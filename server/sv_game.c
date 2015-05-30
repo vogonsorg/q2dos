@@ -385,7 +385,6 @@ void SV_InitGameProgs (void)
 
 	ge = (game_export_t *)Sys_GetGameAPI (&import);
 
-#ifndef GAME_HARD_LINKED
 	if (!ge)
 		Com_Error (ERR_DROP, "failed to load game DLL");
 	if (ge->apiversion != GAME_API_VERSION)
@@ -393,8 +392,8 @@ void SV_InitGameProgs (void)
 		GAME_API_VERSION);
 
 	ge->Init ();
-#endif
-	printf("how to init game?!\n");
-	InitGame();
+	
+	//printf("how to init game?!\n");
+	//InitGame();
 }
 
