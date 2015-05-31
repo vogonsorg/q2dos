@@ -457,8 +457,10 @@ Sys_UnloadGame
 */
 void Sys_UnloadGame (void)
 {
+#ifndef GAME_HARD_LINKED
 	if (!FreeLibrary (game_library))
 		Com_Error (ERR_FATAL, "FreeLibrary failed for game library");
+#endif
 	game_library = NULL;
 }
 
@@ -469,12 +471,20 @@ Sys_GetGameAPI
 Loads the game dll
 =================
 */
+#ifdef GAME_HARD_LINKED
+void *GetGameAPI (void *import);
+#endif	//static game needs a real prototype
+
 void *Sys_GetGameAPI (void *parms)
 {
+#ifndef GAME_HARD_LINKED
+
 	void	*(*GetGameAPI) (void *);
 	char	name[MAX_OSPATH];
 	char	*path;
 	char	cwd[MAX_OSPATH];
+
+
 #if defined _M_IX86
 	const char *gamename = "gamex86.dll";
 
@@ -541,6 +551,7 @@ void *Sys_GetGameAPI (void *parms)
 		Sys_UnloadGame ();		
 		return NULL;
 	}
+#endif	//end of GAME_HARD_LINKED
 
 	return GetGameAPI (parms);
 }
