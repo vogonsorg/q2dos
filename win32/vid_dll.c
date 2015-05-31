@@ -591,13 +591,11 @@ qboolean VID_LoadRefresh( char *name )
 #endif
 	GetRefAPI_t	GetRefAPI;
 	
-//#ifndef REF_HARD_LINKED
 	if ( reflib_active )
 	{
 		re.Shutdown();
 		VID_FreeReflib ();
 	}
-//#endif
 
 	Com_Printf( "------- Loading %s -------\n", name );
 
@@ -630,8 +628,9 @@ qboolean VID_LoadRefresh( char *name )
 #ifndef REF_HARD_LINKED
 	if ( ( GetRefAPI = (void *) GetProcAddress( reflib_library, "GetRefAPI" ) ) == 0 )
 		Com_Error( ERR_FATAL, "GetProcAddress failed on %s", name );
-#else
 
+	re = GetRefAPI( ri );
+#else
 	re.api_version = API_VERSION;
 	re.BeginRegistration = R_BeginRegistration;
     re.RegisterModel = R_RegisterModel;
@@ -639,9 +638,7 @@ qboolean VID_LoadRefresh( char *name )
 	re.RegisterPic = Draw_FindPic;
 	re.SetSky = R_SetSky;
 	re.EndRegistration = R_EndRegistration;
-
 	re.RenderFrame = R_RenderFrame;
-
 	re.DrawGetPicSize = Draw_GetPicSize;
 	re.DrawPic = Draw_Pic;
 	re.DrawStretchPic = Draw_StretchPic;
@@ -649,19 +646,14 @@ qboolean VID_LoadRefresh( char *name )
 	re.DrawTileClear = Draw_TileClear;
 	re.DrawFill = Draw_Fill;
 	re.DrawFadeScreen= Draw_FadeScreen;
-
 	re.DrawStretchRaw = Draw_StretchRaw;
-
 	re.Init = R_Init;
 	re.Shutdown = R_Shutdown;
-
 	re.CinematicSetPalette = R_CinematicSetPalette;
 	re.BeginFrame = R_BeginFrame;
 	re.EndFrame = SWimp_EndFrame;
-
 	re.AppActivate = SWimp_AppActivate;
-
-	Swap_Init ();
+	Swap_Init ();						//This all normally happens when you load the DLL
 #endif
 
 	if (re.api_version != API_VERSION)

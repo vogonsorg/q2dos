@@ -164,11 +164,6 @@ void NET_SendLoopPacket (netsrc_t sock, int length, void *data, netadr_t to)
 
 qboolean	NET_GetPacket (netsrc_t sock, netadr_t *net_from, sizebuf_t *net_message)
 {
-	int 	ret;
-	int		fromlen;
-	int		net_socket;
-	int		protocol;
-	int		err;
 
 	if (NET_GetLoopPacket (sock, net_from, net_message))
 		return true;
@@ -181,8 +176,6 @@ qboolean	NET_GetPacket (netsrc_t sock, netadr_t *net_from, sizebuf_t *net_messag
 
 void NET_SendPacket (netsrc_t sock, int length, void *data, netadr_t to)
 {
-	int		ret;
-	int		net_socket;
 
 	if ( to.type == NA_LOOPBACK )
 	{
