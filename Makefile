@@ -10,7 +10,7 @@ NULL = 	null/cd_null.o \
 	null/sys_null.o \
 	null/in_null.o \
 	null/net_null.o \
-	null/swimp_null.o
+	dos/swimp_dos.o
 
 CLIENT =	client/cl_input.o \
 	client/cl_inv.o \

@@ -21,12 +21,14 @@ void Sys_Error (char *error, ...)
 	vprintf (error,argptr);
 	va_end (argptr);
 	printf ("\n");
-{
+#if 0
+{	//we crash here so we can get a backtrace.  Yes it is ugly, and no this should never be in production!
 	int j,k;
 fflush(stdout);
 	j=0;
-	k=5/j;
+	k=5/j;	//divide by zero!
 }
+#endif
 	exit (1);
 }
 
@@ -39,10 +41,22 @@ void	Sys_UnloadGame (void)
 {
 }
 
+#ifdef GAME_HARD_LINKED
+void *GetGameAPI (void *import);
+
+void	*Sys_GetGameAPI (void *parms)
+{
+
+	return GetGameAPI (parms);
+}
+// needs to be statically linked for null
+#else
 void	*Sys_GetGameAPI (void *parms)
 {
 	return NULL;
 }
+#endif	
+
 
 char *Sys_ConsoleInput (void)
 {
@@ -98,12 +112,12 @@ int		Sys_Milliseconds (void)
 
 void	Sys_Mkdir (char *path)
 {
-printf("Sys_Mkdir [%s]\n UNIMPLEMENTED!\n",path);
+	printf("Sys_Mkdir [%s]: UNIMPLEMENTED!\n",path);
 }
 
 char	*Sys_FindFirst (char *path, unsigned musthave, unsigned canthave)
 {
-printf("Sys_FindFirst [%s]\n UNIMPLEMENTED!\n",path);
+	printf("Sys_FindFirst [%s]: UNIMPLEMENTED!\n",path);
 	return NULL;
 }
 
@@ -129,7 +143,8 @@ void main (int argc, char **argv)
 
 	while (1)
 	{
-		Qcommon_Frame (0.1);
+		//Qcommon_Frame (0.1);
+		Qcommon_Frame (1.1);
 	}
 }
 

@@ -26,3 +26,7 @@ void SNDDMA_BeginPainting (void)
 void SNDDMA_Submit(void)
 {
 }
+
+void S_Activate (qboolean active)
+{
+}

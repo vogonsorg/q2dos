@@ -36,3 +36,6 @@ void IN_DeactivateMouse (void)
 {
 }
 
+void IN_MouseEvent (int mstate)
+{
+}

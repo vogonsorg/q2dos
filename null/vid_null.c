@@ -9,6 +9,7 @@ refexport_t	re;
 
 refexport_t GetRefAPI (refimport_t rimp);
 
+
 /*
 ==========================================================================
 
@@ -49,6 +50,7 @@ void VID_NewWindow (int width, int height)
 {
         viddef.width = width;
         viddef.height = height;
+		printf("VID_NewWindow %d %\n",width,height);
 }
 
 /*
@@ -63,7 +65,8 @@ typedef struct vidmode_s
 
 vidmode_t vid_modes[] =
 {
-    { "Mode 0: 320x240",   320, 240,   0 },
+    //{ "Mode 0: 320x240",   320, 240,   0 },
+    { "Mode 0: 320x200",   320, 200,   0 },
     { "Mode 1: 400x300",   400, 300,   1 },
     { "Mode 2: 512x384",   512, 384,   2 },
     { "Mode 3: 640x480",   640, 480,   3 },
@@ -83,7 +86,7 @@ qboolean VID_GetModeInfo( int *width, int *height, int mode )
 
     *width  = vid_modes[mode].width;
     *height = vid_modes[mode].height;
-printf("VID_GetModeInfo %dx%d mode %d\n",width,height,mode);
+	printf("VID_GetModeInfo %dx%d mode %d\n",width,height,mode);
 
     return true;
 }

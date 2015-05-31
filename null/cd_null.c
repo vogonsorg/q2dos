@@ -1,5 +1,9 @@
 #include "../client/client.h"
 
+void CDAudio_Activate (qboolean active)
+{
+}
+
 void CDAudio_Play(int track, qboolean looping)
 {
 }
