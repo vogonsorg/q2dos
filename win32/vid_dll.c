@@ -542,8 +542,10 @@ void VID_NewWindow ( int width, int height)
 
 void VID_FreeReflib (void)
 {
+#ifndef REF_HARD_LINKED
 	if ( !FreeLibrary( reflib_library ) )
 		Com_Error( ERR_FATAL, "Reflib FreeLibrary failed" );
+#endif	//you can't unload a static thing
 	memset (&re, 0, sizeof(re));
 	reflib_library = NULL;
 	reflib_active  = false;
@@ -554,25 +556,59 @@ void VID_FreeReflib (void)
 VID_LoadRefresh
 ==============
 */
+#ifdef REF_HARD_LINKED
+void    R_BeginRegistration (char *map);
+struct model_s  *R_RegisterModel (char *name);
+struct image_s *R_RegisterSkin (char *name);
+struct image_s  *Draw_FindPic (char *name);
+void R_SetSky (char *name, float rotate, vec3_t axis);
+void R_EndRegistration (void);
+void R_RenderFrame (refdef_t *fd);
+void    Draw_GetPicSize (int *w, int *h, char *name);
+void Draw_Pic (int x, int y, char *name);
+void Draw_StretchPic (int x, int y, int w, int h, char *name);
+void Draw_Char (int x, int y, int num);
+void Draw_TileClear (int x, int y, int w, int h, char *name);
+void Draw_Fill (int x, int y, int w, int h, int c);
+void Draw_FadeScreen (void);
+void    Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data);
+qboolean R_Init( void *hInstance, void *wndProc );
+void R_Shutdown (void);
+void R_CinematicSetPalette( const unsigned char *palette );
+void	 R_BeginFrame( float camera_separation );
+void		SWimp_EndFrame (void);
+void		SWimp_AppActivate( qboolean active );
+
+refimport_t	ri;
+#endif	//prototypes for the video
+
+
+
 qboolean VID_LoadRefresh( char *name )
 {
+#ifndef REF_HARD_LINKED
 	refimport_t	ri;
+#endif
 	GetRefAPI_t	GetRefAPI;
 	
+//#ifndef REF_HARD_LINKED
 	if ( reflib_active )
 	{
 		re.Shutdown();
 		VID_FreeReflib ();
 	}
+//#endif
 
 	Com_Printf( "------- Loading %s -------\n", name );
 
+#ifndef REF_HARD_LINKED
 	if ( ( reflib_library = LoadLibrary( name ) ) == 0 )
 	{
 		Com_Printf( "LoadLibrary(\"%s\") failed\n", name );
 
 		return false;
 	}
+#endif
 
 	ri.Cmd_AddCommand = Cmd_AddCommand;
 	ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
@@ -591,10 +627,42 @@ qboolean VID_LoadRefresh( char *name )
 	ri.Vid_MenuInit = VID_MenuInit;
 	ri.Vid_NewWindow = VID_NewWindow;
 
+#ifndef REF_HARD_LINKED
 	if ( ( GetRefAPI = (void *) GetProcAddress( reflib_library, "GetRefAPI" ) ) == 0 )
 		Com_Error( ERR_FATAL, "GetProcAddress failed on %s", name );
+#else
 
-	re = GetRefAPI( ri );
+	re.api_version = API_VERSION;
+	re.BeginRegistration = R_BeginRegistration;
+    re.RegisterModel = R_RegisterModel;
+    re.RegisterSkin = R_RegisterSkin;
+	re.RegisterPic = Draw_FindPic;
+	re.SetSky = R_SetSky;
+	re.EndRegistration = R_EndRegistration;
+
+	re.RenderFrame = R_RenderFrame;
+
+	re.DrawGetPicSize = Draw_GetPicSize;
+	re.DrawPic = Draw_Pic;
+	re.DrawStretchPic = Draw_StretchPic;
+	re.DrawChar = Draw_Char;
+	re.DrawTileClear = Draw_TileClear;
+	re.DrawFill = Draw_Fill;
+	re.DrawFadeScreen= Draw_FadeScreen;
+
+	re.DrawStretchRaw = Draw_StretchRaw;
+
+	re.Init = R_Init;
+	re.Shutdown = R_Shutdown;
+
+	re.CinematicSetPalette = R_CinematicSetPalette;
+	re.BeginFrame = R_BeginFrame;
+	re.EndFrame = SWimp_EndFrame;
+
+	re.AppActivate = SWimp_AppActivate;
+
+	Swap_Init ();
+#endif
 
 	if (re.api_version != API_VERSION)
 	{
@@ -684,6 +752,7 @@ void VID_CheckChanges (void)
 				Con_ToggleConsole_f();
 			}
 		}
+				Cvar_Set( "vid_ref", "soft" );
 		cls.disable_screen = false;
 	}
 

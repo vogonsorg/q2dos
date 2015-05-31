@@ -318,6 +318,7 @@ qboolean R_Init( void *hInstance, void *wndProc )
 
 // TODO: collect 386-specific code in one place
 #if	id386
+#error
 	Sys_MakeCodeWriteable ((long)R_EdgeCodeStart,
 					     (long)R_EdgeCodeEnd - (long)R_EdgeCodeStart);
 	Sys_SetFPCW ();		// get bit masks for FPCW	(FIXME: is this id386?)
