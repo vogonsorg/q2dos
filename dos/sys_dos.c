@@ -19,7 +19,6 @@
 #include "../client/keys.h"
 #include "errno.h"
 
-// FS: TODO FIXME FIXME PLEASE PLEASE.  >> Take DOS_V2.C from Quake1 and SYS_DOS.C from Quake1.  Clean up this crap :S
 int _crt0_startup_flags = _CRT0_FLAG_UNIX_SBRK; // FS: Fake Mem Fix (QIP)
 #define KEYBUF_SIZE     256
 static unsigned char    keybuf[KEYBUF_SIZE];
@@ -146,6 +145,7 @@ void	*Sys_GetGameAPI (void *parms)
 // FS: Doesn't work
 char *Sys_ConsoleInput (void)
 {
+#if 0
 	static char     text[256];
 	static int      len = 0;
 	char            ch;
@@ -184,13 +184,14 @@ char *Sys_ConsoleInput (void)
 			len = (len + 1) & 0xff;
 			break;
 	}
-
+#endif
 	return NULL;
 }
 
 void	Sys_ConsoleOutput (char *string)
 {
 //printf("Sys_ConsoleOutput: %s",string);
+//	if (dedicated || dedicated->value)
 //		printf("%s",string);
 }
 
@@ -308,7 +309,6 @@ int		Hunk_End (void)
 
 int		Sys_Milliseconds (void)
 {
-#if 1
 	struct timeval tp;
 	struct timezone tzp;
 	static int		secbase;
@@ -324,15 +324,12 @@ int		Sys_Milliseconds (void)
 	curtime = (tp.tv_sec - secbase)*1000 + tp.tv_usec/1000;
 	
 	return curtime;
-#else // FS: Busted :(
-	curtime = (int)uclock() / (int)UCLOCKS_PER_SEC;
-	return curtime;  //FS: Accurate Clock (QIP)
-#endif
 }
 
 void	Sys_Mkdir (char *path)
 {
-	mkdir (path, 0777);
+//	mkdir (path, 0777);
+	printf("Sys_Mkdir [%s]: UNIMPLEMENTED!\n",path);
 }
 
 char	*Sys_FindFirst (char *path, unsigned musthave, unsigned canthave)
@@ -363,7 +360,7 @@ int main (int argc, char **argv)
 	Sys_Init();
 	Qcommon_Init (argc, argv);
 	oldtime = Sys_Milliseconds ();
-	dos_registerintr(9, TrapKey); // FS: FIXME FREE THIS WHEN CLOSED
+	dos_registerintr(9, TrapKey);
 
     /* main window message loop */
 	while (1)
@@ -379,5 +376,3 @@ int main (int argc, char **argv)
 	}
 	return oldtime; // FS: Compiler warning
 }
-
-

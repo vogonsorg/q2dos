@@ -13,6 +13,7 @@ DOS = 	dos/cd_dos.o \
 	dos/sys_dos.o \
 	dos/in_dos.o \
 	dos/net_dos.o \
+	dos/dos_v2.o \
 	dos/swimp_dos.o
 
 CLIENT = client/cl_input.o \
