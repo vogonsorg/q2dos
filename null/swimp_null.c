@@ -1,26 +1,31 @@
 #include "../ref_soft/r_local.h"
 
-void		SWimp_BeginFrame( float camera_separation )
+void	SWimp_BeginFrame( float camera_separation )
 {
 	printf("b");
 	fflush(stdout);
 }
 
-void		SWimp_EndFrame (void)
+void	SWimp_EndFrame (void)
 {
 	printf(".");
 	fflush(stdout);
 }
 
-int			SWimp_Init( void *hInstance, void *wndProc )
+int	SWimp_Init( void *hInstance, void *wndProc )
 {
-	printf("SWimp_Init windows only?\n");
 	return 0;
 }
 
-void		SWimp_SetPalette( const unsigned char *palette)
+/*
+** SWimp_SetPalette
+**
+** System specific palette setting routine.  A NULL palette means
+** to use the existing palette.  The palette is expected to be in
+** a padded 4-byte xRGB format.
+*/
+void	SWimp_SetPalette( const unsigned char *palette)
 {
-	printf("SWimp_SetPalette\n");
 }
 
 void		SWimp_Shutdown( void )

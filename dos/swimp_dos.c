@@ -3,42 +3,47 @@
 #include <pc.h>
 
 
-void		SWimp_BeginFrame( float camera_separation )
+void	SWimp_BeginFrame( float camera_separation )
 {
 //	printf("b");
 //	fflush(stdout);
 }
 
-static int wtf;
-void		SWimp_EndFrame (void)
+void	SWimp_EndFrame (void)
 {
-unsigned lol[256*3];
-int j;
+	//For now it's hardcoded to mode 13
 	dosmemput(vid.buffer,320*200,0xA0000);
-#if 0
-//Mess with the palette to prove we didn't crash
-memcpy(lol,vid.buffer,256*3);
-for(j=0;j<256*3;j++)
-	lol[j]=lol[j]+wtf;
-wtf++;
-SWimp_SetPalette(lol);
-#endif
 }
 
-int			SWimp_Init( void *hInstance, void *wndProc )
+int	SWimp_Init( void *hInstance, void *wndProc )
 {
-	printf("SWimp_Init windows only?\n");
+//	printf("SWimp_Init windows only?\n");
 	return 0;
 }
 
-void		SWimp_SetPalette( const unsigned char *pal)
+/*
+** SWimp_SetPalette
+**
+** System specific palette setting routine.  A NULL palette means
+** to use the existing palette.  The palette is expected to be in
+** a padded 4-byte xRGB format.
+*/
+void	SWimp_SetPalette( const unsigned char *palette)
 {
-	int shiftcomponents=2;
-	int i;
+int shiftcomponents;
+int i;
 
-	outportb(0x3c8, 0);
-	for (i=0 ; i<768 ; i++)
-		outportb(0x3c9, (pal[i]>>shiftcomponents));
+if(palette==NULL)
+	return;
+
+shiftcomponents=2;
+outp(0x3c8,0);	//this means we are going to set the pallette
+for(i=0;i<1024;i++){	//we do it this way to skip a byte since it's padded
+        outp(0x3c9,palette[i]>>shiftcomponents);i++;
+        outp(0x3c9,palette[i]>>shiftcomponents);i++;
+        outp(0x3c9,palette[i]>>shiftcomponents);i++;
+	}
+
 }
 
 void		SWimp_Shutdown( void )
