@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define	MAXPRINTMSG	4096
 
-#define MAX_NUM_ARGVS	50
+//#define MAX_NUM_ARGVS	50
 
 
 int		com_argc;
@@ -1577,6 +1577,65 @@ void Qcommon_Frame (int msec)
 		Com_Printf ("all:%3i sv:%3i gm:%3i cl:%3i rf:%3i\n",
 			all, sv, gm, cl, rf);
 	}	
+}
+
+// FS: From Q1
+int Q_atoi (char *str)
+{
+	int             val;
+	int             sign;
+	int             c;
+	
+	if (*str == '-')
+	{
+		sign = -1;
+		str++;
+	}
+	else
+		sign = 1;
+		
+	val = 0;
+
+//
+// check for hex
+//
+	if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X') )
+	{
+		str += 2;
+		while (1)
+		{
+			c = *str++;
+			if (c >= '0' && c <= '9')
+				val = (val<<4) + c - '0';
+			else if (c >= 'a' && c <= 'f')
+				val = (val<<4) + c - 'a' + 10;
+			else if (c >= 'A' && c <= 'F')
+				val = (val<<4) + c - 'A' + 10;
+			else
+				return val*sign;
+		}
+	}
+	
+//
+// check for character
+//
+	if (str[0] == '\'')
+	{
+		return sign * str[1];
+	}
+	
+//
+// assume decimal
+//
+	while (1)
+	{
+		c = *str++;
+		if (c <'0' || c > '9')
+			return val*sign;
+		val = val*10 + c - '0';
+	}
+	
+	return 0;
 }
 
 /*

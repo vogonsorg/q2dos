@@ -828,4 +828,10 @@ void SV_Shutdown (char *finalmsg, qboolean reconnect);
 void SV_Frame (int msec);
 
 
+// FS: DOS shit
+#define MAX_NUM_ARGVS	50
 
+
+extern	int		com_argc;
+extern	char	*com_argv[MAX_NUM_ARGVS+1];
+int Q_atoi (char *str); // FS: From Q1

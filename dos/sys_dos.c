@@ -92,9 +92,332 @@ void TrapKey(void)
 #define SC_RIGHTSHIFT   0x36
 #define SC_RIGHTARROW   0x4d
 
+#define STDOUT 1
 int	curtime;
 unsigned	sys_msg_time;
 unsigned	sys_frame_time;
+int	sys_checksum;
+
+void MaskExceptions (void);
+void Sys_PushFPCW_SetHigh (void);
+void Sys_PopFPCW (void);
+double Sys_FloatTime (void);
+
+#define LEAVE_FOR_CACHE (512*1024)              //FIXME: tune
+#define LOCKED_FOR_MALLOC (128*1024)    //FIXME: tune
+#define MINIMUM_WIN_MEMORY                      0x800000
+#define MINIMUM_WIN_MEMORY_LEVELPAK     (MINIMUM_WIN_MEMORY + 0x100000)
+
+int                     end_of_memory;
+qboolean        lockmem, lockunlockmem, unlockmem;
+static int      win95;
+extern char     start_of_memory __asm__("start");
+static int                      minmem;
+
+void Sys_DetectWin95 (void)
+{
+	__dpmi_regs                             r;
+
+	r.x.ax = 0x160a;                /* Get Windows Version */
+	__dpmi_int(0x2f, &r);
+
+	if(r.x.ax || r.h.bh < 4)        /* Not windows or earlier than Win95 */
+	{
+		win95 = 0;
+		lockmem = true;
+		lockunlockmem = false;
+		unlockmem = true;
+	}
+	else
+	{
+		printf("Microsoft Windows detected.  Please run Q2DOS in pure MS-DOS for best stability.\n"); // FS: Warning
+		win95 = 1;
+		lockunlockmem = COM_CheckParm ("-winlockunlock");
+
+		if (lockunlockmem)
+			lockmem = true;
+		else
+			lockmem = COM_CheckParm ("-winlock");
+
+		unlockmem = lockmem && !lockunlockmem;
+	}
+}
+
+void *dos_getmaxlockedmem(int *size)
+{
+	__dpmi_free_mem_info    meminfo;
+	__dpmi_meminfo                  info;
+	int                                             working_size;
+	void                                    *working_memory;
+	int                                             last_locked;
+        //int                                             extra,  i, j, allocsize;
+	int                                     i, j, extra, allocsize; // FS: 2GB Fix
+	static char                             *msg = "Locking data...";
+	// int                                             m, n;
+	byte                                    *x;
+	unsigned long   ul; // FS: 2GB Fix
+
+// first lock all the current executing image so the locked count will
+// be accurate.  It doesn't hurt to lock the memory multiple times
+	last_locked = __djgpp_selector_limit + 1;
+	info.size = last_locked - 4096;
+	info.address = __djgpp_base_address + 4096;
+
+	if (lockmem)
+	{
+		if(__dpmi_lock_linear_region(&info))
+		{
+			Sys_Error ("Lock of current memory at 0x%lx for %ldKb failed!\n",
+						info.address, info.size/1024);
+		}
+	}
+
+	__dpmi_get_free_memory_information(&meminfo);
+
+	if (!win95)             /* Not windows or earlier than Win95 */
+	{
+		//working_size = meminfo.maximum_locked_page_allocation_in_pages * 4096;
+		ul = meminfo.maximum_locked_page_allocation_in_pages * 4096; // FS: 2GB fix
+	}
+	else
+	{
+//                working_size = meminfo.largest_available_free_block_in_bytes -
+//                                LEAVE_FOR_CACHE;
+		ul = meminfo.largest_available_free_block_in_bytes -
+		LEAVE_FOR_CACHE; // FS: 2GB fix
+	}
+
+        if (ul > 0x7fffffff)
+                ul = 0x7fffffff; /* limit to 2GB */
+        working_size = (int) ul;
+	working_size &= ~0xffff;                /* Round down to 64K */
+	working_size += 0x10000;
+
+	do
+	{
+		working_size -= 0x10000;                /* Decrease 64K and try again */
+		working_memory = sbrk(working_size);
+	} while (working_memory == (void *)-1);
+
+	extra = 0xfffc - ((unsigned)sbrk(0) & 0xffff);
+
+	if (extra > 0)
+	{
+		sbrk(extra);
+		working_size += extra;
+	}
+
+// now grab the memory
+	info.address = last_locked + __djgpp_base_address;
+
+	if (!win95)
+	{
+	    info.size = __djgpp_selector_limit + 1 - last_locked;
+
+		while (info.size > 0 && __dpmi_lock_linear_region(&info))
+		{
+			info.size -= 0x1000;
+			working_size -= 0x1000;
+			sbrk(-0x1000);
+		}
+	}
+	else
+	{                       /* Win95 section */
+		j = COM_CheckParm("-winmem");
+
+		minmem = MINIMUM_WIN_MEMORY;
+
+		if (j)
+		{
+			allocsize = ((int)(Q_atoi(com_argv[j+1]))) * 0x100000 +
+					LOCKED_FOR_MALLOC;
+
+			if (allocsize < (minmem + LOCKED_FOR_MALLOC))
+				allocsize = minmem + LOCKED_FOR_MALLOC;
+		}
+		else
+		{
+			allocsize = minmem + LOCKED_FOR_MALLOC;
+		}
+
+		if (!lockmem)
+		{
+		// we won't lock, just sbrk the memory
+			info.size = allocsize;
+			goto UpdateSbrk;
+		}
+
+		// lock the memory down
+		write (STDOUT, msg, strlen (msg));
+
+		for (j=allocsize ; j>(minmem + LOCKED_FOR_MALLOC) ;
+			 j -= 0x100000)
+		{
+			info.size = j;
+	
+			if (!__dpmi_lock_linear_region(&info))
+				goto Locked;
+	
+			write (STDOUT, ".", 1);
+		}
+
+	// finally, try with the absolute minimum amount
+		for (i=0 ; i<10 ; i++)
+		{
+			info.size = minmem + LOCKED_FOR_MALLOC;
+
+			if (!__dpmi_lock_linear_region(&info))
+				goto Locked;
+		}
+
+                Sys_Error ("Can't lock memory; %ld Mb lockable RAM required. "
+				   "Try shrinking smartdrv.", info.size / 0x100000);
+
+Locked:
+
+UpdateSbrk:
+
+		info.address += info.size;
+		info.address -= __djgpp_base_address + 4; // ending point, malloc align
+		working_size = info.address - (int)working_memory;
+		sbrk(info.address-(int)sbrk(0));                // negative adjustment
+	}
+
+
+	if (lockunlockmem)
+	{
+		__dpmi_unlock_linear_region (&info);
+		printf ("Locked and unlocked %d Mb data\n", working_size / 0x100000);
+	}
+	else if (lockmem)
+	{
+		printf ("Locked %d Mb data\n", working_size / 0x100000);
+	}
+	else
+	{
+		printf ("Allocated %d Mb data\n", working_size / 0x100000);
+	}
+
+// touch all the memory to make sure it's there. The 16-page skip is to
+// keep Win 95 from thinking we're trying to page ourselves in (we are
+// doing that, of course, but there's no reason we shouldn't)
+	x = (byte *)working_memory;
+
+        for (j=0 ; j<4 ; j++) // FS: 2GB Fix
+	{
+                for (i=0 ; i<(working_size - 16 * 0x1000) ; i += 4)
+		{
+                        sys_checksum += *(int *)&x[i];
+                        sys_checksum += *(int *)&x[i + 16 * 0x1000];
+		}
+	}
+
+// give some of what we locked back for malloc before returning.  Done
+// by cheating and passing a negative value to sbrk
+	working_size -= LOCKED_FOR_MALLOC;
+	sbrk( -(LOCKED_FOR_MALLOC));
+	*size = working_size;
+	return working_memory;
+}
+
+void Sys_GetMemory(void)
+{
+// FS: TODO FIXME FIXME doesn't have quakeparms.memsize or anything that I see
+#if 0
+	int             j, tsize;
+
+	j = COM_CheckParm("-mem");
+	if (j)
+	{
+		quakeparms.memsize = (int) (Q_atof(com_argv[j+1]) * 1024 * 1024);
+		quakeparms.membase = malloc (quakeparms.memsize);
+	}
+	else
+	{
+		int j;
+		//quakeparms.membase = dos_getmaxlockedmem (&quakeparms.memsize);
+
+		if (extended_mod) // FS: We're not foolin' around with big boy mods...
+			j=64;
+		else
+			j=32; // FS: from QW
+		quakeparms.memsize = (int) j * 1024 * 1024; 
+		quakeparms.membase = malloc (quakeparms.memsize);
+	}
+
+	fprintf(stderr, "malloc'd: %d\n", quakeparms.memsize);
+
+	if (COM_CheckParm ("-noclear")) // FS: Wanted the option
+	{
+		return;
+	}
+	else
+	{
+		printf("Clearing allocated memory...\n");
+		memset(quakeparms.membase,0x0,quakeparms.memsize); // JASON: Clear memory on startup
+		printf("Done!  Continuing to load Quake.\n");
+	}
+
+	if (COM_CheckParm ("-heapsize"))
+	{
+		tsize = Q_atoi (com_argv[COM_CheckParm("-heapsize") + 1]) * 1024;
+
+		if (tsize < quakeparms.memsize)
+			quakeparms.memsize = tsize;
+	}
+#endif
+}
+
+/*
+================
+Sys_PageInProgram
+
+walks the text, data, and bss to make sure it's all paged in so that the
+actual physical memory detected by Sys_GetMemory is correct.
+================
+*/
+void Sys_PageInProgram(void)
+{
+	int             i, j;
+
+	end_of_memory = (int)sbrk(0);
+
+	if (lockmem)
+	{
+		if (dos_lockmem ((void *)&start_of_memory,
+						 end_of_memory - (int)&start_of_memory))
+			Sys_Error ("Couldn't lock text and data");
+	}
+
+	if (lockunlockmem)
+	{
+		dos_unlockmem((void *)&start_of_memory,
+						 end_of_memory - (int)&start_of_memory);
+		printf ("Locked and unlocked %d Mb image\n",
+				(end_of_memory - (int)&start_of_memory) / 0x100000);
+	}
+	else if (lockmem)
+	{
+		printf ("Locked %d Mb image\n",
+				(end_of_memory - (int)&start_of_memory) / 0x100000);
+	}
+	else
+	{
+		printf ("Loaded %d Mb image\n",
+				(end_of_memory - (int)&start_of_memory) / 0x100000);
+	}
+
+// touch the entire image, doing the 16-page skip so Win95 doesn't think we're
+// trying to page ourselves in
+	for (j=0 ; j<4 ; j++)
+	{
+		for(i=(int)&start_of_memory ; i<(end_of_memory - 16 * 0x1000) ; i += 4)
+		{
+			sys_checksum += *(int *)i;
+			sys_checksum += *(int *)(i + 16 * 0x1000);
+		}
+	}
+}
 
 void Sys_Error (char *error, ...)
 {
@@ -119,6 +442,12 @@ fflush(stdout);
 void Sys_Quit (void)
 {
 	dos_restoreintr(9); // FS: Give back the keyboard
+	if (unlockmem)
+	{
+		dos_unlockmem (&start_of_memory,
+					   end_of_memory - (int)&start_of_memory);
+//		dos_unlockmem (quakeparms.membase, quakeparms.memsize);
+	}
 	exit (0);
 }
 
@@ -207,8 +536,7 @@ void Sys_SendKeyEvents (void)
 
 	while (keybuf_head != keybuf_tail)
 	{
-		sys_msg_time = Sys_Milliseconds();
-//		sys_frame_time = Sys_Milliseconds();
+		sys_msg_time = Sys_Milliseconds();//Sys_FloatTime();
 		k = keybuf[keybuf_tail++];
 		keybuf_tail &= (KEYBUF_SIZE-1);
 
@@ -219,7 +547,7 @@ void Sys_SendKeyEvents (void)
 			continue;                               // pause key bullshit
 		if (k==0xc5 && next == 0x9d) 
 		{ 
-			Key_Event (K_PAUSE, true, sys_msg_time); // FS: FIXME is Sys_Milliseconds() right?
+			Key_Event (K_PAUSE, true, sys_msg_time);
 			continue; 
 		} 
 
@@ -239,11 +567,11 @@ void Sys_SendKeyEvents (void)
 
 		if (k & 0x80)
 		{
-			Key_Event (outkey, false, sys_msg_time); // FS: FIXME is Sys_Milliseconds() right?
+			Key_Event (outkey, false, sys_msg_time);
 		}
 		else
 		{
-			Key_Event (outkey, true, sys_msg_time); // FS: FIXME is Sys_Milliseconds() right?
+			Key_Event (outkey, true, sys_msg_time);
 		}
 	}
 }
@@ -425,13 +753,28 @@ void Sys_FindClose (void)
 
 void	Sys_Init (void)
 {
+	MaskExceptions ();
+
+	Sys_SetFPCW ();
+
+	_go32_interrupt_stack_size = 4 * 1024;;
+	_go32_rmcb_stack_size = 4 * 1024;
+}
+
+double Sys_FloatTime (void)
+{
+	return (double) uclock() / (double) UCLOCKS_PER_SEC; // FS: Win9X/Fast PC Fix (QIP)
 }
 
 //=============================================================================
 
 int main (int argc, char **argv)
 {
-	int	time, oldtime, newtime;
+	int time, oldtime, newtime;
+
+	Sys_DetectWin95 ();
+	Sys_PageInProgram ();
+	Sys_GetMemory ();
 
 	Sys_Init();
 	Qcommon_Init (argc, argv);
@@ -450,5 +793,17 @@ int main (int argc, char **argv)
 		sys_frame_time = newtime; // FS: Need to update this for input to work properly
 		oldtime = newtime;
 	}
-	return oldtime; // FS: Compiler warning
+#if 0
+//Con_Printf ("Top of stack: 0x%x\n", &time);
+	oldtime = Sys_FloatTime ();
+	while (1)
+	{
+		newtime = Sys_FloatTime ();
+		time = newtime - oldtime;
+		Qcommon_Frame (time);
+		sys_frame_time = newtime; // FS: Need to update this for input to work properly
+		oldtime = newtime;
+	}
+#endif
+//	return oldtime; // FS: Compiler warning
 }
