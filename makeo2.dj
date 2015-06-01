@@ -1,6 +1,7 @@
 #CC = gcc-4.2
 #CFLAGS = -arch i386 -g -O0
-CC = i586-pc-msdosdjgpp-gcc
+#CC = i586-pc-msdosdjgpp-gcc
+CC = gcc
 CFLAGS = -g -O2 
 SFLAGS = -DREF_HARD_LINKED -DGAME_HARD_LINKED
 WCFLAGS = -I wattcp/inc
@@ -13,6 +14,7 @@ DOS = 	dos/cd_dos.o \
 	dos/in_dos.o \
 	dos/net_udp.o \
 	dos/dos_v2.o \
+	dos/glob.o \
 	dos/swimp_dos.o
 
 CLIENT =	client/cl_input.o \
