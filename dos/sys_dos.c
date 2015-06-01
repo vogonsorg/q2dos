@@ -8,12 +8,121 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/time.h>
+#include <sys/nearptr.h>
+#include <dpmi.h>
+#include <conio.h>
+#include <bios.h>
+#include <crt0.h> // FS: Fake Mem Fix (QIP)
 
 #include "../qcommon/qcommon.h"
+#include "../client/keys.h"
 #include "errno.h"
 
-int	curtime;
+// FS: TODO FIXME FIXME PLEASE PLEASE.  >> Take DOS_V2.C from Quake1 and SYS_DOS.C from Quake1.  Clean up this crap :S
+int _crt0_startup_flags = _CRT0_FLAG_UNIX_SBRK; // FS: Fake Mem Fix (QIP)
+#define KEYBUF_SIZE     256
+static unsigned char    keybuf[KEYBUF_SIZE];
+static int                              keybuf_head=0;
+static int                              keybuf_tail=0;
 
+byte        scantokey[128] = 
+					{ 
+//  0           1       2       3       4       5       6       7 
+//  8           9       A       B       C       D       E       F 
+	0  ,    27,     '1',    '2',    '3',    '4',    '5',    '6', 
+	'7',    '8',    '9',    '0',    '-',    '=',    K_BACKSPACE, 9, // 0 
+	'q',    'w',    'e',    'r',    't',    'y',    'u',    'i', 
+	'o',    'p',    '[',    ']',    13 ,    K_CTRL,'a',  's',      // 1 
+	'd',    'f',    'g',    'h',    'j',    'k',    'l',    ';', 
+	'\'' ,    '`',    K_SHIFT,'\\',  'z',    'x',    'c',    'v',      // 2 
+	'b',    'n',    'm',    ',',    '.',    '/',    K_SHIFT,'*', 
+	K_ALT,' ',   0  ,    K_F1, K_F2, K_F3, K_F4, K_F5,   // 3 
+	K_F6, K_F7, K_F8, K_F9, K_F10,0  ,    0  , K_HOME, 
+	K_UPARROW,K_PGUP,'-',K_LEFTARROW,'5',K_RIGHTARROW,'+',K_END, //4 
+	K_DOWNARROW,K_PGDN,K_INS,K_DEL,0,0,             0,              K_F11, 
+	K_F12,0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 5 
+	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
+	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 6 
+	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
+	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0         // 7 
+					}; 
+
+byte        shiftscantokey[128] = 
+					{ 
+//  0           1       2       3       4       5       6       7 
+//  8           9       A       B       C       D       E       F 
+	0  ,    27,     '!',    '@',    '#',    '$',    '%',    '^', 
+	'&',    '*',    '(',    ')',    '_',    '+',    K_BACKSPACE, 9, // 0 
+	'Q',    'W',    'E',    'R',    'T',    'Y',    'U',    'I', 
+	'O',    'P',    '{',    '}',    13 ,    K_CTRL,'A',  'S',      // 1 
+	'D',    'F',    'G',    'H',    'J',    'K',    'L',    ':', 
+	'"' ,    '~',    K_SHIFT,'|',  'Z',    'X',    'C',    'V',      // 2 
+	'B',    'N',    'M',    '<',    '>',    '?',    K_SHIFT,'*', 
+	K_ALT,' ',   0  ,    K_F1, K_F2, K_F3, K_F4, K_F5,   // 3 
+	K_F6, K_F7, K_F8, K_F9, K_F10,0  ,    0  , K_HOME, 
+	K_UPARROW,K_PGUP,'_',K_LEFTARROW,'%',K_RIGHTARROW,'+',K_END, //4 
+	K_DOWNARROW,K_PGDN,K_INS,K_DEL,0,0,             0,              K_F11, 
+	K_F12,0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 5 
+	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
+	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 6 
+	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
+	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0         // 7 
+					}; 
+
+int dos_inportb(int port)
+{
+	return inportb(port);
+}
+
+int dos_inportw(int port)
+{
+	return inportw(port);
+}
+
+void dos_outportb(int port, int val)
+{
+	outportb(port, val);
+}
+
+void dos_outportw(int port, int val)
+{
+	outportw(port, val);
+}
+
+void dos_irqenable(void)
+{
+	enable();
+}
+
+void dos_irqdisable(void)
+{
+	disable();
+}
+
+void TrapKey(void)
+{
+//      static int ctrl=0;
+	keybuf[keybuf_head] = dos_inportb(0x60);
+	dos_outportb(0x20, 0x20);
+	/*
+	if (scantokey[keybuf[keybuf_head]&0x7f] == K_CTRL)
+		ctrl=keybuf[keybuf_head]&0x80;
+	if (ctrl && scantokey[keybuf[keybuf_head]&0x7f] == 'c')
+		Sys_Error("ctrl-c hit\n");
+	*/
+	keybuf_head = (keybuf_head + 1) & (KEYBUF_SIZE-1);
+}
+
+#define SC_UPARROW              0x48
+#define SC_DOWNARROW    0x50
+#define SC_LEFTARROW            0x4b
+#define SC_RIGHTARROW   0x4d
+#define SC_LEFTSHIFT   0x2a
+#define SC_RIGHTSHIFT   0x36
+#define SC_RIGHTARROW   0x4d
+
+int	curtime;
+//unsigned	sys_msg_time;
 unsigned	sys_frame_time;
 
 
@@ -78,8 +187,52 @@ void	Sys_ConsoleOutput (char *string)
 printf("%s",string);
 }
 
+#define SC_RSHIFT       0x36 
+#define SC_LSHIFT       0x2a 
 void Sys_SendKeyEvents (void)
 {
+	int k, next;
+	int outkey;
+
+// get key events
+
+	while (keybuf_head != keybuf_tail)
+	{
+
+		k = keybuf[keybuf_tail++];
+		keybuf_tail &= (KEYBUF_SIZE-1);
+
+		if (k==0xe0)
+			continue;               // special / pause keys
+		next = keybuf[(keybuf_tail-2)&(KEYBUF_SIZE-1)];
+		if (next == 0xe1)
+			continue;                               // pause key bullshit
+		if (k==0xc5 && next == 0x9d) 
+		{ 
+			Key_Event (K_PAUSE, true, Sys_Milliseconds()); // FS: FIXME is Sys_Milliseconds() right?
+			continue; 
+		} 
+
+		// extended keyboard shift key bullshit 
+		if ( (k&0x7f)==SC_LSHIFT || (k&0x7f)==SC_RSHIFT ) 
+		{ 
+			if ( keybuf[(keybuf_tail-2)&(KEYBUF_SIZE-1)]==0xe0 ) 
+				continue; 
+			k &= 0x80; 
+			k |= SC_RSHIFT; 
+		} 
+
+		if (k==0xc5 && keybuf[(keybuf_tail-2)&(KEYBUF_SIZE-1)] == 0x9d)
+			continue; // more pause bullshit
+
+		outkey = scantokey[k & 0x7f];
+
+		if (k & 0x80)
+			Key_Event (outkey, false, Sys_Milliseconds()); // FS: FIXME is Sys_Milliseconds() right?
+		else
+			Key_Event (outkey, true, Sys_Milliseconds()); // FS: FIXME is Sys_Milliseconds() right?
+
+	}
 }
 
 void Sys_AppActivate (void)
@@ -184,6 +337,55 @@ void	Sys_FindClose (void)
 void	Sys_Init (void)
 {
 }
+static struct handlerhistory_s
+{
+	int intr;
+	_go32_dpmi_seginfo pm_oldvec;
+} handlerhistory[4];
+
+static int handlercount=0;
+
+void	dos_registerintr(int intr, void (*handler)(void))
+{
+	_go32_dpmi_seginfo info;
+	struct handlerhistory_s *oldstuff;
+
+	oldstuff = &handlerhistory[handlercount];
+
+// remember old handler
+	_go32_dpmi_get_protected_mode_interrupt_vector(intr, &oldstuff->pm_oldvec);
+	oldstuff->intr = intr;
+
+	info.pm_offset = (int) handler;
+	_go32_dpmi_allocate_iret_wrapper(&info);
+
+// set new protected mode handler
+	_go32_dpmi_set_protected_mode_interrupt_vector(intr, &info);
+
+	handlercount++;
+
+}
+
+void	dos_restoreintr(int intr)
+{
+
+	int i;
+	struct handlerhistory_s *oldstuff;
+
+// find and reinstall previous interrupt
+	for (i=0 ; i<handlercount ; i++)
+	{
+		oldstuff = &handlerhistory[i];
+		if (oldstuff->intr == intr)
+		{
+			_go32_dpmi_set_protected_mode_interrupt_vector(intr,
+				&oldstuff->pm_oldvec);
+			oldstuff->intr = -1;
+			break;
+		}
+	}
+
+}
 
 
 //=============================================================================
@@ -194,6 +396,7 @@ void main (int argc, char **argv)
 
 	Qcommon_Init (argc, argv);
 	oldtime = Sys_Milliseconds ();
+	dos_registerintr(9, TrapKey); // FS: FIXME FREE THIS WHEN CLOSED
 
     /* main window message loop */
 	while (1)
