@@ -15,14 +15,14 @@ void		SWimp_EndFrame (void)
 unsigned lol[256*3];
 int j;
 	dosmemput(vid.buffer,320*200,0xA0000);
+#if 0
 //Mess with the palette to prove we didn't crash
 memcpy(lol,vid.buffer,256*3);
 for(j=0;j<256*3;j++)
 	lol[j]=lol[j]+wtf;
-
 wtf++;
-
 SWimp_SetPalette(lol);
+#endif
 }
 
 int			SWimp_Init( void *hInstance, void *wndProc )

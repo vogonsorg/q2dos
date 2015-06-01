@@ -65,8 +65,7 @@ typedef struct vidmode_s
 
 vidmode_t vid_modes[] =
 {
-    //{ "Mode 0: 320x240",   320, 240,   0 },
-    { "Mode 0: 320x200",   320, 200,   0 },
+    /*{ "Mode 0: 320x240",   320, 240,   0 },
     { "Mode 1: 400x300",   400, 300,   1 },
     { "Mode 2: 512x384",   512, 384,   2 },
     { "Mode 3: 640x480",   640, 480,   3 },
@@ -76,6 +75,8 @@ vidmode_t vid_modes[] =
     { "Mode 7: 1152x864",  1152, 864,  7 },
     { "Mode 8: 1280x960",  1280, 960, 8 },
     { "Mode 9: 1600x1200", 1600, 1200, 9 }
+*/
+    { "Mode 0: 320x200", 320, 200, 0 }
 };
 #define VID_NUM_MODES ( sizeof( vid_modes ) / sizeof( vid_modes[0] ) )
 
@@ -97,7 +98,7 @@ void	VID_Init (void)
     refimport_t	ri;
 
     viddef.width = 320;
-    viddef.height = 240;
+    viddef.height = 200; //was originally 240
 
     ri.Cmd_AddCommand = Cmd_AddCommand;
     ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
@@ -109,13 +110,13 @@ void	VID_Init (void)
     ri.FS_LoadFile = FS_LoadFile;
     ri.FS_FreeFile = FS_FreeFile;
     ri.FS_Gamedir = FS_Gamedir;
-	ri.Vid_NewWindow = VID_NewWindow;
+    ri.Vid_NewWindow = VID_NewWindow;
     ri.Cvar_Get = Cvar_Get;
     ri.Cvar_Set = Cvar_Set;
     ri.Cvar_SetValue = Cvar_SetValue;
     ri.Vid_GetModeInfo = VID_GetModeInfo;
 
-    //JASON this is called from a DLL
+    //JASON this is called from the video DLL
     re = GetRefAPI(ri);
 
     if (re.api_version != API_VERSION)

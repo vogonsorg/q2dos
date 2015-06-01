@@ -55,10 +55,10 @@ void *GetGameAPI (void *import);
 
 void	*Sys_GetGameAPI (void *parms)
 {
-
 	return GetGameAPI (parms);
 }
 // needs to be statically linked for null
+// otherwise it sits here to satisfy the linker AFIK
 #else
 void	*Sys_GetGameAPI (void *parms)
 {
