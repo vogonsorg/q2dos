@@ -65,8 +65,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #else	// !WIN32
 
+#ifdef __DJGPP__
+#define BUILDSTRING "MS-DOS/DJGPP"
+#define	CPUSTRING	"i386"
+#else
 #define BUILDSTRING "NON-WIN32"
 #define	CPUSTRING	"NON-WIN32"
+#endif
 
 #endif
 
