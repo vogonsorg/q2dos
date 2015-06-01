@@ -1,0 +1,16 @@
+# ignore all make dependency files
+*.d
+*.o
+*.ncb
+*.opt
+*.plg
+*.suo
+*.user
+*.aps
+*.clwbin/
+# ignore all the windows binaries - they shouldn't be committed! 
+Debug/
+Release/
+out.txt
+q2.exe
+q2
