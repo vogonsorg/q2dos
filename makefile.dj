@@ -1,18 +1,19 @@
 #CC = gcc-4.2
 #CFLAGS = -arch i386 -g -O0
-CC = gcc #i586-pc-msdosdjgpp-gcc
+#CC = gcc 
+CC = i586-pc-msdosdjgpp-gcc
 CFLAGS = -g -O0
 SFLAGS = -DREF_HARD_LINKED -DGAME_HARD_LINKED
 
-NULL = 	null/cd_null.o \
-	null/vid_null.o \
-	null/snddma_null.o \
-	null/sys_null.o \
-	null/in_null.o \
-	null/net_null.o \
+DOS = 	dos/cd_dos.o \
+	dos/vid_dos.o \
+	dos/snddma_dos.o \
+	dos/sys_dos.o \
+	dos/in_dos.o \
+	dos/net_dos.o \
 	dos/swimp_dos.o
 
-CLIENT =	client/cl_input.o \
+CLIENT = client/cl_input.o \
 	client/cl_inv.o \
 	client/cl_main.o \
 	client/cl_cin.o \
@@ -121,11 +122,11 @@ GAME = game/m_tank.o \
 .PHONY: all test clean
 #
 
-OBJECTS =  $(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(REFSOFT) $(NULL)
+OBJECTS =  $(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(REFSOFT) $(DOS)
 
 all: q2
 
-q2:	$(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(REFSOFT) $(NULL) 
+q2:	$(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(REFSOFT) $(DOS) 
 	$(CC) $(CFLAGS) $(OBJECTS) -o q2 -lm
 
 clean:
