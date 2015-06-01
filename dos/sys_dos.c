@@ -19,7 +19,6 @@
 #include "../client/keys.h"
 #include "errno.h"
 
-// FS: TODO FIXME FIXME PLEASE PLEASE.  >> Take DOS_V2.C from Quake1 and SYS_DOS.C from Quake1.  Clean up this crap :S
 int _crt0_startup_flags = _CRT0_FLAG_UNIX_SBRK; // FS: Fake Mem Fix (QIP)
 #define KEYBUF_SIZE     256
 static unsigned char    keybuf[KEYBUF_SIZE];
@@ -361,7 +360,7 @@ int main (int argc, char **argv)
 	Sys_Init();
 	Qcommon_Init (argc, argv);
 	oldtime = Sys_Milliseconds ();
-	dos_registerintr(9, TrapKey); // FS: FIXME FREE THIS WHEN CLOSED
+	dos_registerintr(9, TrapKey);
 
     /* main window message loop */
 	while (1)
@@ -377,5 +376,3 @@ int main (int argc, char **argv)
 	}
 	return oldtime; // FS: Compiler warning
 }
-
-
