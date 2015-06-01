@@ -754,7 +754,7 @@ void Key_Event (int key, qboolean down, unsigned time)
 	if (down)
 	{
 		key_repeats[key]++;
-		if (key != K_BACKSPACE 
+/*		if (key != K_BACKSPACE 
 			&& key != K_PAUSE 
 			&& key != K_PGUP 
 			&& key != K_KP_PGUP 
@@ -762,7 +762,7 @@ void Key_Event (int key, qboolean down, unsigned time)
 			&& key != K_KP_PGDN
 			&& key_repeats[key] > 1)
 			return;	// ignore most autorepeats
-			
+*/			
 		if (key >= 200 && !keybindings[key])
 			Com_Printf ("%s is unbound, hit F4 to set.\n", Key_KeynumToString (key) );
 	}
@@ -784,7 +784,8 @@ void Key_Event (int key, qboolean down, unsigned time)
 	}
 
 	// any key during the attract mode will bring up the menu
-	if (cl.attractloop && cls.key_dest != key_menu)
+	if (cl.attractloop && cls.key_dest != key_menu &&
+		!(key >= K_F1 && key <= K_F12))
 		key = K_ESCAPE;
 
 	// menu key is hardcoded, so the user can never unbind it

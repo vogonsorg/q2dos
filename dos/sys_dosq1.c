@@ -58,7 +58,7 @@ static int                              keybuf_head=0;
 static int                              keybuf_tail=0;
 
 static quakeparms_t     quakeparms;
-int                                     sys_checksum;
+int	sys_checksum;
 //static double           curtime = 0.0; // FS: Win9X/Fast PC Fix (QIP)
 //static double           lastcurtime = 0.0; // FS: Win9X/Fast PC Fix (QIP)
 //static double           oldtime = 0.0; // FS: Win9X/Fast PC Fix (QIP)

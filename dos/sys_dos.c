@@ -122,12 +122,57 @@ void TrapKey(void)
 #define SC_RIGHTARROW   0x4d
 
 int	curtime;
-//unsigned	sys_msg_time;
+unsigned	sys_msg_time;
 unsigned	sys_frame_time;
 
-
-void Sys_mkdir (char *path)
+static struct handlerhistory_s
 {
+	int intr;
+	_go32_dpmi_seginfo pm_oldvec;
+} handlerhistory[4];
+
+static int handlercount=0;
+
+void	dos_registerintr(int intr, void (*handler)(void))
+{
+	_go32_dpmi_seginfo info;
+	struct handlerhistory_s *oldstuff;
+
+	oldstuff = &handlerhistory[handlercount];
+
+// remember old handler
+	_go32_dpmi_get_protected_mode_interrupt_vector(intr, &oldstuff->pm_oldvec);
+	oldstuff->intr = intr;
+
+	info.pm_offset = (int) handler;
+	_go32_dpmi_allocate_iret_wrapper(&info);
+
+// set new protected mode handler
+	_go32_dpmi_set_protected_mode_interrupt_vector(intr, &info);
+
+	handlercount++;
+
+}
+
+void	dos_restoreintr(int intr)
+{
+
+	int i;
+	struct handlerhistory_s *oldstuff;
+
+// find and reinstall previous interrupt
+	for (i=0 ; i<handlercount ; i++)
+	{
+		oldstuff = &handlerhistory[i];
+		if (oldstuff->intr == intr)
+		{
+			_go32_dpmi_set_protected_mode_interrupt_vector(intr,
+				&oldstuff->pm_oldvec);
+			oldstuff->intr = -1;
+			break;
+		}
+	}
+
 }
 
 void Sys_Error (char *error, ...)
@@ -152,6 +197,7 @@ fflush(stdout);
 
 void Sys_Quit (void)
 {
+	dos_restoreintr(9); // FS: Give back the keyboard
 	exit (0);
 }
 
@@ -176,15 +222,56 @@ void	*Sys_GetGameAPI (void *parms)
 #endif	
 
 
+// FS: Doesn't work
 char *Sys_ConsoleInput (void)
 {
+	static char     text[256];
+	static int      len = 0;
+	char            ch;
+
+	if (!dedicated || !dedicated->value)
+		return NULL;
+
+	if (! kbhit())
+		return NULL;
+
+	ch = getche();
+
+	switch (ch)
+	{
+		case '\r':
+			putch('\n');
+			if (len)
+			{
+				text[len] = 0;
+				len = 0;
+				return text;
+			}
+			break;
+
+		case '\b':
+			putch(' ');
+			if (len)
+			{
+				len--;
+				putch('\b');
+			}
+			break;
+
+		default:
+			text[len] = ch;
+			len = (len + 1) & 0xff;
+			break;
+	}
+
 	return NULL;
 }
 
 void	Sys_ConsoleOutput (char *string)
 {
 //printf("Sys_ConsoleOutput: %s",string);
-printf("%s",string);
+	if (dedicated || dedicated->value)
+		printf("%s",string);
 }
 
 #define SC_RSHIFT       0x36 
@@ -198,7 +285,8 @@ void Sys_SendKeyEvents (void)
 
 	while (keybuf_head != keybuf_tail)
 	{
-
+		sys_msg_time = Sys_Milliseconds();
+//		sys_frame_time = Sys_Milliseconds();
 		k = keybuf[keybuf_tail++];
 		keybuf_tail &= (KEYBUF_SIZE-1);
 
@@ -209,7 +297,7 @@ void Sys_SendKeyEvents (void)
 			continue;                               // pause key bullshit
 		if (k==0xc5 && next == 0x9d) 
 		{ 
-			Key_Event (K_PAUSE, true, Sys_Milliseconds()); // FS: FIXME is Sys_Milliseconds() right?
+			Key_Event (K_PAUSE, true, sys_msg_time); // FS: FIXME is Sys_Milliseconds() right?
 			continue; 
 		} 
 
@@ -228,10 +316,13 @@ void Sys_SendKeyEvents (void)
 		outkey = scantokey[k & 0x7f];
 
 		if (k & 0x80)
-			Key_Event (outkey, false, Sys_Milliseconds()); // FS: FIXME is Sys_Milliseconds() right?
+		{
+			Key_Event (outkey, false, sys_msg_time); // FS: FIXME is Sys_Milliseconds() right?
+		}
 		else
-			Key_Event (outkey, true, Sys_Milliseconds()); // FS: FIXME is Sys_Milliseconds() right?
-
+		{
+			Key_Event (outkey, true, sys_msg_time); // FS: FIXME is Sys_Milliseconds() right?
+		}
 	}
 }
 
@@ -297,6 +388,7 @@ int		Hunk_End (void)
 
 int		Sys_Milliseconds (void)
 {
+#if 1
 	struct timeval tp;
 	struct timezone tzp;
 	static int		secbase;
@@ -312,11 +404,15 @@ int		Sys_Milliseconds (void)
 	curtime = (tp.tv_sec - secbase)*1000 + tp.tv_usec/1000;
 	
 	return curtime;
+#else // FS: Busted :(
+	curtime = (int)uclock() / (int)UCLOCKS_PER_SEC;
+	return curtime;  //FS: Accurate Clock (QIP)
+#endif
 }
 
 void	Sys_Mkdir (char *path)
 {
-	printf("Sys_Mkdir [%s]: UNIMPLEMENTED!\n",path);
+	mkdir (path, 0777);
 }
 
 char	*Sys_FindFirst (char *path, unsigned musthave, unsigned canthave)
@@ -337,68 +433,20 @@ void	Sys_FindClose (void)
 void	Sys_Init (void)
 {
 }
-static struct handlerhistory_s
-{
-	int intr;
-	_go32_dpmi_seginfo pm_oldvec;
-} handlerhistory[4];
-
-static int handlercount=0;
-
-void	dos_registerintr(int intr, void (*handler)(void))
-{
-	_go32_dpmi_seginfo info;
-	struct handlerhistory_s *oldstuff;
-
-	oldstuff = &handlerhistory[handlercount];
-
-// remember old handler
-	_go32_dpmi_get_protected_mode_interrupt_vector(intr, &oldstuff->pm_oldvec);
-	oldstuff->intr = intr;
-
-	info.pm_offset = (int) handler;
-	_go32_dpmi_allocate_iret_wrapper(&info);
-
-// set new protected mode handler
-	_go32_dpmi_set_protected_mode_interrupt_vector(intr, &info);
-
-	handlercount++;
-
-}
-
-void	dos_restoreintr(int intr)
-{
-
-	int i;
-	struct handlerhistory_s *oldstuff;
-
-// find and reinstall previous interrupt
-	for (i=0 ; i<handlercount ; i++)
-	{
-		oldstuff = &handlerhistory[i];
-		if (oldstuff->intr == intr)
-		{
-			_go32_dpmi_set_protected_mode_interrupt_vector(intr,
-				&oldstuff->pm_oldvec);
-			oldstuff->intr = -1;
-			break;
-		}
-	}
-
-}
-
 
 //=============================================================================
 
-void main (int argc, char **argv)
+int main (int argc, char **argv)
 {
-	int				time, oldtime, newtime;
+	int	time, oldtime, newtime;
 
+	Sys_Init();
 	Qcommon_Init (argc, argv);
 	oldtime = Sys_Milliseconds ();
 	dos_registerintr(9, TrapKey); // FS: FIXME FREE THIS WHEN CLOSED
 
     /* main window message loop */
+#if 1
 	while (1)
 	{
 		do
@@ -406,14 +454,24 @@ void main (int argc, char **argv)
 			newtime = Sys_Milliseconds ();
 			time = newtime - oldtime;
 		} while (time < 1);
-//			Con_Printf ("time:%5.2f - %5.2f = %5.2f\n", newtime, oldtime, time);
-
-		//	_controlfp( ~( _EM_ZERODIVIDE /*| _EM_INVALID*/ ), _MCW_EM );
-//		_controlfp( _PC_24, _MCW_PC ); // FS: Win32 only maybe?  Can't test this
 		Qcommon_Frame (time);
-
+		sys_frame_time = newtime; // FS: Need to update this for input to work properly
 		oldtime = newtime;
 	}
+#else // FS: Busted, from DK linux
+    oldtime = Sys_Milliseconds ();
+    while (1)
+    {
+        newtime = Sys_Milliseconds ();
+
+        time = newtime - oldtime;
+        oldtime = newtime;
+
+        Qcommon_Frame (time);
+		sys_frame_time = newtime(); // FS: Need to update this for input to work properly
+    }
+#endif
+	return oldtime; // FS: Compiler warning
 }
 
 
