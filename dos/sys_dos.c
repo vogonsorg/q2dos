@@ -423,6 +423,13 @@ void Sys_Error (char *error, ...)
 {
 	va_list		argptr;
 
+   {
+      __dpmi_regs r;
+
+      r.x.ax = 3;
+      __dpmi_int(0x10, &r);
+   }	//return to text mode
+
 	printf ("Sys_Error: ");	
 	va_start (argptr,error);
 	vprintf (error,argptr);
@@ -448,6 +455,12 @@ void Sys_Quit (void)
 					   end_of_memory - (int)&start_of_memory);
 //		dos_unlockmem (quakeparms.membase, quakeparms.memsize);
 	}
+   {
+      __dpmi_regs r;
+
+      r.x.ax = 3;
+      __dpmi_int(0x10, &r);
+   }//return to text mode
 	exit (0);
 }
 
@@ -602,9 +615,9 @@ void	*Hunk_Begin (int maxsize)
 	cursize = 0;
 	hunkmaxsize = maxsize;
 	membase = malloc (maxsize);
-	memset (membase, 0, maxsize);
 	if (!membase)
-		Sys_Error ("VirtualAlloc reserve failed");
+		Sys_Error ("VirtualAlloc reserve failed %d bytes",maxsize);
+	memset (membase, 0, maxsize);
 	return (void *)membase;
 
 }
