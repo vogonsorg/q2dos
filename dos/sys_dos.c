@@ -14,6 +14,7 @@
 #include <bios.h>
 #include <crt0.h> // FS: Fake Mem Fix (QIP)
 
+#include "dosisms.h"
 #include "../qcommon/qcommon.h"
 #include "../client/keys.h"
 #include "errno.h"
@@ -69,36 +70,6 @@ byte        shiftscantokey[128] =
 	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0         // 7 
 					}; 
 
-int dos_inportb(int port)
-{
-	return inportb(port);
-}
-
-int dos_inportw(int port)
-{
-	return inportw(port);
-}
-
-void dos_outportb(int port, int val)
-{
-	outportb(port, val);
-}
-
-void dos_outportw(int port, int val)
-{
-	outportw(port, val);
-}
-
-void dos_irqenable(void)
-{
-	enable();
-}
-
-void dos_irqdisable(void)
-{
-	disable();
-}
-
 void TrapKey(void)
 {
 //      static int ctrl=0;
@@ -124,56 +95,6 @@ void TrapKey(void)
 int	curtime;
 unsigned	sys_msg_time;
 unsigned	sys_frame_time;
-
-static struct handlerhistory_s
-{
-	int intr;
-	_go32_dpmi_seginfo pm_oldvec;
-} handlerhistory[4];
-
-static int handlercount=0;
-
-void	dos_registerintr(int intr, void (*handler)(void))
-{
-	_go32_dpmi_seginfo info;
-	struct handlerhistory_s *oldstuff;
-
-	oldstuff = &handlerhistory[handlercount];
-
-// remember old handler
-	_go32_dpmi_get_protected_mode_interrupt_vector(intr, &oldstuff->pm_oldvec);
-	oldstuff->intr = intr;
-
-	info.pm_offset = (int) handler;
-	_go32_dpmi_allocate_iret_wrapper(&info);
-
-// set new protected mode handler
-	_go32_dpmi_set_protected_mode_interrupt_vector(intr, &info);
-
-	handlercount++;
-
-}
-
-void	dos_restoreintr(int intr)
-{
-
-	int i;
-	struct handlerhistory_s *oldstuff;
-
-// find and reinstall previous interrupt
-	for (i=0 ; i<handlercount ; i++)
-	{
-		oldstuff = &handlerhistory[i];
-		if (oldstuff->intr == intr)
-		{
-			_go32_dpmi_set_protected_mode_interrupt_vector(intr,
-				&oldstuff->pm_oldvec);
-			oldstuff->intr = -1;
-			break;
-		}
-	}
-
-}
 
 void Sys_Error (char *error, ...)
 {
@@ -270,8 +191,7 @@ char *Sys_ConsoleInput (void)
 void	Sys_ConsoleOutput (char *string)
 {
 //printf("Sys_ConsoleOutput: %s",string);
-	if (dedicated || dedicated->value)
-		printf("%s",string);
+//		printf("%s",string);
 }
 
 #define SC_RSHIFT       0x36 
@@ -446,7 +366,6 @@ int main (int argc, char **argv)
 	dos_registerintr(9, TrapKey); // FS: FIXME FREE THIS WHEN CLOSED
 
     /* main window message loop */
-#if 1
 	while (1)
 	{
 		do
@@ -458,19 +377,6 @@ int main (int argc, char **argv)
 		sys_frame_time = newtime; // FS: Need to update this for input to work properly
 		oldtime = newtime;
 	}
-#else // FS: Busted, from DK linux
-    oldtime = Sys_Milliseconds ();
-    while (1)
-    {
-        newtime = Sys_Milliseconds ();
-
-        time = newtime - oldtime;
-        oldtime = newtime;
-
-        Qcommon_Frame (time);
-		sys_frame_time = newtime(); // FS: Need to update this for input to work properly
-    }
-#endif
 	return oldtime; // FS: Compiler warning
 }
 
