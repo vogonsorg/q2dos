@@ -1,5 +1,14 @@
 // sys_null.h -- null system driver to aid porting efforts
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <errno.h>
+#include <stdio.h>
+#include <dirent.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#include <sys/time.h>
+
 #include "../qcommon/qcommon.h"
 #include "errno.h"
 
@@ -107,7 +116,21 @@ int		Hunk_End (void)
 
 int		Sys_Milliseconds (void)
 {
-	return 0;
+	struct timeval tp;
+	struct timezone tzp;
+	static int		secbase;
+
+	gettimeofday(&tp, &tzp);
+	
+	if (!secbase)
+	{
+		secbase = tp.tv_sec;
+		return tp.tv_usec/1000;
+	}
+
+	curtime = (tp.tv_sec - secbase)*1000 + tp.tv_usec/1000;
+	
+	return curtime;
 }
 
 void	Sys_Mkdir (char *path)
@@ -139,12 +162,26 @@ void	Sys_Init (void)
 
 void main (int argc, char **argv)
 {
-	Qcommon_Init (argc, argv);
+	int				time, oldtime, newtime;
 
+	Qcommon_Init (argc, argv);
+	oldtime = Sys_Milliseconds ();
+
+    /* main window message loop */
 	while (1)
 	{
-		//Qcommon_Frame (0.1);
-		Qcommon_Frame (1.1);
+		do
+		{
+			newtime = Sys_Milliseconds ();
+			time = newtime - oldtime;
+		} while (time < 1);
+//			Con_Printf ("time:%5.2f - %5.2f = %5.2f\n", newtime, oldtime, time);
+
+		//	_controlfp( ~( _EM_ZERODIVIDE /*| _EM_INVALID*/ ), _MCW_EM );
+//		_controlfp( _PC_24, _MCW_PC ); // FS: Win32 only maybe?  Can't test this
+		Qcommon_Frame (time);
+
+		oldtime = newtime;
 	}
 }
 
