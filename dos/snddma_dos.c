@@ -5,7 +5,8 @@
 #include "../client/client.h"
 #include "../client/snd_loc.h"
 
-#if USE_QDOS_SOUND
+//#define USE_QDOS_SOUND // FS: Uncomment to play with the sound card, currently not actually outputting the sound, but does find and init cards.  It's writing the stuff somewhere.
+#ifdef USE_QDOS_SOUND
 typedef enum
 {
 	dma_none,
@@ -200,13 +201,13 @@ void StartSB(void)
 
 		WriteDSP(0x41);
 
-		WriteDSP(shm->speed>>8);
-		WriteDSP(shm->speed&0xff);
+		WriteDSP(dma.speed>>8);
+		WriteDSP(dma.speed&0xff);
 
 		WriteDSP(0xb6); // 16-bit output
 		WriteDSP(0x30); // stereo
-		WriteDSP((shm->samples-1) & 0xff);		// # of samples - 1
-		WriteDSP((shm->samples-1) >> 8);
+		WriteDSP((dma.samples-1) & 0xff);		// # of samples - 1
+		WriteDSP((dma.samples-1) >> 8);
 	}
 // version 3.xx startup code
 	else if (dsp_version == 3)
@@ -224,15 +225,15 @@ void StartSB(void)
 		for (i=0 ; i<0x10000 ; i++)
 			dos_inportb(dsp_port+0xe);				  // ack the dsp
 		
-		timeconstant = 65536-(256000000/(shm->channels*shm->speed));
+		timeconstant = 65536-(256000000/(dma.channels*dma.speed));
 		WriteDSP(0x40);
 		WriteDSP(timeconstant>>8);
 
 		WriteMixer (0xe, ReadMixer(0xe) | 0x20);// turn off filter
 
 		WriteDSP(0x48);
-		WriteDSP((shm->samples-1) & 0xff);		// # of samples - 1
-		WriteDSP((shm->samples-1) >> 8);
+		WriteDSP((dma.samples-1) & 0xff);		// # of samples - 1
+		WriteDSP((dma.samples-1) >> 8);
 
 		WriteDSP(0x90); // high speed 8 bit stereo
 	}
@@ -242,13 +243,13 @@ void StartSB(void)
 		Com_Printf("Version 2 SB startup\n");
 		WriteDSP(0xd1); // turn on speaker
 
-		timeconstant = 65536-(256000000/(shm->channels*shm->speed));
+		timeconstant = 65536-(256000000/(dma.channels*dma.speed));
 		WriteDSP(0x40);
 		WriteDSP(timeconstant>>8);
 
 		WriteDSP(0x48);
-		WriteDSP((shm->samples-1) & 0xff);		// # of samples - 1
-		WriteDSP((shm->samples-1) >> 8);
+		WriteDSP((dma.samples-1) & 0xff);		// # of samples - 1
+		WriteDSP((dma.samples-1) >> 8);
 
 		WriteDSP(0x1c); // normal speed 8 bit mono
 	}
@@ -278,11 +279,11 @@ void StartDMA(void)
 
 // use a high dma channel if specified
 	if (high_dma && dsp_version >= 4)		 // 8 bit snd can never use 16 bit dma
-		dma = high_dma;
+		dma_card = high_dma;
 	else
-		dma = low_dma;
+		dma_card = low_dma;
 
-	Com_Printf ("Using DMA channel %i\n", dma);
+	Com_Printf ("Using DMA channel %i\n", dma_card);
 
 	if (dma_card > 3)
 	{
@@ -305,14 +306,14 @@ void StartDMA(void)
 		+(0<<5)			// address increment
 		+(1<<4)			// auto-init dma
 		+(2<<2)			// read
-		+(dma&3);		 // channel #
+		+(dma_card&3);		 // channel #
 	dos_outportb(mode_reg, mode);
 	
 // set address
 	// set page
 	dos_outportb(page_reg[dma_card], realaddr >> 16);
 
-	if (dma > 3)
+	if (dma_card > 3)
 	{		 // address is in words
 		dos_outportb(flipflop_reg, 0);			 // prepare to send 16-bit value
 		dos_outportb(addr_reg[dma_card], (realaddr>>1) & 0xff);
@@ -334,7 +335,7 @@ void StartDMA(void)
 	}
 
 	dos_outportb(clear_reg, 0);				 // clear write mask
-	dos_outportb(disable_reg, dma&~4);
+	dos_outportb(disable_reg, dma_card&~4);
 }
 
 
@@ -352,7 +353,7 @@ qboolean BLASTER_Init(void)
 	int	rc;
 	int	p;
 	
-	shm = 0;
+//	dma = 0; // FS: FIXME
 	rc = 0;
 
 //
@@ -360,7 +361,7 @@ qboolean BLASTER_Init(void)
 //
 	if (!GetBLASTER())
 	{
-		Con_NotifyBox (
+		Com_Printf (
 		"The BLASTER environment variable\n"
 		"is not set, sound effects are\n"
 		"disabled.  See README.TXT for help.\n"
@@ -403,43 +404,45 @@ qboolean BLASTER_Init(void)
 
 
 // everyone does 11khz sampling rate unless told otherwise
-	shm = &sn;
-	shm->speed = 11025;
+//	dma = &sn;
+	dma.speed = 11025;
 	rc = COM_CheckParm("-sspeed");
 
-		  if (s_khz.value > 0) // FS: S_KHZ
-		  {
-					 shm->speed = s_khz.value;
-		  }
+/*
+	if (s_khz.value > 0) // FS: S_KHZ
+	{
+		dma.speed = s_khz.value;
+	}
+*/
 
 	if (rc)
-		shm->speed = Q_atoi(com_argv[rc+1]);
+		dma.speed = Q_atoi(com_argv[rc+1]);
 
 // version 4 cards (sb 16) do 16 bit stereo
 	if (dsp_version >= 4)
 	{
-		shm->channels = 2;
-		shm->samplebits = 16;
+		dma.channels = 2;
+		dma.samplebits = 16;
 	}
 // version 3 cards (sb pro) do 8 bit stereo
 	else if (dsp_version == 3)
 	{
-		shm->channels = 2;
-		shm->samplebits = 8;	 
+		dma.channels = 2;
+		dma.samplebits = 8;	 
 	}
 // v2 cards do 8 bit mono
 	else
 	{
-		shm->channels = 1;
-		shm->samplebits = 8;	 
+		dma.channels = 1;
+		dma.samplebits = 8;	 
 	}
 
-		  if(!host_initialized) // FS: SND_RESTART
-		  {
-					 Cmd_AddCommand("sbinfo", SB_Info_f);
-		  }
+//	if(!host_initialized) // FS: SND_RESTART FIXME
+	{
+		Cmd_AddCommand("sbinfo", SB_Info_f);
+	}
 
-		  size = 4096;
+	size = 4096;
 
 // allocate 8k and get a 4k-aligned buffer from it
 	dma_dosadr = dos_getmemory(size*2); // sezero
@@ -456,14 +459,11 @@ qboolean BLASTER_Init(void)
 
 	memset(dma_buffer, 0, dma_size);
 
-	shm->soundalive = true;
-	shm->splitbuffer = false;
-
-	shm->samples = size/(shm->samplebits/8);
-	shm->samplepos = 0;
-	shm->submission_chunk = 1;
-	shm->buffer = (unsigned char *) dma_buffer;
-	shm->samples = size/(shm->samplebits/8);
+	dma.samples = size/(dma.samplebits/8);
+	dma.samplepos = 0;
+	dma.submission_chunk = 1;
+	dma.buffer = (unsigned char *) dma_buffer;
+	dma.samples = size/(dma.samplebits/8);
 
 	StartDMA();
 	StartSB();
@@ -493,29 +493,29 @@ int BLASTER_GetDMAPos(void)
 
 // clear 16-bit reg flip-flop
 // load the current dma count register
-	if (dma < 4)
+	if (dma_card < 4)
 	{
 		dos_outportb(0xc, 0);
-		count = dos_inportb(dma*2+1);
-		count += dos_inportb(dma*2+1) << 8;
-		if (shm->samplebits == 16)
+		count = dos_inportb(dma_card*2+1);
+		count += dos_inportb(dma_card*2+1) << 8;
+		if (dma.samplebits == 16)
 			count /= 2;
-		count = shm->samples - (count+1);
+		count = dma.samples - (count+1);
 	}
 	else
 	{
 		dos_outportb(0xd8, 0);
-		count = dos_inportb(0xc0+(dma-4)*4+2);
-		count += dos_inportb(0xc0+(dma-4)*4+2) << 8;
-		if (shm->samplebits == 8)
+		count = dos_inportb(0xc0+(dma_card-4)*4+2);
+		count += dos_inportb(0xc0+(dma_card-4)*4+2) << 8;
+		if (dma.samplebits == 8)
 			count *= 2;
-		count = shm->samples - (count+1);
+		count = dma.samples - (count+1);
 	}
 
 //		Com_Printf("DMA pos = 0x%x\n", count);
 
-	shm->samplepos = count & (shm->samples-1);
-	return shm->samplepos;
+	dma.samplepos = count & (dma.samples-1);
+	return dma.samplepos;
 
 }
 
@@ -544,7 +544,7 @@ void BLASTER_Shutdown(void)
 	WriteDSP(0xd3); // turn off speaker
 	ResetDSP ();
 
-	dos_outportb(disable_reg, dma|4);		 // disable dma channel
+	dos_outportb(disable_reg, dma_card|4);		 // disable dma channel
 
 	dos_freememory(dma_dosadr); // sezero
 	dma_dosadr = NULL; // sezero
@@ -564,7 +564,7 @@ void snd_shutdown_f (void) // FS: SND_SHUTDOWN
 {
 	SNDDMA_Shutdown();
 	Com_Printf("\nSound Disabled.\n");
-	Cache_Flush();
+//	Cache_Flush();
 }
 
 
@@ -572,32 +572,33 @@ void snd_restart_f (void) // FS: SND_RESTART
 {
 	SNDDMA_Shutdown();
 	Com_Printf("\nSound Restarting\n");
-	Cache_Flush();
+//	Cache_Flush();
 	SNDDMA_Init();
-	S_StopAllSoundsC(); // FS: For GUS Buffer Clear Fix
-	Com_Printf ("Sound sampling rate: %i\n", shm->speed);
+//	S_StopAllSoundsC(); // FS: For GUS Buffer Clear Fix
+	Com_Printf ("Sound sampling rate: %i\n", dma.speed);
 }
 #endif // USE_QDOS_SOUND
 
 qboolean SNDDMA_Init(void)
 {
-#if USE_QDOS_SOUND
-	if (!host_initialized)
+#ifdef USE_QDOS_SOUND
+//	if (!host_initialized)
 	{
 		Cmd_AddCommand ("snd_restart", snd_restart_f); // FS
 		Cmd_AddCommand ("snd_shutdown", snd_shutdown_f); // FS
 	}
 	if (GUS_Init ())
 	{
-		Con_DPrintf(DEVELOPER_MSG_SOUND, "GUS_Init\n");
+		Com_DPrintf("GUS_Init\n");
 		dmacard = dma_gus;
 		havegus = 1; // FS
-		S_StopAllSoundsC(); // FS: For GUS Buffer Clear Fix
+//		S_StopAllSoundsC(); // FS: For GUS Buffer Clear Fix
 		return true;
 	}
+
 	if (BLASTER_Init ())
 	{
-		  Con_DPrintf(DEVELOPER_MSG_SOUND, "BLASTER_Init\n");
+		  Com_DPrintf("BLASTER_Init\n");
 		dmacard = dma_blaster;
 		return true;
 	}
@@ -612,7 +613,7 @@ qboolean SNDDMA_Init(void)
 
 int	SNDDMA_GetDMAPos(void)
 {
-#if USE_QDOS_SOUND
+#ifdef USE_QDOS_SOUND
 	switch (dmacard)
 	{
 	case dma_blaster:
@@ -631,7 +632,7 @@ int	SNDDMA_GetDMAPos(void)
 
 void SNDDMA_Shutdown(void)
 {
-#if USE_QDOS_SOUND
+#ifdef USE_QDOS_SOUND
 	switch (dmacard)
 	{
 	case dma_blaster:
