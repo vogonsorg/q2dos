@@ -54,7 +54,6 @@ void IN_Init (void)
 
 void IN_Shutdown (void)
 {
-	// FS: TODO FIXME FIXME ETC -- Let the mouse go
 }
 
 void IN_Commands (void)
