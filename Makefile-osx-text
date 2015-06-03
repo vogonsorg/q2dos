@@ -1,4 +1,4 @@
-CC = gcc-4.2
+CC = gcc
 CFLAGS = -arch i386 -g -O0 -Did386=0
 #CC = i586-pc-msdosdjgpp-gcc
 #CFLAGS = -g -O0

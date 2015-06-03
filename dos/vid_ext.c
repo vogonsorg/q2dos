@@ -376,7 +376,7 @@ void VID_InitExtra (void)
 			vesa_modes[nummodes].height = modeinfo.height;
 			vesa_modes[nummodes].aspect =
 					((float)modeinfo.height / (float)modeinfo.width) *
-					(320.0 / 240.0);
+					(320.0 / 200.0); //200 for VGA was 240 for Mode X
 			vesa_modes[nummodes].rowbytes = modeinfo.bytes_per_scanline;
 			vesa_modes[nummodes].planar = 0;
 			vesa_modes[nummodes].pextradata = &vesa_extra[nummodes];

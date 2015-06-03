@@ -1,7 +1,7 @@
 #CC = gcc-4.2
 #CFLAGS = -arch i386 -g -O0
 CC = i586-pc-msdosdjgpp-gcc
-CFLAGS = -g -O0
+CFLAGS = -g -O0 -Did386=0
 SFLAGS = -DREF_HARD_LINKED -DGAME_HARD_LINKED
 
 NULL = 	null/cd_null.o \

@@ -32,14 +32,12 @@ void		SWimp_Shutdown( void )
 
 rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
 {
-	printf("SWimp_SetMode %d x %d mode %d fs %d\n",&pwidth,&pheight,mode,fullscreen);
 
         if ( !ri.Vid_GetModeInfo( pwidth, pheight, mode ) )
         {
                 ri.Con_Printf( PRINT_ALL, " invalid mode\n" );
                 return rserr_invalid_mode;
         }
-        ri.Con_Printf( PRINT_ALL, " %d %d\n", *pwidth, *pheight);
 
 
 	vid.height=200;
@@ -47,6 +45,8 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 	vid.rowbytes=320;
 	vid.buffer=malloc(320*200*1);
 
+        //ri.Con_Printf( PRINT_ALL, " %d %d\n", *pwidth, *pheight);
+	ri.Con_Printf(PRINT_ALL,"SWimp_SetMode %d x %d mode %d fs %d\n",*pwidth,*pheight,mode,fullscreen);
 	return rserr_ok;
 }
 

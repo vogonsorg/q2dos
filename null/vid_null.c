@@ -87,7 +87,7 @@ qboolean VID_GetModeInfo( int *width, int *height, int mode )
 
     *width  = vid_modes[mode].width;
     *height = vid_modes[mode].height;
-	printf("VID_GetModeInfo %dx%d mode %d\n",width,height,mode);
+    Com_Printf("VID_GetModeInfo %dx%d mode %d\n",*width,*height,mode);
 
     return true;
 }

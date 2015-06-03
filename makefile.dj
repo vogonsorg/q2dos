@@ -2,7 +2,7 @@
 #CFLAGS = -arch i386 -g -O0
 CC = gcc
 #CC = i586-pc-msdosdjgpp-gcc
-CFLAGS = -g -O0
+CFLAGS = -g -O0 -Did386=0
 SFLAGS = -DREF_HARD_LINKED -DGAME_HARD_LINKED
 WCFLAGS = -I wattcp/inc
 WLFLAGS = -Lwattcp/lib -lwatt
@@ -131,10 +131,10 @@ OBJECTS =  $(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(REFSOFT) $(DOS)
 all: q2
 
 q2:	$(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(REFSOFT) $(DOS) 
-        $(CC) $(CFLAGS) $(OBJECTS) -o q2 -lm $(WLFLAGS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o q2 -lm $(WLFLAGS)
 
 clean:
 	find ./ -name '*.o' -exec rm {} \;
 
 %.o : %.c
-        $(CC) $(CFLAGS) $(WCFLAGS) $(SFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(WCFLAGS) $(SFLAGS) -c $< -o $@
