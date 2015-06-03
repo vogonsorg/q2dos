@@ -2,6 +2,8 @@
 #include <dpmi.h>
 #include <pc.h>
 
+int whatmodearewe = 0;
+
 
 void	SWimp_BeginFrame( float camera_separation )
 {
@@ -11,8 +13,11 @@ void	SWimp_BeginFrame( float camera_separation )
 
 void	SWimp_EndFrame (void)
 {
-	//For now it's hardcoded to mode 13
+	//It's LFB only
+if(whatmodearewe==0)	//VGA mode 13
 	dosmemput(vid.buffer,320*200,0xA0000);
+else
+	dosmemput(vid.buffer,848*480,0xC0000000);
 }
 
 int	SWimp_Init( void *hInstance, void *wndProc )
@@ -46,14 +51,14 @@ for(i=0;i<1024;i++){	//we do it this way to skip a byte since it's padded
 
 }
 
+
 void		SWimp_Shutdown( void )
 {
 }
 
 rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
 {
-//	printf("SWimp_SetMode %d x %d mode %d fs %d\n",&pwidth,&pheight,mode,fullscreen); // FS: jason fix this compile warning
-
+Com_Printf("SWimp_SetMode %d x %d mode %d fs %d\n",*pwidth,*pheight,mode,fullscreen); 
         if ( !ri.Vid_GetModeInfo( pwidth, pheight, mode ) )
         {
                 ri.Con_Printf( PRINT_ALL, " invalid mode\n" );
@@ -61,7 +66,8 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
         }
         ri.Con_Printf( PRINT_ALL, " %d %d\n", *pwidth, *pheight);
 
-
+whatmodearewe=mode;
+if(mode==0) {
 	vid.height=200;
 	vid.width=320;
 	vid.rowbytes=320;
@@ -72,7 +78,22 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
       r.x.ax = 0x13;
       __dpmi_int(0x10, &r);
    }
-
+  }
+else {
+        vid.height=480;
+        vid.width=848;
+        vid.rowbytes=848;
+        vid.buffer=malloc(848*480*1);
+   {    //VESA 222
+      __dpmi_regs r;
+      r.x.ax = 0x4F02;
+      r.x.bx = 0x222;
+      __dpmi_int(0x10, &r);
+      if (r.h.ah)
+         Sys_Error("Error setting VESA mode 0x222");
+   }
+ }
+	ri.Vid_NewWindow(vid.width,vid.height);
 	return rserr_ok;
 }
 

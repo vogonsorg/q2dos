@@ -4,6 +4,8 @@
 #include "../client/client.h"
 #include "../client/qmenu.h"
 
+extern int whatmodearewe;
+
 #define REF_SOFT	0
 #define REF_OPENGL	1
 #define REF_3DFX	2
@@ -120,7 +122,8 @@ vidmode_t vid_modes[] =
     { "Mode 8: 1280x960",  1280, 960, 8 },
     { "Mode 9: 1600x1200", 1600, 1200, 9 }
 */
-    { "Mode 0: 320x200", 320, 200, 0 }
+    { "Mode 0: 320x200", 320, 200, 0 },
+    { "Mode 0: 320x200", 848, 480, 1 }
 };
 #define VID_NUM_MODES ( sizeof( vid_modes ) / sizeof( vid_modes[0] ) )
 
@@ -275,6 +278,9 @@ void	VID_Init (void)
 {
     refimport_t	ri;
 
+    VID_InitExtra(); //probe VESA
+
+    whatmodearewe=0; //hope this means start in mode 0
     viddef.width = 320;
     viddef.height = 200; //was originally 240
 
@@ -325,6 +331,7 @@ void	VID_MenuInit (void)
 	static const char *resolutions[] = 
 	{
 		"[320 200  ]",
+		"[848 480  ]",
 #if 0
 		"[320 240  ]",
 		"[400 300  ]",
