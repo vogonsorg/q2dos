@@ -407,6 +407,7 @@ qboolean BLASTER_Init(void)
 	dma.speed = 11025;
 	rc = COM_CheckParm("-sspeed");
 
+
 	if (s_khz->value > 8000) // FS: S_KHZ
 	{
 		dma.speed = s_khz->value;
@@ -439,7 +440,7 @@ qboolean BLASTER_Init(void)
 		Cmd_AddCommand("sbinfo", SB_Info_f);
 	}
 
-	size = 4096;
+	size = 4096*8; // FS: Yeah this blows, but we need way more now because of stereo and shit
 
 // allocate 8k and get a 4k-aligned buffer from it
 	dma_dosadr = dos_getmemory(size*2); // sezero

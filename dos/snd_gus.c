@@ -466,7 +466,7 @@ void ini_fgets(FILE *f, const char *section, const char *field, char *s)
 #define WORD unsigned short
 #define DWORD unsigned long
 
-#define BUFFER_SIZE 4096
+#define BUFFER_SIZE 4096*8
 
 #define CODEC_ADC_INPUT_CONTROL_LEFT	0x00
 #define CODEC_ADC_INPUT_CONTROL_RIGHT	0x01
