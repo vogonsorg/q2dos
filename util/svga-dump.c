@@ -309,6 +309,7 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 	dos_int86(0x10);
 	if (regs.x.ax != 0x4f)
 	{
+		dos_freememory(infobuf);
 		return false;
 	}
 	else
@@ -325,6 +326,7 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 			(modeinfo.width > MAXWIDTH) ||
 			(modeinfo.height > MAXHEIGHT))
 		{
+			dos_freememory(infobuf);
 			return false;
 		}
 
@@ -335,6 +337,7 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 			 (MODE_SUPPORTED_IN_HW | COLOR_MODE | GRAPHICS_MODE)) !=
 			(MODE_SUPPORTED_IN_HW | COLOR_MODE | GRAPHICS_MODE))
 		{
+			dos_freememory(infobuf);
 			return false;
 		}
 
@@ -343,7 +346,10 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 		if (!(modeinfo.mode_attributes & LINEAR_FRAME_BUFFER))
 		{
 			if ((modeinfo.width != 320) || (modeinfo.height != 200))
+				{
+				dos_freememory(infobuf);
 				return false;
+				}
 		}
 
 		modeinfo.bytes_per_scanline = *(short*)(infobuf+16);
@@ -351,7 +357,10 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 		modeinfo.pagesize = modeinfo.bytes_per_scanline * modeinfo.height;
 
 		if (modeinfo.pagesize > totalvidmem)
+			{
+			dos_freememory(infobuf);
 			return false;
+			}
 
 	// force to one page if the adapter reports it doesn't support more pages
 	// than that, no matter how much memory it has--it may not have hardware
@@ -427,7 +436,6 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 	}
 
 	dos_freememory(infobuf);
-
 	return true;
 }
 
