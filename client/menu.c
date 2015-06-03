@@ -1012,25 +1012,35 @@ CONTROLS MENU
 
 =======================================================================
 */
+#ifndef __DJGPP__
 static cvar_t *win_noalttab;
+#endif
+#ifdef USE_JOYSTICK
 extern cvar_t *in_joystick;
+#endif
 
 static menuframework_s	s_options_menu;
 static menuaction_s		s_options_defaults_action;
 static menuaction_s		s_options_customize_options_action;
 static menuslider_s		s_options_sensitivity_slider;
 static menulist_s		s_options_freelook_box;
+#ifndef __DJGPP__
 static menulist_s		s_options_noalttab_box;
+#endif
 static menulist_s		s_options_alwaysrun_box;
 static menulist_s		s_options_invertmouse_box;
 static menulist_s		s_options_lookspring_box;
 static menulist_s		s_options_lookstrafe_box;
 static menulist_s		s_options_crosshair_box;
 static menuslider_s		s_options_sfxvolume_slider;
+#ifdef USE_JOYSTICK
 static menulist_s		s_options_joystick_box;
+#endif
 static menulist_s		s_options_cdvolume_box;
 static menulist_s		s_options_quality_list;
+#ifdef WIN32
 static menulist_s		s_options_compatibility_list;
+#endif
 static menulist_s		s_options_console_action;
 
 static void CrosshairFunc( void *unused )
@@ -1038,10 +1048,12 @@ static void CrosshairFunc( void *unused )
 	Cvar_SetValue( "crosshair", s_options_crosshair_box.curvalue );
 }
 
+#ifdef USE_JOYSTICK
 static void JoystickFunc( void *unused )
 {
 	Cvar_SetValue( "in_joystick", s_options_joystick_box.curvalue );
 }
+#endif
 
 static void CustomizeControlsFunc( void *unused )
 {
@@ -1063,10 +1075,12 @@ static void MouseSpeedFunc( void *unused )
 	Cvar_SetValue( "sensitivity", s_options_sensitivity_slider.curvalue / 2.0F );
 }
 
+#ifndef __DJGPP__
 static void NoAltTabFunc( void *unused )
 {
 	Cvar_SetValue( "win_noalttab", s_options_noalttab_box.curvalue );
 }
+#endif
 
 static float ClampCvar( float min, float max, float value )
 {
@@ -1099,10 +1113,14 @@ static void ControlsSetMenuItemValues( void )
 	Cvar_SetValue( "crosshair", ClampCvar( 0, 3, crosshair->value ) );
 	s_options_crosshair_box.curvalue		= crosshair->value;
 
+#ifdef USE_JOYSTICK
 	Cvar_SetValue( "in_joystick", ClampCvar( 0, 1, in_joystick->value ) );
 	s_options_joystick_box.curvalue		= in_joystick->value;
+#endif
 
+#ifndef __DJGPP__
 	s_options_noalttab_box.curvalue			= win_noalttab->value;
+#endif
 }
 
 static void ControlsResetDefaultsFunc( void *unused )
@@ -1190,9 +1208,10 @@ static void UpdateSoundQualityFunc( void *unused )
 			Cvar_SetValue( "s_loadas8bit", true );
 		}
 	}
-	
-	Cvar_SetValue( "s_primary", s_options_compatibility_list.curvalue );
 
+#ifdef WIN32
+	Cvar_SetValue( "s_primary", s_options_compatibility_list.curvalue );
+#endif
 	M_DrawTextBox( 8, 120 - 48, 36, 3 );
 	M_Print( 16 + 16, 120 - 48 + 8,  "Restarting the sound system. This" );
 	M_Print( 16 + 16, 120 - 48 + 16, "could take up to a minute, so" );
@@ -1217,11 +1236,12 @@ void Options_MenuInit( void )
 		"low", "high", 0
 	};
 
+#ifdef WIN32
 	static const char *compatibility_items[] =
 	{
 		"max compatibility", "max performance", 0
 	};
-
+#endif
 	static const char *yesno_names[] =
 	{
 		"no",
@@ -1238,7 +1258,9 @@ void Options_MenuInit( void )
 		0
 	};
 
+#ifndef __DJGPP__
 	win_noalttab = Cvar_Get( "win_noalttab", "0", CVAR_ARCHIVE );
+#endif
 
 	/*
 	** configure controls menu and menu items
@@ -1272,6 +1294,7 @@ void Options_MenuInit( void )
 	s_options_quality_list.itemnames		= quality_items;
 	s_options_quality_list.curvalue			= !Cvar_VariableValue( "s_loadas8bit" );
 
+#ifdef WIN32
 	s_options_compatibility_list.generic.type	= MTYPE_SPINCONTROL;
 	s_options_compatibility_list.generic.x		= 0;
 	s_options_compatibility_list.generic.y		= 30;
@@ -1279,7 +1302,7 @@ void Options_MenuInit( void )
 	s_options_compatibility_list.generic.callback = UpdateSoundQualityFunc;
 	s_options_compatibility_list.itemnames		= compatibility_items;
 	s_options_compatibility_list.curvalue		= Cvar_VariableValue( "s_primary" );
-
+#endif
 	s_options_sensitivity_slider.generic.type	= MTYPE_SLIDER;
 	s_options_sensitivity_slider.generic.x		= 0;
 	s_options_sensitivity_slider.generic.y		= 50;
@@ -1329,21 +1352,24 @@ void Options_MenuInit( void )
 	s_options_crosshair_box.generic.name	= "crosshair";
 	s_options_crosshair_box.generic.callback = CrosshairFunc;
 	s_options_crosshair_box.itemnames = crosshair_names;
-/*
+
+#ifndef __DJGPP__
 	s_options_noalttab_box.generic.type = MTYPE_SPINCONTROL;
 	s_options_noalttab_box.generic.x	= 0;
 	s_options_noalttab_box.generic.y	= 110;
 	s_options_noalttab_box.generic.name	= "disable alt-tab";
 	s_options_noalttab_box.generic.callback = NoAltTabFunc;
 	s_options_noalttab_box.itemnames = yesno_names;
-*/
+#endif
+
+#ifdef USE_JOYSTICK
 	s_options_joystick_box.generic.type = MTYPE_SPINCONTROL;
 	s_options_joystick_box.generic.x	= 0;
 	s_options_joystick_box.generic.y	= 120;
 	s_options_joystick_box.generic.name	= "use joystick";
 	s_options_joystick_box.generic.callback = JoystickFunc;
 	s_options_joystick_box.itemnames = yesno_names;
-
+#endif
 	s_options_customize_options_action.generic.type	= MTYPE_ACTION;
 	s_options_customize_options_action.generic.x		= 0;
 	s_options_customize_options_action.generic.y		= 140;
@@ -1367,7 +1393,9 @@ void Options_MenuInit( void )
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_sfxvolume_slider );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_cdvolume_box );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_quality_list );
+#ifdef WIN32
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_compatibility_list );
+#endif
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_sensitivity_slider );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_alwaysrun_box );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_invertmouse_box );
@@ -1375,7 +1403,9 @@ void Options_MenuInit( void )
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_lookstrafe_box );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_freelook_box );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_crosshair_box );
+#ifdef USE_JOYSTICK
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_joystick_box );
+#endif
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_customize_options_action );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_defaults_action );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_console_action );
