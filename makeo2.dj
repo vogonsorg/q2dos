@@ -1,7 +1,7 @@
 #CC = gcc-4.2
 #CFLAGS = -arch i386 -g -O0
-CC = i586-pc-msdosdjgpp-gcc
-#CC = gcc
+#CC = i586-pc-msdosdjgpp-gcc
+CC = gcc
 CFLAGS = -g -O2 -Did386=0
 SFLAGS = -DREF_HARD_LINKED -DGAME_HARD_LINKED
 WCFLAGS = -I wattcp/inc
