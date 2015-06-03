@@ -50,7 +50,6 @@ D_Patch
 void D_Patch (void)
 {
 #if id386
-#error
 	extern void D_Aff8Patch( void );
 	static qboolean protectset8 = false;
 	extern void D_PolysetAff8Start( void );

@@ -5,7 +5,7 @@
 #include "../client/client.h"
 #include "../client/snd_loc.h"
 
-//#define USE_QDOS_SOUND // FS: Uncomment to play with the sound card, currently not actually outputting the sound, but does find and init cards.  It's writing the stuff somewhere.
+#define USE_QDOS_SOUND // FS: Uncomment to play with the sound card, currently not actually outputting the sound, but does find and init cards.  It's writing the stuff somewhere.
 #ifdef USE_QDOS_SOUND
 typedef enum
 {
@@ -661,4 +661,5 @@ void SNDDMA_Submit(void)
 
 void S_Activate (qboolean active)
 {
+Com_Printf("S_Activate %d",active);
 }

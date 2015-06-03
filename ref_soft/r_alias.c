@@ -429,7 +429,7 @@ void R_AliasSetUpTransform (void)
 R_AliasTransformFinalVerts
 ================
 */
-#if id386 && !defined __linux__
+#if id386 && !defined __DJGPP__ // !defined __linux__
 void R_AliasTransformFinalVerts( int numpoints, finalvert_t *fv, dtrivertx_t *oldv, dtrivertx_t *newv )
 {
 	float  lightcos;

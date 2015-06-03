@@ -130,6 +130,8 @@ q2:	$(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(REFSOFT) $(NULL)
 
 clean:
 	find ./ -name '*.o' -exec rm {} \;
+	rm -f q2
+	rm -f q2.exe
 
 %.o : %.c
 	$(CC) $(CFLAGS) $(SFLAGS) -c $< -o $@

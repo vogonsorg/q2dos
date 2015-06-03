@@ -411,7 +411,7 @@ void R_PolysetSetUpForLineScan(fixed8_t startvertu, fixed8_t startvertv,
 R_PolysetCalcGradients
 ================
 */
-#if id386 && !defined __linux__
+#if id386 && !defined __DJGPP__ //__linux__
 void R_PolysetCalcGradients( int skinwidth )
 {
 	static float xstepdenominv, ystepdenominv, t0, t1;

@@ -820,3 +820,7 @@ int main (int argc, char **argv)
 #endif
 //	return oldtime; // FS: Compiler warning
 }
+
+void Sys_MakeCodeWriteable(void)
+{
+} //MS-DOS is always writeable
