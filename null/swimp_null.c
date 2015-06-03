@@ -1,15 +1,12 @@
 #include "../ref_soft/r_local.h"
 
+
 void	SWimp_BeginFrame( float camera_separation )
 {
-	printf("b");
-	fflush(stdout);
 }
 
 void	SWimp_EndFrame (void)
 {
-	printf(".");
-	fflush(stdout);
 }
 
 int	SWimp_Init( void *hInstance, void *wndProc )
@@ -26,6 +23,7 @@ int	SWimp_Init( void *hInstance, void *wndProc )
 */
 void	SWimp_SetPalette( const unsigned char *palette)
 {
+
 }
 
 void		SWimp_Shutdown( void )
@@ -35,10 +33,19 @@ void		SWimp_Shutdown( void )
 rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
 {
 	printf("SWimp_SetMode %d x %d mode %d fs %d\n",&pwidth,&pheight,mode,fullscreen);
+
+        if ( !ri.Vid_GetModeInfo( pwidth, pheight, mode ) )
+        {
+                ri.Con_Printf( PRINT_ALL, " invalid mode\n" );
+                return rserr_invalid_mode;
+        }
+        ri.Con_Printf( PRINT_ALL, " %d %d\n", *pwidth, *pheight);
+
+
 	vid.height=200;
 	vid.width=320;
 	vid.rowbytes=320;
-	vid.buffer=malloc(320*240*8);
+	vid.buffer=malloc(320*200*1);
 
 	return rserr_ok;
 }
