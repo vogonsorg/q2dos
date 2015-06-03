@@ -48,7 +48,7 @@ void IN_Init (void)
 	m_filter				= Cvar_Get ("m_filter",					"0",		0);
 	Cmd_AddCommand ("+mlook", IN_MLookDown);
 	Cmd_AddCommand ("-mlook", IN_MLookUp);
-
+	in_joystick = Cvar_Get ("in_joystick", "0", CVAR_ARCHIVE);
 	IN_StartupMouse ();
 }
 

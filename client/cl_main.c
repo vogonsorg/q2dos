@@ -1495,8 +1495,9 @@ void CL_InitLocal (void)
 	Cmd_AddCommand ("skins", CL_Skins_f);
 
 	Cmd_AddCommand ("userinfo", CL_Userinfo_f);
+#ifndef __DJGPP__ // FS: Special DOS version in snddma_dos.c
 	Cmd_AddCommand ("snd_restart", CL_Snd_Restart_f);
-
+#endif
 	Cmd_AddCommand ("changing", CL_Changing_f);
 	Cmd_AddCommand ("disconnect", CL_Disconnect_f);
 	Cmd_AddCommand ("record", CL_Record_f);

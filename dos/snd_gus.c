@@ -84,6 +84,7 @@ static int current_field_buffer=0;
 static struct section_buffer section_buffers[NUM_SECTION_BUFFERS];
 static struct field_buffer field_buffers[NUM_FIELD_BUFFERS];
 byte	extVoices,extCodecVoices; // FS: GUS clicking sounds during map transitions and pauseing fix
+int	havegus; // FS
 //***************************************************************************
 // Internal routines
 //***************************************************************************
@@ -1108,8 +1109,6 @@ qboolean GUS_Init(void)
 			if (GUS_GetGUSData()==false)
 				return(false);
 
-//	dma = &sn;
-
 	if (HaveCodec)
 	{
 		// do 11khz sampling rate unless command line parameter wants different
@@ -1117,9 +1116,9 @@ qboolean GUS_Init(void)
 		FSVal = extCodecVoices = 0x03; // FS: Added extCodecVoices
 		rc = COM_CheckParm("-sspeed");
 
-/*		if (s_khz.value > 11024) // FS: S_KHZ
+		if (s_khz->value > 11024) // FS: S_KHZ
 		{
-			dma.speed = s_khz.value;
+			dma.speed = s_khz->value;
 
 			// Make sure rate not too high
 			if (dma.speed>48000)
@@ -1136,7 +1135,7 @@ qboolean GUS_Init(void)
 				}
 			}
 		}
-*/
+
 		if (rc)
 		{
 			dma.speed = Q_atoi(com_argv[rc+1]);
@@ -1187,17 +1186,18 @@ qboolean GUS_Init(void)
 
 		GUS_StartDMA(DmaChannel,dma_buffer,BUFFER_SIZE);
 		GUS_StartCODEC(BUFFER_SIZE,FSVal);
+		havegus = 2; // FS: GUS MAX/IWPNP
 	}
 	else
 	{
 		// do 19khz sampling rate unless command line parameter wants different
-					 dma.speed = 19293;
+		dma.speed = 19293;
 		Voices=extVoices=32; // FS: Added extVoices
 		rc = COM_CheckParm("-sspeed");
 
-/*		if (s_khz.value > 19292) // FS: S_KHZ
+		if (s_khz->value > 19292) // FS: S_KHZ
 		{
-								dma.speed = s_khz.value;
+			dma.speed = s_khz->value;
 
 			// Make sure rate not too high
 			if (dma.speed>44100)
@@ -1214,7 +1214,7 @@ qboolean GUS_Init(void)
 				}
 			}
 		}
-*/
+
 		if (rc)
 		{
 			dma.speed = Q_atoi(com_argv[rc+1]);
@@ -1253,9 +1253,6 @@ qboolean GUS_Init(void)
 		// Zero off DMA buffer
 		memset(dma_buffer, 0, BUFFER_SIZE);
 
-//		dma.soundalive = true;
-//		dma.splitbuffer = false;
-
 		dma.samplepos = 0;
 		dma.submission_chunk = 1;
 		dma.buffer = (unsigned char *) dma_buffer;
@@ -1268,6 +1265,7 @@ qboolean GUS_Init(void)
 		else
 			SetGf18(DMA_CONTROL,0x45);
 		GUS_StartGf1(BUFFER_SIZE,Voices);
+		havegus = 1; // FS: Classic GUS
 	}
 	return(true);
 }
@@ -1362,8 +1360,6 @@ void GUS_Shutdown (void)
 void GUS_ClearDMA (void) // FS: This stops the constant clicking sound during map loads and pause screens
 {
 	memset(dma_buffer, 0, BUFFER_SIZE);
-//	dma.soundalive = true;
-//	dma.splitbuffer = false;
 	dma.samplepos = 0;
 	dma.submission_chunk = 1;
 	dma.buffer = (unsigned char *) dma_buffer;

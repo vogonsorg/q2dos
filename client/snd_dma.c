@@ -82,7 +82,7 @@ cvar_t		*s_primary;
 
 int		s_rawend;
 portable_samplepair_t	s_rawsamples[MAX_RAW_SAMPLES];
-
+extern int	havegus; // FS
 
 // ====================================================================
 // User-setable variables
@@ -125,8 +125,8 @@ void S_Init (void)
 	else
 	{
 		s_volume = Cvar_Get ("s_volume", "0.7", CVAR_ARCHIVE);
-		s_khz = Cvar_Get ("s_khz", "11", CVAR_ARCHIVE);
-		s_loadas8bit = Cvar_Get ("s_loadas8bit", "1", CVAR_ARCHIVE);
+		s_khz = Cvar_Get ("s_khz", "11025", CVAR_ARCHIVE);
+		s_loadas8bit = Cvar_Get ("s_loadas8bit", "0", CVAR_ARCHIVE);
 		s_mixahead = Cvar_Get ("s_mixahead", "0.2", CVAR_ARCHIVE);
 		s_show = Cvar_Get ("s_show", "0", 0);
 		s_testsound = Cvar_Get ("s_testsound", "0", 0);
@@ -136,6 +136,9 @@ void S_Init (void)
 		Cmd_AddCommand("stopsound", S_StopAllSounds);
 		Cmd_AddCommand("soundlist", S_SoundList);
 		Cmd_AddCommand("soundinfo", S_SoundInfo_f);
+
+		if (s_khz->value < 11025) // FS: Old config, fix it up
+			Cvar_SetValue("s_khz", 11025);
 
 		if (!SNDDMA_Init())
 			return;
@@ -775,6 +778,10 @@ void S_ClearBuffer (void)
 	if (dma.buffer)
 		memset(dma.buffer, clear, dma.samples * dma.samplebits/8);
 	SNDDMA_Submit ();
+#ifdef __DJGPP__
+	if(havegus)
+		GUS_ClearDMA(); // FS
+#endif
 }
 
 /*

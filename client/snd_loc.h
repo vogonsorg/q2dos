@@ -120,6 +120,9 @@ void	SNDDMA_Shutdown(void);
 void	SNDDMA_BeginPainting (void);
 
 void	SNDDMA_Submit(void);
+#ifdef __DJGPP__
+void GUS_ClearDMA (void); // FS: This stops the constant clicking sound during map loads and pause screens
+#endif
 
 //====================================================================
 

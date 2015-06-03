@@ -6,7 +6,7 @@
 #include "../client/snd_loc.h"
 #include "dosisms.h"
 
-#define USE_QDOS_SOUND // FS: Uncomment to play with the sound card.  FIXME TODO -- Fix S_KHZ to match
+#define USE_QDOS_SOUND
 #ifdef USE_QDOS_SOUND
 typedef enum
 {
@@ -17,7 +17,6 @@ typedef enum
 
 dmacard_t		 dmacard;
 int BLASTER_GetDMAPos(void);
-void S_StopAllSoundsC (void); // FS: Proto this for GUS Clear Buffer Fix
 
 /*
 ===============================================================================
@@ -29,7 +28,7 @@ GUS SUPPORT
 qboolean GUS_Init (void);
 int GUS_GetDMAPos (void);
 void GUS_Shutdown (void);
-int   havegus = 0; // FS
+static int	firstInit = true; // FS
 
 
 /*
@@ -405,16 +404,13 @@ qboolean BLASTER_Init(void)
 
 
 // everyone does 11khz sampling rate unless told otherwise
-//	dma = &sn;
 	dma.speed = 11025;
 	rc = COM_CheckParm("-sspeed");
 
-/*
-	if (s_khz.value > 0) // FS: S_KHZ
+	if (s_khz->value > 8000) // FS: S_KHZ
 	{
-		dma.speed = s_khz.value;
+		dma.speed = s_khz->value;
 	}
-*/
 
 	if (rc)
 		dma.speed = Q_atoi(com_argv[rc+1]);
@@ -438,7 +434,7 @@ qboolean BLASTER_Init(void)
 		dma.samplebits = 8;	 
 	}
 
-//	if(!host_initialized) // FS: SND_RESTART FIXME
+	if(firstInit)
 	{
 		Cmd_AddCommand("sbinfo", SB_Info_f);
 	}
@@ -573,9 +569,9 @@ void snd_restart_f (void) // FS: SND_RESTART
 {
 	SNDDMA_Shutdown();
 	Com_Printf("\nSound Restarting\n");
-//	Cache_Flush();
+//	Cache_Flush(); // FS: TODO FIXME Is there a cache flush function in q2?
 	SNDDMA_Init();
-//	S_StopAllSoundsC(); // FS: For GUS Buffer Clear Fix
+	S_StopAllSounds();
 	Com_Printf ("Sound sampling rate: %i\n", dma.speed);
 }
 #endif // USE_QDOS_SOUND
@@ -583,17 +579,18 @@ void snd_restart_f (void) // FS: SND_RESTART
 qboolean SNDDMA_Init(void)
 {
 #ifdef USE_QDOS_SOUND
-//	if (!host_initialized)
+	if (firstInit)
 	{
 		Cmd_AddCommand ("snd_restart", snd_restart_f); // FS
 		Cmd_AddCommand ("snd_shutdown", snd_shutdown_f); // FS
 	}
+	firstInit = false;
+
 	if (GUS_Init ())
 	{
 		Com_DPrintf("GUS_Init\n");
 		dmacard = dma_gus;
-		havegus = 1; // FS
-//		S_StopAllSoundsC(); // FS: For GUS Buffer Clear Fix
+		S_StopAllSounds(); // FS: For GUS Buffer Clear Fix
 		return true;
 	}
 
@@ -605,7 +602,6 @@ qboolean SNDDMA_Init(void)
 	}
 	
 	dmacard = dma_none;
-	
 	return false;
 #else
 	return false;
@@ -662,5 +658,5 @@ void SNDDMA_Submit(void)
 
 void S_Activate (qboolean active)
 {
-Com_Printf("S_Activate %d",active);
+	Com_Printf("S_Activate %d", active);
 }

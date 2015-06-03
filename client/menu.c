@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 #include "client.h"
 #include "../client/qmenu.h"
+#include "snd_loc.h"
 
 static int	m_main_cursor;
 
@@ -53,7 +54,6 @@ void M_Menu_Main_f (void);
 
 qboolean	m_entersound;		// play after drawing a frame, so caching
 								// won't disrupt the sound
-
 void	(*m_drawfunc) (void);
 const char *(*m_keyfunc) (int key);
 
@@ -1167,15 +1167,28 @@ static void ConsoleFunc( void *unused )
 
 static void UpdateSoundQualityFunc( void *unused )
 {
+	extern int	havegus; // FS: DOS GUS
+
 	if ( s_options_quality_list.curvalue )
 	{
-		Cvar_SetValue( "s_khz", 22 );
+		Cvar_SetValue( "s_khz", 22050 );
 		Cvar_SetValue( "s_loadas8bit", false );
 	}
 	else
 	{
-		Cvar_SetValue( "s_khz", 11 );
-		Cvar_SetValue( "s_loadas8bit", true );
+		if(havegus > 0)
+		{
+			if (havegus == 1)
+				Cvar_SetValue ("s_khz", 19293);
+			else
+				Cvar_SetValue ("s_khz", 11025);
+			Cvar_SetValue( "s_loadas8bit", false );
+		}
+		else
+		{
+			Cvar_SetValue( "s_khz", 11025 );
+			Cvar_SetValue( "s_loadas8bit", true );
+		}
 	}
 	
 	Cvar_SetValue( "s_primary", s_options_compatibility_list.curvalue );

@@ -95,6 +95,9 @@ void	dos_usleep(int usecs);
 int dos_getheapsize(void);
 
 extern regs_t regs;
+void Sys_LowFPPrecision (void);
+void Sys_HighFPPrecision (void);
+void Sys_SetFPCW (void);
 
 #endif	// _DOSISMS_H_
 
