@@ -843,3 +843,4 @@ void SV_Frame (int msec);
 extern	int		com_argc;
 extern	char	*com_argv[MAX_NUM_ARGVS+1];
 int Q_atoi (char *str); // FS: From Q1
+char Q_toupper(char c); // FS

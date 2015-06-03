@@ -52,7 +52,7 @@ void		SWimp_Shutdown( void )
 
 rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
 {
-	printf("SWimp_SetMode %d x %d mode %d fs %d\n",&pwidth,&pheight,mode,fullscreen);
+//	printf("SWimp_SetMode %d x %d mode %d fs %d\n",&pwidth,&pheight,mode,fullscreen); // FS: jason fix this compile warning
 
         if ( !ri.Vid_GetModeInfo( pwidth, pheight, mode ) )
         {

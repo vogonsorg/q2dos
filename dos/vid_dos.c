@@ -94,7 +94,7 @@ void VID_NewWindow (int width, int height)
 {
         viddef.width = width;
         viddef.height = height;
-		printf("VID_NewWindow %d %\n",width,height);
+		printf("VID_NewWindow %d %d\n",width,height);
 }
 
 /*

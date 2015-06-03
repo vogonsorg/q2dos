@@ -389,7 +389,7 @@ void CL_ParsePacketEntities (frame_t *oldframe, frame_t *newframe)
 {
 	int			newnum;
 	int			bits;
-	entity_state_t	*oldstate;
+	entity_state_t	*oldstate = NULL; // FS: Compiler warning
 	int			oldindex, oldnum;
 
 	newframe->parse_entities = cl.parse_entities;

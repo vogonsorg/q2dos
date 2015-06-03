@@ -1638,6 +1638,12 @@ int Q_atoi (char *str)
 	return 0;
 }
 
+char Q_toupper (char c) // FS
+{
+	if (c>='a' && c<='z')
+		c-=('a'-'A');
+	return(c);
+}
 /*
 =================
 Qcommon_Shutdown

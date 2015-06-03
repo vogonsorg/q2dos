@@ -4,6 +4,7 @@
 
 #include "../client/client.h"
 #include "../client/snd_loc.h"
+#include "dosisms.h"
 
 #define USE_QDOS_SOUND // FS: Uncomment to play with the sound card.  FIXME TODO -- Fix S_KHZ to match
 #ifdef USE_QDOS_SOUND
