@@ -440,7 +440,7 @@ qboolean BLASTER_Init(void)
 		Cmd_AddCommand("sbinfo", SB_Info_f);
 	}
 
-	size = 4096*8; // FS: Yeah this blows, but we need way more now because of stereo and shit
+	size = SND_BUFFER_SIZE;
 
 // allocate 8k and get a 4k-aligned buffer from it
 	dma_dosadr = dos_getmemory(size*2); // sezero
@@ -562,18 +562,6 @@ void snd_shutdown_f (void) // FS: SND_SHUTDOWN
 {
 	SNDDMA_Shutdown();
 	Com_Printf("\nSound Disabled.\n");
-//	Cache_Flush();
-}
-
-
-void snd_restart_f (void) // FS: SND_RESTART
-{
-	SNDDMA_Shutdown();
-	Com_Printf("\nSound Restarting\n");
-//	Cache_Flush(); // FS: TODO FIXME Is there a cache flush function in q2?
-	SNDDMA_Init();
-	S_StopAllSounds();
-	Com_Printf ("Sound sampling rate: %i\n", dma.speed);
 }
 #endif // USE_QDOS_SOUND
 
@@ -582,7 +570,6 @@ qboolean SNDDMA_Init(void)
 #ifdef USE_QDOS_SOUND
 	if (firstInit)
 	{
-		Cmd_AddCommand ("snd_restart", snd_restart_f); // FS
 		Cmd_AddCommand ("snd_shutdown", snd_shutdown_f); // FS
 	}
 	firstInit = false;
@@ -597,7 +584,7 @@ qboolean SNDDMA_Init(void)
 
 	if (BLASTER_Init ())
 	{
-		  Com_DPrintf("BLASTER_Init\n");
+		Com_DPrintf("BLASTER_Init\n");
 		dmacard = dma_blaster;
 		return true;
 	}
@@ -614,12 +601,12 @@ int	SNDDMA_GetDMAPos(void)
 #ifdef USE_QDOS_SOUND
 	switch (dmacard)
 	{
-	case dma_blaster:
-		return BLASTER_GetDMAPos ();
-	case dma_gus:
-		return GUS_GetDMAPos ();
-	case dma_none:
-		break;
+		case dma_blaster:
+			return BLASTER_GetDMAPos ();
+		case dma_gus:
+			return GUS_GetDMAPos ();
+		case dma_none:
+			break;
 	}
 	
 	return 0;
@@ -633,14 +620,14 @@ void SNDDMA_Shutdown(void)
 #ifdef USE_QDOS_SOUND
 	switch (dmacard)
 	{
-	case dma_blaster:
-		BLASTER_Shutdown ();
-		break;
-	case dma_gus:
-		GUS_Shutdown ();
-		break;
-	case dma_none:
-		break;
+		case dma_blaster:
+			BLASTER_Shutdown ();
+			break;
+		case dma_gus:
+			GUS_Shutdown ();
+			break;
+		case dma_none:
+			break;
 	}
 
 	dmacard = dma_none;

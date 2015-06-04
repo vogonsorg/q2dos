@@ -1094,6 +1094,7 @@ new parameters and flush all sounds
 */
 void CL_Snd_Restart_f (void)
 {
+	S_StopAllSounds(); // FS: Clear GUS Buffer
 	S_Shutdown ();
 	S_Init ();
 	CL_RegisterSounds ();
@@ -1495,9 +1496,8 @@ void CL_InitLocal (void)
 	Cmd_AddCommand ("skins", CL_Skins_f);
 
 	Cmd_AddCommand ("userinfo", CL_Userinfo_f);
-#ifndef __DJGPP__ // FS: Special DOS version in snddma_dos.c
 	Cmd_AddCommand ("snd_restart", CL_Snd_Restart_f);
-#endif
+
 	Cmd_AddCommand ("changing", CL_Changing_f);
 	Cmd_AddCommand ("disconnect", CL_Disconnect_f);
 	Cmd_AddCommand ("record", CL_Record_f);
@@ -1524,7 +1524,7 @@ void CL_InitLocal (void)
 	// the only thing this does is allow command completion
 	// to work -- all unknown commands are automatically
 	// forwarded to the server
-#if 0
+//#if 0
 	Cmd_AddCommand ("wave", NULL);
 	Cmd_AddCommand ("inven", NULL);
 	Cmd_AddCommand ("kill", NULL);
@@ -1544,7 +1544,7 @@ void CL_InitLocal (void)
 	Cmd_AddCommand ("invdrop", NULL);
 	Cmd_AddCommand ("weapnext", NULL);
 	Cmd_AddCommand ("weapprev", NULL);
-#endif
+//#endif
 //JASON this crashes out?
 }
 
