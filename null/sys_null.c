@@ -71,46 +71,30 @@ byte        shiftscantokey[128] =
 
 int dos_inportb(int port)
 {
-	return inportb(port);
 }
 
 int dos_inportw(int port)
 {
-	return inportw(port);
 }
 
 void dos_outportb(int port, int val)
 {
-	outportb(port, val);
 }
 
 void dos_outportw(int port, int val)
 {
-	outportw(port, val);
 }
 
 void dos_irqenable(void)
 {
-	enable();
 }
 
 void dos_irqdisable(void)
 {
-	disable();
 }
 
 void TrapKey(void)
 {
-//      static int ctrl=0;
-	keybuf[keybuf_head] = dos_inportb(0x60);
-	dos_outportb(0x20, 0x20);
-	/*
-	if (scantokey[keybuf[keybuf_head]&0x7f] == K_CTRL)
-		ctrl=keybuf[keybuf_head]&0x80;
-	if (ctrl && scantokey[keybuf[keybuf_head]&0x7f] == 'c')
-		Sys_Error("ctrl-c hit\n");
-	*/
-	keybuf_head = (keybuf_head + 1) & (KEYBUF_SIZE-1);
 }
 
 #define SC_UPARROW              0x48
@@ -125,9 +109,15 @@ int	curtime;
 //unsigned	sys_msg_time;
 unsigned	sys_frame_time;
 
+#ifndef id386
+void Sys_SetFPCW()
+{
+}
+#endif
 
 void Sys_mkdir (char *path)
 {
+Com_Printf("mkdir %s\n",path);
 }
 
 void Sys_Error (char *error, ...)
@@ -175,10 +165,39 @@ void	*Sys_GetGameAPI (void *parms)
 }
 #endif	
 
-
 char *Sys_ConsoleInput (void)
 {
+#ifdef __DJGPP__
+        static char     text[1024];
+        static int index;
+        int     len;
+        char c;
+
+        //cin.rdbuf()->setbuf(NULL, 0);//me vomit over a C++ book
+
+
+    if (!kbhit())
+                return NULL;
+
+
+    c = getche();
+
+        text[index]=c;
+
+        index ++;
+
+        if (c!=13)
+                return NULL;
+
+        printf("\n");
+
+        text[index]=0;
+        index = 0;
+
+        return text;
+#else
 	return NULL;
+#endif
 }
 
 void	Sys_ConsoleOutput (char *string)
@@ -191,48 +210,6 @@ printf("%s",string);
 #define SC_LSHIFT       0x2a 
 void Sys_SendKeyEvents (void)
 {
-	int k, next;
-	int outkey;
-
-// get key events
-
-	while (keybuf_head != keybuf_tail)
-	{
-
-		k = keybuf[keybuf_tail++];
-		keybuf_tail &= (KEYBUF_SIZE-1);
-
-		if (k==0xe0)
-			continue;               // special / pause keys
-		next = keybuf[(keybuf_tail-2)&(KEYBUF_SIZE-1)];
-		if (next == 0xe1)
-			continue;                               // pause key bullshit
-		if (k==0xc5 && next == 0x9d) 
-		{ 
-			Key_Event (K_PAUSE, true, Sys_Milliseconds()); // FS: FIXME is Sys_Milliseconds() right?
-			continue; 
-		} 
-
-		// extended keyboard shift key bullshit 
-		if ( (k&0x7f)==SC_LSHIFT || (k&0x7f)==SC_RSHIFT ) 
-		{ 
-			if ( keybuf[(keybuf_tail-2)&(KEYBUF_SIZE-1)]==0xe0 ) 
-				continue; 
-			k &= 0x80; 
-			k |= SC_RSHIFT; 
-		} 
-
-		if (k==0xc5 && keybuf[(keybuf_tail-2)&(KEYBUF_SIZE-1)] == 0x9d)
-			continue; // more pause bullshit
-
-		outkey = scantokey[k & 0x7f];
-
-		if (k & 0x80)
-			Key_Event (outkey, false, Sys_Milliseconds()); // FS: FIXME is Sys_Milliseconds() right?
-		else
-			Key_Event (outkey, true, Sys_Milliseconds()); // FS: FIXME is Sys_Milliseconds() right?
-
-	}
 }
 
 void Sys_AppActivate (void)
@@ -347,44 +324,15 @@ static int handlercount=0;
 
 void	dos_registerintr(int intr, void (*handler)(void))
 {
-	_go32_dpmi_seginfo info;
-	struct handlerhistory_s *oldstuff;
-
-	oldstuff = &handlerhistory[handlercount];
-
-// remember old handler
-	_go32_dpmi_get_protected_mode_interrupt_vector(intr, &oldstuff->pm_oldvec);
-	oldstuff->intr = intr;
-
-	info.pm_offset = (int) handler;
-	_go32_dpmi_allocate_iret_wrapper(&info);
-
-// set new protected mode handler
-	_go32_dpmi_set_protected_mode_interrupt_vector(intr, &info);
-
-	handlercount++;
 
 }
 
 void	dos_restoreintr(int intr)
 {
+}
 
-	int i;
-	struct handlerhistory_s *oldstuff;
-
-// find and reinstall previous interrupt
-	for (i=0 ; i<handlercount ; i++)
-	{
-		oldstuff = &handlerhistory[i];
-		if (oldstuff->intr == intr)
-		{
-			_go32_dpmi_set_protected_mode_interrupt_vector(intr,
-				&oldstuff->pm_oldvec);
-			oldstuff->intr = -1;
-			break;
-		}
-	}
-
+void Sys_MakeCodeWriteable()
+{
 }
 
 
@@ -396,7 +344,6 @@ void main (int argc, char **argv)
 
 	Qcommon_Init (argc, argv);
 	oldtime = Sys_Milliseconds ();
-	dos_registerintr(9, TrapKey); // FS: FIXME FREE THIS WHEN CLOSED
 
     /* main window message loop */
 	while (1)

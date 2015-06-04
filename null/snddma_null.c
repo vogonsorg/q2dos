@@ -5,6 +5,12 @@
 #include "../client/client.h"
 #include "../client/snd_loc.h"
 
+int	havegus;
+
+void GUS_ClearDMA(void)
+{
+}
+
 qboolean SNDDMA_Init(void)
 {
 	return false;
