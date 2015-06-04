@@ -36,7 +36,8 @@ static menuframework_s	s_opengl_menu;
 static menuframework_s *s_current_menu;
 static int				s_current_menu_index;
 
-static menulist_s		s_mode_list[2];
+//static menulist_s		s_mode_list[2];
+static menuslider_s		s_mode_list[2];
 static menulist_s		s_ref_list[2];
 static menuslider_s		s_tq_slider;
 static menuslider_s		s_screensize_slider[2];
@@ -167,6 +168,12 @@ static void DriverCallback( void *unused )
 		s_current_menu_index = 1;
 	}
 
+}
+
+static void ResolutionCallback( void *s )
+{
+	menuslider_s *slider = ( menuslider_s * ) s;
+	Cvar_SetValue( "sw_mode", slider->curvalue);
 }
 
 static void ScreenSizeCallback( void *s )
@@ -341,6 +348,7 @@ void	VID_CheckChanges (void)
 
 void	VID_MenuInit (void)
 {
+#if 0
 	static const char *resolutions[] = 
 	{
 		"[320 200  ]",
@@ -352,13 +360,12 @@ void	VID_MenuInit (void)
 		"[800 600  ]",
 		"[960 720  ]",
 		"[1024 768 ]",
-#if 0
 		"[1152 864 ]",
 		"[1280 960 ]",
 		"[1600 1200]",
-#endif
 		0
 	};
+#endif
 	static const char *refs[] =
 	{
 		"[software      ]",
@@ -371,6 +378,7 @@ void	VID_MenuInit (void)
 		0
 	};
 	int i;
+
 
 	if ( !gl_driver )
 		gl_driver = Cvar_Get( "gl_driver", "opengl32", 0 );
@@ -430,11 +438,23 @@ void	VID_MenuInit (void)
 		s_ref_list[i].generic.callback = DriverCallback;
 		s_ref_list[i].itemnames = refs;
 
+/*
+		Before the Video Resolution menu was a static
+		list, but you can't update it..
 		s_mode_list[i].generic.type = MTYPE_SPINCONTROL;
-		s_mode_list[i].generic.name = "video mode";
+		s_mode_list[i].generic.name = "video resolution";
 		s_mode_list[i].generic.x = 0;
 		s_mode_list[i].generic.y = 10;
 		s_mode_list[i].itemnames = resolutions;
+*/
+                s_mode_list[i].generic.type     = MTYPE_SLIDER;
+		s_mode_list[i].generic.name = "video resolution";
+                s_mode_list[i].generic.x = 0;
+                s_mode_list[i].generic.y = 10;
+                s_mode_list[i].minvalue = 0;
+                s_mode_list[i].maxvalue = 10;
+		s_mode_list[i].generic.callback = ResolutionCallback;
+
 
 		s_screensize_slider[i].generic.type	= MTYPE_SLIDER;
 		s_screensize_slider[i].generic.x		= 0;

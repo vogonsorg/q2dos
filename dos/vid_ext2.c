@@ -32,6 +32,7 @@ struct vid_resolutions_t {
 	char menuname[30];
 } vid_resolutions[10];
 int num_vid_resolutions=1;	//we always have mode 13
+char (resolutions[10])[20];
 
 #define MODE_SUPPORTED_IN_HW		0x0001
 #define COLOR_MODE			0x0008
@@ -69,9 +70,6 @@ static vesa_extra_t	vesa_extra[MAX_VESA_MODES];
 
 
 extern regs_t regs;
-
-#define MAX_VESA_MODES	30	// we'll just take the first 30 if there
-				//  are more
 
 
 typedef struct vbeinfoblock_s {
@@ -140,10 +138,11 @@ VID_InitExtra
 */
 void VID_InitExtra (void)
 {
-	int				nummodes;
-	short			*pmodenums;
+	int		nummodes;
+	short		*pmodenums;
 	vbeinfoblock_t	*pinfoblock;
 	__dpmi_meminfo	phys_mem_info;
+	int		x;
 
 	pinfoblock = dos_getmemory(sizeof(vbeinfoblock_t));
 
@@ -156,6 +155,14 @@ vid_resolutions[0].vesa_mode=-1;
 vid_resolutions[0].height=200;
 vid_resolutions[0].width=320;
 sprintf(vid_resolutions[0].menuname,"[VGA 320x200]");
+sprintf(resolutions[0],vid_resolutions[0].menuname);
+memset(resolutions,0x0,sizeof(resolutions));
+while(x<10)
+{
+sprintf(resolutions[x],"NA");
+}
+
+//return;	//test for VGA only
 
 // see if VESA support is available
 	regs.x.ax = 0x4f00;
