@@ -96,12 +96,12 @@ void VID_NewWindow (int width, int height)
 {
         viddef.width = width;
         viddef.height = height;
-		printf("VID_NewWindow %d %d\n",width,height);
 }
 
 /*
 ** VID_GetModeInfo
 */
+#if 0
 typedef struct vidmode_s
 {
     const char *description;
@@ -126,16 +126,28 @@ vidmode_t vid_modes[] =
     { "Mode 0: 320x200", 848, 480, 1 }
 };
 #define VID_NUM_MODES ( sizeof( vid_modes ) / sizeof( vid_modes[0] ) )
+#endif
+
+extern int num_vid_resolutions;
+struct vid_resolutions_t {
+        int mode;
+        int vesa_mode;
+        int height;
+        int width;
+	int address;
+        char menuname[30];
+} ;
+extern struct vid_resolutions_t vid_resolutions[10];
 
 qboolean VID_GetModeInfo( int *width, int *height, int mode )
 {
-    if ( mode < 0 || mode >= VID_NUM_MODES )
+    if ( mode < 0 || mode >= num_vid_resolutions) //VID_NUM_MODES )
         return false;
 
-    *width  = vid_modes[mode].width;
-    *height = vid_modes[mode].height;
+    *width  = vid_resolutions[mode].width;//vid_modes[mode].width;
+    *height = vid_resolutions[mode].height;//vid_modes[mode].height;
 
-    Com_Printf("VID_GetModeInfo %dx%d mode %d\n",*width,*height,mode);
+    //Com_Printf("VID_GetModeInfo %dx%d mode %d\n",*width,*height,mode);
 
     return true;
 }
@@ -326,13 +338,13 @@ void	VID_CheckChanges (void)
 {
 }
 
+
 void	VID_MenuInit (void)
 {
 	static const char *resolutions[] = 
 	{
 		"[320 200  ]",
 		"[848 480  ]",
-#if 0
 		"[320 240  ]",
 		"[400 300  ]",
 		"[512 384  ]",
@@ -340,6 +352,7 @@ void	VID_MenuInit (void)
 		"[800 600  ]",
 		"[960 720  ]",
 		"[1024 768 ]",
+#if 0
 		"[1152 864 ]",
 		"[1280 960 ]",
 		"[1600 1200]",

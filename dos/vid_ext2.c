@@ -12,7 +12,7 @@
 //
 //http://uhexen2.sourceforge.net/changes.html
 // 
-//This just dumps the first 30 SVGA modes 
+//This just dumps the first 40 SVGA modes 
 
 #include <stdio.h>
 #include <dpmi.h>
@@ -22,6 +22,16 @@
 #include "../client/qmenu.h"
 #include "vid_dos.h"
 #include "dosisms.h"
+
+struct vid_resolutions_t {
+	int mode;
+	int vesa_mode;
+	int height;
+	int width;
+	int address;
+	char menuname[30];
+} vid_resolutions[10];
+int num_vid_resolutions=1;	//we always have mode 13
 
 #define MODE_SUPPORTED_IN_HW		0x0001
 #define COLOR_MODE			0x0008
@@ -49,7 +59,7 @@ typedef struct {
 } vesa_extra_t;
 
 
-#define MAX_VESA_MODES			30
+#define MAX_VESA_MODES			40
 static vmode_t		vesa_modes[MAX_VESA_MODES] = 
 	{{NULL, NULL, "    ********* VESA modes *********    "}};
 static char			names[MAX_VESA_MODES][10];
@@ -139,6 +149,14 @@ void VID_InitExtra (void)
 
 	*(long *)pinfoblock->VbeSignature = 'V' + ('B'<<8) + ('E'<<16) + ('2'<<24);
 
+// We always have mode 13 VGA
+memset(vid_resolutions,0x0,sizeof(vid_resolutions));
+vid_resolutions[0].mode=0;
+vid_resolutions[0].vesa_mode=-1;
+vid_resolutions[0].height=200;
+vid_resolutions[0].width=320;
+sprintf(vid_resolutions[0].menuname,"[VGA 320x200]");
+
 // see if VESA support is available
 	regs.x.ax = 0x4f00;
 	regs.x.es = ptr2real(pinfoblock) >> 4;
@@ -151,8 +169,7 @@ void VID_InitExtra (void)
 	if (pinfoblock->VbeVersion[1] < 0x02)
 		return;		// not VESA 2.0 or greater
 
-	//Con_Printf ("VESA 2.0 compliant adapter:\n%s\n",
-	printf ("VESA 2.0 compliant adapter:\n%s\n",
+	Com_Printf ("VESA 2.0 compliant adapter:\n%s\n",
 				VID_ExtraFarToLinear (*(byte **)&pinfoblock->OemStringPtr[0]));
 
 	totalvidmem = *(unsigned short *)&pinfoblock->TotalMemory[0] << 16;
@@ -402,8 +419,21 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 		modeinfo.blue_pos = *(char*)(infobuf+36);
 
 		modeinfo.pptr = *(long *)(infobuf+40);
-
-#if 1
+//8bit linear only
+if((modeinfo.memory_model==0x4)&&(modeinfo.bits_per_pixel==8))
+	{
+	Com_Printf("VESA mode 0x%0x %dx%d supported\n",modeinfo.modenum,modeinfo.width,modeinfo.height);
+	if(num_vid_resolutions<10) {
+	vid_resolutions[num_vid_resolutions].mode=0;
+	vid_resolutions[num_vid_resolutions].vesa_mode=modeinfo.modenum;
+	vid_resolutions[num_vid_resolutions].height=modeinfo.height;
+	vid_resolutions[num_vid_resolutions].width=modeinfo.width;
+	vid_resolutions[num_vid_resolutions].address=modeinfo.pptr;
+	sprintf(vid_resolutions[num_vid_resolutions].menuname,"[VESA %dx%d]",modeinfo.width,modeinfo.height);
+	num_vid_resolutions++;
+		}
+	}
+#if 0
 		printf("VID: (VESA) info for mode 0x%x\n", modeinfo.modenum);
 		printf("  mode attrib = 0x%0x\n", modeinfo.mode_attributes);
 		printf("  win a attrib = 0x%0x\n", *(unsigned char*)(infobuf+2));
