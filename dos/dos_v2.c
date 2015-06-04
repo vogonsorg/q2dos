@@ -148,18 +148,20 @@ void *dos_getmemory(int size)
 	info.size = (size+15) / 16;
 	rc = _go32_dpmi_allocate_dos_memory(&info);
 	if (rc)
-                return NULL; // FS: from HOT
+	{
+		return NULL; // FS: from HOT
+	}
 
-        for (i=0;i<MAX_SEGINFO;i++)
-        {
-                if (!seginfo[i].rm_segment)  // FS: from HOT
-                {
-                        seginfo[i] = info;
-                        return real2ptr((int) info.rm_segment << 4);
-                }
-        }
-        Sys_Error("Reached MAX_SEGINFO"); // FS: from HOT
-   return NULL; // silence compiler warning
+	for (i=0;i<MAX_SEGINFO;i++)
+	{
+		if (!seginfo[i].rm_segment)  // FS: from HOT
+		{
+			seginfo[i] = info;
+			return real2ptr((int) info.rm_segment << 4);
+		}
+	}
+	Sys_Error("Reached MAX_SEGINFO"); // FS: from HOT
+	return NULL; // silence compiler warning
 }
 
 void dos_freememory(void *ptr)
@@ -169,16 +171,16 @@ void dos_freememory(void *ptr)
 	int segment;
 
 	segment = ptr2real(ptr) >> 4;
-        for (i=0 ; i<MAX_SEGINFO ; i++) //FS: from HOT
-        {
+	for (i=0 ; i<MAX_SEGINFO ; i++) //FS: from HOT
+	{
 		if (seginfo[i].rm_segment == segment)
 		{
 			_go32_dpmi_free_dos_memory(&seginfo[i]);
 			seginfo[i].rm_segment = 0;
-                        return;
+			return;
 		}
-        }
-  Sys_Error("Unknown seginfo");
+	}
+	Sys_Error("Unknown seginfo");
 }
 
 static struct handlerhistory_s

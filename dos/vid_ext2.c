@@ -146,6 +146,9 @@ void VID_InitExtra (void)
 
 	pinfoblock = dos_getmemory(sizeof(vbeinfoblock_t));
 
+	if(!pinfoblock)
+		Sys_Error("pinfoblock NULL!\n");
+
 	*(long *)pinfoblock->VbeSignature = 'V' + ('B'<<8) + ('E'<<16) + ('2'<<24);
 
 // We always have mode 13 VGA
@@ -171,10 +174,16 @@ sprintf(resolutions[x],"NA");
 	dos_int86(0x10);
 
 	if (regs.x.ax != 0x4f)
+	{
+		dos_freememory(pinfoblock); // FS: from HOT
 		return;		// no VESA support
+	}
 
 	if (pinfoblock->VbeVersion[1] < 0x02)
+	{
+		dos_freememory(pinfoblock); // FS: from HOT
 		return;		// not VESA 2.0 or greater
+	}
 
 	Com_Printf ("VESA 2.0 compliant adapter:\n%s\n",
 				VID_ExtraFarToLinear (*(byte **)&pinfoblock->OemStringPtr[0]));
@@ -377,10 +386,10 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 		modeinfo.pagesize = modeinfo.bytes_per_scanline * modeinfo.height;
 
 		if (modeinfo.pagesize > totalvidmem)
-			{
+		{
 			dos_freememory(infobuf);
 			return false;
-			}
+		}
 
 	// force to one page if the adapter reports it doesn't support more pages
 	// than that, no matter how much memory it has--it may not have hardware
