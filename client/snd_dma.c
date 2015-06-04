@@ -137,7 +137,7 @@ void S_Init (void)
 		Cmd_AddCommand("soundlist", S_SoundList);
 		Cmd_AddCommand("soundinfo", S_SoundInfo_f);
 
-		if (s_khz->value < 11025) // FS: Old config, fix it up
+		if (s_khz->value < 7000) // FS: Old config, fix it up
 			Cvar_SetValue("s_khz", 11025);
 
 		if (!SNDDMA_Init())

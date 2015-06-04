@@ -1098,8 +1098,8 @@ qboolean GUS_Init(void)
 	struct CodecRateStruct *CodecRate;
 	struct Gf1RateStruct *Gf1Rate;
 
-		  if (COM_CheckParm("-nogus"))
-					 return false;			  // FS: Disables GUS, useful if you want to use SB16 instead.  Thanks to Oz of HoT for oneliner.
+	if (COM_CheckParm("-nogus"))
+		return false;			  // FS: Disables GUS, useful if you want to use SB16 instead.  Thanks to Oz of HoT for oneliner.
 		  
 	// See what kind of UltraSound we have, if any
 	if (GUS_GetIWData()==false)
@@ -1163,7 +1163,7 @@ qboolean GUS_Init(void)
 		dma_dosadr = dos_getmemory(SND_BUFFER_SIZE*2);
 		if (dma_dosadr==NULL)  // sezero
 		{
-			Com_Printf("Couldn't allocate sound dma buffer");
+			Com_Printf("Couldn't allocate sound dma buffer\n");
 			return false;
 		}
 
@@ -1173,9 +1173,6 @@ qboolean GUS_Init(void)
 
 		// Zero off DMA buffer
 		memset(dma_buffer, 0, SND_BUFFER_SIZE);
-
-//		dma.soundalive = true;
-//		dma.splitbuffer = false;
 
 		dma.samplepos = 0;
 		dma.submission_chunk = 1;
@@ -1240,7 +1237,7 @@ qboolean GUS_Init(void)
 		dma_dosadr = dos_getmemory(SND_BUFFER_SIZE*2);
 		if (dma_dosadr==NULL)
 		{
-			Com_Printf("Couldn't allocate sound dma buffer");
+			Com_Printf("Couldn't allocate sound dma buffer\n");
 			return false;
 		}
 
@@ -1264,7 +1261,11 @@ qboolean GUS_Init(void)
 			SetGf18(DMA_CONTROL,0x45);
 		GUS_StartGf1(SND_BUFFER_SIZE,Voices);
 		havegus = 1; // FS: Classic GUS
+
+		if (s_mixahead->value <= 0.2) // FS: GUS Classic needs 0.3 to work properly.
+			Cvar_SetValue ("s_mixahead", 0.3);
 	}
+
 	return(true);
 }
 
@@ -1362,6 +1363,7 @@ void GUS_ClearDMA (void) // FS: This stops the constant clicking sound during ma
 	dma.submission_chunk = 1;
 	dma.buffer = (unsigned char *) dma_buffer;
 	dma.samples = SND_BUFFER_SIZE/(dma.samplebits/8);
+
 	if (HaveCodec) // FS: GUS MAX, AMD InterWave/GUS PnP
 	{
 		dos_outportb(CodecRegisterSelect,CODEC_INTERFACE_CONFIG);
@@ -1381,7 +1383,9 @@ void GUS_ClearDMA (void) // FS: This stops the constant clicking sound during ma
 		SetGf18(DMA_CONTROL,0x00);
 		GetGf18(DMA_CONTROL);
 	}
+
 	GUS_StartDMA(DmaChannel,dma_buffer,SND_BUFFER_SIZE);
+
 	if (HaveCodec) // FS: GUS MAX, AMD InterWave/GUS PnP
 	{
 		GUS_StartCODEC(SND_BUFFER_SIZE,extCodecVoices);

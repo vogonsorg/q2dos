@@ -257,7 +257,7 @@ void R_Register (void)
 	sw_reportsurfout = ri.Cvar_Get ("sw_reportsurfout", "0", 0);
 	sw_stipplealpha = ri.Cvar_Get( "sw_stipplealpha", "0", CVAR_ARCHIVE );
 	sw_surfcacheoverride = ri.Cvar_Get ("sw_surfcacheoverride", "0", 0);
-	sw_waterwarp = ri.Cvar_Get ("sw_waterwarp", "1", 0);
+	sw_waterwarp = ri.Cvar_Get ("sw_waterwarp", "1", CVAR_ARCHIVE);
 	sw_mode = ri.Cvar_Get( "sw_mode", "0", CVAR_ARCHIVE );
 
 	r_lefthand = ri.Cvar_Get( "hand", "0", CVAR_USERINFO | CVAR_ARCHIVE );
