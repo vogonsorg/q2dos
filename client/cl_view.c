@@ -35,6 +35,7 @@ cvar_t		*cl_testparticles;
 cvar_t		*cl_testentities;
 cvar_t		*cl_testlights;
 cvar_t		*cl_testblend;
+cvar_t		*r_contentblend; // FS: Fucking hate palette blends from gun fire, etc.
 
 cvar_t		*cl_stats;
 
@@ -483,6 +484,14 @@ void V_RenderView( float stereo_separation )
 			cl.refdef.blend[3] = 0.5;
 		}
 
+		if (!r_contentblend->value) // FS: Fucking hate palette blends from gun fire, etc.
+		{
+			cl.refdef.blend[0] = 0;
+			cl.refdef.blend[1] = 0;
+			cl.refdef.blend[2] = 0;
+			cl.refdef.blend[3] = 0;
+		}
+
 		// offset vieworg appropriately if we're doing stereo separation
 		if ( stereo_separation != 0 )
 		{
@@ -579,6 +588,6 @@ void V_Init (void)
 	cl_testparticles = Cvar_Get ("cl_testparticles", "0", 0);
 	cl_testentities = Cvar_Get ("cl_testentities", "0", 0);
 	cl_testlights = Cvar_Get ("cl_testlights", "0", 0);
-
+	r_contentblend = Cvar_Get ("r_contentblend", "1", CVAR_ARCHIVE); // FS: Fucking hate palette blends from gun fire, etc.
 	cl_stats = Cvar_Get ("cl_stats", "0", 0);
 }

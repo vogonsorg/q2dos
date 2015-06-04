@@ -51,6 +51,7 @@ void CDAudio_Update(void)
 
 int CDAudio_Init(void)
 {
+	Con_Printf("CD Audio is disabled in this build.\n");
 	return 0;
 }
 
@@ -279,6 +280,10 @@ static byte		cdrom;
 static byte		playTrack;
 static byte		cdvolume;
 
+cvar_t *cd_nocd;
+cvar_t *cd_loopcount;
+cvar_t *cd_looptrack;
+int		loopcounter;
 
 static int RedBookToSector(int rb)
 {
@@ -565,17 +570,7 @@ void CDAudio_Play(int track, qboolean looping)
 		return;
 	}
 
-	volume = 255; //(int)(bgmvolume->value * 255.0);
-	if (volume < 0)
-	{
-//		Cvar_SetValue ("bgmvolume", 0.0);
-		volume = 0;
-	}
-	else if (volume > 255)
-	{
-//		Cvar_SetValue ("bgmvolume", 1.0);
-		volume = 255;
-	}
+	volume = 255;
 	CDAudio_SetVolume (volume);
 
 	cdRequest->headerLength = 13;
@@ -600,6 +595,9 @@ void CDAudio_Play(int track, qboolean looping)
 		playing = false;
 		return;
 	}
+	// set a loop counter so that this track will change to the
+	// looptrack later
+	loopcounter = 0;
 
 	playing = true;
 }
@@ -777,7 +775,6 @@ static void CD_f (void)
 void CDAudio_Update(void)
 {
 	int		ret;
-	int		newVolume;
 	static	int lastUpdate;
 
 	if (!initialized || !enabled)
@@ -808,22 +805,6 @@ void CDAudio_Update(void)
 		}
 	}
 
-	newVolume = 255; //(int)(bgmvolume->value * 255.0);
-	if (newVolume != cdvolume)
-	{
-		if (newVolume < 0)
-		{
-//			Cvar_SetValue ("bgmvolume", 0.0);
-			newVolume = 0;
-		}
-		else if (newVolume > 255)
-		{
-//			Cvar_SetValue ("bgmvolume", 1.0);
-			newVolume = 255;
-		}
-		CDAudio_SetVolume (newVolume);
-	}
-
 	if (playing)
 	{
 		CDAudio_GetAudioStatus();
@@ -831,7 +812,13 @@ void CDAudio_Update(void)
 		{
 			playing = false;
 			if (playLooping)
-				CDAudio_Play(playTrack, true);
+			{
+				loopcounter++;
+				if (loopcounter >= cd_loopcount->value)
+					CDAudio_Play(cd_looptrack->value, true);
+				else
+					CDAudio_Play(playTrack, true);
+			}
 		}
 	}
 }
@@ -843,10 +830,17 @@ int CDAudio_Init(void)
 	int		n;
 
 //	cvar_t *bgmvolume = Cvar_Get ("cd_volume", "1.0", 0);
-/*	if (cls.state == ca_dedicated) // FS: FIXME
+	if (dedicated && dedicated->value)
 		return -1;
-*/
+
 	if (COM_CheckParm("-nocdaudio") || COM_CheckParm("-nocd")) // FS
+		return -1;
+
+	cd_nocd = Cvar_Get ("cd_nocd", "0", CVAR_ARCHIVE );
+	cd_loopcount = Cvar_Get ("cd_loopcount", "4", 0);
+	cd_looptrack = Cvar_Get ("cd_looptrack", "11", 0);
+
+	if ( cd_nocd->value)
 		return -1;
 
 	if (COM_CheckParm("-cdmediacheck"))

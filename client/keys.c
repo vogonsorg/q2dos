@@ -42,6 +42,7 @@ qboolean	menubound[256];	// if true, can't be rebound while in menu
 int		keyshift[256];		// key to map to if shift held down in console
 int		key_repeats[256];	// if > 1, it is autorepeating
 qboolean	keydown[256];
+extern char *Sort_Possible_Cmds (char *partial); // FS
 
 typedef struct
 {
@@ -164,14 +165,22 @@ keyname_t keynames[] =
 void CompleteCommand (void)
 {
 	char	*cmd, *s;
+	extern	cvar_t	*console_old_complete; // FS
 
 	s = key_lines[edit_line]+1;
 	if (*s == '\\' || *s == '/')
 		s++;
+	if (console_old_complete->value)
+	{
+		cmd = Cmd_CompleteCommand (s);
+		if (!cmd)
+			cmd = Cvar_CompleteVariable (s);
+	}
+	else
+	{
+		cmd = Sort_Possible_Cmds(s); // FS: Show us all possible commands if it's a partial
+	}
 
-	cmd = Cmd_CompleteCommand (s);
-	if (!cmd)
-		cmd = Cvar_CompleteVariable (s);
 	if (cmd)
 	{
 		key_lines[edit_line][1] = '/';

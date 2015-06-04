@@ -371,7 +371,7 @@ qboolean BLASTER_Init(void)
 
 	if (ResetDSP())
 	{
-		Com_Printf("Could not reset SB");
+		Com_Printf("Could not reset SB\n");
 		return 0;
 	}
 
@@ -408,7 +408,7 @@ qboolean BLASTER_Init(void)
 	rc = COM_CheckParm("-sspeed");
 
 
-	if (s_khz->value > 8000) // FS: S_KHZ
+	if (s_khz->value > 7000) // FS: S_KHZ.  7000 for future Disney Sound Source someday...
 	{
 		dma.speed = s_khz->value;
 	}

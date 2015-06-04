@@ -453,11 +453,38 @@ Cvar_List_f
 void Cvar_List_f (void)
 {
 	cvar_t	*var;
+	qboolean endReached = false; // FS: For the filter
+	qboolean endIsAMatch = false; // FS: For the filter
 	int		i;
 
 	i = 0;
+
 	for (var = cvar_vars ; var ; var = var->next, i++)
 	{
+		// FS: Filter it
+		if(Cmd_Argc() > 1)
+		{
+			if (i == 0)
+				Com_Printf("Listing matches for '%s'...\n", Cmd_Argv(1));
+			while( !strstr(var->name, Cmd_Argv(1)) && var->next)
+			{
+				if(var->next)
+					var = var->next;
+			}
+
+			if(!var->next)
+			{
+				if(strstr(var->name, Cmd_Argv(1))) // FS: The last one in the search actually matches, so don't break out
+					endIsAMatch = true;
+				endReached = true;
+			}
+		}
+
+		if(endReached && !endIsAMatch) // FS: We're at the end, and it's not a match to the filter so bust out.
+		{
+			break;
+		}
+
 		if (var->flags & CVAR_ARCHIVE)
 			Com_Printf ("*");
 		else
@@ -478,6 +505,7 @@ void Cvar_List_f (void)
 			Com_Printf (" ");
 		Com_Printf (" %s \"%s\"\n", var->name, var->string);
 	}
+	Com_Printf("Legend: * Archive. U Userinfo. S Serverinfo. - Write Protected. L Latched.\n"); // FS: Added a legend
 	Com_Printf ("%i cvars\n", i);
 }
 

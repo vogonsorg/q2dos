@@ -86,6 +86,7 @@ cvar_t	*gender;
 cvar_t	*gender_auto;
 
 cvar_t	*cl_vwep;
+cvar_t	*console_old_complete; // FS: Old style command completing
 
 client_static_t	cls;
 client_state_t	cl;
@@ -1485,6 +1486,9 @@ void CL_InitLocal (void)
 	gender->modified = false; // clear this so we know when user sets it manually
 
 	cl_vwep = Cvar_Get ("cl_vwep", "1", CVAR_ARCHIVE);
+
+	// FS: New stuff
+	console_old_complete = Cvar_Get("console_old_complete", "0", CVAR_ARCHIVE); // FS: Old style command completing
 
 
 	//
