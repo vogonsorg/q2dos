@@ -23,6 +23,7 @@
 #include "vid_dos.h"
 #include "dosisms.h"
 
+#define MAX_RESOLUTIONS 10
 struct vid_resolutions_t {
 	int mode;
 	int vesa_mode;
@@ -30,9 +31,9 @@ struct vid_resolutions_t {
 	int width;
 	int address;
 	char menuname[30];
-} vid_resolutions[10];
+} vid_resolutions[MAX_RESOLUTIONS];
 int num_vid_resolutions=1;	//we always have mode 13
-char (resolutions[10])[20];
+char (resolutions[MAX_RESOLUTIONS])[20];
 
 #define MODE_SUPPORTED_IN_HW		0x0001
 #define COLOR_MODE			0x0008
@@ -142,7 +143,7 @@ void VID_InitExtra (void)
 	short		*pmodenums;
 	vbeinfoblock_t	*pinfoblock;
 	__dpmi_meminfo	phys_mem_info;
-	int		x;
+	int		x = 0;
 
 	pinfoblock = dos_getmemory(sizeof(vbeinfoblock_t));
 
@@ -151,19 +152,21 @@ void VID_InitExtra (void)
 
 	*(long *)pinfoblock->VbeSignature = 'V' + ('B'<<8) + ('E'<<16) + ('2'<<24);
 
-// We always have mode 13 VGA
-memset(vid_resolutions,0x0,sizeof(vid_resolutions));
-vid_resolutions[0].mode=0;
-vid_resolutions[0].vesa_mode=-1;
-vid_resolutions[0].height=200;
-vid_resolutions[0].width=320;
-sprintf(vid_resolutions[0].menuname,"[VGA 320x200]");
-sprintf(resolutions[0],vid_resolutions[0].menuname);
-memset(resolutions,0x0,sizeof(resolutions));
-while(x<10)
-{
-sprintf(resolutions[x],"NA");
-}
+	// We always have mode 13 VGA
+	memset(vid_resolutions,0x0,sizeof(vid_resolutions));
+	vid_resolutions[0].mode=0;
+	vid_resolutions[0].vesa_mode=-1;
+	vid_resolutions[0].height=200;
+	vid_resolutions[0].width=320;
+	sprintf(vid_resolutions[0].menuname,"[VGA 320x200]");
+	sprintf(resolutions[0],vid_resolutions[0].menuname);
+	memset(resolutions,0x0,sizeof(resolutions));
+
+	while(x<=MAX_RESOLUTIONS)
+	{
+		sprintf(resolutions[x],"NA");
+		x++;
+	}
 
 //return;	//test for VGA only
 
@@ -274,8 +277,7 @@ sprintf(resolutions[x],"NA");
 				vesa_extra[nummodes].plinearmem =
 						real2ptr(modeinfo.winasegment<<4);
 
-				//vesa_modes[nummodes].begindirectrect =
-						VGA_BankedBeginDirectRect;
+				//vesa_modes[nummodes].begindirectrect = VGA_BankedBeginDirectRect;
 				//vesa_modes[nummodes].enddirectrect = VGA_BankedEndDirectRect;
 				vesa_extra[nummodes].pages[1] = modeinfo.pagesize;
 				vesa_extra[nummodes].pages[2] = modeinfo.pagesize * 2;
