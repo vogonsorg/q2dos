@@ -1,0 +1,24 @@
+#CC = gcc-4.2
+#CFLAGS = -arch i386 -g -O0
+CC = i586-pc-msdosdjgpp-gcc
+CFLAGS = -g -O0 -Did386=0 -I.
+SFLAGS = -DREF_HARD_LINKED -DGAME_HARD_LINKED
+
+
+.PHONY: all test clean
+#
+
+OBJECTS =  util/svga-dump.o dos/dos_v2.c
+
+all: svd
+
+svd:	$(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o svd -lm
+
+clean:
+	rm -f util/*.o
+	rm -f svd.exe
+	rm -f svd
+
+%.o : %.c
+	$(CC) $(CFLAGS) $(SFLAGS) -c $< -o $@
