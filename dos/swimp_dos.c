@@ -79,13 +79,15 @@ Com_Printf("SWimp_SetMode %d fullscreen %d\n",mode,fullscreen);
                 ri.Con_Printf( PRINT_ALL, " invalid mode\n" );
                 return rserr_invalid_mode;
         }
-        ri.Con_Printf( PRINT_ALL, "SWimp_SetMode setting to %dx%d\n", *pwidth, *pheight);
+ri.Con_Printf( PRINT_ALL, "SWimp_SetMode setting to %s %dx%d\n",vid_resolutions[mode].menuname, *pwidth, *pheight);
 
 whatmodearewe=mode;
 if(mode==0) {
 	vid.height=200;
 	vid.width=320;
 	vid.rowbytes=320;
+	if(vid.buffer)
+		free(vid.buffer);
 	vid.buffer=malloc(320*200*1);
    {	//mode 13
       __dpmi_regs r;
@@ -98,6 +100,8 @@ else {
         vid.height=vid_resolutions[mode].height;
         vid.width=vid_resolutions[mode].width;
         vid.rowbytes=vid.width;
+	if(vid.buffer)
+		free(vid.buffer);
         vid.buffer=malloc(vid.width*vid.height*1);
    {    //VESA 
       __dpmi_regs r;
