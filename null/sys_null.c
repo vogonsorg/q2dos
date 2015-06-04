@@ -109,9 +109,11 @@ int	curtime;
 //unsigned	sys_msg_time;
 unsigned	sys_frame_time;
 
+#ifndef id386
 void Sys_SetFPCW()
 {
 }
+#endif
 
 void Sys_mkdir (char *path)
 {
