@@ -6,6 +6,7 @@ WLFLAGS = -Lwattcp/lib -lwatt
 
 DOS = 	dos/cd_dos.o \
 	dos/vid_dos.o \
+	dos/vid_ext2.o \
 	dos/snddma_dos.o \
 	dos/snd_gus.o \
 	dos/sys_dos.o \
