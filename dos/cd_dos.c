@@ -538,6 +538,7 @@ void CDAudio_SetVolume (byte volume)
 void CDAudio_Play(int track, qboolean looping)
 {
 	int		volume;
+	int		previousTrack; // FS
 
 	if (!initialized || !enabled)
 		return;
@@ -562,6 +563,7 @@ void CDAudio_Play(int track, qboolean looping)
 		return;
 	}
 
+	previousTrack = playTrack; // FS
 	playTrack = track;
 
 	if (cd.track[track].isData)
@@ -597,7 +599,8 @@ void CDAudio_Play(int track, qboolean looping)
 	}
 	// set a loop counter so that this track will change to the
 	// looptrack later
-	loopcounter = 0;
+	if (previousTrack != track)
+		loopcounter = 0;
 
 	playing = true;
 }
