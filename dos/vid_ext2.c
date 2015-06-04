@@ -159,7 +159,8 @@ void VID_InitExtra (void)
 	vid_resolutions[0].width=320;
 	sprintf(vid_resolutions[0].menuname,"[VGA 320x200]");
 
-//return;	//test for VGA only
+if(COM_CheckParm("-vgaonly"))
+	return;	//test for VGA only
 
 // see if VESA support is available
 	regs.x.ax = 0x4f00;
