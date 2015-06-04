@@ -4,6 +4,8 @@
 #include "../client/client.h"
 #include "../client/qmenu.h"
 
+extern int whatmodearewe;
+
 #define REF_SOFT	0
 #define REF_OPENGL	1
 #define REF_3DFX	2
@@ -94,12 +96,12 @@ void VID_NewWindow (int width, int height)
 {
         viddef.width = width;
         viddef.height = height;
-		printf("VID_NewWindow %d %d\n",width,height);
 }
 
 /*
 ** VID_GetModeInfo
 */
+#if 0
 typedef struct vidmode_s
 {
     const char *description;
@@ -120,19 +122,32 @@ vidmode_t vid_modes[] =
     { "Mode 8: 1280x960",  1280, 960, 8 },
     { "Mode 9: 1600x1200", 1600, 1200, 9 }
 */
-    { "Mode 0: 320x200", 320, 200, 0 }
+    { "Mode 0: 320x200", 320, 200, 0 },
+    { "Mode 0: 320x200", 848, 480, 1 }
 };
 #define VID_NUM_MODES ( sizeof( vid_modes ) / sizeof( vid_modes[0] ) )
+#endif
+
+extern int num_vid_resolutions;
+struct vid_resolutions_t {
+        int mode;
+        int vesa_mode;
+        int height;
+        int width;
+	int address;
+        char menuname[30];
+} ;
+extern struct vid_resolutions_t vid_resolutions[10];
 
 qboolean VID_GetModeInfo( int *width, int *height, int mode )
 {
-    if ( mode < 0 || mode >= VID_NUM_MODES )
+    if ( mode < 0 || mode >= num_vid_resolutions) //VID_NUM_MODES )
         return false;
 
-    *width  = vid_modes[mode].width;
-    *height = vid_modes[mode].height;
+    *width  = vid_resolutions[mode].width;//vid_modes[mode].width;
+    *height = vid_resolutions[mode].height;//vid_modes[mode].height;
 
-    Com_Printf("VID_GetModeInfo %dx%d mode %d\n",*width,*height,mode);
+    //Com_Printf("VID_GetModeInfo %dx%d mode %d\n",*width,*height,mode);
 
     return true;
 }
@@ -275,6 +290,9 @@ void	VID_Init (void)
 {
     refimport_t	ri;
 
+    VID_InitExtra(); //probe VESA
+
+    whatmodearewe=0; //hope this means start in mode 0
     viddef.width = 320;
     viddef.height = 200; //was originally 240
 
@@ -320,12 +338,13 @@ void	VID_CheckChanges (void)
 {
 }
 
+
 void	VID_MenuInit (void)
 {
 	static const char *resolutions[] = 
 	{
 		"[320 200  ]",
-#if 0
+		"[848 480  ]",
 		"[320 240  ]",
 		"[400 300  ]",
 		"[512 384  ]",
@@ -333,6 +352,7 @@ void	VID_MenuInit (void)
 		"[800 600  ]",
 		"[960 720  ]",
 		"[1024 768 ]",
+#if 0
 		"[1152 864 ]",
 		"[1280 960 ]",
 		"[1600 1200]",
