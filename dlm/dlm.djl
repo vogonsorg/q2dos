@@ -1,0 +1,25 @@
+OUTPUT_FORMAT("coff-go32")
+SECTIONS
+{
+  .text : {
+    *(.text)
+  }
+  .data : {
+    *(.data)
+  }
+  .ctor : {
+    *(.ctor)
+  }
+  .dtor : {
+    *(.dtor)
+  }
+  .eh_fram : {
+    *(.eh_fram)
+  }
+  .gcc_exc : {
+    *(.gcc_exc)
+  }
+  .bss : {
+    *(.bss)
+  }
+}

@@ -488,8 +488,8 @@ void    Sys_UnloadGame (void)
 void	*Sys_GetGameAPI (void *parms)
 {
 	//Load the DLL
-	LoadDLM("gamex86.dlm");
-	if (GetGameAPI==0xFFFFFFFF)
+	//LoadDLM("gamex86.dlm");
+	//if (GetGameAPI==0xFFFFFFFF)
 		Sys_Error("unable to load the game dll!\n");
 	return NULL;
 }
