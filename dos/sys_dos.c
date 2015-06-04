@@ -464,12 +464,13 @@ void Sys_Quit (void)
 	exit (0);
 }
 
+void *GetGameAPI (void *import);
+#ifdef GAME_HARD_LINKED
 void	Sys_UnloadGame (void)
 {
 }
 
-#ifdef GAME_HARD_LINKED
-void *GetGameAPI (void *import);
+//void *GetGameAPI (void *import);
 
 void	*Sys_GetGameAPI (void *parms)
 {
@@ -478,8 +479,18 @@ void	*Sys_GetGameAPI (void *parms)
 // needs to be statically linked for null
 // otherwise it sits here to satisfy the linker AFIK
 #else
+#include <dlmlib.h>
+//Unload the DLL
+void    Sys_UnloadGame (void)
+{
+}
+//Load the DLL
 void	*Sys_GetGameAPI (void *parms)
 {
+	//Load the DLL
+	LoadDLM("gamex86.dlm");
+	if (GetGameAPI==0xFFFFFFFF)
+		Sys_Error("unable to load the game dll!\n");
 	return NULL;
 }
 #endif	
