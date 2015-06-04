@@ -33,7 +33,6 @@ struct vid_resolutions_t {
 	char menuname[30];
 } vid_resolutions[MAX_RESOLUTIONS];
 int num_vid_resolutions=1;	//we always have mode 13
-char (resolutions[MAX_RESOLUTIONS])[20];
 
 #define MODE_SUPPORTED_IN_HW		0x0001
 #define COLOR_MODE			0x0008
@@ -159,14 +158,6 @@ void VID_InitExtra (void)
 	vid_resolutions[0].height=200;
 	vid_resolutions[0].width=320;
 	sprintf(vid_resolutions[0].menuname,"[VGA 320x200]");
-	sprintf(resolutions[0],vid_resolutions[0].menuname);
-	memset(resolutions,0x0,sizeof(resolutions));
-
-	while(x<=MAX_RESOLUTIONS)
-	{
-		sprintf(resolutions[x],"NA");
-		x++;
-	}
 
 //return;	//test for VGA only
 
@@ -442,7 +433,7 @@ if((modeinfo.memory_model==0x4)&&(modeinfo.bits_per_pixel==8))
 	{
 	Com_Printf("VESA mode 0x%0x %dx%d supported\n",modeinfo.modenum,modeinfo.width,modeinfo.height);
 	if(num_vid_resolutions<10) {
-	vid_resolutions[num_vid_resolutions].mode=0;
+	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
 	vid_resolutions[num_vid_resolutions].vesa_mode=modeinfo.modenum;
 	vid_resolutions[num_vid_resolutions].height=modeinfo.height;
 	vid_resolutions[num_vid_resolutions].width=modeinfo.width;
