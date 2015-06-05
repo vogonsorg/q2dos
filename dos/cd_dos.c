@@ -51,7 +51,7 @@ void CDAudio_Update(void)
 
 int CDAudio_Init(void)
 {
-	Con_Printf("CD Audio is disabled in this build.\n");
+	Com_Printf("CD Audio is disabled in this build.\n");
 	return 0;
 }
 
