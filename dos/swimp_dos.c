@@ -1,6 +1,8 @@
 #include "../ref_soft/r_local.h"
 #include <dpmi.h>
 #include <pc.h>
+#include <sys/nearptr.h>
+
 
 int whatmodearewe = 0;
 
@@ -28,7 +30,12 @@ void	SWimp_EndFrame (void)
 	if(whatmodearewe==0)	//VGA mode 13
 		dosmemput(vid.buffer,320*200,0xA0000);
 	else
-		dosmemput(vid.buffer,(vid.height*vid.width),vid_resolutions[whatmodearewe].address);
+		{
+		//dosmemput(vid.buffer,(vid.height*vid.width),vid_resolutions[whatmodearewe].address);
+		__djgpp_nearptr_enable();
+		memcpy(vid_resolutions[whatmodearewe].address+__djgpp_conventional_base,vid.buffer,(vid.height*vid.width));
+		__djgpp_nearptr_disable();
+		}
 }
 
 //Windows style hook
