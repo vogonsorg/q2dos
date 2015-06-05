@@ -109,7 +109,7 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 		{    //VESA 
 			__dpmi_regs r;
 			r.x.ax = 0x4F02;
-			r.x.bx = vid_resolutions[mode].vesa_mode;
+			r.x.bx = vid_resolutions[mode].vesa_mode+0x4000; //0x4000 for Linear access
 			__dpmi_int(0x10, &r);
 			if (r.h.ah)
 				Sys_Error("Error setting VESA mode 0x%0x",vid_resolutions[mode].vesa_mode);
