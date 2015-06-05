@@ -560,8 +560,8 @@ INTERFACE
 
 void snd_shutdown_f (void) // FS: SND_SHUTDOWN
 {
-	SNDDMA_Shutdown();
-	Com_Printf("\nSound Disabled.\n");
+	S_Shutdown();
+	Com_Printf("\nSound Shutdown.\n");
 }
 #endif // USE_QDOS_SOUND
 
