@@ -33,7 +33,8 @@ void	SWimp_EndFrame (void)
 		{
 		//dosmemput(vid.buffer,(vid.height*vid.width),vid_resolutions[whatmodearewe].address);
 		__djgpp_nearptr_enable();
-		memcpy(vid_resolutions[whatmodearewe].address+__djgpp_conventional_base,vid.buffer,(vid.height*vid.width));
+		//memcpy(vid_resolutions[whatmodearewe].address+__djgpp_conventional_base,vid.buffer,(vid.height*vid.width));
+		dosmemput(vid.buffer,(vid.height*vid.width),vid_resolutions[whatmodearewe].address);
 		__djgpp_nearptr_disable();
 		}
 }
