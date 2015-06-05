@@ -1,7 +1,11 @@
 #include "../ref_soft/r_local.h"
 #include <dpmi.h>
 #include <pc.h>
+#ifdef USE_NEAR
 #include <sys/nearptr.h>
+#else
+#include <sys/farptr.h>
+#endif
 
 
 int whatmodearewe = 0;
@@ -31,11 +35,15 @@ void	SWimp_EndFrame (void)
 		dosmemput(vid.buffer,320*200,0xA0000);
 	else
 		{
-		//dosmemput(vid.buffer,(vid.height*vid.width),vid_resolutions[whatmodearewe].address);
+		int j;
+		#ifdef USE_NEAR
 		__djgpp_nearptr_enable();
-		//memcpy(vid_resolutions[whatmodearewe].address+__djgpp_conventional_base,vid.buffer,(vid.height*vid.width));
-		dosmemput(vid.buffer,(vid.height*vid.width),vid_resolutions[whatmodearewe].address);
+		memcpy(vid_resolutions[whatmodearewe].address+__djgpp_conventional_base,vid.buffer,(vid.height*vid.width));
 		__djgpp_nearptr_disable();
+		#else
+		for(j=0;j<(vid.height*vid.width);j++)
+		_farnspokeb(vid_resolutions[whatmodearewe].address+j,vid.buffer+j);
+		#endif
 		}
 }
 
