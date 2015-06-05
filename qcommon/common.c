@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // common.c -- misc functions used in client and server
 #include "qcommon.h"
+#include "../dos/zone.h"
 #include <setjmp.h>
 
 #define	MAXPRINTMSG	4096
@@ -1091,6 +1092,7 @@ just cleared malloc with counters now...
 ==============================================================================
 */
 
+#ifndef USE_QDOS_ZONE
 #define	Z_MAGIC		0x1d1d
 
 
@@ -1192,7 +1194,7 @@ void *Z_Malloc (int size)
 {
 	return Z_TagMalloc (size, 0);
 }
-
+#endif // USE_QDOS_ZONE
 
 //============================================================================
 
@@ -1395,6 +1397,7 @@ void Com_Error_f (void)
 Qcommon_Init
 =================
 */
+#ifndef USE_QDOS_ZONE
 void Qcommon_Init (int argc, char **argv)
 {
 	char	*s;
@@ -1403,10 +1406,10 @@ void Qcommon_Init (int argc, char **argv)
 		Sys_Error ("Qcommon_Init: Error during initialization");
 
 	z_chain.next = z_chain.prev = &z_chain;
-
 	// prepare enough of the subsystems to handle
 	// cvar and command buffer management
 	COM_InitArgv (argc, argv);
+
 
 	Swap_Init ();
 	Cbuf_Init ();
@@ -1483,6 +1486,98 @@ void Qcommon_Init (int argc, char **argv)
 
 	Com_Printf ("====== Quake2 Initialized ======\n\n");	
 }
+#else
+quakeparms_t host_parms;
+void Qcommon_Init (quakeparms_t *parms)
+{
+	char	*s;
+
+	if (setjmp (abortframe) )
+		Sys_Error ("Qcommon_Init: Error during initialization");
+
+	// prepare enough of the subsystems to handle
+	// cvar and command buffer management
+	COM_InitArgv (parms->argc, parms->argv);
+
+	host_parms = *parms;
+
+	Memory_Init (parms->membase, parms->memsize);
+
+	Swap_Init ();
+	Cbuf_Init ();
+
+	Cmd_Init ();
+	Cvar_Init ();
+
+	Key_Init ();
+
+	// we need to add the early commands twice, because
+	// a basedir or cddir needs to be set before execing
+	// config files, but we want other parms to override
+	// the settings of the config files
+	Cbuf_AddEarlyCommands (false);
+	Cbuf_Execute ();
+
+	FS_InitFilesystem ();
+
+	Cbuf_AddText ("exec default.cfg\n");
+	Cbuf_AddText ("exec config.cfg\n");
+
+	Cbuf_AddEarlyCommands (true);
+	Cbuf_Execute ();
+
+
+	//
+	// init commands and vars
+	//
+    Cmd_AddCommand ("error", Com_Error_f);
+
+	host_speeds = Cvar_Get ("host_speeds", "0", 0);
+	log_stats = Cvar_Get ("log_stats", "0", 0);
+	developer = Cvar_Get ("developer", "0", 0);
+	timescale = Cvar_Get ("timescale", "1", 0);
+	fixedtime = Cvar_Get ("fixedtime", "0", 0);
+	logfile_active = Cvar_Get ("logfile", "0", 0);
+	showtrace = Cvar_Get ("showtrace", "0", 0);
+#ifdef DEDICATED_ONLY
+	dedicated = Cvar_Get ("dedicated", "1", CVAR_NOSET);
+#else
+	dedicated = Cvar_Get ("dedicated", "0", CVAR_NOSET);
+#endif
+
+	s = va("%4.2f %s %s %s", VERSION, CPUSTRING, __DATE__, BUILDSTRING);
+	Cvar_Get ("version", s, CVAR_SERVERINFO|CVAR_NOSET);
+
+
+	if (dedicated->value)
+		Cmd_AddCommand ("quit", Com_Quit);
+
+	Sys_Init ();
+
+	NET_Init ();
+	Netchan_Init ();
+
+	SV_Init ();
+	CL_Init ();
+
+	// add + commands from command line
+	if (!Cbuf_AddLateCommands ())
+	{	// if the user didn't give any commands, run default action
+		if (!dedicated->value)
+			Cbuf_AddText ("d1\n");
+		else
+			Cbuf_AddText ("dedicated_start\n");
+		Cbuf_Execute ();
+	}
+	else
+	{	// the user asked for something explicit
+		// so drop the loading plaque
+		SCR_EndLoadingPlaque ();
+	}
+
+	Com_Printf ("====== Quake2 Initialized ======\n\n");	
+}
+#endif // USE_QDOS_ZONE
 
 /*
 =================
@@ -1644,6 +1739,128 @@ char Q_toupper (char c) // FS
 		c-=('a'-'A');
 	return(c);
 }
+
+// FS: All this from Q1
+void Q_memset (void *dest, int fill, int count)
+{
+	int             i;
+	
+	if ( (((long)dest | count) & 3) == 0)
+	{
+		count >>= 2;
+		fill = fill | (fill<<8) | (fill<<16) | (fill<<24);
+		for (i=0 ; i<count ; i++)
+			((int *)dest)[i] = fill;
+	}
+	else
+		for (i=0 ; i<count ; i++)
+			((byte *)dest)[i] = fill;
+}
+
+void Q_memcpy (void *dest, void *src, int count)
+{
+	int             i;
+	
+	if (( ( (long)dest | (long)src | count) & 3) == 0 )
+	{
+		count>>=2;
+		for (i=0 ; i<count ; i++)
+			((int *)dest)[i] = ((int *)src)[i];
+	}
+	else
+		for (i=0 ; i<count ; i++)
+			((byte *)dest)[i] = ((byte *)src)[i];
+}
+
+int Q_memcmp (void *m1, void *m2, int count)
+{
+	while(count)
+	{
+		count--;
+		if (((byte *)m1)[count] != ((byte *)m2)[count])
+			return -1;
+	}
+	return 0;
+}
+
+void Q_strcpy (char *dest, char *src)
+{
+	while (*src)
+	{
+		*dest++ = *src++;
+	}
+	*dest++ = 0;
+}
+
+void Q_strncpy (char *dest, char *src, int count)
+{
+	while (*src && count--)
+	{
+		*dest++ = *src++;
+	}
+	if (count)
+		*dest++ = 0;
+}
+
+int Q_strlen (char *str)
+{
+	int             count;
+	
+	count = 0;
+	while (str[count])
+		count++;
+
+	return count;
+}
+
+char *Q_strrchr(char *s, char c)
+{
+    int len = Q_strlen(s);
+    s += len;
+    while (len--)
+	if (*--s == c) return s;
+    return 0;
+}
+
+void Q_strcat (char *dest, char *src)
+{
+	dest += Q_strlen(dest);
+	Q_strcpy (dest, src);
+}
+
+int Q_strcmp (char *s1, char *s2)
+{
+	while (1)
+	{
+		if (*s1 != *s2)
+			return -1;              // strings not equal    
+		if (!*s1)
+			return 0;               // strings are equal
+		s1++;
+		s2++;
+	}
+	
+	return -1;
+}
+
+int Q_strncmp (char *s1, char *s2, int count)
+{
+	while (1)
+	{
+		if (!count--)
+			return 0;
+		if (*s1 != *s2)
+			return -1;              // strings not equal    
+		if (!*s1)
+			return 0;               // strings are equal
+		s1++;
+		s2++;
+	}
+	
+	return -1;
+}
+
+
 /*
 =================
 Qcommon_Shutdown

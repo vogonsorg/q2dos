@@ -14,6 +14,7 @@
 #include <bios.h>
 #include <crt0.h> // FS: Fake Mem Fix (QIP)
 
+#include "zone.h"
 #include "dosisms.h"
 #include "../qcommon/qcommon.h"
 #include "../client/keys.h"
@@ -25,6 +26,10 @@ int _crt0_startup_flags = _CRT0_FLAG_UNIX_SBRK; // FS: Fake Mem Fix (QIP)
 static unsigned char    keybuf[KEYBUF_SIZE];
 static int                              keybuf_head=0;
 static int                              keybuf_tail=0;
+
+#ifdef USE_QDOS_ZONE
+static quakeparms_t     quakeparms;
+#endif
 
 byte        scantokey[128] = 
 					{ 
@@ -328,13 +333,13 @@ void Sys_GetMemory(void)
 //	virtualmembase = malloc (virtualmemsize);
 //	virtualmemsize = (int) 4096 * 1024 * 1024;
 //	virtualmembase = dos_getmaxlockedmem(&virtualmemsize); // FS: Lock Virtual memory?
-#if 0
+#ifdef USE_QDOS_ZONE
 	int             j, tsize;
 
 	j = COM_CheckParm("-mem");
 	if (j)
 	{
-		quakeparms.memsize = (int) (Q_atof(com_argv[j+1]) * 1024 * 1024);
+		quakeparms.memsize = (int) (atof(com_argv[j+1]) * 1024 * 1024); // FS: FIXME USE Q_ATOF
 		quakeparms.membase = malloc (quakeparms.memsize);
 	}
 	else
@@ -342,10 +347,7 @@ void Sys_GetMemory(void)
 		int j;
 		//quakeparms.membase = dos_getmaxlockedmem (&quakeparms.memsize);
 
-		if (extended_mod) // FS: We're not foolin' around with big boy mods...
-			j=64;
-		else
-			j=32; // FS: from QW
+		j=32; // FS: from QW
 		quakeparms.memsize = (int) j * 1024 * 1024; 
 		quakeparms.membase = malloc (quakeparms.memsize);
 	}
@@ -360,7 +362,7 @@ void Sys_GetMemory(void)
 	{
 		printf("Clearing allocated memory...\n");
 		memset(quakeparms.membase,0x0,quakeparms.memsize); // JASON: Clear memory on startup
-		printf("Done!  Continuing to load Quake.\n");
+		printf("Done!  Continuing to load Quake 2.\n");
 	}
 
 	if (COM_CheckParm ("-heapsize"))
@@ -370,7 +372,7 @@ void Sys_GetMemory(void)
 		if (tsize < quakeparms.memsize)
 			quakeparms.memsize = tsize;
 	}
-#endif
+#endif // USE_QDOS_ZONE
 }
 
 /*
@@ -458,14 +460,16 @@ void Sys_Quit (void)
 	{
 		dos_unlockmem (&start_of_memory,
 					   end_of_memory - (int)&start_of_memory);
-//		dos_unlockmem (quakeparms.membase, quakeparms.memsize);
+#ifdef USE_QDOS_ZONE
+		dos_unlockmem (quakeparms.membase, quakeparms.memsize);
+#endif
 	}
-   {
-      __dpmi_regs r;
+	{
+		__dpmi_regs r;
 
-      r.x.ax = 3;
-      __dpmi_int(0x10, &r);
-   }//return to text mode
+		r.x.ax = 3;
+		__dpmi_int(0x10, &r);
+	}//return to text mode
 	exit (0);
 }
 
@@ -639,12 +643,25 @@ int main (int argc, char **argv)
 {
 	int time, oldtime, newtime;
 
+#ifdef USE_QDOS_ZONE
+	COM_InitArgv (argc, argv);
+
+	quakeparms.argc = com_argc;
+	quakeparms.argv = com_argv;
+#endif
+
 	Sys_DetectWin95 ();
 	Sys_PageInProgram ();
 	Sys_GetMemory ();
 
-//	Sys_Init();
+	Sys_Init();
+
+#ifndef USE_QDOS_ZONE
 	Qcommon_Init (argc, argv);
+#else
+	Qcommon_Init(&quakeparms);
+#endif
+
 	oldtime = Sys_Milliseconds ();
 	dos_registerintr(9, TrapKey);
 

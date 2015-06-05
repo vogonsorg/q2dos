@@ -24,6 +24,7 @@ byte	*membase;
 int		hunkmaxsize;
 int		cursize;
 
+#ifndef USE_QDOS_ZONE
 void	*Hunk_Begin (int maxsize)
 {
 	// reserve a huge chunk of memory, but don't commit any yet
@@ -50,6 +51,7 @@ void	*Hunk_Alloc (int size)
 
 	return (void *)(membase+cursize-size);
 }
+#endif
 
 void	Hunk_Free (void *buf)
 {
