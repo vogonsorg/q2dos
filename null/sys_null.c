@@ -18,8 +18,10 @@
 #include "../client/keys.h"
 #include "errno.h"
 
+#ifdef __DJGPP__
 // FS: TODO FIXME FIXME PLEASE PLEASE.  >> Take DOS_V2.C from Quake1 and SYS_DOS.C from Quake1.  Clean up this crap :S
 int _crt0_startup_flags = _CRT0_FLAG_UNIX_SBRK; // FS: Fake Mem Fix (QIP)
+#endif
 #define KEYBUF_SIZE     256
 static unsigned char    keybuf[KEYBUF_SIZE];
 static int                              keybuf_head=0;
@@ -145,12 +147,12 @@ void Sys_Quit (void)
 	exit (0);
 }
 
-void	Sys_UnloadGame (void)
+void *GetGameAPI (void *import);
+#ifdef GAME_HARD_LINKED
+
+void    Sys_UnloadGame (void)
 {
 }
-
-#ifdef GAME_HARD_LINKED
-void *GetGameAPI (void *import);
 
 void	*Sys_GetGameAPI (void *parms)
 {
@@ -159,9 +161,19 @@ void	*Sys_GetGameAPI (void *parms)
 // needs to be statically linked for null
 // otherwise it sits here to satisfy the linker AFIK
 #else
+#include <dlmlib.h>
+
+void    Sys_UnloadGame (void)
+{
+	Com_Printf("Sys_UnloadGame\n");
+	UnloadDLM("gamex86.dlm");
+}
+
 void	*Sys_GetGameAPI (void *parms)
 {
-	return NULL;
+	Com_Printf("Sys_LoadGame\n");
+	LoadDLM("gamex86.dlm");
+	return GetGameAPI (parms);
 }
 #endif	
 
@@ -341,6 +353,10 @@ void Sys_MakeCodeWriteable()
 void main (int argc, char **argv)
 {
 	int				time, oldtime, newtime;
+#ifndef GAME_HARD_LINKED
+	LoadDLM("libc.dlm");
+	LoadDLM("libm.dlm");
+#endif
 
 	Qcommon_Init (argc, argv);
 	oldtime = Sys_Milliseconds ();
