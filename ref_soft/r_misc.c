@@ -522,11 +522,12 @@ void R_SetupFrame (void)
 ================
 R_SurfacePatch
 ================
-*/
+why is this here, it's also in r_edge
 void R_SurfacePatch (void)
 {
 	// we only patch code on Intel
 }
+*/
 
 #endif	// !id386
 
