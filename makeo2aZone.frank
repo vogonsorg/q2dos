@@ -141,11 +141,11 @@ GAME = game/m_tank.o \
 
 OBJECTS =  $(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(REFSOFT) $(REFASM) $(DOS)
 
-all: q2
+all: q2z
 
-q2:	$(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o q2 -lm $(WLFLAGS)
-	cp q2.exe $(HOME)/dos/q2
+q2z:	$(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o q2z -lm $(WLFLAGS)
+	cp q2z.exe $(HOME)/dos/q2z
 
 clean:
 	find ./ -name '*.o' -exec rm {} \;
