@@ -717,10 +717,10 @@ void R_DrawTriangle( void );
 void R_AliasClipTriangle (finalvert_t *index0, finalvert_t *index1, finalvert_t *index2);
 
 
-extern float    r_time1;
-extern float	da_time1, da_time2;
-extern float	dp_time1, dp_time2, db_time1, db_time2, rw_time1, rw_time2;
-extern float	se_time1, se_time2, de_time1, de_time2, dv_time1, dv_time2;
+extern double    r_time1;
+extern double	da_time1, da_time2;
+extern double	dp_time1, dp_time2, db_time1, db_time2, rw_time1, rw_time2;
+extern double	se_time1, se_time2, de_time1, de_time2, dv_time1, dv_time2;
 extern int              r_frustum_indexes[4*6];
 extern int              r_maxsurfsseen, r_maxedgesseen, r_cnumsurfs;
 extern qboolean r_surfsonstack;

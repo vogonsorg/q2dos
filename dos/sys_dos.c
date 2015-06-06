@@ -98,8 +98,8 @@ void TrapKey(void)
 #define SC_RIGHTARROW   0x4d
 
 #define STDOUT 1
-unsigned	sys_msg_time;
-unsigned	sys_frame_time;
+double	sys_msg_time;
+double	sys_frame_time;
 int	sys_checksum;
 
 void MaskExceptions (void);
@@ -641,7 +641,7 @@ double Sys_FloatTime (void)
 
 int main (int argc, char **argv)
 {
-	int time, oldtime, newtime;
+	double time, oldtime, newtime;
 
 #ifdef USE_QDOS_ZONE
 	COM_InitArgv (argc, argv);
@@ -666,6 +666,7 @@ int main (int argc, char **argv)
 	dos_registerintr(9, TrapKey);
 
     /* main window message loop */
+#if 1
 	while (1)
 	{
 		do
@@ -677,19 +678,16 @@ int main (int argc, char **argv)
 		sys_frame_time = newtime; // FS: Need to update this for input to work properly
 		oldtime = newtime;
 	}
-#if 0
-//Con_Printf ("Top of stack: 0x%x\n", &time);
-	oldtime = Sys_FloatTime ();
+#else
 	while (1)
 	{
-		newtime = Sys_FloatTime ();
+		newtime = Sys_Milliseconds ();
 		time = newtime - oldtime;
 		Qcommon_Frame (time);
 		sys_frame_time = newtime; // FS: Need to update this for input to work properly
 		oldtime = newtime;
 	}
 #endif
-//	return oldtime; // FS: Compiler warning
 }
 
 void Sys_MakeCodeWriteable(void)

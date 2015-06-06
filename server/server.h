@@ -151,14 +151,14 @@ typedef struct
 {
 	netadr_t	adr;
 	int			challenge;
-	int			time;
+	double			time;
 } challenge_t;
 
 
 typedef struct
 {
 	qboolean	initialized;				// sv_init has completed
-	int			realtime;					// always increasing, no clamping, etc
+	double			realtime;					// always increasing, no clamping, etc
 
 	char		mapcmd[MAX_TOKEN_CHARS];	// ie: *intro.cin+base 
 

@@ -51,10 +51,10 @@ FILE	*logfile;
 int			server_state;
 
 // host_speeds times
-int		time_before_game;
-int		time_after_game;
-int		time_before_ref;
-int		time_after_ref;
+double		time_before_game;
+double		time_after_game;
+double		time_before_ref;
+double		time_after_ref;
 
 /*
 ============================================================================
@@ -1587,7 +1587,7 @@ Qcommon_Frame
 void Qcommon_Frame (int msec)
 {
 	char	*s;
-	int		time_before, time_between, time_after;
+	double		time_before, time_between, time_after;
 
 	if (setjmp (abortframe) )
 		return;			// an ERR_DROP was thrown

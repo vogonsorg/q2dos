@@ -1359,6 +1359,7 @@ void CL_AddPlayerBeams (void)
 	float		hand_multiplier;
 	frame_t		*oldframe;
 	player_state_t	*ps, *ops;
+	int cltime;
 
 //PMM
 	if (hand)
@@ -1560,7 +1561,8 @@ void CL_AddPlayerBeams (void)
 				ent.flags = RF_FULLBRIGHT;
 				ent.angles[0] = -pitch;
 				ent.angles[1] = yaw + 180.0;
-				ent.angles[2] = (cl.time) % 360;
+				cltime = cl.time;
+				ent.angles[2] = (cltime) % 360;
 //				ent.angles[2] = rand()%360;
 				ent.frame = framenum;
 			}

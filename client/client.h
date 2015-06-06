@@ -43,7 +43,7 @@ typedef struct
 {
 	qboolean		valid;			// cleared if delta parsing was invalid
 	int				serverframe;
-	int				servertime;		// server time the message is valid for (in msec)
+	double				servertime;		// server time the message is valid for (in msec)
 	int				deltaframe;
 	byte			areabits[MAX_MAP_AREAS/8];		// portalarea visibility bits
 	player_state_t	playerstate;
@@ -102,7 +102,7 @@ typedef struct
 
 	usercmd_t	cmd;
 	usercmd_t	cmds[CMD_BACKUP];	// each mesage will send several old cmds
-	int			cmd_time[CMD_BACKUP];	// time sent, for calculating pings
+	double			cmd_time[CMD_BACKUP];	// time sent, for calculating pings
 	short		predicted_origins[CMD_BACKUP][3];	// for debug comparing against server
 
 	float		predicted_step;				// for stair up smoothing
@@ -123,7 +123,7 @@ typedef struct
 	// and teleport direction changes
 	vec3_t		viewangles;
 
-	int			time;			// this is the time value that the client
+	double			time;			// this is the time value that the client
 								// is rendering at.  always <= cls.realtime
 	float		lerpfrac;		// between oldframe and frame
 
@@ -141,7 +141,7 @@ typedef struct
 	// non-gameserver infornamtion
 	// FIXME: move this cinematic stuff into the cin_t structure
 	FILE		*cinematic_file;
-	int			cinematictime;		// cls.realtime for first cinematic frame
+	double			cinematictime;		// cls.realtime for first cinematic frame
 	int			cinematicframe;
 	char		cinematicpalette[768];
 	qboolean	cinematicpalette_active;
@@ -204,8 +204,8 @@ typedef struct
 	keydest_t	key_dest;
 
 	int			framecount;
-	int			realtime;			// always increasing, no clamping, etc
-	float		frametime;			// seconds since last frame
+	double		realtime;			// always increasing, no clamping, etc
+	double		frametime;			// seconds since last frame
 
 // screen rendering information
 	float		disable_screen;		// showing loading plaque between levels
@@ -216,7 +216,7 @@ typedef struct
 
 // connection information
 	char		servername[MAX_OSPATH];	// name of server from original connect
-	float		connect_time;		// for connection retransmits
+	double		connect_time;		// for connection retransmits
 
 	int			quakePort;			// a 16 bit value that allows quake servers
 									// to work around address translating routers
@@ -297,7 +297,7 @@ typedef struct
 	vec3_t	color;
 	vec3_t	origin;
 	float	radius;
-	float	die;				// stop lighting after this time
+	double	die;				// stop lighting after this time
 	float	decay;				// drop this each second
 	float	minlight;			// don't add when contributing less
 } cdlight_t;
@@ -327,9 +327,9 @@ typedef struct cl_sustain
 {
 	int			id;
 	int			type;
-	int			endtime;
-	int			nextthink;
-	int			thinkinterval;
+	double			endtime;
+	double			nextthink;
+	double			thinkinterval;
 	vec3_t		org;
 	vec3_t		dir;
 	int			color;
@@ -357,7 +357,7 @@ typedef struct particle_s
 {
 	struct particle_s	*next;
 
-	float		time;
+	double		time;
 
 	vec3_t		org;
 	vec3_t		vel;
@@ -468,8 +468,8 @@ void CL_RequestNextDownload (void);
 typedef struct
 {
 	int			down[2];		// key nums holding it down
-	unsigned	downtime;		// msec timestamp
-	unsigned	msec;			// msec down this frame
+	double		downtime;		// msec timestamp
+	double		msec;			// msec down this frame
 	int			state;
 } kbutton_t;
 

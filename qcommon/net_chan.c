@@ -93,7 +93,7 @@ void Netchan_Init (void)
 	int		port;
 
 	// pick a port value that should be nice and random
-	port = Sys_Milliseconds() & 0xffff;
+	port = Sys_LinuxTime() & 0xffff; // FS: DOS counter doesn't work with this
 
 	showpackets = Cvar_Get ("showpackets", "0", 0);
 	showdrop = Cvar_Get ("showdrop", "0", 0);

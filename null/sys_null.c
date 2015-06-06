@@ -284,11 +284,11 @@ int		Hunk_End (void)
 	return cursize;
 }
 
-int		Sys_Milliseconds (void)
+double		Sys_Milliseconds (void)
 {
 	struct timeval tp;
 	struct timezone tzp;
-	static int		secbase;
+	static double		secbase;
 
 	gettimeofday(&tp, &tzp);
 	
@@ -352,7 +352,7 @@ void Sys_MakeCodeWriteable()
 
 void main (int argc, char **argv)
 {
-	int				time, oldtime, newtime;
+	double				time, oldtime, newtime;
 #ifndef GAME_HARD_LINKED
 	LoadDLM("libc.dlm");
 	LoadDLM("libm.dlm");

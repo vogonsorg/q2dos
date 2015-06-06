@@ -66,9 +66,17 @@ int	Hunk_End (void)
 	return cursize;
 }
 
-int	curtime;
-int	Sys_Milliseconds (void)
+double	curtime;
+double	Sys_Milliseconds (void)
 {
+	// FS: Needed *1000 to work properly
+	curtime = (double) uclock() / (double) UCLOCKS_PER_SEC*1000; // FS: Win9X/Fast PC Fix (QIP)
+	return curtime;
+}
+
+int	Sys_LinuxTime (void) // FS: DOS needs this for random qport
+{
+	int linuxtime;
 	struct timeval tp;
 	struct timezone tzp;
 	static int		secbase;
@@ -81,9 +89,9 @@ int	Sys_Milliseconds (void)
 		return tp.tv_usec/1000;
 	}
 
-	curtime = (tp.tv_sec - secbase)*1000 + tp.tv_usec/1000;
+	linuxtime = (tp.tv_sec - secbase)*1000 + tp.tv_usec/1000;
 	
-	return curtime;
+	return linuxtime;
 }
 
 void	Sys_Mkdir (char *path)

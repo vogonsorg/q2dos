@@ -23,9 +23,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 cvar_t	*cl_nodelta;
 
-extern	unsigned	sys_frame_time;
-unsigned	frame_msec;
-unsigned	old_sys_frame_time;
+extern	double	sys_frame_time;
+double	frame_msec;
+double	old_sys_frame_time;
 
 /*
 ===============================================================================
@@ -184,8 +184,8 @@ Returns the fraction of the frame that the key was down
 */
 float CL_KeyState (kbutton_t *key)
 {
-	float		val;
-	int			msec;
+	double		val;
+	double			msec;
 
 	key->state &= 1;		// clear impulses
 
@@ -205,7 +205,7 @@ float CL_KeyState (kbutton_t *key)
 	}
 #endif
 
-	val = (float)msec / frame_msec;
+	val = msec / frame_msec;
 	if (val < 0)
 		val = 0;
 	if (val > 1)
@@ -335,7 +335,7 @@ CL_FinishMove
 */
 void CL_FinishMove (usercmd_t *cmd)
 {
-	int		ms;
+	double		ms;
 	int		i;
 
 //

@@ -1682,10 +1682,10 @@ CL_Frame
 
 ==================
 */
-void CL_Frame (int msec)
+void CL_Frame (double msec)
 {
-	static int	extratime;
-	static int  lasttimecalled;
+	static double	extratime;
+	static double  lasttimecalled;
 
 	if (dedicated->value)
 		return;
@@ -1767,10 +1767,10 @@ void CL_Frame (int msec)
 			}
 			else
 			{
-				int now = Sys_Milliseconds();
+				double now = Sys_Milliseconds();
 
 				if ( log_stats_file )
-					fprintf( log_stats_file, "%d\n", now - lasttimecalled );
+					fprintf( log_stats_file, "%d\n", (int)(now - lasttimecalled) );
 				lasttimecalled = now;
 			}
 		}

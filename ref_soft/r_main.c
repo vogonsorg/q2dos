@@ -45,7 +45,7 @@ swstate_t sw_state;
 void		*colormap;
 vec3_t		viewlightvec;
 alight_t	r_viewlighting = {128, 192, viewlightvec};
-float		r_time1;
+double		r_time1;
 int			r_numallocatededges;
 float		r_aliasuvscale = 1.0;
 int			r_outofsurfaces;
@@ -103,8 +103,8 @@ int			r_viewcluster, r_oldviewcluster;
 
 image_t  	*r_notexture_mip;
 
-float	da_time1, da_time2, dp_time1, dp_time2, db_time1, db_time2, rw_time1, rw_time2;
-float	se_time1, se_time2, de_time1, de_time2;
+double	da_time1, da_time2, dp_time1, dp_time2, db_time1, db_time2, rw_time1, rw_time2;
+double	se_time1, se_time2, de_time1, de_time2;
 
 void R_MarkLeaves (void);
 

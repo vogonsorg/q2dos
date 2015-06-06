@@ -771,10 +771,10 @@ extern	cvar_t	*log_stats;
 extern	FILE *log_stats_file;
 
 // host_speeds times
-extern	int		time_before_game;
-extern	int		time_after_game;
-extern	int		time_before_ref;
-extern	int		time_after_ref;
+extern	double		time_before_game;
+extern	double		time_after_game;
+extern	double		time_before_ref;
+extern	double		time_after_ref;
 
 void Z_Free (void *ptr);
 void *Z_Malloc (int size);			// returns 0 filled memory
@@ -832,7 +832,7 @@ CLIENT / SERVER SYSTEMS
 void CL_Init (void);
 void CL_Drop (void);
 void CL_Shutdown (void);
-void CL_Frame (int msec);
+void CL_Frame (double msec);
 void Con_Print (char *text);
 void SCR_BeginLoadingPlaque (void);
 

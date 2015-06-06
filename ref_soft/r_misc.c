@@ -130,14 +130,14 @@ R_PrintTimes
 */
 void R_PrintTimes (void)
 {
-	int		r_time2;
-	int		ms;
+	double		r_time2;
+	double		ms;
 
 	r_time2 = Sys_Milliseconds ();
 
 	ms = r_time2 - r_time1;
 	
-	ri.Con_Printf (PRINT_ALL,"%5i ms %3i/%3i/%3i poly %3i surf\n",
+	ri.Con_Printf (PRINT_ALL,"%5d ms %3d/%3d/%3d poly %3d surf\n",
 				ms, c_faceclip, r_polycount, r_drawnpolycount, c_surf);
 	c_surf = 0;
 }
@@ -150,7 +150,7 @@ R_PrintDSpeeds
 */
 void R_PrintDSpeeds (void)
 {
-	int	ms, dp_time, r_time2, rw_time, db_time, se_time, de_time, da_time;
+	double	ms, dp_time, r_time2, rw_time, db_time, se_time, de_time, da_time;
 
 	r_time2 = Sys_Milliseconds ();
 
