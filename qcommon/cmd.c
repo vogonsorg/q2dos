@@ -219,8 +219,16 @@ void Cbuf_Execute (void)
 		}
 			
 				
+		// R1ch's fix for overflow vulnerability
+		if (i >= sizeof(line) - 1) {
+			Com_Printf ("Cbuf_Execute: overflow of %d truncated\n", i);
+			memcpy (line, text, sizeof(line)-1);
+			line[sizeof(line)-1] = 0;
+		}
+		else {
 		memcpy (line, text, i);
 		line[i] = 0;
+		}
 		
 // delete the text from the command buffer and move remaining commands down
 // this is necessary because commands (exec, alias) can insert data at the

@@ -383,7 +383,9 @@ typedef struct particle_s
 
 void CL_ClearEffects (void);
 void CL_ClearTEnts (void);
-void CL_BlasterTrail (vec3_t start, vec3_t end);
+void CL_BlasterParticles (vec3_t org, vec3_t dir, unsigned int color);
+//void CL_BlasterTrail (vec3_t start, vec3_t end);
+void CL_BlasterTrail (vec3_t start, vec3_t end, float color);
 void CL_QuadTrail (vec3_t start, vec3_t end);
 void CL_RailTrail (vec3_t start, vec3_t end);
 void CL_BubbleTrail (vec3_t start, vec3_t end);
@@ -394,8 +396,8 @@ void CL_IonripperTrail (vec3_t start, vec3_t end);
 
 // ========
 // PGM
-void CL_BlasterParticles2 (vec3_t org, vec3_t dir, unsigned int color);
-void CL_BlasterTrail2 (vec3_t start, vec3_t end);
+//void CL_BlasterParticles2 (vec3_t org, vec3_t dir, unsigned int color);
+//void CL_BlasterTrail2 (vec3_t start, vec3_t end);
 void CL_DebugTrail (vec3_t start, vec3_t end);
 void CL_SmokeTrail (vec3_t start, vec3_t end, int colorStart, int colorRun, int spacing);
 void CL_Flashlight (int ent, vec3_t pos);
@@ -468,6 +470,7 @@ void CL_GetChallengePacket (void);
 void CL_PingServers_f (void);
 void CL_Snd_Restart_f (void);
 void CL_RequestNextDownload (void);
+void CL_WriteConfig_f (void);	// Knightmare- added writeconfig command
 
 //
 // cl_input

@@ -3660,7 +3660,9 @@ qboolean PlayerConfig_MenuInit( void )
 	if ( hand->value < 0 || hand->value > 2 )
 		Cvar_SetValue( "hand", 0 );
 
-	strcpy( currentdirectory, skin->string );
+	// r1ch: buffer overflow fix
+//	strcpy( currentdirectory, skin->string );
+	strncpy( currentdirectory, Cvar_VariableString ("skin"), sizeof(currentdirectory)-1);
 
 	if ( strchr( currentdirectory, '/' ) )
 	{

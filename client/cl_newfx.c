@@ -1228,6 +1228,7 @@ void CL_ParticleSmokeEffect (vec3_t org, vec3_t dir, int color, int count, int m
 	}
 }
 
+#if 0 // Knightmare- removed these as redundant
 /*
 ===============
 CL_BlasterParticles2
@@ -1321,3 +1322,4 @@ void CL_BlasterTrail2 (vec3_t start, vec3_t end)
 		VectorAdd (move, vec, move);
 	}
 }
+#endif

@@ -166,6 +166,9 @@ void COM_InitArgv (int argc, char **argv);
 
 char *CopyString (char *in);
 
+void StripHighBits (char *string, int highbits);
+void ExpandNewLines (char *string);
+
 //============================================================================
 
 void Info_Print (char *s);

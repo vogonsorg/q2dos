@@ -1869,3 +1869,167 @@ Qcommon_Shutdown
 void Qcommon_Shutdown (void)
 {
 }
+
+/*
+=================
+StripHighBits
+
+String parsing function from r1q2
+=================
+*/
+void StripHighBits (char *string, int highbits)
+{
+	byte		high;
+	byte		c;
+	char		*p;
+
+	p = string;
+
+	if (highbits)
+		high = 127;
+	else
+		high = 255;
+
+	while (string[0])
+	{
+		c = *(string++);
+
+		if (c >= 32 && c <= high)
+			*p++ = c;
+	}
+
+	p[0] = '\0';
+}
+
+
+/*
+=================
+IsValidChar
+
+Security function from r1q2
+=================
+*/
+qboolean IsValidChar (int c)
+{
+	if (!isalnum(c) && c != '_' && c != '-')
+		return false;
+	return true;
+}
+
+/*
+=================
+ExpandNewLines
+
+String parsing function from r1q2
+=================
+*/
+void ExpandNewLines (char *string)
+{
+	char *q = string;
+	char *s = q;
+
+	if (!string[0])
+		return;
+
+	while (*(q+1))
+	{
+		if (*q == '\\' && *(q+1) == 'n')
+		{
+			*s++ = '\n';
+			q++;
+		}
+		else
+		{
+			*s++ = *q;
+		}
+		q++;
+
+		//crashfix, check if we reached eol on an expansion.
+		if (!*q)
+			break;
+	}
+
+	if (*q)
+		*s++ = *q;
+	*s = '\0';
+}
+
+/*
+=================
+StripQuotes
+
+String parsing function from r1q2
+=================
+*/
+char *StripQuotes (char *string)
+{
+	size_t	i;
+
+	if (!string[0])
+		return string;
+
+	i = strlen(string);
+
+	if (string[0] == '"' && string[i-1] == '"')
+	{
+		string[i-1] = 0;
+		return string + 1;
+	}
+
+	return string;
+}
+
+/*
+=================
+MakePrintable
+
+String parsing function from r1q2
+=================
+*/
+const char *MakePrintable (const void *subject, size_t numchars)
+{
+	int			len;
+	static char printable[4096];
+	char		tmp[8];
+	char		*p;
+	const byte	*s;
+
+	if (!subject)
+	{
+		strcpy (printable, "(null)");
+		return printable;
+	}
+
+	s = (const byte *)subject;
+	p = printable;
+	len = 0;
+
+	if (!numchars)
+		numchars = strlen((const char *) s);
+
+	while (numchars--)
+	{
+		if (isprint(s[0]))
+		{
+			*p++ = s[0];
+			len++;
+		}
+		else
+		{
+			sprintf (tmp, "%.3d", s[0]);
+			*p++ = '\\';
+			*p++ = tmp[0];
+			*p++ = tmp[1];
+			*p++ = tmp[2];
+			len += 4;
+		}
+
+		if (len >= sizeof(printable)-5)
+			break;
+
+		s++;
+	}
+
+	printable[len] = 0;
+	return printable;
+}
