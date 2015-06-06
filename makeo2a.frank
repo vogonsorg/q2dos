@@ -1,8 +1,12 @@
 CC = gcc
 CFLAGS = -g -Wall -O2 
-SFLAGS = -Did386 -DREF_HARD_LINKED -DGAME_HARD_LINKED -DUSE_DOS_CD
+SFLAGS = -Did386 -DREF_HARD_LINKED -DGAME_HARD_LINKED -DUSE_DOS_CD -DOGG_SUPPORT
 WCFLAGS = -I wattcp/inc
 WLFLAGS = -Lwattcp/lib -lwatt
+OGGCFLAGS = -I libogg/inc
+OCCLFLAGS = -Llibogg/lib -logg
+VORBCFLAGS = -I libvorb/inc
+VORBLFLAGS = -Llibvorb/lib -lvorbisenc -lvorbisfile -lvorbis -logg
 
 DOS = 	dos/cd_dos.o \
 	dos/vid_dos.o \
@@ -145,7 +149,7 @@ OBJECTS =  $(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(REFSOFT) $(REFASM) $(DOS)
 all: q2
 
 q2:	$(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o q2 -lm $(WLFLAGS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o q2 -lm $(WLFLAGS) -lm $(OCCLFLAGS) -lm $(VORBLFLAGS)
 	cp q2.exe $(HOME)/dos/q2
 
 clean:
@@ -154,7 +158,7 @@ clean:
 DO_AS=$(CC) -x assembler-with-cpp
 
 %.o : %.c
-	$(CC) $(CFLAGS) $(WCFLAGS) $(SFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(WCFLAGS) $(SFLAGS) $(OGGCFLAGS) $(VORBCFLAGS) -c $< -o $@
 
 %.o: %.S
 	$(DO_AS) $(CFLAGS) -c $< -o $@
