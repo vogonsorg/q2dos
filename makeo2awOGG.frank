@@ -6,7 +6,7 @@ WLFLAGS = -Lwattcp/lib -lwatt
 OGGCFLAGS = -I libogg/inc
 OCCLFLAGS = -Llibogg/lib -logg
 VORBCFLAGS = -I libvorb/inc
-VORBLFLAGS = -Llibvorb/lib -lvorbis -lm -Llibvorb/lib -lvorbisfile -lm -Llibvorb/lib -lvorbisenc
+VORBLFLAGS = -Llibvorb/lib -lvorbisenc -lvorbisfile -lvorbis -logg
 
 DOS = 	dos/cd_dos.o \
 	dos/vid_dos.o \

@@ -1,5 +1,5 @@
 /********************************************************************
- *                                                                  *
+ * Modified by RayeR, 15.1.2015                                     *
  * THIS FILE IS PART OF THE OggVorbis SOFTWARE CODEC SOURCE CODE.   *
  * USE, DISTRIBUTION AND REPRODUCTION OF THIS LIBRARY SOURCE IS     *
  * GOVERNED BY A BSD-STYLE SOURCE LICENSE INCLUDED WITH THIS SOURCE *
@@ -109,6 +109,7 @@
    /* DJGPP */
    typedef short ogg_int16_t;
    typedef int ogg_int32_t;
+   typedef unsigned short ogg_uint16_t; // added by RayeR, 19.1.2013
    typedef unsigned int ogg_uint32_t;
    typedef long long ogg_int64_t;
 
