@@ -300,9 +300,9 @@ void	VID_Init (void)
 
     VID_InitExtra(); //probe VESA
 
-    whatmodearewe=4; //hope this means start in mode 0
-    viddef.width = 640;
-    viddef.height = 480; //was originally 240
+    whatmodearewe=0; //hope this means start in mode 0
+    viddef.width = 320;
+    viddef.height = 200; //was originally 240
 
     ri.Cmd_AddCommand = Cmd_AddCommand;
     ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
