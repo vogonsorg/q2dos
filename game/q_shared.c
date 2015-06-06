@@ -17,9 +17,10 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
+#include <ctype.h> // FS: For tolower
 #include "q_shared.h"
 
-#define DEG2RAD( a ) ( a * M_PI ) / 180.0F
+//#define DEG2RAD( a ) ( a * M_PI ) / 180.0F
 
 vec3_t vec3_origin = {0,0,0};
 
@@ -1232,6 +1233,81 @@ void Com_sprintf (char *dest, int size, char *fmt, ...)
 	if (len >= size)
 		Com_Printf ("Com_sprintf: overflow of %i in %i\n", len, size);
 	strncpy (dest, bigbuffer, size-1);
+}
+
+// Knightmare added
+void Com_strcpy (char *dest, int destSize, const char *src)
+{
+	if (!dest) {
+		Com_Printf ("Com_strcpy: NULL dst\n");
+		return;
+	}
+	if (!src) {
+		Com_Printf ("Com_strcpy: NULL src\n");
+		return;
+	}
+	if (destSize < 1) {
+		Com_Printf ("Com_strcpy: dstSize < 1\n");
+		return;
+	}
+
+	strncpy(dest, src, destSize-1);
+	dest[destSize-1] = 0;
+}
+
+// Knightmare added
+void Com_strcat (char *dest, int destSize, const char *src)
+{
+	if (!dest) {
+		Com_Printf ("Com_strcat: NULL dst\n");
+		return;
+	}
+	if (!src) {
+		Com_Printf ("Com_strcat: NULL src\n");
+		return;
+	}
+	if (destSize < 1) {
+		Com_Printf ("Com_strcat: dstSize < 1\n");
+		return;
+	}
+
+	while (--destSize && *dest)
+		dest++;
+
+	if (destSize > 0) {
+		while (--destSize && *src)
+			*dest++ = *src++;
+
+		*dest = 0;
+	}
+}
+
+// Knightmare added
+/*
+=============
+Com_HashFileName
+=============
+*/
+long Com_HashFileName (const char *fname, int hashSize, qboolean sized)
+{
+	int		i = 0;
+	long	hash = 0;
+	char	letter;
+
+	if (fname[0] == '/' || fname[0] == '\\') i++;	// skip leading slash
+	while (fname[i] != '\0')
+	{
+		letter = tolower(fname[i]);
+	//	if (letter == '.') break;
+		if (letter == '\\') letter = '/';	// fix filepaths
+		hash += (long)(letter)*(i+119);
+		i++;
+	}
+	hash = (hash ^ (hash >> 10) ^ (hash >> 20));
+	if (sized) {
+		hash &= (hashSize-1);
+	}
+	return hash;
 }
 
 /*

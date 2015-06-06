@@ -704,6 +704,12 @@ FILESYSTEM
 
 ==============================================================
 */
+// Knightmare added
+typedef enum {
+	FS_SEEK_CUR,
+	FS_SEEK_SET,
+	FS_SEEK_END
+} fsOrigin_t;
 
 void	FS_InitFilesystem (void);
 void	FS_SetGamedir (char *dir);
@@ -726,6 +732,16 @@ void	FS_FreeFile (void *buffer);
 
 void	FS_CreatePath (char *path);
 
+// Knightmare added
+int			FS_FRead (void *buffer, int size, int count, FILE *f);
+void		FS_Seek (FILE *f, int offset, fsOrigin_t origin);
+int			FS_Tell (FILE *f);
+char		**FS_ListPak (char *find, int *num);
+char		**FS_ListFiles (char *findname, int *numfiles, unsigned musthave, unsigned canthave);
+void		FS_FreeFileList (char **list, int n);
+qboolean	FS_ItemInList (char *check, int num, char **list);
+void		FS_InsertInList (char **list, char *insert, int len, int start);
+// end Knightmare
 
 /*
 ==============================================================

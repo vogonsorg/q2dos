@@ -258,6 +258,11 @@ extern	cvar_t	*cl_footsteps;
 extern	cvar_t	*cl_noskins;
 extern	cvar_t	*cl_autoskins;
 
+// Knightmare- whether to try to play OGGs instead of CD tracks
+extern	cvar_t	*cl_ogg_music;
+extern	cvar_t	*cl_rogue_music; // whether to play Rogue tracks
+extern	cvar_t	*cl_xatrix_music; // whether to play Xatrix tracks
+
 extern	cvar_t	*cl_upspeed;
 extern	cvar_t	*cl_forwardspeed;
 extern	cvar_t	*cl_sidespeed;
@@ -420,6 +425,7 @@ void CL_ParseFrame (void);
 
 void CL_ParseTEnt (void);
 void CL_ParseConfigString (void);
+void CL_PlayBackgroundTrack (void); // Knightmare added
 void CL_ParseMuzzleFlash (void);
 void CL_ParseMuzzleFlash2 (void);
 void SmokeAndFlash(vec3_t origin);
@@ -452,6 +458,7 @@ void CL_ParseLayout (void);
 //
 extern	refexport_t	re;		// interface to refresh .dll
 
+float ClampCvar (float min, float max, float value);
 void CL_Init (void);
 
 void CL_FixUpGender(void);

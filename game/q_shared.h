@@ -125,9 +125,26 @@ typedef	int	fixed4_t;
 typedef	int	fixed8_t;
 typedef	int	fixed16_t;
 
+// Knightmare added
+#ifndef min
+#define min(a,b)        (((a) < (b)) ? (a) : (b))
+#endif
+#ifndef max
+#define max(a,b)        (((a) > (b)) ? (a) : (b))
+#endif
+
 #ifndef M_PI
 #define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
 #endif
+
+#ifndef M_PI2
+#define M_PI2					6.28318530717958647692	// Matches value in GCC v2 math.h
+#endif
+
+#define SqrtFast(x)				((x) * Q_rsqrt(x))
+
+#define DEG2RAD(a)				(((a) * M_PI) / 180.0F)
+#define RAD2DEG(a)				(((a) * 180.0F) / M_PI)
 
 struct cplane_s;
 
@@ -214,6 +231,10 @@ char *COM_Parse (char **data_p);
 // data is an in/out parm, returns a parsed out token
 
 void Com_sprintf (char *dest, int size, char *fmt, ...);
+// Knightmare added
+void Com_strcpy (char *dest, int destSize, const char *src);
+void Com_strcat (char *dest, int destSize, const char *src);
+long Com_HashFileName (const char *fname, int hashSize, qboolean sized);
 
 void Com_PageInMemory (byte *buffer, int size);
 

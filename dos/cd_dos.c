@@ -59,6 +59,19 @@ int CDAudio_Init(void)
 void CDAudio_Shutdown(void)
 {
 }
+
+// Knightmare added
+/*
+===========
+CDAudio_Active
+
+===========
+*/
+qboolean CDAudio_Active (void)
+{
+	return false;
+}
+
 #else
 
 
@@ -922,4 +935,17 @@ void CDAudio_Shutdown(void)
 		return;
 	CDAudio_Stop();
 }
+
+// Knightmare added
+/*
+===========
+CDAudio_Active
+
+===========
+*/
+qboolean CDAudio_Active (void)
+{
+	return playing;
+}
+
 #endif // USE_DOS_CD

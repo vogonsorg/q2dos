@@ -47,6 +47,10 @@ cvar_t	*cl_predict;
 //cvar_t	*cl_minfps;
 cvar_t	*cl_maxfps;
 cvar_t	*cl_gun;
+// Knightmare- whether to try to play OGGs instead of CD tracks
+cvar_t	*cl_ogg_music;
+cvar_t	*cl_rogue_music; // whether to play Rogue tracks
+cvar_t	*cl_xatrix_music; // whether to play Xatrix tracks
 
 cvar_t	*cl_add_particles;
 cvar_t	*cl_add_lights;
@@ -100,6 +104,19 @@ extern	cvar_t *allow_download_players;
 extern	cvar_t *allow_download_models;
 extern	cvar_t *allow_download_sounds;
 extern	cvar_t *allow_download_maps;
+
+
+/*
+==========================
+ClampCvar
+==========================
+*/
+float ClampCvar (float min, float max, float value)
+{
+	if ( value < min ) return min;
+	if ( value > max ) return max;
+	return value;
+}
 
 //======================================================================
 
@@ -1121,6 +1138,8 @@ void CL_RequestNextDownload (void)
 	unsigned	map_checksum;		// for detecting cheater maps
 	char fn[MAX_OSPATH];
 	dmdl_t *pheader;
+	dsprite_t	*spriteheader;
+	char		*skinname;
 
 	if (cls.state != ca_connected)
 		return;
@@ -1153,7 +1172,8 @@ void CL_RequestNextDownload (void)
 				}
 
 				// checking for skins in the model
-				if (!precache_model) {
+				if (!precache_model)
+				{
 
 					FS_LoadFile (cl.configstrings[precache_check], (void **)&precache_model);
 					if (!precache_model) {
@@ -1161,8 +1181,43 @@ void CL_RequestNextDownload (void)
 						precache_check++;
 						continue; // couldn't load it
 					}
-					if (LittleLong(*(unsigned *)precache_model) != IDALIASHEADER) {
-						// not an alias model
+					if (LittleLong(*(unsigned *)precache_model) != IDALIASHEADER)
+					{	// is it a sprite?
+						if (LittleLong(*(unsigned *)precache_model) != IDSPRITEHEADER)
+						{	// not a recognized model
+						FS_FreeFile(precache_model);
+						precache_model = 0;
+						precache_model_skin = 0;
+						precache_check++;
+						continue;
+						}
+						else
+						{	// get sprite header
+							spriteheader = (dsprite_t *)precache_model;
+							if (LittleLong (spriteheader->version != SPRITE_VERSION))
+							{	// not a recognized sprite
+								FS_FreeFile(precache_model);
+								precache_model = 0;
+								precache_check++;
+								precache_model_skin = 0;
+								continue; // couldn't load it
+							}
+						}
+					}
+					else
+					{	// get md2 header
+					pheader = (dmdl_t *)precache_model;
+						if (LittleLong (pheader->version) != ALIAS_VERSION)
+						{	// not a recognized md2
+							FS_FreeFile(precache_model);
+							precache_model = 0;
+						precache_check++;
+						precache_model_skin = 0;
+						continue; // couldn't load it
+						}
+					}
+				/*	if (LittleLong(*(unsigned *)precache_model) != IDALIASHEADER)
+					{	// not an alias model
 						FS_FreeFile(precache_model);
 						precache_model = 0;
 						precache_model_skin = 0;
@@ -1174,20 +1229,53 @@ void CL_RequestNextDownload (void)
 						precache_check++;
 						precache_model_skin = 0;
 						continue; // couldn't load it
-					}
+					}*/
 				}
 
+				if (LittleLong(*(unsigned *)precache_model) == IDALIASHEADER) // md2
+				{
 				pheader = (dmdl_t *)precache_model;
 
-				while (precache_model_skin - 1 < LittleLong(pheader->num_skins)) {
-					if (!CL_CheckOrDownloadFile((char *)precache_model +
-						LittleLong(pheader->ofs_skins) + 
-						(precache_model_skin - 1)*MAX_SKINNAME)) {
+					while (precache_model_skin - 1 < LittleLong(pheader->num_skins))
+					{
+						skinname = (char *)precache_model + LittleLong(pheader->ofs_skins) + 
+									(precache_model_skin - 1)*MAX_SKINNAME;
+						// r1ch: spam warning for models that are broken
+						if (strchr (skinname, '\\'))
+							Com_Printf ("Warning, model %s with incorrectly linked skin: %s\n", cl.configstrings[precache_check], skinname);
+						else if (strlen(skinname) > MAX_SKINNAME-1)
+							Com_Error (ERR_DROP, "Model %s has too long a skin path: %s", cl.configstrings[precache_check], skinname);
+
+						if (!CL_CheckOrDownloadFile(skinname))
+						{
+							precache_model_skin++;
+							return; // started a download
+						}
 						precache_model_skin++;
-						return; // started a download
 					}
-					precache_model_skin++;
 				}
+				else // sprite
+				{
+					spriteheader = (dsprite_t *)precache_model;
+					while (precache_model_skin - 1 < LittleLong(spriteheader->numframes))
+					{
+						skinname = spriteheader->frames[(precache_model_skin - 1)].name;
+
+						// r1ch: spam warning for models that are broken
+						if (strchr (skinname, '\\'))
+							Com_Printf ("Warning, model %s with incorrectly linked skin: %s\n", cl.configstrings[precache_check], skinname);
+						else if (strlen(skinname) > MAX_SKINNAME-1)
+							Com_Error (ERR_DROP, "Model %s has too long a skin path: %s", cl.configstrings[precache_check], skinname);
+
+						if (!CL_CheckOrDownloadFile(skinname))
+						{
+							precache_model_skin++;
+							return; // started a download
+						}
+						precache_model_skin++;
+					}
+				}
+
 				if (precache_model) { 
 					FS_FreeFile(precache_model);
 					precache_model = 0;
@@ -1439,6 +1527,11 @@ void CL_InitLocal (void)
 	cl_predict = Cvar_Get ("cl_predict", "1", 0);
 //	cl_minfps = Cvar_Get ("cl_minfps", "5", 0);
 	cl_maxfps = Cvar_Get ("cl_maxfps", "90", 0);
+
+	// Knightmare- whether to try to play OGGs instead of CD tracks
+	cl_ogg_music = Cvar_Get ("cl_ogg_music", "1", CVAR_ARCHIVE);
+	cl_rogue_music = Cvar_Get ("cl_rogue_music", "0", CVAR_ARCHIVE);
+	cl_xatrix_music = Cvar_Get ("cl_xatrix_music", "0", CVAR_ARCHIVE);
 
 	cl_upspeed = Cvar_Get ("cl_upspeed", "200", 0);
 	cl_forwardspeed = Cvar_Get ("cl_forwardspeed", "200", 0);

@@ -465,6 +465,9 @@ void CL_SendCmd (void)
 	usercmd_t	nullcmd;
 	int			checksumIndex;
 
+	// Knightmare- clear buffer
+	memset (&buf, 0, sizeof(buf));
+
 	// build a command even if not connected
 
 	// save this command off for prediction
