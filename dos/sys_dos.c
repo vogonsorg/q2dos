@@ -1,18 +1,25 @@
 // sys_dos.c -- dos system driver
 
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <errno.h>
-#include <stdio.h>
-#include <dirent.h>
 #include <unistd.h>
-#include <sys/mman.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <limits.h>
 #include <sys/time.h>
-#include <sys/nearptr.h>
+#include <sys/types.h>
+#include <dir.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <string.h>
 #include <dpmi.h>
+#include <sys/nearptr.h>
 #include <conio.h>
-#include <bios.h>
 #include <crt0.h> // FS: Fake Mem Fix (QIP)
+
+int _crt0_startup_flags = _CRT0_FLAG_UNIX_SBRK; // FS: Fake Mem Fix (QIP)
 
 #include "zone.h"
 #include "dosisms.h"
@@ -21,7 +28,9 @@
 #include "errno.h"
 #include "glob.h"
 
-int _crt0_startup_flags = _CRT0_FLAG_UNIX_SBRK; // FS: Fake Mem Fix (QIP)
+#define MINIMUM_WIN_MEMORY                      0x800000
+#define MINIMUM_WIN_MEMORY_LEVELPAK     (MINIMUM_WIN_MEMORY + 0x100000)
+
 #define KEYBUF_SIZE     256
 static unsigned char    keybuf[KEYBUF_SIZE];
 static int                              keybuf_head=0;
@@ -30,6 +39,7 @@ static int                              keybuf_tail=0;
 #ifdef USE_QDOS_ZONE
 static quakeparms_t     quakeparms;
 #endif
+extern char     start_of_memory __asm__("start");
 
 byte        scantokey[128] = 
 					{ 
@@ -109,13 +119,11 @@ double Sys_FloatTime (void);
 
 #define LEAVE_FOR_CACHE (512*1024)              //FIXME: tune
 #define LOCKED_FOR_MALLOC (128*1024)    //FIXME: tune
-#define MINIMUM_WIN_MEMORY                      0x800000
-#define MINIMUM_WIN_MEMORY_LEVELPAK     (MINIMUM_WIN_MEMORY + 0x100000)
+
 
 int                     end_of_memory;
 qboolean        lockmem, lockunlockmem, unlockmem;
 static int      win95;
-extern char     start_of_memory __asm__("start");
 static int                      minmem;
 
 void Sys_DetectWin95 (void)
@@ -146,6 +154,7 @@ void Sys_DetectWin95 (void)
 		unlockmem = lockmem && !lockunlockmem;
 	}
 }
+
 
 void *dos_getmaxlockedmem(int *size)
 {
@@ -455,7 +464,11 @@ fflush(stdout);
 
 void Sys_Quit (void)
 {
-	dos_restoreintr(9); // FS: Give back the keyboard
+	__dpmi_regs r;
+
+	if(!dedicated || !dedicated->value)
+		dos_restoreintr(9); // FS: Give back the keyboard
+
 	if (unlockmem)
 	{
 		dos_unlockmem (&start_of_memory,
@@ -464,12 +477,10 @@ void Sys_Quit (void)
 		dos_unlockmem (quakeparms.membase, quakeparms.memsize);
 #endif
 	}
-	{
-		__dpmi_regs r;
+	//return to text mode
 
-		r.x.ax = 3;
-		__dpmi_int(0x10, &r);
-	}//return to text mode
+	r.x.ax = 3;
+	__dpmi_int(0x10, &r);
 	exit (0);
 }
 
@@ -508,7 +519,6 @@ void	*Sys_GetGameAPI (void *parms)
 // FS: Doesn't work
 char *Sys_ConsoleInput (void)
 {
-#if 0
 	static char     text[256];
 	static int      len = 0;
 	char            ch;
@@ -547,15 +557,15 @@ char *Sys_ConsoleInput (void)
 			len = (len + 1) & 0xff;
 			break;
 	}
-#endif
 	return NULL;
 }
 
 void	Sys_ConsoleOutput (char *string)
 {
 //printf("Sys_ConsoleOutput: %s",string);
-//	if (dedicated || dedicated->value)
-//		printf("%s",string);
+	if (!dedicated || !dedicated->value)
+		return;
+	printf("%s",string);
 }
 
 #define SC_RSHIFT       0x36 
@@ -649,7 +659,6 @@ int main (int argc, char **argv)
 	quakeparms.argc = com_argc;
 	quakeparms.argv = com_argv;
 #endif
-
 	Sys_DetectWin95 ();
 	Sys_PageInProgram ();
 	Sys_GetMemory ();
@@ -663,7 +672,9 @@ int main (int argc, char **argv)
 #endif
 
 	oldtime = Sys_Milliseconds ();
-	dos_registerintr(9, TrapKey);
+
+	if (!dedicated || !dedicated->value)
+		dos_registerintr(9, TrapKey);
 
     /* main window message loop */
 #if 1
