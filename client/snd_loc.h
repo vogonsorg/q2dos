@@ -20,11 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // snd_loc.h -- private sound functions
 
 #ifdef OGG_SUPPORT	// Knightmare added- vorbis support
-#if defined (_MSC_VER) && (_MSC_VER <= 1200)	// use older version of Ogg Vorbis for MSVC6
-#include "../include/ogg_old/vorbisfile.h"
-#else
 #include "../include/ogg/vorbisfile.h"
-#endif
 #include "../include/al/altypes.h"
 #include "snd_ogg.h"
 #endif

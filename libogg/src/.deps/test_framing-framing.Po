@@ -1,0 +1,18 @@
+test_framing-framing.o : \
+ framing.c c:/djgpp/include/stdlib.h \
+ c:/djgpp/include/sys/djtypes.h c:/djgpp/include/limits.h \
+ c:/djgpp/include/string.h c:/djgpp/include/sys/movedata.h \
+ ../include/ogg/ogg.h c:/djgpp/include/stddef.h \
+ ../include/ogg/os_types.h c:/djgpp/include/stdio.h \
+ c:/djgpp/include/sys/version.h
+framing.c :
+c:/djgpp/include/stdlib.h :
+c:/djgpp/include/sys/djtypes.h :
+c:/djgpp/include/limits.h :
+c:/djgpp/include/string.h :
+c:/djgpp/include/sys/movedata.h :
+../include/ogg/ogg.h :
+c:/djgpp/include/stddef.h :
+../include/ogg/os_types.h :
+c:/djgpp/include/stdio.h :
+c:/djgpp/include/sys/version.h :

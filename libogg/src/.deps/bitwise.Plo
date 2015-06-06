@@ -1,0 +1,15 @@
+bitwise.lo : \
+ bitwise.c c:/djgpp/include/string.h \
+ c:/djgpp/include/sys/djtypes.h c:/djgpp/include/sys/movedata.h \
+ c:/djgpp/include/stdlib.h c:/djgpp/include/limits.h \
+ ../include/ogg/ogg.h c:/djgpp/include/stddef.h \
+ ../include/ogg/os_types.h
+bitwise.c :
+c:/djgpp/include/string.h :
+c:/djgpp/include/sys/djtypes.h :
+c:/djgpp/include/sys/movedata.h :
+c:/djgpp/include/stdlib.h :
+c:/djgpp/include/limits.h :
+../include/ogg/ogg.h :
+c:/djgpp/include/stddef.h :
+../include/ogg/os_types.h :
