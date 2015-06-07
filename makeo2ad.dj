@@ -3,9 +3,17 @@
 CC = i586-pc-msdosdjgpp-gcc
 #CC = gcc
 CFLAGS = -g -O2 
-SFLAGS = -Did386 -DREF_HARD_LINKED 
+SFLAGS = -Uid386 -DREF_HARD_LINKED 
 WCFLAGS = -I wattcp/inc
 WLFLAGS = -Lwattcp/lib -lwatt
+
+OS =  null/cd_null.o \
+        null/vid_null.o \
+        null/snddma_null.o \
+        null/sys_null.o \
+        null/in_null.o \
+        null/net_null.o \
+        null/swimp_null.o
 
 DOS = 	dos/cd_dos.o \
 	dos/vid_dos.o \
@@ -144,7 +152,7 @@ DGAME = game/m_tank.o \
 .PHONY: all test clean
 #
 
-OBJECTS =  $(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(REFSOFT) $(REFASM) $(DOS)
+OBJECTS =  $(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(REFSOFT) $(OS)
 
 all: q2.o gamex86.o
 

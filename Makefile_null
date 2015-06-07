@@ -1,7 +1,7 @@
 #CC = gcc-4.2
 #CFLAGS = -arch i386 -g -O0
 CC = i586-pc-msdosdjgpp-gcc
-CFLAGS = -g -O0 -Did386=0
+CFLAGS = -g -O0 -Uid386
 SFLAGS = -DREF_HARD_LINKED -DGAME_HARD_LINKED
 
 NULL = 	null/cd_null.o \
@@ -10,7 +10,7 @@ NULL = 	null/cd_null.o \
 	null/sys_null.o \
 	null/in_null.o \
 	null/net_null.o \
-	dos/swimp_dos.o
+	null/swimp_null.o
 
 CLIENT =	client/cl_input.o \
 	client/cl_inv.o \
