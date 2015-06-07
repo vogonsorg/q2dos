@@ -114,15 +114,25 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 	{
 		char players[4];
 		char *test = strchr(savedkeyvals, '\n');
+		qboolean	hasBots = false;
 
 		while (test != NULL)
 		{
+			if(strstr(test, "WallFly[BZZZ]")) // FS: Don't report servers that just have WallFly in them.
+				hasBots = true;
 			numplayers++;
 			test = strchr(test+1, '\n');
 		}
 
+		numplayers = numplayers-2;
+
+		if (numplayers == 1 && hasBots == true)
+		{
+			return;
+		}
+
 		kvpair.key = _strdup("numplayers");
-		Com_sprintf(players, sizeof(players), "%i", numplayers-2);
+		Com_sprintf(players, sizeof(players), "%i", numplayers/*-2*/);
 		kvpair.value = _strdup(players);
 		TableEnter(server->keyvals, &kvpair);
 	}	
