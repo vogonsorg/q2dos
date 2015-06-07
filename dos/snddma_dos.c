@@ -573,9 +573,7 @@ qboolean SNDDMA_Init(void)
 		Cmd_AddCommand ("snd_shutdown", snd_shutdown_f); // FS
 	}
 	firstInit = false;
-	
-	if(COM_CheckParm("-nosound"))
-		goto nocard;
+
 	if (GUS_Init ())
 	{
 		Com_DPrintf("GUS_Init\n");
@@ -590,7 +588,7 @@ qboolean SNDDMA_Init(void)
 		dmacard = dma_blaster;
 		return true;
 	}
-nocard:
+	
 	dmacard = dma_none;
 	return false;
 #else

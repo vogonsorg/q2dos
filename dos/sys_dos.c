@@ -630,19 +630,14 @@ char *Sys_GetClipboardData( void )
 	return NULL;
 }
 
-qboolean initialized;
 void	Sys_Init (void)
 {
-	if (!initialized) // FS: This gets called in Qcommon_init too, im lazy
-	{
-		MaskExceptions ();
+	MaskExceptions ();
 
-		Sys_SetFPCW ();
+	Sys_SetFPCW ();
 
-		_go32_interrupt_stack_size = 16 * 1024;
-		_go32_rmcb_stack_size = 16 * 1024;
-		initialized = true;
-	}
+	_go32_interrupt_stack_size = 4 * 1024;;
+	_go32_rmcb_stack_size = 4 * 1024;
 }
 
 double Sys_FloatTime (void)
