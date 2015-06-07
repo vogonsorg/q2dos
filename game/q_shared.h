@@ -64,6 +64,11 @@ typedef enum {false, true}	qboolean;
 #endif
 // end Knightmare
 
+#define CL_MASTER_ADDR	"maraakate.org" // FS: Gamespy dead "master.gamespy.com"
+#define CL_MASTER_PORT "28900"
+#define SV_MASTER_IP "maraakate.org" // FS: gamespy dead "master.gamespy.com"
+#define SV_MASTER_PORT "27900"
+	
 // angle indexes
 #define	PITCH				0		// up / down
 #define	YAW					1		// left / right
@@ -140,6 +145,12 @@ typedef	int	fixed16_t;
 #endif
 #ifndef max
 #define max(a,b)        (((a) > (b)) ? (a) : (b))
+#endif
+
+// FS
+#ifndef bound
+#define bound(a,b,c) ((a) >= (c) ? (a) : \
+					(b) < (a) ? (a) : (b) > (c) ? (c) : (b))
 #endif
 
 #ifndef M_PI

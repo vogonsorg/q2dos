@@ -641,7 +641,8 @@ void Con_DrawConsole (float frac)
 //ZOID
 	// draw the download bar
 	// figure out width
-	if (cls.download) {
+	if (cls.download)
+	{
 		if ((text = strrchr(cls.downloadname, '/')) != NULL)
 			text++;
 		else
@@ -682,6 +683,45 @@ void Con_DrawConsole (float frac)
 			re.DrawChar ( (i+1)<<3, y, dlbar[i]);
 	}
 //ZOID
+
+	if (cls.gamespyupdate) // FS: For gamespy server list
+	{
+		text = "Gamespy";
+
+		x = con.linewidth - ((con.linewidth * 7) / 40);
+		y = x - strlen(text) - 8;
+		i = con.linewidth/3;
+		if (strlen(text) > i) {
+			y = x - i - 11;
+			strncpy(dlbar, text, i);
+			dlbar[i] = 0;
+			strcat(dlbar, "...");
+		} else
+			strcpy(dlbar, text);
+		strcat(dlbar, ": ");
+		i = strlen(dlbar);
+		dlbar[i++] = '\x80';
+		// where's the dot go?
+		if (cls.gamespypercent == 0)
+			n = 0;
+		else
+			n = y * cls.gamespypercent / 100;
+			
+		for (j = 0; j < y; j++)
+			if (j == n)
+				dlbar[i++] = '\x83';
+			else
+				dlbar[i++] = '\x81';
+		dlbar[i++] = '\x82';
+		dlbar[i] = 0;
+
+		sprintf(dlbar + strlen(dlbar), " %02d%%", cls.gamespypercent);
+
+		// draw it
+		y = con.vislines-12;
+		for (i = 0; i < strlen(dlbar); i++)
+			re.DrawChar ( (i+1)<<3, y, dlbar[i]);
+	}
 
 // draw the input prompt, user text, and cursor if desired
 	Con_DrawInput ();

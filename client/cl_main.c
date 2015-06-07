@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // cl_main.c  -- client main loop
 
 #include "client.h"
+#include "../Goa/CEngine/goaceng.h" // FS: For Gamespy SDK
 
 cvar_t	*freelook;
 
@@ -92,6 +93,11 @@ cvar_t	*gender_auto;
 cvar_t	*cl_vwep;
 cvar_t	*console_old_complete; // FS: Old style command completing
 
+cvar_t	*cl_master_server_ip; // FS: For gamespy
+cvar_t	*cl_master_server_port; // FS: For gamespy
+cvar_t	*cl_master_server_queries; // FS: For gamespy
+cvar_t	*s_gamespy_sounds; // FS: For gamespy
+
 client_static_t	cls;
 client_state_t	cl;
 
@@ -105,6 +111,12 @@ extern	cvar_t *allow_download_models;
 extern	cvar_t *allow_download_sounds;
 extern	cvar_t *allow_download_maps;
 
+
+// FS: For Gamespy
+static    GServerList serverlist; // FS: Moved outside so we can abort whenever we need to
+
+void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2);
+void CL_PingNetServers_f (void);
 
 /*
 ==========================
@@ -679,6 +691,19 @@ void CL_Disconnect (void)
 
 void CL_Disconnect_f (void)
 {
+
+	if(serverlist != NULL) // FS: Immediately abort gspy scans
+	{
+		Com_Printf("\x02Server scan aborted!\n");
+		cls.gamespyupdate = 0;
+		cls.gamespypercent = 0;
+		S_GamespySound ("gamespy/abort.wav"); // FS: FIXME
+		ServerListHalt( serverlist );
+		ServerListClear( serverlist );
+	    ServerListFree(serverlist);
+		serverlist = NULL; // FS: This is on purpose so future ctrl+c's won't try to close empty serverlists
+	}
+	
 	Com_Error (ERR_DROP, "Disconnected from server");
 }
 
@@ -1583,6 +1608,11 @@ void CL_InitLocal (void)
 	// FS: New stuff
 	console_old_complete = Cvar_Get("console_old_complete", "0", CVAR_ARCHIVE); // FS: Old style command completing
 
+	// FS: For gamespy
+	cl_master_server_ip = Cvar_Get("cl_master_server_ip", CL_MASTER_ADDR, CVAR_ARCHIVE);
+	cl_master_server_port = Cvar_Get("cl_master_server_port", CL_MASTER_PORT, CVAR_ARCHIVE);
+	cl_master_server_queries = Cvar_Get("cl_master_server_queries", "10", CVAR_ARCHIVE);
+	s_gamespy_sounds = Cvar_Get("s_gamespysounds", "0", CVAR_ARCHIVE);
 
 	//
 	// register our commands
@@ -1607,7 +1637,7 @@ void CL_InitLocal (void)
 
 	Cmd_AddCommand ("rcon", CL_Rcon_f);
 
-// 	Cmd_AddCommand ("packet", CL_Packet_f); // this is dangerous to leave in
+ 	Cmd_AddCommand ("packet", CL_Packet_f); // this is dangerous to leave in
 
 	Cmd_AddCommand ("setenv", CL_Setenv_f );
 
@@ -1645,6 +1675,8 @@ void CL_InitLocal (void)
 	Cmd_AddCommand ("weapprev", NULL);
 //#endif
 //JASON this crashes out?
+
+	Cmd_AddCommand ("slist2", CL_PingNetServers_f); // FS: For Gamespy
 }
 
 
@@ -1811,17 +1843,24 @@ void CL_Frame (double msec)
 {
 	static double	extratime;
 	static double  lasttimecalled;
+	float	fps;
 
 	if (dedicated->value)
 		return;
 
 	extratime += msec;
 
+
+   if (cl_maxfps->value)
+      fps = bound(5, cl_maxfps->value, 1000); // FS: Don't go under 5
+   else
+      fps = bound(5, cl_maxfps->value, 72); // FS: Default to 72hz if nothing is set
+
 	if (!cl_timedemo->value)
 	{
 		if (cls.state == ca_connected && extratime < 100)
 			return;			// don't flood packets out while connecting
-		if (extratime < 1000/cl_maxfps->value)
+		if (extratime < 1000/fps)
 			return;			// framerate is too high
 	}
 
@@ -1974,4 +2013,60 @@ void CL_Shutdown(void)
 	VID_Shutdown();
 }
 
+//GAMESPY
+void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2)
+{
+	GServer server;
+	if (msg == LIST_PROGRESS)
+	{
+		server = (GServer)param1;
+		if(ServerGetIntValue(server,"numplayers",0)) // FS: Only show populated servers
+			Com_Printf ( "%s:%d [%d] %s %d/%d %s\n",ServerGetAddress(server),ServerGetQueryPort(server), ServerGetPing(server),ServerGetStringValue(server, "hostname","(NONE)"), ServerGetIntValue(server,"numplayers",0), ServerGetIntValue(server,"maxclients",0), ServerGetStringValue(server,"mapname","(NO MAP)"));
+	}
 
+}
+
+void CL_PingNetServers_f (void)
+{
+	char goa_secret_key[256];
+	int error = 0; // FS: Grab the error code
+	int allocatedSockets; // FS: FIXME
+
+	if(cls.state != ca_disconnected)
+	{
+		Com_Printf("You must be disconnected to use this command!\n");
+		return;
+	}
+
+	goa_secret_key[0] = 'r';
+	goa_secret_key[1] = 't';
+	goa_secret_key[2] = 'W';
+	goa_secret_key[3] = '0';
+	goa_secret_key[4] = 'x';
+	goa_secret_key[5] = 'g';
+
+	Com_Printf("\x02Grabbing populated server list from GameSpy master. . .\n");
+	cls.gamespyupdate = 1;
+	cls.gamespypercent = 0;
+
+	allocatedSockets = bound(5, cl_master_server_queries->value, 100);
+
+	SCR_UpdateScreen(); // FS: Force an update so the percentage bar shows some progress
+	serverlist = ServerListNew("quake2","quake2",goa_secret_key,allocatedSockets,ListCallBack,GCALLBACK_FUNCTION,NULL);
+    error = ServerListUpdate(serverlist,false);
+
+	if (error != GE_NOERROR) // FS: Grab the error code
+	{
+		cls.gamespyupdate = 0;
+		cls.gamespypercent = 0;
+		Com_Printf("\x02GameSpy Error: ");
+		Com_Printf("%s.\n", ServerListErrorDesc(serverlist, error));
+		ServerListHalt( serverlist );
+		ServerListClear( serverlist );
+	}
+	cls.gamespyupdate = 0;
+	cls.gamespypercent = 0;
+	ServerListClear( serverlist );
+    ServerListFree(serverlist);
+	serverlist = NULL; // FS: This is on purpose so future ctrl+c's won't try to close empty serverlists
+}

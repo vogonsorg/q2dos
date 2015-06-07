@@ -281,6 +281,7 @@ void Key_Console (int key)
 		if ( keydown[K_CTRL] )
 		{
 			Cbuf_AddText ("disconnect\n");
+			Cbuf_Execute(); // FS: Fire immediately because of gamespy crap
 			return;
 		}
 	}

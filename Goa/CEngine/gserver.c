@@ -79,7 +79,12 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 	*keyvals = *keyvals++;
 	*keyvals = *keyvals++;
 	*keyvals = *keyvals++;
-	*keyvals = *keyvals++;
+	*keyvals = *keyvals++; // P
+	*keyvals = *keyvals++; // R
+	*keyvals = *keyvals++; // I
+	*keyvals = *keyvals++; // N
+	*keyvals = *keyvals++; // T
+	*keyvals = *keyvals++; // newline
 
 	Q_strcpy(savedkeyvals, keyvals);
 	savedkeyvals[strlen(keyvals)] = '\0';
@@ -105,9 +110,9 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 
 	}
 
-	if (numplayers) // FS: QW sends shit with \n as players and their data :/
+	if (numplayers) // FS: Q2 sends shit with \n as players and their data :/
 	{
-		dstring_t *players = dstring_new();
+		char players[4];
 		char *test = strchr(savedkeyvals, '\n');
 
 		while (test != NULL)
@@ -117,10 +122,9 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 		}
 
 		kvpair.key = _strdup("numplayers");
-		Com_sprintf(players, "%i", numplayers-2);
-		kvpair.value = _strdup(players->str);
+		Com_sprintf(players, sizeof(players), "%i", numplayers-2);
+		kvpair.value = _strdup(players);
 		TableEnter(server->keyvals, &kvpair);
-		dstring_delete(players);
 	}	
 }
 

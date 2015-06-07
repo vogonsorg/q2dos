@@ -18,5 +18,7 @@ What doesn't work
 * Loading/unloading of DLLs.  No other game modes, but connecting to custom
   servers is OK.
 
+Run /slist2 to get a gamespy list of active servers.  Use Ctrl+c to abort.
+
 Follow me @
 http://virtuallyfun.superglobalmegacorp.com/

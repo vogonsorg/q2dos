@@ -788,6 +788,11 @@ void S_StartLocalSound (char *sound)
 	S_StartSound (NULL, cl.playernum+1, 0, sfx, 1, 1, 0);
 }
 
+void S_GamespySound (char *sound) // FS
+{
+	if (s_gamespy_sounds->value)
+		S_StartLocalSound(sound);
+}
 
 /*
 ==================

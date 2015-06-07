@@ -42,6 +42,13 @@ CLIENT =	client/cl_input.o \
 	client/qmenu.o \
 	client/cl_newfx.o 
 
+GAMESPY = Goa/CEngine/darray.o \
+	Goa/CEngine/gserver.o \
+	Goa/CEngine/gserverlist.o \
+	Goa/CEngine/gutil.o \
+	Goa/CEngine/hashtable.o \
+	Goa/nonport.o
+
 QCOMMON = 	qcommon/cmd.o \
 	qcommon/cmodel.o \
 	qcommon/common.o \
@@ -142,7 +149,7 @@ GAME = game/m_tank.o \
 .PHONY: all test clean
 #
 
-OBJECTS =  $(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(REFSOFT) $(REFASM) $(DOS)
+OBJECTS =  $(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(GAMESPY) $(REFSOFT) $(REFASM) $(DOS)
 
 all: q2
 

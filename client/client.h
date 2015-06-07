@@ -231,6 +231,8 @@ typedef struct
 	int			downloadnumber;
 	dltype_t	downloadtype;
 	int			downloadpercent;
+	int			gamespypercent; // FS: For gamespy
+	int			gamespyupdate; // FS: For gamespy
 
 // demo recording info must be here, so it isn't cleared on level change
 	qboolean	demorecording;
@@ -295,6 +297,11 @@ extern	cvar_t	*cl_paused;
 extern	cvar_t	*cl_timedemo;
 
 extern	cvar_t	*cl_vwep;
+
+// FS: Gamespy stuff
+extern	cvar_t	*cl_master_server_ip;
+extern	cvar_t	*cl_master_server_port;
+extern	cvar_t	*s_gamespy_sounds;
 
 typedef struct
 {
