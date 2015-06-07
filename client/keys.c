@@ -276,8 +276,18 @@ void Key_Console (int key)
 		return;
 	}
 
+	if( key == 'c' ) // FS: Added
+	{
+		if ( keydown[K_CTRL] )
+		{
+			Cbuf_AddText ("disconnect\n");
+			return;
+		}
+	}
+
 	if ( key == 'l' ) 
 	{
+
 		if ( keydown[K_CTRL] )
 		{
 			Cbuf_AddText ("clear\n");
@@ -285,10 +295,20 @@ void Key_Console (int key)
 		}
 	}
 
+	if( key == 'r' ) // FS: Wanted this
+	{
+		if ( keydown[K_CTRL] )
+		{
+			Cbuf_AddText ("reconnect\n");
+			return;
+		}
+	}
 	if ( key == K_ENTER || key == K_KP_ENTER )
 	{	// backslash text are commands, else chat
 		if (key_lines[edit_line][1] == '\\' || key_lines[edit_line][1] == '/')
+		{
 			Cbuf_AddText (key_lines[edit_line]+2);	// skip the >
+		}
 		else
 			Cbuf_AddText (key_lines[edit_line]+1);	// valid command
 
@@ -299,8 +319,10 @@ void Key_Console (int key)
 		key_lines[edit_line][0] = ']';
 		key_linepos = 1;
 		if (cls.state == ca_disconnected)
+		{
 			SCR_UpdateScreen ();	// force an update, because the command
-									// may take some time
+		}							// may take some time
+
 		return;
 	}
 
@@ -395,8 +417,15 @@ void Key_Console (int key)
 
 //============================================================================
 
+#define MAX_CHAT 32
+#define MAX_NETNAME_WITH_APPEND 29 // FS: What will be trimmed because after it's sent it could be "[MAX_NETNAMELENGTH] whispers: <your text>"
+#define MAX_CHAT_TEXT 149 // FS: Magic number from Physics.dll handling it
 qboolean	chat_team;
-char		chat_buffer[MAXCMDLINE];
+char		chat_buffer[MAX_CHAT_TEXT-MAX_NETNAME_WITH_APPEND];
+
+char		chat_buffer_array[MAX_CHAT][MAX_CHAT_TEXT-MAX_NETNAME_WITH_APPEND]; // FS: Chat history
+int			chat_head = 0, chat_tail = 0; // FS: Chat history
+int			chat_index = 0; // FS: Chat history
 int			chat_bufferlen = 0;
 
 void Key_Message (int key)
@@ -412,14 +441,50 @@ void Key_Message (int key)
 		Cbuf_AddText("\"\n");
 
 		cls.key_dest = key_game;
+
+		/* Taniwha's chat ring array */
+		strcpy (chat_buffer_array[chat_head], chat_buffer);
+		chat_head = (chat_head + 1) % MAX_CHAT;
+		if (chat_head == chat_tail)
+			chat_tail = (chat_tail + 1) % MAX_CHAT;
+		chat_buffer_array[chat_head][0] = 0;
+		chat_index = chat_head;
+		/* end */
 		chat_bufferlen = 0;
 		chat_buffer[0] = 0;
 		return;
 	}
 
+	if (key == K_UPARROW || key == K_RIGHTARROW) // FS: Press up to cycle up the index to the first chat msg
+	{
+		cls.key_dest = key_message;
+
+		if (chat_index != chat_tail) 
+		{
+			chat_index = (chat_index + MAX_CHAT - 1) % MAX_CHAT;
+			strcpy (chat_buffer, chat_buffer_array[chat_index]);
+		}
+
+		chat_bufferlen = (strlen(chat_buffer));
+		return;
+	}
+
+	if (key == K_DOWNARROW || key == K_LEFTARROW) // FS: Press down to cycle down the index to the last chat msg
+	{
+		cls.key_dest = key_message;
+		
+		if (chat_index != chat_head) {
+			chat_index = (chat_index + 1) % MAX_CHAT;
+			strcpy (chat_buffer, chat_buffer_array[chat_index]);
+		}
+
+		chat_bufferlen = (strlen(chat_buffer));
+		return;
+	}
 	if (key == K_ESCAPE)
 	{
 		cls.key_dest = key_game;
+		chat_index = chat_head; // FS: Reset to the beginning of the chat history
 		chat_bufferlen = 0;
 		chat_buffer[0] = 0;
 		return;
@@ -792,6 +857,24 @@ void Key_Event (int key, qboolean down, unsigned time)
 		return;
 	}
 
+
+	if (key == 'q') // FS: Instant quit
+	{
+		if (keydown[K_CTRL])
+		{
+			Cbuf_AddText ("disconnect ; quit\n");
+			return;
+		}
+	}
+
+	if (keydown [K_F4]) // FS: Instant quit
+	{
+		if (keydown[K_ALT])
+		{
+			Cbuf_AddText ("disconnect ; quit\n");
+			return;
+		}
+	}
 	// any key during the attract mode will bring up the menu
 	if (cl.attractloop && cls.key_dest != key_menu &&
 		!(key >= K_F1 && key <= K_F12))

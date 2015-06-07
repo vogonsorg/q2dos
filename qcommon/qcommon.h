@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../game/q_shared.h"
 #include "../dos/zone.h"
 
-#define	VERSION		3.21
+#define	VERSION		3.24
 
 #define	BASEDIRNAME	"baseq2"
 
@@ -880,3 +880,6 @@ int Q_strcmp (char *s1, char *s2);
 int Q_strncmp (char *s1, char *s2, int count);
 int Q_atoi (char *str);
 float Q_atof (char *str);
+#ifdef __DJGPP__
+int vsnprintf(char *str, size_t n, const char *fmt, va_list ap);
+#endif

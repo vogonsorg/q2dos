@@ -18,11 +18,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // common.c -- misc functions used in client and server
+#include <setjmp.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
+#include <limits.h>
+#include <errno.h>
+#include <libc/file.h>
+#include <ctype.h>
 #include "qcommon.h"
 #include "../dos/zone.h"
-#include <setjmp.h>
 
-#define	MAXPRINTMSG	4096
+#define	MAXPRINTMSG	8192 // was 4096
 
 //#define MAX_NUM_ARGVS	50
 
@@ -105,7 +112,8 @@ void Com_Printf (char *fmt, ...)
 	char		msg[MAXPRINTMSG];
 
 	va_start (argptr,fmt);
-	vsprintf (msg,fmt,argptr);
+//	vsprintf (msg, fmt, argptr);
+	Q_vsnprintf (msg, sizeof(msg), fmt, argptr);
 	va_end (argptr);
 
 	if (rd_target)
@@ -132,6 +140,9 @@ void Com_Printf (char *fmt, ...)
 		if (!logfile)
 		{
 			Com_sprintf (name, sizeof(name), "%s/qconsole.log", FS_Gamedir ());
+			if (logfile_active->value > 2)
+				logfile = fopen (name, "a");
+			else
 			logfile = fopen (name, "w");
 		}
 		if (logfile)
@@ -158,7 +169,8 @@ void Com_DPrintf (char *fmt, ...)
 		return;			// don't confuse non-developers with techie stuff...
 
 	va_start (argptr,fmt);
-	vsprintf (msg,fmt,argptr);
+//	vsprintf (msg, fmt, argptr);
+	Q_vsnprintf (msg, sizeof(msg), fmt, argptr);
 	va_end (argptr);
 	
 	Com_Printf ("%s", msg);
@@ -184,7 +196,8 @@ void Com_Error (int code, char *fmt, ...)
 	recursive = true;
 
 	va_start (argptr,fmt);
-	vsprintf (msg,fmt,argptr);
+//	vsprintf (msg, fmt, argptr);
+	Q_vsnprintf (msg, sizeof(msg), fmt, argptr);
 	va_end (argptr);
 	
 	if (code == ERR_DISCONNECT)
@@ -2033,3 +2046,42 @@ const char *MakePrintable (const void *subject, size_t numchars)
 	printable[len] = 0;
 	return printable;
 }
+
+#ifdef __DJGPP__
+int vsnprintf(char *str, size_t n, const char *fmt, va_list ap)
+{
+  FILE _strbuf;
+  int len;
+
+  /* _cnt is an int in the FILE structure. To prevent wrap-around, we limit
+   * n to between 0 and INT_MAX inclusively. */
+  if (n > INT_MAX)
+  {
+    errno = EFBIG;
+    return -1;
+  }
+
+  memset(&_strbuf, 0, sizeof(_strbuf));
+  _strbuf._flag = _IOWRT | _IOSTRG | _IONTERM;  
+
+  /* If n == 0, just querying how much space is needed. */
+  if (n > 0)
+  {
+    _strbuf._cnt = n - 1;
+    _strbuf._ptr = str;
+  }
+  else
+  {
+    _strbuf._cnt = 0;
+    _strbuf._ptr = NULL;
+  }
+
+  len = _doprnt(fmt, ap, &_strbuf);
+
+  /* Ensure nul termination */
+  if (n > 0)
+    *_strbuf._ptr = 0;
+
+  return len;
+}
+#endif
