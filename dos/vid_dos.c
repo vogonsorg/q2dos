@@ -272,8 +272,6 @@ void	VID_Init (void)
 {
     refimport_t	ri;
 
-	Cmd_AddCommand ("vid_restart", VID_Restart_f);
-
     memset(vid_resolutions,0x0,sizeof(vid_resolutions));
     VID_InitExtra(); //probe VESA
 
@@ -321,24 +319,6 @@ void	VID_Shutdown (void)
 
 void	VID_CheckChanges (void)
 {
-	if ( vid_ref->modified )
-	{
-		cl.force_refdef = true;		// can't use a paused refdef
-		S_StopAllSounds();
-	}
-	while (vid_ref->modified)
-	{
-		/*
-		** refresh has changed
-		*/
-		vid_ref->modified = false;
-		vid_fullscreen->modified = true;
-		cl.refresh_prepped = false;
-		cls.disable_screen = true;
-
-		Cvar_Set( "vid_ref", "soft" );
-		cls.disable_screen = false;
-	}
 }
 
 
@@ -608,9 +588,4 @@ const char *VID_MenuKey( int k)
 
 	return sound;
 //	return NULL;
-}
-
-void VID_Restart_f (void)
-{
-	vid_ref->modified = true;
 }

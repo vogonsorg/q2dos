@@ -32,7 +32,7 @@ void	SWimp_EndFrame (void)
 	else
 	{
 		__djgpp_nearptr_enable();
-		memcpy((void *)vid_resolutions[whatmodearewe].address+__djgpp_conventional_base,vid.buffer,(vid.height*vid.width));
+		memcpy(vid_resolutions[whatmodearewe].address+__djgpp_conventional_base,vid.buffer,(vid.height*vid.width));
 //		__djgpp_nearptr_disable(); // FS: FIXME TODO -- DON'T DISABLE.  WILL STOMP DMA.BUFFER!
 	}
 }
