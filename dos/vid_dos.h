@@ -80,4 +80,5 @@ void VGA_EndDirectRect (viddef_t *vid, struct vmode_s *pcurrentmode, int x,
 	int y, int width, int height);
 void VGA_UpdateLinearScreen (void *srcptr, void *destptr, int width,
 	int height, int srcrowbytes, int destrowbytes);
+void VID_Restart_f (void);
 

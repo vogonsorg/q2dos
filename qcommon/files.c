@@ -1013,7 +1013,10 @@ void FS_SetGamedir (char *dir)
 	if (dedicated && !dedicated->value)
 		Cbuf_AddText ("vid_restart\nsnd_restart\n");
 
-	Com_sprintf (fs_gamedir, sizeof(fs_gamedir), "%s/%s", fs_basedir->string, dir);
+	if (*dir == 0)	// Knightmare- set to basedir if a blank dir is passed
+		Com_sprintf (fs_gamedir, sizeof(fs_gamedir), "%s/"BASEDIRNAME, fs_basedir->string);
+	else
+		Com_sprintf (fs_gamedir, sizeof(fs_gamedir), "%s/%s", fs_basedir->string, dir);
 
 	if (!strcmp(dir,BASEDIRNAME) || (*dir == 0))
 	{
