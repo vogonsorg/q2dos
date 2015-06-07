@@ -867,14 +867,15 @@ int CDAudio_Init(void)
 	dos_int86 (0x2f);
 	if (regs.x.bx == 0)
 	{
-             //   Con_NotifyBox (
-             //           "MSCDEX not loaded, music is\n"
-             //           "disabled.  Use \"-nocdaudio\" if you\n"
-             //           "wish to avoid this message in the\n"
-             //           "future.  See README.TXT for help.\n"
-             //          );                      
-             Com_Printf("\nMSCDEX not loaded, music is\ndisabled.  Use \"-nocdaudio\" if you\nwish to avoid this message in the\nfuture.  See README.TXT for help.\n");
-               return -1; // FS: Just warn me, no need for the press any key shit.
+		//   Con_NotifyBox (
+		//           "MSCDEX not loaded, music is\n"
+		//           "disabled.  Use \"-nocdaudio\" if you\n"
+		//           "wish to avoid this message in the\n"
+		//           "future.  See README.TXT for help.\n"
+		//          );                      
+		Com_Printf("\n\x02MSCDEX not loaded, music is\ndisabled.  Use \"-nocdaudio\" if you\nwish to avoid this message in the\nfuture.  See README.TXT for help.\n");
+		enabled = false;
+		return -1; // FS: Just warn me, no need for the press any key shit.
 	}
 	if (regs.x.bx > 1)
 		Com_DPrintf("CDAudio_Init: First CD-ROM drive will be used\n");
@@ -894,8 +895,7 @@ int CDAudio_Init(void)
 		return -1;
 	}
 
-	memory = dos_getmemory(sizeof(struct cd_request
-) + sizeof(union readInfo_u));
+	memory = dos_getmemory(sizeof(struct cd_request) + sizeof(union readInfo_u));
 	if (memory == NULL)
 	{
 		Com_DPrintf("CDAudio_Init: Unable to allocate low memory.\n");
