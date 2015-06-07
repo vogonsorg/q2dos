@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -arch i386 -g -O0 -Uid386
 #CC = i586-pc-msdosdjgpp-gcc
 #CFLAGS = -g -O0
-SFLAGS = -DREF_HARD_LINKED -DGAME_HARD_LINKED
+SFLAGS = -DREF_HARD_LINKED -DGAME_HARD_LINKED -DDEDICATED_ONLY
 
 NULL = 	null/cd_null.o \
 	null/vid_null.o \

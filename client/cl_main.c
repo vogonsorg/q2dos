@@ -692,6 +692,7 @@ void CL_Disconnect (void)
 void CL_Disconnect_f (void)
 {
 
+#ifdef GAMESPY
 	if(serverlist != NULL) // FS: Immediately abort gspy scans
 	{
 		Com_Printf("\x02Server scan aborted!\n");
@@ -703,6 +704,7 @@ void CL_Disconnect_f (void)
 	    ServerListFree(serverlist);
 		serverlist = NULL; // FS: This is on purpose so future ctrl+c's won't try to close empty serverlists
 	}
+#endif
 	
 	Com_Error (ERR_DROP, "Disconnected from server");
 }
@@ -1653,7 +1655,6 @@ void CL_InitLocal (void)
 	// the only thing this does is allow command completion
 	// to work -- all unknown commands are automatically
 	// forwarded to the server
-//#if 0
 	Cmd_AddCommand ("wave", NULL);
 	Cmd_AddCommand ("inven", NULL);
 	Cmd_AddCommand ("kill", NULL);
@@ -1673,10 +1674,9 @@ void CL_InitLocal (void)
 	Cmd_AddCommand ("invdrop", NULL);
 	Cmd_AddCommand ("weapnext", NULL);
 	Cmd_AddCommand ("weapprev", NULL);
-//#endif
-//JASON this crashes out?
-
+#ifdef GAMESPY
 	Cmd_AddCommand ("slist2", CL_PingNetServers_f); // FS: For Gamespy
+#endif
 }
 
 
@@ -2014,6 +2014,7 @@ void CL_Shutdown(void)
 }
 
 //GAMESPY
+#ifdef GAMESPY
 void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2)
 {
 	GServer server;
@@ -2070,3 +2071,4 @@ void CL_PingNetServers_f (void)
     ServerListFree(serverlist);
 	serverlist = NULL; // FS: This is on purpose so future ctrl+c's won't try to close empty serverlists
 }
+#endif
