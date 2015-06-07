@@ -47,7 +47,7 @@ typedef struct
 	qboolean	attractloop;		// running cinematics and demos for the local system only
 	qboolean	loadgame;			// client begins should reuse existing entity
 
-	unsigned	time;				// always sv.framenum * 100 msec
+	double	time;				// always sv.framenum * 100 msec
 	int			framenum;
 
 	char		name[MAX_QPATH];			// map name, or cinematic name

@@ -516,7 +516,6 @@ void	*Sys_GetGameAPI (void *parms)
 #endif	
 
 
-// FS: Doesn't work
 char *Sys_ConsoleInput (void)
 {
 	static char     text[256];
@@ -562,7 +561,6 @@ char *Sys_ConsoleInput (void)
 
 void	Sys_ConsoleOutput (char *string)
 {
-//printf("Sys_ConsoleOutput: %s",string);
 	if (!dedicated || !dedicated->value)
 		return;
 	printf("%s",string);
@@ -677,7 +675,6 @@ int main (int argc, char **argv)
 		dos_registerintr(9, TrapKey);
 
     /* main window message loop */
-#if 1
 	while (1)
 	{
 		do
@@ -689,16 +686,6 @@ int main (int argc, char **argv)
 		sys_frame_time = newtime; // FS: Need to update this for input to work properly
 		oldtime = newtime;
 	}
-#else
-	while (1)
-	{
-		newtime = Sys_Milliseconds ();
-		time = newtime - oldtime;
-		Qcommon_Frame (time);
-		sys_frame_time = newtime; // FS: Need to update this for input to work properly
-		oldtime = newtime;
-	}
-#endif
 }
 
 void Sys_MakeCodeWriteable(void)
