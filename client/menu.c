@@ -1082,12 +1082,14 @@ static void NoAltTabFunc( void *unused )
 }
 #endif
 
-static float ClampCvar( float min, float max, float value )
+#if 0
+float ClampCvar( float min, float max, float value )
 {
 	if ( value < min ) return min;
 	if ( value > max ) return max;
 	return value;
 }
+#endif	//duplicate from cl_main
 
 static void ControlsSetMenuItemValues( void )
 {

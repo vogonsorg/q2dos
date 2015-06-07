@@ -107,7 +107,7 @@ void TrapKey(void)
 #define SC_RIGHTSHIFT   0x36
 #define SC_RIGHTARROW   0x4d
 
-int	curtime;
+double	curtime;
 //unsigned	sys_msg_time;
 unsigned	sys_frame_time;
 
@@ -379,4 +379,24 @@ void main (int argc, char **argv)
 	}
 }
 
+
+int     Sys_LinuxTime (void) // FS: DOS needs this for random qport
+{
+        int linuxtime;
+        struct timeval tp;
+        struct timezone tzp;
+        static int              secbase;
+
+        gettimeofday(&tp, &tzp);
+
+        if (!secbase)
+        {
+                secbase = tp.tv_sec;
+                return tp.tv_usec/1000;
+        }
+
+        linuxtime = (tp.tv_sec - secbase)*1000 + tp.tv_usec/1000;
+
+        return linuxtime;
+}
 
