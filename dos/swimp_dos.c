@@ -17,7 +17,7 @@ struct vid_resolutions_t
 	int address;
 	char menuname[30];
 };
-extern struct vid_resolutions_t vid_resolutions[10];
+extern struct vid_resolutions_t vid_resolutions[20];
 
 
 void	SWimp_BeginFrame( float camera_separation )

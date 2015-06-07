@@ -2,10 +2,14 @@
 #CFLAGS = -arch i386 -g -O0
 #CC = i586-pc-msdosdjgpp-gcc
 CC = gcc
-CFLAGS = -g -O2 -Did386=0
+CFLAGS = -g -O2 -Uid386 -DOGG_SUPPORT
 SFLAGS = -DREF_HARD_LINKED -DGAME_HARD_LINKED
 WCFLAGS = -I wattcp/inc
 WLFLAGS = -Lwattcp/lib -lwatt
+OGGCFLAGS = -I libogg/inc
+OCCLFLAGS = -Llibogg/lib -logg
+VORBCFLAGS = -I libvorb/inc
+VORBLFLAGS = -Llibvorb/lib -lvorbisenc -lvorbisfile -lvorbis -logg
 
 DOS = 	dos/cd_dos.o \
 	dos/vid_dos.o \
@@ -136,7 +140,7 @@ OBJECTS =  $(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(REFSOFT) $(DOS)
 all: q2
 
 q2:	$(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(REFSOFT) $(DOS) 
-	$(CC) $(CFLAGS) $(OBJECTS) -o q2 -lm $(WLFLAGS)
+	$(CC) $(CFLAGS) $(OBJECTS) $(WLFLAGS) $(OCCLFLAGS) $(VORBLFLAGS) -lm -o q2.exe
 	cp q2.exe $(HOME)/dos/q2/
 
 clean:

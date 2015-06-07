@@ -23,7 +23,7 @@
 #include "vid_dos.h"
 #include "dosisms.h"
 
-#define MAX_RESOLUTIONS 10
+#define MAX_RESOLUTIONS 20
 struct vid_resolutions_t {
 	int mode;
 	int vesa_mode;
@@ -433,7 +433,7 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 if((modeinfo.memory_model==0x4)&&(modeinfo.bits_per_pixel==8))
 	{
 	Com_Printf("VESA mode 0x%0x %dx%d supported\n",modeinfo.modenum,modeinfo.width,modeinfo.height);
-	if(num_vid_resolutions<10) {
+	if(num_vid_resolutions<MAX_RESOLUTIONS) {
 	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
 	vid_resolutions[num_vid_resolutions].vesa_mode=modeinfo.modenum;
 	vid_resolutions[num_vid_resolutions].height=modeinfo.height;

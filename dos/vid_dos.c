@@ -103,32 +103,6 @@ void VID_NewWindow (int width, int height)
 /*
 ** VID_GetModeInfo
 */
-#if 0
-typedef struct vidmode_s
-{
-    const char *description;
-    int         width, height;
-    int         mode;
-} vidmode_t;
-
-vidmode_t vid_modes[] =
-{
-    /*{ "Mode 0: 320x240",   320, 240,   0 },
-    { "Mode 1: 400x300",   400, 300,   1 },
-    { "Mode 2: 512x384",   512, 384,   2 },
-    { "Mode 3: 640x480",   640, 480,   3 },
-    { "Mode 4: 800x600",   800, 600,   4 },
-    { "Mode 5: 960x720",   960, 720,   5 },
-    { "Mode 6: 1024x768",  1024, 768,  6 },
-    { "Mode 7: 1152x864",  1152, 864,  7 },
-    { "Mode 8: 1280x960",  1280, 960, 8 },
-    { "Mode 9: 1600x1200", 1600, 1200, 9 }
-*/
-    { "Mode 0: 320x200", 320, 200, 0 },
-    { "Mode 0: 320x200", 848, 480, 1 }
-};
-#define VID_NUM_MODES ( sizeof( vid_modes ) / sizeof( vid_modes[0] ) )
-#endif
 
 extern int num_vid_resolutions;
 struct vid_resolutions_t {
@@ -139,7 +113,7 @@ struct vid_resolutions_t {
 	int address;
         char menuname[30];
 } ;
-extern struct vid_resolutions_t vid_resolutions[10];
+extern struct vid_resolutions_t vid_resolutions[20];
 
 qboolean VID_GetModeInfo( int *width, int *height, int mode )
 {
@@ -298,6 +272,7 @@ void	VID_Init (void)
 {
     refimport_t	ri;
 
+    memset(vid_resolutions,0x0,sizeof(vid_resolutions));
     VID_InitExtra(); //probe VESA
 
     whatmodearewe=0; //hope this means start in mode 0
@@ -451,9 +426,9 @@ void	VID_MenuInit (void)
                 s_mode_list[i].generic.type     = MTYPE_SLIDER;
 		s_mode_list[i].generic.name = "video resolution";
                 s_mode_list[i].generic.x = 0;
-                s_mode_list[i].generic.y = 10;
+                s_mode_list[i].generic.y = num_vid_resolutions-1;
                 s_mode_list[i].minvalue = 0;
-                s_mode_list[i].maxvalue = 10;
+                s_mode_list[i].maxvalue = num_vid_resolutions-1;
 		s_mode_list[i].generic.callback = ResolutionCallback;
 
 
