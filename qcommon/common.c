@@ -24,7 +24,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdarg.h>
 #include <limits.h>
 #include <errno.h>
+#ifdef __DJGPP
 #include <libc/file.h>
+#endif
 #include <ctype.h>
 #include "qcommon.h"
 #include "../dos/zone.h"
