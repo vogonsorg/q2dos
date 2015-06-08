@@ -104,17 +104,6 @@ void VID_NewWindow (int width, int height)
 ** VID_GetModeInfo
 */
 
-extern int num_vid_resolutions;
-struct vid_resolutions_t {
-        int mode;
-        int vesa_mode;
-        int height;
-        int width;
-	int address;
-        char menuname[30];
-} ;
-extern struct vid_resolutions_t vid_resolutions[20];
-
 qboolean VID_GetModeInfo( int *width, int *height, int mode )
 {
     if ( mode < 0 || mode >= num_vid_resolutions) //VID_NUM_MODES )
