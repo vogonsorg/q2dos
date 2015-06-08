@@ -18,9 +18,12 @@ void	SWimp_EndFrame (void)
 		dosmemput(vid.buffer,320*200,0xA0000);
 	else
 	{
+#ifdef OLD_RELIABLE_CODE
 		__djgpp_nearptr_enable();
 		memcpy(vid_resolutions[whatmodearewe].address+__djgpp_conventional_base,vid.buffer,(vid.height*vid.width));
 //		__djgpp_nearptr_disable(); // FS: FIXME TODO -- DON'T DISABLE.  WILL STOMP DMA.BUFFER!
+#endif
+		memcpy(vid_resolutions[whatmodearewe].address, vid.buffer, (vid.height*vid.width));
 	}
 }
 

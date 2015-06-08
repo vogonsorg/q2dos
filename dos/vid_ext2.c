@@ -429,7 +429,7 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 				vid_resolutions[num_vid_resolutions].vesa_mode=modeinfo.modenum;
 				vid_resolutions[num_vid_resolutions].height=modeinfo.height;
 				vid_resolutions[num_vid_resolutions].width=modeinfo.width;
-				vid_resolutions[num_vid_resolutions].address=(void *)modeinfo.pptr; // FS: Real2ptr returns a (void *)
+				vid_resolutions[num_vid_resolutions].address=real2ptr(modeinfo.pptr);//(void *)modeinfo.pptr; // FS: Real2ptr returns a (void *)
 				sprintf(vid_resolutions[num_vid_resolutions].menuname,"[VESA %dx%d]",modeinfo.width,modeinfo.height);
 				num_vid_resolutions++;
 			}

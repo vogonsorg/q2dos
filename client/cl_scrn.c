@@ -569,14 +569,14 @@ void SCR_RunConsole (void)
 	
 	if (scr_conlines < scr_con_current)
 	{
-		scr_con_current -= scr_conspeed->value*cls.frametime;
+		scr_con_current -= scr_conspeed->value*(float)cls.frametime;
 		if (scr_conlines > scr_con_current)
 			scr_con_current = scr_conlines;
 
 	}
 	else if (scr_conlines > scr_con_current)
 	{
-		scr_con_current += scr_conspeed->value*cls.frametime;
+		scr_con_current += scr_conspeed->value*(float)cls.frametime;
 		if (scr_conlines < scr_con_current)
 			scr_con_current = scr_conlines;
 	}
