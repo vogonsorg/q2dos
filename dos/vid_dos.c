@@ -308,7 +308,7 @@ void	VID_Init (void)
 	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
 	vid_fullscreen = Cvar_Get ("vid_fullscreen", "0", CVAR_ARCHIVE);
 	vid_gamma = Cvar_Get( "vid_gamma", "1", CVAR_ARCHIVE );
-
+	Cmd_AddCommand("vid_restart", VID_Restart_f);
 }
 
 void	VID_Shutdown (void)
@@ -588,4 +588,9 @@ const char *VID_MenuKey( int k)
 
 	return sound;
 //	return NULL;
+}
+
+void VID_Restart_f (void) // FS: Currently does nothing
+{
+	return;
 }
