@@ -54,6 +54,9 @@ typedef enum {false, true}	qboolean;
 #define NULL ((void *)0)
 #endif
 
+#ifdef __DJGPP__
+int vsnprintf(char *str, size_t n, const char *fmt, va_list ap);
+#endif
 
 // from Quake3 source
 #ifdef WIN32

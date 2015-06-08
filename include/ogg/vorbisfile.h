@@ -43,6 +43,7 @@ typedef struct {
   long   (*tell_func)  (void *datasource);
 } ov_callbacks;
 
+#define OV_EXCLUDE_STATIC_CALLBACKS // FS: Tired of the GCC Warnings
 #ifndef OV_EXCLUDE_STATIC_CALLBACKS
 
 /* a few sets of convenient callbacks, especially for use under

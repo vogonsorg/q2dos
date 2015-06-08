@@ -860,6 +860,7 @@ void SV_Shutdown (char *finalmsg, qboolean reconnect);
 void SV_Frame (int msec);
 
 
+qboolean IsValidChar (int c); // FS: From KMQ2
 // FS: DOS shit
 #define MAX_NUM_ARGVS	50
 
@@ -880,6 +881,3 @@ int Q_strcmp (char *s1, char *s2);
 int Q_strncmp (char *s1, char *s2, int count);
 int Q_atoi (char *str);
 float Q_atof (char *str);
-#ifdef __DJGPP__
-int vsnprintf(char *str, size_t n, const char *fmt, va_list ap);
-#endif
