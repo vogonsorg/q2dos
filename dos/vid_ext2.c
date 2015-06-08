@@ -23,15 +23,7 @@
 #include "vid_dos.h"
 #include "dosisms.h"
 
-#define MAX_RESOLUTIONS 20
-struct vid_resolutions_t {
-	int mode;
-	int vesa_mode;
-	int height;
-	int width;
-	int address;
-	char menuname[30];
-} vid_resolutions[MAX_RESOLUTIONS];
+vid_resolutions_t vid_resolutions[MAX_RESOLUTIONS];
 int num_vid_resolutions=1;	//we always have mode 13
 
 #define MODE_SUPPORTED_IN_HW		0x0001
@@ -50,7 +42,6 @@ vmode_t	*pvidmodes;
 static int	totalvidmem;
 static byte	*ppal;
 int		numvidmodes;
-
 
 typedef struct {
 	int	pages[3];	// either 2 or 3 is valid
@@ -142,7 +133,6 @@ void VID_InitExtra (void)
 	short		*pmodenums;
 	vbeinfoblock_t	*pinfoblock;
 	__dpmi_meminfo	phys_mem_info;
-	int		x = 0;
 
 	pinfoblock = dos_getmemory(sizeof(vbeinfoblock_t));
 
@@ -429,21 +419,22 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 		modeinfo.blue_pos = *(char*)(infobuf+36);
 
 		modeinfo.pptr = *(long *)(infobuf+40);
-//8bit linear only
-if((modeinfo.memory_model==0x4)&&(modeinfo.bits_per_pixel==8))
-	{
-	Com_Printf("VESA mode 0x%0x %dx%d supported\n",modeinfo.modenum,modeinfo.width,modeinfo.height);
-	if(num_vid_resolutions<MAX_RESOLUTIONS) {
-	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
-	vid_resolutions[num_vid_resolutions].vesa_mode=modeinfo.modenum;
-	vid_resolutions[num_vid_resolutions].height=modeinfo.height;
-	vid_resolutions[num_vid_resolutions].width=modeinfo.width;
-	vid_resolutions[num_vid_resolutions].address=modeinfo.pptr;
-	sprintf(vid_resolutions[num_vid_resolutions].menuname,"[VESA %dx%d]",modeinfo.width,modeinfo.height);
-	num_vid_resolutions++;
+		//8bit linear only
+		if((modeinfo.memory_model==0x4)&&(modeinfo.bits_per_pixel==8))
+		{
+			Com_Printf("VESA mode 0x%0x %dx%d supported\n",modeinfo.modenum,modeinfo.width,modeinfo.height);
+			if(num_vid_resolutions<MAX_RESOLUTIONS)
+			{
+				vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
+				vid_resolutions[num_vid_resolutions].vesa_mode=modeinfo.modenum;
+				vid_resolutions[num_vid_resolutions].height=modeinfo.height;
+				vid_resolutions[num_vid_resolutions].width=modeinfo.width;
+				vid_resolutions[num_vid_resolutions].address=(void *)modeinfo.pptr; // FS: Real2ptr returns a (void *)
+				sprintf(vid_resolutions[num_vid_resolutions].menuname,"[VESA %dx%d]",modeinfo.width,modeinfo.height);
+				num_vid_resolutions++;
+			}
 		}
-	}
-#if 0
+#ifdef VESA_DEBUG_OUTPUT
 		printf("VID: (VESA) info for mode 0x%x\n", modeinfo.modenum);
 		printf("  mode attrib = 0x%0x\n", modeinfo.mode_attributes);
 		printf("  win a attrib = 0x%0x\n", *(unsigned char*)(infobuf+2));

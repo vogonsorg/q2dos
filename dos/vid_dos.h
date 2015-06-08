@@ -42,6 +42,20 @@ typedef struct vmode_s {
 								 int x, int y, int width, int height);
 } vmode_t;
 
+// FS: Moved this here so we don't have to call extern to places with copy/paste
+#define MAX_RESOLUTIONS 20
+#define VIDNAME_LEN 30
+typedef struct vid_resolutions_s {
+	int mode;
+	int vesa_mode;
+	int height;
+	int width;
+	void *address;
+	char menuname[VIDNAME_LEN];
+} vid_resolutions_t;
+extern int num_vid_resolutions;
+extern vid_resolutions_t vid_resolutions[MAX_RESOLUTIONS];
+
 // vid_wait settings
 #define VID_WAIT_NONE			0
 #define VID_WAIT_VSYNC			1

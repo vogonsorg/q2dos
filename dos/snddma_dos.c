@@ -567,7 +567,10 @@ void snd_shutdown_f (void) // FS: SND_SHUTDOWN
 
 qboolean SNDDMA_Init(void)
 {
+	if (COM_CheckParm("-nosound"))
+		goto nocard;
 #ifdef USE_QDOS_SOUND
+
 	if (firstInit)
 	{
 		Cmd_AddCommand ("snd_shutdown", snd_shutdown_f); // FS
@@ -588,10 +591,11 @@ qboolean SNDDMA_Init(void)
 		dmacard = dma_blaster;
 		return true;
 	}
-	
+nocard:
 	dmacard = dma_none;
 	return false;
 #else
+nocard:
 	return false;
 #endif
 }

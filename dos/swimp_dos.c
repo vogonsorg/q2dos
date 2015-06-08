@@ -1,24 +1,11 @@
-#include "../ref_soft/r_local.h"
 #include <dpmi.h>
 #include <pc.h>
 #include <sys/nearptr.h>
+#include "../ref_soft/r_local.h"
+#include "vid_dos.h"
 
 
 int whatmodearewe = 0;
-
-//My stupid thing for video modes.
-extern int num_vid_resolutions;
-struct vid_resolutions_t
-{
-	int mode;
-	int vesa_mode;
-	int height;
-	int width;
-	int address;
-	char menuname[30];
-};
-extern struct vid_resolutions_t vid_resolutions[20];
-
 
 void	SWimp_BeginFrame( float camera_separation )
 {
@@ -118,7 +105,7 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 			r.x.bx = vid_resolutions[mode].vesa_mode+0x4000; //0x4000 for Linear access
 			__dpmi_int(0x10, &r);
 			if (r.h.ah)
-				Sys_Error("Error setting VESA mode 0x%0x",vid_resolutions[mode].vesa_mode);
+				Sys_Error("Error setting VESA LFB mode 0x%0x",vid_resolutions[mode].vesa_mode);
 		}
 	}
 	ri.Vid_NewWindow(vid.width,vid.height);
