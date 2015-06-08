@@ -110,7 +110,7 @@ typedef struct
 	qboolean	fixed_origin;	// use origin instead of fetching entnum's origin
 	qboolean	autosound;		// from an entity->sound, cleared each frame
 #ifdef OGG_SUPPORT	// Knightmare added
-	int			streaming;
+	qboolean	streaming;
 #endif
 } channel_t;
 
