@@ -1,6 +1,12 @@
 Welcome to the Quake II for MS-DOS port.
 By Neozeed and [HCI]Mara'akate.
 
+
+What's required?
+* Pentium 1.  At least a 133MHz to play it at 20fps.
+* 32MB RAM.  16MB RAM might be OK.
+* LFN TSR.  Use the included DOSLFN.ZIP (can be loaded high with LH DLFN.COM)
+
 What works?
 
 * VGA
