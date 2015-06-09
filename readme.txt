@@ -1,4 +1,5 @@
 Welcome to the Quake II for MS-DOS port.
+By Neozeed and [HCI]Mara'akate.
 
 What works?
 
@@ -13,7 +14,6 @@ What works?
 
 What doesn't work
 
-* Changing video modes on the fly during a game (use disconnect first).
 * Modern sound cards like AC'97 or HDA
 * Loading/unloading of DLLs.  No other game modes, but connecting to custom
   servers is OK.

@@ -4,7 +4,6 @@
 #include "../ref_soft/r_local.h"
 #include "vid_dos.h"
 
-
 int whatmodearewe = 0;
 
 void	SWimp_BeginFrame( float camera_separation )
@@ -58,19 +57,21 @@ void	SWimp_SetPalette( const unsigned char *palette)
 	}
 }
 
-
 void	SWimp_Shutdown( void )
 {
+	//return to text mode
 	__dpmi_regs r;
+	vid.buffer = 0;
+	vid.rowbytes = 0;
 
 	r.x.ax = 3;
 	__dpmi_int(0x10, &r);
-	//return to text mode
 }
 
 rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
 {
 	Com_Printf("SWimp_SetMode %d fullscreen %d\n",mode,fullscreen); 
+
 	if ( !ri.Vid_GetModeInfo( pwidth, pheight, mode ) )
 	{
 		ri.Con_Printf( PRINT_ALL, " invalid mode\n" );

@@ -96,8 +96,10 @@ void VID_Error (int err_level, char *fmt, ...)
 
 void VID_NewWindow (int width, int height)
 {
-        viddef.width = width;
-        viddef.height = height;
+	viddef.width = width;
+	viddef.height = height;
+
+	cl.force_refdef = true;		// can't use a paused refdef
 }
 
 /*
@@ -308,6 +310,24 @@ void	VID_Shutdown (void)
 
 void	VID_CheckChanges (void)
 {
+	if ( vid_ref->modified)
+	{
+		cl.force_refdef = true;		// can't use a paused refdef
+		S_StopAllSounds();
+	}
+	while (vid_ref->modified)
+	{
+		/*
+		** refresh has changed
+		*/
+		vid_ref->modified = false;
+		vid_fullscreen->modified = true;
+		cl.refresh_prepped = false;
+		cls.disable_screen = true;
+
+		Cvar_Set( "vid_ref", "soft" );
+		cls.disable_screen = false;
+	}
 }
 
 
@@ -412,12 +432,12 @@ void	VID_MenuInit (void)
 		s_mode_list[i].generic.y = 10;
 		s_mode_list[i].itemnames = resolutions;
 */
-                s_mode_list[i].generic.type     = MTYPE_SLIDER;
+		s_mode_list[i].generic.type     = MTYPE_SLIDER;
 		s_mode_list[i].generic.name = "video resolution";
-                s_mode_list[i].generic.x = 0;
-                s_mode_list[i].generic.y = num_vid_resolutions-1;
-                s_mode_list[i].minvalue = 0;
-                s_mode_list[i].maxvalue = num_vid_resolutions-1;
+		s_mode_list[i].generic.x = 0;
+		s_mode_list[i].generic.y = num_vid_resolutions-1;
+		s_mode_list[i].minvalue = 0;
+		s_mode_list[i].maxvalue = num_vid_resolutions-1;
 		s_mode_list[i].generic.callback = ResolutionCallback;
 
 
@@ -579,7 +599,8 @@ const char *VID_MenuKey( int k)
 //	return NULL;
 }
 
-void VID_Restart_f (void) // FS: Currently does nothing
+void VID_Restart_f (void)
 {
+	vid_ref->modified = true;
 	return;
 }
