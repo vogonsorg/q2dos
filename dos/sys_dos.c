@@ -142,7 +142,8 @@ void Sys_DetectWin95 (void)
 	}
 	else
 	{
-		printf("Microsoft Windows detected.  Please run Q2DOS in pure MS-DOS for best stability.\n"); // FS: Warning
+		Sys_Error("Microsoft Windows detected.  You must run Q2DOS in MS-DOS.\n"); // FS: Warning.  Too many issues in Win9x and even XP.  QDOS is the same way.  So forget it.
+		// FS: TODO Detect the presence of LFN support.  Either warn or bail out if it's not there.  Some maps might bomb if theres LFN in them.
 		win95 = 1;
 		lockunlockmem = COM_CheckParm ("-winlockunlock");
 
