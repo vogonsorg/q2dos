@@ -37,8 +37,11 @@ static menuframework_s	s_opengl_menu;
 static menuframework_s *s_current_menu;
 static int				s_current_menu_index;
 
+#ifndef JASON_VIDMENU_SLIDER
 static menulist_s		s_mode_list[2];
-//static menuslider_s		s_mode_list[2];
+#else
+static menuslider_s		s_mode_list[2];
+#endif
 static menulist_s		s_ref_list[2];
 static menuslider_s		s_tq_slider;
 static menuslider_s		s_screensize_slider[2];
@@ -138,10 +141,14 @@ static void DriverCallback( void *unused )
 
 static void ResolutionCallback( void *s )
 {
-	menulist_s		*slist = (menulist_s *) s; //s_mode_list[2];
+#ifndef JASON_VIDMENU_SLIDER
+	menulist_s		*slist = (menulist_s *) s;
 	slist->itemnames[slist->curvalue] = vid_resolutions[slist->curvalue].menuname;
-//	menuslider_s *slider = ( menuslider_s * ) s;
-//	Cvar_SetValue( "sw_mode", slider->curvalue);
+#else
+	menuslider_s *slider = ( menuslider_s * ) s;
+	Cvar_SetValue( "sw_mode", slider->curvalue);
+	M_ForceMenuOff();
+#endif
 }
 
 static void ScreenSizeCallback( void *s )
@@ -335,36 +342,33 @@ void	VID_CheckChanges (void)
 
 void	VID_MenuInit (void)
 {
-//#if 0
+#ifndef JASON_VIDMENU_SLIDER
+	// FS: Bah, this is kind of dumb.  Oh well.
 	static const char *resolutions[] = 
 	{
-		"[XXXXXXXXXXXXX]",
-		"[848 480  ]",
-		"[320 240  ]",
-		"[400 300  ]",
-		"[512 384  ]",
-		"[640 480  ]",
-		"[800 600  ]",
-		"[960 720  ]",
-		"[1024 768 ]",
-		"[1152 864 ]",
-		"[1280 960 ]",
-		"[1600 1200]",
-		"[320 200  ]",
-		"[848 480  ]",
-		"[320 240  ]",
-		"[400 300  ]",
-		"[512 384  ]",
-		"[640 480  ]",
-		"[800 600  ]",
-		"[960 720  ]",
-		"[1024 768 ]",
-		"[1152 864 ]",
-		"[1280 960 ]",
-		"[1600 1200]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
 		0
 	};
-//#endif
+#endif
 	static const char *refs[] =
 	{
 		"[software      ]",
@@ -437,19 +441,19 @@ void	VID_MenuInit (void)
 		s_ref_list[i].generic.callback = DriverCallback;
 		s_ref_list[i].itemnames = refs;
 
-
+#ifndef JASON_VIDMENU_SLIDER
 //		Before the Video Resolution menu was a static
 //		list, but you can't update it..
+// FS: Now you can :P
 		s_mode_list[i].generic.type = MTYPE_SPINCONTROL;
 		s_mode_list[i].generic.name = "video resolution";
 		s_mode_list[i].generic.x = 0;
-		s_mode_list[i].generic.y = 10;
+		s_mode_list[i].generic.y = 10; // FS: Y position for where the spin control ends up
 		s_mode_list[i].itemnames = resolutions;
 		s_mode_list->itemnames[i] = vid_resolutions[s_mode_list->curvalue].menuname;
-		s_mode_list->itemnames[num_vid_resolutions] = 0;	
+		s_mode_list->itemnames[num_vid_resolutions] = 0; // FS: Put 0 in the middle of the resolutions array so we don't spill over to non-existant modes
 		s_mode_list[i].generic.callback = ResolutionCallback;
-
-#if 0
+#else
 		s_mode_list[i].generic.type     = MTYPE_SLIDER;
 		s_mode_list[i].generic.name = "video resolution";
 		s_mode_list[i].generic.x = 0;
@@ -529,7 +533,9 @@ void	VID_MenuInit (void)
 	Menu_AddItem( &s_software_menu, ( void * ) &s_mode_list[SOFTWARE_MENU] );
 	Menu_AddItem( &s_software_menu, ( void * ) &s_screensize_slider[SOFTWARE_MENU] );
 	Menu_AddItem( &s_software_menu, ( void * ) &s_brightness_slider[SOFTWARE_MENU] );
-	Menu_AddItem( &s_software_menu, ( void * ) &s_fs_box[SOFTWARE_MENU] );
+#ifndef __DJGPP__
+	Menu_AddItem( &s_software_menu, ( void * ) &s_fs_box[SOFTWARE_MENU] ); // FS: Don't need this in DOS!
+#endif
 	Menu_AddItem( &s_software_menu, ( void * ) &s_stipple_box );
 
 	Menu_AddItem( &s_opengl_menu, ( void * ) &s_ref_list[OPENGL_MENU] );
@@ -576,6 +582,11 @@ void	VID_MenuDraw (void)
 	** draw the menu
 	*/
 	Menu_Draw( s_current_menu );
+
+#ifndef JASON_VIDMENU_SLIDER
+	if (s_current_menu_index == 0) // FS: Hack, first time its drawn stupid shit happens, so update it immediately.
+		ResolutionCallback(&s_mode_list[SOFTWARE_MENU]);
+#endif
 }
 
 const char *VID_MenuKey( int k)

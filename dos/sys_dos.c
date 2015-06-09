@@ -126,6 +126,20 @@ qboolean        lockmem, lockunlockmem, unlockmem;
 static int      win95;
 static int                      minmem;
 
+// FS: Q2 needs it badly
+// FS: See http://www.delorie.com/djgpp/doc/libc/libc_380.html for more information
+void Sys_DetectLFN (void)
+{
+	unsigned int fd = _get_volume_info (NULL, 0, 0, NULL);
+
+	if(!(fd & _FILESYS_LFN_SUPPORTED))
+	{
+		printf("WARNING: Long file name support not detected!  Grab a copy of DOSLFN!\n");
+		sleep(2);
+		printf("Continuing to load Quake II. . .\n");
+	}
+}
+
 void Sys_DetectWin95 (void)
 {
 	__dpmi_regs                             r;
@@ -658,6 +672,7 @@ int main (int argc, char **argv)
 	quakeparms.argc = com_argc;
 	quakeparms.argv = com_argv;
 #endif
+	Sys_DetectLFN();
 	Sys_DetectWin95 ();
 	Sys_PageInProgram ();
 	Sys_GetMemory ();
