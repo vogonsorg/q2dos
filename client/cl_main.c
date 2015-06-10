@@ -1167,11 +1167,17 @@ void CL_RequestNextDownload (void)
 	dmdl_t *pheader;
 	dsprite_t	*spriteheader;
 	char		*skinname;
+	qboolean	localServer = false;	// Knightmare added
 
 	if (cls.state != ca_connected)
 		return;
 
-	if (!allow_download->value && precache_check < ENV_CNT)
+	// Knightmare 11/17/13- new download check
+	if ( Com_ServerState() )	// no downloading from local server!
+		localServer = true;
+
+	// skip to loading map if downloads disabled or on local server
+	if ( (localServer || !allow_download->value) && (precache_check < ENV_CNT) )
 		precache_check = ENV_CNT;
 
 //ZOID
@@ -1424,8 +1430,12 @@ void CL_RequestNextDownload (void)
 		precache_check = ENV_CNT;
 	}
 
-	if (precache_check == ENV_CNT) {
-		precache_check = ENV_CNT + 1;
+	if (precache_check == ENV_CNT)
+	{
+		if (localServer)	// if on local server, skip checking textures
+			precache_check = TEXTURE_CNT+999;
+		else
+			precache_check = ENV_CNT + 1;
 
 		CM_LoadMap (cl.configstrings[CS_MODELS+1], true, &map_checksum);
 
