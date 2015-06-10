@@ -157,7 +157,6 @@ void Sys_DetectWin95 (void)
 	else
 	{
 		Sys_Error("Microsoft Windows detected.  You must run Q2DOS in MS-DOS.\n"); // FS: Warning.  Too many issues in Win9x and even XP.  QDOS is the same way.  So forget it.
-		// FS: TODO Detect the presence of LFN support.  Either warn or bail out if it's not there.  Some maps might bomb if theres LFN in them.
 		win95 = 1;
 		lockunlockmem = COM_CheckParm ("-winlockunlock");
 
@@ -215,9 +214,9 @@ void *dos_getmaxlockedmem(int *size)
 		LEAVE_FOR_CACHE; // FS: 2GB fix
 	}
 
-        if (ul > 0x7fffffff)
-                ul = 0x7fffffff; /* limit to 2GB */
-        working_size = (int) ul;
+	if (ul > 0x7fffffff)
+		ul = 0x7fffffff; /* limit to 2GB */
+	working_size = (int) ul;
 	working_size &= ~0xffff;                /* Round down to 64K */
 	working_size += 0x10000;
 
@@ -331,12 +330,12 @@ UpdateSbrk:
 // doing that, of course, but there's no reason we shouldn't)
 	x = (byte *)working_memory;
 
-        for (j=0 ; j<4 ; j++) // FS: 2GB Fix
+	for (j=0 ; j<4 ; j++) // FS: 2GB Fix
 	{
-                for (i=0 ; i<(working_size - 16 * 0x1000) ; i += 4)
+		for (i=0 ; i<(working_size - 16 * 0x1000) ; i += 4)
 		{
-                        sys_checksum += *(int *)&x[i];
-                        sys_checksum += *(int *)&x[i + 16 * 0x1000];
+			sys_checksum += *(int *)&x[i];
+			sys_checksum += *(int *)&x[i + 16 * 0x1000];
 		}
 	}
 
@@ -651,7 +650,7 @@ void	Sys_Init (void)
 
 	Sys_SetFPCW ();
 
-	_go32_interrupt_stack_size = 4 * 1024;;
+	_go32_interrupt_stack_size = 4 * 1024;
 	_go32_rmcb_stack_size = 4 * 1024;
 }
 

@@ -268,6 +268,52 @@ static void CancelChanges( void *unused )
 	M_PopMenu();
 }
 
+void	VID_LoadRefresh (void) // FS: Needed for dynamic changing game modes/vid_restart
+{
+    refimport_t	ri;
+
+	re.Shutdown();
+
+#if 0
+    memset(vid_resolutions,0x0,sizeof(vid_resolutions));
+    VID_InitExtra(); //probe VESA
+
+    whatmodearewe=0; //hope this means start in mode 0
+    viddef.width = 320;
+    viddef.height = 200; //was originally 240
+#endif
+
+    ri.Cmd_AddCommand = Cmd_AddCommand;
+    ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
+    ri.Cmd_Argc = Cmd_Argc;
+    ri.Cmd_Argv = Cmd_Argv;
+    ri.Cmd_ExecuteText = Cbuf_ExecuteText;
+    ri.Con_Printf = VID_Printf;
+    ri.Sys_Error = VID_Error;
+    ri.FS_LoadFile = FS_LoadFile;
+    ri.FS_FreeFile = FS_FreeFile;
+    ri.FS_Gamedir = FS_Gamedir;
+    ri.Vid_NewWindow = VID_NewWindow;
+    ri.Cvar_Get = Cvar_Get;
+    ri.Cvar_Set = Cvar_Set;
+    ri.Cvar_SetValue = Cvar_SetValue;
+    ri.Vid_GetModeInfo = VID_GetModeInfo;
+
+    //JASON this is called from the video DLL
+    re = GetRefAPI(ri);
+
+    if (re.api_version != API_VERSION)
+        Com_Error (ERR_FATAL, "Re has incompatible api_version");
+    
+        // call the init function
+    if (re.Init (NULL, NULL) == -1)
+		Com_Error (ERR_FATAL, "Couldn't start refresh");
+
+	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
+	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE);
+	vid_gamma = Cvar_Get( "vid_gamma", "1", CVAR_ARCHIVE );
+}
+
 void	VID_Init (void)
 {
     refimport_t	ri;
@@ -306,7 +352,7 @@ void	VID_Init (void)
 		Com_Error (ERR_FATAL, "Couldn't start refresh");
 
 	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
-	vid_fullscreen = Cvar_Get ("vid_fullscreen", "0", CVAR_ARCHIVE);
+	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE);
 	vid_gamma = Cvar_Get( "vid_gamma", "1", CVAR_ARCHIVE );
 	Cmd_AddCommand("vid_restart", VID_Restart_f);
 }
@@ -333,6 +379,8 @@ void	VID_CheckChanges (void)
 		vid_fullscreen->modified = true;
 		cl.refresh_prepped = false;
 		cls.disable_screen = true;
+
+		VID_LoadRefresh();
 
 		Cvar_Set( "vid_ref", "soft" );
 		cls.disable_screen = false;
