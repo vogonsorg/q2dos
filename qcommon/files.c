@@ -338,7 +338,7 @@ int FS_FOpenFile (char *filename, FILE **file)
 			*file = fopen (netpath, "rb");
 			if (*file)
 			{		
-				Com_DPrintf ("link file: %s\n",netpath);
+				Com_DPrintf(DEVELOPER_MSG_IO, "link file: %s\n",netpath);
 				return FS_filelength (*file);
 			}
 			return -1;
@@ -378,7 +378,7 @@ int FS_FOpenFile (char *filename, FILE **file)
 				if (!Q_strcasecmp (pak->files[i].name, filename))
 				{	// found it!
 					file_from_pak = 1;
-					Com_DPrintf ("PackFile: %s : %s\n",pak->filename, filename);
+					Com_DPrintf(DEVELOPER_MSG_IO, "PackFile: %s : %s\n",pak->filename, filename);
 				// open a new file on the pakfile
 					*file = fopen (pak->filename, "rb");
 					if (!*file)
@@ -398,14 +398,14 @@ int FS_FOpenFile (char *filename, FILE **file)
 			if (!*file)
 				continue;
 			
-			Com_DPrintf ("FindFile: %s\n",netpath);
+			Com_DPrintf(DEVELOPER_MSG_IO, "FindFile: %s\n",netpath);
 
 			return FS_filelength (*file);
 		}
 		
 	}
 	
-	Com_DPrintf ("FindFile: can't find %s\n", filename);
+	Com_DPrintf(DEVELOPER_MSG_IO, "FindFile: can't find %s\n", filename);
 	
 	*file = NULL;
 	return -1;
@@ -437,7 +437,7 @@ int FS_FOpenFile (char *filename, FILE **file)
 		if (!*file)
 			return -1;
 		
-		Com_DPrintf ("FindFile: %s\n",netpath);
+		Com_DPrintf(DEVELOPER_MSG_IO, "FindFile: %s\n",netpath);
 
 		return FS_filelength (*file);
 	}
@@ -461,7 +461,7 @@ int FS_FOpenFile (char *filename, FILE **file)
 		if (!Q_strcasecmp (pak->files[i].name, filename))
 		{	// found it!
 			file_from_pak = 1;
-			Com_DPrintf ("PackFile: %s : %s\n",pak->filename, filename);
+			Com_DPrintf(DEVELOPER_MSG_IO, "PackFile: %s : %s\n",pak->filename, filename);
 		// open a new file on the pakfile
 			*file = fopen (pak->filename, "rb");
 			if (!*file)
@@ -471,7 +471,7 @@ int FS_FOpenFile (char *filename, FILE **file)
 		}
 	}
 	
-	Com_DPrintf ("FindFile: can't find %s\n", filename);
+	Com_DPrintf(DEVELOPER_MSG_IO, "FindFile: can't find %s\n", filename);
 	
 	*file = NULL;
 	return -1;

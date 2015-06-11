@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "qcommon.h"
 
 cvar_t	*cvar_vars;
+void Cvar_ParseDeveloperFlags (void); // FS: Special stuff for showing all the dev flags
 
 /*
 ============
@@ -353,6 +354,7 @@ void Cvar_GetLatchedVars (void)
 	}
 }
 
+
 /*
 ============
 Cvar_Command
@@ -368,7 +370,15 @@ qboolean Cvar_Command (void)
 	v = Cvar_FindVar (Cmd_Argv(0));
 	if (!v)
 		return false;
-		
+
+	if (!strcmp(v->name, "developer")/* && con_show_dev_flags->intValue*/) // FS: Special case for showing enabled flags
+	{
+		if(strlen(Cmd_Argv(1)) > 0)
+			Cvar_Set(developer->name, Cmd_Argv(1));
+		Cvar_ParseDeveloperFlags();
+		return true;
+	}
+
 // perform a variable print or set
 	if (Cmd_Argc() == 1)
 	{
@@ -552,4 +562,59 @@ void Cvar_Init (void)
 	Cmd_AddCommand ("set", Cvar_Set_f);
 	Cmd_AddCommand ("cvarlist", Cvar_List_f);
 
+}
+
+void Cvar_ParseDeveloperFlags (void) // FS: Special stuff for showing all the dev flags
+{
+	extern cvar_t	*developer;
+
+	Com_Printf("\"%s\" is \"%s\"\n", developer->name, developer->string);
+	if(developer->value > 0)
+	{
+		unsigned long devFlags = 0;
+		if(developer->value == 1)
+			devFlags = 65534;
+		else
+			devFlags = (unsigned long)developer->value;
+		Com_Printf("Toggled flags:\n");
+		if(devFlags & DEVELOPER_MSG_STANDARD)
+			Com_Printf(" * Standard messages - 2\n");
+		if(devFlags & DEVELOPER_MSG_SOUND)
+			Com_Printf(" * Sound messages - 4\n");
+		if(devFlags & DEVELOPER_MSG_NET)
+			Com_Printf(" * Network messages - 8\n");
+		if(devFlags & DEVELOPER_MSG_IO)
+			Com_Printf(" * File IO messages - 16\n");
+		if(devFlags & DEVELOPER_MSG_GFX)
+			Com_Printf(" * Graphics Renderer messages - 32\n");
+		if(devFlags & DEVELOPER_MSG_GAME)
+			Com_Printf(" * Game DLL messages - 64\n");
+		if(devFlags & DEVELOPER_MSG_MEM)
+			Com_Printf(" * Memory messages - 128\n");
+		if(devFlags & DEVELOPER_MSG_SERVER)
+			Com_Printf(" * Server messages - 256\n");
+		if(devFlags & DEVELOPER_MSG_CD)
+			Com_Printf(" * CD Audio messages - 512\n");
+		if(devFlags & DEVELOPER_MSG_OGG)
+			Com_Printf(" * OGG Vorbis messages - 1024\n");
+		if(devFlags & DEVELOPER_MSG_PHYSICS)
+			Com_Printf(" * Physics.dll messages - 2048\n");
+		if(devFlags & DEVELOPER_MSG_ENTITY)
+			Com_Printf(" * Entity messages - 4096\n");
+		if(devFlags & DEVELOPER_MSG_SAVE)
+			Com_Printf(" * Save/Restore messages - 8192\n");
+		if(devFlags & DEVELOPER_MSG_UNUSED1)
+			Com_Printf(" * Currently unused - 16384\n");
+		if(devFlags & DEVELOPER_MSG_UNUSED2)
+			Com_Printf(" * Currently unused - 32768\n");
+		if(devFlags & DEVELOPER_MSG_VERBOSE)
+			Com_Printf(" * Extremely Verbose messages - 65536\n");
+		if(devFlags & DEVELOPER_MSG_GAMESPY)
+			Com_Printf(" * Extremely Verbose Gamespy messages - 131072\n");
+	}
+	else
+	{
+//		if (developer->description && con_show_description->intValue) // FS
+//			Com_Printf("Description: %s\n", developer->description);
+	}
 }

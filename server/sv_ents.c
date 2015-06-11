@@ -654,7 +654,7 @@ void SV_BuildClientFrame (client_t *client)
 		state = &svs.client_entities[svs.next_client_entities%svs.num_client_entities];
 		if (ent->s.number != e)
 		{
-			Com_DPrintf ("FIXING ENT->S.NUMBER!!!\n");
+			Com_DPrintf(DEVELOPER_MSG_ENTITY, "FIXING ENT->S.NUMBER!!!\n");
 			ent->s.number = e;
 		}
 		*state = ent->s;

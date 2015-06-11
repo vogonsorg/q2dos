@@ -274,7 +274,7 @@ void SV_LinkEdict (edict_t *ent)
 			if (ent->areanum && ent->areanum != area)
 			{
 				if (ent->areanum2 && ent->areanum2 != area && sv.state == ss_loading)
-					Com_DPrintf ("Object touching 3 areas at %f %f %f\n",
+					Com_DPrintf(DEVELOPER_MSG_PHYSICS, "Object touching 3 areas at %f %f %f\n",
 					ent->absmin[0], ent->absmin[1], ent->absmin[2]);
 				ent->areanum2 = area;
 			}

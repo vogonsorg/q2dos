@@ -188,7 +188,7 @@ void SV_SpawnServer (char *server, char *spawnpoint, server_state_t serverstate,
 
 	Com_Printf ("------- Server Initialization -------\n");
 
-	Com_DPrintf ("SpawnServer: %s\n",server);
+	Com_DPrintf(DEVELOPER_MSG_SERVER, "SpawnServer: %s\n",server);
 	if (sv.demofile)
 		fclose (sv.demofile);
 

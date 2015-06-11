@@ -129,7 +129,7 @@ void VID_Printf (int print_level, char *fmt, ...)
 	}
 	else if ( print_level == PRINT_DEVELOPER )
 	{
-		Com_DPrintf ("%s", msg);
+		Com_DPrintf(DEVELOPER_MSG_WORLD, "%s", msg);
 	}
 	else if ( print_level == PRINT_ALERT )
 	{

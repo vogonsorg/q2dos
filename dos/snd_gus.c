@@ -1399,5 +1399,5 @@ void GUS_ClearDMA (void) // FS: This stops the constant clicking sound during ma
 			SetGf18(DMA_CONTROL,0x45);
 		GUS_StartGf1(SND_BUFFER_SIZE,extVoices);
 	}
-        Com_DPrintf("Cleared GUS DMA Buffer!\n");
+        Com_DPrintf(DEVELOPER_MSG_SOUND, "Cleared GUS DMA Buffer!\n");
 }

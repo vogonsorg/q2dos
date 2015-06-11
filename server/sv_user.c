@@ -61,7 +61,7 @@ void SV_New_f (void)
 	int			playernum;
 	edict_t		*ent;
 
-	Com_DPrintf ("New() from %s\n", sv_client->name);
+	Com_DPrintf(DEVELOPER_MSG_SERVER, "New() from %s\n", sv_client->name);
 
 	if (sv_client->state != cs_connected)
 	{
@@ -125,7 +125,7 @@ void SV_Configstrings_f (void)
 {
 	int			startPos, start;
 
-	Com_DPrintf ("Configstrings() from %s\n", sv_client->name);
+	Com_DPrintf(DEVELOPER_MSG_SERVER, "Configstrings() from %s\n", sv_client->name);
 
 	if (sv_client->state != cs_connected)
 	{
@@ -190,7 +190,7 @@ void SV_Baselines_f (void)
 	entity_state_t	nullstate;
 	entity_state_t	*base;
 
-	Com_DPrintf ("Baselines() from %s\n", sv_client->name);
+	Com_DPrintf(DEVELOPER_MSG_SERVER, "Baselines() from %s\n", sv_client->name);
 
 	if (sv_client->state != cs_connected)
 	{
@@ -253,7 +253,7 @@ SV_Begin_f
 */
 void SV_Begin_f (void)
 {
-	Com_DPrintf ("Begin() from %s\n", sv_client->name);
+	Com_DPrintf(DEVELOPER_MSG_SERVER, "Begin() from %s\n", sv_client->name);
 
 	// r1ch: could be abused to respawn or cause spam/other mod specific problems
 	if (sv_client->state != cs_connected)
@@ -438,7 +438,7 @@ void SV_BeginDownload_f (void)
 		// download  ZOID
 		|| (strncmp(name, "maps/", 5) == 0 && file_from_pak))
 	{
-		Com_DPrintf ("Couldn't download %s to %s\n", name, sv_client->name);
+		Com_DPrintf(DEVELOPER_MSG_SERVER, "Couldn't download %s to %s\n", name, sv_client->name);
 		if (sv_client->download) {
 			FS_FreeFile (sv_client->download);
 			sv_client->download = NULL;
@@ -451,7 +451,7 @@ void SV_BeginDownload_f (void)
 	}
 
 	SV_NextDownload_f ();
-	Com_DPrintf ("Downloading %s to %s\n", name, sv_client->name);
+	Com_DPrintf(DEVELOPER_MSG_SERVER, "Downloading %s to %s\n", name, sv_client->name);
 }
 
 
@@ -546,11 +546,11 @@ to the next server,
 void SV_Nextserver_f (void)
 {
 	if ( atoi(Cmd_Argv(1)) != svs.spawncount ) {
-		Com_DPrintf ("Nextserver() from wrong level, from %s\n", sv_client->name);
+		Com_DPrintf(DEVELOPER_MSG_SERVER, "Nextserver() from wrong level, from %s\n", sv_client->name);
 		return;		// leftover from last server
 	}
 
-	Com_DPrintf ("Nextserver() from %s\n", sv_client->name);
+	Com_DPrintf(DEVELOPER_MSG_SERVER, "Nextserver() from %s\n", sv_client->name);
 
 	SV_Nextserver ();
 }
@@ -634,7 +634,7 @@ void SV_ClientThink (client_t *cl, usercmd_t *cmd)
 
 	if (cl->commandMsec < 0 && sv_enforcetime->value )
 	{
-		Com_DPrintf ("commandMsec underflow from %s\n", cl->name);
+		Com_DPrintf(DEVELOPER_MSG_SERVER, "commandMsec underflow from %s\n", cl->name);
 		return;
 	}
 
@@ -735,7 +735,7 @@ void SV_ExecuteClientMessage (client_t *cl)
 
 			if (calculatedChecksum != checksum)
 			{
-				Com_DPrintf ("Failed command checksum for %s (%d != %d)/%d\n", 
+				Com_DPrintf(DEVELOPER_MSG_SERVER, "Failed command checksum for %s (%d != %d)/%d\n", 
 					cl->name, calculatedChecksum, checksum, 
 					cl->netchan.incoming_sequence);
 				return;

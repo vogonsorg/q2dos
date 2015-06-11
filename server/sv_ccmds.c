@@ -158,7 +158,7 @@ void SV_WipeSavegame (char *savename)
 	char	name[MAX_OSPATH];
 	char	*s;
 
-	Com_DPrintf("SV_WipeSaveGame(%s)\n", savename);
+	Com_DPrintf(DEVELOPER_MSG_SAVE, "SV_WipeSaveGame(%s)\n", savename);
 
 	Com_sprintf (name, sizeof(name), "%s/save/%s/server.ssv", FS_Gamedir (), savename);
 	remove (name);
@@ -195,7 +195,7 @@ void CopyFile (char *src, char *dst)
 	int		l;
 	byte	buffer[65536];
 
-	Com_DPrintf ("CopyFile (%s, %s)\n", src, dst);
+	Com_DPrintf(DEVELOPER_MSG_IO, "CopyFile (%s, %s)\n", src, dst);
 
 	f1 = fopen (src, "rb");
 	if (!f1)
@@ -231,7 +231,7 @@ void SV_CopySaveGame (char *src, char *dst)
 	int		l, len;
 	char	*found;
 
-	Com_DPrintf("SV_CopySaveGame(%s, %s)\n", src, dst);
+	Com_DPrintf(DEVELOPER_MSG_SAVE, "SV_CopySaveGame(%s, %s)\n", src, dst);
 
 	SV_WipeSavegame (dst);
 
@@ -280,7 +280,7 @@ void SV_WriteLevelFile (void)
 	char	name[MAX_OSPATH];
 	FILE	*f;
 
-	Com_DPrintf("SV_WriteLevelFile()\n");
+	Com_DPrintf(DEVELOPER_MSG_SAVE, "SV_WriteLevelFile()\n");
 
 	Com_sprintf (name, sizeof(name), "%s/save/current/%s.sv2", FS_Gamedir(), sv.name);
 	f = fopen(name, "wb");
@@ -308,7 +308,7 @@ void SV_ReadLevelFile (void)
 	char	name[MAX_OSPATH];
 	FILE	*f;
 
-	Com_DPrintf("SV_ReadLevelFile()\n");
+	Com_DPrintf(DEVELOPER_MSG_SAVE, "SV_ReadLevelFile()\n");
 
 	Com_sprintf (name, sizeof(name), "%s/save/current/%s.sv2", FS_Gamedir(), sv.name);
 	f = fopen(name, "rb");
@@ -340,7 +340,7 @@ void SV_WriteServerFile (qboolean autosave)
 	time_t	aclock;
 	struct tm	*newtime;
 
-	Com_DPrintf("SV_WriteServerFile(%s)\n", autosave ? "true" : "false");
+	Com_DPrintf(DEVELOPER_MSG_SAVE, "SV_WriteServerFile(%s)\n", autosave ? "true" : "false");
 
 	Com_sprintf (fileName, sizeof(fileName), "%s/save/current/server.ssv", FS_Gamedir());
 	f = fopen (fileName, "wb");
@@ -411,7 +411,7 @@ void SV_ReadServerFile (void)
 	char	comment[32];
 	char	mapcmd[MAX_TOKEN_CHARS];
 
-	Com_DPrintf("SV_ReadServerFile()\n");
+	Com_DPrintf(DEVELOPER_MSG_SAVE, "SV_ReadServerFile()\n");
 
 	Com_sprintf (fileName, sizeof(fileName), "%s/save/current/server.ssv", FS_Gamedir());
 	f = fopen (fileName, "rb");
@@ -433,7 +433,7 @@ void SV_ReadServerFile (void)
 		if (!fread (varName, 1, sizeof(varName), f))
 			break;
 		FS_Read (string, sizeof(string), f);
-		Com_DPrintf ("Set %s = %s\n", varName, string);
+		Com_DPrintf(DEVELOPER_MSG_STANDARD, "Set %s = %s\n", varName, string);
 		Cvar_ForceSet (varName, string);
 	}
 
@@ -498,7 +498,7 @@ void SV_GameMap_f (void)
 		return;
 	}
 
-	Com_DPrintf("SV_GameMap(%s)\n", Cmd_Argv(1));
+	Com_DPrintf(DEVELOPER_MSG_SAVE, "SV_GameMap(%s)\n", Cmd_Argv(1));
 
 	FS_CreatePath (va("%s/save/current/", FS_Gamedir()));
 
@@ -954,7 +954,7 @@ void SV_ServerRecord_f (void)
 		}
 
 	// write it to the demo file
-	Com_DPrintf ("signon message length: %i\n", buf.cursize);
+	Com_DPrintf(DEVELOPER_MSG_NET, "signon message length: %i\n", buf.cursize);
 	len = LittleLong (buf.cursize);
 	fwrite (&len, 4, 1, svs.demofile);
 	fwrite (buf.data, buf.cursize, 1, svs.demofile);

@@ -58,7 +58,7 @@ void CL_ClearProjectiles (void)
 
 	for (i = 0; i < MAX_PROJECTILES; i++) {
 //		if (cl_projectiles[i].present)
-//			Com_DPrintf("PROJ: %d CLEARED\n", cl_projectiles[i].num);
+//			Com_DPrintf(DEVELOPER_MSG_ENTITY, "PROJ: %d CLEARED\n", cl_projectiles[i].num);
 		cl_projectiles[i].present = false;
 	}
 }

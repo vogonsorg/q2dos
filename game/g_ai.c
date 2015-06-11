@@ -370,7 +370,7 @@ void FoundTarget (edict_t *self)
 	{
 		self->goalentity = self->movetarget = self->enemy;
 		HuntTarget (self);
-		gi.dprintf("%s at %s, combattarget %s not found\n", self->classname, vtos(self->s.origin), self->combattarget);
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s, combattarget %s not found\n", self->classname, vtos(self->s.origin), self->combattarget);
 		return;
 	}
 
@@ -1047,7 +1047,7 @@ void ai_run (edict_t *self, float dist)
 
 	if (new)
 	{
-//		gi.dprintf("checking for course correction\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "checking for course correction\n");
 
 		tr = gi.trace(self->s.origin, self->mins, self->maxs, self->monsterinfo.last_sighting, self, MASK_PLAYERSOLID);
 		if (tr.fraction < 1)
@@ -1076,7 +1076,7 @@ void ai_run (edict_t *self, float dist)
 				{
 					VectorSet(v, d2 * left * 0.5, -16, 0);
 					G_ProjectSource (self->s.origin, v, v_forward, v_right, left_target);
-//					gi.dprintf("incomplete path, go part way and adjust again\n");
+//					gi.dprintf(DEVELOPER_MSG_GAME, "incomplete path, go part way and adjust again\n");
 				}
 				VectorCopy (self->monsterinfo.last_sighting, self->monsterinfo.saved_goal);
 				self->monsterinfo.aiflags |= AI_PURSUE_TEMP;
@@ -1084,7 +1084,7 @@ void ai_run (edict_t *self, float dist)
 				VectorCopy (left_target, self->monsterinfo.last_sighting);
 				VectorSubtract (self->goalentity->s.origin, self->s.origin, v);
 				self->s.angles[YAW] = self->ideal_yaw = vectoyaw(v);
-//				gi.dprintf("adjusted left\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "adjusted left\n");
 //				debug_drawline(self.origin, self.last_sighting, 152);
 			}
 			else if (right >= center && right > left)
@@ -1093,7 +1093,7 @@ void ai_run (edict_t *self, float dist)
 				{
 					VectorSet(v, d2 * right * 0.5, 16, 0);
 					G_ProjectSource (self->s.origin, v, v_forward, v_right, right_target);
-//					gi.dprintf("incomplete path, go part way and adjust again\n");
+//					gi.dprintf(DEVELOPER_MSG_GAME, "incomplete path, go part way and adjust again\n");
 				}
 				VectorCopy (self->monsterinfo.last_sighting, self->monsterinfo.saved_goal);
 				self->monsterinfo.aiflags |= AI_PURSUE_TEMP;
@@ -1101,11 +1101,11 @@ void ai_run (edict_t *self, float dist)
 				VectorCopy (right_target, self->monsterinfo.last_sighting);
 				VectorSubtract (self->goalentity->s.origin, self->s.origin, v);
 				self->s.angles[YAW] = self->ideal_yaw = vectoyaw(v);
-//				gi.dprintf("adjusted right\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "adjusted right\n");
 //				debug_drawline(self.origin, self.last_sighting, 152);
 			}
 		}
-//		else gi.dprintf("course was fine\n");
+//		else gi.dprintf(DEVELOPER_MSG_GAME, "course was fine\n");
 	}
 
 	M_MoveToGoal (self, dist);

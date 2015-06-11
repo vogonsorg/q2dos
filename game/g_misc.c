@@ -31,7 +31,7 @@ Used to group brushes together just for editor convenience.
 void Use_Areaportal (edict_t *ent, edict_t *other, edict_t *activator)
 {
 	ent->count ^= 1;		// toggle state
-//	gi.dprintf ("portalstate: %i = %i\n", ent->style, ent->count);
+//	gi.dprintf(DEVELOPER_MSG_GAME, "portalstate: %i = %i\n", ent->style, ent->count);
 	gi.SetAreaPortalState (ent->style, ent->count);
 }
 
@@ -400,7 +400,7 @@ void SP_path_corner (edict_t *self)
 {
 	if (!self->targetname)
 	{
-		gi.dprintf ("path_corner with no targetname at %s\n", vtos(self->s.origin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "path_corner with no targetname at %s\n", vtos(self->s.origin));
 		G_FreeEdict (self);
 		return;
 	}
@@ -432,7 +432,7 @@ void point_combat_touch (edict_t *self, edict_t *other, cplane_t *plane, csurfac
 		other->goalentity = other->movetarget = G_PickTarget(other->target);
 		if (!other->goalentity)
 		{
-			gi.dprintf("%s at %s target %s does not exist\n", self->classname, vtos(self->s.origin), self->target);
+			gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s target %s does not exist\n", self->classname, vtos(self->s.origin), self->target);
 			other->movetarget = self;
 		}
 		self->target = NULL;
@@ -498,7 +498,7 @@ void TH_viewthing(edict_t *ent)
 
 void SP_viewthing(edict_t *ent)
 {
-	gi.dprintf ("viewthing spawned\n");
+	gi.dprintf(DEVELOPER_MSG_GAME, "viewthing spawned\n");
 
 	ent->movetype = MOVETYPE_NONE;
 	ent->solid = SOLID_BBOX;
@@ -630,7 +630,7 @@ void SP_func_wall (edict_t *self)
 	// it must be TRIGGER_SPAWN
 	if (!(self->spawnflags & 1))
 	{
-//		gi.dprintf("func_wall missing TRIGGER_SPAWN\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "func_wall missing TRIGGER_SPAWN\n");
 		self->spawnflags |= 1;
 	}
 
@@ -639,7 +639,7 @@ void SP_func_wall (edict_t *self)
 	{
 		if (!(self->spawnflags & 2))
 		{
-			gi.dprintf("func_wall START_ON without TOGGLE\n");
+			gi.dprintf(DEVELOPER_MSG_GAME, "func_wall START_ON without TOGGLE\n");
 			self->spawnflags |= 2;
 		}
 	}
@@ -1286,7 +1286,7 @@ void SP_misc_viper (edict_t *ent)
 {
 	if (!ent->target)
 	{
-		gi.dprintf ("misc_viper without a target at %s\n", vtos(ent->absmin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "misc_viper without a target at %s\n", vtos(ent->absmin));
 		G_FreeEdict (ent);
 		return;
 	}
@@ -1416,7 +1416,7 @@ void SP_misc_strogg_ship (edict_t *ent)
 {
 	if (!ent->target)
 	{
-		gi.dprintf ("%s without a target at %s\n", ent->classname, vtos(ent->absmin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s without a target at %s\n", ent->classname, vtos(ent->absmin));
 		G_FreeEdict (ent);
 		return;
 	}
@@ -1661,7 +1661,7 @@ typedef struct zhead_s {
 	if (size < CLOCK_MESSAGE_SIZE) {
 		gi.TagFree (self->message);
 		self->message = gi.TagMalloc (CLOCK_MESSAGE_SIZE, TAG_LEVEL);
-		//gi.dprintf ("WARNING: func_clock_format_countdown: self->message is too small: %i\n", size);
+		//gi.dprintf(DEVELOPER_MSG_GAME, "WARNING: func_clock_format_countdown: self->message is too small: %i\n", size);
 	} 
 	// end Skuller's hack
 
@@ -1769,14 +1769,14 @@ void SP_func_clock (edict_t *self)
 {
 	if (!self->target)
 	{
-		gi.dprintf("%s with no target at %s\n", self->classname, vtos(self->s.origin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s with no target at %s\n", self->classname, vtos(self->s.origin));
 		G_FreeEdict (self);
 		return;
 	}
 
 	if ((self->spawnflags & 2) && (!self->count))
 	{
-		gi.dprintf("%s with no count at %s\n", self->classname, vtos(self->s.origin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s with no count at %s\n", self->classname, vtos(self->s.origin));
 		G_FreeEdict (self);
 		return;
 	}
@@ -1808,7 +1808,7 @@ void teleporter_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_
 	dest = G_Find (NULL, FOFS(targetname), self->target);
 	if (!dest)
 	{
-		gi.dprintf ("Couldn't find destination\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "Couldn't find destination\n");
 		return;
 	}
 
@@ -1853,7 +1853,7 @@ void SP_misc_teleporter (edict_t *ent)
 
 	if (!ent->target)
 	{
-		gi.dprintf ("teleporter without a target.\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "teleporter without a target.\n");
 		G_FreeEdict (ent);
 		return;
 	}

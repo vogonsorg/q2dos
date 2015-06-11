@@ -61,11 +61,23 @@ PF_dprintf
 Debug print to server console
 ===============
 */
-void PF_dprintf (char *fmt, ...)
+void PF_dprintf (unsigned long developerFlags, char *fmt, ...)
 {
 	char		msg[1024];
 	va_list		argptr;
-	
+	unsigned long			devValue = 0;
+		
+	if (!developer || !developer->value)
+		return;			// don't confuse non-developers with techie stuff...
+
+	devValue = (unsigned long)developer->value;
+
+	if (developer->value == 1) // FS: Show all except extremely verbose shit
+		devValue = 65534;
+
+	if (!(devValue & developerFlags))
+		return;
+
 	va_start (argptr,fmt);
 //	vsprintf (msg, fmt, argptr);
 	Q_vsnprintf (msg, sizeof(msg), fmt, argptr);

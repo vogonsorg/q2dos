@@ -579,7 +579,7 @@ qboolean SNDDMA_Init(void)
 
 	if (GUS_Init ())
 	{
-		Com_DPrintf("GUS_Init\n");
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "GUS_Init\n");
 		dmacard = dma_gus;
 		S_StopAllSounds(); // FS: For GUS Buffer Clear Fix
 		return true;
@@ -587,7 +587,7 @@ qboolean SNDDMA_Init(void)
 
 	if (BLASTER_Init ())
 	{
-		Com_DPrintf("BLASTER_Init\n");
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "BLASTER_Init\n");
 		dmacard = dma_blaster;
 		return true;
 	}

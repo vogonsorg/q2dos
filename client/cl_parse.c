@@ -301,7 +301,7 @@ void CL_ParseServerData (void)
 	char	*str;
 	int		i;
 	
-	Com_DPrintf ("Serverdata packet received.\n");
+	Com_DPrintf(DEVELOPER_MSG_NET, "Serverdata packet received.\n");
 //
 // wipe the client_state_t struct
 //
@@ -564,7 +564,7 @@ void CL_PlayBackgroundTrack (void)
 	char	name[MAX_QPATH];
 	int		track;
 
-	Com_DPrintf ("CL_PlayBackgroundTrack\n");	// debug
+	Com_DPrintf(DEVELOPER_MSG_CD, "CL_PlayBackgroundTrack\n");	// debug
 
 	if (!cl.refresh_prepped)
 		return;
@@ -585,7 +585,7 @@ void CL_PlayBackgroundTrack (void)
 
 	if (track == 0)
 	{	// Stop any playing track
-		Com_DPrintf ("CL_PlayBackgroundTrack: stopping\n");	// debug
+		Com_DPrintf(DEVELOPER_MSG_CD, "CL_PlayBackgroundTrack: stopping\n");	// debug
 		CDAudio_Stop();
 		S_StopBackgroundTrack();
 		return;
@@ -594,7 +594,7 @@ void CL_PlayBackgroundTrack (void)
 	// If an OGG file exists play it, otherwise fall back to CD audio
 	Com_sprintf (name, sizeof(name), "music/track%02i.ogg", CL_MissionPackCDTrack(track));
 	if ( (FS_LoadFile(name, NULL) != -1) && cl_ogg_music->value ) {
-		Com_DPrintf ("CL_PlayBackgroundTrack: playing track %s\n", name);	// debug
+		Com_DPrintf(DEVELOPER_MSG_OGG, "CL_PlayBackgroundTrack: playing track %s\n", name);	// debug
 		S_StartBackgroundTrack(name, name);
 	}
 	else
@@ -840,7 +840,7 @@ void CL_ParseServerMessage (void)
 			
 		case svc_stufftext:
 			s = MSG_ReadString (&net_message);
-			Com_DPrintf ("stufftext: %s\n", s);
+			Com_DPrintf(DEVELOPER_MSG_NET, "stufftext: %s\n", s);
 			Cbuf_AddText (s);
 			break;
 			

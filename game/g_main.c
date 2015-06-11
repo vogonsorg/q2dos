@@ -93,7 +93,7 @@ void G_RunFrame (void);
 
 void ShutdownGame (void)
 {
-	gi.dprintf ("==== ShutdownGame ====\n");
+	gi.dprintf(DEVELOPER_MSG_GAME, "==== ShutdownGame ====\n");
 
 	gi.FreeTags (TAG_LEVEL);
 	gi.FreeTags (TAG_GAME);
@@ -163,7 +163,7 @@ void Com_Printf (char *msg, ...)
 	Q_vsnprintf (text, sizeof(text), msg, argptr);	// Knightmare- buffer overflow fix
 	va_end (argptr);
 
-	gi.dprintf ("%s", text);
+	gi.dprintf(DEVELOPER_MSG_GAME, "%s", text);
 }
 
 #endif

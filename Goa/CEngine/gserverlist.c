@@ -303,15 +303,15 @@ GError ServerListUpdate(GServerList serverlist, gbool async)
 
 	error = InitUpdateList(serverlist);
 
-	Com_DPrintf("Gamespy ServerListUpdate: Created Update list\n");
+	Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListUpdate: Created Update list\n");
 	if (error)
 		return error;
 	error = CreateServerListSocket(serverlist);
-	Com_DPrintf("Gamespy ServerListUpdate: Created ServerListSocket list\n");
+	Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListUpdate: Created ServerListSocket list\n");
 	if (error)
 		return error;
 	error = SendListRequest(serverlist);
-	Com_DPrintf("Gamespy ServerListUpdate: Send List Request\n");
+	Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListUpdate: Send List Request\n");
 	if (error)
 		return error;
 
@@ -407,7 +407,7 @@ static GError ServerListReadList(GServerList serverlist)
 
 	data[len + oldlen] = 0; //null terminate it
 	// data is in the form of '\ip\1.2.3.4:1234\ip\1.2.3.4:1234\final\'
-	Com_DPrintf("List xfer data: %s\n", data);
+	Com_DPrintf(DEVELOPER_MSG_GAMESPY, "List xfer data: %s\n", data);
 	
 	lastip = data;
 	while (*lastip != '\0')
@@ -601,14 +601,14 @@ static GError ServerListQueryLoop(GServerList serverlist)
 			server = *(GServer *)ArrayNth(serverlist->servers,serverlist->updatelist[i].serverindex);
 			saddr.sin_family = AF_INET;
 			saddr.sin_addr.s_addr = inet_addr(ServerGetAddress(server));
-			Com_DPrintf("Attempting to ping[%i]: %s\n", i, ServerGetAddress(server));
+			Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Attempting to ping[%i]: %s\n", i, ServerGetAddress(server));
 			saddr.sin_port = htons((short)ServerGetQueryPort(server));
 
 #if 0
 			error = connect (serverlist->updatelist[i].s, (struct sockaddr *) &saddr, saddrlen);
 			if (error != 0) //uhh.. bad server address?
 			{
-				Com_DPrintf("Error during connect: %d\n", errno); // FS
+				Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Error during connect: %d\n", errno); // FS
 				serverlist->updatelist[i].serverindex = -1;
 				continue;
 			}
@@ -639,7 +639,7 @@ static GError ServerListQueryLoop(GServerList serverlist)
 				}
 				else
 				{
-					Com_DPrintf("Error during gamespy recv %d\n", errno);
+					Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Error during gamespy recv %d\n", errno);
 					continue;
 				}
 			}
@@ -677,16 +677,16 @@ GError ServerListThink(GServerList serverlist)
 		case sl_idle:
 			return 0;
 		case sl_listxfer:
-				Com_DPrintf("Gamespy ServerListThink: Server List xfer\n");
+				Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListThink: Server List xfer\n");
 				 //read the data
 				return ServerListReadList(serverlist);
 				break;
 		case sl_lanlist:
-				Com_DPrintf("Gamespy ServerListThink: Server Lan List Query\n");
+				Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListThink: Server Lan List Query\n");
 				return ServerListLANList(serverlist);
 		case sl_querying: 
 				//do some queries
-				Com_DPrintf("Gamespy ServerListThink: Server List Query Loop\n");
+				Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListThink: Server List Query Loop\n");
 				return ServerListQueryLoop(serverlist);
 				break;
 	}

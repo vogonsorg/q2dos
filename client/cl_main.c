@@ -1057,7 +1057,7 @@ void CL_ReadPackets (void)
 		//
 		if (!NET_CompareAdr (net_from, cls.netchan.remote_address))
 		{
-			Com_DPrintf ("%s:sequenced packet without connection\n"
+			Com_DPrintf(DEVELOPER_MSG_NET, "%s:sequenced packet without connection\n"
 				,NET_AdrToString(net_from));
 			continue;
 		}

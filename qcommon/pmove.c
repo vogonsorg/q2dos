@@ -1143,7 +1143,7 @@ void PM_SnapPosition (void)
 
 	// go back to the last position
 	VectorCopy (pml.previous_origin, pm->s.origin);
-//	Com_DPrintf ("using previous_origin\n");
+//	Com_DPrintf(DEVELOPER_MSG_PHYSICS, "using previous_origin\n");
 }
 
 #if 0
@@ -1182,7 +1182,7 @@ void PM_InitialSnapPosition (void)
 		}
 	}
 
-	Com_DPrintf ("Bad InitialSnapPosition\n");
+	Com_DPrintf(DEVELOPER_MSG_PHYSICS, "Bad InitialSnapPosition\n");
 }
 #else
 /*
@@ -1216,7 +1216,7 @@ void PM_InitialSnapPosition(void)
 		}
 	}
 
-	Com_DPrintf ("Bad InitialSnapPosition\n");
+	Com_DPrintf(DEVELOPER_MSG_PHYSICS, "Bad InitialSnapPosition\n");
 }
 
 #endif

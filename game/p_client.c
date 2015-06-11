@@ -55,7 +55,7 @@ static void SP_FixCoopSpots (edict_t *self)
 		{
 			if ((!self->targetname) || Q_stricmp(self->targetname, spot->targetname) != 0)
 			{
-//				gi.dprintf("FixCoopSpots changed %s at %s targetname from %s to %s\n", self->classname, vtos(self->s.origin), self->targetname, spot->targetname);
+//				gi.dprintf(DEVELOPER_MSG_GAME, "FixCoopSpots changed %s at %s targetname from %s to %s\n", self->classname, vtos(self->s.origin), self->targetname, spot->targetname);
 				self->targetname = spot->targetname;
 			}
 			return;
@@ -1505,7 +1505,7 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 	ClientUserinfoChanged (ent, userinfo);
 
 	if (game.maxclients > 1)
-		gi.dprintf ("%s connected\n", ent->client->pers.netname);
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s connected\n", ent->client->pers.netname);
 
 	ent->svflags = 0; // make sure we start with known default
 	ent->client->pers.connected = true;
@@ -1640,7 +1640,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		if (memcmp(&client->old_pmove, &pm.s, sizeof(pm.s)))
 		{
 			pm.snapinitial = true;
-	//		gi.dprintf ("pmove changed!\n");
+	//		gi.dprintf(DEVELOPER_MSG_GAME, "pmove changed!\n");
 		}
 
 		pm.cmd = *ucmd;

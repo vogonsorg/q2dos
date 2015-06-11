@@ -167,7 +167,7 @@ void CMod_LoadSubmodels (lump_t *l)
 		// Knightmare added
 		headnode = LittleLong (in->headnode);
 		if (headnode >= numnodes) {
-			Com_DPrintf ("CMod_LoadSubmodels: bad headnode\n");
+			Com_DPrintf(DEVELOPER_MSG_STANDARD, "CMod_LoadSubmodels: bad headnode\n");
 			out->headnode = 0;
 		}
 		else
@@ -1724,7 +1724,7 @@ void CM_DecompressVis (byte *in, byte *out)
 		if ((out_p - out) + c > row)
 		{
 			c = row - (out_p - out);
-			Com_DPrintf ("warning: Vis decompression overrun\n");
+			Com_DPrintf(DEVELOPER_MSG_STANDARD, "warning: Vis decompression overrun\n");
 		}
 		while (c)
 		{

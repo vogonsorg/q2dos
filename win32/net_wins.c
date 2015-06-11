@@ -455,7 +455,7 @@ void NET_SendPacket (netsrc_t sock, int length, void *data, netadr_t to)
 		{
 			if (err == WSAEADDRNOTAVAIL)
 			{
-				Com_DPrintf ("NET_SendPacket Warning: %s : %s\n", 
+				Com_DPrintf (DEVELOPER_MSG_WORLD, "NET_SendPacket Warning: %s : %s\n", 
 						NET_ErrorString(), NET_AdrToString (to));
 			}
 			else

@@ -289,7 +289,7 @@ int SV_FlyMove (edict_t *ent, float time, int mask)
 		{	// go along the crease
 			if (numplanes != 2)
 			{
-//				gi.dprintf ("clip velocity, numplanes == %i\n",numplanes);
+//				gi.dprintf(DEVELOPER_MSG_GAME, "clip velocity, numplanes == %i\n",numplanes);
 				VectorCopy (vec3_origin, ent->velocity);
 				return 7;
 			}

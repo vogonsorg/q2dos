@@ -115,14 +115,14 @@ static qboolean DS_CreateBuffers( void )
 
 	Com_Printf( "Creating DS buffers\n" );
 
-	Com_DPrintf("...setting EXCLUSIVE coop level: " );
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "...setting EXCLUSIVE coop level: " );
 	if ( DS_OK != pDS->lpVtbl->SetCooperativeLevel( pDS, cl_hwnd, DSSCL_EXCLUSIVE ) )
 	{
 		Com_Printf ("failed\n");
 		FreeSound ();
 		return false;
 	}
-	Com_DPrintf("ok\n" );
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "ok\n" );
 
 // get access to the primary buffer, if possible, so we can set the
 // sound hardware format
@@ -145,12 +145,12 @@ static qboolean DS_CreateBuffers( void )
 		if (DS_OK != pDSPBuf->lpVtbl->SetFormat (pDSPBuf, &pformat))
 		{
 			if (snd_firsttime)
-				Com_DPrintf ("...setting primary sound format: failed\n");
+				Com_DPrintf(DEVELOPER_MSG_SOUND, "...setting primary sound format: failed\n");
 		}
 		else
 		{
 			if (snd_firsttime)
-				Com_DPrintf ("...setting primary sound format: ok\n");
+				Com_DPrintf(DEVELOPER_MSG_SOUND, "...setting primary sound format: ok\n");
 
 			primary_format_set = true;
 		}
@@ -378,7 +378,7 @@ sndinitstat SNDDMA_InitDirect (void)
 			return SIS_FAILURE;
 		}
 
-		Com_DPrintf ("ok\n");
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "ok\n");
 		pDirectSoundCreate = (void *)GetProcAddress(hInstDS,"DirectSoundCreate");
 
 		if (!pDirectSoundCreate)
@@ -418,7 +418,7 @@ sndinitstat SNDDMA_InitDirect (void)
 
 	if ( dscaps.dwFlags & DSCAPS_EMULDRIVER )
 	{
-		Com_DPrintf ("...no DSound driver found\n" );
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "...no DSound driver found\n" );
 		FreeSound();
 		return SIS_FAILURE;
 	}
@@ -428,7 +428,7 @@ sndinitstat SNDDMA_InitDirect (void)
 
 	dsound_init = true;
 
-	Com_DPrintf("...completed successfully\n" );
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "...completed successfully\n" );
 
 	return SIS_SUCCESS;
 }
@@ -474,7 +474,7 @@ qboolean SNDDMA_InitWav (void)
 		*format.nBlockAlign; 
 	
 	/* Open a waveform device for output using window callback. */ 
-	Com_DPrintf ("...opening waveform device: ");
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "...opening waveform device: ");
 	while ((hr = waveOutOpen((LPHWAVEOUT)&hWaveOut, WAVE_MAPPER, 
 					&format, 
 					0, 0L, CALLBACK_NULL)) != MMSYSERR_NOERROR)
@@ -503,7 +503,7 @@ qboolean SNDDMA_InitWav (void)
 	 * GMEM_MOVEABLE and GMEM_SHARE flags. 
 
 	*/ 
-	Com_DPrintf ("...allocating waveform buffer: ");
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "...allocating waveform buffer: ");
 	gSndBufSize = WAV_BUFFERS*WAV_BUFFER_SIZE;
 	hData = GlobalAlloc(GMEM_MOVEABLE | GMEM_SHARE, gSndBufSize); 
 	if (!hData) 
@@ -514,7 +514,7 @@ qboolean SNDDMA_InitWav (void)
 	}
 	Com_DPrintf( "ok\n" );
 
-	Com_DPrintf ("...locking waveform buffer: ");
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "...locking waveform buffer: ");
 	lpData = GlobalLock(hData);
 	if (!lpData)
 	{ 
@@ -530,7 +530,7 @@ qboolean SNDDMA_InitWav (void)
 	 * also be globally allocated with GMEM_MOVEABLE and 
 	 * GMEM_SHARE flags. 
 	 */ 
-	Com_DPrintf ("...allocating waveform header: ");
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "...allocating waveform header: ");
 	hWaveHdr = GlobalAlloc(GMEM_MOVEABLE | GMEM_SHARE, 
 		(DWORD) sizeof(WAVEHDR) * WAV_BUFFERS); 
 
@@ -542,7 +542,7 @@ qboolean SNDDMA_InitWav (void)
 	} 
 	Com_DPrintf( "ok\n" );
 
-	Com_DPrintf ("...locking waveform header: ");
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "...locking waveform header: ");
 	lpWaveHdr = (LPWAVEHDR) GlobalLock(hWaveHdr); 
 
 	if (lpWaveHdr == NULL)
@@ -555,7 +555,7 @@ qboolean SNDDMA_InitWav (void)
 	Com_DPrintf( "ok\n" );
 
 	/* After allocation, set up and prepare headers. */ 
-	Com_DPrintf ("...preparing headers: ");
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "...preparing headers: ");
 	for (i=0 ; i<WAV_BUFFERS ; i++)
 	{
 		lpWaveHdr[i].dwBufferLength = WAV_BUFFER_SIZE; 
@@ -569,7 +569,7 @@ qboolean SNDDMA_InitWav (void)
 			return false;
 		}
 	}
-	Com_DPrintf ("ok\n");
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "ok\n");
 
 	dma.samples = gSndBufSize/(dma.samplebits/8);
 	dma.samplepos = 0;
@@ -780,7 +780,7 @@ void SNDDMA_Submit(void)
 	{
 		if ( snd_completed == snd_sent )
 		{
-			Com_DPrintf ("Sound overrun\n");
+			Com_DPrintf(DEVELOPER_MSG_SOUND, "Sound overrun\n");
 			break;
 		}
 

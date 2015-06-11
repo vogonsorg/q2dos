@@ -335,13 +335,13 @@ void SVC_DirectConnect (void)
 
 	adr = net_from;
 
-	Com_DPrintf ("SVC_DirectConnect ()\n");
+	Com_DPrintf(DEVELOPER_MSG_SERVER, "SVC_DirectConnect ()\n");
 
 	version = atoi(Cmd_Argv(1));
 	if (version != PROTOCOL_VERSION)
 	{
 		Netchan_OutOfBandPrint (NS_SERVER, adr, "print\nServer is version %4.2f.\n", VERSION);
-		Com_DPrintf ("    rejected connect from version %i\n", version);
+		Com_DPrintf(DEVELOPER_MSG_SERVER, "    rejected connect from version %i\n", version);
 		return;
 	}
 
@@ -367,7 +367,7 @@ void SVC_DirectConnect (void)
 	if (previousclients >= (int)sv_iplimit->value * 2)
 	{
 		Netchan_OutOfBandPrint (NS_SERVER, adr, "print\nToo many connections from your host.\n");
-		Com_DPrintf ("    too many connections\n");
+		Com_DPrintf(DEVELOPER_MSG_SERVER, "    too many connections\n");
 		return;
 	}
 	// end r1ch fix
@@ -423,14 +423,14 @@ void SVC_DirectConnect (void)
 		{
 			if (!NET_IsLocalAddress (adr) && (svs.realtime - cl->lastconnect) < ((int)sv_reconnect_limit->value * 1000))
 			{
-				Com_DPrintf ("%s:reconnect rejected : too soon\n", NET_AdrToString (adr));
+				Com_DPrintf(DEVELOPER_MSG_SERVER, "%s:reconnect rejected : too soon\n", NET_AdrToString (adr));
 				return;
 			}
 			// r1ch: !! fix nasty bug where non-disconnected clients (from dropped disconnect
 			// packets) could be overwritten!
 			if (cl->state != cs_zombie)
 			{
-				Com_DPrintf ("    client already found\n");
+				Com_DPrintf(DEVELOPER_MSG_SERVER, "    client already found\n");
 				// If we legitly get here, spoofed udp isn't possible (passed challenge) and client addr/port combo
 				// is exactly the same, so we can assume its really a dropped/crashed client. i hope...
 				Com_Printf ("Dropping %s, ghost reconnect\n", cl->name);
@@ -456,7 +456,7 @@ void SVC_DirectConnect (void)
 	if (!newcl)
 	{
 		Netchan_OutOfBandPrint (NS_SERVER, adr, "print\nServer is full.\n");
-		Com_DPrintf ("Rejected a connection.\n");
+		Com_DPrintf(DEVELOPER_MSG_SERVER, "Rejected a connection.\n");
 		return;
 	}
 
@@ -479,7 +479,7 @@ gotnewcl:
 				Info_ValueForKey (userinfo, "rejmsg"));
 		else
 			Netchan_OutOfBandPrint (NS_SERVER, adr, "print\nConnection refused.\n" );
-		Com_DPrintf ("Game rejected a connection.\n");
+		Com_DPrintf(DEVELOPER_MSG_SERVER, "Game rejected a connection.\n");
 		return;
 	}
 
@@ -577,7 +577,7 @@ void SV_ConnectionlessPacket (void)
 	Cmd_TokenizeString (s, false);
 
 	c = Cmd_Argv(0);
-	Com_DPrintf ("Packet %s : %s\n", NET_AdrToString(net_from), c);
+	Com_DPrintf(DEVELOPER_MSG_SERVER, "Packet %s : %s\n", NET_AdrToString(net_from), c);
 
 	if (!strcmp(c, "ping"))
 		SVC_Ping ();

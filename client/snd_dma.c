@@ -165,7 +165,7 @@ void S_Init (void)
 	}
 
 #ifdef OGG_SUPPORT
-//	Com_DPrintf ("S_Init: calling S_OGG_Init\n");	// debug
+//	Com_DPrintf(DEVELOPER_MSG_OGG, "S_Init: calling S_OGG_Init\n");	// debug
 	S_OGG_Init(); // Knightmare added
 #endif
 
@@ -186,7 +186,7 @@ void S_Shutdown(void)
 		return;
 
 #ifdef OGG_SUPPORT
-//	Com_DPrintf ("S_Shutdown: calling S_OGG_Shutdown\n");	// debug
+//	Com_DPrintf(DEVELOPER_MSG_OGG, "S_Shutdown: calling S_OGG_Shutdown\n");	// debug
 	S_OGG_Shutdown(); // Knightmare added
 #endif
 
@@ -853,7 +853,7 @@ void S_StopAllSounds(void)
 
 #ifdef OGG_SUPPORT
 	// Stop background track
-//	Com_DPrintf ("S_StopAllSounds: calling S_StopBackgroundTrack\n");	// debug
+//	Com_DPrintf(DEVELOPER_MSG_OGG, "S_StopAllSounds: calling S_StopBackgroundTrack\n");	// debug
 	S_StopBackgroundTrack (); // Knightmare added
 #endif
 
@@ -1164,7 +1164,7 @@ void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 	}
 
 #ifdef OGG_SUPPORT
-//	Com_DPrintf ("S_Update: calling S_UpdateBackgroundTrack\n");	// debug
+//	Com_DPrintf(DEVELOPER_MSG_OGG, "S_Update: calling S_UpdateBackgroundTrack\n");	// debug
 	S_UpdateBackgroundTrack ();	//  Knightmare added
 #endif
 
@@ -1221,7 +1221,7 @@ void S_Update_(void)
 // check to make sure that we haven't overshot
 	if (paintedtime < soundtime)
 	{
-		Com_DPrintf ("S_Update_ : overflow\n");
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "S_Update_ : overflow\n");
 		paintedtime = soundtime;
 	}
 

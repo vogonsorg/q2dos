@@ -203,7 +203,7 @@ void turret_breach_finish_init (edict_t *self)
 	// get and save info for muzzle location
 	if (!self->target)
 	{
-		gi.dprintf("%s at %s needs a target\n", self->classname, vtos(self->s.origin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s needs a target\n", self->classname, vtos(self->s.origin));
 	}
 	else
 	{
@@ -422,7 +422,7 @@ void SP_turret_driver (edict_t *self)
 	{
 		self->item = FindItemByClassname (st.item);
 		if (!self->item)
-			gi.dprintf("%s at %s has bad item: %s\n", self->classname, vtos(self->s.origin), st.item);
+			gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s has bad item: %s\n", self->classname, vtos(self->s.origin), st.item);
 	}
 
 	self->think = turret_driver_link;
