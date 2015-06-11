@@ -1468,6 +1468,7 @@ void Qcommon_Init (int argc, char **argv)
 	host_speeds = Cvar_Get ("host_speeds", "0", 0);
 	log_stats = Cvar_Get ("log_stats", "0", 0);
 	developer = Cvar_Get ("developer", "0", 0);
+	developer->description = "Enable the use of developer messages. \nAvailable flags:\n  * All flags except verbose messages - 1\n  * Standard msgs - 2\n  * Sound msgs - 4\n  * Network msgs - 8\n  * File IO msgs - 16\n  * Graphics renderer msgs - 32\n  * Game DLL msgs - 64\n  * Memory management msgs - 128\n  * Server msgs - 256\n  * CD Audio msgs - 512\n  * OGG Vorbis msgs - 1024\n  * Physics msgs - 2048\n  * Entity msgs - 4096\n  * Save/Restore msgs - 8192\n  * Currently unused - 16384\n  * Currently unused - 32768\n  * Extremely verbose msgs - 65536\n  * Extremely verbose Gamespy msgs - 131072";
 	timescale = Cvar_Get ("timescale", "1", 0);
 	fixedtime = Cvar_Get ("fixedtime", "0", 0);
 	logfile_active = Cvar_Get ("logfile", "0", 0);

@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "qcommon.h"
 
 cvar_t	*cvar_vars;
+cvar_t	*con_show_description; // FS
+cvar_t	*con_show_dev_flags; // FS
 void Cvar_ParseDeveloperFlags (void); // FS: Special stuff for showing all the dev flags
 
 /*
@@ -384,7 +386,7 @@ qboolean Cvar_Command (void)
 	if (!v)
 		return false;
 
-	if (!strcmp(v->name, "developer")/* && con_show_dev_flags->intValue*/) // FS: Special case for showing enabled flags
+	if (!strcmp(v->name, "developer") && con_show_dev_flags->intValue) // FS: Special case for showing enabled flags
 	{
 		if(strlen(Cmd_Argv(1)) > 0)
 			Cvar_Set(developer->name, Cmd_Argv(1));
@@ -399,6 +401,11 @@ qboolean Cvar_Command (void)
 			Com_Printf ("\"%s\" is \"%s\", Default: \"%s\", Latched to: \"%s\"\n", v->name, v->string, v->defaultValue, v->latched_string);
 		else
 			Com_Printf ("\"%s\" is \"%s\", Default: \"%s\"\n", v->name, v->string, v->defaultValue);
+
+		if (v->description && con_show_description->intValue) // FS
+			Com_Printf("Description: %s\n", v->description);
+		else if (v->description && !strcmp(v->name, "con_show_description")) // FS: Always show it for con_show_description so we know what it does
+			Com_Printf("Description: %s\n", v->description);
 
 		return true;
 	}
@@ -530,13 +537,18 @@ void Cvar_List_f (void)
 			Com_Printf ("L");
 		else
 			Com_Printf (" ");
+		if (var->description)
+			Com_Printf ("D");
+		else
+			Com_Printf (" ");
+
 //		Com_Printf (" %s \"%s\"\n", var->name, var->string);
 		if ( (var->flags & CVAR_LATCH) && var->latched_string)
 			Com_Printf ("\"%s\" is \"%s\", Default: \"%s\", Latched to: \"%s\"\n", var->name, var->string, var->defaultValue, var->latched_string);
 		else
 			Com_Printf (" %s \"%s\", Default: \"%s\"\n", var->name, var->string, var->defaultValue);
 	}
-	Com_Printf("Legend: * Archive. U Userinfo. S Serverinfo. - Write Protected. L Latched.\n"); // FS: Added a legend
+	Com_Printf("Legend: * Archive. U Userinfo. S Serverinfo. - Write Protected. L Latched. D Containts a Help Description.\n"); // FS: Added a legend
 	Com_Printf ("%i cvars\n", i);
 }
 
@@ -580,6 +592,11 @@ Reads in all archived cvars
 */
 void Cvar_Init (void)
 {
+	con_show_description = Cvar_Get("con_show_description", "1", CVAR_ARCHIVE); // FS
+	con_show_description->description = "Toggle descriptions for CVARs.  This CVAR (con_show_description) will always show this description.";
+	con_show_dev_flags = Cvar_Get ("con_show_dev_flags", "1", CVAR_ARCHIVE); // FS
+	con_show_dev_flags->description = "Show toggled developer flags when using the developer CVAR.";
+
 	Cmd_AddCommand ("set", Cvar_Set_f);
 	Cmd_AddCommand ("cvarlist", Cvar_List_f);
 
@@ -589,7 +606,8 @@ void Cvar_ParseDeveloperFlags (void) // FS: Special stuff for showing all the de
 {
 	extern cvar_t	*developer;
 
-	Com_Printf("\"%s\" is \"%s\"\n", developer->name, developer->string);
+	Com_Printf("\"%s\" is \"%s\", Default: \"%s\"\n", developer->name, developer->string, developer->defaultValue);
+
 	if(developer->value > 0)
 	{
 		unsigned long devFlags = 0;
@@ -619,7 +637,7 @@ void Cvar_ParseDeveloperFlags (void) // FS: Special stuff for showing all the de
 		if(devFlags & DEVELOPER_MSG_OGG)
 			Com_Printf(" * OGG Vorbis messages - 1024\n");
 		if(devFlags & DEVELOPER_MSG_PHYSICS)
-			Com_Printf(" * Physics.dll messages - 2048\n");
+			Com_Printf(" * Physics messages - 2048\n");
 		if(devFlags & DEVELOPER_MSG_ENTITY)
 			Com_Printf(" * Entity messages - 4096\n");
 		if(devFlags & DEVELOPER_MSG_SAVE)
@@ -635,7 +653,7 @@ void Cvar_ParseDeveloperFlags (void) // FS: Special stuff for showing all the de
 	}
 	else
 	{
-//		if (developer->description && con_show_description->intValue) // FS
-//			Com_Printf("Description: %s\n", developer->description);
+		if (developer->description && con_show_description->intValue) // FS
+			Com_Printf("Description: %s\n", developer->description);
 	}
 }
