@@ -34,7 +34,7 @@ typedef struct
 	vec3_t		velocity;		// full float precision
 
 	vec3_t		forward, right, up;
-	float		frametime;
+	double		frametime;
 
 
 	csurface_t	*groundsurface;
