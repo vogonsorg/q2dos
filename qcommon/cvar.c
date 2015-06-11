@@ -142,6 +142,11 @@ cvar_t *Cvar_Get (char *var_name, char *var_value, int flags)
 	if (var)
 	{
 		var->flags |= flags;
+		// Knightmare- change default value if this is called again
+		Z_Free(var->defaultValue);
+		var->defaultValue = CopyString(var_value);
+		var->defaultFlags |= flags; // FS: Ditto
+		
 		return var;
 	}
 
@@ -162,6 +167,10 @@ cvar_t *Cvar_Get (char *var_name, char *var_value, int flags)
 	var->string = CopyString (var_value);
 	var->modified = true;
 	var->value = atof (var->string);
+	var->intValue = atoi(var->string); // FS: So we don't need to cast shit all the time
+	var->defaultValue = CopyString(var_value); // FS: Find out what it was initially
+	var->defaultFlags = flags; // FS: Default flags for resetcvar
+	var->description = NULL; // FS: Init it first, d'oh
 
 	// link the variable in
 	var->next = cvar_vars;
@@ -227,6 +236,7 @@ cvar_t *Cvar_Set2 (char *var_name, char *value, qboolean force)
 			{
 				var->string = CopyString(value);
 				var->value = atof (var->string);
+				var->intValue = atoi(var->string); // FS: So we don't need to cast shit all the time
 				if (!strcmp(var->name, "game"))
 				{
 					FS_SetGamedir (var->string);
@@ -257,6 +267,7 @@ cvar_t *Cvar_Set2 (char *var_name, char *value, qboolean force)
 	
 	var->string = CopyString(value);
 	var->value = atof (var->string);
+	var->intValue = atoi(var->string); // FS: So we don't need to cast shit all the time
 
 	return var;
 }
@@ -305,6 +316,7 @@ cvar_t *Cvar_FullSet (char *var_name, char *value, int flags)
 	
 	var->string = CopyString(value);
 	var->value = atof (var->string);
+	var->intValue = atoi(var->string); // FS: So we don't need to cast shit all the time
 	var->flags = flags;
 
 	return var;
@@ -346,6 +358,7 @@ void Cvar_GetLatchedVars (void)
 		var->string = var->latched_string;
 		var->latched_string = NULL;
 		var->value = atof(var->string);
+		var->intValue = atoi(var->string); // FS: So we don't need to cast shit all the time
 		if (!strcmp(var->name, "game"))
 		{
 			FS_SetGamedir (var->string);
@@ -382,7 +395,11 @@ qboolean Cvar_Command (void)
 // perform a variable print or set
 	if (Cmd_Argc() == 1)
 	{
-		Com_Printf ("\"%s\" is \"%s\"\n", v->name, v->string);
+		if ( (v->flags & CVAR_LATCH) && v->latched_string)
+			Com_Printf ("\"%s\" is \"%s\", Default: \"%s\", Latched to: \"%s\"\n", v->name, v->string, v->defaultValue, v->latched_string);
+		else
+			Com_Printf ("\"%s\" is \"%s\", Default: \"%s\"\n", v->name, v->string, v->defaultValue);
+
 		return true;
 	}
 
@@ -513,7 +530,11 @@ void Cvar_List_f (void)
 			Com_Printf ("L");
 		else
 			Com_Printf (" ");
-		Com_Printf (" %s \"%s\"\n", var->name, var->string);
+//		Com_Printf (" %s \"%s\"\n", var->name, var->string);
+		if ( (var->flags & CVAR_LATCH) && var->latched_string)
+			Com_Printf ("\"%s\" is \"%s\", Default: \"%s\", Latched to: \"%s\"\n", var->name, var->string, var->defaultValue, var->latched_string);
+		else
+			Com_Printf (" %s \"%s\", Default: \"%s\"\n", var->name, var->string, var->defaultValue);
 	}
 	Com_Printf("Legend: * Archive. U Userinfo. S Serverinfo. - Write Protected. L Latched.\n"); // FS: Added a legend
 	Com_Printf ("%i cvars\n", i);

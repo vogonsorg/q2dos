@@ -361,6 +361,10 @@ typedef struct cvar_s
 	int			flags;
 	qboolean	modified;	// set each time the cvar is changed
 	float		value;
+	int			intValue; // FS
+	char		*defaultValue; // FS
+	const char	*description; // FS
+	int			defaultFlags; // FS
 	struct cvar_s *next;
 } cvar_t;
 
