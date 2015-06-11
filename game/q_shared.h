@@ -1238,3 +1238,23 @@ typedef struct
 extern int vidref_val;
 // PGM
 // ==================
+
+// FS: Developer flags for developer cvar and DPrintf's
+// FS: No 0x00000001 because that would be developer->value 1 and we use that to show it all!
+#define DEVELOPER_MSG_STANDARD		0x00000002 // 2
+#define DEVELOPER_MSG_SOUND			0x00000004 // 4
+#define DEVELOPER_MSG_NET			0x00000008 // 8
+#define DEVELOPER_MSG_IO			0x00000010 // 16
+#define DEVELOPER_MSG_GFX			0x00000020 // 32
+#define DEVELOPER_MSG_GAME			0x00000040 // 64
+#define DEVELOPER_MSG_MEM			0x00000080 // 128
+#define DEVELOPER_MSG_SERVER		0x00000100 // 256
+#define DEVELOPER_MSG_CD			0x00000200 // 512
+#define DEVELOPER_MSG_OGG			0x00000400 // 1024
+#define DEVELOPER_MSG_PHYSICS		0x00000800 // 2048
+#define DEVELOPER_MSG_ENTITY		0x00001000 // 4096
+#define DEVELOPER_MSG_SAVE			0x00002000 // 8192
+#define DEVELOPER_MSG_UNUSED1		0x00004000 // 16384
+#define DEVELOPER_MSG_UNUSED2		0x00008000 // 32768
+#define DEVELOPER_MSG_VERBOSE		0x00010000 // 65536
+#define DEVELOPER_MSG_GAMESPY		0x00020000 // 131072
