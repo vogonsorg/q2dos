@@ -1897,12 +1897,12 @@ CL_Frame_Async
 ==================
 */
 #define FRAMETIME_MAX 0.5 // was 0.2
-void CL_Frame_Async (int msec)
+void CL_Frame_Async (double msec)
 {
-	static int	packetDelta = 0;
-	static int	renderDelta = 0;
-	static int	miscDelta = 0;
-	static int  lasttimecalled;
+	static double	packetDelta = 0;
+	static double	renderDelta = 0;
+	static double	miscDelta = 0;
+	static double  lasttimecalled;
 	qboolean	packetFrame = true;
 	qboolean	renderFrame = true;
 	qboolean	miscFrame = true;
@@ -2062,7 +2062,7 @@ void CL_Frame_Async (int msec)
 					int now = Sys_Milliseconds();
 
 					if (log_stats_file)
-						fprintf( log_stats_file, "%d\n", now - lasttimecalled );
+						fprintf( log_stats_file, "%f\n", now - lasttimecalled );
 					lasttimecalled = now;
 				}
 			}

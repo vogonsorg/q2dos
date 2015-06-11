@@ -461,7 +461,7 @@ that occurred since last Init or RefreshCmd.
 */
 void CL_RefreshCmd (void)
 {	
-	int			ms;
+	double			ms;
 	usercmd_t	*cmd = &cl.cmds[ cls.netchan.outgoing_sequence & (CMD_BACKUP-1) ];
 
 	// get delta for this sample.
@@ -489,7 +489,7 @@ void CL_RefreshCmd (void)
 	cmd->angles[2] = ANGLE2SHORT(cl.viewangles[2]);
 
 	// Update cmd->msec for CL_PredictMove
-	ms = (int)(cls.netFrameTime * 1000);
+	ms = cls.netFrameTime * 1000;
 	if (ms > 250)
 		ms = 100;
 
