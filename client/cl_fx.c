@@ -224,7 +224,7 @@ void CL_RunDLights (void)
 			dl->radius = 0;
 			return;
 		}
-		dl->radius -= cls.frametime*dl->decay;
+		dl->radius -= cls.renderFrameTime*dl->decay;
 		if (dl->radius < 0)
 			dl->radius = 0;
 	}

@@ -1089,8 +1089,7 @@ void R_AliasDrawModel (void)
 	// set up the skin and verify it exists
 	if ( !R_AliasSetupSkin () )
 	{
-		ri.Con_Printf( PRINT_ALL, "R_AliasDrawModel %s: NULL skin found\n",
-			currentmodel->name);
+		ri.Con_Printf( PRINT_DEVELOPER, "R_AliasDrawModel %s: NULL skin found\n", currentmodel->name); // FS: This shows up with custom player models where the server doesn't have the weapon model skin, very annoying because you see it every time they're in view.
 		return;
 	}
 

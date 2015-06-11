@@ -361,7 +361,7 @@ void SCR_DrawCenterString (void)
 
 void SCR_CheckDrawCenterString (void)
 {
-	scr_centertime_off -= cls.frametime;
+	scr_centertime_off -= cls.renderFrameTime;
 	
 	if (scr_centertime_off <= 0)
 		return;
@@ -569,14 +569,14 @@ void SCR_RunConsole (void)
 	
 	if (scr_conlines < scr_con_current)
 	{
-		scr_con_current -= scr_conspeed->value*(float)cls.frametime;
+		scr_con_current -= scr_conspeed->value*(float)cls.renderFrameTime;
 		if (scr_conlines > scr_con_current)
 			scr_con_current = scr_conlines;
 
 	}
 	else if (scr_conlines > scr_con_current)
 	{
-		scr_con_current += scr_conspeed->value*(float)cls.frametime;
+		scr_con_current += scr_conspeed->value*(float)cls.renderFrameTime;
 		if (scr_conlines < scr_con_current)
 			scr_con_current = scr_conlines;
 	}
@@ -1438,7 +1438,7 @@ void SCR_UpdateScreen (void)
 			SCR_CheckDrawCenterString ();
 
 			if (scr_timegraph->value)
-				SCR_DebugGraph (cls.frametime*300, 0);
+				SCR_DebugGraph (cls.renderFrameTime*300, 0);
 
 			if (scr_debuggraph->value || scr_timegraph->value || scr_netgraph->value)
 				SCR_DrawDebugGraph ();

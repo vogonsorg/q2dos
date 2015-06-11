@@ -206,6 +206,9 @@ void CL_PredictMovement (void)
 	int			i;
 	int			step;
 	int			oldz;
+#ifdef CLIENT_SPLIT_NETFRAME
+	static int	last_step_frame = 0;
+#endif
 
 	if (cls.state != ca_active)
 		return;
@@ -245,28 +248,64 @@ void CL_PredictMovement (void)
 //	SCR_DebugGraph (current - ack - 1, 0);
 
 	frame = 0;
-
-	// run frames
-	while (++ack < current)
+#ifdef CLIENT_SPLIT_NETFRAME
+	if (cl_async->value)
 	{
-		frame = ack & (CMD_BACKUP-1);
-		cmd = &cl.cmds[frame];
+		// run frames
+		while (++ack <= current) // Changed '<' to '<=' cause current is our pending cmd
+		{
+			frame = ack & (CMD_BACKUP-1);
+			cmd = &cl.cmds[frame];
 
-		pm.cmd = *cmd;
-		Pmove (&pm);
+			if (!cmd->msec) // Ignore 'null' usercmd entries
+				continue;
 
-		// save for debug checking
-		VectorCopy (pm.s.origin, cl.predicted_origins[frame]);
+			pm.cmd = *cmd;
+			Pmove (&pm);
+
+			// save for debug checking
+			VectorCopy (pm.s.origin, cl.predicted_origins[frame]);
+		}
+
+		oldframe = (ack-2) & (CMD_BACKUP-1);
+		oldz = cl.predicted_origins[oldframe][2];
+		step = pm.s.origin[2] - oldz;
+
+		// TODO: Add Paril's step down fix here
+		if (last_step_frame != current && step > 63 && step < 160 && (pm.s.pm_flags & PMF_ON_GROUND) )
+		{
+			cl.predicted_step = step * 0.125;
+			cl.predicted_step_time = cls.realtime - cls.netFrameTime * 500;
+			last_step_frame = current;
+		}
 	}
-
-	oldframe = (ack-2) & (CMD_BACKUP-1);
-	oldz = cl.predicted_origins[oldframe][2];
-	step = pm.s.origin[2] - oldz;
-	if (step > 63 && step < 160 && (pm.s.pm_flags & PMF_ON_GROUND) )
+	else
 	{
-		cl.predicted_step = step * 0.125;
-		cl.predicted_step_time = cls.realtime - cls.frametime * 500;
+#endif // CLIENT_SPLIT_NETFRAME
+		// run frames
+		while (++ack < current)
+		{
+			frame = ack & (CMD_BACKUP-1);
+			cmd = &cl.cmds[frame];
+
+			pm.cmd = *cmd;
+			Pmove (&pm);
+
+			// save for debug checking
+			VectorCopy (pm.s.origin, cl.predicted_origins[frame]);
+		}
+
+		oldframe = (ack-2) & (CMD_BACKUP-1);
+		oldz = cl.predicted_origins[oldframe][2];
+		step = pm.s.origin[2] - oldz;
+		if (step > 63 && step < 160 && (pm.s.pm_flags & PMF_ON_GROUND) )
+		{
+			cl.predicted_step = step * 0.125;
+			cl.predicted_step_time = cls.realtime - cls.netFrameTime * 500;
+		}
+#ifdef CLIENT_SPLIT_NETFRAME
 	}
+#endif // CLIENT_SPLIT_NETFRAME
 
 
 	// copy results out for rendering

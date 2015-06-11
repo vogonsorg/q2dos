@@ -206,6 +206,9 @@ typedef struct
 	int			framecount;
 	double		realtime;			// always increasing, no clamping, etc
 	double		frametime;			// seconds since last frame
+	double		netFrameTime;		// seconds since last packet frame
+	double		renderFrameTime;	// seconds since last refresh frame
+	qboolean	forcePacket;		// forces a packet to be sent the next frame
 
 // screen rendering information
 	float		disable_screen;		// showing loading plaque between levels
@@ -295,6 +298,10 @@ extern	cvar_t	*cl_lightlevel;	// FIXME HACK
 
 extern	cvar_t	*cl_paused;
 extern	cvar_t	*cl_timedemo;
+
+#ifdef CLIENT_SPLIT_NETFRAME
+extern	cvar_t	*cl_async;
+#endif
 
 extern	cvar_t	*cl_vwep;
 
@@ -496,6 +503,13 @@ extern 	kbutton_t 	in_speed;
 
 void CL_InitInput (void);
 void CL_SendCmd (void);
+
+#ifdef CLIENT_SPLIT_NETFRAME
+void CL_SendCmd_Async (void);
+void CL_RefreshCmd (void);
+void CL_RefreshMove (void);
+#endif
+
 void CL_SendMove (usercmd_t *cmd);
 
 void CL_ClearState (void);

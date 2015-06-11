@@ -47,6 +47,14 @@ cvar_t	*cl_timeout;
 cvar_t	*cl_predict;
 //cvar_t	*cl_minfps;
 cvar_t	*cl_maxfps;
+
+// Knightmare
+#ifdef CLIENT_SPLIT_NETFRAME
+cvar_t	*cl_async;
+cvar_t	*net_maxfps;
+cvar_t	*r_maxfps;
+#endif
+
 cvar_t	*cl_gun;
 // Knightmare- whether to try to play OGGs instead of CD tracks
 cvar_t	*cl_ogg_music;
@@ -329,6 +337,7 @@ void Cmd_ForwardToServer (void)
 		SZ_Print (&cls.netchan.message, " ");
 		SZ_Print (&cls.netchan.message, Cmd_Args());
 	}
+	cls.forcePacket = true;
 }
 
 void CL_Setenv_f( void )
@@ -385,6 +394,7 @@ void CL_ForwardToServer_f (void)
 	{
 		MSG_WriteByte (&cls.netchan.message, clc_stringcmd);
 		SZ_Print (&cls.netchan.message, Cmd_Args());
+		cls.forcePacket = true;
 	}
 }
 
@@ -803,6 +813,7 @@ void CL_Reconnect_f (void)
 		cls.state = ca_connected;
 		MSG_WriteChar (&cls.netchan.message, clc_stringcmd);
 		MSG_WriteString (&cls.netchan.message, "new");		
+		cls.forcePacket = true;
 		return;
 	}
 
@@ -950,6 +961,7 @@ void CL_ConnectionlessPacket (void)
 		MSG_WriteChar (&cls.netchan.message, clc_stringcmd);
 		MSG_WriteString (&cls.netchan.message, "new");	
 		cls.state = ca_connected;
+		cls.forcePacket = true;
 		return;
 	}
 
@@ -1493,6 +1505,7 @@ void CL_RequestNextDownload (void)
 
 	MSG_WriteByte (&cls.netchan.message, clc_stringcmd);
 	MSG_WriteString (&cls.netchan.message, va("begin %i\n", precache_spawncount) );
+	cls.forcePacket = true;
 }
 
 /*
@@ -1551,7 +1564,9 @@ void CL_InitLocal (void)
 // register our variables
 //
 	cl_stereo_separation = Cvar_Get( "cl_stereo_separation", "0.4", CVAR_ARCHIVE );
+	cl_stereo_separation->description = "Stereo separation when used with cl_stereo 1.";
 	cl_stereo = Cvar_Get( "cl_stereo", "0", 0 );
+	cl_stereo->description = "Stereo mode for 3D Glasses.";
 
 	cl_add_blend = Cvar_Get ("cl_blend", "1", 0);
 	cl_add_lights = Cvar_Get ("cl_lights", "1", 0);
@@ -1562,11 +1577,23 @@ void CL_InitLocal (void)
 	cl_noskins = Cvar_Get ("cl_noskins", "0", 0);
 	cl_autoskins = Cvar_Get ("cl_autoskins", "0", 0);
 	cl_predict = Cvar_Get ("cl_predict", "1", 0);
+	cl_predict->description = "Client-side movement prediction.  Recommended to leave enabled.";
 //	cl_minfps = Cvar_Get ("cl_minfps", "5", 0);
 	cl_maxfps = Cvar_Get ("cl_maxfps", "90", 0);
+	cl_maxfps->description = "Maximum number of frames to render ahead when cl_async (asynchronous frames) is set to 0.";
+
+#ifdef CLIENT_SPLIT_NETFRAME
+	cl_async = Cvar_Get ("cl_async", "1", 0);
+	cl_async->description = "Asynchronous Frame rendering.  Network frames and renderer frames are separated.  Uses r_maxfps and net_maxfps cvars.";
+	net_maxfps = Cvar_Get ("net_maxfps", "60", 0);
+	net_maxfps->description = "FPS limit for network frames when used with cl_async 1.";
+	r_maxfps = Cvar_Get ("r_maxfps", "125", 0);
+	r_maxfps->description = "FPS limit for renderer frames when used with cl_async 1.";
+#endif
 
 	// Knightmare- whether to try to play OGGs instead of CD tracks
 	cl_ogg_music = Cvar_Get ("cl_ogg_music", "1", CVAR_ARCHIVE);
+	cl_ogg_music->description = "Whether to try to play OGG Vorbis files instead of CD audio tracks.";
 	cl_rogue_music = Cvar_Get ("cl_rogue_music", "0", CVAR_ARCHIVE);
 	cl_xatrix_music = Cvar_Get ("cl_xatrix_music", "0", CVAR_ARCHIVE);
 
@@ -1622,8 +1649,11 @@ void CL_InitLocal (void)
 
 	// FS: For gamespy
 	cl_master_server_ip = Cvar_Get("cl_master_server_ip", CL_MASTER_ADDR, CVAR_ARCHIVE);
+	cl_master_server_ip->description = "Master server IP to use with the gamespy browser.";
 	cl_master_server_port = Cvar_Get("cl_master_server_port", CL_MASTER_PORT, CVAR_ARCHIVE);
+	cl_master_server_port->description = "Master server port to use with the gamespy browser.";
 	cl_master_server_queries = Cvar_Get("cl_master_server_queries", "10", CVAR_ARCHIVE);
+	cl_master_server_queries->description = "Maximum number of query (ping) requests to use per loop with the gamespy browser.";
 	s_gamespy_sounds = Cvar_Get("s_gamespysounds", "0", CVAR_ARCHIVE);
 
 	//
@@ -1813,6 +1843,235 @@ void CL_FixCvarCheats (void)
 	}
 }
 
+#ifdef CLIENT_SPLIT_NETFRAME
+/*
+==================
+CL_RefreshInputs
+==================
+*/
+static void CL_RefreshInputs (void)
+{
+	// fetch results from server
+	CL_ReadPackets ();
+
+	// get new key events
+	Sys_SendKeyEvents ();
+
+	// allow mice or other external controllers to add commands
+	IN_Commands ();
+
+	// process console commands
+	Cbuf_Execute ();
+
+	// fix any cheating cvars
+	CL_FixCvarCheats ();
+
+	// fetch results from server
+//	CL_ReadPackets ();
+
+	// Update usercmd state
+	if (cls.state > ca_connecting)
+		CL_RefreshCmd ();
+	else
+		CL_RefreshMove ();
+}
+
+/*
+==================
+CL_SendCommand_Async
+==================
+*/
+static void CL_SendCommand_Async (void)
+{
+	// send intentions now
+	CL_SendCmd_Async ();
+
+	// resend a connection request if necessary
+	CL_CheckForResend ();
+}
+
+
+/*
+==================
+CL_Frame_Async
+==================
+*/
+#define FRAMETIME_MAX 0.5 // was 0.2
+void CL_Frame_Async (int msec)
+{
+	static int	packetDelta = 0;
+	static int	renderDelta = 0;
+	static int	miscDelta = 0;
+	static int  lasttimecalled;
+	qboolean	packetFrame = true;
+	qboolean	renderFrame = true;
+	qboolean	miscFrame = true;
+
+	// Don't allow setting maxfps too low or too high
+	if (net_maxfps->value < 10)
+		Cvar_SetValue("net_maxfps", 10);
+	if (net_maxfps->value > 90)
+		Cvar_SetValue("net_maxfps", 90);
+	if (r_maxfps->value < 10)
+		Cvar_SetValue("r_maxfps", 10);
+	if (r_maxfps->value > 1000)
+		Cvar_SetValue("r_maxfps", 1000);
+
+	packetDelta += msec;
+	renderDelta += msec;
+	miscDelta += msec;
+
+	// decide the simulation time
+	cls.netFrameTime = packetDelta * 0.001f;
+	cls.renderFrameTime = renderDelta * 0.001f;
+	cl.time += msec;
+	cls.realtime = curtime;
+
+	// Don't extrapolate too far ahead
+	if (cls.netFrameTime > FRAMETIME_MAX)
+		cls.netFrameTime = FRAMETIME_MAX;
+	if (cls.renderFrameTime > FRAMETIME_MAX)
+		cls.renderFrameTime = FRAMETIME_MAX;
+
+	// If in the debugger last frame, don't timeout
+	if (msec > 5000)
+		cls.netchan.last_received = Sys_Milliseconds ();
+
+	if (!cl_timedemo->value)
+	{	// Don't flood packets out while connecting
+		if (cls.state == ca_connected && packetDelta < 100)
+			packetFrame = false;
+
+		if (packetDelta < 1000.0 / net_maxfps->value)
+			packetFrame = false;
+		else if (cls.netFrameTime == cls.renderFrameTime)
+			packetFrame = false;
+
+		if (renderDelta < 1000.0 / r_maxfps->value)
+			renderFrame = false;
+
+		// Stuff that only needs to run at 10FPS
+		if (miscDelta < 1000.0 / 10)
+			miscFrame = false;
+		
+		if (!packetFrame && !renderFrame && !cls.forcePacket && !userinfo_modified)
+		{	// Pooy's CPU usage fix
+#if 0 // FS: Don't need this in DOS
+			if (cl_sleep->value)
+			{
+				int temptime = min( (1000.0 / net_maxfps->value - packetDelta), (1000.0 / r_maxfps->value - renderDelta) );
+				if (temptime > 1)
+					Sys_Sleep (1);
+			} // end CPU usage fix
+#endif
+			return;
+		}
+		
+	}
+	else if (msec < 1)	// don't exceed 1000 fps in timedemo mode (fixes hang)
+	{
+		return;
+	}
+
+#ifdef USE_CURL	// HTTP downloading from R1Q2
+	if (cls.state == ca_connected)
+	{
+		// downloads run full speed when connecting
+		CL_RunHTTPDownloads ();
+	}
+#endif	// USE_CURL
+
+	// Update the inputs (keyboard, mouse, console)
+	if (packetFrame || renderFrame)
+		CL_RefreshInputs ();
+
+	if (cls.forcePacket || userinfo_modified)
+	{
+		packetFrame = true;
+		cls.forcePacket = false;
+	}
+
+	// Send a new command message to the server
+	if (packetFrame)
+	{
+		packetDelta = 0;
+		CL_SendCommand_Async ();
+
+#ifdef USE_CURL	// HTTP downloading from R1Q2
+		// downloads run less often in game
+		CL_RunHTTPDownloads ();
+#endif	// USE_CURL
+	}
+	
+	if (renderFrame)
+	{
+		renderDelta = 0;
+
+		if (miscFrame)
+		{
+			miscDelta = 0;
+
+			// Let the mouse activate or deactivate
+			IN_Frame ();
+
+			// Allow rendering DLL change
+			VID_CheckChanges ();
+		}
+		// Predict all unacknowledged movements
+		CL_PredictMovement ();
+
+		if (!cl.refresh_prepped && cls.state == ca_active)
+			CL_PrepRefresh ();
+
+		// Predict all unacknowledged movements
+	//	CL_PredictMovement ();
+
+		// update the screen
+		if (host_speeds->value)
+			time_before_ref = Sys_Milliseconds ();
+		SCR_UpdateScreen ();
+		if (host_speeds->value)
+			time_after_ref = Sys_Milliseconds ();
+
+		// Update audio
+		S_Update (cl.refdef.vieworg, cl.v_forward, cl.v_right, cl.v_up);
+		
+		if (miscFrame)
+			CDAudio_Update();
+
+		// Advance local effects for next frame
+		CL_RunDLights ();
+		CL_RunLightStyles ();
+		SCR_RunCinematic ();
+		SCR_RunConsole ();
+
+		cls.framecount++;
+
+		if (log_stats->value)
+		{
+			if (cls.state == ca_active)
+			{
+				if (!lasttimecalled)
+				{
+					lasttimecalled = Sys_Milliseconds();
+					if (log_stats_file)
+						fprintf( log_stats_file, "0\n" );
+				}
+				else
+				{
+					int now = Sys_Milliseconds();
+
+					if (log_stats_file)
+						fprintf( log_stats_file, "%d\n", now - lasttimecalled );
+					lasttimecalled = now;
+				}
+			}
+		}
+	}
+}
+#endif // CLIENT_SPLIT_NETFRAME
+
+
 //============================================================================
 
 /*
@@ -1858,6 +2117,15 @@ void CL_Frame (double msec)
 	if (dedicated->value)
 		return;
 
+#ifdef CLIENT_SPLIT_NETFRAME
+//	if (cl_async->value)
+	if (cl_async->value && !cl_timedemo->value)
+	{
+		CL_Frame_Async (msec);
+		return;
+	}
+#endif
+
 	extratime += msec;
 
 
@@ -1878,18 +2146,19 @@ void CL_Frame (double msec)
 	IN_Frame ();
 
 	// decide the simulation time
-	cls.frametime = extratime/1000.0;
+	cls.netFrameTime = extratime/1000.0;
 	cl.time += extratime;
 	cls.realtime = curtime;
 
 	extratime = 0;
 #if 0
-	if (cls.frametime > (1.0 / cl_minfps->value))
-		cls.frametime = (1.0 / cl_minfps->value);
+	if (cls.netFrameTime > (1.0 / cl_minfps->value))
+		cls.netFrameTime = (1.0 / cl_minfps->value);
 #else
-	if (cls.frametime > (1.0 / 5))
-		cls.frametime = (1.0 / 5);
+	if (cls.netFrameTime > (1.0 / 5))
+		cls.netFrameTime = (1.0 / 5);
 #endif
+	cls.renderFrameTime = cls.netFrameTime;
 
 	// if in the debugger last frame, don't timeout
 	if (msec > 5000)
