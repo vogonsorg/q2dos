@@ -1579,15 +1579,15 @@ void CL_InitLocal (void)
 	cl_predict = Cvar_Get ("cl_predict", "1", 0);
 	cl_predict->description = "Client-side movement prediction.  Recommended to leave enabled.";
 //	cl_minfps = Cvar_Get ("cl_minfps", "5", 0);
-	cl_maxfps = Cvar_Get ("cl_maxfps", "90", 0);
+	cl_maxfps = Cvar_Get ("cl_maxfps", "90", CVAR_ARCHIVE);
 	cl_maxfps->description = "Maximum number of frames to render ahead when cl_async (asynchronous frames) is set to 0.";
 
 #ifdef CLIENT_SPLIT_NETFRAME
-	cl_async = Cvar_Get ("cl_async", "1", 0);
+	cl_async = Cvar_Get ("cl_async", "0", CVAR_ARCHIVE);
 	cl_async->description = "Asynchronous Frame rendering.  Network frames and renderer frames are separated.  Uses r_maxfps and net_maxfps cvars.";
-	net_maxfps = Cvar_Get ("net_maxfps", "60", 0);
+	net_maxfps = Cvar_Get ("net_maxfps", "60", CVAR_ARCHIVE);
 	net_maxfps->description = "FPS limit for network frames when used with cl_async 1.";
-	r_maxfps = Cvar_Get ("r_maxfps", "125", 0);
+	r_maxfps = Cvar_Get ("r_maxfps", "125", CVAR_ARCHIVE);
 	r_maxfps->description = "FPS limit for renderer frames when used with cl_async 1.";
 #endif
 
