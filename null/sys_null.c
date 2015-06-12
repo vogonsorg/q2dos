@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <stdio.h>
+#ifndef WIN32
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/mman.h>
@@ -13,6 +14,9 @@
 #include <conio.h>
 #include <bios.h>
 #include <crt0.h> // FS: Fake Mem Fix (QIP)
+#else
+#include <time.h>
+#endif
 
 #include "../qcommon/qcommon.h"
 #include "../client/keys.h"
@@ -286,6 +290,7 @@ int		Hunk_End (void)
 
 double		Sys_Milliseconds (void)
 {
+#ifndef WIN32
 	struct timeval tp;
 	struct timezone tzp;
 	static double		secbase;
@@ -299,7 +304,9 @@ double		Sys_Milliseconds (void)
 	}
 
 	curtime = (tp.tv_sec - secbase)*1000 + tp.tv_usec/1000;
-	
+#else
+	curtime++;
+#endif
 	return curtime;
 }
 
@@ -326,11 +333,13 @@ void	Sys_FindClose (void)
 void	Sys_Init (void)
 {
 }
+#ifdef __DJGPP__
 static struct handlerhistory_s
 {
 	int intr;
 	_go32_dpmi_seginfo pm_oldvec;
 } handlerhistory[4];
+#endif
 
 static int handlercount=0;
 
@@ -382,7 +391,8 @@ void main (int argc, char **argv)
 
 int     Sys_LinuxTime (void) // FS: DOS needs this for random qport
 {
-        int linuxtime;
+        int linuxtime = 0;
+#ifndef WIN32
         struct timeval tp;
         struct timezone tzp;
         static int              secbase;
@@ -396,7 +406,9 @@ int     Sys_LinuxTime (void) // FS: DOS needs this for random qport
         }
 
         linuxtime = (tp.tv_sec - secbase)*1000 + tp.tv_usec/1000;
-
+#else
+		linuxtime++;
+#endif
         return linuxtime;
 }
 

@@ -136,12 +136,12 @@ static qboolean DS_CreateBuffers( void )
 	dsbcaps.dwSize = sizeof(dsbcaps);
 	primary_format_set = false;
 
-	Com_DPrintf( "...creating primary buffer: " );
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "...creating primary buffer: " );
 	if (DS_OK == pDS->lpVtbl->CreateSoundBuffer(pDS, &dsbuf, &pDSPBuf, NULL))
 	{
 		pformat = format;
 
-		Com_DPrintf( "ok\n" );
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "ok\n" );
 		if (DS_OK != pDSPBuf->lpVtbl->SetFormat (pDSPBuf, &pformat))
 		{
 			if (snd_firsttime)
@@ -170,14 +170,14 @@ static qboolean DS_CreateBuffers( void )
 		memset(&dsbcaps, 0, sizeof(dsbcaps));
 		dsbcaps.dwSize = sizeof(dsbcaps);
 
-		Com_DPrintf( "...creating secondary buffer: " );
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "...creating secondary buffer: " );
 		if (DS_OK != pDS->lpVtbl->CreateSoundBuffer(pDS, &dsbuf, &pDSBuf, NULL))
 		{
 			Com_Printf( "failed\n" );
 			FreeSound ();
 			return false;
 		}
-		Com_DPrintf( "ok\n" );
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "ok\n" );
 
 		dma.channels = format.nChannels;
 		dma.samplebits = format.wBitsPerSample;
@@ -196,14 +196,14 @@ static qboolean DS_CreateBuffers( void )
 	{
 		Com_Printf( "...using primary buffer\n" );
 
-		Com_DPrintf( "...setting WRITEPRIMARY coop level: " );
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "...setting WRITEPRIMARY coop level: " );
 		if (DS_OK != pDS->lpVtbl->SetCooperativeLevel (pDS, cl_hwnd, DSSCL_WRITEPRIMARY))
 		{
 			Com_Printf( "failed\n" );
 			FreeSound ();
 			return false;
 		}
-		Com_DPrintf( "ok\n" );
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "ok\n" );
 
 		if (DS_OK != pDSPBuf->lpVtbl->GetCaps (pDSPBuf, &dsbcaps))
 		{
@@ -246,16 +246,16 @@ static qboolean DS_CreateBuffers( void )
 */
 static void DS_DestroyBuffers( void )
 {
-	Com_DPrintf( "Destroying DS buffers\n" );
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "Destroying DS buffers\n" );
 	if ( pDS )
 	{
-		Com_DPrintf( "...setting NORMAL coop level\n" );
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "...setting NORMAL coop level\n" );
 		pDS->lpVtbl->SetCooperativeLevel( pDS, cl_hwnd, DSSCL_NORMAL );
 	}
 
 	if ( pDSBuf )
 	{
-		Com_DPrintf( "...stopping and releasing sound buffer\n" );
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "...stopping and releasing sound buffer\n" );
 		pDSBuf->lpVtbl->Stop( pDSBuf );
 		pDSBuf->lpVtbl->Release( pDSBuf );
 	}
@@ -263,7 +263,7 @@ static void DS_DestroyBuffers( void )
 	// only release primary buffer if it's not also the mixing buffer we just released
 	if ( pDSPBuf && ( pDSBuf != pDSPBuf ) )
 	{
-		Com_DPrintf( "...releasing primary buffer\n" );
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "...releasing primary buffer\n" );
 		pDSPBuf->lpVtbl->Release( pDSPBuf );
 	}
 	pDSBuf = NULL;
@@ -281,36 +281,36 @@ void FreeSound (void)
 {
 	int		i;
 
-	Com_DPrintf( "Shutting down sound system\n" );
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "Shutting down sound system\n" );
 
 	if ( pDS )
 		DS_DestroyBuffers();
 
 	if ( hWaveOut )
 	{
-		Com_DPrintf( "...resetting waveOut\n" );
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "...resetting waveOut\n" );
 		waveOutReset (hWaveOut);
 
 		if (lpWaveHdr)
 		{
-			Com_DPrintf( "...unpreparing headers\n" );
+			Com_DPrintf(DEVELOPER_MSG_SOUND, "...unpreparing headers\n" );
 			for (i=0 ; i< WAV_BUFFERS ; i++)
 				waveOutUnprepareHeader (hWaveOut, lpWaveHdr+i, sizeof(WAVEHDR));
 		}
 
-		Com_DPrintf( "...closing waveOut\n" );
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "...closing waveOut\n" );
 		waveOutClose (hWaveOut);
 
 		if (hWaveHdr)
 		{
-			Com_DPrintf( "...freeing WAV header\n" );
+			Com_DPrintf(DEVELOPER_MSG_SOUND, "...freeing WAV header\n" );
 			GlobalUnlock(hWaveHdr);
 			GlobalFree(hWaveHdr);
 		}
 
 		if (hData)
 		{
-			Com_DPrintf( "...freeing WAV buffer\n" );
+			Com_DPrintf(DEVELOPER_MSG_SOUND, "...freeing WAV buffer\n" );
 			GlobalUnlock(hData);
 			GlobalFree(hData);
 		}
@@ -319,13 +319,13 @@ void FreeSound (void)
 
 	if ( pDS )
 	{
-		Com_DPrintf( "...releasing DS object\n" );
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "...releasing DS object\n" );
 		pDS->lpVtbl->Release( pDS );
 	}
 
 	if ( hInstDS )
 	{
-		Com_DPrintf( "...freeing DSOUND.DLL\n" );
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "...freeing DSOUND.DLL\n" );
 		FreeLibrary( hInstDS );
 		hInstDS = NULL;
 	}
@@ -368,7 +368,7 @@ sndinitstat SNDDMA_InitDirect (void)
 
 	if ( !hInstDS )
 	{
-		Com_DPrintf( "...loading dsound.dll: " );
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "...loading dsound.dll: " );
 
 		hInstDS = LoadLibrary("dsound.dll");
 		
@@ -388,7 +388,7 @@ sndinitstat SNDDMA_InitDirect (void)
 		}
 	}
 
-	Com_DPrintf( "...creating DS object: " );
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "...creating DS object: " );
 	while ( ( hresult = iDirectSoundCreate( NULL, &pDS, NULL ) ) != DS_OK )
 	{
 		if (hresult != DSERR_ALLOCATED)
@@ -407,7 +407,7 @@ sndinitstat SNDDMA_InitDirect (void)
 			return SIS_NOTAVAIL;
 		}
 	}
-	Com_DPrintf( "ok\n" );
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "ok\n" );
 
 	dscaps.dwSize = sizeof(dscaps);
 
@@ -495,7 +495,7 @@ qboolean SNDDMA_InitWav (void)
 			return false;
 		}
 	} 
-	Com_DPrintf( "ok\n" );
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "ok\n" );
 
 	/* 
 	 * Allocate and lock memory for the waveform data. The memory 
@@ -512,7 +512,7 @@ qboolean SNDDMA_InitWav (void)
 		FreeSound ();
 		return false; 
 	}
-	Com_DPrintf( "ok\n" );
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "ok\n" );
 
 	Com_DPrintf(DEVELOPER_MSG_SOUND, "...locking waveform buffer: ");
 	lpData = GlobalLock(hData);
@@ -523,7 +523,7 @@ qboolean SNDDMA_InitWav (void)
 		return false; 
 	} 
 	memset (lpData, 0, gSndBufSize);
-	Com_DPrintf( "ok\n" );
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "ok\n" );
 
 	/* 
 	 * Allocate and lock memory for the header. This memory must 
@@ -540,7 +540,7 @@ qboolean SNDDMA_InitWav (void)
 		FreeSound ();
 		return false; 
 	} 
-	Com_DPrintf( "ok\n" );
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "ok\n" );
 
 	Com_DPrintf(DEVELOPER_MSG_SOUND, "...locking waveform header: ");
 	lpWaveHdr = (LPWAVEHDR) GlobalLock(hWaveHdr); 
@@ -552,7 +552,7 @@ qboolean SNDDMA_InitWav (void)
 		return false; 
 	}
 	memset (lpWaveHdr, 0, sizeof(WAVEHDR) * WAV_BUFFERS);
-	Com_DPrintf( "ok\n" );
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "ok\n" );
 
 	/* After allocation, set up and prepare headers. */ 
 	Com_DPrintf(DEVELOPER_MSG_SOUND, "...preparing headers: ");

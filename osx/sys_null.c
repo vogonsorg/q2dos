@@ -115,7 +115,7 @@ void TrapKey(void)
 
 double	curtime;
 //unsigned	sys_msg_time;
-unsigned	sys_frame_time;
+double	sys_frame_time;
 
 
 void Sys_mkdir (char *path)

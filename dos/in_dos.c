@@ -10,7 +10,7 @@ int		mouse_oldbuttonstate;
 int		mouse_buttonstate;
 float	mouse_x, mouse_y;
 float	old_mouse_x, old_mouse_y;
-extern	unsigned	sys_msg_time;
+extern	double	sys_msg_time;
 // mouse variables
 cvar_t	*m_filter;
 qboolean	mlooking;

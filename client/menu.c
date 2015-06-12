@@ -1193,8 +1193,11 @@ static void ConsoleFunc( void *unused )
 
 static void UpdateSoundQualityFunc( void *unused )
 {
+#ifdef __DJGPP__
 	extern int	havegus; // FS: DOS GUS
-
+#else
+	int havegus = 0;
+#endif
 	if ( s_options_quality_list.curvalue )
 	{
 		Cvar_SetValue( "s_khz", 22050 );

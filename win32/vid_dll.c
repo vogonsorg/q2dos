@@ -58,7 +58,7 @@ LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 static qboolean s_alttab_disabled;
 
-extern	unsigned	sys_msg_time;
+extern	double	sys_msg_time;
 
 /*
 ** WIN32 helper functions
@@ -129,7 +129,7 @@ void VID_Printf (int print_level, char *fmt, ...)
 	}
 	else if ( print_level == PRINT_DEVELOPER )
 	{
-		Com_DPrintf(DEVELOPER_MSG_WORLD, "%s", msg);
+		Com_DPrintf(DEVELOPER_MSG_GFX, "%s", msg);
 	}
 	else if ( print_level == PRINT_ALERT )
 	{
@@ -589,8 +589,8 @@ qboolean VID_LoadRefresh( char *name )
 {
 #ifndef REF_HARD_LINKED
 	refimport_t	ri;
-#endif
 	GetRefAPI_t	GetRefAPI;
+#endif
 	
 	if ( reflib_active )
 	{

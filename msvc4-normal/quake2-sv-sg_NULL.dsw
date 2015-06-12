@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "quake2"=".\quake2-sv-sg.dsp" - Package Owner=<4>
+Project: "quake2"=".\quake2-sv-sg_NULL.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{

@@ -508,3 +508,8 @@ void CDAudio_Activate (qboolean active)
 	else
 		CDAudio_Pause ();
 }
+
+qboolean CDAudio_Active (void)
+{
+	return playing;
+}

@@ -44,13 +44,12 @@ qboolean	Minimized;
 
 static HANDLE		hinput, houtput;
 
-unsigned	sys_msg_time;
-unsigned	sys_frame_time;
+double	sys_msg_time;
+double	sys_frame_time;
 
 
 static HANDLE		qwclsemaphore;
 
-#define	MAX_NUM_ARGVS	128
 int			argc;
 char		*argv[MAX_NUM_ARGVS];
 
@@ -381,13 +380,13 @@ void Sys_SendKeyEvents (void)
 	{
 		if (!GetMessage (&msg, NULL, 0, 0))
 			Sys_Quit ();
-		sys_msg_time = msg.time;
+		sys_msg_time = (double)msg.time;
       	TranslateMessage (&msg);
       	DispatchMessage (&msg);
 	}
 
 	// grab frame time 
-	sys_frame_time = timeGetTime();	// FIXME: should this be at start?
+	sys_frame_time = (double)timeGetTime();	// FIXME: should this be at start?
 }
 
 

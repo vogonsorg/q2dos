@@ -864,7 +864,6 @@ qboolean IsValidChar (int c); // FS: From KMQ2
 // FS: DOS shit
 #define MAX_NUM_ARGVS	50
 
-
 extern	int		com_argc;
 extern	char	*com_argv[MAX_NUM_ARGVS+1];
 char Q_toupper(char c); // FS

@@ -93,8 +93,11 @@ void Netchan_Init (void)
 	int		port;
 
 	// pick a port value that should be nice and random
+#ifdef __DJGPP__
 	port = Sys_LinuxTime() & 0xffff; // FS: DOS counter doesn't work with this
-
+#else
+	port = (int)Sys_Milliseconds() & 0xffff;
+#endif
 	showpackets = Cvar_Get ("showpackets", "0", 0);
 	showdrop = Cvar_Get ("showdrop", "0", 0);
 	qport = Cvar_Get ("qport", va("%i", port), CVAR_NOSET);

@@ -2,6 +2,8 @@
 // this assumes that one of the refs is statically linked to the executable
 
 #include "../client/client.h"
+#include "../client/qmenu.h"
+//#include "vid_dos.h"
 
 viddef_t	viddef;				// global video state
 

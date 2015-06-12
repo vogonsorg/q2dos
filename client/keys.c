@@ -812,7 +812,7 @@ Called by the system between frames for both key up and key down events
 Should NOT be called during an interrupt!
 ===================
 */
-void Key_Event (int key, qboolean down, unsigned time)
+void Key_Event (int key, qboolean down, double time)
 {
 	char	*kb;
 	char	cmd[1024];
