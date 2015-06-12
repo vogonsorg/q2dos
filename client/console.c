@@ -469,7 +469,7 @@ void Con_DrawInput (void)
 
 	text = key_lines[edit_line];
 
-	clsrealtime = cls.realtime;
+	clsrealtime = (int)cls.realtime;
 // add the cursor frame
 	text[key_linepos] = 10+((int)(clsrealtime>>8)&1);
 	
@@ -551,7 +551,7 @@ void Con_DrawNotify (void)
 			re.DrawChar ( (x+skip)<<3, v, s[x]);
 			x++;
 		}
-		clsrealtime = cls.realtime;
+		clsrealtime = (int)cls.realtime;
 		re.DrawChar ( (x+skip)<<3, v, 10+((clsrealtime>>8)&1));
 		v += 8;
 	}

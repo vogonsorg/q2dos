@@ -2138,8 +2138,19 @@ void CL_Frame (double msec)
 	{
 		if (cls.state == ca_connected && extratime < 100)
 			return;			// don't flood packets out while connecting
-		if (extratime < 1000/fps)
+		if (extratime < 1000/cl_maxfps->value)
+		{
+		#if 0
+			// Knightmare- added Pooy's CPU usage fix
+			if (cl_sleep->value)
+			{
+				int temptime = 1000 / cl_maxfps->value - extratime;
+				if (temptime > 1)
+					Sys_Sleep (1);
+			} // end CPU usage fix
+		#endif
 			return;			// framerate is too high
+		}
 	}
 
 	// let the mouse activate or deactivate
