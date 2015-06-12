@@ -1,0 +1,48 @@
+ Profile:
+Bot Name: ACE (Artificial Control Experiment)
+Current Version: 007
+Author: Steave Yeager
+
+Features:
+- Full Client Emulation.
+This allows the bot to act very much 'humanlike'.
+- Complex Level Navigation.
+This is the part of the bot that allows it move around, almost 'humanlike', around some of the many complex levels in Quake II.
+- Support for CTF, Teamplay, and use of all Game Items.
+The bot is now able to use all game items ('cept for hand grenades). It is also able to play with you in mods such as CTF, instead of just DM.
+- Complex AI.
+The bot now works with a fuzzy logic type system, for all movements, and decisions alike.
+- Complex Movement.
+The ACE bot is able to jump, crouch, and is also able to get 'out of the way', when certain obstacles arise.
+- Built-in pathing editor.
+This allows the bot to be ready for any level, once properly 'taught'.
+- Improved combat skills.
+Combat abilities have been improved, and will basically, shoot and chase you until they finally get there target.
+- Improved server support.
+(self explanitory)
+
+Commands:
+(ONLY DM)
+sv addbot - Add a bot skill = 1 to 4 (4 highest)
+(i.e. "sv addbot 4 male/sniper Masher", or just "sv addbot" to spawn a random bot)
+sv removebot - Remove a bot by name.
+cmd botbrain - Replace player control with bot control.
+sv acelearn - Turn on "learning" mode.
+sv acedebug - Turns on ACE's debugging messages. Shows when stuck, bot's thought process, node placement and linkage information.
+sv savenodes - Saves bots current knowledge of level.
+
+(NOTE: The below commands only work when learn mode is on.)
+cmd findnode - Finds the closest node relative to the player.
+cmd goto - Invokes botbrain and sends you to a particular node, also shows the path to the node.
+cmd addnode <0|1|2|3|4|5|6> - Adds a new node of type 0-6.
+cmd addlink - Adds a link between nodes.
+cmd removelink - Removes a link between nodes.
+cmd pathlink - Turns on pathing validator.
+cmd shownode - Shows particular node represented by a color coded sphere, also the location.
+cmd movenode - Moves a node to a new location, useful for nudging a node about.
+
+Running the ACE Bot:
+Basically run the acesetup.exe file and name where your quake2 directory is located.
+Here is the shortcut's parameter line if you need it:
++set game ace +set deathmatch 1 map q2dm1 
+

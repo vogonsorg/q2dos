@@ -1,0 +1,178 @@
+CC = gcc
+CFLAGS = -g -Wall -O2 
+SFLAGS = -Did386 -DREF_HARD_LINKED -DGAME_HARD_LINKED -DUSE_DOS_CD -DOGG_SUPPORT -DCLIENT_SPLIT_NETFRAME -DGAMESPY
+WCFLAGS = -I wattcp/inc
+WLFLAGS = -Lwattcp/lib -lwatt
+OGGCFLAGS = -I libogg/inc
+OCCLFLAGS = -Llibogg/lib -logg
+VORBCFLAGS = -I libvorb/inc
+VORBLFLAGS = -Llibvorb/lib -lvorbisenc -lvorbisfile -lvorbis -logg
+
+DOS = 	dos/cd_dos.o \
+	dos/vid_dos.o \
+	dos/vid_ext2.o \
+	dos/snddma_dos.o \
+	dos/snd_gus.o \
+	dos/sys_dos.o \
+	dos/in_dos.o \
+	linux/net_udp.o \
+	dos/dos_v2.o \
+	dos/glob.o \
+	dos/sys_dosa.o \
+	dos/q_shdos.o \
+	dos/zone.o \
+	dos/swimp_dos.o
+
+CLIENT =	client/cl_input.o \
+	client/cl_inv.o \
+	client/cl_main.o \
+	client/cl_cin.o \
+	client/cl_ents.o \
+	client/cl_fx.o \
+	client/cl_parse.o \
+	client/cl_pred.o \
+	client/cl_scrn.o \
+	client/cl_tent.o \
+	client/cl_view.o \
+	client/menu.o \
+	client/console.o \
+	client/keys.o \
+	client/snd_dma.o \
+	client/snd_mem.o \
+	client/snd_mix.o \
+	client/snd_stream.o \
+	client/qmenu.o \
+	client/cl_newfx.o 
+
+GAMESPY = Goa/CEngine/darray.o \
+	Goa/CEngine/gserver.o \
+	Goa/CEngine/gserverlist.o \
+	Goa/CEngine/gutil.o \
+	Goa/CEngine/hashtable.o \
+	Goa/nonport.o
+
+QCOMMON = 	qcommon/cmd.o \
+	qcommon/cmodel.o \
+	qcommon/common.o \
+	qcommon/crc.o \
+	qcommon/cvar.o \
+	qcommon/files.o \
+	qcommon/md4.o \
+	qcommon/net_chan.o \
+	qcommon/pmove.o 
+
+SERVER = server/sv_ccmds.o \
+	server/sv_ents.o \
+	server/sv_game.o \
+	server/sv_init.o \
+	server/sv_main.o \
+	server/sv_send.o \
+	server/sv_user.o \
+	server/sv_world.o
+
+REFSOFT = ref_soft/r_alias.o \
+	ref_soft/r_main.o \
+	ref_soft/r_light.o \
+	ref_soft/r_misc.o \
+	ref_soft/r_model.o \
+	ref_soft/r_part.o \
+	ref_soft/r_poly.o \
+	ref_soft/r_polyse.o \
+	ref_soft/r_rast.o \
+	ref_soft/r_scan.o \
+	ref_soft/r_sprite.o \
+	ref_soft/r_surf.o \
+	ref_soft/r_aclip.o \
+	ref_soft/r_bsp.o \
+	ref_soft/r_draw.o \
+	ref_soft/r_edge.o \
+	ref_soft/r_image.o
+
+REFASM = linux/snd_mixa.o \
+	linux/d_polysa.o \
+	linux/r_aclipa.o \
+	linux/r_draw16.o \
+	linux/r_drawa.o \
+	linux/r_edgea.o \
+	linux/r_scana.o \
+	linux/r_spr8.o \
+	linux/r_surf8.o \
+	linux/r_varsa.o 
+
+GAME = xsrc/g_ai.o \
+	xsrc/g_chase.o \
+	xsrc/g_cmds.o \
+	xsrc/g_combat.o \
+	xsrc/g_func.o \
+	xsrc/g_items.o \
+	xsrc/g_main.o \
+	xsrc/g_misc.o \
+	xsrc/g_monster.o \
+	xsrc/g_phys.o \
+	xsrc/g_save.o \
+	xsrc/g_spawn.o \
+	xsrc/g_svcmds.o \
+	xsrc/g_target.o \
+	xsrc/g_trigger.o \
+	xsrc/g_turret.o \
+	xsrc/g_utils.o \
+	xsrc/g_weapon.o \
+	xsrc/m_actor.o \
+	xsrc/m_berserk.o \
+	xsrc/m_boss2.o \
+	xsrc/m_boss3.o \
+	xsrc/m_boss31.o \
+	xsrc/m_boss32.o \
+	xsrc/m_boss5.o \
+	xsrc/m_brain.o \
+	xsrc/m_chick.o \
+	xsrc/m_fixbot.o \
+	xsrc/m_flash.o \
+	xsrc/m_flipper.o \
+	xsrc/m_float.o \
+	xsrc/m_flyer.o \
+	xsrc/m_gekk.o \
+	xsrc/m_gladb.o \
+	xsrc/m_gladiator.o \
+	xsrc/m_gunner.o \
+	xsrc/m_hover.o \
+	xsrc/m_infantry.o \
+	xsrc/m_insane.o \
+	xsrc/m_medic.o \
+	xsrc/m_move.o \
+	xsrc/m_mutant.o \
+	xsrc/m_parasite.o \
+	xsrc/m_soldier.o \
+	xsrc/m_supertank.o \
+	xsrc/m_tank.o \
+	xsrc/p_client.o \
+	xsrc/p_hud.o \
+	xsrc/p_trail.o \
+	xsrc/p_view.o \
+	xsrc/p_weapon.o \
+	xsrc/q_shared.o \
+
+.PHONY: all test clean
+#
+
+OBJECTS =  $(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(GAMESPY) $(REFSOFT) $(REFASM) $(DOS)
+
+all: q2xatrix.exe
+
+q2xatrix.exe:	$(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o q2xatrix.exe -lm $(WLFLAGS) -lm $(OCCLFLAGS) -lm $(VORBLFLAGS)
+
+clean:
+	find ./ -name '*.o' -exec rm {} \;
+
+DO_AS=$(CC) -x assembler-with-cpp
+
+%.o : %.c
+	$(CC) $(CFLAGS) $(WCFLAGS) $(SFLAGS) $(OGGCFLAGS) $(VORBCFLAGS) -c $< -o $@
+
+%.o: %.S
+	$(DO_AS) $(CFLAGS) -c $< -o $@
+
+%.o: %.s
+	$(DO_AS) $(CFLAGS) -c $< -o $@
+
