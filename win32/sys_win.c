@@ -604,7 +604,7 @@ HINSTANCE	global_hInstance;
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     MSG				msg;
-	int				time, oldtime, newtime;
+	double				time, oldtime, newtime;
 	char			*cddir;
 
     /* previous instances do not exist in Win32 */
@@ -649,7 +649,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		{
 			if (!GetMessage (&msg, NULL, 0, 0))
 				Com_Quit ();
-			sys_msg_time = msg.time;
+			sys_msg_time = (double)msg.time;
 			TranslateMessage (&msg);
    			DispatchMessage (&msg);
 		}

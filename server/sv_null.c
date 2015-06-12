@@ -9,7 +9,7 @@ void SV_Shutdown (char *finalmsg, qboolean reconnect)
 {
 }
 
-void SV_Frame (float time)
+void SV_Frame (double time)
 {
 }
 

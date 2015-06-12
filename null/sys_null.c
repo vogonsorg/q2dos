@@ -77,10 +77,12 @@ byte        shiftscantokey[128] =
 
 int dos_inportb(int port)
 {
+	return port;
 }
 
 int dos_inportw(int port)
 {
+	return port;
 }
 
 void dos_outportb(int port, int val)
@@ -113,7 +115,7 @@ void TrapKey(void)
 
 double	curtime;
 //unsigned	sys_msg_time;
-unsigned	sys_frame_time;
+double	sys_frame_time;
 
 #ifndef id386
 void Sys_SetFPCW()
@@ -263,8 +265,6 @@ void	*Hunk_Begin (int maxsize)
 
 void	*Hunk_Alloc (int size)
 {
-	void	*buf;
-
 	// round to cacheline
 	size = (size+31)&~31;
 

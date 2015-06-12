@@ -522,7 +522,7 @@ char *NET_ErrorString (void)
 }
 
 // sleeps msec or until net socket is ready
-void NET_Sleep(int msec)
+void NET_Sleep(double msec)
 {
     struct timeval timeout;
 	fd_set	fdset;
@@ -536,8 +536,8 @@ void NET_Sleep(int msec)
 //	if (stdin_active)
 	FD_SET(0, &fdset); // stdin is processed too
 	FD_SET(ip_sockets[NS_SERVER], &fdset); // network socket
-	timeout.tv_sec = msec/1000;
-	timeout.tv_usec = (msec%1000)*1000;
+	timeout.tv_sec = (long)msec/1000;
+	timeout.tv_usec = ((long)msec%1000)*1000;
 	select(ip_sockets[NS_SERVER]+1, &fdset, NULL, NULL, &timeout);
 }
 

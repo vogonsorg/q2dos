@@ -570,7 +570,7 @@ qboolean	NET_CompareBaseAdr (netadr_t a, netadr_t b);
 qboolean	NET_IsLocalAddress (netadr_t adr);
 char		*NET_AdrToString (netadr_t a);
 qboolean	NET_StringToAdr (char *s, netadr_t *a);
-void		NET_Sleep(int msec);
+void		NET_Sleep(double msec);
 
 //============================================================================
 
@@ -806,7 +806,7 @@ void Qcommon_Init (int argc, char **argv);
 void Qcommon_Init (quakeparms_t *parms);
 #endif
 
-void Qcommon_Frame (int msec);
+void Qcommon_Frame (double msec);
 void Qcommon_Shutdown (void);
 
 #define NUMVERTEXNORMALS	162
@@ -857,7 +857,7 @@ void SCR_BeginLoadingPlaque (void);
 
 void SV_Init (void);
 void SV_Shutdown (char *finalmsg, qboolean reconnect);
-void SV_Frame (int msec);
+void SV_Frame (double msec);
 
 
 qboolean IsValidChar (int c); // FS: From KMQ2
@@ -866,7 +866,7 @@ qboolean IsValidChar (int c); // FS: From KMQ2
 
 extern	int		com_argc;
 extern	char	*com_argv[MAX_NUM_ARGVS+1];
-char Q_toupper(char c); // FS
+char Q_toupper(int c); // FS
 // FS: All this from Q1
 void Q_memset (void *dest, int fill, int count);
 void Q_memcpy (void *dest, void *src, int count);

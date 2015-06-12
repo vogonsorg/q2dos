@@ -6,78 +6,16 @@
 --------------------Configuration: quake2 - Win32 Debug--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\Frank\LOCALS~1\Temp\RSP1A2.tmp" with contents
+Creating temporary file "C:\DOCUME~1\Frank\LOCALS~1\Temp\RSP385.tmp" with contents
 [
-/nologo /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /FR".\Debug/" /Fp".\Debug/quake2-sv-sg.pch" /YX /Fo".\Debug/" /Fd".\Debug/" /FD /c 
-"F:\PROJ\q2dos\WIN32\cd_win.c"
-"F:\PROJ\q2dos\CLIENT\cl_cin.c"
-"F:\PROJ\q2dos\CLIENT\cl_ents.c"
-"F:\PROJ\q2dos\CLIENT\cl_fx.c"
-"F:\PROJ\q2dos\CLIENT\cl_input.c"
-"F:\PROJ\q2dos\CLIENT\cl_inv.c"
-"F:\PROJ\q2dos\CLIENT\cl_main.c"
-"F:\PROJ\q2dos\CLIENT\cl_newfx.c"
-"F:\PROJ\q2dos\CLIENT\cl_parse.c"
-"F:\PROJ\q2dos\CLIENT\cl_pred.c"
-"F:\PROJ\q2dos\CLIENT\cl_scrn.c"
-"F:\PROJ\q2dos\CLIENT\cl_tent.c"
-"F:\PROJ\q2dos\CLIENT\cl_view.c"
-"F:\PROJ\q2dos\QCOMMON\cmd.c"
-"F:\PROJ\q2dos\QCOMMON\cmodel.c"
-"F:\PROJ\q2dos\QCOMMON\common.c"
-"F:\PROJ\q2dos\CLIENT\console.c"
-"F:\PROJ\q2dos\QCOMMON\crc.c"
-"F:\PROJ\q2dos\QCOMMON\cvar.c"
-"F:\PROJ\q2dos\QCOMMON\files.c"
-"F:\PROJ\q2dos\WIN32\in_win.c"
-"F:\PROJ\q2dos\CLIENT\keys.c"
-"F:\PROJ\q2dos\CLIENT\menu.c"
-"F:\PROJ\q2dos\QCOMMON\net_chan.c"
-"F:\PROJ\q2dos\NULL\net_null.c"
-"F:\PROJ\q2dos\QCOMMON\pmove.c"
-"F:\PROJ\q2dos\WIN32\q_shwin.c"
-"F:\PROJ\q2dos\CLIENT\qmenu.c"
-"F:\PROJ\q2dos\REF_SOFT\r_aclip.c"
-"F:\PROJ\q2dos\REF_SOFT\r_alias.c"
-"F:\PROJ\q2dos\REF_SOFT\r_bsp.c"
-"F:\PROJ\q2dos\REF_SOFT\r_draw.c"
-"F:\PROJ\q2dos\REF_SOFT\r_edge.c"
-"F:\PROJ\q2dos\REF_SOFT\r_image.c"
-"F:\PROJ\q2dos\REF_SOFT\r_light.c"
-"F:\PROJ\q2dos\REF_SOFT\r_main.c"
-"F:\PROJ\q2dos\REF_SOFT\r_misc.c"
-"F:\PROJ\q2dos\REF_SOFT\r_model.c"
-"F:\PROJ\q2dos\REF_SOFT\r_part.c"
-"F:\PROJ\q2dos\REF_SOFT\r_poly.c"
-"F:\PROJ\q2dos\REF_SOFT\r_polyse.c"
-"F:\PROJ\q2dos\REF_SOFT\r_rast.c"
-"F:\PROJ\q2dos\REF_SOFT\r_scan.c"
-"F:\PROJ\q2dos\REF_SOFT\r_sprite.c"
-"F:\PROJ\q2dos\REF_SOFT\r_surf.c"
-"F:\PROJ\q2dos\WIN32\rw_ddraw.c"
-"F:\PROJ\q2dos\WIN32\rw_dib.c"
-"F:\PROJ\q2dos\WIN32\rw_imp.c"
-"F:\PROJ\q2dos\CLIENT\snd_dma.c"
-"F:\PROJ\q2dos\CLIENT\snd_mem.c"
-"F:\PROJ\q2dos\CLIENT\snd_mix.c"
-"F:\PROJ\q2dos\WIN32\snd_win.c"
-"F:\PROJ\q2dos\SERVER\sv_ccmds.c"
-"F:\PROJ\q2dos\SERVER\sv_ents.c"
-"F:\PROJ\q2dos\SERVER\sv_game.c"
-"F:\PROJ\q2dos\SERVER\sv_init.c"
-"F:\PROJ\q2dos\SERVER\sv_main.c"
-"F:\PROJ\q2dos\SERVER\sv_send.c"
-"F:\PROJ\q2dos\SERVER\sv_user.c"
-"F:\PROJ\q2dos\SERVER\sv_world.c"
-"F:\PROJ\q2dos\WIN32\sys_win.c"
-"F:\PROJ\q2dos\WIN32\vid_dll.c"
-"F:\PROJ\q2dos\WIN32\vid_menu.c"
-"F:\PROJ\q2dos\CLIENT\x86.c"
+/nologo /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /FR".\Debug/" /Fp".\Debug/quake2-sv-sg.pch" /YX /Fo".\Debug/" /Fd".\Debug/" /FD /c 
+"F:\proj\q2dos\CLIENT\cl_fx.c"
+"F:\proj\q2dos\CLIENT\cl_main.c"
 ]
-Creating command line "cl.exe @C:\DOCUME~1\Frank\LOCALS~1\Temp\RSP1A2.tmp" 
-Creating temporary file "C:\DOCUME~1\Frank\LOCALS~1\Temp\RSP1A3.tmp" with contents
+Creating command line "cl.exe @C:\DOCUME~1\Frank\LOCALS~1\Temp\RSP385.tmp" 
+Creating temporary file "C:\DOCUME~1\Frank\LOCALS~1\Temp\RSP386.tmp" with contents
 [
-kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /incremental:yes /pdb:".\Debug/quake2-sv-sg.pdb" /debug /machine:I386 /out:".\Debug/quake2-sv-sg.exe" 
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /incremental:yes /pdb:".\Debug/quake2-sv-sg.pdb" /map:".\Debug/quake2-sv-sg.map" /debug /machine:I386 /out:".\Debug/quake2-sv-sg.exe" 
 ".\Debug\cd_win.obj"
 ".\Debug\cl_cin.obj"
 ".\Debug\cl_ents.obj"
@@ -146,7 +84,6 @@ kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32
 ".\Debug\md4.obj"
 ".\Debug\menu.obj"
 ".\Debug\net_chan.obj"
-".\Debug\net_null.obj"
 ".\Debug\p_client.obj"
 ".\Debug\p_hud.obj"
 ".\Debug\p_trail.obj"
@@ -192,84 +129,26 @@ kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32
 ".\Debug\vid_dll.obj"
 ".\Debug\vid_menu.obj"
 ".\Debug\x86.obj"
+".\Debug\net_wins.obj"
+".\Debug\nonport.obj"
+".\Debug\hashtable.obj"
+".\Debug\darray.obj"
+".\Debug\gserver.obj"
+".\Debug\gserverlist.obj"
+".\Debug\gutil.obj"
 ]
-Creating command line "link.exe @C:\DOCUME~1\Frank\LOCALS~1\Temp\RSP1A3.tmp"
+Creating command line "link.exe @C:\DOCUME~1\Frank\LOCALS~1\Temp\RSP386.tmp"
 <h3>Output Window</h3>
 Compiling...
-cd_win.c
-cl_cin.c
-cl_ents.c
 cl_fx.c
-cl_input.c
-cl_inv.c
 cl_main.c
-cl_newfx.c
-cl_parse.c
-cl_pred.c
-cl_scrn.c
-cl_tent.c
-cl_view.c
-cmd.c
-cmodel.c
-common.c
-console.c
-crc.c
-cvar.c
-files.c
-in_win.c
-keys.c
-f:\proj\q2dos\win32\in_win.c(574) : warning C4715: 'RawValuePointer' : not all control paths return a value
-menu.c
-f:\proj\q2dos\client\keys.c(253) : warning C4761: integral size mismatch in argument; conversion supplied
-net_chan.c
-net_null.c
-pmove.c
-q_shwin.c
-qmenu.c
-r_aclip.c
-f:\proj\q2dos\client\qmenu.c(198) : warning C4761: integral size mismatch in argument; conversion supplied
-r_alias.c
-r_bsp.c
-r_draw.c
-r_edge.c
-r_image.c
-r_light.c
-r_main.c
-r_misc.c
-r_model.c
-r_part.c
-r_poly.c
-r_polyse.c
-r_rast.c
-r_scan.c
-r_sprite.c
-r_surf.c
-rw_ddraw.c
-rw_dib.c
-rw_imp.c
-snd_dma.c
-snd_mem.c
-snd_mix.c
-snd_win.c
-sv_ccmds.c
-sv_ents.c
-sv_game.c
-sv_init.c
-sv_main.c
-sv_send.c
-F:\PROJ\q2dos\SERVER\sv_main.c(879) : warning C4761: integral size mismatch in argument; conversion supplied
-sv_user.c
-sv_world.c
-sys_win.c
-vid_dll.c
-vid_menu.c
-x86.c
 Linking...
+LINK : LNK6004: .\Debug/quake2-sv-sg.exe not found or not built by the last incremental link; performing full link
 
 
 
 <h3>Results</h3>
-quake2-sv-sg.exe - 0 error(s), 4 warning(s)
+quake2-sv-sg.exe - 0 error(s), 0 warning(s)
 </pre>
 </body>
 </html>

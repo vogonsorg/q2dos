@@ -847,7 +847,7 @@ SV_Frame
 
 ==================
 */
-void SV_Frame (int msec)
+void SV_Frame (double msec)
 {
 	time_before_game = time_after_game = 0;
 

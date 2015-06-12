@@ -121,6 +121,7 @@ qboolean	NET_CompareAdr (netadr_t a, netadr_t b)
 			return true;
 		return false;
 	}
+	return false; // FS: Compiler warning
 }
 
 /*
@@ -151,6 +152,7 @@ qboolean	NET_CompareBaseAdr (netadr_t a, netadr_t b)
 			return true;
 		return false;
 	}
+	return false; // FS: Compiler warning
 }
 
 char	*NET_AdrToString (netadr_t a)
@@ -455,7 +457,7 @@ void NET_SendPacket (netsrc_t sock, int length, void *data, netadr_t to)
 		{
 			if (err == WSAEADDRNOTAVAIL)
 			{
-				Com_DPrintf (DEVELOPER_MSG_WORLD, "NET_SendPacket Warning: %s : %s\n", 
+				Com_DPrintf (DEVELOPER_MSG_NET, "NET_SendPacket Warning: %s : %s\n", 
 						NET_ErrorString(), NET_AdrToString (to));
 			}
 			else
@@ -723,7 +725,7 @@ void	NET_Config (qboolean multiplayer)
 }
 
 // sleeps msec or until net socket is ready
-void NET_Sleep(int msec)
+void NET_Sleep(double msec)
 {
     struct timeval timeout;
 	fd_set	fdset;
@@ -744,8 +746,8 @@ void NET_Sleep(int msec)
 		if (ipx_sockets[NS_SERVER] > i)
 			i = ipx_sockets[NS_SERVER];
 	}
-	timeout.tv_sec = msec/1000;
-	timeout.tv_usec = (msec%1000)*1000;
+	timeout.tv_sec = (long)msec/1000;
+	timeout.tv_usec = ((long)msec%1000)*1000;
 	select(i+1, &fdset, NULL, NULL, &timeout);
 }
 

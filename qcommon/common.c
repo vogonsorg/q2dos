@@ -1609,7 +1609,7 @@ void Qcommon_Init (quakeparms_t *parms)
 Qcommon_Frame
 =================
 */
-void Qcommon_Frame (int msec)
+void Qcommon_Frame (double msec)
 {
 	char	*s;
 	double		time_before, time_between, time_after;
@@ -1758,7 +1758,7 @@ int Q_atoi (char *str)
 	return 0;
 }
 
-char Q_toupper (char c) // FS
+char Q_toupper (int c) // FS
 {
 	if (c>='a' && c<='z')
 		c-=('a'-'A');

@@ -184,7 +184,7 @@ Returns the fraction of the frame that the key was down
 */
 float CL_KeyState (kbutton_t *key)
 {
-	double		val;
+	float		val;
 	double			msec;
 
 	key->state &= 1;		// clear impulses
@@ -205,7 +205,7 @@ float CL_KeyState (kbutton_t *key)
 	}
 #endif
 
-	val = msec / frame_msec;
+	val = (float)msec / (float)frame_msec;
 	if (val < 0)
 		val = 0;
 	if (val > 1)
