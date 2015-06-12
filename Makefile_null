@@ -123,15 +123,15 @@ GAME = game/m_tank.o \
 
 OBJECTS =  $(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(REFSOFT) $(NULL)
 
-all: q2
+all: q2_null
 
-q2:	$(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(REFSOFT) $(NULL) 
-	$(CC) $(CFLAGS) $(OBJECTS) -o q2 -lm
+q2_null:	$(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(REFSOFT) $(NULL) 
+	$(CC) $(CFLAGS) $(OBJECTS) -o q2_null -lm
 
 clean:
 	find ./ -name '*.o' -exec rm {} \;
-	rm -f q2
-	rm -f q2.exe
+	rm -f q2_null
+	rm -f q2_null.exe
 
 %.o : %.c
 	$(CC) $(CFLAGS) $(SFLAGS) -c $< -o $@
