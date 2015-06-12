@@ -1037,6 +1037,7 @@ static menuslider_s		s_options_sfxvolume_slider;
 static menulist_s		s_options_joystick_box;
 #endif
 static menulist_s		s_options_cdvolume_box;
+static menuslider_s		s_options_musicvolume_slider; // FS
 static menulist_s		s_options_quality_list;
 #ifdef WIN32
 static menulist_s		s_options_compatibility_list;
@@ -1165,6 +1166,11 @@ static void UpdateCDVolumeFunc( void *unused )
 	Cvar_SetValue( "cd_nocd", !s_options_cdvolume_box.curvalue );
 }
 
+static void UpdateOGGVolumeFunc (void *unused) // FS: OGG Music Volume
+{
+	Cvar_SetValue ( "s_musicvolume", s_options_musicvolume_slider.curvalue / 10 );
+}
+
 static void ConsoleFunc( void *unused )
 {
 	/*
@@ -1280,9 +1286,19 @@ void Options_MenuInit( void )
 	s_options_sfxvolume_slider.maxvalue		= 10;
 	s_options_sfxvolume_slider.curvalue		= Cvar_VariableValue( "s_volume" ) * 10;
 
+// FS: For OGG
+	s_options_musicvolume_slider.generic.type	= MTYPE_SLIDER;
+	s_options_musicvolume_slider.generic.x	= 0;
+	s_options_musicvolume_slider.generic.y	= 10;
+	s_options_musicvolume_slider.generic.name	= "ogg music volume";
+	s_options_musicvolume_slider.generic.callback	= UpdateOGGVolumeFunc;
+	s_options_musicvolume_slider.minvalue		= 0;
+	s_options_musicvolume_slider.maxvalue		= 10;
+	s_options_musicvolume_slider.curvalue		= Cvar_VariableValue( "s_musicvolume" ) * 10;
+
 	s_options_cdvolume_box.generic.type	= MTYPE_SPINCONTROL;
 	s_options_cdvolume_box.generic.x		= 0;
-	s_options_cdvolume_box.generic.y		= 10;
+	s_options_cdvolume_box.generic.y		= 20;
 	s_options_cdvolume_box.generic.name	= "CD music";
 	s_options_cdvolume_box.generic.callback	= UpdateCDVolumeFunc;
 	s_options_cdvolume_box.itemnames		= cd_music_items;
@@ -1290,7 +1306,7 @@ void Options_MenuInit( void )
 
 	s_options_quality_list.generic.type	= MTYPE_SPINCONTROL;
 	s_options_quality_list.generic.x		= 0;
-	s_options_quality_list.generic.y		= 20;;
+	s_options_quality_list.generic.y		= 30;
 	s_options_quality_list.generic.name		= "sound quality";
 	s_options_quality_list.generic.callback = UpdateSoundQualityFunc;
 	s_options_quality_list.itemnames		= quality_items;
@@ -1299,12 +1315,13 @@ void Options_MenuInit( void )
 #ifdef WIN32
 	s_options_compatibility_list.generic.type	= MTYPE_SPINCONTROL;
 	s_options_compatibility_list.generic.x		= 0;
-	s_options_compatibility_list.generic.y		= 30;
+	s_options_compatibility_list.generic.y		= 40;
 	s_options_compatibility_list.generic.name	= "sound compatibility";
 	s_options_compatibility_list.generic.callback = UpdateSoundQualityFunc;
 	s_options_compatibility_list.itemnames		= compatibility_items;
 	s_options_compatibility_list.curvalue		= Cvar_VariableValue( "s_primary" );
 #endif
+
 	s_options_sensitivity_slider.generic.type	= MTYPE_SLIDER;
 	s_options_sensitivity_slider.generic.x		= 0;
 	s_options_sensitivity_slider.generic.y		= 50;
@@ -1372,6 +1389,7 @@ void Options_MenuInit( void )
 	s_options_joystick_box.generic.callback = JoystickFunc;
 	s_options_joystick_box.itemnames = yesno_names;
 #endif
+
 	s_options_customize_options_action.generic.type	= MTYPE_ACTION;
 	s_options_customize_options_action.generic.x		= 0;
 	s_options_customize_options_action.generic.y		= 140;
@@ -1392,7 +1410,9 @@ void Options_MenuInit( void )
 
 	ControlsSetMenuItemValues();
 
+// FS: If you add stuff you gotta be certain it's in order it appears!
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_sfxvolume_slider );
+	Menu_AddItem( &s_options_menu, ( void * ) &s_options_musicvolume_slider); // FS
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_cdvolume_box );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_quality_list );
 #ifdef WIN32
