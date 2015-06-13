@@ -117,6 +117,9 @@ void	FloodAreaConnections (void);
 
 int		c_pointcontents;
 int		c_traces, c_brush_traces;
+extern	cvar_t	*sv_entfile; // FS
+qboolean	entToggle; // FS
+char	entBSP[MAX_MAP_ENTSTRING]; // FS
 
 
 /*
@@ -590,12 +593,57 @@ void CMod_LoadVisibility (lump_t *l)
 CMod_LoadEntityString
 =================
 */
-void CMod_LoadEntityString (lump_t *l)
+void CMod_LoadEntityString (lump_t *l, char *name)
 {
+	memcpy (entBSP, cmod_base + l->fileofs, l->filelen); // FS: Copy the BSP ents to global char for dumping purposes.
+	entBSP[l->filelen]=0; // FS: Paranoia null terminator
+
+	// Knightmare 6/25/12- optional .ent file loading
+	if (sv_entfile->value)
+	{
+		char		en[MAX_QPATH];
+		char		*buffer = NULL;
+		int			len, entStrLen;
+
+		len = strlen(name);
+		strncpy (en, name, sizeof(en));
+		en[len-3] = 'e';	en[len-2] = 'n';	en[len-1] = 't';
+		entStrLen = FS_LoadFile(en, (void **)&buffer);
+		if (buffer != NULL && entStrLen > 1)
+		{
+			if (entStrLen > MAX_MAP_ENTSTRING)
+			{
+				Com_Printf("CMod_LoadEntityString: .ent file %s too large: %i > %i.\n", en, entStrLen, MAX_MAP_ENTSTRING);
+				FS_FreeFile (buffer);
+			//	Com_Error (ERR_DROP, "Entfile %s is too large for entity lump", en);
+			}
+			else
+			{
+				Com_Printf("CMod_LoadEntityString: .ent file %s loaded.\n", en);
+
+				numentitychars = entStrLen;
+//				map_entitystring = (char *)Hunk_Alloc (entStrLen + 1);
+				memset(map_entitystring, 0, sizeof(map_entitystring));
+				memcpy (map_entitystring, buffer, entStrLen);
+				map_entitystring[entStrLen] = '\0';
+				FS_FreeFile (buffer);
+				return;
+			}
+		}
+		else if (entStrLen != -1)	// catch too-small entfile
+		{
+			Com_Printf("CMod_LoadEntityString: .ent file %s too small.\n", en);
+			FS_FreeFile (buffer);
+		}
+		// fall back to bsp entity string if no .ent file loaded
+	}
+	// end Knightmare
+
 	numentitychars = l->filelen;
 	if (l->filelen > MAX_MAP_ENTSTRING)
 		Com_Error (ERR_DROP, "Map has too large entity lump");
-
+//	map_entitystring = (char *)Hunk_Alloc (l->filelen + 1);
+	memset(map_entitystring, 0, sizeof(map_entitystring));
 	memcpy (map_entitystring, cmod_base + l->fileofs, l->filelen);
 }
 
@@ -685,6 +733,16 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 	int				ofs, len, end;	// Knightmare added
 
 	map_noareas = Cvar_Get ("map_noareas", "0", 0);
+
+	// FS: Check to see if entfile changed.  ->modified isn't working right, so I'll half ass this.
+	if ((sv_entfile->value >= 1 && entToggle == false) || (sv_entfile->value == 0 && entToggle == true)) // Knightmare:  Logic adjustment
+		map_name[0] = 0;
+
+	// FS: For checkin' later
+	if (sv_entfile->value)
+		entToggle = true;
+	else
+		entToggle = false;
 
 	if (  !strcmp (map_name, name) && (clientload || !Cvar_VariableValue ("flushmap")) )
 	{
@@ -777,7 +835,7 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 	CMod_LoadLeafs (&header.lumps[LUMP_LEAFS]);
 	CMod_LoadNodes (&header.lumps[LUMP_NODES]);
 	CMod_LoadSubmodels (&header.lumps[LUMP_MODELS]);
-	CMod_LoadEntityString (&header.lumps[LUMP_ENTITIES]);
+	CMod_LoadEntityString (&header.lumps[LUMP_ENTITIES], name); // FS: Added name for sv_entfile stuff
 
 	// Knightmare added
 	CMod_ValidateAreaPortals ();

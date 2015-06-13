@@ -329,10 +329,9 @@ SOURCE=..\xsrc\p_weapon.c
 SOURCE=..\xsrc\q_shared.c
 # End Source File
 # End Group
-# Begin Source File
+# Begin Group "Client"
 
-SOURCE=..\WIN32\cd_win.c
-# End Source File
+# PROP Default_Filter ""
 # Begin Source File
 
 SOURCE=..\CLIENT\cl_cin.c
@@ -383,72 +382,12 @@ SOURCE=..\CLIENT\cl_view.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\QCOMMON\cmd.c
+SOURCE=..\CLIENT\x86.c
 # End Source File
-# Begin Source File
+# End Group
+# Begin Group "Ref_Soft"
 
-SOURCE=..\QCOMMON\cmodel.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\QCOMMON\common.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\WIN32\conproc.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\CLIENT\console.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\QCOMMON\crc.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\QCOMMON\cvar.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\QCOMMON\files.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\WIN32\in_win.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\CLIENT\keys.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\QCOMMON\md4.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\CLIENT\menu.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\QCOMMON\net_chan.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\win32\net_wins.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\QCOMMON\pmove.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\WIN32\q_shwin.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\CLIENT\qmenu.c
-# End Source File
+# PROP Default_Filter ""
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_aclip.c
@@ -517,6 +456,26 @@ SOURCE=..\REF_SOFT\r_sprite.c
 
 SOURCE=..\REF_SOFT\r_surf.c
 # End Source File
+# End Group
+# Begin Group "Win32"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\WIN32\cd_win.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\in_win.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\win32\net_wins.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\q_shwin.c
+# End Source File
 # Begin Source File
 
 SOURCE=..\WIN32\rw_ddraw.c
@@ -531,20 +490,24 @@ SOURCE=..\WIN32\rw_imp.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\CLIENT\snd_dma.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\CLIENT\snd_mem.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\CLIENT\snd_mix.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\WIN32\snd_win.c
 # End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\sys_win.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\vid_dll.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\vid_menu.c
+# End Source File
+# End Group
+# Begin Group "Server"
+
+# PROP Default_Filter ""
 # Begin Source File
 
 SOURCE=..\SERVER\sv_ccmds.c
@@ -577,21 +540,74 @@ SOURCE=..\SERVER\sv_user.c
 
 SOURCE=..\SERVER\sv_world.c
 # End Source File
+# End Group
 # Begin Source File
 
-SOURCE=..\WIN32\sys_win.c
+SOURCE=..\QCOMMON\cmd.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\WIN32\vid_dll.c
+SOURCE=..\QCOMMON\cmodel.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\WIN32\vid_menu.c
+SOURCE=..\QCOMMON\common.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\CLIENT\x86.c
+SOURCE=..\WIN32\conproc.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\CLIENT\console.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\QCOMMON\crc.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\QCOMMON\cvar.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\QCOMMON\files.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\CLIENT\keys.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\QCOMMON\md4.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\CLIENT\menu.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\QCOMMON\net_chan.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\QCOMMON\pmove.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\CLIENT\qmenu.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\CLIENT\snd_dma.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\CLIENT\snd_mem.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\CLIENT\snd_mix.c
 # End Source File
 # End Group
 # Begin Group "Header Files"

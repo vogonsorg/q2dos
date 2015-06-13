@@ -1017,6 +1017,46 @@ void SV_ServerCommand_f (void)
 	ge->ServerCommand();
 }
 
+char *SV_MapName()
+{
+	if( !svs.initialized )
+	{
+		return NULL;
+	}
+
+	return sv.name;
+}
+
+// FS: Dump Entities
+void SV_DumpEntities_f (void)
+{
+    FILE    *f;
+    char    fileName[MAX_OSPATH];
+	extern	char	entBSP[MAX_MAP_ENTSTRING];
+
+	if (!svs.initialized)
+	{
+		Com_Printf ("No server running.\n");
+		return;
+	}
+
+    Com_sprintf (fileName, sizeof(fileName), "%s/maps/%s.ent", FS_Gamedir(), SV_MapName());
+	FS_CreatePath(fileName); // FS: Create the /maps dir if it's not there
+
+    f = fopen (fileName, "w");
+
+    if (!f)
+    {
+        Com_Printf("SV_DumpEntities_f: Couldn't write %s.\n", fileName);
+    }
+    else
+    {
+        Com_Printf("SV_DumpEntities_f: Dumping Entities to %s.\n", fileName);
+        fputs(entBSP, f);
+        fclose(f);
+    }
+}
+
 //===========================================================
 
 /*
@@ -1049,5 +1089,6 @@ void SV_InitOperatorCommands (void)
 	Cmd_AddCommand ("killserver", SV_KillServer_f);
 
 	Cmd_AddCommand ("sv", SV_ServerCommand_f);
+	Cmd_AddCommand ("sv_dumpentities", SV_DumpEntities_f); // FS
 }
 

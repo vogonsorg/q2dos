@@ -52,6 +52,7 @@ cvar_t	*public_server;			// should heartbeats be sent
 
 cvar_t	*sv_iplimit;			// r1ch: max connections from a single IP (prevent DoS)
 cvar_t	*sv_reconnect_limit;	// minimum seconds between connect messages
+cvar_t	*sv_entfile;	// Knightmare 6/25/12- cvar to control use of .ent files
 
 void Master_Shutdown (void);
 
@@ -1058,6 +1059,9 @@ void SV_Init (void)
 	allow_download_models = Cvar_Get ("allow_download_models", "1", CVAR_ARCHIVE);
 	allow_download_sounds = Cvar_Get ("allow_download_sounds", "1", CVAR_ARCHIVE);
 	allow_download_maps	  = Cvar_Get ("allow_download_maps", "1", CVAR_ARCHIVE);
+// Knightmare 6/25/12- cvar to control use of .ent files
+	sv_entfile = Cvar_Get ("sv_entfile", "1", CVAR_ARCHIVE);
+	sv_entfile->description = "Toggle the use of .ent files.";
 
 	sv_noreload = Cvar_Get ("sv_noreload", "0", 0);
 
