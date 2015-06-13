@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <stdio.h>
-#ifndef WIN32
+#ifdef __DJGPP__
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/mman.h>
@@ -16,6 +16,7 @@
 #include <crt0.h> // FS: Fake Mem Fix (QIP)
 #else
 #include <time.h>
+#include <sys/time.h>   //watcom
 #endif
 
 #include "../qcommon/qcommon.h"
@@ -32,57 +33,57 @@ static int                              keybuf_head=0;
 static int                              keybuf_tail=0;
 
 byte        scantokey[128] = 
-					{ 
+                                        { 
 //  0           1       2       3       4       5       6       7 
 //  8           9       A       B       C       D       E       F 
-	0  ,    27,     '1',    '2',    '3',    '4',    '5',    '6', 
-	'7',    '8',    '9',    '0',    '-',    '=',    K_BACKSPACE, 9, // 0 
-	'q',    'w',    'e',    'r',    't',    'y',    'u',    'i', 
-	'o',    'p',    '[',    ']',    13 ,    K_CTRL,'a',  's',      // 1 
-	'd',    'f',    'g',    'h',    'j',    'k',    'l',    ';', 
-	'\'' ,    '`',    K_SHIFT,'\\',  'z',    'x',    'c',    'v',      // 2 
-	'b',    'n',    'm',    ',',    '.',    '/',    K_SHIFT,'*', 
-	K_ALT,' ',   0  ,    K_F1, K_F2, K_F3, K_F4, K_F5,   // 3 
-	K_F6, K_F7, K_F8, K_F9, K_F10,0  ,    0  , K_HOME, 
-	K_UPARROW,K_PGUP,'-',K_LEFTARROW,'5',K_RIGHTARROW,'+',K_END, //4 
-	K_DOWNARROW,K_PGDN,K_INS,K_DEL,0,0,             0,              K_F11, 
-	K_F12,0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 5 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 6 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0         // 7 
-					}; 
+        0  ,    27,     '1',    '2',    '3',    '4',    '5',    '6', 
+        '7',    '8',    '9',    '0',    '-',    '=',    K_BACKSPACE, 9, // 0 
+        'q',    'w',    'e',    'r',    't',    'y',    'u',    'i', 
+        'o',    'p',    '[',    ']',    13 ,    K_CTRL,'a',  's',      // 1 
+        'd',    'f',    'g',    'h',    'j',    'k',    'l',    ';', 
+        '\'' ,    '`',    K_SHIFT,'\\',  'z',    'x',    'c',    'v',      // 2 
+        'b',    'n',    'm',    ',',    '.',    '/',    K_SHIFT,'*', 
+        K_ALT,' ',   0  ,    K_F1, K_F2, K_F3, K_F4, K_F5,   // 3 
+        K_F6, K_F7, K_F8, K_F9, K_F10,0  ,    0  , K_HOME, 
+        K_UPARROW,K_PGUP,'-',K_LEFTARROW,'5',K_RIGHTARROW,'+',K_END, //4 
+        K_DOWNARROW,K_PGDN,K_INS,K_DEL,0,0,             0,              K_F11, 
+        K_F12,0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 5 
+        0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
+        0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 6 
+        0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
+        0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0         // 7 
+                                        }; 
 
 byte        shiftscantokey[128] = 
-					{ 
+                                        { 
 //  0           1       2       3       4       5       6       7 
 //  8           9       A       B       C       D       E       F 
-	0  ,    27,     '!',    '@',    '#',    '$',    '%',    '^', 
-	'&',    '*',    '(',    ')',    '_',    '+',    K_BACKSPACE, 9, // 0 
-	'Q',    'W',    'E',    'R',    'T',    'Y',    'U',    'I', 
-	'O',    'P',    '{',    '}',    13 ,    K_CTRL,'A',  'S',      // 1 
-	'D',    'F',    'G',    'H',    'J',    'K',    'L',    ':', 
-	'"' ,    '~',    K_SHIFT,'|',  'Z',    'X',    'C',    'V',      // 2 
-	'B',    'N',    'M',    '<',    '>',    '?',    K_SHIFT,'*', 
-	K_ALT,' ',   0  ,    K_F1, K_F2, K_F3, K_F4, K_F5,   // 3 
-	K_F6, K_F7, K_F8, K_F9, K_F10,0  ,    0  , K_HOME, 
-	K_UPARROW,K_PGUP,'_',K_LEFTARROW,'%',K_RIGHTARROW,'+',K_END, //4 
-	K_DOWNARROW,K_PGDN,K_INS,K_DEL,0,0,             0,              K_F11, 
-	K_F12,0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 5 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 6 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0         // 7 
-					}; 
+        0  ,    27,     '!',    '@',    '#',    '$',    '%',    '^', 
+        '&',    '*',    '(',    ')',    '_',    '+',    K_BACKSPACE, 9, // 0 
+        'Q',    'W',    'E',    'R',    'T',    'Y',    'U',    'I', 
+        'O',    'P',    '{',    '}',    13 ,    K_CTRL,'A',  'S',      // 1 
+        'D',    'F',    'G',    'H',    'J',    'K',    'L',    ':', 
+        '"' ,    '~',    K_SHIFT,'|',  'Z',    'X',    'C',    'V',      // 2 
+        'B',    'N',    'M',    '<',    '>',    '?',    K_SHIFT,'*', 
+        K_ALT,' ',   0  ,    K_F1, K_F2, K_F3, K_F4, K_F5,   // 3 
+        K_F6, K_F7, K_F8, K_F9, K_F10,0  ,    0  , K_HOME, 
+        K_UPARROW,K_PGUP,'_',K_LEFTARROW,'%',K_RIGHTARROW,'+',K_END, //4 
+        K_DOWNARROW,K_PGDN,K_INS,K_DEL,0,0,             0,              K_F11, 
+        K_F12,0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 5 
+        0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
+        0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 6 
+        0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
+        0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0         // 7 
+                                        }; 
 
 int dos_inportb(int port)
 {
-	return port;
+        return port;
 }
 
 int dos_inportw(int port)
 {
-	return port;
+        return port;
 }
 
 void dos_outportb(int port, int val)
@@ -113,9 +114,9 @@ void TrapKey(void)
 #define SC_RIGHTSHIFT   0x36
 #define SC_RIGHTARROW   0x4d
 
-double	curtime;
-//unsigned	sys_msg_time;
-double	sys_frame_time;
+double  curtime;
+//unsigned      sys_msg_time;
+double  sys_frame_time;
 
 #ifndef id386
 void Sys_SetFPCW()
@@ -130,27 +131,27 @@ Com_Printf("mkdir %s\n",path);
 
 void Sys_Error (char *error, ...)
 {
-	va_list		argptr;
+        va_list         argptr;
 
-	printf ("Sys_Error: ");	
-	va_start (argptr,error);
-	vprintf (error,argptr);
-	va_end (argptr);
-	printf ("\n");
+        printf ("Sys_Error: "); 
+        va_start (argptr,error);
+        vprintf (error,argptr);
+        va_end (argptr);
+        printf ("\n");
 #if 0
-{	//we crash here so we can get a backtrace.  Yes it is ugly, and no this should never be in production!
-	int j,k;
+{       //we crash here so we can get a backtrace.  Yes it is ugly, and no this should never be in production!
+        int j,k;
 fflush(stdout);
-	j=0;
-	k=5/j;	//divide by zero!
+        j=0;
+        k=5/j;  //divide by zero!
 }
 #endif
-	exit (1);
+        exit (1);
 }
 
 void Sys_Quit (void)
 {
-	exit (0);
+        exit (0);
 }
 
 void *GetGameAPI (void *import);
@@ -160,9 +161,9 @@ void    Sys_UnloadGame (void)
 {
 }
 
-void	*Sys_GetGameAPI (void *parms)
+void    *Sys_GetGameAPI (void *parms)
 {
-	return GetGameAPI (parms);
+        return GetGameAPI (parms);
 }
 // needs to be statically linked for null
 // otherwise it sits here to satisfy the linker AFIK
@@ -171,21 +172,21 @@ void	*Sys_GetGameAPI (void *parms)
 
 void    Sys_UnloadGame (void)
 {
-	Com_Printf("Sys_UnloadGame\n");
-	UnloadDLM("gamex86.dlm");
+        Com_Printf("Sys_UnloadGame\n");
+        UnloadDLM("gamex86.dlm");
 }
 
-void	*Sys_GetGameAPI (void *parms)
+void    *Sys_GetGameAPI (void *parms)
 {
-	Com_Printf("Sys_LoadGame\n");
-	LoadDLM("gamex86.dlm");
-	return GetGameAPI (parms);
+        Com_Printf("Sys_LoadGame\n");
+        LoadDLM("gamex86.dlm");
+        return GetGameAPI (parms);
 }
-#endif	
+#endif  
 
 char *Sys_ConsoleInput (void)
 {
-#ifdef __DJGPP__
+//#ifdef __DJGPP__
         static char     text[1024];
         static int index;
         int     len;
@@ -213,15 +214,16 @@ char *Sys_ConsoleInput (void)
         index = 0;
 
         return text;
-#else
-	return NULL;
-#endif
+//#else
+//        return NULL;
+//#endif
 }
 
-void	Sys_ConsoleOutput (char *string)
+void    Sys_ConsoleOutput (char *string)
 {
 //printf("Sys_ConsoleOutput: %s",string);
 printf("%s",string);
+fflush(stdout);
 }
 
 #define SC_RSHIFT       0x36 
@@ -240,115 +242,115 @@ void Sys_CopyProtect (void)
 
 char *Sys_GetClipboardData( void )
 {
-	return NULL;
+        return NULL;
 }
 
-int		hunkcount;
+int             hunkcount;
 
 
-byte	*membase;
-int		hunkmaxsize;
-int		cursize;
+byte    *membase;
+int             hunkmaxsize;
+int             cursize;
 
-void	*Hunk_Begin (int maxsize)
+void    *Hunk_Begin (int maxsize)
 {
-	// reserve a huge chunk of memory, but don't commit any yet
-	cursize = 0;
-	hunkmaxsize = maxsize;
-	membase = malloc (maxsize);
-	memset (membase, 0, maxsize);
-	if (!membase)
-		Sys_Error ("VirtualAlloc reserve failed");
-	return (void *)membase;
+        // reserve a huge chunk of memory, but don't commit any yet
+        cursize = 0;
+        hunkmaxsize = maxsize;
+        membase = malloc (maxsize);
+        memset (membase, 0, maxsize);
+        if (!membase)
+                Sys_Error ("VirtualAlloc reserve failed");
+        return (void *)membase;
 
 }
 
-void	*Hunk_Alloc (int size)
+void    *Hunk_Alloc (int size)
 {
-	// round to cacheline
-	size = (size+31)&~31;
+        // round to cacheline
+        size = (size+31)&~31;
 
-	cursize += size;
-	if (cursize > hunkmaxsize)
-		Sys_Error ("Hunk_Alloc overflow");
+        cursize += size;
+        if (cursize > hunkmaxsize)
+                Sys_Error ("Hunk_Alloc overflow");
 
-	return (void *)(membase+cursize-size);
+        return (void *)(membase+cursize-size);
 }
 
-void	Hunk_Free (void *buf)
+void    Hunk_Free (void *buf)
 {
-	free (buf);
-	hunkcount--;
+        free (buf);
+        hunkcount--;
 }
 
-int		Hunk_End (void)
+int             Hunk_End (void)
 {
-	hunkcount++;
+        hunkcount++;
 //Com_Printf ("hunkcount: %i\n", hunkcount);
-	return cursize;
+        return cursize;
 }
 
-double		Sys_Milliseconds (void)
+double          Sys_Milliseconds (void)
 {
-#ifndef WIN32
-	struct timeval tp;
-	struct timezone tzp;
-	static double		secbase;
+#ifdef DONT_WORK_EVE //__DJGPP__ //or linux
+        struct timeval tp;
+        struct timezone tzp;
+        static double           secbase;
 
-	gettimeofday(&tp, &tzp);
-	
-	if (!secbase)
-	{
-		secbase = tp.tv_sec;
-		return tp.tv_usec/1000;
-	}
+        gettimeofday(&tp, &tzp);
+        
+        if (!secbase)
+        {
+                secbase = tp.tv_sec;
+                return tp.tv_usec/1000;
+        }
 
-	curtime = (tp.tv_sec - secbase)*1000 + tp.tv_usec/1000;
+        curtime = (tp.tv_sec - secbase)*1000 + tp.tv_usec/1000;
 #else
-	curtime++;
+        curtime++;
 #endif
-	return curtime;
+        return curtime;
 }
 
-void	Sys_Mkdir (char *path)
+void    Sys_Mkdir (char *path)
 {
-	printf("Sys_Mkdir [%s]: UNIMPLEMENTED!\n",path);
+        printf("Sys_Mkdir [%s]: UNIMPLEMENTED!\n",path);
 }
 
-char	*Sys_FindFirst (char *path, unsigned musthave, unsigned canthave)
+char    *Sys_FindFirst (char *path, unsigned musthave, unsigned canthave)
 {
-	printf("Sys_FindFirst [%s]: UNIMPLEMENTED!\n",path);
-	return NULL;
+        printf("Sys_FindFirst [%s]: UNIMPLEMENTED!\n",path);
+        return NULL;
 }
 
-char	*Sys_FindNext (unsigned musthave, unsigned canthave)
+char    *Sys_FindNext (unsigned musthave, unsigned canthave)
 {
-	return NULL;
+        return NULL;
 }
 
-void	Sys_FindClose (void)
+void    Sys_FindClose (void)
 {
 }
 
-void	Sys_Init (void)
+void    Sys_Init (void)
 {
 }
 #ifdef __DJGPP__
 static struct handlerhistory_s
 {
-	int intr;
-	_go32_dpmi_seginfo pm_oldvec;
+        int intr;
+        _go32_dpmi_seginfo pm_oldvec;
 } handlerhistory[4];
 #endif
 
 static int handlercount=0;
 
-void	dos_registerintr(int intr, void (*handler)(void))
+void    dos_registerintr(int intr, void (*handler)(void))
 {
 
 }
 
-void	dos_restoreintr(int intr)
+void    dos_restoreintr(int intr)
 {
 }
 
@@ -361,38 +363,38 @@ void Sys_MakeCodeWriteable()
 
 void main (int argc, char **argv)
 {
-	double				time, oldtime, newtime;
+        double                          time, oldtime, newtime;
 #ifndef GAME_HARD_LINKED
-	LoadDLM("libc.dlm");
-	LoadDLM("libm.dlm");
+        LoadDLM("libc.dlm");
+        LoadDLM("libm.dlm");
 #endif
 
-	Qcommon_Init (argc, argv);
-	oldtime = Sys_Milliseconds ();
+        Qcommon_Init (argc, argv);
+        oldtime = Sys_Milliseconds ();
 
     /* main window message loop */
-	while (1)
-	{
-		do
-		{
-			newtime = Sys_Milliseconds ();
-			time = newtime - oldtime;
-		} while (time < 1);
-//			Con_Printf ("time:%5.2f - %5.2f = %5.2f\n", newtime, oldtime, time);
+        while (1)
+        {
+                do
+                {
+                        newtime = Sys_Milliseconds ();
+                        time = newtime - oldtime;
+                } while (time < 1);
+//                      Con_Printf ("time:%5.2f - %5.2f = %5.2f\n", newtime, oldtime, time);
 
-		//	_controlfp( ~( _EM_ZERODIVIDE /*| _EM_INVALID*/ ), _MCW_EM );
-//		_controlfp( _PC_24, _MCW_PC ); // FS: Win32 only maybe?  Can't test this
-		Qcommon_Frame (time);
+                //      _controlfp( ~( _EM_ZERODIVIDE /*| _EM_INVALID*/ ), _MCW_EM );
+//              _controlfp( _PC_24, _MCW_PC ); // FS: Win32 only maybe?  Can't test this
+                Qcommon_Frame (time);
 
-		oldtime = newtime;
-	}
+                oldtime = newtime;
+        }
 }
 
 
 int     Sys_LinuxTime (void) // FS: DOS needs this for random qport
 {
         int linuxtime = 0;
-#ifndef WIN32
+#ifdef DONT_WOKR_EVER//__DJGPP__
         struct timeval tp;
         struct timezone tzp;
         static int              secbase;
@@ -407,7 +409,7 @@ int     Sys_LinuxTime (void) // FS: DOS needs this for random qport
 
         linuxtime = (tp.tv_sec - secbase)*1000 + tp.tv_usec/1000;
 #else
-		linuxtime++;
+                linuxtime++;
 #endif
         return linuxtime;
 }
