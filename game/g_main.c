@@ -45,8 +45,11 @@ cvar_t	*maxclients;
 cvar_t	*maxspectators;
 cvar_t	*maxentities;
 cvar_t	*g_select_empty;
-cvar_t	*dedicated;
-
+#ifndef GAME_HARD_LINKED
+cvar_t  *dedicated;
+#else
+extern cvar_t *dedicated;
+#endif
 cvar_t	*filterban;
 
 cvar_t	*sv_maxvelocity;
@@ -318,7 +321,7 @@ void CheckDMRules (void)
 	{
 		if (level.time >= timelimit->value*60)
 		{
-			gi.bprintf (PRINT_HIGH, "Timelimit hit.\n");
+                        gi.bprintf (PRINT_HIGH, "Timelimit hit.\n");
 			EndDMLevel ();
 			return;
 		}
@@ -334,7 +337,7 @@ void CheckDMRules (void)
 
 			if (cl->resp.score >= fraglimit->value)
 			{
-				gi.bprintf (PRINT_HIGH, "Fraglimit hit.\n");
+                                gi.bprintf (PRINT_HIGH, "Fraglimit hit.\n");
 				EndDMLevel ();
 				return;
 			}

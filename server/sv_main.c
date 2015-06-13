@@ -20,21 +20,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "server.h"
 
-netadr_t	master_adr[MAX_MASTERS];	// address of group servers
+netadr_t        master_adr[MAX_MASTERS];        // address of group servers
 
-client_t	*sv_client;			// current client
+client_t        *sv_client;                     // current client
 
-cvar_t	*sv_paused;
-cvar_t	*sv_timedemo;
+cvar_t  *sv_paused;
+cvar_t  *sv_timedemo;
 
-cvar_t	*sv_enforcetime;
+cvar_t  *sv_enforcetime;
 
-cvar_t	*timeout;				// seconds without any message
-cvar_t	*zombietime;			// seconds to sink messages after disconnect
+cvar_t  *timeout;                               // seconds without any message
+cvar_t  *zombietime;                    // seconds to sink messages after disconnect
 
-cvar_t	*rcon_password;			// password for remote server commands
+cvar_t  *rcon_password;                 // password for remote server commands
 
-cvar_t	*allow_download;
+cvar_t  *allow_download;
 cvar_t *allow_download_players;
 cvar_t *allow_download_models;
 cvar_t *allow_download_sounds;
@@ -42,16 +42,17 @@ cvar_t *allow_download_maps;
 
 cvar_t *sv_airaccelerate;
 
-cvar_t	*sv_noreload;			// don't reload level state when reentering
+cvar_t  *sv_noreload;                   // don't reload level state when reentering
 
-cvar_t	*maxclients;			// FIXME: rename sv_maxclients
-cvar_t	*sv_showclamp;
+extern cvar_t  *maxclients;                    // FIXME: rename sv_maxclients
+                                        //made extern from a collision in watcom
+cvar_t  *sv_showclamp;
 
-cvar_t	*hostname;
-cvar_t	*public_server;			// should heartbeats be sent
+cvar_t  *hostname;
+cvar_t  *public_server;                 // should heartbeats be sent
 
-cvar_t	*sv_iplimit;			// r1ch: max connections from a single IP (prevent DoS)
-cvar_t	*sv_reconnect_limit;	// minimum seconds between connect messages
+cvar_t  *sv_iplimit;                    // r1ch: max connections from a single IP (prevent DoS)
+cvar_t  *sv_reconnect_limit;    // minimum seconds between connect messages
 cvar_t	*sv_entfile;	// Knightmare 6/25/12- cvar to control use of .ent files
 
 void Master_Shutdown (void);
@@ -91,7 +92,7 @@ void SV_DropClient (client_t *drop)
 	if (drop->edict && drop->edict->client)
 		drop->edict->client->ps.stats[STAT_FRAGS] = 0;
 
-	drop->state = cs_zombie;		// become free in a few seconds
+	drop->state = cs_zombie;                // become free in a few seconds
 	drop->name[0] = 0;
 }
 
@@ -106,9 +107,9 @@ Given an netadr_t, returns the matching client.
 */
 client_t *GetClientFromAdr (netadr_t address)
 {
-	client_t	*cl;
-	int			i;
-	qboolean	found = false;
+	client_t        *cl;
+	int                     i;
+	qboolean        found = false;
 
 	for (i = 0; i < maxclients->value; i++)
 	{
@@ -920,10 +921,11 @@ void Master_Heartbeat (void)
 	char		*string;
 	int			i;
 
-	
+	// pgm post3.19 change, cvar pointer not validated before dereferencing
 	if (!dedicated || !dedicated->value)
 		return;		// only dedicated servers send heartbeats
 
+	// pgm post3.19 change, cvar pointer not validated before dereferencing
 	if (!public_server || !public_server->value)
 		return;		// a private dedicated game
 
@@ -959,9 +961,11 @@ void Master_Shutdown (void)
 {
 	int			i;
 
+	// pgm post3.19 change, cvar pointer not validated before dereferencing
 	if (!dedicated || !dedicated->value)
 		return;		// only dedicated servers send heartbeats
 
+	// pgm post3.19 change, cvar pointer not validated before dereferencing
 	if (!public_server || !public_server->value)
 		return;		// a private dedicated game
 
@@ -1088,9 +1092,9 @@ to totally exit after returning from this function.
 */
 void SV_FinalMessage (char *message, qboolean reconnect)
 {
-	int			i;
-	client_t	*cl;
-	
+	int                     i;
+	client_t        *cl;
+        
 	SZ_Clear (&net_message);
 	MSG_WriteByte (&net_message, svc_print);
 	MSG_WriteByte (&net_message, PRINT_HIGH);
@@ -1106,13 +1110,11 @@ void SV_FinalMessage (char *message, qboolean reconnect)
 
 	for (i=0, cl = svs.clients ; i<maxclients->value ; i++, cl++)
 		if (cl->state >= cs_connected)
-			Netchan_Transmit (&cl->netchan, net_message.cursize
-			, net_message.data);
+			Netchan_Transmit (&cl->netchan, net_message.cursize, net_message.data);
 
 	for (i=0, cl = svs.clients ; i<maxclients->value ; i++, cl++)
 		if (cl->state >= cs_connected)
-			Netchan_Transmit (&cl->netchan, net_message.cursize
-			, net_message.data);
+			Netchan_Transmit (&cl->netchan, net_message.cursize, net_message.data);
 }
 
 
