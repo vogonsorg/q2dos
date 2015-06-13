@@ -2,6 +2,8 @@
 
 #include "g_local.h"
 
+int	gibsthisframe = 0; // FS: From Yamagi Q2
+int lastgibframe = 0; // FS: From Yamagi Q2
 
 /*QUAKED func_group (0 0 0) ?
 Used to group brushes together just for editor convenience.
@@ -110,38 +112,12 @@ void gib_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf
 
 // RAFAEL 24-APR-98
 // removed acid damage
-#if 0
 // RAFAEL
-void gib_touchacid (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
-{
-	vec3_t normal_angles, right;
 
-	if (other->takedamage)
-	{
-		T_Damage (other, self, self, vec3_origin, other->s.origin, vec3_origin, self->dmg, 1, 0, MOD_CRUSH);
-		G_FreeEdict (self);
-	}
 
-	if (!self->groundentity)
-		return;
 
-	if (plane)
-	{
-		gi.sound (self, CHAN_VOICE, gi.soundindex ("misc/fhit3.wav"), 1, ATTN_NORM, 0);
 
-		vectoangles (plane->normal, normal_angles);
-		AngleVectors (normal_angles, NULL, right, NULL);
-		vectoangles (right, self->s.angles);
 
-		if (self->s.modelindex == sm_meat_index)
-		{
-			self->s.frame++;
-			self->think = gib_think;
-			self->nextthink = level.time + FRAMETIME;
-		}
-	}
-}
-#endif
 
 void gib_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point)
 {
@@ -155,6 +131,25 @@ void ThrowGib (edict_t *self, char *gibname, int damage, int type)
 	vec3_t	origin;
 	vec3_t	size;
 	float	vscale;
+
+	// FS: From Yamagi Q2: Don't crash with too many gibs
+	if (!self || !gibname)
+	{
+		return;
+	}
+
+	if (level.framenum > lastgibframe)
+	{
+		gibsthisframe = 0;
+		lastgibframe = level.framenum;
+	}
+
+	gibsthisframe++;
+
+	if (gibsthisframe > 20)
+	{
+		return;
+	}
 
 	gib = G_Spawn();
 
@@ -252,6 +247,25 @@ void ThrowGibACID (edict_t *self, char *gibname, int damage, int type)
 	vec3_t origin;
 	vec3_t size;
 	float vscale;
+
+	// FS: From Yamagi Q2: Don't crash if there's a lot of gibs flying around
+	if (!self || !gibname)
+	{
+		return;
+	}
+
+	if (level.framenum > lastgibframe)
+	{
+		gibsthisframe = 0;
+		lastgibframe = level.framenum;
+	}
+
+	gibsthisframe++;
+
+	if (gibsthisframe > 20)
+	{
+		return;
+	}
 
 	gib = G_Spawn();
 
@@ -417,6 +431,25 @@ void ThrowDebris (edict_t *self, char *modelname, float speed, vec3_t origin)
 {
 	edict_t	*chunk;
 	vec3_t	v;
+
+	// FS: From Yamagi Q2: Don't crash if there's a lot of gibs flying around
+	if (!self)
+	{
+		return;
+	}
+
+	if (level.framenum > lastgibframe)
+	{
+		gibsthisframe = 0;
+		lastgibframe = level.framenum;
+	}
+
+	gibsthisframe++;
+
+	if (gibsthisframe > 20)
+	{
+		return;
+	}
 
 	chunk = G_Spawn();
 	VectorCopy (origin, chunk->s.origin);
@@ -614,7 +647,7 @@ void SP_point_combat (edict_t *self)
 	VectorSet (self->maxs, 8, 8, 16);
 	self->svflags = SVF_NOCLIENT;
 	gi.linkentity (self);
-};
+}
 
 
 /*QUAKED viewthing (0 .5 .8) (-8 -8 -8) (8 8 8)
@@ -649,7 +682,7 @@ Used as a positional target for spotlights, etc.
 void SP_info_null (edict_t *self)
 {
 	G_FreeEdict (self);
-};
+}
 
 
 /*QUAKED info_notnull (0 0.5 0) (-4 -4 -4) (4 4 4)
@@ -659,7 +692,7 @@ void SP_info_notnull (edict_t *self)
 {
 	VectorCopy (self->s.origin, self->absmin);
 	VectorCopy (self->s.origin, self->absmax);
-};
+}
 
 
 /*QUAKED light (0 1 0) (-8 -8 -8) (8 8 8) START_OFF
@@ -2083,7 +2116,9 @@ void teleporter_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_
 
 	// set angles
 	for (i=0 ; i<3 ; i++)
+	{
 		other->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(dest->s.angles[i] - other->client->resp.cmd_angles[i]);
+	}
 
 	VectorClear (other->s.angles);
 	VectorClear (other->client->ps.viewangles);

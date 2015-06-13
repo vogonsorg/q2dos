@@ -364,7 +364,6 @@ void use_target_spawner (edict_t *self, edict_t *other, edict_t *activator)
 
 	ent = G_Spawn();
 	ent->classname = self->target;
-	ent->flags = self->flags;
 	VectorCopy (self->s.origin, ent->s.origin);
 	VectorCopy (self->s.angles, ent->s.angles);
 	ED_CallSpawn (ent);

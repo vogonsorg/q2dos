@@ -1256,7 +1256,9 @@ void PutClientInServer (edict_t *ent)
 
 	// set the delta angle
 	for (i=0 ; i<3 ; i++)
+	{
 		client->ps.pmove.delta_angles[i] = ANGLE2SHORT(spawn_angles[i] - client->resp.cmd_angles[i]);
+	}
 
 	ent->s.angles[PITCH] = 0;
 	ent->s.angles[YAW] = spawn_angles[YAW];

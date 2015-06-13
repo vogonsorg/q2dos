@@ -166,7 +166,8 @@ void InitGame (void)
 	fraglimit = gi.cvar ("fraglimit", "0", CVAR_SERVERINFO);
 	timelimit = gi.cvar ("timelimit", "0", CVAR_SERVERINFO);
 	password = gi.cvar ("password", "", CVAR_USERINFO);
-	spectator_password = gi.cvar ("spectator_password", "", 0);
+	spectator_password = gi.cvar ("spectator_password", "", CVAR_USERINFO);
+	needpass = gi.cvar ("needpass", "0", CVAR_SERVERINFO);
 	filterban = gi.cvar ("filterban", "1", 0);
 
 	g_select_empty = gi.cvar ("g_select_empty", "0", CVAR_ARCHIVE);
@@ -297,6 +298,8 @@ void WriteField2 (FILE *f, field_t *field, byte *base)
 			fwrite (*(char **)p, len, 1, f);
 		}
 		break;
+	default:
+		break;
 	}
 }
 
@@ -325,7 +328,11 @@ void ReadField (FILE *f, field_t *field, byte *base)
 			*(char **)p = NULL;
 		else
 		{
-			*(char **)p = gi.TagMalloc (len, TAG_LEVEL);
+			/* 
+			  SBF: FIXME - 32 extra bytes alloc'd since the saved 
+			  string might not be long enough
+			 */
+			*(char **)p = gi.TagMalloc (32+len, TAG_LEVEL);
 			fread (*(char **)p, len, 1, f);
 		}
 		break;
