@@ -244,9 +244,9 @@ void CL_AdjustAngles (void)
 	float	up, down;
 	
 	if (in_speed.state & 1)
-		speed = cls.netFrameTime * cl_anglespeedkey->value;
+		speed = (float)cls.netFrameTime * cl_anglespeedkey->value;
 	else
-		speed = cls.netFrameTime;
+		speed = (float)cls.netFrameTime;
 
 	if (!(in_strafe.state & 1))
 	{
@@ -356,7 +356,7 @@ void CL_FinishMove (usercmd_t *cmd)
 	ms = cls.netFrameTime * 1000;
 	if (ms > 250)
 		ms = 100;		// time was unreasonable
-	cmd->msec = ms;
+	cmd->msec = (byte)ms;
 
 	CL_ClampPitch ();
 	for (i=0 ; i<3 ; i++)
@@ -493,7 +493,7 @@ void CL_RefreshCmd (void)
 	if (ms > 250)
 		ms = 100;
 
-	cmd->msec = ms;
+	cmd->msec = (byte)ms;
 
 	// Update counter
 	old_sys_frame_time = sys_frame_time;
