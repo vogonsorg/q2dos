@@ -735,7 +735,7 @@ gekk_hit_left(edict_t *self)
 {
 	vec3_t aim;
 
-  	if (!self)
+  	if (!self || !self->enemy) // FS
 	{
 		return;
 	}
@@ -757,7 +757,7 @@ gekk_hit_right(edict_t *self)
 {
 	vec3_t aim;
 
-  	if (!self)
+  	if (!self || !self->enemy)
 	{
 		return;
 	}
