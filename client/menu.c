@@ -3788,7 +3788,7 @@ qboolean PlayerConfig_MenuInit( void )
 
 	s_player_config_menu.x = viddef.width / 2 - 95; 
 
-	if(viddef.width > 320 && viddef.height > 240) // FS: Will draw out of bounds on extremely low res
+	if(viddef.height >= 300) // FS: Will draw out of bounds on extremely low res
 	{
 		s_player_config_menu.y = viddef.height / 2 - 58; // was - 97;
 	}
@@ -3899,7 +3899,7 @@ void PlayerConfig_MenuDraw( void )
 	refdef_t refdef;
 	char scratch[MAX_QPATH];
 
-	if(viddef.width > 320 && viddef.height > 240) // FS: Will draw out of bounds on extremely low res
+	if(viddef.height >= 300) // FS: Will draw out of bounds on extremely low res
 	{
 		M_Banner( "m_banner_plauer_setup" ); // Knightmare added banner
 	}
@@ -3908,7 +3908,7 @@ void PlayerConfig_MenuDraw( void )
 
 	refdef.x = viddef.width / 2;
 
-	if(viddef.width > 320 && viddef.height > 240) // FS: Will draw out of bounds on extremely low res
+	if(viddef.height >= 300) // FS: Will draw out of bounds on extremely low res
 	{
 		refdef.y = viddef.height / 2 - 33; // was - 72
 	}
@@ -3980,7 +3980,7 @@ void PlayerConfig_MenuDraw( void )
 		Menu_Draw( &s_player_config_menu );
 
 	//	M_DrawTextBox( ( refdef.x ) * ( 320.0F / viddef.width ) - 8, ( viddef.height / 2 ) * ( 240.0F / viddef.height) - 77, refdef.width / 8, refdef.height / 8 );
-		if(viddef.width > 320 && viddef.height > 240) // FS: Will draw out of bounds on extremely low res
+		if(viddef.height >= 300) // FS: Will draw out of bounds on extremely low res
 		{
 			M_DrawTextBox( ( refdef.x ) * ( 320.0F / viddef.width ) - 8, ( viddef.height / 2 ) * ( 240.0F / viddef.height) - 38, refdef.width / 8, refdef.height / 8 );
 		}
