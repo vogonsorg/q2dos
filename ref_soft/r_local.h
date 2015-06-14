@@ -512,9 +512,11 @@ extern int              r_screenwidth;
 
 extern int              r_drawnpolycount;
 
-extern int      sintable[1280];
-extern int      intsintable[1280];
-extern int		blanktable[1280];		// PGM
+#define TABLESIZE 1280*2 // FS: Fix going underwater with 1280x960 or higher modes
+
+extern int      sintable[TABLESIZE]; // FS: Changed from 1280
+extern int      intsintable[TABLESIZE]; // FS: Changed from 1280
+extern int		blanktable[TABLESIZE]; // FS: Changed from 1280	// PGM
 
 extern  vec3_t  vup, base_vup;
 extern  vec3_t  vpn, base_vpn;

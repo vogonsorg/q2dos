@@ -44,9 +44,9 @@ qboolean		r_leftclipped, r_rightclipped;
 static qboolean	makeleftedge, makerightedge;
 qboolean		r_nearzionly;
 
-int		sintable[1280];
-int		intsintable[1280];
-int		blanktable[1280];		// PGM
+int		sintable[TABLESIZE]; // FS: Changed from 1280
+int		intsintable[TABLESIZE]; // FS: Changed from 1280
+int		blanktable[TABLESIZE]; // FS: Changed from 1280		// PGM
 
 mvertex_t	r_leftenter, r_leftexit;
 mvertex_t	r_rightenter, r_rightexit;
