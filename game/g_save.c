@@ -1434,6 +1434,8 @@ void WriteField2 (FILE *f, field_t *field, byte *base)
 			fwrite (*(char **)p, len, 1, f);
 		}
 		break;
+	default:
+		break;
 	}
 }
 
@@ -1462,7 +1464,11 @@ void ReadField (FILE *f, field_t *field, byte *base)
 			*(char **)p = NULL;
 		else
 		{
-			*(char **)p = gi.TagMalloc (len, TAG_LEVEL);
+			/* 
+			  SBF: FIXME - 32 extra bytes alloc'd since the saved 
+			  string might not be long enough
+			 */
+			*(char **)p = gi.TagMalloc (32+len, TAG_LEVEL);
 			fread (*(char **)p, len, 1, f);
 		}
 		break;
