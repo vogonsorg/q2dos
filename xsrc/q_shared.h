@@ -277,10 +277,12 @@ qboolean Info_Validate (char *s);
 /* ============================================= */
 
 /* Random number generator */
+#if 0 // FS: Currently broken in DJGPP
 int  randk(void);
 float frandk(void);
 float crandk(void);
 void randk_seed(void);
+#endif
 /*
 ==============================================================
 
