@@ -462,7 +462,7 @@ mmove_t gekk_move_swim_start = {
 void
 gekk_swim(edict_t *self)
 {
-  	if (!self)
+  	if (!self || !self->enemy->waterlevel) // FS
 	{
 		return;
 	}

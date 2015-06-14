@@ -1476,6 +1476,8 @@ END GAME MENU
 =============================================================================
 */
 static int credits_start_time;
+// Knigthtmare added- allow credits to scroll past top of screen
+static int credits_start_line;
 static const char **credits;
 static char *creditsIndex[256];
 static char *creditsBuffer;
@@ -1830,15 +1832,30 @@ void M_Credits_MenuDraw( void )
 {
 	int i, y;
 
+	// Knightmare - check if start line needs to be incremented
+	if ((viddef.height - ((cls.realtime - credits_start_time)/40.0F)
+		+ credits_start_line * 10) < 0)
+	{
+		credits_start_line++;
+		if (!credits[credits_start_line])
+		{
+			credits_start_line = 0;
+			credits_start_time = cls.realtime;
+		}
+	}
+
 	/*
 	** draw the credits
 	*/
-	for ( i = 0, y = viddef.height - ( ( cls.realtime - credits_start_time ) / 40.0F ); credits[i] && y < viddef.height; y += 10, i++ )
+	for ( i = credits_start_line, y = viddef.height - ((cls.realtime - credits_start_time) / 40.0F) + credits_start_line * 10;
+			credits[i] && y < viddef.height; y += 10, i++ )
 	{
 		int j, stringoffset = 0;
 		int bold = false;
 
 		if ( y <= -8 )
+			continue;
+		if (y > viddef.height)
 			continue;
 
 		if ( credits[i][0] == '+' )
@@ -1865,8 +1882,8 @@ void M_Credits_MenuDraw( void )
 		}
 	}
 
-	if ( y < 0 )
-		credits_start_time = cls.realtime;
+//	if ( y < 0 )
+//		credits_start_time = cls.realtime;
 }
 
 const char *M_Credits_Key( int key )
@@ -1936,6 +1953,7 @@ void M_Menu_Credits_f( void )
 	}
 
 	credits_start_time = cls.realtime;
+	credits_start_line = 0; // Knightmare- allow credits to scroll past top of screen
 	M_PushMenu( M_Credits_MenuDraw, M_Credits_Key);
 }
 
@@ -3499,6 +3517,19 @@ static qboolean IconOfSkinExists( char *skin, char **pcxfiles, int npcxfiles )
 	return false;
 }
 
+static qboolean IsValidSkin (char **filelist, int numFiles, int index)
+{
+	int		len = strlen(filelist[index]);
+
+	if ( !strcmp (filelist[index]+max(len-4,0), ".pcx") )
+	{
+		if ( strcmp (filelist[index]+max(len-6,0), "_i.pcx") )
+			if ( IconOfSkinExists (filelist[index], filelist, numFiles-1) )
+				return true;
+	}
+	return false;
+}
+
 static qboolean PlayerConfig_ScanDirectories( void )
 {
 	char findname[1024];
@@ -3512,132 +3543,151 @@ static qboolean PlayerConfig_ScanDirectories( void )
 
 	s_numplayermodels = 0;
 
-	/*
-	** get a list of directories
-	*/
-	do 
+	// Knightmare- Loop back to here as long as there is another path to search.
+	// This fixes the bug with patched player models in a mod's gamedir.
+	do
 	{
-		path = FS_NextPath( path );
-		Com_sprintf( findname, sizeof(findname), "%s/players/*.*", path );
-
-		if ( ( dirnames = FS_ListFiles( findname, &ndirs, SFF_SUBDIR, 0 ) ) != 0 )
-			break;
-	} while ( path );
-
-	if ( !dirnames )
-		return false;
-
-	/*
-	** go through the subdirectories
-	*/
-	npms = ndirs;
-	if ( npms > MAX_PLAYERMODELS )
-		npms = MAX_PLAYERMODELS;
-
-	for ( i = 0; i < npms; i++ )
-	{
-		int k, s;
-		char *a, *b, *c;
-		char **pcxnames;
-		char **skinnames;
-		int npcxfiles;
-		int nskins = 0;
-
-		if ( dirnames[i] == 0 )
-			continue;
-
-		// verify the existence of tris.md2
-		strcpy( scratch, dirnames[i] );
-		strcat( scratch, "/tris.md2" );
-		if ( !Sys_FindFirst( scratch, 0, SFF_SUBDIR | SFF_HIDDEN | SFF_SYSTEM ) )
+		/*
+		** get a list of directories
+		*/
+		do 
 		{
-			free( dirnames[i] );
-			dirnames[i] = 0;
+			path = FS_NextPath( path );
+			Com_sprintf( findname, sizeof(findname), "%s/players/*.*", path );
+
+			if ( ( dirnames = FS_ListFiles( findname, &ndirs, SFF_SUBDIR, 0 ) ) != 0 )
+				break;
+		} while ( path );
+
+		if ( !dirnames )
+			return false;
+
+		/*
+		** go through the subdirectories
+		*/
+		npms = ndirs;
+		if ( npms > MAX_PLAYERMODELS )
+			npms = MAX_PLAYERMODELS;
+		if ( (s_numplayermodels + npms) > MAX_PLAYERMODELS ) // Knightmare added
+			npms = MAX_PLAYERMODELS - s_numplayermodels;
+
+		for ( i = 0; i < npms; i++ )
+		{
+			int			k, s;
+			char		*a, *b, *c;
+			char		**pcxnames;
+			char		**skinnames;
+			int			npcxfiles;
+			int			nskins = 0;
+			qboolean	already_added = false;	
+
+			if ( dirnames[i] == 0 )
+				continue;
+
+			// Knightmare- check if dirnames[i] is already added to the ui_pmi[i].directory list
+			a = strrchr(dirnames[i], '/');
+			b = strrchr(dirnames[i], '\\');
+			c = (a > b) ? a : b;
+			for (k=0; k < s_numplayermodels; k++)
+				if (!strcmp(s_pmi[k].directory, c+1))
+				{	already_added = true;	break;	}
+			if (already_added)
+			{	// todo: add any skins for this model not already listed to skinDisplayNames
+				continue;
+			}
+			// end Knightmare
+
+			// verify the existence of tris.md2
+			strcpy( scratch, dirnames[i] );
+			strcat( scratch, "/tris.md2" );
+			if ( !Sys_FindFirst( scratch, 0, SFF_SUBDIR | SFF_HIDDEN | SFF_SYSTEM ) )
+			{
+				free( dirnames[i] );
+				dirnames[i] = 0;
+				Sys_FindClose();
+				continue;
+			}
 			Sys_FindClose();
-			continue;
-		}
-		Sys_FindClose();
 
-		// verify the existence of at least one pcx skin
-		strcpy( scratch, dirnames[i] );
-		strcat( scratch, "/*.pcx" );
-		pcxnames = FS_ListFiles( scratch, &npcxfiles, 0, SFF_SUBDIR | SFF_HIDDEN | SFF_SYSTEM );
+			// verify the existence of at least one pcx skin
+			strcpy( scratch, dirnames[i] );
+			strcat( scratch, "/*.pcx" );
+			pcxnames = FS_ListFiles( scratch, &npcxfiles, 0, SFF_SUBDIR | SFF_HIDDEN | SFF_SYSTEM );
 
-		if ( !pcxnames )
-		{
-			free( dirnames[i] );
-			dirnames[i] = 0;
-			continue;
-		}
-
-		// count valid skins, which consist of a skin with a matching "_i" icon
-		for ( k = 0; k < npcxfiles-1; k++ )
-		{
-			if ( !strstr( pcxnames[k], "_i.pcx" ) )
+			if ( !pcxnames )
 			{
-				if ( IconOfSkinExists( pcxnames[k], pcxnames, npcxfiles - 1 ) )
-				{
+				free( dirnames[i] );
+				dirnames[i] = 0;
+				continue;
+			}
+
+			// count valid skins, which consist of a skin with a matching "_i" icon
+			for ( k = 0; k < npcxfiles-1; k++ )
+				if ( IsValidSkin(pcxnames, npcxfiles, k) )
 					nskins++;
-				}
-			}
-		}
-		if ( !nskins )
-			continue;
-
-		skinnames = malloc( sizeof( char * ) * ( nskins + 1 ) );
-		memset( skinnames, 0, sizeof( char * ) * ( nskins + 1 ) );
-
-		// copy the valid skins
-		for ( s = 0, k = 0; k < npcxfiles-1; k++ )
-		{
-			char *a, *b, *c;
-
-			if ( !strstr( pcxnames[k], "_i.pcx" ) )
-			{
-				if ( IconOfSkinExists( pcxnames[k], pcxnames, npcxfiles - 1 ) )
+		/*	{
+				if ( !strstr( pcxnames[k], "_i.pcx" ) )
 				{
-					a = strrchr( pcxnames[k], '/' );
-					b = strrchr( pcxnames[k], '\\' );
+					if ( IconOfSkinExists( pcxnames[k], pcxnames, npcxfiles - 1 ) )
+					{
+						nskins++;
+					}
+				}
+			}*/
+			if ( !nskins )
+				continue;
 
-					if ( a > b )
-						c = a;
-					else
-						c = b;
+			skinnames = malloc( sizeof( char * ) * ( nskins + 1 ) );
+			memset( skinnames, 0, sizeof( char * ) * ( nskins + 1 ) );
 
-					strcpy( scratch, c + 1 );
+			// copy the valid skins
+			for ( s = 0, k = 0; k < npcxfiles-1; k++ )
+			{
+				char *a, *b, *c;
 
-					if ( strrchr( scratch, '.' ) )
-						*strrchr( scratch, '.' ) = 0;
+				if ( !strstr( pcxnames[k], "_i.pcx" ) )
+				{
+					if ( IconOfSkinExists( pcxnames[k], pcxnames, npcxfiles - 1 ) )
+					{
+						a = strrchr( pcxnames[k], '/' );
+						b = strrchr( pcxnames[k], '\\' );
+						c = (a > b) ? a : b;
 
-					skinnames[s] = strdup( scratch );
-					s++;
+						strcpy( scratch, c + 1 );
+
+						if ( strrchr( scratch, '.' ) )
+							*strrchr( scratch, '.' ) = 0;
+
+						skinnames[s] = strdup( scratch );
+						s++;
+					}
 				}
 			}
+
+			// at this point we have a valid player model
+			s_pmi[s_numplayermodels].nskins = nskins;
+			s_pmi[s_numplayermodels].skindisplaynames = skinnames;
+
+			// make short name for the model
+			a = strrchr( dirnames[i], '/' );
+			b = strrchr( dirnames[i], '\\' );
+			c = (a > b) ? a : b;
+
+			strncpy( s_pmi[s_numplayermodels].displayname, c + 1, MAX_DISPLAYNAME-1 );
+			strcpy( s_pmi[s_numplayermodels].directory, c + 1 );
+
+			FreeFileList( pcxnames, npcxfiles );
+
+			s_numplayermodels++;
 		}
+		if ( dirnames )
+			FreeFileList( dirnames, ndirs );
 
-		// at this point we have a valid player model
-		s_pmi[s_numplayermodels].nskins = nskins;
-		s_pmi[s_numplayermodels].skindisplaynames = skinnames;
+	// If no valid player models found in path,
+	// try next path, if there is one.
+	} while (path);
 
-		// make short name for the model
-		a = strrchr( dirnames[i], '/' );
-		b = strrchr( dirnames[i], '\\' );
-
-		if ( a > b )
-			c = a;
-		else
-			c = b;
-
-		strncpy( s_pmi[s_numplayermodels].displayname, c + 1, MAX_DISPLAYNAME-1 );
-		strcpy( s_pmi[s_numplayermodels].directory, c + 1 );
-
-		FreeFileList( pcxnames, npcxfiles );
-
-		s_numplayermodels++;
-	}
-	if ( dirnames )
-		FreeFileList( dirnames, ndirs );
-	return false; // FS: Compiler warning
+	return true;	//** DMP warning fix
 }
 
 static int pmicmpfnc( const void *_a, const void *_b )
