@@ -328,6 +328,10 @@ SOURCE=..\xsrc\p_weapon.c
 
 SOURCE=..\xsrc\q_shared.c
 # End Source File
+# Begin Source File
+
+SOURCE=..\xsrc\rand.c
+# End Source File
 # End Group
 # Begin Group "Client"
 

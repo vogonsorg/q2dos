@@ -1,6 +1,9 @@
 #include "g_local.h"
 #include "m_player.h"
 
+extern void HelpComputer (edict_t *ent); // FS
+extern void InventoryMessage(edict_t *ent); // FS
+
 static char *
 ClientTeam(edict_t *ent, char* value)
 {
@@ -635,8 +638,7 @@ void Cmd_Drop_f (edict_t *ent)
 	it->drop (ent, it);
 }
 
-void
-Cmd_Score_f(edict_t *ent)
+void Cmd_Score_f(edict_t *ent)
 {
 	if (!ent)
 	{
@@ -662,8 +664,7 @@ Cmd_Score_f(edict_t *ent)
 	gi.unicast(ent, true);
 }
 
-	void
-Cmd_Help_f(edict_t *ent)
+void Cmd_Help_f(edict_t *ent)
 {
 	if (!ent)
 	{
@@ -688,7 +689,7 @@ Cmd_Help_f(edict_t *ent)
 
 	ent->client->showhelp = true;
 	ent->client->pers.helpchanged = 0;
-	HelpComputerMessage(ent);
+	HelpComputer(ent);
 	gi.unicast(ent, true);
 }
 

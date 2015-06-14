@@ -1,47 +1,44 @@
 #include "g_local.h"
 
+#define HEALTH_IGNORE_MAX 1
+#define HEALTH_TIMED 2
 
-qboolean	Pickup_Weapon (edict_t *ent, edict_t *other);
-void		Use_Weapon (edict_t *ent, gitem_t *inv);
-void		Use_Weapon2 (edict_t *ent, gitem_t *inv);
-void		Drop_Weapon (edict_t *ent, gitem_t *inv);
+qboolean Pickup_Weapon(edict_t *ent, edict_t *other);
+void Use_Weapon(edict_t *ent, gitem_t *inv);
+void Use_Weapon2(edict_t *ent, gitem_t *inv);
+void Drop_Weapon(edict_t *ent, gitem_t *inv);
 
-void Weapon_Blaster (edict_t *ent);
-void Weapon_Shotgun (edict_t *ent);
-void Weapon_SuperShotgun (edict_t *ent);
-void Weapon_Machinegun (edict_t *ent);
-void Weapon_Chaingun (edict_t *ent);
-void Weapon_HyperBlaster (edict_t *ent);
-void Weapon_RocketLauncher (edict_t *ent);
-void Weapon_Grenade (edict_t *ent);
-void Weapon_GrenadeLauncher (edict_t *ent);
-void Weapon_Railgun (edict_t *ent);
-void Weapon_BFG (edict_t *ent);
-// RAFAEL
-void Weapon_Ionripper (edict_t *ent);
-void Weapon_Phalanx (edict_t *ent);
-void Weapon_Trap (edict_t *ent);
+void Weapon_Blaster(edict_t *ent);
+void Weapon_Shotgun(edict_t *ent);
+void Weapon_SuperShotgun(edict_t *ent);
+void Weapon_Machinegun(edict_t *ent);
+void Weapon_Chaingun(edict_t *ent);
+void Weapon_HyperBlaster(edict_t *ent);
+void Weapon_RocketLauncher(edict_t *ent);
+void Weapon_Grenade(edict_t *ent);
+void Weapon_GrenadeLauncher(edict_t *ent);
+void Weapon_Railgun(edict_t *ent);
+void Weapon_BFG(edict_t *ent);
 
-gitem_armor_t jacketarmor_info	= { 25,  50, .30, .00, ARMOR_JACKET};
-gitem_armor_t combatarmor_info	= { 50, 100, .60, .30, ARMOR_COMBAT};
-gitem_armor_t bodyarmor_info	= {100, 200, .80, .60, ARMOR_BODY};
+void Weapon_Ionripper(edict_t *ent);
+void Weapon_Phalanx(edict_t *ent);
+void Weapon_Trap(edict_t *ent);
 
-static int	jacket_armor_index;
-static int	combat_armor_index;
-static int	body_armor_index;
-static int	power_screen_index;
-static int	power_shield_index;
+gitem_armor_t jacketarmor_info = {25, 50, .30, .00, ARMOR_JACKET};
+gitem_armor_t combatarmor_info = {50, 100, .60, .30, ARMOR_COMBAT};
+gitem_armor_t bodyarmor_info = {100, 200, .80, .60, ARMOR_BODY};
 
-#define HEALTH_IGNORE_MAX	1
-#define HEALTH_TIMED		2
+int jacket_armor_index;
+int combat_armor_index;
+int body_armor_index;
+static int power_screen_index;
+static int power_shield_index;
 
-void Use_Quad (edict_t *ent, gitem_t *item);
-// RAFAEL
-void Use_QuadFire (edict_t *ent, gitem_t *item);
+void Use_Quad(edict_t *ent, gitem_t *item);
+void Use_QuadFire(edict_t *ent, gitem_t *item);
 
-static int	quad_drop_timeout_hack;
-// RAFAEL
-static int	quad_fire_drop_timeout_hack;
+static int quad_drop_timeout_hack;
+static int quad_fire_drop_timeout_hack;
 
 //======================================================================
 
@@ -1316,7 +1313,7 @@ void Touch_Item (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf
 
 //======================================================================
 
-static void drop_temp_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
+void drop_temp_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
 	if (!ent || !other)
 	{
@@ -1335,7 +1332,7 @@ static void drop_temp_touch (edict_t *ent, edict_t *other, cplane_t *plane, csur
 	Touch_Item(ent, other, plane, surf);
 }
 
-static void drop_make_touchable (edict_t *ent)
+void drop_make_touchable (edict_t *ent)
 {
 	if (!ent)
 	{
@@ -2994,7 +2991,7 @@ void InitItems (void)
 
 
 /*
-===============
+=============== 
 SetItemNames
 
 Called by worldspawn
