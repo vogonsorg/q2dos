@@ -765,6 +765,7 @@ void R_PolygonScanLeftEdge (void)
 	fixed16_t	u, u_step;
 
 	pspan = s_polygon_spans;
+
 	i = s_minindex;
 	if (i == 0)
 		i = r_polydesc.nump;
@@ -1143,6 +1144,7 @@ static void R_DrawPoly( int iswater )
 	emitpoint_t	*pverts;
 	espan_t	spans[MAXHEIGHT+1];
 
+	memset (&spans, 0, sizeof(spans));	// Knightmare- zero the spans array
 	s_polygon_spans = spans;
 
 // find the top and bottom vertices, and make sure there's at least one scan to
