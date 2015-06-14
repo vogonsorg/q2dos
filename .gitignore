@@ -7,6 +7,8 @@
 *.suo
 *.user
 *.aps
+*.idb
+*.pdb
 *.clwbin/
 # ignore all the windows binaries - they shouldn't be committed! 
 Debug/

@@ -7,3 +7,5 @@ del /s *.plg
 del /s *.suo
 del /s *.user
 del /s *.aps
+del /s *.idb
+del /s *.pdb

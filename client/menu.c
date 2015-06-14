@@ -2382,6 +2382,7 @@ void JoinServer_MenuInit( void )
 	int i;
 
 	s_joinserver_menu.x = viddef.width * 0.50 - 120;
+	s_joinserver_menu.y = viddef.height * 0.50 - 58;
 	s_joinserver_menu.nitems = 0;
 
 	s_joinserver_address_book_action.generic.type	= MTYPE_ACTION;
@@ -2423,7 +2424,7 @@ void JoinServer_MenuInit( void )
 	for ( i = 0; i < 8; i++ )
 		Menu_AddItem( &s_joinserver_menu, &s_joinserver_server_actions[i] );
 
-	Menu_Center( &s_joinserver_menu );
+//	Menu_Center( &s_joinserver_menu );
 
 	SearchLocalGames();
 }
@@ -2659,7 +2660,7 @@ void StartServer_MenuInit( void )
 		strcpy( shortname, COM_Parse( &s ) );
 		l = strlen(shortname);
 		for (j=0 ; j<l ; j++)
-			shortname[j] = Q_toupper(shortname[j]);
+			shortname[j] = toupper(shortname[j]);
 		strcpy( longname, COM_Parse( &s ) );
 		Com_sprintf( scratch, sizeof( scratch ), "%s\n%s", longname, shortname );
 
@@ -2682,6 +2683,7 @@ void StartServer_MenuInit( void )
 	** initialize the menu stuff
 	*/
 	s_startserver_menu.x = viddef.width * 0.50;
+	s_startserver_menu.y = viddef.height * 0.50 - 58;
 	s_startserver_menu.nitems = 0;
 
 	s_startmap_list.generic.type = MTYPE_SPINCONTROL;
@@ -2781,7 +2783,7 @@ void StartServer_MenuInit( void )
 	Menu_AddItem( &s_startserver_menu, &s_startserver_dmoptions_action );
 	Menu_AddItem( &s_startserver_menu, &s_startserver_start_action );
 
-	Menu_Center( &s_startserver_menu );
+//	Menu_Center( &s_startserver_menu );
 
 	// call this now to set proper inital state
 	RulesChangeFunc ( NULL );
@@ -2789,6 +2791,7 @@ void StartServer_MenuInit( void )
 
 void StartServer_MenuDraw(void)
 {
+	M_Banner ("m_banner_start_server"); // Knightmare added banner
 	Menu_Draw( &s_startserver_menu );
 }
 
@@ -3008,6 +3011,7 @@ void DMOptions_MenuInit( void )
 	int y = 0;
 
 	s_dmoptions_menu.x = viddef.width * 0.50;
+	s_dmoptions_menu.y = viddef.height * 0.50 - 58;
 	s_dmoptions_menu.nitems = 0;
 
 	s_falls_box.generic.type = MTYPE_SPINCONTROL;
@@ -3197,7 +3201,7 @@ void DMOptions_MenuInit( void )
 //ROGUE
 //=======
 
-	Menu_Center( &s_dmoptions_menu );
+//	Menu_Center( &s_dmoptions_menu );
 
 	// set the original dmflags statusbar
 	DMFlagCallback( 0 );
@@ -3206,6 +3210,7 @@ void DMOptions_MenuInit( void )
 
 void DMOptions_MenuDraw(void)
 {
+	M_Banner ("m_banner_multiplayer"); // Knightmare added banner
 	Menu_Draw( &s_dmoptions_menu );
 }
 
@@ -3275,6 +3280,7 @@ void DownloadOptions_MenuInit( void )
 	int y = 0;
 
 	s_downloadoptions_menu.x = viddef.width * 0.50;
+	s_downloadoptions_menu.y = viddef.height * 0.50 - 58;
 	s_downloadoptions_menu.nitems = 0;
 
 	s_download_title.generic.type = MTYPE_SEPARATOR;
@@ -3338,6 +3344,7 @@ void DownloadOptions_MenuInit( void )
 
 void DownloadOptions_MenuDraw(void)
 {
+	M_Banner ("m_banner_multiplayer");
 	Menu_Draw( &s_downloadoptions_menu );
 }
 
@@ -3715,6 +3722,7 @@ static int pmicmpfnc( const void *_a, const void *_b )
 qboolean PlayerConfig_MenuInit( void )
 {
 	extern cvar_t *name;
+	extern cvar_t *team;
 	extern cvar_t *skin;
 	char currentdirectory[1024];
 	char currentskin[1024];
@@ -3779,7 +3787,16 @@ qboolean PlayerConfig_MenuInit( void )
 	}
 
 	s_player_config_menu.x = viddef.width / 2 - 95; 
-	s_player_config_menu.y = viddef.height / 2 - 97;
+
+	if(viddef.width > 320 && viddef.height > 240) // FS: Will draw out of bounds on extremely low res
+	{
+		s_player_config_menu.y = viddef.height / 2 - 58; // was - 97;
+	}
+	else
+	{
+		s_player_config_menu.y = viddef.height / 2 - 97;
+	}
+
 	s_player_config_menu.nitems = 0;
 
 	s_player_name_field.generic.type = MTYPE_FIELD;
@@ -3882,48 +3899,95 @@ void PlayerConfig_MenuDraw( void )
 	refdef_t refdef;
 	char scratch[MAX_QPATH];
 
+	if(viddef.width > 320 && viddef.height > 240) // FS: Will draw out of bounds on extremely low res
+	{
+		M_Banner( "m_banner_plauer_setup" ); // Knightmare added banner
+	}
+
 	memset( &refdef, 0, sizeof( refdef ) );
 
 	refdef.x = viddef.width / 2;
-	refdef.y = viddef.height / 2 - 72;
+
+	if(viddef.width > 320 && viddef.height > 240) // FS: Will draw out of bounds on extremely low res
+	{
+		refdef.y = viddef.height / 2 - 33; // was - 72
+	}
+	else
+	{
+		refdef.y = viddef.height / 2 - 72;
+	}
+
 	refdef.width = 144;
 	refdef.height = 168;
 	refdef.fov_x = 40;
 	refdef.fov_y = CalcFov( refdef.fov_x, refdef.width, refdef.height );
 	refdef.time = cls.realtime*0.001;
 
+	// Knightmare- redid this to show weapon model
 	if ( s_pmi[s_player_model_box.curvalue].skindisplaynames )
 	{
-		static int yaw;
-		entity_t entity;
+		int			yaw; // was static
+		int			maxframe = 29;
+		vec3_t		modelOrg;
+		entity_t	entity[2], *ent;
 
-		memset( &entity, 0, sizeof( entity ) );
+		refdef.num_entities = 0;
+		refdef.entities = entity;
+
+		yaw = anglemod(cl.time/10);
+		VectorSet (modelOrg, 80, 0, 0);
+
+		// Setup player model
+		ent = &entity[0];
+		memset( &entity[0], 0, sizeof( entity[0] ) );
 
 		Com_sprintf( scratch, sizeof( scratch ), "players/%s/tris.md2", s_pmi[s_player_model_box.curvalue].directory );
-		entity.model = re.RegisterModel( scratch );
+		ent->model = re.RegisterModel( scratch );
 		Com_sprintf( scratch, sizeof( scratch ), "players/%s/%s.pcx", s_pmi[s_player_model_box.curvalue].directory, s_pmi[s_player_model_box.curvalue].skindisplaynames[s_player_skin_box.curvalue] );
-		entity.skin = re.RegisterSkin( scratch );
-		entity.flags = RF_FULLBRIGHT;
-		entity.origin[0] = 80;
-		entity.origin[1] = 0;
-		entity.origin[2] = 0;
-		VectorCopy( entity.origin, entity.oldorigin );
-		entity.frame = 0;
-		entity.oldframe = 0;
-		entity.backlerp = 0.0;
-		entity.angles[1] = yaw++;
-		if ( ++yaw > 360 )
-			yaw -= 360;
+		ent->skin = re.RegisterSkin( scratch );
+		ent->flags = RF_FULLBRIGHT;
+		VectorCopy( modelOrg, ent->origin );
+		VectorCopy( ent->origin, ent->oldorigin );
+		ent->frame = 0;
+		ent->oldframe = 0;
+		ent->backlerp = 0.0;
+		ent->angles[1] = yaw;
+		refdef.num_entities++;
+
+		// Setup weapon model
+		ent = &entity[1];
+		memset( &entity[1], 0, sizeof( entity[1] ) );
+
+		Com_sprintf( scratch, sizeof( scratch ), "players/%s/weapon.md2", s_pmi[s_player_model_box.curvalue].directory );
+		ent->model = re.RegisterModel( scratch );
+		if (ent->model)
+		{
+			ent->skinnum = 0;
+			ent->flags = RF_FULLBRIGHT;
+			VectorCopy( modelOrg, ent->origin );
+			VectorCopy( ent->origin, ent->oldorigin );
+			ent->frame = 0;
+			ent->oldframe = 0;
+			ent->backlerp = 0.0;
+			ent->angles[1] = yaw;
+			refdef.num_entities++;
+		}
 
 		refdef.areabits = 0;
-		refdef.num_entities = 1;
-		refdef.entities = &entity;
 		refdef.lightstyles = 0;
 		refdef.rdflags = RDF_NOWORLDMODEL;
 
 		Menu_Draw( &s_player_config_menu );
 
-		M_DrawTextBox( ( refdef.x ) * ( 320.0F / viddef.width ) - 8, ( viddef.height / 2 ) * ( 240.0F / viddef.height) - 77, refdef.width / 8, refdef.height / 8 );
+	//	M_DrawTextBox( ( refdef.x ) * ( 320.0F / viddef.width ) - 8, ( viddef.height / 2 ) * ( 240.0F / viddef.height) - 77, refdef.width / 8, refdef.height / 8 );
+		if(viddef.width > 320 && viddef.height > 240) // FS: Will draw out of bounds on extremely low res
+		{
+			M_DrawTextBox( ( refdef.x ) * ( 320.0F / viddef.width ) - 8, ( viddef.height / 2 ) * ( 240.0F / viddef.height) - 38, refdef.width / 8, refdef.height / 8 );
+		}
+		else
+		{
+			M_DrawTextBox( ( refdef.x ) * ( 320.0F / viddef.width ) - 8, ( viddef.height / 2 ) * ( 240.0F / viddef.height) - 77, refdef.width / 8, refdef.height / 8 );
+		}
 		refdef.height += 4;
 
 		re.RenderFrame( &refdef );
