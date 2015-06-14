@@ -271,7 +271,7 @@ void gunner_pain (edict_t *self, edict_t *other, float kick, int damage)
 	if (!self->groundentity)
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("gunner: pain avoided due to no ground\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "gunner: pain avoided due to no ground\n");
 		return;
 	}
 
@@ -443,14 +443,14 @@ qboolean gunner_grenade_check(edict_t *self)
 		if (self->s.origin[2]+self->viewheight < self->monsterinfo.blind_fire_target[2])
 		{
 //			if(g_showlogic && g_showlogic->value)
-//				gi.dprintf("blind_fire_target is above my head, using machinegun\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "blind_fire_target is above my head, using machinegun\n");
 			return false;
 		}
 	}
 	else if(self->absmax[2] <= self->enemy->absmin[2])
 	{
 //		if(g_showlogic && g_showlogic->value)
-//			gi.dprintf("player is above my head, using machinegun\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "player is above my head, using machinegun\n");
 		return false;
 	}
 
@@ -476,7 +476,7 @@ qboolean gunner_grenade_check(edict_t *self)
 		return true;
 
 //	if(g_showlogic && g_showlogic->value)
-//		gi.dprintf("can't trace to target, using machinegun\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "can't trace to target, using machinegun\n");
 	return false;
 }
 
@@ -529,8 +529,8 @@ void GunnerGrenade (edict_t *self)
 		if (VectorCompare (self->monsterinfo.blind_fire_target, vec3_origin))
 			return;
 		
-//		gi.dprintf ("blind_fire_target = %s\n", vtos (self->monsterinfo.blind_fire_target));
-//		gi.dprintf ("GunnerGrenade: ideal yaw is %f\n", self->ideal_yaw);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "blind_fire_target = %s\n", vtos (self->monsterinfo.blind_fire_target));
+//		gi.dprintf(DEVELOPER_MSG_GAME, "GunnerGrenade: ideal yaw is %f\n", self->ideal_yaw);
 		VectorCopy (self->monsterinfo.blind_fire_target, target);
 	}
 	else
@@ -630,8 +630,8 @@ void gunner_blind_check (edict_t *self)
 		VectorSubtract(self->monsterinfo.blind_fire_target, self->s.origin, aim);
 		self->ideal_yaw = vectoyaw(aim);
 		
-//		gi.dprintf ("blind_fire_target = %s\n", vtos (self->monsterinfo.blind_fire_target));
-//		gi.dprintf ("gunner_attack: ideal yaw is %f\n", self->ideal_yaw);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "blind_fire_target = %s\n", vtos (self->monsterinfo.blind_fire_target));
+//		gi.dprintf(DEVELOPER_MSG_GAME, "gunner_attack: ideal yaw is %f\n", self->ideal_yaw);
 	}
 }
 
@@ -691,7 +691,7 @@ void gunner_attack(edict_t *self)
 		if (r > chance)
 		{
 //			if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf ("blindfire - NO SHOT\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "blindfire - NO SHOT\n");
 			return;
 		}
 
@@ -707,7 +707,7 @@ void gunner_attack(edict_t *self)
 //		else
 //			self->monsterinfo.currentmove = &gunner_move_attack_chain;
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("blind grenade check failed, doing nothing\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "blind grenade check failed, doing nothing\n");
 
 		// turn off blindfire flag
 		self->monsterinfo.aiflags &= ~AI_MANUAL_STEERING;

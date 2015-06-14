@@ -346,7 +346,7 @@ void ED_CallSpawn (edict_t *ent)
 
 	if (!ent->classname)
 	{
-		gi.dprintf ("ED_CallSpawn: NULL classname\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "ED_CallSpawn: NULL classname\n");
 		return;
 	}
 
@@ -388,7 +388,7 @@ void ED_CallSpawn (edict_t *ent)
 			return;
 		}
 	}
-	gi.dprintf ("%s doesn't have a spawn function\n", ent->classname);
+	gi.dprintf(DEVELOPER_MSG_GAME, "%s doesn't have a spawn function\n", ent->classname);
 }
 
 /*
@@ -480,7 +480,7 @@ void ED_ParseField (char *key, char *value, edict_t *ent)
 			return;
 		}
 	}
-	gi.dprintf ("%s is not a field\n", key);
+	gi.dprintf(DEVELOPER_MSG_GAME, "%s is not a field\n", key);
 }
 
 /*
@@ -594,7 +594,7 @@ void G_FixTeams (void)
 			}
 		}
 	}
-	gi.dprintf ("%i teams repaired\n", c);
+	gi.dprintf(DEVELOPER_MSG_GAME, "%i teams repaired\n", c);
 }
 
 void G_FindTeams (void)
@@ -638,7 +638,7 @@ void G_FindTeams (void)
 
 	G_FixTeams();
 
-	gi.dprintf ("%i teams with %i entities\n", c, c2);
+	gi.dprintf(DEVELOPER_MSG_GAME, "%i teams with %i entities\n", c, c2);
 }
 
 /*
@@ -778,7 +778,7 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 		ent->s.renderfx |= RF_IR_VISIBLE;		//PGM
 	}	
 
-	gi.dprintf ("%i entities inhibited\n", inhibit);
+	gi.dprintf(DEVELOPER_MSG_GAME, "%i entities inhibited\n", inhibit);
 
 #ifdef DEBUG
 	i = 1;
@@ -1327,16 +1327,16 @@ qboolean FindSpawnPoint (vec3_t startpoint, vec3_t mins, vec3_t maxs, vec3_t spa
 		{
 //			if ((g_showlogic) && (g_showlogic->value))
 //				if (tr.ent)
-//					gi.dprintf("FindSpawnPoint: failed to find a point -- blocked by %s\n", tr.ent->classname);
+//					gi.dprintf(DEVELOPER_MSG_GAME, "FindSpawnPoint: failed to find a point -- blocked by %s\n", tr.ent->classname);
 //				else
-//					gi.dprintf("FindSpawnPoint: failed to find a point\n");
+//					gi.dprintf(DEVELOPER_MSG_GAME, "FindSpawnPoint: failed to find a point\n");
 
 			return false;
 		} 
 		else
 		{
 //			if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf ("FindSpawnPoint: %s -> %s\n", vtos (startpoint), vtos (tr.endpos));
+//				gi.dprintf(DEVELOPER_MSG_GAME, "FindSpawnPoint: %s -> %s\n", vtos (startpoint), vtos (tr.endpos));
 			VectorCopy (tr.endpos, spawnpoint);
 			return true;
 		}
@@ -1371,13 +1371,13 @@ qboolean CheckSpawnPoint (vec3_t origin, vec3_t mins, vec3_t maxs)
 	if(tr.startsolid || tr.allsolid)
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf("createmonster in wall. removing\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "createmonster in wall. removing\n");
 		return false;
 	}
 	if (tr.ent != world)
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf("createmonster in entity %s\n", tr.ent->classname);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "createmonster in entity %s\n", tr.ent->classname);
 		return false;
 	}	
 	return true;
@@ -1517,7 +1517,7 @@ realcheck:
 					if (tr.fraction == 1.0 || tr.endpos[2] - mid > STEPSIZE)
 					{
 //						if ((g_showlogic) && (g_showlogic->value))
-//							gi.dprintf ("spawn - rejecting due to uneven ground\n");
+//							gi.dprintf(DEVELOPER_MSG_GAME, "spawn - rejecting due to uneven ground\n");
 						return false;
 					}
 				}
@@ -1528,7 +1528,7 @@ realcheck:
 					if (tr.fraction == 1.0 || mid - tr.endpos[2] > STEPSIZE)
 					{
 //						if ((g_showlogic) && (g_showlogic->value))
-//							gi.dprintf ("spawn - rejecting due to uneven ground\n");
+//							gi.dprintf(DEVELOPER_MSG_GAME, "spawn - rejecting due to uneven ground\n");
 						return false;
 					}
 				}
@@ -1551,10 +1551,10 @@ realcheck:
 //	{
 //		if (tr.fraction < 1)
 //			if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf("groundmonster would fall into water/slime/lava\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "groundmonster would fall into water/slime/lava\n");
 //		else
 //			if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf("groundmonster would fall too far\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "groundmonster would fall too far\n");
 //	}
 
 	return false;

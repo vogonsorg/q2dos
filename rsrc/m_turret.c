@@ -40,7 +40,7 @@ void TurretAim(edict_t *self)
 	float	move, idealPitch, idealYaw, current, speed;
 	int		orientation;
 
-// gi.dprintf("turret_aim: %d %d\n", self->s.frame, self->monsterinfo.nextframe);
+// gi.dprintf(DEVELOPER_MSG_GAME, "turret_aim: %d %d\n", self->s.frame, self->monsterinfo.nextframe);
 
 	if(!self->enemy || self->enemy == world)
 	{
@@ -102,7 +102,7 @@ void TurretAim(edict_t *self)
 				idealPitch = -185;
 			break;
 		case 0:				// +X		pitch: 0 to -90, -270 to -360 (or 0 to 90)
-//gi.dprintf("idealpitch %0.1f  idealyaw %0.1f\n", idealPitch, idealYaw);
+//gi.dprintf(DEVELOPER_MSG_GAME, "idealpitch %0.1f  idealyaw %0.1f\n", idealPitch, idealYaw);
 			if(idealPitch < -180)
 				idealPitch += 360;
 
@@ -111,7 +111,7 @@ void TurretAim(edict_t *self)
 			else if(idealPitch < -85)
 				idealPitch = -85;
 
-//gi.dprintf("idealpitch %0.1f  idealyaw %0.1f\n", idealPitch, idealYaw);
+//gi.dprintf(DEVELOPER_MSG_GAME, "idealpitch %0.1f  idealyaw %0.1f\n", idealPitch, idealYaw);
 							//			yaw: 270 to 360, 0 to 90
 							//			yaw: -90 to 90 (270-360 == -90-0)
 			if(idealYaw > 180)
@@ -120,7 +120,7 @@ void TurretAim(edict_t *self)
 				idealYaw = 85;
 			else if(idealYaw < -85)
 				idealYaw = -85;
-//gi.dprintf("idealpitch %0.1f  idealyaw %0.1f\n", idealPitch, idealYaw);
+//gi.dprintf(DEVELOPER_MSG_GAME, "idealpitch %0.1f  idealyaw %0.1f\n", idealPitch, idealYaw);
 			break;
 		case 90:			// +Y	pitch: 0 to 90, -270 to -360 (or 0 to 90)
 			if(idealPitch < -180)
@@ -264,7 +264,7 @@ mmove_t turret_move_stand = {FRAME_stand01, FRAME_stand02, turret_frames_stand, 
 
 void turret_stand (edict_t *self)
 {
-//gi.dprintf("turret_stand\n");
+//gi.dprintf(DEVELOPER_MSG_GAME, "turret_stand\n");
 	self->monsterinfo.currentmove = &turret_move_stand;
 }
 
@@ -344,7 +344,7 @@ void TurretFire (edict_t *self)
 	chance = DotProduct(dir, forward);
 	if(chance < 0.98)
 	{
-//		gi.dprintf("off-angle\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "off-angle\n");
 		return;
 	}
 
@@ -444,7 +444,7 @@ void TurretFireBlind (edict_t *self)
 	chance = DotProduct(dir, forward);
 	if(chance < 0.98)
 	{
-//		gi.dprintf("off-angle\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "off-angle\n");
 		return;
 	}
 
@@ -892,7 +892,7 @@ void SP_monster_turret (edict_t *self)
 
 	// VERSIONING
 //	if (g_showlogic && g_showlogic->value)
-//		gi.dprintf ("%s\n", ROGUE_VERSION_STRING);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "%s\n", ROGUE_VERSION_STRING);
 
 //	self->plat2flags = ROGUE_VERSION_ID;
 	// versions
@@ -990,7 +990,7 @@ void SP_monster_turret (edict_t *self)
 	{
 		if(!self->targetname)
 		{
-//			gi.dprintf("Wall Unit Turret without targetname! %s\n", vtos(self->s.origin));
+//			gi.dprintf(DEVELOPER_MSG_GAME, "Wall Unit Turret without targetname! %s\n", vtos(self->s.origin));
 			G_FreeEdict(self);
 			return;
 		}

@@ -45,7 +45,7 @@ void trigger_teleport_touch(edict_t *self, edict_t *other, cplane_t *plane, csur
 	dest = G_Find (NULL, FOFS(targetname), self->target);
 	if(!dest)
 	{
-		gi.dprintf("Teleport Destination not found!\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "Teleport Destination not found!\n");
 		return;
 	}
 

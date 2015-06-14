@@ -80,7 +80,7 @@ void drawbbox (edict_t *self);
 
 void showme (edict_t *self)
 {
-	gi.dprintf ("frame %d\n", self->s.frame);
+	gi.dprintf(DEVELOPER_MSG_GAME, "frame %d\n", self->s.frame);
 }
 
 void widow_search (edict_t *self)
@@ -95,7 +95,7 @@ void widow_sight (edict_t *self, edict_t *other)
 //	gi.sound (self, CHAN_WEAPON, sound_sight, 1, ATTN_NORM, 0);
 
 //	if ((g_showlogic) && (g_showlogic->value))
-//		gi.dprintf ("widow: found target!\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "widow: found target!\n");
 }
 
 mmove_t widow_move_attack_post_blaster;
@@ -127,7 +127,7 @@ int WidowTorso (edict_t *self)
 	enemy_yaw = target_angle (self);
 
 //	if ((g_showlogic) && (g_showlogic->value))
-//		gi.dprintf ("%2.2f -> ", enemy_yaw);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "%2.2f -> ", enemy_yaw);
 
 	if (enemy_yaw >= 105)
 	{
@@ -264,7 +264,7 @@ void WidowBlaster (edict_t *self)
 			self->monsterinfo.nextframe = self->s.frame;
 
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("%d\n", self->monsterinfo.nextframe);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "%d\n", self->monsterinfo.nextframe);
 
 		if (self->s.frame == FRAME_fired02a)
 			flashnum = MZ2_WIDOW_BLASTER_0;
@@ -292,31 +292,31 @@ void WidowBlaster (edict_t *self)
 		if (error > VARIANCE)
 		{
 //			if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf ("angle %2.2f (really %2.2f) (%2.2f off of %2.2f) corrected to", target_angle, angles[YAW], error, aim_angle);
+//				gi.dprintf(DEVELOPER_MSG_GAME, "angle %2.2f (really %2.2f) (%2.2f off of %2.2f) corrected to", target_angle, angles[YAW], error, aim_angle);
 			angles[YAW] = (self->s.angles[YAW] - aim_angle) + VARIANCE;
 //			if ((g_showlogic) && (g_showlogic->value))
 //			{
 //				if (angles[YAW] <= 0)
 //					angles[YAW] += 360;
-//				gi.dprintf (" %2.2f\n", angles[YAW]);
+//				gi.dprintf(DEVELOPER_MSG_GAME, " %2.2f\n", angles[YAW]);
 //			}
 			AngleVectors (angles, forward, NULL, NULL);
 		}
 		else if (error < -VARIANCE)
 		{
 //			if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf ("angle %2.2f (really %2.2f) (%2.2f off of %2.2f) corrected to", target_angle, angles[YAW], error, aim_angle);
+//				gi.dprintf(DEVELOPER_MSG_GAME, "angle %2.2f (really %2.2f) (%2.2f off of %2.2f) corrected to", target_angle, angles[YAW], error, aim_angle);
 			angles[YAW] = (self->s.angles[YAW] - aim_angle) - VARIANCE;
 //			if ((g_showlogic) && (g_showlogic->value))
 //			{
 //				if (angles[YAW] <= 0)
 //					angles[YAW] += 360;
-//				gi.dprintf (" %2.2f\n", angles[YAW]);
+//				gi.dprintf(DEVELOPER_MSG_GAME, " %2.2f\n", angles[YAW]);
 //			}
 			AngleVectors (angles, forward, NULL, NULL);
 		}
-//		gi.dprintf ("%2.2f - %2.2f - %2.2f - %2.2f\n", aim_angle, self->s.angles[YAW] - angles[YAW], target_angle, error);
-//		gi.dprintf ("%2.2f - %2.2f - %2.2f\n", angles[YAW], aim_angle, self->s.angles[YAW]);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "%2.2f - %2.2f - %2.2f - %2.2f\n", aim_angle, self->s.angles[YAW] - angles[YAW], target_angle, error);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "%2.2f - %2.2f - %2.2f\n", angles[YAW], aim_angle, self->s.angles[YAW]);
 
 /*
 		if (self->s.frame == FRAME_fired20)
@@ -356,7 +356,7 @@ void WidowBlaster (edict_t *self)
 //	else
 //	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("widow: firing on non-fire frame!\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "widow: firing on non-fire frame!\n");
 //	}
 }	
 
@@ -384,7 +384,7 @@ void WidowSpawn (edict_t *self)
 			self->monsterinfo.monster_used++;
 			ent->monsterinfo.commander = self;
 //			if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf ("widow: post-spawn : %d slots left out of %d\n", SELF_SLOTS_LEFT, self->monsterinfo.monster_slots);
+//				gi.dprintf(DEVELOPER_MSG_GAME, "widow: post-spawn : %d slots left out of %d\n", SELF_SLOTS_LEFT, self->monsterinfo.monster_slots);
 
 			ent->nextthink = level.time;
 			ent->think (ent);
@@ -408,17 +408,17 @@ void WidowSpawn (edict_t *self)
 						{
 //							if ((g_showlogic) && (g_showlogic->value))
 //							{
-//								gi.dprintf ("PickCoopTarget returned a %s - ", designated_enemy->classname);
+//								gi.dprintf(DEVELOPER_MSG_GAME, "PickCoopTarget returned a %s - ", designated_enemy->classname);
 //								if (designated_enemy->client)
-//									gi.dprintf ("with name %s\n", designated_enemy->client->pers.netname);
+//									gi.dprintf(DEVELOPER_MSG_GAME, "with name %s\n", designated_enemy->client->pers.netname);
 //								else
-//									gi.dprintf ("NOT A CLIENT\n");
+//									gi.dprintf(DEVELOPER_MSG_GAME, "NOT A CLIENT\n");
 //							}
 						}
 						else
 						{
 //							if ((g_showlogic) && (g_showlogic->value))
-//								gi.dprintf ("pick coop failed, using my current enemy\n");
+//								gi.dprintf(DEVELOPER_MSG_GAME, "pick coop failed, using my current enemy\n");
 							designated_enemy = self->enemy;
 						}
 					}
@@ -426,7 +426,7 @@ void WidowSpawn (edict_t *self)
 				else
 				{
 //					if ((g_showlogic) && (g_showlogic->value))
-//						gi.dprintf ("pick coop failed, using my current enemy\n");
+//						gi.dprintf(DEVELOPER_MSG_GAME, "pick coop failed, using my current enemy\n");
 					designated_enemy = self->enemy;
 				}
 			}
@@ -655,7 +655,7 @@ void WidowRail (edict_t *self)
 	vec3_t	forward, right;
 	int		flash;
 
-//	gi.dprintf ("railing!\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "railing!\n");
 	AngleVectors (self->s.angles, forward, right, NULL);
 
 	if (self->monsterinfo.currentmove == &widow_move_attack_rail)
@@ -749,7 +749,7 @@ mmove_t widow_move_attack_rail_l = {FRAME_firec01, FRAME_firec09, widow_frames_a
 void widow_attack_rail (edict_t *self)
 {
 	float	enemy_angle;
-//	gi.dprintf ("going to the rail!\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "going to the rail!\n");
 
 	enemy_angle = target_angle (self);
 
@@ -939,7 +939,7 @@ mmove_t widow_move_attack_kick = {FRAME_kick01, FRAME_kick08, widow_frames_attac
 
 void widow_stand (edict_t *self)
 {
-//	gi.dprintf ("widow stand\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "widow stand\n");
 	gi.sound (self, CHAN_WEAPON, gi.soundindex ("widow/laugh.wav"), 1, ATTN_NORM, 0);
 	self->monsterinfo.currentmove = &widow_move_stand;
 }
@@ -1008,7 +1008,7 @@ void widow_attack (edict_t *self)
 	if ((self->monsterinfo.attack_state == AS_BLIND) && (SELF_SLOTS_LEFT >= 2))
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("attacking blind!\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "attacking blind!\n");
 		self->monsterinfo.currentmove = &widow_move_spawn;
 		return;
 	}
@@ -1028,7 +1028,7 @@ void widow_attack (edict_t *self)
 
 	if (blaster_frames)
 	{
-//		gi.dprintf ("blaster frame %2.2f <= %2.2f\n", self->monsterinfo.pausetime + BLASTER_TIME, level.time);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "blaster frame %2.2f <= %2.2f\n", self->monsterinfo.pausetime + BLASTER_TIME, level.time);
 		if (SELF_SLOTS_LEFT >= 2)
 		{
 			self->monsterinfo.currentmove = &widow_move_spawn;
@@ -1043,7 +1043,7 @@ void widow_attack (edict_t *self)
 
 	if (rail_frames)
 	{
-//		gi.dprintf ("rail frame %2.2f - %2.2f\n", level.time, self->timestamp);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "rail frame %2.2f - %2.2f\n", level.time, self->timestamp);
 		if (!(level.time < self->timestamp))
 		{
 			gi.sound (self, CHAN_WEAPON, sound_rail, 1, ATTN_NORM, 0);
@@ -1055,7 +1055,7 @@ void widow_attack (edict_t *self)
 		return;
 
 //	if ((g_showlogic) && (g_showlogic->value))
-//		gi.dprintf ("widow: unknown start frame, picking randomly\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "widow: unknown start frame, picking randomly\n");
 
 	luck = random();
 	if (SELF_SLOTS_LEFT >= 2)
@@ -1088,7 +1088,7 @@ void widow_attack (edict_t *self)
 {
 	float	range, luck;
 
-//	gi.dprintf ("widow attack\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "widow attack\n");
 	
 	if ((!self->enemy) || (!self->enemy->inuse))
 		return;
@@ -1184,9 +1184,9 @@ void widow_reattack_blaster (edict_t *self)
 //	if ((g_showlogic) && (g_showlogic->value))
 //	{
 //		if (self->monsterinfo.currentmove == &widow_move_attack_post_blaster_l)
-//			gi.dprintf ("pulling left!\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "pulling left!\n");
 //		if (self->monsterinfo.currentmove == &widow_move_attack_post_blaster_r)
-//			gi.dprintf ("pulling right!\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "pulling right!\n");
 //	}
 
 //	self->monsterinfo.currentmove = &widow_move_attack_blaster;
@@ -1439,7 +1439,7 @@ qboolean Widow_CheckAttack (edict_t *self)
 			case FRAME_walk12:
 				{
 //					if ((g_showlogic) && (g_showlogic->value))
-//						gi.dprintf ("Not in good walk frame (%d), not attacking\n", (self->s.frame - FRAME_walk01+1));
+//						gi.dprintf(DEVELOPER_MSG_GAME, "Not in good walk frame (%d), not attacking\n", (self->s.frame - FRAME_walk01+1));
 					return false;
 				}
 			default:
@@ -1493,7 +1493,7 @@ qboolean Widow_CheckAttack (edict_t *self)
 	real_enemy_range = realrange (self, self->enemy);
 
 //	if (g_showlogic->value)
-//		gi.dprintf ("range = %2.2f\n", real_enemy_range);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "range = %2.2f\n", real_enemy_range);
 
 	// melee attack
 //	if (enemy_range == RANGE_MELEE)
@@ -1603,7 +1603,7 @@ void WidowCalcSlots (edict_t *self)
 		self->monsterinfo.monster_slots = min (6, self->monsterinfo.monster_slots + ((skill->value)*(CountPlayers()-1)));
 	}
 //	if ((g_showlogic) && (g_showlogic->value) && (old_slots != self->monsterinfo.monster_slots))
-//		gi.dprintf ("number of slots changed from %d to %d\n", old_slots, self->monsterinfo.monster_slots);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "number of slots changed from %d to %d\n", old_slots, self->monsterinfo.monster_slots);
 }
 
 void WidowPrecache ()

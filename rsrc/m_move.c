@@ -158,11 +158,11 @@ qboolean IsBadAhead (edict_t *self, edict_t *bad, vec3_t move)
 /*
 	if(DotProduct(forward, dir) > 0)
 	{
-//		gi.dprintf ("bad ahead...\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "bad ahead...\n");
 		return true;
 	}
 
-//	gi.dprintf ("bad behind...\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "bad behind...\n");
 	return false;
 	*/
 }
@@ -217,14 +217,14 @@ qboolean SV_movestep (edict_t *ent, vec3_t move, qboolean relink)
 			ent->bad_area = NULL;
 			if(ent->oldenemy)// && ent->bad_area->owner == ent->enemy)
 			{
-	//			gi.dprintf("resuming being pissed at %s\n", ent->oldenemy->classname);
+	//			gi.dprintf(DEVELOPER_MSG_GAME, "resuming being pissed at %s\n", ent->oldenemy->classname);
 				ent->enemy = ent->oldenemy;
 				ent->goalentity = ent->oldenemy;
 				FoundTarget(ent);
 	// FIXME - remove this when ready!!!
 //	if (ent->lastMoveTime == level.time)
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("Duplicate move detected for %s, please tell programmers!\n", ent->classname);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "Duplicate move detected for %s, please tell programmers!\n", ent->classname);
 //	ent->lastMoveTime = level.time;
 	// FIXME
 
@@ -321,7 +321,7 @@ qboolean SV_movestep (edict_t *ent, vec3_t move, qboolean relink)
 //PGM				
 				if(!current_bad && CheckForBadArea(ent))
 				{
-//						gi.dprintf("Oooh! Bad Area!\n");
+//						gi.dprintf(DEVELOPER_MSG_GAME, "Oooh! Bad Area!\n");
 					VectorCopy (oldorg, ent->s.origin);
 				}
 				else
@@ -334,7 +334,7 @@ qboolean SV_movestep (edict_t *ent, vec3_t move, qboolean relink)
 	// FIXME - remove this when ready!!!
 //	if (ent->lastMoveTime == level.time)
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("Duplicate move detected for %s, please tell programmers!\n", ent->classname);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "Duplicate move detected for %s, please tell programmers!\n", ent->classname);
 //	ent->lastMoveTime = level.time;
 	// FIXME
 
@@ -422,7 +422,7 @@ qboolean SV_movestep (edict_t *ent, vec3_t move, qboolean relink)
 	// FIXME - remove this when ready!!!
 //	if (ent->lastMoveTime == level.time)
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("Duplicate move detected for %s, please tell programmers!\n", ent->classname);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "Duplicate move detected for %s, please tell programmers!\n", ent->classname);
 //	ent->lastMoveTime = level.time;
 	// FIXME
 
@@ -446,36 +446,36 @@ qboolean SV_movestep (edict_t *ent, vec3_t move, qboolean relink)
 			if (new_bad->owner)
 			{
 //				if ((g_showlogic) && (g_showlogic->value))
-//					gi.dprintf("Blocked -");
+//					gi.dprintf(DEVELOPER_MSG_GAME, "Blocked -");
 				if (!strcmp(new_bad->owner->classname, "tesla"))
 				{
 //					if ((g_showlogic) && (g_showlogic->value))
-//						gi.dprintf ("it's a tesla -");
+//						gi.dprintf(DEVELOPER_MSG_GAME, "it's a tesla -");
 					if ((!(ent->enemy)) || (!(ent->enemy->inuse)))
 					{
 //						if ((g_showlogic) && (g_showlogic->value))
-//							gi.dprintf ("I don't have a valid enemy, attacking tesla!\n");
+//							gi.dprintf(DEVELOPER_MSG_GAME, "I don't have a valid enemy, attacking tesla!\n");
 						TargetTesla (ent, new_bad->owner);
 						ent->monsterinfo.aiflags |= AI_BLOCKED;
 					}
 					else if (!strcmp(ent->enemy->classname, "telsa"))
 					{
 //						if ((g_showlogic) && (g_showlogic->value))
-//							gi.dprintf ("but we're already mad at a tesla\n");
+//							gi.dprintf(DEVELOPER_MSG_GAME, "but we're already mad at a tesla\n");
 					}
 					else if ((ent->enemy) && (ent->enemy->client))
 					{
 //						if ((g_showlogic) && (g_showlogic->value))
-//							gi.dprintf ("we have a player enemy -");
+//							gi.dprintf(DEVELOPER_MSG_GAME, "we have a player enemy -");
 						if (visible(ent, ent->enemy))
 						{
 //							if ((g_showlogic) && (g_showlogic->value))
-//								gi.dprintf ("we can see him -");
+//								gi.dprintf(DEVELOPER_MSG_GAME, "we can see him -");
 						}
 						else
 						{
 //							if ((g_showlogic) && (g_showlogic->value))
-//								gi.dprintf ("can't see him, kill the tesla! -");
+//								gi.dprintf(DEVELOPER_MSG_GAME, "can't see him, kill the tesla! -");
 							TargetTesla (ent, new_bad->owner);
 							ent->monsterinfo.aiflags |= AI_BLOCKED;
 						}
@@ -483,17 +483,17 @@ qboolean SV_movestep (edict_t *ent, vec3_t move, qboolean relink)
 					else
 					{
 //						if ((g_showlogic) && (g_showlogic->value))
-//							gi.dprintf ("the enemy isn't a player, killing tesla -");
+//							gi.dprintf(DEVELOPER_MSG_GAME, "the enemy isn't a player, killing tesla -");
 						TargetTesla (ent, new_bad->owner);
 						ent->monsterinfo.aiflags |= AI_BLOCKED;
 					}
 				}
 //				else if ((g_showlogic) && (g_showlogic->value))
 //				{
-//					gi.dprintf(" by non-tesla bad area!");
+//					gi.dprintf(DEVELOPER_MSG_GAME, " by non-tesla bad area!");
 //				}
 			}
-//			gi.dprintf ("\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "\n");
 
 			VectorCopy (oldorg, ent->s.origin);
 			return false;
@@ -514,7 +514,7 @@ qboolean SV_movestep (edict_t *ent, vec3_t move, qboolean relink)
 	// FIXME - remove this when ready!!!
 //	if (ent->lastMoveTime == level.time)
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("Duplicate move detected for %s, please tell programmers!\n", ent->classname);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "Duplicate move detected for %s, please tell programmers!\n", ent->classname);
 //	ent->lastMoveTime = level.time;
 	// FIXME
 
@@ -540,7 +540,7 @@ qboolean SV_movestep (edict_t *ent, vec3_t move, qboolean relink)
 	// FIXME - remove this when ready!!!
 //	if (ent->lastMoveTime == level.time)
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("Duplicate move detected for %s, please tell programmers!\n", ent->classname);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "Duplicate move detected for %s, please tell programmers!\n", ent->classname);
 //	ent->lastMoveTime = level.time;
 	// FIXME
 
@@ -806,7 +806,7 @@ void M_MoveToGoal (edict_t *ent, float dist)
 		if (ent->monsterinfo.aiflags & AI_BLOCKED)
 		{
 //			if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf ("tesla attack detected, not changing direction!\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "tesla attack detected, not changing direction!\n");
 			ent->monsterinfo.aiflags &= ~AI_BLOCKED;
 			return;
 		}

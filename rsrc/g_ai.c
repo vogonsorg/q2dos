@@ -223,8 +223,8 @@ void ai_charge (edict_t *self, float dist)
 	{
 		VectorSubtract (self->enemy->s.origin, self->s.origin, v);
 		self->ideal_yaw = vectoyaw(v);
-//		gi.dprintf ("enemy = %s\n", vtos (self->enemy->s.origin));
-//		gi.dprintf ("enemy: ideal yaw is %f\n", self->ideal_yaw);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "enemy = %s\n", vtos (self->enemy->s.origin));
+//		gi.dprintf(DEVELOPER_MSG_GAME, "enemy: ideal yaw is %f\n", self->ideal_yaw);
 	}
 //	if (!(self->monsterinfo.aiflags & AI_MANUAL_STEERING))
 	M_ChangeYaw (self);
@@ -441,7 +441,7 @@ void FoundTarget (edict_t *self)
 	{
 		self->goalentity = self->movetarget = self->enemy;
 		HuntTarget (self);
-		gi.dprintf("%s at %s, combattarget %s not found\n", self->classname, vtos(self->s.origin), self->combattarget);
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s, combattarget %s not found\n", self->classname, vtos(self->s.origin), self->combattarget);
 		return;
 	}
 
@@ -545,7 +545,7 @@ qboolean FindTarget (edict_t *self)
 	if ((self->monsterinfo.aiflags & AI_HINT_PATH) && (coop) && (coop->value))
 	{
 //		if ((heardit) && (g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("ignoring coop sound target\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "ignoring coop sound target\n");
 		heardit = false;
 	}
 	// pmm
@@ -664,7 +664,7 @@ qboolean FindTarget (edict_t *self)
 	if (self->monsterinfo.aiflags & AI_HINT_PATH)
 	{
 //		if(g_showlogic && g_showlogic->value)
-//			gi.dprintf("stopped following hint paths in FindTarget\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "stopped following hint paths in FindTarget\n");
 
 		// this calls foundtarget for us
 		hintpath_stop (self);
@@ -750,7 +750,7 @@ qboolean M_CheckAttack (edict_t *self)
 							if (tr.allsolid || tr.startsolid || ((tr.fraction < 1.0) && (tr.ent != self->enemy)))
 							{
 //								if ((g_showlogic) && (g_showlogic->value))
-//									gi.dprintf ("blindfire blocked\n");
+//									gi.dprintf(DEVELOPER_MSG_GAME, "blindfire blocked\n");
 								return false;
 							}
 
@@ -907,7 +907,7 @@ void ai_run_missile(edict_t *self)
 		if ((self->monsterinfo.attack_state == AS_MISSILE) || (self->monsterinfo.attack_state == AS_BLIND))
 			self->monsterinfo.attack_state = AS_STRAIGHT;
 //		else if (self->monsterinfo.attack_state != AS_SLIDING)
-//			gi.dprintf ("ai_run_missile: Unexpected attack state %d !\n", self->monsterinfo.attack_state);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "ai_run_missile: Unexpected attack state %d !\n", self->monsterinfo.attack_state);
 	}
 };
 
@@ -1081,7 +1081,7 @@ qboolean ai_checkattack (edict_t *self, float dist)
 		else if(self->monsterinfo.last_player_enemy && self->monsterinfo.last_player_enemy->health > 0)
 		{
 //			if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf("resorting to last_player_enemy...\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "resorting to last_player_enemy...\n");
 			self->enemy = self->monsterinfo.last_player_enemy;
 			self->oldenemy = NULL;
 			self->monsterinfo.last_player_enemy = NULL;
@@ -1210,19 +1210,19 @@ void ai_run (edict_t *self, float dist)
 	if (self->monsterinfo.aiflags & AI_DUCKED)
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("%s - duck flag cleaned up!\n", self->classname);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "%s - duck flag cleaned up!\n", self->classname);
 		self->monsterinfo.aiflags &= ~AI_DUCKED;
 	}
 	if (self->maxs[2] != self->monsterinfo.base_height)
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("%s - ducked height corrected!\n", self->classname);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "%s - ducked height corrected!\n", self->classname);
 		monster_duck_up (self);
 	}
 //	if ((self->monsterinfo.aiflags & AI_MANUAL_STEERING) && (strcmp(self->classname, "monster_turret")))
 //	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("%s - manual steering in ai_run!\n", self->classname);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "%s - manual steering in ai_run!\n", self->classname);
 //	}
 	// pmm
 
@@ -1237,7 +1237,7 @@ void ai_run (edict_t *self, float dist)
 //		VectorSubtract(self->movetarget->s.origin, self->s.origin, v);
 //		vectoangles(v, v_forward);
 //		self->ideal_yaw = v_forward[YAW];
-//		gi.dprintf("seeking hintpath. origin: %s %0.1f\n", vtos(v), self->ideal_yaw);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "seeking hintpath. origin: %s %0.1f\n", vtos(v), self->ideal_yaw);
 		M_MoveToGoal (self, dist);
 		if(!self->inuse)
 			return;			// PGM - g_touchtrigger free problem
@@ -1298,7 +1298,7 @@ void ai_run (edict_t *self, float dist)
 		if (gotcha)
 		{
 //			if(g_showlogic && g_showlogic->value)
-//				gi.dprintf("stopped following hint paths in ai_run\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "stopped following hint paths in ai_run\n");
 
 			// disconnect from hintpaths and start looking normally for players.
 			hintpath_stop (self);
@@ -1402,7 +1402,7 @@ void ai_run (edict_t *self, float dist)
 	if ((self->enemy) && (self->enemy->inuse) && (enemy_vis))
 	{
 //		if (self->monsterinfo.aiflags & AI_LOST_SIGHT)
-//			gi.dprintf("regained sight\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "regained sight\n");
 		// PMM - check for alreadyMoved
 		if (!alreadyMoved)
 			M_MoveToGoal (self, dist);
@@ -1452,7 +1452,7 @@ void ai_run (edict_t *self, float dist)
 		if (!alreadyMoved)
 			M_MoveToGoal (self, dist);
 		self->monsterinfo.search_time = 0;
-//		gi.dprintf("search timeout\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "search timeout\n");
 		return;
 	}
 
@@ -1465,7 +1465,7 @@ void ai_run (edict_t *self, float dist)
 	if (!(self->monsterinfo.aiflags & AI_LOST_SIGHT))
 	{
 		// just lost sight of the player, decide where to go first
-//		gi.dprintf("lost sight of player, last seen at %s\n", vtos(self->monsterinfo.last_sighting));
+//		gi.dprintf(DEVELOPER_MSG_GAME, "lost sight of player, last seen at %s\n", vtos(self->monsterinfo.last_sighting));
 		self->monsterinfo.aiflags |= (AI_LOST_SIGHT | AI_PURSUIT_LAST_SEEN);
 		self->monsterinfo.aiflags &= ~(AI_PURSUE_NEXT | AI_PURSUE_TEMP);
 		new = true;
@@ -1477,14 +1477,14 @@ void ai_run (edict_t *self, float dist)
 
 		self->monsterinfo.aiflags &= ~AI_PURSUE_NEXT;
 //		VectorSubtract(self->monsterinfo.last_sighting, self->s.origin, debug_vec); 
-//		gi.dprintf("reached current goal: %s %s %f", vtos(self->s.origin), vtos(self->monsterinfo.last_sighting), VectorLength(debug_vec));
+//		gi.dprintf(DEVELOPER_MSG_GAME, "reached current goal: %s %s %f", vtos(self->s.origin), vtos(self->monsterinfo.last_sighting), VectorLength(debug_vec));
 
 		// give ourself more time since we got this far
 		self->monsterinfo.search_time = level.time + 5;
 
 		if (self->monsterinfo.aiflags & AI_PURSUE_TEMP)
 		{
-//			gi.dprintf("was temp goal; retrying original\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "was temp goal; retrying original\n");
 			self->monsterinfo.aiflags &= ~AI_PURSUE_TEMP;
 			marker = NULL;
 			VectorCopy (self->monsterinfo.saved_goal, self->monsterinfo.last_sighting);
@@ -1505,7 +1505,7 @@ void ai_run (edict_t *self, float dist)
 			VectorCopy (marker->s.origin, self->monsterinfo.last_sighting);
 			self->monsterinfo.trail_time = marker->timestamp;
 			self->s.angles[YAW] = self->ideal_yaw = marker->s.angles[YAW];
-//			gi.dprintf("heading is %0.1f\n", self->ideal_yaw);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "heading is %0.1f\n", self->ideal_yaw);
 
 //			debug_drawline(self.origin, self.last_sighting, 52);
 			new = true;
@@ -1524,7 +1524,7 @@ void ai_run (edict_t *self, float dist)
 
 	if (new)
 	{
-//		gi.dprintf("checking for course correction\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "checking for course correction\n");
 
 		tr = gi.trace(self->s.origin, self->mins, self->maxs, self->monsterinfo.last_sighting, self, MASK_PLAYERSOLID);
 		if (tr.fraction < 1)
@@ -1553,7 +1553,7 @@ void ai_run (edict_t *self, float dist)
 				{
 					VectorSet(v, d2 * left * 0.5, -16, 0);
 					G_ProjectSource (self->s.origin, v, v_forward, v_right, left_target);
-//					gi.dprintf("incomplete path, go part way and adjust again\n");
+//					gi.dprintf(DEVELOPER_MSG_GAME, "incomplete path, go part way and adjust again\n");
 				}
 				VectorCopy (self->monsterinfo.last_sighting, self->monsterinfo.saved_goal);
 				self->monsterinfo.aiflags |= AI_PURSUE_TEMP;
@@ -1561,7 +1561,7 @@ void ai_run (edict_t *self, float dist)
 				VectorCopy (left_target, self->monsterinfo.last_sighting);
 				VectorSubtract (self->goalentity->s.origin, self->s.origin, v);
 				self->s.angles[YAW] = self->ideal_yaw = vectoyaw(v);
-//				gi.dprintf("adjusted left\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "adjusted left\n");
 //				debug_drawline(self.origin, self.last_sighting, 152);
 			}
 			else if (right >= center && right > left)
@@ -1570,7 +1570,7 @@ void ai_run (edict_t *self, float dist)
 				{
 					VectorSet(v, d2 * right * 0.5, 16, 0);
 					G_ProjectSource (self->s.origin, v, v_forward, v_right, right_target);
-//					gi.dprintf("incomplete path, go part way and adjust again\n");
+//					gi.dprintf(DEVELOPER_MSG_GAME, "incomplete path, go part way and adjust again\n");
 				}
 				VectorCopy (self->monsterinfo.last_sighting, self->monsterinfo.saved_goal);
 				self->monsterinfo.aiflags |= AI_PURSUE_TEMP;
@@ -1578,11 +1578,11 @@ void ai_run (edict_t *self, float dist)
 				VectorCopy (right_target, self->monsterinfo.last_sighting);
 				VectorSubtract (self->goalentity->s.origin, self->s.origin, v);
 				self->s.angles[YAW] = self->ideal_yaw = vectoyaw(v);
-//				gi.dprintf("adjusted right\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "adjusted right\n");
 //				debug_drawline(self.origin, self.last_sighting, 152);
 			}
 		}
-//		else gi.dprintf("course was fine\n");
+//		else gi.dprintf(DEVELOPER_MSG_GAME, "course was fine\n");
 	}
 
 	M_MoveToGoal (self, dist);

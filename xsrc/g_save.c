@@ -134,7 +134,7 @@ is loaded.
 */
 void InitGame (void)
 {
-	gi.dprintf ("==== InitGame ====\n");
+	gi.dprintf(DEVELOPER_MSG_GAME, "==== InitGame ====\n");
 
 	gun_x = gi.cvar ("gun_x", "0", 0);
 	gun_y = gi.cvar ("gun_y", "0", 0);
@@ -708,7 +708,7 @@ void ReadLevel (char *filename)
 		gi.error ("ReadLevel: function pointers have moved");
 	}
 #else
-	gi.dprintf("Function offsets %d\n", ((byte *)base) - ((byte *)InitGame));
+	gi.dprintf(DEVELOPER_MSG_GAME, "Function offsets %d\n", ((byte *)base) - ((byte *)InitGame));
 #endif
 */
 

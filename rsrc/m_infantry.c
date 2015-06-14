@@ -204,7 +204,7 @@ void infantry_pain (edict_t *self, edict_t *other, float kick, int damage)
 	if (!self->groundentity)
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("infantry: pain avoided due to no ground\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "infantry: pain avoided due to no ground\n");
 		return;
 	}
 

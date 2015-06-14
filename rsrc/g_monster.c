@@ -454,7 +454,7 @@ void M_SetEffects (edict_t *ent)
 /*
 	if (fmod (level.time, 4.0) > 2.0)
 	{
-		gi.dprintf ("invulnerable ");
+		gi.dprintf(DEVELOPER_MSG_GAME, "invulnerable ");
 		ent->s.renderfx |= RF_SHELL_RED;
 	}
 	else
@@ -462,7 +462,7 @@ void M_SetEffects (edict_t *ent)
 
 	if (fmod (level.time, 8.0) > 4.0)
 	{
-		gi.dprintf ("shield ");
+		gi.dprintf(DEVELOPER_MSG_GAME, "shield ");
 		ent->s.renderfx |= RF_SHELL_GREEN;
 	}
 	else
@@ -470,7 +470,7 @@ void M_SetEffects (edict_t *ent)
 
 	if (fmod (level.time, 16.0) > 8.0)
 	{
-		gi.dprintf ("quad ");
+		gi.dprintf(DEVELOPER_MSG_GAME, "quad ");
 		ent->s.renderfx |= RF_SHELL_BLUE;\
 	}
 	else
@@ -478,7 +478,7 @@ void M_SetEffects (edict_t *ent)
 
 	if (fmod (level.time, 32.0) > 16.0)
 	{
-		gi.dprintf ("double ");
+		gi.dprintf(DEVELOPER_MSG_GAME, "double ");
 		ent->s.renderfx |= RF_SHELL_DOUBLE;
 	}
 	else
@@ -486,13 +486,13 @@ void M_SetEffects (edict_t *ent)
 
 	if (fmod (level.time, 64.0) > 32.0)
 	{
-		gi.dprintf ("half ");
+		gi.dprintf(DEVELOPER_MSG_GAME, "half ");
 		ent->s.renderfx |= RF_SHELL_HALF_DAM;
 	}
 	else
 		ent->s.renderfx &= ~RF_SHELL_HALF_DAM;
 
-	gi.dprintf ("\n");
+	gi.dprintf(DEVELOPER_MSG_GAME, "\n");
 */
 }
 
@@ -688,7 +688,7 @@ qboolean monster_start (edict_t *self)
 	{
 		self->spawnflags &= ~4;
 		self->spawnflags |= 1;
-//		gi.dprintf("fixed spawnflags on %s at %s\n", self->classname, vtos(self->s.origin));
+//		gi.dprintf(DEVELOPER_MSG_GAME, "fixed spawnflags on %s at %s\n", self->classname, vtos(self->s.origin));
 	}
 
 	if ((!(self->monsterinfo.aiflags & AI_GOOD_GUY)) && (!(self->monsterinfo.aiflags & AI_DO_NOT_COUNT)))
@@ -715,7 +715,7 @@ qboolean monster_start (edict_t *self)
 	{
 		self->item = FindItemByClassname (st.item);
 		if (!self->item)
-			gi.dprintf("%s at %s has bad item: %s\n", self->classname, vtos(self->s.origin), st.item);
+			gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s has bad item: %s\n", self->classname, vtos(self->s.origin), st.item);
 	}
 
 	// randomize what frame they start on
@@ -763,7 +763,7 @@ void monster_start_go (edict_t *self)
 			}
 		}
 		if (notcombat && self->combattarget)
-			gi.dprintf("%s at %s has target with mixed types\n", self->classname, vtos(self->s.origin));
+			gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s has target with mixed types\n", self->classname, vtos(self->s.origin));
 		if (fixup)
 			self->target = NULL;
 	}
@@ -778,7 +778,7 @@ void monster_start_go (edict_t *self)
 		{
 			if (strcmp(target->classname, "point_combat") != 0)
 			{
-				gi.dprintf("%s at (%i %i %i) has a bad combattarget %s : %s at (%i %i %i)\n",
+				gi.dprintf(DEVELOPER_MSG_GAME, "%s at (%i %i %i) has a bad combattarget %s : %s at (%i %i %i)\n",
 					self->classname, (int)self->s.origin[0], (int)self->s.origin[1], (int)self->s.origin[2],
 					self->combattarget, target->classname, (int)target->s.origin[0], (int)target->s.origin[1],
 					(int)target->s.origin[2]);
@@ -791,7 +791,7 @@ void monster_start_go (edict_t *self)
 		self->goalentity = self->movetarget = G_PickTarget(self->target);
 		if (!self->movetarget)
 		{
-			gi.dprintf ("%s can't find target %s at %s\n", self->classname, self->target, vtos(self->s.origin));
+			gi.dprintf(DEVELOPER_MSG_GAME, "%s can't find target %s at %s\n", self->classname, self->target, vtos(self->s.origin));
 			self->target = NULL;
 			self->monsterinfo.pausetime = 100000000;
 			self->monsterinfo.stand (self);
@@ -829,7 +829,7 @@ void walkmonster_start_go (edict_t *self)
 
 		if (self->groundentity)
 			if (!M_walkmove (self, 0, 0))
-				gi.dprintf ("%s in solid at %s\n", self->classname, vtos(self->s.origin));
+				gi.dprintf(DEVELOPER_MSG_GAME, "%s in solid at %s\n", self->classname, vtos(self->s.origin));
 	}
 	
 	if (!self->yaw_speed)
@@ -856,7 +856,7 @@ void walkmonster_start (edict_t *self)
 void flymonster_start_go (edict_t *self)
 {
 	if (!M_walkmove (self, 0, 0))
-		gi.dprintf ("%s in solid at %s\n", self->classname, vtos(self->s.origin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s in solid at %s\n", self->classname, vtos(self->s.origin));
 
 	if (!self->yaw_speed)
 		self->yaw_speed = 10;
@@ -952,7 +952,7 @@ void stationarymonster_start_go (edict_t *self)
 // PGM - only turrets use this, so remove the error message. They're supposed to be in solid.
 
 //	if (!M_walkmove (self, 0, 0))
-//		gi.dprintf ("%s in solid at %s\n", self->classname, vtos(self->s.origin));
+//		gi.dprintf(DEVELOPER_MSG_GAME, "%s in solid at %s\n", self->classname, vtos(self->s.origin));
 	
 	if (!self->yaw_speed)
 		self->yaw_speed = 20;
@@ -973,7 +973,7 @@ void stationarymonster_start (edict_t *self)
 void monster_done_dodge (edict_t *self)
 {
 //	if ((g_showlogic) && (g_showlogic->value))
-//		gi.dprintf ("%s done dodging\n", self->classname);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "%s done dodging\n", self->classname);
 	self->monsterinfo.aiflags &= ~AI_DODGING;
 }
 //ROGUE

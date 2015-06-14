@@ -1883,7 +1883,7 @@ void Weapon_ChainFist (edict_t *ent)
 
 	Weapon_Generic (ent, 4, 32, 57, 60, pause_frames, fire_frames, weapon_chainfist_fire);
 
-//	gi.dprintf("chainfist %d\n", ent->client->ps.gunframe);
+//	gi.dprintf(DEVELOPER_MSG_GAME, "chainfist %d\n", ent->client->ps.gunframe);
 	if((ent->client->buttons) & BUTTON_ATTACK)
 	{
 		if(ent->client->ps.gunframe == 13 ||
@@ -2051,26 +2051,26 @@ void weapon_etf_rifle_fire (edict_t *ent)
 	// get start / end positions
 	VectorAdd (ent->client->v_angle, ent->client->kick_angles, angles);
 //	AngleVectors (angles, forward, right, NULL);
-//	gi.dprintf("v_angle: %s\n", vtos(ent->client->v_angle));
+//	gi.dprintf(DEVELOPER_MSG_GAME, "v_angle: %s\n", vtos(ent->client->v_angle));
 	AngleVectors (ent->client->v_angle, forward, right, up);
 
 	// FIXME - set correct frames for different offsets.
 
 	if(ent->client->ps.gunframe == 6)					// right barrel
 	{
-//		gi.dprintf("right\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "right\n");
 		VectorSet(offset, 15, 8, -8);
 	}
 	else										// left barrel
 	{
-//		gi.dprintf("left\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "left\n");
 		VectorSet(offset, 15, 6, -8);
 	}
 	
 	VectorCopy (ent->s.origin, tempPt);
 	tempPt[2] += ent->viewheight;
 	P_ProjectSource2 (ent->client, tempPt, offset, forward, right, up, start);
-//	gi.dprintf("start: %s\n", vtos(start));
+//	gi.dprintf(DEVELOPER_MSG_GAME, "start: %s\n", vtos(start));
 	fire_flechette (ent, start, forward, damage, 750, kick);
 
 	// send muzzle flash
@@ -2120,7 +2120,7 @@ void Weapon_ETF_Rifle (edict_t *ent)
 	if(ent->client->ps.gunframe == 8 && (ent->client->buttons & BUTTON_ATTACK))
 		ent->client->ps.gunframe = 6;
 
-//	gi.dprintf("etf rifle %d\n", ent->client->ps.gunframe);
+//	gi.dprintf(DEVELOPER_MSG_GAME, "etf rifle %d\n", ent->client->ps.gunframe);
 }
 
 // pgm - this now uses ent->client->pers.weapon->quantity like all the other weapons
@@ -2215,7 +2215,7 @@ void Weapon_Heatbeam (edict_t *ent)
 //	static int  off_model, on_model;
 
 //	if ((g_showlogic) && (g_showlogic->value)) {
-//		gi.dprintf ("Frame %d, skin %d\n", ent->client->ps.gunframe, ent->client->ps.gunskin);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "Frame %d, skin %d\n", ent->client->ps.gunframe, ent->client->ps.gunskin);
 //	}
 	
 //	if (!attack_index)

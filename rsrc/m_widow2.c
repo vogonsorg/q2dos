@@ -154,7 +154,7 @@ void Widow2Beam (edict_t *self)
 	else
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("bad fire frame for widow2 beam -- tell me you saw this!\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "bad fire frame for widow2 beam -- tell me you saw this!\n");
 
 		Widow2SaveBeamTarget(self);
 		G_ProjectSource (self->s.origin, monster_flash_offset[MZ2_WIDOW2_BEAMER_1], forward, right, start);
@@ -193,7 +193,7 @@ void Widow2Spawn (edict_t *self)
 			self->monsterinfo.monster_used++;
 			ent->monsterinfo.commander = self;
 //			if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf ("widow: post-spawn : %d slots left\n", SELF_SLOTS_LEFT);
+//				gi.dprintf(DEVELOPER_MSG_GAME, "widow: post-spawn : %d slots left\n", SELF_SLOTS_LEFT);
 
 			ent->nextthink = level.time;
 			ent->think (ent);
@@ -217,17 +217,17 @@ void Widow2Spawn (edict_t *self)
 						{
 //							if ((g_showlogic) && (g_showlogic->value))
 //							{
-//								gi.dprintf ("PickCoopTarget returned a %s - ", designated_enemy->classname);
+//								gi.dprintf(DEVELOPER_MSG_GAME, "PickCoopTarget returned a %s - ", designated_enemy->classname);
 //								if (designated_enemy->client)
-//									gi.dprintf ("with name %s\n", designated_enemy->client->pers.netname);
+//									gi.dprintf(DEVELOPER_MSG_GAME, "with name %s\n", designated_enemy->client->pers.netname);
 //								else
-//									gi.dprintf ("NOT A CLIENT\n");
+//									gi.dprintf(DEVELOPER_MSG_GAME, "NOT A CLIENT\n");
 //							}
 						}
 						else
 						{
 //							if ((g_showlogic) && (g_showlogic->value))
-//								gi.dprintf ("pick coop failed, using my current enemy\n");
+//								gi.dprintf(DEVELOPER_MSG_GAME, "pick coop failed, using my current enemy\n");
 							designated_enemy = self->enemy;
 						}
 					}
@@ -235,7 +235,7 @@ void Widow2Spawn (edict_t *self)
 				else
 				{
 //					if ((g_showlogic) && (g_showlogic->value))
-//						gi.dprintf ("pick coop failed, using my current enemy\n");
+//						gi.dprintf(DEVELOPER_MSG_GAME, "pick coop failed, using my current enemy\n");
 					designated_enemy = self->enemy;
 				}
 			}
@@ -359,7 +359,7 @@ void WidowDisrupt (edict_t *self)
 	if (len < 30)
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("target locked - dist %2.2f\n", len);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "target locked - dist %2.2f\n", len);
 		// calc direction to where we targeted
 		VectorSubtract (self->pos1, start, dir);
 		VectorNormalize (dir);
@@ -369,7 +369,7 @@ void WidowDisrupt (edict_t *self)
 	else
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("target missed - dist %2.2f\n", len);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "target missed - dist %2.2f\n", len);
 
 		PredictAim (self->enemy, start, 1200, true, 0, dir, NULL);
 
@@ -742,14 +742,14 @@ void widow2_finaldeath (edict_t *self)
 
 void widow2_stand (edict_t *self)
 {
-//	gi.dprintf ("widow2 stand\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "widow2 stand\n");
 	self->monsterinfo.currentmove = &widow2_move_stand;
 }
 
 void widow2_run (edict_t *self)
 {
 
-//	gi.dprintf ("widow2 run - %2.2f - %s \n", level.time, self->enemy->classname);
+//	gi.dprintf(DEVELOPER_MSG_GAME, "widow2 run - %2.2f - %s \n", level.time, self->enemy->classname);
 	self->monsterinfo.aiflags &= ~AI_HOLD_FRAME;
 
 	if (self->monsterinfo.aiflags & AI_STAND_GROUND)
@@ -779,7 +779,7 @@ void widow2_attack (edict_t *self)
 		self->monsterinfo.aiflags &= ~AI_BLOCKED;
 	}
 
-//	gi.dprintf ("widow2 attack\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "widow2 attack\n");
 	
 	if (!self->enemy)
 		return;
@@ -898,7 +898,7 @@ void widow2_pain (edict_t *self, edict_t *other, float kick, int damage)
 	if (skill->value == 3)
 		return;		// no pain anims in nightmare
 
-//	gi.dprintf ("widow2 pain\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "widow2 pain\n");
 	if (level.time < self->pain_debounce_time)
 		return;
 
@@ -1449,7 +1449,7 @@ void WidowExplode (edict_t *self)
 	int		n;
 
 	self->think = WidowExplode;
-//	gi.dprintf ("count = %d\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "count = %d\n");
 
 //redo:
 	VectorCopy (self->s.origin, org);
@@ -1563,7 +1563,7 @@ void WidowExplosion1 (edict_t *self)
 	vec3_t	f,r,u, startpoint;
 	vec3_t	offset = {23.74, -37.67, 76.96};
 
-//	gi.dprintf ("1\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "1\n");
 	AngleVectors (self->s.angles, f, r, u);
 	G_ProjectSource2 (self->s.origin, offset, f, r, u, startpoint);
 
@@ -1586,7 +1586,7 @@ void WidowExplosion2 (edict_t *self)
 	vec3_t	f,r,u, startpoint;
 	vec3_t	offset = {-20.49, 36.92, 73.52};
 
-//	gi.dprintf ("2\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "2\n");
 
 	AngleVectors (self->s.angles, f, r, u);
 	G_ProjectSource2 (self->s.origin, offset, f, r, u, startpoint);
@@ -1610,7 +1610,7 @@ void WidowExplosion3 (edict_t *self)
 	vec3_t	f,r,u, startpoint;
 	vec3_t	offset = {2.11, 0.05, 92.20};
 
-//	gi.dprintf ("3\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "3\n");
 
 	AngleVectors (self->s.angles, f, r, u);
 	G_ProjectSource2 (self->s.origin, offset, f, r, u, startpoint);
@@ -1634,7 +1634,7 @@ void WidowExplosion4 (edict_t *self)
 	vec3_t	f,r,u, startpoint;
 	vec3_t	offset = {-28.04, -35.57, -77.56};
 
-//	gi.dprintf ("4\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "4\n");
 
 	AngleVectors (self->s.angles, f, r, u);
 	G_ProjectSource2 (self->s.origin, offset, f, r, u, startpoint);
@@ -1658,7 +1658,7 @@ void WidowExplosion5 (edict_t *self)
 	vec3_t	f,r,u, startpoint;
 	vec3_t	offset = {-20.11, -1.11, 40.76};
 
-//	gi.dprintf ("5\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "5\n");
 
 	AngleVectors (self->s.angles, f, r, u);
 	G_ProjectSource2 (self->s.origin, offset, f, r, u, startpoint);
@@ -1682,7 +1682,7 @@ void WidowExplosion6 (edict_t *self)
 	vec3_t	f,r,u, startpoint;
 	vec3_t	offset = {-20.11, -1.11, 40.76};
 
-	//gi.dprintf ("6\n");
+	//gi.dprintf(DEVELOPER_MSG_GAME, "6\n");
 
 	AngleVectors (self->s.angles, f, r, u);
 	G_ProjectSource2 (self->s.origin, offset, f, r, u, startpoint);
@@ -1706,7 +1706,7 @@ void WidowExplosion7 (edict_t *self)
 	vec3_t	f,r,u, startpoint;
 	vec3_t	offset = {-20.11, -1.11, 40.76};
 
-	//gi.dprintf ("7\n");
+	//gi.dprintf(DEVELOPER_MSG_GAME, "7\n");
 
 	AngleVectors (self->s.angles, f, r, u);
 	G_ProjectSource2 (self->s.origin, offset, f, r, u, startpoint);
@@ -1731,7 +1731,7 @@ void WidowExplosionLeg (edict_t *self)
 	vec3_t	offset1 = {-31.89, -47.86, 67.02};
 	vec3_t	offset2 = {-44.9, -82.14, 54.72};
 
-	//gi.dprintf ("Leg\n");
+	//gi.dprintf(DEVELOPER_MSG_GAME, "Leg\n");
 
 	AngleVectors (self->s.angles, f, r, u);
 	G_ProjectSource2 (self->s.origin, offset1, f, r, u, startpoint);

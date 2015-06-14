@@ -43,7 +43,7 @@ void Boss2PredictiveRocket  (edict_t *self)
 	vec3_t	vec;
 	float	time, dist;
 
-gi.dprintf("predictive fire\n");
+gi.dprintf(DEVELOPER_MSG_GAME, "predictive fire\n");
 
 	AngleVectors (self->s.angles, forward, right, NULL);
 

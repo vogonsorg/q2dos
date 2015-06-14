@@ -1848,7 +1848,7 @@ ClientConnect(edict_t *ent, char *userinfo)
 
 	if (game.maxclients > 1)
 	{
-		gi.dprintf("%s connected\n", ent->client->pers.netname);
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s connected\n", ent->client->pers.netname);
 	}
 
 	ent->svflags = 0; /* make sure we start with known default */

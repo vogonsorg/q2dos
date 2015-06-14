@@ -180,7 +180,7 @@ void SP_trigger_once(edict_t *ent)
 		VectorMA (ent->mins, 0.5, ent->size, v);
 		ent->spawnflags &= ~1;
 		ent->spawnflags |= 4;
-		gi.dprintf("fixed TRIGGERED flag on %s at %s\n", ent->classname, vtos(v));
+		gi.dprintf(DEVELOPER_MSG_GAME, "fixed TRIGGERED flag on %s at %s\n", ent->classname, vtos(v));
 	}
 
 	ent->wait = -1;
@@ -287,20 +287,20 @@ void SP_trigger_key (edict_t *self)
 {
 	if (!st.item)
 	{
-		gi.dprintf("no key item for trigger_key at %s\n", vtos(self->s.origin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "no key item for trigger_key at %s\n", vtos(self->s.origin));
 		return;
 	}
 	self->item = FindItemByClassname (st.item);
 
 	if (!self->item)
 	{
-		gi.dprintf("item %s not found for trigger_key at %s\n", st.item, vtos(self->s.origin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "item %s not found for trigger_key at %s\n", st.item, vtos(self->s.origin));
 		return;
 	}
 
 	if (!self->target)
 	{
-		gi.dprintf("%s at %s has no target\n", self->classname, vtos(self->s.origin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s has no target\n", self->classname, vtos(self->s.origin));
 		return;
 	}
 
@@ -463,7 +463,7 @@ void SP_trigger_push (edict_t *self)
 	}
 	else if(self->spawnflags & PUSH_START_OFF)
 	{
-		gi.dprintf ("trigger_push is START_OFF but not targeted.\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "trigger_push is START_OFF but not targeted.\n");
 		self->svflags = 0;
 		self->touch = NULL;
 		self->solid = SOLID_BSP;
@@ -594,7 +594,7 @@ void SP_trigger_gravity (edict_t *self)
 {
 	if (st.gravity == 0)
 	{
-		gi.dprintf("trigger_gravity without gravity set at %s\n", vtos(self->s.origin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "trigger_gravity without gravity set at %s\n", vtos(self->s.origin));
 		G_FreeEdict  (self);
 		return;
 	}

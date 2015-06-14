@@ -115,7 +115,7 @@ void Killed (edict_t *targ, edict_t *inflictor, edict_t *attacker, int damage, v
 			{
 				targ->monsterinfo.commander->monsterinfo.monster_slots++;
 //				if ((g_showlogic) && (g_showlogic->value))
-//					gi.dprintf ("g_combat: freeing up carrier slot - %d left\n", targ->monsterinfo.commander->monsterinfo.monster_slots);
+//					gi.dprintf(DEVELOPER_MSG_GAME, "g_combat: freeing up carrier slot - %d left\n", targ->monsterinfo.commander->monsterinfo.monster_slots);
 			}
 		}
 		if (targ->monsterinfo.aiflags & AI_SPAWNED_MEDIC_C)
@@ -126,14 +126,14 @@ void Killed (edict_t *targ, edict_t *inflictor, edict_t *attacker, int damage, v
 				{
 					targ->monsterinfo.commander->monsterinfo.monster_slots++;
 //					if ((g_showlogic) && (g_showlogic->value))
-//						gi.dprintf ("g_combat: freeing up medic slot - %d left\n", targ->monsterinfo.commander->monsterinfo.monster_slots);
+//						gi.dprintf(DEVELOPER_MSG_GAME, "g_combat: freeing up medic slot - %d left\n", targ->monsterinfo.commander->monsterinfo.monster_slots);
 				}
 //				else
 //					if ((g_showlogic) && (g_showlogic->value))
-//						gi.dprintf ("my commander is dead!  he's a %s\n", targ->monsterinfo.commander->classname);
+//						gi.dprintf(DEVELOPER_MSG_GAME, "my commander is dead!  he's a %s\n", targ->monsterinfo.commander->classname);
 			}
 //			else if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf ("My commander is GONE\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "My commander is GONE\n");
 
 		}
 		if (targ->monsterinfo.aiflags & AI_SPAWNED_WIDOW)
@@ -145,7 +145,7 @@ void Killed (edict_t *targ, edict_t *inflictor, edict_t *attacker, int damage, v
 				if (targ->monsterinfo.commander->monsterinfo.monster_used > 0)
 					targ->monsterinfo.commander->monsterinfo.monster_used--;
 //				if ((g_showlogic) && (g_showlogic->value))
-//					gi.dprintf ("g_combat: freeing up black widow slot - %d used\n", targ->monsterinfo.commander->monsterinfo.monster_used);
+//					gi.dprintf(DEVELOPER_MSG_GAME, "g_combat: freeing up black widow slot - %d used\n", targ->monsterinfo.commander->monsterinfo.monster_used);
 			}
 		}
 		//rogue
@@ -377,14 +377,14 @@ void M_ReactToDamage (edict_t *targ, edict_t *attacker, edict_t *inflictor)
 			// FIXME - coop issues?
 			if ((!targ->enemy) || (!visible(targ, targ->enemy)))
 			{
-				gi.dprintf ("can't see player, switching to tesla\n");
+				gi.dprintf(DEVELOPER_MSG_GAME, "can't see player, switching to tesla\n");
 				TargetTesla (targ, inflictor);
 				return;
 			}
-			gi.dprintf ("can see player, ignoring tesla\n");
+			gi.dprintf(DEVELOPER_MSG_GAME, "can see player, ignoring tesla\n");
 		}
 		else if ((g_showlogic) && (g_showlogic->value))
-			gi.dprintf ("no enemy, or I'm doing other, more important things, than worrying about a damned tesla!\n");
+			gi.dprintf(DEVELOPER_MSG_GAME, "no enemy, or I'm doing other, more important things, than worrying about a damned tesla!\n");
 */
 	}
 //ROGUE
@@ -862,9 +862,9 @@ void T_RadiusNukeDamage (edict_t *inflictor, edict_t *attacker, float damage, ed
 //		if ((g_showlogic) && (g_showlogic->value))
 //		{
 //			if (!(strcmp(ent->classname, "player")))
-//				gi.dprintf ("dist = %2.2f doing %6.0f damage to %s\n", len, points, inflictor->teammaster->client->pers.netname);
+//				gi.dprintf(DEVELOPER_MSG_GAME, "dist = %2.2f doing %6.0f damage to %s\n", len, points, inflictor->teammaster->client->pers.netname);
 //			else
-//				gi.dprintf ("dist = %2.2f doing %6.0f damage to %s\n", len, points, ent->classname);
+//				gi.dprintf(DEVELOPER_MSG_GAME, "dist = %2.2f doing %6.0f damage to %s\n", len, points, ent->classname);
 //		}
 		if (points > 0)
 		{
@@ -887,7 +887,7 @@ void T_RadiusNukeDamage (edict_t *inflictor, edict_t *attacker, float damage, ed
 			if (tr.fraction == 1.0)
 			{
 //				if ((g_showlogic) && (g_showlogic->value))
-//					gi.dprintf ("Undamaged player in LOS with nuke, flashing!\n");
+//					gi.dprintf(DEVELOPER_MSG_GAME, "Undamaged player in LOS with nuke, flashing!\n");
 				ent->client->nuke_framenum = level.framenum + 20;
 			}
 			else

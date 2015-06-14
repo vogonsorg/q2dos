@@ -538,14 +538,14 @@ void ChickRocket (edict_t *self)
 	// don't shoot at feet if they're above where i'm shooting from.
 	else if(random() < 0.33 || (start[2] < self->enemy->absmin[2]))
 	{
-//		gi.dprintf("normal shot\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "normal shot\n");
 		VectorCopy (target, vec);
 		vec[2] += self->enemy->viewheight;
 		VectorSubtract (vec, start, dir);
 	}
 	else
 	{
-//		gi.dprintf("shooting at feet!\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "shooting at feet!\n");
 		VectorCopy (target, vec);
 		vec[2] = self->enemy->absmin[2];
 		VectorSubtract (vec, start, dir);
@@ -559,7 +559,7 @@ void ChickRocket (edict_t *self)
 	{
 		float	time;
 
-//		gi.dprintf ("leading target\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "leading target\n");
 		dist = VectorLength (dir);
 		time = dist/rocketSpeed;
 		VectorMA(vec, time, self->enemy->velocity, vec);
@@ -602,7 +602,7 @@ void ChickRocket (edict_t *self)
 					monster_fire_rocket (self, start, dir, 50, rocketSpeed, MZ2_CHICK_ROCKET_1);
 //				else if ((g_showlogic) && (g_showlogic->value))
 //					// ok, I give up
-//					gi.dprintf ("chick avoiding blindfire shot\n");
+//					gi.dprintf(DEVELOPER_MSG_GAME, "chick avoiding blindfire shot\n");
 			}
 		}
 	}
@@ -614,7 +614,7 @@ void ChickRocket (edict_t *self)
 			if(trace.fraction > 0.5 || (trace.ent && trace.ent->client))
 				monster_fire_rocket (self, start, dir, 50, rocketSpeed, MZ2_CHICK_ROCKET_1);
 	//		else
-	//			gi.dprintf("didn't make it halfway to target...aborting\n");
+	//			gi.dprintf(DEVELOPER_MSG_GAME, "didn't make it halfway to target...aborting\n");
 		}
 	}
 }	
@@ -800,7 +800,7 @@ void chick_attack(edict_t *self)
 		if (r > chance)
 		{
 //			if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf ("blindfire - NO SHOT\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "blindfire - NO SHOT\n");
 			return;
 		}
 

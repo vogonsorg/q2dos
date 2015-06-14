@@ -641,7 +641,7 @@ SP_path_corner(edict_t *self)
 
 	if (!self->targetname)
 	{
-		gi.dprintf("path_corner with no targetname at %s\n",
+		gi.dprintf(DEVELOPER_MSG_GAME, "path_corner with no targetname at %s\n",
 				vtos(self->s.origin));
 		G_FreeEdict(self);
 		return;
@@ -687,7 +687,7 @@ point_combat_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */,
 
 		if (!other->goalentity)
 		{
-			gi.dprintf("%s at %s target %s does not exist\n",
+			gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s target %s does not exist\n",
 					self->classname, vtos(self->s.origin),
 					self->target);
 			other->movetarget = self;
@@ -787,7 +787,7 @@ SP_viewthing(edict_t *ent)
 		return;
 	}
 
-	gi.dprintf("viewthing spawned\n");
+	gi.dprintf(DEVELOPER_MSG_GAME, "viewthing spawned\n");
 
 	ent->movetype = MOVETYPE_NONE;
 	ent->solid = SOLID_BBOX;
@@ -979,7 +979,7 @@ SP_func_wall(edict_t *self)
 	{
 		if (!(self->spawnflags & 2))
 		{
-			gi.dprintf("func_wall START_ON without TOGGLE\n");
+			gi.dprintf(DEVELOPER_MSG_GAME, "func_wall START_ON without TOGGLE\n");
 			self->spawnflags |= 2;
 		}
 	}
@@ -1923,7 +1923,7 @@ SP_misc_viper(edict_t *ent)
 
 	if (!ent->target)
 	{
-		gi.dprintf("misc_viper without a target at %s\n", vtos(ent->absmin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "misc_viper without a target at %s\n", vtos(ent->absmin));
 		G_FreeEdict(ent);
 		return;
 	}
@@ -1963,7 +1963,7 @@ SP_misc_crashviper(edict_t *ent)
 
 	if (!ent->target)
 	{
-		gi.dprintf("misc_viper without a target at %s\n", vtos(ent->absmin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "misc_viper without a target at %s\n", vtos(ent->absmin));
 		G_FreeEdict(ent);
 		return;
 	}
@@ -2199,7 +2199,7 @@ SP_misc_strogg_ship(edict_t *ent)
 
 	if (!ent->target)
 	{
-		gi.dprintf("%s without a target at %s\n", ent->classname,
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s without a target at %s\n", ent->classname,
 				vtos(ent->absmin));
 		G_FreeEdict(ent);
 		return;
@@ -2240,7 +2240,7 @@ SP_misc_transport(edict_t *ent)
 
 	if (!ent->target)
 	{
-		gi.dprintf("%s without a target at %s\n", ent->classname,
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s without a target at %s\n", ent->classname,
 				vtos(ent->absmin));
 		G_FreeEdict(ent);
 		return;
@@ -2744,7 +2744,7 @@ SP_func_clock(edict_t *self)
 
 	if (!self->target)
 	{
-		gi.dprintf("%s with no target at %s\n", self->classname,
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s with no target at %s\n", self->classname,
 				vtos(self->s.origin));
 		G_FreeEdict(self);
 		return;
@@ -2752,7 +2752,7 @@ SP_func_clock(edict_t *self)
 
 	if ((self->spawnflags & 2) && (!self->count))
 	{
-		gi.dprintf("%s with no count at %s\n", self->classname,
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s with no count at %s\n", self->classname,
 				vtos(self->s.origin));
 		G_FreeEdict(self);
 		return;
@@ -2802,7 +2802,7 @@ teleporter_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */,
 
 	if (!dest)
 	{
-		gi.dprintf("Couldn't find destination\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "Couldn't find destination\n");
 		return;
 	}
 
@@ -2855,7 +2855,7 @@ SP_misc_teleporter(edict_t *ent)
 
 	if (!ent->target)
 	{
-		gi.dprintf("teleporter without a target.\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "teleporter without a target.\n");
 		G_FreeEdict(ent);
 		return;
 	}

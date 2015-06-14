@@ -153,7 +153,7 @@ edict_t *G_PickTarget (char *targetname)
 
 	if (!targetname)
 	{
-		gi.dprintf("G_PickTarget called with NULL targetname\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "G_PickTarget called with NULL targetname\n");
 		return NULL;
 	}
 
@@ -169,7 +169,7 @@ edict_t *G_PickTarget (char *targetname)
 
 	if (!num_choices)
 	{
-		gi.dprintf("G_PickTarget: target %s not found\n", targetname);
+		gi.dprintf(DEVELOPER_MSG_GAME, "G_PickTarget: target %s not found\n", targetname);
 		return NULL;
 	}
 
@@ -218,7 +218,7 @@ void G_UseTargets (edict_t *ent, edict_t *activator)
 		t->think = Think_Delay;
 		t->activator = activator;
 		if (!activator)
-			gi.dprintf ("Think_Delay with no activator\n");
+			gi.dprintf(DEVELOPER_MSG_GAME, "Think_Delay with no activator\n");
 		t->message = ent->message;
 		t->target = ent->target;
 		t->killtarget = ent->killtarget;
@@ -250,7 +250,7 @@ void G_UseTargets (edict_t *ent, edict_t *activator)
 			if (t->flags & FL_TEAMSLAVE)
 			{
 //				if ((g_showlogic) && (g_showlogic->value))
-//					gi.dprintf ("Removing %s from train!\n", t->classname);
+//					gi.dprintf(DEVELOPER_MSG_GAME, "Removing %s from train!\n", t->classname);
 
 				if (t->teammaster)
 				{
@@ -266,21 +266,21 @@ void G_UseTargets (edict_t *ent, edict_t *activator)
 						if (!master)
 						{
 //							if ((g_showlogic) && (g_showlogic->value))
-//								gi.dprintf ("Couldn't find myself in master's chain, ignoring!\n");
+//								gi.dprintf(DEVELOPER_MSG_GAME, "Couldn't find myself in master's chain, ignoring!\n");
 						}
 					}
 				}
 				else
 				{
 //					if ((g_showlogic) && (g_showlogic->value))
-//						gi.dprintf ("No master to free myself from, ignoring!\n");
+//						gi.dprintf(DEVELOPER_MSG_GAME, "No master to free myself from, ignoring!\n");
 				}
 			}
 			// PMM
 			G_FreeEdict (t);
 			if (!ent->inuse)
 			{
-				gi.dprintf("entity was removed while using killtargets\n");
+				gi.dprintf(DEVELOPER_MSG_GAME, "entity was removed while using killtargets\n");
 				return;
 			}
 		}
@@ -301,7 +301,7 @@ void G_UseTargets (edict_t *ent, edict_t *activator)
 
 			if (t == ent)
 			{
-				gi.dprintf ("WARNING: Entity used itself.\n");
+				gi.dprintf(DEVELOPER_MSG_GAME, "WARNING: Entity used itself.\n");
 			}
 			else
 			{
@@ -310,7 +310,7 @@ void G_UseTargets (edict_t *ent, edict_t *activator)
 			}
 			if (!ent->inuse)
 			{
-				gi.dprintf("entity was removed while using targets\n");
+				gi.dprintf(DEVELOPER_MSG_GAME, "entity was removed while using targets\n");
 				return;
 			}
 		}
@@ -533,7 +533,7 @@ void G_InitEdict (edict_t *e)
 	if (e->nextthink)
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("G_SPAWN:  Fixed bad nextthink time\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "G_SPAWN:  Fixed bad nextthink time\n");
 		e->nextthink = 0;
 	}
 	// ROGUE
@@ -601,7 +601,7 @@ void G_FreeEdict (edict_t *ed)
 
 	if ((ed - g_edicts) <= (maxclients->value + BODY_QUEUE_SIZE))
 	{
-//		gi.dprintf("tried to free special edict\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "tried to free special edict\n");
 		return;
 	}
 

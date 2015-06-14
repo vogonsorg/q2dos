@@ -194,7 +194,7 @@ qboolean Pickup_Powerup (edict_t *ent, edict_t *other)
 			if(ent->item->use)
 				ent->item->use (other, ent->item);
 			else
-				gi.dprintf("Powerup has no use function!\n");
+				gi.dprintf(DEVELOPER_MSG_GAME, "Powerup has no use function!\n");
 //PGM
 		}
 	}
@@ -551,7 +551,7 @@ qboolean Pickup_Sphere (edict_t *ent, edict_t *other)
 			if(ent->item->use)
 				ent->item->use (other, ent->item);
 			else
-				gi.dprintf("Powerup has no use function!\n");
+				gi.dprintf(DEVELOPER_MSG_GAME, "Powerup has no use function!\n");
 //PGM
 		}
 	}
@@ -751,7 +751,7 @@ qboolean Add_Ammo (edict_t *ent, gitem_t *item, int count)
 // ROGUE
 	else
 	{
-		gi.dprintf("undefined ammo type\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "undefined ammo type\n");
 		return false;
 	}
 
@@ -1246,7 +1246,7 @@ void droptofloor (edict_t *ent)
 	tr = gi.trace (ent->s.origin, ent->mins, ent->maxs, dest, ent, MASK_SOLID);
 	if (tr.startsolid)
 	{
-		gi.dprintf ("droptofloor: %s startsolid at %s\n", ent->classname, vtos(ent->s.origin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "droptofloor: %s startsolid at %s\n", ent->classname, vtos(ent->s.origin));
 		G_FreeEdict (ent);
 		return;
 	}
@@ -1415,7 +1415,7 @@ void SpawnItem (edict_t *ent, gitem_t *item)
 		if (strcmp(ent->classname, "key_power_cube") != 0)
 		{
 			ent->spawnflags = 0;
-			gi.dprintf("%s at %s has invalid spawnflags set\n", ent->classname, vtos(ent->s.origin));
+			gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s has invalid spawnflags set\n", ent->classname, vtos(ent->s.origin));
 		}
 	}
 

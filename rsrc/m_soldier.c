@@ -551,17 +551,17 @@ void soldier_fire (edict_t *self, int in_flash_number)
 			VectorCopy (aim, aim_norm);
 			VectorNormalize (aim_norm);
 			angle = DotProduct (aim_norm, forward);
-			//gi.dprintf ("Dot Product:  %f", DotProduct (aim_norm, forward));
+			//gi.dprintf(DEVELOPER_MSG_GAME, "Dot Product:  %f", DotProduct (aim_norm, forward));
 			if (angle < 0.9)  // ~25 degree angle
 			{
 //				if(g_showlogic && g_showlogic->value)
-//					gi.dprintf (" not firing due to bad dotprod %f\n", angle);
+//					gi.dprintf(DEVELOPER_MSG_GAME, " not firing due to bad dotprod %f\n", angle);
 				return;
 			}
 //			else
 //			{
 //				if(g_showlogic && g_showlogic->value)
-//					gi.dprintf (" firing:  dotprod = %f\n", angle);
+//					gi.dprintf(DEVELOPER_MSG_GAME, " firing:  dotprod = %f\n", angle);
 //			}
 		}
 		//-PMM
@@ -593,7 +593,7 @@ void soldier_fire (edict_t *self, int in_flash_number)
 		if ((tr.ent != self->enemy) && (tr.ent != world))
 		{
 //			if(g_showlogic && g_showlogic->value)
-//				gi.dprintf ("infantry shot aborted due to bad target\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "infantry shot aborted due to bad target\n");
 			return;
 		}
 	}
@@ -752,7 +752,7 @@ mmove_t soldier_move_attack2 = {FRAME_attak201, FRAME_attak218, soldier_frames_a
 void soldier_duck_down (edict_t *self)
 {
 	if ((g_showlogic) && (g_showlogic->value))
-		gi.dprintf ("duck down - %d!\n", self->s.frame);
+		gi.dprintf(DEVELOPER_MSG_GAME, "duck down - %d!\n", self->s.frame);
 
 	self->monsterinfo.aiflags |= AI_DUCKED;
 //	self->maxs[2] -= 32;
@@ -761,7 +761,7 @@ void soldier_duck_down (edict_t *self)
 	if (self->monsterinfo.duck_wait_time < level.time)
 	{
 		if ((g_showlogic) && (g_showlogic->value))
-			gi.dprintf ("soldier duck with no time!\n");
+			gi.dprintf(DEVELOPER_MSG_GAME, "soldier duck with no time!\n");
 		self->monsterinfo.duck_wait_time = level.time + 1;
 	}
 	gi.linkentity (self);
@@ -770,7 +770,7 @@ void soldier_duck_down (edict_t *self)
 void soldier_duck_up (edict_t *self)
 {
 	if ((g_showlogic) && (g_showlogic->value))
-		gi.dprintf ("duck up - %d!\n", self->s.frame);
+		gi.dprintf(DEVELOPER_MSG_GAME, "duck up - %d!\n", self->s.frame);
 	self->monsterinfo.aiflags &= ~AI_DUCKED;
 //	self->maxs[2] += 32;
 	self->maxs[2] = self->monsterinfo.base_height;
@@ -942,7 +942,7 @@ void soldier_attack(edict_t *self)
 		if (r > chance)
 		{
 //			if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf ("blindfire - NO SHOT\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "blindfire - NO SHOT\n");
 			return;
 		}
 
@@ -1038,9 +1038,9 @@ void soldier_dodge (edict_t *self, edict_t *attacker, float eta, trace_t *tr)
 	if ((g_showlogic) && (g_showlogic->value))
 	{
 		if (self->monsterinfo.aiflags & AI_DODGING)
-			gi.dprintf ("dodging - ");
+			gi.dprintf(DEVELOPER_MSG_GAME, "dodging - ");
 		if (self->monsterinfo.aiflags & AI_DUCKED)
-			gi.dprintf ("ducked - ");
+			gi.dprintf(DEVELOPER_MSG_GAME, "ducked - ");
 	}
 	if (!self->enemy)
 	{
@@ -1053,7 +1053,7 @@ void soldier_dodge (edict_t *self, edict_t *attacker, float eta, trace_t *tr)
 	if ((eta < 0.1) || (eta > 5))
 	{
 		if ((g_showlogic) && (g_showlogic->value))
-			gi.dprintf ("timeout\n");
+			gi.dprintf(DEVELOPER_MSG_GAME, "timeout\n");
 		return;
 	}
 
@@ -1061,7 +1061,7 @@ void soldier_dodge (edict_t *self, edict_t *attacker, float eta, trace_t *tr)
 	if (r > (0.25*((skill->value)+1)))
 	{
 		if ((g_showlogic) && (g_showlogic->value))
-			gi.dprintf ("skillout\n");
+			gi.dprintf(DEVELOPER_MSG_GAME, "skillout\n");
 		return;
 	}
 
@@ -1079,7 +1079,7 @@ void soldier_dodge (edict_t *self, edict_t *attacker, float eta, trace_t *tr)
 		if (self->monsterinfo.aiflags & AI_DODGING)
 		{
 			if ((g_showlogic) && (g_showlogic->value))
-				gi.dprintf ("already dodging\n");
+				gi.dprintf(DEVELOPER_MSG_GAME, "already dodging\n");
 			return;
 		}
 
@@ -1089,9 +1089,9 @@ void soldier_dodge (edict_t *self, edict_t *attacker, float eta, trace_t *tr)
 		if (DotProduct (right, diff) < 0)
 		{
 			self->monsterinfo.lefty = 1;
-//			gi.dprintf ("left\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "left\n");
 		} else {
-//			gi.dprintf ("right\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "right\n");
 		}
 		// if it doesn't sense to duck, try to strafe and shoot
 		// we don't want the machine gun guys running & shooting (looks bad)
@@ -1100,7 +1100,7 @@ void soldier_dodge (edict_t *self, edict_t *attacker, float eta, trace_t *tr)
 		if (self->monsterinfo.aiflags & AI_DUCKED)
 		{
 			if ((g_showlogic) && (g_showlogic->value))
-				gi.dprintf ("unducking - ");
+				gi.dprintf(DEVELOPER_MSG_GAME, "unducking - ");
 			soldier_duck_up(self);
 		}
 
@@ -1110,13 +1110,13 @@ void soldier_dodge (edict_t *self, edict_t *attacker, float eta, trace_t *tr)
 		if (self->s.skinnum <= 3)
 		{
 			if ((g_showlogic) && (g_showlogic->value))
-				gi.dprintf ("shooting back!\n");
+				gi.dprintf(DEVELOPER_MSG_GAME, "shooting back!\n");
 			self->monsterinfo.currentmove = &soldier_move_attack6;
 		}
 		else
 		{
 			if ((g_showlogic) && (g_showlogic->value))
-				gi.dprintf ("strafing away!\n");
+				gi.dprintf(DEVELOPER_MSG_GAME, "strafing away!\n");
 			self->monsterinfo.currentmove = &soldier_move_start_run;
 		}
 		return;
@@ -1125,7 +1125,7 @@ void soldier_dodge (edict_t *self, edict_t *attacker, float eta, trace_t *tr)
 	// if we're here, we're ducking, so clear the dodge bit if it's set
 
 	if ((g_showlogic) && (g_showlogic->value))
-		gi.dprintf ("ducking!\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "ducking!\n");
 	if (skill->value == 0)
 	{
 		// set this prematurely; it doesn't hurt, and prevents extra iterations
@@ -1557,14 +1557,14 @@ void soldier_sidestep (edict_t *self)
 	if (self->s.skinnum <= 3)
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("shooting back!\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "shooting back!\n");
 		if (self->monsterinfo.currentmove != &soldier_move_attack6)
 			self->monsterinfo.currentmove = &soldier_move_attack6;
 	}
 	else
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("strafing away!\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "strafing away!\n");
 		if (self->monsterinfo.currentmove != &soldier_move_start_run)
 			self->monsterinfo.currentmove = &soldier_move_start_run;
 	}

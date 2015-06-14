@@ -38,7 +38,7 @@ void showme1 (edict_t *self)
 {
 	if (!self->dmg)
 	{
-		gi.dprintf ("straight - %d\n", self->monsterinfo.lefty);
+		gi.dprintf(DEVELOPER_MSG_GAME, "straight - %d\n", self->monsterinfo.lefty);
 		self->dmg = 1;
 	}
 }
@@ -47,7 +47,7 @@ void showme2 (edict_t *self)
 {
 	if (!self->dmg)
 	{
-		gi.dprintf ("strafe - %d\n", self->monsterinfo.lefty);
+		gi.dprintf(DEVELOPER_MSG_GAME, "strafe - %d\n", self->monsterinfo.lefty);
 		self->dmg = 1;
 	}
 }
@@ -268,10 +268,10 @@ void flyer_kamikaze_explode (edict_t *self)
 	{
 		self->monsterinfo.commander->monsterinfo.monster_slots++;
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("suicide hit!. %d slots left\n", self->monsterinfo.commander->monsterinfo.monster_slots);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "suicide hit!. %d slots left\n", self->monsterinfo.commander->monsterinfo.monster_slots);
 	}
 
-//	gi.dprintf ("boom!\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "boom!\n");
 //	T_RadiusDamage(self, self->owner, 125, self, self->dmg_radius, MOD_NUKE);
 //	T_RadiusDamage(self, self->owner, 125, self, 150, MOD_NUKE);
 	if (self->enemy)
@@ -737,7 +737,7 @@ int flyer_blocked (edict_t *self, float dist)
 			{
 				self->monsterinfo.commander->monsterinfo.monster_slots++;
 //				if ((g_showlogic) && (g_showlogic->value))
-//					gi.dprintf ("suicide blocked, exploding.  %d slots left\n", self->monsterinfo.commander->monsterinfo.monster_slots);
+//					gi.dprintf(DEVELOPER_MSG_GAME, "suicide blocked, exploding.  %d slots left\n", self->monsterinfo.commander->monsterinfo.monster_slots);
 			}
 
 			VectorMA (self->s.origin, -0.02, self->velocity, origin);

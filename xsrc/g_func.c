@@ -1854,7 +1854,7 @@ SP_func_door_rotating(edict_t *ent)
 
 	if (!st.distance)
 	{
-		gi.dprintf("%s at %s with no distance set\n", ent->classname,
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s with no distance set\n", ent->classname,
 				vtos(ent->s.origin));
 		st.distance = 90;
 	}
@@ -2209,7 +2209,7 @@ again:
 
 	if (!ent)
 	{
-		gi.dprintf("train_next: bad target %s\n", self->target);
+		gi.dprintf(DEVELOPER_MSG_GAME, "train_next: bad target %s\n", self->target);
 		return;
 	}
 
@@ -2220,7 +2220,7 @@ again:
 	{
 		if (!first)
 		{
-			gi.dprintf("connected teleport path_corners, see %s at %s\n",
+			gi.dprintf(DEVELOPER_MSG_GAME, "connected teleport path_corners, see %s at %s\n",
 					ent->classname, vtos(ent->s.origin));
 			return;
 		}
@@ -2289,7 +2289,7 @@ func_train_find(edict_t *self)
 
 	if (!self->target)
 	{
-		gi.dprintf("train_find: no target\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "train_find: no target\n");
 		return;
 	}
 
@@ -2297,7 +2297,7 @@ func_train_find(edict_t *self)
 
 	if (!ent)
 	{
-		gi.dprintf("train_find: target %s not found\n", self->target);
+		gi.dprintf(DEVELOPER_MSG_GAME, "train_find: target %s not found\n", self->target);
 		return;
 	}
 
@@ -2408,7 +2408,7 @@ SP_func_train(edict_t *self)
 	}
 	else
 	{
-		gi.dprintf("func_train without a target at %s\n", vtos(self->absmin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "func_train without a target at %s\n", vtos(self->absmin));
 	}
 }
 
@@ -2434,7 +2434,7 @@ trigger_elevator_use(edict_t *self, edict_t *other, edict_t *activator /* unused
 
 	if (!other->pathtarget)
 	{
-		gi.dprintf("elevator used with no pathtarget\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "elevator used with no pathtarget\n");
 		return;
 	}
 
@@ -2442,7 +2442,7 @@ trigger_elevator_use(edict_t *self, edict_t *other, edict_t *activator /* unused
 
 	if (!target)
 	{
-		gi.dprintf("elevator used with bad pathtarget: %s\n", other->pathtarget);
+		gi.dprintf(DEVELOPER_MSG_GAME, "elevator used with bad pathtarget: %s\n", other->pathtarget);
 		return;
 	}
 
@@ -2460,7 +2460,7 @@ trigger_elevator_init(edict_t *self)
 
 	if (!self->target)
 	{
-		gi.dprintf("trigger_elevator has no target\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "trigger_elevator has no target\n");
 		return;
 	}
 
@@ -2468,13 +2468,13 @@ trigger_elevator_init(edict_t *self)
 
 	if (!self->movetarget)
 	{
-		gi.dprintf("trigger_elevator unable to find target %s\n", self->target);
+		gi.dprintf(DEVELOPER_MSG_GAME, "trigger_elevator unable to find target %s\n", self->target);
 		return;
 	}
 
 	if (strcmp(self->movetarget->classname, "func_train") != 0)
 	{
-		gi.dprintf("trigger_elevator target %s is not a train\n", self->target);
+		gi.dprintf(DEVELOPER_MSG_GAME, "trigger_elevator target %s is not a train\n", self->target);
 		return;
 	}
 
@@ -2570,7 +2570,7 @@ SP_func_timer(edict_t *self)
 	if (self->random >= self->wait)
 	{
 		self->random = self->wait - FRAMETIME;
-		gi.dprintf("func_timer at %s has random >= wait\n", vtos(self->s.origin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "func_timer at %s has random >= wait\n", vtos(self->s.origin));
 	}
 
 	if (self->spawnflags & 1)

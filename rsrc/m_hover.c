@@ -472,7 +472,7 @@ void hover_reattack (edict_t *self)
 					return;
 				}
 				else
-					gi.dprintf ("hover_reattack: unexpected state %d\n", self->monsterinfo.attack_state);
+					gi.dprintf(DEVELOPER_MSG_GAME, "hover_reattack: unexpected state %d\n", self->monsterinfo.attack_state);
 			}
 	self->monsterinfo.currentmove = &hover_move_end_attack;
 }

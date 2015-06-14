@@ -93,19 +93,19 @@ void DBall_ClientBegin (edict_t *ent)
 
 	if(team1 > team2)
 	{
-		gi.dprintf("assigned to team 2\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "assigned to team 2\n");
 		Info_SetValueForKey(ent->client->pers.userinfo, "skin", dball_team2_skin->string);
 	}
 	else
 	{
-		gi.dprintf("assigned to team 1\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "assigned to team 1\n");
 		Info_SetValueForKey(ent->client->pers.userinfo, "skin", dball_team1_skin->string);
 	}
 	
 	ClientUserinfoChanged(ent, ent->client->pers.userinfo);
 
 	if(unassigned)
-		gi.dprintf("%d unassigned players present!\n", unassigned);
+		gi.dprintf(DEVELOPER_MSG_GAME, "%d unassigned players present!\n", unassigned);
 }
 
 //==================
@@ -194,7 +194,7 @@ void DBall_PostInitSetup (void)
 	}
 
 	if(dball_ball_startpt_count == 0)
-		gi.dprintf("No Deathball start points!\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "No Deathball start points!\n");
 }
 
 //==================
@@ -229,7 +229,7 @@ int DBall_ChangeKnockback (edict_t *targ, edict_t *attacker, int knockback, int 
 		else if(mod == MOD_BFG_EFFECT)	// bfg
 			knockback = 90;
 		else
-	 		gi.dprintf ("zero knockback, mod %d\n", mod);
+	 		gi.dprintf(DEVELOPER_MSG_GAME, "zero knockback, mod %d\n", mod);
 	}
 	else
 	{
@@ -271,7 +271,7 @@ int DBall_ChangeKnockback (edict_t *targ, edict_t *attacker, int knockback, int 
 		}
 	}
 
-//	gi.dprintf("mod: %d    knockback: %d\n", mod, knockback);
+//	gi.dprintf(DEVELOPER_MSG_GAME, "mod: %d    knockback: %d\n", mod, knockback);
 	return knockback;
 }
 
@@ -338,14 +338,14 @@ void DBall_GoalTouch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t
 					ent->client->resp.score -= scorechange;
 			}
 			else
-				gi.dprintf("unassigned player!!!!\n");
+				gi.dprintf(DEVELOPER_MSG_GAME, "unassigned player!!!!\n");
 		}
 	}
 
 	if(other->enemy)
-		gi.dprintf("score for team %d by %s\n", team_score, other->enemy->client->pers.netname);
+		gi.dprintf(DEVELOPER_MSG_GAME, "score for team %d by %s\n", team_score, other->enemy->client->pers.netname);
 	else
-		gi.dprintf("score for team %d by someone\n", team_score);
+		gi.dprintf(DEVELOPER_MSG_GAME, "score for team %d by someone\n", team_score);
 
 	DBall_BallDie (other, other->enemy, other->enemy, 0, vec3_origin);
 
@@ -373,7 +373,7 @@ edict_t *PickBallStart (edict_t *ent)
 	}
 
 	if(current == 0)
-		gi.dprintf("No ball start points found!\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "No ball start points found!\n");
 
 	return G_Find(NULL, FOFS(classname), "dm_dball_ball_start");
 }
@@ -417,7 +417,7 @@ void DBall_BallPain (edict_t *self, edict_t *other, float kick, int damage)
 	self->enemy = other;
 	self->health = self->max_health;
 //	if(other->classname)
-//		gi.dprintf("hurt by %s -- %d\n", other->classname, self->health);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "hurt by %s -- %d\n", other->classname, self->health);
 }
 
 void DBall_BallDie (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point)

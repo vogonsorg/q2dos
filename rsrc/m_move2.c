@@ -159,14 +159,14 @@ qboolean SV_movestep (edict_t *ent, vec3_t move, qboolean relink)
 	current_bad = CheckForBadArea(ent);
 	if(current_bad)
 	{
-//		gi.dprintf("in bad area\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "in bad area\n");
 		ent->bad_area = current_bad;
 		 
 		if(ent->enemy && !strcmp(ent->enemy->classname, "tesla"))
 		{
-//			gi.dprintf("%s  -->>  ", vtos(move));
+//			gi.dprintf(DEVELOPER_MSG_GAME, "%s  -->>  ", vtos(move));
 			VectorScale(move, -1, move);
-//			gi.dprintf("%s\n", vtos(move));
+//			gi.dprintf(DEVELOPER_MSG_GAME, "%s\n", vtos(move));
 		}
 	}
 	else if(ent->bad_area)
@@ -175,7 +175,7 @@ qboolean SV_movestep (edict_t *ent, vec3_t move, qboolean relink)
 		ent->bad_area = NULL;
 		if(ent->oldenemy)// && ent->bad_area->owner == ent->enemy)
 		{
-//			gi.dprintf("resuming being pissed at %s\n", ent->oldenemy->classname);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "resuming being pissed at %s\n", ent->oldenemy->classname);
 			ent->enemy = ent->oldenemy;
 			ent->goalentity = ent->oldenemy;
 			FoundTarget(ent);
@@ -271,7 +271,7 @@ qboolean SV_movestep (edict_t *ent, vec3_t move, qboolean relink)
 //PGM				
 				if(!current_bad && CheckForBadArea(ent))
 				{
-//						gi.dprintf("Oooh! Bad Area!\n");
+//						gi.dprintf(DEVELOPER_MSG_GAME, "Oooh! Bad Area!\n");
 					VectorCopy (oldorg, ent->s.origin);
 				}
 				else
@@ -378,44 +378,44 @@ qboolean SV_movestep (edict_t *ent, vec3_t move, qboolean relink)
 		if (new_bad->owner)
 		{
 			if ((g_showlogic) && (g_showlogic->value))
-				gi.dprintf("Blocked -");
+				gi.dprintf(DEVELOPER_MSG_GAME, "Blocked -");
 			if (!strcmp(new_bad->owner->classname, "tesla"))
 			{
 				if ((g_showlogic) && (g_showlogic->value))
-					gi.dprintf ("it's a tesla -");
+					gi.dprintf(DEVELOPER_MSG_GAME, "it's a tesla -");
 				if ((!(ent->enemy)) || (!(ent->enemy->inuse)))
 				{
 					if ((g_showlogic) && (g_showlogic->value))
-						gi.dprintf ("I don't have a valid enemy!\n");
+						gi.dprintf(DEVELOPER_MSG_GAME, "I don't have a valid enemy!\n");
 				}
 				else if (!strcmp(ent->enemy->classname, "telsa"))
 				{
 					if ((g_showlogic) && (g_showlogic->value))
-						gi.dprintf ("but we're already mad at a tesla\n");
+						gi.dprintf(DEVELOPER_MSG_GAME, "but we're already mad at a tesla\n");
 				}
 				else if ((ent->enemy) && (ent->enemy->client))
 				{
 					if ((g_showlogic) && (g_showlogic->value))
-						gi.dprintf ("we have a player enemy -");
+						gi.dprintf(DEVELOPER_MSG_GAME, "we have a player enemy -");
 					if (visible(ent, ent->enemy))
 					{
 						if ((g_showlogic) && (g_showlogic->value))
-							gi.dprintf ("we can see him -");
+							gi.dprintf(DEVELOPER_MSG_GAME, "we can see him -");
 					}
 					else
 					{
 						if ((g_showlogic) && (g_showlogic->value))
-							gi.dprintf ("can't see him, kill the tesla! -");
+							gi.dprintf(DEVELOPER_MSG_GAME, "can't see him, kill the tesla! -");
 					}
 				}
 				else
 				{
 					if ((g_showlogic) && (g_showlogic->value))
-						gi.dprintf ("the enemy isn't a player -");
+						gi.dprintf(DEVELOPER_MSG_GAME, "the enemy isn't a player -");
 				}
 			}
 		}
-		gi.dprintf ("\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "\n");
 
 
 		VectorCopy (oldorg, ent->s.origin);

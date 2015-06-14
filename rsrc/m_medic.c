@@ -123,7 +123,7 @@ void abortHeal (edict_t *self, qboolean change_frame, qboolean gib, qboolean mar
 	if ((mark) && (self->enemy) && (self->enemy->inuse))
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("%s - marking target as bad\n", self->classname);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "%s - marking target as bad\n", self->classname);
 		// if the first badMedic slot is filled by a medic, skip it and use the second one
 		if ((self->enemy->monsterinfo.badMedic1) && (self->enemy->monsterinfo.badMedic1->inuse)
 			&& (!strncmp(self->enemy->monsterinfo.badMedic1->classname, "monster_medic", 13)) )
@@ -138,7 +138,7 @@ void abortHeal (edict_t *self, qboolean change_frame, qboolean gib, qboolean mar
 	if ((gib) && (self->enemy) && (self->enemy->inuse))
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("%s - gibbing bad heal target", self->classname);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "%s - gibbing bad heal target", self->classname);
 
 		if(self->enemy->gib_health)
 			hurt = - self->enemy->gib_health;
@@ -772,7 +772,7 @@ void medic_cable_attack (edict_t *self)
 	if ((!self->enemy) || (!self->enemy->inuse) || (self->enemy->s.effects & EF_GIB))
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("medic_commander - aborting heal due to target's disappearance\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "medic_commander - aborting heal due to target's disappearance\n");
 		abortHeal (self, true, false, false);
 		return;
 	}
@@ -796,12 +796,12 @@ void medic_cable_attack (edict_t *self)
 	if (distance < MEDIC_MIN_DISTANCE)
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("medic_commander - aborting heal due to proximity to target ");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "medic_commander - aborting heal due to proximity to target ");
 		abortHeal (self, true, true, false );
 		return;
 	}
 //	if ((g_showlogic)&&(g_showlogic->value))
-//		gi.dprintf ("distance to target is %f\n", distance);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "distance to target is %f\n", distance);
 //	if (distance > 300)
 //		return;
 
@@ -813,7 +813,7 @@ void medic_cable_attack (edict_t *self)
 //	if (fabs(angles[0]) > 45)
 //	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("medic_commander - aborting heal due to bad angle\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "medic_commander - aborting heal due to bad angle\n");
 //		abortHeal(self);
 //		return;
 //	}
@@ -834,7 +834,7 @@ void medic_cable_attack (edict_t *self)
 			return;
 		}
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("medic_commander - aborting heal due to beamus interruptus\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "medic_commander - aborting heal due to beamus interruptus\n");
 		abortHeal (self, true, false, false);
 		return;
 	}
@@ -869,21 +869,21 @@ void medic_cable_attack (edict_t *self)
 		if (tr.startsolid || tr.allsolid)
 		{
 //			if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf ("Spawn point obstructed, aborting heal!\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "Spawn point obstructed, aborting heal!\n");
 			abortHeal (self, true, true, false);
 			return;
 		} 
 		else if (tr.ent != world)
 		{
 //			if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf("heal in entity %s\n", tr.ent->classname);
+//				gi.dprintf(DEVELOPER_MSG_GAME, "heal in entity %s\n", tr.ent->classname);
 			abortHeal (self, true, true, false);
 			return;
 		}
 /*		else if (tr.ent == world)
 		{
 			if ((g_showlogic) && (g_showlogic->value))
-				gi.dprintf ("heal in world, aborting!\n");
+				gi.dprintf(DEVELOPER_MSG_GAME, "heal in world, aborting!\n");
 			abortHeal (self, 1);
 			return;
 		}
@@ -907,7 +907,7 @@ void medic_cable_attack (edict_t *self)
 			if ((self->oldenemy) && (self->oldenemy->inuse) && (self->oldenemy->health > 0))
 			{
 //				if ((g_showlogic) && (g_showlogic->value))
-//					gi.dprintf ("setting heal target's enemy to %s\n", self->oldenemy->classname);
+//					gi.dprintf(DEVELOPER_MSG_GAME, "setting heal target's enemy to %s\n", self->oldenemy->classname);
 				self->enemy->enemy = self->oldenemy;
 //				HuntTarget (self->enemy);
 				FoundTarget (self->enemy);
@@ -915,7 +915,7 @@ void medic_cable_attack (edict_t *self)
 			else
 			{
 //				if (g_showlogic && g_showlogic->value)
-//					gi.dprintf ("no valid enemy to set!\n");
+//					gi.dprintf(DEVELOPER_MSG_GAME, "no valid enemy to set!\n");
 				self->enemy->enemy = NULL;
 				if (!FindTarget (self->enemy))
 				{
@@ -1076,7 +1076,7 @@ void medic_determine_spawn (edict_t *self)
 		num_summoned = 1;
 
 //	if ((g_showlogic) && (g_showlogic->value))
-//		gi.dprintf ("medic_commander: summonStr = %d num = %d\n", summonStr, num_summoned);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "medic_commander: summonStr = %d num = %d\n", summonStr, num_summoned);
 
 	for (count = 0; count < num_summoned; count++)
 	{
@@ -1098,7 +1098,7 @@ void medic_determine_spawn (edict_t *self)
 				count = num_summoned;
 			}
 //			else if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf ("medic_commander: CheckGroundSpawnPoint says bad stuff down there!\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "medic_commander: CheckGroundSpawnPoint says bad stuff down there!\n");
 		}
 	}
 
@@ -1142,7 +1142,7 @@ void medic_determine_spawn (edict_t *self)
 	if (num_success == 0)
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("medic_commander: failed to find any spawn points, aborting!\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "medic_commander: failed to find any spawn points, aborting!\n");
 		self->monsterinfo.nextframe = FRAME_attack53;
 	}
 }
@@ -1216,7 +1216,7 @@ void medic_spawngrows (edict_t *self)
 	if (num_success == 0)
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("medic_commander: spawngrows bad, aborting!\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "medic_commander: spawngrows bad, aborting!\n");
 		self->monsterinfo.nextframe = FRAME_attack53;
 	}
 }
@@ -1256,7 +1256,7 @@ void medic_finish_spawn (edict_t *self)
 		num_summoned = 1;
 
 //	if ((g_showlogic) && (g_showlogic->value))
-//		gi.dprintf ("medic_commander: summonStr = %d num = %d\n", summonStr, num_summoned);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "medic_commander: summonStr = %d num = %d\n", summonStr, num_summoned);
 
 	for (count = 0; count < num_summoned; count++)
 	{
@@ -1276,18 +1276,18 @@ void medic_finish_spawn (edict_t *self)
 					reinforcement_mins[summonStr-inc], reinforcement_maxs[summonStr-inc],
 					reinforcements[summonStr-inc], 256);
 //			else if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf ("CheckSpawnPoint failed volume check!\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "CheckSpawnPoint failed volume check!\n");
 		}
 		else
 		{
 //			if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf ("FindSpawnPoint failed to find a point!\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "FindSpawnPoint failed to find a point!\n");
 		}
 
 		if (!ent)
 		{
 //			if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf ("Spawn point obstructed for %s, aborting!\n", reinforcements[summonStr-inc]);
+//				gi.dprintf(DEVELOPER_MSG_GAME, "Spawn point obstructed for %s, aborting!\n", reinforcements[summonStr-inc]);
 			continue;
 		}
 
@@ -1303,7 +1303,7 @@ void medic_finish_spawn (edict_t *self)
 		ent->monsterinfo.commander = self;
 		self->monsterinfo.monster_slots--;
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("medic_commander: %d slots remaining\n", self->monsterinfo.monster_slots);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "medic_commander: %d slots remaining\n", self->monsterinfo.monster_slots);
 
 		if (self->monsterinfo.aiflags & AI_MEDIC)
 			designated_enemy = self->oldenemy;
@@ -1323,17 +1323,17 @@ void medic_finish_spawn (edict_t *self)
 					{
 //						if ((g_showlogic) && (g_showlogic->value))
 //						{
-//							gi.dprintf ("PickCoopTarget returned a %s - ", designated_enemy->classname);
+//							gi.dprintf(DEVELOPER_MSG_GAME, "PickCoopTarget returned a %s - ", designated_enemy->classname);
 //							if (designated_enemy->client)
-//								gi.dprintf ("with name %s\n", designated_enemy->client->pers.netname);
+//								gi.dprintf(DEVELOPER_MSG_GAME, "with name %s\n", designated_enemy->client->pers.netname);
 //							else
-//								gi.dprintf ("NOT A CLIENT\n");
+//								gi.dprintf(DEVELOPER_MSG_GAME, "NOT A CLIENT\n");
 //						}
 					}
 					else
 					{
 //						if ((g_showlogic) && (g_showlogic->value))
-//							gi.dprintf ("pick coop failed, using my current enemy\n");
+//							gi.dprintf(DEVELOPER_MSG_GAME, "pick coop failed, using my current enemy\n");
 						designated_enemy = self->enemy;
 					}
 				}
@@ -1341,7 +1341,7 @@ void medic_finish_spawn (edict_t *self)
 			else
 			{
 //				if ((g_showlogic) && (g_showlogic->value))
-//					gi.dprintf ("pick coop failed, using my current enemy\n");
+//					gi.dprintf(DEVELOPER_MSG_GAME, "pick coop failed, using my current enemy\n");
 				designated_enemy = self->enemy;
 			}
 		}
@@ -1443,7 +1443,7 @@ qboolean medic_checkattack (edict_t *self)
 		if ((!self->enemy) || (!self->enemy->inuse))
 		{
 //			if (g_showlogic && g_showlogic->value)
-//				gi.dprintf ("aborting heal target due to gib\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "aborting heal target due to gib\n");
 			abortHeal (self, true, false, false);
 			return false;
 		}
@@ -1452,7 +1452,7 @@ qboolean medic_checkattack (edict_t *self)
 		if (self->timestamp < level.time)
 		{
 //			if (g_showlogic && g_showlogic->value)
-//				gi.dprintf ("aborting heal target (%s) due to time\n", self->enemy->classname);
+//				gi.dprintf(DEVELOPER_MSG_GAME, "aborting heal target (%s) due to time\n", self->enemy->classname);
 			abortHeal (self, true, false, true);
 			self->timestamp = 0;
 			return false;

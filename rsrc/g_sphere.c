@@ -47,7 +47,7 @@ void sphere_explode (edict_t *self, edict_t *inflictor, edict_t *attacker, int d
 {
 //	if(self->owner && self->owner->client)
 //		gi.cprintf(self->owner, PRINT_HIGH, "Sphere timed out\n");
-//	gi.dprintf("player died, blowing up\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "player died, blowing up\n");
 	sphere_think_explode (self);
 }
 
@@ -58,7 +58,7 @@ void sphere_if_idle_die (edict_t *self, edict_t *inflictor, edict_t *attacker, i
 {
 	if(!self->enemy)
 	{
-//		gi.dprintf("player died, blowing up\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "player died, blowing up\n");
 		sphere_think_explode(self);
 	}
 }
@@ -76,7 +76,7 @@ void sphere_fly (edict_t *self)
 
 	if(level.time >= self->wait)
 	{
-//		gi.dprintf("fly: timed out\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "fly: timed out\n");
 		sphere_think_explode(self);
 		return;
 	}
@@ -349,7 +349,7 @@ void hunter_pain (edict_t *self, edict_t *other, float kick, int damage)
 		if(other == owner)
 		{
 //			if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf ("hunter: won't get mad at my owner!\n");
+//				gi.dprintf(DEVELOPER_MSG_GAME, "hunter: won't get mad at my owner!\n");
 			return;
 		}
 		//pmm
@@ -367,7 +367,7 @@ void hunter_pain (edict_t *self, edict_t *other, float kick, int damage)
 	self->enemy = other;
 
 //	if(g_showlogic && g_showlogic->value)
-//		gi.dprintf("hunter_pain: mad at %s\n", other->classname);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "hunter_pain: mad at %s\n", other->classname);
 
 	// if we're not owned by a player, no sam raimi
 	// if we're spawned by a doppleganger, no sam raimi
@@ -417,7 +417,7 @@ void hunter_pain (edict_t *self, edict_t *other, float kick, int damage)
 			gi.linkentity (self);
 		}
 //		else
-//			gi.dprintf("too close for sam raimi cam\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "too close for sam raimi cam\n");
 	}
 }
 
@@ -429,7 +429,7 @@ void defender_pain (edict_t *self, edict_t *other, float kick, int damage)
 	if(other == self->owner)
 	{
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("defender: won't get mad at my owner!\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, "defender: won't get mad at my owner!\n");
 		return;
 	}
 	//pmm
@@ -452,7 +452,7 @@ void vengeance_pain (edict_t *self, edict_t *other, float kick, int damage)
 		if(other == self->owner)
 		{
 	//		if ((g_showlogic) && (g_showlogic->value))
-	//			gi.dprintf ("vengeance: won't get mad at my owner!\n");
+	//			gi.dprintf(DEVELOPER_MSG_GAME, "vengeance: won't get mad at my owner!\n");
 			return;
 		}
 		//pmm
@@ -479,7 +479,7 @@ void defender_think (edict_t *self)
 {
 	if(!self->owner)
 	{
-//		gi.dprintf("think: no owner\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "think: no owner\n");
 		G_FreeEdict(self);
 		return;
 	}
@@ -546,7 +546,7 @@ void hunter_think (edict_t *self)
 	owner = self->owner;
 	if(!owner && !(self->spawnflags & SPHERE_DOPPLEGANGER))
 	{
-//		gi.dprintf("think: no owner\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "think: no owner\n");
 		G_FreeEdict(self);
 		return;
 	}
@@ -627,7 +627,7 @@ void vengeance_think (edict_t *self)
 
 	if(!(self->owner) && !(self->spawnflags & SPHERE_DOPPLEGANGER))
 	{
-//		gi.dprintf("think: no owner\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "think: no owner\n");
 		G_FreeEdict(self);
 		return;
 	}
@@ -713,7 +713,7 @@ edict_t *Sphere_Spawn (edict_t *owner, int spawnflags)
 			VectorSet (sphere->avelocity, 30, 30, 0);
 			break;
 		default:
-			gi.dprintf("Tried to create an invalid sphere\n");
+			gi.dprintf(DEVELOPER_MSG_GAME, "Tried to create an invalid sphere\n");
 			G_FreeEdict(sphere);
 			return NULL;
 	}

@@ -88,7 +88,7 @@ typedef struct
 {
 	// special messages
 	void	(*bprintf) (int printlevel, char *fmt, ...);
-	void	(*dprintf) (char *fmt, ...);
+	void	(*dprintf) (unsigned long developerFlags, char *fmt, ...); // FS: Added developer flags
 	void	(*cprintf) (edict_t *ent, int printlevel, char *fmt, ...);
 	void	(*centerprintf) (edict_t *ent, char *fmt, ...);
 	void	(*sound) (edict_t *ent, int channel, int soundindex, float volume, float attenuation, float timeofs);

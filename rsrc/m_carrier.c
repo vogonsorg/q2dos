@@ -113,7 +113,7 @@ void CarrierCoopCheck (edict_t *self)
 			if (tr.fraction == 1.0)
 			{
 //				if ((g_showlogic) && (g_showlogic->value))
-//					gi.dprintf ("Carrier: found a player who I can shoot\n");
+//					gi.dprintf(DEVELOPER_MSG_GAME, "Carrier: found a player who I can shoot\n");
 				targets[num_targets++] = ent;
 			}
 		}
@@ -194,7 +194,7 @@ void CarrierGrenade (edict_t *self)
 	{
 		// error, shoot straight
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("CarrierGrenade: bad time  %2.2f   %2.2f\n", level.time, self->timestamp);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "CarrierGrenade: bad time  %2.2f   %2.2f\n", level.time, self->timestamp);
 		spreadR = 0;
 		spreadU = 0;
 	}
@@ -224,7 +224,7 @@ void CarrierPredictiveRocket  (edict_t *self)
 	vec3_t	dir;
 
 //	if ((g_showlogic) && (g_showlogic->value))
-//		gi.dprintf("predictive fire\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "predictive fire\n");
 
 	AngleVectors (self->s.angles, forward, right, NULL);
 
@@ -407,7 +407,7 @@ void CarrierSpawn (edict_t *self)
 	// the +0.1 is because level.time is sometimes a little low
 	mytime = (int)((level.time + 0.1 - self->timestamp)/0.5);
 //	if ((g_showlogic) && (g_showlogic->value))
-//		gi.dprintf ("mytime = %d, (%2.2f)\n", mytime, level.time - self->timestamp);
+//		gi.dprintf(DEVELOPER_MSG_GAME, "mytime = %d, (%2.2f)\n", mytime, level.time - self->timestamp);
 
 	if (FindSpawnPoint (startpoint, flyer_mins, flyer_maxs, spawnpoint, 32))
 	{
@@ -424,7 +424,7 @@ void CarrierSpawn (edict_t *self)
 
 		self->monsterinfo.monster_slots--;
 //		if ((g_showlogic) && (g_showlogic->value))
-//			gi.dprintf ("carrier: post-spawn : %d slots left\n", self->monsterinfo.monster_slots);
+//			gi.dprintf(DEVELOPER_MSG_GAME, "carrier: post-spawn : %d slots left\n", self->monsterinfo.monster_slots);
 
 		ent->nextthink = level.time;
 		ent->think (ent);
@@ -457,7 +457,7 @@ void CarrierSpawn (edict_t *self)
 				ent->monsterinfo.currentmove = &flyer_move_attack3;
 			}
 //			else if ((g_showlogic) && (g_showlogic->value))
-//				gi.dprintf ("carrier:  unexpected time %d!\n", mytime);
+//				gi.dprintf(DEVELOPER_MSG_GAME, "carrier:  unexpected time %d!\n", mytime);
 		}
 	}
 }
@@ -473,7 +473,7 @@ void carrier_prep_spawn (edict_t *self)
 
 void carrier_spawn_check (edict_t *self)
 {
-//	gi.dprintf ("times - %2.2f %2.2f\n", level.time, self->timestamp);
+//	gi.dprintf(DEVELOPER_MSG_GAME, "times - %2.2f %2.2f\n", level.time, self->timestamp);
 	CarrierCoopCheck(self);
 	CarrierMachineGun(self);
 	CarrierSpawn (self);
@@ -498,7 +498,7 @@ void carrier_ready_spawn (edict_t *self)
 
 	current_yaw = anglemod(self->s.angles[YAW]);
 
-//	gi.dprintf ("yaws = %2.2f %2.2f\n", current_yaw, self->ideal_yaw);
+//	gi.dprintf(DEVELOPER_MSG_GAME, "yaws = %2.2f %2.2f\n", current_yaw, self->ideal_yaw);
 
 	if (fabs(current_yaw - self->ideal_yaw) > 0.1)
 	{
@@ -554,7 +554,7 @@ void carrier_start_spawn (edict_t *self)
 //		VectorSet (offset, 90.9, -52.5, 0);
 	}
 //	else if ((g_showlogic) && (g_showlogic->value))
-//		gi.dprintf ("carrier: bad spawntime\n");
+//		gi.dprintf(DEVELOPER_MSG_GAME, "carrier: bad spawntime\n");
 
 	CarrierMachineGun (self);
 }
@@ -801,14 +801,14 @@ mmove_t carrier_move_death = {FRAME_death01, FRAME_death16, carrier_frames_death
 
 void carrier_stand (edict_t *self)
 {
-//	gi.dprintf ("carrier stand\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "carrier stand\n");
 	self->monsterinfo.currentmove = &carrier_move_stand;
 }
 
 void carrier_run (edict_t *self)
 {
 
-//	gi.dprintf ("carrier run - %2.2f - %s \n", level.time, self->enemy->classname);
+//	gi.dprintf(DEVELOPER_MSG_GAME, "carrier run - %2.2f - %s \n", level.time, self->enemy->classname);
 	self->monsterinfo.aiflags &= ~AI_HOLD_FRAME;
 
 	if (self->monsterinfo.aiflags & AI_STAND_GROUND)
@@ -836,7 +836,7 @@ void carrier_attack (edict_t *self)
 	float	range, luck;
 	qboolean	enemy_inback, enemy_infront, enemy_below;
 
-//	gi.dprintf ("carrier attack\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "carrier attack\n");
 	
 	self->monsterinfo.aiflags &= ~AI_HOLD_FRAME;
 
@@ -881,13 +881,13 @@ void carrier_attack (edict_t *self)
 
 /*	if ((g_showlogic) && (g_showlogic->value))
 	{
-		gi.dprintf ("checking enemy ..");
+		gi.dprintf(DEVELOPER_MSG_GAME, "checking enemy ..");
 		if (enemy_inback)
-			gi.dprintf (" in back\n");
+			gi.dprintf(DEVELOPER_MSG_GAME, " in back\n");
 		else if (enemy_infront)
-			gi.dprintf (" in front\n");
+			gi.dprintf(DEVELOPER_MSG_GAME, " in front\n");
 		else
-			gi.dprintf (" inaccessible\n");
+			gi.dprintf(DEVELOPER_MSG_GAME, " inaccessible\n");
 	}
 */	
 	if (enemy_infront)
@@ -995,7 +995,7 @@ void carrier_reattack_mg (edict_t *self)
 
 void carrier_attack_gren (edict_t *self)
 {
-//	gi.dprintf ("carrier_attack_gren - %2.2f\n",level.time);
+//	gi.dprintf(DEVELOPER_MSG_GAME, "carrier_attack_gren - %2.2f\n",level.time);
 	CarrierCoopCheck(self);
 	self->timestamp = level.time;
 	self->monsterinfo.currentmove = &carrier_move_attack_gren;
@@ -1004,15 +1004,15 @@ void carrier_attack_gren (edict_t *self)
 void carrier_reattack_gren (edict_t *self)
 {
 	CarrierCoopCheck(self);
-//	gi.dprintf ("carrier_reattack - %2.2f", level.time);
+//	gi.dprintf(DEVELOPER_MSG_GAME, "carrier_reattack - %2.2f", level.time);
 	if ( infront(self, self->enemy) )
 		if (self->timestamp + 1.3 > level.time ) // four grenades
 		{
-//			gi.dprintf (" attacking\n");
+//			gi.dprintf(DEVELOPER_MSG_GAME, " attacking\n");
 			self->monsterinfo.currentmove = &carrier_move_attack_gren;
 			return;
 		}
-//	gi.dprintf ("not attacking\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "not attacking\n");
 	self->monsterinfo.currentmove = &carrier_move_attack_post_gren;
 }
 
@@ -1027,7 +1027,7 @@ void carrier_pain (edict_t *self, edict_t *other, float kick, int damage)
 	if (skill->value == 3)
 		return;		// no pain anims in nightmare
 
-	//	gi.dprintf ("carrier pain\n");
+	//	gi.dprintf(DEVELOPER_MSG_GAME, "carrier pain\n");
 	if (level.time < self->pain_debounce_time)
 		return;
 

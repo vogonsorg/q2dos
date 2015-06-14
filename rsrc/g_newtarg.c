@@ -89,7 +89,7 @@ void target_steam_start (edict_t *self)
 	{
 		ent = G_Find (NULL, FOFS(targetname), self->target);
 		if (!ent)
-			gi.dprintf ("%s at %s: %s is a bad target\n", self->classname, vtos(self->s.origin), self->target);
+			gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s: %s is a bad target\n", self->classname, vtos(self->s.origin), self->target);
 		self->enemy = ent;
 	}
 	else
@@ -153,7 +153,7 @@ void target_anger_use (edict_t *self, edict_t *other, edict_t *activator)
 		{
 			if (t == self)
 			{
-				gi.dprintf ("WARNING: entity used itself.\n");
+				gi.dprintf(DEVELOPER_MSG_GAME, "WARNING: entity used itself.\n");
 			}
 			else
 			{
@@ -162,7 +162,7 @@ void target_anger_use (edict_t *self, edict_t *other, edict_t *activator)
 					if (t->health < 0)
 					{
 //						if ((g_showlogic) && (g_showlogic->value))
-//							gi.dprintf ("target_anger with dead monster!\n");
+//							gi.dprintf(DEVELOPER_MSG_GAME, "target_anger with dead monster!\n");
 						return;
 					}
 					t->enemy = target;
@@ -172,7 +172,7 @@ void target_anger_use (edict_t *self, edict_t *other, edict_t *activator)
 			}
 			if (!self->inuse)
 			{
-				gi.dprintf("entity was removed while using targets\n");
+				gi.dprintf(DEVELOPER_MSG_GAME, "entity was removed while using targets\n");
 				return;
 			}
 		}
@@ -191,13 +191,13 @@ void SP_target_anger (edict_t *self)
 {	
 	if (!self->target)
 	{
-		gi.dprintf("target_anger without target!\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "target_anger without target!\n");
 		G_FreeEdict (self);
 		return;
 	}
 	if (!self->killtarget)
 	{
-		gi.dprintf("target_anger without killtarget!\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "target_anger without killtarget!\n");
 		G_FreeEdict (self);
 		return;
 	}

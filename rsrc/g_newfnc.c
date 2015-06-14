@@ -31,7 +31,7 @@ void fd_secret_use (edict_t *self, edict_t *other, edict_t *activator)
 {
 	edict_t *ent;
 
-//	gi.dprintf("fd_secret_use\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "fd_secret_use\n");
 	if (self->flags & FL_TEAMSLAVE)
 		return;
 
@@ -43,7 +43,7 @@ void fd_secret_use (edict_t *self, edict_t *other, edict_t *activator)
 
 void fd_secret_killed (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point)
 {
-//	gi.dprintf("fd_secret_killed\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "fd_secret_killed\n");
 	self->health = self->max_health;
 	self->takedamage = DAMAGE_NO;
 
@@ -56,7 +56,7 @@ void fd_secret_killed (edict_t *self, edict_t *inflictor, edict_t *attacker, int
 // Wait after first movement...
 void fd_secret_move1(edict_t *self) 
 {
-//	gi.dprintf("fd_secret_move1\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "fd_secret_move1\n");
 	self->nextthink = level.time + 1.0;
 	self->think = fd_secret_move2;
 }
@@ -64,14 +64,14 @@ void fd_secret_move1(edict_t *self)
 // Start moving sideways w/sound...
 void fd_secret_move2(edict_t *self)
 {
-//	gi.dprintf("fd_secret_move2\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "fd_secret_move2\n");
 	Move_Calc(self, self->moveinfo.end_origin, fd_secret_move3);
 }
 
 // Wait here until time to go back...
 void fd_secret_move3(edict_t *self)
 {
-//	gi.dprintf("fd_secret_move3\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "fd_secret_move3\n");
 	if (!(self->spawnflags & SEC_OPEN_ONCE))
 	{
 		self->nextthink = level.time + self->wait;
@@ -82,27 +82,27 @@ void fd_secret_move3(edict_t *self)
 // Move backward...
 void fd_secret_move4(edict_t *self)
 {
-//	gi.dprintf("fd_secret_move4\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "fd_secret_move4\n");
 	Move_Calc(self, self->moveinfo.start_origin, fd_secret_move5);          
 }
 
 // Wait 1 second...
 void fd_secret_move5(edict_t *self)
 {
-//	gi.dprintf("fd_secret_move5\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "fd_secret_move5\n");
 	self->nextthink = level.time + 1.0;
 	self->think = fd_secret_move6;
 }
 
 void fd_secret_move6(edict_t *self)
 {
-//	gi.dprintf("fd_secret_move6\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "fd_secret_move6\n");
 	Move_Calc(self, self->move_origin, fd_secret_done);
 }
 
 void fd_secret_done(edict_t *self)
 {
-//	gi.dprintf("fd_secret_done\n");
+//	gi.dprintf(DEVELOPER_MSG_GAME, "fd_secret_done\n");
 	if (!self->targetname || self->spawnflags & SEC_YES_SHOOT)
 	{
 		self->health = 1;
@@ -202,7 +202,7 @@ void SP_func_door_secret2 (edict_t *ent)
 	}		
 	else
 	{
-		gi.dprintf("Secret door not at 0,90,180,270!\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "Secret door not at 0,90,180,270!\n");
 	}
 
 	if(ent->spawnflags & SEC_MOVE_FORWARD)

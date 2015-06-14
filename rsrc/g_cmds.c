@@ -261,7 +261,7 @@ void Cmd_Give_f (edict_t *ent)
 //ROGUE
 	if (it->flags & IT_NOT_GIVEABLE)		
 	{
-		gi.dprintf ("item cannot be given\n");
+		gi.dprintf(DEVELOPER_MSG_GAME, "item cannot be given\n");
 		return;							
 	}
 //ROGUE
@@ -902,7 +902,7 @@ void Cmd_Ent_Count_f (edict_t *ent)
 			x++;
 	}
 
-	gi.dprintf("%d entites active\n", x);
+	gi.dprintf(DEVELOPER_MSG_GAME, "%d entites active\n", x);
 }
 //ROGUE
 //======

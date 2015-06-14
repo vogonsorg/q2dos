@@ -961,7 +961,7 @@ monster_start(edict_t *self)
 
 		if (!self->item)
 		{
-			gi.dprintf("%s at %s has bad item: %s\n", self->classname,
+			gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s has bad item: %s\n", self->classname,
 					vtos(self->s.origin), st.item);
 		}
 	}
@@ -1020,7 +1020,7 @@ monster_start_go(edict_t *self)
 
 		if (notcombat && self->combattarget)
 		{
-			gi.dprintf("%s at %s has target with mixed types\n",
+			gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s has target with mixed types\n",
 					self->classname, vtos(self->s.origin));
 		}
 
@@ -1042,7 +1042,7 @@ monster_start_go(edict_t *self)
 		{
 			if (strcmp(target->classname, "point_combat") != 0)
 			{
-				gi.dprintf("%s at (%i %i %i) has a bad combattarget %s : %s at (%i %i %i)\n",
+				gi.dprintf(DEVELOPER_MSG_GAME, "%s at (%i %i %i) has a bad combattarget %s : %s at (%i %i %i)\n",
 						self->classname, (int)self->s.origin[0], (int)self->s.origin[1],
 						(int)self->s.origin[2], self->combattarget, target->classname,
 						(int)target->s.origin[0], (int)target->s.origin[1],
@@ -1057,7 +1057,7 @@ monster_start_go(edict_t *self)
 
 		if (!self->movetarget)
 		{
-			gi.dprintf("%s can't find target %s at %s\n", self->classname,
+			gi.dprintf(DEVELOPER_MSG_GAME, "%s can't find target %s at %s\n", self->classname,
 					self->target, vtos(self->s.origin));
 			self->target = NULL;
 			self->monsterinfo.pausetime = 100000000;
@@ -1103,7 +1103,7 @@ walkmonster_start_go(edict_t *self)
 		{
 			if (!M_walkmove(self, 0, 0))
 			{
-				gi.dprintf("%s in solid at %s\n", self->classname,
+				gi.dprintf(DEVELOPER_MSG_GAME, "%s in solid at %s\n", self->classname,
 						vtos(self->s.origin));
 			}
 		}
@@ -1146,7 +1146,7 @@ flymonster_start_go(edict_t *self)
 
 	if (!M_walkmove(self, 0, 0))
 	{
-		gi.dprintf("%s in solid at %s\n", self->classname, vtos(self->s.origin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s in solid at %s\n", self->classname, vtos(self->s.origin));
 	}
 
 	if (!self->yaw_speed)
