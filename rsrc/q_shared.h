@@ -267,6 +267,11 @@ void Com_PageInMemory (byte *buffer, int size);
 int Q_stricmp (char *s1, char *s2);
 int Q_strcasecmp (char *s1, char *s2);
 int Q_strncasecmp (char *s1, char *s2, int n);
+// FS: From KMQ2
+void Q_strncpyz (char *dst, const char *src, int dstSize);
+void Q_strncatz (char *dst, const char *src, int dstSize);
+char *Q_strlwr (char *string);
+char *Q_strupr (char *string);
 
 //=============================================
 
@@ -294,6 +299,15 @@ void Info_RemoveKey (char *s, char *key);
 void Info_SetValueForKey (char *s, char *key, char *value);
 qboolean Info_Validate (char *s);
 
+/* ============================================= */
+
+/* Random number generator */
+#if 0 // FS: Currently broken in DJGPP
+int  randk(void);
+float frandk(void);
+float crandk(void);
+void randk_seed(void);
+#endif
 /*
 ==============================================================
 

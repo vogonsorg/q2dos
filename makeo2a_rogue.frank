@@ -1,12 +1,14 @@
 CC = gcc
 CFLAGS = -g -Wall -O2 
-SFLAGS = -Did386 -DREF_HARD_LINKED -DGAME_HARD_LINKED -DUSE_DOS_CD -DOGG_SUPPORT -DCLIENT_SPLIT_NETFRAME -DGAMESPY
+SFLAGS = -Did386 -DREF_HARD_LINKED -DGAME_HARD_LINKED -DUSE_DOS_CD -DOGG_SUPPORT -DCLIENT_SPLIT_NETFRAME -DGAMESPY -DUSE_CURL
 WCFLAGS = -I wattcp/inc
 WLFLAGS = -Lwattcp/lib -lwatt
 OGGCFLAGS = -I libogg/inc
 OCCLFLAGS = -Llibogg/lib -logg
 VORBCFLAGS = -I libvorb/inc
 VORBLFLAGS = -Llibvorb/lib -lvorbisenc -lvorbisfile -lvorbis -logg
+CURLCFLAGS = -I libcurl/include
+CURLLFLAGS = -Llibcurl/lib -lcurl
 
 DOS = 	dos/cd_dos.o \
 	dos/vid_dos.o \
@@ -28,6 +30,7 @@ CLIENT =	client/cl_input.o \
 	client/cl_main.o \
 	client/cl_cin.o \
 	client/cl_ents.o \
+	client/cl_http.o \
 	client/cl_fx.o \
 	client/cl_parse.o \
 	client/cl_pred.o \
@@ -170,7 +173,7 @@ OBJECTS =  $(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(GAMESPY) $(REFSOFT) $(REFASM
 all: q2rogue.exe
 
 q2rogue.exe:	$(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o q2rogue.exe -lm $(WLFLAGS) -lm $(OCCLFLAGS) -lm $(VORBLFLAGS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o q2rogue.exe $(OCCLFLAGS) $(VORBLFLAGS) $(CURLLFLAGS) -lm $(WLFLAGS)
 
 clean:
 	find ./ -name '*.o' -exec rm {} \;
@@ -178,7 +181,7 @@ clean:
 DO_AS=$(CC) -x assembler-with-cpp
 
 %.o : %.c
-	$(CC) $(CFLAGS) $(WCFLAGS) $(SFLAGS) $(OGGCFLAGS) $(VORBCFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(WCFLAGS) $(SFLAGS) $(OGGCFLAGS) $(VORBCFLAGS) $(CURLCFLAGS) -c $< -o $@
 
 %.o: %.S
 	$(DO_AS) $(CFLAGS) -c $< -o $@
