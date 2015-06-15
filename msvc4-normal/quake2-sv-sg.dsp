@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir ".\Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "OGG_SUPPORT" /D "USE_CURL" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x1009 /d "NDEBUG"
@@ -68,7 +68,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /FR /YX /FD /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "OGG_SUPPORT" /D "USE_CURL" /FR /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x1009 /d "_DEBUG"
@@ -78,7 +78,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /map /debug /machine:I386
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /map /debug /machine:I386 /nodefaultlib:"msvcrt.lib"
 
 !ENDIF 
 
@@ -117,10 +117,9 @@ SOURCE=..\Goa\CEngine\hashtable.c
 SOURCE=..\Goa\nonport.c
 # End Source File
 # End Group
-# Begin Source File
+# Begin Group "Client"
 
-SOURCE=..\WIN32\cd_win.c
-# End Source File
+# PROP Default_Filter ""
 # Begin Source File
 
 SOURCE=..\CLIENT\cl_cin.c
@@ -132,6 +131,10 @@ SOURCE=..\CLIENT\cl_ents.c
 # Begin Source File
 
 SOURCE=..\CLIENT\cl_fx.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\client\cl_http.c
 # End Source File
 # Begin Source File
 
@@ -171,36 +174,108 @@ SOURCE=..\CLIENT\cl_view.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\QCOMMON\cmd.c
+SOURCE=..\CLIENT\snd_dma.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\QCOMMON\cmodel.c
+SOURCE=..\CLIENT\snd_mem.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\QCOMMON\common.c
+SOURCE=..\CLIENT\snd_mix.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\WIN32\conproc.c
+SOURCE=..\client\snd_stream.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\CLIENT\console.c
+SOURCE=..\WIN32\snd_win.c
+# End Source File
+# End Group
+# Begin Group "Server"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\SERVER\sv_ccmds.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\QCOMMON\crc.c
+SOURCE=..\SERVER\sv_ents.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\QCOMMON\cvar.c
+SOURCE=..\SERVER\sv_game.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\QCOMMON\files.c
+SOURCE=..\SERVER\sv_init.c
 # End Source File
+# Begin Source File
+
+SOURCE=..\SERVER\sv_main.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\SERVER\sv_send.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\SERVER\sv_user.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\SERVER\sv_world.c
+# End Source File
+# End Group
+# Begin Group "Win32"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\WIN32\cd_win.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\in_win.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\win32\net_wins.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\q_shwin.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\rw_ddraw.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\rw_dib.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\rw_imp.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\sys_win.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\vid_dll.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\vid_menu.c
+# End Source File
+# End Group
+# Begin Group "Game"
+
+# PROP Default_Filter ""
 # Begin Source File
 
 SOURCE=..\GAME\g_ai.c
@@ -272,14 +347,6 @@ SOURCE=..\GAME\g_utils.c
 # Begin Source File
 
 SOURCE=..\GAME\g_weapon.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\WIN32\in_win.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\CLIENT\keys.c
 # End Source File
 # Begin Source File
 
@@ -379,22 +446,6 @@ SOURCE=..\GAME\m_tank.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\QCOMMON\md4.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\CLIENT\menu.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\QCOMMON\net_chan.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\win32\net_wins.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\GAME\p_client.c
 # End Source File
 # Begin Source File
@@ -413,22 +464,10 @@ SOURCE=..\GAME\p_view.c
 
 SOURCE=..\GAME\p_weapon.c
 # End Source File
-# Begin Source File
+# End Group
+# Begin Group "ref_soft"
 
-SOURCE=..\QCOMMON\pmove.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\GAME\q_shared.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\WIN32\q_shwin.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\CLIENT\qmenu.c
-# End Source File
+# PROP Default_Filter ""
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_aclip.c
@@ -497,77 +536,66 @@ SOURCE=..\REF_SOFT\r_sprite.c
 
 SOURCE=..\REF_SOFT\r_surf.c
 # End Source File
+# End Group
 # Begin Source File
 
-SOURCE=..\WIN32\rw_ddraw.c
+SOURCE=..\QCOMMON\cmd.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\WIN32\rw_dib.c
+SOURCE=..\QCOMMON\cmodel.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\WIN32\rw_imp.c
+SOURCE=..\QCOMMON\common.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\CLIENT\snd_dma.c
+SOURCE=..\WIN32\conproc.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\CLIENT\snd_mem.c
+SOURCE=..\CLIENT\console.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\CLIENT\snd_mix.c
+SOURCE=..\QCOMMON\crc.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\WIN32\snd_win.c
+SOURCE=..\QCOMMON\cvar.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\SERVER\sv_ccmds.c
+SOURCE=..\QCOMMON\files.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\SERVER\sv_ents.c
+SOURCE=..\CLIENT\keys.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\SERVER\sv_game.c
+SOURCE=..\QCOMMON\md4.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\SERVER\sv_init.c
+SOURCE=..\CLIENT\menu.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\SERVER\sv_main.c
+SOURCE=..\QCOMMON\net_chan.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\SERVER\sv_send.c
+SOURCE=..\QCOMMON\pmove.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\SERVER\sv_user.c
+SOURCE=..\GAME\q_shared.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\SERVER\sv_world.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\WIN32\sys_win.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\WIN32\vid_dll.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\WIN32\vid_menu.c
+SOURCE=..\CLIENT\qmenu.c
 # End Source File
 # Begin Source File
 
@@ -806,5 +834,17 @@ SOURCE=..\dos\zone.h
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
 # End Group
+# Begin Source File
+
+SOURCE=..\win32\libcurl.lib
+# End Source File
+# Begin Source File
+
+SOURCE=..\win32\libogg.lib
+# End Source File
+# Begin Source File
+
+SOURCE=..\win32\libvorbis.lib
+# End Source File
 # End Target
 # End Project

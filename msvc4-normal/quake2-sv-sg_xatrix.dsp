@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir ".\Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "OGG_SUPPORT" /D "USE_CURL" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x1009 /d "NDEBUG"
@@ -68,7 +68,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "OGG_SUPPORT" /FR /YX /FD /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "OGG_SUPPORT" /D "USE_CURL" /FR /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x1009 /d "_DEBUG"
@@ -348,6 +348,10 @@ SOURCE=..\CLIENT\cl_ents.c
 # Begin Source File
 
 SOURCE=..\CLIENT\cl_fx.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\client\cl_http.c
 # End Source File
 # Begin Source File
 
@@ -970,6 +974,10 @@ SOURCE=..\win32\libvorbis.lib
 # Begin Source File
 
 SOURCE=..\win32\libogg.lib
+# End Source File
+# Begin Source File
+
+SOURCE=..\win32\libcurl.lib
 # End Source File
 # End Target
 # End Project
