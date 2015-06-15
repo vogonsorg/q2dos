@@ -744,6 +744,8 @@ char		**FS_ListFiles (char *findname, int *numfiles, unsigned musthave, unsigned
 void		FS_FreeFileList (char **list, int n);
 qboolean	FS_ItemInList (char *check, int num, char **list);
 void		FS_InsertInList (char **list, char *insert, int len, int start);
+void		FS_AddPAKFile (const char *packPath);
+qboolean	FS_LocalFileExists (char *path);
 // end Knightmare
 
 /*
@@ -880,3 +882,4 @@ int Q_strcmp (char *s1, char *s2);
 int Q_strncmp (char *s1, char *s2, int count);
 int Q_atoi (char *str);
 float Q_atof (char *str);
+const char *MakePrintable (const void *subject, size_t numchars); // FS: From R1Q2

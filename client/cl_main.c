@@ -696,6 +696,13 @@ void CL_Disconnect (void)
 		cls.download = NULL;
 	}
 
+#ifdef USE_CURL	// HTTP downloading from R1Q2
+	CL_CancelHTTPDownloads (true);
+	cls.downloadReferer[0] = 0;
+	cls.downloadname[0] = 0;
+	cls.downloadposition = 0;
+#endif	// USE_CURL
+
 	cls.state = ca_disconnected;
 }
 
@@ -937,7 +944,11 @@ void CL_ConnectionlessPacket (void)
 {
 	char	*s;
 	char	*c;
-	
+	// HTTP downloading from R1Q2
+	char	*buff, *p;
+	int		i;
+	// end HTTP downloading from R1Q2
+
 	MSG_BeginReading (&net_message);
 	MSG_ReadLong (&net_message);	// skip the -1
 
@@ -958,6 +969,25 @@ void CL_ConnectionlessPacket (void)
 			return;
 		}
 		Netchan_Setup (NS_CLIENT, &cls.netchan, net_from, cls.quakePort);
+		// HTTP downloading from R1Q2
+		buff = NET_AdrToString(cls.netchan.remote_address);
+		for (i = 1; i < Cmd_Argc(); i++)
+		{
+			p = Cmd_Argv(i);
+			if ( !strncmp (p, "dlserver=", 9) )
+			{
+#ifdef USE_CURL
+				p += 9;
+				Com_sprintf (cls.downloadReferer, sizeof(cls.downloadReferer), "quake2://%s", buff);
+				CL_SetHTTPServer (p);
+				if ( cls.downloadServer[0] )
+					Com_Printf ("HTTP downloading enabled, URL: %s\n", cls.downloadServer);
+#else
+				Com_Printf ("HTTP downloading supported by server but this client was built without libcurl.\n");
+#endif	// USE_CURL
+			}
+		}
+		// end HTTP downloading from R1Q2
 		MSG_WriteChar (&cls.netchan.message, clc_stringcmd);
 		MSG_WriteString (&cls.netchan.message, "new");	
 		cls.state = ca_connected;
@@ -1161,6 +1191,7 @@ int precache_check; // for autodownload of precache items
 int precache_spawncount;
 int precache_tex;
 int precache_model_skin;
+int precache_pak; // Knightmare
 
 byte *precache_model; // used for skin checking in alias models
 
@@ -1171,6 +1202,22 @@ byte *precache_model; // used for skin checking in alias models
 #define TEXTURE_CNT (ENV_CNT+13)
 
 static const char *env_suf[6] = {"rt", "bk", "lf", "ft", "up", "dn"};
+
+/*
+=================
+CL_ResetPrecacheCheck
+=================
+*/
+void CL_ResetPrecacheCheck (void)
+{
+//	precache_start_time = Sys_Milliseconds();
+
+	precache_check = CS_MODELS;
+//	precache_spawncount = atoi(Cmd_Argv(1));
+	precache_model = 0;
+	precache_model_skin = 0;
+	precache_pak = 0;	// Knightmare added
+}
 
 void CL_RequestNextDownload (void)
 {
@@ -1215,7 +1262,11 @@ void CL_RequestNextDownload (void)
 					}
 					precache_model_skin = 1;
 				}
-
+#ifdef USE_CURL	// HTTP downloading from R1Q2
+				// pending downloads (models), let's wait here before we can check skins.
+				if ( CL_PendingHTTPDownloads() )
+					return;
+#endif	// USE_CURL
 				// checking for skins in the model
 				if (!precache_model)
 				{
@@ -1441,7 +1492,11 @@ void CL_RequestNextDownload (void)
 		// precache phase completed
 		precache_check = ENV_CNT;
 	}
-
+#ifdef USE_CURL	// HTTP downloading from R1Q2
+	// pending downloads (possibly the map), let's wait here.
+	if ( CL_PendingHTTPDownloads() )
+		return;
+#endif	// USE_CURL
 	if (precache_check == ENV_CNT)
 	{
 		if (localServer)	// if on local server, skip checking textures
@@ -1498,7 +1553,11 @@ void CL_RequestNextDownload (void)
 		}
 		precache_check = TEXTURE_CNT+999;
 	}
-
+#ifdef USE_CURL	// HTTP downloading from R1Q2
+	// pending downloads (possibly textures), let's wait here.
+	if ( CL_PendingHTTPDownloads() )
+		return;
+#endif	// USE_CURL
 //ZOID
 	CL_RegisterSounds ();
 	CL_PrepRefresh ();
@@ -1533,6 +1592,11 @@ void CL_Precache_f (void)
 	precache_spawncount = atoi(Cmd_Argv(1));
 	precache_model = 0;
 	precache_model_skin = 0;
+	precache_pak = 0;	// Knightmare added
+
+#ifdef USE_CURL	// HTTP downloading from R1Q2
+	CL_HTTP_ResetMapAbort ();	// Knightmare- reset the map abort flag
+#endif	// USE_CURL
 
 	CL_RequestNextDownload();
 }
@@ -1656,6 +1720,13 @@ void CL_InitLocal (void)
 	cl_master_server_queries->description = "Maximum number of query (ping) requests to use per loop with the gamespy browser.";
 	s_gamespy_sounds = Cvar_Get("s_gamespysounds", "0", CVAR_ARCHIVE);
 
+#ifdef USE_CURL	// HTTP downloading from R1Q2
+	cl_http_proxy = Cvar_Get ("cl_http_proxy", "", 0);
+	cl_http_filelists = Cvar_Get ("cl_http_filelists", "1", 0);
+	cl_http_downloads = Cvar_Get ("cl_http_downloads", "1", CVAR_ARCHIVE);
+	cl_http_max_connections = Cvar_Get ("cl_http_max_connections", "4", 0);
+//	cl_http_max_connections->changed = _cl_http_max_connections_changed;
+#endif	// USE_CURL
 	//
 	// register our commands
 	//
@@ -2175,6 +2246,10 @@ void CL_Frame (double msec)
 	if (msec > 5000)
 		cls.netchan.last_received = Sys_Milliseconds ();
 
+#ifdef USE_CURL	// HTTP downloading from R1Q2
+	CL_RunHTTPDownloads ();
+#endif	// USE_CURL
+
 	// fetch results from server
 	CL_ReadPackets ();
 
@@ -2269,6 +2344,10 @@ void CL_Init (void)
 	CL_InitLocal ();
 	IN_Init ();
 
+#ifdef USE_CURL	// HTTP downloading from R1Q2
+	CL_InitHTTPDownloads ();
+#endif	// USE_CURL
+
 //	Cbuf_AddText ("exec autoexec.cfg\n");
 	FS_ExecAutoexec ();
 	Cbuf_Execute ();
@@ -2294,6 +2373,10 @@ void CL_Shutdown(void)
 		return;
 	}
 	isdown = true;
+
+#ifdef USE_CURL	// HTTP downloading from R1Q2
+	CL_HTTP_Cleanup (true);
+#endif	// USE_CURL
 
 	CL_WriteConfiguration ("config");	// Knightmare- changed to take config name as a parameter
 

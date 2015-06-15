@@ -329,8 +329,18 @@ void R_ViewChanged (vrect_t *vr)
 
 	r_refdef.vrect = *vr;
 
-	r_refdef.horizontalFieldOfView = 2*tan((float)r_newrefdef.fov_x/360*M_PI);;
-	verticalFieldOfView = 2*tan((float)r_newrefdef.fov_y/360*M_PI);
+	r_refdef.horizontalFieldOfView = 2*tan((float)r_newrefdef.fov_x/360*M_PI);
+ 	// Knightmare- catch 5:4 modes pushing top and bottom clips beyond screen buffer
+ 	if ( (r_refdef.vrect.width != r_newrefdef.width || r_refdef.vrect.height != r_newrefdef.height)
+ 		&& (((float)r_newrefdef.width / (float)r_newrefdef.height) < (640.0f/480.0f)) )
+ 	{
+ 		float	x;
+ 		x = r_refdef.vrect.width/tan(r_newrefdef.fov_x/360*M_PI);
+ 		verticalFieldOfView = 2*(r_refdef.vrect.height/x);
+ 	}
+ 	else
+ 		verticalFieldOfView = 2*tan((float)r_newrefdef.fov_y/360*M_PI);
+ 	// end Knightmare
 
 	r_refdef.fvrectx = (float)r_refdef.vrect.x;
 	r_refdef.fvrectx_adj = (float)r_refdef.vrect.x - 0.5;
@@ -421,6 +431,7 @@ R_SetupFrame
 void R_SetupFrame (void)
 {
 	int			i;
+	int			adj_warp_height;	// Knightmare added
 	vrect_t		vrect;
 
 	if (r_fullbright->modified)
@@ -450,12 +461,23 @@ void R_SetupFrame (void)
 	else
 		r_dowarp = false;
 
-	if (r_dowarp)
-	{	// warp into off screen buffer
-		vrect.x = 0;
-		vrect.y = 0;
-		vrect.width = r_newrefdef.width < WARP_WIDTH ? r_newrefdef.width : WARP_WIDTH;
-		vrect.height = r_newrefdef.height < WARP_HEIGHT ? r_newrefdef.height : WARP_HEIGHT;
+ 	if (r_dowarp)
+ 	{	// warp into off screen buffer
+ 		vrect.x = 0;
+ 		vrect.y = 0;
+ 		vrect.width = r_newrefdef.width < WARP_WIDTH ? r_newrefdef.width : WARP_WIDTH;
+		//	vrect.height = r_newrefdef.height < WARP_HEIGHT ? r_newrefdef.height : WARP_HEIGHT;
+ 		// Knightmare- adjust warp height for widescreen aspect ratio
+ 		if ( ((float)r_newrefdef.width / (float)r_newrefdef.height) > (640.0f/480.0f) )
+		{
+ 			adj_warp_height = (int)( ((float)r_newrefdef.height / (float)r_newrefdef.width) * (float)WARP_WIDTH );
+		}
+ 		else
+		{
+ 			adj_warp_height = WARP_HEIGHT;
+		}
+ 		vrect.height = r_newrefdef.height < adj_warp_height ? r_newrefdef.height : adj_warp_height;
+ 		// end Knightmare
 
 		d_viewbuffer = r_warpbuffer;
 		r_screenwidth = WARP_WIDTH;

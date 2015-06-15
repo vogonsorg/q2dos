@@ -638,10 +638,12 @@ void Con_DrawConsole (float frac)
 			re.DrawChar ( (x+1)<<3, y, text[x]);
 	}
 
-//ZOID
-	// draw the download bar
-	// figure out width
+//ZOID- draw the download bar
+#ifdef USE_CURL	// HTTP downloading from R1Q2
+	if ( cls.downloadname[0] && (cls.download || cls.downloadposition) )
+#else
 	if (cls.download)
+#endif	// USE_CURL
 	{
 		if ((text = strrchr(cls.downloadname, '/')) != NULL)
 			text++;

@@ -81,7 +81,17 @@ qboolean	CL_CheckOrDownloadFile (char *filename)
 	{	// it exists, no need to download
 		return true;
 	}
-
+#ifdef USE_CURL	// HTTP downloading from R1Q2
+	if ( CL_QueueHTTPDownload(filename) )
+	{
+		// We return true so that the precache check keeps feeding us more files.
+		// Since we have multiple HTTP connections we want to minimize latency
+		// and be constantly sending requests, not one at a time.
+		return true;
+	}
+	else
+	{
+#endif	// USE_CURL
 	strcpy (cls.downloadname, filename);
 
 	// download to a temp name, and only rename
@@ -121,6 +131,9 @@ qboolean	CL_CheckOrDownloadFile (char *filename)
 	cls.forcePacket = true;
 
 	return false;
+#ifdef USE_CURL	// HTTP downloading from R1Q2
+	}
+#endif	// USE_CURL
 }
 
 /*

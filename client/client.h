@@ -37,6 +37,27 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "console.h"
 #include "cdaudio.h"
 
+// HTTP downloading from R1Q2
+#ifdef USE_CURL
+#ifdef _WIN32
+#define CURL_STATICLIB
+#define CURL_HIDDEN_SYMBOLS
+#define CURL_EXTERN_SYMBOL
+#define CURL_CALLING_CONVENTION __cdecl
+#endif
+
+//#if defined (_MSC_VER) && (_MSC_VER <= 1200)	// use older version of libcurl for MSVC6
+//#include "../include/curl_old/curl.h"
+//#define CURL_ERROR(x)	va("%i",(x))
+//#else
+#define CURL_STATICLIB
+#include "../libcurl/include/curl/curl.h"
+#define CURL_ERROR(x)	curl_easy_strerror(x)
+//#endif
+
+#endif	// USE_CURL
+// end HTTP downloading from R1Q2
+
 //=============================================================================
 
 typedef struct
@@ -82,6 +103,46 @@ extern char cl_weaponmodels[MAX_CLIENTWEAPONMODELS][MAX_QPATH];
 extern int num_cl_weaponmodels;
 
 #define	CMD_BACKUP		64	// allow a lot of command backups for very fast systems
+
+#ifdef USE_CURL	// HTTP downloading from R1Q2
+
+void CL_CancelHTTPDownloads (qboolean permKill);
+void CL_InitHTTPDownloads (void);
+qboolean CL_QueueHTTPDownload (const char *quakePath);
+void CL_RunHTTPDownloads (void);
+qboolean CL_PendingHTTPDownloads (void);
+void CL_SetHTTPServer (const char *URL);
+void CL_HTTP_Cleanup (qboolean fullShutdown);
+void CL_HTTP_ResetMapAbort (void);	// Knightmare added
+
+typedef enum
+{
+	DLQ_STATE_NOT_STARTED,
+	DLQ_STATE_RUNNING,
+	DLQ_STATE_DONE
+} dlq_state;
+
+typedef struct dlqueue_s
+{
+	struct dlqueue_s	*next;
+	char				quakePath[MAX_QPATH];
+	dlq_state			state;
+} dlqueue_t;
+
+typedef struct dlhandle_s
+{
+	CURL		*curl;
+	char		filePath[MAX_OSPATH];
+	FILE		*file;
+	dlqueue_t	*queueEntry;
+	size_t		fileSize;
+	size_t		position;
+	double		speed;
+	char		URL[576];
+	char		*tempBuffer;
+} dlhandle_t;
+
+#endif	// USE_CURL
 
 //
 // the client_state_t structure is wiped completely at every
@@ -233,7 +294,9 @@ typedef struct
 	char		downloadname[MAX_OSPATH];
 	int			downloadnumber;
 	dltype_t	downloadtype;
+	size_t		downloadposition;	// added for HTTP downloads
 	int			downloadpercent;
+	float		downloadrate;		// Knightmare- to display KB/s
 	int			gamespypercent; // FS: For gamespy
 	int			gamespyupdate; // FS: For gamespy
 
@@ -241,6 +304,21 @@ typedef struct
 	qboolean	demorecording;
 	qboolean	demowaiting;	// don't record until a non-delta message is received
 	FILE		*demofile;
+#ifdef USE_CURL	// HTTP downloading from R1Q2
+	dlqueue_t		downloadQueue;			//queue of paths we need
+	
+	dlhandle_t		HTTPHandles[4];			//actual download handles
+	//don't raise this!
+	//i use a hardcoded maximum of 4 simultaneous connections to avoid
+	//overloading the server. i'm all too familiar with assholes who set
+	//their IE or Firefox max connections to 16 and rape my Apache processes
+	//every time they load a page... i'd rather not have my q2 client also
+	//have the ability to do so - especially since we're possibly downloading
+	//large files.
+
+	char			downloadServer[512];	//base url prefix to download from
+	char			downloadReferer[32];	//libcurl requires a static string :(
+#endif	// USE_CURL
 } client_static_t;
 
 extern client_static_t	cls;
@@ -309,6 +387,13 @@ extern	cvar_t	*cl_vwep;
 extern	cvar_t	*cl_master_server_ip;
 extern	cvar_t	*cl_master_server_port;
 extern	cvar_t	*s_gamespy_sounds;
+
+#ifdef USE_CURL	// HTTP downloading from R1Q2
+extern	cvar_t	*cl_http_downloads;
+extern	cvar_t	*cl_http_filelists;
+extern	cvar_t	*cl_http_proxy;
+extern	cvar_t	*cl_http_max_connections;
+#endif	// USE_CURL
 
 typedef struct
 {

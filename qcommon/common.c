@@ -2058,3 +2058,4 @@ const char *MakePrintable (const void *subject, size_t numchars)
 	printable[len] = 0;
 	return printable;
 }
+

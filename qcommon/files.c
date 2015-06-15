@@ -893,6 +893,47 @@ pack_t *FS_LoadPackFile (char *packfile)
 	return pack;
 }
 
+/*
+=================
+FS_LocalFileExists
+================
+*/
+// FS: From KMQ2
+qboolean FS_LocalFileExists (char *path)
+{
+	char		realPath[MAX_OSPATH];
+	FILE		*f;
+
+	Com_sprintf (realPath, sizeof(realPath), "%s/%s", FS_Gamedir(), path);
+	f = fopen (realPath, "rb");
+	if (f) {
+		fclose(f);
+		return true;
+	}
+	return false;
+}
+
+/*
+=================
+FS_AddPAKFile
+
+Adds a Pak file to the searchpath
+=================
+*/
+// FS: From KMQ2
+void FS_AddPAKFile (const char *packPath)
+{
+	searchpath_t	*search;
+	pack_t		*pack;
+
+    pack = FS_LoadPackFile ((char *)packPath);
+    if (!pack)
+        return;
+    search = Z_Malloc (sizeof(searchpath_t));
+    search->pack = pack;
+    search->next = fs_searchpaths;
+    fs_searchpaths = search;
+}
 
 /*
 ================
