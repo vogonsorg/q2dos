@@ -5,8 +5,6 @@
 #include "../client/qmenu.h"
 #include "vid_dos.h"
 
-extern int whatmodearewe;
-
 #define REF_SOFT	0
 #define REF_OPENGL	1
 #define REF_3DFX	2
@@ -278,7 +276,7 @@ void	VID_LoadRefresh (void) // FS: Needed for dynamic changing game modes/vid_re
     memset(vid_resolutions,0x0,sizeof(vid_resolutions));
     VID_InitExtra(); //probe VESA
 
-    whatmodearewe=0; //hope this means start in mode 0
+    currentvideomode=0; //hope this means start in mode 0
     viddef.width = 320;
     viddef.height = 200; //was originally 240
 #endif
@@ -321,7 +319,7 @@ void	VID_Init (void)
     memset(vid_resolutions,0x0,sizeof(vid_resolutions));
     VID_InitExtra(); //probe VESA
 
-    whatmodearewe=0; //hope this means start in mode 0
+    currentvideomode=0; //hope this means start in mode 0
     viddef.width = 320;
     viddef.height = 200; //was originally 240
 

@@ -112,7 +112,8 @@ static int /*EXPORT*/ CL_HTTP_Progress (void *clientp, double dltotal, double dl
 		Q_strncpyz (cls.downloadname, dl->queueEntry->quakePath, sizeof(cls.downloadname));
 		cls.downloadposition = dl->position;
 
-		if (dltotal) {
+		if (dltotal)
+		{
 			CL_HTTP_Calculate_KBps ((int)dlnow, (int)dltotal);	// Knightmare- added KB/s counter
 			cls.downloadpercent = (int)((dlnow / dltotal) * 100.0f);
 		}

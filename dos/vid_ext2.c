@@ -143,11 +143,13 @@ void VID_InitExtra (void)
 
 	// We always have mode 13 VGA
 	memset(vid_resolutions,0x0,sizeof(vid_resolutions));
+
 	vid_resolutions[0].mode=0;
 	vid_resolutions[0].vesa_mode=-1;
 	vid_resolutions[0].height=200;
 	vid_resolutions[0].width=320;
-	sprintf(vid_resolutions[0].menuname,"[VGA 320x200]");
+	vid_resolutions[0].isLFB=false;
+	Com_sprintf(vid_resolutions[0].menuname, sizeof(vid_resolutions[0].menuname), "[VGA 320x200]");
 
 if(COM_CheckParm("-vgaonly"))
 	return;	//test for VGA only
@@ -430,7 +432,8 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 				vid_resolutions[num_vid_resolutions].height=modeinfo.height;
 				vid_resolutions[num_vid_resolutions].width=modeinfo.width;
 				vid_resolutions[num_vid_resolutions].address=real2ptr(modeinfo.pptr);//(void *)modeinfo.pptr; // FS: Real2ptr returns a (void *)
-				sprintf(vid_resolutions[num_vid_resolutions].menuname,"[VESA %dx%d]",modeinfo.width,modeinfo.height);
+				vid_resolutions[num_vid_resolutions].isLFB=true; // FS: Added
+				Com_sprintf(vid_resolutions[num_vid_resolutions].menuname, sizeof(vid_resolutions[num_vid_resolutions].menuname), "[VESA %dx%d]",modeinfo.width,modeinfo.height);
 				num_vid_resolutions++;
 			}
 		}

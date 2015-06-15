@@ -701,6 +701,8 @@ void CL_Disconnect (void)
 	cls.downloadReferer[0] = 0;
 	cls.downloadname[0] = 0;
 	cls.downloadposition = 0;
+	cls.downloadrate = 0.0f;
+	CL_Download_Reset_KBps_counter();
 #endif	// USE_CURL
 
 	cls.state = ca_disconnected;
@@ -2468,7 +2470,7 @@ CL_Download_Reset_KBps_counter
 */
 void CL_Download_Reset_KBps_counter (void)
 {
-	dlSpeedInfo.prevTime = dlSpeedInfo.prevTimeCount = dlSpeedInfo.bytesRead = dlSpeedInfo.byteCount = 0;
+	dlSpeedInfo.timeCount = dlSpeedInfo.prevTime = dlSpeedInfo.prevTimeCount = dlSpeedInfo.bytesRead = dlSpeedInfo.byteCount = 0;
 	dlSpeedInfo.startTime = (float)cls.realtime;
 	cls.downloadrate = 0;
 }
@@ -2487,12 +2489,17 @@ void CL_Download_Calculate_KBps (int byteDistance, int totalSize)
 	dlSpeedInfo.byteCount += byteDistance;
 	dlSpeedInfo.bytesRead += byteDistance;
 
+//	Com_DPrintf(DEVELOPER_MSG_NET, "Time distance: %fs\n", timeDistance);
+//	Com_DPrintf(DEVELOPER_MSG_NET, "Byte distance: %i\nByteCount: %i\nTotal: %i\n", byteDistance, dlSpeedInfo.byteCount, totalSize);
+//	Com_DPrintf(DEVELOPER_MSG_NET, "Total time counted: %3.2fs\n", totalTime );
+
 	if (totalTime >= 1.0f)
 	{
-		cls.downloadrate = dlSpeedInfo.byteCount / 1024.0;
+		cls.downloadrate = (float)(dlSpeedInfo.byteCount / 1024.0f);
 		Com_DPrintf (DEVELOPER_MSG_NET, "Rate: %4.2fKB/s, Downloaded %4.2fKB of %4.2fKB\n", cls.downloadrate, (float)dlSpeedInfo.bytesRead/1024.0, (float)totalSize/1024.0);
 		dlSpeedInfo.byteCount = 0;
 		dlSpeedInfo.startTime = (float)cls.realtime;
 	}
 	dlSpeedInfo.prevTime = cls.realtime;
 }
+

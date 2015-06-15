@@ -51,10 +51,12 @@ typedef struct vid_resolutions_s {
 	int height;
 	int width;
 	void *address;
+	qboolean isLFB; // FS: Added
 	char menuname[VIDNAME_LEN];
 } vid_resolutions_t;
 extern int num_vid_resolutions;
 extern vid_resolutions_t vid_resolutions[MAX_RESOLUTIONS];
+extern int currentvideomode;
 
 // vid_wait settings
 #define VID_WAIT_NONE			0
