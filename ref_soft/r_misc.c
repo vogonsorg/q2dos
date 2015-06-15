@@ -91,7 +91,9 @@ void D_ViewChanged (void)
 		d_pix_min = 1;
 
 	d_pix_max = (int)((float)r_refdef.vrect.width / (320.0 / 4.0) + 0.5);
-	d_pix_shift = 8 - (int)((float)r_refdef.vrect.width / 320.0 + 0.5);
+
+	D_SetParticleSize(); // FS
+
 	if (d_pix_max < 1)
 		d_pix_max = 1;
 
@@ -670,3 +672,18 @@ void R_ScreenShot_f (void)
 	ri.Con_Printf (PRINT_ALL, "Wrote %s\n", checkname);
 } 
 
+void D_SetParticleSize(void) // FS: Because particles like blood and bullet dust/spray/dunno the term look funny in high res
+{
+	if (sw_particle_size_override->intValue && sw_particle_size->intValue)
+	{
+		d_pix_shift = sw_particle_size->intValue - (int)((float)r_refdef.vrect.width / 320.0 + 0.5);
+		return;
+	}
+
+	if(r_newrefdef.width >= 1024)
+		d_pix_shift = 24 - (int)((float)r_refdef.vrect.width / 320.0 + 0.5);
+	if(r_newrefdef.width >= 800)
+		d_pix_shift = 16 - (int)((float)r_refdef.vrect.width / 320.0 + 0.5);
+	else
+		d_pix_shift = 8 - (int)((float)r_refdef.vrect.width / 320.0 + 0.5);
+}

@@ -450,6 +450,7 @@ extern vec3_t   r_pright, r_pup, r_ppn;
 void D_DrawSurfaces (void);
 void R_DrawParticle( void );
 void D_ViewChanged (void);
+void D_SetParticleSize(void); // FS: Because particles like blood and bullet dust/spray/dunno the term look funny in high res
 void D_WarpScreen (void);
 void R_PolysetUpdateTables (void);
 
@@ -576,7 +577,8 @@ extern cvar_t   *r_lightlevel;  //FIXME HACK
 
 extern cvar_t	*vid_fullscreen;
 extern	cvar_t	*vid_gamma;
-
+extern	cvar_t	*sw_particle_size_override; // FS
+extern	cvar_t	*sw_particle_size; // FS
 
 extern  clipplane_t     view_clipplanes[4];
 extern int              *pfrustum_indexes[4];

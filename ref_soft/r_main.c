@@ -136,6 +136,8 @@ cvar_t	*r_lightlevel;	//FIXME HACK
 cvar_t	*vid_fullscreen;
 cvar_t	*vid_gamma;
 
+cvar_t	*sw_particle_size; // FS
+cvar_t	*sw_particle_size_override; // FS
 //PGM
 cvar_t	*sw_lockpvs;
 //PGM
@@ -272,6 +274,11 @@ void R_Register (void)
 
 	vid_fullscreen = ri.Cvar_Get( "vid_fullscreen", "0", CVAR_ARCHIVE );
 	vid_gamma = ri.Cvar_Get( "vid_gamma", "1.0", CVAR_ARCHIVE );
+
+	sw_particle_size_override = ri.Cvar_Get ("sw_particle_size_override", "0", CVAR_ARCHIVE);
+	sw_particle_size_override->description = "Enable this to override particle size scaling with sw_particle_size.";
+	sw_particle_size = ri.Cvar_Get ("sw_particle_size", "8", CVAR_ARCHIVE);
+	sw_particle_size->description = "How many bits to shift for particle sizes.  Higher numbers are smaller particles.  Use sw_particle_size_override to enable.";
 
 	ri.Cmd_AddCommand ("modellist", Mod_Modellist_f);
 	ri.Cmd_AddCommand( "screenshot", R_ScreenShot_f );

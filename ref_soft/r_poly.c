@@ -612,8 +612,8 @@ void R_PolygonDrawSpans(espan_t *pspan, int iswater )
 
 	do
 	{
-		if ( ((pspan->u || pspan->v) < 0) // FS: Knightmare's out of bounds check.  Fixes xswamp.bsp in xatrix with res greater than 320x240.  Thanks!
-			||  (pspan->v >= (sizeof(d_scantable) / sizeof(int))))
+		if ( ( (pspan->u < 0) || (pspan->v < 0) ) // FS: Knightmare's out of bounds check.  Fixes xswamp.bsp in xatrix with res greater than 320x240.  Thanks!
+			|| (pspan->v >= (sizeof(d_scantable) / sizeof(int))) )
 			goto NextSpan;
 
 		s_spanletvars.pdest   = (byte *)d_viewbuffer + ( d_scantable[pspan->v] /*r_screenwidth * pspan->v*/) + pspan->u;
