@@ -138,6 +138,8 @@ cvar_t	*vid_gamma;
 
 cvar_t	*sw_particle_size; // FS
 cvar_t	*sw_particle_size_override; // FS
+cvar_t	*sw_particle_size_min; // FS
+cvar_t	*sw_particle_size_max; // FS
 //PGM
 cvar_t	*sw_lockpvs;
 //PGM
@@ -276,9 +278,13 @@ void R_Register (void)
 	vid_gamma = ri.Cvar_Get( "vid_gamma", "1.0", CVAR_ARCHIVE );
 
 	sw_particle_size_override = ri.Cvar_Get ("sw_particle_size_override", "0", CVAR_ARCHIVE);
-	sw_particle_size_override->description = "Enable this to override particle size scaling with sw_particle_size.";
+	sw_particle_size_override->description = "Enable this to override particle size scaling with sw_particle_size, sw_particle_size_min, and sw_particle_size_max.";
 	sw_particle_size = ri.Cvar_Get ("sw_particle_size", "8", CVAR_ARCHIVE);
 	sw_particle_size->description = "How many bits to shift for particle sizes.  Higher numbers are smaller particles.  Use sw_particle_size_override to enable.";
+	sw_particle_size_min = ri.Cvar_Get ("sw_particle_size_min", "1", CVAR_ARCHIVE); // FS
+	sw_particle_size_min->description = "Minimum particle size.  Standard formula is resolution width divided by 320.  Use sw_particle_size_override to enable.";
+	sw_particle_size_max = ri.Cvar_Get ("sw_particle_size_max", "8.5", CVAR_ARCHIVE); // FS
+	sw_particle_size_max->description = "Minimum particle size.  Standard formula is resolution width divided by 80 plus 0.5.  Use sw_particle_size_override to enable.";
 
 	ri.Cmd_AddCommand ("modellist", Mod_Modellist_f);
 	ri.Cmd_AddCommand( "screenshot", R_ScreenShot_f );

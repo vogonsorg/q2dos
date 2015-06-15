@@ -86,16 +86,7 @@ void D_ViewChanged (void)
 	d_zrowbytes = vid.width * 2;
 	d_zwidth = vid.width;
 
-	d_pix_min = r_refdef.vrect.width / 320;
-	if (d_pix_min < 1)
-		d_pix_min = 1;
-
-	d_pix_max = (int)((float)r_refdef.vrect.width / (320.0 / 4.0) + 0.5);
-
 	D_SetParticleSize(); // FS
-
-	if (d_pix_max < 1)
-		d_pix_max = 1;
 
 	d_vrectx = r_refdef.vrect.x;
 	d_vrecty = r_refdef.vrect.y;
@@ -674,16 +665,62 @@ void R_ScreenShot_f (void)
 
 void D_SetParticleSize(void) // FS: Because particles like blood and bullet dust/spray/dunno the term look funny in high res
 {
+	if (sw_particle_size_override->intValue && sw_particle_size_min->intValue)
+	{
+		d_pix_min = sw_particle_size_min->intValue;
+	}
+	else
+	{
+		if(r_newrefdef.width >= 800)
+		{
+			d_pix_min = 2;
+		}
+		else if (r_newrefdef.width >= 640) // FS: Yeah, this seems weird, but honestly it looks way too big in 640x4XX
+		{
+			d_pix_min = 1;
+		}
+		else
+		{
+			d_pix_min = r_refdef.vrect.width / 320;
+		}
+	}
+
+	if (d_pix_min < 1)
+	{
+		d_pix_min = 1;
+	}
+
+	if (sw_particle_size_override->intValue && sw_particle_size_max->intValue)
+	{
+		d_pix_max = sw_particle_size_max->intValue;
+	}
+	else
+	{
+		d_pix_max = (int)((float)r_refdef.vrect.width / (320.0 / 4.0) + 0.5);
+	}
+
+	if (d_pix_max < 1)
+	{
+		d_pix_max = 1;
+	}
+
 	if (sw_particle_size_override->intValue && sw_particle_size->intValue)
 	{
 		d_pix_shift = sw_particle_size->intValue - (int)((float)r_refdef.vrect.width / 320.0 + 0.5);
-		return;
 	}
-
-	if(r_newrefdef.width >= 1024)
-		d_pix_shift = 24 - (int)((float)r_refdef.vrect.width / 320.0 + 0.5);
-	if(r_newrefdef.width >= 800)
-		d_pix_shift = 16 - (int)((float)r_refdef.vrect.width / 320.0 + 0.5);
 	else
-		d_pix_shift = 8 - (int)((float)r_refdef.vrect.width / 320.0 + 0.5);
+	{
+		if(r_newrefdef.width >= 800)
+		{
+			d_pix_shift = 16 - (int)((float)r_refdef.vrect.width / 320.0 + 0.5);
+		}
+		else if(r_newrefdef.width >= 640)
+		{
+			d_pix_shift = 12 - (int)((float)r_refdef.vrect.width / 320.0 + 0.5);
+		}
+		else
+		{
+			d_pix_shift = 8 - (int)((float)r_refdef.vrect.width / 320.0 + 0.5);
+		}
+	}
 }
