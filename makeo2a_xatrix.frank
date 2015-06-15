@@ -163,7 +163,7 @@ OBJECTS =  $(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(GAMESPY) $(REFSOFT) $(REFASM
 all: q2xatrix.exe
 
 q2xatrix.exe:	$(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o q2xatrix.exe -lm $(WLFLAGS) -lm $(OCCLFLAGS) -lm $(VORBLFLAGS) -lm $(CURLLFLAGS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o q2xatrix.exe $(OCCLFLAGS) $(VORBLFLAGS) $(CURLLFLAGS) -lm $(WLFLAGS)
 
 clean:
 	find ./ -name '*.o' -exec rm {} \;
