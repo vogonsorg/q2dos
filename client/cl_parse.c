@@ -236,6 +236,8 @@ void CL_ParseDownload (void)
 	// open the file if not opened yet
 	if (!cls.download)
 	{
+		CL_Download_Reset_KBps_counter ();	// Knightmare- for KB/s counter
+
 		CL_DownloadFileName(name, sizeof(name), cls.downloadtempname);
 
 		FS_CreatePath (name);
@@ -265,6 +267,8 @@ void CL_ParseDownload (void)
 			Com_Printf ("%i%%", cls.downloadpercent);
 		}
 #endif
+		CL_Download_Calculate_KBps (size, 0);	// Knightmare- for KB/s counter
+
 		cls.downloadpercent = percent;
 
 		MSG_WriteByte (&cls.netchan.message, clc_stringcmd);

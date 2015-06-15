@@ -70,7 +70,7 @@ also resets prevSize.
 static void CL_HTTP_Reset_KBps_counter (void)
 {
 	prevSize = 0;
-//	CL_Download_Reset_KBps_counter ();
+	CL_Download_Reset_KBps_counter ();
 }
 
 /*
@@ -85,7 +85,7 @@ static void CL_HTTP_Calculate_KBps (int curSize, int totalSize)
 {
 	int byteDistance = curSize - prevSize;
 
-//	CL_Download_Calculate_KBps (byteDistance, totalSize);
+	CL_Download_Calculate_KBps (byteDistance, totalSize);
 	prevSize = curSize;
 }
 

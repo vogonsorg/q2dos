@@ -627,6 +627,8 @@ void CL_LoadClientinfo (clientinfo_t *ci, char *s);
 void SHOWNET(char *s);
 void CL_ParseClientinfo (int player);
 void CL_Download_f (void);
+void CL_Download_Reset_KBps_counter (void); // FS
+void CL_Download_Calculate_KBps (int byteDistance, int totalSize); // FS
 
 //
 // cl_view.c

@@ -677,7 +677,11 @@ void Con_DrawConsole (float frac)
 		dlbar[i++] = '\x82';
 		dlbar[i] = 0;
 
-		sprintf(dlbar + strlen(dlbar), " %02d%%", cls.downloadpercent);
+//		sprintf(dlbar + strlen(dlbar), " %02d%%", cls.downloadpercent);
+		if (cls.downloadrate > 0.0f)
+			Com_sprintf(dlbar + strlen(dlbar), sizeof(dlbar)-strlen(dlbar), " %2d%% (%4.2fKB/s)", cls.downloadpercent, cls.downloadrate);
+		else
+			Com_sprintf(dlbar + strlen(dlbar), sizeof(dlbar)-strlen(dlbar), " %2d%%", cls.downloadpercent);
 
 		// draw it
 		y = con.vislines-12;

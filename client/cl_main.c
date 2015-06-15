@@ -2445,3 +2445,54 @@ void CL_PingNetServers_f (void)
 	serverlist = NULL; // FS: This is on purpose so future ctrl+c's won't try to close empty serverlists
 }
 #endif
+
+//=============================================================================
+
+// Download speed counter
+
+typedef struct {
+	int		prevTime;
+	int		bytesRead;
+	int		byteCount;
+	float	timeCount;
+	float	prevTimeCount;
+	float	startTime;
+} dlSpeedInfo_t;
+
+dlSpeedInfo_t	dlSpeedInfo;
+
+/*
+=====================
+CL_Download_Reset_KBps_counter
+=====================
+*/
+void CL_Download_Reset_KBps_counter (void)
+{
+	dlSpeedInfo.prevTime = dlSpeedInfo.prevTimeCount = dlSpeedInfo.bytesRead = dlSpeedInfo.byteCount = 0;
+	dlSpeedInfo.startTime = (float)cls.realtime;
+	cls.downloadrate = 0;
+}
+
+/*
+=====================
+CL_Download_Calculate_KBps
+=====================
+*/
+void CL_Download_Calculate_KBps (int byteDistance, int totalSize)
+{
+	float	timeDistance = (float)(cls.realtime - dlSpeedInfo.prevTime);
+	float	totalTime = (dlSpeedInfo.timeCount - dlSpeedInfo.startTime) / 1000.0f;
+
+	dlSpeedInfo.timeCount += timeDistance;
+	dlSpeedInfo.byteCount += byteDistance;
+	dlSpeedInfo.bytesRead += byteDistance;
+
+	if (totalTime >= 1.0f)
+	{
+		cls.downloadrate = dlSpeedInfo.byteCount / 1024.0;
+		Com_DPrintf (DEVELOPER_MSG_NET, "Rate: %4.2fKB/s, Downloaded %4.2fKB of %4.2fKB\n", cls.downloadrate, (float)dlSpeedInfo.bytesRead/1024.0, (float)totalSize/1024.0);
+		dlSpeedInfo.byteCount = 0;
+		dlSpeedInfo.startTime = (float)cls.realtime;
+	}
+	dlSpeedInfo.prevTime = cls.realtime;
+}
