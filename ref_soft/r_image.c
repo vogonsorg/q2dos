@@ -300,7 +300,11 @@ void LoadTGA (char *name, byte **pic, int *width, int *height)
 		}
 	}
 	else if (targa_header.image_type==10) {   // Runlength encoded RGB images
-		unsigned char red,green,blue,alphabyte,packetHeader,packetSize,j;
+		unsigned char red = 0; // FS: Compiler warning
+		unsigned char green = 0; // FS: Compiler warning
+		unsigned char blue = 0; // FS: Compiler warning
+		unsigned char alphabyte = 0; // FS: Compiler warning
+		unsigned char packetHeader,packetSize,j;
 		for(row=rows-1; row>=0; row--) {
 			pixbuf = targa_rgba + row*columns*4;
 			for(column=0; column<columns; ) {

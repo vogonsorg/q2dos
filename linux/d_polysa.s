@@ -829,7 +829,11 @@ LRightEdgeStepped:
 	pushl	%esi
 
 	movl	spanpackage_t_ptex(%esi),%esi
+#ifdef _MSC_VER
 	jmp		aff8entryvec_table(,%eax,4)
+#else
+        jmp             *aff8entryvec_table(,%eax,4) // FS: Compiler Warning
+#endif
 
 // %bx = count of full and partial loops
 // %ebx high word = sfrac

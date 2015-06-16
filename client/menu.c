@@ -3722,8 +3722,8 @@ static int pmicmpfnc( const void *_a, const void *_b )
 qboolean PlayerConfig_MenuInit( void )
 {
 	extern cvar_t *name;
-	extern cvar_t *team;
-	extern cvar_t *skin;
+//	extern cvar_t *team; // FS: Unused
+//	extern cvar_t *skin; // FS: Unused
 	char currentdirectory[1024];
 	char currentskin[1024];
 	int i = 0;
@@ -3927,7 +3927,7 @@ void PlayerConfig_MenuDraw( void )
 	if ( s_pmi[s_player_model_box.curvalue].skindisplaynames )
 	{
 		int			yaw; // was static
-		int			maxframe = 29;
+//		int			maxframe = 29; // FS: Unused
 		vec3_t		modelOrg;
 		entity_t	entity[2], *ent;
 

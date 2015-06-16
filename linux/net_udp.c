@@ -316,7 +316,7 @@ void NET_SendPacket (netsrc_t sock, int length, void *data, netadr_t to)
 {
 	int		ret;
 	struct sockaddr_in	addr;
-	int		net_socket;
+	int		net_socket = 0; // FS: Compiler warning
 
 	if ( to.type == NA_LOOPBACK )
 	{
