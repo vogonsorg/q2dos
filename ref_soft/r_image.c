@@ -520,7 +520,19 @@ image_t	*R_FindImage (char *name, imagetype_t type)
 	//
 	pic = NULL;
 	palette = NULL;
-	if (!strcmp(name+len-4, ".pcx"))
+	if (!strcmp(name+len-4, ".tga"))
+	{
+#ifdef USE_TGA
+		ri.Con_Printf(PRINT_ALL,"Attempting to load a TGA: %s!\n", name);
+		LoadTGA(name, &pic, &width, &height);
+		if (!pic)
+			return NULL;
+		image = GL_LoadPic(name, pic, width, height, type);
+#else
+		return NULL;	// ri.Sys_Error (ERR_DROP, "R_FindImage: can't load %s in software renderer", name);
+#endif
+	}
+	else if (!strcmp(name+len-4, ".pcx"))
 	{
 		LoadPCX (name, &pic, &palette, &width, &height);
 		if (!pic)
@@ -531,10 +543,10 @@ image_t	*R_FindImage (char *name, imagetype_t type)
 	{
 		image = R_LoadWal (name);
 	}
-	else if (!strcmp(name+len-4, ".tga"))
-		return NULL;	// ri.Sys_Error (ERR_DROP, "R_FindImage: can't load %s in software renderer", name);
 	else
+	{
 		return NULL;	// ri.Sys_Error (ERR_DROP, "R_FindImage: bad extension on: %s", name);
+	}
 
 	if (pic)
 		free(pic);
