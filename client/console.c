@@ -27,6 +27,8 @@ cvar_t		*con_notifytime;
 
 
 #define		MAXCMDLINE	256
+#define		CONWIDTH_AT_640X480	78 // FS
+
 extern	char	key_lines[32][MAXCMDLINE];
 extern	int		edit_line;
 extern	int		key_linepos;
@@ -660,24 +662,36 @@ void Con_DrawConsole (float frac)
 		}
 
 		// make this a little shorter in case of longer version string
-		x = con.linewidth - ((con.linewidth * 7) / 40) - (verlen-14);
-
-		if (cls.downloadrate > 0.0f)
+		if (con.linewidth >= CONWIDTH_AT_640X480)
 		{
-			if(con.linewidth >= 640)
-				y = x - strlen(text) - 19;
-			else
-				y = x - strlen(text) - 25;
+			x = con.linewidth - ((con.linewidth * 7) / 40) - (verlen-12);
 		}
 		else
 		{
-			if(con.linewidth >= 640)
+			x = con.linewidth - ((con.linewidth * 7) / 40) - (verlen+1);
+		}
+
+		if (cls.downloadrate > 0.0f)
+		{
+			if(con.linewidth >= CONWIDTH_AT_640X480)
+				y = x - strlen(text) - 19;
+			else
+			{
+				y = x - strlen(text) - 9;
+			}
+		}
+		else
+		{
+			if(con.linewidth >= CONWIDTH_AT_640X480)
 				y = x - strlen(text) - 8;
 			else
-				y = x - strlen(text) - 16;
+			{
+				y = x - strlen(text) - 2;
+			}
 		}
 
 		i = con.linewidth/3;
+
 		if (strlen(text) > i)
 		{
 			y = x - i - 11;
