@@ -661,7 +661,7 @@ void CL_Disconnect (void)
 
 	if (cl_timedemo && cl_timedemo->value)
 	{
-		int	time;
+		double	time;
 		
 		time = Sys_Milliseconds () - cl.timedemo_start;
 		if (time > 0)
