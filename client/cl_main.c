@@ -2495,7 +2495,7 @@ void CL_Download_Calculate_KBps (int byteDistance, int totalSize)
 
 	if (totalTime >= 1.0f)
 	{
-		cls.downloadrate = (float)(dlSpeedInfo.byteCount / 1024.0f);
+		cls.downloadrate = (float)byteCount / 1024.0f;
 		Com_DPrintf (DEVELOPER_MSG_NET, "Rate: %4.2fKB/s, Downloaded %4.2fKB of %4.2fKB\n", cls.downloadrate, (float)dlSpeedInfo.bytesRead/1024.0, (float)totalSize/1024.0);
 		dlSpeedInfo.byteCount = 0;
 		dlSpeedInfo.startTime = (float)cls.realtime;
