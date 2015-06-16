@@ -119,7 +119,8 @@ PKT_STUB = pkt_stub.h
 
 
 CC     = gcc
-CFLAGS = -O2 -g -gcoff -I. -I../inc -W -Wall -fno-strength-reduce -ffast-math -DUSD_BSD_API
+CFLAGS = -O2 -g -gcoff -I. -I../inc -W -Wall -fno-strength-reduce \
+         -ffast-math #-ffunction-sections -fomit-frame-pointer
 
 AS     = as --gdwarf2
 TARGET = ../lib/libwatt.a
