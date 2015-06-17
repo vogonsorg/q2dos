@@ -87,6 +87,7 @@ int		s_rawend;
 portable_samplepair_t	s_rawsamples[MAX_RAW_SAMPLES];
 extern int	havegus; // FS
 
+
 // ====================================================================
 // User-setable variables
 // ====================================================================
@@ -201,7 +202,6 @@ void S_Shutdown(void)
 #ifdef OGG_SUPPORT
 	Cmd_RemoveCommand("ogg_restart"); // Knightmare added
 #endif
-
 
 	// free all sounds
 	for (i=0, sfx=known_sfx ; i < num_sfx ; i++,sfx++)

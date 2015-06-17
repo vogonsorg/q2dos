@@ -6223,7 +6223,7 @@ void w_set_device_master_volume(int volume)
 
 
 
-#if DEBUG
+#ifdef TEST_PROGRAM
 
 
 static double sin1dt;
