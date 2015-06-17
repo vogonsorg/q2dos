@@ -794,7 +794,8 @@ struct model_s *S_RegisterSexedModel (entity_state_t *ent, char *base)
 		if (p)
 		{
 			p += 1;
-			strcpy(model, p);
+		//	strncpy(model, p);
+			Q_strncpyz(model, p, sizeof(model));
 			p = strchr(model, '/');
 			if (p)
 				*p = 0;
@@ -802,7 +803,8 @@ struct model_s *S_RegisterSexedModel (entity_state_t *ent, char *base)
 	}
 	// if we can't figure it out, they're male
 	if (!model[0])
-		strcpy(model, "male");
+	//	strncpy(model, "male");
+		Q_strncpyz(model, "male", sizeof(model));
 
 	Com_sprintf (buffer, sizeof(buffer), "players/%s/%s", model, base+1);
 	mdl = re.RegisterModel(buffer);
@@ -980,7 +982,7 @@ void CL_AddPacketEntities (frame_t *frame)
 		}
 
 		// only used for black hole model right now, FIXME: do better
-		if (renderfx == RF_TRANSLUCENT)
+		if (renderfx & RF_TRANSLUCENT)
 			ent.alpha = 0.70;
 
 		// render effects (fullbright, translucent, etc)

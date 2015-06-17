@@ -325,9 +325,11 @@ qboolean Cbuf_AddLateCommands (void)
 	text[0] = 0;
 	for (i=1 ; i<argc ; i++)
 	{
-		strcat (text,COM_Argv(i));
+	//	strncat (text,COM_Argv(i));
+		Q_strncatz (text, COM_Argv(i), s+1);
 		if (i != argc-1)
-			strcat (text, " ");
+		//	strncat (text, " ");
+			Q_strncatz (text, " ", s+1);
 	}
 	
 // pull out the commands
@@ -346,8 +348,10 @@ qboolean Cbuf_AddLateCommands (void)
 			c = text[j];
 			text[j] = 0;
 			
-			strcat (build, text+i);
-			strcat (build, "\n");
+		//	strncat (build, text+i);
+		//	strncat (build, "\n");
+			Q_strncatz (build, text+i, s+1);
+			Q_strncatz (build, "\n", s+1);
 			text[j] = c;
 			i = j-1;
 		}
@@ -398,9 +402,10 @@ void Cmd_Exec_f (void)
 	Com_Printf ("execing %s\n",Cmd_Argv(1));
 	
 	// the file doesn't have a trailing 0, so we need to copy it off
-	f2 = Z_Malloc(len+1);
+	f2 = Z_Malloc(len+2); // Echon fix- was len+1
 	memcpy (f2, f, len);
-	f2[len] = 0;
+	f2[len] = '\n';  // Echon fix added
+	f2[len+1] = '\0'; // Echon fix- was len, = 0
 
 	Cbuf_InsertText (f2);
 
@@ -470,18 +475,22 @@ void Cmd_Alias_f (void)
 		a->next = cmd_alias;
 		cmd_alias = a;
 	}
-	strcpy (a->name, s);	
+//	strncpy (a->name, s);	
+	Q_strncpyz (a->name, s, sizeof(a->name));	
 
 // copy the rest of the command line
 	cmd[0] = 0;		// start out with a null string
 	c = Cmd_Argc();
 	for (i=2 ; i< c ; i++)
 	{
-		strcat (cmd, Cmd_Argv(i));
+	//	strncat (cmd, Cmd_Argv(i));
+		Q_strncatz (cmd, Cmd_Argv(i), sizeof(cmd));
 		if (i != (c - 1))
-			strcat (cmd, " ");
+		//	strncat (cmd, " ");
+			Q_strncatz (cmd, " ", sizeof(cmd));
 	}
-	strcat (cmd, "\n");
+//	strncat (cmd, "\n");
+	Q_strncatz (cmd, "\n", sizeof(cmd));
 	
 	a->value = CopyString (cmd);
 }
@@ -595,10 +604,13 @@ char *Cmd_MacroExpandString (char *text)
 		}
 
 		strncpy (temporary, scan, i);
-		strcpy (temporary+i, token);
-		strcpy (temporary+i+j, start);
+	//	strncpy (temporary+i, token);
+	//	strncpy (temporary+i+j, start);
+		Q_strncpyz (temporary+i, token, sizeof(temporary)-i);
+		Q_strncpyz (temporary+i+j, start, sizeof(temporary)-i-j);
 
-		strcpy (expanded, temporary);
+//		strncpy (expanded, temporary);
+		Q_strncpyz (expanded, temporary, sizeof(expanded));
 		scan = expanded;
 		i--;
 
@@ -667,7 +679,10 @@ void Cmd_TokenizeString (char *text, qboolean macroExpand)
 		{
 			int		l;
 
-			strcpy (cmd_args, text);
+			// [SkulleR]'s fix for overflow vulnerability
+			//strncpy (cmd_args, text);
+			Q_strncpyz (cmd_args, text, sizeof(cmd_args));
+			cmd_args[sizeof(cmd_args)-1] = 0; 
 
 			// strip off any trailing whitespace
 			l = strlen(cmd_args) - 1;
@@ -685,7 +700,8 @@ void Cmd_TokenizeString (char *text, qboolean macroExpand)
 		if (cmd_argc < MAX_STRING_TOKENS)
 		{
 			cmd_argv[cmd_argc] = Z_Malloc (strlen(com_token)+1);
-			strcpy (cmd_argv[cmd_argc], com_token);
+		//	strncpy (cmd_argv[cmd_argc], com_token);
+			Q_strncpyz (cmd_argv[cmd_argc], com_token, strlen(com_token)+1);
 			cmd_argc++;
 		}
 	}

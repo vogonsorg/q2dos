@@ -365,7 +365,7 @@ void S_StreamBackgroundTrack (void)
 				}
 				else
 				{	// check if it's time to switch to the ambient track
-					if ( ++ogg_loopcounter >= (int)ogg_loopcount->value
+					if ( ++ogg_loopcounter >= (int)ogg_loopcount->intValue
 						&& (!cl.configstrings[CS_MAXCLIENTS][0] || !strcmp(cl.configstrings[CS_MAXCLIENTS], "1")) )
 					{	// Close the loop track
 						S_CloseBackgroundTrack(&s_bgTrack);
@@ -445,12 +445,9 @@ void S_StartBackgroundTrack (const char *introTrack, const char *loopTrack)
 	S_StopBackgroundTrack();
 
 	// Start it up
-//	Q_strncpyz(s_bgTrack.introName, introTrack, sizeof(s_bgTrack.introName));
-//	Q_strncpyz(s_bgTrack.loopName, loopTrack, sizeof(s_bgTrack.loopName));
-//	Q_strncpyz(s_bgTrack.ambientName, va("music/%s.ogg", ogg_ambient_track->string), sizeof(s_bgTrack.ambientName));
-	Com_strcpy(s_bgTrack.introName, sizeof(s_bgTrack.introName), introTrack);
-	Com_strcpy(s_bgTrack.loopName, sizeof(s_bgTrack.loopName), loopTrack);
-	Com_strcpy(s_bgTrack.ambientName, sizeof(s_bgTrack.ambientName), va("music/%s.ogg", ogg_ambient_track->string));
+	Q_strncpyz(s_bgTrack.introName, introTrack, sizeof(s_bgTrack.introName));
+	Q_strncpyz(s_bgTrack.loopName, loopTrack, sizeof(s_bgTrack.loopName));
+	Q_strncpyz(s_bgTrack.ambientName, va("music/%s.ogg", ogg_ambient_track->string), sizeof(s_bgTrack.ambientName));
 
 	// set a loop counter so that this track will change to the ambient track later
 	ogg_loopcounter = 0;
@@ -703,7 +700,7 @@ void S_OGG_LoadFileList (void)
 		if (numfiles) // Free the file list
 			FS_FreeFileList(list, numfiles);
 
-		strncpy (lastPath, path, sizeof(lastPath));	// Knightmare- copy to lastPath
+		Q_strncpyz (lastPath, path, sizeof(lastPath));	// Knightmare- copy to lastPath
 		path = FS_NextPath( path );
 	}
 

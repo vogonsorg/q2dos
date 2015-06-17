@@ -204,21 +204,24 @@ void SV_SpawnServer (char *server, char *spawnpoint, server_state_t serverstate,
 	sv.attractloop = attractloop;
 
 	// save name for levels that don't set message
-	strcpy (sv.configstrings[CS_NAME], server);
+//	strncpy (sv.configstrings[CS_NAME], server);
+	Q_strncpyz (sv.configstrings[CS_NAME], server, sizeof(sv.configstrings[CS_NAME]));
 	if (Cvar_VariableValue ("deathmatch"))
 	{
-		sprintf(sv.configstrings[CS_AIRACCEL], "%g", sv_airaccelerate->value);
+		Com_sprintf(sv.configstrings[CS_AIRACCEL], sizeof(sv.configstrings[CS_AIRACCEL]), "%g", sv_airaccelerate->value);
 		pm_airaccelerate = sv_airaccelerate->value;
 	}
 	else
 	{
-		strcpy(sv.configstrings[CS_AIRACCEL], "0");
+	//	strncpy(sv.configstrings[CS_AIRACCEL], "0");
+		Q_strncpyz(sv.configstrings[CS_AIRACCEL], "0", sizeof(sv.configstrings[CS_AIRACCEL]));
 		pm_airaccelerate = 0;
 	}
 
 	SZ_Init (&sv.multicast, sv.multicast_buf, sizeof(sv.multicast_buf));
 
-	strcpy (sv.name, server);
+//	strncpy (sv.name, server);
+	Q_strncpyz (sv.name, server, sizeof(sv.name));
 
 	// leave slots at start for clients only
 	for (i=0 ; i<maxclients->value ; i++)
@@ -231,8 +234,10 @@ void SV_SpawnServer (char *server, char *spawnpoint, server_state_t serverstate,
 
 	sv.time = 1000;
 	
-	strcpy (sv.name, server);
-	strcpy (sv.configstrings[CS_NAME], server);
+//	strncpy (sv.name, server);
+//	strncpy (sv.configstrings[CS_NAME], server);
+	Q_strncpyz (sv.name, server, sizeof(sv.name));
+	Q_strncpyz (sv.configstrings[CS_NAME], server, sizeof(sv.configstrings[CS_NAME]));
 
 	if (serverstate != ss_game)
 	{
@@ -416,8 +421,11 @@ void SV_Map (qboolean attractloop, char *levelstring, qboolean loadgame)
 		SV_InitGame ();	// the game is just starting
 
 	// r1ch fix: buffer overflow
-//	strcpy (level, levelstring);
-	strncpy (level, levelstring, sizeof(level)-1);
+//	strncpy (level, levelstring);
+	if (levelstring[0] == '*')
+		Q_strncpyz (level, levelstring+1, sizeof(level));
+	else
+		Q_strncpyz (level, levelstring, sizeof(level));
 
 	// if there is a + in the map, set nextserver to the remainder
 	ch = strstr(level, "+");
@@ -438,7 +446,8 @@ void SV_Map (qboolean attractloop, char *levelstring, qboolean loadgame)
 	if (ch)
 	{
 		*ch = 0;
-		strcpy (spawnpoint, ch+1);
+	//	strncpy (spawnpoint, ch+1);
+		Q_strncpyz (spawnpoint, ch+1, sizeof(spawnpoint));
 	}
 	else
 		spawnpoint[0] = 0;
@@ -450,24 +459,28 @@ void SV_Map (qboolean attractloop, char *levelstring, qboolean loadgame)
 	l = strlen(level);
 	if (l > 4 && !strcmp (level+l-4, ".cin") )
 	{
+		if (!dedicated->value)
 		SCR_BeginLoadingPlaque ();			// for local system
 		SV_BroadcastCommand ("changing\n");
 		SV_SpawnServer (level, spawnpoint, ss_cinematic, attractloop, loadgame);
 	}
 	else if (l > 4 && !strcmp (level+l-4, ".dm2") )
 	{
+		if (!dedicated->value)
 		SCR_BeginLoadingPlaque ();			// for local system
 		SV_BroadcastCommand ("changing\n");
 		SV_SpawnServer (level, spawnpoint, ss_demo, attractloop, loadgame);
 	}
 	else if (l > 4 && !strcmp (level+l-4, ".pcx") )
 	{
+		if (!dedicated->value)
 		SCR_BeginLoadingPlaque ();			// for local system
 		SV_BroadcastCommand ("changing\n");
 		SV_SpawnServer (level, spawnpoint, ss_pic, attractloop, loadgame);
 	}
 	else
 	{
+		if (!dedicated->value)
 		SCR_BeginLoadingPlaque ();			// for local system
 		SV_BroadcastCommand ("changing\n");
 		SV_SendClientMessages ();

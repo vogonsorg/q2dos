@@ -611,7 +611,7 @@ void CMod_LoadEntityString (lump_t *l, char *name)
 		entStrLen = FS_LoadFile(en, (void **)&buffer);
 		if (buffer != NULL && entStrLen > 1)
 		{
-			if (entStrLen > MAX_MAP_ENTSTRING)
+			if (entStrLen + 1 > sizeof(map_entitystring))
 			{
 				Com_Printf("CMod_LoadEntityString: .ent file %s too large: %i > %i.\n", en, entStrLen, MAX_MAP_ENTSTRING);
 				FS_FreeFile (buffer);
@@ -640,7 +640,8 @@ void CMod_LoadEntityString (lump_t *l, char *name)
 	// end Knightmare
 
 	numentitychars = l->filelen;
-	if (l->filelen > MAX_MAP_ENTSTRING)
+	if (l->filelen + 1 > sizeof(map_entitystring)) // jit fix
+	//if (l->filelen > MAX_MAP_ENTSTRING)
 		Com_Error (ERR_DROP, "Map has too large entity lump");
 //	map_entitystring = (char *)Hunk_Alloc (l->filelen + 1);
 	memset(map_entitystring, 0, sizeof(map_entitystring));
@@ -849,7 +850,8 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 	memset (portalopen, 0, sizeof(portalopen));
 	FloodAreaConnections ();
 
-	strcpy (map_name, name);
+//	strncpy (map_name, name);
+	Q_strncpyz (map_name, name, sizeof(map_name));
 
 	return &map_cmodels[0];
 }

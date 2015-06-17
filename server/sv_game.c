@@ -224,20 +224,39 @@ PF_Configstring
 
 ===============
 */
+// From Q2Pro
+// Some mods actually exploit CS_STATUSBAR to take space up to CS_AIRACCEL
+#define CS_SIZE(cs) \
+    ((cs) >= CS_STATUSBAR && (cs) < CS_AIRACCEL ? \
+      MAX_QPATH * (CS_AIRACCEL - (cs)) : MAX_QPATH)
+
 void PF_Configstring (int index, char *val)
 {
+	size_t	len, maxlen;
+	char	*dest;
 	if ((index < 0) || (index >= MAX_CONFIGSTRINGS))
 	{
-		Com_Error (ERR_DROP, "configstring: bad index %i\n", index);
+		Com_Error (ERR_DROP, "PF_Configstring: bad index %i\n", index);
 	}
 
 	if (!val)
-	{
 		val = "";
+
+	// catch overflow of indvidual configstrings
+	len = strlen(val);
+	maxlen = CS_SIZE(index);
+	if (len >= maxlen)
+	{
+		Com_Printf("PF_Configstring: index %d overflowed: %d > %d\n", index, len, maxlen);
+		len = maxlen - 1;
 	}
 
 	// change the string in sv
-	strcpy (sv.configstrings[index], val);
+	// Don't use a null-terminated strncpy here!!
+//	strncpy (sv.configstrings[index], val);
+	dest = sv.configstrings[index];
+	memcpy(dest, val, len);
+	dest[len] = 0;
 	
 	if (sv.state != ss_loading)
 	{	// send the update to everyone

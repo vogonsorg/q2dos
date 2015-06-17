@@ -260,16 +260,18 @@ void SV_CopySaveGame (char *src, char *dst)
 	found = Sys_FindFirst(name, 0, 0 );
 	while (found)
 	{
-		strcpy (name+len, found+len);
-
+	//	strncpy (name+len, found+len);
+		Q_strncpyz (name+len, found+len, sizeof(name)-len);
 		Com_sprintf (name2, sizeof(name2), "%s/save/%s/%s", FS_Gamedir(), dst, found+len);
 		CopyFile (name, name2);
 
 		// change sav to sv2
 		l = strlen(name);
-		strcpy (name+l-3, "sv2");
+	//	strncpy (name+l-3, "sv2");
+		Q_strncpyz (name+l-3, "sv2", sizeof(name)-l+3);
 		l = strlen(name2);
-		strcpy (name2+l-3, "sv2");
+	//	strncpy (name2+l-3, "sv2");
+		Q_strncpyz (name2+l-3, "sv2", sizeof(name2)-l+3);
 		CopyFile (name, name2);
 
 		found = Sys_FindNext( 0, 0 );
@@ -394,8 +396,10 @@ void SV_WriteServerFile (qboolean autosave)
 		}
 		memset (varName, 0, sizeof(varName));
 		memset (string, 0, sizeof(string));
-		strcpy (varName, var->name);
-		strcpy (string, var->string);
+	//	strncpy (varName, var->name);
+	//	strncpy (string, var->string);
+		Q_strncpyz (varName, var->name, sizeof(varName));
+		Q_strncpyz (string, var->string, sizeof(string));
 		fwrite (varName, 1, sizeof(varName), f);
 		fwrite (string, 1, sizeof(string), f);
 	}
@@ -451,7 +455,8 @@ void SV_ReadServerFile (void)
 	// start a new game fresh with new cvars
 	SV_InitGame ();
 
-	strcpy (svs.mapcmd, mapcmd);
+//	strncpy (svs.mapcmd, mapcmd);
+	Q_strncpyz (svs.mapcmd, mapcmd, sizeof(svs.mapcmd));
 
 	// read game state
 	Com_sprintf (fileName, sizeof(fileName), "%s/save/current/game.ssv", FS_Gamedir());
@@ -658,6 +663,8 @@ SV_Savegame_f
 
 ==============
 */
+extern char	fs_gamedir[MAX_OSPATH];
+
 void SV_Savegame_f (void)
 {
 	char	*dir;
@@ -666,6 +673,14 @@ void SV_Savegame_f (void)
 	{
 		Com_Printf ("You must be in a game to save.\n");
 		return;
+	}
+
+	// Knightmare- fs_gamedir may be getting messed up, causing it to occasinally save in the root dir,
+	// thus leading to a hang on game loads, so we reset it here.
+	if (!fs_gamedir[0])
+	{
+		if (fs_gamedirvar->string[0])
+			Com_sprintf (fs_gamedir, sizeof(fs_gamedir), "%s/%s", fs_basedir->string, fs_gamedirvar->string);
 	}
 
 	if (Cmd_Argc() != 2)
@@ -844,7 +859,8 @@ void SV_ConSay_f(void)
 		return;
 	}
 
-	strcpy (text, "console: ");
+//	strncpy (text, "console: ");
+	Q_strncpyz (text, "console: ", sizeof(text));
 	p = Cmd_Args();
 
 	if (*p == '"')
@@ -853,7 +869,8 @@ void SV_ConSay_f(void)
 		p[strlen(p)-1] = 0;
 	}
 
-	strcat(text, p);
+//	strncat(text, p);
+	Q_strncatz(text, p, sizeof(text));
 
 	for (j = 0, client = svs.clients; j < maxclients->value; j++, client++)
 	{
