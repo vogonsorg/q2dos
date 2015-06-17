@@ -227,6 +227,8 @@ void R_DrawTriangle( void )
 
 	d_xdenom = ( dv0_ac * dv1_ab ) - ( dv0_ab * dv1_ac );
 
+	memset(spans, 0, sizeof(spans)); // FS: Was causing crashes on some WOD maps
+
 	if ( d_xdenom < 0 )
 	{
 		a_spans = spans;

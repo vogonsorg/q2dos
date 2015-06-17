@@ -444,7 +444,7 @@ void CL_ParsePacketEntities (frame_t *oldframe, frame_t *newframe)
 			if (cl_shownet->value == 3)
 				Com_Printf ("   remove: %i\n", newnum);
 			if (oldnum != newnum)
-				Com_Printf ("U_REMOVE: oldnum != newnum\n");
+				Com_DPrintf (DEVELOPER_MSG_NET, "U_REMOVE: oldnum != newnum\n"); // FS: Mods like WOD make this one happen fairly often
 
 			oldindex++;
 
