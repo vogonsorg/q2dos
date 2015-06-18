@@ -38,7 +38,7 @@ cvar_t		*cl_testblend;
 cvar_t		*r_contentblend; // FS: Fucking hate palette blends from gun fire, etc.
 
 cvar_t		*cl_stats;
-
+extern	cvar_t	*skin; // FS: From KMQ2
 
 int			r_numdlights;
 dlight_t	r_dlights[MAX_DLIGHTS];
@@ -261,7 +261,8 @@ void CL_PrepRefresh (void)
 	SCR_AddDirtyPoint (viddef.width-1, viddef.height-1);
 
 	// let the render dll load the map
-	strcpy (mapname, cl.configstrings[CS_MODELS+1] + 5);	// skip "maps/"
+//	strncpy (mapname, cl.configstrings[CS_MODELS+1] + 5);	// skip "maps/"
+	Q_strncpyz (mapname, cl.configstrings[CS_MODELS+1] + 5, sizeof(mapname));	// skip "maps/"
 	mapname[strlen(mapname)-4] = 0;		// cut off ".bsp"
 
 	// register models, pics, and skins
@@ -279,7 +280,8 @@ void CL_PrepRefresh (void)
 	CL_RegisterTEntModels ();
 
 	num_cl_weaponmodels = 1;
-	strcpy(cl_weaponmodels[0], "weapon.md2");
+//	strncpy(cl_weaponmodels[0], "weapon.md2");
+	Q_strncpyz(cl_weaponmodels[0], "weapon.md2", sizeof(cl_weaponmodels[0]));
 
 	for (i=1 ; i<MAX_MODELS && cl.configstrings[CS_MODELS+i][0] ; i++)
 	{
@@ -331,7 +333,9 @@ void CL_PrepRefresh (void)
 		Com_Printf ("                                     \r");
 	}
 
-	CL_LoadClientinfo (&cl.baseclientinfo, "unnamed\\male/grunt");
+	// Knightmare - Vics fix to get rid of male/grunt flicker
+	// CL_LoadClientinfo (&cl.baseclientinfo, "unnamed\\male/grunt");
+	CL_LoadClientinfo (&cl.baseclientinfo, va("unnamed\\%s", skin->string));
 
 	// set sky textures and speed
 	Com_Printf ("sky\r", i); 
@@ -355,6 +359,13 @@ void CL_PrepRefresh (void)
 	// start the cd track
 //	CDAudio_Play (atoi(cl.configstrings[CS_CDTRACK]), true);
 	CL_PlayBackgroundTrack ();
+
+	// Knightmare- close loading screen as soon as done
+	cls.disable_screen = false;
+
+	// Knightmare- don't start map with game paused
+	if (cls.key_dest != key_menu)
+		Cvar_Set ("paused", "0");
 }
 
 /*

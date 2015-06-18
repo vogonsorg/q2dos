@@ -4,12 +4,14 @@
 #include "../client/client.h"
 
 cvar_t	*in_joystick;
-qboolean	mouse_avail;
-int		mouse_buttons;
-int		mouse_oldbuttonstate;
-int		mouse_buttonstate;
-float	mouse_x, mouse_y;
-float	old_mouse_x, old_mouse_y;
+static	qboolean	mouse_avail;
+static	qboolean	mouse_wheel; // FS: From HoT
+static	int		mouse_buttons;
+static	int		mouse_oldbuttonstate;
+static	int		mouse_buttonstate;
+static	float	mouse_x, mouse_y;
+static	int		mouse_wheelcounter; // FS: From HoT
+static	float	old_mouse_x, old_mouse_y;
 extern	double	sys_msg_time;
 // mouse variables
 cvar_t	*m_filter;
@@ -41,11 +43,21 @@ void IN_StartupMouse (void)
 	if (mouse_buttons > 3)
 		mouse_buttons = 3;
 	Com_Printf("%d-button mouse available\n", mouse_buttons);
+
+	if (!COM_CheckParm ("-mwheel")) // FS: From HoT
+		return;
+	regs.x.ax = 0x11;
+	dos_int86(0x33);
+	if (regs.x.ax == 0x574D && regs.h.cl == 1)
+	{
+		mouse_wheel = true;
+		Com_Printf("mouse wheel support available\n");
+	}
 }
 
 void IN_Init (void)
 {
-	m_filter				= Cvar_Get ("m_filter",					"0",		0);
+	m_filter	= Cvar_Get ("m_filter", "0", 0);
 	Cmd_AddCommand ("+mlook", IN_MLookDown);
 	Cmd_AddCommand ("-mlook", IN_MLookUp);
 	in_joystick = Cvar_Get ("in_joystick", "0", CVAR_ARCHIVE);
@@ -65,7 +77,8 @@ void IN_Commands (void)
 		regs.x.ax = 3;		// read buttons
 		dos_int86(0x33);
 		mouse_buttonstate = regs.x.bx;
-	
+		mouse_wheelcounter = (signed char) regs.h.bh; // FS: From HoT
+
 	// perform button actions
 		for (i=0 ; i<mouse_buttons ; i++)
 		{
@@ -80,7 +93,20 @@ void IN_Commands (void)
 				Key_Event (K_MOUSE1 + i, false, sys_msg_time);
 			}
 		}	
-		
+
+		if (mouse_wheel) // FS: From HoT
+		{
+			if (mouse_wheelcounter < 0)
+			{
+				Key_Event (K_MWHEELUP, true, sys_msg_time);
+				Key_Event (K_MWHEELUP, false, sys_msg_time);
+			}
+			else if (mouse_wheelcounter > 0)
+			{
+				Key_Event (K_MWHEELDOWN, true, sys_msg_time);
+				Key_Event (K_MWHEELDOWN, false, sys_msg_time);
+			}
+		}		
 		mouse_oldbuttonstate = mouse_buttonstate;
 	}
 }

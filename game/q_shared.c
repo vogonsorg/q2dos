@@ -1239,9 +1239,13 @@ void Com_sprintf (char *dest, int size, char *fmt, ...)
 	len = Q_vsnprintf (bigbuffer, sizeof(bigbuffer), fmt, argptr);	// Knightmare- buffer overflow fix
 	va_end (argptr);
 	if (len < 0)
+	{
 		Com_Printf ("Com_sprintf: overflow in temp buffer of size %i\n", sizeof(bigbuffer));
+	}
 	else if (len >= size)
+	{
 		Com_Printf ("Com_sprintf: overflow of %i in %i\n", len, size);
+	}
 	strncpy (dest, bigbuffer, size-1);
 	dest[size-1] = 0;	// Knightmare- null terminate
 }

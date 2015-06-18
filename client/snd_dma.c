@@ -87,6 +87,7 @@ int		s_rawend;
 portable_samplepair_t	s_rawsamples[MAX_RAW_SAMPLES];
 extern int	havegus; // FS
 
+
 // ====================================================================
 // User-setable variables
 // ====================================================================
@@ -202,7 +203,6 @@ void S_Shutdown(void)
 	Cmd_RemoveCommand("ogg_restart"); // Knightmare added
 #endif
 
-
 	// free all sounds
 	for (i=0, sfx=known_sfx ; i < num_sfx ; i++,sfx++)
 	{
@@ -265,7 +265,8 @@ sfx_t *S_FindName (char *name, qboolean create)
 	
 	sfx = &known_sfx[i];
 	memset (sfx, 0, sizeof(*sfx));
-	strcpy (sfx->name, name);
+//	strncpy (sfx->name, name);
+	Q_strncpyz (sfx->name, name, sizeof(sfx->name));
 	sfx->registration_sequence = s_registration_sequence;
 	
 	return sfx;
@@ -285,7 +286,8 @@ sfx_t *S_AliasName (char *aliasname, char *truename)
 	int		i;
 
 	s = Z_Malloc (MAX_QPATH);
-	strcpy (s, truename);
+//	strncpy (s, truename);
+	Q_strncpyz (s, truename, MAX_QPATH);
 
 	// find a free sfx
 	for (i=0 ; i < num_sfx ; i++)
@@ -301,7 +303,8 @@ sfx_t *S_AliasName (char *aliasname, char *truename)
 	
 	sfx = &known_sfx[i];
 	memset (sfx, 0, sizeof(*sfx));
-	strcpy (sfx->name, aliasname);
+//	strncpy (sfx->name, aliasname);
+	Q_strncpyz (sfx->name, aliasname, sizeof(sfx->name));
 	sfx->registration_sequence = s_registration_sequence;
 	sfx->truename = s;
 
@@ -640,7 +643,8 @@ struct sfx_s *S_RegisterSexedSound (entity_state_t *ent, char *base)
 		if (p)
 		{
 			p += 1;
-			strcpy(model, p);
+		//	strncpy(model, p);
+			Q_strncpyz(model, p, sizeof(model));
 			p = strchr(model, '/');
 			if (p)
 				*p = 0;
@@ -648,7 +652,8 @@ struct sfx_s *S_RegisterSexedSound (entity_state_t *ent, char *base)
 	}
 	// if we can't figure it out, they're male
 	if (!model[0])
-		strcpy(model, "male");
+	//	strncpy(model, "male");
+		Q_strncpyz(model, "male", sizeof(model));
 
 	// see if we already know of the model specific sound
 	Com_sprintf (sexedFilename, sizeof(sexedFilename), "#players/%s/%s", model, base+1);
@@ -1260,11 +1265,14 @@ void S_Play(void)
 	{
 		if (!strrchr(Cmd_Argv(i), '.'))
 		{
-			strcpy(name, Cmd_Argv(i));
-			strcat(name, ".wav");
+		//	strncpy(name, Cmd_Argv(i));
+		//	strncat(name, ".wav");
+			Q_strncpyz(name, Cmd_Argv(i), sizeof(name));
+			Q_strncatz(name, ".wav", sizeof(name));
 		}
 		else
-			strcpy(name, Cmd_Argv(i));
+		//	strncpy(name, Cmd_Argv(i));
+			Q_strncpyz(name, Cmd_Argv(i), sizeof(name));
 		sfx = S_RegisterSound(name);
 		S_StartSound(NULL, cl.playernum+1, 0, sfx, 1.0, 1.0, 0);
 		i++;

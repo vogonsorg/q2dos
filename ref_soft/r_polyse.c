@@ -227,6 +227,9 @@ void R_DrawTriangle( void )
 
 	d_xdenom = ( dv0_ac * dv1_ab ) - ( dv0_ab * dv1_ac );
 
+	// FS: FIXME.  This is way to slow on Pentium 1s, so maybe we need some bounds checking elsewhere...
+//	memset(spans, 0, sizeof(spans)); // FS: Was causing crashes on some WOD maps
+
 	if ( d_xdenom < 0 )
 	{
 		a_spans = spans;

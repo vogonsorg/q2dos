@@ -16,7 +16,13 @@
 #include <crt0.h> // FS: Fake Mem Fix (QIP)
 #else
 #include <time.h>
+
+#ifndef WIN32
 #include <sys/time.h>   //watcom
+#else
+#include <time.h>
+#endif
+
 #endif
 
 #include "../qcommon/qcommon.h"
@@ -196,7 +202,7 @@ char *Sys_ConsoleInput (void)
 
 
     if (!kbhit())
-                return NULL;
+		return NULL;
 
 
     c = getche();

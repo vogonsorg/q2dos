@@ -27,6 +27,8 @@ cvar_t		*con_notifytime;
 
 
 #define		MAXCMDLINE	256
+#define		CONWIDTH_AT_640X480	78 // FS
+
 extern	char	key_lines[32][MAXCMDLINE];
 extern	int		edit_line;
 extern	int		key_linepos;
@@ -597,8 +599,13 @@ void Con_DrawConsole (float frac)
 	verlen = strlen(version);
 //	for (x=0 ; x<5 ; x++)
 //		re.DrawChar (viddef.width-44+x*8, lines-12, 128 + version[x] );
-	for (x=0 ; x<verlen ; x++)
-		re.DrawChar (viddef.width-(verlen*8+4)+x*8, lines-12, 128 + version[x] );
+	if (!cls.downloadrate)
+	{
+		for (x=0 ; x<verlen ; x++)
+		{
+			re.DrawChar (viddef.width-(verlen*8+4)+x*8, lines-12, 128 + version[x] );
+		}
+	}
 
 // draw the text
 	con.vislines = lines;
@@ -646,14 +653,47 @@ void Con_DrawConsole (float frac)
 #endif	// USE_CURL
 	{
 		if ((text = strrchr(cls.downloadname, '/')) != NULL)
+		{
 			text++;
+		}
 		else
+		{
 			text = cls.downloadname;
+		}
 
-		x = con.linewidth - ((con.linewidth * 7) / 40);
-		y = x - strlen(text) - 8;
+		// make this a little shorter in case of longer version string
+		if (con.linewidth >= CONWIDTH_AT_640X480)
+		{
+			x = con.linewidth - ((con.linewidth * 7) / 40) - (verlen-12);
+		}
+		else
+		{
+			x = con.linewidth - ((con.linewidth * 7) / 40) - (verlen+1);
+		}
+
+		if (cls.downloadrate > 0.0f)
+		{
+			if(con.linewidth >= CONWIDTH_AT_640X480)
+				y = x - strlen(text) - 19;
+			else
+			{
+				y = x - strlen(text) - 9;
+			}
+		}
+		else
+		{
+			if(con.linewidth >= CONWIDTH_AT_640X480)
+				y = x - strlen(text) - 8;
+			else
+			{
+				y = x - strlen(text) - 2;
+			}
+		}
+
 		i = con.linewidth/3;
-		if (strlen(text) > i) {
+
+		if (strlen(text) > i)
+		{
 			y = x - i - 11;
 			strncpy(dlbar, text, i);
 			dlbar[i] = 0;
@@ -665,15 +705,25 @@ void Con_DrawConsole (float frac)
 		dlbar[i++] = '\x80';
 		// where's the dot go?
 		if (cls.downloadpercent == 0)
+		{
 			n = 0;
+		}
 		else
+		{
 			n = y * cls.downloadpercent / 100;
+		}
 			
 		for (j = 0; j < y; j++)
+		{
 			if (j == n)
+			{
 				dlbar[i++] = '\x83';
+			}
 			else
+			{
 				dlbar[i++] = '\x81';
+			}
+		}
 		dlbar[i++] = '\x82';
 		dlbar[i] = 0;
 
@@ -721,7 +771,7 @@ void Con_DrawConsole (float frac)
 		dlbar[i++] = '\x82';
 		dlbar[i] = 0;
 
-		sprintf(dlbar + strlen(dlbar), " %02d%%", cls.gamespypercent);
+		Com_sprintf(dlbar + strlen(dlbar), sizeof(dlbar)-strlen(dlbar), " %02d%%", cls.gamespypercent);
 
 		// draw it
 		y = con.vislines-12;

@@ -108,6 +108,10 @@ SOURCE=..\CLIENT\cl_fx.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\client\cl_http.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\CLIENT\cl_input.c
 # End Source File
 # Begin Source File

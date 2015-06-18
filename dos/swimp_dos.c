@@ -4,7 +4,7 @@
 #include "../ref_soft/r_local.h"
 #include "vid_dos.h"
 
-int whatmodearewe = 0;
+int currentvideomode = 0;
 
 void	SWimp_BeginFrame( float camera_separation )
 {
@@ -13,16 +13,18 @@ void	SWimp_BeginFrame( float camera_separation )
 void	SWimp_EndFrame (void)
 {
 	//It's LFB only
-	if(whatmodearewe==0)	//VGA mode 13
-		dosmemput(vid.buffer,320*200,0xA0000);
+	if(!vid_resolutions[currentvideomode].isLFB)	//VGA mode 13
+	{
+		dosmemput(vid.buffer,vid_resolutions[currentvideomode].height*vid_resolutions[currentvideomode].width,0xA0000);
+	}
 	else
 	{
 #ifdef OLD_RELIABLE_CODE
 		__djgpp_nearptr_enable();
-		memcpy(vid_resolutions[whatmodearewe].address+__djgpp_conventional_base,vid.buffer,(vid.height*vid.width));
+		memcpy(vid_resolutions[currentvideomode].address+__djgpp_conventional_base,vid.buffer,(vid.height*vid.width));
 //		__djgpp_nearptr_disable(); // FS: FIXME TODO -- DON'T DISABLE.  WILL STOMP DMA.BUFFER!
 #endif
-		memcpy(vid_resolutions[whatmodearewe].address, vid.buffer, (vid.height*vid.width));
+		memcpy(vid_resolutions[currentvideomode].address, vid.buffer, (vid.height*vid.width));
 	}
 }
 
@@ -79,15 +81,15 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 	}
 	ri.Con_Printf( PRINT_ALL, "SWimp_SetMode setting to %s %dx%d\n",vid_resolutions[mode].menuname, *pwidth, *pheight);
 
-	whatmodearewe=mode;
-	if(mode==0)
+	currentvideomode=mode;
+	if(!vid_resolutions[mode].isLFB)
 	{
-		vid.height=200;
-		vid.width=320;
-		vid.rowbytes=320;
+		vid.height=vid_resolutions[mode].height;
+		vid.width=vid_resolutions[mode].width;
+		vid.rowbytes=vid.width;
 		if(vid.buffer)
 			free(vid.buffer);
-		vid.buffer=malloc(320*200*1);
+		vid.buffer=malloc(vid.width*vid.height*1);
 		{	//mode 13
 			__dpmi_regs r;
 
@@ -119,4 +121,3 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 void		SWimp_AppActivate( qboolean active )
 {
 }
-

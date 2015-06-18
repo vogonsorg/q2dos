@@ -333,7 +333,10 @@ void SV_StartSound (vec3_t origin, edict_t *entity, int channel,
 		if (entity->solid == SOLID_BSP)
 		{
 			for (i=0 ; i<3 ; i++)
-				origin_v[i] = entity->s.origin[i]+0.5*(entity->mins[i]+entity->maxs[i]);
+			{
+				origin_v[i] = entity->s.origin[i] + 0.5f *
+							  (entity->mins[i] + entity->maxs[i]);
+			}
 		}
 		else
 		{

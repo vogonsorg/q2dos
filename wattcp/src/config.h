@@ -21,7 +21,7 @@
 #undef USE_DEBUG       /* Include debug code */
 #undef USE_MULTICAST   /* Include IP multicast code by Jim Martin */
 #undef USE_BIND        /* Include Bind resolver code */
-#undef USE_BSD_API     /* Include BSD-sockets */
+#define USE_BSD_API     /* Include BSD-sockets */ // FS: Libcurl needs this
 #undef USE_BSD_FATAL   /* Exit application on BSD-socket fatal errors */
 #undef USE_BOOTP       /* Include BOOTP client code */
 #undef USE_DHCP        /* Include DHCP boot client code */

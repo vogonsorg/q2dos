@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // g_actor.c
 
+#if 0 // FS: Bot stuff?
 #include "g_local.h"
 #include "m_actor.h"
 
@@ -607,3 +608,4 @@ void SP_target_actor (edict_t *self)
 
 	gi.linkentity (self);
 }
+#endif

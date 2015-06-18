@@ -107,7 +107,7 @@ Given an netadr_t, returns the matching client.
 */
 client_t *GetClientFromAdr (netadr_t address)
 {
-	client_t        *cl;
+	client_t        *cl = NULL; // FS: Compiler warning
 	int                     i;
 	qboolean        found = false;
 
@@ -146,6 +146,41 @@ void SV_DropClientFromAdr (netadr_t address)
 // end Knightmare
 
 /*
+=====================
+SV_KickClient
+
+From R1Q2
+=====================
+*/
+void SV_KickClient (client_t *cl, const char *reason, const char *cprintf)
+{
+	if (reason && cl->state == cs_spawned && cl->name[0])
+		SV_BroadcastPrintf (PRINT_HIGH, "%s was dropped: %s\n", cl->name, reason);
+	if (cprintf)
+		SV_ClientPrintf (cl, PRINT_HIGH, "%s", cprintf);
+	Com_Printf ("Dropping %s, %s.\n", cl->name, reason ? reason : "SV_KickClient");
+	SV_DropClient (cl);
+}
+
+
+/*
+=====================
+SV_CleanClient
+
+From R1Q2
+r1ch: this does the final cleaning up of a client after zombie state.
+=====================
+*/
+void SV_CleanClient (client_t *drop)
+{
+	if (drop->download)
+	{
+		Z_Free (drop->download);
+		drop->download = NULL;
+	}
+}
+
+/*
 ==============================================================================
 
 CONNECTIONLESS COMMANDS
@@ -169,8 +204,10 @@ char	*SV_StatusString (void)
 	int		statusLength;
 	int		playerLength;
 
-	strcpy (status, Cvar_Serverinfo());
-	strcat (status, "\n");
+//	strncpy (status, Cvar_Serverinfo());
+//	strncat (status, "\n");
+	Q_strncpyz (status, Cvar_Serverinfo(), sizeof(status));
+	Q_strncatz (status, "\n", sizeof(status));
 	statusLength = strlen(status);
 
 	for (i=0 ; i<maxclients->value ; i++)
@@ -183,7 +220,8 @@ char	*SV_StatusString (void)
 			playerLength = strlen(player);
 			if (statusLength + playerLength >= sizeof(status) )
 				break;		// can't hold any more
-			strcpy (status + statusLength, player);
+		//	strncpy (status + statusLength, player);
+			Q_strncpyz (status + statusLength, player, sizeof(status));
 			statusLength += playerLength;
 		}
 	}
@@ -440,6 +478,8 @@ void SVC_DirectConnect (void)
 			}
 			// end r1ch fix
 			Com_Printf ("%s:reconnect\n", NET_AdrToString (adr));
+
+			SV_CleanClient (cl);	// r1ch: clean up last client data
 			newcl = cl;
 			goto gotnewcl;
 		}
@@ -771,12 +811,15 @@ void SV_CheckTimeouts (void)
 		if (cl->state == cs_zombie
 		&& cl->lastmessage < zombiepoint)
 		{
+			SV_CleanClient (cl); // r1ch fix: make sure client is cleaned up
 			cl->state = cs_free;	// can now be reused
 			continue;
 		}
 		if ( (cl->state == cs_connected || cl->state == cs_spawned) 
 			&& cl->lastmessage < droppoint)
 		{
+			// r1ch fix: only message if they spawned (less spam plz)
+			if (cl->state == cs_spawned && cl->name[0])
 			SV_BroadcastPrintf (PRINT_HIGH, "%s timed out\n", cl->name);
 			SV_DropClient (cl); 
 			cl->state = cs_free;	// don't bother with zombie state

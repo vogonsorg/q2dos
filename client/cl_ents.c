@@ -444,7 +444,7 @@ void CL_ParsePacketEntities (frame_t *oldframe, frame_t *newframe)
 			if (cl_shownet->value == 3)
 				Com_Printf ("   remove: %i\n", newnum);
 			if (oldnum != newnum)
-				Com_Printf ("U_REMOVE: oldnum != newnum\n");
+				Com_DPrintf (DEVELOPER_MSG_NET, "U_REMOVE: oldnum != newnum\n"); // FS: Mods like WOD make this one happen fairly often
 
 			oldindex++;
 
@@ -794,7 +794,8 @@ struct model_s *S_RegisterSexedModel (entity_state_t *ent, char *base)
 		if (p)
 		{
 			p += 1;
-			strcpy(model, p);
+		//	strncpy(model, p);
+			Q_strncpyz(model, p, sizeof(model));
 			p = strchr(model, '/');
 			if (p)
 				*p = 0;
@@ -802,7 +803,8 @@ struct model_s *S_RegisterSexedModel (entity_state_t *ent, char *base)
 	}
 	// if we can't figure it out, they're male
 	if (!model[0])
-		strcpy(model, "male");
+	//	strncpy(model, "male");
+		Q_strncpyz(model, "male", sizeof(model));
 
 	Com_sprintf (buffer, sizeof(buffer), "players/%s/%s", model, base+1);
 	mdl = re.RegisterModel(buffer);
@@ -980,7 +982,7 @@ void CL_AddPacketEntities (frame_t *frame)
 		}
 
 		// only used for black hole model right now, FIXME: do better
-		if (renderfx == RF_TRANSLUCENT)
+		if (renderfx & RF_TRANSLUCENT)
 			ent.alpha = 0.70;
 
 		// render effects (fullbright, translucent, etc)
@@ -1098,17 +1100,27 @@ void CL_AddPacketEntities (frame_t *frame)
 					{
 						// lose the yellow shell if we have a red, blue, or green shell
 						if (renderfx & (RF_SHELL_RED|RF_SHELL_BLUE|RF_SHELL_GREEN))
+						{
 							renderfx &= ~RF_SHELL_DOUBLE;
+						}
 						// if we have a red shell, turn it to purple by adding blue
 						if (renderfx & RF_SHELL_RED)
+						{
 							renderfx |= RF_SHELL_BLUE;
+						}
 						// if we have a blue shell (and not a red shell), turn it to cyan by adding green
 						else if (renderfx & RF_SHELL_BLUE)
+						{
 							// go to green if it's on already, otherwise do cyan (flash green)
 							if (renderfx & RF_SHELL_GREEN)
+							{
 								renderfx &= ~RF_SHELL_BLUE;
+							}
 							else
+							{
 								renderfx |= RF_SHELL_GREEN;
+							}
+						}
 					}
 				}
 //			}

@@ -37,18 +37,27 @@ void PF_Unicast (edict_t *ent, qboolean reliable)
 	client_t	*client;
 
 	if (!ent)
+	{
 		return;
+	}
 
 	p = NUM_FOR_EDICT(ent);
-	if (p < 1 || p > maxclients->value)
+	if ((p < 1) || (p > maxclients->value))
+	{
 		return;
+	}
 
 	client = svs.clients + (p-1);
 
 	if (reliable)
-		SZ_Write (&client->netchan.message, sv.multicast.data, sv.multicast.cursize);
+	{
+		SZ_Write(&client->netchan.message, sv.multicast.data,
+				sv.multicast.cursize);
+	}
 	else
+	{
 		SZ_Write (&client->datagram, sv.multicast.data, sv.multicast.cursize);
+	}
 
 	SZ_Clear (&sv.multicast);
 }
@@ -100,11 +109,14 @@ void PF_cprintf (edict_t *ent, int level, char *fmt, ...)
 	va_list		argptr;
 	int			n;
 
+	n = 0;
 	if (ent)
 	{
 		n = NUM_FOR_EDICT(ent);
-		if (n < 1 || n > maxclients->value)
+		if ((n < 1) || (n > maxclients->value))
+		{
 			Com_Error (ERR_DROP, "cprintf to a non-client");
+		}
 	}
 
 	va_start (argptr,fmt);
@@ -113,11 +125,14 @@ void PF_cprintf (edict_t *ent, int level, char *fmt, ...)
 	va_end (argptr);
 
 	if (ent)
+	{
 		SV_ClientPrintf (svs.clients+(n-1), level, "%s", msg);
+	}
 	else
+	{
 		Com_Printf ("%s", msg);
+	}
 }
-
 
 /*
 ===============
@@ -133,8 +148,10 @@ void PF_centerprintf (edict_t *ent, char *fmt, ...)
 	int			n;
 	
 	n = NUM_FOR_EDICT(ent);
-	if (n < 1 || n > maxclients->value)
+	if ((n < 1) || (n > maxclients->value))
+	{
 		return;	// Com_Error (ERR_DROP, "centerprintf to a non-client");
+	}
 
 	va_start (argptr,fmt);
 //	vsprintf (msg, fmt, argptr);
@@ -181,7 +198,9 @@ void PF_setmodel (edict_t *ent, char *name)
 	cmodel_t	*mod;
 
 	if (!name)
+	{
 		Com_Error (ERR_DROP, "PF_setmodel: NULL");
+	}
 
 	i = SV_ModelIndex (name);
 		
@@ -205,16 +224,39 @@ PF_Configstring
 
 ===============
 */
+// From Q2Pro
+// Some mods actually exploit CS_STATUSBAR to take space up to CS_AIRACCEL
+#define CS_SIZE(cs) \
+    ((cs) >= CS_STATUSBAR && (cs) < CS_AIRACCEL ? \
+      MAX_QPATH * (CS_AIRACCEL - (cs)) : MAX_QPATH)
+
 void PF_Configstring (int index, char *val)
 {
-	if (index < 0 || index >= MAX_CONFIGSTRINGS)
-		Com_Error (ERR_DROP, "configstring: bad index %i\n", index);
+	size_t	len, maxlen;
+	char	*dest;
+	if ((index < 0) || (index >= MAX_CONFIGSTRINGS))
+	{
+		Com_Error (ERR_DROP, "PF_Configstring: bad index %i\n", index);
+	}
 
 	if (!val)
 		val = "";
 
+	// catch overflow of indvidual configstrings
+	len = strlen(val);
+	maxlen = CS_SIZE(index);
+	if (len >= maxlen)
+	{
+		Com_Printf("PF_Configstring: index %d overflowed: %d > %d\n", index, len, maxlen);
+		len = maxlen - 1;
+	}
+
 	// change the string in sv
-	strcpy (sv.configstrings[index], val);
+	// Don't use a null-terminated strncpy here!!
+//	strncpy (sv.configstrings[index], val);
+	dest = sv.configstrings[index];
+	memcpy(dest, val, len);
+	dest[len] = 0;
 	
 	if (sv.state != ss_loading)
 	{	// send the update to everyone
@@ -263,9 +305,13 @@ qboolean PF_inPVS (vec3_t p1, vec3_t p2)
 	cluster = CM_LeafCluster (leafnum);
 	area2 = CM_LeafArea (leafnum);
 	if ( mask && (!(mask[cluster>>3] & (1<<(cluster&7)) ) ) )
+	{
 		return false;
+	}
 	if (!CM_AreasConnected (area1, area2))
+	{
 		return false;		// a door blocks sight
+	}
 	return true;
 }
 
@@ -293,9 +339,13 @@ qboolean PF_inPHS (vec3_t p1, vec3_t p2)
 	cluster = CM_LeafCluster (leafnum);
 	area2 = CM_LeafArea (leafnum);
 	if ( mask && (!(mask[cluster>>3] & (1<<(cluster&7)) ) ) )
+	{
 		return false;		// more than one bounce away
+	}
 	if (!CM_AreasConnected (area1, area2))
+	{
 		return false;		// a door blocks hearing
+	}
 
 	return true;
 }
@@ -304,8 +354,11 @@ void PF_StartSound (edict_t *entity, int channel, int sound_num, float volume,
     float attenuation, float timeofs)
 {
 	if (!entity)
+	{
 		return;
-	SV_StartSound (NULL, entity, channel, sound_num, volume, attenuation, timeofs);
+	}
+	SV_StartSound(NULL, entity, channel, sound_num,
+			volume, attenuation, timeofs);
 }
 
 //==============================================
@@ -321,7 +374,9 @@ it is changing to a different game directory.
 void SV_ShutdownGameProgs (void)
 {
 	if (!ge)
+	{
 		return;
+	}
 	ge->Shutdown ();
 	Sys_UnloadGame ();
 	ge = NULL;
@@ -342,8 +397,11 @@ void SV_InitGameProgs (void)
 
 	// unload anything we have now
 	if (ge)
+	{
 		SV_ShutdownGameProgs ();
+	}
 
+	Com_Printf("-------- game initialization -------\n");
 
 	// load a new game dll
 	import.multicast = SV_Multicast;
@@ -395,21 +453,27 @@ void SV_InitGameProgs (void)
 	import.args = Cmd_Args;
 	import.AddCommandString = Cbuf_AddText;
 
+#ifndef DEDICATED_ONLY
 	import.DebugGraph = SCR_DebugGraph;
+#endif
 	import.SetAreaPortalState = CM_SetAreaPortalState;
 	import.AreasConnected = CM_AreasConnected;
 
 	ge = (game_export_t *)Sys_GetGameAPI (&import);
 
 	if (!ge)
+	{
 		Com_Error (ERR_DROP, "failed to load game DLL");
+	}
 	if (ge->apiversion != GAME_API_VERSION)
+	{
 		Com_Error (ERR_DROP, "game is version %i, not %i", ge->apiversion,
 		GAME_API_VERSION);
+	}
 
 	ge->Init ();
 	
-	//printf("how to init game?!\n");
+	Com_Printf("------------------------------------\n\n");
 	//InitGame();
 }
 

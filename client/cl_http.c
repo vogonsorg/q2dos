@@ -28,12 +28,12 @@ cvar_t	*cl_http_filelists;
 cvar_t	*cl_http_proxy;
 cvar_t	*cl_http_max_connections;
 
-static enum
+typedef enum
 {
 	HTTPDL_ABORT_NONE,
 	HTTPDL_ABORT_SOFT,
 	HTTPDL_ABORT_HARD
-};
+}http_abort_t;
 
 static CURLM	*multi = NULL;
 static int		handleCount = 0;
@@ -112,7 +112,8 @@ static int /*EXPORT*/ CL_HTTP_Progress (void *clientp, double dltotal, double dl
 		Q_strncpyz (cls.downloadname, dl->queueEntry->quakePath, sizeof(cls.downloadname));
 		cls.downloadposition = dl->position;
 
-		if (dltotal) {
+		if (dltotal)
+		{
 			CL_HTTP_Calculate_KBps ((int)dlnow, (int)dltotal);	// Knightmare- added KB/s counter
 			cls.downloadpercent = (int)((dlnow / dltotal) * 100.0f);
 		}
@@ -852,7 +853,7 @@ static void CL_FinishHTTPDownload (void)
 	int			msgs_in_queue;
 	CURLMsg		*msg;
 	CURLcode	result;
-	dlhandle_t	*dl;
+	dlhandle_t	*dl = NULL;
 	CURL		*curl;
 	long		responseCode;
 	double		timeTaken;

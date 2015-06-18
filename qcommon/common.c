@@ -125,13 +125,15 @@ void Com_Printf (char *fmt, ...)
 			rd_flush(rd_target, rd_buffer);
 			*rd_buffer = 0;
 		}
-		strcat (rd_buffer, msg);
+	//	strncat (rd_buffer, msg);
+		Q_strncatz (rd_buffer, msg, rd_buffersize);
 		return;
 	}
 
 	Con_Print (msg);
 		
 	// also echo to debugging console
+	if (msg[strlen(msg)-1] != '\r') // skip overwrittten outputs
 	Sys_ConsoleOutput (msg);
 
 	// logfile
@@ -1056,10 +1058,10 @@ char *CopyString (char *in)
 	char	*out;
 	
 	out = Z_Malloc (strlen(in)+1);
-	strcpy (out, in);
+//	strncpy (out, in);
+	Q_strncpyz (out, in, strlen(in)+1);
 	return out;
 }
-
 
 
 void Info_Print (char *s)
@@ -2021,7 +2023,8 @@ const char *MakePrintable (const void *subject, size_t numchars)
 
 	if (!subject)
 	{
-		strcpy (printable, "(null)");
+	//	strncpy (printable, "(null)");
+		Q_strncpyz (printable, "(null)", sizeof(printable));
 		return printable;
 	}
 

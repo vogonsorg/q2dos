@@ -636,7 +636,7 @@ void SCR_PlayCinematic (char *arg)
 
 	// switch up to 22 khz sound if necessary
 	old_khz = Cvar_VariableValue ("s_khz");
-	if (old_khz != cin.s_rate)
+	if (old_khz < cin.s_rate)
 	{
 		cin.restart_sound = true;
 		Cvar_SetValue ("s_khz", cin.s_rate);

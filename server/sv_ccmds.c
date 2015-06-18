@@ -51,13 +51,18 @@ void SV_SetMaster_f (void)
 	Cvar_Set ("public", "1");
 
 	for (i=1 ; i<MAX_MASTERS ; i++)
+	{
 		memset (&master_adr[i], 0, sizeof(master_adr[i]));
+	}
 
 	slot = 1;		// slot 0 will always contain the id master
+
 	for (i=1 ; i<Cmd_Argc() ; i++)
 	{
 		if (slot == MAX_MASTERS)
+		{
 			break;
+		}
 
 		if (!NET_StringToAdr (Cmd_Argv(i), &master_adr[i]))
 		{
@@ -96,15 +101,17 @@ qboolean SV_SetPlayer (void)
 	char		*s;
 
 	if (Cmd_Argc() < 2)
+	{
 		return false;
+	}
 
 	s = Cmd_Argv(1);
 
 	// numeric values are just slot numbers
-	if (s[0] >= '0' && s[0] <= '9')
+	if ((s[0] >= '0') && (s[0] <= '9'))
 	{
 		idnum = atoi(Cmd_Argv(1));
-		if (idnum < 0 || idnum >= maxclients->value)
+		if ((idnum < 0) || (idnum >= maxclients->value))
 		{
 			Com_Printf ("Bad client slot: %i\n", idnum);
 			return false;
@@ -124,7 +131,9 @@ qboolean SV_SetPlayer (void)
 	for (i=0,cl=svs.clients ; i<maxclients->value; i++,cl++)
 	{
 		if (!cl->state)
+		{
 			continue;
+		}
 		if (!strcmp(cl->name, s))
 		{
 			sv_client = cl;
@@ -251,16 +260,18 @@ void SV_CopySaveGame (char *src, char *dst)
 	found = Sys_FindFirst(name, 0, 0 );
 	while (found)
 	{
-		strcpy (name+len, found+len);
-
+	//	strncpy (name+len, found+len);
+		Q_strncpyz (name+len, found+len, sizeof(name)-len);
 		Com_sprintf (name2, sizeof(name2), "%s/save/%s/%s", FS_Gamedir(), dst, found+len);
 		CopyFile (name, name2);
 
 		// change sav to sv2
 		l = strlen(name);
-		strcpy (name+l-3, "sv2");
+	//	strncpy (name+l-3, "sv2");
+		Q_strncpyz (name+l-3, "sv2", sizeof(name)-l+3);
 		l = strlen(name2);
-		strcpy (name2+l-3, "sv2");
+	//	strncpy (name2+l-3, "sv2");
+		Q_strncpyz (name2+l-3, "sv2", sizeof(name2)-l+3);
 		CopyFile (name, name2);
 
 		found = Sys_FindNext( 0, 0 );
@@ -385,8 +396,10 @@ void SV_WriteServerFile (qboolean autosave)
 		}
 		memset (varName, 0, sizeof(varName));
 		memset (string, 0, sizeof(string));
-		strcpy (varName, var->name);
-		strcpy (string, var->string);
+	//	strncpy (varName, var->name);
+	//	strncpy (string, var->string);
+		Q_strncpyz (varName, var->name, sizeof(varName));
+		Q_strncpyz (string, var->string, sizeof(string));
 		fwrite (varName, 1, sizeof(varName), f);
 		fwrite (string, 1, sizeof(string), f);
 	}
@@ -442,7 +455,8 @@ void SV_ReadServerFile (void)
 	// start a new game fresh with new cvars
 	SV_InitGame ();
 
-	strcpy (svs.mapcmd, mapcmd);
+//	strncpy (svs.mapcmd, mapcmd);
+	Q_strncpyz (svs.mapcmd, mapcmd, sizeof(svs.mapcmd));
 
 	// read game state
 	Com_sprintf (fileName, sizeof(fileName), "%s/save/current/game.ssv", FS_Gamedir());
@@ -562,11 +576,19 @@ void SV_Map_f (void)
 	char	*map;
 	char	expanded[MAX_QPATH];
 
+	if (Cmd_Argc() != 2)
+	{
+		Com_Printf("USAGE: map <mapname>\n");
+		return;
+	}
+
 	// if not a pcx, demo, or cinematic, check to make sure the level exists
 	map = Cmd_Argv(1);
-	if (!strstr (map, "."))
+
+	if (!strstr(map, ".") && !strstr(map, "$") && (*map != '*'))
 	{
 		Com_sprintf (expanded, sizeof(expanded), "maps/%s.bsp", map);
+
 		if (FS_LoadFile (expanded, NULL) == -1)
 		{
 			Com_Printf ("Can't find %s\n", expanded);
@@ -641,6 +663,8 @@ SV_Savegame_f
 
 ==============
 */
+extern char	fs_gamedir[MAX_OSPATH];
+
 void SV_Savegame_f (void)
 {
 	char	*dir;
@@ -649,6 +673,14 @@ void SV_Savegame_f (void)
 	{
 		Com_Printf ("You must be in a game to save.\n");
 		return;
+	}
+
+	// Knightmare- fs_gamedir may be getting messed up, causing it to occasinally save in the root dir,
+	// thus leading to a hang on game loads, so we reset it here.
+	if (!fs_gamedir[0])
+	{
+		if (fs_gamedirvar->string[0])
+			Com_sprintf (fs_gamedir, sizeof(fs_gamedir), "%s/%s", fs_basedir->string, fs_gamedirvar->string);
 	}
 
 	if (Cmd_Argc() != 2)
@@ -721,9 +753,14 @@ void SV_Kick_f (void)
 	}
 
 	if (!SV_SetPlayer ())
+	{
 		return;
+	}
 
+	if ((sv_client->state == cs_spawned) && *sv_client->name)
+	{
 	SV_BroadcastPrintf (PRINT_HIGH, "%s was kicked\n", sv_client->name);
+	}
 	// print directly, because the dropped client won't get the
 	// SV_BroadcastPrintf message
 	SV_ClientPrintf (sv_client, PRINT_HIGH, "You were kicked from the game\n");
@@ -755,14 +792,20 @@ void SV_Status_f (void)
 	for (i=0,cl=svs.clients ; i<maxclients->value; i++,cl++)
 	{
 		if (!cl->state)
+		{
 			continue;
-		Com_Printf ("%3i ", i);
+		}
+		Com_Printf("%2i ", i);
 		Com_Printf ("%5i ", cl->edict->client->ps.stats[STAT_FRAGS]);
 
 		if (cl->state == cs_connected)
+		{
 			Com_Printf ("CNCT ");
+		}
 		else if (cl->state == cs_zombie)
+		{
 			Com_Printf ("ZMBI ");
+		}
 		else
 		{
 			ping = cl->ping < 9999 ? cl->ping : 9999;
@@ -772,7 +815,9 @@ void SV_Status_f (void)
 		Com_Printf ("%s", cl->name);
 		l = 16 - strlen(cl->name);
 		for (j=0 ; j<l ; j++)
+		{
 			Com_Printf (" ");
+		}
 
 		Com_Printf ("%7i ", svs.realtime - cl->lastmessage );
 
@@ -780,7 +825,9 @@ void SV_Status_f (void)
 		Com_Printf ("%s", s);
 		l = 22 - strlen(s);
 		for (j=0 ; j<l ; j++)
+		{
 			Com_Printf (" ");
+		}
 		
 		Com_Printf ("%5i", cl->netchan.qport);
 
@@ -802,9 +849,18 @@ void SV_ConSay_f(void)
 	char	text[1024];
 
 	if (Cmd_Argc () < 2)
+	{
 		return;
+	}
 
-	strcpy (text, "console: ");
+	if (!svs.initialized)
+	{
+		Com_Printf("No server running.\n");
+		return;
+	}
+
+//	strncpy (text, "console: ");
+	Q_strncpyz (text, "console: ", sizeof(text));
 	p = Cmd_Args();
 
 	if (*p == '"')
@@ -813,12 +869,15 @@ void SV_ConSay_f(void)
 		p[strlen(p)-1] = 0;
 	}
 
-	strcat(text, p);
+//	strncat(text, p);
+	Q_strncatz(text, p, sizeof(text));
 
 	for (j = 0, client = svs.clients; j < maxclients->value; j++, client++)
 	{
 		if (client->state != cs_spawned)
+		{
 			continue;
+		}
 		SV_ClientPrintf(client, PRINT_CHAT, "%s\n", text);
 	}
 }
@@ -858,6 +917,12 @@ Examine all a users info strings
 */
 void SV_DumpUser_f (void)
 {
+	if (!svs.initialized)
+	{
+		Com_Printf("No server running.\n");
+		return;
+	}
+
 	if (Cmd_Argc() != 2)
 	{
 		Com_Printf ("Usage: info <userid>\n");
@@ -865,7 +930,9 @@ void SV_DumpUser_f (void)
 	}
 
 	if (!SV_SetPlayer ())
+	{
 		return;
+	}
 
 	Com_Printf ("userinfo\n");
 	Com_Printf ("--------\n");
@@ -885,7 +952,7 @@ recorded, but no playerinfo will be stored.  Primarily for demo merging.
 void SV_ServerRecord_f (void)
 {
 	char	name[MAX_OSPATH];
-	char	buf_data[32768];
+	byte buf_data[32768];
 	sizebuf_t	buf;
 	int		len;
 	int		i;
@@ -908,6 +975,13 @@ void SV_ServerRecord_f (void)
 		return;
 	}
 
+	if (strstr(Cmd_Argv(1), "..") || 
+		strstr(Cmd_Argv(1), "/") || 
+		strstr(Cmd_Argv(1), "\\"))
+	{
+		Com_Printf("Illegal filename.\n");
+		return;
+	}
 	//
 	// open the demo file
 	//
@@ -940,18 +1014,28 @@ void SV_ServerRecord_f (void)
 	MSG_WriteLong (&buf, svs.spawncount);
 	// 2 means server demo
 	MSG_WriteByte (&buf, 2);	// demos are always attract loops
-	MSG_WriteString (&buf, Cvar_VariableString ("gamedir"));
+	MSG_WriteString(&buf, (char *)Cvar_VariableString("gamedir"));
 	MSG_WriteShort (&buf, -1);
 	// send full levelname
 	MSG_WriteString (&buf, sv.configstrings[CS_NAME]);
 
 	for (i=0 ; i<MAX_CONFIGSTRINGS ; i++)
+	{
 		if (sv.configstrings[i][0])
 		{
 			MSG_WriteByte (&buf, svc_configstring);
 			MSG_WriteShort (&buf, i);
 			MSG_WriteString (&buf, sv.configstrings[i]);
+
+			if (buf.cursize + 67 >= buf.maxsize)
+			{
+				Com_Printf("not enough buffer space available.\n");
+				fclose(svs.demofile);
+				svs.demofile = NULL;
+				return;
+			}
 		}
+	}
 
 	// write it to the demo file
 	Com_DPrintf(DEVELOPER_MSG_NET, "signon message length: %i\n", buf.cursize);
@@ -994,7 +1078,9 @@ Kick everyone off, possibly in preparation for a new game
 void SV_KillServer_f (void)
 {
 	if (!svs.initialized)
+	{
 		return;
+	}
 	SV_Shutdown ("Server was killed.\n", false);
 	NET_Config ( false );	// close network sockets
 }
@@ -1078,7 +1164,9 @@ void SV_InitOperatorCommands (void)
 	Cmd_AddCommand ("setmaster", SV_SetMaster_f);
 
 	if ( dedicated->value )
+	{
 		Cmd_AddCommand ("say", SV_ConSay_f);
+	}
 
 	Cmd_AddCommand ("serverrecord", SV_ServerRecord_f);
 	Cmd_AddCommand ("serverstop", SV_ServerStop_f);
