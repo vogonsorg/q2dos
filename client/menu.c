@@ -2489,6 +2489,25 @@ void SearchGamespyGamesFunc( void *self ) // FS
 	SearchGamespyGames();
 }
 
+int Get_Vidscale(void)
+{
+	// FS: Special function for some what scaling of the server browser depending on video resolution height.
+	if (viddef.height <= 240)
+		return 20;
+	else if (viddef.height <= 300)
+		return 23;
+	else if (viddef.height <= 400)
+		return 27;
+	else if (viddef.height <= 480)
+		return 32;
+	else if (viddef.height <= 800)
+		return 38;
+	else if (viddef.height > 800)
+		return 40;
+
+	// FS: We must have some weirdo mode, so 20 should be OK.
+	return 20;
+}
 void JoinServer_MenuInit( void )
 {
 	int i;
@@ -2549,6 +2568,7 @@ void JoinGamespyServer_MenuInit( void )
 	s_joingamespyserver_menu.x = viddef.width * 0.50 - 120;
 	s_joingamespyserver_menu.y = viddef.height * 0.50 - 118;//58;
 	s_joingamespyserver_menu.nitems = 0;
+	s_joingamespyserver_page2_menu.cursor = 0; // FS: Set the cursor at the top
 
 	s_joingamespyserver_search_action.generic.type = MTYPE_ACTION;
 	s_joingamespyserver_search_action.generic.name	= "Query server list";
@@ -2563,7 +2583,7 @@ void JoinGamespyServer_MenuInit( void )
 	s_joingamespyserver_server_title.generic.x    = 80;
 	s_joingamespyserver_server_title.generic.y	   = 20;
 
-	vidscale = (viddef.height / (12 + sw_mode->intValue)) - 1; // FS: Yeah, yeah.  This kind of blows but we're using fixed tables anyways.
+	vidscale = Get_Vidscale() - 1; //(viddef.height / (12 + sw_mode->intValue)) - 1; // FS: Yeah, yeah.  This kind of blows but we're using fixed tables anyways.
 
 	for (i = 0; i <= MAX_GAMESPY_SERVERS; i++)
 	{
@@ -2614,6 +2634,7 @@ void JoinGamespyServerPage2_MenuInit( void )
 	s_joingamespyserver_page2_menu.x = viddef.width * 0.50 - 120;
 	s_joingamespyserver_page2_menu.y = viddef.height * 0.50 - 118;//58;
 	s_joingamespyserver_page2_menu.nitems = 0;
+	s_joingamespyserver_page2_menu.cursor = 0; // FS: Set the cursor at the top
 
 	s_joingamespyserver_search_action.generic.type = MTYPE_ACTION;
 	s_joingamespyserver_search_action.generic.name	= "Query server list";
@@ -2628,7 +2649,7 @@ void JoinGamespyServerPage2_MenuInit( void )
 	s_joingamespyserver_server_title.generic.x    = 80;
 	s_joingamespyserver_server_title.generic.y	   = 20;
 
-	vidscale = (viddef.height / (12 + sw_mode->intValue)) - 2; // FS: Yeah, yeah.  This kind of blows but we're using fixed tables anyways.
+	vidscale = Get_Vidscale() - 2;//(viddef.height / (12 + sw_mode->intValue)) - 2; // FS: Yeah, yeah.  This kind of blows but we're using fixed tables anyways.
 
 	for ( i = 0; i < vidscale; i++ )
 	{
@@ -2673,7 +2694,9 @@ void JoinGamespyServerPage2_MenuInit( void )
 	s_joingamespyserver_page3_action.generic.statusbar = "continue to page 3";
 
 	Menu_AddItem (&s_joingamespyserver_page2_menu, &s_joingamespyserver_page2_action );
-	Menu_AddItem (&s_joingamespyserver_page2_menu, &s_joingamespyserver_page3_action );
+
+	if (Get_Vidscale() < 32) // FS: Don't bother with this in real high res modes
+		Menu_AddItem (&s_joingamespyserver_page2_menu, &s_joingamespyserver_page3_action );
 }
 
 void JoinGamespyServerPage3_MenuInit( void )
@@ -2684,6 +2707,7 @@ void JoinGamespyServerPage3_MenuInit( void )
 	s_joingamespyserver_page3_menu.x = viddef.width * 0.50 - 120;
 	s_joingamespyserver_page3_menu.y = viddef.height * 0.50 - 118;//58;
 	s_joingamespyserver_page3_menu.nitems = 0;
+	s_joingamespyserver_page2_menu.cursor = 0; // FS: Set the cursor at the top
 
 	s_joingamespyserver_search_action.generic.type = MTYPE_ACTION;
 	s_joingamespyserver_search_action.generic.name	= "Query server list";
@@ -2698,7 +2722,7 @@ void JoinGamespyServerPage3_MenuInit( void )
 	s_joingamespyserver_server_title.generic.x    = 80;
 	s_joingamespyserver_server_title.generic.y	   = 20;
 
-	vidscale = (viddef.height / (12 + sw_mode->intValue)) - 2; // FS: Yeah, yeah.  This kind of blows but we're using fixed tables anyways.
+	vidscale = Get_Vidscale() - 2; //(viddef.height / (12 + sw_mode->intValue)) - 2; // FS: Yeah, yeah.  This kind of blows but we're using fixed tables anyways.
 
 	for ( i = 0; i < vidscale; i++ )
 	{
