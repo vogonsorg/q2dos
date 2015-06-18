@@ -10,7 +10,7 @@ What's required?
 What works?
 
 * VGA
-* SVGA
+* SVGA (LFB modes only)
 * Mouse
 * Keyboard
 * SoundBlaster and Gravis UltraSound Family
@@ -24,10 +24,15 @@ What doesn't work:
 * Loading/unloading of DLLs.  No other game modes, but connecting to custom
   servers is OK.
 * Playing in a Win9x or NTVDM DOS box.
+* TGA files from maps that were only optimized for OpenGL.
+* Some models from Whale's WODX server can crash the software renderer.  I'm
+  assuming they're custom player models as I tried replaying the same maps
+  later and got no crashes.  Until I can spot it, be on the lookout.
 
 Tips and other misc info:
 
-* Run /slist2 to get a gamespy list of active servers.  Use CTRL+C to abort.
+* Run /slist2 to get a gamespy list of active servers, or use the new browser
+  menu.  Run /srelist to print the previous list.  Use CTRL+C to abort.
 * Don't use EMM386.  If you get weird virtual alloc failed errors, 
   it's probably related to this.
 * Use FastVid for some faster linear frame buffering if you a P1 or P2-era PC.
@@ -40,6 +45,12 @@ Tips and other misc info:
   http://dk.toastednet.org/QDOS/GUSFIX.ZIP.
 * Make sure you are using the included CWSDPMI.EXE in your Q2 directory or you
   may get some issues with running out of memory.
+* To hear Ogg Vorbis tracks ingame, rip the Q2 CD's audio tracks (2-11) to 
+  track02-track11.ogg and put them in baseq2/music.  For the mission pack audio
+  tracks, rip the Ground Zero CD's audio tracks (2-11) to track12-track21.ogg.
+  Don't bother ripping the tracks from the Reckoning CD, as they're a mix of
+  the tracks on the Q2 and Ground Zero CDs.  Everything else will be taken care
+  of internally.
 
 Follow neozeed @
 http://virtuallyfun.superglobalmegacorp.com/
@@ -51,3 +62,6 @@ Various code from
 * Knightmare -- KMQuake II (http://www.markshan.com/knightmare/)
 * R1CH -- R1Q2 (http://old.r1ch.net/stuff/r1q2/)
 * Yamagi -- YamagiQ2 (http://www.yamagi.org/quake2/)
+* Berserk, CDawg, Pat Aftermoon, Anthony Jacques, David M. Pochron, Dopefish,
+  GuyP, Jitspoe, MH, MrG, NeVo, Skuller, Riot, R1ch, Psychospaz, Pooy, Sul, 
+  and others.
