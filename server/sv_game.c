@@ -226,9 +226,7 @@ PF_Configstring
 */
 // From Q2Pro
 // Some mods actually exploit CS_STATUSBAR to take space up to CS_AIRACCEL
-#define CS_SIZE(cs) \
-    ((cs) >= CS_STATUSBAR && (cs) < CS_AIRACCEL ? \
-      MAX_QPATH * (CS_AIRACCEL - (cs)) : MAX_QPATH)
+#define CS_SIZE(cs) ((cs) >= CS_STATUSBAR && (cs) < CS_AIRACCEL ? MAX_QPATH * (CS_AIRACCEL - (cs)) : MAX_QPATH)
 
 void PF_Configstring (int index, char *val)
 {
