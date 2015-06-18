@@ -2426,6 +2426,7 @@ void NullCursorDraw( void *self )
 {
 }
 
+static char	found[64];
 void SearchGamespyGames (void)
 {
 #ifdef GAMESPY
@@ -2436,6 +2437,8 @@ void SearchGamespyGames (void)
 	{
 		strcpy (gamespy_server_names[i], NO_SERVER_STRING);
 	}
+	s_joingamespyserver_search_action.generic.statusbar = "Querying GameSpy for servers, please wait. . .";
+	SCR_UpdateScreen();
 
 	M_DrawTextBox( 8, 120 - 48, 36, 4 );
 	M_Print( 16 + 16, 120 - 48 + 8,  "Querying GameSpy for servers, this" );
@@ -2445,12 +2448,20 @@ void SearchGamespyGames (void)
 
 	// the text box won't show up unless we do a buffer swap
 	re.EndFrame();
-	cls.disable_screen = true;
+	cls.disable_screen = Sys_Milliseconds();;
 
 	// send out info packets
-	CL_PingNetServers_f ();
-	cls.disable_screen = false;
+	if(cls.state != ca_disconnected)
+	{
+		cls.disable_screen = 0.0f;
+		s_joingamespyserver_search_action.generic.statusbar = "You must be disconnected to use this command!\n";
+		return;
+	}
 
+	CL_PingNetServers_f ();
+	cls.disable_screen = 0.0f;
+
+	re.EndFrame();
 	for (j = 0; j<MAX_GAMESPY_SERVERS; j++)
 	{
 		if (browserList[j].hostname[0] != 0)
@@ -2463,7 +2474,9 @@ void SearchGamespyGames (void)
 			break;
 		}
 	}
-	Com_Printf("Found %d servers\n", m_num_gamespy_servers);
+	Com_sprintf(found, sizeof(found), "Found %d servers\n", m_num_gamespy_servers);
+	s_joingamespyserver_search_action.generic.statusbar = found;
+	Com_Printf(found);
 #else
 	Com_Printf("Q2DOS compiled without GAMESPY!\n");
 #endif

@@ -272,7 +272,7 @@ typedef struct
 	qboolean	forcePacket;		// forces a packet to be sent the next frame
 
 // screen rendering information
-	float		disable_screen;		// showing loading plaque between levels
+	double		disable_screen;		// showing loading plaque between levels
 									// or changing rendering dlls
 									// if time gets > 30 seconds ahead, break it
 	int			disable_servercount;	// when we receive a frame and cl.servercount
