@@ -2304,7 +2304,7 @@ JOIN SERVER MENU
 =============================================================================
 */
 #define MAX_LOCAL_SERVERS 12 // FS: Was 8 -- Max 320x200 can handle
-#define MAX_GAMESPY_SERVERS 20 // FS
+#define MAX_GAMESPY_SERVERS 50 // FS
 
 static menuframework_s	s_joinserver_menu;
 static menuframework_s	s_joingamespyserver_menu; // FS
@@ -2380,13 +2380,13 @@ void ConnectGamespyServerFunc( void *self ) // FS
 	Com_Printf("Index: %i\n", index);
 	if ( Q_stricmp( gamespy_server_names[index], NO_SERVER_STRING ) == 0 )
 	{
-		Com_Printf("No server string!\n");
+//		Com_Printf("No server string!\n");
 		return;
 	}
 
 	if (index >= m_num_gamespy_servers)
 	{
-		Com_Printf("Index greater than m_num_servers!\n");
+//		Com_Printf("Index greater than m_num_servers!\n");
 		return;
 	}
 
@@ -2414,10 +2414,11 @@ void SearchGamespyGames (void)
 		strcpy (gamespy_server_names[i], NO_SERVER_STRING);
 	}
 
-	M_DrawTextBox( 8, 120 - 48, 36, 3 );
+	M_DrawTextBox( 8, 120 - 48, 36, 4 );
 	M_Print( 16 + 16, 120 - 48 + 8,  "Querying GameSpy for servers, this" );
 	M_Print( 16 + 16, 120 - 48 + 16, "could take up to a minute, so" );
 	M_Print( 16 + 16, 120 - 48 + 24, "please be patient." );
+	M_Print( 16 + 16, 120 - 48 + 32, "Use CTRL+C to abort." );
 
 	// the text box won't show up unless we do a buffer swap
 	re.EndFrame();
@@ -2439,6 +2440,7 @@ void SearchGamespyGames (void)
 			break;
 		}
 	}
+	Com_Printf("Found %d servers\n", m_num_gamespy_servers);
 }
 
 void SearchLocalGames( void )
@@ -2525,7 +2527,8 @@ void JoinServer_MenuInit( void )
 
 void JoinGamespyServer_MenuInit( void )
 {
-	int i;
+	int i, vidscale;
+	extern	cvar_t	*sw_mode;
 
 	s_joingamespyserver_menu.x = viddef.width * 0.50 - 120;
 	s_joingamespyserver_menu.y = viddef.height * 0.50 - 118;//58;
@@ -2560,8 +2563,16 @@ void JoinGamespyServer_MenuInit( void )
 	Menu_AddItem( &s_joingamespyserver_menu, &s_joingamespyserver_search_action );
 	Menu_AddItem( &s_joingamespyserver_menu, &s_joingamespyserver_server_title );
 
+	i = 0;
+	vidscale = viddef.height / (12 + sw_mode->intValue);
 	for ( i = 0; i < MAX_GAMESPY_SERVERS; i++ )
+	{
+		if (i >= vidscale)
+			break;
+//		else if (viddef.height == 480 && i >= 32)
+//			break;
 		Menu_AddItem( &s_joingamespyserver_menu, &s_joingamespyserver_server_actions[i] );
+	}
 
 	gamespy_initialized = true;
 
