@@ -4,7 +4,7 @@
 
 #include "../client/client.h"
 #include "../client/snd_loc.h"
-#include "../wss/wss.h"
+#include "wss.h"
 
 int	havegus;
 static  short *dma_buffer = NULL; // sezero
