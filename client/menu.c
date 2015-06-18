@@ -2314,7 +2314,7 @@ static menuaction_s		s_joinserver_search_action;
 static menuaction_s		s_joingamespyserver_search_action; // FS
 static menuaction_s		s_joinserver_address_book_action;
 static menuaction_s		s_joinserver_server_actions[MAX_LOCAL_SERVERS];
-static menuaction_s		s_joingamespyserver_server_actions[MAX_LOCAL_SERVERS]; // FS
+static menuaction_s		s_joingamespyserver_server_actions[MAX_GAMESPY_SERVERS]; // FS
 
 int		m_num_servers;
 int		m_num_gamespy_servers; // FS
@@ -2408,7 +2408,7 @@ void SearchGamespyGames (void)
 {
 	int		i, j;
 
-	m_num_servers = 0;
+	m_num_gamespy_servers = 0;
 	for (i=0 ; i<MAX_GAMESPY_SERVERS ; i++)
 	{
 		strcpy (gamespy_server_names[i], NO_SERVER_STRING);
