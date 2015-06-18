@@ -714,21 +714,35 @@ void CL_Disconnect_f (void)
 #ifdef GAMESPY
 	if(serverlist != NULL) // FS: Immediately abort gspy scans
 	{
-		Com_Printf("\x02Server scan aborted!\n");
 		cls.gamespyupdate = 0;
 		cls.gamespypercent = 0;
-		S_GamespySound ("gamespy/abort.wav"); // FS: FIXME
+		Com_Printf("\x02Server scan aborted!\n");
+		S_GamespySound ("gamespy/abort.wav");
 		ServerListHalt( serverlist );
 		ServerListClear( serverlist );
 	    ServerListFree(serverlist);
 		serverlist = NULL; // FS: This is on purpose so future ctrl+c's won't try to close empty serverlists
 	}
 #endif
-	
+
 	Com_Error (ERR_DROP, "Disconnected from server");
 }
 
 
+void CL_Gspystop_f (void)
+{
+
+#ifdef GAMESPY
+	if(serverlist != NULL) // FS: Immediately abort gspy scans
+	{
+		cls.gamespyupdate = 0;
+		cls.gamespypercent = 0;
+		Com_Printf("\x02Server scan aborted!\n");
+		S_GamespySound ("gamespy/abort.wav");
+		ServerListHalt( serverlist );
+	}
+#endif
+}
 /*
 ====================
 CL_Packet_f
@@ -1742,6 +1756,7 @@ void CL_InitLocal (void)
 
 	Cmd_AddCommand ("changing", CL_Changing_f);
 	Cmd_AddCommand ("disconnect", CL_Disconnect_f);
+	Cmd_AddCommand ("gspystop", CL_Gspystop_f); // FS
 	Cmd_AddCommand ("record", CL_Record_f);
 	Cmd_AddCommand ("stop", CL_Stop_f);
 

@@ -42,6 +42,7 @@ void M_Menu_Main_f (void);
 		void M_Menu_Credits_f( void );
 	void M_Menu_Multiplayer_f( void );
 		void M_Menu_JoinServer_f (void);
+		void M_Menu_JoinGamespyServer_f (void); // FS
 			void M_Menu_AddressBook_f( void );
 		void M_Menu_StartServer_f (void);
 			void M_Menu_DMOptions_f (void);
@@ -498,6 +499,7 @@ MULTIPLAYER MENU
 =======================================================================
 */
 static menuframework_s	s_multiplayer_menu;
+static menuaction_s		s_join_gamespy_server_action; // FS
 static menuaction_s		s_join_network_server_action;
 static menuaction_s		s_start_network_server_action;
 static menuaction_s		s_player_setup_action;
@@ -515,9 +517,14 @@ static void PlayerSetupFunc( void *unused )
 	M_Menu_PlayerConfig_f();
 }
 
-static void JoinNetworkServerFunc( void *unused )
+static void JoinNetworkServerFunc( void *unused ) // FS
 {
 	M_Menu_JoinServer_f();
+}
+
+static void JoinGamespyServerFunc( void *unused )
+{
+	M_Menu_JoinGamespyServer_f();
 }
 
 static void StartNetworkServerFunc( void *unused )
@@ -530,27 +537,35 @@ void Multiplayer_MenuInit( void )
 	s_multiplayer_menu.x = viddef.width * 0.50 - 64;
 	s_multiplayer_menu.nitems = 0;
 
+	s_join_gamespy_server_action.generic.type	= MTYPE_ACTION;
+	s_join_gamespy_server_action.generic.flags  = QMF_LEFT_JUSTIFY;
+	s_join_gamespy_server_action.generic.x		= 0;
+	s_join_gamespy_server_action.generic.y		= 0;
+	s_join_gamespy_server_action.generic.name	= " join gamespy server";
+	s_join_gamespy_server_action.generic.callback = JoinGamespyServerFunc;
+
 	s_join_network_server_action.generic.type	= MTYPE_ACTION;
 	s_join_network_server_action.generic.flags  = QMF_LEFT_JUSTIFY;
 	s_join_network_server_action.generic.x		= 0;
-	s_join_network_server_action.generic.y		= 0;
+	s_join_network_server_action.generic.y		= 10;
 	s_join_network_server_action.generic.name	= " join network server";
 	s_join_network_server_action.generic.callback = JoinNetworkServerFunc;
 
 	s_start_network_server_action.generic.type	= MTYPE_ACTION;
 	s_start_network_server_action.generic.flags  = QMF_LEFT_JUSTIFY;
 	s_start_network_server_action.generic.x		= 0;
-	s_start_network_server_action.generic.y		= 10;
+	s_start_network_server_action.generic.y		= 20;
 	s_start_network_server_action.generic.name	= " start network server";
 	s_start_network_server_action.generic.callback = StartNetworkServerFunc;
 
 	s_player_setup_action.generic.type	= MTYPE_ACTION;
 	s_player_setup_action.generic.flags  = QMF_LEFT_JUSTIFY;
 	s_player_setup_action.generic.x		= 0;
-	s_player_setup_action.generic.y		= 20;
+	s_player_setup_action.generic.y		= 30;
 	s_player_setup_action.generic.name	= " player setup";
 	s_player_setup_action.generic.callback = PlayerSetupFunc;
 
+	Menu_AddItem( &s_multiplayer_menu, ( void * ) &s_join_gamespy_server_action ); // FS
 	Menu_AddItem( &s_multiplayer_menu, ( void * ) &s_join_network_server_action );
 	Menu_AddItem( &s_multiplayer_menu, ( void * ) &s_start_network_server_action );
 	Menu_AddItem( &s_multiplayer_menu, ( void * ) &s_player_setup_action );
@@ -2289,18 +2304,26 @@ JOIN SERVER MENU
 =============================================================================
 */
 #define MAX_LOCAL_SERVERS 12 // FS: Was 8 -- Max 320x200 can handle
+#define MAX_GAMESPY_SERVERS 20 // FS
 
 static menuframework_s	s_joinserver_menu;
+static menuframework_s	s_joingamespyserver_menu; // FS
 static menuseparator_s	s_joinserver_server_title;
+static menuseparator_s	s_joingamespyserver_server_title; // FS
 static menuaction_s		s_joinserver_search_action;
+static menuaction_s		s_joingamespyserver_search_action; // FS
 static menuaction_s		s_joinserver_address_book_action;
 static menuaction_s		s_joinserver_server_actions[MAX_LOCAL_SERVERS];
+static menuaction_s		s_joingamespyserver_server_actions[MAX_LOCAL_SERVERS]; // FS
 
 int		m_num_servers;
+int		m_num_gamespy_servers; // FS
+static	qboolean	gamespy_initialized; // FS
 #define	NO_SERVER_STRING	"<no server>"
 
 // user readable information
 static char local_server_names[MAX_LOCAL_SERVERS][80];
+static char gamespy_server_names[MAX_GAMESPY_SERVERS][80];
 
 // network address
 static netadr_t local_server_netadr[MAX_LOCAL_SERVERS];
@@ -2332,21 +2355,41 @@ void JoinServerFunc( void *self )
 
 	index = ( menuaction_s * ) self - s_joinserver_server_actions;
 
-	Com_Printf("Index: %i\n", index);
 	if ( Q_stricmp( local_server_names[index], NO_SERVER_STRING ) == 0 )
 	{
-		Com_Printf("No server string!\n");
 		return;
 	}
 
 	if (index >= m_num_servers)
 	{
+		return;
+	}
+
+	Com_sprintf (buffer, sizeof(buffer), "connect %s\n", NET_AdrToString (local_server_netadr[index]));
+	Cbuf_AddText (buffer);
+	M_ForceMenuOff ();
+}
+
+void ConnectGamespyServerFunc( void *self ) // FS
+{
+	char	buffer[128];
+	int		index;
+
+	index = ( menuaction_s * ) self - s_joingamespyserver_server_actions;
+
+	Com_Printf("Index: %i\n", index);
+	if ( Q_stricmp( gamespy_server_names[index], NO_SERVER_STRING ) == 0 )
+	{
+		Com_Printf("No server string!\n");
+		return;
+	}
+
+	if (index >= m_num_gamespy_servers)
+	{
 		Com_Printf("Index greater than m_num_servers!\n");
 		return;
 	}
 
-//	Com_sprintf (buffer, sizeof(buffer), "connect %s\n", NET_AdrToString (local_server_netadr[index]));
-	// FS: FIXME TODO make this all it's own thing.
 	Com_sprintf (buffer, sizeof(buffer), "connect %s:%d\n", browserList[index].ip, browserList[index].port);
 	Cbuf_AddText (buffer);
 	M_ForceMenuOff ();
@@ -2366,8 +2409,10 @@ void SearchGamespyGames (void)
 	int		i, j;
 
 	m_num_servers = 0;
-	for (i=0 ; i<MAX_LOCAL_SERVERS ; i++)
-		strcpy (local_server_names[i], NO_SERVER_STRING);
+	for (i=0 ; i<MAX_GAMESPY_SERVERS ; i++)
+	{
+		strcpy (gamespy_server_names[i], NO_SERVER_STRING);
+	}
 
 	M_DrawTextBox( 8, 120 - 48, 36, 3 );
 	M_Print( 16 + 16, 120 - 48 + 8,  "Querying GameSpy for servers, this" );
@@ -2379,29 +2424,26 @@ void SearchGamespyGames (void)
 	cls.disable_screen = true;
 
 	// send out info packets
-	// FS: FIXME TODO -- Make this all it's own thing
 	CL_PingNetServers_f ();
 	cls.disable_screen = false;
 
-	for (j = 0; j<MAX_LOCAL_SERVERS; j++)
+	for (j = 0; j<MAX_GAMESPY_SERVERS; j++)
 	{
 		if (browserList[j].hostname[0] != 0)
 		{
-			Com_sprintf(local_server_names[j], sizeof(local_server_names[j]), "%s [%d] %d/%d", browserList[j].hostname, browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
-			m_num_servers++;
+			Com_sprintf(gamespy_server_names[j], sizeof(gamespy_server_names[j]), "%s [%d] %d/%d", browserList[j].hostname, browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
+			m_num_gamespy_servers++;
 		}
 		else
+		{
 			break;
+		}
 	}
 }
 
 void SearchLocalGames( void )
 {
 	int		i;
-
-	// FS: FIXME TODO -- Make this all it's own thing
-	SearchGamespyGames();
-	return;
 
 	m_num_servers = 0;
 	for (i=0 ; i<MAX_LOCAL_SERVERS ; i++)
@@ -2422,6 +2464,11 @@ void SearchLocalGames( void )
 void SearchLocalGamesFunc( void *self )
 {
 	SearchLocalGames();
+}
+
+void SearchGamespyGamesFunc( void *self ) // FS
+{
+	SearchGamespyGames();
 }
 
 void JoinServer_MenuInit( void )
@@ -2476,12 +2523,56 @@ void JoinServer_MenuInit( void )
 	SearchLocalGames();
 }
 
+void JoinGamespyServer_MenuInit( void )
+{
+	int i;
+
+	s_joingamespyserver_menu.x = viddef.width * 0.50 - 120;
+	s_joingamespyserver_menu.y = viddef.height * 0.50 - 118;//58;
+	s_joingamespyserver_menu.nitems = 0;
+
+	s_joingamespyserver_search_action.generic.type = MTYPE_ACTION;
+	s_joingamespyserver_search_action.generic.name	= "Query server list";
+	s_joingamespyserver_search_action.generic.flags	= QMF_LEFT_JUSTIFY;
+	s_joingamespyserver_search_action.generic.x	= 0;
+	s_joingamespyserver_search_action.generic.y	= 0;
+	s_joingamespyserver_search_action.generic.callback = SearchGamespyGamesFunc;
+	s_joingamespyserver_search_action.generic.statusbar = "search for servers";
+
+	s_joingamespyserver_server_title.generic.type = MTYPE_SEPARATOR;
+	s_joingamespyserver_server_title.generic.name = "connect to...";
+	s_joingamespyserver_server_title.generic.x    = 80;
+	s_joingamespyserver_server_title.generic.y	   = 20;
+
+	for ( i = 0; i < MAX_GAMESPY_SERVERS; i++ )
+	{
+		s_joingamespyserver_server_actions[i].generic.type	= MTYPE_ACTION;
+		if(!gamespy_initialized)
+			strcpy (gamespy_server_names[i], NO_SERVER_STRING);
+		s_joingamespyserver_server_actions[i].generic.name	= gamespy_server_names[i];
+		s_joingamespyserver_server_actions[i].generic.flags	= QMF_LEFT_JUSTIFY;
+		s_joingamespyserver_server_actions[i].generic.x		= 0;
+		s_joingamespyserver_server_actions[i].generic.y		= 30 + i*10;
+		s_joingamespyserver_server_actions[i].generic.callback = ConnectGamespyServerFunc;
+		s_joingamespyserver_server_actions[i].generic.statusbar = "press ENTER to connect";
+	}
+
+	Menu_AddItem( &s_joingamespyserver_menu, &s_joingamespyserver_search_action );
+	Menu_AddItem( &s_joingamespyserver_menu, &s_joingamespyserver_server_title );
+
+	for ( i = 0; i < MAX_GAMESPY_SERVERS; i++ )
+		Menu_AddItem( &s_joingamespyserver_menu, &s_joingamespyserver_server_actions[i] );
+
+	gamespy_initialized = true;
+
+//	SearchGamespyGames();
+}
+
 void JoinServer_MenuDraw(void)
 {
 	M_Banner( "m_banner_join_server" );
 	Menu_Draw( &s_joinserver_menu );
 }
-
 
 const char *JoinServer_MenuKey( int key )
 {
@@ -2494,6 +2585,22 @@ void M_Menu_JoinServer_f (void)
 	M_PushMenu( JoinServer_MenuDraw, JoinServer_MenuKey );
 }
 
+void JoinGamespyServer_MenuDraw(void) // FS
+{
+//	M_Banner( "m_banner_join_server" );
+	Menu_Draw( &s_joingamespyserver_menu );
+}
+
+const char *JoinGamespyServer_MenuKey( int key ) // FS
+{
+	return Default_MenuKey( &s_joingamespyserver_menu, key );
+}
+
+void M_Menu_JoinGamespyServer_f (void) // FS
+{
+	JoinGamespyServer_MenuInit();
+	M_PushMenu( JoinGamespyServer_MenuDraw, JoinGamespyServer_MenuKey );
+}
 
 /*
 =============================================================================
@@ -4175,6 +4282,7 @@ void M_Init (void)
 		Cmd_AddCommand ("menu_loadgame", M_Menu_LoadGame_f);
 		Cmd_AddCommand ("menu_savegame", M_Menu_SaveGame_f);
 		Cmd_AddCommand ("menu_joinserver", M_Menu_JoinServer_f);
+		Cmd_AddCommand ("menu_gamespy", M_Menu_JoinGamespyServer_f); // fS
 			Cmd_AddCommand ("menu_addressbook", M_Menu_AddressBook_f);
 		Cmd_AddCommand ("menu_startserver", M_Menu_StartServer_f);
 			Cmd_AddCommand ("menu_dmoptions", M_Menu_DMOptions_f);
@@ -4229,10 +4337,23 @@ M_Keydown
 void M_Keydown (int key)
 {
 	const char *s;
+	extern	qboolean keydown[256];
 
 	if (m_keyfunc)
 		if ( ( s = m_keyfunc( key ) ) != 0 )
 			S_StartLocalSound( ( char * ) s );
+
+	if( key == 'c' ) // FS: Added
+	{
+		if ( keydown[K_CTRL] )
+		{
+			Cbuf_AddText ("gspystop\n");
+			if (cls.gamespyupdate)
+				Cbuf_Execute(); // FS: Fire immediately because of gamespy crap
+			return;
+		}
+	}
+
 }
 
 
