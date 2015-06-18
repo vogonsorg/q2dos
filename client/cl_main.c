@@ -2391,7 +2391,7 @@ void CL_Shutdown(void)
 
 //GAMESPY
 #ifdef GAMESPY
-static gspyCur;
+static int gspyCur;
 gamespyBrowser_t browserList[MAX_SERVERS];
 
 void CL_PrintBrowserList_f (void)
