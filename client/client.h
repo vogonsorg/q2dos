@@ -690,6 +690,7 @@ typedef struct
 }
 gamespyBrowser_t;
 extern gamespyBrowser_t browserList[MAX_SERVERS];
+void CL_PingNetServers_f (void);
 
 void M_Init (void);
 void M_Keydown (int key);

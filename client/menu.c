@@ -2288,7 +2288,7 @@ JOIN SERVER MENU
 
 =============================================================================
 */
-#define MAX_LOCAL_SERVERS 8
+#define MAX_LOCAL_SERVERS 12 // FS: Was 8 -- Max 320x200 can handle
 
 static menuframework_s	s_joinserver_menu;
 static menuseparator_s	s_joinserver_server_title;
@@ -2332,13 +2332,22 @@ void JoinServerFunc( void *self )
 
 	index = ( menuaction_s * ) self - s_joinserver_server_actions;
 
+	Com_Printf("Index: %i\n", index);
 	if ( Q_stricmp( local_server_names[index], NO_SERVER_STRING ) == 0 )
+	{
+		Com_Printf("No server string!\n");
 		return;
+	}
 
 	if (index >= m_num_servers)
+	{
+		Com_Printf("Index greater than m_num_servers!\n");
 		return;
+	}
 
-	Com_sprintf (buffer, sizeof(buffer), "connect %s\n", NET_AdrToString (local_server_netadr[index]));
+//	Com_sprintf (buffer, sizeof(buffer), "connect %s\n", NET_AdrToString (local_server_netadr[index]));
+	// FS: FIXME TODO make this all it's own thing.
+	Com_sprintf (buffer, sizeof(buffer), "connect %s:%d\n", browserList[index].ip, browserList[index].port);
 	Cbuf_AddText (buffer);
 	M_ForceMenuOff ();
 }
@@ -2352,9 +2361,47 @@ void NullCursorDraw( void *self )
 {
 }
 
+void SearchGamespyGames (void)
+{
+	int		i, j;
+
+	m_num_servers = 0;
+	for (i=0 ; i<MAX_LOCAL_SERVERS ; i++)
+		strcpy (local_server_names[i], NO_SERVER_STRING);
+
+	M_DrawTextBox( 8, 120 - 48, 36, 3 );
+	M_Print( 16 + 16, 120 - 48 + 8,  "Querying GameSpy for servers, this" );
+	M_Print( 16 + 16, 120 - 48 + 16, "could take up to a minute, so" );
+	M_Print( 16 + 16, 120 - 48 + 24, "please be patient." );
+
+	// the text box won't show up unless we do a buffer swap
+	re.EndFrame();
+	cls.disable_screen = true;
+
+	// send out info packets
+	// FS: FIXME TODO -- Make this all it's own thing
+	CL_PingNetServers_f ();
+	cls.disable_screen = false;
+
+	for (j = 0; j<MAX_LOCAL_SERVERS; j++)
+	{
+		if (browserList[j].hostname[0] != 0)
+		{
+			Com_sprintf(local_server_names[j], sizeof(local_server_names[j]), "%s [%d] %d/%d", browserList[j].hostname, browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
+			m_num_servers++;
+		}
+		else
+			break;
+	}
+}
+
 void SearchLocalGames( void )
 {
 	int		i;
+
+	// FS: FIXME TODO -- Make this all it's own thing
+	SearchGamespyGames();
+	return;
 
 	m_num_servers = 0;
 	for (i=0 ; i<MAX_LOCAL_SERVERS ; i++)
@@ -2421,7 +2468,7 @@ void JoinServer_MenuInit( void )
 	Menu_AddItem( &s_joinserver_menu, &s_joinserver_server_title );
 	Menu_AddItem( &s_joinserver_menu, &s_joinserver_search_action );
 
-	for ( i = 0; i < 8; i++ )
+	for ( i = 0; i < MAX_LOCAL_SERVERS; i++ )
 		Menu_AddItem( &s_joinserver_menu, &s_joinserver_server_actions[i] );
 
 //	Menu_Center( &s_joinserver_menu );

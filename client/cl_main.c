@@ -2442,6 +2442,12 @@ void CL_PingNetServers_f (void)
 		return;
 	}
 
+	if(cls.gamespyupdate)
+	{
+		Com_Printf("Error: Already querying the GameSpy Master!\n");
+		return;
+	}
+
 	gspyCur = 0;
 	memset(&browserList, 0, sizeof(browserList));
 
