@@ -2436,10 +2436,10 @@ void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1,
 			Q_strncpyz(browserList[gspyCur].mapname, ServerGetStringValue(server,"mapname","(NO MAP)"), sizeof(browserList[gspyCur].mapname));
 			browserList[gspyCur].curPlayers = ServerGetIntValue(server,"numplayers",0);
 			browserList[gspyCur].maxPlayers = ServerGetIntValue(server,"maxclients",0);
-			Com_Printf("%s:%d [%d] %s %d/%d %s\n", browserList[gspyCur].ip, browserList[gspyCur].port, browserList[gspyCur].ping, browserList[gspyCur].hostname, browserList[gspyCur].curPlayers, browserList[gspyCur].maxPlayers, browserList[gspyCur].mapname);
-#if 0 // FS: Old way
-			Com_Printf ( "%s:%d [%d] %s %d/%d %s\n", ServerGetAddress(server), ServerGetQueryPort(server), ServerGetPing(server), ServerGetStringValue(server, "hostname","(NONE)"), ServerGetIntValue(server,"numplayers",0), ServerGetIntValue(server,"maxclients",0), ServerGetStringValue(server,"mapname","(NO MAP)"));
-#endif
+
+			if (cls.key_dest == key_console) // FS: Only print this from an slist2 command, not the server browser.
+				Com_Printf("%s:%d [%d] %s %d/%d %s\n", browserList[gspyCur].ip, browserList[gspyCur].port, browserList[gspyCur].ping, browserList[gspyCur].hostname, browserList[gspyCur].curPlayers, browserList[gspyCur].maxPlayers, browserList[gspyCur].mapname);
+
 			gspyCur++;
 		}
 	}
@@ -2478,7 +2478,7 @@ void CL_PingNetServers_f (void)
 	cls.gamespyupdate = 1;
 	cls.gamespypercent = 0;
 
-	allocatedSockets = bound(5, cl_master_server_queries->value, 100);
+	allocatedSockets = bound(5, cl_master_server_queries->value, 40);
 
 	SCR_UpdateScreen(); // FS: Force an update so the percentage bar shows some progress
 	serverlist = ServerListNew("quake2","quake2",goa_secret_key,allocatedSockets,ListCallBack,GCALLBACK_FUNCTION,NULL);

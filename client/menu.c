@@ -4604,5 +4604,3 @@ void M_Keydown (int key)
 	}
 
 }
-
-
