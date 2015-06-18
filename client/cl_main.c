@@ -122,9 +122,9 @@ extern	cvar_t *allow_download_maps;
 
 // FS: For Gamespy
 static    GServerList serverlist; // FS: Moved outside so we can abort whenever we need to
-
 void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2);
 void CL_PingNetServers_f (void);
+void CL_PrintBrowserList_f (void);
 
 /*
 ==========================
@@ -1789,6 +1789,7 @@ void CL_InitLocal (void)
 	Cmd_AddCommand ("weapprev", NULL);
 #ifdef GAMESPY
 	Cmd_AddCommand ("slist2", CL_PingNetServers_f); // FS: For Gamespy
+	Cmd_AddCommand ("srelist", CL_PrintBrowserList_f);
 #endif
 }
 
@@ -2390,23 +2391,50 @@ void CL_Shutdown(void)
 
 //GAMESPY
 #ifdef GAMESPY
+static gspyCur;
+gamespyBrowser_t browserList[MAX_SERVERS];
+
+void CL_PrintBrowserList_f (void)
+{
+	int i = 0;
+	for ( i = 0; i <= MAX_SERVERS; i++)
+	{
+		if(browserList[i].hostname[0] != 0)
+			Com_Printf("%02d:  %s:%d [%d] %s %d/%d %s\n", i+1, browserList[i].ip, browserList[i].port, browserList[i].ping, browserList[i].hostname, browserList[i].curPlayers, browserList[i].maxPlayers, browserList[i].mapname);
+		else // FS: if theres nothing there the rest of the list is old garbage, bye.
+			break;
+	}
+}
+
 void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2)
 {
 	GServer server;
 	if (msg == LIST_PROGRESS)
 	{
 		server = (GServer)param1;
-		if(ServerGetIntValue(server,"numplayers",0)) // FS: Only show populated servers
-			Com_Printf ( "%s:%d [%d] %s %d/%d %s\n",ServerGetAddress(server),ServerGetQueryPort(server), ServerGetPing(server),ServerGetStringValue(server, "hostname","(NONE)"), ServerGetIntValue(server,"numplayers",0), ServerGetIntValue(server,"maxclients",0), ServerGetStringValue(server,"mapname","(NO MAP)"));
+		if(ServerGetIntValue(server,"numplayers",0) && gspyCur <= MAX_SERVERS) // FS: Only show populated servers
+		{
+			Q_strncpyz(browserList[gspyCur].ip, ServerGetAddress(server), sizeof(browserList[gspyCur].ip));
+			browserList[gspyCur].port = ServerGetQueryPort(server);
+			browserList[gspyCur].ping = ServerGetPing(server);
+			Q_strncpyz(browserList[gspyCur].hostname, ServerGetStringValue(server, "hostname","(NONE)"), sizeof(browserList[gspyCur].hostname));
+			Q_strncpyz(browserList[gspyCur].mapname, ServerGetStringValue(server,"mapname","(NO MAP)"), sizeof(browserList[gspyCur].mapname));
+			browserList[gspyCur].curPlayers = ServerGetIntValue(server,"numplayers",0);
+			browserList[gspyCur].maxPlayers = ServerGetIntValue(server,"maxclients",0);
+			Com_Printf("%s:%d [%d] %s %d/%d %s\n", browserList[gspyCur].ip, browserList[gspyCur].port, browserList[gspyCur].ping, browserList[gspyCur].hostname, browserList[gspyCur].curPlayers, browserList[gspyCur].maxPlayers, browserList[gspyCur].mapname);
+#if 0 // FS: Old way
+			Com_Printf ( "%s:%d [%d] %s %d/%d %s\n", ServerGetAddress(server), ServerGetQueryPort(server), ServerGetPing(server), ServerGetStringValue(server, "hostname","(NONE)"), ServerGetIntValue(server,"numplayers",0), ServerGetIntValue(server,"maxclients",0), ServerGetStringValue(server,"mapname","(NO MAP)"));
+#endif
+			gspyCur++;
+		}
 	}
-
 }
 
 void CL_PingNetServers_f (void)
 {
 	char goa_secret_key[256];
 	int error = 0; // FS: Grab the error code
-	int allocatedSockets; // FS: FIXME
+	int allocatedSockets;
 
 	if(cls.state != ca_disconnected)
 	{
@@ -2414,12 +2442,16 @@ void CL_PingNetServers_f (void)
 		return;
 	}
 
+	gspyCur = 0;
+	memset(&browserList, 0, sizeof(browserList));
+
 	goa_secret_key[0] = 'r';
 	goa_secret_key[1] = 't';
 	goa_secret_key[2] = 'W';
 	goa_secret_key[3] = '0';
 	goa_secret_key[4] = 'x';
 	goa_secret_key[5] = 'g';
+	goa_secret_key[6] = '\0';
 
 	Com_Printf("\x02Grabbing populated server list from GameSpy master. . .\n");
 	cls.gamespyupdate = 1;

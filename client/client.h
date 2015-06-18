@@ -675,6 +675,22 @@ void CL_TrapParticles (entity_t *ent);
 //
 // menus
 //
+
+#define MAX_SERVERS 50
+// FS: Gamespy browser
+typedef struct
+{
+	char ip[15];
+	int port;
+	int ping;
+	char hostname[32];
+	int curPlayers;
+	int maxPlayers;
+	char mapname[32];
+}
+gamespyBrowser_t;
+extern gamespyBrowser_t browserList[MAX_SERVERS];
+
 void M_Init (void);
 void M_Keydown (int key);
 void M_Draw (void);
