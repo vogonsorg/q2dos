@@ -549,12 +549,14 @@ void Multiplayer_MenuInit( void )
 	s_multiplayer_menu.x = viddef.width * 0.50 - 64;
 	s_multiplayer_menu.nitems = 0;
 
+#ifdef GAMESPY
 	s_join_gamespy_server_action.generic.type	= MTYPE_ACTION;
 	s_join_gamespy_server_action.generic.flags  = QMF_LEFT_JUSTIFY;
 	s_join_gamespy_server_action.generic.x		= 0;
 	s_join_gamespy_server_action.generic.y		= 0;
 	s_join_gamespy_server_action.generic.name	= " join gamespy server";
 	s_join_gamespy_server_action.generic.callback = JoinGamespyServerFunc;
+#endif
 
 	s_join_network_server_action.generic.type	= MTYPE_ACTION;
 	s_join_network_server_action.generic.flags  = QMF_LEFT_JUSTIFY;
@@ -577,7 +579,9 @@ void Multiplayer_MenuInit( void )
 	s_player_setup_action.generic.name	= " player setup";
 	s_player_setup_action.generic.callback = PlayerSetupFunc;
 
+#ifdef GAMESPY
 	Menu_AddItem( &s_multiplayer_menu, ( void * ) &s_join_gamespy_server_action ); // FS
+#endif
 	Menu_AddItem( &s_multiplayer_menu, ( void * ) &s_join_network_server_action );
 	Menu_AddItem( &s_multiplayer_menu, ( void * ) &s_start_network_server_action );
 	Menu_AddItem( &s_multiplayer_menu, ( void * ) &s_player_setup_action );
@@ -2388,27 +2392,29 @@ void JoinServerFunc( void *self )
 
 void ConnectGamespyServerFunc( void *self ) // FS
 {
+#ifdef GAMESPY
 	char	buffer[128];
 	int		index;
 
 	index = ( menuaction_s * ) self - s_joingamespyserver_server_actions;
 
-	Com_Printf("Index: %i\n", index);
 	if ( Q_stricmp( gamespy_server_names[index], NO_SERVER_STRING ) == 0 )
 	{
-//		Com_Printf("No server string!\n");
 		return;
 	}
 
 	if (index >= m_num_gamespy_servers)
 	{
-//		Com_Printf("Index greater than m_num_servers!\n");
 		return;
 	}
 
 	Com_sprintf (buffer, sizeof(buffer), "connect %s:%d\n", browserList[index].ip, browserList[index].port);
 	Cbuf_AddText (buffer);
 	M_ForceMenuOff ();
+#else
+	Com_Printf("Q2DOS compiled without GAMEPSY!\n");
+	M_ForceMenuOff ();
+#endif
 }
 
 void AddressBookFunc( void *self )
@@ -2422,6 +2428,7 @@ void NullCursorDraw( void *self )
 
 void SearchGamespyGames (void)
 {
+#ifdef GAMESPY
 	int		i, j;
 
 	m_num_gamespy_servers = 0;
@@ -2457,6 +2464,9 @@ void SearchGamespyGames (void)
 		}
 	}
 	Com_Printf("Found %d servers\n", m_num_gamespy_servers);
+#else
+	Com_Printf("Q2DOS compiled without GAMESPY!\n");
+#endif
 }
 
 void SearchLocalGames( void )
@@ -4519,9 +4529,9 @@ void M_Init (void)
 		Cmd_AddCommand ("menu_loadgame", M_Menu_LoadGame_f);
 		Cmd_AddCommand ("menu_savegame", M_Menu_SaveGame_f);
 		Cmd_AddCommand ("menu_joinserver", M_Menu_JoinServer_f);
+#ifdef GAMESPY
 		Cmd_AddCommand ("menu_gamespy", M_Menu_JoinGamespyServer_f); // FS
-			Cmd_AddCommand ("menu_gamespy2", M_Menu_JoinGamespyServerPage2_f); // FS
-			Cmd_AddCommand ("menu_gamespy3", M_Menu_JoinGamespyServerPage3_f); // FS
+#endif
 			Cmd_AddCommand ("menu_addressbook", M_Menu_AddressBook_f);
 		Cmd_AddCommand ("menu_startserver", M_Menu_StartServer_f);
 			Cmd_AddCommand ("menu_dmoptions", M_Menu_DMOptions_f);
