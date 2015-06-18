@@ -2437,7 +2437,7 @@ void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1,
 			browserList[gspyCur].curPlayers = ServerGetIntValue(server,"numplayers",0);
 			browserList[gspyCur].maxPlayers = ServerGetIntValue(server,"maxclients",0);
 
-			if (cls.key_dest == key_console) // FS: Only print this from an slist2 command, not the server browser.
+			if (cls.key_dest != key_menu) // FS: Only print this from an slist2 command, not the server browser.
 				Com_Printf("%s:%d [%d] %s %d/%d %s\n", browserList[gspyCur].ip, browserList[gspyCur].port, browserList[gspyCur].ping, browserList[gspyCur].hostname, browserList[gspyCur].curPlayers, browserList[gspyCur].maxPlayers, browserList[gspyCur].mapname);
 
 			gspyCur++;
