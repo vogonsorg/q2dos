@@ -31,6 +31,8 @@ extern cvar_t *scr_viewsize;
 
 static cvar_t *sw_mode;
 static cvar_t *sw_stipplealpha;
+static cvar_t *sw_waterwarp; // FS
+static cvar_t *r_contentblend; // FS
 
 extern void M_ForceMenuOff( void );
 
@@ -53,6 +55,8 @@ static menuslider_s		s_screensize_slider[NUM_VID_DRIVERS];
 static menuslider_s		s_brightness_slider[NUM_VID_DRIVERS];
 static menulist_s  		s_fs_box[NUM_VID_DRIVERS];
 static menulist_s  		s_stipple_box;
+static menulist_s  		s_contentblend_box; // FS
+static menulist_s  		s_waterwarp_box; // FS
 static menuaction_s		s_cancel_action[NUM_VID_DRIVERS];
 static menuaction_s		s_defaults_action[NUM_VID_DRIVERS];
 
@@ -99,6 +103,8 @@ static void ApplyChanges( void *unused )
 
 	Cvar_SetValue( "vid_gamma", gamma );
 	Cvar_SetValue( "sw_stipplealpha", s_stipple_box.curvalue );
+	Cvar_SetValue( "r_contentblend", s_contentblend_box.curvalue ); // FS
+	Cvar_SetValue( "sw_waterwarp", s_waterwarp_box.curvalue ); // FS
 	Cvar_SetValue( "vid_fullscreen", s_fs_box[s_current_menu_index].curvalue );
 	Cvar_SetValue( "sw_mode", s_mode_list[SOFTWARE_MENU].curvalue );
 
@@ -142,10 +148,16 @@ void VID_MenuInit( void )
 	int i;
 
 	if ( !sw_mode )
-		sw_mode = Cvar_Get( "sw_mode", "0", 0 );
+		sw_mode = Cvar_Get( "sw_mode", "0", CVAR_ARCHIVE );
 
 	if ( !sw_stipplealpha )
 		sw_stipplealpha = Cvar_Get( "sw_stipplealpha", "0", CVAR_ARCHIVE );
+
+	if ( !r_contentblend ) // FS
+		r_contentblend = Cvar_Get( "r_contentblend", "1", CVAR_ARCHIVE );
+
+	if ( !sw_waterwarp ) // FS
+		sw_waterwarp = Cvar_Get( "sw_waterwarp", "1", CVAR_ARCHIVE );
 
 	s_mode_list[SOFTWARE_MENU].curvalue = sw_mode->value;
 
@@ -194,13 +206,13 @@ void VID_MenuInit( void )
 		s_defaults_action[i].generic.type = MTYPE_ACTION;
 		s_defaults_action[i].generic.name = "reset to defaults";
 		s_defaults_action[i].generic.x    = 0;
-		s_defaults_action[i].generic.y    = 90;
+		s_defaults_action[i].generic.y    = 100;
 		s_defaults_action[i].generic.callback = ResetDefaults;
 
 		s_cancel_action[i].generic.type = MTYPE_ACTION;
 		s_cancel_action[i].generic.name = "cancel";
 		s_cancel_action[i].generic.x    = 0;
-		s_cancel_action[i].generic.y    = 100;
+		s_cancel_action[i].generic.y    = 110;
 		s_cancel_action[i].generic.callback = CancelChanges;
 	}
 
@@ -211,12 +223,30 @@ void VID_MenuInit( void )
 	s_stipple_box.curvalue = sw_stipplealpha->value;
 	s_stipple_box.itemnames = yesno_names;
 
+	// FS
+	s_contentblend_box.generic.type = MTYPE_SPINCONTROL;
+	s_contentblend_box.generic.x	= 0;
+	s_contentblend_box.generic.y	= 70;
+	s_contentblend_box.generic.name	= "content blending";
+	s_contentblend_box.curvalue = r_contentblend->intValue;
+	s_contentblend_box.itemnames = yesno_names;
 
+	// FS
+	s_waterwarp_box.generic.type = MTYPE_SPINCONTROL;
+	s_waterwarp_box.generic.x	= 0;
+	s_waterwarp_box.generic.y	= 80;
+	s_waterwarp_box.generic.name	= "water warping";
+	s_waterwarp_box.curvalue = sw_waterwarp->intValue;
+	s_waterwarp_box.itemnames = yesno_names;
+
+	// FS: ATTN  AddItem order has to be the order you want to see it in or else the cursor gets wonky!
 	Menu_AddItem( &s_software_menu, ( void * ) &s_mode_list[SOFTWARE_MENU] );
 	Menu_AddItem( &s_software_menu, ( void * ) &s_screensize_slider[SOFTWARE_MENU] );
 	Menu_AddItem( &s_software_menu, ( void * ) &s_brightness_slider[SOFTWARE_MENU] );
 	Menu_AddItem( &s_software_menu, ( void * ) &s_fs_box[SOFTWARE_MENU] );
 	Menu_AddItem( &s_software_menu, ( void * ) &s_stipple_box );
+	Menu_AddItem( &s_software_menu, ( void * ) &s_contentblend_box ); // FS
+	Menu_AddItem( &s_software_menu, ( void * ) &s_waterwarp_box ); // FS
 
 	Menu_AddItem( &s_software_menu, ( void * ) &s_defaults_action[SOFTWARE_MENU] );
 	Menu_AddItem( &s_software_menu, ( void * ) &s_cancel_action[SOFTWARE_MENU] );
