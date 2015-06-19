@@ -21,6 +21,13 @@
 #include <libc.h>
 #endif
 
+// FS: From HoT
+#ifdef __DJGPP__
+#define	IOCTLARG_T	(char*) // FS: Some WATT32 stuff
+#else
+#define IOCTLARG_T
+#endif
+
 netadr_t	net_local_adr;
 
 #define	LOOPBACK	0x7f000001
@@ -461,7 +468,8 @@ int NET_Socket (char *net_interface, int port)
 	}
 
 	// make it non-blocking
-	if (ioctl (newsocket, FIONBIO, &_true) == -1)
+//	if (ioctl (newsocket, FIONBIO, &_true) == -1)
+	if (ioctlsocket (newsocket, FIONBIO, IOCTLARG_T &_true) == SOCKET_ERROR) // FS: From HoT.  May fix 2.05 WATTCP issue
 	{
 		Com_Printf ("ERROR: UDP_OpenSocket: ioctl FIONBIO:%s\n", NET_ErrorString());
 		return 0;
