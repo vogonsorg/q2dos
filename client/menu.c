@@ -2470,6 +2470,12 @@ void SearchGamespyGames (void)
 #ifdef GAMESPY
 	int		i;
 
+	if(cls.state != ca_disconnected)
+	{
+		s_joingamespyserver_search_action.generic.statusbar = "You must be disconnected to use this command!\n";
+		return;
+	}
+
 	m_num_gamespy_servers = 0;
 	for (i=0 ; i<MAX_GAMESPY_SERVERS ; i++)
 	{
@@ -2498,12 +2504,6 @@ void SearchGamespyGames (void)
 	cls.disable_screen = Sys_Milliseconds();;
 
 	// send out info packets
-	if(cls.state != ca_disconnected)
-	{
-		cls.disable_screen = 0.0f;
-		s_joingamespyserver_search_action.generic.statusbar = "You must be disconnected to use this command!\n";
-		return;
-	}
 
 	CL_PingNetServers_f ();
 	cls.disable_screen = 0.0f;
