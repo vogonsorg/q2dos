@@ -2426,18 +2426,63 @@ void NullCursorDraw( void *self )
 {
 }
 
+void FormatGamespyList (void)
+{
+#ifdef GAMESPY
+	int j;
+
+	for (j = 0; j<MAX_GAMESPY_SERVERS; j++)
+	{
+		if (browserList[j].hostname[0] != 0)
+		{
+			if(viddef.height <= 300) // FS: Special formatting for low res.
+			{
+				char buffer[80];
+
+				Q_strncpyz(gamespy_server_names[j], browserList[j].hostname, 20);
+				if(Q_strlen(browserList[j].hostname) >= 20)
+				{
+					Com_sprintf(buffer, sizeof(buffer), "... [%d] %d/%d", browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
+				}
+				else
+				{
+					Com_sprintf(buffer, sizeof(buffer), "... [%d] %d/%d", browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
+				}
+				Com_strcat(gamespy_server_names[j], sizeof(gamespy_server_names[j]), buffer);
+			}
+			else
+			{
+				Com_sprintf(gamespy_server_names[j], sizeof(gamespy_server_names[j]), "%s [%d] %d/%d", browserList[j].hostname, browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
+			}
+			m_num_gamespy_servers++;
+		}
+		else
+		{
+			break;
+		}
+	}
+#endif
+}
+
 static char	found[64];
 void SearchGamespyGames (void)
 {
 #ifdef GAMESPY
-	int		i, j;
+	int		i;
 
 	m_num_gamespy_servers = 0;
 	for (i=0 ; i<MAX_GAMESPY_SERVERS ; i++)
 	{
 		strcpy (gamespy_server_names[i], NO_SERVER_STRING);
 	}
-	s_joingamespyserver_search_action.generic.statusbar = "Querying GameSpy for servers, please wait. . .";
+	if(viddef.height < 300) // FS: 400x300 can handle the longer string
+	{
+		s_joingamespyserver_search_action.generic.statusbar = "Querying GameSpy. . .";
+	}
+	else
+	{
+		s_joingamespyserver_search_action.generic.statusbar = "Querying GameSpy for servers, please wait. . .";
+	}
 	SCR_UpdateScreen();
 
 	M_DrawTextBox( 8, 120 - 48, 36, 4 );
@@ -2445,6 +2490,7 @@ void SearchGamespyGames (void)
 	M_Print( 16 + 16, 120 - 48 + 16, "could take up to a minute, so" );
 	M_Print( 16 + 16, 120 - 48 + 24, "please be patient." );
 	M_Print( 16 + 16, 120 - 48 + 32, "Use CTRL+C to abort." );
+	S_StopAllSounds();
 
 	// the text box won't show up unless we do a buffer swap
 	re.EndFrame();
@@ -2462,18 +2508,9 @@ void SearchGamespyGames (void)
 	cls.disable_screen = 0.0f;
 
 	re.EndFrame();
-	for (j = 0; j<MAX_GAMESPY_SERVERS; j++)
-	{
-		if (browserList[j].hostname[0] != 0)
-		{
-			Com_sprintf(gamespy_server_names[j], sizeof(gamespy_server_names[j]), "%s [%d] %d/%d", browserList[j].hostname, browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
-			m_num_gamespy_servers++;
-		}
-		else
-		{
-			break;
-		}
-	}
+
+	FormatGamespyList();
+
 	Com_sprintf(found, sizeof(found), "Found %d servers\n", m_num_gamespy_servers);
 	s_joingamespyserver_search_action.generic.statusbar = found;
 	Com_Printf(found);
@@ -2647,6 +2684,7 @@ void JoinGamespyServer_MenuInit( void )
 
 	Menu_AddItem (&s_joingamespyserver_menu, &s_joingamespyserver_page2_action );
 	gamespy_initialized = true;
+	FormatGamespyList(); // FS: Incase we changed resolution and went back to this menu...
 }
 
 void JoinGamespyServerPage2_MenuInit( void )
