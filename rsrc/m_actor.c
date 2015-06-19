@@ -3,6 +3,7 @@
 #include "g_local.h"
 #include "m_actor.h"
 
+#if 0 // FS: Unused
 #define	MAX_ACTOR_NAMES		8
 char *actor_names[MAX_ACTOR_NAMES] =
 {
@@ -588,3 +589,4 @@ void SP_target_actor (edict_t *self)
 
 	gi.linkentity (self);
 }
+#endif
