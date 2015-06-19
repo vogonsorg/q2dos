@@ -2451,10 +2451,13 @@ void CL_PingNetServers_f (void)
 	int error = 0; // FS: Grab the error code
 	int allocatedSockets;
 
-	if(cls.state != ca_disconnected)
+	if (cls.netchan.remote_address.type != NA_LOOPBACK) // FS: If we're not single player, check to see if we're actually disconnected first because DOS takes a while to do this
 	{
-		Com_Printf("You must be disconnected to use this command!\n");
-		return;
+		if(cls.state != ca_disconnected)
+		{
+			Com_Printf("You must be disconnected to use this command!\n");
+			return;
+		}
 	}
 
 	if(cls.gamespyupdate)

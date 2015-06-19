@@ -2470,10 +2470,13 @@ void SearchGamespyGames (void)
 #ifdef GAMESPY
 	int		i;
 
-	if(cls.state != ca_disconnected)
+	if (cls.netchan.remote_address.type != NA_LOOPBACK) // FS: If we're not single player, check to see if we're actually disconnected first because DOS takes a while to do this
 	{
-		s_joingamespyserver_search_action.generic.statusbar = "You must be disconnected to use this command!\n";
-		return;
+		if(cls.state != ca_disconnected)
+		{
+			s_joingamespyserver_search_action.generic.statusbar = "You must be disconnected to use this command!\n";
+			return;
+		}
 	}
 
 	m_num_gamespy_servers = 0;
