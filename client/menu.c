@@ -2490,7 +2490,8 @@ void SearchGamespyGames (void)
 	M_Print( 16 + 16, 120 - 48 + 16, "could take up to a minute, so" );
 	M_Print( 16 + 16, 120 - 48 + 24, "please be patient." );
 	M_Print( 16 + 16, 120 - 48 + 32, "Use CTRL+C to abort." );
-	S_StopAllSounds();
+
+	S_StopAllSounds(); // FS: So we don't hear a repeating menu sound.
 
 	// the text box won't show up unless we do a buffer swap
 	re.EndFrame();
