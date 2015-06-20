@@ -584,9 +584,13 @@ struct mpxplay_audioout_info_s *aui=&au_infos;
 		AU_setrate((unsigned int *)dma.speed,(unsigned int *)dma.samplebits,(unsigned int *)dma.channels);
 		Com_Printf(c);
 
+		aui->card_dmasize = SND_BUFFER_SIZE; // FS: Possible fix for the sound buffer size
 		dma.samples = aui->card_dmasize/aui->bytespersample_card;
 		dma.samplepos = 0;
 		dma.submission_chunk = 1;
+
+		memset(aui->card_DMABUFF, 0, aui->card_dmasize); // FS: Clear the dma buffer on Init
+
 		dma.buffer = (unsigned char *) aui->card_DMABUFF;
 		AU_setmixer_all(80);   //80% volume
 		AU_start();
