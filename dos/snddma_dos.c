@@ -5,6 +5,7 @@
 #include "../client/client.h"
 #include "../client/snd_loc.h"
 #include "dosisms.h"
+#include "lib/def.h"
 
 #define USE_QDOS_SOUND
 #ifdef USE_QDOS_SOUND
@@ -12,6 +13,7 @@ typedef enum
 {
 	dma_none,
 	dma_blaster,
+	dma_pci, // FS: From ruslans patch
 	dma_gus
 } dmacard_t;
 
@@ -352,7 +354,10 @@ qboolean BLASTER_Init(void)
 	int	realaddr;
 	int	rc;
 	int	p;
-	
+
+	if(COM_CheckParm("-nosb"))
+		return false;
+
 //	dma = 0; // FS: FIXME
 	rc = 0;
 
@@ -548,7 +553,94 @@ void BLASTER_Shutdown(void)
 	dma_dosadr = NULL; // sezero
 }
 
+/*
+==================
+PCI_Init
 
+Returns false if nothing is found.
+==================
+*/
+qboolean PCI_Init(void)
+{
+struct mpxplay_audioout_info_s *aui=&au_infos;
+
+	char    *c;
+	int     ln;
+	char thing[20];
+
+	sprintf(thing,"-spk");		//sample code had this in
+	c=AU_search(&thing);
+
+	if(c)
+	{
+		unsigned int speed=22050; // FS: AU_setrate wants uints
+		unsigned int samplebits=16; // FS: AU_setrate wants uints
+		unsigned int channels=2; // FS: AU_setrate wants uints
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "PCI Audio: Adding PCI\n");
+		Com_Printf("PCI Audio: %s\n",c);
+
+		if(s_khz->intValue >= 11025) // FS
+			speed = s_khz->intValue;
+
+		dma.speed=speed;
+		dma.samplebits=samplebits;
+		dma.channels=channels;
+		AU_setrate(&speed,&samplebits,&channels);
+		
+#if 1		//not sure but I think it can change in the setrate
+		dma.speed=aui->freq_card;
+		dma.samplebits=aui->bits_set;
+		dma.channels=aui->chan_set;
+		if(dma.speed != s_khz->intValue) // FS: In theory, our rate was not liked, so force the change.
+			Cvar_SetValue("s_khz", dma.speed);
+
+#endif
+
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "Post AU_setrate %d/%d/%d\n",dma.speed,dma.samplebits,dma.channels);
+
+		dma.samples = aui->card_dmasize/aui->bytespersample_card;
+		dma.samplepos = 0;
+		dma.submission_chunk = 1;
+
+		memset(aui->card_DMABUFF, 0, aui->card_dmasize); // FS: Clear the dma buffer on Init
+
+		dma.buffer = (unsigned char *) aui->card_DMABUFF;
+		AU_setmixer_all(80);   //80% volume
+		AU_start();
+
+		return true;
+	}
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "PCI Audio: Detection failed.  Attempting SB init.\n");
+	return false;
+}
+
+/*
+==============
+PCI_GetDMAPos
+
+return the current sample position (in mono samples read)
+inside the recirculating dma buffer, so the mixing code will know
+how many sample are required to fill it up.
+===============
+*/
+int PCI_GetDMAPos(void)
+{
+	dma.samplepos = AU_cardbuf_space();
+	return dma.samplepos;
+}
+
+
+/*
+==============
+PCI_Shutdown
+
+Stop and close the sound device for exiting
+===============
+*/
+void PCI_Shutdown(void)
+{
+	AU_close();
+}
 
 /*
 ===============================================================================
@@ -576,7 +668,16 @@ qboolean SNDDMA_Init(void)
 		Cmd_AddCommand ("snd_shutdown", snd_shutdown_f); // FS
 	}
 	firstInit = false;
-
+	if (COM_CheckParm("-hda")) // FS: Ruslans patch
+	{
+		if(!PCI_Init())
+		{
+			return false;
+		}
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "PCI_Init\n");
+		dmacard = dma_pci;
+		return true;
+	}
 	if (GUS_Init ())
 	{
 		Com_DPrintf(DEVELOPER_MSG_SOUND, "GUS_Init\n");
@@ -584,7 +685,6 @@ qboolean SNDDMA_Init(void)
 		S_StopAllSounds(); // FS: For GUS Buffer Clear Fix
 		return true;
 	}
-
 	if (BLASTER_Init ())
 	{
 		Com_DPrintf(DEVELOPER_MSG_SOUND, "BLASTER_Init\n");
@@ -609,6 +709,8 @@ int	SNDDMA_GetDMAPos(void)
 			return BLASTER_GetDMAPos ();
 		case dma_gus:
 			return GUS_GetDMAPos ();
+		case dma_pci: // FS: Ruslans patch
+			return PCI_GetDMAPos ();
 		case dma_none:
 			break;
 	}
@@ -629,6 +731,9 @@ void SNDDMA_Shutdown(void)
 			break;
 		case dma_gus:
 			GUS_Shutdown ();
+			break;
+		case dma_pci: // FS: Ruslans patch
+			PCI_Shutdown ();
 			break;
 		case dma_none:
 			break;

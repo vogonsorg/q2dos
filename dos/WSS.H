@@ -1,3 +1,5 @@
+#ifdef USE_WSS // FS: Not really needed anymore AFAIK...
+
 // WSS audio library, latest update: 1.9.2010
 #ifndef X86DATATYPE
 typedef unsigned char		BYTE;
@@ -68,3 +70,5 @@ void w_enter_critial(void);
 void w_exit_critial(void);
 
 void vga_vsync(void);
+
+#endif // USE_WSS

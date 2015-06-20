@@ -33,10 +33,10 @@ int num_vid_resolutions=1;	//we always have mode 13
 #define LINEAR_FRAME_BUFFER		0x0080
 #define LINEAR_MODE			0x4000
 
-#define MAXWIDTH		1280
-#define MAXHEIGHT		1024
-
-
+// !!! if this is changed, MAX_HEIGHT and MAX_WIDTH must be changed in d_ifacea.h too !!!
+// !!! if this is changed, MAX_HEIGHT and MAX_WIDTH must be changed in r_local.h too !!!
+#define MAXVESAWIDTH		1600
+#define MAXVESAHEIGHT		1200
 
 vmode_t	*pvidmodes;
 static int	totalvidmem;
@@ -151,8 +151,8 @@ void VID_InitExtra (void)
 	vid_resolutions[0].isLFB=false;
 	Com_sprintf(vid_resolutions[0].menuname, sizeof(vid_resolutions[0].menuname), "[VGA 320x200]");
 
-if(COM_CheckParm("-vgaonly"))
-	return;	//test for VGA only
+	if(COM_CheckParm("-vgaonly"))
+		return;	//test for VGA only
 
 // see if VESA support is available
 	regs.x.ax = 0x4f00;
@@ -338,8 +338,8 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 	// we do only 8-bpp in software
 		if ((modeinfo.bits_per_pixel != 8) ||
 			(modeinfo.bytes_per_pixel != 1) ||
-			(modeinfo.width > MAXWIDTH) ||
-			(modeinfo.height > MAXHEIGHT))
+			(modeinfo.width > MAXVESAWIDTH) ||
+			(modeinfo.height > MAXVESAHEIGHT))
 		{
 			dos_freememory(infobuf);
 			return false;

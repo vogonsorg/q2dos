@@ -122,9 +122,9 @@ extern	cvar_t *allow_download_maps;
 
 // FS: For Gamespy
 static    GServerList serverlist; // FS: Moved outside so we can abort whenever we need to
-
 void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2);
 void CL_PingNetServers_f (void);
+void CL_PrintBrowserList_f (void);
 
 /*
 ==========================
@@ -714,21 +714,35 @@ void CL_Disconnect_f (void)
 #ifdef GAMESPY
 	if(serverlist != NULL) // FS: Immediately abort gspy scans
 	{
-		Com_Printf("\x02Server scan aborted!\n");
 		cls.gamespyupdate = 0;
 		cls.gamespypercent = 0;
-		S_GamespySound ("gamespy/abort.wav"); // FS: FIXME
+		Com_Printf("\x02Server scan aborted!\n");
+		S_GamespySound ("gamespy/abort.wav");
 		ServerListHalt( serverlist );
 		ServerListClear( serverlist );
 	    ServerListFree(serverlist);
 		serverlist = NULL; // FS: This is on purpose so future ctrl+c's won't try to close empty serverlists
 	}
 #endif
-	
+
 	Com_Error (ERR_DROP, "Disconnected from server");
 }
 
 
+void CL_Gspystop_f (void)
+{
+
+#ifdef GAMESPY
+	if(serverlist != NULL) // FS: Immediately abort gspy scans
+	{
+		cls.gamespyupdate = 0;
+		cls.gamespypercent = 0;
+		Com_Printf("\x02Server scan aborted!\n");
+		S_GamespySound ("gamespy/abort.wav");
+		ServerListHalt( serverlist );
+	}
+#endif
+}
 /*
 ====================
 CL_Packet_f
@@ -1742,6 +1756,7 @@ void CL_InitLocal (void)
 
 	Cmd_AddCommand ("changing", CL_Changing_f);
 	Cmd_AddCommand ("disconnect", CL_Disconnect_f);
+	Cmd_AddCommand ("gspystop", CL_Gspystop_f); // FS
 	Cmd_AddCommand ("record", CL_Record_f);
 	Cmd_AddCommand ("stop", CL_Stop_f);
 
@@ -1789,6 +1804,7 @@ void CL_InitLocal (void)
 	Cmd_AddCommand ("weapprev", NULL);
 #ifdef GAMESPY
 	Cmd_AddCommand ("slist2", CL_PingNetServers_f); // FS: For Gamespy
+	Cmd_AddCommand ("srelist", CL_PrintBrowserList_f);
 #endif
 }
 
@@ -2390,29 +2406,68 @@ void CL_Shutdown(void)
 
 //GAMESPY
 #ifdef GAMESPY
+static int gspyCur;
+gamespyBrowser_t browserList[MAX_SERVERS];
+
+void CL_PrintBrowserList_f (void)
+{
+	int i = 0;
+	for ( i = 0; i <= MAX_SERVERS; i++)
+	{
+		if(browserList[i].hostname[0] != 0)
+			Com_Printf("%02d:  %s:%d [%d] %s %d/%d %s\n", i+1, browserList[i].ip, browserList[i].port, browserList[i].ping, browserList[i].hostname, browserList[i].curPlayers, browserList[i].maxPlayers, browserList[i].mapname);
+		else // FS: if theres nothing there the rest of the list is old garbage, bye.
+			break;
+	}
+}
+
 void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2)
 {
 	GServer server;
 	if (msg == LIST_PROGRESS)
 	{
 		server = (GServer)param1;
-		if(ServerGetIntValue(server,"numplayers",0)) // FS: Only show populated servers
-			Com_Printf ( "%s:%d [%d] %s %d/%d %s\n",ServerGetAddress(server),ServerGetQueryPort(server), ServerGetPing(server),ServerGetStringValue(server, "hostname","(NONE)"), ServerGetIntValue(server,"numplayers",0), ServerGetIntValue(server,"maxclients",0), ServerGetStringValue(server,"mapname","(NO MAP)"));
-	}
+		if(ServerGetIntValue(server,"numplayers",0) && gspyCur <= MAX_SERVERS) // FS: Only show populated servers
+		{
+			Q_strncpyz(browserList[gspyCur].ip, ServerGetAddress(server), sizeof(browserList[gspyCur].ip));
+			browserList[gspyCur].port = ServerGetQueryPort(server);
+			browserList[gspyCur].ping = ServerGetPing(server);
+			Q_strncpyz(browserList[gspyCur].hostname, ServerGetStringValue(server, "hostname","(NONE)"), sizeof(browserList[gspyCur].hostname));
+			Q_strncpyz(browserList[gspyCur].mapname, ServerGetStringValue(server,"mapname","(NO MAP)"), sizeof(browserList[gspyCur].mapname));
+			browserList[gspyCur].curPlayers = ServerGetIntValue(server,"numplayers",0);
+			browserList[gspyCur].maxPlayers = ServerGetIntValue(server,"maxclients",0);
 
+			if (cls.key_dest != key_menu) // FS: Only print this from an slist2 command, not the server browser.
+				Com_Printf("%s:%d [%d] %s %d/%d %s\n", browserList[gspyCur].ip, browserList[gspyCur].port, browserList[gspyCur].ping, browserList[gspyCur].hostname, browserList[gspyCur].curPlayers, browserList[gspyCur].maxPlayers, browserList[gspyCur].mapname);
+
+			gspyCur++;
+		}
+	}
 }
 
 void CL_PingNetServers_f (void)
 {
 	char goa_secret_key[256];
 	int error = 0; // FS: Grab the error code
-	int allocatedSockets; // FS: FIXME
+	int allocatedSockets;
 
-	if(cls.state != ca_disconnected)
+	if (cls.netchan.remote_address.type != NA_LOOPBACK) // FS: If we're not single player, check to see if we're actually disconnected first because DOS takes a while to do this
 	{
-		Com_Printf("You must be disconnected to use this command!\n");
+		if(cls.state != ca_disconnected)
+		{
+			Com_Printf("You must be disconnected to use this command!\n");
+			return;
+		}
+	}
+
+	if(cls.gamespyupdate)
+	{
+		Com_Printf("Error: Already querying the GameSpy Master!\n");
 		return;
 	}
+
+	gspyCur = 0;
+	memset(&browserList, 0, sizeof(browserList));
 
 	goa_secret_key[0] = 'r';
 	goa_secret_key[1] = 't';
@@ -2420,12 +2475,13 @@ void CL_PingNetServers_f (void)
 	goa_secret_key[3] = '0';
 	goa_secret_key[4] = 'x';
 	goa_secret_key[5] = 'g';
+	goa_secret_key[6] = '\0';
 
 	Com_Printf("\x02Grabbing populated server list from GameSpy master. . .\n");
 	cls.gamespyupdate = 1;
 	cls.gamespypercent = 0;
 
-	allocatedSockets = bound(5, cl_master_server_queries->value, 100);
+	allocatedSockets = bound(5, cl_master_server_queries->value, 40);
 
 	SCR_UpdateScreen(); // FS: Force an update so the percentage bar shows some progress
 	serverlist = ServerListNew("quake2","quake2",goa_secret_key,allocatedSockets,ListCallBack,GCALLBACK_FUNCTION,NULL);

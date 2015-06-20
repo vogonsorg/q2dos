@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = -g -Wall -O2 
 SFLAGS = -Did386 -DREF_HARD_LINKED -DGAME_HARD_LINKED -DUSE_DOS_CD -DOGG_SUPPORT -DCLIENT_SPLIT_NETFRAME -DGAMESPY -DUSE_CURL
-WCFLAGS = -I wattcp/inc
-WLFLAGS = -Lwattcp/lib -lwatt
+WCFLAGS = -I dos/lib -I wattcp/inc
+WLFLAGS = -Ldos/lib -lau -Lwattcp/lib -lwatt
 OGGCFLAGS = -I libogg/inc
 OCCLFLAGS = -Llibogg/lib -logg
 VORBCFLAGS = -I libvorb/inc
@@ -163,7 +163,8 @@ q2.exe:	$(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o q2.exe $(OCCLFLAGS) $(VORBLFLAGS) $(CURLLFLAGS) -lm $(WLFLAGS)
 
 clean:
-	find ./ -name '*.o' -exec rm {} \;
+#	find ./ -name '*.o' -exec rm {} \;
+	rm .../*.o
 
 DO_AS=$(CC) -x assembler-with-cpp
 

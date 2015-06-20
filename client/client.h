@@ -272,7 +272,7 @@ typedef struct
 	qboolean	forcePacket;		// forces a packet to be sent the next frame
 
 // screen rendering information
-	float		disable_screen;		// showing loading plaque between levels
+	double		disable_screen;		// showing loading plaque between levels
 									// or changing rendering dlls
 									// if time gets > 30 seconds ahead, break it
 	int			disable_servercount;	// when we receive a frame and cl.servercount
@@ -675,6 +675,23 @@ void CL_TrapParticles (entity_t *ent);
 //
 // menus
 //
+
+#define MAX_SERVERS 50
+// FS: Gamespy browser
+typedef struct
+{
+	char ip[15];
+	int port;
+	int ping;
+	char hostname[32];
+	int curPlayers;
+	int maxPlayers;
+	char mapname[32];
+}
+gamespyBrowser_t;
+extern gamespyBrowser_t browserList[MAX_SERVERS];
+void CL_PingNetServers_f (void);
+
 void M_Init (void);
 void M_Keydown (int key);
 void M_Draw (void);

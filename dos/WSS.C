@@ -1,3 +1,5 @@
+
+#ifdef USE_WSS // FS: Not really needed anymore AFAIK...
 // WSS audio library, latest update: 17.9.2013
 #include <stdio.h>
 #include <stdlib.h>
@@ -6458,3 +6460,5 @@ if(0){
 
 
 #endif
+
+#endif // USE_WSS
