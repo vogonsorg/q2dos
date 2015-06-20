@@ -5,6 +5,7 @@
 #include "../client/client.h"
 #include "../client/snd_loc.h"
 #include "dosisms.h"
+#include "lib/def.h"
 
 #define USE_QDOS_SOUND
 #ifdef USE_QDOS_SOUND
@@ -12,6 +13,7 @@ typedef enum
 {
 	dma_none,
 	dma_blaster,
+	dma_pci, // FS: From ruslans patch
 	dma_gus
 } dmacard_t;
 
@@ -548,7 +550,75 @@ void BLASTER_Shutdown(void)
 	dma_dosadr = NULL; // sezero
 }
 
+/*
+==================
+PCI_Init
 
+Returns false if nothing is found.
+==================
+*/
+qboolean PCI_Init(void)
+{
+struct mpxplay_audioout_info_s *aui=&au_infos;
+
+	char    *c;
+	int     ln;
+
+	ln = COM_CheckParm("-spk");
+
+	c=AU_search(ln);
+
+	if(c)
+	{
+		Com_Printf(c);
+
+		dma.speed=44100;
+		dma.samplebits=16;
+		dma.channels=2;
+
+		AU_setrate((unsigned int *)dma.speed,(unsigned int *)dma.samplebits,(unsigned int *)dma.channels);
+		Com_Printf(c);
+
+		dma.samples = aui->card_dmasize/aui->bytespersample_card;
+		dma.samplepos = 0;
+		dma.submission_chunk = 1;
+		dma.size = SND_BUFFER_SIZE; // FS: Was missing
+		dma.buffer = (unsigned char *) aui->card_DMABUFF;
+		AU_setmixer_all(80);   //80% volume
+		AU_start();
+
+		return true;
+	}
+	return false;
+}
+
+/*
+==============
+PCI_GetDMAPos
+
+return the current sample position (in mono samples read)
+inside the recirculating dma buffer, so the mixing code will know
+how many sample are required to fill it up.
+===============
+*/
+int PCI_GetDMAPos(void)
+{
+	dma.samplepos = AU_cardbuf_space();
+	return dma.samplepos;
+}
+
+
+/*
+==============
+PCI_Shutdown
+
+Stop and close the sound device for exiting
+===============
+*/
+void PCI_Shutdown(void)
+{
+	AU_close();
+}
 
 /*
 ===============================================================================
@@ -584,6 +654,12 @@ qboolean SNDDMA_Init(void)
 		S_StopAllSounds(); // FS: For GUS Buffer Clear Fix
 		return true;
 	}
+	if (PCI_Init ()) // FS: Ruslans patch
+	{
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "PCI_Init\n");
+		dmacard = dma_pci;
+		return true;	 
+	}
 
 	if (BLASTER_Init ())
 	{
@@ -609,6 +685,8 @@ int	SNDDMA_GetDMAPos(void)
 			return BLASTER_GetDMAPos ();
 		case dma_gus:
 			return GUS_GetDMAPos ();
+		case dma_pci: // FS: Ruslans patch
+			return PCI_GetDMAPos ();
 		case dma_none:
 			break;
 	}
@@ -629,6 +707,9 @@ void SNDDMA_Shutdown(void)
 			break;
 		case dma_gus:
 			GUS_Shutdown ();
+			break;
+		case dma_pci: // FS: Ruslans patch
+			PCI_Shutdown ();
 			break;
 		case dma_none:
 			break;
