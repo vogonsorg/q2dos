@@ -163,7 +163,8 @@ q2.exe:	$(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o q2.exe $(OCCLFLAGS) $(VORBLFLAGS) $(CURLLFLAGS) -lm $(WLFLAGS)
 
 clean:
-	find ./ -name '*.o' -exec rm {} \;
+#	find ./ -name '*.o' -exec rm {} \;
+	rm .../*.o
 
 DO_AS=$(CC) -x assembler-with-cpp
 

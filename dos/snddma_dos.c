@@ -354,7 +354,10 @@ qboolean BLASTER_Init(void)
 	int	realaddr;
 	int	rc;
 	int	p;
-	
+
+	if(COM_CheckParm("-nosb"))
+		return false;
+
 //	dma = 0; // FS: FIXME
 	rc = 0;
 
@@ -566,10 +569,12 @@ struct mpxplay_audioout_info_s *aui=&au_infos;
 
 	ln = COM_CheckParm("-spk");
 
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "PCI Audio: Check parm: %d\n", ln);
 	c=AU_search(ln);
 
 	if(c)
 	{
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "PCI Audio: Adding PCI\n");
 		Com_Printf(c);
 
 		dma.speed=44100;
@@ -582,13 +587,13 @@ struct mpxplay_audioout_info_s *aui=&au_infos;
 		dma.samples = aui->card_dmasize/aui->bytespersample_card;
 		dma.samplepos = 0;
 		dma.submission_chunk = 1;
-		dma.size = SND_BUFFER_SIZE; // FS: Was missing
 		dma.buffer = (unsigned char *) aui->card_DMABUFF;
 		AU_setmixer_all(80);   //80% volume
 		AU_start();
 
 		return true;
 	}
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "PCI Audio: Detection failed.  Attempting SB init.\n");
 	return false;
 }
 
