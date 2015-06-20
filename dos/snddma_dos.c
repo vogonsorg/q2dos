@@ -566,34 +566,38 @@ struct mpxplay_audioout_info_s *aui=&au_infos;
 
 	char    *c;
 	int     ln;
-char thing[20];
+	char thing[20];
 
 	sprintf(thing,"-spk");		//sample code had this in
 	c=AU_search(&thing);
-	Com_Printf("PCI Audio:%s\n",c);
 
 	if(c)
 	{
-	int speed=22050;
-        int samplebits=16;
-        int channels=2;
+		unsigned int speed=22050; // FS: AU_setrate wants uints
+		unsigned int samplebits=16; // FS: AU_setrate wants uints
+		unsigned int channels=2; // FS: AU_setrate wants uints
 		Com_DPrintf(DEVELOPER_MSG_SOUND, "PCI Audio: Adding PCI\n");
-		Com_Printf(c);
+		Com_Printf("PCI Audio: %s\n",c);
+
+		if(s_khz->intValue >= 11025) // FS
+			speed = s_khz->intValue;
 
 		dma.speed=speed;
 		dma.samplebits=samplebits;
 		dma.channels=channels;
-		s_khz->value=speed;
 		AU_setrate(&speed,&samplebits,&channels);
 		
 #if 1		//not sure but I think it can change in the setrate
-dma.speed=aui->freq_card;
-dma.samplebits=aui->bits_set;
-dma.channels=aui->chan_set;
-s_khz->value=dma.speed;
+		dma.speed=aui->freq_card;
+		dma.samplebits=aui->bits_set;
+		dma.channels=aui->chan_set;
+//		s_khz->value=dma.speed;
+		if(dma.speed != s_khz->intValue) // FS: In theory, our rate was not liked, so force the change.
+			Cvar_SetValue("s_khz", dma.speed);
+
 #endif
 
-Com_Printf("Post AU_setrate %d/%d/%d\n",dma.speed,dma.samplebits,dma.channels);
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "Post AU_setrate %d/%d/%d\n",dma.speed,dma.samplebits,dma.channels);
 
 		dma.samples = aui->card_dmasize/aui->bytespersample_card;
 		dma.samplepos = 0;
@@ -665,15 +669,16 @@ qboolean SNDDMA_Init(void)
 		Cmd_AddCommand ("snd_shutdown", snd_shutdown_f); // FS
 	}
 	firstInit = false;
-        if (COM_CheckParm("-hda")) // FS: Ruslans patch
-        {
-		if(!PCI_Init()) {
+	if (COM_CheckParm("-hda")) // FS: Ruslans patch
+	{
+		if(!PCI_Init())
+		{
 			return false;
-			}
-                Com_DPrintf(DEVELOPER_MSG_SOUND, "PCI_Init\n");
-                dmacard = dma_pci;
-                return true;
-        }
+		}
+		Com_DPrintf(DEVELOPER_MSG_SOUND, "PCI_Init\n");
+		dmacard = dma_pci;
+		return true;
+	}
 	if (GUS_Init ())
 	{
 		Com_DPrintf(DEVELOPER_MSG_SOUND, "GUS_Init\n");
