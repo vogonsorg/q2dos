@@ -566,25 +566,35 @@ struct mpxplay_audioout_info_s *aui=&au_infos;
 
 	char    *c;
 	int     ln;
+char thing[20];
 
-	ln = COM_CheckParm("-spk");
-
-	Com_DPrintf(DEVELOPER_MSG_SOUND, "PCI Audio: Check parm: %d\n", ln);
-	c=AU_search(ln);
+	sprintf(thing,"-spk");		//sample code had this in
+	c=AU_search(&thing);
+	Com_Printf("PCI Audio:%s\n",c);
 
 	if(c)
 	{
+	int speed=22050;
+        int samplebits=16;
+        int channels=2;
 		Com_DPrintf(DEVELOPER_MSG_SOUND, "PCI Audio: Adding PCI\n");
 		Com_Printf(c);
 
-		dma.speed=44100;
-		dma.samplebits=16;
-		dma.channels=2;
+		dma.speed=speed;
+		dma.samplebits=samplebits;
+		dma.channels=channels;
+		s_khz->value=speed;
+		AU_setrate(&speed,&samplebits,&channels);
+		
+#if 1		//not sure but I think it can change in the setrate
+dma.speed=aui->freq_card;
+dma.samplebits=aui->bits_set;
+dma.channels=aui->chan_set;
+s_khz->value=dma.speed;
+#endif
 
-		AU_setrate((unsigned int *)dma.speed,(unsigned int *)dma.samplebits,(unsigned int *)dma.channels);
-		Com_Printf(c);
+Com_Printf("Post AU_setrate %d/%d/%d\n",dma.speed,dma.samplebits,dma.channels);
 
-		aui->card_dmasize = SND_BUFFER_SIZE; // FS: Possible fix for the sound buffer size
 		dma.samples = aui->card_dmasize/aui->bytespersample_card;
 		dma.samplepos = 0;
 		dma.submission_chunk = 1;
@@ -655,7 +665,15 @@ qboolean SNDDMA_Init(void)
 		Cmd_AddCommand ("snd_shutdown", snd_shutdown_f); // FS
 	}
 	firstInit = false;
-
+        if (COM_CheckParm("-hda")) // FS: Ruslans patch
+        {
+		if(!PCI_Init()) {
+			return false;
+			}
+                Com_DPrintf(DEVELOPER_MSG_SOUND, "PCI_Init\n");
+                dmacard = dma_pci;
+                return true;
+        }
 	if (GUS_Init ())
 	{
 		Com_DPrintf(DEVELOPER_MSG_SOUND, "GUS_Init\n");
@@ -663,13 +681,6 @@ qboolean SNDDMA_Init(void)
 		S_StopAllSounds(); // FS: For GUS Buffer Clear Fix
 		return true;
 	}
-	if (PCI_Init ()) // FS: Ruslans patch
-	{
-		Com_DPrintf(DEVELOPER_MSG_SOUND, "PCI_Init\n");
-		dmacard = dma_pci;
-		return true;	 
-	}
-
 	if (BLASTER_Init ())
 	{
 		Com_DPrintf(DEVELOPER_MSG_SOUND, "BLASTER_Init\n");
