@@ -591,7 +591,6 @@ struct mpxplay_audioout_info_s *aui=&au_infos;
 		dma.speed=aui->freq_card;
 		dma.samplebits=aui->bits_set;
 		dma.channels=aui->chan_set;
-		dma.speed=speed;
 		if(dma.speed != s_khz->intValue) // FS: In theory, our rate was not liked, so force the change.
 			Cvar_SetValue("s_khz", dma.speed);
 
