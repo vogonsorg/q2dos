@@ -7,7 +7,7 @@
 #include <fcntl.h>
 #ifdef __DJGPP__
 #ifndef ZDM
-#include <SYS\nearptr.h>
+#include <sys/nearptr.h>
 #else
 #include <SYS\farptr.h>
 #include <SYS\movedata.h>
