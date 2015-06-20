@@ -35,8 +35,8 @@ int num_vid_resolutions=1;	//we always have mode 13
 
 // !!! if this is changed, MAX_HEIGHT and MAX_WIDTH must be changed in d_ifacea.h too !!!
 // !!! if this is changed, MAX_HEIGHT and MAX_WIDTH must be changed in r_local.h too !!!
-#define MAXVESAWIDTH		1600
-#define MAXVESAHEIGHT		1200
+#define MAXVESAWIDTH		4000 // FS: 1600
+#define MAXVESAHEIGHT		4000 // FS: 1200
 
 vmode_t	*pvidmodes;
 static int	totalvidmem;

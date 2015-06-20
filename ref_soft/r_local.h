@@ -159,8 +159,8 @@ extern oldrefdef_t      r_refdef;
 #define MAXWORKINGVERTS (MAXVERTS+4)    // max points in an intermediate
 										//  polygon (while processing)
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
-#define MAXHEIGHT       1200
-#define MAXWIDTH        1600
+#define MAXHEIGHT		4000 // FS: 1200
+#define MAXWIDTH		4000 // FS: 1600
 
 #define INFINITE_DISTANCE       0x10000         // distance that's always guaranteed to
 										//  be farther away than anything in

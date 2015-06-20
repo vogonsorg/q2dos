@@ -5,7 +5,7 @@
 # 22 "chksum0.S"
 # 1 "register.h" 1
 # 63 "register.h"
-# 1 "f:/djgpp_205/include/machine/asm.h" 1 3 4
+# 1 "c:/djgpp/include/machine/asm.h" 1 3 4
 # 64 "register.h" 2
 # 23 "chksum0.S" 2
 

@@ -15,8 +15,8 @@
 // !!! if this is changed, it must be changed in d_iface.h too !!!
 #define	CYCLE	128
 
-// !!! if this is changed, it must be changed in r_shared.h too !!!
-#define	MAXHEIGHT	1200
+// !!! if this is changed, it must be changed in r_local.h too !!!
+#define	MAXHEIGHT	 4000 // FS: 1200
 
 // !!! if this is changed, it must be changed in qcommon.h too !!!
 #define CACHE_SIZE	32		// used to align key data structures
