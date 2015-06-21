@@ -30,6 +30,11 @@ Fax(714)549-0757
 #include <fcntl.h> // FS
 #include <errno.h> // FS
 
+#ifdef __DJGPP__
+#include <sys/ioctl.h>
+extern char *NET_ErrorString (void);
+#endif
+
 #define MSHOST	"maraakate.org" // FS: Gamespy dead "master.gamespy.com"
 #define MSPORT	28900
 #define SERVER_GROWBY 32
@@ -116,29 +121,24 @@ void ServerListFree(GServerList serverlist)
 static GError InitUpdateList(GServerList serverlist)
 {
 	int i;
-	int error = 0;
-#ifdef _WIN32
-	u_long nonblocking_enabled;
-#else
-	int flags = 0;
-#endif
+	qboolean _true = true;
 
 	for (i = 0 ; i < serverlist->maxupdates ; i++)
 	{
 		serverlist->updatelist[i].s = socket (AF_INET, SOCK_DGRAM,IPPROTO_UDP);
 		if (serverlist->updatelist[i].s == INVALID_SOCKET)
 			return GE_NOSOCKET;
-#ifdef _WIN32 // FS: Set non-blocking sockets
-	nonblocking_enabled = 1;
-	error = ioctlsocket( serverlist->updatelist[i].s, FIONBIO, &nonblocking_enabled );
+
+		// FS: Set non-blocking sockets
+		if (ioctlsocket( serverlist->updatelist[i].s, FIONBIO,IOCTLARG_T &_true) == SOCKET_ERROR)
+		{
+#ifdef _WIN32
+			Com_Printf("ERROR: InitUpdateList: ioctl FIOBNIO:%i\n", WSAGetLastError());
 #else
-	flags = fcntl(serverlist->updatelist[i].s, F_GETFL, 0);
-	if (flags == -1)
-		flags = 0;
-	error = fcntl(serverlist->updatelist[i].s, F_SETFL, flags | O_NONBLOCK);
+			Com_Printf("ERROR: InitUpdateList: ioctl FIOBNIO:%s\n", NET_ErrorString());
 #endif // _WIN32
-	if (error == -1)
-		return GE_NOSOCKET;
+			return GE_NOSOCKET;
+		}
 
 		serverlist->updatelist[i].serverindex = -1;
 		serverlist->updatelist[i].starttime = 0;

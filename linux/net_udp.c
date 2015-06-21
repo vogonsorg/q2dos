@@ -21,13 +21,6 @@
 #include <libc.h>
 #endif
 
-// FS: From HoT
-#ifdef __DJGPP__
-#define	IOCTLARG_T	(char*) // FS: Some WATT32 stuff
-#else
-#define IOCTLARG_T
-#endif
-
 netadr_t	net_local_adr;
 
 #define	LOOPBACK	0x7f000001

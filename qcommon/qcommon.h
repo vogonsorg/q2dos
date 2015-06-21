@@ -83,6 +83,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define max(a,b)        (((a) > (b)) ? (a) : (b))
 #endif
 
+
+// FS: From HoT: For ioctl sockets
+#ifdef __DJGPP__
+#define	IOCTLARG_T	(char*) // FS: Some WATT32 stuff
+#else
+#define IOCTLARG_T
+#endif
+
 //============================================================================
 
 typedef struct sizebuf_s
