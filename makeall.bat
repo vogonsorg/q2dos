@@ -8,3 +8,5 @@ call makeq2rogue.bat
 upx -9 q2rogue.exe
 call makeq2xatrix.bat
 upx -9 q2xatrix.exe
+call makeq2zaero.bat
+upx -9 q2zaero.exe

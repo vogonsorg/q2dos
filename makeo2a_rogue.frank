@@ -163,7 +163,7 @@ GAME = rsrc/dm_ball.o \
 	rsrc/p_trail.o \
 	rsrc/p_view.o \
 	rsrc/p_weapon.o \
-	rsrc/q_shared.o \
+	rsrc/q_shared.o
 
 .PHONY: all test clean
 #
