@@ -436,6 +436,7 @@ CL_LoadClientinfo
 
 ================
 */
+
 void CL_LoadClientinfo (clientinfo_t *ci, char *s)
 {
 	int i;
@@ -459,22 +460,8 @@ void CL_LoadClientinfo (clientinfo_t *ci, char *s)
 		s = t+1;
 	}
 
-	//r1ch: check sanity of paths: only allow printable data
-	t = s;
-	while (*t)
+	if (cl_noskins->value || *s == 0)
 	{
-		//if (!isprint (*t))
-		if (*t <= 32)
-		{
-			i = -1;
-			break;
-		}
-		t++;
-	}
-
-	if (cl_noskins->value || *s == 0 || i == -1)
-	{
-badskin:
 		Com_sprintf (model_filename, sizeof(model_filename), "players/male/tris.md2");
 		Com_sprintf (weapon_filename, sizeof(weapon_filename), "players/male/weapon.md2");
 		Com_sprintf (skin_filename, sizeof(skin_filename), "players/male/grunt.pcx");
@@ -487,50 +474,17 @@ badskin:
 	}
 	else
 	{
-		int		length;
-		int		j;
-
-		Q_strncpy (model_name, s, sizeof(model_name)-1);
-
-		t = strchr(model_name, '/');
+		// isolate the model name
+		strcpy (model_name, s);
+		t = strstr(model_name, "/");
 		if (!t)
-			t = strchr(model_name, '\\');
-
+			t = strstr(model_name, "\\");
 		if (!t)
-		{
-			memcpy (model_name, "male\0grunt\0\0\0\0\0\0", 16);
-			s = "male\0grunt";
-		}
-		else
-		{
-			t[0] = 0;
-		}
-
-		//strcpy (original_model_name, model_name);
+			t = model_name;
+		*t = 0;
 
 		// isolate the skin name
-		Q_strncpy (skin_name, s + strlen(model_name) + 1, sizeof(skin_name)-1);
-		//strcpy (original_skin_name, s + strlen(model_name) + 1);
-
-		length = (int)strlen (model_name);
-		for (j = 0; j < length; j++)
-		{
-			if (!IsValidChar(model_name[j]))
-			{
-				Com_DPrintf (DEVELOPER_MSG_NET, "Bad character '%c' in playermodel '%s'\n", model_name[j], model_name);
-				goto badskin;
-			}
-		}
-
-		length = (int)strlen (skin_name);
-		for (j = 0; j < length; j++)
-		{
-			if (!IsValidChar(skin_name[j]))
-			{
-				Com_DPrintf (DEVELOPER_MSG_NET, "Bad character '%c' in playerskin '%s'\n", skin_name[j], skin_name);
-				goto badskin;
-			}
-		}
+		strcpy (skin_name, s + strlen(model_name) + 1);
 
 		// model file
 		Com_sprintf (model_filename, sizeof(model_filename), "players/%s/tris.md2", model_name);
