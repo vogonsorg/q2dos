@@ -13,3 +13,4 @@ del /q q2.exe
 del /q q2ace.exe
 del /q q2rogue.exe
 del /q q2xatrix.exe
+del /q q2zaero.exe
