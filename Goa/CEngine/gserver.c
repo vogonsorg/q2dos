@@ -75,6 +75,9 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 	GKeyValuePair kvpair;
 	int numplayers = 0;
 
+	if(!keyvals || strlen(keyvals) < 11)
+		return;
+
 	*keyvals = *keyvals++; // FS: Skip past the OOB_SEQ
 	*keyvals = *keyvals++;
 	*keyvals = *keyvals++;

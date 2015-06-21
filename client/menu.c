@@ -2627,7 +2627,6 @@ void JoinServer_MenuInit( void )
 void JoinGamespyServer_MenuInit( void )
 {
 	int i, vidscale;
-	extern	cvar_t	*sw_mode;
 
 	s_joingamespyserver_menu.x = viddef.width * 0.50 - 120;
 	s_joingamespyserver_menu.y = viddef.height * 0.50 - 118;//58;
@@ -2694,7 +2693,6 @@ void JoinGamespyServer_MenuInit( void )
 void JoinGamespyServerPage2_MenuInit( void )
 {
 	int i, vidscale;
-	extern	cvar_t	*sw_mode;
 
 	s_joingamespyserver_page2_menu.x = viddef.width * 0.50 - 120;
 	s_joingamespyserver_page2_menu.y = viddef.height * 0.50 - 118;//58;
@@ -2767,7 +2765,6 @@ void JoinGamespyServerPage2_MenuInit( void )
 void JoinGamespyServerPage3_MenuInit( void )
 {
 	int i, vidscale;
-	extern	cvar_t	*sw_mode;
 
 	s_joingamespyserver_page3_menu.x = viddef.width * 0.50 - 120;
 	s_joingamespyserver_page3_menu.y = viddef.height * 0.50 - 118;//58;

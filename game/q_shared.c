@@ -257,15 +257,9 @@ void R_ConcatTransforms (float in1[3][4], float in2[3][4], float out[3][4])
 
 float Q_fabs (float f)
 {
-#if 0
-	if (f >= 0)
-		return f;
-	return -f;
-#else
-	int tmp = * ( int * ) &f;
+	int tmp = *(int *)&f;
 	tmp &= 0x7FFFFFFF;
-	return * ( float * ) &tmp;
-#endif
+	return *(float*)&tmp;
 }
 
 #if defined _M_IX86 && !defined C_ONLY

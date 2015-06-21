@@ -198,7 +198,7 @@ Begins recording a demo from the current position
 void CL_Record_f (void)
 {
 	char	name[MAX_OSPATH];
-	char	buf_data[MAX_MSGLEN];
+	byte	buf_data[MAX_MSGLEN];
 	sizebuf_t	buf;
 	int		i;
 	int		len;
@@ -684,9 +684,9 @@ void CL_Disconnect (void)
 	// send a disconnect message to the server
 	final[0] = clc_stringcmd;
 	strcpy ((char *)final+1, "disconnect");
-	Netchan_Transmit (&cls.netchan, strlen(final), final);
-	Netchan_Transmit (&cls.netchan, strlen(final), final);
-	Netchan_Transmit (&cls.netchan, strlen(final), final);
+	Netchan_Transmit (&cls.netchan, strlen((char *)final), final);
+	Netchan_Transmit (&cls.netchan, strlen((char *)final), final);
+	Netchan_Transmit (&cls.netchan, strlen((char *)final), final);
 
 	CL_ClearState ();
 
@@ -2227,7 +2227,7 @@ void CL_Frame (double msec)
 	{
 		if (cls.state == ca_connected && extratime < 100)
 			return;			// don't flood packets out while connecting
-		if (extratime < 1000/cl_maxfps->value)
+		if (extratime < 1000/fps)
 		{
 		#if 0
 			// Knightmare- added Pooy's CPU usage fix

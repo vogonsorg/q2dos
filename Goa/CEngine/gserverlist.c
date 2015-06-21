@@ -237,8 +237,8 @@ static GError SendListRequest(GServerList serverlist)
 	data[len] = '\0'; //null terminate it
 	
 	ptr = strstr ( data, SECURE ) + strlen(SECURE);
-	gs_encrypt   ( (uchar *) serverlist->seckey, 6, ptr, 6 );
-	gs_encode ( ptr, 6, result );
+	gs_encrypt   ( (uchar *) serverlist->seckey, 6, (uchar *)ptr, 6 );
+	gs_encode ( (uchar *)ptr, 6, (uchar *)result );
 
 	//validate to the master
 	sprintf(data, "\\gamename\\%s\\gamever\\%s\\location\\0\\validate\\%s\\final\\\\queryid\\1.1\\",

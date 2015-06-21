@@ -388,7 +388,7 @@ rest of the data stream.
 void CL_ParsePacketEntities (frame_t *oldframe, frame_t *newframe)
 {
 	int			newnum;
-	int			bits;
+	unsigned int			bits;
 	entity_state_t	*oldstate = NULL; // FS: Compiler warning
 	int			oldindex, oldnum;
 
@@ -1429,7 +1429,7 @@ void CL_CalcViewValues (void)
 {
 	int			i;
 	float		lerp, backlerp;
-	centity_t	*ent;
+//	centity_t	*ent; // FS: Unused
 	frame_t		*oldframe;
 	player_state_t	*ps, *ops;
 
@@ -1447,7 +1447,7 @@ void CL_CalcViewValues (void)
 		|| abs(ops->pmove.origin[2] - ps->pmove.origin[2]) > 256*8)
 		ops = ps;		// don't interpolate
 
-	ent = &cl_entities[cl.playernum+1];
+//	ent = &cl_entities[cl.playernum+1]; // FS: Unused
 	lerp = cl.lerpfrac;
 
 	// calculate the origin

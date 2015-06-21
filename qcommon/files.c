@@ -228,16 +228,17 @@ void FS_FCloseFile (FILE *f)
 int	Developer_searchpath (int who)
 {
 	
-	int		ch;
+//	int		ch; // FS: Unused
 	// PMM - warning removal
 //	char	*start;
 	searchpath_t	*search;
-	
+
+/*	
 	if (who == 1) // xatrix
 		ch = 'x';
 	else if (who == 2)
 		ch = 'r';
-
+*/
 	for (search = fs_searchpaths ; search ; search = search->next)
 	{
 		if (strstr (search->filename, "xatrix"))
@@ -756,7 +757,9 @@ pack_t *FS_LoadPackFile (char *packfile)
 	pack_t			*pack;
 	FILE			*packhandle;
 	dpackfile_t		info[MAX_FILES_IN_PACK];
+#ifdef NO_ADDONS
 	unsigned		checksum;
+#endif
 	unsigned		contentFlags = 0;	// Knightmare added
 	int				tmpPos, tmpLen;		// Knightmare added
 #ifdef BINARY_PACK_SEARCH	//  Knightmare added
@@ -819,9 +822,9 @@ pack_t *FS_LoadPackFile (char *packfile)
 	}
 
 // crc the directory to check for modifications
+#ifdef NO_ADDONS
 	checksum = Com_BlockChecksum ((void *)info, header.dirlen);
 
-#ifdef NO_ADDONS
 	if (checksum != PAK0_CHECKSUM)
 		return NULL;
 #endif
