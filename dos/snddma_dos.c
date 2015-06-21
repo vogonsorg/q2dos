@@ -565,8 +565,7 @@ qboolean PCI_Init(void)
 struct mpxplay_audioout_info_s *aui=&au_infos;
 
 	char    *c;
-	int     ln;
-	char thing[20];
+	char thing[20]; // FS: GCC hates this and I don't understand it?
 
 	sprintf(thing,"-spk");		//sample code had this in
 	c=AU_search(&thing);

@@ -75,9 +75,10 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 	GKeyValuePair kvpair;
 	int numplayers = 0;
 
-	if(!keyvals || strlen(keyvals) < 11)
+	if(!keyvals || strlen(keyvals) < 11) // FS: Some kind of bad status packet, forget it.
 		return;
 
+/*
 	*keyvals = *keyvals++; // FS: Skip past the OOB_SEQ
 	*keyvals = *keyvals++;
 	*keyvals = *keyvals++;
@@ -88,8 +89,13 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 	*keyvals = *keyvals++; // N
 	*keyvals = *keyvals++; // T
 	*keyvals = *keyvals++; // newline
+*/
+//	Com_Printf("Keyvals before[%i]: %s\n", strlen(keyvals), keyvals);
+	memmove(keyvals, keyvals+10, strlen(keyvals));
+//	Com_Printf("Keyvals now[%i]: %s\n", strlen(keyvals), keyvals);
 
-	Q_strcpy(savedkeyvals, keyvals);
+	Q_strncpyz(savedkeyvals, keyvals, sizeof(savedkeyvals));
+//	Q_strcpy(savedkeyvals, keyvals);
 	savedkeyvals[strlen(keyvals)] = '\0';
 
 	k = mytok(++keyvals,'\\'); //skip over starting backslash
@@ -132,6 +138,10 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 		if (numplayers == 1 && hasBots == true)
 		{
 			return;
+		}
+		else if(numplayers > 1 && hasBots == true)
+		{
+			numplayers = numplayers-1; // FS: Remove wallfly from total output
 		}
 
 		kvpair.key = _strdup("numplayers");

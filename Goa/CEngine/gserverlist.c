@@ -137,6 +137,9 @@ static GError InitUpdateList(GServerList serverlist)
 		flags = 0;
 	error = fcntl(serverlist->updatelist[i].s, F_SETFL, flags | O_NONBLOCK);
 #endif // _WIN32
+	if (error == -1)
+		return GE_NOSOCKET;
+
 		serverlist->updatelist[i].serverindex = -1;
 		serverlist->updatelist[i].starttime = 0;
 	}
