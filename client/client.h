@@ -214,6 +214,7 @@ typedef struct
 	int			servercount;	// server identification for prespawns
 	char		gamedir[MAX_QPATH];
 	int			playernum;
+	int			maxclients; // FS: From R1Q2
 
 	char		configstrings[MAX_CONFIGSTRINGS][MAX_QPATH];
 

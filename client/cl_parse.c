@@ -70,10 +70,31 @@ qboolean	CL_CheckOrDownloadFile (char *filename)
 {
 	FILE *fp;
 	char	name[MAX_OSPATH];
+	static char lastfilename[MAX_OSPATH] = {0};
+
+	strcpy (lastfilename, filename);
 
 	if (strstr (filename, ".."))
 	{
-		Com_Printf ("Refusing to download a path with ..\n");
+		Com_Printf ("Refusing to check a path with .. (%s)\n", filename);
+		return true;
+	}
+
+	if (strchr (filename, ' '))
+	{
+		Com_Printf ("Refusing to check a path containing spaces (%s)\n", filename);
+		return true;
+	}
+
+	if (strchr (filename, ':'))
+	{
+		Com_Printf ("Refusing to check a path containing a colon (%s)\n", filename);
+		return true;
+	}
+
+	if (filename[0] == '/')
+	{
+		Com_Printf ("Refusing to check a path starting with / (%s)\n", filename);
 		return true;
 	}
 
@@ -92,40 +113,67 @@ qboolean	CL_CheckOrDownloadFile (char *filename)
 	else
 	{
 #endif	// USE_CURL
-	strcpy (cls.downloadname, filename);
+		int		length;
+		char	*p;
 
-	// download to a temp name, and only rename
-	// to the real name when done, so if interrupted
-	// a runt file wont be left
-	COM_StripExtension (cls.downloadname, cls.downloadtempname);
-	strcat (cls.downloadtempname, ".tmp");
+		strcpy (cls.downloadname, filename);
+
+		//r1: fix \ to /
+		p = cls.downloadname;
+		while ((p = strchr(p, '\\')))
+			p[0] = '/';
+
+		length = (int)strlen(cls.downloadname);
+
+		//normalize path
+		p = cls.downloadname;
+		while ((p = strstr (p, "./")))
+		{
+			memmove (p, p+2, length - (p - cls.downloadname) - 1);
+			length -= 2;
+		}
+
+		//r1: verify we are giving the server a legal path
+		if (cls.downloadname[length-1] == '/')
+		{
+			Com_Printf ("Refusing to download bad path (%s)\n", filename);
+			return true;
+		}
+
+		// download to a temp name, and only rename
+		// to the real name when done, so if interrupted
+		// a runt file wont be left
+		COM_StripExtension (cls.downloadname, cls.downloadtempname);
+		strcat (cls.downloadtempname, ".tmp");
 
 //ZOID
-	// check to see if we already have a tmp for this file, if so, try to resume
-	// open the file if not opened yet
-	CL_DownloadFileName(name, sizeof(name), cls.downloadtempname);
+		// check to see if we already have a tmp for this file, if so, try to resume
+		// open the file if not opened yet
+		CL_DownloadFileName(name, sizeof(name), cls.downloadtempname);
 
 //	FS_CreatePath (name);
 
-	fp = fopen (name, "r+b");
-	if (fp) { // it exists
-		int len;
-		fseek(fp, 0, SEEK_END);
-		len = ftell(fp);
+		fp = fopen (name, "r+b");
+		if (fp)
+		{ // it exists
+			int len;
+			fseek(fp, 0, SEEK_END);
+			len = ftell(fp);
 
-		cls.download = fp;
+			cls.download = fp;
 
-		// give the server an offset to start the download
-		Com_Printf ("Resuming %s\n", cls.downloadname);
-		MSG_WriteByte (&cls.netchan.message, clc_stringcmd);
-		MSG_WriteString (&cls.netchan.message,
-			va("download %s %i", cls.downloadname, len));
-	} else {
+			// give the server an offset to start the download
+			Com_Printf ("Resuming %s\n", cls.downloadname);
+			MSG_WriteByte (&cls.netchan.message, clc_stringcmd);
+			MSG_WriteString (&cls.netchan.message, va("download \"%s\" %i", cls.downloadname, len));
+		}
+		else
+		{
 		Com_Printf ("Downloading %s\n", cls.downloadname);
 		MSG_WriteByte (&cls.netchan.message, clc_stringcmd);
 		MSG_WriteString (&cls.netchan.message,
 			va("download %s", cls.downloadname));
-	}
+		}
 
 	cls.downloadnumber++;
 	cls.forcePacket = true;
@@ -145,41 +193,31 @@ Request a download from the server
 */
 void	CL_Download_f (void)
 {
-	char filename[MAX_OSPATH];
+	// FS: R1Q2 version
+	char	*filename;
 
 	if (Cmd_Argc() != 2) {
 		Com_Printf("Usage: download <filename>\n");
 		return;
 	}
 
-	Com_sprintf(filename, sizeof(filename), "%s", Cmd_Argv(1));
-
-	if (strstr (filename, ".."))
+	if (cls.state < ca_connected)
 	{
-		Com_Printf ("Refusing to download a path with ..\n");
+		Com_Printf ("You must be connected to use this command.\n");
 		return;
 	}
 
+	//Com_sprintf(filename, sizeof(filename), "%s", Cmd_Argv(1));
+	filename = Cmd_Argv(1);
+
 	if (FS_LoadFile (filename, NULL) != -1)
-	{	// it exists, no need to download
+	{	
+		// it exists, no need to download
 		Com_Printf("File already exists.\n");
 		return;
 	}
 
-	strcpy (cls.downloadname, filename);
-	Com_Printf ("Downloading %s\n", cls.downloadname);
-
-	// download to a temp name, and only rename
-	// to the real name when done, so if interrupted
-	// a runt file wont be left
-	COM_StripExtension (cls.downloadname, cls.downloadtempname);
-	strcat (cls.downloadtempname, ".tmp");
-
-	MSG_WriteByte (&cls.netchan.message, clc_stringcmd);
-	MSG_WriteString (&cls.netchan.message,
-		va("download %s", cls.downloadname));
-
-	cls.downloadnumber++;
+	CL_CheckOrDownloadFile (filename);
 }
 
 /*
@@ -220,9 +258,17 @@ void CL_ParseDownload (void)
 	// read the data
 	size = MSG_ReadShort (&net_message);
 	percent = MSG_ReadByte (&net_message);
-	if (size == -1)
+	if (size < 0)
 	{
-		Com_Printf ("Server does not have this file.\n");
+		if (size == -1)
+			Com_Printf ("Server does not have this file.\n");
+		else
+			Com_Printf ("Bad download data from server.\n");
+
+		//r1: nuke the temp filename
+		cls.downloadtempname[0] = 0;
+		cls.downloadname[0] = 0;
+		
 		if (cls.download)
 		{
 			// if here, we tried to resume a file but the server said no
@@ -252,21 +298,15 @@ void CL_ParseDownload (void)
 		}
 	}
 
+	//r1: downloading something, drop to console to show status bar
+	SCR_EndLoadingPlaque();
+
 	fwrite (net_message.data + net_message.readcount, 1, size, cls.download);
 	net_message.readcount += size;
 
 	if (percent != 100)
 	{
 		// request next block
-// change display routines by zoid
-#if 0
-		Com_Printf (".");
-		if (10*(percent/10) != cls.downloadpercent)
-		{
-			cls.downloadpercent = 10*(percent/10);
-			Com_Printf ("%i%%", cls.downloadpercent);
-		}
-#endif
 		CL_Download_Calculate_KBps (size, 0);	// Knightmare- for KB/s counter
 
 		cls.downloadpercent = percent;
@@ -419,8 +459,22 @@ void CL_LoadClientinfo (clientinfo_t *ci, char *s)
 		s = t+1;
 	}
 
-	if (cl_noskins->value || *s == 0)
+	//r1ch: check sanity of paths: only allow printable data
+	t = s;
+	while (*t)
 	{
+		//if (!isprint (*t))
+		if (*t <= 32)
+		{
+			i = -1;
+			break;
+		}
+		t++;
+	}
+
+	if (cl_noskins->value || *s == 0 || i == -1)
+	{
+badskin:
 		Com_sprintf (model_filename, sizeof(model_filename), "players/male/tris.md2");
 		Com_sprintf (weapon_filename, sizeof(weapon_filename), "players/male/weapon.md2");
 		Com_sprintf (skin_filename, sizeof(skin_filename), "players/male/grunt.pcx");
@@ -433,17 +487,50 @@ void CL_LoadClientinfo (clientinfo_t *ci, char *s)
 	}
 	else
 	{
-		// isolate the model name
-		strcpy (model_name, s);
-		t = strstr(model_name, "/");
+		int		length;
+		int		j;
+
+		Q_strncpy (model_name, s, sizeof(model_name)-1);
+
+		t = strchr(model_name, '/');
 		if (!t)
-			t = strstr(model_name, "\\");
+			t = strchr(model_name, '\\');
+
 		if (!t)
-			t = model_name;
-		*t = 0;
+		{
+			memcpy (model_name, "male\0grunt\0\0\0\0\0\0", 16);
+			s = "male\0grunt";
+		}
+		else
+		{
+			t[0] = 0;
+		}
+
+		//strcpy (original_model_name, model_name);
 
 		// isolate the skin name
-		strcpy (skin_name, s + strlen(model_name) + 1);
+		Q_strncpy (skin_name, s + strlen(model_name) + 1, sizeof(skin_name)-1);
+		//strcpy (original_skin_name, s + strlen(model_name) + 1);
+
+		length = (int)strlen (model_name);
+		for (j = 0; j < length; j++)
+		{
+			if (!IsValidChar(model_name[j]))
+			{
+				Com_DPrintf (DEVELOPER_MSG_NET, "Bad character '%c' in playermodel '%s'\n", model_name[j], model_name);
+				goto badskin;
+			}
+		}
+
+		length = (int)strlen (skin_name);
+		for (j = 0; j < length; j++)
+		{
+			if (!IsValidChar(skin_name[j]))
+			{
+				Com_DPrintf (DEVELOPER_MSG_NET, "Bad character '%c' in playerskin '%s'\n", skin_name[j], skin_name);
+				goto badskin;
+			}
+		}
 
 		// model file
 		Com_sprintf (model_filename, sizeof(model_filename), "players/%s/tris.md2", model_name);
@@ -509,6 +596,7 @@ void CL_LoadClientinfo (clientinfo_t *ci, char *s)
 		return;
 	}
 }
+
 
 /*
 ================
@@ -682,10 +770,25 @@ void CL_ParseConfigString (void)
 		if (cl.refresh_prepped)
 			cl.image_precache[i-CS_IMAGES] = re.RegisterPic (cl.configstrings[i]);
 	}
+	else if (i == CS_MAXCLIENTS)
+	{
+		if (!cl.attractloop)
+			cl.maxclients = atoi(cl.configstrings[CS_MAXCLIENTS]);
+	}
 	else if (i >= CS_PLAYERSKINS && i < CS_PLAYERSKINS+MAX_CLIENTS)
 	{
-		if (cl.refresh_prepped && strcmp(olds, s))
-			CL_ParseClientinfo (i-CS_PLAYERSKINS);
+		//r1: hack to avoid parsing non-skins from mods that overload CS_PLAYERSKINS
+		//FIXME: how reliable is CS_MAXCLIENTS?
+		i -= CS_PLAYERSKINS;
+		if (i < cl.maxclients)
+		{
+			if (cl.refresh_prepped && strcmp(olds, s))
+				CL_ParseClientinfo (i);
+		}
+		else
+		{
+			Com_DPrintf (DEVELOPER_MSG_NET, "CL_ParseConfigString: Ignoring out-of-range playerskin %d (%s)\n", i, s);
+		}
 	}
 }
 

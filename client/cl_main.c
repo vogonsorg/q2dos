@@ -1438,6 +1438,12 @@ void CL_RequestNextDownload (void)
 				i = (precache_check - CS_PLAYERSKINS)/PLAYER_MULT;
 				n = (precache_check - CS_PLAYERSKINS)%PLAYER_MULT;
 
+				if (i >= cl.maxclients) // FS: From R1Q2
+				{
+					precache_check = ENV_CNT;
+					continue;
+				}
+
 				if (!cl.configstrings[CS_PLAYERSKINS+i][0]) {
 					precache_check = CS_PLAYERSKINS + (i + 1) * PLAYER_MULT;
 					continue;
