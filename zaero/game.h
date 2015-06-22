@@ -1,3 +1,5 @@
+#ifndef ZAERO_GAME_H
+#define ZAERO_GAME_H
 
 // game.h -- game dll information visible to server
 
@@ -214,3 +216,4 @@ typedef struct
 } game_export_t;
 
 game_export_t *GetGameApi (game_import_t *import);
+#endif /* ZAERO_GAME_H */

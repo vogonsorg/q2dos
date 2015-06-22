@@ -10,7 +10,7 @@
 // the damages too, but I'm not sure that's such a good idea.
 void monster_fire_bullet (edict_t *self, vec3_t start, vec3_t dir, int damage, int kick, int hspread, int vspread, int flashtype)
 {
-   ANIM_AIM(self, dir);
+	ANIM_AIM(self, dir); // FS: Zaero specific
 	fire_bullet (self, start, dir, damage, kick, hspread, vspread, MOD_UNKNOWN);
 
 	gi.WriteByte (svc_muzzleflash2);
@@ -21,7 +21,7 @@ void monster_fire_bullet (edict_t *self, vec3_t start, vec3_t dir, int damage, i
 
 void monster_fire_shotgun (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick, int hspread, int vspread, int count, int flashtype)
 {
-   ANIM_AIM(self, aimdir);
+	ANIM_AIM(self, aimdir); // FS: Zaero specific
 	fire_shotgun (self, start, aimdir, damage, kick, hspread, vspread, count, MOD_UNKNOWN);
 
 	gi.WriteByte (svc_muzzleflash2);
@@ -32,13 +32,13 @@ void monster_fire_shotgun (edict_t *self, vec3_t start, vec3_t aimdir, int damag
 
 void monster_fire_blaster (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, int flashtype, int effect)
 {
-  if(EMPNukeCheck(self, start))
-  {
+	if(EMPNukeCheck(self, start)) // FS: Zaero specific
+	{
 		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
-    return;
-  }
+		return;
+	}
 
-  ANIM_AIM(self, dir);
+	ANIM_AIM(self, dir); // FS: Zaero specific
 	fire_blaster (self, start, dir, damage, speed, effect, false);
 
 	gi.WriteByte (svc_muzzleflash2);
@@ -49,7 +49,7 @@ void monster_fire_blaster (edict_t *self, vec3_t start, vec3_t dir, int damage, 
 
 void monster_fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, int flashtype)
 {
-   ANIM_AIM(self, aimdir);
+	ANIM_AIM(self, aimdir); // FS: Zaero specific
 	fire_grenade (self, start, aimdir, damage, speed, 2.5, damage+40);
 
 	gi.WriteByte (svc_muzzleflash2);
@@ -60,13 +60,13 @@ void monster_fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damag
 
 void monster_fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, int flashtype)
 {
-  if(EMPNukeCheck(self, start))
-  {
+	if(EMPNukeCheck(self, start)) // FS: Zaero specific
+	{
 		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
-    return;
-  }
+		return;
+	}
 
-  ANIM_AIM(self, dir);
+	ANIM_AIM(self, dir); // FS: Zaero specific
 	fire_rocket (self, start, dir, damage, speed, damage+20, damage);
 
 	gi.WriteByte (svc_muzzleflash2);
@@ -77,13 +77,13 @@ void monster_fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, i
 
 void monster_fire_railgun (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick, int flashtype)
 {
-  if(EMPNukeCheck(self, start))
-  {
+	if(EMPNukeCheck(self, start)) // FS: Zaero specific
+	{
 		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
-    return;
-  }
+		return;
+	}
 
-  ANIM_AIM(self, aimdir);
+	ANIM_AIM(self, aimdir); // FS: Zaero specific
 	fire_rail (self, start, aimdir, damage, kick);
 
 	gi.WriteByte (svc_muzzleflash2);
@@ -94,13 +94,13 @@ void monster_fire_railgun (edict_t *self, vec3_t start, vec3_t aimdir, int damag
 
 void monster_fire_bfg (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, int kick, float damage_radius, int flashtype)
 {
-  if(EMPNukeCheck(self, start))
-  {
+	if(EMPNukeCheck(self, start)) // FS: Zaero specific
+	{
 		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
-    return;
-  }
+		return;
+	}
 
-  ANIM_AIM(self, aimdir);
+	ANIM_AIM(self, aimdir); // FS: Zaero specific
 	fire_bfg (self, start, aimdir, damage, speed, damage_radius);
 
 	gi.WriteByte (svc_muzzleflash2);
@@ -115,13 +115,13 @@ void monster_fire_bfg (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 // Monster utility functions
 //
 
-static void M_FliesOff (edict_t *self)
+void M_FliesOff (edict_t *self)
 {
 	self->s.effects &= ~EF_FLIES;
 	self->s.sound = 0;
 }
 
-static void M_FliesOn (edict_t *self)
+void M_FliesOn (edict_t *self)
 {
 	if (self->waterlevel)
 		return;
@@ -163,7 +163,7 @@ void M_CheckGround (edict_t *ent)
 		return;
 	}
 
-// if the hull point one-quarter unit down is solid the entity is on ground
+	// if the hull point one-quarter unit down is solid the entity is on ground
 	point[0] = ent->s.origin[0];
 	point[1] = ent->s.origin[1];
 	point[2] = ent->s.origin[2] - 0.25;
@@ -177,10 +177,6 @@ void M_CheckGround (edict_t *ent)
 		return;
 	}
 
-//	ent->groundentity = trace.ent;
-//	ent->groundentity_linkcount = trace.ent->linkcount;
-//	if (!trace.startsolid && !trace.allsolid)
-//		VectorCopy (trace.endpos, ent->s.origin);
 	if (!trace.startsolid && !trace.allsolid)
 	{
 		VectorCopy (trace.endpos, ent->s.origin);
@@ -196,9 +192,9 @@ void M_CatagorizePosition (edict_t *ent)
 	vec3_t		point;
 	int			cont;
 
-//
-// get waterlevel
-//
+	//
+	// get waterlevel
+	//
 	point[0] = ent->s.origin[0];
 	point[1] = ent->s.origin[1];
 	point[2] = ent->s.origin[2] + ent->mins[2] + 1;	
@@ -368,7 +364,7 @@ void M_SetEffects (edict_t *ent)
 	}
 }
 
-qboolean FindTarget (edict_t *self);
+qboolean FindTarget (edict_t *self); // FS: Zaero specific
 void M_MoveFrame (edict_t *self)
 {
 	mmove_t	*move;
@@ -377,7 +373,7 @@ void M_MoveFrame (edict_t *self)
 	self->nextthink = level.time + FRAMETIME;
 
 	// otherwise, move normally
-	move = self->monsterinfo.currentmove;
+	move = self->monsterinfo.currentmove; // FS: Zaero specific, moved after nexthink
 	
 	if ((self->monsterinfo.nextframe) && (self->monsterinfo.nextframe >= move->firstframe) && (self->monsterinfo.nextframe <= move->lastframe))
 	{
@@ -419,11 +415,12 @@ void M_MoveFrame (edict_t *self)
 
 	index = self->s.frame - move->firstframe;
 	if (move->frame[index].aifunc)
+	{
 		if (!(self->monsterinfo.aiflags & AI_HOLD_FRAME))
 			move->frame[index].aifunc (self, move->frame[index].dist * self->monsterinfo.scale);
 		else
 			move->frame[index].aifunc (self, 0);
-
+	}
 	if (move->frame[index].thinkfunc)
 		move->frame[index].thinkfunc (self);
 }
@@ -442,8 +439,10 @@ void monster_think (edict_t *self)
 	M_SetEffects (self);
 
 	// decrease blindness
-	if (self->monsterinfo.flashTime > 0)
+	if (self->monsterinfo.flashTime > 0) // FS: Zaero specific
+	{
 		self->monsterinfo.flashTime--;
+	}
 }
 
 
@@ -465,7 +464,7 @@ void monster_use (edict_t *self, edict_t *other, edict_t *activator)
 	if (!(activator->client) && !(activator->monsterinfo.aiflags & AI_GOOD_GUY))
 		return;
 	
-// delay reaction so if the monster is teleported, its sound is still heard
+	// delay reaction so if the monster is teleported, its sound is still heard
 	self->enemy = activator;
 	FoundTarget (self);
 }
@@ -477,7 +476,7 @@ void monster_start_go (edict_t *self);
 void monster_triggered_spawn (edict_t *self)
 {
 	self->s.origin[2] += 1;
-	MonsterKillBox (self);
+	MonsterKillBox (self); // FS: Zaero specific
 
 	self->solid = SOLID_BBOX;
 	self->movetype = MOVETYPE_STEP;
@@ -498,8 +497,8 @@ void monster_triggered_spawn (edict_t *self)
 
 	// some sort of spawn effect
 	// TODO good enough?
-	self->s.event = EV_PLAYER_TELEPORT;
-  MonsterPlayerKillBox(self);
+	self->s.event = EV_PLAYER_TELEPORT; // FS: Zaero specific
+	MonsterPlayerKillBox(self); // FS: Zaero specific
 }
 
 void monster_triggered_spawn_use (edict_t *self, edict_t *other, edict_t *activator)
@@ -565,12 +564,11 @@ qboolean monster_start (edict_t *self)
 	{
 		self->spawnflags &= ~4;
 		self->spawnflags |= 1;
-//		gi.dprintf(DEVELOPER_MSG_GAME, "fixed spawnflags on %s at %s\n", self->classname, vtos(self->s.origin));
 	}
 
 	if (!(self->monsterinfo.aiflags & AI_GOOD_GUY))
 	{
-		if(!(self->spawnflags & 16))
+		if(!(self->spawnflags & 16)) // FS: Zaero specific
 		{
 			level.total_monsters++;
 		}
@@ -765,3 +763,4 @@ void swimmonster_start (edict_t *self)
 	self->think = swimmonster_start_go;
 	monster_start (self);
 }
+

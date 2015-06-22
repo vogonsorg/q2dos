@@ -1,6 +1,9 @@
+#ifndef ZAERO_LOCAL_H
+#define ZAERO_LOCAL_H
 // g_local.h -- local definitions for game module
 
 #include "q_shared.h"
+#include "z_anim.h"
 
 // define GAME_INCLUDE so that game.h does not define the
 // short, server-visible gclient_t and edict_t structures,
@@ -23,10 +26,6 @@
 #define Z_FREE(block)	gi.TagFree(block)
 
 // Zaero includes
-#include "z_debug.h"
-#ifdef CACHE_SOUND
-#include "z_list.h"
-#endif
 
 // the "gamename" client command will print this plus compile date
 #define	GAMEVERSION	"Zaero 1.1"
@@ -559,10 +558,10 @@ extern	int	meansOfDeath;
 
 extern	edict_t			*g_edicts;
 
-#define	FOFS(x) (int)&(((edict_t *)0)->x)
-#define	STOFS(x) (int)&(((spawn_temp_t *)0)->x)
-#define	LLOFS(x) (int)&(((level_locals_t *)0)->x)
-#define	CLOFS(x) (int)&(((gclient_t *)0)->x)
+#define	FOFS(x) (size_t)&(((edict_t *)NULL)->x)
+#define	STOFS(x) (size_t)&(((spawn_temp_t *)NULL)->x)
+#define	LLOFS(x) (size_t)&(((level_locals_t *)NULL)->x)
+#define	CLOFS(x) (size_t)&(((gclient_t *)NULL)->x)
 
 #define random()	((rand () & 0x7fff) / ((float)0x7fff))
 #define crandom()	(2.0 * (random() - 0.5))
@@ -600,9 +599,6 @@ extern	cvar_t  *gamedir;
 extern	cvar_t	*grenadeammotype;
 extern	cvar_t	*grenadeammo;
 extern	cvar_t	*bettyammo;
-#ifdef CACHE_SOUND
-extern cvar_t *printSoundRejects;
-#endif
 
 #define world	(&g_edicts[0])
 
@@ -620,6 +616,7 @@ extern cvar_t *printSoundRejects;
 // and saving / loading games
 //
 #define FFL_SPAWNTEMP		1
+#define FFL_NOSPAWN			2
 
 typedef enum {
 	F_INT, 
@@ -631,6 +628,8 @@ typedef enum {
 	F_EDICT,			// index on disk, pointer in memory
 	F_ITEM,				// index on disk, pointer in memory
 	F_CLIENT,			// index on disk, pointer in memory
+	F_FUNCTION,
+	F_MMOVE,
 	F_IGNORE
 } fieldtype_t;
 
@@ -823,6 +822,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 // g_svcmds.c
 //
 void	ServerCommand (void);
+qboolean SV_FilterPacket (char *from);
 
 //
 // p_view.c
@@ -862,22 +862,15 @@ void SaveClientData (void);
 void FetchClientEntData (edict_t *ent);
 
 
-#if defined(_DEBUG) && defined(_Z_TESTMODE)
 
 //
 // z_mtest.c
 //
-void Cmd_TestItem (edict_t *ent);
 
-#endif
 
 //
 // z_trigger.c
 //
-#ifdef CACHE_SOUND
-void printSoundNum();
-void initSoundList();
-#endif
 
 //
 // z_item.c
@@ -1048,9 +1041,6 @@ struct gclient_s
 
 	float		respawn_time;		// can respawn when time > this
 
-#if defined(_DEBUG) && defined(_Z_TESTMODE)
-	struct edict_s *lineDraw;
-#endif
 
 	// used for blinding
 	int flashTime;
@@ -1237,10 +1227,7 @@ struct edict_s
 
 	float weaponsound_time;
 
-#if defined(_DEBUG) && defined(_Z_TESTMODE)
 	//can't teach an old dog new tricks
-	void *extra_data;
-#endif
 
 	// schooling info
 	edict_t *zRaduisList, *zSchoolChain;
@@ -1272,9 +1259,8 @@ struct edict_s
 };
 
 //zaero debug includes (need type info)
-#include "z_frames.h"
-#include "z_anim.h"
 
 // Zaero dmflags
 #define ZDM_NO_GL_POLYBLEND_DAMAGE	1
 #define ZDM_ZAERO_ITEMS				2
+#endif /* ZAERO_LOCAL_H */

@@ -91,10 +91,6 @@ and global variables
 game_export_t *GetGameAPI (game_import_t *import)
 {
 	gi = *import;
-#ifdef CACHE_SOUND
-	actual_soundindex = gi.soundindex;
-	gi.soundindex = internalSoundIndex;
-#endif
 	globals.apiversion = GAME_API_VERSION;
 	globals.Init = InitGame;
 	globals.Shutdown = ShutdownGame;

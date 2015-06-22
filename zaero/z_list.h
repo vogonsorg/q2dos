@@ -1,3 +1,4 @@
+#if 0 // FS: Yamagai Removed
 #ifndef __Z_LIST_H
 #define __Z_LIST_H
 
@@ -50,3 +51,4 @@ void copyList(list_t *src, list_t *dest);
 void stealList(list_t *src, list_t *dest);
 
 #endif
+#endif // 0

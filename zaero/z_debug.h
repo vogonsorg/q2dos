@@ -1,3 +1,4 @@
+#if 0 // FS: Yamagi Removed
 #ifndef __Z_DEBUG_H
 #define __Z_DEBUG_H
 
@@ -10,3 +11,4 @@ void assertMsg(const char *msg, const char *file, int line);
 #endif
 
 #endif
+#endif // 0

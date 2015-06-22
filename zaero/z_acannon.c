@@ -62,7 +62,7 @@ ac_anim_t acFiringFrames[5] =
 	// dummy
 	{
 		0,
-		{ true, false, -1 }
+		{ { true, false, -1 } }
 	},
 
 	// chaingun
@@ -700,11 +700,7 @@ void monster_autocannon_deactivate(edict_t *self)
 		self->s.frame < acDeactEnd[self->style])
 	{
 		self->chain->s.sound = 0;
-		if (self->s.frame == acDeactStart[self->style])
-		{
-			//gi.sound(self, CHAN_VOICE, gi.soundindex("objects/acannon/ac_away.wav"), 1, ATTN_NORM, 0);
-		}
-		// continue
+
 		self->s.frame++;
 		self->chain->s.frame++;
 	}

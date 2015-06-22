@@ -1,3 +1,4 @@
+#if 0 // FS: Yamagi removed
 #include "g_local.h"
 #include "z_list.h"
 #include <stdlib.h>
@@ -214,3 +215,4 @@ int findIndex(list_t *list, void *data)
 	// failure
 	return -1;
 }
+#endif

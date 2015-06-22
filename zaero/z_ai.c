@@ -9,20 +9,7 @@ void ai_run_melee(edict_t *self);
 qboolean FindTarget (edict_t *self);
 qboolean SV_StepDirection (edict_t *ent, float yaw, float dist);
 void SV_NewChaseDir (edict_t *actor, vec3_t eOrigin, float dist);
-#if 0
-void z_aiMoveTo(edict_t *self, float dist)
-{
 	// sanity check
-	if (!(self->monsterinfo.scriptState & MSS_AIMOVETO))
-		return;
-#if 0
-	if (!SV_StepDirection (self, self->ideal_yaw, dist))
-	{
-		SV_NewChaseDir (self, self->monsterinfo.aiMoveTo, dist);
-	}
-#endif
-}
-#endif
 
 
 /*
@@ -187,7 +174,7 @@ int zSchoolMonsters(edict_t *self, float dist, int runStyle, float *currentSpeed
   	float totalSpeed;
     float totalBearing;
     float distanceToNearest, distanceToLeader, dist;
-    edict_t *nearestEntity, *list;
+    edict_t *nearestEntity = 0, *list;
     vec3_t vec;
 
     totalSpeed = 0;

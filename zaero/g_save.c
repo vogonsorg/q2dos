@@ -98,7 +98,7 @@
  * function signature with
  * the corresponding pointer
  */
-typedef struct
+typedef struct 
 {
 	char *funcStr;
 	byte *funcPtr;
@@ -109,7 +109,7 @@ typedef struct
  * mmove_t string with the
  * correspondig pointer
  * */
-typedef struct
+typedef struct 
 {
 	char	*mmoveStr;
 	mmove_t *mmovePtr;
@@ -158,7 +158,7 @@ field_t fields[] = {
 };
 
 /*
- * Level fields to
+ * Level fields to 
  * be saved
  */
 field_t levelfields[] = {
@@ -177,7 +177,7 @@ field_t clientfields[] = {
 
 /*
  * This will be called when the dll is first loaded,
- * which only happens when a new game is started or
+ * which only happens when a new game is started or 
  * a save game is loaded.
  */
 void
@@ -189,8 +189,6 @@ InitGame(void)
 	gun_x = gi.cvar ("gun_x", "0", 0);
 	gun_y = gi.cvar ("gun_y", "0", 0);
 	gun_z = gi.cvar ("gun_z", "0", 0);
-
-	//FIXME: sv_ prefix is wrong for these
 	sv_rollspeed = gi.cvar ("sv_rollspeed", "200", 0);
 	sv_rollangle = gi.cvar ("sv_rollangle", "2", 0);
 	sv_maxvelocity = gi.cvar ("sv_maxvelocity", "2000", 0);
@@ -203,48 +201,28 @@ InitGame(void)
 	sv_cheats = gi.cvar ("cheats", "0", CVAR_SERVERINFO|CVAR_LATCH);
 	gi.cvar ("gamename", GAMEVERSION , CVAR_SERVERINFO | CVAR_LATCH);
 	gi.cvar ("gamedate", __DATE__ , CVAR_SERVERINFO | CVAR_LATCH);
-
 	maxclients = gi.cvar ("maxclients", "4", CVAR_SERVERINFO | CVAR_LATCH);
 	deathmatch = gi.cvar ("deathmatch", "0", CVAR_LATCH);
 	coop = gi.cvar ("coop", "0", CVAR_LATCH);
 	skill = gi.cvar ("skill", "1", CVAR_LATCH);
-	maxentities = gi.cvar ("maxentities", "1024", CVAR_LATCH);
+	maxentities = gi.cvar ("maxentities", va("%i",MAX_EDICTS), CVAR_LATCH);
 
 	// change anytime vars
 	dmflags = gi.cvar ("dmflags", "0", CVAR_SERVERINFO);
-	zdmflags = gi.cvar ("zdmflags", "0", CVAR_SERVERINFO);
 	fraglimit = gi.cvar ("fraglimit", "0", CVAR_SERVERINFO);
 	timelimit = gi.cvar ("timelimit", "0", CVAR_SERVERINFO);
 	password = gi.cvar ("password", "", CVAR_USERINFO);
-
 	g_select_empty = gi.cvar ("g_select_empty", "0", CVAR_ARCHIVE);
-
 	run_pitch = gi.cvar ("run_pitch", "0.002", 0);
 	run_roll = gi.cvar ("run_roll", "0.005", 0);
 	bob_up  = gi.cvar ("bob_up", "0.005", 0);
 	bob_pitch = gi.cvar ("bob_pitch", "0.002", 0);
 	bob_roll = gi.cvar ("bob_roll", "0.002", 0);
 
-	gamedir = gi.cvar ("gamedir", "baseq2", CVAR_SERVERINFO);
-#ifdef CACHE_SOUND
-	printSoundRejects = gi.cvar("printsoundrejects", "0", CVAR_SERVERINFO);
-#endif
-
 	// items
 	InitItems ();
 
-#if defined(_DEBUG) && defined(_Z_TESTMODE)
-
-	gi.dprintf(DEVELOPER_MSG_GAME, "==== InitTestWeapon ====\n");
-	InitTestWeapon();
-
-	gi.dprintf(DEVELOPER_MSG_GAME, "==== InitTestItem ====\n");
-	InitTestItem();
-
-#endif
-
 	Com_sprintf (game.helpmessage1, sizeof(game.helpmessage1), "");
-
 	Com_sprintf (game.helpmessage2, sizeof(game.helpmessage2), "");
 
 	// initialize all entities for this game
@@ -257,9 +235,6 @@ InitGame(void)
 	game.maxclients = maxclients->value;
 	game.clients = gi.TagMalloc (game.maxclients * sizeof(game.clients[0]), TAG_GAME);
 	globals.num_edicts = game.maxclients+1;
-
-	// get at the gl_polyblend client variable
-	gi.cvar("gl_polyblend", "1", CVAR_USERINFO);
 }
 
 /* ========================================================= */
@@ -367,6 +342,8 @@ WriteField1(FILE *f, field_t *field, byte *base)
 	void *p;
 	int len;
 	int index;
+	functionList_t *func;
+	mmoveList_t *mmove;
 
 	if (field->flags & FFL_SPAWNTEMP)
 	{
@@ -437,6 +414,46 @@ WriteField1(FILE *f, field_t *field, byte *base)
 
 			*(int *)p = index;
 			break;
+		case F_FUNCTION:
+
+			if (*(byte **)p == NULL)
+			{
+				len = 0;
+			}
+			else
+			{
+				func = GetFunctionByAddress (*(byte **)p);
+
+				if (!func)
+				{
+					gi.error ("WriteField1: function not in list, can't save game");
+				}
+				
+				len = strlen(func->funcStr)+1;
+			}
+			
+			*(int *)p = len;
+			break;
+		case F_MMOVE:
+
+			if (*(byte **)p == NULL)
+			{
+				len = 0;
+			}
+			else
+			{
+				mmove = GetMmoveByAddress (*(mmove_t **)p);
+				
+				if (!mmove)
+				{
+					gi.error ("WriteField1: mmove not in list, can't save game");
+				}
+
+				len = strlen(mmove->mmoveStr)+1;
+			}
+			
+			*(int *)p = len;
+			break;
 		default:
 			gi.error("WriteEdict: unknown field type");
 	}
@@ -447,6 +464,8 @@ WriteField2(FILE *f, field_t *field, byte *base)
 {
 	int len;
 	void *p;
+	functionList_t *func;
+	mmoveList_t *mmove;
 
 	if (field->flags & FFL_SPAWNTEMP)
 	{
@@ -466,6 +485,38 @@ WriteField2(FILE *f, field_t *field, byte *base)
 			}
 
 			break;
+		case F_FUNCTION:
+			
+			if (*(byte **)p)
+			{
+				func = GetFunctionByAddress (*(byte **)p);
+				
+				if (!func)
+				{
+					gi.error ("WriteField2: function not in list, can't save game");
+				}
+				
+				len = strlen(func->funcStr)+1;
+				fwrite (func->funcStr, len, 1, f);
+			}
+
+			break;
+		case F_MMOVE:
+			
+			if (*(byte **)p)
+			{
+				mmove = GetMmoveByAddress (*(mmove_t **)p);
+
+				if (!mmove)
+				{
+					gi.error ("WriteField2: mmove not in list, can't save game");
+				}
+
+				len = strlen(mmove->mmoveStr)+1;
+				fwrite (mmove->mmoveStr, len, 1, f);
+			}
+
+			break;
 		default:
 			break;
 	}
@@ -473,7 +524,7 @@ WriteField2(FILE *f, field_t *field, byte *base)
 
 /* ========================================================= */
 
-/*
+/* 
  * This function does the dirty
  * work to read the data from a
  * file. The processing of the
@@ -486,6 +537,7 @@ ReadField(FILE *f, field_t *field, byte *base)
 	void *p;
 	int len;
 	int index;
+	char funcStr[2048];
 
 	if (field->flags & FFL_SPAWNTEMP)
 	{
@@ -556,6 +608,54 @@ ReadField(FILE *f, field_t *field, byte *base)
 			}
 
 			break;
+		case F_FUNCTION:
+			len = *(int *)p;
+
+			if (!len)
+			{
+				*(byte **)p = NULL;
+			}
+			else
+			{
+				if (len > sizeof(funcStr))
+				{
+					gi.error ("ReadField: function name is longer than buffer (%i chars)",
+							sizeof(funcStr));
+				}
+
+				fread (funcStr, len, 1, f);
+
+				if ( !(*(byte **)p = FindFunctionByName (funcStr)) )
+				{
+					gi.error ("ReadField: function %s not found in table, can't load game", funcStr);
+				}
+
+			}
+			break;
+		case F_MMOVE:
+			len = *(int *)p;
+
+			if (!len)
+			{
+				*(byte **)p = NULL;
+			}
+			else
+			{
+				if (len > sizeof(funcStr))
+				{
+					gi.error ("ReadField: mmove name is longer than buffer (%i chars)",
+						   	sizeof(funcStr));
+				}
+
+				fread (funcStr, len, 1, f);
+				
+				if ( !(*(mmove_t **)p = FindMmoveByName (funcStr)) )
+				{
+					gi.error ("ReadField: mmove %s not found in table, can't load game", funcStr);
+				}
+			}
+			break;
+
 		default:
 			gi.error("ReadEdict: unknown field type");
 	}
@@ -564,7 +664,7 @@ ReadField(FILE *f, field_t *field, byte *base)
 /* ========================================================= */
 
 /*
- * Write the client struct into a file.
+ * Write the client struct into a file. 
  */
 void
 WriteClient(FILE *f, gclient_t *client)
@@ -620,7 +720,7 @@ ReadClient(FILE *f, gclient_t *client)
  * - help computer info
  */
 void
-WriteGame(char *filename, qboolean autosave)
+WriteGame(const char *filename, qboolean autosave)
 {
 	FILE *f;
 	int i;
@@ -647,10 +747,10 @@ WriteGame(char *filename, qboolean autosave)
 	memset(str_os, 0, sizeof(str_os));
 	memset(str_arch, 0, sizeof(str_arch));
 
-	strncpy(str_ver, SAVEGAMEVER, sizeof(str_ver) - 1);
-	strncpy(str_game, GAMEVERSION, sizeof(str_game) - 1);
-	strncpy(str_os, OS, sizeof(str_os) - 1);
-	strncpy(str_arch, ARCH, sizeof(str_arch) - 1);
+	strncpy(str_ver, SAVEGAMEVER, sizeof(str_ver));
+	strncpy(str_game, GAMEVERSION, sizeof(str_game));
+	strncpy(str_os, OS, sizeof(str_os));
+    strncpy(str_arch, ARCH, sizeof(str_arch));
 
 	fwrite(str_ver, sizeof(str_ver), 1, f);
 	fwrite(str_game, sizeof(str_game), 1, f);
@@ -675,7 +775,7 @@ WriteGame(char *filename, qboolean autosave)
  * savegames is loaded.
  */
 void
-ReadGame(char *filename)
+ReadGame(const char *filename)
 {
 	FILE *f;
 	int i;
@@ -803,7 +903,7 @@ WriteLevelLocals(FILE *f)
  * into a file.
  */
 void
-WriteLevel(char *filename)
+WriteLevel(const char *filename)
 {
 	int i;
 	edict_t *ent;
@@ -893,7 +993,7 @@ ReadLevelLocals(FILE *f)
  * are connected to the server.
  */
 void
-ReadLevel(char *filename)
+ReadLevel(const char *filename)
 {
 	int entnum;
 	FILE *f;

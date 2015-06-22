@@ -146,8 +146,6 @@ void Move_Calc (edict_t *ent, vec3_t dest, void(*func)(edict_t*), int smoothSpee
 		}
 
 		// smooth speed change
-//		ent->think = Think_SmoothAccelMove;
-//		ent->nextthink = level.time + FRAMETIME;
 		Think_SmoothAccelMove(ent);
 	}
 	else if (ent->moveinfo.speed == ent->moveinfo.accel && ent->moveinfo.speed == ent->moveinfo.decel)
@@ -291,7 +289,7 @@ void plat_CalcAcceleratedMove(moveinfo_t *moveinfo)
 	}
 
 	moveinfo->decel_distance = decel_dist;
-};
+}
 
 void plat_Accelerate (moveinfo_t *moveinfo)
 {
@@ -362,7 +360,7 @@ void plat_Accelerate (moveinfo_t *moveinfo)
 
 	// we are at constant velocity (move_speed)
 	return;
-};
+}
 
 void Think_AccelMove (edict_t *ent)
 {
@@ -430,8 +428,6 @@ void Think_SmoothAccelMove (edict_t *ent)
 	ent->think = Think_SmoothAccelMove;
 }
 
-
-
 void plat_go_down (edict_t *ent);
 
 void plat_hit_top (edict_t *ent)
@@ -491,7 +487,15 @@ void plat_blocked (edict_t *self, edict_t *other)
 		T_Damage (other, self, self, vec3_origin, other->s.origin, vec3_origin, 100000, 1, 0, MOD_CRUSH);
 		// if it's still there, nuke it
 		if (other)
-			BecomeExplosion1 (other);
+		{
+			/* Hack for entity without it's origin near the model */
+			vec3_t save;
+			VectorCopy(other->s.origin,save);
+			VectorMA (other->absmin, 0.5, other->size, other->s.origin);
+
+			BecomeExplosion1(other);
+		}
+
 		return;
 	}
 
@@ -514,7 +518,6 @@ void Use_Plat (edict_t *ent, edict_t *other, edict_t *activator)
 
 void Touch_Plat_Center (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
-	edict_t *trigger = ent;
 	if (!other->client)
 		return;
 		
@@ -541,9 +544,9 @@ void plat_spawn_inside_trigger (edict_t *ent)
 	edict_t	*trigger;
 	vec3_t	tmin, tmax;
 
-//
-// middle trigger
-//	
+	//
+	// middle trigger
+	//	
 	trigger = G_Spawn();
 	trigger->touch = Touch_Plat_Center;
 	trigger->movetype = MOVETYPE_NONE;
@@ -793,8 +796,6 @@ void SP_func_rotating (edict_t *ent)
 		ent->speed = 100;
 	if (!ent->dmg)
 		ent->dmg = 2;
-
-//	ent->moveinfo.sound_middle = "doors/hydro1.wav";
 
 	ent->use = rotating_use;
 	if (ent->dmg)
@@ -1247,7 +1248,7 @@ void Think_SpawnDoorTrigger (edict_t *ent)
 	VectorCopy (mins, other->mins);
 	VectorCopy (maxs, other->maxs);
 	other->owner = ent;
-  other->spawnflags2 = ent->spawnflags2 & SPAWNFLAG2_MIRRORLEVEL;
+	other->spawnflags2 = ent->spawnflags2 & SPAWNFLAG2_MIRRORLEVEL;
 	other->solid = SOLID_TRIGGER;
 	other->movetype = MOVETYPE_NONE;
 	other->touch = Touch_DoorTrigger;
@@ -1269,7 +1270,15 @@ void door_blocked  (edict_t *self, edict_t *other)
 		T_Damage (other, self, self, vec3_origin, other->s.origin, vec3_origin, 100000, 1, 0, MOD_CRUSH);
 		// if it's still there, nuke it
 		if (other)
-			BecomeExplosion1 (other);
+		{
+			/* Hack for entitiy without their origin near the model */
+			vec3_t save;
+			VectorCopy(other->s.origin,save);
+			VectorMA (other->absmin, 0.5, other->size, other->s.origin);
+
+			BecomeExplosion1(other);
+		}
+
 		return;
 	}
 
@@ -1280,8 +1289,8 @@ void door_blocked  (edict_t *self, edict_t *other)
 		return;
 
 
-// if a door has a negative wait, it would never come back if blocked,
-// so let it just squash the object to death real fast
+	// if a door has a negative wait, it would never come back if blocked,
+	// so let it just squash the object to death real fast
 	if (self->moveinfo.wait >= 0)
 	{
 		if (self->moveinfo.state == STATE_DOWN)
@@ -1495,8 +1504,6 @@ void SP_func_door_rotating (edict_t *ent)
 
 	if (!ent->wait)
 		ent->wait = 3;
-	//if (!ent->dmg)
-	//	ent->dmg = 2;
 
 	if (ent->sounds != 1)
 	{
@@ -1664,7 +1671,15 @@ void train_blocked (edict_t *self, edict_t *other)
 		T_Damage (other, self, self, vec3_origin, other->s.origin, vec3_origin, 100000, 1, 0, MOD_CRUSH);
 		// if it's still there, nuke it
 		if (other)
-			BecomeExplosion1 (other);
+		{
+			/* Hack for entity without an origin near the model */			
+			vec3_t save;
+			VectorCopy(other->s.origin,save);
+			VectorMA (other->absmin, 0.5, other->size, other->s.origin);
+
+			BecomeExplosion1(other);
+		}
+
 		return;
 	}
 
@@ -1734,7 +1749,6 @@ void train_next (edict_t *self)
 again:
 	if (!self->target)
 	{
-//		gi.dprintf(DEVELOPER_MSG_GAME, "train_next: no next target\n");
 		return;
 	}
 
@@ -2229,7 +2243,15 @@ void door_secret_blocked  (edict_t *self, edict_t *other)
 		T_Damage (other, self, self, vec3_origin, other->s.origin, vec3_origin, 100000, 1, 0, MOD_CRUSH);
 		// if it's still there, nuke it
 		if (other)
-			BecomeExplosion1 (other);
+		{
+			/* Hack for entities without their origin near the model */
+			vec3_t save;
+			VectorCopy(other->s.origin,save);
+			VectorMA (other->absmin, 0.5, other->size, other->s.origin);
+
+			BecomeExplosion1(other);
+		}
+
 		return;
 	}
 
@@ -2320,6 +2342,15 @@ Kills everything inside when fired, irrespective of protection.
 void use_killbox (edict_t *self, edict_t *other, edict_t *activator)
 {
 	KillBox (self);
+
+	/* Hack to make sure that really everything is killed */
+	self->count--;
+
+	if (!self->count) 
+	{
+		self->think = G_FreeEdict;
+		self->nextthink = level.time + 1;
+	}
 }
 
 void SP_func_killbox (edict_t *ent)

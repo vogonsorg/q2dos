@@ -312,7 +312,7 @@ void Weapon_Test (edict_t *ent)
 }
 
 
-static void testitem_think (edict_t *ent)
+void testitem_think (edict_t *ent)
 {
   if(testItem_aminationFrames[animUpto])
   {
@@ -557,5 +557,5 @@ void Drop_TestItem (edict_t *ent, gitem_t *item)
 	ValidateSelectedItem (ent);
 }
 
-
 #endif
+
