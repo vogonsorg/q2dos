@@ -178,7 +178,7 @@ void G_UseTargets (edict_t *ent, edict_t *activator)
 //
 // print the message
 //
-	if ((ent->message) && (activator) && !(activator->svflags & SVF_MONSTER))
+	if ((ent->message) && (activator) && !(activator->svflags & SVF_MONSTER)) // FS: Zaero specific, check for activator
 	{
 		gi.centerprintf (activator, "%s", ent->message);
 		if (ent->noise_index)
@@ -444,7 +444,7 @@ void G_FreeEdict (edict_t *ed)
 	ed->classname = "freed";
 	ed->freetime = level.time;
 	ed->inuse = false;
-  ed->nextthink = 0;    // just in case freed before a nextthink...
+  ed->nextthink = 0;    // just in case freed before a nextthink... // FS: Zaero specific
 }
 
 
@@ -559,7 +559,7 @@ Kills all entities except players that would touch the proposed new
 positioning of ent.  Ent should be unlinked before calling this!
 =================
 */
-qboolean MonsterKillBox (edict_t *ent)
+qboolean MonsterKillBox (edict_t *ent) // FS: Zaero specific
 {
 	trace_t		tr;
 
@@ -593,7 +593,7 @@ Kills all entities except players that would touch the proposed new
 positioning of ent.  Ent should be unlinked before calling this!
 =================
 */
-qboolean MonsterPlayerKillBox (edict_t *ent)
+qboolean MonsterPlayerKillBox (edict_t *ent) // FS: Zaero specific
 {
 	trace_t		tr;
 

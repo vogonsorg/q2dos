@@ -917,7 +917,6 @@ void flare_flash(edict_t *ent)
 			target->client->flashBase = 30;
 
 			if (deathmatch->value &&
-				!target->client->pers.gl_polyblend &&
 				!(((int)zdmflags->value) & ZDM_NO_GL_POLYBLEND_DAMAGE))
 				T_Damage(target, ent, ent->owner, vec3_origin, target->s.origin, vec3_origin, (int)(10.0*ratio), 0, 0, MOD_GL_POLYBLEND);
 		}

@@ -21,10 +21,18 @@ cvar_t	*skill;
 cvar_t	*fraglimit;
 cvar_t	*timelimit;
 cvar_t	*password;
+cvar_t *spectator_password;
+cvar_t *needpass;
 cvar_t	*maxclients;
+cvar_t *maxspectators;
 cvar_t	*maxentities;
 cvar_t	*g_select_empty;
+#ifndef GAME_HARD_LINKED
 cvar_t	*dedicated;
+#else
+extern cvar_t *dedicated;
+#endif
+cvar_t	*filterban;
 
 cvar_t	*sv_maxvelocity;
 cvar_t	*sv_gravity;
@@ -43,6 +51,13 @@ cvar_t	*bob_roll;
 
 cvar_t	*sv_cheats;
 
+cvar_t	*flood_msgs;
+cvar_t	*flood_persecond;
+cvar_t	*flood_waitdelay;
+
+cvar_t	*sv_maplist;
+
+cvar_t *gib_on;
 void SpawnEntities (char *mapname, char *entities, char *spawnpoint);
 void ClientThink (edict_t *ent, usercmd_t *cmd);
 qboolean ClientConnect (edict_t *ent, char *userinfo);
@@ -57,7 +72,6 @@ void WriteLevel (char *filename);
 void ReadLevel (char *filename);
 void InitGame (void);
 void G_RunFrame (void);
-void ServerCommand(void); // FS: Zaero specific
 
 
 //===================================================================
@@ -117,7 +131,8 @@ void Sys_Error (char *error, ...)
 	char		text[1024];
 
 	va_start (argptr, error);
-	vsprintf (text, error, argptr);
+//	vsprintf (text, error, argptr);
+	Q_vsnprintf (text, sizeof(text), error, argptr);	// Knightmare- buffer overflow fix
 	va_end (argptr);
 
 	gi.error (ERR_FATAL, "%s", text);
@@ -129,7 +144,8 @@ void Com_Printf (char *msg, ...)
 	char		text[1024];
 
 	va_start (argptr, msg);
-	vsprintf (text, msg, argptr);
+//	vsprintf (text, msg, argptr);
+	Q_vsnprintf (text, sizeof(text), msg, argptr);	// Knightmare- buffer overflow fix
 	va_end (argptr);
 
 	gi.dprintf(DEVELOPER_MSG_GAME, "%s", text);
@@ -147,19 +163,45 @@ ClientEndServerFrames
 */
 void ClientEndServerFrames (void)
 {
-	int		i;
-	edict_t	*ent;
+	int i;
+	edict_t *ent;
 
-	// calc the player views now that all pushing
-	// and damage has been added
-	for (i=0 ; i<maxclients->value ; i++)
+	/* calc the player views now that all
+	   pushing  and damage has been added */
+	for (i = 0; i < maxclients->value; i++)
 	{
 		ent = g_edicts + 1 + i;
+
 		if (!ent->inuse || !ent->client)
+		{
 			continue;
-		ClientEndServerFrame (ent);
+		}
+
+		ClientEndServerFrame(ent);
+	}
+}
+
+/*
+=================
+CreateTargetChangeLevel
+
+Returns the created target changelevel
+=================
+*/
+edict_t *CreateTargetChangeLevel(char *map)
+{
+	edict_t *ent;
+
+	if (!map)
+	{
+		return NULL;
 	}
 
+	ent = G_Spawn();
+	ent->classname = "target_changelevel";
+	Com_sprintf(level.nextmap, sizeof(level.nextmap), "%s", map);
+	ent->map = level.nextmap;
+	return ent;
 }
 
 /*
@@ -169,7 +211,7 @@ EndDMLevel
 The timelimit or fraglimit has been exceeded
 =================
 */
-void EndDMLevel (void)
+void EndDMLevel (void) // FS: FIXME Zaero changes
 {
 	edict_t		*ent;
 
@@ -204,6 +246,39 @@ void EndDMLevel (void)
 	BeginIntermission (ent);
 }
 
+
+/*
+=================
+CheckNeedPass
+=================
+*/
+void CheckNeedPass (void)
+{
+	int need;
+
+	/* if password or spectator_password has
+	   changed, update needpass as needed */
+	if (password->modified || spectator_password->modified)
+	{
+		password->modified = spectator_password->modified = false;
+
+		need = 0;
+
+		if (*password->string && Q_stricmp(password->string, "none"))
+		{
+			need |= 1;
+		}
+
+		if (*spectator_password->string &&
+			Q_stricmp(spectator_password->string, "none"))
+		{
+			need |= 2;
+		}
+
+		gi.cvar_set("needpass", va("%d", need));
+	}
+}
+
 /*
 =================
 CheckDMRules
@@ -215,10 +290,14 @@ void CheckDMRules (void)
 	gclient_t	*cl;
 
 	if (level.intermissiontime)
+	{
 		return;
+	}
 
 	if (!deathmatch->value)
+	{
 		return;
+	}
 
 	if (timelimit->value)
 	{
@@ -236,7 +315,9 @@ void CheckDMRules (void)
 		{
 			cl = game.clients + i;
 			if (!g_edicts[i+1].inuse)
+			{
 				continue;
+			}
 
 			if (cl->resp.score >= fraglimit->value)
 			{
@@ -269,10 +350,16 @@ void ExitLevel (void)
 	for (i=0 ; i<maxclients->value ; i++)
 	{
 		ent = g_edicts + 1 + i;
+
 		if (!ent->inuse)
+		{
 			continue;
+		}
+
 		if (ent->health > ent->client->pers.max_health)
+		{
 			ent->health = ent->client->pers.max_health;
+		}
 	}
 	level.fadeFrames = 0; // FS: Zaero specific
 	level.exitintermission = 0; // FS: Zaero specific, moved after changemap = NULL
@@ -309,46 +396,54 @@ void G_RunFrame (void)
 		return;
 	}
 
-	//
-	// treat each object in turn
-	// even the world gets a chance to think
-	//
+	/* treat each object in turn
+	   even the world gets a chance
+	   to think */
 	ent = &g_edicts[0];
-	for (i=0 ; i<globals.num_edicts ; i++, ent++)
+
+	for (i = 0; i < globals.num_edicts; i++, ent++)
 	{
 		if (!ent->inuse)
+		{
 			continue;
+		}
 
 		level.current_entity = ent;
 
-    if(!(ent->flags & FL_DONTSETOLDORIGIN)) // FS: Zaero specific
-    {
-		  VectorCopy (ent->s.origin, ent->s.old_origin);
-    }
+	    if(!(ent->flags & FL_DONTSETOLDORIGIN)) // FS: Zaero specific
+		{
+			VectorCopy (ent->s.origin, ent->s.old_origin);
+		}
 
-		// if the ground entity moved, make sure we are still on it
-		if ((ent->groundentity) && (ent->groundentity->linkcount != ent->groundentity_linkcount))
+		/* if the ground entity moved, make sure we are still on it */
+		if ((ent->groundentity) &&
+			(ent->groundentity->linkcount != ent->groundentity_linkcount))
 		{
 			ent->groundentity = NULL;
-			if ( !(ent->flags & (FL_SWIM|FL_FLY)) && (ent->svflags & SVF_MONSTER) )
+
+			if (!(ent->flags & (FL_SWIM | FL_FLY)) &&
+				(ent->svflags & SVF_MONSTER))
 			{
-				M_CheckGround (ent);
+				M_CheckGround(ent);
 			}
 		}
 
-		if (i > 0 && i <= maxclients->value)
+		if ((i > 0) && (i <= maxclients->value))
 		{
-			ClientBeginServerFrame (ent);
+			ClientBeginServerFrame(ent);
 			continue;
 		}
 
-		G_RunEntity (ent);
+		G_RunEntity(ent);
 	}
 
-	// see if it is time to end a deathmatch
-	CheckDMRules ();
+	/* see if it is time to end a deathmatch */
+	CheckDMRules();
 
-	// build the playerstate_t structures for all players
-	ClientEndServerFrames ();
+	/* see if needpass needs updated */
+	CheckNeedPass();
+
+	/* build the playerstate_t structures for all players */
+	ClientEndServerFrames();
 }
 

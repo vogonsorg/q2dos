@@ -816,3 +816,33 @@ SP_monster_infantry(edict_t *self)
 
 	walkmonster_start(self);
 }
+
+void handler_ConvertToInfantry(edict_t *self) // FS: Zaero specific
+{
+	if (!self)
+	{
+		return;
+	}
+
+	self->s.modelindex = gi.modelindex("models/monsters/infantry/tris.md2");
+	VectorSet (self->mins, -16, -16, -24);
+	VectorSet (self->maxs, 16, 16, 32);
+	self->pain = infantry_pain;
+	self->die = infantry_die;
+
+	self->s.origin[0] -= 18;
+	self->s.origin[1] -= 9;
+
+	self->monsterinfo.stand = infantry_stand;
+	self->monsterinfo.walk = infantry_walk;
+	self->monsterinfo.run = infantry_run;
+	self->monsterinfo.dodge = infantry_dodge;
+	self->monsterinfo.attack = infantry_attack;
+	self->monsterinfo.melee = NULL;
+	self->monsterinfo.sight = infantry_sight;
+	self->monsterinfo.idle = infantry_fidget;
+
+	self->s.frame = FRAME_run01;
+
+	infantry_run (self);
+}

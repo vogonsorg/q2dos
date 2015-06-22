@@ -205,9 +205,9 @@ Spawns an explosion temporary entity when used.
 "delay"		wait this long before going off
 "dmg"		how much radius damage should be done, defaults to 0
 */
-#define EMP_STYLE	1
+#define EMP_STYLE	1 // FS: Zaero specific
 
-void target_explosion_explode_think(edict_t *self)
+void target_explosion_explode_think(edict_t *self) // FS: Zaero specific
 {
 	if(self->s.frame >= 5)
 	{
@@ -226,7 +226,7 @@ void target_explosion_explode (edict_t *self)
 {
 	float		save;
 
-	if (self->spawnflags & EMP_STYLE)
+	if (self->spawnflags & EMP_STYLE) // FS: Zaero specific
 	{
 		// play the sound
 		gi.positioned_sound(self->s.origin, self, CHAN_AUTO, gi.soundindex("weapons/a2k/ak_exp01.wav"), 1, ATTN_NORM, 0);
@@ -405,11 +405,11 @@ void use_target_spawner (edict_t *self, edict_t *other, edict_t *activator)
 	VectorCopy (self->s.angles, ent->s.angles);
 	ED_CallSpawn (ent);
 	gi.unlinkentity (ent);
-	MonsterKillBox (ent);
+	MonsterKillBox (ent); // FS: Zaero specific
 	gi.linkentity (ent);
 	if (self->speed)
 		VectorCopy (self->movedir, ent->velocity);
-	MonsterPlayerKillBox (ent);
+	MonsterPlayerKillBox (ent); // FS: Zaero specific
 }
 
 void SP_target_spawner (edict_t *self)
@@ -436,11 +436,11 @@ void use_target_blaster (edict_t *self, edict_t *other, edict_t *activator)
 {
 	int effect;
 
-	if(EMPNukeCheck(self, self->s.origin))
-	{
+  if(EMPNukeCheck(self, self->s.origin)) // FS: Zaero specific
+  {
 		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
-		return;
-	}
+    return;
+  }
 
 	if (self->spawnflags & 2)
 		effect = 0;

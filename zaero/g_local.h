@@ -36,6 +36,7 @@
 #define	svc_temp_entity		3
 #define	svc_layout			4
 #define	svc_inventory		5
+#define	svc_stufftext		11
 
 //==================================================================
 
@@ -579,8 +580,12 @@ extern	cvar_t	*skill;
 extern	cvar_t	*fraglimit;
 extern	cvar_t	*timelimit;
 extern	cvar_t	*password;
+extern	cvar_t	*spectator_password;
+extern	cvar_t	*needpass;
 extern	cvar_t	*g_select_empty;
 extern	cvar_t	*dedicated;
+
+extern	cvar_t	*filterban;
 
 extern	cvar_t	*sv_gravity;
 extern	cvar_t	*sv_maxvelocity;
@@ -597,8 +602,13 @@ extern	cvar_t	*bob_roll;
 
 extern	cvar_t	*sv_cheats;
 extern	cvar_t	*maxclients;
+extern	cvar_t	*maxspectators;
 
-extern	cvar_t  *gamedir;
+extern	cvar_t	*flood_msgs;
+extern	cvar_t	*flood_persecond;
+extern	cvar_t	*flood_waitdelay;
+
+extern	cvar_t	*sv_maplist;
 
 extern	cvar_t	*grenadeammotype; // FS: Zaero specific
 extern	cvar_t	*grenadeammo; // FS: Zaero specific
@@ -675,7 +685,7 @@ int PowerArmorType (edict_t *ent);
 gitem_t	*GetItemByIndex (int index);
 qboolean Add_Ammo (edict_t *ent, gitem_t *item, int count);
 void Touch_Item (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf);
-void precacheAllItems();
+void precacheAllItems(); // FS: Zaero specific
 
 //
 // g_utils.c
@@ -838,6 +848,8 @@ void ClientEndServerFrame (edict_t *ent);
 //
 void MoveClientToIntermission (edict_t *client);
 void G_SetStats (edict_t *ent);
+void G_SetSpectatorStats (edict_t *ent);
+void G_CheckChaseStats (edict_t *ent);
 void ValidateSelectedItem (edict_t *ent);
 void DeathmatchScoreboardMessage (edict_t *client, edict_t *killer);
 
@@ -865,29 +877,24 @@ void G_RunEntity (edict_t *ent);
 void SaveClientData (void);
 void FetchClientEntData (edict_t *ent);
 
-
-
 //
-// z_mtest.c
+// g_chase.c
 //
-
-
-//
-// z_trigger.c
-//
+void UpdateChaseCam(edict_t *ent);
+void ChaseNext(edict_t *ent);
+void ChasePrev(edict_t *ent);
+void GetChaseTarget(edict_t *ent);
 
 //
 // z_item.c
 //
 qboolean EMPNukeCheck(edict_t	*ent, vec3_t pos); // FS: Zaero specific
 
-
 //
 // z_weapon.c
 //
 void fire_bb (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius); // FS: Zaero specific
 void fire_flare (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage); // FS: Zaero specific
-
 
 //
 // z_ai.c
@@ -911,6 +918,7 @@ void ai_schoolSideStepLeft (edict_t *self, float dist); // FS: Zaero specific
 #define	ANIM_PAIN		3
 #define	ANIM_ATTACK		4
 #define	ANIM_DEATH		5
+#define	ANIM_REVERSE	6
 
 
 // client data that stays across multiple level loads
@@ -926,7 +934,7 @@ typedef struct
 	// values saved and restored from edicts when changing levels
 	int			health;
 	int			max_health;
-	qboolean	powerArmorActive;
+	int			savedFlags;
 
 	int			selected_item;
 	int			inventory[MAX_ITEMS];
@@ -951,6 +959,11 @@ typedef struct
 	int			power_cubes;	// used for tracking the cubes in coop games
 	int			score;			// for calculating total unit score in coop games
 
+	int			game_helpchanged;
+	int			helpchanged;
+
+	qboolean	spectator;			// client is a spectator
+
 	float visorFrames; // FS: Zaero specific
 } client_persistant_t;
 
@@ -961,8 +974,8 @@ typedef struct
 	int			enterframe;			// level.framenum the client entered the game
 	int			score;				// frags, etc
 	vec3_t		cmd_angles;			// angles sent over in the last command
-	int			game_helpchanged;
-	int			helpchanged;
+
+	qboolean	spectator;			// client is a spectator
 } client_respawn_t;
 
 // this structure is cleared on each PutClientInServer(),
@@ -1042,8 +1055,14 @@ struct gclient_s
 
 	float		pickup_msg_time;
 
+	float		flood_locktill;		// locked from talking
+	float		flood_when[10];		// when messages were said
+	int			flood_whenhead;		// head pointer for when said
+
 	float		respawn_time;		// can respawn when time > this
 
+	edict_t		*chase_target;		// player we are chasing
+	qboolean	update_chase;		// need to update chase info?
 	// used for blinding
 	int flashTime; // FS: Zaero specific
 	int flashBase; // FS: Zaero specific
@@ -1254,8 +1273,8 @@ struct edict_s
 	// used by floor-mounted autocannon
 	int onFloor;
 
-  float bossFireTimeout;
-  int bossFireCount;
+	float bossFireTimeout;
+	int bossFireCount;
 	char		*musictrack;	// Knightmare- for specifying OGG or CD track
 };
 

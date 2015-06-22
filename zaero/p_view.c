@@ -396,7 +396,9 @@ SV_CalcViewOffset(edict_t *ent)
 			ent->client->ps.viewangles[YAW] += framepercent * 15;
 		}
 		else
+		{
 			VectorCopy (ent->client->zCameraTrack->s.angles, ent->client->ps.viewangles);  
+		}
 
 		for(i = 0; i < 3; i++)
 		{
@@ -459,7 +461,8 @@ SV_CalcGunOffset(edict_t *ent)
 		return;
 	}
 
-	// if we're using the sniper rifle, let's not do this
+
+// if we're using the sniper rifle, let's not do this
 	if (ent->client->pers.weapon &&
 		Q_stricmp(ent->client->pers.weapon->classname, "weapon_sniperrifle") != 0) // FS: Zaero specific
 	{
@@ -479,27 +482,28 @@ SV_CalcGunOffset(edict_t *ent)
 		{
 			delta = ent->client->oldviewangles[i] - ent->client->ps.viewangles[i];
 			if (delta > 180)
-		{
+			{
 				delta -= 360;
-		}
+			}
 			if (delta < -180)
-		{
+			{
 				delta += 360;
-		}
+			}
 			if (delta > 45)
-		{
+			{
 				delta = 45;
-		}
+			}
 			if (delta < -45)
-		{
+			{
 				delta = -45;
-		}
+			}
 			if (i == YAW)
-		{
+			{
 				ent->client->ps.gunangles[ROLL] += 0.1*delta;
-		}
+			}
 
-		ent->client->ps.gunangles[i] += 0.2 * delta;
+			ent->client->ps.gunangles[i] += 0.2 * delta;
+		}
 	}
 
 	// gun height
@@ -663,6 +667,7 @@ SV_CalcBlend(edict_t *ent)
 
 	// drop the damage value
 	ent->client->damage_alpha -= 0.06;
+
 	if (ent->client->damage_alpha < 0)
 	{
 		ent->client->damage_alpha = 0;
@@ -670,6 +675,7 @@ SV_CalcBlend(edict_t *ent)
 
 	// drop the bonus value
 	ent->client->bonus_alpha -= 0.1;
+
 	if (ent->client->bonus_alpha < 0)
 	{
 		ent->client->bonus_alpha = 0;
@@ -986,13 +992,8 @@ P_WorldEffects(void)
 	}
 }
 
-
-/*
-===============
-G_SetClientEffects
-===============
-*/
-void G_SetClientEffects (edict_t *ent)
+void
+G_SetClientEffects(edict_t *ent)
 {
 	int		pa_type;
 	int		remaining;
