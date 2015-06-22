@@ -4,6 +4,7 @@
 
 int	gibsthisframe = 0;
 int lastgibframe = 0;
+qboolean SV_movestep (edict_t *ent, vec3_t move, qboolean relink); // FS: Zaero specific
 
 /*QUAKED func_group (0 0 0) ?
 Used to group brushes together just for editor convenience.
@@ -392,7 +393,7 @@ void path_corner_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface
 
 	if (self->wait)
 	{
-		if(other->goalentity)
+		if(other->goalentity) // FS: Zaero specific
 		{
 			VectorSubtract (other->goalentity->s.origin, other->s.origin, v);
 			other->ideal_yaw = vectoyaw (v);
@@ -887,20 +888,20 @@ void SP_func_explosive (edict_t *self)
 Large exploding box.  You can override its mass (100),
 health (80), and dmg (150).
 */
-qboolean SV_movestep (edict_t *ent, vec3_t move, qboolean relink);
 void barrel_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
 
 {
 	float	ratio;
 	vec3_t	v;
-	vec3_t	move;
-	float yaw, dist;
+	vec3_t	move; // FS: Zaero specific
+	float yaw, dist; // FS: Zaero specific
 
-	if (other->groundentity == self || !other->client)
+	if (other->groundentity == self || !other->client) // FS: Zaero specific
 		return;
 
 	ratio = (float)other->mass / (float)self->mass;
 	VectorSubtract (self->s.origin, other->s.origin, v);
+	// FS: Below all Zaero specific
 	yaw = vectoyaw(v);
 	dist = 20 * ratio * FRAMETIME;
 
@@ -1013,7 +1014,7 @@ void SP_misc_explobox (edict_t *self)
 	gi.modelindex ("models/objects/debris3/tris.md2");
 
 	self->solid = SOLID_BBOX;
-	self->movetype = MOVETYPE_FALLFLOAT;
+	self->movetype = MOVETYPE_FALLFLOAT; // FS: Zaero specific
 
 	self->model = "models/objects/barrels/tris.md2";
 	self->s.modelindex = gi.modelindex (self->model);
@@ -1320,7 +1321,7 @@ void SP_misc_viper (edict_t *ent)
 		return;
 	}
 
-	if (ent->spawnflags & 1)
+	if (ent->spawnflags & 1) // FS: Zaero specific
 	{
 		ent->s.effects |= EF_ROCKET;
 		ent->spawnflags &= ~1; // turn this off so that it doesn't mess up the trains
@@ -1331,7 +1332,7 @@ void SP_misc_viper (edict_t *ent)
 
 	ent->movetype = MOVETYPE_PUSH;
 
-	if (ent->spawnflags & 2)
+	if (ent->spawnflags & 2) // FS: Zaero specific
 	{
 		ent->solid = SOLID_BBOX;
 	}
@@ -1340,7 +1341,7 @@ void SP_misc_viper (edict_t *ent)
 		ent->solid = SOLID_NOT;
 	}
 
-	if(ent->model)
+	if(ent->model) // FS: Zaero specific
 	{
 		ent->s.modelindex = gi.modelindex (ent->model);
 	}
@@ -1349,22 +1350,22 @@ void SP_misc_viper (edict_t *ent)
 		ent->s.modelindex = gi.modelindex ("models/ships/viper/tris.md2");
 	}
 
-	if(ent->model2)
+	if(ent->model2) // FS: Zaero specific
 	{
 		ent->s.modelindex2 = gi.modelindex (ent->model2);
 	}
 
-	if(ent->model3)
+	if(ent->model3) // FS: Zaero specific
 	{
 		ent->s.modelindex3 = gi.modelindex (ent->model3);
 	}
 
-	if(ent->model4)
+	if(ent->model4) // FS: Zaero specific
 	{
 		ent->s.modelindex4 = gi.modelindex (ent->model4);
 	}
 
-	if (!(ent->spawnflags & 4))
+	if (!(ent->spawnflags & 4)) // FS: Zaero specific
 	{
 		VectorSet (ent->mins, -16, -16, 0);
 		VectorSet (ent->maxs, 16, 16, 32);
