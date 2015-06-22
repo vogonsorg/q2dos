@@ -552,6 +552,12 @@ TankMachineGun(edict_t *self)
 
 	AngleVectors(dir, forward, NULL, NULL);
 
+	if(EMPNukeCheck(self, start)) // FS: Zaero specific
+	{
+		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
+		return;
+	}
+
 	monster_fire_bullet(self, start, forward, 20, 4,
 			DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD,
 			flash_number);

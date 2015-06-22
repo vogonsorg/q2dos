@@ -832,7 +832,8 @@ qboolean ai_checkattack (edict_t *self, float dist)
 		{
 			if ((level.time - self->enemy->teleport_time) > 5.0)
 			{
-				if (self->goalentity == self->enemy) {
+				if (self->goalentity == self->enemy)
+				{
 					if (self->movetarget)
 						self->goalentity = self->movetarget;
 					else
@@ -994,10 +995,16 @@ void ai_run (edict_t *self, float dist)
 			return;
 	}
 
-	if (self->monsterinfo.attack_state == AS_FLY_STRAFE)
+	if (self->monsterinfo.attack_state == AS_FLY_STRAFE) // FS: Zaero specific
 	{
-		ai_fly_strafe(self, dist);
-		return;
+		if (self->monsterinfo.flyStrafeTimeout < level.time)
+			self->monsterinfo.attack_state == AS_STRAIGHT;
+		else
+		{
+			ai_fly_strafe(self, dist);
+			//if (random() < 0.5) 
+				return;
+		}
 	}
 
 	if (ai_checkattack (self, dist))

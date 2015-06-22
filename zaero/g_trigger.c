@@ -369,14 +369,14 @@ trigger_push
 */
 
 #define PUSH_ONCE		1
-#define START_OFF		2
-#define NO_SOUND		4
+#define START_OFF		2 // FS: Zaero specific
+#define NO_SOUND		4 // FS: Zaero specific
 
 static int windsound;  // fixup or zaero or may not work with mirror level's...
 
 void trigger_push_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
-	if (self->spawnflags & START_OFF)
+	if (self->spawnflags & START_OFF) // FS: Zaero specific
 	{
 		if (self->message && self->touch_debounce_time < level.time)
 		{
@@ -401,7 +401,7 @@ void trigger_push_touch (edict_t *self, edict_t *other, cplane_t *plane, csurfac
 			if (other->fly_sound_debounce_time < level.time)
 			{
 				other->fly_sound_debounce_time = level.time + 1.5;
-				if (!(self->spawnflags & NO_SOUND))
+				if (!(self->spawnflags & NO_SOUND)) // FS: Zaero specific
 					gi.sound (other, CHAN_AUTO, windsound, 1, ATTN_NORM, 0);
 			}
 		}
@@ -410,7 +410,7 @@ void trigger_push_touch (edict_t *self, edict_t *other, cplane_t *plane, csurfac
 		G_FreeEdict (self);
 }
 
-void trigger_push_use(edict_t *self, edict_t *other, edict_t *activator)
+void trigger_push_use(edict_t *self, edict_t *other, edict_t *activator) // FS: Zaero specific
 {
 	if (self->spawnflags & START_OFF)
 		self->spawnflags &= ~START_OFF;
@@ -430,7 +430,7 @@ void SP_trigger_push (edict_t *self)
 	if (!self->speed)
 		self->speed = 1000;
 
-	if (self->targetname)
+	if (self->targetname) // FS: Zaero specific
 		self->use = trigger_push_use;
 	
 	gi.linkentity (self);

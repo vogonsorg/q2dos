@@ -1099,14 +1099,14 @@ field_t fields[] = {
 	{"classname", FOFS(classname), F_LSTRING},
 	{"origin", FOFS(s.origin), F_VECTOR},
 	{"model", FOFS(model), F_LSTRING},
-	{"model2", FOFS(model2), F_LSTRING},
-	{"model3", FOFS(model3), F_LSTRING},
-	{"model4", FOFS(model4), F_LSTRING},
+	{"model2", FOFS(model2), F_LSTRING}, // FS: Zaero specific
+	{"model3", FOFS(model3), F_LSTRING}, // FS: Zaero specific
+	{"model4", FOFS(model4), F_LSTRING}, // FS: Zaero specific
 	{"spawnflags", FOFS(spawnflags), F_INT},
 	{"speed", FOFS(speed), F_FLOAT},
 	{"accel", FOFS(accel), F_FLOAT},
 	{"decel", FOFS(decel), F_FLOAT},
-	{"aspeed", FOFS(aspeed), F_FLOAT},
+	{"aspeed", FOFS(aspeed), F_FLOAT}, // FS: Zaero specific
 	{"target", FOFS(target), F_LSTRING},
 	{"targetname", FOFS(targetname), F_LSTRING},
 	{"pathtarget", FOFS(pathtarget), F_LSTRING},
@@ -1128,18 +1128,18 @@ field_t fields[] = {
 	{"dmg", FOFS(dmg), F_INT},
 	{"angles", FOFS(s.angles), F_VECTOR},
 	{"angle", FOFS(s.angles), F_ANGLEHACK},
-	{"mangle", FOFS(mangle), F_VECTOR},
+	{"mangle", FOFS(mangle), F_VECTOR}, // FS: Zaero specific
 	{"mass", FOFS(mass), F_INT},
 	{"volume", FOFS(volume), F_FLOAT},
 	{"attenuation", FOFS(attenuation), F_FLOAT},
 	{"map", FOFS(map), F_LSTRING},
-	{"active", FOFS(active), F_INT},
-	{"spawnflags2", FOFS(spawnflags2), F_INT},
-	{"mins", FOFS(mins), F_VECTOR},
-	{"maxs", FOFS(maxs), F_VECTOR},
-	{"mteam", FOFS(mteam), F_LSTRING},
-	{"mirrortarget", 0, F_IGNORE},
-	{"mirrorlevelsave", 0, F_IGNORE},
+	{"active", FOFS(active), F_INT}, // FS: Zaero specific
+	{"spawnflags2", FOFS(spawnflags2), F_INT}, // FS: Zaero specific
+	{"mins", FOFS(mins), F_VECTOR}, // FS: Zaero specific
+	{"maxs", FOFS(maxs), F_VECTOR}, // FS: Zaero specific
+	{"mteam", FOFS(mteam), F_LSTRING}, // FS: Zaero specific
+	{"mirrortarget", 0, F_IGNORE}, // FS: Zaero specific
+	{"mirrorlevelsave", 0, F_IGNORE}, // FS: Zaero specific
 
 	// temp spawn vars -- only valid when the spawn function is called
 	{"lip", STOFS(lip), F_INT, FFL_SPAWNTEMP},
@@ -1178,9 +1178,9 @@ field_t		savefields[] =
 	{"", FOFS(deathtarget), F_LSTRING},
 	{"", FOFS(combattarget), F_LSTRING},
 	{"", FOFS(model), F_LSTRING},
-	{"", FOFS(model2), F_LSTRING},
-	{"", FOFS(model3), F_LSTRING},
-	{"", FOFS(model4), F_LSTRING},
+	{"", FOFS(model2), F_LSTRING}, // FS: Zaero specific
+	{"", FOFS(model3), F_LSTRING}, // FS: Zaero specific
+	{"", FOFS(model4), F_LSTRING}, // FS: Zaero specific
 	{"", FOFS(map), F_LSTRING},
 	{"", FOFS(message), F_LSTRING},
 
@@ -1202,12 +1202,12 @@ field_t		savefields[] =
 	{"", FOFS(chain), F_EDICT},
 	
 	// evolve
-	{"", FOFS(laser), F_EDICT},
-	{"", FOFS(zRaduisList), F_EDICT},
-	{"", FOFS(zSchoolChain), F_EDICT},
-	{"", FOFS(rideWith[0]), F_EDICT},
-	{"", FOFS(rideWith[1]), F_EDICT},
-	{"", FOFS(mteam), F_LSTRING},
+	{"", FOFS(laser), F_EDICT}, // FS: Zaero specific
+	{"", FOFS(zRaduisList), F_EDICT}, // FS: Zaero specific
+	{"", FOFS(zSchoolChain), F_EDICT}, // FS: Zaero specific
+	{"", FOFS(rideWith[0]), F_EDICT}, // FS: Zaero specific
+	{"", FOFS(rideWith[1]), F_EDICT}, // FS: Zaero specific
+	{"", FOFS(mteam), F_LSTRING}, // FS: Zaero specific
 	{NULL, 0, F_INT}
 };
 
@@ -1227,12 +1227,12 @@ field_t		clientfields[] =
 {
 	{"", CLOFS(pers.weapon), F_ITEM},
 	{"", CLOFS(pers.lastweapon), F_ITEM},
-	{"", CLOFS(pers.lastweapon2), F_ITEM},
+	{"", CLOFS(pers.lastweapon2), F_ITEM}, // FS: Zaero specific
 	{"", CLOFS(newweapon), F_ITEM},
 
 	// evolve
-	{"", CLOFS(zCameraTrack), F_EDICT},
-	{"", CLOFS(zCameraLocalEntity), F_EDICT},
+	{"", CLOFS(zCameraTrack), F_EDICT}, // FS: Zaero specific
+	{"", CLOFS(zCameraLocalEntity), F_EDICT}, // FS: Zaero specific
 
 	{NULL, 0, F_INT}
 };
@@ -1276,7 +1276,7 @@ void InitGame (void)
 
 	// change anytime vars
 	dmflags = gi.cvar ("dmflags", "0", CVAR_SERVERINFO);
-	zdmflags = gi.cvar ("zdmflags", "0", CVAR_SERVERINFO);
+	zdmflags = gi.cvar ("zdmflags", "0", CVAR_SERVERINFO); // FS: Zaero specific
 	fraglimit = gi.cvar ("fraglimit", "0", CVAR_SERVERINFO);
 	timelimit = gi.cvar ("timelimit", "0", CVAR_SERVERINFO);
 	password = gi.cvar ("password", "", CVAR_USERINFO);
@@ -1289,23 +1289,8 @@ void InitGame (void)
 	bob_pitch = gi.cvar ("bob_pitch", "0.002", 0);
 	bob_roll = gi.cvar ("bob_roll", "0.002", 0);
 
-	gamedir = gi.cvar ("gamedir", "baseq2", CVAR_SERVERINFO);
-#ifdef CACHE_SOUND
-	printSoundRejects = gi.cvar("printsoundrejects", "0", CVAR_SERVERINFO);
-#endif
-
 	// items
 	InitItems ();
-
-#if defined(_DEBUG) && defined(_Z_TESTMODE)
-
-	gi.dprintf(DEVELOPER_MSG_GAME, "==== InitTestWeapon ====\n");
-	InitTestWeapon();
-
-	gi.dprintf(DEVELOPER_MSG_GAME, "==== InitTestItem ====\n");
-	InitTestItem();
-
-#endif
 
 	Com_sprintf (game.helpmessage1, sizeof(game.helpmessage1), "");
 
@@ -1321,9 +1306,6 @@ void InitGame (void)
 	game.maxclients = maxclients->value;
 	game.clients = gi.TagMalloc (game.maxclients * sizeof(game.clients[0]), TAG_GAME);
 	globals.num_edicts = game.maxclients+1;
-
-	// get at the gl_polyblend client variable
-	gi.cvar("gl_polyblend", "1", CVAR_USERINFO);
 }
 
 //=========================================================
@@ -1561,9 +1543,7 @@ void ReadGame (char *filename)
 	char	str[16];
 
 	gi.FreeTags (TAG_GAME);
-#ifdef CACHE_SOUND
-	initSoundList();
-#endif
+
 	f = fopen (filename, "rb");
 	if (!f)
 		gi.error ("Couldn't open %s", filename);
@@ -1602,7 +1582,7 @@ void WriteEdict (FILE *f, edict_t *ent)
 	field_t		*field;
 	edict_t		temp;
 
-	if (Q_stricmp(ent->classname, "misc_viper") == 0)
+	if (Q_stricmp(ent->classname, "misc_viper") == 0) // FS: Zaero specific
 	{
 		temp = *ent;
 	}
@@ -1776,9 +1756,7 @@ void ReadLevel (char *filename)
 	// free any dynamic memory allocated by loading the level
 	// base state
 	gi.FreeTags (TAG_LEVEL);
-#ifdef CACHE_SOUND
-	initSoundList();
-#endif
+
 	// wipe all the entities
 	memset (g_edicts, 0, game.maxentities*sizeof(g_edicts[0]));
 	globals.num_edicts = maxclients->value+1;

@@ -697,6 +697,12 @@ supertankMachineGun(edict_t *self)
 		VectorNormalize(forward);
 	}
 
+	if(EMPNukeCheck(self, start)) // FS: Zaero specific
+	{
+		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
+		return;
+	}
+
 	monster_fire_bullet(self, start, forward, 6, 4,
 			DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD,
 			flash_number);

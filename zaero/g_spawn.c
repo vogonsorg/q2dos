@@ -1,6 +1,8 @@
 
 #include "g_local.h"
 
+void Z_SpawnDMItems(); // FS: Zaero specific
+
 typedef struct
 {
 	char	*name;
@@ -125,25 +127,25 @@ void SP_turret_breach (edict_t *self);
 void SP_turret_base (edict_t *self);
 void SP_turret_driver (edict_t *self);
 
-void SP_sound_echo (edict_t *self);
+void SP_sound_echo (edict_t *self); // FS: Zaero specific
 
-void SP_misc_lasertripbomb (edict_t *self);
-void SP_load_mirrorlevel (edict_t *self);
-void SP_trigger_laser(edict_t *self);
-void SP_monster_autocannon(edict_t *self);
-void SP_monster_autocannon_floor(edict_t *self);
-void SP_monster_sentien(edict_t *self);
-void SP_misc_securitycamera(edict_t *self);
-void SP_monster_hound (edict_t *self);
-void SP_monster_handler (edict_t *self);
-void SP_misc_commdish (edict_t *self);
-void SP_misc_crate(edict_t *self);
-void SP_misc_crate_medium(edict_t *self);
-void SP_misc_crate_small(edict_t *self);
-void SP_monster_zboss (edict_t *self);
-void SP_target_zboss_target(edict_t *self);
-void SP_func_barrier(edict_t *self);
-void SP_misc_seat(edict_t *self);
+void SP_misc_lasertripbomb (edict_t *self); // FS: Zaero specific
+void SP_load_mirrorlevel (edict_t *self); // FS: Zaero specific
+void SP_trigger_laser(edict_t *self); // FS: Zaero specific
+void SP_monster_autocannon(edict_t *self); // FS: Zaero specific
+void SP_monster_autocannon_floor(edict_t *self); // FS: Zaero specific
+void SP_monster_sentien(edict_t *self); // FS: Zaero specific
+void SP_misc_securitycamera(edict_t *self); // FS: Zaero specific
+void SP_monster_hound (edict_t *self); // FS: Zaero specific
+void SP_monster_handler (edict_t *self); // FS: Zaero specific
+void SP_misc_commdish (edict_t *self); // FS: Zaero specific
+void SP_misc_crate(edict_t *self); // FS: Zaero specific
+void SP_misc_crate_medium(edict_t *self); // FS: Zaero specific
+void SP_misc_crate_small(edict_t *self); // FS: Zaero specific
+void SP_monster_zboss (edict_t *self); // FS: Zaero specific
+void SP_target_zboss_target(edict_t *self); // FS: Zaero specific
+void SP_func_barrier(edict_t *self); // FS: Zaero specific
+void SP_misc_seat(edict_t *self); // FS: Zaero specific
 
 
 
@@ -267,29 +269,29 @@ spawn_t	spawns[] = {
 	{"turret_base", SP_turret_base},
 	{"turret_driver", SP_turret_driver},
 
-	// evolve map entities
-	{"sound_echo", SP_sound_echo},
-	{"misc_ired", SP_misc_lasertripbomb},
-	{"trigger_laser", SP_trigger_laser},
-	{"monster_autocannon", SP_monster_autocannon},
-	{"monster_autocannon_floor", SP_monster_autocannon_floor},
-	{"monster_sentien", SP_monster_sentien},
-	{"misc_securitycamera", SP_misc_securitycamera},
-	{"monster_hound", SP_monster_hound},
-	{"monster_handler", SP_monster_handler},
-	{"misc_commdish", SP_misc_commdish},
+// evolve map entities
+	{"sound_echo", SP_sound_echo}, // FS: Zaero specific
+	{"misc_ired", SP_misc_lasertripbomb}, // FS: Zaero specific
+	{"trigger_laser", SP_trigger_laser}, // FS: Zaero specific
+	{"monster_autocannon", SP_monster_autocannon}, // FS: Zaero specific
+	{"monster_autocannon_floor", SP_monster_autocannon_floor}, // FS: Zaero specific
+	{"monster_sentien", SP_monster_sentien}, // FS: Zaero specific
+	{"misc_securitycamera", SP_misc_securitycamera}, // FS: Zaero specific
+	{"monster_hound", SP_monster_hound}, // FS: Zaero specific
+	{"monster_handler", SP_monster_handler}, // FS: Zaero specific
+	{"misc_commdish", SP_misc_commdish}, // FS: Zaero specific
 
-	// mirror level's 
-	{"load_mirrorlevel", SP_load_mirrorlevel},
+// mirror level's 
+	{"load_mirrorlevel", SP_load_mirrorlevel}, // FS: Zaero specific
 
-	{"misc_crate", SP_misc_crate},
-	{"misc_crate_medium", SP_misc_crate_medium},
-	{"misc_crate_small", SP_misc_crate_small},
+	{"misc_crate", SP_misc_crate}, // FS: Zaero specific
+	{"misc_crate_medium", SP_misc_crate_medium}, // FS: Zaero specific
+	{"misc_crate_small", SP_misc_crate_small}, // FS: Zaero specific
 
-	{"monster_zboss", SP_monster_zboss},
-	{"func_barrier", SP_func_barrier},
-	{"misc_seat", SP_misc_seat},
-	{"target_zboss_target", SP_target_zboss_target},
+	{"monster_zboss", SP_monster_zboss}, // FS: Zaero specific
+	{"func_barrier", SP_func_barrier}, // FS: Zaero specific
+	{"misc_seat", SP_misc_seat}, // FS: Zaero specific
+	{"target_zboss_target", SP_target_zboss_target}, // FS: Zaero specific
 	{NULL, NULL}
 };
 
@@ -572,7 +574,7 @@ void SpawnEntities (const char *mapname, char *entities, const char *spawnpoint)
 	const char	*com_token;
 	int			i;
 	float		skill_level;
-	int oldmaxent;
+	int oldmaxent; // FS: Zaero specific
 
 	skill_level = floor (skill->value);
 	if (skill_level < 0)
@@ -613,7 +615,7 @@ void SpawnEntities (const char *mapname, char *entities, const char *spawnpoint)
 			ent = g_edicts;
 		else
 			ent = G_Spawn ();
-		ent->spawnflags2 = 0;
+		ent->spawnflags2 = 0; // FS: Zaero specific
 		entities = ED_ParseEdict (entities, ent);
 
 		// yet another map hack
@@ -660,8 +662,8 @@ void SpawnEntities (const char *mapname, char *entities, const char *spawnpoint)
 #endif // 0
 			else
 			{
-				if (((!coop->value) && (ent->spawnflags2 & SPAWNFLAG2_NOT_SINGLE)) ||
-						((coop->value) && (ent->spawnflags2 & SPAWNFLAG2_NOT_COOP)) ||
+				if (((!coop->value) && (ent->spawnflags2 & SPAWNFLAG2_NOT_SINGLE)) || // FS: Zaero specific
+          ((coop->value) && (ent->spawnflags2 & SPAWNFLAG2_NOT_COOP)) ||
 					((skill->value == 0) && (ent->spawnflags & SPAWNFLAG_NOT_EASY)) ||
 					((skill->value == 1) && (ent->spawnflags & SPAWNFLAG_NOT_MEDIUM)) ||
 					(((skill->value == 2) || (skill->value == 3)) && (ent->spawnflags & SPAWNFLAG_NOT_HARD))
@@ -679,7 +681,7 @@ void SpawnEntities (const char *mapname, char *entities, const char *spawnpoint)
 		ED_CallSpawn (ent);
 	}	
 
-	oldmaxent = globals.num_edicts;
+	oldmaxent = globals.num_edicts; // FS: Zaero specific
 
 	gi.dprintf(DEVELOPER_MSG_GAME, "%i entities created\n", globals.num_edicts);
 	gi.dprintf(DEVELOPER_MSG_GAME, "%i entities inhibited\n", inhibit);
@@ -688,7 +690,7 @@ void SpawnEntities (const char *mapname, char *entities, const char *spawnpoint)
 
 	PlayerTrail_Init ();
 
-	Z_SpawnDMItems();
+	Z_SpawnDMItems(); // FS: Zaero specific
 }
 
 
@@ -751,7 +753,7 @@ char *single_statusbar =
 "	pic	11 "
 "endif "
 
-// player origin
+// player origin // FS: Zaero specific
 "if 16 "
 "	xl 0 "
 "	yb -120 "
@@ -825,7 +827,7 @@ char *dm_statusbar =
 "yt 2 "
 "num 3 14 "
 
-// player origin
+// player origin // FS: Zaero specific
 "if 16 "
 "	xl 0 "
 "	yb -120 "
@@ -854,7 +856,7 @@ void SP_worldspawn (edict_t *ent)
 	ent->solid = SOLID_BSP;
 	ent->inuse = true;			// since the world doesn't use G_Spawn()
 	ent->s.modelindex = 1;		// world model is always index 1
-	ent->spawnflags2 = 0;
+	ent->spawnflags2 = 0; // FS: Zaero specific
 
 	//---------------
 

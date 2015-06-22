@@ -35,15 +35,15 @@ static int	quad_drop_timeout_hack;
 
 // *** Zaero prototypes ***
 
-void Weapon_FlareGun (edict_t *ent);
-void Weapon_SniperRifle(edict_t *ent);
-void Weapon_LaserTripBomb(edict_t *ent);
-void Weapon_SonicCannon (edict_t *ent);
-void Weapon_EMPNuke (edict_t *ent);
-void Weapon_A2k (edict_t *ent);
-void Use_Visor (edict_t *ent, gitem_t *item);
-void Action_Push(edict_t *ent);
-void Use_PlasmaShield (edict_t *ent, gitem_t *item);
+void Weapon_FlareGun (edict_t *ent); // FS: Zaero specific
+void Weapon_SniperRifle(edict_t *ent); // FS: Zaero specific
+void Weapon_LaserTripBomb(edict_t *ent); // FS: Zaero specific
+void Weapon_SonicCannon (edict_t *ent); // FS: Zaero specific
+void Weapon_EMPNuke (edict_t *ent); // FS: Zaero specific
+void Weapon_A2k (edict_t *ent); // FS: Zaero specific
+void Use_Visor (edict_t *ent, gitem_t *item); // FS: Zaero specific
+void Action_Push(edict_t *ent); // FS: Zaero specific
+void Use_PlasmaShield (edict_t *ent, gitem_t *item); // FS: Zaero specific
 
 
 //======================================================================
@@ -108,7 +108,7 @@ gitem_t	*FindItem (char *pickup_name)
 	return NULL;
 }
 
-void precacheAllItems()
+void precacheAllItems() // FS: Zaero specific
 {
 	int		i;
 	gitem_t	*it;
@@ -282,13 +282,13 @@ qboolean Pickup_Pack (edict_t *ent, edict_t *other)
 		other->client->pers.max_cells = 300;
 	if (other->client->pers.max_slugs < 100)
 		other->client->pers.max_slugs = 100;
-	if (other->client->pers.max_tbombs < 100)
+	if (other->client->pers.max_tbombs < 100) // FS: Zaero specific
 		other->client->pers.max_tbombs = 100;
-	if (other->client->pers.max_a2k < 1)
+	if (other->client->pers.max_a2k < 1) // FS: Zaero specific
 		other->client->pers.max_a2k = 1;
-	if (other->client->pers.max_empnuke < 100)
+	if (other->client->pers.max_empnuke < 100) // FS: Zaero specific
 		other->client->pers.max_empnuke = 100;
-	if (other->client->pers.max_plasmashield < 40)
+	if (other->client->pers.max_plasmashield < 40) // FS: Zaero specific
 		other->client->pers.max_plasmashield =40;
 
 	item = FindItem("Bullets");
@@ -345,7 +345,7 @@ qboolean Pickup_Pack (edict_t *ent, edict_t *other)
 			other->client->pers.inventory[index] = other->client->pers.max_slugs;
 	}
 
-	item = FindItem("IRED");
+	item = FindItem("IRED"); // FS: Zaero specific
 	if (item)
 	{
 		index = ITEM_INDEX(item);
@@ -354,7 +354,7 @@ qboolean Pickup_Pack (edict_t *ent, edict_t *other)
 			other->client->pers.inventory[index] = other->client->pers.max_tbombs;
 	}
 
-	item = FindItem("A2k");
+	item = FindItem("A2k"); // FS: Zaero specific
 	if (item)
 	{
 		index = ITEM_INDEX(item);
@@ -363,7 +363,7 @@ qboolean Pickup_Pack (edict_t *ent, edict_t *other)
 			other->client->pers.inventory[index] = other->client->pers.max_a2k;
 	}
 
-	item = FindItem("EMPNuke");
+	item = FindItem("EMPNuke"); // FS: Zaero specific
 	if (item)
 	{
 		index = ITEM_INDEX(item);
@@ -372,7 +372,7 @@ qboolean Pickup_Pack (edict_t *ent, edict_t *other)
 			other->client->pers.inventory[index] = other->client->pers.max_empnuke;
 	}
 
-	item = FindItem("Plasma Shield");
+	item = FindItem("Plasma Shield"); // FS: Zaero specific
 	if (item)
 	{
 		index = ITEM_INDEX(item);
@@ -425,6 +425,8 @@ void Use_Breather (edict_t *ent, gitem_t *item)
 		ent->client->breather_framenum += 300;
 	else
 		ent->client->breather_framenum = level.framenum + 300;
+
+//	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/damage.wav"), 1, ATTN_NORM, 0);
 }
 
 //======================================================================
@@ -438,6 +440,8 @@ void Use_Envirosuit (edict_t *ent, gitem_t *item)
 		ent->client->enviro_framenum += 300;
 	else
 		ent->client->enviro_framenum = level.framenum + 300;
+
+//	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/damage.wav"), 1, ATTN_NORM, 0);
 }
 
 //======================================================================
@@ -462,6 +466,8 @@ void	Use_Silencer (edict_t *ent, gitem_t *item)
 	ent->client->pers.inventory[ITEM_INDEX(item)]--;
 	ValidateSelectedItem (ent);
 	ent->client->silencer_shots += 30;
+
+//	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/damage.wav"), 1, ATTN_NORM, 0);
 }
 
 //======================================================================
@@ -511,16 +517,18 @@ qboolean Add_Ammo (edict_t *ent, gitem_t *item, int count)
 		max = ent->client->pers.max_cells;
 	else if (item->tag == AMMO_SLUGS)
 		max = ent->client->pers.max_slugs;
-	else if (item->tag == AMMO_LASERTRIPBOMB)
+// [evolve
+	else if (item->tag == AMMO_LASERTRIPBOMB) // FS: Zaero specific
 		max = ent->client->pers.max_tbombs;
-	else if (item->tag == AMMO_FLARES)
+	else if (item->tag == AMMO_FLARES) // FS: Zaero specific
 		max = ent->client->pers.max_flares;
-	else if (item->tag == AMMO_EMPNUKE)
+	else if (item->tag == AMMO_EMPNUKE) // FS: Zaero specific
 		max = ent->client->pers.max_empnuke;
-	else if (item->tag == AMMO_A2K)
+	else if (item->tag == AMMO_A2K) // FS: Zaero specific
 		max = ent->client->pers.max_a2k;
-	else if (item->tag == AMMO_PLASMASHIELD)
+	else if (item->tag == AMMO_PLASMASHIELD) // FS: Zaero specific
 		max = ent->client->pers.max_plasmashield;
+// evolve]
 	else
 		return false;
 
@@ -553,15 +561,15 @@ qboolean Pickup_Ammo (edict_t *ent, edict_t *other)
 
 	oldcount = other->client->pers.inventory[ITEM_INDEX(ent->item)];
   
-	if(ent->spawnflags & 0x08)
-	{
-		if(oldcount >= count)
-		{
-			return false;
-		}
+  if(ent->spawnflags & 0x08) // FS: Zaero specific
+  {
+    if(oldcount >= count)
+    {
+      return false;
+    }
 
-		count -= oldcount;
-	}
+    count -= oldcount;
+  }
 
 	if (!Add_Ammo (other, ent->item, count))
 		return false;
@@ -576,7 +584,7 @@ qboolean Pickup_Ammo (edict_t *ent, edict_t *other)
 	{
 		SetRespawn (ent, 30);
 	}
-	else if(ent->spawnflags & 0x04)
+	else if(ent->spawnflags & 0x04) // FS: Zaero specific
 	{
 		SetRespawn (ent, 15);
 	}
@@ -599,7 +607,7 @@ void Drop_Ammo (edict_t *ent, gitem_t *item)
 	ValidateSelectedItem (ent);
 }
 
-qboolean Pickup_A2k (edict_t *ent, edict_t *other)
+qboolean Pickup_A2k (edict_t *ent, edict_t *other) // FS: Zaero specific
 {
 	// do we already have an a2k?
 	if (other->client->pers.inventory[ITEM_INDEX(ent->item)] == 1)
@@ -845,7 +853,7 @@ void Drop_PowerArmor (edict_t *ent, gitem_t *item)
 
 //======================================================================
 
-qboolean Pickup_PlasmaShield(edict_t *ent, edict_t *other)
+qboolean Pickup_PlasmaShield(edict_t *ent, edict_t *other) // FS: Zaero specific
 {
   if(other->client->pers.inventory[ITEM_INDEX(ent->item)])
   {
@@ -864,7 +872,7 @@ qboolean Pickup_PlasmaShield(edict_t *ent, edict_t *other)
 }
 
 
-qboolean Pickup_Visor(edict_t *ent, edict_t *other)
+qboolean Pickup_Visor(edict_t *ent, edict_t *other) // FS: Zaero specific
 {
 	// do we already have a visor?
 	if (other->client->pers.inventory[ITEM_INDEX(ent->item)] == 1 &&
@@ -889,7 +897,7 @@ qboolean Pickup_Visor(edict_t *ent, edict_t *other)
 	return true;
 }
 
-void Drop_Visor(edict_t *ent, gitem_t *item)
+void Drop_Visor(edict_t *ent, gitem_t *item) // FS: Zaero specific
 {
 	edict_t *visor = Drop_Item (ent, item);
 	ent->client->pers.inventory[ITEM_INDEX(item)] = 0;
@@ -1197,7 +1205,7 @@ void SpawnItem (edict_t *ent, gitem_t *item)
 
 	if (ent->spawnflags)
 	{
-		if (!(item->flags & IT_KEY) && !(item->flags & IT_AMMO))
+		if (!(item->flags & IT_KEY) && !(item->flags & IT_AMMO)) // FS: Zaero specific
 		{
 			ent->spawnflags = 0;
 			gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s has invalid spawnflags set\n", ent->classname, vtos(ent->s.origin));
@@ -1414,7 +1422,7 @@ gitem_t	itemlist[] =
 /*QUAKED weapon_hand (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"weapon_push",
+		"weapon_push", // FS: Zaero specific
 		NULL,
 		Use_Weapon,
 		NULL,
@@ -1437,7 +1445,7 @@ gitem_t	itemlist[] =
 /*QUAKED weapon_flaregun (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"weapon_flaregun",
+		"weapon_flaregun", // FS: Zaero specific
 		Pickup_Weapon,
 		Use_Weapon,
 		Drop_Weapon,
@@ -1594,7 +1602,7 @@ always owned, never in the world
 /*QUAKED ammo_ired (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"ammo_ired",
+		"ammo_ired", // FS: Zaero specific
 		Pickup_Ammo,
 		Use_Weapon,
 		Drop_Ammo,
@@ -1710,7 +1718,7 @@ always owned, never in the world
 /*QUAKED weapon_sniperrifle (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"weapon_sniperrifle", 
+		"weapon_sniperrifle",  // FS: Zaero specific
 		Pickup_Weapon,
 		Use_Weapon,
 		Drop_Weapon,
@@ -1782,7 +1790,7 @@ always owned, never in the world
 /*QUAKED ammo_a2k (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"ammo_a2k",
+		"ammo_a2k", // FS: Zaero specific
 		Pickup_A2k,
 		Use_Weapon,
 		Drop_Ammo,
@@ -1810,7 +1818,7 @@ always owned, never in the world
 /*QUAKED ammo_flares (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"ammo_flares",
+		"ammo_flares", // FS: Zaero specific
 		Pickup_Ammo,
 		NULL,
 		Drop_Ammo,
@@ -1946,7 +1954,7 @@ always owned, never in the world
 /*QUAKED ammo_empnuke (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"ammo_empnuke",
+		"ammo_empnuke", // FS: Zaero specific
 		Pickup_Ammo,
 		Use_Weapon,
 		Drop_Ammo,
@@ -1964,6 +1972,8 @@ always owned, never in the world
 		AMMO_EMPNUKE,
 /* precache */ "items/empnuke/emp_trg.wav"  //items/empnuke/emp_act.wav items/empnuke/emp_spin.wav items/empnuke/emp_idle.wav 
 	},
+
+// EVOLVE]
 
 	//
 	// POWERUP ITEMS
@@ -2081,7 +2091,7 @@ always owned, never in the world
 /*QUAKED item_visor (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"item_visor",
+		"item_visor", // FS: Zaero specific
 		Pickup_Visor,
 		Use_Visor,
 		Drop_Visor,
@@ -2104,7 +2114,7 @@ always owned, never in the world
 /*QUAKED ammo_plasmashield (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"ammo_plasmashield",
+		"ammo_plasmashield", // FS: Zaero specific
 		Pickup_Ammo,
 		Use_PlasmaShield,
 		Drop_Ammo,
@@ -2429,7 +2439,7 @@ tank commander's head
 landing arena key - blue
 */
 	{
-		"key_landing_area",
+		"key_landing_area", // FS: Zaero specific
 		Pickup_Key,
 		NULL,
 		Drop_General,
@@ -2452,7 +2462,7 @@ landing arena key - blue
 security pass for the laboratory
 */
 	{
-		"key_lab",
+		"key_lab", // FS: Zaero specific
 		Pickup_Key,
 		NULL,
 		Drop_General,
@@ -2475,7 +2485,7 @@ security pass for the laboratory
 security pass for the security level
 */
 	{
-		"key_clearancepass",
+		"key_clearancepass", // FS: Zaero specific
 		Pickup_Key,
 		NULL,
 		Drop_General,
@@ -2498,7 +2508,7 @@ security pass for the security level
 security pass for the security level
 */
 	{
-		"key_energy",
+		"key_energy", // FS: Zaero specific
 		Pickup_Key,
 		NULL,
 		Drop_General,
@@ -2520,7 +2530,7 @@ security pass for the security level
 /*QUAKED key_lava (0 .5 .8) (-16 -16 -16) (16 16 16)
 */
 	{
-		"key_lava",
+		"key_lava", // FS: Zaero specific
 		Pickup_Key,
 		NULL,
 		Drop_General,
@@ -2542,7 +2552,7 @@ security pass for the security level
 /*QUAKED key_slime (0 .5 .8) (-16 -16 -16) (16 16 16)
 */
 	{
-		"key_slime",
+		"key_slime", // FS: Zaero specific
 		Pickup_Key,
 		NULL,
 		Drop_General,

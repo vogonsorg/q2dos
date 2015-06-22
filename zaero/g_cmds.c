@@ -58,7 +58,7 @@ void SelectNextItem (edict_t *ent, int itflags)
 		if (!cl->pers.inventory[index])
 			continue;
 		it = &itemlist[index];
-		if (it->hideFlags & HIDE_FROM_INVENTORY) // don't show this
+		if (it->hideFlags & HIDE_FROM_INVENTORY) // don't show this // FS: Zaero specific
 			continue;
 		if (!it->use)
 			continue;
@@ -87,7 +87,7 @@ void SelectPrevItem (edict_t *ent, int itflags)
 		if (!cl->pers.inventory[index])
 			continue;
 		it = &itemlist[index];
-		if (it->hideFlags & HIDE_FROM_INVENTORY)
+		if (it->hideFlags & HIDE_FROM_INVENTORY) // FS: Zaero specific
 			continue;
 		if (!it->use)
 			continue;
@@ -131,8 +131,8 @@ void Cmd_Give_f (edict_t *ent)
 	int			i;
 	qboolean	give_all;
 	edict_t		*it_ent;
-	int     numargs;
-	char tryname[256];
+	int     numargs; // FS: Zaero specific
+	char tryname[256]; // FS: Zaero specific
 
 	if (deathmatch->value && !sv_cheats->value)
 	{
@@ -141,7 +141,7 @@ void Cmd_Give_f (edict_t *ent)
 	}
 
 	name = gi.args();
-	numargs = gi.argc();
+	numargs = gi.argc(); // FS: Zaero specific
 
 	if (Q_stricmp(name, "all") == 0)
 		give_all = true;
@@ -206,7 +206,7 @@ void Cmd_Give_f (edict_t *ent)
 			return;
 	}
 
-	if (give_all || Q_stricmp(name, "Visor") == 0)
+	if (give_all || Q_stricmp(name, "Visor") == 0) // FS: Zaero specific
 	{
 		it = FindItem("Visor");
 		it_ent = G_Spawn();
@@ -251,6 +251,7 @@ void Cmd_Give_f (edict_t *ent)
 	it = FindItem (name);
 	if (!it)
 	{
+	 // FS: Zaero specific, redone
 		tryname[0] = 0;
 		for(numargs = 1; numargs < gi.argc(); numargs++)
 		{
@@ -271,7 +272,7 @@ void Cmd_Give_f (edict_t *ent)
 			return;
 		}
 
-		numargs++;
+		numargs++; // FS: Zaero specific
 	}
 
 	if (!it->pickup)
@@ -284,7 +285,7 @@ void Cmd_Give_f (edict_t *ent)
 
 	if (it->flags & IT_AMMO)
 	{
-		if (numargs < gi.argc())
+		if (numargs < gi.argc()) // FS: Zaero specific
 			ent->client->pers.inventory[index] = atoi(gi.argv(numargs));
 		else
 			ent->client->pers.inventory[index] += it->quantity;
@@ -390,6 +391,7 @@ void Cmd_Noclip_f (edict_t *ent)
 	gi.cprintf (ent, PRINT_HIGH, msg);
 }
 
+ // FS: Zaero specific
 #define MAX_ALT 2
 struct altsel_s
 {
@@ -410,7 +412,7 @@ struct altsel_s
 	{2,{"BFG10K", "Sonic Cannon"}}
 };
 
-qboolean tryUse(edict_t *ent, char *s)
+qboolean tryUse(edict_t *ent, char *s) // FS: Zaero specific
 {
 	int index = 0;
 	gitem_t *it = FindItem(s);
@@ -434,7 +436,7 @@ qboolean tryUse(edict_t *ent, char *s)
 	return true;
 }
 
-void findNext(edict_t *ent, struct altsel_s *ptr, int offset)
+void findNext(edict_t *ent, struct altsel_s *ptr, int offset) // FS: Zaero specific
 {
 	int start = offset;
 
@@ -453,7 +455,7 @@ void findNext(edict_t *ent, struct altsel_s *ptr, int offset)
 	}
 }
 
-void altSelect(edict_t *ent, int num)
+void altSelect(edict_t *ent, int num) // FS: Zaero specific
 {
 	int offset = -1;
 	int i = 0;
@@ -505,7 +507,7 @@ void Cmd_Use_f (edict_t *ent)
 	char		*s;
 
 	// are we using a multiselect item?
-	if (Q_stricmp(gi.argv(1), "weapon") == 0)
+	if (Q_stricmp(gi.argv(1), "weapon") == 0) // FS: Zaero specific
 	{
 		s = gi.argv(2);
 		if (Q_stricmp(s, "") == 0)
@@ -600,7 +602,7 @@ void Cmd_Inven_f (edict_t *ent)
 	gi.WriteByte (svc_inventory);
 	for (i=0; i < MAX_ITEMS ; i++)
 	{
-		gitem_t *it = &itemlist[i];
+		gitem_t *it = &itemlist[i]; // FS: Zaero specific
 		if (it->hideFlags & HIDE_FROM_INVENTORY)
 			gi.WriteShort(0);	// this is a hack and will work as long as
 								// the client continues to hide items that
@@ -660,18 +662,20 @@ void Cmd_WeapPrev_f (edict_t *ent)
 	// scan  for the next valid one
 	for (i=1 ; i<=MAX_ITEMS ; i++)
 	{
-		index = (selected_weapon + MAX_ITEMS - i)%MAX_ITEMS;
+		index = (selected_weapon + MAX_ITEMS - i)%MAX_ITEMS; // FS: Zaero specific
+//		index = (selected_weapon + i)%MAX_ITEMS;
 		if (!cl->pers.inventory[index])
 			continue;
 		it = &itemlist[index];
-		if (it->hideFlags & HIDE_FROM_SELECTION)
+		if (it->hideFlags & HIDE_FROM_SELECTION) // FS: Zaero specific
 			continue;
 		if (!it->use)
 			continue;
 		if (! (it->flags & IT_WEAPON) )
 			continue;
 		it->use (ent, it);
-		if (cl->newweapon == it)
+//		if (cl->pers.weapon == it)
+		if (cl->newweapon == it) // FS: Zaero specific
 			return;	// successful
 	}
 }
@@ -698,18 +702,20 @@ void Cmd_WeapNext_f (edict_t *ent)
 	// scan  for the next valid one
 	for (i=1 ; i<=MAX_ITEMS ; i++)
 	{
-		index = (selected_weapon + i)%MAX_ITEMS;
+		index = (selected_weapon + i)%MAX_ITEMS; // FS: Zaero specific
+//		index = (selected_weapon + MAX_ITEMS - i)%MAX_ITEMS;
 		if (!cl->pers.inventory[index])
 			continue;
 		it = &itemlist[index];
-		if (it->hideFlags & HIDE_FROM_SELECTION)
+		if (it->hideFlags & HIDE_FROM_SELECTION) // FS: Zaero specific
 			continue;
 		if (!it->use)
 			continue;
 		if (! (it->flags & IT_WEAPON) )
 			continue;
 		it->use (ent, it);
-		if (cl->newweapon == it)
+//		if (cl->pers.weapon == it)
+		if (cl->newweapon == it) // FS: Zaero specific
 			return;	// successful
 	}
 }
@@ -781,8 +787,8 @@ void Cmd_Kill_f (edict_t *ent)
 	meansOfDeath = MOD_SUICIDE;
 	player_die (ent, ent, ent, 100000, vec3_origin);
 	// don't even bother waiting for death frames
-	ent->deadflag = DEAD_DEAD;
-	respawn (ent);
+	ent->deadflag = DEAD_DEAD; // FS: Zaero specific
+	respawn (ent); // FS: Zaero specific
 }
 
 void stopCamera(edict_t *self);
@@ -797,7 +803,7 @@ void Cmd_PutAway_f (edict_t *ent)
 	ent->client->showhelp = false;
 	ent->client->showinventory = false;
 
-	if (ent->client->zCameraTrack)
+	if (ent->client->zCameraTrack) // FS: Zaero specific
 		stopCamera(ent);
 }
 
@@ -994,7 +1000,7 @@ void ClientCommand (edict_t *ent)
 	cmd = gi.argv(0);
 
 	// if we're viewing thru the camera, only allow some things to happen
-	if (ent->client->zCameraTrack && !level.intermissiontime)
+	if (ent->client->zCameraTrack && !level.intermissiontime) // FS: Zaero specific
 	{
 		if (Q_stricmp (cmd, "putaway") == 0)
 			Cmd_PutAway_f(ent);
@@ -1088,24 +1094,7 @@ void ClientCommand (edict_t *ent)
 		Cmd_PutAway_f (ent);
 	else if (Q_stricmp (cmd, "wave") == 0)
 		Cmd_Wave_f (ent);
-#if defined(_DEBUG) && defined(_Z_TESTMODE)
-  else if(Q_stricmp (cmd, "linesize") == 0)
-  {
-    extern float lineSize;
-    float ls = atof(gi.argv(1));
-
-    if(ls <= 0.0)
-    {
-      gi.cprintf (ent, PRINT_HIGH, "LineSize must be greater than 0\n");
-      return;
-    }
-
-    lineSize = ls;
-  }
-	else if (Q_stricmp (cmd, "testitem") == 0)
-		Cmd_TestItem (ent);
-#endif
-	else if (Q_stricmp(cmd, "showorigin") == 0)
+	else if (Q_stricmp(cmd, "showorigin") == 0) // FS: Zaero specific
 	{
 		ent->client->showOrigin = !ent->client->showOrigin;
 		if (ent->client->showOrigin)
@@ -1113,10 +1102,6 @@ void ClientCommand (edict_t *ent)
 		else
 			gi.cprintf(ent, PRINT_HIGH, "Show origin OFF\n");
 	}
-#if defined(_DEBUG) && defined(_Z_TESTMODE)
-   else if(Q_stricmp (cmd, "anim") == 0)
-      anim_player_cmd(ent);
-#endif
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
 }

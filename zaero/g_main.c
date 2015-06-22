@@ -16,7 +16,7 @@ edict_t		*g_edicts;
 cvar_t	*deathmatch;
 cvar_t	*coop;
 cvar_t	*dmflags;
-cvar_t	*zdmflags;
+cvar_t	*zdmflags; // FS: Zaero specific
 cvar_t	*skill;
 cvar_t	*fraglimit;
 cvar_t	*timelimit;
@@ -41,15 +41,7 @@ cvar_t	*bob_up;
 cvar_t	*bob_pitch;
 cvar_t	*bob_roll;
 
-cvar_t  *gamedir;
-
 cvar_t	*sv_cheats;
-
-#ifdef CACHE_SOUND
-cvar_t *printSoundRejects;
-int internalSoundIndex(char *name);
-int	(*actual_soundindex) (char *name);
-#endif
 
 void SpawnEntities (char *mapname, char *entities, char *spawnpoint);
 void ClientThink (edict_t *ent, usercmd_t *cmd);
@@ -65,7 +57,7 @@ void WriteLevel (char *filename);
 void ReadLevel (char *filename);
 void InitGame (void);
 void G_RunFrame (void);
-void ServerCommand(void);
+void ServerCommand(void); // FS: Zaero specific
 
 
 //===================================================================
@@ -187,14 +179,14 @@ void EndDMLevel (void)
 		ent = G_Spawn ();
 		ent->classname = "target_changelevel";
 		ent->map = level.mapname;
-    ent->spawnflags2 = 0;
+		ent->spawnflags2 = 0; // FS: Zaero specific
 	}
 	else if (level.nextmap[0])
 	{	// go to a specific map
 		ent = G_Spawn ();
 		ent->classname = "target_changelevel";
 		ent->map = level.nextmap;
-    ent->spawnflags2 = 0;
+		ent->spawnflags2 = 0; // FS: Zaero specific
 	}
 	else
 	{	// search for a changeleve
@@ -205,7 +197,7 @@ void EndDMLevel (void)
 			ent = G_Spawn ();
 			ent->classname = "target_changelevel";
 			ent->map = level.mapname;
-      ent->spawnflags2 = 0;
+			ent->spawnflags2 = 0; // FS: Zaero specific
 		}
 	}
 
@@ -282,9 +274,9 @@ void ExitLevel (void)
 		if (ent->health > ent->client->pers.max_health)
 			ent->health = ent->client->pers.max_health;
 	}
-	level.fadeFrames = 0;
-	level.exitintermission = 0;
-	level.intermissiontime = 0;
+	level.fadeFrames = 0; // FS: Zaero specific
+	level.exitintermission = 0; // FS: Zaero specific, moved after changemap = NULL
+	level.intermissiontime = 0; // FS: Zaero specific, moved after changemap = NULL
 }
 
 /*
@@ -307,7 +299,7 @@ void G_RunFrame (void)
 
 	// exit intermissions
 
-	if (level.fadeFrames > 1)
+	if (level.fadeFrames > 1) // FS: Zaero specific
 	{
 		level.fadeFrames--;
 	}
@@ -329,7 +321,7 @@ void G_RunFrame (void)
 
 		level.current_entity = ent;
 
-    if(!(ent->flags & FL_DONTSETOLDORIGIN))
+    if(!(ent->flags & FL_DONTSETOLDORIGIN)) // FS: Zaero specific
     {
 		  VectorCopy (ent->s.origin, ent->s.old_origin);
     }

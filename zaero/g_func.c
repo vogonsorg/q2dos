@@ -35,17 +35,17 @@
 */
 
 #define PLAT_LOW_TRIGGER	1
-#define PLAT_LOW_TRIGGER_2	2
+#define PLAT_LOW_TRIGGER_2	2 // FS: Zaero specific
 
 #define	STATE_TOP			0
 #define	STATE_BOTTOM		1
 #define STATE_UP			2
 #define STATE_DOWN			3
 
-#define STATE_STOPPED		0
-#define STATE_ACCEL			1
-#define STATE_TOPSPEED		2
-#define STATE_DECEL			3
+#define STATE_STOPPED		0 // FS: Zaero specific
+#define STATE_ACCEL			1 // FS: Zaero specific
+#define STATE_TOPSPEED		2 // FS: Zaero specific
+#define STATE_DECEL			3 // FS: Zaero specific
 
 #define DOOR_START_OPEN		1
 #define DOOR_REVERSE		2
@@ -99,20 +99,20 @@ void Move_Begin (edict_t *ent)
 	ent->think = Move_Final;
 
 	// set the angle velocity
-	VectorScale(ent->movedir, ent->aspeed, ent->avelocity);
+	VectorScale(ent->movedir, ent->aspeed, ent->avelocity); // FS: Zaero specific
 }
 
 void Think_AccelMove (edict_t *ent);
-void Think_SmoothAccelMove (edict_t *ent);
+void Think_SmoothAccelMove (edict_t *ent); // FS: Zaero specific
 
-void Move_Calc (edict_t *ent, vec3_t dest, void(*func)(edict_t*), int smoothSpeedChange)
+void Move_Calc (edict_t *ent, vec3_t dest, void(*func)(edict_t*), int smoothSpeedChange) // FS: Zaero specific, added smoothSpeedChange
 {
 	VectorClear (ent->velocity);
 	VectorSubtract (dest, ent->s.origin, ent->moveinfo.dir);
 	ent->moveinfo.remaining_distance = VectorNormalize (ent->moveinfo.dir);
 	ent->moveinfo.endfunc = func;
 
-	if(smoothSpeedChange & 0x6)
+	if(smoothSpeedChange & 0x6) // FS: Zaero specific
 	{
 		if(!ent->moveinfo.current_speed)
 		{
@@ -150,7 +150,7 @@ void Move_Calc (edict_t *ent, vec3_t dest, void(*func)(edict_t*), int smoothSpee
 	}
 	else if (ent->moveinfo.speed == ent->moveinfo.accel && ent->moveinfo.speed == ent->moveinfo.decel)
 	{
-		ent->moveinfo.current_speed = ent->moveinfo.speed;
+		ent->moveinfo.current_speed = ent->moveinfo.speed; // FS: Zaero specific, added
 		if (level.current_entity == ((ent->flags & FL_TEAMSLAVE) ? ent->teammaster : ent))
 		{
 			Move_Begin (ent);
@@ -395,7 +395,7 @@ change the speed for the next frame
 */
 
 
-void Think_SmoothAccelMove (edict_t *ent)
+void Think_SmoothAccelMove (edict_t *ent) // FS: Zaero specific
 {
 	if (ent->moveinfo.remaining_distance >= ent->moveinfo.current_speed)
 	{
@@ -464,7 +464,7 @@ void plat_go_down (edict_t *ent)
 		ent->s.sound = ent->moveinfo.sound_middle;
 	}
 	ent->moveinfo.state = STATE_DOWN;
-	Move_Calc (ent, ent->moveinfo.end_origin, plat_hit_bottom, false);
+	Move_Calc (ent, ent->moveinfo.end_origin, plat_hit_bottom, false); // FS: Zaero specific, added false
 }
 
 void plat_go_up (edict_t *ent)
@@ -476,7 +476,7 @@ void plat_go_up (edict_t *ent)
 		ent->s.sound = ent->moveinfo.sound_middle;
 	}
 	ent->moveinfo.state = STATE_UP;
-	Move_Calc (ent, ent->moveinfo.start_origin, plat_hit_top, false);
+	Move_Calc (ent, ent->moveinfo.start_origin, plat_hit_top, false); // FS: Zaero specific, added false
 }
 
 void plat_blocked (edict_t *self, edict_t *other)
@@ -518,6 +518,7 @@ void Use_Plat (edict_t *ent, edict_t *other, edict_t *activator)
 
 void Touch_Plat_Center (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
+	edict_t *trigger = ent; // FS: Zaero specific
 	if (!other->client)
 		return;
 		
@@ -527,7 +528,7 @@ void Touch_Plat_Center (edict_t *ent, edict_t *other, cplane_t *plane, csurface_
 	ent = ent->enemy;	// now point at the plat, not the trigger
 	if (ent->moveinfo.state == STATE_BOTTOM)
 	{
-		if (ent->spawnflags & PLAT_LOW_TRIGGER_2)
+		if (ent->spawnflags & PLAT_LOW_TRIGGER_2) // FS: Zaero specific
 		{
 			if (other->s.origin[2] + other->mins[2] > 
 				ent->moveinfo.end_origin[2] + ent->maxs[2] /*+ ent->size[2] */+ 8)
@@ -535,7 +536,7 @@ void Touch_Plat_Center (edict_t *ent, edict_t *other, cplane_t *plane, csurface_
 		}
 		plat_go_up (ent);
 	}
-	else if (ent->think && ent->moveinfo.state == STATE_TOP)
+	else if (ent->think && ent->moveinfo.state == STATE_TOP) // FS: Zaero specific
 		ent->nextthink = level.time + 1;	// the player is still on the plat, so delay going down
 }
                                             
@@ -730,7 +731,7 @@ void rotating_think(edict_t *self)
 	VectorScale(self->movedir, self->moveinfo.current_speed, self->avelocity);
 }
 
-void rotating_use (edict_t *self, edict_t *other, edict_t *activator)
+void rotating_use (edict_t *self, edict_t *other, edict_t *activator) // FS: Zaero specific, all different now
 {
 	// if we're at full speed or we're accelerating
 	if (self->moveinfo.state == STATE_TOPSPEED || self->moveinfo.state == STATE_ACCEL) 
@@ -811,8 +812,8 @@ void SP_func_rotating (edict_t *ent)
 
 	gi.setmodel (ent, ent->model);
 
-	ent->moveinfo.state = STATE_STOPPED;
-	ent->moveinfo.current_speed = 0;
+	ent->moveinfo.state = STATE_STOPPED; // FS: Zaero specific
+	ent->moveinfo.current_speed = 0; // FS: Zaero specific
 	gi.linkentity (ent);
 }
 
@@ -852,7 +853,7 @@ void button_return (edict_t *self)
 {
 	self->moveinfo.state = STATE_DOWN;
 
-	Move_Calc (self, self->moveinfo.start_origin, button_done, false);
+	Move_Calc (self, self->moveinfo.start_origin, button_done, false); // FS: Zaero specific
 
 	self->s.frame = 0;
 
@@ -883,7 +884,7 @@ void button_fire (edict_t *self)
 	self->moveinfo.state = STATE_UP;
 	if (self->moveinfo.sound_start && !(self->flags & FL_TEAMSLAVE))
 		gi.sound (self, CHAN_NO_PHS_ADD+CHAN_VOICE, self->moveinfo.sound_start, 1, ATTN_STATIC, 0);
-	Move_Calc (self, self->moveinfo.end_origin, button_wait, false);
+	Move_Calc (self, self->moveinfo.end_origin, button_wait, false); // FS: Zaero specific
 }
 
 void button_use (edict_t *self, edict_t *other, edict_t *activator)
@@ -1065,7 +1066,7 @@ void door_go_down (edict_t *self)
 	
 	self->moveinfo.state = STATE_DOWN;
 	if (strcmp(self->classname, "func_door") == 0)
-		Move_Calc (self, self->moveinfo.start_origin, door_hit_bottom, false);
+		Move_Calc (self, self->moveinfo.start_origin, door_hit_bottom, false); // FS: Zaero specific
 	else if (strcmp(self->classname, "func_door_rotating") == 0)
 		AngleMove_Calc (self, door_hit_bottom);
 }
@@ -1090,7 +1091,7 @@ void door_go_up (edict_t *self, edict_t *activator)
 	}
 	self->moveinfo.state = STATE_UP;
 	if (strcmp(self->classname, "func_door") == 0)
-		Move_Calc (self, self->moveinfo.end_origin, door_hit_top, false);
+		Move_Calc (self, self->moveinfo.end_origin, door_hit_top, false); // FS: Zaero specific
 	else if (strcmp(self->classname, "func_door_rotating") == 0)
 		AngleMove_Calc (self, door_hit_top);
 
@@ -1098,7 +1099,7 @@ void door_go_up (edict_t *self, edict_t *activator)
 	door_use_areaportals (self, true);
 }
 
-void door_openclose (edict_t *self, edict_t *other, edict_t *activator)
+void door_openclose (edict_t *self, edict_t *other, edict_t *activator) // FS: Zaero specific
 {
 	edict_t	*ent;
 
@@ -1112,11 +1113,11 @@ void door_openclose (edict_t *self, edict_t *other, edict_t *activator)
 			// trigger all paired doors
 			for (ent = self ; ent ; ent = ent->teamchain)
 			{
-				char *m = ent->message;
+				char *m = ent->message; // FS: Zaero specific
 				ent->message = NULL;
 				ent->touch = NULL;
 				door_go_down (ent);
-				ent->message = m;
+				ent->message = m; // FS: Zaero specific
 			}
 			return;
 		}
@@ -1125,16 +1126,16 @@ void door_openclose (edict_t *self, edict_t *other, edict_t *activator)
 	// trigger all paired doors
 	for (ent = self ; ent ; ent = ent->teamchain)
 	{
-		char *m = ent->message;
+		char *m = ent->message; // FS: Zaero specific
 		ent->message = NULL;
 		ent->touch = NULL;
 		door_go_up (ent, activator);
-		ent->message = m;
+		ent->message = m; // FS: Zaero specific
 	}
 };
 
-void door_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf);
-void door_use (edict_t *self, edict_t *other, edict_t *activator)
+void door_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf); // FS: Zaero specific
+void door_use (edict_t *self, edict_t *other, edict_t *activator) // FS: Zaero specific
 {
 	// toggle active?
 	edict_t *ent;
@@ -1172,13 +1173,13 @@ void Touch_DoorTrigger (edict_t *self, edict_t *other, cplane_t *plane, csurface
 	if (level.time < self->touch_debounce_time)
 		return;
 
-	if (self->owner->active & DOOR_ACTIVE_TOGGLE &&
+	if (self->owner->active & DOOR_ACTIVE_TOGGLE && // FS: Zaero specific
 		!(self->owner->active & DOOR_ACTIVE_ON))
 		return;
 	
 	self->touch_debounce_time = level.time + 1.0;
 
-	door_openclose (self->owner, other, other);
+	door_openclose (self->owner, other, other); // FS: Zaero specific
 }
 
 void Think_CalcMoveSpeed (edict_t *self)
@@ -1248,7 +1249,7 @@ void Think_SpawnDoorTrigger (edict_t *ent)
 	VectorCopy (mins, other->mins);
 	VectorCopy (maxs, other->maxs);
 	other->owner = ent;
-	other->spawnflags2 = ent->spawnflags2 & SPAWNFLAG2_MIRRORLEVEL;
+  other->spawnflags2 = ent->spawnflags2 & SPAWNFLAG2_MIRRORLEVEL; // FS: Zaero specific
 	other->solid = SOLID_TRIGGER;
 	other->movetype = MOVETYPE_NONE;
 	other->touch = Touch_DoorTrigger;
@@ -1282,7 +1283,7 @@ void door_blocked  (edict_t *self, edict_t *other)
 		return;
 	}
 
-	if (self->dmg > 0)
+	if (self->dmg > 0) // FS: Zaero specific
 		T_Damage (other, self, self, vec3_origin, other->s.origin, vec3_origin, self->dmg, 1, 0, MOD_CRUSH);
 
 	if (self->spawnflags & DOOR_CRUSHER)
@@ -1421,11 +1422,11 @@ void SP_func_door (edict_t *ent)
 	gi.linkentity (ent);
 
 	// toggle active
-	if (!(ent->active & DOOR_ACTIVE_TOGGLE))
+	if (!(ent->active & DOOR_ACTIVE_TOGGLE)) // FS: Zaero specific
 		ent->active = 0;
 
 	ent->nextthink = level.time + FRAMETIME;
-	if ((ent->health || ent->targetname) && !(ent->active & DOOR_ACTIVE_TOGGLE))
+	if ((ent->health || ent->targetname) && !(ent->active & DOOR_ACTIVE_TOGGLE)) // FS: Zaero specific
 		ent->think = Think_CalcMoveSpeed;
 	else
 		ent->think = Think_SpawnDoorTrigger;
@@ -1504,6 +1505,8 @@ void SP_func_door_rotating (edict_t *ent)
 
 	if (!ent->wait)
 		ent->wait = 3;
+	//if (!ent->dmg) // FS: Zaero specific: removed?
+	//	ent->dmg = 2;
 
 	if (ent->sounds != 1)
 	{
@@ -1646,10 +1649,10 @@ void SP_func_water (edict_t *self)
 #define TRAIN_START_ON		1
 #define TRAIN_TOGGLE		2
 #define TRAIN_BLOCK_STOPS	4
-#define TRAIN_REVERSE		8
-#define TRAIN_X_AXIS		16
-#define TRAIN_Y_AXIS		32
-#define TRAIN_Z_AXIS		64
+#define TRAIN_REVERSE		8 // FS: Zaero specific
+#define TRAIN_X_AXIS		16 // FS: Zaero specific
+#define TRAIN_Y_AXIS		32 // FS: Zaero specific
+#define TRAIN_Z_AXIS		64 // FS: Zaero specific
 
 /*QUAKED func_train (0 .5 .8) ? START_ON TOGGLE BLOCK_STOPS
 Trains are moving platforms that players can ride.
@@ -1779,7 +1782,7 @@ again:
 	self->moveinfo.wait = ent->wait;
 	self->target_ent = ent;
 
-	if(ent->speed)
+	if(ent->speed) // FS: Zaero specific
 	{
 		self->moveinfo.speed = ent->speed;
 
@@ -1809,14 +1812,14 @@ again:
 		self->s.sound = self->moveinfo.sound_middle;
 	}
 
-	if (self->classname != NULL && Q_stricmp(self->classname, "misc_viper") == 0)
+	if (self->classname != NULL && Q_stricmp(self->classname, "misc_viper") == 0) // FS: Zaero specific
 		VectorCopy(ent->s.origin, dest);
 	else
 		VectorSubtract(ent->s.origin, self->mins, dest);
 	self->moveinfo.state = STATE_TOP;
 	VectorCopy (self->s.origin, self->moveinfo.start_origin);
 	VectorCopy (dest, self->moveinfo.end_origin);
-	Move_Calc (self, dest, train_wait, ent->spawnflags);
+	Move_Calc (self, dest, train_wait, ent->spawnflags); // FS: Zaero specific
 	self->spawnflags |= TRAIN_START_ON;
 }
 
@@ -1914,6 +1917,7 @@ void SP_func_train (edict_t *self)
 	self->moveinfo.accel = self->moveinfo.decel = self->moveinfo.speed;
 
 	// set the axis of rotation
+	 // FS: Zaero specific
 	VectorClear(self->movedir);
 	if (self->spawnflags & TRAIN_X_AXIS)
 		self->movedir[2] = 1.0;
@@ -1923,6 +1927,7 @@ void SP_func_train (edict_t *self)
 		self->movedir[1] = 1.0;
 
 	// check for reverse rotation
+	 // FS: Zaero specific
 	if (self->spawnflags & TRAIN_REVERSE)
 		VectorNegate (self->movedir, self->movedir);
 
@@ -2059,14 +2064,14 @@ void parseTargets(edict_t *self)
 
 void func_timer_think (edict_t *self)
 {
-	if (self->numTargets <= 0)
+	if (self->numTargets <= 0) // FS: Zaero specific
 		return;
 
-	self->target = self->targets[rand() % self->numTargets];
+	self->target = self->targets[rand() % self->numTargets]; // FS: Zaero specific
 
 	G_UseTargets (self, self->activator);
 	self->nextthink = level.time + self->wait + crandom() * self->random;
-	self->target = NULL;
+	self->target = NULL; // FS: Zaero specific
 }
 
 void func_timer_use (edict_t *self, edict_t *other, edict_t *activator)
@@ -2186,7 +2191,7 @@ void door_secret_use (edict_t *self, edict_t *other, edict_t *activator)
 	if (!VectorCompare(self->s.origin, vec3_origin))
 		return;
 
-	Move_Calc (self, self->pos1, door_secret_move1, false);
+	Move_Calc (self, self->pos1, door_secret_move1, false); // FS: Zaero specific
 	door_use_areaportals (self, true);
 }
 
@@ -2198,7 +2203,7 @@ void door_secret_move1 (edict_t *self)
 
 void door_secret_move2 (edict_t *self)
 {
-	Move_Calc (self, self->pos2, door_secret_move3, false);
+	Move_Calc (self, self->pos2, door_secret_move3, false); // FS: Zaero specific
 }
 
 void door_secret_move3 (edict_t *self)
@@ -2211,7 +2216,7 @@ void door_secret_move3 (edict_t *self)
 
 void door_secret_move4 (edict_t *self)
 {
-	Move_Calc (self, self->pos1, door_secret_move5, false);
+	Move_Calc (self, self->pos1, door_secret_move5, false); // FS: Zaero specific
 }
 
 void door_secret_move5 (edict_t *self)
@@ -2222,7 +2227,7 @@ void door_secret_move5 (edict_t *self)
 
 void door_secret_move6 (edict_t *self)
 {
-	Move_Calc (self, vec3_origin, door_secret_done, false);
+	Move_Calc (self, vec3_origin, door_secret_done, false); // FS: Zaero specific
 }
 
 void door_secret_done (edict_t *self)

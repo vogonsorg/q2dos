@@ -54,7 +54,7 @@
 
 // edict->spawnflags2
 // these are set with checkboxes on each entity in the map editor
-#define	SPAWNFLAG2_MIRRORLEVEL  0x0001
+#define	SPAWNFLAG2_MIRRORLEVEL  0x0001 // FS: Zaero specific
 #define	SPAWNFLAG2_NOT_COOP			0x0002
 #define SPAWNFLAG2_NOT_SINGLE   0x0004
 
@@ -72,8 +72,8 @@
 #define	FL_TEAMSLAVE			0x00000400	// not the first on the team
 #define FL_NO_KNOCKBACK				0x00000800
 #define FL_POWER_ARMOR				0x00001000	// power armor (if any) is active
-#define FL_DONTSETOLDORIGIN		0x00002000  // Don't set the old_origin for this entity
-#define FL_BFGMISSFIRE				0x00004000  // BFG Miss Fire
+#define FL_DONTSETOLDORIGIN		0x00002000  // Don't set the old_origin for this entity  // FS: Zaero specific
+#define FL_BFGMISSFIRE				0x00004000  // BFG Miss Fire // FS: Zaero specific
 #define FL_RESPAWN						0x80000000	// used for item respawning
 
 
@@ -94,7 +94,7 @@ typedef enum
 	DAMAGE_NO,
 	DAMAGE_YES,			// will take damage if hit
 	DAMAGE_AIM,			// auto targeting recognizes this
-	DAMAGE_IMMORTAL		// similar to DAMAGE_YES, but health is not deducted
+	DAMAGE_IMMORTAL		// similar to DAMAGE_YES, but health is not deducted // FS: Zaero specific
 } damage_t;
 
 typedef enum 
@@ -110,14 +110,14 @@ typedef enum
 	AMMO_BULLETS,
 	AMMO_SHELLS,
 	AMMO_ROCKETS,
-	AMMO_FLARES,
+	AMMO_FLARES, // FS: Zaero specific
 	AMMO_GRENADES,
 	AMMO_CELLS,
 	AMMO_SLUGS,
-	AMMO_LASERTRIPBOMB,
-	AMMO_EMPNUKE,
-	AMMO_A2K,
-	AMMO_PLASMASHIELD
+	AMMO_LASERTRIPBOMB, // FS: Zaero specific
+	AMMO_EMPNUKE, // FS: Zaero specific
+	AMMO_A2K, // FS: Zaero specific
+	AMMO_PLASMASHIELD // FS: Zaero specific
 } ammo_t;
 
 
@@ -153,6 +153,7 @@ typedef enum
 #define AI_COMBAT_POINT					0x00001000
 #define AI_MEDIC								0x00002000
 #define AI_RESURRECTING					0x00004000
+ // FS: Zaero specific
 #define AI_SCHOOLING  					0x00008000
 #define AI_REDUCEDDAMAGE				0x00010000
 #define AI_SCHOOLINGTURNING			0x00020000
@@ -168,6 +169,7 @@ typedef enum
 #define AS_SLIDING				2
 #define	AS_MELEE				  3
 #define	AS_MISSILE				4
+ // FS: Zaero specific
 #define AS_FLY_STRAFE			5
 
 // armor types
@@ -220,6 +222,7 @@ MOVETYPE_FLY,
 MOVETYPE_TOSS,			// gravity
 MOVETYPE_FLYMISSILE,	// extra size to monsters
 MOVETYPE_BOUNCE,
+ // FS: Zaero specific
 MOVETYPE_BOUNCEFLY,
 MOVETYPE_FREEZE,       // player freeze, used for Zaero Camera
 MOVETYPE_FALLFLOAT,		// falls down slopes and floats in water
@@ -247,6 +250,7 @@ typedef struct
 #define IT_KEY			16
 #define IT_POWERUP		32
 
+ // FS: Zaero specific
 // hide flags
 #define HIDE_FROM_INVENTORY	1	// don't list this item in the inventory
 #define HIDE_DONT_KEEP		2	// don't keep in the lastweapon variable
@@ -277,8 +281,8 @@ typedef struct gitem_s
 	int			tag;
 
 	char		*precaches;		// string of all models, sounds, and images this item will use
-	int		hideFlags;
-	char    *weapon;        // weapon used by ammo
+	int		hideFlags; // FS: Zaero specific
+	char    *weapon;        // weapon used by ammo  // FS: Zaero specific
 	
 } gitem_t;
 
@@ -333,7 +337,7 @@ typedef struct
 	float		intermissiontime;		// time the intermission was started
 	char		*changemap;
 	int			exitintermission;
-	int			fadeFrames;
+	int			fadeFrames; // FS: Zaero specific
 	vec3_t		intermission_origin;
 	vec3_t		intermission_angle;
 
@@ -453,9 +457,9 @@ typedef struct
 	void		(*melee)(edict_t *self);
 	void		(*sight)(edict_t *self, edict_t *other);
 	qboolean	(*checkattack)(edict_t *self);
-	void		(*backwalk)(edict_t *self);
-	void		(*sidestepright)(edict_t *self);
-	void		(*sidestepleft)(edict_t *self);
+	void		(*backwalk)(edict_t *self); // FS: Zaero specific
+	void		(*sidestepright)(edict_t *self); // FS: Zaero specific
+	void		(*sidestepleft)(edict_t *self); // FS: Zaero specific
 
 	float		pausetime;
 	float		attack_finished;
@@ -472,25 +476,25 @@ typedef struct
 	int			power_armor_type;
 	int			power_armor_power;
 
-	int flashTime;
-	int flashBase;
+	int flashTime; // FS: Zaero specific
+	int flashBase; // FS: Zaero specific
 
 	// strafing
-	float flyStrafePitch;
-	float flyStrafeTimeout;
+	float flyStrafePitch; // FS: Zaero specific
+	float flyStrafeTimeout; // FS: Zaero specific
 
   //schooling info
-  float zSchoolSightRadius;
-  float zSchoolMaxSpeed, zSchoolMinSpeed;
-  float zSpeedStandMax, zSpeedWalkMax;
-  float zSchoolDecayRate, zSchoolMinimumDistance;
-  int   zSchoolFlags;
+  float zSchoolSightRadius; // FS: Zaero specific
+  float zSchoolMaxSpeed, zSchoolMinSpeed; // FS: Zaero specific
+  float zSpeedStandMax, zSpeedWalkMax; // FS: Zaero specific
+  float zSchoolDecayRate, zSchoolMinimumDistance; // FS: Zaero specific
+  int   zSchoolFlags; // FS: Zaero specific
 
-	float reducedDamageAmount;
+	float reducedDamageAmount; // FS: Zaero specific
 
-	float dodgetimeout;
+	float dodgetimeout; // FS: Zaero specific
 
-	vec3_t shottarget;
+	vec3_t shottarget; // FS: Zaero specific
 } monsterinfo_t;
 
 
@@ -570,7 +574,7 @@ extern	cvar_t	*maxentities;
 extern	cvar_t	*deathmatch;
 extern	cvar_t	*coop;
 extern	cvar_t	*dmflags;
-extern	cvar_t	*zdmflags;
+extern	cvar_t	*zdmflags; // FS: Zaero specific
 extern	cvar_t	*skill;
 extern	cvar_t	*fraglimit;
 extern	cvar_t	*timelimit;
@@ -596,9 +600,9 @@ extern	cvar_t	*maxclients;
 
 extern	cvar_t  *gamedir;
 
-extern	cvar_t	*grenadeammotype;
-extern	cvar_t	*grenadeammo;
-extern	cvar_t	*bettyammo;
+extern	cvar_t	*grenadeammotype; // FS: Zaero specific
+extern	cvar_t	*grenadeammo; // FS: Zaero specific
+extern	cvar_t	*bettyammo; // FS: Zaero specific
 
 #define world	(&g_edicts[0])
 
@@ -677,8 +681,8 @@ void precacheAllItems();
 // g_utils.c
 //
 qboolean	KillBox (edict_t *ent);
-qboolean MonsterKillBox (edict_t *ent);
-qboolean MonsterPlayerKillBox (edict_t *ent);
+qboolean MonsterKillBox (edict_t *ent); // FS: Zaero specific
+qboolean MonsterPlayerKillBox (edict_t *ent); // FS: Zaero specific
 void	G_ProjectSource (vec3_t point, vec3_t distance, vec3_t forward, vec3_t right, vec3_t result);
 edict_t *G_Find (edict_t *from, int fieldofs, char *match);
 edict_t *findradius (edict_t *from, vec3_t org, float rad);
@@ -708,7 +712,7 @@ qboolean OnSameTeam (edict_t *ent1, edict_t *ent2);
 qboolean CanDamage (edict_t *targ, edict_t *inflictor);
 void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir, vec3_t point, vec3_t normal, int damage, int knockback, int dflags, int mod);
 void T_RadiusDamage (edict_t *inflictor, edict_t *attacker, float damage, edict_t *ignore, float radius, int mod);
-void T_RadiusDamagePosition (vec3_t origin, edict_t *inflictor, edict_t *attacker, float damage, edict_t *ignore, float radius, int mod);
+void T_RadiusDamagePosition (vec3_t origin, edict_t *inflictor, edict_t *attacker, float damage, edict_t *ignore, float radius, int mod); // FS: Zaero specific
 
 // damage flags
 #define DAMAGE_RADIUS			    0x00000001	// damage was indirect
@@ -717,7 +721,7 @@ void T_RadiusDamagePosition (vec3_t origin, edict_t *inflictor, edict_t *attacke
 #define DAMAGE_NO_KNOCKBACK		0x00000008	// do not affect velocity, just view angles
 #define DAMAGE_BULLET			    0x00000010  // damage is from a bullet (used for ricochets)
 #define DAMAGE_NO_PROTECTION	0x00000020  // armor, shields, invulnerability, and godmode have no effect
-#define DAMAGE_ARMORMOSTLY    0x00000040  // reduces the armor more than the health
+#define DAMAGE_ARMORMOSTLY    0x00000040  // reduces the armor more than the health // FS: Zaero specific
 
 #define DEFAULT_BULLET_HSPREAD	300
 #define DEFAULT_BULLET_VSPREAD	500
@@ -774,7 +778,7 @@ void FoundTarget (edict_t *self);
 qboolean infront (edict_t *self, edict_t *other);
 qboolean visible (edict_t *self, edict_t *other);
 qboolean FacingIdeal(edict_t *self);
-qboolean inweaponLineOfSight (edict_t *self, edict_t *other);
+qboolean inweaponLineOfSight (edict_t *self, edict_t *other); // FS: Zaero specific
 
 //
 // g_weapon.c
@@ -875,26 +879,26 @@ void FetchClientEntData (edict_t *ent);
 //
 // z_item.c
 //
-qboolean EMPNukeCheck(edict_t	*ent, vec3_t pos);
+qboolean EMPNukeCheck(edict_t	*ent, vec3_t pos); // FS: Zaero specific
 
 
 //
 // z_weapon.c
 //
-void fire_bb (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius);
-void fire_flare (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage);
+void fire_bb (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius); // FS: Zaero specific
+void fire_flare (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage); // FS: Zaero specific
 
 
 //
 // z_ai.c
 //
-void ai_schoolStand (edict_t *self, float dist);
-void ai_schoolRun (edict_t *self, float dist);
-void ai_schoolWalk (edict_t *self, float dist);
-void ai_schoolCharge (edict_t *self, float dist);
-void ai_schoolBackWalk (edict_t *self, float dist);
-void ai_schoolSideStepRight (edict_t *self, float dist);
-void ai_schoolSideStepLeft (edict_t *self, float dist);
+void ai_schoolStand (edict_t *self, float dist); // FS: Zaero specific
+void ai_schoolRun (edict_t *self, float dist); // FS: Zaero specific
+void ai_schoolWalk (edict_t *self, float dist); // FS: Zaero specific
+void ai_schoolCharge (edict_t *self, float dist); // FS: Zaero specific
+void ai_schoolBackWalk (edict_t *self, float dist); // FS: Zaero specific
+void ai_schoolSideStepRight (edict_t *self, float dist); // FS: Zaero specific
+void ai_schoolSideStepLeft (edict_t *self, float dist); // FS: Zaero specific
 
 
 
@@ -915,7 +919,6 @@ typedef struct
 	char		userinfo[MAX_INFO_STRING];
 	char		netname[16];
 	int			hand;
-	int			gl_polyblend; // so that we know whether to damage "cheating" players
 
 	qboolean	connected;			// a loadgame will leave valid entities that
 									// just don't have a connection yet
@@ -932,23 +935,23 @@ typedef struct
 	int			max_bullets;
 	int			max_shells;
 	int			max_rockets;
-	int			max_flares;
+	int			max_flares; // FS: Zaero specific
 	int			max_grenades;
 	int			max_cells;
 	int			max_slugs;
-	int			max_tbombs;
-	int			max_a2k;
-	int			max_empnuke;
-	int			max_plasmashield;
+	int			max_tbombs; // FS: Zaero specific
+	int			max_a2k; // FS: Zaero specific
+	int			max_empnuke; // FS: Zaero specific
+	int			max_plasmashield; // FS: Zaero specific
 
 	gitem_t		*weapon;
 	gitem_t		*lastweapon;
-	gitem_t		*lastweapon2; // this if for inventory hiding items
+	gitem_t		*lastweapon2; // this if for inventory hiding items // FS: Zaero specific
 
 	int			power_cubes;	// used for tracking the cubes in coop games
 	int			score;			// for calculating total unit score in coop games
 
-	float visorFrames;
+	float visorFrames; // FS: Zaero specific
 } client_persistant_t;
 
 // client data that stays across deathmatch respawns
@@ -1030,7 +1033,7 @@ struct gclient_s
 	float		invincible_framenum;
 	float		breather_framenum;
 	float		enviro_framenum;
-	float		a2kFramenum;
+	float		a2kFramenum; // FS: Zaero specific
 
 	qboolean	grenade_blew_up;
 	float		grenade_time;
@@ -1041,23 +1044,22 @@ struct gclient_s
 
 	float		respawn_time;		// can respawn when time > this
 
-
 	// used for blinding
-	int flashTime;
-	int flashBase;
+	int flashTime; // FS: Zaero specific
+	int flashBase; // FS: Zaero specific
 
-	edict_t		*zCameraTrack;    // the entity to see through
-	vec3_t     zCameraOffset;   // offset from camera origin
-	edict_t		*zCameraLocalEntity;
-	float zCameraStaticFramenum;
+	edict_t		*zCameraTrack;    // the entity to see through // FS: Zaero specific
+	vec3_t     zCameraOffset;   // offset from camera origin // FS: Zaero specific
+	edict_t		*zCameraLocalEntity; // FS: Zaero specific
+	float zCameraStaticFramenum; // FS: Zaero specific
 
-	qboolean showOrigin;
+	qboolean showOrigin; // FS: Zaero specific
 
 	// for sniper rifle
-	int sniperFramenum;
+	int sniperFramenum; // FS: Zaero specific
 
 	// for sonic cannon
-	float startFireTime;
+	float startFireTime; // FS: Zaero specific
 };
 
 struct edict_s
@@ -1097,9 +1099,9 @@ struct edict_s
 	int			flags;
 
 	char		*model;
-	char		*model2;
-	char		*model3;
-	char		*model4;
+	char		*model2; // FS: Zaero specific
+	char		*model3; // FS: Zaero specific
+	char		*model4; // FS: Zaero specific
 	float		freetime;			// sv.time when the object was freed
 	
 	//
@@ -1121,7 +1123,7 @@ struct edict_s
 	char		*combattarget;
 	edict_t		*target_ent;
 
-	float		speed, accel, decel, aspeed;
+	float		speed, accel, decel, aspeed; // FS: Zaero specific, aspeed added
 	vec3_t		movedir;
 	vec3_t		pos1, pos2;
 
@@ -1211,6 +1213,7 @@ struct edict_s
 	moveinfo_t		moveinfo;
 	monsterinfo_t	monsterinfo;
 
+// FS: Below is all Zaero specific
 	// can use this for misc. timeouts
 	float timeout;
 
@@ -1226,8 +1229,6 @@ struct edict_s
 	edict_t *laser;
 
 	float weaponsound_time;
-
-	//can't teach an old dog new tricks
 
 	// schooling info
 	edict_t *zRaduisList, *zSchoolChain;

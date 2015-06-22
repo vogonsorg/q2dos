@@ -20,6 +20,7 @@ solid_edge items only clip against bsp models.
 
 */
 
+void adjustRiders(edict_t *ent); // FS: Zaero specific
 
 /*
 ============
@@ -483,7 +484,6 @@ pushed_t	pushed[MAX_EDICTS], *pushed_p;
 
 edict_t	*obstacle;
 
-void adjustRiders(edict_t *ent);
 
 /*
 ============
@@ -607,7 +607,7 @@ qboolean SV_Push (edict_t *pusher, vec3_t move, vec3_t amove)
 			if (!block)
 			{	// pushed ok
 				gi.linkentity (check);
-				adjustRiders(check);
+				adjustRiders(check); // FS: Zaero specific
 				// impact?
 				continue;
 			}
@@ -769,7 +769,7 @@ void SV_Physics_Toss (edict_t *ent)
 	qboolean	wasinwater;
 	qboolean	isinwater;
 	vec3_t		old_origin;
-	float		speed = 0;
+	float		speed = 0; // FS: Zaero physics
 
 	// regular thinking
 	SV_RunThink (ent);
@@ -797,7 +797,7 @@ void SV_Physics_Toss (edict_t *ent)
 	// add gravity
 	if (ent->movetype != MOVETYPE_FLY
 	&& ent->movetype != MOVETYPE_FLYMISSILE 
-	&& ent->movetype != MOVETYPE_BOUNCEFLY)
+  && ent->movetype != MOVETYPE_BOUNCEFLY) // FS: Zaero specific
 		SV_AddGravity (ent);
 
 	// move angles
@@ -813,21 +813,21 @@ void SV_Physics_Toss (edict_t *ent)
 	{
 		if (ent->movetype == MOVETYPE_BOUNCE)
 			backoff = 1.5;
-		else if(ent->movetype == MOVETYPE_BOUNCEFLY)
-		{
+    else if(ent->movetype == MOVETYPE_BOUNCEFLY) // FS: Zaero specific
+    {
 			backoff = 2;
-		}
+    }
 		else
 			backoff = 1;
 
-		if(ent->movetype == MOVETYPE_BOUNCEFLY)
-		{
-			speed = VectorLength(ent->velocity);
-		}
+    if(ent->movetype == MOVETYPE_BOUNCEFLY) // FS: Zaero specific
+    {
+    	speed = VectorLength(ent->velocity);
+    }
 
 		ClipVelocity (ent->velocity, trace.plane.normal, ent->velocity, backoff);
 
-		if(ent->movetype == MOVETYPE_BOUNCEFLY)
+    if(ent->movetype == MOVETYPE_BOUNCEFLY) // FS: Zaero specific
 		{
 			VectorNormalize (ent->velocity);
 			VectorScale (ent->velocity, speed, ent->velocity);
@@ -1030,7 +1030,7 @@ void SV_Physics_Step (edict_t *ent)
 	SV_RunThink (ent);
 }
 
-void SV_Physics_FallFloat (edict_t *ent)
+void SV_Physics_FallFloat (edict_t *ent) // FS: Zaero specific
 {
 	float gravVal = ent->gravity * sv_gravity->value * FRAMETIME;
 	qboolean wasonground = false;
@@ -1166,7 +1166,7 @@ void SV_Physics_FallFloat (edict_t *ent)
 	SV_RunThink (ent);
 }
 
-void adjustRiders(edict_t *ent)
+void adjustRiders(edict_t *ent) // FS: Zaero specific
 {
 	int i = 0;
 
@@ -1178,7 +1178,7 @@ void adjustRiders(edict_t *ent)
 	}
 }
 
-void SV_Physics_Ride (edict_t *ent)
+void SV_Physics_Ride (edict_t *ent) // FS: Zaero specific
 {
 	// base ourself on the step
 	SV_Physics_Step(ent);
@@ -1216,14 +1216,14 @@ void G_RunEntity (edict_t *ent)
 	case MOVETYPE_TOSS:
 	case MOVETYPE_BOUNCE:
 	case MOVETYPE_FLY:
-	case MOVETYPE_BOUNCEFLY:
+	case MOVETYPE_BOUNCEFLY: // FS: Zaero specific
 	case MOVETYPE_FLYMISSILE:
 		SV_Physics_Toss (ent);
 		break;
-	case MOVETYPE_FALLFLOAT:
+	case MOVETYPE_FALLFLOAT: // FS: Zaero specific
 		SV_Physics_FallFloat(ent);
 		break;
-	case MOVETYPE_RIDE:
+	case MOVETYPE_RIDE: // FS: Zaero specific
 		SV_Physics_Ride(ent);
 		break;
 	default:

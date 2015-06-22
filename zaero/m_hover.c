@@ -765,6 +765,53 @@ hover_die(edict_t *self, edict_t *inflictor /* unused */,
 	self->monsterinfo.currentmove = &hover_move_death1;
 }
 
+void hover_dodge (edict_t *self, edict_t *attacker, float eta) // FS: Zaero specific
+{
+	int delta = 0;
+	vec3_t forward, right;
+	vec3_t dir;
+	int count  = 0;
+	if (self->monsterinfo.currentmove == &hover_move_attack1)
+		if (random() < 0.75) // if we're attacking, stop attacking and dodge 1/4 the time
+			return;
+
+	self->monsterinfo.attack_state = AS_FLY_STRAFE;
+	 // TODO choose an angle to move based on what's around me
+
+	// start at a random value
+	self->monsterinfo.flyStrafePitch = crandom() * 180;
+	
+	// choose a random delta dir
+	delta = (random() < 0.5 ? 10 : -10);
+	AngleVectors(self->s.angles, forward, right, NULL);
+
+	// now try to find a direction that'll give us sufficient room to move
+	// (ie. away from walls)
+	count = 36;
+	while(1)
+	{
+		trace_t tr;
+		vec3_t end;
+		RotatePointAroundVector(dir, forward, right, self->monsterinfo.flyStrafePitch);
+		VectorMA(self->s.origin, 96, dir, end);
+
+		// trace out in this direction
+		tr = gi.trace(self->s.origin, self->mins, self->maxs, end, self, MASK_MONSTERSOLID);
+		if (tr.fraction >= 1.0)
+			break;
+
+		if (count-- <= 0)
+			break; // we've tried enough times;
+
+		self->monsterinfo.flyStrafePitch += delta;
+	}
+
+	self->monsterinfo.flyStrafeTimeout = level.time + /*eta + */ 1.0;
+	
+	//if (random() < 0.5)
+	//	self->monsterinfo.currentmove = &hover_move_run;
+}
+
 /*
  * QUAKED monster_hover (1 .5 0) (-16 -16 -24) (16 16 32) Ambush Trigger_Spawn Sight
  */
@@ -810,6 +857,7 @@ SP_monster_hover(edict_t *self)
 	self->monsterinfo.stand = hover_stand;
 	self->monsterinfo.walk = hover_walk;
 	self->monsterinfo.run = hover_run;
+	self->monsterinfo.dodge = hover_dodge; // FS: Zaero specific
 	self->monsterinfo.attack = hover_start_attack;
 	self->monsterinfo.sight = hover_sight;
 	self->monsterinfo.search = hover_search;

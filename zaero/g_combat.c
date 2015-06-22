@@ -167,7 +167,7 @@ int CheckPowerArmor (edict_t *ent, vec3_t point, vec3_t normal, int damage, int 
 	if (dflags & DAMAGE_NO_ARMOR)
 		return 0;
 
-  if(EMPNukeCheck(ent, point))
+  if(EMPNukeCheck(ent, point)) // FS: Zaero specific
   {
     return 0;
   }
@@ -191,8 +191,10 @@ int CheckPowerArmor (edict_t *ent, vec3_t point, vec3_t normal, int damage, int 
     power_armor_type = POWER_ARMOR_SHIELD;
 		power = ent->health;
   }
-  else
+	else
+	{
 		return 0;
+	}
 
 	if (power_armor_type == POWER_ARMOR_NONE)
 		return 0;
@@ -293,7 +295,7 @@ int CheckArmor (edict_t *ent, vec3_t point, vec3_t normal, int damage, int te_sp
 
 	client->pers.inventory[index] -= save;
 
-  if(dflags & DAMAGE_ARMORMOSTLY)
+  if(dflags & DAMAGE_ARMORMOSTLY) // FS: Zaero specific
   {
     save *= 2;
   }
@@ -359,7 +361,7 @@ void M_ReactToDamage (edict_t *targ, edict_t *attacker)
 			FoundTarget (targ);
 	}
 	// otherwise get mad at whoever they are mad at (help our buddy) unless it is us!
-	else if (attacker->enemy && attacker->enemy != targ)
+	else if (attacker->enemy && attacker->enemy != targ) // FS: Zaero specific
 	{
 		if (targ->enemy && targ->enemy->client)
 			targ->oldenemy = targ->enemy;
