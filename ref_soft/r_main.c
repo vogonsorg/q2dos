@@ -1041,6 +1041,9 @@ void R_RenderFrame (refdef_t *fd)
 	if (r_dspeeds->value)
 		dp_time2 = Sys_Milliseconds ();
 
+	currententity = &r_worldentity; // FS: Dr Jack Whitham ref_soft fix
+	currentmodel = currententity->model; // FS: Dr Jack Whitham ref_soft fix
+
 	R_DrawAlphaSurfaces();
 
 	R_SetLightLevel ();
