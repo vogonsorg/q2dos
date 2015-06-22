@@ -25,6 +25,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../client/qmenu.h"
 #include "snd_loc.h"
 
+#ifdef __DJGPP__
+	extern int	havegus; // FS: DOS GUS
+#else
+	int havegus = 0;
+#endif
+
 static int	m_main_cursor;
 
 #define NUM_CURSOR_FRAMES 15
@@ -1046,6 +1052,7 @@ CONTROLS MENU
 #ifndef __DJGPP__
 static cvar_t *win_noalttab;
 #endif
+
 #ifdef USE_JOYSTICK
 extern cvar_t *in_joystick;
 #endif
@@ -1055,24 +1062,31 @@ static menuaction_s		s_options_defaults_action;
 static menuaction_s		s_options_customize_options_action;
 static menuslider_s		s_options_sensitivity_slider;
 static menulist_s		s_options_freelook_box;
+
 #ifndef __DJGPP__
 static menulist_s		s_options_noalttab_box;
 #endif
+
 static menulist_s		s_options_alwaysrun_box;
 static menulist_s		s_options_invertmouse_box;
 static menulist_s		s_options_lookspring_box;
 static menulist_s		s_options_lookstrafe_box;
 static menulist_s		s_options_crosshair_box;
 static menuslider_s		s_options_sfxvolume_slider;
+
 #ifdef USE_JOYSTICK
 static menulist_s		s_options_joystick_box;
 #endif
+
 static menulist_s		s_options_cdvolume_box;
 static menuslider_s		s_options_musicvolume_slider; // FS
 static menulist_s		s_options_quality_list;
+static menulist_s		s_options_loadas8bit_box; // FS
+
 #ifdef WIN32
 static menulist_s		s_options_compatibility_list;
 #endif
+
 static menulist_s		s_options_console_action;
 
 static void CrosshairFunc( void *unused )
@@ -1123,12 +1137,57 @@ float ClampCvar( float min, float max, float value )
 }
 #endif	//duplicate from cl_main
 
+static int Get_S_KHZ_Quality (void) // FS
+{
+	if(s_khz->intValue <= 19293)
+	{
+		return 0;
+	}
+	else if(s_khz->intValue > 19293 && s_khz->intValue <= 22050)
+	{
+		return 1;
+	}
+	else if(s_khz->intValue > 22050 && s_khz->intValue <= 44100)
+	{
+		return 2;
+	}
+	else if(s_khz->intValue > 44100 && s_khz->intValue <= 48000 )
+	{
+		if(havegus == 1) // FS: Max of GUS Classic is 44100
+		{
+			return 2;
+		}
+		return 3;
+	}
+	else if(s_khz->intValue > 48000 )
+	{
+		if (havegus)
+		{
+			if(havegus == 1)
+			{
+				return 2; // FS: Max of GUS Classic is 44100
+			}
+			else
+			{
+				return 3; // FS: Max of GUS MAX/PnP is 48000
+			}
+		}
+
+		return 4;
+	}
+
+	return 0;
+}
+
 static void ControlsSetMenuItemValues( void )
 {
 	s_options_sfxvolume_slider.curvalue		= Cvar_VariableValue( "s_volume" ) * 10;
 	s_options_cdvolume_box.curvalue 		= !Cvar_VariableValue("cd_nocd");
-	s_options_quality_list.curvalue			= !Cvar_VariableValue( "s_loadas8bit" );
+	s_options_quality_list.curvalue			= Get_S_KHZ_Quality(); // FS
 	s_options_sensitivity_slider.curvalue	= ( sensitivity->value ) * 2;
+
+	// FS
+	s_options_loadas8bit_box.curvalue		= !Cvar_VariableValue("s_loadas8bit");
 
 	Cvar_SetValue( "cl_run", ClampCvar( 0, 1, cl_run->value ) );
 	s_options_alwaysrun_box.curvalue		= cl_run->value;
@@ -1224,36 +1283,48 @@ static void ConsoleFunc( void *unused )
 
 static void UpdateSoundQualityFunc( void *unused )
 {
-#ifdef __DJGPP__
-	extern int	havegus; // FS: DOS GUS
-#else
-	int havegus = 0;
-#endif
-	if ( s_options_quality_list.curvalue )
+	switch (s_options_quality_list.curvalue)
 	{
-		Cvar_SetValue( "s_khz", 22050 );
-		Cvar_SetValue( "s_loadas8bit", false );
-	}
-	else
-	{
-		if(havegus > 0)
-		{
-			if (havegus == 1)
-				Cvar_SetValue ("s_khz", 19293);
+		case 0:
+			if(havegus == 1)
+			{
+				Cvar_SetValue( "s_khz", 19293 );
+			}
 			else
-				Cvar_SetValue ("s_khz", 11025);
-			Cvar_SetValue( "s_loadas8bit", false );
-		}
-		else
-		{
-			Cvar_SetValue( "s_khz", 11025 );
-			Cvar_SetValue( "s_loadas8bit", true );
-		}
+			{
+				Cvar_SetValue( "s_khz", 11025 );
+			}
+			break;
+		case 1:
+			Cvar_SetValue( "s_khz", 22050 );
+			break;
+		case 2:
+			Cvar_SetValue( "s_khz", 44100 );
+			break;
+		case 3:
+			if(havegus == 1)
+			{
+				Cvar_SetValue( "s_khz", 44100 );
+			}
+			else
+			{
+				Cvar_SetValue( "s_khz", 48000 );
+			}
+			break;
+		case 4:
+			Cvar_SetValue( "s_khz", 96000 );
+			break;
+		default:
+			Cvar_SetValue( "s_khz", 22050 );
+			break;
 	}
 
 #ifdef WIN32
 	Cvar_SetValue( "s_primary", s_options_compatibility_list.curvalue );
 #endif
+
+	Cvar_SetValue( "s_loadas8bit", !s_options_loadas8bit_box.curvalue ); // FS
+
 	M_DrawTextBox( 8, 120 - 48, 36, 3 );
 	M_Print( 16 + 16, 120 - 48 + 8,  "Restarting the sound system. This" );
 	M_Print( 16 + 16, 120 - 48 + 16, "could take up to a minute, so" );
@@ -1272,10 +1343,6 @@ void Options_MenuInit( void )
 		"disabled",
 		"enabled",
 		0
-	};
-	static const char *quality_items[] =
-	{
-		"low", "high", 0
 	};
 
 #ifdef WIN32
@@ -1297,6 +1364,53 @@ void Options_MenuInit( void )
 		"cross",
 		"dot",
 		"angle",
+		0
+	};
+
+#ifdef WIN32
+	static const char *skhz_win32_frequency[] =
+	{
+		"11025",
+		"22050",
+		"44100",
+		"48000",
+		"96000",
+		0
+	};
+#else
+
+	static const char *skhz_gusmax_frequency[] =
+	{
+		"11025",
+		"22050",
+		"44100",
+		"48000",
+		0
+	};
+
+	static const char *skhz_gusclassic_frequency[] =
+	{
+		"19293",
+		"22050",
+		"44100",
+		0
+	};
+
+	static const char *skhz_generic_dos_frequency[] =
+	{
+		"11025",
+		"22050",
+		"44100",
+		"48000",
+		"96000",
+		0
+	};
+#endif // WIN32
+
+	static const char *sloadas8bit_names[] = // FS
+	{
+		"8-bit",
+		"16-bit",
 		0
 	};
 
@@ -1341,24 +1455,50 @@ void Options_MenuInit( void )
 	s_options_quality_list.generic.type	= MTYPE_SPINCONTROL;
 	s_options_quality_list.generic.x		= 0;
 	s_options_quality_list.generic.y		= 30;
-	s_options_quality_list.generic.name		= "sound quality";
+	s_options_quality_list.generic.name		= "sound frequency";
 	s_options_quality_list.generic.callback = UpdateSoundQualityFunc;
-	s_options_quality_list.itemnames		= quality_items;
-	s_options_quality_list.curvalue			= !Cvar_VariableValue( "s_loadas8bit" );
+#ifdef WIN32
+	s_options_quality_list.itemnames		= skhz_win32_frequency;
+#else
+	if (havegus)
+	{
+		if(havegus == 1)
+		{
+			s_options_quality_list.itemnames		= skhz_gusclassic_frequency;
+		}
+		else
+		{
+			s_options_quality_list.itemnames		= skhz_gusmax_frequency;
+		}
+	}
+	else
+	{
+		s_options_quality_list.itemnames		= skhz_generic_dos_frequency;
+	}
+#endif // WIN32
+	s_options_quality_list.curvalue			= Get_S_KHZ_Quality(); // FS;
+
+	// FS
+	s_options_loadas8bit_box.generic.type = MTYPE_SPINCONTROL;
+	s_options_loadas8bit_box.generic.x	= 0;
+	s_options_loadas8bit_box.generic.y	= 40;
+	s_options_loadas8bit_box.generic.name	= "sound bit-depth";
+	s_options_loadas8bit_box.generic.callback = UpdateSoundQualityFunc;
+	s_options_loadas8bit_box.itemnames = sloadas8bit_names;
 
 #ifdef WIN32
 	s_options_compatibility_list.generic.type	= MTYPE_SPINCONTROL;
 	s_options_compatibility_list.generic.x		= 0;
-	s_options_compatibility_list.generic.y		= 40;
+	s_options_compatibility_list.generic.y		= 50;
 	s_options_compatibility_list.generic.name	= "sound compatibility";
 	s_options_compatibility_list.generic.callback = UpdateSoundQualityFunc;
 	s_options_compatibility_list.itemnames		= compatibility_items;
 	s_options_compatibility_list.curvalue		= Cvar_VariableValue( "s_primary" );
-#endif
+#endif // WIN32
 
 	s_options_sensitivity_slider.generic.type	= MTYPE_SLIDER;
 	s_options_sensitivity_slider.generic.x		= 0;
-	s_options_sensitivity_slider.generic.y		= 50;
+	s_options_sensitivity_slider.generic.y		= 60;
 	s_options_sensitivity_slider.generic.name	= "mouse speed";
 	s_options_sensitivity_slider.generic.callback = MouseSpeedFunc;
 	s_options_sensitivity_slider.minvalue		= 2;
@@ -1366,42 +1506,42 @@ void Options_MenuInit( void )
 
 	s_options_alwaysrun_box.generic.type = MTYPE_SPINCONTROL;
 	s_options_alwaysrun_box.generic.x	= 0;
-	s_options_alwaysrun_box.generic.y	= 60;
+	s_options_alwaysrun_box.generic.y	= 70;
 	s_options_alwaysrun_box.generic.name	= "always run";
 	s_options_alwaysrun_box.generic.callback = AlwaysRunFunc;
 	s_options_alwaysrun_box.itemnames = yesno_names;
 
 	s_options_invertmouse_box.generic.type = MTYPE_SPINCONTROL;
 	s_options_invertmouse_box.generic.x	= 0;
-	s_options_invertmouse_box.generic.y	= 70;
+	s_options_invertmouse_box.generic.y	= 80;
 	s_options_invertmouse_box.generic.name	= "invert mouse";
 	s_options_invertmouse_box.generic.callback = InvertMouseFunc;
 	s_options_invertmouse_box.itemnames = yesno_names;
 
 	s_options_lookspring_box.generic.type = MTYPE_SPINCONTROL;
 	s_options_lookspring_box.generic.x	= 0;
-	s_options_lookspring_box.generic.y	= 80;
+	s_options_lookspring_box.generic.y	= 90;
 	s_options_lookspring_box.generic.name	= "lookspring";
 	s_options_lookspring_box.generic.callback = LookspringFunc;
 	s_options_lookspring_box.itemnames = yesno_names;
 
 	s_options_lookstrafe_box.generic.type = MTYPE_SPINCONTROL;
 	s_options_lookstrafe_box.generic.x	= 0;
-	s_options_lookstrafe_box.generic.y	= 90;
+	s_options_lookstrafe_box.generic.y	= 100;
 	s_options_lookstrafe_box.generic.name	= "lookstrafe";
 	s_options_lookstrafe_box.generic.callback = LookstrafeFunc;
 	s_options_lookstrafe_box.itemnames = yesno_names;
 
 	s_options_freelook_box.generic.type = MTYPE_SPINCONTROL;
 	s_options_freelook_box.generic.x	= 0;
-	s_options_freelook_box.generic.y	= 100;
+	s_options_freelook_box.generic.y	= 110;
 	s_options_freelook_box.generic.name	= "free look";
 	s_options_freelook_box.generic.callback = FreeLookFunc;
 	s_options_freelook_box.itemnames = yesno_names;
 
 	s_options_crosshair_box.generic.type = MTYPE_SPINCONTROL;
 	s_options_crosshair_box.generic.x	= 0;
-	s_options_crosshair_box.generic.y	= 110;
+	s_options_crosshair_box.generic.y	= 120;
 	s_options_crosshair_box.generic.name	= "crosshair";
 	s_options_crosshair_box.generic.callback = CrosshairFunc;
 	s_options_crosshair_box.itemnames = crosshair_names;
@@ -1409,7 +1549,7 @@ void Options_MenuInit( void )
 #ifndef __DJGPP__
 	s_options_noalttab_box.generic.type = MTYPE_SPINCONTROL;
 	s_options_noalttab_box.generic.x	= 0;
-	s_options_noalttab_box.generic.y	= 110;
+	s_options_noalttab_box.generic.y	= 130;
 	s_options_noalttab_box.generic.name	= "disable alt-tab";
 	s_options_noalttab_box.generic.callback = NoAltTabFunc;
 	s_options_noalttab_box.itemnames = yesno_names;
@@ -1418,7 +1558,7 @@ void Options_MenuInit( void )
 #ifdef USE_JOYSTICK
 	s_options_joystick_box.generic.type = MTYPE_SPINCONTROL;
 	s_options_joystick_box.generic.x	= 0;
-	s_options_joystick_box.generic.y	= 120;
+	s_options_joystick_box.generic.y	= 140;
 	s_options_joystick_box.generic.name	= "use joystick";
 	s_options_joystick_box.generic.callback = JoystickFunc;
 	s_options_joystick_box.itemnames = yesno_names;
@@ -1426,19 +1566,19 @@ void Options_MenuInit( void )
 
 	s_options_customize_options_action.generic.type	= MTYPE_ACTION;
 	s_options_customize_options_action.generic.x		= 0;
-	s_options_customize_options_action.generic.y		= 140;
+	s_options_customize_options_action.generic.y		= 150;
 	s_options_customize_options_action.generic.name	= "customize controls";
 	s_options_customize_options_action.generic.callback = CustomizeControlsFunc;
 
 	s_options_defaults_action.generic.type	= MTYPE_ACTION;
 	s_options_defaults_action.generic.x		= 0;
-	s_options_defaults_action.generic.y		= 150;
+	s_options_defaults_action.generic.y		= 160;
 	s_options_defaults_action.generic.name	= "reset defaults";
 	s_options_defaults_action.generic.callback = ControlsResetDefaultsFunc;
 
 	s_options_console_action.generic.type	= MTYPE_ACTION;
 	s_options_console_action.generic.x		= 0;
-	s_options_console_action.generic.y		= 160;
+	s_options_console_action.generic.y		= 170;
 	s_options_console_action.generic.name	= "go to console";
 	s_options_console_action.generic.callback = ConsoleFunc;
 
@@ -1449,9 +1589,12 @@ void Options_MenuInit( void )
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_musicvolume_slider); // FS
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_cdvolume_box );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_quality_list );
+	Menu_AddItem( &s_options_menu, ( void * ) &s_options_loadas8bit_box ); // FS
+
 #ifdef WIN32
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_compatibility_list );
 #endif
+
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_sensitivity_slider );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_alwaysrun_box );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_invertmouse_box );
@@ -1459,9 +1602,15 @@ void Options_MenuInit( void )
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_lookstrafe_box );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_freelook_box );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_crosshair_box );
+
+#ifndef __DJGPP__
+	Menu_AddItem( &s_options_menu, ( void * ) &s_options_noalttab_box );
+#endif
+
 #ifdef USE_JOYSTICK
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_joystick_box );
 #endif
+
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_customize_options_action );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_defaults_action );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_console_action );
