@@ -1,0 +1,24 @@
+From Yamagi Q2:
+# -O2 are enough optimizations.
+#
+# -fno-strict-aliasing since the source doesn't comply
+#  with strict aliasing rules and it's next to impossible
+#  to get it there...
+#
+# -fomit-frame-pointer since the framepointer is mostly
+#  useless for debugging Quake II and slows things down.
+#
+# -g to build always with debug symbols. Please DO NOT
+#  CHANGE THIS, since it's our only chance to debug this
+#  crap when random crashes happen!
+
+From a rogue post on reddit:
+Quake2 also has other issues with floating point math. R1Q2 compiles with 
+-ffloat-store because apparently the original client and server (and the 
+windows version) stored intermediates in memory. If the server and client 
+don't do the same thing you will get significant prediction error (resulting 
+in rubberbanding) in some places.
+
+We personally haven't seen any rubberbanding issues, it also takes a 3-4fps hit
+via timedemo testing.  On a P1, those extra 3-4 frames really make the
+difference.  If we see issues down the road, well... here's the note!
