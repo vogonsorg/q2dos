@@ -1157,7 +1157,8 @@ void Weapon_SniperRifle(edict_t *ent)
 		if (ent->client->ps.gunframe == deactivateStart)
 		{
 			// back to old fov
-			ent->client->ps.fov = 90;	
+			ent->client->ps.fov = atoi(Info_ValueForKey(ent->client->pers.userinfo, "fov")); // FS: Changed from 90
+;	
 			if (deathmatch->value)
 				gi.sound(ent, CHAN_WEAPON2, gi.soundindex("weapons/sniper/snip_bye.wav"), 1, ATTN_NORM, 0);
 		}

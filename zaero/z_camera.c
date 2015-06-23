@@ -17,7 +17,7 @@ void zCam_TrackEntity(struct edict_s *player, struct edict_s *track, qboolean pl
 	// set the player view stuff...
 	player->movetype = MOVETYPE_FREEZE;
 	player->client->ps.gunindex = 0;
-	player->client->ps.fov = 90;
+	player->client->ps.fov = 90; // FS: FIXME: Widescreen scaleable
 
 	VectorSet(player->client->zCameraOffset, 0, 0, 0);
 	
@@ -64,6 +64,7 @@ void zCam_Stop(struct edict_s *player)
 	// set the player view stuff...
 	player->movetype = MOVETYPE_WALK;
 	player->client->ps.gunindex = gi.modelindex(player->client->pers.weapon->view_model);
+	player->client->ps.fov = atoi(Info_ValueForKey(player->client->pers.userinfo, "fov")); // FS: Added
 
 	// if invisible, turn on model, etc
 	if(player->client->zCameraLocalEntity)
@@ -78,40 +79,10 @@ void zCam_Stop(struct edict_s *player)
 	}
 }
 
-
-char *getSkinModel(char *s, char *buffer)
-{
-  char *cp;
-
-
-  strcpy(buffer, "players/");
-  cp = buffer + strlen(buffer);
-
-  while(*s && *s != '/')
-  {
-    *cp = *s;
-    cp++;
-    s++;
-  }
-
-  strcpy(cp, "/tris.md2");
-
-  return buffer;
-}
-
-char *getSkinName(char *s, char *buffer)
-{
-  strcpy(buffer, "players/");
-  strcat(buffer, s);
-  strcat(buffer, ".pcx");
-
-  return buffer;
-}
-
 void zCam_SetLocalCopy(struct edict_s *player, char *s)
 {
-  if(player->client->zCameraLocalEntity)
-  {
-    player->client->zCameraLocalEntity->s.modelindex = gi.modelindex("models/objects/gibs/head2/tris.md2");
-  }
+	if(player->client->zCameraLocalEntity)
+	{
+		player->client->zCameraLocalEntity->s.modelindex = gi.modelindex("models/objects/gibs/head2/tris.md2");
+	}
 }

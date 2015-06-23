@@ -149,8 +149,6 @@ extern void handler_standup ( edict_t * self ) ;
 extern void handler_scratch ( edict_t * self ) ;
 extern void handler_sight ( edict_t * self , edict_t * other ) ;
 extern void zCam_SetLocalCopy ( struct edict_s * player , char * s ) ;
-extern char * getSkinName ( char * s , char * buffer ) ;
-extern char * getSkinModel ( char * s , char * buffer ) ;
 extern void zCam_Stop ( struct edict_s * player ) ;
 extern void zCam_TrackEntity ( struct edict_s * player , struct edict_s * track , qboolean playerVisiable , qboolean playerOffset ) ;
 extern void SP_target_zboss_target ( edict_t * self ) ;

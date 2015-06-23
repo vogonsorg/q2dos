@@ -149,8 +149,6 @@
 {"handler_scratch", (byte *)handler_scratch},
 {"handler_sight", (byte *)handler_sight},
 {"zCam_SetLocalCopy", (byte *)zCam_SetLocalCopy},
-{"getSkinName", (byte *)getSkinName},
-{"getSkinModel", (byte *)getSkinModel},
 {"zCam_Stop", (byte *)zCam_Stop},
 {"zCam_TrackEntity", (byte *)zCam_TrackEntity},
 {"SP_target_zboss_target", (byte *)SP_target_zboss_target},

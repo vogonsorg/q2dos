@@ -202,6 +202,7 @@ InitGame(void)
 	gi.cvar ("gamename", GAMEVERSION , CVAR_SERVERINFO | CVAR_LATCH);
 	gi.cvar ("gamedate", __DATE__ , CVAR_SERVERINFO | CVAR_LATCH);
 	maxclients = gi.cvar ("maxclients", "4", CVAR_SERVERINFO | CVAR_LATCH);
+	maxspectators = gi.cvar("maxspectators", "4", CVAR_SERVERINFO);
 	deathmatch = gi.cvar ("deathmatch", "0", CVAR_LATCH);
 	coop = gi.cvar ("coop", "0", CVAR_LATCH);
 	skill = gi.cvar ("skill", "1", CVAR_LATCH);
@@ -222,6 +223,11 @@ InitGame(void)
 	bob_up  = gi.cvar ("bob_up", "0.005", 0);
 	bob_pitch = gi.cvar ("bob_pitch", "0.002", 0);
 	bob_roll = gi.cvar ("bob_roll", "0.002", 0);
+
+	/* flood control */
+	flood_msgs = gi.cvar("flood_msgs", "4", 0);
+	flood_persecond = gi.cvar("flood_persecond", "4", 0);
+	flood_waitdelay = gi.cvar("flood_waitdelay", "10", 0);
 
 	// items
 	InitItems ();
@@ -1089,7 +1095,7 @@ ReadLevel(const char *filename)
 	}
 }
 
-#else // OLD_SAVE
+#else // OLD_SAVE // FS: THIS IS FOR REFERENCE TOO MUCH HAS BEEN CHANGED IT WON'T WORK ANYMORE!
 
 #if defined(_DEBUG) && defined(_Z_TESTMODE)
 
