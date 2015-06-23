@@ -683,3 +683,4 @@ KillBox(edict_t *ent)
 
 	return true; /* all clear */
 }
+

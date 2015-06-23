@@ -952,8 +952,11 @@ SV_Physics_Toss(edict_t *ent)
 	// move origin
 	VectorScale (ent->velocity, FRAMETIME, move);
 	trace = SV_PushEntity (ent, move);
+
 	if (!ent->inuse)
+	{
 		return;
+	}
 
 	if (trace.fraction < 1)
 	{

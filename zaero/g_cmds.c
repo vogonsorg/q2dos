@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 extern void HelpComputer (edict_t *ent); // FS
 extern void InventoryMessage(edict_t *ent); // FS
+extern void stopCamera(edict_t *self); // FS: Zaero specific
 
 static char *
 ClientTeam(edict_t *ent, char* value)

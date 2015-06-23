@@ -545,6 +545,10 @@ SOURCE=..\zaero\g_ai.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\zaero\g_chase.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\zaero\g_cmds.c
 # End Source File
 # Begin Source File

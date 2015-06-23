@@ -213,6 +213,9 @@ InitGame(void)
 	fraglimit = gi.cvar ("fraglimit", "0", CVAR_SERVERINFO);
 	timelimit = gi.cvar ("timelimit", "0", CVAR_SERVERINFO);
 	password = gi.cvar ("password", "", CVAR_USERINFO);
+	spectator_password = gi.cvar("spectator_password", "", CVAR_USERINFO);
+	needpass = gi.cvar("needpass", "0", CVAR_SERVERINFO);
+	filterban = gi.cvar("filterban", "1", 0);
 	g_select_empty = gi.cvar ("g_select_empty", "0", CVAR_ARCHIVE);
 	run_pitch = gi.cvar ("run_pitch", "0.002", 0);
 	run_roll = gi.cvar ("run_roll", "0.005", 0);
@@ -427,7 +430,7 @@ WriteField1(FILE *f, field_t *field, byte *base)
 
 				if (!func)
 				{
-					gi.error ("WriteField1: function not in list, can't save game");
+					gi.error ("WriteField1: function %s not in list, can't save game", p);
 				}
 				
 				len = strlen(func->funcStr)+1;
@@ -494,7 +497,7 @@ WriteField2(FILE *f, field_t *field, byte *base)
 				
 				if (!func)
 				{
-					gi.error ("WriteField2: function not in list, can't save game");
+					gi.error ("WriteField2: function %s not in list, can't save game", p);
 				}
 				
 				len = strlen(func->funcStr)+1;
