@@ -1193,7 +1193,7 @@
 {"Cmd_Drop_f", (byte *)Cmd_Drop_f},
 {"Cmd_Use_f", (byte *)Cmd_Use_f},
 {"altSelect", (byte *)altSelect},
-{"findNext", (byte *)findNext},
+//{"findNext", (byte *)findNext}, // FS: FIXME
 {"tryUse", (byte *)tryUse},
 {"Cmd_Noclip_f", (byte *)Cmd_Noclip_f},
 {"Cmd_Notarget_f", (byte *)Cmd_Notarget_f},

@@ -757,7 +757,7 @@ void SpawnEntities (const char *mapname, char *entities, const char *spawnpoint)
 
 	oldmaxent = globals.num_edicts; // FS: Zaero specific
 
-	gi.dprintf(DEVELOPER_MSG_GAME, "%i entities created\n", globals.num_edicts);
+	gi.dprintf(DEVELOPER_MSG_GAME, "%i entities created\n", oldmaxent);
 	gi.dprintf(DEVELOPER_MSG_GAME, "%i entities inhibited\n", inhibit);
 
 	G_FindTeams ();

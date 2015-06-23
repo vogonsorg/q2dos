@@ -700,7 +700,7 @@ mmove_t zboss_move_attack2b = {FRAME_attack2bStart, FRAME_attack2bEnd, zboss_fra
 void HookDragThink (edict_t *self)
 {
 	vec3_t	dir, vec;
-	float length, speed;
+	float 	speed;
 	vec3_t	hookoffset	= {-5, -24, 34};
 	vec3_t	forward, right;
 
@@ -710,7 +710,6 @@ void HookDragThink (edict_t *self)
 	}
 
 	VectorSubtract (self->owner->s.origin, self->s.origin, dir);
-	length = VectorLength (dir);
 
 	AngleVectors (self->owner->s.angles, forward, right, NULL);
 	G_ProjectSource(self->owner->s.origin, hookoffset, forward, right, vec);

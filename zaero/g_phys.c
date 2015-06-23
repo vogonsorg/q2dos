@@ -897,7 +897,7 @@ SV_Physics_Toss(edict_t *ent)
 	qboolean wasinwater;
 	qboolean isinwater;
 	vec3_t old_origin;
-	float	speed; // FS: Zaero specific
+	float	speed = 0.0f; // FS: Zaero specific
 
 	if (!ent)
 	{
