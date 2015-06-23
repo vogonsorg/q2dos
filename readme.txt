@@ -3,12 +3,11 @@ By Neozeed and [HCI]Mara'akate.
 
 
 What's required?
-* Pentium 1.  At least a 133MHz to play it at 20fps.
+* Pentium 1.  At least a 200MHz to play it at ~20-30fps.
 * 32MB RAM.  16MB RAM might be OK.
 * LFN TSR.  Use the included DOSLFN.ZIP (can be loaded high with LH DLFN.COM)
 
 What works?
-
 * VGA
 * SVGA (LFB modes only)
 * Mouse
@@ -18,9 +17,10 @@ What works?
 * OGG music
 * Networking (You need a packet driver)
 
-What doesn't work:
-
+What works but needs more testing?
 * Modern sound cards like AC'97 or HDA
+
+What doesn't work:
 * Loading/unloading of DLLs.  No other game modes, but connecting to custom
   servers is OK.
 * Playing in a Win9x or NTVDM DOS box.
@@ -30,7 +30,6 @@ What doesn't work:
   later and got no crashes.  Until I can spot it, be on the lookout.
 
 Tips and other misc info:
-
 * Run /slist2 to get a gamespy list of active servers, or use the new browser
   menu.  Run /srelist to print the previous list.  Use CTRL+C to abort.
 * Don't use EMM386.  If you get weird virtual alloc failed errors, 
@@ -59,9 +58,16 @@ Follow maraakate @
 http://dk.toastednet.org/
 
 Various code from
+* cURL -- (http://curl.haxx.se/)
+* DJGPP community -- (http://www.delorie.com/djgpp/)
 * Knightmare -- KMQuake II (http://www.markshan.com/knightmare/)
+* Mpxplay -- (http://mpxplay.sourceforge.net/)
+* Mpxplay code importing by Ruslan Starodubov (http://sound-dos.ucoz.ru/)
+* Ogg Vorbis -- (https://www.xiph.org/)
 * R1CH -- R1Q2 (http://old.r1ch.net/stuff/r1q2/)
+* Sezero -- HoT (http://uhexen2.sourceforge.net/)
 * Yamagi -- YamagiQ2 (http://www.yamagi.org/quake2/)
+* Various DJGPP v2.05 upgrade help from RayeR (http://rayer.g6.cz/)
 * Berserk, CDawg, Pat Aftermoon, Anthony Jacques, David M. Pochron, Dopefish,
   GuyP, Jitspoe, MH, MrG, NeVo, Skuller, Riot, R1ch, Psychospaz, Pooy, Sul, 
   and others.
