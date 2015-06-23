@@ -828,14 +828,14 @@ char *single_statusbar =
 "endif "
 
 // player origin // FS: Zaero specific
-"if 16 "
+"if 18 " // FS: Must mirror STAT_SHOW_ORIGIN
 "	xl 0 "
 "	yb -120 "
-"	num 5 17 "
+"	num 5 19 " // FS: Must mirror STAT_ORIGIN_X
 "	yb -96 "
-"	num 5 18 "
+"	num 5 20 " // FS: Must mirror STAT_ORIGIN_Y
 "	yb -72 "
-"	num 5 19 "
+"	num 5 21 " // FS: Must mirror STAT_ORIGIN_Z
 "endif "
 ;
 
@@ -902,14 +902,14 @@ char *dm_statusbar =
 "num 3 14 "
 
 // player origin // FS: Zaero specific
-"if 16 "
+"if 18 " // FS: Must mirror STAT_SHOW_ORIGIN
 "	xl 0 "
 "	yb -120 "
-"	num 5 17 "
+"	num 5 19 " // FS: Must mirror STAT_ORIGIN_X
 "	yb -96 "
-"	num 5 18 "
+"	num 5 20 " // FS: Must mirror STAT_ORIGIN_Y
 "	yb -72 "
-"	num 5 19 "
+"	num 5 21 " // FS: Must mirror STAT_ORIGIN_Z
 "endif "
 
 /* spectator */
@@ -918,6 +918,15 @@ char *dm_statusbar =
 	"yb -58 "
 	"string2 \"SPECTATOR MODE\" "
 	"endif "
+/* chase camera */
+	"if 16 "
+	"xv 0 "
+	"yb -68 "
+	"string \"Chasing\" "
+	"xv 64 "
+	"stat_string 16 "
+	"endif "
+
 ;
 
 /*QUAKED worldspawn (0 0 0) ?

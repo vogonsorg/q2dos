@@ -1429,7 +1429,14 @@ ClientEndServerFrame(edict_t *ent)
 		/* if the scoreboard is up, update it */
 		if (ent->client->showscores)
 		{
-			DeathmatchScoreboardMessage(ent, ent->enemy);
+			if (ent->client->zCameraTrack) // FS: Zaero specific
+			{
+				updateVisorHud(ent);
+			}
+			else
+			{
+				DeathmatchScoreboardMessage (ent, ent->enemy);
+			}
 			gi.unicast(ent, false);
 		}
 
