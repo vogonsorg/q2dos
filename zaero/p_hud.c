@@ -574,7 +574,7 @@ G_SetStats(edict_t *ent)
 	}
 
 	// origin
-	if (ent->client->showOrigin) // FS: Zaero specific?
+	if (ent->client->showOrigin) // FS: Zaero specific, special debug command
 	{
 		ent->client->ps.stats[STAT_SHOW_ORIGIN] = 1;
 		ent->client->ps.stats[STAT_ORIGIN_X] = (int)ent->s.origin[0];

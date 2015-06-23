@@ -651,7 +651,7 @@ SV_CalcBlend(edict_t *ent)
 
 
 	// for blinding
-	if (ent->client->flashTime > 0)  // FS: Zaero specific?
+	if (ent->client->flashTime > 0)  // FS: Zaero specific
 	{
 		float alpha = (float)ent->client->flashTime / (float)ent->client->flashBase;
 		if (alpha > 1)
@@ -1313,7 +1313,7 @@ ClientEndServerFrame(edict_t *ent)
 		current_client->ps.fov = 90;
 		G_SetStats (ent);
 
-		if (level.fadeFrames > 0) // FS: Zaero specific?
+		if (level.fadeFrames > 0) // FS: Zaero specific
 		{
 			float ratio = (float)(50 - level.fadeFrames) / 50.0;
 			SV_AddBlend (1, 1, 1, ratio, current_client->ps.blend);

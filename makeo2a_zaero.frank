@@ -104,6 +104,7 @@ REFASM = linux/snd_mixa.o \
 
 GAME = zaero/g_ai.o \
 	zaero/g_cmds.o \
+	zaero/g_chase.o \
 	zaero/g_combat.o \
 	zaero/g_func.o \
 	zaero/g_items.o \
