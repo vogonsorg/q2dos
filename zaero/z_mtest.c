@@ -557,5 +557,4 @@ void Drop_TestItem (edict_t *ent, gitem_t *item)
 	ValidateSelectedItem (ent);
 }
 
-#endif
-
+#endif // _DEBUG && _Z_TESTMODE

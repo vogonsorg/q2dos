@@ -46,7 +46,6 @@
 {"SpawnZ", (byte *)SpawnZ},
 {"FindZSpawn", (byte *)FindZSpawn},
 {"SP_monster_sentien", (byte *)SP_monster_sentien},
-{"SP_monster_sentien_precache", (byte *)SP_monster_sentien_precache},
 {"create_sentien_laser", (byte *)create_sentien_laser},
 {"sentien_die", (byte *)sentien_die},
 {"sentien_dead", (byte *)sentien_dead},

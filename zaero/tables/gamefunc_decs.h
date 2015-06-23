@@ -46,7 +46,6 @@ extern void Z_SpawnDMItems ( ) ;
 extern qboolean SpawnZ ( gitem_t * item , edict_t * spot ) ;
 extern edict_t * FindZSpawn ( int i ) ;
 extern void SP_monster_sentien ( edict_t * self ) ;
-extern void SP_monster_sentien_precache ( void ) ;
 extern void create_sentien_laser ( edict_t * self ) ;
 extern void sentien_die ( edict_t * self , edict_t * inflictor , edict_t * attacker , int damage , vec3_t point ) ;
 extern void sentien_dead ( edict_t * self ) ;

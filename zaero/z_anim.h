@@ -53,6 +53,6 @@ void anim_player_cmd(edict_t *ent);
 
 #define ANIM_AIM(x, y) 
 
-#endif
+#endif // _DEBUG && _Z_TESTMODE
 
-#endif
+#endif // Z_ANIM_H

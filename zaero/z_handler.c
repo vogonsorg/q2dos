@@ -386,7 +386,7 @@ void SP_monster_handler (edict_t *self)
 		return;
 	}
 
-  SP_monster_handler_precache();
+	SP_monster_handler_precache();
 
 	self->s.modelindex = gi.modelindex ("models/monsters/guard/handler/tris.md2");
 	self->s.modelindex2 = gi.modelindex ("models/monsters/guard/hound/tris.md2");

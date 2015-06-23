@@ -1,6 +1,8 @@
 #include "g_local.h"
 #include "m_player.h"
 
+#define A2K_FRAMENUM	50
+
 extern qboolean is_quad;
 extern byte is_silenced;
 
@@ -32,11 +34,12 @@ const int SC_MAXCELLS       = 100;       // maximum number of cells
 vec_t VectorLengthSquared(vec3_t v)
 {
 	int		i;
-	float	length;
+	float	length = 0.0f;
 	
-	length = 0;
 	for (i=0 ; i< 3 ; i++)
+	{
 		length += v[i]*v[i];
+	}
 
 	return length;
 }
@@ -44,18 +47,26 @@ vec_t VectorLengthSquared(vec3_t v)
 void angleToward(edict_t *self, vec3_t point, float speed)
 {
 	vec3_t forward;
-	float yaw = 0.0;
-	float vel = 0.0;
+	float yaw = 0.0f;
+	float vel = 0.0f;
 	vec3_t delta;
 	vec3_t destAngles;
+
+	if(!self)
+	{
+		return;
+	}
+
 	VectorSubtract(point, self->s.origin, delta);
 	vectoangles(delta, destAngles);
 	self->ideal_yaw = destAngles[YAW];
 	self->yaw_speed = speed;
+
 	M_ChangeYaw(self);
 	yaw = self->s.angles[YAW];
 	self->ideal_yaw = destAngles[PITCH];
 	self->s.angles[YAW] = self->s.angles[PITCH];
+
 	M_ChangeYaw(self);
 	self->s.angles[PITCH] = self->s.angles[YAW];
 	self->s.angles[YAW] = yaw;
@@ -84,12 +95,21 @@ void angleToward(edict_t *self, vec3_t point, float speed)
 
 void shrapnel_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
+	if(!ent || !other)
+	{
+		return;
+	}
+
 	// do damage if we can
 	if (!other->takedamage)
+	{
 		return;
+	}
 
 	if (VectorCompare(ent->velocity, vec3_origin))
+	{
 		return;
+	}
 
 	T_Damage (other, ent, ent->owner, ent->velocity, ent->s.origin, 
 		plane->normal, TBOMB_SHRAPNEL_DMG, 8, 0, MOD_TRIPBOMB);
@@ -101,6 +121,11 @@ void TripBomb_Explode (edict_t *ent)
 	vec3_t origin;
 	int i = 0;
 
+	if(!ent)
+	{
+		return;
+	}
+
 	T_RadiusDamage(ent, ent->owner ? ent->owner : ent, ent->dmg, ent->enemy, ent->dmg_radius, MOD_TRIPBOMB);
 
 	VectorMA (ent->s.origin, -0.02, ent->velocity, origin);
@@ -109,16 +134,24 @@ void TripBomb_Explode (edict_t *ent)
 	if (ent->waterlevel)
 	{
 		if (ent->groundentity)
+		{
 			gi.WriteByte (TE_GRENADE_EXPLOSION_WATER);
+		}
 		else
+		{
 			gi.WriteByte (TE_ROCKET_EXPLOSION_WATER);
+		}
 	}
 	else
 	{
 		if (ent->groundentity)
+		{
 			gi.WriteByte (TE_GRENADE_EXPLOSION);
+		}
 		else
+		{
 			gi.WriteByte (TE_ROCKET_EXPLOSION);
+		}
 	}
 	gi.WritePosition (origin);
 	gi.multicast (ent->s.origin, MULTICAST_PHS);
@@ -156,6 +189,11 @@ void tripbomb_laser_think (edict_t *self)
 	vec3_t delta;
 	trace_t	tr;
 	int		count = 8;
+
+	if(!self)
+	{
+		return;
+	}
 
 	self->nextthink = level.time + FRAMETIME;
 
@@ -212,6 +250,11 @@ void tripbomb_laser_think (edict_t *self)
 
 void tripbomb_laser_on (edict_t *self)
 {
+	if(!self)
+	{
+		return;
+	}
+
 	self->svflags &= ~SVF_NOCLIENT;
 	self->think = tripbomb_laser_think;
 
@@ -222,8 +265,15 @@ void tripbomb_laser_on (edict_t *self)
 
 void create_tripbomb_laser(edict_t *bomb)
 {
+	edict_t *laser;
+
+	if(!bomb)
+	{
+		return;
+	}
+
 	// create the laser
-	edict_t *laser = G_Spawn();
+	laser = G_Spawn();
 	bomb->chain = laser;
 	laser->classname = "laser trip bomb laser";
 	VectorCopy(bomb->s.origin, laser->s.origin);
@@ -248,6 +298,11 @@ void create_tripbomb_laser(edict_t *bomb)
 
 void use_tripbomb(edict_t *self, edict_t *other, edict_t *activator)
 {
+	if(!self)
+	{
+		return;
+	}
+
 	if (self->chain)
 	{
 		// we already have a laser, remove it
@@ -255,12 +310,19 @@ void use_tripbomb(edict_t *self, edict_t *other, edict_t *activator)
 		self->chain = NULL;
 	}
 	else
+	{
 		// create the laser
 		create_tripbomb_laser(self);
+	}
 }
 
 void turnOffGlow(edict_t *self)
 {
+	if(!self)
+	{
+		return;
+	}
+
 	self->s.effects &= ~EF_COLOR_SHELL;
 	self->s.renderfx &= ~RF_SHELL_GREEN;
 	self->think = NULL;
@@ -269,6 +331,11 @@ void turnOffGlow(edict_t *self)
 
 void tripbomb_pain(edict_t *self, edict_t *other, float kick, int damage)
 {
+	if(!self)
+	{
+		return;
+	}
+
 	// turn on the glow
 	self->damage_debounce_time = level.time + 0.2;
 
@@ -284,6 +351,11 @@ void tripbomb_pain(edict_t *self, edict_t *other, float kick, int damage)
 
 void tripbomb_think(edict_t *self)
 {
+	if(!self)
+	{
+		return;
+	}
+
 	if (self->chain == NULL)
 	{
 		// check whether we need to create the laser
@@ -310,6 +382,11 @@ void tripbomb_think(edict_t *self)
 
 void setupBomb(edict_t *bomb, char *classname, float damage, float damage_radius)
 {
+	if(!bomb)
+	{
+		return;
+	}
+
 	bomb->classname = classname;
 	VectorSet(bomb->mins, -8, -8, -8);
 	VectorSet(bomb->maxs, 8, 8, 8);
@@ -333,8 +410,11 @@ void removeOldest()
 	while(1)
 	{
 		e = G_Find(e, FOFS(classname), "ired");
+
 		if (e == NULL) // no more
+		{
 			break;
+		}
 
 		count++;
 
@@ -362,6 +442,11 @@ qboolean fire_lasertripbomb(edict_t *self, vec3_t start, vec3_t dir, float timer
 	vec3_t endPos;
 	vec3_t _dir;
 	edict_t *bomb = NULL;
+
+	if(!self)
+	{
+		return false;
+	}
 
 	VectorScale(dir, 64, _dir);
 	VectorAdd(start, _dir, endPos);
@@ -402,6 +487,11 @@ qboolean fire_lasertripbomb(edict_t *self, vec3_t start, vec3_t dir, float timer
 
 void weapon_lasertripbomb_fire (edict_t *ent)
 {
+	if(!ent)
+	{
+		return;
+	}
+
 	if (ent->client->ps.gunframe == 10)
 	{
 		vec3_t	offset;
@@ -460,6 +550,11 @@ void Weapon_LaserTripBomb(edict_t *ent)
 	const int idleLast = 43;
 	const int fireFirst = 7;
 	const int activateLast = 6;
+
+	if(!ent)
+	{
+		return;
+	}
 	
 	if (ent->client->weaponstate == WEAPON_DROPPING)
 	{
@@ -615,14 +710,19 @@ Sonic Cannon
 
 void weapon_sc_fire (edict_t *ent)
 {
+	if(!ent)
+	{
+		return;
+	}
+
 	if (!(ent->client->buttons & BUTTON_ATTACK))
 	{
 		ent->client->ps.gunframe++;
 
-    if(ent->client->weapon_sound && ent->client->ps.gunframe < 18)
-    {
-      ent->client->ps.gunframe = 18;
-    }
+		if(ent->client->weapon_sound && ent->client->ps.gunframe < 18)
+		{
+			ent->client->ps.gunframe = 18;
+		}
 	}
 	else
 	{
@@ -634,44 +734,44 @@ void weapon_sc_fire (edict_t *ent)
 			ent->client->weapon_sound = 0;
 			ent->weaponsound_time = 0;
 
-	    ent->dmg_radius = 0;
-		  ent->client->startFireTime = 0;
+			ent->dmg_radius = 0;
+			ent->client->startFireTime = 0;
 			return;
 		}
 
-    if(!ent->client->startFireTime)
-    {
-      ent->client->startFireTime = level.time;
-    }
-    else if(level.time - ent->client->startFireTime >= SC_MAXFIRETIME)
-    {
-      ent->client->ps.gunframe = 17;
-    }
-    else
-    {
-      int old_cells = (int)ent->dmg_radius;
-      ent->dmg_radius = ((level.time - ent->client->startFireTime) /  SC_MAXFIRETIME) * SC_MAXCELLS;
+		if(!ent->client->startFireTime)
+		{
+			ent->client->startFireTime = level.time;
+		}
+		else if(level.time - ent->client->startFireTime >= SC_MAXFIRETIME)
+		{
+			ent->client->ps.gunframe = 17;
+		}
+		else
+		{
+			int old_cells = (int)ent->dmg_radius;
 
-      if(old_cells < (int)ent->dmg_radius)
-      {
-        old_cells = (int)ent->dmg_radius - old_cells;
+			ent->dmg_radius = ((level.time - ent->client->startFireTime) /  SC_MAXFIRETIME) * SC_MAXCELLS;
 
+			if(old_cells < (int)ent->dmg_radius)
+			{
+				old_cells = (int)ent->dmg_radius - old_cells;
 
-        if(ent->client->pers.inventory[ent->client->ammo_index] < old_cells)
-        {
-          ent->dmg_radius -= (old_cells - ent->client->pers.inventory[ent->client->ammo_index]);
-          ent->client->pers.inventory[ent->client->ammo_index] = 0;
-        }
-        else
-        {
-          ent->client->pers.inventory[ent->client->ammo_index] -= old_cells;
-        }
-      }
-    }
+				if(ent->client->pers.inventory[ent->client->ammo_index] < old_cells)
+				{
+					ent->dmg_radius -= (old_cells - ent->client->pers.inventory[ent->client->ammo_index]);
+					ent->client->pers.inventory[ent->client->ammo_index] = 0;
+				}
+				else
+				{
+					ent->client->pers.inventory[ent->client->ammo_index] -= old_cells;
+				}
+			}
+		}
 
-    if(!ent->client->pers.inventory[ent->client->ammo_index])
-    {
-      ent->client->ps.gunframe = 17;
+		if(!ent->client->pers.inventory[ent->client->ammo_index])
+		{
+			ent->client->ps.gunframe = 17;
 
 			if (level.time >= ent->pain_debounce_time)
 			{
@@ -682,23 +782,26 @@ void weapon_sc_fire (edict_t *ent)
 		}
 		else
 		{
-      if(ent->weaponsound_time < level.time)
-      {
-	      ent->client->weapon_sound = gi.soundindex("weapons/sonic/sc_fire.wav");
-      }
+			if(ent->weaponsound_time < level.time)
+			{
+				ent->client->weapon_sound = gi.soundindex("weapons/sonic/sc_fire.wav");
+			}
 		}
 
-    fire_sconnanEffects (ent);
+		fire_sconnanEffects (ent);
 
 		ent->client->ps.gunframe++;
+
 		if (ent->client->ps.gunframe == 18 && (level.time - ent->client->startFireTime) < SC_MAXFIRETIME && ent->client->pers.inventory[ent->client->ammo_index])
+		{
 			ent->client->ps.gunframe = 12;
+		}
 	}
 
 	if (ent->client->ps.gunframe == 18)
 	{
 		ent->client->weapon_sound = 0;
-    ent->weaponsound_time = 0;
+		ent->weaponsound_time = 0;
 
 		if(EMPNukeCheck(ent, ent->s.origin))
 		{
@@ -707,9 +810,13 @@ void weapon_sc_fire (edict_t *ent)
 		else
 		{
 			if (!is_silenced)
+			{
 				gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/sonic/sc_cool.wav"), 1, ATTN_NORM, 0);
+			}
 			else
+			{
 				gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/sonic/sc_cool.wav"), 0.4, ATTN_NORM, 0);
+			}
 
 			if(ent->dmg_radius)
 			{
@@ -717,8 +824,8 @@ void weapon_sc_fire (edict_t *ent)
 			}
 		}
 
-    ent->dmg_radius = 0;
-    ent->client->startFireTime = 0;
+		ent->dmg_radius = 0;
+		ent->client->startFireTime = 0;
 	}
 }
 
@@ -727,40 +834,57 @@ void Weapon_SonicCannon (edict_t *ent)
 	static int	pause_frames[] = {32, 42, 52, 0};
 	static int	fire_frames[]	= {12, 13, 14, 15, 16, 17, 0};
 
+	if(!ent)
+	{
+		return;
+	}
+
 	if (ent->client->ps.gunframe == 0)
 	{
 		if (deathmatch->value)
 		{
 			if (!is_silenced)
+			{
 				gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/sonic/sc_act.wav"), 1, ATTN_NORM, 0);
+			}
 			else
+			{
 				gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/sonic/sc_act.wav"), 0.4, ATTN_NORM, 0);
+			}
 		}
-    ent->weaponsound_time = 0;
-    ent->client->startFireTime = 0;
-    ent->dmg_radius = 0;
-  }
-  else if (ent->client->ps.gunframe == 53)
-  {
+		ent->weaponsound_time = 0;
+		ent->client->startFireTime = 0;
+		ent->dmg_radius = 0;
+	}
+	else if (ent->client->ps.gunframe == 53)
+	{
 		if (deathmatch->value)
 		{
 			if (!is_silenced)
+			{
 				gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/sonic/sc_dact.wav"), 1, ATTN_NORM, 0);
+			}
 			else
+			{
 				gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/sonic/sc_dact.wav"), 0.4, ATTN_NORM, 0);
+			}
 		}
-  }
-  else if((ent->client->buttons & BUTTON_ATTACK) && ent->weaponsound_time == 0)
-  {
-    ent->weaponsound_time = level.time + 0.4;
+	}
+	else if((ent->client->buttons & BUTTON_ATTACK) && ent->weaponsound_time == 0)
+	{
+		ent->weaponsound_time = level.time + 0.4;
 
 		if (!is_silenced)
+		{
 			gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/sonic/sc_warm.wav"), 1, ATTN_NORM, 0);
+		}
 		else
+		{
 			gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/sonic/sc_warm.wav"), 0.4, ATTN_NORM, 0);
-  }
+		}
+	}
 
-  Weapon_Generic (ent, 6, 22, 52, 57, pause_frames, fire_frames, weapon_sc_fire);
+	Weapon_Generic (ent, 6, 22, 52, 57, pause_frames, fire_frames, weapon_sc_fire);
 }
 
 void SpawnDamage (int type, vec3_t origin, vec3_t normal, int damage);
@@ -771,7 +895,12 @@ void fire_sconnanEffects (edict_t *self)
 	vec3_t		forward, right;
 	vec3_t		offset, v;
 	trace_t		tr;
-  
+
+	if (!self)
+	{
+		return;
+	}
+
 	AngleVectors (self->client->v_angle, forward, right, NULL);
 
 	VectorScale (forward, -3, self->client->kick_origin);
@@ -782,17 +911,22 @@ void fire_sconnanEffects (edict_t *self)
 
 	VectorMA (start, 8192, forward, end);
 
-  tr = gi.trace (start, NULL, NULL, end, self, MASK_SHOT|CONTENTS_SLIME|CONTENTS_LAVA);
+	tr = gi.trace (start, NULL, NULL, end, self, MASK_SHOT|CONTENTS_SLIME|CONTENTS_LAVA);
 
 	VectorMA (tr.endpos, -5, forward, end);
 
-  VectorSet(v, crandom() * 10 - 20, crandom() * 10 - 20, crandom() * 10 - 20);
-  SpawnDamage(TE_SHIELD_SPARKS, end, v, 0);
+	VectorSet(v, crandom() * 10 - 20, crandom() * 10 - 20, crandom() * 10 - 20);
+	SpawnDamage(TE_SHIELD_SPARKS, end, v, 0);
 }
 
 void scexplode_think(edict_t *self)
 {
-  gi.WriteByte (svc_temp_entity);
+	if(!self)
+	{
+		return;
+	}
+
+	gi.WriteByte (svc_temp_entity);
 	gi.WriteByte (TE_ROCKET_EXPLOSION);
 	gi.WritePosition (self->s.origin);
 	gi.multicast (self->s.origin, MULTICAST_PHS);
@@ -806,12 +940,17 @@ void fire_sconnan (edict_t *self)
 	vec3_t		forward, right, up;
 	vec3_t		offset;
 	trace_t		tr;
-  float damage;
-  float radius;
+	float damage;
+	float radius;
 
-  damage = self->dmg_radius / SC_MAXCELLS;
-  radius = damage * SC_MAXRADIUS;
-  damage = SC_BASEDAMAGE + (damage * SC_DAMGERANGE);
+	if(!self)
+	{
+		return;
+	}
+
+	damage = self->dmg_radius / SC_MAXCELLS;
+	radius = damage * SC_MAXRADIUS;
+	damage = SC_BASEDAMAGE + (damage * SC_DAMGERANGE);
 
 	AngleVectors (self->client->v_angle, forward, right, up);
 
@@ -823,43 +962,43 @@ void fire_sconnan (edict_t *self)
 
 	VectorMA (start, 8192, forward, end);
 
-  tr = gi.trace (start, NULL, NULL, end, self, MASK_SHOT|CONTENTS_SLIME|CONTENTS_LAVA);
+	tr = gi.trace (start, NULL, NULL, end, self, MASK_SHOT|CONTENTS_SLIME|CONTENTS_LAVA);
 
-  if ((tr.ent != self) && (tr.ent->takedamage))
-  {
+	if ((tr.ent != self) && (tr.ent->takedamage))
+	{
 		T_Damage (tr.ent, self, self, forward, tr.endpos, tr.plane.normal, damage, 0, 0, MOD_SONICCANNON);
-  }
+	}
 
-  T_RadiusDamagePosition (tr.endpos, self, self, damage, tr.ent, radius, MOD_SONICCANNON);
+	T_RadiusDamagePosition (tr.endpos, self, self, damage, tr.ent, radius, MOD_SONICCANNON);
 
 	VectorMA (tr.endpos, -5, forward, end);
 
-  gi.WriteByte (svc_temp_entity);
+	gi.WriteByte (svc_temp_entity);
 	gi.WriteByte (TE_ROCKET_EXPLOSION);
 	gi.WritePosition (end);
 	gi.multicast (self->s.origin, MULTICAST_PHS);
 
-  damage -= 100;
-  radius = 0.1;
+	damage -= 100;
+	radius = 0.1;
 
-  while(damage > 0)
-  {
-	  edict_t	*explode;
+	while(damage > 0)
+	{
+		edict_t	*explode;
 
-    VectorMA (end, (50 * crandom()) - 5, forward, explodepos);
-  	VectorMA (explodepos, (50 * crandom()) - 5, right, explodepos);
-  	VectorMA (explodepos, (50 * crandom()) - 5, up, explodepos);
+		VectorMA (end, (50 * crandom()) - 5, forward, explodepos);
+		VectorMA (explodepos, (50 * crandom()) - 5, right, explodepos);
+		VectorMA (explodepos, (50 * crandom()) - 5, up, explodepos);
 
-    explode = G_Spawn();
-  	VectorCopy (explodepos, explode->s.origin);
+		explode = G_Spawn();
+		VectorCopy (explodepos, explode->s.origin);
 
-  	explode->classname = "sconnanExplode";
-  	explode->nextthink = level.time + radius;
-  	explode->think = scexplode_think;
+		explode->classname = "sconnanExplode";
+		explode->nextthink = level.time + radius;
+		explode->think = scexplode_think;
 
-    radius += 0.1;
-    damage -= 100;
-  }
+		radius += 0.1;
+		damage -= 100;
+	}
 
 	// play quad damage sound
 	playQuadSound(self);
@@ -874,7 +1013,12 @@ void FoundTarget (edict_t *self);
 void flare_flash(edict_t *ent)
 {
 	edict_t *target = NULL;
-	
+
+	if(!ent)
+	{
+		return;
+	}
+
 	// flash
 	while (1)
 	{
@@ -886,21 +1030,36 @@ void flare_flash(edict_t *ent)
 
 		// get the next entity near us
 		target = findradius(target, ent->s.origin, FLASH_RANGE);
+
 		if (target == NULL)
+		{
 			break;
-		if (!target->client && !(target->svflags & SVF_MONSTER)) 
+		}
+
+		if (!target->client && !(target->svflags & SVF_MONSTER))
+		{
 			continue;
+		}
+
 		if (target->deadflag)
+		{
 			continue;
+		}
+
 		if (!visible(ent, target))
+		{
 			continue;
+		}
 
 		// what's the distance, so that closer get's more
 		VectorSubtract(ent->s.origin, target->s.origin, delta);
 		dist = VectorLength(delta);
 		ratio = 1 - (dist/FLASH_RANGE);
+
 		if (ratio < 0)
+		{
 			ratio = 0;
+		}
 
 		// looking to the side get's less
 		AngleVectors(target->s.angles, forward, NULL, NULL);
@@ -912,19 +1071,26 @@ void flare_flash(edict_t *ent)
 		if (target->client)
 		{
 			target->client->flashTime += ratio*25;
+
 			if (target->client->flashTime > 25)
+			{
 				target->client->flashTime = 25;
+			}
+
 			target->client->flashBase = 30;
 
 			if (deathmatch->value &&
 				!(((int)zdmflags->value) & ZDM_NO_GL_POLYBLEND_DAMAGE))
+			{
 				T_Damage(target, ent, ent->owner, vec3_origin, target->s.origin, vec3_origin, (int)(10.0*ratio), 0, 0, MOD_GL_POLYBLEND);
+			}
 		}
 		else if ((target->svflags & SVF_MONSTER) && strcmp(target->classname, "monster_zboss") != 0)
 		{
 			target->monsterinfo.flashTime =
 				Z_MAX(target->monsterinfo.flashTime, ratio*150); // a little bit more advantageous
 			target->monsterinfo.flashBase = 50;
+
 			if (target->enemy == NULL)
 			{
 				target->enemy = ent->owner;
@@ -936,6 +1102,11 @@ void flare_flash(edict_t *ent)
 
 void flare_think(edict_t *self)
 {
+	if(!self)
+	{
+		return;
+	}
+
 	// on our last leg?
 	if (level.time > self->timeout)
 	{
@@ -968,6 +1139,11 @@ void fire_flare (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed,
 	vec3_t adir;
 	vec3_t up;
 
+	if(!self)
+	{
+		return;
+	}
+
 	vectoangles (dir, adir);
 	AngleVectors (adir, NULL, NULL, up);
 
@@ -994,7 +1170,9 @@ void fire_flare (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed,
 	flare->classname = "flare";
 
 	if (self->client)
+	{
 		check_dodge (self, flare->s.origin, dir, speed);
+	}
 
 	gi.linkentity (flare);
 }
@@ -1003,6 +1181,11 @@ void Weapon_FlareLauncher_Fire (edict_t *ent)
 {
 	vec3_t	offset, start;
 	vec3_t	forward, right;
+
+	if(!ent)
+	{
+		return;
+	}
 
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 
@@ -1018,19 +1201,30 @@ void Weapon_FlareLauncher_Fire (edict_t *ent)
 	playQuadSound(ent);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+	{
 		ent->client->pers.inventory[ent->client->ammo_index]--;
+	}
 
 	// play shooting sound
 	if (!is_silenced)
+	{
 		gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/flare/shoot.wav"), 1, ATTN_NORM, 0);
+	}
 	else
+	{
 		gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/flare/shoot.wav"), 0.4, ATTN_NORM, 0);
+	}
 }
 
 void Weapon_FlareGun (edict_t *ent)
 {
 	static int	pause_frames[]	= {15, 25, 35, 0};
 	static int	fire_frames[]	= {8, 0};
+
+	if(!ent)
+	{
+		return;
+	}
 
 	Weapon_Generic (ent, 5, 14, 44, 48, pause_frames, fire_frames, Weapon_FlareLauncher_Fire);
 }
@@ -1043,14 +1237,26 @@ void fire_sniper_bullet (edict_t *self, vec3_t start, vec3_t aimdir, int damage,
 	trace_t tr;
 	vec3_t end;
 	vec3_t s;
-	edict_t *ignore = self;
+	edict_t *ignore = NULL;
+
+	if(!self)
+	{
+		return;
+	}
+	
+	ignore = self;
+
 	VectorMA (start, 8192, aimdir, end);
 	VectorCopy(start, s);
+
 	while(1)
 	{
 		tr = gi.trace (s, NULL, NULL, end, ignore, MASK_SHOT_NO_WINDOW);
+
 		if (tr.fraction >= 1.0)
+		{
 			return;
+		}
 
 		// if we hit a plasmashield, then pass thru it
 		if (Q_stricmp(tr.ent->classname, "PlasmaShield") == 0)
@@ -1059,29 +1265,43 @@ void fire_sniper_bullet (edict_t *self, vec3_t start, vec3_t aimdir, int damage,
 			VectorCopy(tr.endpos, s);
 		}
 		else
+		{
 			break;
+		}
 	}
 
 	gi.WriteByte (svc_temp_entity);
+
 	if (gi.pointcontents(tr.endpos) & MASK_WATER)
 	{
 		if (tr.plane.normal[2] > 0.7)
+		{
 			gi.WriteByte (TE_GRENADE_EXPLOSION_WATER);
+		}
 		else
+		{
 			gi.WriteByte (TE_ROCKET_EXPLOSION_WATER);
+		}
 	}
 	else
 	{
 		if (tr.plane.normal[2] > 0.7)
+		{
 			gi.WriteByte (TE_GRENADE_EXPLOSION);
+		}
 		else
+		{
 			gi.WriteByte (TE_ROCKET_EXPLOSION);
+		}
 	}
+
 	gi.WritePosition (tr.endpos);
 	gi.multicast (tr.endpos, MULTICAST_PHS);
 
 	if (tr.ent->takedamage)
+	{
 		T_Damage (tr.ent, self, self, aimdir, tr.endpos, tr.plane.normal, damage, kick, DAMAGE_NO_ARMOR, MOD_SNIPERRIFLE);
+	}
 }
 
 void weapon_sniperrifle_fire (edict_t *ent)
@@ -1090,6 +1310,11 @@ void weapon_sniperrifle_fire (edict_t *ent)
 	vec3_t offset, start;
 	int damage;
 	int kick;
+
+	if(!ent)
+	{
+		return;
+	}
 
 	if (deathmatch->value)
 	{	// normal damage is too extreme in dm
@@ -1115,9 +1340,13 @@ void weapon_sniperrifle_fire (edict_t *ent)
 	fire_sniper_bullet(ent, start, forward, damage, kick);
 
 	if (!is_silenced)
+	{
 		gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/sniper/fire.wav"), 1, ATTN_NORM, 0);
+	}
 	else
+	{
 		gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/sniper/fire.wav"), 0.4, ATTN_NORM, 0);
+	}
 
   	PlayerNoise(ent, start, PNOISE_WEAPON);
 
@@ -1150,7 +1379,12 @@ void Weapon_SniperRifle(edict_t *ent)
 	const static int deactivateEnd = 41;
 	const static int spFov = 15;
 	const static int dmFov = 30;
-	
+
+	if(!ent)
+	{
+		return;
+	}
+
 	if (ent->client->weaponstate == WEAPON_DROPPING)
 	{
 		ent->client->sniperFramenum = 0;
@@ -1279,6 +1513,11 @@ void Weapon_SniperRifle(edict_t *ent)
 
 void weapon_a2k_exp_think(edict_t *self)
 {
+	if(!self)
+	{
+		return;
+	}
+
 	self->s.frame++;
 	self->s.skinnum++;
 
@@ -1323,10 +1562,13 @@ void Z_RadiusDamageVisible(edict_t *inflictor, edict_t *attacker, float damage, 
 	}
 }
 
-
-#define A2K_FRAMENUM	50
 void weapon_a2k_fire (edict_t *ent)
 {
+	if(!ent)
+	{
+		return;
+	}
+
 	if (ent->client->ps.gunframe == 14)
 	{
 		ent->client->a2kFramenum = level.framenum + A2K_FRAMENUM;
@@ -1395,6 +1637,11 @@ void Weapon_A2k (edict_t *ent)
 	static int	pause_frames[]	= {20, 30, 40, 0};
 	static int	fire_frames[]	= {14, 19, 0};
 
+	if(!ent)
+	{
+		return;
+	}
+
 	Weapon_Generic (ent, 9, 19, 49, 55, pause_frames, fire_frames, weapon_a2k_fire);
 }
 
@@ -1415,8 +1662,11 @@ qboolean push_hit (edict_t *self, vec3_t start, vec3_t aim, int damage, int kick
 	//see if enemy is in range
 	VectorMA(start, 64, aim, end);
 	tr = gi.trace(start, NULL, NULL, end, self, MASK_SHOT);
+
 	if (tr.fraction >= 1)
+	{
 		return false;
+	}
 
 	// play sound
 	gi.sound(self, CHAN_WEAPON, gi.soundindex("weapons/push/contact.wav"), 1, ATTN_NORM, 0);
@@ -1429,8 +1679,11 @@ qboolean push_hit (edict_t *self, vec3_t start, vec3_t aim, int damage, int kick
 		VectorSubtract (v, start, v);
 		VectorNormalize (v);
 		VectorMA (tr.ent->velocity, kick, v, tr.ent->velocity);
+
 		if (tr.ent->velocity[2] > 0)
+		{
 			tr.ent->groundentity = NULL;
+		}
 	}
 	else if (tr.ent->movetype == MOVETYPE_FALLFLOAT)
 	{
@@ -1445,7 +1698,9 @@ qboolean push_hit (edict_t *self, vec3_t start, vec3_t aim, int damage, int kick
 
 	// ok, we hit something, damage it
 	if (!tr.ent->takedamage)
+	{
 		return false;
+	}
 
 	// do the damage
 	T_Damage (tr.ent, self, self, aim, tr.endpos, vec3_origin, damage, kick/2, DAMAGE_NO_KNOCKBACK, MOD_HIT);
@@ -1455,6 +1710,11 @@ qboolean push_hit (edict_t *self, vec3_t start, vec3_t aim, int damage, int kick
 
 void Action_Push (edict_t *ent)
 {
+	if(!ent)
+	{
+		return;
+	}
+
 	if (ent->client->ps.gunframe == 0)
 	{
 		ent->client->ps.gunframe++;
@@ -1481,4 +1741,3 @@ void Action_Push (edict_t *ent)
 	else
 		ent->client->ps.gunframe++;
 }
-

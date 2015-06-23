@@ -1,4 +1,4 @@
-#if defined(_DEBUG) && defined(_Z_TESTMODE)
+#if defined(_DEBUG) && defined(_Z_TESTMODE) // FS: Unused/unneeded
 
 #include "g_local.h"
 
@@ -702,4 +702,4 @@ void anim_player_cmd(edict_t *ent)
       gi.TagFree(arg2);
 }
 
-#endif
+#endif // _DEBUG && _Z_TESTMODE

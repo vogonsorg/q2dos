@@ -6,9 +6,9 @@
 void assertMsg(const char *msg, const char *file, int line);
 
 #define DEBUG(expr, msg)	((!(expr)) ? assertMsg(msg, __FILE__, __LINE__),1 : 0)
-#else
+#else // _DEBUG && _Z_TESTMODE
 #define DEBUG(expr, msg)	0
 #endif
 
-#endif
+#endif // __Z_DEBUG_H
 #endif // 0
