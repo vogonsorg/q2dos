@@ -2035,7 +2035,9 @@ const char *MakePrintable (const void *subject, size_t numchars)
 	len = 0;
 
 	if (!numchars)
+	{
 		numchars = strlen((const char *) s);
+	}
 
 	while (numchars--)
 	{
