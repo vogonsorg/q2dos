@@ -209,6 +209,7 @@ void tripbomb_laser_think (edict_t *self)
 	// randomly phase out or EMPNuke is in effect
 	if (EMPNukeCheck(self, self->s.origin) || random() < 0.1)
 	{
+		self->svflags |= SVF_NOCLIENT;
 		return;
 	}
 
@@ -1238,6 +1239,7 @@ void fire_sniper_bullet (edict_t *self, vec3_t start, vec3_t aimdir, int damage,
 	vec3_t end;
 	vec3_t s;
 	edict_t *ignore = NULL;
+	int i = 0;
 
 	if(!self)
 	{
@@ -1249,7 +1251,7 @@ void fire_sniper_bullet (edict_t *self, vec3_t start, vec3_t aimdir, int damage,
 	VectorMA (start, 8192, aimdir, end);
 	VectorCopy(start, s);
 
-	while(1)
+	while (i<256) // Knightmare- prevent infinite loop, was 1
 	{
 		tr = gi.trace (s, NULL, NULL, end, ignore, MASK_SHOT_NO_WINDOW);
 
@@ -1268,6 +1270,7 @@ void fire_sniper_bullet (edict_t *self, vec3_t start, vec3_t aimdir, int damage,
 		{
 			break;
 		}
+		i++;
 	}
 
 	gi.WriteByte (svc_temp_entity);
