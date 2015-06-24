@@ -45,6 +45,23 @@ gitem_armor_t bodyarmor_info	= {100, 200, .80, .60, ARMOR_BODY};
 int	jacket_armor_index;
 int	combat_armor_index;
 int	body_armor_index;
+// FS: Knightmare added indexes
+int	jacket_armor_index;
+int	combat_armor_index;
+int	body_armor_index;
+int	shells_index;
+int	bullets_index;
+int	grenades_index;
+int	rockets_index;
+int	cells_index;
+int	slugs_index;
+int	flares_index;
+int	tbombs_index;
+int	empnuke_index;
+int	plasmashield_index;
+int	a2k_index;
+// FS: Knightmare end
+
 static int	power_screen_index;
 static int	power_shield_index;
 
@@ -77,6 +94,7 @@ GetItemByIndex(int index)
 
 	return &itemlist[index];
 }
+
 
 gitem_t *
 FindItemByClassname(char *classname)
@@ -1870,6 +1888,7 @@ gitem_t	itemlist[] =
 		0,
 		NULL,
 		IT_ARMOR,
+		0,
 		&bodyarmor_info,
 		ARMOR_BODY,
 /* precache */ ""
@@ -1892,6 +1911,7 @@ gitem_t	itemlist[] =
 		0,
 		NULL,
 		IT_ARMOR,
+		0,
 		&combatarmor_info,
 		ARMOR_COMBAT,
 /* precache */ ""
@@ -1914,6 +1934,7 @@ gitem_t	itemlist[] =
 		0,
 		NULL,
 		IT_ARMOR,
+		0,
 		&jacketarmor_info,
 		ARMOR_JACKET,
 /* precache */ ""
@@ -1936,6 +1957,7 @@ gitem_t	itemlist[] =
 		0,
 		NULL,
 		IT_ARMOR,
+		0,
 		NULL,
 		ARMOR_SHARD,
 /* precache */ ""
@@ -1959,6 +1981,7 @@ gitem_t	itemlist[] =
 		60,
 		NULL,
 		IT_ARMOR,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -1981,6 +2004,7 @@ gitem_t	itemlist[] =
 		60,
 		NULL,
 		IT_ARMOR,
+		0,
 		NULL,
 		0,
 /* precache */ "misc/power2.wav misc/power1.wav"
@@ -2007,6 +2031,7 @@ gitem_t	itemlist[] =
 		0,
 		NULL,
 		IT_WEAPON|IT_STAY_COOP,
+		WEAP_NONE,
 		NULL,
 		0,
 /* precache */ "weapons/push/contact.wav",// weapons/push/grunt.wav",
@@ -2030,6 +2055,7 @@ gitem_t	itemlist[] =
 		1,
 		"Flares",
 		IT_WEAPON|IT_STAY_COOP,
+		WEAP_BLASTER,
 		NULL,
 		0,
 /* precache */ "models/objects/flare/tris.md2 weapons/flare/shoot.wav weapons/flare/flarehis.wav"
@@ -2053,6 +2079,7 @@ always owned, never in the world
 		0,
 		NULL,
 		IT_WEAPON|IT_STAY_COOP,
+		WEAP_BLASTER,
 		NULL,
 		0,
 /* precache */ "weapons/blastf1a.wav misc/lasfly.wav"
@@ -2075,6 +2102,7 @@ always owned, never in the world
 		1,
 		"Shells",
 		IT_WEAPON|IT_STAY_COOP,
+		WEAP_SHOTGUN,
 		NULL,
 		0,
 /* precache */ "weapons/shotgf1b.wav weapons/shotgr1b.wav"
@@ -2097,6 +2125,7 @@ always owned, never in the world
 		2,
 		"Shells",
 		IT_WEAPON|IT_STAY_COOP,
+		WEAP_SUPERSHOTGUN,
 		NULL,
 		0,
 /* precache */ "weapons/sshotf1b.wav"
@@ -2119,6 +2148,7 @@ always owned, never in the world
 		1,
 		"Bullets",
 		IT_WEAPON|IT_STAY_COOP,
+		WEAP_MACHINEGUN,
 		NULL,
 		0,
 /* precache */ "weapons/machgf1b.wav weapons/machgf2b.wav weapons/machgf3b.wav weapons/machgf4b.wav weapons/machgf5b.wav",
@@ -2141,6 +2171,7 @@ always owned, never in the world
 		1,
 		"Bullets",
 		IT_WEAPON|IT_STAY_COOP,
+		WEAP_CHAINGUN,
 		NULL,
 		0,
 /* precache */ "weapons/chngnu1a.wav weapons/chngnl1a.wav weapons/machgf3b.wav` weapons/chngnd1a.wav"
@@ -2163,6 +2194,7 @@ always owned, never in the world
 		5,
 		"Grenades",
 		IT_AMMO|IT_WEAPON,
+		WEAP_GRENADES,
 		NULL,
 		AMMO_GRENADES,
 /* precache */ "weapons/hgrent1a.wav weapons/hgrena1b.wav weapons/hgrenc1b.wav weapons/hgrenb1a.wav weapons/hgrenb2a.wav ",
@@ -2187,6 +2219,7 @@ always owned, never in the world
 		3,
 		"IRED",
 		IT_AMMO|IT_WEAPON,
+		WEAP_GRENADES,
 		NULL,
 		AMMO_LASERTRIPBOMB,
 /* precache */ "models/weapons/v_ired/hand.md2 models/objects/ired/tris.md2 modes/objects models/objects/shrapnel/tris.md2 "
@@ -2212,6 +2245,7 @@ always owned, never in the world
 		1,
 		"Grenades",
 		IT_WEAPON|IT_STAY_COOP,
+		WEAP_GRENADELAUNCHER,
 		NULL,
 		0,
 /* precache */ "models/objects/grenade/tris.md2 weapons/grenlf1a.wav weapons/grenlr1b.wav weapons/grenlb1b.wav",
@@ -2237,6 +2271,7 @@ always owned, never in the world
 		1,
 		"Rockets",
 		IT_WEAPON|IT_STAY_COOP,
+		WEAP_ROCKETLAUNCHER,
 		NULL,
 		0,
 /* precache */ "models/objects/rocket/tris.md2 weapons/rockfly.wav weapons/rocklf1a.wav weapons/rocklr1b.wav models/objects/debris2/tris.md2"
@@ -2259,6 +2294,7 @@ always owned, never in the world
 		1,
 		"Cells",
 		IT_WEAPON|IT_STAY_COOP,
+		WEAP_HYPERBLASTER,
 		NULL,
 		0,
 /* precache */ "weapons/hyprbu1a.wav weapons/hyprbl1a.wav weapons/hyprbf1a.wav weapons/hyprbd1a.wav misc/lasfly.wav"
@@ -2281,6 +2317,7 @@ always owned, never in the world
 		1,
 		"Slugs",
 		IT_WEAPON|IT_STAY_COOP,
+		WEAP_RAILGUN,
 		NULL,
 		0,
 /* precache */ "weapons/rg_hum.wav"
@@ -2303,6 +2340,7 @@ always owned, never in the world
 		3,
 		"Slugs",
 		IT_WEAPON|IT_STAY_COOP,
+		WEAP_RAILGUN,
 		NULL,
 		0,
 /* precache */ "models/weapons/v_sniper/scope/tris.md2 models/weapons/v_sniper/dmscope/tris.md2 weapons/sniper/beep.wav weapons/sniper/fire.wav "
@@ -2327,6 +2365,7 @@ always owned, never in the world
 		50,
 		"Cells",
 		IT_WEAPON|IT_STAY_COOP,
+		WEAP_BFG,
 		NULL,
 		0,
 /* precache */ "sprites/s_bfg1.sp2 sprites/s_bfg2.sp2 sprites/s_bfg3.sp2 weapons/bfg__f1y.wav weapons/bfg__l1a.wav weapons/bfg__x1b.wav weapons/bfg_hum.wav"
@@ -2353,6 +2392,7 @@ always owned, never in the world
 		1,
 		"Cells",
 		IT_WEAPON|IT_STAY_COOP,
+		WEAP_HYPERBLASTER,
 		NULL,
 		0,
 /* precache */ "weapons/sonic/sc_warm.wav weapons/sonic/sc_cool.wav weapons/sonic/sc_fire.wav" // weapons/sonic/sc_act.wav weapons/sonic/sc_dact.wav  
@@ -2375,6 +2415,7 @@ always owned, never in the world
 		1,
 		"A2k",
 		IT_POWERUP,
+		WEAP_NONE,
 		NULL,
 		AMMO_A2K,
 /* precache */ "weapons/a2k/countdn.wav weapons/a2k/ak_exp01.wav",
@@ -2403,6 +2444,7 @@ always owned, never in the world
 		3,
 		NULL,
 		IT_AMMO,
+		0,
 		NULL,
 		AMMO_FLARES,
 /* precache */ ""
@@ -2425,6 +2467,7 @@ always owned, never in the world
 		10,
 		NULL,
 		IT_AMMO,
+		0,
 		NULL,
 		AMMO_SHELLS,
 /* precache */ ""
@@ -2447,6 +2490,7 @@ always owned, never in the world
 		50,
 		NULL,
 		IT_AMMO,
+		0,
 		NULL,
 		AMMO_BULLETS,
 /* precache */ ""
@@ -2469,6 +2513,7 @@ always owned, never in the world
 		50,
 		NULL,
 		IT_AMMO,
+		0,
 		NULL,
 		AMMO_CELLS,
 /* precache */ ""
@@ -2491,6 +2536,7 @@ always owned, never in the world
 		5,
 		NULL,
 		IT_AMMO,
+		0,
 		NULL,
 		AMMO_ROCKETS,
 /* precache */ ""
@@ -2513,6 +2559,7 @@ always owned, never in the world
 		10,
 		NULL,
 		IT_AMMO,
+		0,
 		NULL,
 		AMMO_SLUGS,
 /* precache */ ""
@@ -2539,6 +2586,7 @@ always owned, never in the world
 		1,
 		"EMPNuke",
 		IT_AMMO,
+		0,
 		NULL,
 		AMMO_EMPNUKE,
 /* precache */ "items/empnuke/emp_trg.wav"  //items/empnuke/emp_act.wav items/empnuke/emp_spin.wav items/empnuke/emp_idle.wav 
@@ -2566,6 +2614,7 @@ always owned, never in the world
 		60,
 		NULL,
 		IT_POWERUP,
+		0,
 		NULL,
 		0,
 /* precache */ "items/damage.wav items/damage2.wav items/damage3.wav"
@@ -2588,6 +2637,7 @@ always owned, never in the world
 		300,
 		NULL,
 		IT_POWERUP,
+		0,
 		NULL,
 		0,
 /* precache */ "items/protect.wav items/protect2.wav items/protect4.wav"
@@ -2610,6 +2660,7 @@ always owned, never in the world
 		60,
 		NULL,
 		IT_POWERUP,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -2632,6 +2683,7 @@ always owned, never in the world
 		60,
 		NULL,
 		IT_STAY_COOP|IT_POWERUP,
+		0,
 		NULL,
 		0,
 /* precache */ "items/airout.wav"
@@ -2654,6 +2706,7 @@ always owned, never in the world
 		60,
 		NULL,
 		IT_STAY_COOP|IT_POWERUP,
+		0,
 		NULL,
 		0,
 /* precache */ "items/airout.wav"
@@ -2676,6 +2729,7 @@ always owned, never in the world
 		30,
 		"Cells",
 		IT_STAY_COOP|IT_POWERUP,
+		0,
 		NULL,
 		0,
 /* precache */ "items/visor/act.wav items/visor/deact.wav"// items/visor/next.wav"
@@ -2699,6 +2753,7 @@ always owned, never in the world
 		5,
 		"",
 		IT_AMMO,
+		0,
 		NULL,
 		AMMO_PLASMASHIELD,
 /* precache */ "items/plasmashield/psactive.wav sprites/plasmashield.sp2"
@@ -2723,6 +2778,7 @@ Special item that gives +2 to maximum health
 		60,
 		NULL,
 		0,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -2746,6 +2802,7 @@ gives +1 to maximum health
 		60,
 		NULL,
 		0,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -2768,6 +2825,7 @@ gives +1 to maximum health
 		60,
 		NULL,
 		0,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -2789,6 +2847,7 @@ gives +1 to maximum health
 /* width */		2,
 		180,
 		NULL,
+		0,
 		0,
 		NULL,
 		0,
@@ -2816,6 +2875,7 @@ key for computer centers
 		0,
 		NULL,
 		IT_STAY_COOP|IT_KEY,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -2839,6 +2899,7 @@ warehouse circuits
 		0,
 		NULL,
 		IT_STAY_COOP|IT_KEY,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -2862,6 +2923,7 @@ key for the entrance of jail3
 		0,
 		NULL,
 		IT_STAY_COOP|IT_KEY,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -2885,6 +2947,7 @@ key for the city computer
 		0,
 		NULL,
 		IT_STAY_COOP|IT_KEY,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -2908,6 +2971,7 @@ security pass for the security level
 		0,
 		NULL,
 		IT_STAY_COOP|IT_KEY,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -2931,6 +2995,7 @@ normal door key - blue
 		0,
 		NULL,
 		IT_STAY_COOP|IT_KEY,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -2954,6 +3019,7 @@ normal door key - red
 		0,
 		NULL,
 		IT_STAY_COOP|IT_KEY,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -2977,6 +3043,7 @@ tank commander's head
 		0,
 		NULL,
 		IT_STAY_COOP|IT_KEY,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -3000,6 +3067,7 @@ tank commander's head
 		0,
 		NULL,
 		IT_STAY_COOP|IT_KEY,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -3024,6 +3092,7 @@ landing arena key - blue
 		0,
 		NULL,
 		IT_STAY_COOP|IT_KEY,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -3047,6 +3116,7 @@ security pass for the laboratory
 		0,
 		NULL,
 		IT_STAY_COOP|IT_KEY,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -3070,6 +3140,7 @@ security pass for the security level
 		0,
 		NULL,
 		IT_STAY_COOP|IT_KEY,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -3093,6 +3164,7 @@ security pass for the security level
 		0,
 		NULL,
 		IT_STAY_COOP|IT_KEY,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -3115,6 +3187,7 @@ security pass for the security level
 		0,
 		NULL,
 		IT_STAY_COOP|IT_KEY,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -3137,6 +3210,7 @@ security pass for the security level
 		0,
 		NULL,
 		IT_STAY_COOP|IT_KEY,
+		0,
 		NULL,
 		0,
 /* precache */ ""
@@ -3156,6 +3230,7 @@ security pass for the security level
 /* width */		3,
 		0,
 		NULL,
+		0,
 		0,
 		NULL,
 		0,
@@ -3274,8 +3349,8 @@ SetItemNames(void)
 {
 	int i;
 	gitem_t *it;
-
-	for (i = 0; i < game.num_items; i++)
+	int index;
+	for (i=0, index = 0; i<game.num_items ; i++)
 	{
 		it = &itemlist[i];
 		gi.configstring(CS_ITEMS + i, it->pickup_name);
@@ -3286,5 +3361,16 @@ SetItemNames(void)
 	body_armor_index = ITEM_INDEX(FindItem("Body Armor"));
 	power_screen_index = ITEM_INDEX(FindItem("Power Screen"));
 	power_shield_index = ITEM_INDEX(FindItem("Power Shield"));
+	shells_index = ITEM_INDEX(FindItem("Bullets"));
+	bullets_index = ITEM_INDEX(FindItem("Shells"));
+	grenades_index = ITEM_INDEX(FindItem("Grenades"));
+	rockets_index = ITEM_INDEX(FindItem("Rockets"));
+	cells_index = ITEM_INDEX(FindItem("Cells"));
+	slugs_index = ITEM_INDEX(FindItem("Slugs"));
+	flares_index = ITEM_INDEX(FindItem("Flares"));
+	tbombs_index = ITEM_INDEX(FindItem("IRED"));
+	empnuke_index = ITEM_INDEX(FindItem("EMPNuke"));
+	plasmashield_index = ITEM_INDEX(FindItem("Plasma Shield"));
+	a2k_index = ITEM_INDEX(FindItem("A2K"));
 }
 

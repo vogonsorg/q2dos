@@ -1037,7 +1037,7 @@ struct edict_s
 	float		yaw_speed;
 	float		ideal_yaw;
 
-	double		nextthink;
+	float		nextthink;
 	void		(*prethink) (edict_t *ent);
 	void		(*think)(edict_t *self);
 	void		(*blocked)(edict_t *self, edict_t *other);	//move to moveinfo?

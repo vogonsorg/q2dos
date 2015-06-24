@@ -251,6 +251,20 @@ typedef struct
 #define IT_KEY			16
 #define IT_POWERUP		32
 
+// gitem_t->weapmodel for weapons indicates model index
+#define WEAP_BLASTER			1 
+#define WEAP_SHOTGUN			2 
+#define WEAP_SUPERSHOTGUN		3 
+#define WEAP_MACHINEGUN			4 
+#define WEAP_CHAINGUN			5 
+#define WEAP_GRENADES			6 
+#define WEAP_GRENADELAUNCHER	7 
+#define WEAP_ROCKETLAUNCHER		8 
+#define WEAP_HYPERBLASTER		9 
+#define WEAP_RAILGUN			10
+#define WEAP_BFG				11
+#define WEAP_NONE               12
+
  // FS: Zaero specific
 // hide flags
 #define HIDE_FROM_INVENTORY	1	// don't list this item in the inventory
@@ -277,6 +291,8 @@ typedef struct gitem_s
 	int			quantity;		// for ammo how much, for weapons how much is used per shot
 	char		*ammo;			// for weapons
 	int			flags;			// IT_* flags
+
+	int			weapmodel;		// weapon model index (for weapons)
 
 	void		*info;
 	int			tag;
@@ -512,6 +528,16 @@ extern	int	snd_fry;
 extern	int	jacket_armor_index;
 extern	int	combat_armor_index;
 extern	int	body_armor_index;
+extern	int	shells_index;
+extern	int	bullets_index;
+extern	int	grenades_index;
+extern	int	rockets_index;
+extern	int	cells_index;
+extern	int	slugs_index;
+extern	int	flares_index;
+extern	int	tbombs_index;
+extern	int	empnuke_index;
+extern	int	plasmashield_index;
 
 
 // means of death
@@ -1158,7 +1184,7 @@ struct edict_s
 	float		yaw_speed;
 	float		ideal_yaw;
 
-	double		nextthink;
+	float		nextthink;
 	void		(*prethink) (edict_t *ent);
 	void		(*think)(edict_t *self);
 	void		(*blocked)(edict_t *self, edict_t *other);	//move to moveinfo?

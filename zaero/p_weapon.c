@@ -161,6 +161,7 @@ current
 */
 void ChangeWeapon (edict_t *ent)
 {
+	int		i;
 	if (ent->client->grenade_time)
 	{
 		ent->client->grenade_time = level.time;
@@ -185,6 +186,20 @@ void ChangeWeapon (edict_t *ent)
 	ent->client->newweapon = NULL;
 	ent->client->machinegun_shots = 0;
 
+	// set visible model
+	if (ent->s.modelindex == MAX_MODELS-1)
+	{
+		if (ent->client->pers.weapon)
+		{
+			i = ((ent->client->pers.weapon->weapmodel & 0xff) << 8);
+		}
+		else
+		{
+			i = 0;
+		}
+		ent->s.skinnum = (ent - g_edicts - 1) | i;
+	}
+
 	if (ent->client->pers.weapon && ent->client->pers.weapon->ammo)
 	{
 		gitem_t *item = FindItem(ent->client->pers.weapon->ammo);
@@ -202,6 +217,17 @@ void ChangeWeapon (edict_t *ent)
 	ent->client->weaponstate = WEAPON_ACTIVATING;
 	ent->client->ps.gunframe = 0;
 	ent->client->ps.gunindex = gi.modelindex(ent->client->pers.weapon->view_model);
+	ent->client->anim_priority = ANIM_PAIN;
+	if (ent->client->ps.pmove.pm_flags & PMF_DUCKED)
+	{
+			ent->s.frame = FRAME_crpain1;
+			ent->client->anim_end = FRAME_crpain4;
+	}
+	else
+	{
+			ent->s.frame = FRAME_pain301;
+			ent->client->anim_end = FRAME_pain304;
+	}
 }
 
 /*
