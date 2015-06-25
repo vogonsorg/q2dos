@@ -16,14 +16,13 @@ What works?
 * CD-ROM music
 * OGG music
 * Networking (You need a packet driver)
+* Loading/unloading game DLLs in DX3 format.
 
 What works but needs more testing?
 * Modern sound cards like AC'97 or HDA
 * Mouse wheel support with -mwheel.  See other misc info below.
 
 What doesn't work:
-* Loading/unloading of DLLs.  No other game modes, but connecting to custom
-  servers is OK.
 * Playing in a Win9x or NTVDM DOS box.
 * TGA files from maps that were only optimized for OpenGL.
 * Some models from Whale's WODX server can crash the software renderer.  I'm

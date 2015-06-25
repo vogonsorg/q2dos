@@ -1,5 +1,6 @@
 CC = gcc
-CFLAGS = -g -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer -std=gnu90 #gnu90 for old style inlines, thanks to rayer
+CFLAGS = -g -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer -std=gnu90
+#gnu90 for old style inlines, thanks to rayer
 DXE3GEN = dxe3gen
 
 GAME = g_ai.o \
@@ -78,13 +79,12 @@ gamex86.dx3:	$(OBJECTS)
 	$(DXE3GEN) -U $(OBJECTS) -o gamex86.dx3
 
 clean:
-#	find ./ -name '*.o' -exec rm {} \;
 	rm .../*.o
 
 DO_AS=$(CC) -x assembler-with-cpp
 
 %.o : %.c
-	$(CC) $(CFLAGS) $(WCFLAGS) $(SFLAGS) $(OGGCFLAGS) $(VORBCFLAGS) $(CURLCFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 %.o: %.S
 	$(DO_AS) $(CFLAGS) -c $< -o $@

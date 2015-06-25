@@ -9,6 +9,7 @@ del /s /q *.user
 del /s /q *.aps
 del /s /q *.idb
 del /s /q *.pdb
+del /s /q *.dx3
 del /q q2.exe
 del /q q2ace.exe
 del /q q2rogue.exe
