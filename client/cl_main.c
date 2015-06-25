@@ -718,9 +718,9 @@ void CL_Disconnect_f (void)
 #ifdef GAMESPY
 	if(serverlist != NULL) // FS: Immediately abort gspy scans
 	{
+		Com_Printf("\x02Server scan aborted!\n");
 		cls.gamespyupdate = 0;
 		cls.gamespypercent = 0;
-		Com_Printf("\x02Server scan aborted!\n");
 		S_GamespySound ("gamespy/abort.wav");
 		ServerListHalt( serverlist );
 		ServerListClear( serverlist );
@@ -739,9 +739,9 @@ void CL_Gspystop_f (void)
 #ifdef GAMESPY
 	if(serverlist != NULL) // FS: Immediately abort gspy scans
 	{
+		Com_Printf("\x02Server scan aborted!\n");
 		cls.gamespyupdate = 0;
 		cls.gamespypercent = 0;
-		Com_Printf("\x02Server scan aborted!\n");
 		S_GamespySound ("gamespy/abort.wav");
 		ServerListHalt( serverlist );
 	}

@@ -2617,6 +2617,7 @@ void FormatGamespyList (void)
 #endif
 }
 
+#define USE_GSPY_BOX // FS: DOS hated this, but I think I fixed it but I'll leave this here for a while
 static char	found[64];
 void SearchGamespyGames (void)
 {
@@ -2645,6 +2646,8 @@ void SearchGamespyGames (void)
 	{
 		s_joingamespyserver_search_action.generic.statusbar = "Querying GameSpy for servers, please wait. . .";
 	}
+
+#ifdef USE_GSPY_BOX // FS: This makes DOS cry
 	SCR_UpdateScreen();
 
 	M_DrawTextBox( 8, 120 - 48, 36, 4 );
@@ -2652,20 +2655,22 @@ void SearchGamespyGames (void)
 	M_Print( 16 + 16, 120 - 48 + 16, "could take up to a minute, so" );
 	M_Print( 16 + 16, 120 - 48 + 24, "please be patient." );
 	M_Print( 16 + 16, 120 - 48 + 32, "Use CTRL+C to abort." );
+#endif
 
 	S_StopAllSounds(); // FS: So we don't hear a repeating menu sound.
 
+#ifdef USE_GSPY_BOX
 	// the text box won't show up unless we do a buffer swap
 	re.EndFrame();
-	cls.disable_screen = Sys_Milliseconds();;
-
+	cls.disable_screen = Sys_Milliseconds();
+#endif
 	// send out info packets
 
 	CL_PingNetServers_f ();
-	cls.disable_screen = 0.0f;
-
-	re.EndFrame();
-
+#ifdef USE_GSPY_BOX
+	cls.disable_screen = false;
+	SCR_UpdateScreen();
+#endif
 	FormatGamespyList();
 
 	Com_sprintf(found, sizeof(found), "Found %d servers\n", m_num_gamespy_servers);
