@@ -19,6 +19,7 @@ What works?
 
 What works but needs more testing?
 * Modern sound cards like AC'97 or HDA
+* Mouse wheel support with -mwheel.  See other misc info below.
 
 What doesn't work:
 * Loading/unloading of DLLs.  No other game modes, but connecting to custom
@@ -50,6 +51,10 @@ Tips and other misc info:
   Don't bother ripping the tracks from the Reckoning CD, as they're a mix of
   the tracks on the Q2 and Ground Zero CDs.  Everything else will be taken care
   of internally.
+* Mouse wheel code is from HoT and since mouse wheel code varies from mouse
+  driver it will not be enabled by default.  We've already had reports that
+  it works, but not 100% properly.  I can't really do much more for you.
+  DOS was made in a time where mouse wheels didn't even exist.
 * MEMSTATS command will report available Physical and Virtual Memory in Mb.
   You will notice the number will never rise, this is on purpose.
   Please read the DJGPP FAQ @ http://www.delorie.com/djgpp//v2faq/faq15_2.html
