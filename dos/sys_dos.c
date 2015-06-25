@@ -590,6 +590,12 @@ DXE_EXPORT_TABLE (syms)
   DXE_EXPORT (vectoangles2)
   DXE_EXPORT (crand)
   DXE_EXPORT (stpcpy)
+  DXE_EXPORT (malloc)
+  DXE_EXPORT (vsprintf)
+  DXE_EXPORT (getc)
+  DXE_EXPORT (putc)
+  DXE_EXPORT (strrchr)
+  DXE_EXPORT (stricmp)
 DXE_EXPORT_END
 static void (*game_library)(void);
 
