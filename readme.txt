@@ -50,6 +50,10 @@ Tips and other misc info:
   Don't bother ripping the tracks from the Reckoning CD, as they're a mix of
   the tracks on the Q2 and Ground Zero CDs.  Everything else will be taken care
   of internally.
+* MEMSTATS command will report available Physical and Virtual Memory in Mb.
+  You will notice the number will never rise, this is on purpose.
+  Please read the DJGPP FAQ @ http://www.delorie.com/djgpp//v2faq/faq15_2.html
+  for more information on how DJGPP and CWSDPMI work.
 
 Follow neozeed @
 http://virtuallyfun.superglobalmegacorp.com/
