@@ -82,7 +82,6 @@ LINK32=link.exe
 !ENDIF 
 
 # Begin Target
-
 # Name "quake2 - Win32 Release"
 # Name "quake2 - Win32 Debug"
 # Begin Group "Source Files"
@@ -90,195 +89,195 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;for;f90"
 # Begin Source File
 
-SOURCE=.\Q2DOS\WIN32\cd_win.c
+SOURCE=..\WIN32\cd_win.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\cl_cin.c
+SOURCE=..\CLIENT\cl_cin.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\cl_ents.c
+SOURCE=..\CLIENT\cl_ents.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\cl_fx.c
+SOURCE=..\CLIENT\cl_fx.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\cl_input.c
+SOURCE=..\CLIENT\cl_input.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\cl_inv.c
+SOURCE=..\CLIENT\cl_inv.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\cl_main.c
+SOURCE=..\CLIENT\cl_main.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\cl_newfx.c
+SOURCE=..\CLIENT\cl_newfx.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\cl_parse.c
+SOURCE=..\CLIENT\cl_parse.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\cl_pred.c
+SOURCE=..\CLIENT\cl_pred.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\cl_scrn.c
+SOURCE=..\CLIENT\cl_scrn.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\cl_tent.c
+SOURCE=..\CLIENT\cl_tent.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\cl_view.c
+SOURCE=..\CLIENT\cl_view.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\QCOMMON\cmd.c
+SOURCE=..\QCOMMON\cmd.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\QCOMMON\cmodel.c
+SOURCE=..\QCOMMON\cmodel.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\QCOMMON\common.c
+SOURCE=..\QCOMMON\common.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\WIN32\conproc.c
+SOURCE=..\WIN32\conproc.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\console.c
+SOURCE=..\CLIENT\console.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\QCOMMON\crc.c
+SOURCE=..\QCOMMON\crc.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\QCOMMON\cvar.c
+SOURCE=..\QCOMMON\cvar.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\QCOMMON\files.c
+SOURCE=..\QCOMMON\files.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\WIN32\in_win.c
+SOURCE=..\WIN32\in_win.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\keys.c
+SOURCE=..\CLIENT\keys.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\GAME\m_flash.c
+SOURCE=..\GAME\m_flash.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\QCOMMON\md4.c
+SOURCE=..\QCOMMON\md4.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\menu.c
+SOURCE=..\CLIENT\menu.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\QCOMMON\net_chan.c
+SOURCE=..\QCOMMON\net_chan.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\WIN32\net_wins.c
+SOURCE=..\WIN32\net_wins.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\QCOMMON\pmove.c
+SOURCE=..\QCOMMON\pmove.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\GAME\q_shared.c
+SOURCE=..\GAME\q_shared.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\WIN32\q_shwin.c
+SOURCE=..\WIN32\q_shwin.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\qmenu.c
+SOURCE=..\CLIENT\qmenu.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\snd_dma.c
+SOURCE=..\CLIENT\snd_dma.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\snd_mem.c
+SOURCE=..\CLIENT\snd_mem.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\snd_mix.c
+SOURCE=..\CLIENT\snd_mix.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\WIN32\snd_win.c
+SOURCE=..\WIN32\snd_win.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\SERVER\sv_ccmds.c
+SOURCE=..\SERVER\sv_ccmds.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\SERVER\sv_ents.c
+SOURCE=..\SERVER\sv_ents.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\SERVER\sv_game.c
+SOURCE=..\SERVER\sv_game.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\SERVER\sv_init.c
+SOURCE=..\SERVER\sv_init.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\SERVER\sv_main.c
+SOURCE=..\SERVER\sv_main.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\SERVER\sv_send.c
+SOURCE=..\SERVER\sv_send.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\SERVER\sv_user.c
+SOURCE=..\SERVER\sv_user.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\SERVER\sv_world.c
+SOURCE=..\SERVER\sv_world.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\WIN32\sys_win.c
+SOURCE=..\WIN32\sys_win.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\WIN32\vid_dll.c
+SOURCE=..\WIN32\vid_dll.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\WIN32\vid_menu.c
+SOURCE=..\WIN32\vid_menu.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Q2DOS\CLIENT\x86.c
+SOURCE=..\CLIENT\x86.c
 # End Source File
 # End Group
 # Begin Group "Header Files"

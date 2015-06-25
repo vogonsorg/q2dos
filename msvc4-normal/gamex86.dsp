@@ -33,14 +33,14 @@ RSC=rc.exe
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir ".\gamex86\Release"
-# PROP BASE Intermediate_Dir ".\gamex86\Release"
-# PROP BASE Target_Dir ".\gamex86"
+# PROP BASE Output_Dir ".\Release"
+# PROP BASE Intermediate_Dir ".\Release"
+# PROP BASE Target_Dir "."
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir ".\gamex86\Release"
-# PROP Intermediate_Dir ".\gamex86\Release"
-# PROP Target_Dir ".\gamex86"
+# PROP Output_Dir ".\Release"
+# PROP Intermediate_Dir ".\Release"
+# PROP Target_Dir "."
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
 # ADD CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /win32
@@ -58,14 +58,14 @@ LINK32=link.exe
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir ".\gamex86\Debug"
-# PROP BASE Intermediate_Dir ".\gamex86\Debug"
-# PROP BASE Target_Dir ".\gamex86"
+# PROP BASE Output_Dir ".\Debug"
+# PROP BASE Intermediate_Dir ".\Debug"
+# PROP BASE Target_Dir "."
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir ".\gamex86\Debug"
-# PROP Intermediate_Dir ".\gamex86\Debug"
-# PROP Target_Dir ".\gamex86"
+# PROP Output_Dir ".\Debug"
+# PROP Intermediate_Dir ".\Debug"
+# PROP Target_Dir "."
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
 # ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
@@ -88,6 +88,202 @@ LINK32=link.exe
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;for;f90"
+# Begin Source File
+
+SOURCE=..\GAME\g_ai.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\g_chase.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\g_cmds.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\g_combat.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\g_func.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\g_items.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\g_main.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\g_misc.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\g_monster.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\g_phys.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\g_save.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\g_spawn.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\g_svcmds.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\g_target.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\g_trigger.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\g_turret.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\g_utils.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\g_weapon.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\game.def
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_actor.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_berserk.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_boss2.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_boss3.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_boss31.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_boss32.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_brain.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_chick.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_flash.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_flipper.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_float.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_flyer.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_gladiator.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_gunner.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_hover.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_infantry.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_insane.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_medic.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_move.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_mutant.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_parasite.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_soldier.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_supertank.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\m_tank.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\p_client.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\p_hud.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\p_trail.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\p_view.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\p_weapon.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\GAME\q_shared.c
+# End Source File
 # End Group
 # Begin Group "Header Files"
 

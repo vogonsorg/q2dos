@@ -33,14 +33,14 @@ RSC=rc.exe
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir ".\ref_soft\Release"
-# PROP BASE Intermediate_Dir ".\ref_soft\Release"
-# PROP BASE Target_Dir ".\ref_soft"
+# PROP BASE Output_Dir ".\Release"
+# PROP BASE Intermediate_Dir ".\Release"
+# PROP BASE Target_Dir "."
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir ".\ref_soft\Release"
-# PROP Intermediate_Dir ".\ref_soft\Release"
-# PROP Target_Dir ".\ref_soft"
+# PROP Output_Dir ".\Release"
+# PROP Intermediate_Dir ".\Release"
+# PROP Target_Dir "."
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
 # ADD CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /win32
@@ -58,14 +58,14 @@ LINK32=link.exe
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir ".\ref_soft\Debug"
-# PROP BASE Intermediate_Dir ".\ref_soft\Debug"
-# PROP BASE Target_Dir ".\ref_soft"
+# PROP BASE Output_Dir ".\Debug"
+# PROP BASE Intermediate_Dir ".\Debug"
+# PROP BASE Target_Dir "."
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir ".\ref_soft\Debug"
-# PROP Intermediate_Dir ".\ref_soft\Debug"
-# PROP Target_Dir ".\ref_soft"
+# PROP Output_Dir ".\Debug"
+# PROP Intermediate_Dir ".\Debug"
+# PROP Target_Dir "."
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
 # ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
@@ -88,6 +88,98 @@ LINK32=link.exe
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;for;f90"
+# Begin Source File
+
+SOURCE=..\GAME\q_shared.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\q_shwin.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\REF_SOFT\r_aclip.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\REF_SOFT\r_alias.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\REF_SOFT\r_bsp.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\REF_SOFT\r_draw.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\REF_SOFT\r_edge.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\REF_SOFT\r_image.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\REF_SOFT\r_light.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\REF_SOFT\r_main.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\REF_SOFT\r_misc.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\REF_SOFT\r_model.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\REF_SOFT\r_part.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\REF_SOFT\r_poly.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\REF_SOFT\r_polyse.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\REF_SOFT\r_rast.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\REF_SOFT\r_scan.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\REF_SOFT\r_sprite.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\REF_SOFT\r_surf.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\REF_SOFT\ref_soft.def
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\rw_ddraw.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\rw_dib.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\rw_imp.c
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
