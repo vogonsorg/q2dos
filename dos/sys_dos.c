@@ -533,20 +533,161 @@ void	*Sys_GetGameAPI (void *parms)
 // needs to be statically linked for null
 // otherwise it sits here to satisfy the linker AFIK
 #else
-#include <dlmlib.h>
+
 //Unload the DLL
+#include <dlfcn.h>
+#include <sys/dxe.h>
+#include <assert.h>
+#include <ctype.h>
+
+// FS: The following is gross, but I just figured this out.
+extern void vectoangles2 (vec3_t value1, vec3_t angles);
+DXE_EXPORT_TABLE (syms)
+  DXE_EXPORT (printf)
+  DXE_EXPORT (sprintf)
+  DXE_EXPORT (tan)
+  DXE_EXPORT (free)
+  DXE_EXPORT (strcat)
+  DXE_EXPORT (strcmp)
+  DXE_EXPORT (rand)
+  DXE_EXPORT (ceil)
+  DXE_EXPORT (_doprnt)
+  DXE_EXPORT (fwrite)
+  DXE_EXPORT (strncpy)
+  DXE_EXPORT (atoi)
+  DXE_EXPORT (memcpy)
+  DXE_EXPORT (memset)
+  DXE_EXPORT (fprintf)
+  DXE_EXPORT (strtol)
+  DXE_EXPORT (strdup)
+  DXE_EXPORT (strcasecmp)
+  DXE_EXPORT (fread)
+  DXE_EXPORT (fopen)
+  DXE_EXPORT (time)
+  DXE_EXPORT (strtod)
+  DXE_EXPORT (strchr)
+  DXE_EXPORT (fclose)
+  DXE_EXPORT (sscanf)
+  DXE_EXPORT (memcmp)
+  DXE_EXPORT (sqrt)
+  DXE_EXPORT (strtok)
+  DXE_EXPORT (localtime)
+  DXE_EXPORT (cos)
+  DXE_EXPORT (sin)
+  DXE_EXPORT (strlen)
+  DXE_EXPORT (errno)
+  DXE_EXPORT (atan2)
+  DXE_EXPORT (qsort)
+  DXE_EXPORT (floor)
+  DXE_EXPORT (strstr)
+  DXE_EXPORT (strcpy)
+  DXE_EXPORT (__dj_ctype_tolower)
+  DXE_EXPORT (__dj_ctype_toupper)
+  DXE_EXPORT (__dj_assert)
+  DXE_EXPORT (atof)
+  DXE_EXPORT (atan)
+  DXE_EXPORT (asin)
+  DXE_EXPORT (vectoangles2)
+  DXE_EXPORT (crand)
+  DXE_EXPORT (stpcpy)
+DXE_EXPORT_END
+static void (*game_library)(void);
+
 void    Sys_UnloadGame (void)
 {
+	if (game_library)
+	{
+		dlclose (game_library);
+	}
+	game_library = NULL;
 }
-//Load the DLL
-void	*Sys_GetGameAPI (void *parms)
+
+static int lastresort ()
 {
-	//Load the DLL
-	//LoadDLM("gamex86.dlm");
-	//if (GetGameAPI==0xFFFFFFFF)
-		Sys_Error("unable to load the game dll!\n");
-	return NULL;
+	printf ("last resort function called!\n");
+	return 0;
 }
+
+void *dxe_res (const char *symname)
+{
+	printf ("%s: undefined symbol in dynamic module.  Please report this as a bug!\n", symname);
+	Com_Printf ("%s: undefined symbol in dynamic module.  Please report this as a bug!\n", symname);
+
+	union
+	{
+		int (*from)(void);
+		void *to;
+	} func_ptr_cast;
+
+	func_ptr_cast.from = lastresort;
+	return func_ptr_cast.to;
+}
+
+void *Sys_GetGameAPI (void *parms)
+{
+	void	*(*GetGameAPI) (void *);
+	char	name[MAX_OSPATH];
+	char	curpath[MAX_OSPATH];
+	char	*path;
+	const char *gamename = "gamex86.dx3";
+
+	getcwd(curpath, sizeof(curpath));
+
+	Com_Printf("------- Loading %s -------\n", gamename);
+
+	  // Set the error callback function
+	_dlsymresolver = dxe_res;
+
+	// Register the symbols exported into dynamic modules
+	dlregsym (syms);
+
+	// now run through the search paths
+	path = NULL;
+
+	while (1)
+	{
+		path = FS_NextPath (path);
+		if (!path)
+			return NULL;		// couldn't find one anywhere
+		sprintf (name, "%s/%s/%s", curpath, path, gamename);
+		game_library = dlopen (name, RTLD_LAZY);
+		if (game_library)
+		{
+			Com_Printf ("LoadLibrary (%s)\n",name);
+			break;
+		}
+	}
+
+#if 0 // FS: Me testing it out.
+	if(game_library)
+	{
+		void (*Test_DXE)(void);
+
+		dlerror();
+		*(void **) (&Test_DXE) = dlsym(game_library, "_Test_DXE");
+//		void *Test_DXE = (void*)dlsym(game_library, "Test_DXE");
+		if(!Test_DXE)
+			Com_Printf("Can't find Test_DXE!");
+		else
+			Com_Printf("Found Test_DXE!\n");
+	}
+#endif
+
+	*(void **) (&GetGameAPI) = dlsym (game_library, "_GetGameAPI");
+
+	if (!GetGameAPI)
+	{
+		Sys_UnloadGame ();		
+		return NULL;
+	}
+	else
+	{
+//		Com_Printf("it loaded\n");
+	}
+
+	return GetGameAPI (parms);
+}
+
 #endif	
 
 

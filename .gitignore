@@ -9,6 +9,7 @@
 *.aps
 *.idb
 *.pdb
+*.dx3
 *.clwbin/
 # ignore all the windows binaries - they shouldn't be committed! 
 Debug/
@@ -20,3 +21,4 @@ q2ace
 q2rogue
 q2xatrix
 q2zaero
+q2dxe
