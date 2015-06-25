@@ -638,7 +638,7 @@ qboolean thruBarrier(edict_t *targ, edict_t *inflictor)
 		e = tr.ent;
 	}
 
-	return true;
+	return false;
 }
 
 void barrier_think(edict_t *self)

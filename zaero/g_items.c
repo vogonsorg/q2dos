@@ -45,6 +45,8 @@ gitem_armor_t bodyarmor_info	= {100, 200, .80, .60, ARMOR_BODY};
 int	jacket_armor_index;
 int	combat_armor_index;
 int	body_armor_index;
+int	power_screen_index;
+int	power_shield_index;
 // FS: Knightmare added indexes
 int	jacket_armor_index;
 int	combat_armor_index;
@@ -61,10 +63,6 @@ int	empnuke_index;
 int	plasmashield_index;
 int	a2k_index;
 // FS: Knightmare end
-
-static int	power_screen_index;
-static int	power_shield_index;
-
 
 void Use_Quad (edict_t *ent, gitem_t *item);
 static int	quad_drop_timeout_hack;
@@ -3361,8 +3359,8 @@ SetItemNames(void)
 	body_armor_index = ITEM_INDEX(FindItem("Body Armor"));
 	power_screen_index = ITEM_INDEX(FindItem("Power Screen"));
 	power_shield_index = ITEM_INDEX(FindItem("Power Shield"));
-	shells_index = ITEM_INDEX(FindItem("Bullets"));
-	bullets_index = ITEM_INDEX(FindItem("Shells"));
+	shells_index = ITEM_INDEX(FindItem("Shells"));
+	bullets_index = ITEM_INDEX(FindItem("Bullets"));
 	grenades_index = ITEM_INDEX(FindItem("Grenades"));
 	rockets_index = ITEM_INDEX(FindItem("Rockets"));
 	cells_index = ITEM_INDEX(FindItem("Cells"));
