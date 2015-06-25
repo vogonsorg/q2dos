@@ -398,6 +398,23 @@ void Sys_GetMemory(void)
 #endif // USE_QDOS_ZONE
 }
 
+int Sys_Get_Physical_Memory(void) // FS: From DJGPP tutorial
+{
+	_go32_dpmi_meminfo info;
+	_go32_dpmi_get_free_memory_information(&info);
+
+	if (info.available_physical_pages != -1)
+	{
+		return info.available_physical_pages * 4096;
+	}
+	return info.available_memory;
+}
+
+void Sys_Memory_Stats_f (void)
+{
+	Com_Printf("%d Mb available for Q2DOS.\n", (Sys_Get_Physical_Memory() / 0x100000) ); // FS: Added
+	Com_Printf("%lu Virtual Mb available for Q2DOS.\n", (_go32_dpmi_remaining_virtual_memory() / 0x100000) ); // FS: Added
+}
 /*
 ================
 Sys_PageInProgram
@@ -447,6 +464,9 @@ void Sys_PageInProgram(void)
 			sys_checksum += *(int *)(i + 16 * 0x1000);
 		}
 	}
+	
+	printf("%d Mb available for Q2DOS.\n", (Sys_Get_Physical_Memory() / 0x100000) ); // FS: Added
+	printf("%lu Virtual Mb available for Q2DOS.\n", (_go32_dpmi_remaining_virtual_memory() / 0x100000) ); // FS: Added
 }
 
 void Sys_Error (char *error, ...)

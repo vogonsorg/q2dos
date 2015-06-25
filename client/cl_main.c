@@ -126,6 +126,10 @@ void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1,
 void CL_PingNetServers_f (void);
 void CL_PrintBrowserList_f (void);
 
+#ifdef __DJGPP__
+void Sys_Memory_Stats_f (void); // FS: Added
+#endif
+
 /*
 ==========================
 ClampCvar
@@ -1808,9 +1812,14 @@ void CL_InitLocal (void)
 	Cmd_AddCommand ("invdrop", NULL);
 	Cmd_AddCommand ("weapnext", NULL);
 	Cmd_AddCommand ("weapprev", NULL);
+
 #ifdef GAMESPY
 	Cmd_AddCommand ("slist2", CL_PingNetServers_f); // FS: For Gamespy
 	Cmd_AddCommand ("srelist", CL_PrintBrowserList_f);
+#endif
+
+#ifdef __DJGPP__
+	Cmd_AddCommand ("memstats", Sys_Memory_Stats_f); // FS: Added
 #endif
 }
 
