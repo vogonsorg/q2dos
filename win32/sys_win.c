@@ -513,7 +513,7 @@ void *Sys_GetGameAPI (void *parms)
 	game_library = LoadLibrary ( name );
 	if (game_library)
 	{
-		Com_DPrintf(DEVELOPER_MSG_WORLD, "LoadLibrary (%s)\n", name);
+		Com_DPrintf(DEVELOPER_MSG_STANDARD, "LoadLibrary (%s)\n", name);
 	}
 	else
 	{
@@ -522,7 +522,7 @@ void *Sys_GetGameAPI (void *parms)
 		game_library = LoadLibrary ( name );
 		if (game_library)
 		{
-			Com_DPrintf(DEVELOPER_MSG_WORLD, "LoadLibrary (%s)\n", name);
+			Com_DPrintf(DEVELOPER_MSG_STANDARD, "LoadLibrary (%s)\n", name);
 		}
 		else
 		{
