@@ -71,10 +71,8 @@ qboolean	CL_CheckOrDownloadFile (char *filename)
 	FILE *fp;
 	char	name[MAX_OSPATH];
 	static char lastfilename[MAX_OSPATH] = {0};
-#ifndef USE_CURL
-	int	length;	
-	char	*p;
-#endif
+	int	length = 0; // FS: MSVC4 hates it elsewhere
+	char	*p = NULL; // FS: MSVC4 hates it elsewhere
 
 
 	strcpy (lastfilename, filename);
