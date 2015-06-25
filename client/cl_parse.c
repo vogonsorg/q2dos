@@ -71,6 +71,11 @@ qboolean	CL_CheckOrDownloadFile (char *filename)
 	FILE *fp;
 	char	name[MAX_OSPATH];
 	static char lastfilename[MAX_OSPATH] = {0};
+#ifndef USE_CURL
+	int	length;	
+	char	*p;
+#endif
+
 
 	strcpy (lastfilename, filename);
 
@@ -113,9 +118,6 @@ qboolean	CL_CheckOrDownloadFile (char *filename)
 	else
 	{
 #endif	// USE_CURL
-		int		length;
-		char	*p;
-
 		strcpy (cls.downloadname, filename);
 
 		//r1: fix \ to /
