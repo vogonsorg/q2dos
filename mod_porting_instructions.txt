@@ -1,0 +1,24 @@
+To port a mod to Q2DOS the following changes must occur:
+
+* q_shared.c and q_shared.h need to be merged with the ones in /game.
+  There as some string safe functions that are used throughout the engine
+  as well as some DJGPP specific stuff.  It's needed!
+
+* game.h needs dprintf changed to:
+  void (*dprintf) (unsigned long developerFlags, char *fmt, ...);
+
+* ALL gi.dprintfs need to be changed to this format:
+  gi.dprintf (DEVELOPER_MSG_GAME, "%s", ...)
+  
+  This is so you can use the developer flags to filter game dll
+  specific messages.
+  
+* DX3 has to be built with -U.  Start the game and see if you see any
+  complaints upon cinematic/demo/map load about missing functions that
+  should be reported as a bug.  It is also reported to stdout so you can
+  run q2.exe +set game <yourmod> >out.txt to capture it.
+  
+  Added the exports to the family of DXE_EXPORTS in sys_dos.c
+  Please report these to me.  The common ones mods use have been added.
+  
+Good luck!

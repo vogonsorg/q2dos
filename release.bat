@@ -41,7 +41,7 @@ md xatrix
 md zaero
 cd ..
 
-copy q2dxe.exe release
+copy q2.exe release
 copy cwsdpmi.exe release
 copy readme.txt release
 copy game\gamex86.dx3 release\baseq2
