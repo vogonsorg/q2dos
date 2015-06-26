@@ -4,9 +4,14 @@ call setenv.bat
 
 make -f makedxe.frank clean
 make -f makedxe.frank
-upx -9 q2dxe.exe
+upx -9 q2.exe
 
 cd game
+make -f makedx3 clean
+make -f makedx3
+cd..
+
+cd ctf
 make -f makedx3 clean
 make -f makedx3
 cd..

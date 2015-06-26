@@ -109,10 +109,10 @@ REFASM = linux/snd_mixa.o \
 
 OBJECTS =  $(CLIENT) $(QCOMMON) $(SERVER) $(GAMESPY) $(REFSOFT) $(REFASM) $(DOS)
 
-all: q2dxe.exe
+all: q2.exe
 
-q2dxe.exe:	$(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o q2dxe.exe $(OCCLFLAGS) $(VORBLFLAGS) $(CURLLFLAGS) -lm $(WLFLAGS)
+q2.exe:	$(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o q2.exe $(OCCLFLAGS) $(VORBLFLAGS) $(CURLLFLAGS) -lm $(WLFLAGS)
 
 clean:
 #	find ./ -name '*.o' -exec rm {} \;

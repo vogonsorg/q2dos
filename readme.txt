@@ -74,7 +74,7 @@ Various code from
 * Ogg Vorbis -- (https://www.xiph.org/)
 * R1CH -- R1Q2 (http://old.r1ch.net/stuff/r1q2/)
 * Sezero -- HoT (http://uhexen2.sourceforge.net/)
-* Yamagi -- YamagiQ2 (http://www.yamagi.org/quake2/)
+* Yamagi -- Updated game code from YamagiQ2 (http://www.yamagi.org/quake2/)
 * Various DJGPP v2.05 upgrade help from RayeR (http://rayer.g6.cz/)
 * Berserk, CDawg, Pat Aftermoon, Anthony Jacques, David M. Pochron, Dopefish,
   GuyP, Jitspoe, MH, MrG, NeVo, Skuller, Riot, R1ch, Psychospaz, Pooy, Sul, 

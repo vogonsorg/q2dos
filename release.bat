@@ -30,6 +30,8 @@ cd release
 
 md baseq2
 
+md ctf
+
 md ace
 
 md rogue
@@ -43,6 +45,7 @@ copy q2dxe.exe release
 copy cwsdpmi.exe release
 copy readme.txt release
 copy game\gamex86.dx3 release\baseq2
+copy ctf\gamex86.dx3 release\ctf
 copy acebot\gamex86.dx3 release\ace
 copy rsrc\gamex86.dx3 release\rogue
 copy xsrc\gamex86.dx3 release\xatrix
@@ -55,3 +58,6 @@ cd "7-zip"
 7z.exe a -mx9 -mmt "F:\PROJ\Q2DOS\Q2DOS_EXE_%MONTH%%DAY%%YEAR%.7Z" "F:\PROJ\Q2DOS\RELEASE\*"
 cd F:\PROJ\Q2DOS
 rd /s /q F:\PROJ\Q2DOS\RELEASE
+
+F:
+cd "F:\PROJ\Q2DOS"

@@ -1,0 +1,56 @@
+CC = gcc
+CFLAGS = -g -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer -std=gnu90
+#gnu90 for old style inlines, thanks to rayer
+DXE3GEN = dxe3gen
+
+GAME = g_ai.o \
+	g_chase.o \
+	g_cmds.o \
+	g_combat.o \
+	g_ctf.o \
+	g_func.o \
+	g_items.o \
+	g_main.o \
+	g_misc.o \
+	g_monster.o \
+	g_phys.o \
+	g_save.o \
+	g_spawn.o \
+	g_svcmds.o \
+	g_target.o \
+	g_trigger.o \
+	g_utils.o \
+	g_weapon.o \
+	menu.o \
+	move.o \
+	p_client.o \
+	p_hud.o \
+	p_trail.o \
+	p_view.o \
+	p_weapon.o \
+	q_shared.o
+
+.PHONY: all test clean
+#
+
+OBJECTS =  $(GAME)
+
+all: gamex86.dx3
+
+gamex86.dx3:	$(OBJECTS)
+	$(DXE3GEN) -U $(OBJECTS) -o gamex86.dx3
+
+clean:
+	rm .../*.o
+
+DO_AS=$(CC) -x assembler-with-cpp
+
+%.o : %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+%.o: %.S
+	$(DO_AS) $(CFLAGS) -c $< -o $@
+
+%.o: %.s
+	$(DO_AS) $(CFLAGS) -c $< -o $@
+
