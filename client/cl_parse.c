@@ -901,12 +901,23 @@ void CL_ParseServerMessage (void)
 
 		case svc_print:
 			i = MSG_ReadByte (&net_message);
+			s = MSG_ReadString(&net_message);
+
 			if (i == PRINT_CHAT)
 			{
 				S_StartLocalSound ("misc/talk.wav");
 				con.ormask = 128;
+
+				//r1: change !p_version to !version since p is for proxies
+				if ((strstr (s, "!r1q2_version") || strstr (s, "!version")) &&
+					(cls.lastSpamTime == 0.0f || cls.realtime > cls.lastSpamTime + 300000.0f)) // FS: 5 minutes
+				{
+					cls.spamTime = cls.realtime + 1500.0f; // FS: 1.5 second delay
+				}
+
 			}
-			Com_Printf ("%s", MSG_ReadString (&net_message));
+			Com_Printf("%s", s); // FS: !version reply
+
 			con.ormask = 0;
 			break;
 			

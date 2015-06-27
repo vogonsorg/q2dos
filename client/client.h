@@ -266,6 +266,8 @@ typedef struct
 	keydest_t	key_dest;
 
 	int			framecount;
+	double		spamTime; // FS: From R1Q2
+	double		lastSpamTime; // FS: From R1Q2
 	double		realtime;			// always increasing, no clamping, etc
 	double		frametime;			// seconds since last frame
 	double		netFrameTime;		// seconds since last packet frame

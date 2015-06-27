@@ -2115,6 +2115,16 @@ void CL_Frame_Async (double msec)
 		{
 			miscDelta = 0;
 
+			if (cls.spamTime && (cls.spamTime < cls.realtime)) // FS: From R1Q2
+			{
+				char versionStr[256];
+
+				Com_sprintf(versionStr, sizeof(versionStr), "say Q2DOS %4.2f %s %s %s\n", VERSION, CPUSTRING, __DATE__, BUILDSTRING);
+				Cbuf_AddText(versionStr);
+				cls.lastSpamTime = cls.realtime;
+				cls.spamTime = 0.0f;
+			}
+
 			// Let the mouse activate or deactivate
 			IN_Frame ();
 
@@ -2288,6 +2298,16 @@ void CL_Frame (double msec)
 
 	// send a new command message to the server
 	CL_SendCommand ();
+
+	if (cls.spamTime && (cls.spamTime < cls.realtime)) // FS: From R1Q2
+	{
+		char versionStr[256];
+
+		Com_sprintf(versionStr, sizeof(versionStr), "say Q2DOS %4.2f %s %s %s\n", VERSION, CPUSTRING, __DATE__, BUILDSTRING);
+		Cbuf_AddText(versionStr);
+		cls.lastSpamTime = cls.realtime;
+		cls.spamTime = 0.0f;
+	}
 
 	// predict all unacknowledged movements
 	CL_PredictMovement ();
