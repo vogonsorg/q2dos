@@ -8,12 +8,12 @@ CFG=quake2 - Win32 Release
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "quake2-sv-sg_rogue.mak".
+!MESSAGE NMAKE /f "q2_custom_coop.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "quake2-sv-sg_rogue.mak" CFG="quake2 - Win32 Release"
+!MESSAGE NMAKE /f "q2_custom_coop.mak" CFG="quake2 - Win32 Release"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "USE_CURL" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "OGG_SUPPORT" /D "USE_CURL" /D "USE_JOYSTICK" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x1009 /d "NDEBUG"
@@ -69,7 +69,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "OGG_SUPPORT" /D "USE_CURL" /FR /YX /FD /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "OGG_SUPPORT" /D "USE_CURL" /D "USE_JOYSTICK" /FR /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x1009 /d "_DEBUG"
@@ -191,10 +191,382 @@ SOURCE=..\client\snd_stream.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\CLIENT\x86.c
+SOURCE=..\WIN32\snd_win.c
 # End Source File
 # End Group
-# Begin Group "Ref_Soft"
+# Begin Group "Server"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\SERVER\sv_ccmds.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\SERVER\sv_ents.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\SERVER\sv_game.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\SERVER\sv_init.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\SERVER\sv_main.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\SERVER\sv_send.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\SERVER\sv_user.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\SERVER\sv_world.c
+# End Source File
+# End Group
+# Begin Group "Win32"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\WIN32\cd_win.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\in_win.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\win32\net_wins.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\q_shwin.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\rw_ddraw.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\rw_dib.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\rw_imp.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\sys_win.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\vid_dll.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\WIN32\vid_menu.c
+# End Source File
+# End Group
+# Begin Group "Game"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\coop\g_ai.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_chase.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_cmds.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_combat.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_func.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_items.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_local.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_main.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_misc.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_monster.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_phys.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_save.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_spawn.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_svcmds.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_target.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_trigger.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_turret.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_utils.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_weapon.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\game.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_actor.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_actor.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_berserk.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_berserk.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_boss2.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_boss2.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_boss3.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_boss31.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_boss31.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_boss32.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_boss32.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_brain.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_brain.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_chick.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_chick.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_flash.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_flipper.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_flipper.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_float.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_float.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_flyer.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_flyer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_gladiator.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_gladiator.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_gunner.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_gunner.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_hover.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_hover.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_infantry.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_infantry.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_insane.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_insane.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_medic.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_medic.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_move.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_mutant.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_mutant.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_parasite.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_parasite.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_player.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_rider.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_soldier.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_soldier.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_supertank.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_supertank.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_tank.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_tank.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\p_client.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\p_hud.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\p_trail.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\p_view.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\p_weapon.c
+# End Source File
+# End Group
+# Begin Group "ref_soft"
 
 # PROP Default_Filter ""
 # Begin Source File
@@ -266,340 +638,103 @@ SOURCE=..\REF_SOFT\r_sprite.c
 SOURCE=..\REF_SOFT\r_surf.c
 # End Source File
 # End Group
-# Begin Group "Win32"
+# Begin Group "DOS"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\WIN32\cd_win.c
+SOURCE=..\dos\asm_i386.h
+# PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
 
-SOURCE=..\WIN32\in_win.c
+SOURCE=..\dos\cd_audio.c
+# PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
 
-SOURCE=..\win32\net_wins.c
+SOURCE=..\dos\cd_dos.c
+# PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
 
-SOURCE=..\WIN32\q_shwin.c
+SOURCE=..\dos\dos_v2.c
+# PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
 
-SOURCE=..\WIN32\rw_ddraw.c
+SOURCE=..\dos\dosisms.h
+# PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
 
-SOURCE=..\WIN32\rw_dib.c
+SOURCE=..\dos\glob.c
+# PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
 
-SOURCE=..\WIN32\rw_imp.c
+SOURCE=..\dos\glob.h
+# PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
 
-SOURCE=..\WIN32\snd_win.c
+SOURCE=..\dos\in_dos.c
+# PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
 
-SOURCE=..\WIN32\sys_win.c
+SOURCE=..\dos\q_shdos.c
+# PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
 
-SOURCE=..\WIN32\vid_dll.c
+SOURCE=..\dos\QUAKEASM.H
+# PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
 
-SOURCE=..\WIN32\vid_menu.c
+SOURCE=..\dos\snd_gus.c
+# PROP Exclude_From_Build 1
 # End Source File
-# End Group
-# Begin Group "Server"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\SERVER\sv_ccmds.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\SERVER\sv_ents.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\SERVER\sv_game.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\SERVER\sv_init.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\SERVER\sv_main.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\SERVER\sv_send.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\SERVER\sv_user.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\SERVER\sv_world.c
-# End Source File
-# End Group
-# Begin Group "Rogue Game"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\rsrc\dm_ball.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\dm_tag.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_ai.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_chase.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_cmds.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_combat.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_func.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_items.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_main.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_misc.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_monster.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_newai.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_newdm.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_newfnc.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_newtarg.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_newtrig.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_newweap.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_phys.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_save.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_spawn.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_sphere.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_svcmds.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_target.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_trigger.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_turret.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_utils.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\g_weapon.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_actor.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_berserk.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_boss2.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_boss3.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_boss31.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_boss32.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_brain.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_carrier.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_chick.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_flash.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_flipper.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_float.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_flyer.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_gladiator.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_gunner.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_hover.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_infantry.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_insane.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_medic.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_move.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_mutant.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_parasite.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_soldier.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_stalker.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_supertank.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_tank.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_turret.c
-# End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_widow.c
+SOURCE=..\dos\snddma_dos.c
+# PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_widow2.c
+SOURCE=..\dos\swimp_dos.c
+# PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\p_client.c
+SOURCE=..\dos\sys_dos.c
+# PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\p_hud.c
+SOURCE=..\dos\sys_dosq1.c
+# PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\p_trail.c
+SOURCE=..\dos\vid_dos.c
+# PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\p_view.c
+SOURCE=..\dos\vid_dos.h
+# PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\p_weapon.c
+SOURCE=..\dos\vid_ext2.c
+# PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\q_shared.c
+SOURCE=..\dos\zone.c
+# PROP Exclude_From_Build 1
 # End Source File
 # End Group
 # Begin Source File
@@ -656,7 +791,15 @@ SOURCE=..\QCOMMON\pmove.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\GAME\q_shared.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\CLIENT\qmenu.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\CLIENT\x86.c
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -700,11 +843,11 @@ SOURCE=..\Goa\CEngine\darray.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\g_local.h
+SOURCE=..\game\g_local.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\game.h
+SOURCE=..\game\game.h
 # End Source File
 # Begin Source File
 
@@ -732,115 +875,91 @@ SOURCE=..\client\keys.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_actor.h
+SOURCE=..\game\m_actor.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_berserk.h
+SOURCE=..\game\m_berserk.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_boss2.h
+SOURCE=..\game\m_boss2.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_boss31.h
+SOURCE=..\game\m_boss31.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_boss32.h
+SOURCE=..\game\m_boss32.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_brain.h
+SOURCE=..\game\m_brain.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_carrier.h
+SOURCE=..\game\m_chick.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_chick.h
+SOURCE=..\game\m_flipper.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_flipper.h
+SOURCE=..\game\m_float.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_float.h
+SOURCE=..\game\m_flyer.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_flyer.h
+SOURCE=..\game\m_gladiator.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_gladiator.h
+SOURCE=..\game\m_gunner.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_gunner.h
+SOURCE=..\game\m_hover.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_hover.h
+SOURCE=..\game\m_infantry.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_infantry.h
+SOURCE=..\game\m_insane.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_insane.h
+SOURCE=..\game\m_medic.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_medic.h
+SOURCE=..\game\m_mutant.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_mutant.h
+SOURCE=..\game\m_parasite.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_parasite.h
+SOURCE=..\game\m_player.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_player.h
+SOURCE=..\game\m_soldier.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_rider.h
+SOURCE=..\game\m_supertank.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\m_soldier.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_stalker.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_supertank.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_tank.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_turret.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_widow.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\rsrc\m_widow2.h
+SOURCE=..\game\m_tank.h
 # End Source File
 # Begin Source File
 
@@ -848,7 +967,7 @@ SOURCE=..\Goa\nonport.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\rsrc\q_shared.h
+SOURCE=..\game\q_shared.h
 # End Source File
 # Begin Source File
 

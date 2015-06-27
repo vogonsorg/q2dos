@@ -1503,7 +1503,7 @@ spectator_respawn(edict_t *ent)
 	}
 
 	/* clear score on respawn */
-	ent->client->pers.score = ent->client->resp.score = 0;
+	ent->client->resp.score = ent->client->pers.score = 0;
 
 	ent->svflags &= ~SVF_NOCLIENT;
 	PutClientInServer(ent);
@@ -1543,6 +1543,7 @@ spectator_respawn(edict_t *ent)
 void
 PutClientInServer(edict_t *ent)
 {
+	char userinfo[MAX_INFO_STRING];
 	vec3_t mins = {-16, -16, -24};
 	vec3_t maxs = {16, 16, 32};
 	int index;
@@ -1574,7 +1575,6 @@ PutClientInServer(edict_t *ent)
 	/* deathmatch wipes most client data every spawn */
 	if (deathmatch->value)
 	{
-		char userinfo[MAX_INFO_STRING];
 
 		resp = client->resp;
 		memcpy(userinfo, client->pers.userinfo, sizeof(userinfo));
@@ -1583,7 +1583,6 @@ PutClientInServer(edict_t *ent)
 	}
 	else if (coop->value)
 	{
-		char userinfo[MAX_INFO_STRING];
 
 		resp = client->resp;
 		memcpy(userinfo, client->pers.userinfo, sizeof(userinfo));
@@ -1601,6 +1600,8 @@ PutClientInServer(edict_t *ent)
 	{
 		memset(&resp, 0, sizeof(resp));
 	}
+	memcpy(userinfo, client->pers.userinfo, sizeof(userinfo));
+	ClientUserinfoChanged(ent, userinfo);
 
 	/* clear everything but the persistant data */
 	saved = client->pers;
