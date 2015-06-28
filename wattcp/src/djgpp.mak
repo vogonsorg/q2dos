@@ -154,7 +154,7 @@ language.c: language.l
 	flex -8 -o$@ $<
 
 clean:
-	rm -f $(TARGET) $(OBJDIR)/*.o $(OBJDIR)/*.iS $(PKT_STUB)
+	rm -f $(TARGET) $(OBJDIR)/*.o $(OBJDIR)/*.iS $(PKT_STUB) asmpkt.lst asmpkt.bin ../util/bin2c
 	@echo Cleaning done
 
 -include djgpp/watt32.dep
