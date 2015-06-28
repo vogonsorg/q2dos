@@ -183,6 +183,7 @@
 {"SaveClientData", (byte *)SaveClientData},
 {"InitClientResp", (byte *)InitClientResp},
 {"InitClientPersistant", (byte *)InitClientPersistant},
+{"InitClientCoopPersistant", (byte *)InitClientCoopPersistant},
 {"player_die", (byte *)player_die},
 {"LookAtKiller", (byte *)LookAtKiller},
 {"TossClientWeapon", (byte *)TossClientWeapon},

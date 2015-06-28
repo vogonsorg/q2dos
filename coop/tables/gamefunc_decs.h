@@ -183,6 +183,7 @@ extern void FetchClientEntData ( edict_t * ent ) ;
 extern void SaveClientData ( void ) ;
 extern void InitClientResp ( gclient_t * client ) ;
 extern void InitClientPersistant ( gclient_t * client ) ;
+extern void InitClientCoopPersistant( edict_t *ent ) ;
 extern void player_die ( edict_t * self , edict_t * inflictor , edict_t * attacker , int damage , vec3_t point ) ;
 extern void LookAtKiller ( edict_t * self , edict_t * inflictor , edict_t * attacker ) ;
 extern void TossClientWeapon ( edict_t * self ) ;

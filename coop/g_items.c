@@ -260,6 +260,11 @@ Pickup_Adrenaline(edict_t *ent, edict_t *other)
 		other->max_health += 1;
 	}
 
+	if (coop->intValue)
+	{
+		other->client->resp.coop_respawn.max_health += 1; // FS: For coop respawn
+	}
+
 	if (other->health < other->max_health)
 	{
 		other->health = other->max_health;
@@ -355,6 +360,11 @@ Pickup_Bandolier(edict_t *ent, edict_t *other)
 	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value || Coop_Respawn()) ) // FS: Added
 	{
 		SetRespawn(ent, ent->item->quantity);
+	}
+
+	if (coop->intValue)
+	{
+		other->client->resp.coop_respawn.ammoUpgrade = COOP_BANDOLIER; // FS: For coop respawn
 	}
 
 	return true;
@@ -494,6 +504,11 @@ Pickup_Pack(edict_t *ent, edict_t *other)
 	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value || Coop_Respawn()) ) // FS: Added
 	{
 		SetRespawn(ent, ent->item->quantity);
+	}
+
+	if (coop->intValue)
+	{
+		other->client->resp.coop_respawn.ammoUpgrade = COOP_BACKPACK; // FS: For coop respawn
 	}
 
 	return true;

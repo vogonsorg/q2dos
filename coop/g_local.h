@@ -827,6 +827,8 @@ void GetChaseTarget(edict_t *ent);
 #define	ANIM_DEATH		5
 #define	ANIM_REVERSE	6
 
+#define COOP_BANDOLIER	1 // FS: For coop respawn
+#define COOP_BACKPACK	2 // FS: For coop respawn
 
 // client data that stays across multiple level loads
 typedef struct
@@ -862,6 +864,7 @@ typedef struct
 
 	int			game_helpchanged;
 	int			helpchanged;
+	int			ammoUpgrade; // FS: For Coop respawn
 
 	qboolean	spectator;			// client is a spectator
 } client_persistant_t;
