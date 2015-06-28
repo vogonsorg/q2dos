@@ -464,6 +464,11 @@ static byte BlendParticle100( int pcolor, int dstcolor )
 ** function pointer route.  This exacts some overhead, but
 ** it pays off in clean and easy to understand code.
 */
+
+#ifndef WIN32 // FS: GCC stuff -- Thanks to ggorts on vogons
+	#pragma GCC optimize ("-ffast-math")
+#endif // WIN32
+
 void R_DrawParticle( void )
 {
 	particle_t *pparticle = partparms.particle;
@@ -582,6 +587,10 @@ void R_DrawParticle( void )
         break;
     }
 }
+//following in gcc44 and later
+#ifndef WIN32
+	#pragma GCC reset_options
+#endif // WIN32
 
 #endif	// !id386
 

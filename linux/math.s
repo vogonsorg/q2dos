@@ -2,7 +2,6 @@
 // math.s
 // x86 assembly-language math routines.
 
-#define GLQUAKE	1	// don't include unneeded defs
 #include "qasm.h"
 
 
@@ -10,11 +9,9 @@
 
 	.data
 
-#if 0
 	.align	4
 Ljmptab:	.long	Lcase0, Lcase1, Lcase2, Lcase3
 			.long	Lcase4, Lcase5, Lcase6, Lcase7
-#endif
 
 	.text
 
@@ -84,8 +81,6 @@ C(TransformVector):
 	fstps	(%edx)		// out[0]
 
 	ret
-
-#if 0 // in C
 
 #define EMINS	4+4
 #define EMAXS	4+8
@@ -397,7 +392,5 @@ LSetSides:
 
 Lerror:
 	call	C(BOPS_Error)
-
-#endif
 
 #endif	// id386

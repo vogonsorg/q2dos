@@ -199,8 +199,8 @@ void R_TransformFrustum (void)
 }
 
 
-//#if !(defined __linux__ && defined __i386__)
-//#if !id386
+#if !(defined __DJGPP__ && defined __i386__) // FS: Now using math.s thanks to ggorts on vogons.org
+#if !id386
 
 /*
 ================
@@ -214,8 +214,7 @@ void TransformVector (vec3_t in, vec3_t out)
 	out[2] = DotProduct(in,vpn);		
 }
 
-//#else
-#if 0
+#else
 
 __declspec( naked ) void TransformVector( vec3_t vin, vec3_t vout )
 {
@@ -263,7 +262,7 @@ __declspec( naked ) void TransformVector( vec3_t vin, vec3_t vout )
 }
 
 #endif
-//#endif
+#endif
 
 
 /*

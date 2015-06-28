@@ -94,6 +94,7 @@ REFSOFT = ref_soft/r_alias.o \
 	ref_soft/r_image.o
 
 REFASM = linux/snd_mixa.o \
+	linux/math.o \
 	linux/d_polysa.o \
 	linux/r_aclipa.o \
 	linux/r_draw16.o \

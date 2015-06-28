@@ -257,15 +257,9 @@ void R_ConcatTransforms (float in1[3][4], float in2[3][4], float out[3][4])
 
 float Q_fabs (float f)
 {
-#if 0
-	if (f >= 0)
-		return f;
-	return -f;
-#else
 	int tmp = * ( int * ) &f;
 	tmp &= 0x7FFFFFFF;
 	return * ( float * ) &tmp;
-#endif
 }
 
 #if defined _M_IX86 && !defined C_ONLY
@@ -352,7 +346,7 @@ BoxOnPlaneSide
 Returns 1, 2, or 1 + 2
 ==================
 */
-#if !id386 || defined __DJGPP__ //defined __linux__ 
+#if !id386 || defined __linux__ // FS: Now using math.s.  Thanks to ggorts on vogons
 int BoxOnPlaneSide (vec3_t emins, vec3_t emaxs, struct cplane_s *p)
 {
 	float	dist1, dist2;
@@ -420,6 +414,7 @@ dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
 	return sides;
 }
 #else
+#ifdef WIN32
 #pragma warning( disable: 4035 )
 
 __declspec( naked ) int BoxOnPlaneSide (vec3_t emins, vec3_t emaxs, struct cplane_s *p)
@@ -653,6 +648,19 @@ Lerror:
 }
 #pragma warning( default: 4035 )
 #endif
+#endif
+
+/*
+==================
+BOPS_Error
+
+Split out like this for ASM to call.
+==================
+*/
+void BOPS_Error (void)
+{
+	Sys_Error ("BoxOnPlaneSide:  Bad signbits");
+}
 
 void ClearBounds (vec3_t mins, vec3_t maxs)
 {
@@ -1239,9 +1247,13 @@ void Com_sprintf (char *dest, int size, char *fmt, ...)
 	len = Q_vsnprintf (bigbuffer, sizeof(bigbuffer), fmt, argptr);	// Knightmare- buffer overflow fix
 	va_end (argptr);
 	if (len < 0)
+	{
 		Com_Printf ("Com_sprintf: overflow in temp buffer of size %i\n", sizeof(bigbuffer));
+	}
 	else if (len >= size)
+	{
 		Com_Printf ("Com_sprintf: overflow of %i in %i\n", len, size);
+	}
 	strncpy (dest, bigbuffer, size-1);
 	dest[size-1] = 0;	// Knightmare- null terminate
 }
