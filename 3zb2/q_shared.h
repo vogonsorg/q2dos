@@ -39,7 +39,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdlib.h>
 #include <time.h>
 
-
 #if defined _M_ALPHA && !defined C_ONLY
 #define idaxp	1
 #else
@@ -124,7 +123,6 @@ MULTICAST_ALL_R,
 MULTICAST_PHS_R,
 MULTICAST_PVS_R
 } multicast_t;
-
 
 /*
 ==============================================================
@@ -450,8 +448,10 @@ COLLISION DETECTION
 #define	MASK_OPAQUE				(CONTENTS_SOLID|CONTENTS_SLIME|CONTENTS_LAVA)
 #define	MASK_SHOT				(CONTENTS_SOLID|CONTENTS_MONSTER|CONTENTS_WINDOW|CONTENTS_DEADMONSTER)
 #define MASK_CURRENT			(CONTENTS_CURRENT_0|CONTENTS_CURRENT_90|CONTENTS_CURRENT_180|CONTENTS_CURRENT_270|CONTENTS_CURRENT_UP|CONTENTS_CURRENT_DOWN)
+#define	MASK_BOTSOLID			(CONTENTS_SOLID|CONTENTS_LADDER/*CONTENTS_PLAYERCLIP*/|CONTENTS_WINDOW|CONTENTS_MONSTER)
+#define	MASK_BOTSOLIDX			(CONTENTS_SOLID|CONTENTS_WINDOW|CONTENTS_PLAYERCLIP|CONTENTS_MONSTER)
+#define	MASK_GROUND				(CONTENTS_SOLID|CONTENTS_WINDOW|CONTENTS_MONSTER)
 #define MASK_SHOT_NO_WINDOW		(CONTENTS_SOLID|CONTENTS_MONSTER|CONTENTS_DEADMONSTER)
-
 
 // gi.BoxEdicts() can return a list of either solid or trigger entities
 // FIXME: eliminate AREA_ distinction?
@@ -715,6 +715,8 @@ typedef struct
 #define	MZ_NUKE8			39
 //ROGUE
 
+#define MZ_SILENCED			128		// bit flag ORed with one of the above numbers
+
 //
 // monster muzzle flashes
 //
@@ -948,7 +950,7 @@ typedef struct
 
 // ROGUE
 
-extern	vec3_t monster_flash_offset [];
+extern  vec3_t monster_flash_offset [];
 
 
 // temp entity events
@@ -1067,6 +1069,8 @@ typedef enum
 #define	STAT_FLASHES			15		// cleared each frame, 1 = health, 2 = armor
 #define STAT_CHASE				16
 #define STAT_SPECTATOR			17
+
+#define STAT_SIGHT_PIC			31
 
 #define	MAX_STATS				32
 

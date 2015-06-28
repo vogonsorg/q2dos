@@ -596,7 +596,21 @@ DXE_EXPORT_TABLE (syms)
   DXE_EXPORT (putc)
   DXE_EXPORT (strrchr)
   DXE_EXPORT (stricmp)
+  DXE_EXPORT (acos)
+  DXE_EXPORT (fseek)
+  DXE_EXPORT (fgets)
+  DXE_EXPORT (strncmp)
+  DXE_EXPORT (strnicmp)
+  DXE_EXPORT (FS_Gamedir)
+  DXE_EXPORT (feof)
+  DXE_EXPORT (fputc)
+  DXE_EXPORT (fputs)
+  DXE_EXPORT (strftime)
+  DXE_EXPORT (fscanf)
+  DXE_EXPORT (__dj_stderr)
+  DXE_EXPORT (__dj_huge_val)
 DXE_EXPORT_END
+
 static void (*game_library)(void);
 
 void    Sys_UnloadGame (void)
