@@ -68,6 +68,7 @@ http://dk.toastednet.org/
 Various code from
 * cURL -- (http://curl.haxx.se/)
 * DJGPP community -- (http://www.delorie.com/djgpp/)
+* ggorts -- Ported 3zb2, action, chaos, and dday to Q2DOS
 * Knightmare -- KMQuake II (http://www.markshan.com/knightmare/)
 * Mpxplay -- (http://mpxplay.sourceforge.net/)
 * Mpxplay code importing by Ruslan Starodubov (http://sound-dos.ucoz.ru/)

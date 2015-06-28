@@ -32,7 +32,15 @@ md baseq2
 
 md ctf
 
+md 3zb2
+
 md ace
+
+md action
+
+md chaos
+
+md dday
 
 md rogue
 
@@ -46,7 +54,11 @@ copy cwsdpmi.exe release
 copy readme.txt release
 copy game\gamex86.dx3 release\baseq2
 copy ctf\gamex86.dx3 release\ctf
+copy 3zb2\gamex86.dx3 release\3zb2
 copy acebot\gamex86.dx3 release\ace
+copy action\gamex86.dx3 release\action
+copy chaos\gamex86.dx3 release\chaos
+copy dday\gamex86.dx3 release\dday
 copy rsrc\gamex86.dx3 release\rogue
 copy xsrc\gamex86.dx3 release\xatrix
 copy zaero\gamex86.dx3 release\zaero

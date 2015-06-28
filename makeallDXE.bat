@@ -16,7 +16,27 @@ make -f makedx3 clean
 make -f makedx3
 cd..
 
+cd 3zb2
+make -f makedx3 clean
+make -f makedx3
+cd..
+
 cd acebot
+make -f makedx3 clean
+make -f makedx3
+cd ..
+
+cd action
+make -f makedx3 clean
+make -f makedx3
+cd ..
+
+cd chaos
+make -f makedx3 clean
+make -f makedx3
+cd ..
+
+cd dday
 make -f makedx3 clean
 make -f makedx3
 cd ..
