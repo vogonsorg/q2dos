@@ -4,6 +4,7 @@ call setenv.bat
 
 make -f makedxe.frank clean
 make -f makedxe.frank
+strip q2.exe
 upx -9 q2.exe
 
 cd game

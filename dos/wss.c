@@ -1013,7 +1013,7 @@ static DMA_S mydma[] =
 
 
 
-__inline__ BYTE get_8bit_pcm_value(long value)
+static __inline__ BYTE get_8bit_pcm_value(long value)
 {
 	BYTE d0;
 
