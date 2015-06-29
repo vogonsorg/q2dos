@@ -19,6 +19,7 @@ static cvar_t *sw_waterwarp; // FS
 static cvar_t *r_contentblend; // FS
 
 extern void M_ForceMenuOff( void );
+void VID_ListModes_f (void); // FS: Added
 
 #define SOFTWARE_MENU 0
 
@@ -209,7 +210,9 @@ void	VID_LoadRefresh (void) // FS: Needed for dynamic changing game modes/vid_re
 		Com_Error (ERR_FATAL, "Couldn't start refresh");
 
 	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
-	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE);
+	vid_ref->description = "Video renderer to use.  Locked to software in Q2DOS.";
+	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE|CVAR_NOSET);
+	vid_fullscreen->description = "Enable fullscreen video.  Locked to fullscreen in Q2DOS.";
 	vid_gamma = Cvar_Get( "vid_gamma", "1", CVAR_ARCHIVE );
 }
 
@@ -254,6 +257,7 @@ void	VID_Init (void)
 	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE);
 	vid_gamma = Cvar_Get( "vid_gamma", "1", CVAR_ARCHIVE );
 	Cmd_AddCommand("vid_restart", VID_Restart_f);
+	Cmd_AddCommand("vid_listmodes", VID_ListModes_f); // FS: Added
 }
 
 void	VID_Shutdown (void)
@@ -512,4 +516,19 @@ void VID_Restart_f (void)
 {
 	vid_ref->modified = true;
 	return;
+}
+
+void VID_ListModes_f (void) // FS: Added
+{
+	int i = 0;
+
+	for(i = 0; i <= num_vid_resolutions; i++)
+	{
+		if(vid_resolutions[i].menuname[0] != 0)
+		{
+			Com_Printf("[Mode %02d] %s\n", i, vid_resolutions[i].menuname);
+		}
+
+	}
+	Com_Printf("Available modes: %d\n", num_vid_resolutions);
 }

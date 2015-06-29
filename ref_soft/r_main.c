@@ -254,7 +254,9 @@ void R_Register (void)
 	sw_drawflat = ri.Cvar_Get ("sw_drawflat", "0", 0);
 	sw_draworder = ri.Cvar_Get ("sw_draworder", "0", 0);
 	sw_maxedges = ri.Cvar_Get ("sw_maxedges", STRINGER(MAXSTACKSURFACES), 0);
+	sw_maxedges->description = "Maximum number of edges to draw.  This value may need to be raised if you see disappearing geometry.";
 	sw_maxsurfs = ri.Cvar_Get ("sw_maxsurfs", "0", 0);
+	sw_maxsurfs->description = "Maximum number of surfaces to draw.  This value may need to be raised if you see disappearing textures.";
 	sw_mipcap = ri.Cvar_Get ("sw_mipcap", "0", 0);
 	sw_mipscale = ri.Cvar_Get ("sw_mipscale", "1", 0);
 	sw_reportedgeout = ri.Cvar_Get ("sw_reportedgeout", "0", 0);
@@ -262,6 +264,7 @@ void R_Register (void)
 	sw_stipplealpha = ri.Cvar_Get( "sw_stipplealpha", "0", CVAR_ARCHIVE );
 	sw_surfcacheoverride = ri.Cvar_Get ("sw_surfcacheoverride", "0", 0);
 	sw_waterwarp = ri.Cvar_Get ("sw_waterwarp", "1", CVAR_ARCHIVE);
+	sw_waterwarp->description = "Enables water warping effect when swimming.";
 	sw_mode = ri.Cvar_Get( "sw_mode", "0", CVAR_ARCHIVE );
 
 	r_lefthand = ri.Cvar_Get( "hand", "0", CVAR_USERINFO | CVAR_ARCHIVE );
@@ -276,6 +279,7 @@ void R_Register (void)
 
 	vid_fullscreen = ri.Cvar_Get( "vid_fullscreen", "0", CVAR_ARCHIVE );
 	vid_gamma = ri.Cvar_Get( "vid_gamma", "1.0", CVAR_ARCHIVE );
+	vid_gamma->description = "Video gamma.  Use lower values for a brighter screen display.";
 
 	sw_particle_size_override = ri.Cvar_Get ("sw_particle_size_override", "0", CVAR_ARCHIVE);
 	sw_particle_size_override->description = "Enable this to override particle size scaling with sw_particle_size, sw_particle_size_min, and sw_particle_size_max.";
@@ -284,7 +288,7 @@ void R_Register (void)
 	sw_particle_size_min = ri.Cvar_Get ("sw_particle_size_min", "1", CVAR_ARCHIVE); // FS
 	sw_particle_size_min->description = "Minimum particle size.  Standard formula is resolution width divided by 320.  Use sw_particle_size_override to enable.";
 	sw_particle_size_max = ri.Cvar_Get ("sw_particle_size_max", "8.5", CVAR_ARCHIVE); // FS
-	sw_particle_size_max->description = "Minimum particle size.  Standard formula is resolution width divided by 80 plus 0.5.  Use sw_particle_size_override to enable.";
+	sw_particle_size_max->description = "Maximum particle size.  Standard formula is resolution width divided by 80 plus 0.5.  Use sw_particle_size_override to enable.";
 
 	ri.Cmd_AddCommand ("modellist", Mod_Modellist_f);
 	ri.Cmd_AddCommand( "screenshot", R_ScreenShot_f );
