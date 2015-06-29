@@ -1,5 +1,6 @@
 CC = gcc
-CFLAGS = -g -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
+CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
+#CFLAGS+= -g
 DXE3GEN = dxe3gen
 
 GAME = g_ai.o \
