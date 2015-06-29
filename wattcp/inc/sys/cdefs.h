@@ -44,11 +44,8 @@
 #ifndef __SYS_CDEFS_H
 #define __SYS_CDEFS_H
 
-#if defined(__DJGPP__) && !defined(djgpp_cdefs_incl)
-  //#include "/dev/env/DJDIR/include/sys/cdefs.h"
-  #include <sys/cdefs.h>
-  #include_next <sys/cdefs.h> // FS: Rayer fix for DJGPP 2.05
-  #define djgpp_cdefs_incl
+#if defined(__DJGPP__)
+  #include_next <sys/cdefs.h>
 #endif
 
 #ifdef __cplusplus
@@ -189,6 +186,16 @@ struct mbuf {
     #define __dead2
   #endif
 #endif
+
+#if defined(__GNUC__)  /* from djgpp-2.04 sys/cdefs.h : */
+/* Ensure that always traditional GNU extern inline semantics are used
+   (aka -fgnu89-inline) even if ISO C99 semantics have been specified.  */
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2)
+# define _W32_EXTERN_INLINE  extern __inline__ __attribute__ ((__gnu_inline__))
+#else
+# define _W32_EXTERN_INLINE  extern __inline__
+#endif
+#endif /* _W32_EXTERN_INLINE */
 
 /*
  * Delete pseudo-keywords wherever they are not available or needed.

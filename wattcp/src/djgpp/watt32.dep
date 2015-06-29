@@ -57,7 +57,7 @@ $(OBJDIR)/neterr.o: neterr.c socket.h
 $(OBJDIR)/nettime.o: nettime.c socket.h
 $(OBJDIR)/nsapaddr.o: nsapaddr.c socket.h
 $(OBJDIR)/oldstuff.o: oldstuff.c copyrigh.h wattcp.h pctcp.h netaddr.h strings.h chksum.h misc.h timer.h udp_dom.h
-$(OBJDIR)/packet32.o: packet32.c wattcp.h misc.h timer.h strings.h pcconfig.h pcdbug.h NtddNdis.h cpumodel.h packet32.h
+$(OBJDIR)/packet32.o: packet32.c wattcp.h misc.h timer.h strings.h pcconfig.h pcdbug.h ntddndis.h cpumodel.h packet32.h
 $(OBJDIR)/pc_cbrk.o: pc_cbrk.c copyrigh.h wattcp.h sock_ini.h wdpmi.h x32vm.h misc.h printk.h bsddbug.h language.h strings.h nochkstk.h
 $(OBJDIR)/pcarp.o: pcarp.c copyrigh.h wattcp.h strings.h language.h netaddr.h misc.h timer.h rs232.h ip4_in.h ip4_out.h sock_ini.h chksum.h pcdbug.h pctcp.h pcsed.h pcconfig.h pcqueue.h pcicmp.h pcdhcp.h pcpkt.h pcarp.h
 pcarp.h: pcsarp.h
@@ -138,6 +138,6 @@ wattcp.h: target.h config.h fortify.h dxe_sym.h
 $(OBJDIR)/wdpmi.o: wdpmi.c wattcp.h strings.h language.h pcsed.h printk.h sock_ini.h cpumodel.h misc.h wdpmi.h nochkstk.h
 wdpmi.h: misc.h
 $(OBJDIR)/winmisc.o: winmisc.c socket.h udp_dom.h get_xby.h sock_ini.h
-$(OBJDIR)/winpcap.o: winpcap.c wattcp.h strings.h misc.h timer.h sock_ini.h language.h pcconfig.h pcdbug.h pcstat.h pcpkt.h winpcap.h NtddNdis.h Packet32.h
+$(OBJDIR)/winpcap.o: winpcap.c wattcp.h strings.h misc.h timer.h sock_ini.h language.h pcconfig.h pcdbug.h pcstat.h pcpkt.h winpcap.h ntddndis.h packet32.h
 $(OBJDIR)/x32vm.o: x32vm.c wattcp.h printk.h strings.h misc.h cpumodel.h x32vm.h
-neterr.c: djgpp/syserr.c        
+neterr.c: djgpp/syserr.c

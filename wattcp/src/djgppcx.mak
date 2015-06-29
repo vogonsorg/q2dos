@@ -3,7 +3,7 @@
 #     DO NOT EDIT.
 #
 # Makefile for Waterloo TCP/IP kernel
-#
+# FOR CROSS-COMPILING ON LINUX
 
 ASM_SOURCE = asmpkt.asm chksum0.asm cpumodel.asm
 
@@ -118,7 +118,7 @@ PKT_STUB = pkt_stub.h
 ########################################################################
 
 
-CC     = i586-pc-msdosdjgpp-gcc -m486
+CC     = i586-pc-msdosdjgpp-gcc -march=i486
 CFLAGS = -O2 -g -gcoff -I. -I../inc -W -Wall -fno-strength-reduce \
          -ffast-math #-ffunction-sections -fomit-frame-pointer
 
@@ -135,10 +135,10 @@ ZLIB_OBJS := $(subst .obj,.o,$(ZLIB_OBJS))
 all: $(PKT_STUB) $(TARGET)
 
 $(TARGET): $(OBJS) $(ZLIB_OBJS)
-	ar rs $@ $?
+	i586-pc-msdosdjgpp-ar rs $@ $?
 
 $(ZLIB_OBJS):
-	$(MAKE) -f djgpp.mak -C zlib
+	$(MAKE) -f djgppcx.mak -C zlib
 
 $(OBJDIR)/%.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $<
@@ -154,19 +154,11 @@ language.c: language.l
 	flex -8 -o$@ $<
 
 clean:
-	rm -f $(TARGET) $(OBJDIR)/*.o $(OBJDIR)/*.iS $(PKT_STUB)
+	rm -f $(TARGET) $(OBJDIR)/*.o $(OBJDIR)/*.iS $(PKT_STUB) asmpkt.lst asmpkt.bin ../util/bin2c
 	@echo Cleaning done
 
 -include djgpp/watt32.dep
 
-
-########################################################################
-
-
-########################################################################
-
-
-########################################################################
 
 doxygen:
 	doxygen doxyfile
@@ -175,7 +167,7 @@ doxygen:
 $(OBJDIR)/pcpkt.o: asmpkt.nas
 
 $(PKT_STUB): asmpkt.nas
-	../util/nasm32 -f bin -l asmpkt.lst -o asmpkt.bin asmpkt.nas
+	nasm -f bin -l asmpkt.lst -o asmpkt.bin asmpkt.nas
+	gcc -Wall -W ../util/bin2c.c -o ../util/bin2c
 	../util/bin2c asmpkt.bin > $@
-
 
