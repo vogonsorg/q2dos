@@ -2,20 +2,15 @@
 
 #include "../qcommon/qcommon.h"
 
-#include <ctype.h>
-#include <errno.h>
-#include <netdb.h>
 #include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/ioctl.h>
-#include <sys/param.h>
 #include <sys/socket.h>
 #include <sys/time.h>
-#include <sys/types.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <sys/param.h>
+#include <sys/ioctl.h>
 #include <sys/uio.h>
+#include <errno.h>
 
 #ifdef NeXT
 #include <libc.h>
@@ -111,7 +106,6 @@ qboolean	NET_CompareBaseAdr (netadr_t a, netadr_t b)
 			return true;
 		return false;
 	}
-	return false; // FS: Compiler warning
 }
 
 char	*NET_AdrToString (netadr_t a)
@@ -316,7 +310,7 @@ void NET_SendPacket (netsrc_t sock, int length, void *data, netadr_t to)
 {
 	int		ret;
 	struct sockaddr_in	addr;
-	int		net_socket = 0; // FS: Compiler warning
+	int		net_socket;
 
 	if ( to.type == NA_LOOPBACK )
 	{
@@ -461,8 +455,7 @@ int NET_Socket (char *net_interface, int port)
 	}
 
 	// make it non-blocking
-//	if (ioctl (newsocket, FIONBIO, &_true) == -1)
-	if (ioctlsocket (newsocket, FIONBIO, IOCTLARG_T &_true) == SOCKET_ERROR) // FS: From HoT.  May fix 2.05 WATTCP issue
+	if (ioctl (newsocket, FIONBIO, &_true) == -1)
 	{
 		Com_Printf ("ERROR: UDP_OpenSocket: ioctl FIONBIO:%s\n", NET_ErrorString());
 		return 0;
@@ -523,22 +516,22 @@ char *NET_ErrorString (void)
 }
 
 // sleeps msec or until net socket is ready
-void NET_Sleep(double msec)
+void NET_Sleep(int msec)
 {
     struct timeval timeout;
 	fd_set	fdset;
 	extern cvar_t *dedicated;
 //	extern qboolean stdin_active;
 
-	if ( /*!ip_sockets[NS_SERVER] || */(dedicated && !dedicated->value))
+//	if (!ip_sockets[NS_SERVER] || (dedicated && !dedicated->value))
 		return; // we're not a server, just run full speed
 
 	FD_ZERO(&fdset);
-//	if (stdin_active)
-	FD_SET(0, &fdset); // stdin is processed too
+	//if (stdin_active)
+//		FD_SET(0, &fdset); // stdin is processed too
 	FD_SET(ip_sockets[NS_SERVER], &fdset); // network socket
-	timeout.tv_sec = (long)msec/1000;
-	timeout.tv_usec = ((long)msec%1000)*1000;
+	timeout.tv_sec = msec/1000;
+	timeout.tv_usec = (msec%1000)*1000;
 	select(ip_sockets[NS_SERVER]+1, &fdset, NULL, NULL, &timeout);
 }
 
