@@ -1,6 +1,5 @@
 CC = gcc
-CFLAGS = -g -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer -std=gnu90
-#gnu90 for old style inlines, thanks to rayer
+CFLAGS = -g -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 DXE3GEN = dxe3gen
 
 GAME = g_ai.o \

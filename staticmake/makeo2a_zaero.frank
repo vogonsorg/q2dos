@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -g -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer -std=gnu90 #gnu90 for old style inlines, thanks to rayer
+CFLAGS = -g -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 SFLAGS = -Did386 -DREF_HARD_LINKED -DGAME_HARD_LINKED -DUSE_DOS_CD -DOGG_SUPPORT -DCLIENT_SPLIT_NETFRAME -DGAMESPY -DUSE_CURL
 WCFLAGS = -I dos/lib -I wattcp/inc
 WLFLAGS = -Ldos/lib -lau -Lwattcp/lib -lwatt
