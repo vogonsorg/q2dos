@@ -130,7 +130,7 @@ static GError InitUpdateList(GServerList serverlist)
 			return GE_NOSOCKET;
 
 		// FS: Set non-blocking sockets
-		if (ioctlsocket( serverlist->updatelist[i].s, FIONBIO,IOCTLARG_T &_true) == SOCKET_ERROR)
+		if (ioctlsocket( serverlist->updatelist[i].s, FIONBIO, (char *) &_true) == SOCKET_ERROR)
 		{
 #ifdef _WIN32
 			Com_Printf("ERROR: InitUpdateList: ioctl FIOBNIO:%i\n", WSAGetLastError());
