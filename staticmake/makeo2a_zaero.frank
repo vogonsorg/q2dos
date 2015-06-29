@@ -17,7 +17,7 @@ DOS = 	dos/cd_dos.o \
 	dos/snd_gus.o \
 	dos/sys_dos.o \
 	dos/in_dos.o \
-	linux/net_udp.o \
+	dos/net_watt.o \
 	dos/dos_v2.o \
 	dos/glob.o \
 	dos/sys_dosa.o \

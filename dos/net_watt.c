@@ -1,20 +1,27 @@
-// net_wins.c
+// net_watt.c
+// net_udp code using Watt-32 library
 
 #include "../qcommon/qcommon.h"
 
-#include <unistd.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <netinet/in.h>
-#include <netdb.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <stddef.h>
+#include <limits.h>
+#include <sys/time.h> /* struct timeval */
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <sys/param.h>
 #include <sys/ioctl.h>
-#include <sys/uio.h>
-#include <errno.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <tcp.h>		/* for select_s(), sock_init() & friends. */
 
-#ifdef NeXT
-#include <libc.h>
-#endif
+extern int	_watt_do_exit;	/* in sock_ini.h, but not in public headers. */
+
 
 netadr_t	net_local_adr;
 
@@ -106,6 +113,7 @@ qboolean	NET_CompareBaseAdr (netadr_t a, netadr_t b)
 			return true;
 		return false;
 	}
+	return false; // FS: Compiler warning
 }
 
 char	*NET_AdrToString (netadr_t a)
@@ -280,7 +288,7 @@ qboolean	NET_GetPacket (netsrc_t sock, netadr_t *net_from, sizebuf_t *net_messag
 		fromlen = sizeof(from);
 		ret = recvfrom (net_socket, net_message->data, net_message->maxsize
 			, 0, (struct sockaddr *)&from, &fromlen);
-		if (ret == -1)
+		if (ret == SOCKET_ERROR)
 		{
 			err = errno;
 
@@ -310,7 +318,7 @@ void NET_SendPacket (netsrc_t sock, int length, void *data, netadr_t to)
 {
 	int		ret;
 	struct sockaddr_in	addr;
-	int		net_socket;
+	int		net_socket = 0; // FS: Compiler warning
 
 	if ( to.type == NA_LOOPBACK )
 	{
@@ -348,7 +356,7 @@ void NET_SendPacket (netsrc_t sock, int length, void *data, netadr_t to)
 	NetadrToSockadr (&to, &addr);
 
 	ret = sendto (net_socket, data, length, 0, (struct sockaddr *)&addr, sizeof(addr) );
-	if (ret == -1)
+	if (ret == SOCKET_ERROR)
 	{
 		Com_Printf ("NET_SendPacket ERROR: %i\n", NET_ErrorString());
 	}
@@ -405,12 +413,12 @@ void	NET_Config (qboolean multiplayer)
 		{
 			if (ip_sockets[i])
 			{
-				close (ip_sockets[i]);
+				closesocket (ip_sockets[i]);
 				ip_sockets[i] = 0;
 			}
 			if (ipx_sockets[i])
 			{
-				close (ipx_sockets[i]);
+				closesocket (ipx_sockets[i]);
 				ipx_sockets[i] = 0;
 			}
 		}
@@ -433,6 +441,17 @@ NET_Init
 */
 void NET_Init (void)
 {
+	int i, err;
+
+/*	dbug_init();*/
+
+	i = _watt_do_exit;
+	_watt_do_exit = 0;
+	err = sock_init();
+	_watt_do_exit = i;
+	if (err != 0)
+		Com_Printf("WATTCP initialization failed (%s)", sock_init_err(err));
+	else	Com_Printf("WATTCP Initialized\n");
 }
 
 
@@ -448,21 +467,21 @@ int NET_Socket (char *net_interface, int port)
 	qboolean _true = true;
 	int	i = 1;
 
-	if ((newsocket = socket (PF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
+	if ((newsocket = socket (PF_INET, SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET)
 	{
 		Com_Printf ("ERROR: UDP_OpenSocket: socket:", NET_ErrorString());
 		return 0;
 	}
 
 	// make it non-blocking
-	if (ioctl (newsocket, FIONBIO, &_true) == -1)
+	if (ioctlsocket (newsocket, FIONBIO, (char *) &_true) == SOCKET_ERROR)
 	{
 		Com_Printf ("ERROR: UDP_OpenSocket: ioctl FIONBIO:%s\n", NET_ErrorString());
 		return 0;
 	}
 
 	// make it broadcast capable
-	if (setsockopt(newsocket, SOL_SOCKET, SO_BROADCAST, (char *)&i, sizeof(i)) == -1)
+	if (setsockopt(newsocket, SOL_SOCKET, SO_BROADCAST, (char *)&i, sizeof(i)) == SOCKET_ERROR)
 	{
 		Com_Printf ("ERROR: UDP_OpenSocket: setsockopt SO_BROADCAST:%s\n", NET_ErrorString());
 		return 0;
@@ -480,10 +499,10 @@ int NET_Socket (char *net_interface, int port)
 
 	address.sin_family = AF_INET;
 
-	if( bind (newsocket, (void *)&address, sizeof(address)) == -1)
+	if( bind (newsocket, (void *)&address, sizeof(address)) == SOCKET_ERROR)
 	{
 		Com_Printf ("ERROR: UDP_OpenSocket: bind: %s\n", NET_ErrorString());
-		close (newsocket);
+		closesocket (newsocket);
 		return 0;
 	}
 
@@ -516,22 +535,22 @@ char *NET_ErrorString (void)
 }
 
 // sleeps msec or until net socket is ready
-void NET_Sleep(int msec)
+void NET_Sleep(double msec)
 {
-    struct timeval timeout;
+	struct timeval timeout;
 	fd_set	fdset;
 	extern cvar_t *dedicated;
 //	extern qboolean stdin_active;
 
-//	if (!ip_sockets[NS_SERVER] || (dedicated && !dedicated->value))
+	if ( /*!ip_sockets[NS_SERVER] || */(dedicated && !dedicated->value))
 		return; // we're not a server, just run full speed
 
 	FD_ZERO(&fdset);
-	//if (stdin_active)
-//		FD_SET(0, &fdset); // stdin is processed too
+//	if (stdin_active)
+	FD_SET(0, &fdset); // stdin is processed too
 	FD_SET(ip_sockets[NS_SERVER], &fdset); // network socket
-	timeout.tv_sec = msec/1000;
-	timeout.tv_usec = (msec%1000)*1000;
-	select(ip_sockets[NS_SERVER]+1, &fdset, NULL, NULL, &timeout);
+	timeout.tv_sec = (long)msec/1000;
+	timeout.tv_usec = ((long)msec%1000)*1000;
+	select_s(ip_sockets[NS_SERVER]+1, &fdset, NULL, NULL, &timeout);
 }
 
