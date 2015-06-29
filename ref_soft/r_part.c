@@ -466,7 +466,7 @@ static byte BlendParticle100( int pcolor, int dstcolor )
 */
 
 #ifndef WIN32 // FS: GCC stuff -- Thanks to ggorts on vogons
-	#pragma GCC optimize ("-ffast-math")
+//	#pragma GCC optimize ("-ffast-math") // FS: Currently disabled because it's causing some issues with blaster particles
 #endif // WIN32
 
 void R_DrawParticle( void )
@@ -589,7 +589,7 @@ void R_DrawParticle( void )
 }
 //following in gcc44 and later
 #ifndef WIN32
-	#pragma GCC reset_options
+//	#pragma GCC reset_options
 #endif // WIN32
 
 #endif	// !id386
