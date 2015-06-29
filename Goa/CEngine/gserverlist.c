@@ -40,6 +40,13 @@ extern char *NET_ErrorString (void);
 #define SERVER_GROWBY 32
 #define LAN_SEARCH_TIME 3000 //3 sec
 
+// FS: From HoT: For ioctl sockets
+#ifdef __DJGPP__
+	#define	IOCTLARG_T	(char*)
+#else
+	#define IOCTLARG_T
+#endif // __DJGPP__
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -130,7 +137,7 @@ static GError InitUpdateList(GServerList serverlist)
 			return GE_NOSOCKET;
 
 		// FS: Set non-blocking sockets
-		if (ioctlsocket( serverlist->updatelist[i].s, FIONBIO, (char *) &_true) == SOCKET_ERROR)
+		if (ioctlsocket( serverlist->updatelist[i].s, FIONBIO,IOCTLARG_T &_true) == SOCKET_ERROR)
 		{
 #ifdef _WIN32
 			Com_Printf("ERROR: InitUpdateList: ioctl FIOBNIO:%i\n", WSAGetLastError());
