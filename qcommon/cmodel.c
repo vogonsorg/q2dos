@@ -119,7 +119,7 @@ int		c_pointcontents;
 int		c_traces, c_brush_traces;
 extern	cvar_t	*sv_entfile; // FS
 qboolean	entToggle; // FS
-char	entBSP[MAX_MAP_ENTSTRING]; // FS
+char	entBSP[MAX_MAP_ENTSTRING+1]; // FS
 
 
 /*
@@ -142,7 +142,6 @@ void CMod_LoadSubmodels (lump_t *l)
 	dmodel_t	*in;
 	cmodel_t	*out;
 	int			i, j, count;
-	unsigned	headnode;	// Knightmare added
 
 	in = (void *)(cmod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
@@ -166,16 +165,7 @@ void CMod_LoadSubmodels (lump_t *l)
 			out->maxs[j] = LittleFloat (in->maxs[j]) + 1;
 			out->origin[j] = LittleFloat (in->origin[j]);
 		}
-	//	out->headnode = LittleLong (in->headnode);
-		// Knightmare added
-		headnode = LittleLong (in->headnode);
-		if (headnode >= numnodes) {
-			Com_DPrintf(DEVELOPER_MSG_STANDARD, "CMod_LoadSubmodels: bad headnode\n");
-			out->headnode = 0;
-		}
-		else
-			out->headnode = headnode;
-		// end Knightmare
+		out->headnode = LittleLong (in->headnode);
 	}
 }
 
@@ -225,7 +215,6 @@ void CMod_LoadNodes (lump_t *l)
 	int			child;
 	cnode_t		*out;
 	int			i, j, count;
-	int			plane_num;	// Knightmare added
 	
 	in = (void *)(cmod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
@@ -243,19 +232,10 @@ void CMod_LoadNodes (lump_t *l)
 
 	for (i=0 ; i<count ; i++, out++, in++)
 	{
-	//	out->plane = map_planes + LittleLong(in->planenum);
-		// Knightmare added
-		plane_num = LittleLong(in->planenum);
-		if (plane_num >= numplanes)
-			Com_Error (ERR_DROP, "CMod_LoadNodes: bad planenum");
-		out->plane = map_planes + plane_num;
-	//	out->parent = -1;
-		// end Knightmare
+		out->plane = map_planes + LittleLong(in->planenum);
 		for (j=0 ; j<2 ; j++)
 		{
 			child = LittleLong (in->children[j]);
-			if (child >= count)		// Knightmare added
-				Com_Error (ERR_DROP, "CMod_LoadNodes: bad nodenum");
 			out->children[j] = child;
 		}
 	}
@@ -273,7 +253,6 @@ void CMod_LoadBrushes (lump_t *l)
 	dbrush_t	*in;
 	cbrush_t	*out;
 	int			i, count;
-	int			lastside;	// Knightmare added
 	
 	in = (void *)(cmod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
@@ -292,11 +271,6 @@ void CMod_LoadBrushes (lump_t *l)
 		out->firstbrushside = LittleLong(in->firstside);
 		out->numsides = LittleLong(in->numsides);
 		out->contents = LittleLong(in->contents);
-		// Knightmare added
-		lastside = out->firstbrushside + out->numsides;
-		if ( lastside <  out->firstbrushside || lastside > numbrushsides )
-			Com_Error (ERR_DROP, "CMod_LoadBrushes: bad brushsides");
-		// end Knightmare
 	}
 
 }
@@ -338,14 +312,6 @@ void CMod_LoadLeafs (lump_t *l)
 
 		if (out->cluster >= numclusters)
 			numclusters = out->cluster + 1;
-		// Knightmare added
-		if (out->cluster < -1)	
-			Com_Error (ERR_DROP, "CMod_LoadLeafs: bad cluster");
-		if (out->area >= numareas)
-			Com_Error (ERR_DROP, "CMod_LoadLeafs: bad area");
-		if ( (out->firstleafbrush + out->numleafbrushes) > numleafbrushes )
-			Com_Error (ERR_DROP, "CMod_LoadLeafs: bad leafbrushes");
-		// end Knightmare
 	}
 
 	if (map_leafs[0].contents != CONTENTS_SOLID)
@@ -434,11 +400,7 @@ void CMod_LoadLeafBrushes (lump_t *l)
 	numleafbrushes = count;
 
 	for ( i=0 ; i<count ; i++, in++, out++)
-	{
 		*out = LittleShort (*in);
-		if (*out >= numbrushes)	// Knightmare added
-			Com_Error (ERR_DROP, "CMod_LoadLeafBrushes: bad brushnum");
-	}
 }
 
 /*
@@ -469,12 +431,10 @@ void CMod_LoadBrushSides (lump_t *l)
 	for ( i=0 ; i<count ; i++, in++, out++)
 	{
 		num = LittleShort (in->planenum);
-		if ( num >= numplanes)	// Knightmare added
-			Com_Error (ERR_DROP, "CMod_LoadBrushSides: bad planenum");
 		out->plane = &map_planes[num];
 		j = LittleShort (in->texinfo);
 		if (j >= numtexinfo)
-			Com_Error (ERR_DROP, "CMod_LoadBrushSides: Bad brushside texinfo");
+			Com_Error (ERR_DROP, "Bad brushside texinfo");
 		out->surface = &map_surfaces[j];
 	}
 }
@@ -490,7 +450,6 @@ void CMod_LoadAreas (lump_t *l)
 	carea_t		*out;
 	darea_t 	*in;
 	int			count;
-	int			lastareaportal;	// Knightmare added
 
 	in = (void *)(cmod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
@@ -509,11 +468,6 @@ void CMod_LoadAreas (lump_t *l)
 		out->firstareaportal = LittleLong (in->firstareaportal);
 		out->floodvalid = 0;
 		out->floodnum = 0;
-		// Knightmare added
-		lastareaportal = out->firstareaportal + out->numareaportals;
-		if ( lastareaportal < out->firstareaportal || lastareaportal > numareaportals )
-			Com_Error (ERR_DROP, "CMod_LoadAreas: bad areaportals");
-		// end Knightmare
 	}
 }
 
@@ -555,35 +509,18 @@ CMod_LoadVisibility
 void CMod_LoadVisibility (lump_t *l)
 {
 	int		i;
-	int		count;	// Knightmare added
 
 	numvisibility = l->filelen;
 	if (l->filelen > MAX_MAP_VISIBILITY)
 		Com_Error (ERR_DROP, "Map has too large visibility lump");
 
-	// Knightmare added
-	count = l->filelen / sizeof(byte);
-	// Removed, as this prevents un-VISed maps from loading
-//	if (count < 4)
-//		Com_Error (ERR_DROP, "Map has too small visibility header");
-	// end Knightmare
-
 	memcpy (map_visibility, cmod_base + l->fileofs, l->filelen);
 
 	map_vis->numclusters = LittleLong (map_vis->numclusters);
-	// Knightmare added
-	if ( map_vis->numclusters > MAX_MAP_LEAFS )
-		Com_Error (ERR_DROP, "Map has bad visibility numclusters");
-	if ( map_vis->numclusters > (count - 4) / 8 )
-		Com_Error (ERR_DROP, "Map has too small visibility header");
-	// end Knightmare
-
 	for (i=0 ; i<map_vis->numclusters ; i++)
 	{
 		map_vis->bitofs[i][0] = LittleLong (map_vis->bitofs[i][0]);
 		map_vis->bitofs[i][1] = LittleLong (map_vis->bitofs[i][1]);
-		if ( map_vis->bitofs[i][0] >= count || map_vis->bitofs[i][1] >= count )	// Knightmare added
-			Com_Error (ERR_DROP, "Map has bad visibility bitofs");
 	}
 }
 
@@ -640,81 +577,17 @@ void CMod_LoadEntityString (lump_t *l, char *name)
 	// end Knightmare
 
 	numentitychars = l->filelen;
+
 	if (l->filelen + 1 > sizeof(map_entitystring)) // jit fix
-	//if (l->filelen > MAX_MAP_ENTSTRING)
+	{
 		Com_Error (ERR_DROP, "Map has too large entity lump");
+	}
+
 //	map_entitystring = (char *)Hunk_Alloc (l->filelen + 1);
 	memset(map_entitystring, 0, sizeof(map_entitystring));
-	memcpy (map_entitystring, cmod_base + l->fileofs, l->filelen);
+	memcpy(map_entitystring, cmod_base + l->fileofs, l->filelen);
 }
 
-// Knightmare added
-/*
-=================
-CMod_ValidateAreaPortals
-=================
-*/
-void CMod_ValidateAreaPortals (void)
-{
-	dareaportal_t	*p;
-	int				i;
-
-	for (i=0, p = &map_areaportals[0]; i < numareaportals; i++, p++)
-	{
-		if (p->portalnum >= MAX_MAP_AREAPORTALS)
-			Com_Error (ERR_DROP, "CMod_ValidateAreaPortal: bad portalnum");
-		if (p->otherarea >= numareas)
-			Com_Error (ERR_DROP, "CMod_ValidateAreaPortal: bad otherarea");
-	}
-}
-
-#if 0
-/*
-=================
-CMod_SetNodeParent
-=================
-*/
-void CMod_SetNodeParent (cnode_t *node)
-{
-	cnode_t	*child;
-
-	while (node->plane)
-	{
-		child = &map_nodes[node->children[0]];
-		if (child->parent != -1)
-			Com_Error (ERR_DROP, "CMod_ValidateTree: cycle encountered");
-		child->parent = (node - &map_nodes[0]) / sizeof(cnode_t);
-		CMod_SetNodeParent (child);
-		child = &map_nodes[node->children[1]];
-		if (child->parent != -1)
-			Com_Error (ERR_DROP, "CMod_ValidateTree: cycle encountered");
-		child->parent = (node - &map_nodes[0]) / sizeof(cnode_t);
-		node = child;
-	}
-}
-
-
-/*
-=================
-CMod_ValidateTree
-=================
-*/
-void CMod_ValidateTree (void)
-{
-	cmodel_t	*mod;
-	int			i;
-
-	for (i=0, mod = &map_cmodels[0]; i < numcmodels; i++, mod++)
-	{
-		if ( i == 0 && mod->headnode != 0)
-			Com_Error (ERR_DROP, "CMod_ValidateTree: cmodel 0 headnode is not the first node");
-
-		if (mod->headnode >= 0)
-			CMod_SetNodeParent (&map_nodes[mod->headnode]);
-	}
-}
-#endif
-// end Knightmare
 
 
 /*
@@ -731,10 +604,8 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 	dheader_t		header;
 	int				length;
 	static unsigned	last_checksum;
-	int				ofs, len, end;	// Knightmare added
 
 	map_noareas = Cvar_Get ("map_noareas", "0", 0);
-
 	// FS: Check to see if entfile changed.  ->modified isn't working right, so I'll half ass this.
 	if ((sv_entfile->value >= 1 && entToggle == false) || (sv_entfile->value == 0 && entToggle == true)) // Knightmare:  Logic adjustment
 		map_name[0] = 0;
@@ -793,24 +664,9 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 		Com_Error (ERR_DROP, "CMod_LoadBrushModel: %s has wrong version number (%i should be %i)"
 		, name, header.version, BSPVERSION);
 
-	// Knightmare added- check lump extents
-	for (i=0; i<HEADER_LUMPS; i++)
-	{
-		ofs = LittleLong(header.lumps[i].fileofs);
-		len = LittleLong(header.lumps[i].filelen);
-		end = ofs + len;
-		if (ofs > end || ofs > length || end > length)
-		{
-			Com_Error (ERR_DROP, "CM_LoadMap: bad lump extents");
-	
-		}
-	}
-	// end Knightmare
-
 	cmod_base = (byte *)buf;
 
 	// load into heap
-	/*
 	CMod_LoadSurfaces (&header.lumps[LUMP_TEXINFO]);
 	CMod_LoadLeafs (&header.lumps[LUMP_LEAFS]);
 	CMod_LoadLeafBrushes (&header.lumps[LUMP_LEAFBRUSHES]);
@@ -822,26 +678,7 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 	CMod_LoadAreas (&header.lumps[LUMP_AREAS]);
 	CMod_LoadAreaPortals (&header.lumps[LUMP_AREAPORTALS]);
 	CMod_LoadVisibility (&header.lumps[LUMP_VISIBILITY]);
-	CMod_LoadEntityString (&header.lumps[LUMP_ENTITIES]);
-	*/
-
-	CMod_LoadVisibility (&header.lumps[LUMP_VISIBILITY]);
-	CMod_LoadSurfaces (&header.lumps[LUMP_TEXINFO]);
-	CMod_LoadPlanes (&header.lumps[LUMP_PLANES]);
-	CMod_LoadBrushSides (&header.lumps[LUMP_BRUSHSIDES]);
-	CMod_LoadBrushes (&header.lumps[LUMP_BRUSHES]);
-	CMod_LoadLeafBrushes (&header.lumps[LUMP_LEAFBRUSHES]);
-	CMod_LoadAreaPortals (&header.lumps[LUMP_AREAPORTALS]);
-	CMod_LoadAreas (&header.lumps[LUMP_AREAS]);
-	CMod_LoadLeafs (&header.lumps[LUMP_LEAFS]);
-	CMod_LoadNodes (&header.lumps[LUMP_NODES]);
-	CMod_LoadSubmodels (&header.lumps[LUMP_MODELS]);
 	CMod_LoadEntityString (&header.lumps[LUMP_ENTITIES], name); // FS: Added name for sv_entfile stuff
-
-	// Knightmare added
-	CMod_ValidateAreaPortals ();
-//	CMod_ValidateTree ();
-	// end Knightmare
 
 	FS_FreeFile (buf);
 
@@ -850,8 +687,7 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 	memset (portalopen, 0, sizeof(portalopen));
 	FloodAreaConnections ();
 
-//	strncpy (map_name, name);
-	Q_strncpyz (map_name, name, sizeof(map_name));
+	strcpy (map_name, name);
 
 	return &map_cmodels[0];
 }

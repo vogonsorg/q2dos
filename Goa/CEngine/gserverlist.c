@@ -418,7 +418,7 @@ static GError ServerListReadList(GServerList serverlist)
 	data[len + oldlen] = 0; //null terminate it
 	// data is in the form of '\ip\1.2.3.4:1234\ip\1.2.3.4:1234\final\'
 	Com_DPrintf(DEVELOPER_MSG_GAMESPY, "List xfer data: %s\n", data);
-	
+
 	lastip = data;
 	while (*lastip != '\0')
 	{
