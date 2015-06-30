@@ -30,15 +30,14 @@ char *lin;
 #endif
 
 asm("movl %0,%%ebx"::"m"(size));
-asm("
-movw $0x100,%ax
-addl $16,%ebx
-shrl $4,%ebx
-int $0x31
-jnc go
-xorl %edx,%edx
-go:
-movzx %ax,%eax
+asm("movw $0x100,%ax\n\
+addl $16,%ebx\n\
+shrl $4,%ebx\n\
+int $0x31\n\
+jnc go\n\
+xorl %edx,%edx\n\
+go:\n\
+movzx %ax,%eax\n\
 shll $4,%eax");
 asm("movl %%eax,%0":"=m"(lin));
 asm("movw %%dx,%0":"=m"(sel));
