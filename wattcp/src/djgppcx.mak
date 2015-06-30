@@ -136,7 +136,7 @@ ZLIB_OBJS := $(subst .obj,.o,$(ZLIB_OBJS))
 
 all: $(PKT_STUB) $(TARGET)
 
-$(TARGET): $(OBJS) $(ZLIB_OBJS)
+$(TARGET): $(OBJS) #$(ZLIB_OBJS)
 	i586-pc-msdosdjgpp-ar rs $@ $?
 
 $(ZLIB_OBJS):
