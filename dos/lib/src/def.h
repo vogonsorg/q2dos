@@ -7,10 +7,10 @@
 #include <fcntl.h>
 #ifdef __DJGPP__
 #ifndef ZDM
-#include <SYS\nearptr.h>
+#include <sys/nearptr.h>
 #else
-#include <SYS\farptr.h>
-#include <SYS\movedata.h>
+#include <sys/farptr.h>
+#include <sys/movedata.h>
 #include <dpmi.h>
 #include <go32.h>
 #define __djgpp_conventional_base 0
