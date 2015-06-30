@@ -119,10 +119,11 @@ PKT_STUB = pkt_stub.h
 
 
 CC     = gcc
-CFLAGS = -O2 -g -gcoff -I. -I../inc -W -Wall -fno-strength-reduce \
-         -ffast-math #-ffunction-sections -fomit-frame-pointer
+CFLAGS = -g -O2 -I. -I../inc -W -Wall -ffast-math -fomit-frame-pointer
+#-gcoff
+#-ffunction-sections -fno-strength-reduce
 
-AS     = as --gdwarf2
+AS     = as
 TARGET = ../lib/libwatt.a
 OBJDIR = djgpp
 
@@ -134,7 +135,7 @@ ZLIB_OBJS := $(subst .obj,.o,$(ZLIB_OBJS))
 
 all: $(PKT_STUB) $(TARGET)
 
-$(TARGET): $(OBJS) $(ZLIB_OBJS)
+$(TARGET): $(OBJS) #$(ZLIB_OBJS)
 	ar rs $@ $?
 
 $(ZLIB_OBJS):
@@ -160,22 +161,9 @@ clean:
 -include djgpp/watt32.dep
 
 
-########################################################################
-
-
-########################################################################
-
-
-########################################################################
-
-doxygen:
-	doxygen doxyfile
-
-
 $(OBJDIR)/pcpkt.o: asmpkt.nas
 
 $(PKT_STUB): asmpkt.nas
 	../util/nasm32 -f bin -l asmpkt.lst -o asmpkt.bin asmpkt.nas
 	../util/bin2c asmpkt.bin > $@
-
 

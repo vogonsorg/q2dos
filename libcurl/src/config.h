@@ -1,1 +1,1 @@
-'#include "../lib/config.dos"'
+#include "../lib/config.dos"

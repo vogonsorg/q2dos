@@ -318,7 +318,7 @@ card->pcmout_buffer=(char *)card->dm->linearptr;
  aui->card_DMABUFF=card->pcmout_buffer;
 
 #ifdef __DJGPP__
-(unsigned int)aui->card_DMABUFF+=__djgpp_conventional_base;
+ aui->card_DMABUFF=(char*)((unsigned int)aui->card_DMABUFF + __djgpp_conventional_base);
 #endif
 
  mpxplay_debugf(ENS_DEBUG_OUTPUT,"buffer init: pcmoutbuf:%8.8X size:%d",(unsigned long)card->pcmout_buffer,card->pcmout_bufsize);

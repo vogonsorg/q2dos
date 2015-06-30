@@ -3,6 +3,7 @@
 #     DO NOT EDIT.
 #
 # Makefile for Waterloo TCP/IP kernel
+#
 # FOR CROSS-COMPILING ON LINUX
 
 ASM_SOURCE = asmpkt.asm chksum0.asm cpumodel.asm
@@ -118,11 +119,12 @@ PKT_STUB = pkt_stub.h
 ########################################################################
 
 
-CC     = i586-pc-msdosdjgpp-gcc -march=i486
-CFLAGS = -O2 -g -gcoff -I. -I../inc -W -Wall -fno-strength-reduce \
-         -ffast-math #-ffunction-sections -fomit-frame-pointer
+CC     = i586-pc-msdosdjgpp-gcc
+CFLAGS = -g -O2 -I. -I../inc -W -Wall -ffast-math -fomit-frame-pointer
+#-gcoff
+#-ffunction-sections -fno-strength-reduce
 
-AS     = i586-pc-msdosdjgpp-as  #--gdwarf2
+AS     = i586-pc-msdosdjgpp-as
 TARGET = ../lib/libwatt.a
 OBJDIR = djgpp
 
@@ -134,7 +136,7 @@ ZLIB_OBJS := $(subst .obj,.o,$(ZLIB_OBJS))
 
 all: $(PKT_STUB) $(TARGET)
 
-$(TARGET): $(OBJS) $(ZLIB_OBJS)
+$(TARGET): $(OBJS) #$(ZLIB_OBJS)
 	i586-pc-msdosdjgpp-ar rs $@ $?
 
 $(ZLIB_OBJS):
@@ -158,10 +160,6 @@ clean:
 	@echo Cleaning done
 
 -include djgpp/watt32.dep
-
-
-doxygen:
-	doxygen doxyfile
 
 
 $(OBJDIR)/pcpkt.o: asmpkt.nas

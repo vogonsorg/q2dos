@@ -603,7 +603,7 @@ if(!card->dm)	return 0;
  pcmbufp<<=1;
 
 #ifdef __DJGPP__
-(unsigned int)card->virtualpagetable+=__djgpp_conventional_base;
+ card->virtualpagetable=(uint32_t*)((unsigned int)card->virtualpagetable + __djgpp_conventional_base);
 #endif
 
 #ifdef ZDM
@@ -626,8 +626,8 @@ _farnspokel((unsigned int)&card->virtualpagetable[pagecount],((uint32_t)card->si
  aui->card_DMABUFF=card->pcmout_buffer;
 
 #ifdef __DJGPP__
-(unsigned int)aui->card_DMABUFF+=__djgpp_conventional_base;
-(unsigned int)card->virtualpagetable-=__djgpp_conventional_base;
+ aui->card_DMABUFF=(char *)((unsigned int)aui->card_DMABUFF + __djgpp_conventional_base);
+ card->virtualpagetable=(uint32_t*)((unsigned int)card->virtualpagetable - __djgpp_conventional_base);
 #endif
 
  mpxplay_debugf(XFI_DEBUG_OUTPUT,"buffer init: pcmoutbuf:%8.8X size:%d",(unsigned long)card->pcmout_buffer,card->pcmout_bufsize);

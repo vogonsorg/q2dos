@@ -15,11 +15,10 @@ OBJS = $(OBJDIR)\adler32.obj  $(OBJDIR)\compress.obj \
        $(OBJDIR)\inflate.obj  $(OBJDIR)\infback.obj  \
        $(OBJDIR)\inftrees.obj $(OBJDIR)\inffast.obj
 
-########################################################################
-
 
 CC     = gcc
-CFLAGS = -O2 -g -gcoff -W -Wall -I../../inc
+CFLAGS = -g -O2 -W -Wall -I../../inc
+#-gcoff
 OBJDIR = ../djgpp
 
 OBJS := $(subst \,/,$(OBJS))
@@ -34,7 +33,4 @@ clean:
 	rm -f $(OBJS)
 
 -include ../djgpp/zlib.dep
-
-########################################################################
-
 

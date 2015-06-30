@@ -604,7 +604,7 @@ if(!card->dm)goto err_adetect;
  aui->card_DMABUFF=card->pcmout_buffer;
 
 #ifdef __DJGPP__
-(unsigned int)aui->card_DMABUFF+=__djgpp_conventional_base;
+ aui->card_DMABUFF=(char *)((unsigned int)aui->card_DMABUFF + __djgpp_conventional_base);
 #endif
 
  // init chip

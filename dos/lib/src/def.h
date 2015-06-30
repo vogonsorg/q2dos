@@ -7,10 +7,10 @@
 #include <fcntl.h>
 #ifdef __DJGPP__
 #ifndef ZDM
-#include <SYS\nearptr.h>
+#include <sys/nearptr.h>
 #else
-#include <SYS\farptr.h>
-#include <SYS\movedata.h>
+#include <sys/farptr.h>
+#include <sys/movedata.h>
 #include <dpmi.h>
 #include <go32.h>
 #define __djgpp_conventional_base 0
@@ -311,7 +311,7 @@ typedef struct aucards_submixerchan_s{
 typedef struct aucards_onemixerchan_s{
  unsigned long mixchan;       // master,pcm,etc. & volume,mute-sw
  unsigned long subchannelnum; // sub-channels (mono (1) or left&right (2))
-#ifdef __WATCOMC__
+#if defined(__WATCOMC__) || (defined(__GNUC__) && __GNUC__ > 2)
  aucards_submixerchan_s submixerchans[]; // infos of 1 or 2 subchannels (reg,max,shift,flag)
 #else
  aucards_submixerchan_s submixerchans[0]; // infos of 1 or 2 subchannels (reg,max,shift,flag)
