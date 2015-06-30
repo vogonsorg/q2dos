@@ -3,6 +3,7 @@
 #     DO NOT EDIT.
 #
 # Makefile for zlib in Watt-32
+#
 # FOR CROSS-COMPILING ON LINUX
 
 SOURCE = adler32.c compress.c crc32.c gzio.c uncompr.c deflate.c \
@@ -17,7 +18,8 @@ OBJS = $(OBJDIR)\adler32.obj  $(OBJDIR)\compress.obj \
 
 
 CC     = i586-pc-msdosdjgpp-gcc
-CFLAGS = -O2 -g -gcoff -W -Wall -I../../inc
+CFLAGS = -g -O2 -W -Wall -I../../inc
+#-gcoff
 OBJDIR = ../djgpp
 
 OBJS := $(subst \,/,$(OBJS))
