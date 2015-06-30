@@ -1976,9 +1976,13 @@ static void CL_RefreshInputs (void)
 
 	// Update usercmd state
 	if (cls.state > ca_connecting)
+	{
 		CL_RefreshCmd ();
+	}
 	else
+	{
 		CL_RefreshMove ();
+	}
 }
 
 /*
@@ -2014,13 +2018,24 @@ void CL_Frame_Async (double msec)
 
 	// Don't allow setting maxfps too low or too high
 	if (net_maxfps->value < 10)
+	{
 		Cvar_SetValue("net_maxfps", 10);
+	}
+
 	if (net_maxfps->value > 90)
+	{
 		Cvar_SetValue("net_maxfps", 90);
+	}
+
 	if (r_maxfps->value < 10)
+	{
 		Cvar_SetValue("r_maxfps", 10);
+	}
+
 	if (r_maxfps->value > 1000)
+	{
 		Cvar_SetValue("r_maxfps", 1000);
+	}
 
 	packetDelta += msec;
 	renderDelta += msec;
@@ -2034,30 +2049,47 @@ void CL_Frame_Async (double msec)
 
 	// Don't extrapolate too far ahead
 	if (cls.netFrameTime > FRAMETIME_MAX)
+	{
 		cls.netFrameTime = FRAMETIME_MAX;
+	}
+
 	if (cls.renderFrameTime > FRAMETIME_MAX)
+	{
 		cls.renderFrameTime = FRAMETIME_MAX;
+	}
 
 	// If in the debugger last frame, don't timeout
 	if (msec > 5000)
+	{
 		cls.netchan.last_received = Sys_Milliseconds ();
+	}
 
 	if (!cl_timedemo->value)
 	{	// Don't flood packets out while connecting
 		if (cls.state == ca_connected && packetDelta < 100)
+		{
 			packetFrame = false;
+		}
 
 		if (packetDelta < 1000.0 / net_maxfps->value)
+		{
 			packetFrame = false;
+		}
 		else if (cls.netFrameTime == cls.renderFrameTime)
+		{
 			packetFrame = false;
+		}
 
 		if (renderDelta < 1000.0 / r_maxfps->value)
+		{
 			renderFrame = false;
+		}
 
 		// Stuff that only needs to run at 10FPS
 		if (miscDelta < 1000.0 / 10)
+		{
 			miscFrame = false;
+		}
 		
 		if (!packetFrame && !renderFrame && !cls.forcePacket && !userinfo_modified)
 		{	// Pooy's CPU usage fix
@@ -2065,10 +2097,14 @@ void CL_Frame_Async (double msec)
 			if (cl_sleep->value)
 			{
 				int temptime = min( (1000.0 / net_maxfps->value - packetDelta), (1000.0 / r_maxfps->value - renderDelta) );
+
 				if (temptime > 1)
+				{
 					Sys_Sleep (1);
+				}
 			} // end CPU usage fix
 #endif
+
 			return;
 		}
 		
@@ -2088,7 +2124,9 @@ void CL_Frame_Async (double msec)
 
 	// Update the inputs (keyboard, mouse, console)
 	if (packetFrame || renderFrame)
+	{
 		CL_RefreshInputs ();
+	}
 
 	if (cls.forcePacket || userinfo_modified)
 	{
@@ -2136,23 +2174,30 @@ void CL_Frame_Async (double msec)
 		CL_PredictMovement ();
 
 		if (!cl.refresh_prepped && cls.state == ca_active)
+		{
 			CL_PrepRefresh ();
-
-		// Predict all unacknowledged movements
-	//	CL_PredictMovement ();
+		}
 
 		// update the screen
 		if (host_speeds->value)
+		{
 			time_before_ref = Sys_Milliseconds ();
+		}
+
 		SCR_UpdateScreen ();
+
 		if (host_speeds->value)
+		{
 			time_after_ref = Sys_Milliseconds ();
+		}
 
 		// Update audio
 		S_Update (cl.refdef.vieworg, cl.v_forward, cl.v_right, cl.v_up);
 		
 		if (miscFrame)
+		{
 			CDAudio_Update();
+		}
 
 		// Advance local effects for next frame
 		CL_RunDLights ();
@@ -2169,15 +2214,21 @@ void CL_Frame_Async (double msec)
 				if (!lasttimecalled)
 				{
 					lasttimecalled = Sys_Milliseconds();
+
 					if (log_stats_file)
+					{
 						fprintf( log_stats_file, "0\n" );
+					}
 				}
 				else
 				{
 					int now = Sys_Milliseconds();
 
 					if (log_stats_file)
+					{
 						fprintf( log_stats_file, "%f\n", now - lasttimecalled );
+					}
+
 					lasttimecalled = now;
 				}
 			}
@@ -2230,10 +2281,11 @@ void CL_Frame (double msec)
 	float	fps;
 
 	if (dedicated->value)
+	{
 		return;
+	}
 
 #ifdef CLIENT_SPLIT_NETFRAME
-//	if (cl_async->value)
 	if (cl_async->value && !cl_timedemo->value)
 	{
 		CL_Frame_Async (msec);
@@ -2244,15 +2296,22 @@ void CL_Frame (double msec)
 	extratime += msec;
 
 
-   if (cl_maxfps->value)
-      fps = bound(5, cl_maxfps->value, 1000); // FS: Don't go under 5
-   else
-      fps = bound(5, cl_maxfps->value, 72); // FS: Default to 72hz if nothing is set
+	if (cl_maxfps->value)
+	{
+		fps = bound(5, cl_maxfps->value, 1000); // FS: Don't go under 5
+	}
+	else
+	{
+		fps = bound(5, cl_maxfps->value, 72); // FS: Default to 72hz if nothing is set
+	}
 
 	if (!cl_timedemo->value)
 	{
 		if (cls.state == ca_connected && extratime < 100)
+		{
 			return;			// don't flood packets out while connecting
+		}
+
 		if (extratime < 1000/fps)
 		{
 		#if 0
@@ -2260,10 +2319,14 @@ void CL_Frame (double msec)
 			if (cl_sleep->value)
 			{
 				int temptime = 1000 / cl_maxfps->value - extratime;
+
 				if (temptime > 1)
+				{
 					Sys_Sleep (1);
+				}
 			} // end CPU usage fix
 		#endif
+
 			return;			// framerate is too high
 		}
 	}
@@ -2277,18 +2340,19 @@ void CL_Frame (double msec)
 	cls.realtime = curtime;
 
 	extratime = 0;
-#if 0
-	if (cls.netFrameTime > (1.0 / cl_minfps->value))
-		cls.netFrameTime = (1.0 / cl_minfps->value);
-#else
-	if (cls.netFrameTime > (1.0 / 5))
+
+	if (cls.netFrameTime > (1.0 / 5)) // FS: 5 -- Minfps
+	{
 		cls.netFrameTime = (1.0 / 5);
-#endif
+	}
+
 	cls.renderFrameTime = cls.netFrameTime;
 
 	// if in the debugger last frame, don't timeout
 	if (msec > 5000)
+	{
 		cls.netchan.last_received = Sys_Milliseconds ();
+	}
 
 #ifdef USE_CURL	// HTTP downloading from R1Q2
 	CL_RunHTTPDownloads ();
@@ -2315,15 +2379,24 @@ void CL_Frame (double msec)
 
 	// allow rendering DLL change
 	VID_CheckChanges ();
+
 	if (!cl.refresh_prepped && cls.state == ca_active)
+	{
 		CL_PrepRefresh ();
+	}
 
 	// update the screen
 	if (host_speeds->value)
+	{
 		time_before_ref = Sys_Milliseconds ();
+	}
+
 	SCR_UpdateScreen ();
+
 	if (host_speeds->value)
+	{
 		time_after_ref = Sys_Milliseconds ();
+	}
 
 	// update audio
 	S_Update (cl.refdef.vieworg, cl.v_forward, cl.v_right, cl.v_up);
@@ -2345,15 +2418,21 @@ void CL_Frame (double msec)
 			if ( !lasttimecalled )
 			{
 				lasttimecalled = Sys_Milliseconds();
+
 				if ( log_stats_file )
+				{
 					fprintf( log_stats_file, "0\n" );
+				}
 			}
 			else
 			{
 				double now = Sys_Milliseconds();
 
 				if ( log_stats_file )
+				{
 					fprintf( log_stats_file, "%d\n", (int)(now - lasttimecalled) );
+				}
+
 				lasttimecalled = now;
 			}
 		}
@@ -2371,7 +2450,9 @@ CL_Init
 void CL_Init (void)
 {
 	if (dedicated->value)
+	{
 		return;		// nothing running on the client
+	}
 
 	// all archived variables will now be loaded
 
@@ -2448,21 +2529,28 @@ gamespyBrowser_t browserList[MAX_SERVERS];
 void CL_PrintBrowserList_f (void)
 {
 	int i = 0;
+
 	for ( i = 0; i <= MAX_SERVERS; i++)
 	{
 		if(browserList[i].hostname[0] != 0)
+		{
 			Com_Printf("%02d:  %s:%d [%d] %s %d/%d %s\n", i+1, browserList[i].ip, browserList[i].port, browserList[i].ping, browserList[i].hostname, browserList[i].curPlayers, browserList[i].maxPlayers, browserList[i].mapname);
+		}
 		else // FS: if theres nothing there the rest of the list is old garbage, bye.
+		{
 			break;
+		}
 	}
 }
 
 void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2)
 {
 	GServer server;
+
 	if (msg == LIST_PROGRESS)
 	{
 		server = (GServer)param1;
+
 		if(ServerGetIntValue(server,"numplayers",0) && gspyCur <= MAX_SERVERS) // FS: Only show populated servers
 		{
 			Q_strncpyz(browserList[gspyCur].ip, ServerGetAddress(server), sizeof(browserList[gspyCur].ip));
@@ -2474,7 +2562,9 @@ void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1,
 			browserList[gspyCur].maxPlayers = ServerGetIntValue(server,"maxclients",0);
 
 			if (cls.key_dest != key_menu) // FS: Only print this from an slist2 command, not the server browser.
+			{
 				Com_Printf("%s:%d [%d] %s %d/%d %s\n", browserList[gspyCur].ip, browserList[gspyCur].port, browserList[gspyCur].ping, browserList[gspyCur].hostname, browserList[gspyCur].curPlayers, browserList[gspyCur].maxPlayers, browserList[gspyCur].mapname);
+			}
 
 			gspyCur++;
 		}
@@ -2483,7 +2573,7 @@ void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1,
 
 void CL_PingNetServers_f (void)
 {
-	char goa_secret_key[256];
+	char goa_secret_key[7];
 	int error = 0; // FS: Grab the error code
 	int allocatedSockets;
 
@@ -2511,15 +2601,17 @@ void CL_PingNetServers_f (void)
 	goa_secret_key[3] = '0';
 	goa_secret_key[4] = 'x';
 	goa_secret_key[5] = 'g';
-	goa_secret_key[6] = '\0';
+	goa_secret_key[6] = '\0'; // FS: Gamespy requires a null terminator at the end of the secret key
 
 	Com_Printf("\x02Grabbing populated server list from GameSpy master. . .\n");
+
 	cls.gamespyupdate = 1;
 	cls.gamespypercent = 0;
 
 	allocatedSockets = bound(5, cl_master_server_queries->value, 40);
 
 	SCR_UpdateScreen(); // FS: Force an update so the percentage bar shows some progress
+
 	serverlist = ServerListNew("quake2","quake2",goa_secret_key,allocatedSockets,ListCallBack,GCALLBACK_FUNCTION,NULL);
     error = ServerListUpdate(serverlist,false);
 
@@ -2532,13 +2624,14 @@ void CL_PingNetServers_f (void)
 		ServerListHalt( serverlist );
 		ServerListClear( serverlist );
 	}
+
 	cls.gamespyupdate = 0;
 	cls.gamespypercent = 0;
 	ServerListClear( serverlist );
     ServerListFree(serverlist);
 	serverlist = NULL; // FS: This is on purpose so future ctrl+c's won't try to close empty serverlists
 }
-#endif
+#endif // GAMESPY
 
 //=============================================================================
 

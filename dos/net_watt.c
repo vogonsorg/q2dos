@@ -1,4 +1,4 @@
-// net_watt.c
+// net_watt.c by sezero
 // net_udp code using Watt-32 library
 
 #include "../qcommon/qcommon.h"
@@ -81,7 +81,10 @@ void SockadrToNetadr (struct sockaddr_in *s, netadr_t *a)
 qboolean	NET_CompareAdr (netadr_t a, netadr_t b)
 {
 	if (a.ip[0] == b.ip[0] && a.ip[1] == b.ip[1] && a.ip[2] == b.ip[2] && a.ip[3] == b.ip[3] && a.port == b.port)
+	{
 		return true;
+	}
+
 	return false;
 }
 
@@ -95,24 +98,35 @@ Compares without the port
 qboolean	NET_CompareBaseAdr (netadr_t a, netadr_t b)
 {
 	if (a.type != b.type)
+	{
 		return false;
+	}
 
 	if (a.type == NA_LOOPBACK)
+	{
 		return true;
+	}
 
 	if (a.type == NA_IP)
 	{
 		if (a.ip[0] == b.ip[0] && a.ip[1] == b.ip[1] && a.ip[2] == b.ip[2] && a.ip[3] == b.ip[3])
+		{
 			return true;
+		}
+
 		return false;
 	}
 
 	if (a.type == NA_IPX)
 	{
 		if ((memcmp(a.ipx, b.ipx, 10) == 0))
+		{
 			return true;
+		}
+
 		return false;
 	}
+
 	return false; // FS: Compiler warning
 }
 
@@ -159,11 +173,13 @@ qboolean	NET_StringToSockaddr (char *s, struct sockaddr *sadr)
 	strcpy (copy, s);
 	// strip off a trailing :port if present
 	for (colon = copy ; *colon ; colon++)
+	{
 		if (*colon == ':')
 		{
 			*colon = 0;
 			((struct sockaddr_in *)sadr)->sin_port = htons((short)atoi(colon+1));	
 		}
+	}
 	
 	if (copy[0] >= '0' && copy[0] <= '9')
 	{
@@ -172,7 +188,10 @@ qboolean	NET_StringToSockaddr (char *s, struct sockaddr *sadr)
 	else
 	{
 		if (! (h = gethostbyname(copy)) )
+		{
 			return 0;
+		}
+
 		*(int *)&((struct sockaddr_in *)sadr)->sin_addr = *(int *)h->h_addr_list[0];
 	}
 	
@@ -198,11 +217,14 @@ qboolean	NET_StringToAdr (char *s, netadr_t *a)
 	{
 		memset (a, 0, sizeof(*a));
 		a->type = NA_LOOPBACK;
+
 		return true;
 	}
 
 	if (!NET_StringToSockaddr (s, (struct sockaddr *)&sadr))
+	{
 		return false;
+	}
 	
 	SockadrToNetadr (&sadr, a);
 
@@ -231,10 +253,14 @@ qboolean	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, sizebuf_t *net_me
 	loop = &loopbacks[sock];
 
 	if (loop->send - loop->get > MAX_LOOPBACK)
+	{
 		loop->get = loop->send - MAX_LOOPBACK;
+	}
 
 	if (loop->get >= loop->send)
+	{
 		return false;
+	}
 
 	i = loop->get & (MAX_LOOPBACK-1);
 	loop->get++;
@@ -242,8 +268,8 @@ qboolean	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, sizebuf_t *net_me
 	memcpy (net_message->data, loop->msgs[i].data, loop->msgs[i].datalen);
 	net_message->cursize = loop->msgs[i].datalen;
 	*net_from = net_local_adr;
-	return true;
 
+	return true;
 }
 
 
@@ -273,27 +299,39 @@ qboolean	NET_GetPacket (netsrc_t sock, netadr_t *net_from, sizebuf_t *net_messag
 	int		err;
 
 	if (NET_GetLoopPacket (sock, net_from, net_message))
+	{
 		return true;
+	}
 
 	for (protocol = 0 ; protocol < 2 ; protocol++)
 	{
 		if (protocol == 0)
+		{
 			net_socket = ip_sockets[sock];
+		}
 		else
+		{
 			net_socket = ipx_sockets[sock];
+		}
 
 		if (!net_socket)
+		{
 			continue;
+		}
 
 		fromlen = sizeof(from);
 		ret = recvfrom (net_socket, net_message->data, net_message->maxsize
 			, 0, (struct sockaddr *)&from, &fromlen);
+
 		if (ret == SOCKET_ERROR)
 		{
 			err = errno;
 
 			if (err == EWOULDBLOCK || err == ECONNREFUSED)
+			{
 				continue;
+			}
+
 			Com_Printf ("NET_GetPacket: %s", NET_ErrorString());
 			continue;
 		}
@@ -306,6 +344,7 @@ qboolean	NET_GetPacket (netsrc_t sock, netadr_t *net_from, sizebuf_t *net_messag
 
 		net_message->cursize = ret;
 		SockadrToNetadr (&from, net_from);
+
 		return true;
 	}
 
@@ -329,33 +368,48 @@ void NET_SendPacket (netsrc_t sock, int length, void *data, netadr_t to)
 	if (to.type == NA_BROADCAST)
 	{
 		net_socket = ip_sockets[sock];
+
 		if (!net_socket)
+		{
 			return;
+		}
 	}
 	else if (to.type == NA_IP)
 	{
 		net_socket = ip_sockets[sock];
+
 		if (!net_socket)
+		{
 			return;
+		}
 	}
 	else if (to.type == NA_IPX)
 	{
 		net_socket = ipx_sockets[sock];
+
 		if (!net_socket)
+		{
 			return;
+		}
 	}
 	else if (to.type == NA_BROADCAST_IPX)
 	{
 		net_socket = ipx_sockets[sock];
+
 		if (!net_socket)
+		{
 			return;
+		}
 	}
 	else
+	{
 		Com_Error (ERR_FATAL, "NET_SendPacket: bad address type");
+	}
 
 	NetadrToSockadr (&to, &addr);
 
 	ret = sendto (net_socket, data, length, 0, (struct sockaddr *)&addr, sizeof(addr) );
+
 	if (ret == SOCKET_ERROR)
 	{
 		Com_Printf ("NET_SendPacket ERROR: %i\n", NET_ErrorString());
@@ -381,9 +435,14 @@ void NET_OpenIP (void)
 	ip = Cvar_Get ("ip", "localhost", CVAR_NOSET);
 
 	if (!ip_sockets[NS_SERVER])
+	{
 		ip_sockets[NS_SERVER] = NET_Socket (ip->string, port->value);
+	}
+
 	if (!ip_sockets[NS_CLIENT])
+	{
 		ip_sockets[NS_CLIENT] = NET_Socket (ip->string, PORT_ANY);
+	}
 }
 
 /*
@@ -416,6 +475,7 @@ void	NET_Config (qboolean multiplayer)
 				closesocket (ip_sockets[i]);
 				ip_sockets[i] = 0;
 			}
+
 			if (ipx_sockets[i])
 			{
 				closesocket (ipx_sockets[i]);
@@ -449,9 +509,15 @@ void NET_Init (void)
 	_watt_do_exit = 0;
 	err = sock_init();
 	_watt_do_exit = i;
+
 	if (err != 0)
+	{
 		Com_Printf("WATTCP initialization failed (%s)", sock_init_err(err));
-	else	Com_Printf("WATTCP Initialized\n");
+	}
+	else
+	{
+		Com_Printf("WATTCP Initialized\n");
+	}
 }
 
 
@@ -470,6 +536,7 @@ int NET_Socket (char *net_interface, int port)
 	if ((newsocket = socket (PF_INET, SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET)
 	{
 		Com_Printf ("ERROR: UDP_OpenSocket: socket:", NET_ErrorString());
+
 		return 0;
 	}
 
@@ -477,6 +544,7 @@ int NET_Socket (char *net_interface, int port)
 	if (ioctlsocket (newsocket, FIONBIO, (char *) &_true) == SOCKET_ERROR)
 	{
 		Com_Printf ("ERROR: UDP_OpenSocket: ioctl FIONBIO:%s\n", NET_ErrorString());
+
 		return 0;
 	}
 
@@ -484,18 +552,27 @@ int NET_Socket (char *net_interface, int port)
 	if (setsockopt(newsocket, SOL_SOCKET, SO_BROADCAST, (char *)&i, sizeof(i)) == SOCKET_ERROR)
 	{
 		Com_Printf ("ERROR: UDP_OpenSocket: setsockopt SO_BROADCAST:%s\n", NET_ErrorString());
+
 		return 0;
 	}
 
 	if (!net_interface || !net_interface[0] || !Q_stricmp(net_interface, "localhost"))
+	{
 		address.sin_addr.s_addr = INADDR_ANY;
+	}
 	else
+	{
 		NET_StringToSockaddr (net_interface, (struct sockaddr *)&address);
+	}
 
 	if (port == PORT_ANY)
+	{
 		address.sin_port = 0;
+	}
 	else
+	{
 		address.sin_port = htons((short)port);
+	}
 
 	address.sin_family = AF_INET;
 
@@ -503,6 +580,7 @@ int NET_Socket (char *net_interface, int port)
 	{
 		Com_Printf ("ERROR: UDP_OpenSocket: bind: %s\n", NET_ErrorString());
 		closesocket (newsocket);
+
 		return 0;
 	}
 
@@ -531,6 +609,7 @@ char *NET_ErrorString (void)
 	int		code;
 
 	code = errno;
+
 	return strerror (code);
 }
 
@@ -542,15 +621,20 @@ void NET_Sleep(double msec)
 	extern cvar_t *dedicated;
 //	extern qboolean stdin_active;
 
-	if ( /*!ip_sockets[NS_SERVER] || */(dedicated && !dedicated->value))
+	if ( /*!ip_sockets[NS_SERVER] || */(dedicated && !dedicated->value)) // FS: ip_sockets[NS_SERVER] won't statr until a map is actually loaded.  So a dedicated server without anything running will just suck up cycles.
+	{
 		return; // we're not a server, just run full speed
+	}
 
 	FD_ZERO(&fdset);
+
 //	if (stdin_active)
-	FD_SET(0, &fdset); // stdin is processed too
+	{
+		FD_SET(0, &fdset); // stdin is processed too
+	}
+
 	FD_SET(ip_sockets[NS_SERVER], &fdset); // network socket
 	timeout.tv_sec = (long)msec/1000;
 	timeout.tv_usec = ((long)msec%1000)*1000;
 	select_s(ip_sockets[NS_SERVER]+1, &fdset, NULL, NULL, &timeout);
 }
-
