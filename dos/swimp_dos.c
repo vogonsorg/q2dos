@@ -19,11 +19,6 @@ void	SWimp_EndFrame (void)
 	}
 	else
 	{
-#ifdef OLD_RELIABLE_CODE
-		__djgpp_nearptr_enable();
-		memcpy(vid_resolutions[currentvideomode].address+__djgpp_conventional_base,vid.buffer,(vid.height*vid.width));
-//		__djgpp_nearptr_disable(); // FS: FIXME TODO -- DON'T DISABLE.  WILL STOMP DMA.BUFFER!
-#endif
 		memcpy(vid_resolutions[currentvideomode].address, vid.buffer, (vid.height*vid.width));
 	}
 }
@@ -80,8 +75,10 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 	if ( !ri.Vid_GetModeInfo( pwidth, pheight, mode ) )
 	{
 		ri.Con_Printf( PRINT_ALL, " invalid mode\n" );
+
 		return rserr_invalid_mode;
 	}
+
 	ri.Con_Printf( PRINT_ALL, "SWimp_SetMode setting to %s %dx%d\n",vid_resolutions[mode].menuname, *pwidth, *pheight);
 
 	currentvideomode=mode;
@@ -131,6 +128,7 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 	}
 
 	ri.Vid_NewWindow(vid.width,vid.height);
+
 	return rserr_ok;
 }
 

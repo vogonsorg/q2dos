@@ -725,7 +725,7 @@ static qboolean GUS_GetIWData(void)
 		return(false);
 
 	HaveCodec=1;
-        Com_Printf("\x02Sound Card is UltraSound PnP\nIf you experience garbage sound run\nULTRAMID.EXE\n");
+	Com_Printf("\x02Sound Card is UltraSound PnP\nIf you experience garbage sound run\nULTRAMID.EXE\n");
 	return(true);
 }
 
@@ -794,7 +794,7 @@ static qboolean GUS_GetMAXData(void)
 		return(false);
 
 	HaveCodec=1;
-        Com_Printf("\x02Sound Card is UltraSound MAX\nIf you experience garbage sound run\nULTRAMID.EXE\n");
+	Com_Printf("\x02Sound Card is UltraSound MAX\nIf you experience garbage sound run\nULTRAMID.EXE\n");
 	return(true);
 }
 
@@ -877,7 +877,7 @@ static qboolean GUS_GetGUSData(void)
 	dos_outportb(GusBase,0x08);
 
 	HaveCodec=0;
-        Com_Printf("\x02Sound Card is UltraSound\nIf you experience garbage sound run\nULTRAMID.EXE\n");
+	Com_Printf("\x02Sound Card is UltraSound\nIf you experience garbage sound run\nULTRAMID.EXE\n");
 	return(true);
 }
 
