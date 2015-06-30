@@ -726,6 +726,14 @@ SOURCE=..\client\client.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\win32\include\vorbis\codec.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\win32\include\ogg\config_types.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\win32\conproc.h
 # End Source File
 # Begin Source File
@@ -862,6 +870,14 @@ SOURCE=..\Goa\nonport.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\win32\include\ogg\ogg.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\win32\include\ogg\os_types.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\game\q_shared.h
 # End Source File
 # Begin Source File
@@ -915,6 +931,10 @@ SOURCE=..\client\sound.h
 # Begin Source File
 
 SOURCE=..\client\vid.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\win32\include\vorbis\vorbisfile.h
 # End Source File
 # Begin Source File
 

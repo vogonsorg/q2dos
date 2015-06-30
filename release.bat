@@ -23,6 +23,7 @@ SET DAY=%ERR10%%ERR1%
 F:
 cd "F:\PROJ\Q2DOS"
 del Q2DOS_EXE_%MONTH%%DAY%%YEAR%.7Z
+del Q2DOS_EXE_LATEST.7Z
 rd /s /q release
 
 md release
@@ -67,7 +68,11 @@ C:
 cd\
 cd "program files"
 cd "7-zip"
-7z.exe a -mx9 -mmt "F:\PROJ\Q2DOS\Q2DOS_EXE_%MONTH%%DAY%%YEAR%.7Z" "F:\PROJ\Q2DOS\RELEASE\*"
+REM Uploading this as _LATEST.7Z to bitbucket now
+REM 7z.exe a -mx9 -mmt "F:\PROJ\Q2DOS\Q2DOS_EXE_%MONTH%%DAY%%YEAR%.7Z" "F:\PROJ\Q2DOS\RELEASE\*"
+
+7z.exe a -mx9 -mmt "F:\PROJ\Q2DOS\Q2DOS_EXE_LATEST.7Z" "F:\PROJ\Q2DOS\RELEASE\*"
+
 cd F:\PROJ\Q2DOS
 rd /s /q F:\PROJ\Q2DOS\RELEASE
 
