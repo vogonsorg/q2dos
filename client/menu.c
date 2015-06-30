@@ -60,6 +60,7 @@ void M_Menu_Main_f (void);
 			void M_Menu_DMOptions_f (void);
 	void M_Menu_Video_f (void);
 	void M_Menu_Options_f (void);
+		void M_Menu_Extended_Options_f (void); // FS
 		void M_Menu_Keys_f (void);
 	void M_Menu_Quit_f (void);
 
@@ -1062,8 +1063,10 @@ extern cvar_t *in_joystick;
 #endif
 
 static menuframework_s	s_options_menu;
+static menuframework_s	s_extended_options_menu; // FS
 static menuaction_s		s_options_defaults_action;
 static menuaction_s		s_options_customize_options_action;
+static menuaction_s		s_options_extended_options_action; // FS
 static menuslider_s		s_options_sensitivity_slider;
 static menulist_s		s_options_freelook_box;
 
@@ -1104,6 +1107,11 @@ static void JoystickFunc( void *unused )
 	Cvar_SetValue( "in_joystick", s_options_joystick_box.curvalue );
 }
 #endif
+
+static void ExtendedOptionsFunc( void *unused ) // FS
+{
+	M_Menu_Extended_Options_f();
+}
 
 static void CustomizeControlsFunc( void *unused )
 {
@@ -1568,22 +1576,33 @@ void Options_MenuInit( void )
 	s_options_joystick_box.itemnames = yesno_names;
 #endif
 
+	// FS
+	s_options_extended_options_action.generic.type	= MTYPE_ACTION;
+	s_options_extended_options_action.generic.x		= 0;
+	s_options_extended_options_action.generic.y		= 150;
+	s_options_extended_options_action.generic.name	= "extended options";
+	s_options_extended_options_action.generic.statusbar	= "extended Q2DOS options";
+	s_options_extended_options_action.generic.callback = ExtendedOptionsFunc;
+
 	s_options_customize_options_action.generic.type	= MTYPE_ACTION;
 	s_options_customize_options_action.generic.x		= 0;
-	s_options_customize_options_action.generic.y		= 150;
+	s_options_customize_options_action.generic.y		= 160;
 	s_options_customize_options_action.generic.name	= "customize controls";
+	s_options_customize_options_action.generic.statusbar	= "customize controls";
 	s_options_customize_options_action.generic.callback = CustomizeControlsFunc;
 
 	s_options_defaults_action.generic.type	= MTYPE_ACTION;
 	s_options_defaults_action.generic.x		= 0;
-	s_options_defaults_action.generic.y		= 160;
+	s_options_defaults_action.generic.y		= 170;
 	s_options_defaults_action.generic.name	= "reset defaults";
+	s_options_defaults_action.generic.statusbar	= "reset options to default values";
 	s_options_defaults_action.generic.callback = ControlsResetDefaultsFunc;
 
 	s_options_console_action.generic.type	= MTYPE_ACTION;
 	s_options_console_action.generic.x		= 0;
-	s_options_console_action.generic.y		= 170;
+	s_options_console_action.generic.y		= 180;
 	s_options_console_action.generic.name	= "go to console";
+	s_options_console_action.generic.statusbar	= "go to command console";
 	s_options_console_action.generic.callback = ConsoleFunc;
 
 	ControlsSetMenuItemValues();
@@ -1614,7 +1633,7 @@ void Options_MenuInit( void )
 #ifdef USE_JOYSTICK
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_joystick_box );
 #endif
-
+	Menu_AddItem( &s_options_menu, ( void * ) &s_options_extended_options_action ); // FS
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_customize_options_action );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_defaults_action );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_console_action );
@@ -1636,6 +1655,189 @@ void M_Menu_Options_f (void)
 {
 	Options_MenuInit();
 	M_PushMenu ( Options_MenuDraw, Options_MenuKey );
+}
+
+/*
+=======================================================================
+
+EXTENDED OPTIONS MENU
+
+=======================================================================
+*/
+// FS: New stuff unique to Q2DOS
+static menulist_s		s_extended_options_showfps_box;
+static menulist_s		s_extended_options_showtime_box;
+static menulist_s		s_extended_options_showuptime_box;
+static menulist_s		s_extended_options_altcolours_box;
+static menulist_s		s_extended_options_hidegunicon_box;
+static menulist_s		s_extended_options_back_action;
+
+extern cvar_t	*cl_drawfps;
+extern cvar_t	*cl_drawtime;
+extern cvar_t	*cl_drawuptime;
+extern cvar_t	*cl_drawaltcolours;
+extern cvar_t	*cl_hide_gun_icon;
+
+static void Extended_ControlsSetMenuItemValues( void )
+{
+#if 0
+	s_options_sfxvolume_slider.curvalue		= Cvar_VariableValue( "s_volume" ) * 10;
+	s_options_cdvolume_box.curvalue 		= !Cvar_VariableValue("cd_nocd");
+	s_options_quality_list.curvalue			= Get_S_KHZ_Quality(); // FS
+	s_options_sensitivity_slider.curvalue	= ( sensitivity->value ) * 2;
+#endif
+
+	Cvar_SetValue( "cl_drawfps", ClampCvar( 0, 1, cl_drawfps->value ) );
+	s_extended_options_showfps_box.curvalue		= cl_drawfps->value;
+
+	Cvar_SetValue( "cl_drawtime", ClampCvar( 0, 2, cl_drawtime->value ) );
+	s_extended_options_showtime_box.curvalue		= cl_drawtime->value;
+
+	Cvar_SetValue( "cl_drawuptime", ClampCvar( 0, 2, cl_drawuptime->value ) );
+	s_extended_options_showuptime_box.curvalue		= cl_drawuptime->value;
+
+	Cvar_SetValue( "cl_drawaltcolours", ClampCvar( 0, 1, cl_drawaltcolours->value ) );
+	s_extended_options_altcolours_box.curvalue		= cl_drawaltcolours->value;
+
+	Cvar_SetValue( "cl_hide_gun_icon", ClampCvar( 0, 1, cl_hide_gun_icon->value ) );
+	s_extended_options_hidegunicon_box.curvalue		= cl_hide_gun_icon->value;
+}
+
+static void GoToOptionsFunc( void *unused )
+{
+	M_Menu_Options_f();
+}
+
+static void showFPSFunc( void *unused )
+{
+	Cvar_SetValue( "cl_drawfps", s_extended_options_showfps_box.curvalue );
+}
+
+static void showTimeFunc( void *unused )
+{
+	Cvar_SetValue( "cl_drawtime", s_extended_options_showtime_box.curvalue );
+}
+
+static void showUptimeFunc( void *unused )
+{
+	Cvar_SetValue( "cl_drawuptime", s_extended_options_showuptime_box.curvalue );
+}
+
+static void altColoursFunc( void *unused )
+{
+	Cvar_SetValue( "cl_drawaltcolours", s_extended_options_altcolours_box.curvalue );
+}
+
+static void hideGunIconFunc( void *unused )
+{
+	Cvar_SetValue( "cl_hide_gun_icon", s_extended_options_hidegunicon_box.curvalue );
+}
+
+void Extended_Options_MenuInit( void )
+{
+	static const char *yesno_names[] =
+	{
+		"no",
+		"yes",
+		0
+	};
+
+	static const char *showtime_names[] =
+	{
+		"no",
+		"military",
+		"AM/PM",
+		0
+	};
+
+	static const char *showuptime_names[] =
+	{
+		"no",
+		"map uptime",
+		"total uptime",
+		0
+	};
+
+	/*
+	** configure controls menu and menu items
+	*/
+	s_extended_options_menu.x = viddef.width / 2;
+	s_extended_options_menu.y = viddef.height / 2 - 78;
+	s_extended_options_menu.nitems = 0;
+
+	s_extended_options_showfps_box.generic.type = MTYPE_SPINCONTROL;
+	s_extended_options_showfps_box.generic.x	= 0;
+	s_extended_options_showfps_box.generic.y	= 10;
+	s_extended_options_showfps_box.generic.name	= "show FPS";
+	s_extended_options_showfps_box.generic.statusbar = "draw FPS on screen";
+	s_extended_options_showfps_box.generic.callback = showFPSFunc;
+	s_extended_options_showfps_box.itemnames = yesno_names;
+
+	s_extended_options_showtime_box.generic.type = MTYPE_SPINCONTROL;
+	s_extended_options_showtime_box.generic.x	= 0;
+	s_extended_options_showtime_box.generic.y	= 20;
+	s_extended_options_showtime_box.generic.name	= "show time";
+	s_extended_options_showtime_box.generic.statusbar = "draw current time on screen";
+	s_extended_options_showtime_box.generic.callback = showTimeFunc;
+	s_extended_options_showtime_box.itemnames = showtime_names;
+
+	s_extended_options_showuptime_box.generic.type = MTYPE_SPINCONTROL;
+	s_extended_options_showuptime_box.generic.x	= 0;
+	s_extended_options_showuptime_box.generic.y	= 30;
+	s_extended_options_showuptime_box.generic.name	= "show uptime";
+	s_extended_options_showuptime_box.generic.statusbar = "draw uptime on screen";
+	s_extended_options_showuptime_box.generic.callback = showUptimeFunc;
+	s_extended_options_showuptime_box.itemnames = showuptime_names;
+
+	s_extended_options_altcolours_box.generic.type = MTYPE_SPINCONTROL;
+	s_extended_options_altcolours_box.generic.x	= 0;
+	s_extended_options_altcolours_box.generic.y	= 40;
+	s_extended_options_altcolours_box.generic.name	= "draw alt colours";
+	s_extended_options_altcolours_box.generic.statusbar = "draw alternate colours for draw cvars";
+	s_extended_options_altcolours_box.generic.callback = altColoursFunc;
+	s_extended_options_altcolours_box.itemnames = yesno_names;
+
+	s_extended_options_hidegunicon_box.generic.type = MTYPE_SPINCONTROL;
+	s_extended_options_hidegunicon_box.generic.x	= 0;
+	s_extended_options_hidegunicon_box.generic.y	= 50;
+	s_extended_options_hidegunicon_box.generic.name	= "hide gun icon";
+	s_extended_options_hidegunicon_box.generic.statusbar = "hide the gun/help icon";
+	s_extended_options_hidegunicon_box.generic.callback = hideGunIconFunc;
+	s_extended_options_hidegunicon_box.itemnames = yesno_names;
+
+	s_extended_options_back_action.generic.type	= MTYPE_ACTION;
+	s_extended_options_back_action.generic.x		= 0;
+	s_extended_options_back_action.generic.y		= 100;
+	s_extended_options_back_action.generic.name	= "go to options";
+	s_extended_options_back_action.generic.statusbar = "go back to the options menu";
+	s_extended_options_back_action.generic.callback = GoToOptionsFunc;
+
+	Extended_ControlsSetMenuItemValues();
+
+// FS: If you add stuff you gotta be certain it's in order it appears!
+	Menu_AddItem( &s_extended_options_menu, ( void * ) &s_extended_options_showfps_box );
+	Menu_AddItem( &s_extended_options_menu, ( void * ) &s_extended_options_showtime_box );
+	Menu_AddItem( &s_extended_options_menu, ( void * ) &s_extended_options_showuptime_box );
+	Menu_AddItem( &s_extended_options_menu, ( void * ) &s_extended_options_altcolours_box );
+	Menu_AddItem( &s_extended_options_menu, ( void * ) &s_extended_options_hidegunicon_box );
+	Menu_AddItem( &s_extended_options_menu, ( void * ) &s_extended_options_back_action );
+}
+
+void Extended_Options_MenuDraw (void)
+{
+	Menu_AdjustCursor( &s_extended_options_menu, 1 );
+	Menu_Draw( &s_extended_options_menu );
+}
+
+const char *Extended_Options_MenuKey( int key )
+{
+	return Default_MenuKey( &s_extended_options_menu, key );
+}
+
+void M_Menu_Extended_Options_f (void)
+{
+	Extended_Options_MenuInit();
+	M_PushMenu ( Extended_Options_MenuDraw, Extended_Options_MenuKey );
 }
 
 /*
@@ -4751,6 +4953,7 @@ void M_Init (void)
 	Cmd_AddCommand ("menu_multiplayer", M_Menu_Multiplayer_f );
 	Cmd_AddCommand ("menu_video", M_Menu_Video_f);
 	Cmd_AddCommand ("menu_options", M_Menu_Options_f);
+		Cmd_AddCommand ("menu_extended_options", M_Menu_Extended_Options_f);
 		Cmd_AddCommand ("menu_keys", M_Menu_Keys_f);
 	Cmd_AddCommand ("menu_quit", M_Menu_Quit_f);
 }

@@ -325,7 +325,7 @@ void S_StreamBackgroundTrack (void)
 	float	scale;
 	byte	data[MAX_RAW_SAMPLES*4];
 
-	if (!s_bgTrack.file || !s_musicvolume->value)
+	if (!s_bgTrack.file || !s_musicvolume->value || !cl_ogg_music->intValue)
 		return;
 
 	if (!s_streamingChannel)

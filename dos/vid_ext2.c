@@ -157,7 +157,9 @@ void VID_InitExtra (void)
 	pinfoblock = dos_getmemory(sizeof(vbeinfoblock_t));
 
 	if(!pinfoblock)
+	{
 		Sys_Error("pinfoblock NULL!\n");
+	}
 
 	*(long *)pinfoblock->VbeSignature = 'V' + ('B'<<8) + ('E'<<16) + ('2'<<24);
 
@@ -172,7 +174,9 @@ void VID_InitExtra (void)
 	Com_sprintf(vid_resolutions[0].menuname, sizeof(vid_resolutions[0].menuname), "[VGA 320x200]");
 
 	if(COM_CheckParm("-vgaonly"))
+	{
 		return;	//test for VGA only
+	}
 
 // see if VESA support is available
 	regs.x.ax = 0x4f00;

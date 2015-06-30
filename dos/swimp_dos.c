@@ -47,10 +47,13 @@ void	SWimp_SetPalette( const unsigned char *palette)
 	int i;
 
 	if(palette==NULL)
+	{
 		return;
+	}
 
 	shiftcomponents=2;
 	outp(0x3c8,0);	//this means we are going to set the pallette
+
 	for(i=0;i<1024;i++)	//we do it this way to skip a byte since it's padded
 	{
 		outp(0x3c9,palette[i]>>shiftcomponents);i++;
@@ -82,13 +85,18 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 	ri.Con_Printf( PRINT_ALL, "SWimp_SetMode setting to %s %dx%d\n",vid_resolutions[mode].menuname, *pwidth, *pheight);
 
 	currentvideomode=mode;
+
 	if(!vid_resolutions[mode].isLFB)
 	{
 		vid.height=vid_resolutions[mode].height;
 		vid.width=vid_resolutions[mode].width;
 		vid.rowbytes=vid.width;
+
 		if(vid.buffer)
+		{
 			free(vid.buffer);
+		}
+
 		vid.buffer=malloc(vid.width*vid.height*1);
 		{	//mode 13
 			__dpmi_regs r;
@@ -102,18 +110,26 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 		vid.height=vid_resolutions[mode].height;
 		vid.width=vid_resolutions[mode].width;
 		vid.rowbytes=vid.width;
+
 		if(vid.buffer)
+		{
 			free(vid.buffer);
+		}
+
 		vid.buffer=malloc(vid.width*vid.height*1);
 		{    //VESA 
 			__dpmi_regs r;
 			r.x.ax = 0x4F02;
 			r.x.bx = vid_resolutions[mode].vesa_mode+0x4000; //0x4000 for Linear access
 			__dpmi_int(0x10, &r);
+
 			if (r.h.ah)
+			{
 				Sys_Error("Error setting VESA LFB mode 0x%0x",vid_resolutions[mode].vesa_mode);
+			}
 		}
 	}
+
 	ri.Vid_NewWindow(vid.width,vid.height);
 	return rserr_ok;
 }
