@@ -59,19 +59,6 @@ void SocketShutDown()
 
 }
 
-#ifndef _WIN32
-#include <string.h>
-char *_strdup(const char *src)
-{
-	char *res;
-	res = (char *)malloc(strlen(src) + 1);
-	strcpy(res, src);
-	return res;
-}
-
-
-#endif
-
 #ifdef __cplusplus
 }
 #endif
