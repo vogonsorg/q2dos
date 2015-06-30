@@ -260,7 +260,7 @@ static void snd_ca0106_pcm_prepare_playback(struct emu10k1_card *card,struct mpx
 
  // build pagetable
 #ifdef __DJGPP__
-(unsigned int)table_base+=__djgpp_conventional_base;
+ table_base=(uint32_t*)((unsigned int)table_base + __djgpp_conventional_base);
 #endif
 
 #ifdef ZDM

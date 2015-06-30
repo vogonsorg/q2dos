@@ -169,7 +169,7 @@ card->virtualpagetable=(uint32_t *)card->dm->linearptr; // pagetable requires 8 
  aui->card_DMABUFF=card->pcmout_buffer;
 
 #ifdef __DJGPP__
-(unsigned int)aui->card_DMABUFF+=__djgpp_conventional_base;
+ aui->card_DMABUFF=(char *)((unsigned int)aui->card_DMABUFF + __djgpp_conventional_base);
 #endif
 
  mpxplay_debugf(ICH_DEBUG_OUTPUT,"buffer init: pagetable:%8.8X pcmoutbuf:%8.8X size:%d",(unsigned long)card->virtualpagetable,(unsigned long)card->pcmout_buffer,card->pcmout_bufsize);
@@ -291,7 +291,7 @@ static void snd_intel_prepare_playback(struct intel_card_s *card,struct mpxplay_
  table_base=card->virtualpagetable;
 
 #ifdef __DJGPP__
-(unsigned int)table_base+=__djgpp_conventional_base;
+ table_base=(uint32_t *)((unsigned int)table_base + __djgpp_conventional_base);
 #endif
 
  period_size_samples=card->period_size_bytes/(aui->bits_card>>3);

@@ -251,7 +251,7 @@ if(!card->dm) goto err_adetect;
 
  aui->card_DMABUFF=card->pcmout_buffer;
 #ifdef __DJGPP__
-(unsigned int)aui->card_DMABUFF+=__djgpp_conventional_base;
+ aui->card_DMABUFF=(char *)((unsigned int)aui->card_DMABUFF + __djgpp_conventional_base);
 #endif
 
  // init chip
@@ -298,7 +298,7 @@ static void VIA82XX_setrate(struct mpxplay_audioout_info_s *aui)
  pcmbufp=(unsigned long)card->pcmout_buffer;
 
 #ifdef __DJGPP__
-(unsigned int)card->virtualpagetable+=__djgpp_conventional_base;
+ card->virtualpagetable=(uint32_t*)((unsigned int)card->virtualpagetable + __djgpp_conventional_base);
 #endif
 
 #ifdef ZDM
@@ -323,7 +323,7 @@ _farnspokel((unsigned int)&card->virtualpagetable[pagecount*2+1],VIA_TBL_BIT_EOL
 #endif
 
 #ifdef __DJGPP__
-(unsigned int)card->virtualpagetable-=__djgpp_conventional_base;
+ card->virtualpagetable=(uint32_t*)((unsigned int)card->virtualpagetable - __djgpp_conventional_base);
 #endif
 
  // ac97 config

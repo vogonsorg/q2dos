@@ -811,7 +811,7 @@ if(!card->dm)	return 0;
  pcmbufp<<=1;
 
 #ifdef __DJGPP__
-(unsigned int)card->virtualpagetable+=__djgpp_conventional_base;
+ card->virtualpagetable=(uint32_t*)((unsigned int)card->virtualpagetable +__djgpp_conventional_base);
 #endif
 
 #ifdef ZDM
@@ -832,7 +832,7 @@ _farnspokel((unsigned int)&card->virtualpagetable[pagecount],((uint32_t)card->si
 #endif
 
 #ifdef __DJGPP__
-(unsigned int)card->virtualpagetable-=__djgpp_conventional_base;
+ card->virtualpagetable=(uint32_t*)((unsigned int)card->virtualpagetable - __djgpp_conventional_base);
 #endif
  return 1;
 }
@@ -979,7 +979,7 @@ static void snd_p16v_pcm_prepare_playback(struct emu10k1_card *card,unsigned int
  snd_emu_set_spdif_freq(card,freq);
 
 #ifdef __DJGPP__
-(unsigned int)table_base+=__djgpp_conventional_base;
+ table_base=(uint32_t *)((unsigned int)table_base + __djgpp_conventional_base);
 #endif
 
 #ifdef ZDM
@@ -1261,7 +1261,7 @@ static int SBLIVE_adetect(struct mpxplay_audioout_info_s *aui)
 
  aui->card_DMABUFF=card->pcmout_buffer;
 #ifdef __DJGPP__
-(unsigned int)aui->card_DMABUFF+=__djgpp_conventional_base;
+ aui->card_DMABUFF=(char *)((unsigned int)aui->card_DMABUFF + __djgpp_conventional_base);
 #endif
 
  if(card->driver_funcs->hw_init)

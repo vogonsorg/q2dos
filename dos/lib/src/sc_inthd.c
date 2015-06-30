@@ -826,7 +826,7 @@ static void azx_setup_periods(struct intelhd_card_s *card)
  unsigned int i;
 
 #ifdef __DJGPP__
-(unsigned int)bdl+=__djgpp_conventional_base;
+ bdl=(uint32_t *)((unsigned int)bdl + __djgpp_conventional_base);
 #endif
 
  card->pcmout_num_periods=card->pcmout_dmasize/card->pcmout_period_size;
@@ -1106,7 +1106,7 @@ static int INTELHD_adetect(struct mpxplay_audioout_info_s *aui)
  aui->card_DMABUFF=card->pcmout_buffer;
 
 #ifdef __DJGPP__
-(unsigned int)aui->card_DMABUFF+=__djgpp_conventional_base;
+ aui->card_DMABUFF=(char *)((unsigned int)aui->card_DMABUFF + __djgpp_conventional_base);
 #endif
 
  mpxplay_debugf(IHD_DEBUG_OUTPUT,"IHD board type: %s (%4.4X%4.4X) ",card->pci_dev->device_name,(long)card->pci_dev->vendor_id,(long)card->pci_dev->device_id);
