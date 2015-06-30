@@ -372,7 +372,7 @@ static GError ServerListLANList(GServerList serverlist)
 	{
 		FD_ZERO(&set);
 		FD_SET( serverlist->slsocket, &set);
-		error = selectsocket(FD_SETSIZE, &set, NULL, NULL, &timeout);
+		error = select(FD_SETSIZE, &set, NULL, NULL, &timeout);
 		if (SOCKET_ERROR == error || 0 == error) //no data
 			break;
 		error = recvfrom(serverlist->slsocket, indata, sizeof(indata) - 1, 0, (struct sockaddr *)&saddr, &saddrlen );
@@ -472,7 +472,7 @@ static GError ServerListQueryLoop(GServerList serverlist)
 
 	if (scount > 0) //there are sockets to check for data
 	{
-		error = selectsocket(serverlist->maxupdates + 1, &set, NULL, NULL, &timeout);
+		error = select(serverlist->maxupdates + 1, &set, NULL, NULL, &timeout);
 		if (SOCKET_ERROR != error && 0 != error)
 		{
 			for (i = 0 ; i < serverlist->maxupdates ; i++)
@@ -585,7 +585,7 @@ static GError ServerListQueryLoop(GServerList serverlist)
 			error = sendto(serverlist->updatelist[i].s,STATUS,strlen(STATUS), 0, (struct sockaddr *) &saddr, saddrlen);
 			serverlist->updatelist[i].starttime = current_time();
 
-			selectsocket(serverlist->updatelist[i].s + 1, &set, NULL, NULL, &timeout);
+			select(serverlist->updatelist[i].s + 1, &set, NULL, NULL, &timeout);
 			if (FD_ISSET(serverlist->updatelist[i].s, &set))
 			{
 				error = recvfrom(serverlist->updatelist[i].s, indata, sizeof(indata) - 1, 0, (struct sockaddr *)&saddr, &saddrlen );
