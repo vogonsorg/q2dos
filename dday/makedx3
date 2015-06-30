@@ -63,7 +63,7 @@ OBJECTS =  $(GAME)
 all: gamex86.dx3
 
 gamex86.dx3:	$(OBJECTS)
-	$(DXE3GEN) -U $(OBJECTS) -o gamex86.dx3 -lm $(LFLAGS)
+	$(DXE3GEN) -U -E _GetGameAPI $(OBJECTS) -o gamex86.dx3 -lm $(LFLAGS)
 
 clean:
 	rm .../*.o
