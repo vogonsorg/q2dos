@@ -30,22 +30,15 @@ Fax(714)549-0757
 #include <fcntl.h> // FS
 #include <errno.h> // FS
 
-#ifdef __DJGPP__
+#ifndef _WIN32
 #include <sys/ioctl.h>
-extern char *NET_ErrorString (void);
 #endif
+extern char *NET_ErrorString (void);
 
 #define MSHOST	"maraakate.org" // FS: Gamespy dead "master.gamespy.com"
 #define MSPORT	28900
 #define SERVER_GROWBY 32
 #define LAN_SEARCH_TIME 3000 //3 sec
-
-// FS: From HoT: For ioctl sockets
-#ifdef __DJGPP__
-	#define	IOCTLARG_T	(char*)
-#else
-	#define IOCTLARG_T
-#endif // __DJGPP__
 
 #ifdef __cplusplus
 extern "C" {
@@ -139,11 +132,7 @@ static GError InitUpdateList(GServerList serverlist)
 		// FS: Set non-blocking sockets
 		if (ioctlsocket( serverlist->updatelist[i].s, FIONBIO,IOCTLARG_T &_true) == SOCKET_ERROR)
 		{
-#ifdef _WIN32
-			Com_Printf("ERROR: InitUpdateList: ioctl FIOBNIO:%i\n", WSAGetLastError());
-#else
 			Com_Printf("ERROR: InitUpdateList: ioctl FIOBNIO:%s\n", NET_ErrorString());
-#endif // _WIN32
 			return GE_NOSOCKET;
 		}
 
@@ -383,7 +372,7 @@ static GError ServerListLANList(GServerList serverlist)
 	{
 		FD_ZERO(&set);
 		FD_SET( serverlist->slsocket, &set);
-		error = select(FD_SETSIZE, &set, NULL, NULL, &timeout);
+		error = selectsocket(FD_SETSIZE, &set, NULL, NULL, &timeout);
 		if (SOCKET_ERROR == error || 0 == error) //no data
 			break;
 		error = recvfrom(serverlist->slsocket, indata, sizeof(indata) - 1, 0, (struct sockaddr *)&saddr, &saddrlen );
@@ -483,7 +472,7 @@ static GError ServerListQueryLoop(GServerList serverlist)
 
 	if (scount > 0) //there are sockets to check for data
 	{
-		error = select(serverlist->maxupdates + 1, &set, NULL, NULL, &timeout);
+		error = selectsocket(serverlist->maxupdates + 1, &set, NULL, NULL, &timeout);
 		if (SOCKET_ERROR != error && 0 != error)
 		{
 			for (i = 0 ; i < serverlist->maxupdates ; i++)
@@ -596,7 +585,7 @@ static GError ServerListQueryLoop(GServerList serverlist)
 			error = sendto(serverlist->updatelist[i].s,STATUS,strlen(STATUS), 0, (struct sockaddr *) &saddr, saddrlen);
 			serverlist->updatelist[i].starttime = current_time();
 
-			select(serverlist->updatelist[i].s + 1, &set, NULL, NULL, &timeout);
+			selectsocket(serverlist->updatelist[i].s + 1, &set, NULL, NULL, &timeout);
 			if (FD_ISSET(serverlist->updatelist[i].s, &set))
 			{
 				error = recvfrom(serverlist->updatelist[i].s, indata, sizeof(indata) - 1, 0, (struct sockaddr *)&saddr, &saddrlen );

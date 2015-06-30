@@ -29,6 +29,9 @@ Fax(714)549-0757
 	#include <ctype.h>
 	#include <errno.h>
 	#include <sys/time.h>
+    #ifdef __DJGPP__
+	#include <tcp.h>  /* select_s() */
+    #endif
 #endif
 #ifdef __cplusplus
 extern "C" {
@@ -51,10 +54,20 @@ void SocketShutDown();
 
 #ifdef _WIN32
 	#define strcasecmp _stricmp
+	#define selectsocket select
+	#define IOCTLARG_T
+#elif defined(__DJGPP__)
+	#define _strdup strdup
+	#define IOCTLARG_T	(char*)
+	#define SOCKET int
+	#define selectsocket select_s
 #else
-	char *_strdup(const char *src);
+	#define _strdup strdup
 	#define SOCKET int	
+	#define ioctlsocket ioctl
 	#define closesocket close
+	#define selectsocket select
+	#define IOCTLARG_T
 #endif
 
 #ifdef __cplusplus

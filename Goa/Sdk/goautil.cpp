@@ -177,7 +177,7 @@ void goa_process_queries(void)
 
 	while (1)
 	{
-		error = select(FD_SETSIZE, &set, NULL, NULL, &timeout);
+		error = selectsocket(FD_SETSIZE, &set, NULL, NULL, &timeout);
 		if (SOCKET_ERROR == error || 0 == error)
 			return;
 		//else we have data
