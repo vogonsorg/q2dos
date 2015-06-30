@@ -76,7 +76,9 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 	int numplayers = 0;
 
 	if(!keyvals || strlen(keyvals) < 11) // FS: Some kind of bad status packet, forget it.
+	{
 		return;
+	}
 
 /*
 	*keyvals = *keyvals++; // FS: Skip past the OOB_SEQ
@@ -102,10 +104,12 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 	while (!numplayers || k != NULL)
 	{
 		v = mytok(NULL,'\\');
+
 		if (v != NULL)
 		{
 			kvpair.key = _strdup(k);
 			kvpair.value = _strdup(v);
+
 			if(strstr(kvpair.value, "\n"))
 			{
 				char *cutoffLen;
@@ -113,6 +117,7 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 				kvpair.value[cutoffLen-kvpair.value] = '\0';
 				numplayers++;
 			}
+
 			TableEnter(server->keyvals, &kvpair);
 		}
 		k = mytok(NULL,'\\');
@@ -128,7 +133,10 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 		while (test != NULL)
 		{
 			if(strstr(test, "WallFly[BZZZ]")) // FS: Don't report servers that just have WallFly in them.
+			{
 				hasBots = true;
+			}
+
 			numplayers++;
 			test = strchr(test+1, '\n');
 		}

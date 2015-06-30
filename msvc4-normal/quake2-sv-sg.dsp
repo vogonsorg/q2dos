@@ -631,11 +631,6 @@ SOURCE=..\dos\vid_dos.h
 SOURCE=..\dos\vid_ext2.c
 # PROP Exclude_From_Build 1
 # End Source File
-# Begin Source File
-
-SOURCE=..\dos\zone.c
-# PROP Exclude_From_Build 1
-# End Source File
 # End Group
 # Begin Source File
 
@@ -924,10 +919,6 @@ SOURCE=..\client\vid.h
 # Begin Source File
 
 SOURCE=..\win32\winquake.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\dos\zone.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"

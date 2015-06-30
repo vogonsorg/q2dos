@@ -4,7 +4,7 @@ By Neozeed and [HCI]Mara'akate.
 
 What's required?
 * Pentium 1.  At least a 200MHz to play it at ~20-30fps.
-* 32MB RAM.  16MB RAM might be OK.
+* 64MB RAM.  128MB RAM for larger mods.  x1.5 MB for virtual memory.
 * LFN TSR.  Use the included DOSLFN.ZIP (can be loaded high with LH DLFN.COM)
 
 What works?
@@ -68,13 +68,16 @@ http://dk.toastednet.org/
 Various code from
 * cURL -- (http://curl.haxx.se/)
 * DJGPP community -- (http://www.delorie.com/djgpp/)
-* ggorts -- Ported 3zb2, action, chaos, and dday to Q2DOS
-* Knightmare -- KMQuake II (http://www.markshan.com/knightmare/)
+* Gamespy SDK -- release publically in 2014.
+* ggorts -- Ported 3ZB2, Action, Chaos, and DDay to Q2DOS
+* Knightmare -- Ref_soft help.
+                KMQuake II (http://www.markshan.com/knightmare/)
 * Mpxplay -- (http://mpxplay.sourceforge.net/)
 * Mpxplay code importing by Ruslan Starodubov (http://sound-dos.ucoz.ru/)
 * Ogg Vorbis -- (https://www.xiph.org/)
 * R1CH -- R1Q2 (http://old.r1ch.net/stuff/r1q2/)
-* Sezero -- HoT (http://uhexen2.sourceforge.net/)
+* Sezero -- WATT32 and DJGPP 2.05 help.
+            HoT (http://uhexen2.sourceforge.net/)
 * Yamagi -- Updated game code from YamagiQ2 (http://www.yamagi.org/quake2/)
 * Various DJGPP v2.05 upgrade help from RayeR (http://rayer.g6.cz/)
 * Berserk, CDawg, Pat Aftermoon, Anthony Jacques, David M. Pochron, Dopefish,
