@@ -1750,8 +1750,9 @@ void CL_InitLocal (void)
 	cl_http_proxy = Cvar_Get ("cl_http_proxy", "", 0);
 	cl_http_filelists = Cvar_Get ("cl_http_filelists", "1", 0);
 	cl_http_downloads = Cvar_Get ("cl_http_downloads", "1", CVAR_ARCHIVE);
+	cl_http_downloads->description = "Enable HTTP downloading.";
 	cl_http_max_connections = Cvar_Get ("cl_http_max_connections", "4", 0);
-//	cl_http_max_connections->changed = _cl_http_max_connections_changed;
+	cl_http_max_connections->description = "Maximum number of connections to open up during HTTP downloading.  Currently limited to 4.";
 #endif	// USE_CURL
 	//
 	// register our commands

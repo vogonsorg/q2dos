@@ -2795,6 +2795,7 @@ void FormatGamespyList (void)
 				char buffer[80];
 
 				Q_strncpyz(gamespy_server_names[j], browserList[j].hostname, 20);
+
 				if(Q_strlen(browserList[j].hostname) >= 20)
 				{
 					Com_sprintf(buffer, sizeof(buffer), "... [%d] %d/%d", browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
@@ -2803,6 +2804,7 @@ void FormatGamespyList (void)
 				{
 					Com_sprintf(buffer, sizeof(buffer), "... [%d] %d/%d", browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
 				}
+
 				Com_strcat(gamespy_server_names[j], sizeof(gamespy_server_names[j]), buffer);
 			}
 			else
@@ -2819,7 +2821,6 @@ void FormatGamespyList (void)
 #endif
 }
 
-#define USE_GSPY_BOX // FS: DOS hated this, but I think I fixed it but I'll leave this here for a while
 static char	found[64];
 void SearchGamespyGames (void)
 {
@@ -2840,6 +2841,7 @@ void SearchGamespyGames (void)
 	{
 		strcpy (gamespy_server_names[i], NO_SERVER_STRING);
 	}
+
 	if(viddef.height < 300) // FS: 400x300 can handle the longer string
 	{
 		s_joingamespyserver_search_action.generic.statusbar = "Querying GameSpy. . .";
@@ -2849,7 +2851,6 @@ void SearchGamespyGames (void)
 		s_joingamespyserver_search_action.generic.statusbar = "Querying GameSpy for servers, please wait. . .";
 	}
 
-#ifdef USE_GSPY_BOX // FS: This makes DOS cry
 	SCR_UpdateScreen();
 
 	M_DrawTextBox( 8, 120 - 48, 36, 4 );
@@ -2857,22 +2858,19 @@ void SearchGamespyGames (void)
 	M_Print( 16 + 16, 120 - 48 + 16, "could take up to a minute, so" );
 	M_Print( 16 + 16, 120 - 48 + 24, "please be patient." );
 	M_Print( 16 + 16, 120 - 48 + 32, "Use CTRL+C to abort." );
-#endif
 
 	S_StopAllSounds(); // FS: So we don't hear a repeating menu sound.
 
-#ifdef USE_GSPY_BOX
 	// the text box won't show up unless we do a buffer swap
 	re.EndFrame();
 	cls.disable_screen = Sys_Milliseconds();
-#endif
-	// send out info packets
 
+	// send out info packets
 	CL_PingNetServers_f ();
-#ifdef USE_GSPY_BOX
+
 	cls.disable_screen = false;
 	SCR_UpdateScreen();
-#endif
+
 	FormatGamespyList();
 
 	Com_sprintf(found, sizeof(found), "Found %d servers\n", m_num_gamespy_servers);
@@ -2880,7 +2878,7 @@ void SearchGamespyGames (void)
 	Com_Printf(found);
 #else
 	Com_Printf("Q2DOS compiled without GAMESPY!\n");
-#endif
+#endif // GAMESPY
 }
 
 void SearchLocalGames( void )
@@ -2917,17 +2915,29 @@ int Get_Vidscale(void)
 {
 	// FS: Special function for some what scaling of the server browser depending on video resolution height.
 	if (viddef.height <= 240)
+	{
 		return 20;
+	}
 	else if (viddef.height <= 300)
+	{
 		return 23;
+	}
 	else if (viddef.height <= 400)
+	{
 		return 27;
+	}
 	else if (viddef.height <= 480)
+	{
 		return 32;
+	}
 	else if (viddef.height <= 800)
+	{
 		return 38;
+	}
 	else if (viddef.height > 800)
+	{
 		return 40;
+	}
 
 	// FS: We must have some weirdo mode, so 20 should be OK.
 	return 20;
@@ -2977,7 +2987,9 @@ void JoinServer_MenuInit( void )
 	Menu_AddItem( &s_joinserver_menu, &s_joinserver_search_action );
 
 	for ( i = 0; i < MAX_LOCAL_SERVERS; i++ )
+	{
 		Menu_AddItem( &s_joinserver_menu, &s_joinserver_server_actions[i] );
+	}
 
 //	Menu_Center( &s_joinserver_menu );
 
@@ -3006,12 +3018,14 @@ void JoinGamespyServer_MenuInit( void )
 	s_joingamespyserver_server_title.generic.x    = 80;
 	s_joingamespyserver_server_title.generic.y	   = 20;
 
-	vidscale = Get_Vidscale() - 1; //(viddef.height / (12 + sw_mode->intValue)) - 1; // FS: Yeah, yeah.  This kind of blows but we're using fixed tables anyways.
+	vidscale = Get_Vidscale() - 1;
 
 	for (i = 0; i <= MAX_GAMESPY_SERVERS; i++)
 	{
 		if(!gamespy_initialized)
+		{
 			strcpy (gamespy_server_names[i], NO_SERVER_STRING);
+		}
 	}
 
 	i = 0;
@@ -3072,12 +3086,14 @@ void JoinGamespyServerPage2_MenuInit( void )
 	s_joingamespyserver_server_title.generic.x    = 80;
 	s_joingamespyserver_server_title.generic.y	   = 20;
 
-	vidscale = Get_Vidscale() - 2;//(viddef.height / (12 + sw_mode->intValue)) - 2; // FS: Yeah, yeah.  This kind of blows but we're using fixed tables anyways.
+	vidscale = Get_Vidscale() - 2;
 
 	for ( i = 0; i < vidscale; i++ )
 	{
 		if (i+vidscale > MAX_GAMESPY_SERVERS)
+		{
 			break;
+		}
 
 		s_joingamespyserver_server_actions[i+vidscale].generic.type	= MTYPE_ACTION;
 		s_joingamespyserver_server_actions[i+vidscale].generic.name	= gamespy_server_names[i+vidscale];
@@ -3096,10 +3112,13 @@ void JoinGamespyServerPage2_MenuInit( void )
 	for ( i = 0; i < vidscale; i++ )
 	{
 		if (i+vidscale > MAX_GAMESPY_SERVERS)
+		{
 			break;
+		}
 
 		Menu_AddItem( &s_joingamespyserver_page2_menu, &s_joingamespyserver_server_actions[i+vidscale] );
 	}
+
 	s_joingamespyserver_page2_action.generic.type = MTYPE_ACTION;
 	s_joingamespyserver_page2_action.generic.name	= "<Page 1>";
 	s_joingamespyserver_page2_action.generic.flags	= QMF_LEFT_JUSTIFY;
@@ -3119,7 +3138,9 @@ void JoinGamespyServerPage2_MenuInit( void )
 	Menu_AddItem (&s_joingamespyserver_page2_menu, &s_joingamespyserver_page2_action );
 
 	if (Get_Vidscale() < 32) // FS: Don't bother with this in real high res modes
+	{
 		Menu_AddItem (&s_joingamespyserver_page2_menu, &s_joingamespyserver_page3_action );
+	}
 }
 
 void JoinGamespyServerPage3_MenuInit( void )
@@ -3149,7 +3170,9 @@ void JoinGamespyServerPage3_MenuInit( void )
 	for ( i = 0; i < vidscale; i++ )
 	{
 		if (i+vidscale+vidscale > MAX_GAMESPY_SERVERS)
+		{
 			break;
+		}
 
 		s_joingamespyserver_server_actions[i+vidscale+vidscale].generic.type	= MTYPE_ACTION;
 		s_joingamespyserver_server_actions[i+vidscale+vidscale].generic.name	= gamespy_server_names[i+vidscale+vidscale];
@@ -3168,10 +3191,13 @@ void JoinGamespyServerPage3_MenuInit( void )
 	for ( i = 0; i < vidscale; i++ )
 	{
 		if (i+vidscale+vidscale > MAX_GAMESPY_SERVERS)
+		{
 			break;
+		}
 
 		Menu_AddItem( &s_joingamespyserver_page3_menu, &s_joingamespyserver_server_actions[i+vidscale+vidscale] );
 	}
+
 	s_joingamespyserver_page3_action.generic.type = MTYPE_ACTION;
 	s_joingamespyserver_page3_action.generic.name	= "<Page 1>";
 	s_joingamespyserver_page3_action.generic.flags	= QMF_LEFT_JUSTIFY;
@@ -4049,6 +4075,7 @@ static menuframework_s s_downloadoptions_menu;
 
 static menuseparator_s	s_download_title;
 static menulist_s	s_allow_download_box;
+static menulist_s	s_allow_download_http_box; // FS
 static menulist_s	s_allow_download_maps_box;
 static menulist_s	s_allow_download_models_box;
 static menulist_s	s_allow_download_players_box;
@@ -4062,6 +4089,13 @@ static void DownloadCallback( void *self )
 	{
 		Cvar_SetValue("allow_download", f->curvalue);
 	}
+
+#ifdef USE_CURL
+	else if (f == &s_allow_download_http_box)
+	{
+		Cvar_SetValue("cl_http_downloads", f->curvalue);
+	}
+#endif
 
 	else if (f == &s_allow_download_maps_box)
 	{
@@ -4109,9 +4143,21 @@ void DownloadOptions_MenuInit( void )
 	s_allow_download_box.itemnames = yes_no_names;
 	s_allow_download_box.curvalue = (Cvar_VariableValue("allow_download") != 0);
 
+#ifdef USE_CURL
+	s_allow_download_http_box.generic.type = MTYPE_SPINCONTROL;
+	s_allow_download_http_box.generic.x	= 0;
+	s_allow_download_http_box.generic.y	= y += 20;
+	s_allow_download_http_box.generic.name	= "http downloading";
+	s_allow_download_http_box.generic.callback = DownloadCallback;
+	s_allow_download_http_box.itemnames = yes_no_names;
+	s_allow_download_http_box.curvalue = (Cvar_VariableValue("cl_http_downloads") != 0);
+#else
+	y += 10;
+#endif
+
 	s_allow_download_maps_box.generic.type = MTYPE_SPINCONTROL;
 	s_allow_download_maps_box.generic.x	= 0;
-	s_allow_download_maps_box.generic.y	= y += 20;
+	s_allow_download_maps_box.generic.y	= y += 10;
 	s_allow_download_maps_box.generic.name	= "maps";
 	s_allow_download_maps_box.generic.callback = DownloadCallback;
 	s_allow_download_maps_box.itemnames = yes_no_names;
@@ -4143,6 +4189,11 @@ void DownloadOptions_MenuInit( void )
 
 	Menu_AddItem( &s_downloadoptions_menu, &s_download_title );
 	Menu_AddItem( &s_downloadoptions_menu, &s_allow_download_box );
+
+#ifdef USE_CURL
+	Menu_AddItem( &s_downloadoptions_menu, &s_allow_download_http_box );
+#endif
+
 	Menu_AddItem( &s_downloadoptions_menu, &s_allow_download_maps_box );
 	Menu_AddItem( &s_downloadoptions_menu, &s_allow_download_players_box );
 	Menu_AddItem( &s_downloadoptions_menu, &s_allow_download_models_box );
@@ -4152,7 +4203,9 @@ void DownloadOptions_MenuInit( void )
 
 	// skip over title
 	if (s_downloadoptions_menu.cursor == 0)
+	{
 		s_downloadoptions_menu.cursor = 1;
+	}
 }
 
 void DownloadOptions_MenuDraw(void)
@@ -4344,8 +4397,12 @@ static qboolean IsValidSkin (char **filelist, int numFiles, int index)
 	if ( !strcmp (filelist[index]+max(len-4,0), ".pcx") )
 	{
 		if ( strcmp (filelist[index]+max(len-6,0), "_i.pcx") )
+		{
 			if ( IconOfSkinExists (filelist[index], filelist, numFiles-1) )
+			{
 				return true;
+			}
+		}
 	}
 	return false;
 }
@@ -4376,20 +4433,29 @@ static qboolean PlayerConfig_ScanDirectories( void )
 			Com_sprintf( findname, sizeof(findname), "%s/players/*.*", path );
 
 			if ( ( dirnames = FS_ListFiles( findname, &ndirs, SFF_SUBDIR, 0 ) ) != 0 )
+			{
 				break;
-		} while ( path );
+			}
+		}
+		while ( path );
 
 		if ( !dirnames )
+		{
 			return false;
+		}
 
 		/*
 		** go through the subdirectories
 		*/
 		npms = ndirs;
 		if ( npms > MAX_PLAYERMODELS )
+		{
 			npms = MAX_PLAYERMODELS;
+		}
 		if ( (s_numplayermodels + npms) > MAX_PLAYERMODELS ) // Knightmare added
+		{
 			npms = MAX_PLAYERMODELS - s_numplayermodels;
+		}
 
 		for ( i = 0; i < npms; i++ )
 		{
@@ -4967,16 +5033,22 @@ M_Draw
 void M_Draw (void)
 {
 	if (cls.key_dest != key_menu)
+	{
 		return;
+	}
 
 	// repaint everything next frame
 	SCR_DirtyScreen ();
 
 	// dim everything behind it down
 	if (cl.cinematictime > 0)
+	{
 		re.DrawFill (0,0,viddef.width, viddef.height, 0);
+	}
 	else
+	{
 		re.DrawFadeScreen ();
+	}
 
 	m_drawfunc ();
 
@@ -5002,8 +5074,12 @@ void M_Keydown (int key)
 	extern	qboolean keydown[256];
 
 	if (m_keyfunc)
+	{
 		if ( ( s = m_keyfunc( key ) ) != 0 )
+		{
 			S_StartLocalSound( ( char * ) s );
+		}
+	}
 
 	if( key == 'c' ) // FS: Added
 	{
@@ -5011,7 +5087,9 @@ void M_Keydown (int key)
 		{
 			Cbuf_AddText ("gspystop\n");
 			if (cls.gamespyupdate)
+			{
 				Cbuf_Execute(); // FS: Fire immediately because of gamespy crap
+			}
 			return;
 		}
 	}

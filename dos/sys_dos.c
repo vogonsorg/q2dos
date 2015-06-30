@@ -1,4 +1,4 @@
-// sys_dos.c -- dos system driver
+// sys_dos.c -- dos system driver, adapated from Quake 1
 
 #include <errno.h>
 #include <unistd.h>
@@ -21,7 +21,6 @@
 
 int _crt0_startup_flags = _CRT0_FLAG_UNIX_SBRK; // FS: Fake Mem Fix (QIP)
 
-#include "zone.h"
 #include "dosisms.h"
 #include "../qcommon/qcommon.h"
 #include "../client/keys.h"
@@ -36,9 +35,6 @@ static unsigned char    keybuf[KEYBUF_SIZE];
 static int                              keybuf_head=0;
 static int                              keybuf_tail=0;
 
-#ifdef USE_QDOS_ZONE
-static quakeparms_t     quakeparms;
-#endif
 extern char     start_of_memory __asm__("start");
 
 byte        scantokey[128] = 
@@ -87,15 +83,10 @@ byte        shiftscantokey[128] =
 
 void TrapKey(void)
 {
-//      static int ctrl=0;
 	keybuf[keybuf_head] = dos_inportb(0x60);
 	dos_outportb(0x20, 0x20);
-	/*
-	if (scantokey[keybuf[keybuf_head]&0x7f] == K_CTRL)
-		ctrl=keybuf[keybuf_head]&0x80;
-	if (ctrl && scantokey[keybuf[keybuf_head]&0x7f] == 'c')
-		Sys_Error("ctrl-c hit\n");
-	*/
+
+
 	keybuf_head = (keybuf_head + 1) & (KEYBUF_SIZE-1);
 }
 
@@ -157,15 +148,6 @@ void Sys_DetectWin95 (void)
 	else
 	{
 		Sys_Error("Microsoft Windows detected.  You must run Q2DOS in MS-DOS.\n"); // FS: Warning.  Too many issues in Win9x and even XP.  QDOS is the same way.  So forget it.
-		win95 = 1;
-		lockunlockmem = COM_CheckParm ("-winlockunlock");
-
-		if (lockunlockmem)
-			lockmem = true;
-		else
-			lockmem = COM_CheckParm ("-winlock");
-
-		unlockmem = lockmem && !lockunlockmem;
 	}
 }
 
@@ -203,19 +185,19 @@ void *dos_getmaxlockedmem(int *size)
 
 	if (!win95)             /* Not windows or earlier than Win95 */
 	{
-		//working_size = meminfo.maximum_locked_page_allocation_in_pages * 4096;
 		ul = meminfo.maximum_locked_page_allocation_in_pages * 4096; // FS: 2GB fix
 	}
 	else
 	{
-//                working_size = meminfo.largest_available_free_block_in_bytes -
-//                                LEAVE_FOR_CACHE;
 		ul = meminfo.largest_available_free_block_in_bytes -
 		LEAVE_FOR_CACHE; // FS: 2GB fix
 	}
 
 	if (ul > 0x7fffffff)
+	{
 		ul = 0x7fffffff; /* limit to 2GB */
+	}
+
 	working_size = (int) ul;
 	working_size &= ~0xffff;                /* Round down to 64K */
 	working_size += 0x10000;
@@ -224,7 +206,8 @@ void *dos_getmaxlockedmem(int *size)
 	{
 		working_size -= 0x10000;                /* Decrease 64K and try again */
 		working_memory = sbrk(working_size);
-	} while (working_memory == (void *)-1);
+	}
+	while (working_memory == (void *)-1);
 
 	extra = 0xfffc - ((unsigned)sbrk(0) & 0xffff);
 
@@ -260,7 +243,9 @@ void *dos_getmaxlockedmem(int *size)
 					LOCKED_FOR_MALLOC;
 
 			if (allocsize < (minmem + LOCKED_FOR_MALLOC))
+			{
 				allocsize = minmem + LOCKED_FOR_MALLOC;
+			}
 		}
 		else
 		{
@@ -283,7 +268,9 @@ void *dos_getmaxlockedmem(int *size)
 			info.size = j;
 	
 			if (!__dpmi_lock_linear_region(&info))
+			{
 				goto Locked;
+			}
 	
 			write (STDOUT, ".", 1);
 		}
@@ -294,11 +281,13 @@ void *dos_getmaxlockedmem(int *size)
 			info.size = minmem + LOCKED_FOR_MALLOC;
 
 			if (!__dpmi_lock_linear_region(&info))
+			{
 				goto Locked;
+			}
 		}
 
-                Sys_Error ("Can't lock memory; %ld Mb lockable RAM required. "
-				   "Try shrinking smartdrv.", info.size / 0x100000);
+	Sys_Error ("Can't lock memory; %ld Mb lockable RAM required. "
+				"Try shrinking smartdrv.", info.size / 0x100000);
 
 Locked:
 
@@ -344,59 +333,12 @@ UpdateSbrk:
 	working_size -= LOCKED_FOR_MALLOC;
 	sbrk( -(LOCKED_FOR_MALLOC));
 	*size = working_size;
+
 	return working_memory;
 }
 
 int virtualmemsize;
 byte *virtualmembase;
-
-void Sys_GetMemory(void)
-{
-// FS: TODO FIXME FIXME doesn't have quakeparms.memsize or anything that I see
-//	virtualmembase = malloc (virtualmemsize);
-//	virtualmemsize = (int) 4096 * 1024 * 1024;
-//	virtualmembase = dos_getmaxlockedmem(&virtualmemsize); // FS: Lock Virtual memory?
-#ifdef USE_QDOS_ZONE
-	int             j, tsize;
-
-	j = COM_CheckParm("-mem");
-	if (j)
-	{
-		quakeparms.memsize = (int) (atof(com_argv[j+1]) * 1024 * 1024); // FS: FIXME USE Q_ATOF
-		quakeparms.membase = malloc (quakeparms.memsize);
-	}
-	else
-	{
-		int j;
-		//quakeparms.membase = dos_getmaxlockedmem (&quakeparms.memsize);
-
-		j=32; // FS: from QW
-		quakeparms.memsize = (int) j * 1024 * 1024; 
-		quakeparms.membase = malloc (quakeparms.memsize);
-	}
-
-	fprintf(stderr, "malloc'd: %d\n", quakeparms.memsize);
-
-	if (COM_CheckParm ("-noclear")) // FS: Wanted the option
-	{
-		return;
-	}
-	else
-	{
-		printf("Clearing allocated memory...\n");
-		memset(quakeparms.membase,0x0,quakeparms.memsize); // JASON: Clear memory on startup
-		printf("Done!  Continuing to load Quake 2.\n");
-	}
-
-	if (COM_CheckParm ("-heapsize"))
-	{
-		tsize = Q_atoi (com_argv[COM_CheckParm("-heapsize") + 1]) * 1024;
-
-		if (tsize < quakeparms.memsize)
-			quakeparms.memsize = tsize;
-	}
-#endif // USE_QDOS_ZONE
-}
 
 int Sys_Get_Physical_Memory(void) // FS: From DJGPP tutorial
 {
@@ -501,15 +443,14 @@ void Sys_Quit (void)
 	__dpmi_regs r;
 
 	if(!dedicated || !dedicated->value)
+	{
 		dos_restoreintr(9); // FS: Give back the keyboard
+	}
 
 	if (unlockmem)
 	{
 		dos_unlockmem (&start_of_memory,
 					   end_of_memory - (int)&start_of_memory);
-#ifdef USE_QDOS_ZONE
-		dos_unlockmem (quakeparms.membase, quakeparms.memsize);
-#endif
 	}
 	//return to text mode
 
@@ -524,8 +465,6 @@ void	Sys_UnloadGame (void)
 {
 }
 
-//void *GetGameAPI (void *import);
-
 void	*Sys_GetGameAPI (void *parms)
 {
 	return GetGameAPI (parms);
@@ -533,188 +472,6 @@ void	*Sys_GetGameAPI (void *parms)
 // needs to be statically linked for null
 // otherwise it sits here to satisfy the linker AFIK
 #else
-
-//Unload the DLL
-#include <dlfcn.h>
-#include <sys/dxe.h>
-#include <assert.h>
-#include <ctype.h>
-
-// FS: The following is gross, but I just figured this out.
-extern void vectoangles2 (vec3_t value1, vec3_t angles);
-extern	vec3_t monster_flash_offset [];
-
-DXE_EXPORT_TABLE (syms)
-  DXE_EXPORT (FS_Gamedir)
-  DXE_EXPORT (__dj_assert)
-  DXE_EXPORT (__dj_ctype_tolower)
-  DXE_EXPORT (__dj_ctype_toupper)
-  DXE_EXPORT (__dj_huge_val)
-  DXE_EXPORT (__dj_stderr)
-  DXE_EXPORT (_doprnt)
-  DXE_EXPORT (acos)
-  DXE_EXPORT (asin)
-  DXE_EXPORT (atan)
-  DXE_EXPORT (atan2)
-  DXE_EXPORT (atof)
-  DXE_EXPORT (atoi)
-  DXE_EXPORT (ceil)
-  DXE_EXPORT (cos)
-  DXE_EXPORT (crand)
-  DXE_EXPORT (errno)
-  DXE_EXPORT (exit)
-  DXE_EXPORT (fclose)
-  DXE_EXPORT (feof)
-  DXE_EXPORT (fgetc)
-  DXE_EXPORT (fgets)
-  DXE_EXPORT (floor)
-  DXE_EXPORT (fopen)
-  DXE_EXPORT (fprintf)
-  DXE_EXPORT (fputc)
-  DXE_EXPORT (fputs)
-  DXE_EXPORT (fread)
-  DXE_EXPORT (free)
-  DXE_EXPORT (fscanf)
-  DXE_EXPORT (fseek)
-  DXE_EXPORT (fwrite)
-  DXE_EXPORT (getc)
-  DXE_EXPORT (localtime)
-  DXE_EXPORT (malloc)
-  DXE_EXPORT (memcmp)
-  DXE_EXPORT (memcpy)
-  DXE_EXPORT (memset)
-  DXE_EXPORT (monster_flash_offset)
-  DXE_EXPORT (printf)
-  DXE_EXPORT (putc)
-  DXE_EXPORT (puts)
-  DXE_EXPORT (qsort)
-  DXE_EXPORT (rand)
-  DXE_EXPORT (sin)
-  DXE_EXPORT (sprintf)
-  DXE_EXPORT (sqrt)
-  DXE_EXPORT (srand)
-  DXE_EXPORT (sscanf)
-  DXE_EXPORT (stpcpy)
-  DXE_EXPORT (strcasecmp)
-  DXE_EXPORT (strcat)
-  DXE_EXPORT (strchr)
-  DXE_EXPORT (strcmp)
-  DXE_EXPORT (strcpy)
-  DXE_EXPORT (strdup)
-  DXE_EXPORT (strftime)
-  DXE_EXPORT (stricmp)
-  DXE_EXPORT (strlen)
-  DXE_EXPORT (strncmp)
-  DXE_EXPORT (strncpy)
-  DXE_EXPORT (strnicmp)
-  DXE_EXPORT (strrchr)
-  DXE_EXPORT (strstr)
-  DXE_EXPORT (strtod)
-  DXE_EXPORT (strtok)
-  DXE_EXPORT (strtol)
-  DXE_EXPORT (tan)
-  DXE_EXPORT (time)
-  DXE_EXPORT (tolower)
-  DXE_EXPORT (vectoangles2)
-  DXE_EXPORT (vsprintf)
-DXE_EXPORT_END
-
-static void (*game_library)(void);
-
-void    Sys_UnloadGame (void)
-{
-	if (game_library)
-	{
-		dlclose (game_library);
-	}
-	game_library = NULL;
-}
-
-static int lastresort ()
-{
-	printf ("last resort function called!\n");
-	return 0;
-}
-
-void *dxe_res (const char *symname)
-{
-	printf ("%s: undefined symbol in dynamic module.  Please report this as a bug!\n", symname);
-	Com_Printf ("%s: undefined symbol in dynamic module.  Please report this as a bug!\n", symname);
-
-	union
-	{
-		int (*from)(void);
-		void *to;
-	} func_ptr_cast;
-
-	func_ptr_cast.from = lastresort;
-	return func_ptr_cast.to;
-}
-
-void *Sys_GetGameAPI (void *parms)
-{
-	void	*(*GetGameAPI) (void *);
-	char	name[MAX_OSPATH];
-	char	curpath[MAX_OSPATH];
-	char	*path;
-	const char *gamename = "gamex86.dx3";
-
-	getcwd(curpath, sizeof(curpath));
-
-	Com_Printf("------- Loading %s -------\n", gamename);
-
-	  // Set the error callback function
-	_dlsymresolver = dxe_res;
-
-	// Register the symbols exported into dynamic modules
-	dlregsym (syms);
-
-	// now run through the search paths
-	path = NULL;
-
-	while (1)
-	{
-		path = FS_NextPath (path);
-		if (!path)
-			return NULL;		// couldn't find one anywhere
-		sprintf (name, "%s/%s/%s", curpath, path, gamename);
-		game_library = dlopen (name, RTLD_LAZY);
-		if (game_library)
-		{
-			Com_Printf ("LoadLibrary (%s)\n",name);
-			break;
-		}
-	}
-
-#if 0 // FS: Me testing it out.
-	if(game_library)
-	{
-		void (*Test_DXE)(void);
-
-		dlerror();
-		*(void **) (&Test_DXE) = dlsym(game_library, "_Test_DXE");
-//		void *Test_DXE = (void*)dlsym(game_library, "Test_DXE");
-		if(!Test_DXE)
-			Com_Printf("Can't find Test_DXE!");
-		else
-			Com_Printf("Found Test_DXE!\n");
-	}
-#endif
-
-	*(void **) (&GetGameAPI) = dlsym (game_library, "_GetGameAPI");
-
-	if (!GetGameAPI)
-	{
-		Sys_UnloadGame ();		
-		return NULL;
-	}
-	else
-	{
-//		Com_Printf("it loaded\n");
-	}
-
-	return GetGameAPI (parms);
-}
 
 #endif	
 
@@ -726,10 +483,14 @@ char *Sys_ConsoleInput (void)
 	char            ch;
 
 	if (!dedicated || !dedicated->value)
+	{
 		return NULL;
+	}
 
 	if (! kbhit())
+	{
 		return NULL;
+	}
 
 	ch = getche();
 
@@ -759,13 +520,17 @@ char *Sys_ConsoleInput (void)
 			len = (len + 1) & 0xff;
 			break;
 	}
+
 	return NULL;
 }
 
 void	Sys_ConsoleOutput (char *string)
 {
 	if (!dedicated || !dedicated->value)
+	{
 		return;
+	}
+
 	printf("%s",string);
 }
 
@@ -854,29 +619,20 @@ int main (int argc, char **argv)
 {
 	double time, oldtime, newtime;
 
-#ifdef USE_QDOS_ZONE
-	COM_InitArgv (argc, argv);
-
-	quakeparms.argc = com_argc;
-	quakeparms.argv = com_argv;
-#endif
 	Sys_DetectLFN();
 	Sys_DetectWin95 ();
 	Sys_PageInProgram ();
-	Sys_GetMemory ();
 
 	Sys_Init();
 
-#ifndef USE_QDOS_ZONE
 	Qcommon_Init (argc, argv);
-#else
-	Qcommon_Init(&quakeparms);
-#endif
 
 	oldtime = Sys_Milliseconds ();
 
 	if (!dedicated || !dedicated->value)
+	{
 		dos_registerintr(9, TrapKey);
+	}
 
     /* main window message loop */
 	while (1)
@@ -885,7 +641,9 @@ int main (int argc, char **argv)
 		{
 			newtime = Sys_Milliseconds ();
 			time = newtime - oldtime;
-		} while (time < 1);
+		}
+		while (time < 1);
+
 		Qcommon_Frame (time);
 		sys_frame_time = newtime; // FS: Need to update this for input to work properly
 		oldtime = newtime;
@@ -894,4 +652,5 @@ int main (int argc, char **argv)
 
 void Sys_MakeCodeWriteable(void)
 {
-} //MS-DOS is always writeable
+// MS-DOS is always writeable
+}

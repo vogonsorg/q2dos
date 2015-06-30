@@ -21,7 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // qcommon.h -- definitions common between client and server, but not game.dll
 
 #include "../game/q_shared.h"
-#include "../dos/zone.h"
 
 #define	VERSION		3.24
 
@@ -806,11 +805,7 @@ void *Z_Malloc (int size);			// returns 0 filled memory
 void *Z_TagMalloc (int size, int tag);
 void Z_FreeTags (int tag);
 
-#ifndef USE_QDOS_ZONE
 void Qcommon_Init (int argc, char **argv);
-#else
-void Qcommon_Init (quakeparms_t *parms);
-#endif
 
 void Qcommon_Frame (double msec);
 void Qcommon_Shutdown (void);

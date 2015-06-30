@@ -24,15 +24,18 @@ byte	*membase;
 int		hunkmaxsize;
 int		cursize;
 
-#ifndef USE_QDOS_ZONE
 void	*Hunk_Begin (int maxsize)
 {
 	// reserve a huge chunk of memory, but don't commit any yet
 	cursize = 0;
 	hunkmaxsize = maxsize;
 	membase = malloc (maxsize);
+
 	if (!membase)
+	{
 		Sys_Error ("VirtualAlloc reserve failed %d bytes",maxsize);
+	}
+
 	memset (membase, 0, maxsize);
 	return (void *)membase;
 
@@ -47,11 +50,12 @@ void	*Hunk_Alloc (int size)
 
 	cursize += size;
 	if (cursize > hunkmaxsize)
+	{
 		Sys_Error ("Hunk_Alloc overflow");
+	}
 
 	return (void *)(membase+cursize-size);
 }
-#endif
 
 void	Hunk_Free (void *buf)
 {
@@ -62,7 +66,6 @@ void	Hunk_Free (void *buf)
 int	Hunk_End (void)
 {
 	hunkcount++;
-//Com_Printf ("hunkcount: %i\n", hunkcount);
 	return cursize;
 }
 
@@ -71,6 +74,7 @@ double	Sys_Milliseconds (void)
 {
 	// FS: Needed *1000 to work properly
 	curtime = (double) uclock() / (double) UCLOCKS_PER_SEC*1000; // FS: Win9X/Fast PC Fix (QIP)
+
 	return curtime;
 }
 

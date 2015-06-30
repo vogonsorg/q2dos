@@ -22,9 +22,9 @@ DOS = 	dos/cd_dos.o \
 	dos/glob.o \
 	dos/sys_dosa.o \
 	dos/q_shdos.o \
-	dos/zone.o \
 	game/m_flash.o \
 	game/q_shared.o \
+	dos/dxe.o \
 	dos/swimp_dos.o
 
 CLIENT =	client/cl_input.o \

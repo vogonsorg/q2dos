@@ -39,12 +39,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // HTTP downloading from R1Q2
 #ifdef USE_CURL
+
 #ifdef _WIN32
 #define CURL_STATICLIB
 #define CURL_HIDDEN_SYMBOLS
 #define CURL_EXTERN_SYMBOL
 #define CURL_CALLING_CONVENTION __cdecl
-#endif
+#endif // _WIN32
 
 //#if defined (_MSC_VER) && (_MSC_VER <= 1200)	// use older version of libcurl for MSVC6
 //#include "../include/curl_old/curl.h"
@@ -54,6 +55,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../libcurl/include/curl/curl.h"
 #define CURL_ERROR(x)	curl_easy_strerror(x)
 //#endif
+
+#define MAX_HTTP_HANDLES 4 // FS: If I want to be nasty and change the value
 
 #endif	// USE_CURL
 // end HTTP downloading from R1Q2
@@ -310,7 +313,7 @@ typedef struct
 #ifdef USE_CURL	// HTTP downloading from R1Q2
 	dlqueue_t		downloadQueue;			//queue of paths we need
 	
-	dlhandle_t		HTTPHandles[4];			//actual download handles
+	dlhandle_t		HTTPHandles[MAX_HTTP_HANDLES];			//actual download handles
 	//don't raise this!
 	//i use a hardcoded maximum of 4 simultaneous connections to avoid
 	//overloading the server. i'm all too familiar with assholes who set

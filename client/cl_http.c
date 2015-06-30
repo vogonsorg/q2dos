@@ -784,7 +784,7 @@ void CL_HTTP_Cleanup (qboolean fullShutdown)
 	if (fullShutdown && httpDown)
 		return;
 
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < MAX_HTTP_HANDLES; i++)
 	{
 		dl = &cls.HTTPHandles[i];
 
@@ -880,7 +880,7 @@ static void CL_FinishHTTPDownload (void)
 		curl = msg->easy_handle;
 
 		// curl doesn't provide reverse-lookup of the void * ptr, so search for it
-		for (i = 0; i < 4; i++)
+		for (i = 0; i < MAX_HTTP_HANDLES; i++)
 		{
 			if (cls.HTTPHandles[i].curl == curl)
 			{
@@ -889,7 +889,7 @@ static void CL_FinishHTTPDownload (void)
 			}
 		}
 
-		if (i == 4)
+		if (i == MAX_HTTP_HANDLES)
 			Com_Error (ERR_DROP, "CL_FinishHTTPDownload: Handle not found");
 
 		// we mark everything as done even if it errored to prevent multiple
@@ -1059,7 +1059,7 @@ static dlhandle_t *CL_GetFreeDLHandle (void)
 	dlhandle_t	*dl;
 	int			i;
 
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < MAX_HTTP_HANDLES; i++)
 	{
 		dl = &cls.HTTPHandles[i];
 		if (!dl->queueEntry || dl->queueEntry->state == DLQ_STATE_DONE)
