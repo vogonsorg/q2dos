@@ -5,7 +5,7 @@
 #include "../client/client.h"
 #include "../client/snd_loc.h"
 #include "dosisms.h"
-#include "lib/def.h"
+#include "libaudef.h"
 
 #define USE_QDOS_SOUND
 #ifdef USE_QDOS_SOUND
