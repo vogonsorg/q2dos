@@ -424,6 +424,8 @@ void CL_SetHTTPServer (const char *URL)
 	handleCount = pendingCount = 0;
 
 	strncpy (cls.downloadServer, URL, sizeof(cls.downloadServer)-1);
+
+	cls.downloadServerRetry[0] = 0; // FS: Added because Whale's Weapons HTTP server rejects you after a lot of 404s.  Then you lose HTTP until a hard reconnect.
 }
 /*
 ===============
@@ -1037,9 +1039,14 @@ static void CL_FinishHTTPDownload (void)
 	if (handleCount == 0)
 	{
 		if (abortDownloads == HTTPDL_ABORT_SOFT)
+		{
 			abortDownloads = HTTPDL_ABORT_NONE;
+		}
 		else if (abortDownloads == HTTPDL_ABORT_HARD)
+		{
+			Q_strncpyz(cls.downloadServerRetry, cls.downloadServer, sizeof(cls.downloadServerRetry)); // FS: Added because Whale's Weapons HTTP server rejects you after a lot of 404s.  Then you lose HTTP until a hard reconnect.
 			cls.downloadServer[0] = 0;
+		}
 	}
 
 	// done current batch, see if we have more to dl - maybe a .bsp needs downloaded

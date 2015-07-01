@@ -323,6 +323,7 @@ typedef struct
 	//large files.
 
 	char			downloadServer[512];	//base url prefix to download from
+	char			downloadServerRetry[512]; // FS: Added because Whale's Weapons HTTP server rejects you after a lot of 404s.  Then you lose HTTP until a hard reconnect.
 	char			downloadReferer[32];	//libcurl requires a static string :(
 #endif	// USE_CURL
 } client_static_t;

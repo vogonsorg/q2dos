@@ -110,7 +110,9 @@ void R_MarkLeaves (void);
 
 cvar_t	*r_lefthand;
 cvar_t	*sw_aliasstats;
+#ifdef WIN32
 cvar_t	*sw_allow_modex;
+#endif
 cvar_t	*sw_clearcolor;
 cvar_t	*sw_drawflat;
 cvar_t	*sw_draworder;
@@ -249,10 +251,15 @@ void R_ImageList_f( void );
 void R_Register (void)
 {
 	sw_aliasstats = ri.Cvar_Get ("sw_polymodelstats", "0", 0);
+#ifdef WIN32
 	sw_allow_modex = ri.Cvar_Get( "sw_allow_modex", "1", CVAR_ARCHIVE );
+#endif
 	sw_clearcolor = ri.Cvar_Get ("sw_clearcolor", "2", 0);
+	sw_clearcolor->description = "The (by default) grey background filler seen when there is a hole in the map.";
 	sw_drawflat = ri.Cvar_Get ("sw_drawflat", "0", 0);
+	sw_drawflat->description = "Draw flat single colour textures instead of the textures themselves.";
 	sw_draworder = ri.Cvar_Get ("sw_draworder", "0", 0);
+	sw_draworder->description = "Generates edge spans backwards";
 	sw_maxedges = ri.Cvar_Get ("sw_maxedges", STRINGER(MAXSTACKSURFACES), 0);
 	sw_maxedges->description = "Maximum number of edges to draw.  This value may need to be raised if you see disappearing geometry.";
 	sw_maxsurfs = ri.Cvar_Get ("sw_maxsurfs", "0", 0);
@@ -260,9 +267,12 @@ void R_Register (void)
 	sw_mipcap = ri.Cvar_Get ("sw_mipcap", "0", 0);
 	sw_mipscale = ri.Cvar_Get ("sw_mipscale", "1", 0);
 	sw_reportedgeout = ri.Cvar_Get ("sw_reportedgeout", "0", 0);
+	sw_reportedgeout->description = "Report running out of edges.";
 	sw_reportsurfout = ri.Cvar_Get ("sw_reportsurfout", "0", 0);
+	sw_reportsurfout->description = "Report running out of surfaces.";
 	sw_stipplealpha = ri.Cvar_Get( "sw_stipplealpha", "0", CVAR_ARCHIVE );
 	sw_surfcacheoverride = ri.Cvar_Get ("sw_surfcacheoverride", "0", 0);
+	sw_surfcacheoverride->description = "Surface cache size (in bytes).  Standard formula is 1024x768 + ((width*height)-64000)*3";
 	sw_waterwarp = ri.Cvar_Get ("sw_waterwarp", "1", CVAR_ARCHIVE);
 	sw_waterwarp->description = "Enables water warping effect when swimming.";
 	sw_mode = ri.Cvar_Get( "sw_mode", "0", CVAR_ARCHIVE );
@@ -270,12 +280,17 @@ void R_Register (void)
 	r_lefthand = ri.Cvar_Get( "hand", "0", CVAR_USERINFO | CVAR_ARCHIVE );
 	r_speeds = ri.Cvar_Get ("r_speeds", "0", 0);
 	r_fullbright = ri.Cvar_Get ("r_fullbright", "0", 0);
+	r_fullbright->description = "Enables full bright lights.  Disabled in multiplayer.";
 	r_drawentities = ri.Cvar_Get ("r_drawentities", "1", 0);
 	r_drawworld = ri.Cvar_Get ("r_drawworld", "1", 0);
+	r_drawworld->description = "Set to 0 to disable drawing of the world.  Disabled in multiplayer.";
 	r_dspeeds = ri.Cvar_Get ("r_dspeeds", "0", 0);
 	r_lightlevel = ri.Cvar_Get ("r_lightlevel", "0", 0);
+	r_lightlevel->description = "The saved off light value for server to look at (BIG HACK!).";
 	r_lerpmodels = ri.Cvar_Get( "r_lerpmodels", "1", 0 );
+	r_lerpmodels->description = "Set to 0 to disable lerping of model animations.";
 	r_novis = ri.Cvar_Get( "r_novis", "0", 0 );
+	r_novis->description = "Disables loading of VIS data for development purposes.";
 
 	vid_fullscreen = ri.Cvar_Get( "vid_fullscreen", "0", CVAR_ARCHIVE );
 	vid_gamma = ri.Cvar_Get( "vid_gamma", "1.0", CVAR_ARCHIVE );
@@ -299,6 +314,7 @@ void R_Register (void)
 
 //PGM
 	sw_lockpvs = ri.Cvar_Get ("sw_lockpvs", "0", 0);
+	sw_lockpvs->description = "Development aid to let you run around and see exactly where the Potentially Visble Set ends.";
 //PGM
 }
 
