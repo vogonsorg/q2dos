@@ -625,7 +625,7 @@ G_SetSpectatorStats(edict_t *ent)
 		return;
 	}
 
-	 cl = ent->client;
+	cl = ent->client;
 
 	if (!cl->chase_target)
 	{

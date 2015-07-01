@@ -607,7 +607,7 @@ G_CheckChaseStats(edict_t *ent)
 void
 G_SetSpectatorStats(edict_t *ent)
 {
-	gclient_t *cl = NULL;
+	gclient_t *cl;
 
 	if (!ent)
 	{

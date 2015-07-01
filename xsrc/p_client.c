@@ -2003,7 +2003,7 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 	}
 	else
 	{
-		int tmpVel = 0;
+		int tmpVel;
 		/* set up for pmove */
 		memset(&pm, 0, sizeof(pm));
 

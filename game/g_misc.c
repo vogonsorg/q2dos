@@ -2340,8 +2340,8 @@ typedef struct zhead_s
 void
 func_clock_format_countdown(edict_t *self)
 {
-	zhead_t *z = NULL;
-	int size = 0;
+	zhead_t *z;
+	int size;
 
 	if (!self)
 	{
