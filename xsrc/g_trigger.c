@@ -520,11 +520,6 @@ trigger_push
 ==============================================================================
 */
 
-// RAFAEL
-#define PUSH_ONCE  1
-
-static int windsound;
-
 void trigger_push_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
 	if (!self || !other)
