@@ -563,6 +563,7 @@ static GError ServerListQueryLoop(GServerList serverlist)
 	GServer server;
 
 	FD_ZERO(&set);
+
 	for (i = 0 ; i < serverlist->maxupdates && serverlist->nextupdate < ArrayLength(serverlist->servers) ; i++)
 	{
 		if (serverlist->abortupdate) // FS: Check if we want to stop.
@@ -575,28 +576,36 @@ static GError ServerListQueryLoop(GServerList serverlist)
 		if (serverlist->updatelist[i].serverindex < 0) //it's availalbe
 		{
 			FD_SET( serverlist->updatelist[i].s, &set);
+
 			serverlist->updatelist[i].serverindex = serverlist->nextupdate++;
 			server = *(GServer *)ArrayNth(serverlist->servers,serverlist->updatelist[i].serverindex);
 			saddr.sin_family = AF_INET;
 			saddr.sin_addr.s_addr = inet_addr(ServerGetAddress(server));
-			Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Attempting to ping[%i]: %s\n", i, ServerGetAddress(server));
+
+			Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Attempting to ping[%i]: %s:%i\n", i, ServerGetAddress(server), ServerGetQueryPort(server));
+
 			saddr.sin_port = htons((short)ServerGetQueryPort(server));
 
 			error = sendto(serverlist->updatelist[i].s,STATUS,strlen(STATUS), 0, (struct sockaddr *) &saddr, saddrlen);
 			serverlist->updatelist[i].starttime = current_time();
 
 			select(serverlist->updatelist[i].s + 1, &set, NULL, NULL, &timeout);
+//			select_s(serverlist->updatelist[i].s + 1, &set, NULL, NULL, &timeout); // FS: Don't use, select_s broken for now
+
 			if (FD_ISSET(serverlist->updatelist[i].s, &set))
 			{
 				error = recvfrom(serverlist->updatelist[i].s, indata, sizeof(indata) - 1, 0, (struct sockaddr *)&saddr, &saddrlen );
+
 				if (SOCKET_ERROR != error) //we got data
 				{
 					indata[error] = 0; //truncate and parse it
 					server = *(GServer *)ArrayNth(serverlist->servers,serverlist->updatelist[i].serverindex);
+
 					if (server->ping == 9999) //set the ping
 					{
 						server->ping = current_time() - serverlist->updatelist[i].starttime;
 					}
+
 					ServerParseKeyVals(server, indata); 
 					serverlist->CallBackFn(serverlist, 
 										LIST_PROGRESS, 
@@ -608,10 +617,12 @@ static GError ServerListQueryLoop(GServerList serverlist)
 				else
 				{
 					Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Error during gamespy recv %d\n", errno);
-					continue;
+					serverlist->updatelist[i].serverindex = -1; //reuse the updatelist
+//					continue;
 				}
 			}
 		}
+
 		percent = ((float)serverlist->nextupdate/(float)ServerListCount(serverlist)) * 100;
 		cls.gamespypercent = percent;
 		SCR_UpdateScreen(); // FS: Force an update so the percentage bar shows some progress
