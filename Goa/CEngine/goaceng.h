@@ -33,11 +33,7 @@ extern "C" {
 
 #define ENGINE_VERSION "0.5"
 
-#ifdef __DJGPP__ // FS: Timeouts are abysmal on DOS
-#define SERVER_TIMEOUT 6000
-#else
 #define SERVER_TIMEOUT 3000
-#endif
 
 /* GServerList and GServer are the abstracted serverlist and server data types.
 All access to their internal data structures is done via the functions below */

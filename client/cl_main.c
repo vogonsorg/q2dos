@@ -104,6 +104,7 @@ cvar_t	*console_old_complete; // FS: Old style command completing
 cvar_t	*cl_master_server_ip; // FS: For gamespy
 cvar_t	*cl_master_server_port; // FS: For gamespy
 cvar_t	*cl_master_server_queries; // FS: For gamespy
+cvar_t	*cl_master_server_timeout; // FS: For gamespy
 cvar_t	*s_gamespy_sounds; // FS: For gamespy
 
 client_static_t	cls;
@@ -1749,6 +1750,8 @@ void CL_InitLocal (void)
 	cl_master_server_port->description = "Master server port to use with the gamespy browser.";
 	cl_master_server_queries = Cvar_Get("cl_master_server_queries", "10", CVAR_ARCHIVE);
 	cl_master_server_queries->description = "Maximum number of query (ping) requests to use per loop with the gamespy browser.";
+	cl_master_server_timeout = Cvar_Get("cl_master_server_timeout", "3000", CVAR_ARCHIVE);
+	cl_master_server_timeout->description = "Timeout (in milliseconds) to give up on pinging a server.";
 	s_gamespy_sounds = Cvar_Get("s_gamespysounds", "0", CVAR_ARCHIVE);
 
 #ifdef USE_CURL	// HTTP downloading from R1Q2
