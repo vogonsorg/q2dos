@@ -624,38 +624,42 @@ G_SetSpectatorStats
 */
 void G_SetSpectatorStats (edict_t *ent)
 {
+	gclient_t *cl;
+
   	if (!ent)
 	{
 		return;
 	}
 
-	if (!ent->client->chase_target)
+	cl = ent->client;
+
+	if (!cl->chase_target)
 	{
 		G_SetStats(ent);
 	}
 
-	ent->client->ps.stats[STAT_SPECTATOR] = 1;
+	cl->ps.stats[STAT_SPECTATOR] = 1;
 
 	/* layouts are independant in spectator */
-	ent->client->ps.stats[STAT_LAYOUTS] = 0;
+	cl->ps.stats[STAT_LAYOUTS] = 0;
 
-	if ((ent->client->pers.health <= 0) || level.intermissiontime || ent->client->showscores)
+	if ((cl->pers.health <= 0) || level.intermissiontime || cl->showscores)
 	{
-		ent->client->ps.stats[STAT_LAYOUTS] |= 1;
+		cl->ps.stats[STAT_LAYOUTS] |= 1;
 	}
 
-	if (ent->client->showinventory && (ent->client->pers.health > 0))
+	if (cl->showinventory && (cl->pers.health > 0))
 	{
-		ent->client->ps.stats[STAT_LAYOUTS] |= 2;
+		cl->ps.stats[STAT_LAYOUTS] |= 2;
 	}
 
-	if (ent->client->chase_target && ent->client->chase_target->inuse)
+	if (cl->chase_target && cl->chase_target->inuse)
 	{
-		ent->client->ps.stats[STAT_CHASE] = CS_PLAYERSKINS +
-								   (ent->client->chase_target - g_edicts) - 1;
+		cl->ps.stats[STAT_CHASE] = CS_PLAYERSKINS +
+								   (cl->chase_target - g_edicts) - 1;
 	}
 	else
 	{
-		ent->client->ps.stats[STAT_CHASE] = 0;
+		cl->ps.stats[STAT_CHASE] = 0;
 	}
 }
