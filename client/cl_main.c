@@ -823,10 +823,12 @@ void CL_Changing_f (void)
 	cls.state = ca_connected;	// not active anymore, but not disconnected
 	Com_Printf ("\nChanging map...\n");
 
+#ifdef USE_CURL
 	if(cls.downloadServerRetry[0] != 0) // FS: Added because Whale's Weapons HTTP server rejects you after a lot of 404s.  Then you lose HTTP until a hard reconnect.
 	{
 		CL_SetHTTPServer(cls.downloadServerRetry);
 	}
+#endif
 }
 
 
