@@ -359,11 +359,6 @@ qboolean infront (edict_t *self, edict_t *other)
 
 	AngleVectors (self->s.angles, forward, NULL, NULL);
 
-	if ((self == NULL) || (other == NULL)) // FS: Sanity check from Yamagi Q2
-	{
-		return false;
-	}
-
 	VectorSubtract (other->s.origin, self->s.origin, vec);
 	VectorNormalize (vec);
 	dot = DotProduct (vec, forward);
