@@ -456,7 +456,8 @@ static GError ServerListQueryLoop(GServerList serverlist)
 	char indata[1500];
 	struct sockaddr_in saddr;
 	int saddrlen = sizeof(saddr);
-	float percent = 0; // FS
+	int server_timeout = bound(100, cl_master_server_timeout->intValue, 9000); // FS: Now a CVAR
+	float percent = 0.0f; // FS
 	GServer server;
 
 //first, check for available data
@@ -509,7 +510,7 @@ static GError ServerListQueryLoop(GServerList serverlist)
 	//kill expired ones
 	for (i = 0 ; i < serverlist->maxupdates ; i++)
 	{
-		if (serverlist->updatelist[i].serverindex >= 0 && current_time() - serverlist->updatelist[i].starttime > SERVER_TIMEOUT ) 
+		if (serverlist->updatelist[i].serverindex >= 0 && current_time() - serverlist->updatelist[i].starttime > server_timeout )
 		{
 			serverlist->updatelist[i].serverindex = -1; //reuse the updatelist
 		}
@@ -542,7 +543,7 @@ static GError ServerListQueryLoop(GServerList serverlist)
 			error = sendto(serverlist->updatelist[i].s,STATUS,strlen(STATUS), 0, (struct sockaddr *) &saddr, saddrlen);
 			serverlist->updatelist[i].starttime = current_time();
 		}
-		percent = ((float)serverlist->nextupdate/(float)ServerListCount(serverlist)) * 100;
+		percent = ((float)serverlist->nextupdate/(float)ServerListCount(serverlist)) * 100.0f;
 		cls.gamespypercent = percent;
 		SCR_UpdateScreen(); // FS: Force an update so the percentage bar shows some progress
 		Sys_SendKeyEvents (); // FS: Check for aborts
@@ -550,7 +551,12 @@ static GError ServerListQueryLoop(GServerList serverlist)
 	return 0;
 }
 #else // DOS
-// FS: DOS is all sorts of fucked with sockets.  This will have to do sadly :(
+
+#ifdef WIN32 // FS: For testing in Win32
+#define EWOULDBLOCK WSAEWOULDBLOCK
+#endif
+
+// FS: DOS is all sorts of fucked with the original version of the code.
 static GError ServerListQueryLoop(GServerList serverlist)
 {
 	int i, error;
@@ -595,13 +601,13 @@ static GError ServerListQueryLoop(GServerList serverlist)
 			}
 			else
 			{
-				Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Error pinging server: %i\n", errno);
+				Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Error pinging server: %s\n", NET_ErrorString());
 				serverlist->updatelist[i].serverindex = -1; // reuse the update index
 			}
 
 			FD_ZERO(&read_fd);
 			FD_SET(serverlist->updatelist[i].s, &write_fd);
-			select_s(serverlist->updatelist[i].s + 1, NULL, &write_fd, NULL, &timeout);
+			selectsocket(serverlist->updatelist[i].s + 1, NULL, &write_fd, NULL, &timeout);
 
 			if (FD_ISSET(serverlist->updatelist[i].s, &write_fd))
 			{
@@ -637,7 +643,7 @@ retry:
 					}
 					else // FS: If we got didn't get EWOULDBLOCK or if it just kept going past the server_timeout threshold then just give up.
 					{
-						Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Error during gamespy recv %d\n", errno);
+						Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Error during gamespy recv %s\n", NET_ErrorString());
 						serverlist->updatelist[i].serverindex = -1; //reuse the updatelist
 					}
 				}
@@ -649,17 +655,6 @@ retry:
 		SCR_UpdateScreen(); // FS: Force an update so the percentage bar shows some progress
 		Sys_SendKeyEvents (); // FS: Check for aborts because this takes a while in DOS
 	}
-
-#if 0
-	//kill expired ones
-	for (i = 0 ; i < serverlist->maxupdates ; i++)
-	{
-		if (serverlist->updatelist[i].serverindex >= 0 && current_time() - serverlist->updatelist[i].starttime > SERVER_TIMEOUT ) 
-		{
-			serverlist->updatelist[i].serverindex = -1; //reuse the updatelist
-		}
-	}
-#endif
 
 	if (serverlist->abortupdate || (serverlist->nextupdate >= ArrayLength(serverlist->servers))) 
 	{ //we are done!!
