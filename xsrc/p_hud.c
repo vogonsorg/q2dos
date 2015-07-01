@@ -612,7 +612,7 @@ void G_CheckChaseStats (edict_t *ent)
 			continue;
 		}
 
-		memcpy(ent->client->ps.stats, ent->client->ps.stats, sizeof(ent->client->ps.stats));
+		memcpy(cl->ps.stats, ent->client->ps.stats, sizeof(cl->ps.stats));
 		G_SetSpectatorStats(g_edicts + i);
 	}
 }
