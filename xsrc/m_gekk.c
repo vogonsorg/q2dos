@@ -462,7 +462,7 @@ mmove_t gekk_move_swim_start = {
 void
 gekk_swim(edict_t *self)
 {
-  	if (!self || !self->enemy->waterlevel) // FS
+	if (!self)
 	{
 		return;
 	}
@@ -735,7 +735,7 @@ gekk_hit_left(edict_t *self)
 {
 	vec3_t aim;
 
-  	if (!self || !self->enemy) // FS
+	if (!self || !self->enemy) // FS
 	{
 		return;
 	}
@@ -757,7 +757,7 @@ gekk_hit_right(edict_t *self)
 {
 	vec3_t aim;
 
-  	if (!self || !self->enemy)
+	if (!self || !self->enemy)
 	{
 		return;
 	}
