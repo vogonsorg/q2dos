@@ -358,8 +358,8 @@ typedef struct cmi8x38_card
 
 }cmi8x38_card;
 
-static void cmi8x38_ac97_write(unsigned int baseport,unsigned int reg, unsigned int value);
-static unsigned int cmi8x38_ac97_read(unsigned int baseport, unsigned int reg);
+//static void cmi8x38_ac97_write(unsigned int baseport,unsigned int reg, unsigned int value);
+//static unsigned int cmi8x38_ac97_read(unsigned int baseport, unsigned int reg);
 
 extern unsigned int intsoundconfig,intsoundcontrol;
 
@@ -571,7 +571,7 @@ static void CMI8X38_close(struct mpxplay_audioout_info_s *aui);
 static void CMI8X38_card_info(struct mpxplay_audioout_info_s *aui)
 {
  struct cmi8x38_card *card=aui->card_private_data;
- sprintf(sout,"CMI : %s soundcard found on port:%4.4X irq:%d chipver:%d max-chans:%d",
+ sprintf(sout,"CMI : %s soundcard found on port:%4.4lX irq:%u chipver:%d max-chans:%d",
          card->pci_dev->device_name,card->iobase,card->irq,card->chip_version,card->max_channels);
 }
 
@@ -598,7 +598,7 @@ static int CMI8X38_adetect(struct mpxplay_audioout_info_s *aui)
 
  card->dm=pds_dpmi_dos_allocmem( card->pcmout_bufsize      // pcm output
                             +PCMBUFFERPAGESIZE );      // to round
-if(!card->dm)goto err_adetect;
+ if(!card->dm)goto err_adetect;
  card->pcmout_buffer=(void *)(((uint32_t)card->dm->linearptr+PCMBUFFERPAGESIZE-1)&(~(PCMBUFFERPAGESIZE-1))); // buffer begins on page (4096 bytes) boundary
 
  aui->card_DMABUFF=card->pcmout_buffer;

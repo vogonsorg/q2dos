@@ -802,7 +802,7 @@ static unsigned int snd_emu10kx_buffer_init(struct emu10k1_card *card,struct mpx
                             +EMUPAGESIZE                     // silentpage
                             +card->pcmout_bufsize            // pcm output
                             +0x1000 );                       // to round
-if(!card->dm)	return 0;
+ if(!card->dm)	return 0;
  card->silentpage=(void *)(((uint32_t)card->dm->linearptr+0x0fff)&0xfffff000); // buffer begins on page boundary
  card->virtualpagetable=(uint32_t *)((uint32_t)card->silentpage+EMUPAGESIZE);
  card->pcmout_buffer=(char *)(card->virtualpagetable+MAXPAGES);
@@ -962,7 +962,7 @@ static unsigned int snd_p16v_buffer_init(struct emu10k1_card *card,struct mpxpla
 {
  card->pcmout_bufsize=MDma_get_max_pcmoutbufsize(AUDIGY2_P16V_DMABUF_ALIGN,AUDIGY2_P16V_BYTES_PER_SAMPLE);
  card->dm=pds_dpmi_dos_allocmem(AUDIGY2_P16V_PERIODS*2*sizeof(uint32_t)+card->pcmout_bufsize);
-if(!card->dm)	return 0;
+ if(!card->dm)	return 0;
  card->virtualpagetable=(uint32_t *)card->dm->linearptr;
  card->pcmout_buffer=((char *)card->virtualpagetable)+AUDIGY2_P16V_PERIODS*2*sizeof(uint32_t);
  mpxplay_debugf(SBL_DEBUG_OUTPUT,"buffer init: pagetable:%8.8X pcmoutbuf:%8.8X size:%d",(unsigned long)card->virtualpagetable,(unsigned long)card->pcmout_buffer,card->pcmout_bufsize);
@@ -1198,10 +1198,10 @@ static void sblive_select_mixer(struct emu10k1_card *card);
 static void SBLIVE_card_info(struct mpxplay_audioout_info_s *aui)
 {
  struct emu10k1_card *card=aui->card_private_data;
- sprintf(sout,"SBA : SB %s (%8.8X)(bits:16%s) on port:%4.4X irq:%d",
+ sprintf(sout,"SBA : SB %s (%8.8lX)(bits:16%s) on port:%4.4lX irq:%u",
          ((card->card_capabilities->longname)? card->card_capabilities->longname:card->pci_dev->device_name),
          card->serial,((card->chips&EMU_CHIPS_24BIT)? ",24":""),
-         (int)card->iobase,(int)card->irq);
+         card->iobase,card->irq);
 }
 
 static int SBLIVE_adetect(struct mpxplay_audioout_info_s *aui)
@@ -1333,7 +1333,7 @@ static long SBLIVE_getbufpos(struct mpxplay_audioout_info_s *aui)
 
 static void SBLIVE_clearbuf()
 {
-struct mpxplay_audioout_info_s *aui=&au_infos;
+ struct mpxplay_audioout_info_s *aui=&au_infos;
  struct emu10k1_card *card=aui->card_private_data;
  MDma_clearbuf();
  if(card->driver_funcs->clear_cache)  card->driver_funcs->clear_cache(card);

@@ -164,7 +164,7 @@ static unsigned int snd_intel_buffer_init(struct intel_card_s *card,struct mpxpl
  card->pcmout_bufsize=MDma_get_max_pcmoutbufsize(ICH_DMABUF_ALIGN,bytes_per_sample);
  card->dm=pds_dpmi_dos_allocmem(ICH_DMABUF_PERIODS*2*sizeof(uint32_t)+card->pcmout_bufsize);
  if(!card->dm)	return 0;
-card->virtualpagetable=(uint32_t *)card->dm->linearptr; // pagetable requires 8 byte align, but dos-allocmem gives 16 byte align (so we don't need alignment correction)
+ card->virtualpagetable=(uint32_t *)card->dm->linearptr; // pagetable requires 8 byte align, but dos-allocmem gives 16 byte align (so we don't need alignment correction)
  card->pcmout_buffer=((char *)card->virtualpagetable)+ICH_DMABUF_PERIODS*2*sizeof(uint32_t);
  aui->card_DMABUFF=card->pcmout_buffer;
 
@@ -347,7 +347,7 @@ static void INTELICH_close(struct mpxplay_audioout_info_s *aui);
 static void INTELICH_card_info(struct mpxplay_audioout_info_s *aui)
 {
  struct intel_card_s *card=aui->card_private_data;
- sprintf(sout,"ICH : Intel %s found on port:%4.4X irq:%d (type:%s, bits:16%s)",
+ sprintf(sout,"ICH : Intel %s found on port:%4.4lX irq:%u (type:%s, bits:16%s)",
          card->pci_dev->device_name,card->baseport_bm,card->irq,
          ich_devnames[card->device_type],((card->device_type==DEVICE_INTEL_ICH4)? ",20":""));
 }
@@ -374,8 +374,8 @@ static int INTELICH_adetect(struct mpxplay_audioout_info_s *aui)
 
  card->device_type=card->pci_dev->device_type;
 
- mpxplay_debugf(ICH_DEBUG_OUTPUT,"vend_id:%4.4X dev_id:%4.4X devtype:%s bmport:%4.4X mixport:%4.4X irq:%d",
-  card->pci_dev->vendor_id,card->pci_dev->device_id,ich_devnames[card->device_type],card->baseport_bm,card->baseport_codec,card->irq);
+ mpxplay_debugf(ICH_DEBUG_OUTPUT,"vend_id:%4.4X dev_id:%4.4X devtype:%s bmport:%4.4lX mixport:%4.4lX irq:%u",
+  (unsigned)card->pci_dev->vendor_id,(unsigned)card->pci_dev->device_id,ich_devnames[card->device_type],card->baseport_bm,card->baseport_codec,card->irq);
 
  if(!snd_intel_buffer_init(card,aui))
   goto err_adetect;

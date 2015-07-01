@@ -1069,10 +1069,10 @@ static char *ihd_search_vendorname(unsigned int vendorid)
 static void INTELHD_card_info(struct mpxplay_audioout_info_s *aui)
 {
  struct intelhd_card_s *card=aui->card_private_data;
- sprintf(sout,"IHD : %s (%4.4X%4.4X) -> %s (%8.8X) (max %dkHz/%dbit%s/%dch)\n",
+ sprintf(sout,"IHD : %s (%4.4X%4.4X) -> %s (%8.8X) (max %ldkHz/%dbit%s/%dch)\n",
          card->pci_dev->device_name,
-         (long)card->pci_dev->vendor_id,(long)card->pci_dev->device_id,
-         ihd_search_vendorname(card->codec_vendor_id>>16),card->codec_vendor_id,
+         (unsigned int)card->pci_dev->vendor_id,(unsigned int)card->pci_dev->device_id,
+         ihd_search_vendorname(card->codec_vendor_id>>16),(unsigned int)card->codec_vendor_id,
          (card->supported_max_freq/1000),card->supported_max_bits,
          ((card->supported_formats==0xffffffff)? "?":""),
          min(INTHD_MAX_CHANNELS,PCM_MAX_CHANNELS)

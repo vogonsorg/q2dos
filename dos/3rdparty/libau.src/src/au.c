@@ -155,7 +155,7 @@ aui->card_bytespersign=aui->chan_card*aui->bytespersample_card;
 aui->card_bufprotect=buffer_protection;
 
 #ifndef SDR
-sprintf(sout,"Ok! : set %iHz/%ibit/%ich -> DMA_size: %i at address: %ph\n",*fr,*bt,*ch,aui->card_dmasize,aui->card_DMABUFF
+sprintf(sout,"Ok! : set %iHz/%ibit/%ich -> DMA_size: %lu at address: %ph\n",*fr,*bt,*ch,aui->card_dmasize,aui->card_DMABUFF
 #ifdef __DJGPP__
 -__djgpp_conventional_base
 #endif

@@ -254,14 +254,15 @@ static unsigned short snd_es1371_codec_read(struct ensoniq_card_s *card,
 
 static void snd_es1371_adc_rate(struct ensoniq_card_s *card, unsigned int rate)
 {
- unsigned int n, truncm, freq, result;
+ unsigned int n, truncm, freq;
+ //unsigned int result;
 
  n = rate / 3000;
  if ((1 << n) & ((1 << 15) | (1 << 13) | (1 << 11) | (1 << 9)))
   n--;
  truncm = (21 * n - 1) | 1;
  freq = ((48000UL << 15) / rate) * n;
- result = (48000UL << 15) / (freq / n);
+ //result = (48000UL << 15) / (freq / n);
  if(rate >= 24000){
   if(truncm > 239)
    truncm = 239;
@@ -314,7 +315,7 @@ static unsigned int snd_es1371_buffer_init(struct ensoniq_card_s *card,struct mp
  card->pcmout_bufsize=MDma_get_max_pcmoutbufsize(ES1371_DMABUF_ALIGN,bytes_per_sample);
  card->dm=pds_dpmi_dos_allocmem(card->pcmout_bufsize);
  if(!card->dm)	return 0;
-card->pcmout_buffer=(char *)card->dm->linearptr;
+ card->pcmout_buffer=(char *)card->dm->linearptr;
  aui->card_DMABUFF=card->pcmout_buffer;
 
 #ifdef __DJGPP__
@@ -438,7 +439,7 @@ static void ES1371_close(struct mpxplay_audioout_info_s *aui);
 static void ES1371_card_info(struct mpxplay_audioout_info_s *aui)
 {
  struct ensoniq_card_s *card=aui->card_private_data;
- sprintf(sout,"ENS : Ensoniq %s found on port:%4.4X irq:%d rev:%2.2X",
+ sprintf(sout,"ENS : Ensoniq %s found on port:%4.4lX irq:%u rev:%2.2X",
          card->pci_dev->device_name,card->port,card->irq,card->chiprev);
 }
 
