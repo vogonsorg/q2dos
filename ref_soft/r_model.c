@@ -518,13 +518,23 @@ void Mod_LoadTexinfo (lump_t *l)
 		out->flags = LittleLong (in->flags);
 
 		next = LittleLong (in->nexttexinfo);
-		if (next > 0) {
+
+		if (next > 0)
+		{
 			if (next >= count)	// Knightmare added
+			{
 				ri.Sys_Error (ERR_DROP, "Mod_LoadTexinfo: bad anim chain");
+			}
+
 			out->next = loadmodel->texinfo + next;
 		}
+
 		Com_sprintf (name, sizeof(name), "textures/%s.wal", in->texture);
+		// FS: I don't quite understand what's the deal with the bottom one, but OK..
+//		Com_sprintf (name, sizeof(name), "textures/tga/%s.tga", in->texture); // TGA loading courtesy of quakewiki's tutorial 39
+
 		out->image = R_FindImage (name, it_wall);
+
 		if (!out->image)
 		{
 			out->image = r_notexture_mip; // texture not found

@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 image_t		r_images[MAX_RIMAGES];
 int			numr_images;
 
+#define USE_TGA // FS: Seems to load TGAs OK for skyboxes, but who knows...
 
 /*
 ===============
@@ -409,16 +410,38 @@ image_t *R_FindFreeImage (void)
 	return image;
 }
 
+void R_BuildPalettedTexture( unsigned char *paletted_texture, unsigned char *scaled, int scaled_width, int scaled_height )
+{
+	int i;
+
+	for ( i = 0; i < scaled_width * scaled_height; i++ )
+	{
+		unsigned int r, g, b, c;
+
+		r = ( scaled[0] >> 3 ) & 31;
+		g = ( scaled[1] >> 2 ) & 63;
+		b = ( scaled[2] >> 3 ) & 31;
+
+		c = r | ( g << 5 ) | ( b << 11 );
+
+		paletted_texture[i] = sw_state.d_16to8table[c];
+
+		scaled += 4;
+	}
+}
+
 /*
 ================
 GL_LoadPic
 
 ================
 */
-image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t type)
+image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t type, int bits)
 {
 	image_t		*image;
 	int			i, c, b;
+	unsigned char paletted_texture[256*256];
+	int j,z,y;
 
 	image = R_FindFreeImage ();
 	if (strlen(name) >= sizeof(image->name))
@@ -426,19 +449,58 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 	strcpy (image->name, name);
 	image->registration_sequence = registration_sequence;
 
-	image->width = width;
-	image->height = height;
-	image->type = type;
-
-	c = width*height;
-	image->pixels[0] = malloc (c);
-	image->transparent = false;
-	for (i=0 ; i<c ; i++)
+	if (type == it_wall || type == it_sky)
 	{
-		b = pic[i];
-		if (b == 255)
-			image->transparent = true;
-		image->pixels[0][i] = b;
+		image->width = LittleLong (width);
+		image->height = LittleLong (height);
+		image->type = it_wall;
+
+		c = image->width*image->height * (256+64+16+4)/256;
+		image->pixels[0] = malloc (c);
+		image->pixels[1] = image->pixels[0] + image->width*image->height;
+		image->pixels[2] = image->pixels[1] + image->width*image->height/4;
+		image->pixels[3] = image->pixels[2] + image->width*image->height/16;
+
+		if (bits == 32)
+		{
+			ri.Con_Printf(PRINT_DEVELOPER, "Attempting to build a paletted texture\n");
+			R_BuildPalettedTexture(paletted_texture, ( unsigned char * ) pic,
+			image->width, image->height );
+			pic = paletted_texture;
+		}
+
+		// Load the texture pixels from pic
+		// Temporary mipmaping code
+		image->transparent = false;
+
+		for (z=1,y=0 ; y<=3 ; z*=2,y++)
+		{
+			for (j=0; j<image -> height/z ; j++)
+			{
+				for (i=0 ; i < image->width/z ; i++)
+				{
+					b = pic[((j*z)*image->width)+(i*z)];
+					image->pixels[y][(j*(image->width/z))+(i)] = b;
+				}
+			}
+		}
+	} 
+	else
+	{
+		image->width = width;
+		image->height = height;
+		image->type = type;
+
+		c = width*height;
+		image->pixels[0] = malloc (c);
+		image->transparent = false;
+		for (i=0 ; i<c ; i++)
+		{
+			b = pic[i];
+			if (b == 255)
+				image->transparent = true;
+			image->pixels[0][i] = b;
+		}
 	}
 
 	return image;
@@ -520,14 +582,28 @@ image_t	*R_FindImage (char *name, imagetype_t type)
 	//
 	pic = NULL;
 	palette = NULL;
+
 	if (!strcmp(name+len-4, ".tga"))
 	{
 #ifdef USE_TGA
-		ri.Con_Printf(PRINT_ALL,"Attempting to load a TGA: %s!\n", name);
-		LoadTGA(name, &pic, &width, &height);
+		ri.Con_Printf(PRINT_DEVELOPER,"Attempting to load a TGA: %s!\n", name);
+
+		LoadTGA (name, &pic, &width, &height);
+
 		if (!pic)
-			return NULL;
-		image = GL_LoadPic(name, pic, width, height, type);
+		{
+			if (type == it_wall || type == it_sky) // FS: Added sky
+			{
+				return r_notexture_mip;
+			}
+			else
+			{
+				return NULL;
+			}
+		}
+
+
+		image = GL_LoadPic (name, pic, width, height, type, 32);
 #else
 		return NULL;	// ri.Sys_Error (ERR_DROP, "R_FindImage: can't load %s in software renderer", name);
 #endif
@@ -535,9 +611,21 @@ image_t	*R_FindImage (char *name, imagetype_t type)
 	else if (!strcmp(name+len-4, ".pcx"))
 	{
 		LoadPCX (name, &pic, &palette, &width, &height);
+
 		if (!pic)
-			return NULL;	// ri.Sys_Error (ERR_DROP, "R_FindImage: can't load %s", name);
-		image = GL_LoadPic (name, pic, width, height, type);
+		{
+			if (type == it_wall || type == it_sky) // FS: Added sky
+			{
+				return r_notexture_mip;
+			}
+			else
+			{
+				return NULL;
+			}
+		}
+
+//		image = GL_LoadPic (name, pic, width, height, type);
+		image = GL_LoadPic (name, pic, width, height, type, 8); //Added 8 bit spec
 	}
 	else if (!strcmp(name+len-4, ".wal"))
 	{
@@ -549,9 +637,14 @@ image_t	*R_FindImage (char *name, imagetype_t type)
 	}
 
 	if (pic)
+	{
 		free(pic);
+	}
+
 	if (palette)
+	{
 		free(palette);
+	}
 
 	return image;
 }
@@ -609,6 +702,14 @@ R_InitImages
 void	R_InitImages (void)
 {
 	registration_sequence = 1;
+
+	// www.quakewiki.net/quakesrc/39.html
+	FS_LoadFile( "pics/16to8.dat", &sw_state.d_16to8table );
+
+	if ( !sw_state.d_16to8table )
+	{
+		Sys_Error( ERR_FATAL, "Couldn't load pics/16to8.dat");
+	}
 }
 
 /*

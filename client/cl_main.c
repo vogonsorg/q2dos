@@ -22,6 +22,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "client.h"
 #include "../Goa/CEngine/goaceng.h" // FS: For Gamespy SDK
 
+cvar_t	*cl_3dcam;
+cvar_t	*cl_3dcam_angle;
+cvar_t	*cl_3dcam_dist;
+
 cvar_t	*freelook;
 
 cvar_t	*adr0;
@@ -1692,6 +1696,10 @@ void CL_InitLocal (void)
 	cl_ogg_music->description = "Whether to try to play OGG Vorbis files instead of CD audio tracks.";
 	cl_rogue_music = Cvar_Get ("cl_rogue_music", "0", CVAR_ARCHIVE);
 	cl_xatrix_music = Cvar_Get ("cl_xatrix_music", "0", CVAR_ARCHIVE);
+
+	cl_3dcam = Cvar_Get ("cl_3dcam", "0", CVAR_ARCHIVE);
+	cl_3dcam_angle = Cvar_Get ("cl_3dcam_angle", "30", CVAR_ARCHIVE);
+	cl_3dcam_dist = Cvar_Get ("cl_3dcam_dist", "50", CVAR_ARCHIVE);
 
 	cl_upspeed = Cvar_Get ("cl_upspeed", "200", 0);
 	cl_forwardspeed = Cvar_Get ("cl_forwardspeed", "200", 0);

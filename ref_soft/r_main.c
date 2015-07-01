@@ -142,6 +142,7 @@ cvar_t	*sw_particle_size; // FS
 cvar_t	*sw_particle_size_override; // FS
 cvar_t	*sw_particle_size_min; // FS
 cvar_t	*sw_particle_size_max; // FS
+cvar_t	*sw_load_tga_sky; // FS
 //PGM
 cvar_t	*sw_lockpvs;
 //PGM
@@ -304,6 +305,8 @@ void R_Register (void)
 	sw_particle_size_min->description = "Minimum particle size.  Standard formula is resolution width divided by 320.  Use sw_particle_size_override to enable.";
 	sw_particle_size_max = ri.Cvar_Get ("sw_particle_size_max", "8.5", CVAR_ARCHIVE); // FS
 	sw_particle_size_max->description = "Maximum particle size.  Standard formula is resolution width divided by 80 plus 0.5.  Use sw_particle_size_override to enable.";
+	sw_load_tga_sky = ri.Cvar_Get ("sw_load_tga_sky", "0", CVAR_ARCHIVE); // FS
+	sw_load_tga_sky->description = "Attempt to load TGA skyboxes.  Experimental.";
 
 	ri.Cmd_AddCommand ("modellist", Mod_Modellist_f);
 	ri.Cmd_AddCommand( "screenshot", R_ScreenShot_f );
@@ -1342,8 +1345,16 @@ void R_SetSky (char *name, float rotate, vec3_t axis)
 
 	for (i=0 ; i<6 ; i++)
 	{
-		Com_sprintf (pathname, sizeof(pathname), "env/%s%s.pcx", skyname, suf[r_skysideimage[i]]);
-		r_skytexinfo[i].image = R_FindImage (pathname, it_sky);
+		if(sw_load_tga_sky->intValue) // FS
+		{
+			Com_sprintf (pathname, sizeof(pathname), "env/%s%s.tga", skyname, suf[r_skysideimage[i]]);
+			r_skytexinfo[i].image = R_FindImage (pathname, it_sky);
+		}
+		else
+		{
+			Com_sprintf (pathname, sizeof(pathname), "env/%s%s.pcx", skyname, suf[r_skysideimage[i]]);
+			r_skytexinfo[i].image = R_FindImage (pathname, it_sky);
+		}
 	}
 }
 

@@ -828,6 +828,8 @@ typedef struct swstate_s
 	qboolean fullscreen;
 	int      prev_mode;				// last valid SW mode
 
+	unsigned char *d_16to8table; // HTrigger : 16 to 8 bit conversion table
+
 	byte		gammatable[256];
 	byte		currentpalette[1024];
 

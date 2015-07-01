@@ -63,6 +63,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 //=============================================================================
 
+extern	cvar_t	*cl_3dcam;
+extern	cvar_t	*cl_3dcam_angle;
+extern	cvar_t	*cl_3dcam_dist;
+
 typedef struct
 {
 	qboolean		valid;			// cleared if delta parsing was invalid
