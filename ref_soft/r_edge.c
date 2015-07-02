@@ -670,7 +670,7 @@ void R_ScanEdges (void)
 
 // FIXME: do we need this now that we clamp x in r_draw.c?
 //	edge_sentinel.u = 2000 << 24;		// make sure nothing sorts past this
-	edge_sentinel.u = 32767<<16;		// FS: Sezero SVGA fix
+	edge_sentinel.u = 32767 << 16;		// FS: Sezero - integer shift overflow fix
 	edge_sentinel.prev = &edge_aftertail;
 
 //	
