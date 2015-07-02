@@ -1579,7 +1579,7 @@ void CL_CalcViewValues (void)
 
 	if (cl_3dcam->value)
 	{
-		vec3_t end, oldorg, camPos;
+		vec3_t end, camPos;
 		float dist_up, dist_back, angle;
 
 		if (cl_3dcam_angle->value<0)
@@ -1596,7 +1596,6 @@ void CL_CalcViewValues (void)
 		dist_up = cl_3dcam_dist->value * sin( angle );
 		dist_back =  cl_3dcam_dist->value * cos ( angle );
 
-		VectorCopy(cl.refdef.vieworg, oldorg);
 		VectorMA(cl.refdef.vieworg, -dist_back, cl.v_forward, end);
 		VectorMA(end, dist_up, cl.v_up, end);
 
