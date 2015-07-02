@@ -1,4 +1,4 @@
-#include "def.h"
+#include "libaudef.h"
 
 unsigned int MDma_get_max_pcmoutbufsize(unsigned int pagesize, unsigned int samplesize)
 {
@@ -85,7 +85,7 @@ void MDma_clearbuf()
 	}
 #else
 	memset(aui->card_DMABUFF,0,aui->card_dmasize);
-#endif // ZDM
+#endif /* ZDM */
 }
 
 unsigned int MDma_bufpos()
@@ -105,7 +105,7 @@ unsigned int MDma_bufpos()
 #ifndef SDR
 	if(aui->card_infobits&AUINFOS_CARDINFOBIT_DMAUNDERRUN)
 	//sets a new put-pointer in this case
-#endif // SDR
+#endif
 	{
 		if(bufpos>=aui->card_outbytes)
 		{
@@ -131,7 +131,7 @@ void MDma_writedata(char *src,unsigned long left)
 
 #ifdef SDR
 //	MDma_bufpos();
-#endif // SDR
+#endif
 
 	todo = aui->card_dmasize-aui->card_dmalastput;
  
@@ -141,7 +141,7 @@ void MDma_writedata(char *src,unsigned long left)
 		dosmemput(src,todo,(unsigned int)aui->card_DMABUFF+aui->card_dmalastput);
 #else
 		memcpy(aui->card_DMABUFF+aui->card_dmalastput,src,todo);
-#endif // ZDM
+#endif /* ZDM */
 
 	aui->card_dmalastput=0;
 	left-=todo;

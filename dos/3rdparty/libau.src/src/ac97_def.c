@@ -14,7 +14,7 @@
 //**************************************************************************
 //function: common AC97 definitions (for SB Live, ES1371, ICH)
 
-#include "def.h"
+#include "libaudef.h"
 #include "ac97_def.h"
 
 static aucards_onemixerchan_s mpxplay_aucards_ac97chan_master_vol={

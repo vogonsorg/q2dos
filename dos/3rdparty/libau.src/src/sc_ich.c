@@ -18,7 +18,7 @@
 //#define MPXPLAY_USE_DEBUGF
 #define ICH_DEBUG_OUTPUT stdout
 
-#include "def.h"
+#include "libaudef.h"
 #include "pcibios.h"
 #include "ac97_def.h"
 

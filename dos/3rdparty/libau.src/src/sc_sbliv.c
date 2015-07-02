@@ -19,7 +19,7 @@
 //#define MPXPLAY_USE_DEBUGF
 #define SBL_DEBUG_OUTPUT stdout
 
-#include "def.h"
+#include "libaudef.h"
 #include "pcibios.h"
 #include "ac97_def.h"
 #include "emu10k1.h"

@@ -19,7 +19,7 @@
 //#define MPXPLAY_USE_DEBUGF
 #define XFI_DEBUG_OUTPUT stdout
 
-#include "def.h"
+#include "libaudef.h"
 #include "pcibios.h"
 
 struct	emu20kx_card_s	xfi;

@@ -1,4 +1,4 @@
-#include "def.h"
+#include "libaudef.h"
 #include <time.h>
 
 void pds_delay_10us(unsigned int ticks) //each tick is 10us
