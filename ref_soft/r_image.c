@@ -448,6 +448,12 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 	unsigned	trans[512*256];
 #endif
 
+	if (type == it_sky && (width > 256 || height > 256))
+	{
+		ri.Con_Printf (PRINT_ALL, "Draw_LoadPic: \"%s\" has dimensions of %ix%i.  Limit is 256x256.\n", name, width, height);
+		return NULL;
+	}
+
 	image = R_FindFreeImage ();
 
 	if (strlen(name) >= sizeof(image->name))
@@ -602,8 +608,8 @@ image_t *R_LoadWal (char *name)
 	ri.FS_LoadFile (name, (void **)&mt);
 	if (!mt)
 	{
-		ri.Con_Printf (PRINT_ALL, "GL_FindImage: can't load %s\n", name);
-		return NULL;
+		ri.Con_Printf (PRINT_ALL, "R_LoadWal: can't load %s\n", name);
+		return r_notexture_mip;
 	}
 
 	width = LittleLong (mt->width);
