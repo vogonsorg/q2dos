@@ -126,7 +126,6 @@ static int                      minmem;
    WEIRD SHIT HAPPENS
    DON'T SEND ME BUG REPORTS FROM A SESSION WITH NO LFN DRIVER LOADED!
 */
-
 void Sys_DetectLFN (void)
 {
 	unsigned int fd = _get_volume_info (NULL, 0, 0, NULL);

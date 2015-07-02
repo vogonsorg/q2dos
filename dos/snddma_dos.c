@@ -609,7 +609,9 @@ struct mpxplay_audioout_info_s *aui=&au_infos;
 
 		return true;
 	}
+
 	Com_DPrintf(DEVELOPER_MSG_SOUND, "PCI Audio: Detection failed.  Attempting SB init.\n");
+
 	return false;
 }
 
