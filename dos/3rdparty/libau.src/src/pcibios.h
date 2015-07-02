@@ -10,34 +10,42 @@
 #ifndef uint8_t
 typedef unsigned char	uint8_t;
 #endif
+
 #ifndef uint16_t
 typedef unsigned short	uint16_t;
 #endif
+
 #ifndef int32_t
 typedef long            int32_t;
 #endif
+
 #ifndef uint32_t
 typedef unsigned long	uint32_t;
 #endif
 
-#endif
+#endif // (HAVE_INTTYPES_H) || (__WATCOMC__>=1240
 
 //for Linux/GCC/ALSA routines
 #ifndef outb
 #define outb(reg,val) outp(reg,val)
 #endif
+
 #ifndef outw
 #define outw(reg,val) outpw(reg,val)
 #endif
+
 #ifndef outl
 #define outl(reg,val) outpd(reg,val)
 #endif
+
 #ifndef inb
 #define inb(reg) inp(reg)
 #endif
+
 #ifndef inw
 #define inw(reg) inpw(reg)
 #endif
+
 #ifndef inl
 #define inl(reg) inpd(reg)
 #endif
@@ -87,23 +95,25 @@ typedef unsigned long	uint32_t;
 #define	PCIR_INTR_LN		0x3C // irq number
 #define	PCIR_INTR_PIN		0x3D
 
-typedef struct pci_config_s{
- uint8_t bBus;
- uint8_t bDev;
- uint8_t bFunc;
- uint16_t vendor_id;
- uint16_t device_id;
- char *device_name;     // from pci_device_s
- uint16_t device_type;  // from pci_device_s
+typedef struct pci_config_s
+{
+	uint8_t bBus;
+	uint8_t bDev;
+	uint8_t bFunc;
+	uint16_t vendor_id;
+	uint16_t device_id;
+	char *device_name;     // from pci_device_s
+	uint16_t device_type;  // from pci_device_s
 }pci_config_s;
 
 struct pci_config_s pci;
 
-typedef struct pci_device_s{
- char *device_name;     // a short id string
- uint16_t vendor_id;    // pci vendor id
- uint16_t device_id;    // pci device id
- uint16_t device_type;  // internal device type
+typedef struct pci_device_s
+{
+	char *device_name;     // a short id string
+	uint16_t vendor_id;    // pci vendor id
+	uint16_t device_id;    // pci device id
+	uint16_t device_type;  // internal device type
 }pci_device_s;
 
 //uint8_t  pcibios_GetBus(void);
@@ -118,4 +128,4 @@ void	 pcibios_WriteConfig_Dword(pci_config_s *, uint16_t, uint32_t);
 void     pcibios_set_master(pci_config_s *);
 void     pcibios_enable_memmap_set_master(pci_config_s *);
 
-#endif
+#endif // pcibios_h
