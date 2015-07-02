@@ -1235,7 +1235,7 @@ For proxy protecting
 */
 byte	COM_BlockSequenceCheckByte (byte *base, int length, int sequence, int challenge)
 {
-	Sys_Error("COM_BlockSequenceCheckByte called\n");
+	Sys_Error("COM_BlockSequenceCheckByte called");
 
 #if 0
 	int		checksum;
@@ -1361,12 +1361,17 @@ byte	COM_BlockSequenceCRCByte (byte *base, int length, int sequence)
 
 
 	if (sequence < 0)
-		Sys_Error("sequence < 0, this shouldn't happen\n");
+	{
+		Sys_Error("sequence < 0, this shouldn't happen");
+	}
 
 	p = chktbl + (sequence % (sizeof(chktbl) - 4));
 
 	if (length > 60)
+	{
 		length = 60;
+	}
+
 	memcpy (chkb, base, length);
 
 	chkb[length] = p[0];
@@ -1379,7 +1384,9 @@ byte	COM_BlockSequenceCRCByte (byte *base, int length, int sequence)
 	crc = CRC_Block(chkb, length);
 
 	for (x=0, n=0; n<length; n++)
+	{
 		x += chkb[n];
+	}
 
 	crc = (crc ^ x) & 0xff;
 
@@ -1425,7 +1432,9 @@ void Qcommon_Init (int argc, char **argv)
 	char	*s;
 
 	if (setjmp (abortframe) )
+	{
 		Sys_Error ("Qcommon_Init: Error during initialization");
+	}
 
 	z_chain.next = z_chain.prev = &z_chain;
 	// prepare enough of the subsystems to handle
@@ -1482,7 +1491,9 @@ void Qcommon_Init (int argc, char **argv)
 
 
 	if (dedicated->value)
+	{
 		Cmd_AddCommand ("quit", Com_Quit);
+	}
 
 	Sys_Init ();
 
@@ -1496,9 +1507,14 @@ void Qcommon_Init (int argc, char **argv)
 	if (!Cbuf_AddLateCommands ())
 	{	// if the user didn't give any commands, run default action
 		if (!dedicated->value)
+		{
 			Cbuf_AddText ("d1\n");
+		}
 		else
+		{
 			Cbuf_AddText ("dedicated_start\n");
+		}
+
 		Cbuf_Execute ();
 	}
 	else
@@ -1523,11 +1539,14 @@ void Qcommon_Frame (double msec)
 	double	time_after = 0.0f;
 
 	if (setjmp (abortframe) )
+	{
 		return;			// an ERR_DROP was thrown
+	}
 
 	if ( log_stats->modified )
 	{
 		log_stats->modified = false;
+
 		if ( log_stats->value )
 		{
 			if ( log_stats_file )
@@ -1535,9 +1554,13 @@ void Qcommon_Frame (double msec)
 				fclose( log_stats_file );
 				log_stats_file = 0;
 			}
+
 			log_stats_file = fopen( "stats.log", "w" );
+
 			if ( log_stats_file )
+			{
 				fprintf( log_stats_file, "entities,dlights,parts,frame time\n" );
+			}
 		}
 		else
 		{
@@ -1550,12 +1573,17 @@ void Qcommon_Frame (double msec)
 	}
 
 	if (fixedtime->value)
+	{
 		msec = fixedtime->value;
+	}
 	else if (timescale->value)
 	{
 		msec *= timescale->value;
-		if (msec < 1)
-			msec = 1;
+
+		if (msec < 1.0f)
+		{
+			msec = 1.0f;
+		}
 	}
 
 	if (showtrace->value)
@@ -1572,24 +1600,34 @@ void Qcommon_Frame (double msec)
 	do
 	{
 		s = Sys_ConsoleInput ();
+
 		if (s)
+		{
 			Cbuf_AddText (va("%s\n",s));
-	} while (s);
+		}
+	}
+	while (s);
+
 	Cbuf_Execute ();
 
 	if (host_speeds->value)
+	{
 		time_before = Sys_Milliseconds ();
+	}
 
 	SV_Frame (msec);
 
 	if (host_speeds->value)
-		time_between = Sys_Milliseconds ();		
+	{
+		time_between = Sys_Milliseconds ();
+	}
 
 	CL_Frame (msec);
 
 	if (host_speeds->value)
-		time_after = Sys_Milliseconds ();		
-
+	{
+		time_after = Sys_Milliseconds ();
+	}
 
 	if (host_speeds->value)
 	{

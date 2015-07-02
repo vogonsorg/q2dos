@@ -18,6 +18,7 @@
 #include <sys/nearptr.h>
 #include <conio.h>
 #include <crt0.h> // FS: Fake Mem Fix (QIP)
+#include <dos.h> // FS: For detecting Windows NT
 
 int _crt0_startup_flags = _CRT0_FLAG_UNIX_SBRK; // FS: Fake Mem Fix (QIP)
 
@@ -119,6 +120,13 @@ static int                      minmem;
 
 // FS: Q2 needs it badly
 // FS: See http://www.delorie.com/djgpp/doc/libc/libc_380.html for more information
+/* ATTENTION FORKERS
+   DO NOT REMOVE THE SLEEP OR WARNING!
+   THIS IS SERIOUS, NO LFN AND SOME SKIN NAMES GET TRUNCATED
+   WEIRD SHIT HAPPENS
+   DON'T SEND ME BUG REPORTS FROM A SESSION WITH NO LFN DRIVER LOADED!
+*/
+
 void Sys_DetectLFN (void)
 {
 	unsigned int fd = _get_volume_info (NULL, 0, 0, NULL);
@@ -131,6 +139,16 @@ void Sys_DetectLFN (void)
 	}
 }
 
+qboolean Sys_DetectWinNT (void) // FS: Wisdom from Gisle Vanem
+{
+	if(_get_dos_version(1) == 0x0532)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 void Sys_DetectWin95 (void)
 {
 	__dpmi_regs                             r;
@@ -138,7 +156,7 @@ void Sys_DetectWin95 (void)
 	r.x.ax = 0x160a;                /* Get Windows Version */
 	__dpmi_int(0x2f, &r);
 
-	if(r.x.ax || r.h.bh < 4)        /* Not windows or earlier than Win95 */
+	if( ((r.x.ax) || (r.h.bh < 4)) && !(Sys_DetectWinNT()) )        /* Not windows or earlier than Win95 */
 	{
 		win95 = 0;
 		lockmem = true;
@@ -147,23 +165,23 @@ void Sys_DetectWin95 (void)
 	}
 	else
 	{
-		Sys_Error("Microsoft Windows detected.  You must run Q2DOS in MS-DOS.\n"); // FS: Warning.  Too many issues in Win9x and even XP.  QDOS is the same way.  So forget it.
+		Sys_Error("Microsoft Windows detected.  You must run Q2DOS in MS-DOS."); // FS: Warning.  Too many issues in Win9x and even XP.  QDOS is the same way.  So forget it.
 	}
 }
 
-__dpmi_meminfo                  info; // FS: Sigh, moved this here because everyone wants me to free this shit at exit.  Again, I'm pretty sure CWSDPMI is already taking care of this...
+__dpmi_meminfo	info; // FS: Sigh, moved this here because everyone wants me to free this shit at exit.  Again, I'm pretty sure CWSDPMI is already taking care of this...
 void *dos_getmaxlockedmem(int *size)
 {
 	__dpmi_free_mem_info    meminfo;
-	int                                             working_size;
-	void                                    *working_memory;
-	int                                             last_locked;
-        //int                                             extra,  i, j, allocsize;
-	int                                     i, j, extra, allocsize; // FS: 2GB Fix
-	static char                             *msg = "Locking data...";
-	// int                                             m, n;
-	byte                                    *x;
-	unsigned long   ul; // FS: 2GB Fix
+	int	working_size;
+	void	*working_memory;
+	int	last_locked;
+//	int	extra,  i, j, allocsize;
+	int	i, j, extra, allocsize; // FS: 2GB Fix
+	static char	*msg = "Locking data...";
+	// int	m, n;
+	byte	*x;
+	unsigned long	ul; // FS: 2GB Fix
 
 // first lock all the current executing image so the locked count will
 // be accurate.  It doesn't hurt to lock the memory multiple times
@@ -175,7 +193,7 @@ void *dos_getmaxlockedmem(int *size)
 	{
 		if(__dpmi_lock_linear_region(&info))
 		{
-			Sys_Error ("Lock of current memory at 0x%lx for %ldKb failed!\n",
+			Sys_Error ("Lock of current memory at 0x%lx for %ldKb failed!",
 						info.address, info.size/1024);
 		}
 	}
@@ -410,16 +428,25 @@ void Sys_PageInProgram(void)
 	printf("%lu Virtual Mb available for Q2DOS.\n", (_go32_dpmi_remaining_virtual_memory() / 0x100000) ); // FS: Added
 }
 
+void Sys_SetTextMode (void) // FS: This was used twice, let's make it a little cleaner if we can.
+{
+	__dpmi_regs r;
+
+	// return to text mode
+	r.x.ax = 3;
+	__dpmi_int(0x10, &r);
+}
+
 void Sys_Error (char *error, ...)
 {
 	va_list		argptr;
 
-   {
-      __dpmi_regs r;
+	if (!dedicated || !dedicated->value)
+	{
+		dos_restoreintr(9); // FS: Give back the keyboard
+	}
 
-      r.x.ax = 3;
-      __dpmi_int(0x10, &r);
-   }	//return to text mode
+	Sys_SetTextMode();
 
 	printf ("Sys_Error: ");	
 	va_start (argptr,error);
@@ -427,11 +454,6 @@ void Sys_Error (char *error, ...)
 	va_end (argptr);
 	printf ("\n");
 	
-	if (!dedicated || !dedicated->value)
-	{
-		dos_restoreintr(9); // FS: Give back the keyboard
-	}
-
 	__dpmi_free_physical_address_mapping(&info);	
 	__djgpp_nearptr_disable(); // FS: Everyone else is a master DOS DPMI programmer.  Pretty sure CWSDPMI is already taking care of this...
 
@@ -448,8 +470,6 @@ fflush(stdout);
 
 void Sys_Quit (void)
 {
-	__dpmi_regs r;
-
 	if(!dedicated || !dedicated->value)
 	{
 		dos_restoreintr(9); // FS: Give back the keyboard
@@ -460,10 +480,8 @@ void Sys_Quit (void)
 		dos_unlockmem (&start_of_memory,
 					   end_of_memory - (int)&start_of_memory);
 	}
-	//return to text mode
 
-	r.x.ax = 3;
-	__dpmi_int(0x10, &r);
+	Sys_SetTextMode();
 	
 	__dpmi_free_physical_address_mapping(&info);	
 	__djgpp_nearptr_disable(); // FS: Everyone else is a master DOS DPMI programmer.  Pretty sure CWSDPMI is already taking care of this...
@@ -605,7 +623,7 @@ void Sys_CopyProtect (void)
 {
 }
 
-char *Sys_GetClipboardData( void )
+char *Sys_GetClipboardData(void)
 {
 	return NULL;
 }

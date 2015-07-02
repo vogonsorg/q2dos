@@ -158,7 +158,7 @@ void VID_InitExtra (void)
 
 	if(!pinfoblock)
 	{
-		Sys_Error("pinfoblock NULL!\n");
+		Sys_Error("pinfoblock NULL!");
 	}
 
 	*(long *)pinfoblock->VbeSignature = 'V' + ('B'<<8) + ('E'<<16) + ('2'<<24);
