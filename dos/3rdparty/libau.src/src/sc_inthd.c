@@ -1069,7 +1069,7 @@ static char *ihd_search_vendorname(unsigned int vendorid)
 static void INTELHD_card_info(struct mpxplay_audioout_info_s *aui)
 {
  struct intelhd_card_s *card=aui->card_private_data;
- sprintf(sout,"IHD : %s (%4.4X%4.4X) -> %s (%8.8X) (max %ldkHz/%dbit%s/%dch)\n",
+ sprintf(libau_istr,"IHD : %s (%4.4X%4.4X) -> %s (%8.8X) (max %ldkHz/%dbit%s/%dch)\n",
          card->pci_dev->device_name,
          (unsigned int)card->pci_dev->vendor_id,(unsigned int)card->pci_dev->device_id,
          ihd_search_vendorname(card->codec_vendor_id>>16),(unsigned int)card->codec_vendor_id,
@@ -1084,7 +1084,7 @@ static int INTELHD_adetect(struct mpxplay_audioout_info_s *aui)
  unsigned int i;
  struct intelhd_card_s *card=&ihd;
  aui->card_private_data=card;
- card->pci_dev=&pci;
+ card->pci_dev=&libau_pci;
 
  if(pcibios_search_devices(intelhda_devices,card->pci_dev)!=PCI_SUCCESSFUL)
   goto err_adetect;

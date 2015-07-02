@@ -1,8 +1,13 @@
 #include "def.h"
 
-void pds_dpmi_dos_freemem()
+struct dosmem_t au_dosmem;
+#ifdef ZDM
+unsigned short au_map_selector;
+#endif
+
+void pds_dpmi_dos_freemem(void)
 {
-struct dosmem_t *dm=&dosmem_t;
+struct dosmem_t *dm=&au_dosmem;
 unsigned short sel=dm->selector;
 #ifdef __DJGPP__
 asm("movw %0,%%dx"::"m"(sel));
@@ -20,7 +25,7 @@ int 31h
 
 struct dosmem_t *pds_dpmi_dos_allocmem(unsigned int size)
 {
-struct dosmem_t *dm=&dosmem_t;
+struct dosmem_t *dm=&au_dosmem;
 unsigned short sel;
 char *lin;
 

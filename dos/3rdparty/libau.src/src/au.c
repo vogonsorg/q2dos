@@ -31,6 +31,10 @@ static one_sndcard_info *all_sndcard_info[]=
 	NULL
 };
 
+struct mpxplay_audioout_info_s au_infos;
+
+char libau_istr[100];
+
 char* AU_search(unsigned int config)
 {
 	struct mpxplay_audioout_info_s *aui=&au_infos;
@@ -57,7 +61,7 @@ char* AU_search(unsigned int config)
 		if(aui->card_handler->card_detect(aui))
 		{
 			aui->card_handler->card_info(aui);
-			return sout;
+			return libau_istr;
 		}
 
 		asip++;
@@ -207,10 +211,11 @@ void AU_setrate(unsigned int *fr, unsigned int *bt, unsigned int *ch)
 	aui->card_bufprotect=buffer_protection;
 
 #ifndef SDR
-		sprintf(sout,"Ok! : set %iHz/%ibit/%ich -> DMA_size: %lu at address: %ph\n",*fr,*bt,*ch,aui->card_dmasize,aui->card_DMABUFF
+		sprintf(libau_istr, "Ok! : set %iHz/%ibit/%ich -> DMA_size: %lu at address: %ph\n",
+			*fr, *bt, *ch, aui->card_dmasize, aui->card_DMABUFF
 	#ifdef __DJGPP__
-			-__djgpp_conventional_base
-	#endif // __DJGPP__
+									- __djgpp_conventional_base
+	#endif
 				);
 #endif // SDR
 }

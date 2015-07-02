@@ -571,7 +571,7 @@ static void CMI8X38_close(struct mpxplay_audioout_info_s *aui);
 static void CMI8X38_card_info(struct mpxplay_audioout_info_s *aui)
 {
  struct cmi8x38_card *card=aui->card_private_data;
- sprintf(sout,"CMI : %s soundcard found on port:%4.4lX irq:%u chipver:%d max-chans:%d",
+ sprintf(libau_istr,"CMI : %s soundcard found on port:%4.4lX irq:%u chipver:%d max-chans:%d",
          card->pci_dev->device_name,card->iobase,card->irq,card->chip_version,card->max_channels);
 }
 
@@ -579,7 +579,7 @@ static int CMI8X38_adetect(struct mpxplay_audioout_info_s *aui)
 {
  struct cmi8x38_card *card=&cmi;
  aui->card_private_data=card;
- card->pci_dev=&pci;
+ card->pci_dev=&libau_pci;
 
  if(pcibios_search_devices(cmi_devices,card->pci_dev)!=PCI_SUCCESSFUL)
   goto err_adetect;
