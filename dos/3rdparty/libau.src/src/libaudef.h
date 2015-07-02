@@ -1,3 +1,6 @@
+#ifndef MPXPLAY_AU_DEF_H
+#define MPXPLAY_AU_DEF_H
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -14,18 +17,17 @@
 #include <dpmi.h>
 #include <go32.h>
 #define __djgpp_conventional_base 0
-unsigned short map_selector;
+extern unsigned short au_map_selector; /* dpmi.c */
 #endif
 #endif
 
-struct mpxplay_audioout_info_s au_infos;
+extern char libau_istr[100]; /* au.c */
 
 struct dosmem_t{
  unsigned short selector;
  char *linearptr;
-}dosmem_t;
-
-char sout[100];
+};
+extern struct dosmem_t au_dosmem; /* dpmi.c */
 
 #define NEWFUNC_ASM
 
@@ -72,7 +74,9 @@ typedef unsigned long           mpxp_ptrsize_t; // !!! on 32 bits
 
 #ifndef __WATCOMC__
 
+ #ifndef min
  #define min(a,b) (((a) < (b))? (a) : (b))
+ #endif
  #define outb(reg,val) outportb(reg,val)
  #define outw(reg,val) outportw(reg,val)
  #define outl(reg,val) outportl(reg,val)
@@ -152,7 +156,7 @@ typedef unsigned long           mpxp_ptrsize_t; // !!! on 32 bits
 
 //dpmi.c
 extern struct dosmem_t *pds_dpmi_dos_allocmem(unsigned int size);
-extern void pds_dpmi_dos_freemem();
+extern void pds_dpmi_dos_freemem(void);
 extern unsigned long pds_dpmi_map_physical_memory(unsigned long phys_addr,unsigned long memsize);
 extern void pds_dpmi_unmap_physycal_memory(unsigned long linear_address);
 
@@ -320,6 +324,8 @@ typedef struct aucards_onemixerchan_s{
 
 typedef struct aucards_onemixerchan_s* aucards_allmixerchan_s;
 
+struct mpxplay_audioout_info_s;
+
 typedef struct one_sndcard_info{
  char *shortname;
  unsigned long infobits;
@@ -377,6 +383,8 @@ typedef struct mpxplay_audioout_info_s{
  int card_mixer_values[AU_MIXCHANS_NUM]; // -1, 0-100
 }mpxplay_audioout_info_s;
 
+extern struct mpxplay_audioout_info_s au_infos;
+
 //main soundcard routines
 extern char* AU_search(unsigned int config);
 extern unsigned int AU_cardbuf_space(void);
@@ -413,4 +421,6 @@ static void mpxplay_debugf(FILE *fp,const char *format, ...)
 #else
  #define mpxplay_debugf(...)
 
-#endif// MPXPLAY_USE_DEBUGF
+#endif/*MPXPLAY_USE_DEBUGF */
+
+#endif /* MPXPLAY_AU_DEF_H */

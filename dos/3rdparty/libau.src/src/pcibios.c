@@ -19,6 +19,8 @@
 #include <dos.h>
 #include "pcibios.h"
 
+struct pci_config_s libau_pci;
+
 #define PCIDEVNUM(bParam)      (bParam >> 3)
 #define PCIFUNCNUM(bParam)     (bParam & 0x07)
 #define PCIDEVFUNC(bDev,bFunc) ((((uint32_t)bDev) << 3) | bFunc)

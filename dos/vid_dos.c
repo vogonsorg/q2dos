@@ -27,9 +27,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define REF_SOFT	0
 
 cvar_t *vid_ref;
-cvar_t *vid_fullscreen;
-cvar_t *vid_gamma;
-cvar_t *scr_viewsize;
+extern cvar_t *vid_fullscreen;	// ref_soft/r_main.c
+extern cvar_t *vid_gamma;	// ref_soft/r_main.c
+extern cvar_t *scr_viewsize;	// client/cl_scrn.c
 
 static cvar_t *sw_mode;
 static cvar_t *sw_stipplealpha;

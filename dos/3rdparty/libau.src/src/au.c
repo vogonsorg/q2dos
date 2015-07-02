@@ -1,6 +1,6 @@
-#include "def.h"
+#include "libaudef.h"
 
-#define SOUNDCARD_BUFFER_PROTECTION 32 // in bytes (requried for PCI cards)
+#define SOUNDCARD_BUFFER_PROTECTION 32 /* in bytes (required for PCI cards) */
 #define AU_MIXCHANS_OUTS 4
 
 static const unsigned int au_mixchan_outs[AU_MIXCHANS_OUTS]=
@@ -31,6 +31,10 @@ static one_sndcard_info *all_sndcard_info[]=
 	NULL
 };
 
+struct mpxplay_audioout_info_s au_infos;
+
+char libau_istr[100];
+
 char* AU_search(unsigned int config)
 {
 	struct mpxplay_audioout_info_s *aui=&au_infos;
@@ -57,7 +61,7 @@ char* AU_search(unsigned int config)
 		if(aui->card_handler->card_detect(aui))
 		{
 			aui->card_handler->card_info(aui);
-			return sout;
+			return libau_istr;
 		}
 
 		asip++;
@@ -90,7 +94,7 @@ void AU_stop()
 		aui->card_handler->card_stop(aui);
 #ifdef SDR
 		MDma_bufpos();
-#endif // SDR
+#endif
 		aui->card_dmaspace=aui->card_dmasize-aui->card_dmalastput;
 	}
 }
@@ -176,7 +180,7 @@ void AU_writedata(char* pcm, long len, unsigned int look)
 		while(len);
 	}
 }
-#endif // SDR
+#endif /* SDR */
 
 void AU_setrate(unsigned int *fr, unsigned int *bt, unsigned int *ch)
 {
@@ -187,7 +191,7 @@ void AU_setrate(unsigned int *fr, unsigned int *bt, unsigned int *ch)
 	{
 		AU_stop();
 	}
-  
+
 	aui->freq_card=aui->freq_set=*fr;
 	aui->bits_set=*bt;
 	aui->chan_set=*ch;
@@ -201,18 +205,19 @@ void AU_setrate(unsigned int *fr, unsigned int *bt, unsigned int *ch)
 
 	aui->card_bytespersign=aui->chan_card*aui->bytespersample_card;
 
-	buffer_protection=SOUNDCARD_BUFFER_PROTECTION;     // rounding to bytespersign
+	buffer_protection=SOUNDCARD_BUFFER_PROTECTION; // rounding to bytespersign
 	buffer_protection+=aui->card_bytespersign-1;
 	buffer_protection-=(buffer_protection%aui->card_bytespersign);
 	aui->card_bufprotect=buffer_protection;
 
 #ifndef SDR
-		sprintf(sout,"Ok! : set %iHz/%ibit/%ich -> DMA_size: %lu at address: %ph\n",*fr,*bt,*ch,aui->card_dmasize,aui->card_DMABUFF
+	sprintf(libau_istr, "Ok! : set %iHz/%ibit/%ich -> DMA_size: %lu at address: %ph\n",
+			*fr, *bt, *ch, aui->card_dmasize, aui->card_DMABUFF
 	#ifdef __DJGPP__
-			-__djgpp_conventional_base
-	#endif // __DJGPP__
-				);
-#endif // SDR
+							- __djgpp_conventional_base
+	#endif
+		);
+#endif /* SDR */
 }
 
 aucards_onemixerchan_s *AU_search_mixerchan(aucards_allmixerchan_s *mixeri,unsigned int mixchannum)
@@ -325,7 +330,7 @@ void AU_setmixer_one(unsigned int mixchannum,unsigned int setmode,int newvalue)
 			continue;
 		}
 
-		newchval=(unsigned long)(((float)newpercentval*(float)subchi->submixch_max+49.0)/100.0);   // percent to chval (rounding up)
+		newchval=(unsigned long)(((float)newpercentval*(float)subchi->submixch_max+49.0)/100.0); // percent to chval (rounding up)
 
 		if(newchval>subchi->submixch_max)
 		{
@@ -406,7 +411,7 @@ int AU_getmixer_one(unsigned int mixchannum)
 	}
 
 	value=cardi->card_readmixer(aui,subchi->submixch_register);	// read
-	value>>=subchi->submixch_shift;				// shift
+	value>>=subchi->submixch_shift;					// shift
 	value&=subchi->submixch_max;					// mask
 
 	if(subchi->submixch_infobits&SUBMIXCH_INFOBIT_REVERSEDVALUE)// reverse value if required
@@ -414,7 +419,7 @@ int AU_getmixer_one(unsigned int mixchannum)
 		value=subchi->submixch_max-value;
 	}
 
-	value=(float)value*100.0/(float)subchi->submixch_max;       // chval to percent
+	value=(float)value*100.0/(float)subchi->submixch_max;		// chval to percent
 
 	if(value>100)
 	{

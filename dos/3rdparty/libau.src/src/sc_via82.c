@@ -15,7 +15,7 @@
 //function: VIA VT82C686, VT8233 (VT8235?) low level routines (onboard chips on AMD Athlon mainboards)
 //some routines are based on the ALSA (http://www.alsa-project.org)
 
-#include "def.h"
+#include "libaudef.h"
 #include "pcibios.h"
 #include "ac97_def.h"
 
@@ -217,7 +217,7 @@ static void VIA82XX_close(struct mpxplay_audioout_info_s *aui);
 static void VIA82XX_card_info(struct mpxplay_audioout_info_s *aui)
 {
  struct via82xx_card *card=aui->card_private_data;
- sprintf(sout,"VIA : %s soundcard found on port:%4.4lX irq:%u chiprev:%2.2X model:%4.4X",
+ sprintf(libau_istr,"VIA : %s soundcard found on port:%4.4lX irq:%u chiprev:%2.2X model:%4.4X",
 	 card->pci_dev->device_name,card->iobase,card->irq,(unsigned)card->chiprev,(unsigned)card->model);
 }
 
@@ -225,7 +225,7 @@ static int VIA82XX_adetect(struct mpxplay_audioout_info_s *aui)
 {
  struct via82xx_card *card=&via;
  aui->card_private_data=card;
- card->pci_dev=&pci;
+ card->pci_dev=&libau_pci;
 
  if(pcibios_search_devices(via_devices,card->pci_dev)!=PCI_SUCCESSFUL)
   goto err_adetect;

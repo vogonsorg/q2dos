@@ -74,7 +74,6 @@ qboolean CDAudio_Active (void)
 #else
 
 
-int realtime;
 //cvar_t	*bgmvolume;
 
 #define ADDRESS_MODE_HSG		0
@@ -790,23 +789,22 @@ static void CD_f (void)
 void CDAudio_Update(void)
 {
 	int		ret;
-	static	int lastUpdate;
+	static double	lastUpdate;
 
 	if (!initialized || !enabled)
 		return;
 
-	realtime = Sys_Milliseconds();
-	if ((realtime - lastUpdate) < 0.25)
+	if ((curtime - lastUpdate) < 0.25)
 		return;
-	lastUpdate = realtime;
+	lastUpdate = curtime;
 
 	if (mediaCheck)
 	{
-		static	double lastCheck;
+		static double	lastCheck;
 
-		if ((realtime - lastCheck) < 5.0)
+		if ((curtime - lastCheck) < 5.0)
 			return;
-		lastCheck = realtime;
+		lastCheck = curtime;
 
 		ret = CDAudio_MediaChange();
 		if (ret == MEDIA_CHANGED)

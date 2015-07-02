@@ -106,7 +106,7 @@ typedef struct pci_config_s
 	uint16_t device_type;  // from pci_device_s
 }pci_config_s;
 
-struct pci_config_s pci;
+extern struct pci_config_s libau_pci;
 
 typedef struct pci_device_s
 {
@@ -128,4 +128,4 @@ void	 pcibios_WriteConfig_Dword(pci_config_s *, uint16_t, uint32_t);
 void     pcibios_set_master(pci_config_s *);
 void     pcibios_enable_memmap_set_master(pci_config_s *);
 
-#endif // pcibios_h
+#endif /* pcibios_h */

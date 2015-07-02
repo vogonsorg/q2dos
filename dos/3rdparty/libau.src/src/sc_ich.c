@@ -18,7 +18,7 @@
 //#define MPXPLAY_USE_DEBUGF
 #define ICH_DEBUG_OUTPUT stdout
 
-#include "def.h"
+#include "libaudef.h"
 #include "pcibios.h"
 #include "ac97_def.h"
 
@@ -347,7 +347,7 @@ static void INTELICH_close(struct mpxplay_audioout_info_s *aui);
 static void INTELICH_card_info(struct mpxplay_audioout_info_s *aui)
 {
  struct intel_card_s *card=aui->card_private_data;
- sprintf(sout,"ICH : Intel %s found on port:%4.4lX irq:%u (type:%s, bits:16%s)",
+ sprintf(libau_istr,"ICH : Intel %s found on port:%4.4lX irq:%u (type:%s, bits:16%s)",
          card->pci_dev->device_name,card->baseport_bm,card->irq,
          ich_devnames[card->device_type],((card->device_type==DEVICE_INTEL_ICH4)? ",20":""));
 }
@@ -356,7 +356,7 @@ static int INTELICH_adetect(struct mpxplay_audioout_info_s *aui)
 {
  struct intel_card_s *card=&ich;
  aui->card_private_data=card;
- card->pci_dev=&pci;
+ card->pci_dev=&libau_pci;
 
  if(pcibios_search_devices(ich_devices,card->pci_dev)!=PCI_SUCCESSFUL)
   goto err_adetect;

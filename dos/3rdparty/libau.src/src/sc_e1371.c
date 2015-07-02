@@ -18,7 +18,7 @@
 //#define MPXPLAY_USE_DEBUGF
 #define ENS_DEBUG_OUTPUT stdout
 
-#include "def.h"
+#include "libaudef.h"
 #include "pcibios.h"
 #include "ac97_def.h"
 
@@ -439,7 +439,7 @@ static void ES1371_close(struct mpxplay_audioout_info_s *aui);
 static void ES1371_card_info(struct mpxplay_audioout_info_s *aui)
 {
  struct ensoniq_card_s *card=aui->card_private_data;
- sprintf(sout,"ENS : Ensoniq %s found on port:%4.4lX irq:%u rev:%2.2X",
+ sprintf(libau_istr,"ENS : Ensoniq %s found on port:%4.4lX irq:%u rev:%2.2X",
          card->pci_dev->device_name,card->port,card->irq,card->chiprev);
 }
 
@@ -447,7 +447,7 @@ static int ES1371_adetect(struct mpxplay_audioout_info_s *aui)
 {
  struct ensoniq_card_s *card=&ens;
  aui->card_private_data=card;
- card->pci_dev=&pci;
+ card->pci_dev=&libau_pci;
 
  if(pcibios_search_devices(ensoniq_devices,card->pci_dev)!=PCI_SUCCESSFUL)
   goto err_adetect;

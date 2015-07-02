@@ -23,7 +23,7 @@
 #define AZX_PERIOD_SIZE 4096
 #define IHD_DEBUG_OUTPUT fopen("debug","a+")
 
-#include "def.h"
+#include "libaudef.h"
 #include "pcibios.h"
 #include "sc_inthd.h"
 
@@ -101,19 +101,19 @@ static aucards_onemixerchan_s ihd_master_vol={
 
 //Intel HDA codec has memory mapping only (by specification)
 #ifdef ZDM
-#define azx_writel(chip,reg,value) _farpokel(map_selector,ICH6_REG_##reg,(unsigned long)value)
-#define azx_readl(chip,reg) (long) _farpeekl(map_selector,ICH6_REG_##reg)
-#define azx_writew(chip,reg,value) _farpokew(map_selector,ICH6_REG_##reg,(unsigned short)value)
-#define azx_readw(chip,reg) (short)_farpeekw(map_selector,ICH6_REG_##reg)
-#define azx_writeb(chip,reg,value) _farpokeb(map_selector,ICH6_REG_##reg,(unsigned char)value)
-#define azx_readb(chip,reg) (unsigned char) _farpeekb(map_selector,ICH6_REG_##reg)
+#define azx_writel(chip,reg,value) _farpokel(au_map_selector,ICH6_REG_##reg,(unsigned long)value)
+#define azx_readl(chip,reg) (long) _farpeekl(au_map_selector,ICH6_REG_##reg)
+#define azx_writew(chip,reg,value) _farpokew(au_map_selector,ICH6_REG_##reg,(unsigned short)value)
+#define azx_readw(chip,reg) (short)_farpeekw(au_map_selector,ICH6_REG_##reg)
+#define azx_writeb(chip,reg,value) _farpokeb(au_map_selector,ICH6_REG_##reg,(unsigned char)value)
+#define azx_readb(chip,reg) (unsigned char) _farpeekb(au_map_selector,ICH6_REG_##reg)
 
-#define azx_sd_writel(dev,reg,value) _farpokel(map_selector,((dev)->sd_addr + ICH6_REG_##reg),(unsigned long)value)
-#define azx_sd_readl(dev,reg) (long) _farpeekl(map_selector,((dev)->sd_addr + ICH6_REG_##reg))
-#define azx_sd_writew(dev,reg,value) _farpokew(map_selector,((dev)->sd_addr + ICH6_REG_##reg),(unsigned short)value)
-#define azx_sd_readw(dev,reg) (short)_farpeekw(map_selector,((dev)->sd_addr + ICH6_REG_##reg))
-#define azx_sd_writeb(dev,reg,value) _farpokeb(map_selector,((dev)->sd_addr + ICH6_REG_##reg),(unsigned char)value)
-#define azx_sd_readb(dev,reg) (unsigned char) _farpeekb(map_selector,((dev)->sd_addr + ICH6_REG_##reg))
+#define azx_sd_writel(dev,reg,value) _farpokel(au_map_selector,((dev)->sd_addr + ICH6_REG_##reg),(unsigned long)value)
+#define azx_sd_readl(dev,reg) (long) _farpeekl(au_map_selector,((dev)->sd_addr + ICH6_REG_##reg))
+#define azx_sd_writew(dev,reg,value) _farpokew(au_map_selector,((dev)->sd_addr + ICH6_REG_##reg),(unsigned short)value)
+#define azx_sd_readw(dev,reg) (short)_farpeekw(au_map_selector,((dev)->sd_addr + ICH6_REG_##reg))
+#define azx_sd_writeb(dev,reg,value) _farpokeb(au_map_selector,((dev)->sd_addr + ICH6_REG_##reg),(unsigned char)value)
+#define azx_sd_readb(dev,reg) (unsigned char) _farpeekb(au_map_selector,((dev)->sd_addr + ICH6_REG_##reg))
 
 #else
 
@@ -1069,7 +1069,7 @@ static char *ihd_search_vendorname(unsigned int vendorid)
 static void INTELHD_card_info(struct mpxplay_audioout_info_s *aui)
 {
  struct intelhd_card_s *card=aui->card_private_data;
- sprintf(sout,"IHD : %s (%4.4X%4.4X) -> %s (%8.8X) (max %ldkHz/%dbit%s/%dch)\n",
+ sprintf(libau_istr,"IHD : %s (%4.4X%4.4X) -> %s (%8.8X) (max %ldkHz/%dbit%s/%dch)\n",
          card->pci_dev->device_name,
          (unsigned int)card->pci_dev->vendor_id,(unsigned int)card->pci_dev->device_id,
          ihd_search_vendorname(card->codec_vendor_id>>16),(unsigned int)card->codec_vendor_id,
@@ -1084,7 +1084,7 @@ static int INTELHD_adetect(struct mpxplay_audioout_info_s *aui)
  unsigned int i;
  struct intelhd_card_s *card=&ihd;
  aui->card_private_data=card;
- card->pci_dev=&pci;
+ card->pci_dev=&libau_pci;
 
  if(pcibios_search_devices(intelhda_devices,card->pci_dev)!=PCI_SUCCESSFUL)
   goto err_adetect;
