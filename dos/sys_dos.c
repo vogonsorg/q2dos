@@ -427,6 +427,14 @@ void Sys_Error (char *error, ...)
 	vprintf (error,argptr);
 	va_end (argptr);
 	printf ("\n");
+	
+	if (!dedicated || !dedicated->value)
+	{
+		dos_restoreintr(9); // FS: Give back the keyboard
+	}
+	
+	__djgpp_nearptr_disable(); // FS: Everyone else is a master DOS DPMI programmer.  Except me, carmack and sezero
+
 #if 0
 {	//we crash here so we can get a backtrace.  Yes it is ugly, and no this should never be in production!
 	int j,k;
@@ -456,6 +464,9 @@ void Sys_Quit (void)
 
 	r.x.ax = 3;
 	__dpmi_int(0x10, &r);
+	
+	__djgpp_nearptr_disable(); // FS: Everyone else is a master DOS DPMI programmer.  Except me, carmack and sezero
+
 	exit (0);
 }
 
