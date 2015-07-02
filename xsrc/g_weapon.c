@@ -401,7 +401,7 @@ void blaster_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *
 		gi.WriteByte (svc_temp_entity);
 		// RAFAEL
 		if (self->s.effects & EF_BLUEHYPERBLASTER)	// Knightmare- this was checking bit TE_BLUEHYPERBLASTER
-			gi.WriteByte (TE_FLECHETTE);			// Knightmare- TE_BLUEHYPERBLASTER is broken (parse error) in most Q2 engines
+			gi.WriteByte (TE_BLUEHYPERBLASTER);			// Knightmare- TE_BLUEHYPERBLASTER is broken (parse error) in most Q2 engines
 		else
 			gi.WriteByte (TE_BLASTER);
 		gi.WritePosition(self->s.origin);
