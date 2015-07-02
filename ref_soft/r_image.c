@@ -443,9 +443,18 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 	unsigned char paletted_texture[256*256];
 	int j,z,y;
 
+#ifdef GL_UPLOAD8 // FS: For weapons mod and its fucked up blood splats, but doesn't work
+	int p, s;
+	unsigned	trans[512*256];
+#endif
+
 	image = R_FindFreeImage ();
+
 	if (strlen(name) >= sizeof(image->name))
+	{
 		ri.Sys_Error (ERR_DROP, "Draw_LoadPic: \"%s\" is too long", name);
+	}
+
 	strcpy (image->name, name);
 	image->registration_sequence = registration_sequence;
 
@@ -473,6 +482,41 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 		// Temporary mipmaping code
 		image->transparent = false;
 
+#ifdef GL_UPLOAD8
+		// FS: From GL_Upload8, but I don't think it's working
+		s = width*height;
+
+		if (bits == 8)
+		{
+			for (i=0 ; i<s ; i++)
+			{
+				p = pic[i];
+				trans[i] = d_8to24table[p];
+	
+				if (p == 255)
+				{	// transparent, so scan around for another color
+					// to avoid alpha fringes
+					// FIXME: do a full flood fill so mips work...
+					ri.Con_Printf(PRINT_ALL, "GL_LoadPic: Found transparency in %s\n", name);
+					if (i > width && pic[i-width] != 255)
+						p = pic[i-width];
+					else if (i < s-width && pic[i+width] != 255)
+						p = pic[i+width];
+					else if (i > 0 && pic[i-1] != 255)
+						p = pic[i-1];
+					else if (i < s-1 && pic[i+1] != 255)
+						p = pic[i+1];
+					else
+						p = 0;
+
+					// copy rgb components
+					((byte *)&trans[i])[0] = ((byte *)&d_8to24table[p])[0];
+					((byte *)&trans[i])[1] = ((byte *)&d_8to24table[p])[1];
+					((byte *)&trans[i])[2] = ((byte *)&d_8to24table[p])[2];
+				}
+			}
+		}
+#endif
 		for (z=1,y=0 ; y<=3 ; z*=2,y++)
 		{
 			for (j=0; j<image -> height/z ; j++)
@@ -494,11 +538,15 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 		c = width*height;
 		image->pixels[0] = malloc (c);
 		image->transparent = false;
+
 		for (i=0 ; i<c ; i++)
 		{
 			b = pic[i];
+
 			if (b == 255)
+			{
 				image->transparent = true;
+			}
 			image->pixels[0][i] = b;
 		}
 	}
@@ -513,6 +561,7 @@ R_LoadWal
 */
 image_t *R_LoadWal (char *name)
 {
+#if 0
 	miptex_t	*mt;
 	int			ofs;
 	image_t		*image;
@@ -540,6 +589,28 @@ image_t *R_LoadWal (char *name)
 
 	ofs = LittleLong (mt->offsets[0]);
 	memcpy ( image->pixels[0], (byte *)mt + ofs, size);
+
+	ri.FS_FreeFile ((void *)mt);
+
+	return image;
+#endif
+	// FS: OpenGL version
+	miptex_t	*mt;
+	int			width, height, ofs;
+	image_t		*image;
+
+	ri.FS_LoadFile (name, (void **)&mt);
+	if (!mt)
+	{
+		ri.Con_Printf (PRINT_ALL, "GL_FindImage: can't load %s\n", name);
+		return NULL;
+	}
+
+	width = LittleLong (mt->width);
+	height = LittleLong (mt->height);
+	ofs = LittleLong (mt->offsets[0]);
+
+	image = GL_LoadPic (name, (byte *)mt + ofs, width, height, it_wall, 8);
 
 	ri.FS_FreeFile ((void *)mt);
 
@@ -592,7 +663,7 @@ image_t	*R_FindImage (char *name, imagetype_t type)
 
 		if (!pic)
 		{
-			if (type == it_wall || type == it_sky) // FS: Added sky
+			if (type == it_wall)
 			{
 				return r_notexture_mip;
 			}
@@ -614,7 +685,7 @@ image_t	*R_FindImage (char *name, imagetype_t type)
 
 		if (!pic)
 		{
-			if (type == it_wall || type == it_sky) // FS: Added sky
+			if (type == it_wall)
 			{
 				return r_notexture_mip;
 			}
