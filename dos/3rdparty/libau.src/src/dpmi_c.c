@@ -76,9 +76,9 @@ unsigned long pds_dpmi_map_physical_memory(unsigned long phys_addr,unsigned long
 	mi.address = phys_addr;
 	mi.size = memsize;
 	if(__dpmi_physical_address_mapping(&mi) != 0) return 0;
-	map_selector = __dpmi_allocate_ldt_descriptors(1);
-	__dpmi_set_segment_base_address (map_selector,mi.address);
-	__dpmi_set_segment_limit (map_selector, mi.size - 1);
+	au_map_selector = __dpmi_allocate_ldt_descriptors(1);
+	__dpmi_set_segment_base_address (au_map_selector,mi.address);
+	__dpmi_set_segment_limit (au_map_selector, mi.size - 1);
 	return mi.address;
 
 #else
