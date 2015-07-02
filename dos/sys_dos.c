@@ -151,11 +151,10 @@ void Sys_DetectWin95 (void)
 	}
 }
 
-
+__dpmi_meminfo                  info; // FS: Sigh, moved this here because everyone wants me to free this shit at exit.  Again, I'm pretty sure CWSDPMI is already taking care of this...
 void *dos_getmaxlockedmem(int *size)
 {
 	__dpmi_free_mem_info    meminfo;
-	__dpmi_meminfo                  info;
 	int                                             working_size;
 	void                                    *working_memory;
 	int                                             last_locked;
@@ -432,8 +431,9 @@ void Sys_Error (char *error, ...)
 	{
 		dos_restoreintr(9); // FS: Give back the keyboard
 	}
-	
-	__djgpp_nearptr_disable(); // FS: Everyone else is a master DOS DPMI programmer.  Except me, carmack and sezero
+
+	__dpmi_free_physical_address_mapping(&info);	
+	__djgpp_nearptr_disable(); // FS: Everyone else is a master DOS DPMI programmer.  Pretty sure CWSDPMI is already taking care of this...
 
 #if 0
 {	//we crash here so we can get a backtrace.  Yes it is ugly, and no this should never be in production!
@@ -465,7 +465,8 @@ void Sys_Quit (void)
 	r.x.ax = 3;
 	__dpmi_int(0x10, &r);
 	
-	__djgpp_nearptr_disable(); // FS: Everyone else is a master DOS DPMI programmer.  Except me, carmack and sezero
+	__dpmi_free_physical_address_mapping(&info);	
+	__djgpp_nearptr_disable(); // FS: Everyone else is a master DOS DPMI programmer.  Pretty sure CWSDPMI is already taking care of this...
 
 	exit (0);
 }

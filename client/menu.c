@@ -1670,6 +1670,7 @@ static menulist_s		s_extended_options_showtime_box;
 static menulist_s		s_extended_options_showuptime_box;
 static menulist_s		s_extended_options_altcolours_box;
 static menulist_s		s_extended_options_hidegunicon_box;
+static menulist_s		s_extended_options_3rd_person_cam_box;
 static menulist_s		s_extended_options_back_action;
 
 extern cvar_t	*cl_drawfps;
@@ -1678,7 +1679,7 @@ extern cvar_t	*cl_drawuptime;
 extern cvar_t	*cl_drawaltcolours;
 extern cvar_t	*cl_hide_gun_icon;
 
-static void Extended_ControlsSetMenuItemValues( void )
+static void Extended_ControlsSetMenuItemValues(void)
 {
 #if 0
 	s_options_sfxvolume_slider.curvalue		= Cvar_VariableValue( "s_volume" ) * 10;
@@ -1701,36 +1702,44 @@ static void Extended_ControlsSetMenuItemValues( void )
 
 	Cvar_SetValue( "cl_hide_gun_icon", ClampCvar( 0, 1, cl_hide_gun_icon->value ) );
 	s_extended_options_hidegunicon_box.curvalue		= cl_hide_gun_icon->value;
+
+	Cvar_SetValue( "cl_3dcam", ClampCvar( 0, 1, cl_3dcam->value ) );
+	s_extended_options_3rd_person_cam_box.curvalue		= cl_3dcam->value;
 }
 
-static void GoToOptionsFunc( void *unused )
+static void GoToOptionsFunc(void *unused)
 {
 	M_Menu_Options_f();
 }
 
-static void showFPSFunc( void *unused )
+static void showFPSFunc(void *unused)
 {
 	Cvar_SetValue( "cl_drawfps", s_extended_options_showfps_box.curvalue );
 }
 
-static void showTimeFunc( void *unused )
+static void showTimeFunc(void *unused)
 {
 	Cvar_SetValue( "cl_drawtime", s_extended_options_showtime_box.curvalue );
 }
 
-static void showUptimeFunc( void *unused )
+static void showUptimeFunc(void *unused)
 {
 	Cvar_SetValue( "cl_drawuptime", s_extended_options_showuptime_box.curvalue );
 }
 
-static void altColoursFunc( void *unused )
+static void altColoursFunc(void *unused)
 {
 	Cvar_SetValue( "cl_drawaltcolours", s_extended_options_altcolours_box.curvalue );
 }
 
-static void hideGunIconFunc( void *unused )
+static void hideGunIconFunc(void *unused)
 {
 	Cvar_SetValue( "cl_hide_gun_icon", s_extended_options_hidegunicon_box.curvalue );
+}
+
+static void thirdPersonCameraFunc (void *unused)
+{
+	Cvar_SetValue("cl_3dcam", s_extended_options_3rd_person_cam_box.curvalue);
 }
 
 void Extended_Options_MenuInit( void )
@@ -1766,17 +1775,17 @@ void Extended_Options_MenuInit( void )
 	s_extended_options_menu.nitems = 0;
 
 	s_extended_options_showfps_box.generic.type = MTYPE_SPINCONTROL;
-	s_extended_options_showfps_box.generic.x	= 0;
-	s_extended_options_showfps_box.generic.y	= 10;
+	s_extended_options_showfps_box.generic.x = 0;
+	s_extended_options_showfps_box.generic.y = 10;
 	s_extended_options_showfps_box.generic.name	= "show FPS";
 	s_extended_options_showfps_box.generic.statusbar = "draw FPS on screen";
 	s_extended_options_showfps_box.generic.callback = showFPSFunc;
 	s_extended_options_showfps_box.itemnames = yesno_names;
 
 	s_extended_options_showtime_box.generic.type = MTYPE_SPINCONTROL;
-	s_extended_options_showtime_box.generic.x	= 0;
-	s_extended_options_showtime_box.generic.y	= 20;
-	s_extended_options_showtime_box.generic.name	= "show time";
+	s_extended_options_showtime_box.generic.x = 0;
+	s_extended_options_showtime_box.generic.y = 20;
+	s_extended_options_showtime_box.generic.name = "show time";
 	s_extended_options_showtime_box.generic.statusbar = "draw current time on screen";
 	s_extended_options_showtime_box.generic.callback = showTimeFunc;
 	s_extended_options_showtime_box.itemnames = showtime_names;
@@ -1798,29 +1807,38 @@ void Extended_Options_MenuInit( void )
 	s_extended_options_altcolours_box.itemnames = yesno_names;
 
 	s_extended_options_hidegunicon_box.generic.type = MTYPE_SPINCONTROL;
-	s_extended_options_hidegunicon_box.generic.x	= 0;
-	s_extended_options_hidegunicon_box.generic.y	= 50;
-	s_extended_options_hidegunicon_box.generic.name	= "hide gun icon";
+	s_extended_options_hidegunicon_box.generic.x = 0;
+	s_extended_options_hidegunicon_box.generic.y = 50;
+	s_extended_options_hidegunicon_box.generic.name = "hide gun icon";
 	s_extended_options_hidegunicon_box.generic.statusbar = "hide the gun/help icon";
 	s_extended_options_hidegunicon_box.generic.callback = hideGunIconFunc;
 	s_extended_options_hidegunicon_box.itemnames = yesno_names;
 
+	s_extended_options_3rd_person_cam_box.generic.type = MTYPE_SPINCONTROL;
+	s_extended_options_3rd_person_cam_box.generic.x = 0;
+	s_extended_options_3rd_person_cam_box.generic.y = 60;
+	s_extended_options_3rd_person_cam_box.generic.name = "3rd person camera";
+	s_extended_options_3rd_person_cam_box.generic.statusbar = "3rd person camera";
+	s_extended_options_3rd_person_cam_box.generic.callback = thirdPersonCameraFunc;
+	s_extended_options_3rd_person_cam_box.itemnames = yesno_names;
+
 	s_extended_options_back_action.generic.type	= MTYPE_ACTION;
-	s_extended_options_back_action.generic.x		= 0;
-	s_extended_options_back_action.generic.y		= 100;
-	s_extended_options_back_action.generic.name	= "go to options";
+	s_extended_options_back_action.generic.x = 0;
+	s_extended_options_back_action.generic.y = 100;
+	s_extended_options_back_action.generic.name = "go to options";
 	s_extended_options_back_action.generic.statusbar = "go back to the options menu";
 	s_extended_options_back_action.generic.callback = GoToOptionsFunc;
 
 	Extended_ControlsSetMenuItemValues();
 
 // FS: If you add stuff you gotta be certain it's in order it appears!
-	Menu_AddItem( &s_extended_options_menu, ( void * ) &s_extended_options_showfps_box );
-	Menu_AddItem( &s_extended_options_menu, ( void * ) &s_extended_options_showtime_box );
-	Menu_AddItem( &s_extended_options_menu, ( void * ) &s_extended_options_showuptime_box );
-	Menu_AddItem( &s_extended_options_menu, ( void * ) &s_extended_options_altcolours_box );
-	Menu_AddItem( &s_extended_options_menu, ( void * ) &s_extended_options_hidegunicon_box );
-	Menu_AddItem( &s_extended_options_menu, ( void * ) &s_extended_options_back_action );
+	Menu_AddItem(&s_extended_options_menu, (void *) &s_extended_options_showfps_box);
+	Menu_AddItem(&s_extended_options_menu, (void *) &s_extended_options_showtime_box);
+	Menu_AddItem(&s_extended_options_menu, (void *) &s_extended_options_showuptime_box);
+	Menu_AddItem(&s_extended_options_menu, (void *) &s_extended_options_altcolours_box);
+	Menu_AddItem(&s_extended_options_menu, (void *) &s_extended_options_hidegunicon_box);
+	Menu_AddItem(&s_extended_options_menu, (void*)&s_extended_options_3rd_person_cam_box);
+	Menu_AddItem(&s_extended_options_menu, (void *) &s_extended_options_back_action);
 }
 
 void Extended_Options_MenuDraw (void)

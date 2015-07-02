@@ -1700,8 +1700,11 @@ void CL_InitLocal (void)
 	cl_xatrix_music = Cvar_Get ("cl_xatrix_music", "0", CVAR_ARCHIVE);
 
 	cl_3dcam = Cvar_Get ("cl_3dcam", "0", CVAR_ARCHIVE);
+	cl_3dcam->description = "Enables 3rd person camera.  Fine tune with cl_3dcam_angle and cl_3dcam_dist.";
 	cl_3dcam_angle = Cvar_Get ("cl_3dcam_angle", "30", CVAR_ARCHIVE);
+	cl_3dcam_angle->description = "Angle for the 3rd person camera.";
 	cl_3dcam_dist = Cvar_Get ("cl_3dcam_dist", "50", CVAR_ARCHIVE);
+	cl_3dcam_dist->description = "Distance for the 3rd person camera.";
 
 	cl_upspeed = Cvar_Get ("cl_upspeed", "200", 0);
 	cl_forwardspeed = Cvar_Get ("cl_forwardspeed", "200", 0);
