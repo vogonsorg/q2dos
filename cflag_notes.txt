@@ -22,3 +22,4 @@ in rubberbanding) in some places.
 We personally haven't seen any rubberbanding issues, it also takes a 3-4fps hit
 via timedemo testing.  On a P1, those extra 3-4 frames really make the
 difference.  If we see issues down the road, well... here's the note!
+
