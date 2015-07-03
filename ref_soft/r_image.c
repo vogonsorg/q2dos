@@ -567,7 +567,6 @@ R_LoadWal
 */
 image_t *R_LoadWal (char *name)
 {
-#if 0
 	miptex_t	*mt;
 	int			ofs;
 	image_t		*image;
@@ -595,28 +594,6 @@ image_t *R_LoadWal (char *name)
 
 	ofs = LittleLong (mt->offsets[0]);
 	memcpy ( image->pixels[0], (byte *)mt + ofs, size);
-
-	ri.FS_FreeFile ((void *)mt);
-
-	return image;
-#endif
-	// FS: OpenGL version
-	miptex_t	*mt;
-	int			width, height, ofs;
-	image_t		*image;
-
-	ri.FS_LoadFile (name, (void **)&mt);
-	if (!mt)
-	{
-		ri.Con_Printf (PRINT_ALL, "R_LoadWal: can't load %s\n", name);
-		return r_notexture_mip;
-	}
-
-	width = LittleLong (mt->width);
-	height = LittleLong (mt->height);
-	ofs = LittleLong (mt->offsets[0]);
-
-	image = GL_LoadPic (name, (byte *)mt + ofs, width, height, it_wall, 8);
 
 	ri.FS_FreeFile ((void *)mt);
 
