@@ -20,7 +20,7 @@ What works?
 
 What works but needs more testing?
 * Modern sound cards like AC'97 or HDA
-* Mouse wheel support with -mwheel.  See other misc info below.
+* Mouse wheel support. (See other misc info below.)
 
 What doesn't work:
 * Playing in a Win9x or NTVDM DOS box.
@@ -50,10 +50,13 @@ Tips and other misc info:
   Don't bother ripping the tracks from the Reckoning CD, as they're a mix of
   the tracks on the Q2 and Ground Zero CDs.  Everything else will be taken care
   of internally.
-* Mouse wheel code is from HoT and since mouse wheel code varies from mouse
-  driver it will not be enabled by default.  We've already had reports that
-  it works, but not 100% properly.  I can't really do much more for you.
-  DOS was made in a time where mouse wheels didn't even exist.
+* Mouse wheel:  The code is from HoT.  If you use the latest beta version of
+  cutemouse, which  is 2.1b3 (ctmouse21b3.zip), the wheel should work nicely.
+  We tested with the 2.0-alpha and 2.1-beta versions. We automatically detect
+  and use the wheel if it is present. To disable the wheel, use the command
+  line argument -nowheel.
+  - Note: As of cutemouse-2.1-beta4 version (cutemouse21b4.zip), the wheel is
+    not enabled by default: you must use their /O switch.
 * MEMSTATS command will report available Physical and Virtual Memory in Mb.
   You will notice the number will never rise, this is on purpose.
   Please read the DJGPP FAQ @ http://www.delorie.com/djgpp//v2faq/faq15_2.html

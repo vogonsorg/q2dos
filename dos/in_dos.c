@@ -44,7 +44,7 @@ void IN_StartupMouse (void)
 		mouse_buttons = 3;
 	Com_Printf("%d-button mouse available\n", mouse_buttons);
 
-	if (!COM_CheckParm ("-mwheel")) // FS: From HoT
+	if (COM_CheckParm ("-nowheel")) // FS: From HoT
 		return;
 	regs.x.ax = 0x11;
 	dos_int86(0x33);
