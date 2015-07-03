@@ -16,7 +16,7 @@ What works?
 * CD-ROM music
 * OGG music
 * Networking (You need a packet driver)
-* Loading/unloading game DLLs in DX3 format.
+* Loading/unloading game DLLs in DXE3 format.
 
 What works but needs more testing?
 * Modern sound cards like AC'97 or HDA
