@@ -353,8 +353,10 @@ UpdateSbrk:
 	return working_memory;
 }
 
+/*
 int virtualmemsize;
 byte *virtualmembase;
+*/
 
 int Sys_Get_Physical_Memory(void) // FS: From DJGPP tutorial
 {

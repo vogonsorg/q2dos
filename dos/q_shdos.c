@@ -19,17 +19,16 @@
 #include "errno.h"
 #include "glob.h"
 
-int		hunkcount;
-byte	*membase;
-int		hunkmaxsize;
-int		cursize;
+static byte	*membase;
+static int	maxhunksize;
+static int	curhunksize;
 
 void	*Hunk_Begin (int maxsize)
 {
 	// reserve a huge chunk of memory, but don't commit any yet
-	cursize = 0;
-	hunkmaxsize = maxsize;
-	membase = malloc (maxsize);
+	maxhunksize = maxsize;
+	curhunksize = 0;
+	membase = malloc (maxhunksize);
 
 	if (!membase)
 	{
@@ -48,25 +47,27 @@ void	*Hunk_Alloc (int size)
 	// round to cacheline
 	size = (size+31)&~31;
 
-	cursize += size;
-	if (cursize > hunkmaxsize)
+	curhunksize += size;
+	if (curhunksize > maxhunksize)
 	{
 		Sys_Error ("Hunk_Alloc overflow");
 	}
 
-	return (void *)(membase+cursize-size);
+	return (void *)(membase+curhunksize-size);
 }
 
 void	Hunk_Free (void *buf)
 {
 	free (buf);
-	hunkcount--;
 }
 
 int	Hunk_End (void)
 {
-	hunkcount++;
-	return cursize;
+	byte *n = realloc(membase, curhunksize);
+	if (n != membase)
+		Sys_Error("Hunk_End:  Could not remap virtual block (%d)", errno);
+	
+	return curhunksize;
 }
 
 double	curtime;
