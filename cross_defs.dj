@@ -1,0 +1,10 @@
+# modify this to meet your own setup
+
+TARGET=i586-pc-msdosdjgpp
+PREFIX=/usr/local/cross-djgpp
+
+PATH="$PREFIX/bin:$PATH"
+export PATH
+
+DXE_LD_LIBRARY_PATH="$PREFIX/lib"
+export DXE_LD_LIBRARY_PATH

@@ -58,6 +58,7 @@ LIBIDN_ROOT  = $(TOPDIR)/../IDN/libidn
 ARES_ROOT    = $(TOPDIR)/ares
 
 CC   = gcc
+AR   = ar
 YACC = bison -y
 
 CFLAGS = -g -O2 -I. -I$(TOPDIR)/include -I$(TOPDIR)/lib $(WATT32_ROOT) -Wall -DHAVE_CONFIG_H

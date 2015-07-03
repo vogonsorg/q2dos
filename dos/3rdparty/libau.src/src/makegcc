@@ -10,3 +10,6 @@ libau.a:
 	$(AR) q libau.a $(OBJS)
 
 all: libau.a
+
+clean:
+	rm -f *.o
