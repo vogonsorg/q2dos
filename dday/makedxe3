@@ -60,13 +60,13 @@ GAME = g_ai.o \
 
 OBJECTS =  $(GAME)
 
-all: gamex86.dx3
+all: gamex86.dxe
 
-gamex86.dx3:	$(OBJECTS)
-	$(DXE3GEN) -U -E _GetGameAPI $(OBJECTS) -o gamex86.dx3 -lm $(LFLAGS)
+gamex86.dxe:	$(OBJECTS)
+	$(DXE3GEN) -U -E _GetGameAPI $(OBJECTS) -o gamex86.dxe -lm $(LFLAGS)
 
 clean:
-	rm .../*.o
+	rm -f *.o
 
 DO_AS=$(CC) -x assembler-with-cpp
 

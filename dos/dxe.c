@@ -128,7 +128,7 @@ void *Sys_GetGameAPI (void *parms)
 	char	name[MAX_OSPATH];
 	char	curpath[MAX_OSPATH];
 	char	*path;
-	const char *gamename = "gamex86.dx3";
+	const char *gamename = "gamex86.dxe";
 
 	getcwd(curpath, sizeof(curpath));
 

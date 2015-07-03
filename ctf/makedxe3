@@ -7,6 +7,7 @@ GAME = g_ai.o \
 	g_chase.o \
 	g_cmds.o \
 	g_combat.o \
+	g_ctf.o \
 	g_func.o \
 	g_items.o \
 	g_main.o \
@@ -18,37 +19,10 @@ GAME = g_ai.o \
 	g_svcmds.o \
 	g_target.o \
 	g_trigger.o \
-	g_turret.o \
 	g_utils.o \
 	g_weapon.o \
-	m_actor.o \
-	m_berserk.o \
-	m_boss2.o \
-	m_boss3.o \
-	m_boss31.o \
-	m_boss32.o \
-	m_boss5.o \
-	m_brain.o \
-	m_chick.o \
-	m_fixbot.o \
-	m_flash.o \
-	m_flipper.o \
-	m_float.o \
-	m_flyer.o \
-	m_gekk.o \
-	m_gladb.o \
-	m_gladiator.o \
-	m_gunner.o \
-	m_hover.o \
-	m_infantry.o \
-	m_insane.o \
-	m_medic.o \
-	m_move.o \
-	m_mutant.o \
-	m_parasite.o \
-	m_soldier.o \
-	m_supertank.o \
-	m_tank.o \
+	menu.o \
+	move.o \
 	p_client.o \
 	p_hud.o \
 	p_trail.o \
@@ -61,13 +35,13 @@ GAME = g_ai.o \
 
 OBJECTS =  $(GAME)
 
-all: gamex86.dx3
+all: gamex86.dxe
 
-gamex86.dx3:	$(OBJECTS)
-	$(DXE3GEN) -U -E _GetGameAPI $(OBJECTS) -o gamex86.dx3
+gamex86.dxe:	$(OBJECTS)
+	$(DXE3GEN) -U -E _GetGameAPI $(OBJECTS) -o gamex86.dxe
 
 clean:
-	rm .../*.o
+	rm -f *.o
 
 DO_AS=$(CC) -x assembler-with-cpp
 
@@ -79,4 +53,3 @@ DO_AS=$(CC) -x assembler-with-cpp
 
 %.o: %.s
 	$(DO_AS) $(CFLAGS) -c $< -o $@
-

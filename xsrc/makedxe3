@@ -4,8 +4,8 @@ CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 DXE3GEN = dxe3gen
 
 GAME = g_ai.o \
-	g_cmds.o \
 	g_chase.o \
+	g_cmds.o \
 	g_combat.o \
 	g_func.o \
 	g_items.o \
@@ -27,12 +27,16 @@ GAME = g_ai.o \
 	m_boss3.o \
 	m_boss31.o \
 	m_boss32.o \
+	m_boss5.o \
 	m_brain.o \
 	m_chick.o \
+	m_fixbot.o \
 	m_flash.o \
 	m_flipper.o \
 	m_float.o \
 	m_flyer.o \
+	m_gekk.o \
+	m_gladb.o \
 	m_gladiator.o \
 	m_gunner.o \
 	m_hover.o \
@@ -50,36 +54,20 @@ GAME = g_ai.o \
 	p_trail.o \
 	p_view.o \
 	p_weapon.o \
-	q_shared.o \
-	z_acannon.o \
-	z_ai.o \
-	z_anim.o \
-	z_boss.o \
-	z_camera.o \
-	z_debug.o \
-	z_frames.o \
-	z_handler.o \
-	z_hound.o \
-	z_item.o \
-	z_list.o \
-	z_mtest.o \
-	z_sentien.o \
-	z_spawn.o \
-	z_trigger.o \
-	z_weapon.o
+	q_shared.o
 
 .PHONY: all test clean
 #
 
 OBJECTS =  $(GAME)
 
-all: gamex86.dx3
+all: gamex86.dxe
 
-gamex86.dx3:	$(OBJECTS)
-	$(DXE3GEN) -U -E _GetGameAPI $(OBJECTS) -o gamex86.dx3
+gamex86.dxe:	$(OBJECTS)
+	$(DXE3GEN) -U -E _GetGameAPI $(OBJECTS) -o gamex86.dxe
 
 clean:
-	rm .../*.o
+	rm -f *.o
 
 DO_AS=$(CC) -x assembler-with-cpp
 

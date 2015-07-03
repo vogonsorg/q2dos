@@ -6,6 +6,7 @@ DXE3GEN = dxe3gen
 GAME = m_tank.o \
 	p_client.o \
 	p_hud.o \
+	p_menu.o \
 	p_trail.o \
 	p_view.o \
 	p_weapon.o \
@@ -14,6 +15,7 @@ GAME = m_tank.o \
 	g_chase.o \
 	g_cmds.o \
 	g_combat.o \
+	g_ctf.o \
 	g_func.o \
 	g_items.o \
 	g_main.o \
@@ -50,20 +52,27 @@ GAME = m_tank.o \
 	m_mutant.o \
 	m_parasite.o \
 	m_soldier.o \
-	m_supertank.o
+	m_supertank.o \
+	acebot_ai.o \
+	acebot_cmds.o \
+	acebot_compress.o \
+	acebot_items.o \
+	acebot_movement.o \
+	acebot_nodes.o \
+	acebot_spawn.o
 
 .PHONY: all test clean
 #
 
 OBJECTS =  $(GAME)
 
-all: gamex86.dx3
+all: gamex86.dxe
 
-gamex86.dx3:	$(OBJECTS)
-	$(DXE3GEN) -U -E _GetGameAPI $(OBJECTS) -o gamex86.dx3
+gamex86.dxe:	$(OBJECTS)
+	$(DXE3GEN) -U -E _GetGameAPI $(OBJECTS) -o gamex86.dxe
 
 clean:
-	rm .../*.o
+	rm -f *.o
 
 DO_AS=$(CC) -x assembler-with-cpp
 

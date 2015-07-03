@@ -118,8 +118,15 @@ q2.exe:	$(OBJECTS)
 	$(CC) $(OBJECTS) -o q2.exe $(LDFLAGS) $(VORBIS_LIBS) $(OGG_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm
 
 clean:
-#	find ./ -name '*.o' -exec rm {} \;
-	rm .../*.o
+	rm -f qcommon/*.o
+	rm -f client/*.o
+	rm -f server/*.o
+	rm -f ref_soft/*.o
+	rm -f dos/*.o
+	rm -f linux/*.o
+	rm -f Goa/*.o
+	rm -f Goa/CEngine/*.o
+	rm -f game/*.o
 
 DO_AS=$(CC) -x assembler-with-cpp
 

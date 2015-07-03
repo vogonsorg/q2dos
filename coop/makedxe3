@@ -1,8 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 #CFLAGS+= -g
-CFLAGS+= -Did386
-#id386 in this specific one because its shared by the engine and we're using math.s now
 DXE3GEN = dxe3gen
 
 GAME = m_tank.o \
@@ -59,13 +57,13 @@ GAME = m_tank.o \
 
 OBJECTS =  $(GAME)
 
-all: gamex86.dx3
+all: gamex86.dxe
 
-gamex86.dx3:	$(OBJECTS)
-	$(DXE3GEN) -U -E _GetGameAPI $(OBJECTS) -o gamex86.dx3
+gamex86.dxe:	$(OBJECTS)
+	$(DXE3GEN) -U -E _GetGameAPI $(OBJECTS) -o gamex86.dxe
 
 clean:
-	rm .../*.o
+	rm -f *.o
 
 DO_AS=$(CC) -x assembler-with-cpp
 
@@ -77,4 +75,3 @@ DO_AS=$(CC) -x assembler-with-cpp
 
 %.o: %.s
 	$(DO_AS) $(CFLAGS) -c $< -o $@
-

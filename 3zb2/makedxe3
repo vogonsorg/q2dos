@@ -1,6 +1,5 @@
 CC = gcc
 CFLAGS = -O2 -fno-strict-aliasing -fomit-frame-pointer
-SFLAGS = -Did386 -DWITH_ACEBOT
 DXE3GEN = dxe3gen
 
 GAME = p_client.o \
@@ -8,8 +7,8 @@ GAME = p_client.o \
 	p_trail.o \
 	p_view.o \
 	p_weapon.o \
+	p_menu.o \
 	q_shared.o \
-	g_ai.o \
 	g_chase.o \
 	g_cmds.o \
 	g_combat.o \
@@ -28,29 +27,24 @@ GAME = p_client.o \
 	g_utils.o \
 	g_weapon.o \
 	m_move.o \
-	m_tank.o \
-	acesrc/acebot_ai.o acesrc/acebot_compress.o \
-	acesrc/acebot_movement.o \
-	acesrc/acebot_spawn.o acesrc/acebot_cmds.o \
-	acesrc/acebot_items.o \
-	acesrc/acebot_nodes.o acesrc/botnav.o \
-	acesrc/botchat.o \
-	acesrc/botscan.o acesrc/fogstub.o \
-	a_cmds.o a_game.o a_menu.o a_team.o \
-	a_doorkick.o a_items.o a_radio.o cgf_sfx_glass.o
+	bot_func.o \
+	bot_za.o \
+	g_ctf.o \
+	bot.o \
+	bot_fire.o
 
 .PHONY: all test clean
 #
 
 OBJECTS =  $(GAME)
 
-all: gamex86.dx3
+all: gamex86.dxe
 
-gamex86.dx3:	$(OBJECTS)
-	$(DXE3GEN) -U -E _GetGameAPI $(OBJECTS) -o gamex86.dx3 -lm $(LFLAGS)
+gamex86.dxe:	$(OBJECTS)
+	$(DXE3GEN) -U -E _GetGameAPI $(OBJECTS) -o gamex86.dxe
 
 clean:
-	rm .../*.o
+	rm -f *.o
 
 DO_AS=$(CC) -x assembler-with-cpp
 
@@ -62,3 +56,4 @@ DO_AS=$(CC) -x assembler-with-cpp
 
 %.o: %.s
 	$(DO_AS) $(CFLAGS) -c $< -o $@
+
