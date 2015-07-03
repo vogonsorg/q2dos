@@ -6,5 +6,5 @@ PREFIX=/usr/local/cross-djgpp
 PATH="$PREFIX/bin:$PATH"
 export PATH
 
-DXE_LD_LIBRARY_PATH="$PREFIX/lib"
+DXE_LD_LIBRARY_PATH="$PREFIX/$TARGET/lib"
 export DXE_LD_LIBRARY_PATH
