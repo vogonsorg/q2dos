@@ -9,7 +9,7 @@
 *.aps
 *.idb
 *.pdb
-*.dx3
+*.dxe
 *.clwbin/
 # ignore all the windows binaries - they shouldn't be committed! 
 Debug/
