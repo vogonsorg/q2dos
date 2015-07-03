@@ -1,5 +1,5 @@
 Welcome to the Quake II for MS-DOS port.
-By Neozeed and [HCI]Mara'akate.
+By Neozeed, [HCI]Mara'akate, and sezero.
 
 
 What's required?
