@@ -13,9 +13,41 @@ void	SWimp_BeginFrame( float camera_separation )
 void	SWimp_EndFrame (void)
 {
 	//It's LFB only
-	if(!vid_resolutions[currentvideomode].isLFB)	//VGA mode 13
+	if(!vid_resolutions[currentvideomode].isLFB)
 	{
-		dosmemput(vid.buffer,vid_resolutions[currentvideomode].height*vid_resolutions[currentvideomode].width,0xA0000);
+		if(!vid_resolutions[currentvideomode].isBanked)	// VGA mode 13
+		{
+			dosmemput(vid.buffer,vid_resolutions[currentvideomode].height*vid_resolutions[currentvideomode].width,0xA0000);
+		}
+		else // FS: Credit to ggorts
+		{
+			int bank_number=0;
+			int todo=307199; //307200;
+			int copy_size;
+			__dpmi_regs r;
+
+			while (todo>0)
+			{
+				r.x.ax = 0x4F05;
+				r.x.bx = 0;
+				r.x.dx = bank_number;
+				__dpmi_int(0x10, &r);
+			
+				if (todo>65536)
+				{
+					copy_size=65536;
+				}
+				else
+				{
+					copy_size=todo;
+				}
+
+				dosmemput(vid.buffer, copy_size, 0xA0000);
+				todo-=copy_size;
+				vid.buffer+=copy_size;
+				bank_number++;
+			}
+		}
 	}
 	else
 	{
@@ -85,6 +117,8 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 
 	if(!vid_resolutions[mode].isLFB)
 	{
+		__dpmi_regs r;
+
 		vid.height=vid_resolutions[mode].height;
 		vid.width=vid_resolutions[mode].width;
 		vid.rowbytes=vid.width;
@@ -95,12 +129,18 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 		}
 
 		vid.buffer=malloc(vid.width*vid.height*1);
+		if(!vid_resolutions[mode].isBanked)
 		{	//mode 13
-			__dpmi_regs r;
 
 			r.x.ax = 0x13;
-			__dpmi_int(0x10, &r);
 		}
+		else
+		{
+			r.x.ax = 0x4F02;
+			r.x.bx = 0x0101;
+		}
+
+		__dpmi_int(0x10, &r);
 	}
 	else
 	{

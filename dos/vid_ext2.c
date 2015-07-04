@@ -171,6 +171,8 @@ void VID_InitExtra (void)
 	vid_resolutions[0].height=200;
 	vid_resolutions[0].width=320;
 	vid_resolutions[0].isLFB=false;
+	vid_resolutions[0].isBanked=false;
+
 	Com_sprintf(vid_resolutions[0].menuname, sizeof(vid_resolutions[0].menuname), "[VGA 320x200]");
 
 	if(COM_CheckParm("-vgaonly"))
@@ -346,6 +348,7 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 	regs.x.es = ptr2real(infobuf) >> 4;
 	regs.x.di = ptr2real(infobuf) & 0xf;
 	dos_int86(0x10);
+
 	if (regs.x.ax != 0x4f)
 	{
 		dos_freememory(infobuf);
@@ -385,10 +388,10 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 		if (!(modeinfo.mode_attributes & LINEAR_FRAME_BUFFER))
 		{
 			if ((modeinfo.width != 320) || (modeinfo.height != 200))
-				{
+			{
 				dos_freememory(infobuf);
 				return false;
-				}
+			}
 		}
 
 		modeinfo.bytes_per_scanline = *(short*)(infobuf+16);
@@ -445,10 +448,12 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 		modeinfo.blue_pos = *(char*)(infobuf+36);
 
 		modeinfo.pptr = *(long *)(infobuf+40);
+
 		//8bit linear only
 		if((modeinfo.memory_model==0x4)&&(modeinfo.bits_per_pixel==8))
 		{
 			Com_Printf("VESA mode 0x%0x %dx%d supported\n",modeinfo.modenum,modeinfo.width,modeinfo.height);
+
 			if(num_vid_resolutions<MAX_RESOLUTIONS)
 			{
 				vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;

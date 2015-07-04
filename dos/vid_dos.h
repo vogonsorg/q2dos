@@ -52,6 +52,7 @@ typedef struct vid_resolutions_s {
 	int width;
 	void *address;
 	qboolean isLFB; // FS: Added
+	qboolean isBanked; // FS: Added
 	char menuname[VIDNAME_LEN];
 } vid_resolutions_t;
 extern int num_vid_resolutions;
