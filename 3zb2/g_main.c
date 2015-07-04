@@ -475,13 +475,13 @@ void G_InitEdict (edict_t *e);
 void G_RunFrame (void)
 {
 	int		i,j;
-	static int ofs;
+//	static int ofs;
 	static float next_fragadd = 0;
 	edict_t	*ent;
 
 	vec3_t	v,vv;
 	qboolean haveflag;
-	gitem_t	*item;
+//	gitem_t	*item;
 
 	level.framenum++;
 	level.time = level.framenum*FRAMETIME;
