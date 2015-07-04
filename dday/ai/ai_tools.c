@@ -118,7 +118,7 @@ void AITools_DrawLine(vec3_t origin, vec3_t dest)
 // AITools_DrawPath
 // Draws the current path (floods as hell also)
 //==========================================
-static int	drawnpath_timeout;
+/*static int	drawnpath_timeout;*/
 void AITools_DrawPath(edict_t *self, int node_from, int node_to)
 {
 /*
@@ -148,7 +148,7 @@ void AITools_DrawPath(edict_t *self, int node_from, int node_to)
 		
 		event = G_SpawnEvent ( EV_BFG_LASER, 0, nodes[self->ai.path->nodes[pos]].origin );
 		event->svflags = SVF_FORCEOLDORIGIN;
-		VectorCopy ( nodes[self->ai.path->nodes[pos+1]].origin, event->s.origin2 );		
+		VectorCopy ( nodes[self->ai.path->nodes[pos+1]].origin, event->s.origin2 );
 		pos++;
 		count++;
 	}
@@ -159,7 +159,7 @@ void AITools_DrawPath(edict_t *self, int node_from, int node_to)
 // AITools_ShowPlinks
 // Draws lines from the current node to it's plinks nodes
 //==========================================
-static int	debugdrawplinks_timeout;
+/*static int	debugdrawplinks_timeout;*/
 void AITools_ShowPlinks( void )
 {
 /*	int		current_node;
