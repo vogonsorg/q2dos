@@ -566,7 +566,7 @@ void BOT_DMClass_JoinGame (edict_t *ent, char *team_name)
 {
 
 	vec3_t	spawn_origin, spawn_angles;
-	int randnum = rand()%5;
+//	int randnum = rand()%5;
 
 	if ( !BOT_JoinCTFTeam(ent, team_name) )
 		Com_Printf ( "%s joined the game.\n",

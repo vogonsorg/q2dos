@@ -433,13 +433,12 @@ int Damage_Loc(edict_t *targ, vec3_t point, edict_t *attacker)
 {	
 	float x_coord, y_coord, p_angle; //faf
 
-	
-	float min_x = targ->s.origin[0] + targ->mins[0] - 0.1;
-	float max_x = targ->s.origin[0] + targ->maxs[0] + 0.1;
-	float min_y = targ->s.origin[1] + targ->mins[1] - 0.1;
-	float max_y = targ->s.origin[1] + targ->maxs[1] + 0.1;
+	//float min_x = targ->s.origin[0] + targ->mins[0] - 0.1;
+	//float max_x = targ->s.origin[0] + targ->maxs[0] + 0.1;
+	//float min_y = targ->s.origin[1] + targ->mins[1] - 0.1;
+	//float max_y = targ->s.origin[1] + targ->maxs[1] + 0.1;
 	float min_z = targ->s.origin[2] + targ->mins[2] - 0.1;
-	float max_z = targ->s.origin[2] + targ->maxs[2] + 0.1;
+	//float max_z = targ->s.origin[2] + targ->maxs[2] + 0.1;
 
 	// rezmoth - impact debug info
 	//gi.dprintf(DEVELOPER_MSG_GAME, "mins  (%f, %f, %f)\n", targ->mins[0], targ->mins[1], targ->mins[2]);

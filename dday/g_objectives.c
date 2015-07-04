@@ -52,7 +52,6 @@ void objective_area_think (edict_t *self) {
 
 	edict_t *ent  = NULL;
 	int count = 0;
-	int i=0;
 	int newteam;
 	int delay;
 
