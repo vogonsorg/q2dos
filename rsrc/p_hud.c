@@ -1,7 +1,5 @@
 #include "g_local.h"
 
-
-
 /*
 ======================================================================
 
@@ -9,7 +7,6 @@ INTERMISSION
 
 ======================================================================
 */
-
 
 void
 MoveClientToIntermission(edict_t *ent)
@@ -388,7 +385,7 @@ void
 G_SetStats(edict_t *ent)
 {
 	gitem_t *item;
-	int index, cells;
+	int index, cells = 0;
 	int power_armor_type;
 
 	if (!ent)

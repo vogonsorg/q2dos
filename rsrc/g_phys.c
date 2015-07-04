@@ -1405,4 +1405,3 @@ SV_Physics_NewToss(edict_t *ent)
 		gi.linkentity(slave);
 	}
 }
-//============

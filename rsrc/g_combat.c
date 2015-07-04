@@ -1160,4 +1160,3 @@ T_RadiusClassDamage(edict_t *inflictor, edict_t *attacker, float damage,
 		}
 	}
 }
-// ********************
