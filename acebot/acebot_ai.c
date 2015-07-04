@@ -148,8 +148,8 @@ void ACEAI_PickLongRangeGoal(edict_t *self)
 	int i;
 	int node;
 	float weight,best_weight=0.0;
-	int current_node,goal_node;
-	edict_t *goal_ent;
+	int current_node, goal_node = INVALID;
+	edict_t *goal_ent = NULL;
 	float cost;
 	
 	// look for a target 
@@ -227,7 +227,7 @@ void ACEAI_PickLongRangeGoal(edict_t *self)
 			best_weight = weight;
 			goal_node = node;
 			goal_ent = players[i];
-		}	
+		}
 	}
 
 	// If do not find a goal, go wandering....
@@ -261,7 +261,7 @@ void ACEAI_PickShortRangeGoal(edict_t *self)
 {
 	edict_t *target;
 	float weight,best_weight=0.0;
-	edict_t *best;
+	edict_t *best = NULL;
 	int index;
 	
 	// look for a target (should make more efficent later)
@@ -340,7 +340,6 @@ qboolean ACEAI_FindEnemy(edict_t *self)
 	}
 
 	return false;
-  
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -411,11 +410,10 @@ void ACEAI_ChooseWeapon(edict_t *self)
 		return;
 	
 	if(ACEIT_ChangeWeapon(self,FindItem("shotgun")))
-   	   return;
+	   return;
 	
 	if(ACEIT_ChangeWeapon(self,FindItem("blaster")))
-   	   return;
+	   return;
 	
 	return;
-
 }

@@ -349,7 +349,8 @@ edict_t *ACESP_FindFreeClient (void)
 	edict_t *bot;
 	int	i;
 	int max_count=0;
-	
+
+	bot = NULL;/* silence compiler */
 	// This is for the naming of the bots
 	for (i = maxclients->value; i > 0; i--)
 	{
