@@ -727,17 +727,17 @@ void GetMapObjective (void) {
 	FILE *map_file;
 	char filename[100];
 	
-	strcpy(filename, GAMEVERSION "/pics/objectives/");		
+	strcpy(filename, GAMEVERSION "/pics/objectives/");
 	strcat(filename, level.mapname);
 	strcat(filename,".pcx");
 
 	gi.dprintf(DEVELOPER_MSG_GAME, "Loading map objective pic %s...", filename);
-	if (map_file = fopen(filename, "r")) 
+	if ((map_file = fopen(filename, "r")) != NULL)
 	{
 		fclose(map_file);
 		level.objectivepic = filename;
 		gi.dprintf(DEVELOPER_MSG_GAME, "done.\n");
-	} 
+	}
 	else
 		gi.dprintf(DEVELOPER_MSG_GAME, "error.\n");
 }
