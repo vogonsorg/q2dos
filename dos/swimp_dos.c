@@ -155,8 +155,8 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 		{
 			ri.Con_Printf(PRINT_ALL, "\x02Setting banked mode!\n");
 			r.x.ax = 0x4F02;
-			r.x.bx = 0x0101; // FS: FIXME: This is setting it to 640x480
-		}
+			r.x.bx = vid_resolutions[mode].vesa_mode;
+}
 
 		__dpmi_int(0x10, &r);
 	}
