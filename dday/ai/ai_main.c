@@ -1054,7 +1054,7 @@ void AI_Think (edict_t *self)
 				sprintf (teamname, "%s ",self->client->resp.team_on->playermodel);
 			}
 			else
-				sprintf (teamname,"");
+				teamname[0] = 0;
 
 			if (dedicated->value){
 				safe_cprintf(NULL, PRINT_HIGH, "%s", teamname);
