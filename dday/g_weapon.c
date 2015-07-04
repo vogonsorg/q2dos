@@ -2618,7 +2618,7 @@ edict_t *ApplyFirstAid (edict_t *ent)
 
 int DoAnarchyStuff(edict_t *ent,char *sound)
 {
-	static lastone;
+	static int lastone;
 	int soundindexM,soundindexF;
 	float RanMale,RanFemale;
 
