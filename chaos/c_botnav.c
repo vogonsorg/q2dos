@@ -23,7 +23,7 @@ void Bot_InitNodes(void)
 
 		for (l = 0; l < MAX_NODES ; l++)
 		{
-			nodes[i].dist[l] = (double)INFINITY;
+			nodes[i].dist[l] = (double)Q_INFINITY;
 		}
 	}
 }
@@ -340,7 +340,7 @@ int Bot_ShortestPath (int source, int target)
 	for (i = 0; i < numnodes; i++)
 	{
 		nodeinfo[i].predecessor	= noPredecessor;
-		nodeinfo[i].dist		= (double)INFINITY;
+		nodeinfo[i].dist		= (double)Q_INFINITY;
 		nodeinfo[i].state		= tentative;
 	}
 
@@ -354,8 +354,8 @@ int Bot_ShortestPath (int source, int target)
 	do
 	{
 		// kNew is the tentatively labeled node with smallest path size
-		kNew	= INFINITY; 
-		minDist = (double)INFINITY;
+		kNew	= Q_INFINITY;
+		minDist = (double)Q_INFINITY;
 	
 		// is there a better path from k
 		for (i = 0; i < numnodes; i++)
@@ -368,7 +368,7 @@ int Bot_ShortestPath (int source, int target)
 			nodeIdist = nodeinfo[i].dist;
 			nodeKdist = nodeinfo[k].dist;
 
-			if ( (distKI != INFINITY) && (nodeinfo[i].state == tentative) )
+			if ((distKI != Q_INFINITY) && (nodeinfo[i].state == tentative))
 			{
 				if ( (nodeKdist + distKI) < nodeIdist)
 				{
@@ -386,7 +386,7 @@ int Bot_ShortestPath (int source, int target)
 
 		// bail out if no path can be found
 
-		if (kNew == INFINITY)
+		if (kNew == Q_INFINITY)
 			return NO_PATH;
 
 		// make that node permanent; there cannot exist a shorter path from source to k
