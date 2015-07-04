@@ -465,5 +465,4 @@ void USM_Weapon_Thompson (edict_t *ent)
 		78, 80, 92, 
 		
 		pause_frames, fire_frames, Weapon_Submachinegun_Fire);
-
 }

@@ -93,11 +93,9 @@ void AIDebug_SetChased(edict_t *ent)
 }
 
 
-
 //=======================================================================
 //							NODE TOOLS	
 //=======================================================================
-
 
 
 //==========================================
@@ -201,7 +199,6 @@ void AITools_ShowPlinks( void )
 
 
 //=======================================================================
-//=======================================================================
 
 
 //==========================================
@@ -215,7 +212,6 @@ void AITools_Frame(void)
 	if( AIDevel.showPLinks )
 		AITools_ShowPlinks();
 }
-
 
 
 //removes nearest node
@@ -232,7 +228,7 @@ void SV_Remove_Node (edict_t *ent)
 
 	nearest_distance = 9999999999;
 	nearest = -1;
-    for (i=1; i<MAX_NODES; i++)
+	for (i=1; i<MAX_NODES; i++)
 	{
 		VectorSubtract(ent->s.origin, nodes[i].origin, v); 
 		dist = VectorLength(v);
@@ -277,9 +273,7 @@ void SV_Remove_Node (edict_t *ent)
 		}
 	}
 */
-
 }
-
 
 
 void Show_Nodes_Think (edict_t *ent)
@@ -305,7 +299,6 @@ void Show_Nodes_Think (edict_t *ent)
 			nearest = i;
 			nearest_distance = dist;
 		}
-
 	}
 
 	if (nearest == -1)
@@ -314,7 +307,6 @@ void Show_Nodes_Think (edict_t *ent)
 		ent->nextthink = level.time+.1;
 		gi.dprintf(DEVELOPER_MSG_GAME, "No nodes!\n");
 	}
-	
 
 	if (ent->mass >= pLinks[nearest].numLinks)	
 	{
@@ -333,7 +325,6 @@ void Show_Nodes_Think (edict_t *ent)
 
 //	gi.dprintf(DEVELOPER_MSG_GAME, "%i\n", pLinks[nearest].moveType[ent->mass]);
 
-
 	//put a head at the end of the link.
 	head = G_Spawn();
 	head->s.skinnum = 0;
@@ -351,9 +342,6 @@ void Show_Nodes_Think (edict_t *ent)
 	head->think = G_FreeEdict;
 	head->nextthink = level.time + .5;
 	gi.linkentity (head);
-
-
-
 
 	//gi.dprintf(DEVELOPER_MSG_GAME, "%i %s, %s %s\n", ent->mass, vtos(start),vtos(end), vtos(nodes[pLinks[nearest].nodes[ent->mass]].origin)); 
 
@@ -374,10 +362,8 @@ void Show_Nodes_Think (edict_t *ent)
 
 	gi.dprintf(DEVELOPER_MSG_GAME, "%i, %i, %s\n", ent->count, ent->mass, vtos(nodes[pLinks[ent->count].nodes[ent->mass]].origin)); 
 
-
 	VectorCopy (nodes[ent->count].origin, start);
 	VectorCopy (nodes[pLinks[ent->count].nodes[ent->mass]].origin, end);*/
-
 
 	VectorCopy (start, ent->s.origin);
 
@@ -388,27 +374,18 @@ void Show_Nodes_Think (edict_t *ent)
 //	if (!VectorCompare(ent->movedir, last_movedir))
 		ent->spawnflags |= 0x80000000;
 
-
-
 	VectorCopy (end, ent->s.old_origin);
 	gi.linkentity (ent);
 	ent->nextthink = level.time +.2;
 
 	ent->mass++;
-
-
-
-	
-
 }
-
 
 
 void Bot_Laser_Think (edict_t *ent)
 {
 	vec3_t	last_movedir;
 	vec3_t	start,end;
-
 
 	if (!ent->owner || !ent->owner->ai  || !ent->owner->client->resp.laser)
 		return;
@@ -418,9 +395,7 @@ void Bot_Laser_Think (edict_t *ent)
 	else
 		VectorCopy (camp_spots[ent->owner->ai->camp_targ].origin, start);
 
-
 	VectorCopy (ent->owner->s.origin, end);
-
 
 	VectorCopy (start, ent->s.origin);
 
@@ -438,9 +413,7 @@ void Bot_Laser_Think (edict_t *ent)
 		ent->s.skinnum = 0xf2f2f0f0;
 	else
 		ent->s.skinnum = 0xdcdddedf;
-
 }
-
 
 
 void ShowLinks(edict_t *ent)
@@ -455,7 +428,6 @@ void ShowLinks(edict_t *ent)
 		return;
 
 	laser = G_Spawn();
-
 
 	laser->movetype = MOVETYPE_NONE;
 	laser->solid = SOLID_NOT;
@@ -480,8 +452,6 @@ void ShowLinks(edict_t *ent)
 	ent->client->resp.laser = laser;
 	laser->owner = ent;
 
-
-
 	//put a team flag over every campspot
 	for (i=0; i< total_camp_spots; i++)
 	{
@@ -494,7 +464,6 @@ void ShowLinks(edict_t *ent)
 			gi.setmodel (thrower, "models/objects/banner2/tris.md2");
 		else
 			gi.setmodel (thrower, "models/objects/banner4/tris.md2");
-
 
 		thrower->s.angles[1] = camp_spots[i].angle;
 
@@ -516,10 +485,6 @@ void ShowLinks(edict_t *ent)
 		}
 	}
 
-
-
-
-
 	//give every bot a laser that points to its campspot
 	for (i=0 ; i< maxclients->value ; i++)
 	{
@@ -530,7 +495,6 @@ void ShowLinks(edict_t *ent)
 			continue;
 		if (e->client->resp.laser)
 			continue;
-	
 
 		blaser = G_Spawn();
 
@@ -557,5 +521,4 @@ void ShowLinks(edict_t *ent)
 		e->client->resp.laser = blaser;
 		blaser->owner = e;
 	}
-
 }

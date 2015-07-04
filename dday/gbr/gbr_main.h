@@ -44,7 +44,6 @@ void Weapon_Bren_Fire (edict_t *ent);
 void Weapon_Vickers_Fire (edict_t *ent);
 void Weapon_PIAT_Fire (edict_t *ent);
 
-
 void Weapon_Webley (edict_t *ent);
 void Weapon_Enfield(edict_t *ent);
 void Weapon_Sten (edict_t *ent);
@@ -52,7 +51,6 @@ void Weapon_Bren(edict_t *ent);
 void Weapon_Vickers(edict_t *ent);
 void Weapon_PIAT(edict_t *ent);
 void Weapon_Enfields(edict_t *ent);
-
 
 void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_LFIRE_LAST, int FRAME_LIDLE_LAST, int FRAME_RELOAD_LAST, int FRAME_LASTRD_LAST,
 					 int FRAME_DEACTIVATE_LAST, int FRAME_RAISE_LAST,int FRAME_AFIRE_LAST, int FRAME_AIDLE_LAST,

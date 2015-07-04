@@ -81,7 +81,7 @@ GunInfo_t usmguninfo[MAX_TEAM_GUNS]=
 		DAMAGE_BAR, 0,
 		0
 	},
-	{//BHMG 
+	{//BHMG
 		{20,21},{90,91}, 21,91, 79,82,
 
 			"usa/bhmg/unload.wav",
@@ -98,7 +98,7 @@ GunInfo_t usmguninfo[MAX_TEAM_GUNS]=
 		DAMAGE_BHMG, 0,
 		0
 	},
-	{//Bazooka 
+	{//Bazooka
 		{4},{73}, 5,75, 65,65,
 
 			"usa/bazooka/unload.wav",
@@ -114,7 +114,7 @@ GunInfo_t usmguninfo[MAX_TEAM_GUNS]=
 		DAMAGE_BAZOOKA_HIT, DAMAGE_BAZOOKA_RAD,
 		0
 	},
-	{//Sniper (M1903) 
+	{//Sniper (M1903)
 		{4},{52,60,75,80}, 26,80, 43,43,
 
 			"usa/m1903/unload.wav",

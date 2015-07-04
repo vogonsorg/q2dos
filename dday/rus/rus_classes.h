@@ -232,5 +232,3 @@ SMos_t RUS_MOS_List[NUM_CLASSES]=
 	}
 };
 
-	
-	

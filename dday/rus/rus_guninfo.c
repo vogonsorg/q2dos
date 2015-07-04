@@ -66,7 +66,7 @@ GunInfo_t rusguninfo[MAX_TEAM_GUNS]=
 		DAMAGE_m9130, 0,
 		13,//17
 	},
-	{//ppsh41 
+	{//ppsh41
 		{4,5},{89,90}, 5,90, 81,81,
 
 			"rus/ppsh41/unload.wav",
@@ -82,7 +82,7 @@ GunInfo_t rusguninfo[MAX_TEAM_GUNS]=
 		DAMAGE_ppsh41, 0, 
 		0
 	},
-	{//pps43 
+	{//pps43
 		{4,5},{79,80}, 5,80, 71,71,
 
 			"rus/pps43/unload.wav",
@@ -98,7 +98,7 @@ GunInfo_t rusguninfo[MAX_TEAM_GUNS]=
 		DAMAGE_pps43, 0, 
 		0
 	},
-	{//dpm 
+	{//dpm
 		{21,22},{86,87}, 22,87, 79,79,
 
 			"rus/dpm/unload.wav",
@@ -114,7 +114,7 @@ GunInfo_t rusguninfo[MAX_TEAM_GUNS]=
 		DAMAGE_dpm, 0, 
 		0
 	},
-	{//RPG-1 // was PanzerShrek 
+	{//RPG-1 // was PanzerShrek
 		{4},{73}, 5,75, 65,65,
 
 			"rus/panzer/unload.wav",
@@ -130,7 +130,7 @@ GunInfo_t rusguninfo[MAX_TEAM_GUNS]=
 		DAMAGE_RPG1_HIT, DAMAGE_RPG1_RAD,
 		0
 	},
-	{//Sniper (m9130s) 
+	{//Sniper (m9130s)
 		{4},{52,60,75,80}, 26,80, 43,43,
 
 			"rus/m9130s/unload.wav",
