@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -O2 -fno-strict-aliasing -fomit-frame-pointer
+CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 SFLAGS = -Did386 -DWITH_ACEBOT
 DXE3GEN = dxe3gen
 

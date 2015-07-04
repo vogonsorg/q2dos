@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -O2 -fno-strict-aliasing -fomit-frame-pointer
+CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 SFLAGS = -Did386 -DWITH_ACEBOT
 DXE3GEN = dxe3gen
 
@@ -67,6 +67,15 @@ gamex86.dxe:	$(OBJECTS)
 
 clean:
 	rm -f *.o
+	rm -f ai/*.o
+	rm -f gbr/*.o
+	rm -f grm/*.o
+	rm -f ita/*.o
+	rm -f jpn/*.o
+	rm -f pol/*.o
+	rm -f rus/*.o
+	rm -f usa/*.o
+	rm -f usm/*.o
 
 DO_AS=$(CC) -x assembler-with-cpp
 

@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -O2 -fno-strict-aliasing -fomit-frame-pointer
+CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 DXE3GEN = dxe3gen
 
 GAME = p_client.o \
