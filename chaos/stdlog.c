@@ -33,8 +33,10 @@ static FILE     *StdLogFile = NULL;
 
 static unsigned int uiLogstyle = 0;
 
+/*
 static const char *_unused_id_stdlog_c = "$Id: stdlog.c,v 1.8 1999/09/11 21:47:01 major Exp $";
 static const char *_unused_id_stdlog_h = __STDLOG_ID__;
+*/
 
 /*
  *  LOCAL FUNCTION PROTOTYPES
@@ -202,7 +204,7 @@ static void _sl_LogTime( void )
 
 static void _sl_LogDeathFlags( unsigned long dmFlags )
 {
-    fprintf( StdLogFile, "\t\tLogDeathFlags\t%ul\n", dmFlags );
+    fprintf( StdLogFile, "\t\tLogDeathFlags\t%lu\n", dmFlags );
 }
 
 static void _sl_LogMapName( char *pMapName )

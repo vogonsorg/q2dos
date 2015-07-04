@@ -542,6 +542,7 @@ void CTFFragBonuses(edict_t *targ, edict_t *inflictor, edict_t *attacker)
 	if (!flag)
 		return; // can't find attacker's flag
 
+	carrier = NULL;
 	// find attacker's team's flag carrier
 	for (i = 1; i <= maxclients->value; i++) {
 		carrier = g_edicts + i;

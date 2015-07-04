@@ -424,11 +424,11 @@ void SV_CalcBlend (edict_t *ent)
 
 //FLASHGRENADE
 	if (ent->client->BlindTime > 0)
-    {
+	{
 		if (strcmp(ent->classname,"player") == 0)
 		{
-			float alpha;
-				
+			float alpha = 0;
+
 			if (ent->client->BlindBase)
 				alpha = ent->client->BlindTime / ent->client->BlindBase;
 
@@ -447,7 +447,7 @@ void SV_CalcBlend (edict_t *ent)
 
 //POISONGRENADE
 	if (ent->client->PoisonTime >= 1)
-    {
+	{
 		static float blend = 0.4;
 		static int updown = 1;
 

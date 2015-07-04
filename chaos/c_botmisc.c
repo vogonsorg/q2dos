@@ -132,7 +132,7 @@ void Bot_Create(int level, int team, char *name, char *skin)
 {
 	int       i;
 	char      userinfo[MAX_INFO_STRING];
-	edict_t   *bot;
+	edict_t   *bot = NULL;
 
 	for (i = maxclients->value; i > 0; i--)
 	{
@@ -1571,15 +1571,16 @@ void Load_BotChat(void)
 	cvar_t	*game_dir;
 
 	game_dir = gi.cvar ("game", "", 0);
+	line = 0;	/* silence compiler */
 
 #ifdef	_WIN32
 	i =  sprintf(filename, ".\\");
 	i += sprintf(filename + i, game_dir->string);
 	i += sprintf(filename + i, "\\botchat.txt");
 #else
-      strcpy(filename, "./");
-      strcat(filename, game_dir->string);
-      strcat(filename, "/botchat.txt");
+	strcpy(filename, "./");
+	strcat(filename, game_dir->string);
+	strcat(filename, "/botchat.txt");
 #endif
 
 	fp = fopen (filename, "r");
@@ -1650,7 +1651,6 @@ void Load_BotChat(void)
 char *Get_RandomBotSkin ()
 {
 	int rn;
-	
 
 	switch(rn = (int) (random() * 28 ))
 	{

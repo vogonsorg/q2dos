@@ -210,6 +210,8 @@ void ThrowDebris (edict_t *self, char *modelname, float speed, vec3_t origin)
 }
 
 
+void DoRespawn (edict_t *ent);
+
 void BecomeExplosion1 (edict_t *self)
 {
 //ZOID
