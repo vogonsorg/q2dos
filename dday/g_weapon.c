@@ -62,6 +62,7 @@ a non-instant attack weapon.  It checks to see if a
 monster's dodge function should be called.
 =================
 */
+#if 0 /* all uses are commented out */
 static void check_dodge (edict_t *self, vec3_t start, vec3_t dir, int speed)
 {
 	vec3_t	end;
@@ -84,6 +85,7 @@ static void check_dodge (edict_t *self, vec3_t start, vec3_t dir, int speed)
 		tr.ent->monsterinfo.dodge (tr.ent, self, eta);
 	}
 }
+#endif
 
 
 /*
