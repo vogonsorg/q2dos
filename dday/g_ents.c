@@ -27,10 +27,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "g_local.h"
 #include "g_cmds.h"
+#include <ctype.h> /* tolower */
 
 // g_ents.c
 // D-Day: Normandy Old / Unsorted Entities
-
 
 
 #define NO_MISSION 99
@@ -42,19 +42,16 @@ int Last_Team_Winner=99;
 
 /*********************************************
 ** This is for all of the custom entity and 
-** trigger functions for DDay				
+** trigger functions for DDay
 *********************************************/
-
 
 /////////////////////////////////////////////////////
 //the following functions keep count of how many troops have triggered it
-
 
 //count is total number required...
 //heath is the mission number (0 defence, 1 offence, 2 patrol)
 //dmg is the ammount of pointes added to the team
 //delay is the time to win before the game is won
-
 
 /////////////////////
 void trigger_enough_troops_use (edict_t *self, edict_t *other, edict_t *activator)
@@ -73,7 +70,6 @@ void trigger_enough_troops_use (edict_t *self, edict_t *other, edict_t *activato
 		gi.dprintf(DEVELOPER_MSG_GAME, "TRIGGER return code 2 \n");
 		return;
 	}
-	
 
 	if( (activator->client->resp.team_on->mission != self->health) && (self->health != NO_MISSION) )
 	{
@@ -99,25 +95,22 @@ void trigger_enough_troops_use (edict_t *self, edict_t *other, edict_t *activato
 		if (self->count)
 		{
 			if (! (self->spawnflags & 1))
-			{ 
+			{
 				safe_centerprintf(activator, "%i more to go...", self->count);
-			} 
+			}
 			gi.dprintf(DEVELOPER_MSG_GAME, "TRIGGER return code 4\n");
 			return;
-		} 
-	
+		}
 		else
 		{
-
 			if (! (self->spawnflags & 1))
-			{ 
+			{
 				safe_centerprintf(activator, "Ok, we got 'em all here!");
 			}
 			activator->client->resp.team_on->score=self->dmg;
 			team_list[self->obj_owner]->time_to_win+=self->delay;
-		} 
-				
-		
+		}
+
 		gi.dprintf(DEVELOPER_MSG_GAME, "TRIGGER return code 5\n");
 		self->activator = activator;
 		multi_trigger (self);
@@ -180,8 +173,6 @@ void SP_target_objective(edict_t *ent)
 }
 
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 //The following is for creating teams on spawn
 ////////////////////////////////////////////////////////////////////////////////
@@ -238,7 +229,7 @@ void SP_info_reinforcement_start(edict_t *ent)
 //	ent->nextthink = level.time+((ent->delay)?ent->delay : RI->value);
 //	ent->nextspawn = ent->nextthink;
 	ent->spawnpoint = true;
-} 
+}
 
 void SP_info_reinforcement_startx(edict_t *ent)
 {
@@ -246,7 +237,6 @@ void SP_info_reinforcement_startx(edict_t *ent)
 //	ent->nextthink = level.time+((ent->delay)?ent->delay : RI->value);
 //	ent->nextspawn = ent->nextthink;
 	ent->spawnpoint = true;
-
 
 /*needs work
 	if (ent->count  && ent->obj_owner)
@@ -256,8 +246,7 @@ void SP_info_reinforcement_startx(edict_t *ent)
 //		ent->nextthink = level.time + 1;
 	}
 */
-
-} 
+}
 
 
 gitem_t *InsertItem(gitem_t *it,spawn_t *spawnInfo);
@@ -323,8 +312,7 @@ InitTeam (char *team, int i)
 		InitMOS_List(team_list[i],GRM_MOS_List);
 		GRM_UserPrecache();
 		grm_index = i;
-
-	}	
+	}
 	else if (!strcmp(team, "rus"))
 	{	for(j=0;rusitems[j].classname;j++)
 		{	rusitems[j].mag_index=i;
@@ -333,7 +321,6 @@ InitTeam (char *team, int i)
 		InitMOS_List(team_list[i],RUS_MOS_List);
 		RUS_UserPrecache();
 		rus_index = i;
-
 	}
 	else if (!strcmp(team, "gbr"))
 	{	for(j=0;gbritems[j].classname;j++)
@@ -343,7 +330,6 @@ InitTeam (char *team, int i)
 		InitMOS_List(team_list[i],GBR_MOS_List);
 		GBR_UserPrecache();
 		gbr_index = i;
-
 	}
 	else if (!strcmp(team, "pol"))
 	{	for(j=0;politems[j].classname;j++)
@@ -353,7 +339,6 @@ InitTeam (char *team, int i)
 		InitMOS_List(team_list[i],POL_MOS_List);
 		POL_UserPrecache();
 		pol_index = i;
-
 	}
 	else if (!strcmp(team, "ita"))
 	{	for(j=0;itaitems[j].classname;j++)
@@ -363,7 +348,6 @@ InitTeam (char *team, int i)
 		InitMOS_List(team_list[i],ITA_MOS_List);
 		ITA_UserPrecache();
 		ita_index = i;
-
 	}
 	else if (!strcmp(team, "jpn"))
 	{	for(j=0;jpnitems[j].classname;j++)
@@ -373,7 +357,6 @@ InitTeam (char *team, int i)
 		InitMOS_List(team_list[i],JPN_MOS_List);
 		JPN_UserPrecache();
 		jpn_index = i;
-
 	}
 	else if (!strcmp(team, "usm"))
 	{	for(j=0;usmitems[j].classname;j++)
@@ -383,7 +366,6 @@ InitTeam (char *team, int i)
 		InitMOS_List(team_list[i],USM_MOS_List);
 		USM_UserPrecache();
 		usm_index = i;
-
 	}
 	else if (i==0)
 	{	for(j=0;usaitems[j].classname;j++)
@@ -402,13 +384,10 @@ InitTeam (char *team, int i)
 		InitMOS_List(team_list[i],GRM_MOS_List);
 		GRM_UserPrecache();
 		grm_index = i;
-
-	}	
+	}
 
 	if (team_list[0] && team_list[1])
 		SetItemNames ();
-
-
 }
 
 void LoadBotChat (int teamnum, char *teamid)
@@ -500,10 +479,8 @@ void LoadBotChat (int teamnum, char *teamid)
 void SP_info_team_start(edict_t *ent)
 {
 	int i,k;
-	
+
 	i=ent->obj_owner;
-
-
 
 	//mapper set fullbright to 1 in info_team_start
 	if (ent->groundentity_linkcount == true)
@@ -512,20 +489,13 @@ void SP_info_team_start(edict_t *ent)
 	if (ent->teleport_time)
 		level.fog = ent->teleport_time;
 
-
-
 	//fix for mappers who use capital letters for teamid
 	for (k = 0; ent->pathtarget[k]; k++)
 		ent->pathtarget[k] = tolower(ent->pathtarget[k]);
 
-
-
 	team_list[i]=gi.TagMalloc(sizeof(TeamS_t),TAG_LEVEL);
 	team_list[i]->teamname=gi.TagMalloc(sizeof(ent->message + 2),TAG_LEVEL);
 	//strcpy(team_list[i]->teamname,ent->message);
-
-
-
 
 	if (mashup->value)
 	{
@@ -579,38 +549,25 @@ void SP_info_team_start(edict_t *ent)
 		}
 		strcpy (ent->pathtarget, team);
 		strcpy (ent->message, team);
-
 	}
-
 
 	team_list[i]->teamname = ent->message;
 	//long team names were causing crashes
 	if (strlen(ent->message) > 12) ent->message[12] =0;
-
-
-
-
 
 //	if (strlen(ent->message) > 12) team_list[i]->teamname = team_list[i]->teamid;
 //	team_list[i]->playermodel = gi.TagMalloc( 64, TAG_LEVEL );
 	strcpy (team_list[i]->teamid , ent->pathtarget);
 	strcpy (team_list[i]->playermodel , ent->pathtarget);
 
-
-
 	if (ent->style == 2)
 		team_list[i]->kills_and_points = true;
-
-
-
-
 
 	if (!stricmp(team_list[i]->teamid, "usm"))  
 	{
 		strcpy (team_list[i]->teamid , "usa");
 		strcpy (team_list[i]->playermodel , "usa");
 	}
-
 
 	team_list[i]->nextmap = gi.TagMalloc( 64, TAG_LEVEL );
 
@@ -624,13 +581,11 @@ void SP_info_team_start(edict_t *ent)
 	else
 		team_list[i]->nextmap = level.mapname;
 
-
 	//make it so if allies win dday5 it goes to dday1
 	if (!stricmp(level.mapname, "dday5"))  
 	{
 		team_list[0]->nextmap = "dday1";
 	}
-
 
 	//faf:  servers can turn off campaign mode
 /*	if (campaign_mode->value != 1)
@@ -646,18 +601,12 @@ void SP_info_team_start(edict_t *ent)
 		}
 
 		//so we dont get stuck
-
 	}*/
-
 
 	//faf: custom skins for map
 	if (ent->deathtarget)
 		team_list[i]->skin = ent->deathtarget;
 
-
-
-
-	
 	if(ent->count!=99 || Last_Team_Winner==99 )
 	{
 		if(ent->count==TEAM_OFFENCE) team_list[i]->mission=TEAM_OFFENCE;
@@ -690,9 +639,7 @@ void SP_info_team_start(edict_t *ent)
 		team_list[i]->delay = 0;
 
 	// now is the time to hook up the mos .dll files...
-	   
 //    InitializeUserDLLs(LoadUserDLLs(ent, i),i);
-
 
 	InitTeam(ent->pathtarget,i);
 
@@ -702,14 +649,10 @@ void SP_info_team_start(edict_t *ent)
 
 //	InitMOS_List(team_list[i]);
 
-
 	LoadBotChat(i, team_list[i]->teamid);
 
-
 	G_FreeEdict (ent);	//clean up entity now that it's not needed.
-
 }
-
 
 
 void SP_info_Max_MOS(edict_t *ent)

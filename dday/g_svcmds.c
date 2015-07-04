@@ -26,10 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "g_local.h"
-
-
-
-
+#include <ctype.h> /* tolower */
 
 
 void Svcmd_Teamswitch_f (void)
@@ -59,9 +56,6 @@ void Svcmd_Teamswitch_f (void)
 	else
 		return;
 
-
-
-
 	if (ent->client->resp.AlreadySpawned) // used choose_team cmd
 	{
 		if (ent->health ==100)
@@ -69,11 +63,9 @@ void Svcmd_Teamswitch_f (void)
 		else
 			T_Damage(ent, world, world, vec3_origin, ent->s.origin, vec3_origin, ent->health + 999, 0, DAMAGE_NO_PROTECTION, MOD_CHANGETEAM_WOUNDED);
 	}
-	
 
 	ent->client->resp.team_on=team_list[team];
 	safe_bprintf(PRINT_HIGH, "%s has been switched to team %s.\n", ent->client->pers.netname, ent->client->resp.team_on->teamname);
-
 
 	ent->client->resp.mos = NONE; // reset MOS
 
@@ -81,21 +73,10 @@ void Svcmd_Teamswitch_f (void)
 	ent->client->resp.changeteam = true;
 	ent->client->forcespawn = level.time + .5;//faf: fixes standing corpse bug
 
-
 	M_ChooseMOS(ent);
 
 	return;
-
-
-
 }
-
-
-
-
-
-
-
 
 
 void Svcmd_Teams_f (void)
@@ -153,13 +134,6 @@ void Svcmd_Teams_f (void)
 }
 
 
-
-
-
-
-
-
-
 void	Svcmd_Test_f (void)
 {
 	safe_cprintf (NULL, PRINT_HIGH, "Svcmd_Test_f()\n");
@@ -202,7 +176,7 @@ char *Get_Next_Campaign_Map ()
 	for (j = 0; j<50; j++)
 		possible_maps[j]=-1;
 
-  	for (i = 0; campaign_spots[i].bspname; i++)
+	for (i = 0; campaign_spots[i].bspname; i++)
 	{
 		//go through all campaign_spots, find entrance points for this team not owned by them
 		if ((Last_Team_Winner == 0 && campaign_spots[i].alliedstart == true && campaign_spots[i].owner == 1)||
@@ -211,7 +185,7 @@ char *Get_Next_Campaign_Map ()
 			add = true;
 			for (j = 0; j<50; j++){
 				if (possible_maps[j] == i)
-					add = false;				
+					add = false;
 			}
 			if (add){
 				for (k = 0; k<50; k++){
@@ -307,8 +281,7 @@ char *Get_Next_Campaign_Map ()
 				break;
 			}
 		}
-	} 
-
+	}
 
 	mapcount=0;
 	//sort possible_maps
@@ -353,7 +326,6 @@ void Update_Campaign_Info (void)
 			break;
 		}
 	}
-
 }
 
 
@@ -365,7 +337,6 @@ void WriteCampaignTxt(void)
 
 	if (!campaign->string || !level.campaign)
 		return;
-	
 
 	sprintf(campaignfilename, "dday/campaigns/%s.campaign", campaign->string);
 	fp = fopen (campaignfilename, "wb");
@@ -403,7 +374,6 @@ void SetupCampaign (qboolean restart)
 	int		i,c;
 	char *s, *f;
 
-
 	char *bspname;
 	char *exita,*exitb,*exitc;
 	int  owner;
@@ -415,9 +385,8 @@ void SetupCampaign (qboolean restart)
 	if (!*campaign->string)
 		return;
 
-
 	sprintf(campaignfilename, "dday/campaigns/%s.campaign", campaign->string);
-	
+
 	// convert string to all lowercase (for Linux)
 	for (i = 0; campaignfilename[i]; i++)
 		campaignfilename[i] = tolower(campaignfilename[i]);
@@ -428,8 +397,6 @@ void SetupCampaign (qboolean restart)
 		sprintf(campaignfilename, "dday/campaigns/%s.cpgntemplate", campaign->string);
 	}
 
-
-
 	campinfo = ReadEntFile(campaignfilename);
 
 	if (campinfo)
@@ -437,8 +404,6 @@ void SetupCampaign (qboolean restart)
 		gi.dprintf(DEVELOPER_MSG_GAME, "%s.cpgntemplate Loaded\n", campaign->string);
 
 		level.campaign = campaign->string;
-
-
 
 		c = 0;
 		f = strdup (campinfo);
@@ -513,8 +478,6 @@ void SetupCampaign (qboolean restart)
 				//gi.dprintf(DEVELOPER_MSG_GAME, "axisstart: %i\n",axisstart);
 				s = strtok (NULL, "\n");
 
-
-
 				campaign_spots[c].bspname = bspname;
 				campaign_spots[c].exita = exita;
 				campaign_spots[c].exitb = exitb;
@@ -526,9 +489,7 @@ void SetupCampaign (qboolean restart)
 				campaign_spots[c].axisstart = axisstart;
 				c++;
 			}
-
 		}
-
 	}
 	else
 	{
@@ -538,18 +499,6 @@ void SetupCampaign (qboolean restart)
 	}
 	WriteCampaignTxt();
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /*
@@ -565,16 +514,12 @@ void	ServerCommand (void)
 {
 	char	*cmd;
 
-
 	// JABot[start]
 	if (BOT_ServerCommand ())
 		return;
 	// [end]
 
-
-
 	cmd = gi.argv(1);
-
 
 	if (Q_stricmp (cmd, "test") == 0)
 		Svcmd_Test_f ();
@@ -586,8 +531,6 @@ void	ServerCommand (void)
 		Svcmd_Teams_f();
 	else if (Q_stricmp (cmd, "switch") ==0)
 		Svcmd_Teamswitch_f();
-	
-
 	else
 		safe_cprintf (NULL, PRINT_HIGH, "Unknown server command \"%s\"\n", cmd);
 }

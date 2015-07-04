@@ -30,6 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "g_cmds.h"
 #include "stddef.h"
 //#include "p_classes.h"
+#include <ctype.h> /* tolower */
 
 void EndObserverMode(edict_t *ent);
 void Show_Mos(edict_t *ent);
@@ -54,7 +55,6 @@ void Cmd_FlyingNunMode_f(edict_t *ent)
 	char* pw = NULL;
 	pw = gi.args();
 
-	
 //		if (ent->client->resp.AlreadySpawned)
 //	{
 //		safe_cprintf(ent, PRINT_HIGH, "Observer Mode is only available before you join a team.\n");
@@ -75,21 +75,20 @@ void Cmd_FlyingNunMode_f(edict_t *ent)
 	}
 */
 
-
 	if (ent->flyingnun)
 	{
 		ent->flyingnun = false;
 		ent->client->chasetarget = NULL;
 		safe_bprintf (PRINT_HIGH, "%s is no longer an Observer.\n", ent->client->pers.netname);
-	
+
 		ent->client->resp.mos = NONE;
 		ent->client->resp.team_on = NULL;
 		ent->client->resp.AlreadySpawned = false;
 		InitClientResp (ent->client);
 		PutClientInServer (ent);
 		SwitchToObserver(ent);
-	} 
-	else 
+	}
+	else
 	{
 		if (!ent->deadflag && !ent->client->limbo_mode && ent->health > 0)
 		{
@@ -100,23 +99,21 @@ void Cmd_FlyingNunMode_f(edict_t *ent)
 		}
 
 		ent->stance_view=20;//faf 22;
-		ent->stanceflags = STANCE_STAND;	
+		ent->stanceflags = STANCE_STAND;
 
 		ent->flyingnun = true;
 		safe_bprintf (PRINT_HIGH, "%s is now an Observer.\n", ent->client->pers.netname);
 		safe_cprintf (ent,PRINT_HIGH, "Type \"Observer\" to leave observer mode.\n");
-		
+
 		//faf
 		ent->client->layout_type = SHOW_NONE;
 
-	
 		//faf
 		ent->client->speedmax[0]=120;
 		ent->client->speedmax[1]=120;
 		ent->client->speedmax[2]=120;
 		ent->client->syncspeed = true;
 		ent->client->display_info = false;
-
 
 		if (ent->ai)
 		{
@@ -136,7 +133,6 @@ void Cmd_FlyingNunMode_f(edict_t *ent)
 			player_die (ent, ent, ent, 100000, vec3_origin);
 		}
 
-
 		ent->s.sound = 0;
 		ent->s.modelindex = 0;
 		ent->movetype = MOVETYPE_NOCLIP; 
@@ -147,17 +143,14 @@ void Cmd_FlyingNunMode_f(edict_t *ent)
 		ent->client->resp.mos = 0;
 		gi.linkentity (ent);  */
 
-
 		ent->s.sound = 0;
 		ent->s.modelindex = 0;
-		ent->movetype = MOVETYPE_NOCLIP; 
-		ent->solid = SOLID_NOT; 
-		ent->svflags |= SVF_NOCLIENT; 
-		ent->client->ps.gunindex = 0; 
+		ent->movetype = MOVETYPE_NOCLIP;
+		ent->solid = SOLID_NOT;
+		ent->svflags |= SVF_NOCLIENT;
+		ent->client->ps.gunindex = 0;
 		ent->client->resp.team_on = NULL;
 		ent->client->resp.mos = NONE;
-
-
 	}
 }
 
@@ -263,10 +256,11 @@ void M_ChooseMOS(edict_t *ent);
 void MainMenu(edict_t *ent);
 
 void Cmd_Menu_Main_f(edict_t *ent) 
-{ 
+{
 	if (!ent->client->display_info)//faf && level.framenum > ((int)level_wait->value * 10))
 		MainMenu(ent);
 }
+
 void Cmd_Menu_Team_f(edict_t *ent) 
 { 
 	if (ent->flyingnun)
@@ -308,7 +302,6 @@ void Cmd_Spot (edict_t *ent)
 	int i;
 	for (i=0 ; i<game.maxentities ; i++)
 	{
-		
 		e = &g_edicts[i];
 
 		if (!e->inuse)
@@ -318,9 +311,6 @@ void Cmd_Spot (edict_t *ent)
 
 		gi.dprintf(DEVELOPER_MSG_GAME, "%s  ", e->classname);
 	}*/
-
-
-
 
 	if (sv_cheats->value != 0)
 	{
@@ -385,38 +375,37 @@ void Cmd_DDebug_f (edict_t *ent)
 	// This is basically a scrap function called to print out defined statistics.
 	// no argument prints everything
 
-		safe_cprintf(ent, PRINT_HIGH, "modelindex =  %i\nmodelindex2 = %i\nmodelindex3 = %i\nmodelindex4 = %i\n",
+	safe_cprintf(ent, PRINT_HIGH, "modelindex =  %i\nmodelindex2 = %i\nmodelindex3 = %i\nmodelindex4 = %i\n",
 			ent->s.modelindex, ent->s.modelindex2, ent->s.modelindex3, ent->s.modelindex4);
-		safe_cprintf(ent, PRINT_HIGH, "skinnum = %i\n", ent->s.skinnum);
-		safe_cprintf(ent, PRINT_HIGH, "cur playermodel = %s\ndef playermodel = %s\n",
+	safe_cprintf(ent, PRINT_HIGH, "skinnum = %i\n", ent->s.skinnum);
+	safe_cprintf(ent, PRINT_HIGH, "cur playermodel = %s\ndef playermodel = %s\n",
 			ent->model, ent->client->resp.team_on->playermodel);
-		safe_cprintf(ent, PRINT_HIGH, "client->aim = %s\n", 
+	safe_cprintf(ent, PRINT_HIGH, "client->aim = %s\n", 
 			(ent->client->aim)?"true":"false");
-		safe_cprintf(ent, PRINT_HIGH, "limbo mode = %s\n", 
+	safe_cprintf(ent, PRINT_HIGH, "limbo mode = %s\n", 
 			(ent->client->limbo_mode)?"true":"false");
-		safe_cprintf(ent, PRINT_HIGH, "changeteam = %s\n",
+	safe_cprintf(ent, PRINT_HIGH, "changeteam = %s\n",
 			(ent->client->resp.changeteam)?"true":"false");
-		safe_cprintf(ent, PRINT_HIGH, "teamname = %s\n", 
+	safe_cprintf(ent, PRINT_HIGH, "teamname = %s\n", 
 			ent->client->resp.team_on->teamname);
-		safe_cprintf(ent, PRINT_HIGH, "class = %s\n", 
+	safe_cprintf(ent, PRINT_HIGH, "class = %s\n", 
 			ent->client->resp.team_on->mos[ent->client->resp.mos]->name);
-//		safe_cprintf(ent, PRINT_HIGH, "MZ_MACHINEGUN: %d (is_silenced: %d)\n", MZ_MACHINEGUN, (MZ_MACHINEGUN | is_silenced));
-		safe_cprintf(ent, PRINT_HIGH, "team1->map: %s\nteam2->map: %s\n", team_list[0]->nextmap, team_list[1]->nextmap);
-		safe_cprintf(ent, PRINT_HIGH, "waterlevel = %i\n", ent->waterlevel);
+//	safe_cprintf(ent, PRINT_HIGH, "MZ_MACHINEGUN: %d (is_silenced: %d)\n", MZ_MACHINEGUN, (MZ_MACHINEGUN | is_silenced));
+	safe_cprintf(ent, PRINT_HIGH, "team1->map: %s\nteam2->map: %s\n", team_list[0]->nextmap, team_list[1]->nextmap);
+	safe_cprintf(ent, PRINT_HIGH, "waterlevel = %i\n", ent->waterlevel);
 
-		for(i=0;i<MAX_ITEMS;i++)
-			if(ent->client->pers.inventory[i])
-				weight+=((itemlist[i].weight) * (ent->client->pers.inventory[i]));
+	for(i=0;i<MAX_ITEMS;i++)
+		if(ent->client->pers.inventory[i])
+			weight+=((itemlist[i].weight) * (ent->client->pers.inventory[i]));
 
-		weight -= ent->client->resp.team_on->mos[ent->client->resp.mos]->normal_weight; 	//subtract normal carring weight for mos from weight.
+	weight -= ent->client->resp.team_on->mos[ent->client->resp.mos]->normal_weight; 	//subtract normal carring weight for mos from weight.
 
-		safe_cprintf(ent, PRINT_HIGH, "def speedmod = %f\n", ent->client->resp.team_on->mos[ent->client->resp.mos]->speed_mod);
-		safe_cprintf(ent, PRINT_HIGH, " norm weight = %f\n", ent->client->resp.team_on->mos[ent->client->resp.mos]->normal_weight);
+	safe_cprintf(ent, PRINT_HIGH, "def speedmod = %f\n", ent->client->resp.team_on->mos[ent->client->resp.mos]->speed_mod);
+	safe_cprintf(ent, PRINT_HIGH, " norm weight = %f\n", ent->client->resp.team_on->mos[ent->client->resp.mos]->normal_weight);
 
-		safe_cprintf(ent, PRINT_HIGH, "  cur weight = %f\n", weight);
-		safe_cprintf(ent, PRINT_HIGH, "------------   ----------\n");
-		safe_cprintf(ent, PRINT_HIGH, "cur speedmod = %f\n", ent->client->speedmod);
-
+	safe_cprintf(ent, PRINT_HIGH, "  cur weight = %f\n", weight);
+	safe_cprintf(ent, PRINT_HIGH, "------------   ----------\n");
+	safe_cprintf(ent, PRINT_HIGH, "cur speedmod = %f\n", ent->client->speedmod);
 }
 
 void Cmd_DDHelp_f(edict_t *ent)
@@ -446,7 +435,6 @@ void Cmd_DDHelp_f(edict_t *ent)
 		"Edit your autoexec.cfg in your dday folder to bind these commands to the keys you want.\n"
 		"To vote, type \"Vote yes\" or \"Vote map xxx\" in the console.\n" 
 		"To open the console, hit the key above the TAB key on your keyboard.\n"
-
 	);
 }
 
@@ -455,7 +443,6 @@ void Cmd_GameVersion_f (edict_t *ent)
 {
 	safe_cprintf (ent, PRINT_HIGH, "%s : %s\n", GAMEVERSION, __DATE__);
 }
-
 
 
 void turret_off (edict_t *self);
@@ -496,8 +483,6 @@ qboolean Cmd_Scope_f(edict_t *ent)
 		return true;
 	}
 
-
-
 	if (!ent->client->pers.weapon ||
  		 ent->client->pers.weapon->classnameb == WEAPON_SANDBAGS ||
  	//	 ent->client->pers.weapon->position== LOC_GRENADES ||
@@ -506,25 +491,23 @@ qboolean Cmd_Scope_f(edict_t *ent)
 //bcass end
 		 return true;
 
-
-if (ent->client->pers.weapon->position == LOC_GRENADES)
-{
-	if (!ent->client->aim){
-		ent->client->aim = true;
-		safe_centerprintf(ent, "Long range throw!\n");
-	}
-	else
+	if (ent->client->pers.weapon->position == LOC_GRENADES)
 	{
-		ent->client->aim = false;
-		safe_centerprintf(ent, "Short range throw!\n");
+		if (!ent->client->aim){
+			ent->client->aim = true;
+			safe_centerprintf(ent, "Long range throw!\n");
+		}
+		else
+		{
+			ent->client->aim = false;
+			safe_centerprintf(ent, "Short range throw!\n");
+		}
+		return true;
 	}
-	return true;
-}
-
 
 	if (ent->client->weaponstate == WEAPON_RAISE ||
-ent->client->weaponstate == WEAPON_LOWER)
-return false;
+			ent->client->weaponstate == WEAPON_LOWER)
+		return false;
 
 	//faf:  crosshair cheat prevention measures
 //	if (!ent->client->aim)
@@ -532,8 +515,6 @@ return false;
 		ent->client->crosshair_offset_x = random() * 4 - 2;
 		ent->client->crosshair_offset_y = random() * 4 - 2;
 	//	gi.dprintf(DEVELOPER_MSG_GAME, "%f\n", ent->client->crosshair_offset_x);
-
-
 //	}
 //	else
 //		ent->client->crosshair_offset = 0;
@@ -548,14 +529,10 @@ return false;
 		ent->client->pers.weapon->position == LOC_TNT ||
 		ent->client->pers.weapon->position == LOC_SPECIAL ||
 		ent->client->pers.weapon->position == LOC_SHOTGUN)
-
 	{
 		ent->client->crosshair_offset_x = 0;
 		ent->client->crosshair_offset_y = 0;
 	}
-
-
-
 
 	//faf:  turret stuff
 	if (ent->client->pers.weapon && ent->client->pers.weapon->classnameb == WEAPON_FISTS
@@ -571,12 +548,10 @@ return false;
 			return true;
 	}
 
-
-if (!ent->client->aim &&
-	ent->client->pers.weapon->classnameb == WEAPON_FISTS &&
-	!ent->client->pers.inventory[ITEM_INDEX(FindItem("Helmet"))])
-	return true;
-
+	if (!ent->client->aim &&
+			ent->client->pers.weapon->classnameb == WEAPON_FISTS &&
+			!ent->client->pers.inventory[ITEM_INDEX(FindItem("Helmet"))])
+		return true;
 
 	if (ent->client->pers.weapon->classnameb == WEAPON_BINOCULARS)
 	{
@@ -592,19 +567,15 @@ if (!ent->client->aim &&
 		return true;
 	}
 
-
-
 //faf
        if (ent->client->pers.weapon &&
 		   (ent->client->pers.weapon->classnameb == WEAPON_MAUSER98K ||
-			ent->client->pers.weapon->classnameb == WEAPON_ARISAKA ||		   
+			ent->client->pers.weapon->classnameb == WEAPON_ARISAKA ||
 			ent->client->pers.weapon->classnameb == WEAPON_CARCANO ||
 			ent->client->pers.weapon->classnameb == WEAPON_ENFIELD) &&
-               (ent->client->weaponstate == WEAPON_LOWER ||
+			(ent->client->weaponstate == WEAPON_LOWER ||
 			   (!ent->client->aim && ent->client->weaponstate == WEAPON_FIRING)))
                return false;
-
-
 
 	// do not let a sniper reload bolt if there is no ammo
 	if (ent->client->pers.weapon &&
@@ -669,8 +640,6 @@ char *ClientTeam (edict_t *ent)
 }
 
 
-
-
 void ChaseNext(edict_t *ent)
 {
 	int i;
@@ -722,10 +691,6 @@ void ChasePrev(edict_t *ent)
 }
 
 
-
-
-
-
 void SelectNextItem (edict_t *ent, int itflags)
 {
 	gclient_t	*cl;
@@ -734,22 +699,17 @@ void SelectNextItem (edict_t *ent, int itflags)
 
 	cl = ent->client;
 
-
-	if (cl->chasetarget) 
+	if (cl->chasetarget)
 	{
 		ChaseNext(ent);
 		return;
 	}
 
-
-   	if (cl->menu) 
+	if (cl->menu)
 	{
 		PMenu_Next(ent);
 		return;
 	}
-
-
-
 
 	// scan  for the next valid one
 	for (i=1 ; i<=MAX_ITEMS ; i++)
@@ -768,7 +728,6 @@ void SelectNextItem (edict_t *ent, int itflags)
 	}
 
 	cl->pers.selected_item = -1;
-
 }
 
 void SelectPrevItem (edict_t *ent, int itflags)
@@ -779,21 +738,16 @@ void SelectPrevItem (edict_t *ent, int itflags)
 
 	cl = ent->client;
 
-
 	if (cl->chasetarget) 
- 	{
+	{
 		ChasePrev(ent);
 		return;
 	}
 
-
-
-
-   	if (cl->menu) {
+	if (cl->menu) {
 		PMenu_Prev(ent);
 		return;
 	}
-
 
 	// scan  for the next valid one
 	for (i=1 ; i<=MAX_ITEMS ; i++)
@@ -908,8 +862,7 @@ void Cmd_Give_f (edict_t *ent)
 		if (!give_all)
 			return;
 	}
-
-*/	
+*/
 	if (give_all)
 	{
 		for (i=0 ; i<game.num_items ; i++)
@@ -1007,9 +960,7 @@ void Cmd_Notarget_f (edict_t *ent)
 	char	*msg;
 /*test	gitem_t	*item;
 
-
-int i;
-
+	int i;
 
 	for (i=0,item=itemlist ; i<game.num_items ; i++,item++)
 	{
@@ -1018,10 +969,6 @@ int i;
 		gi.dprintf(DEVELOPER_MSG_GAME, "%s\n", item->classname);
 	}
 */
-
-
-
-
 
 	if (deathmatch->value && !sv_cheats->value)
 	{
@@ -1065,9 +1012,9 @@ void Cmd_Noclip_f (edict_t *ent)
 	{
 		ent->movetype = MOVETYPE_NOCLIP;
 		msg = "noclip ON\n";
-	
+
 		ent->stance_view=20;
-		ent->stanceflags = STANCE_STAND;	
+		ent->stanceflags = STANCE_STAND;
 	}
 
 	safe_cprintf (ent, PRINT_HIGH, msg);
@@ -1154,8 +1101,6 @@ gitem_t	*FindNextPickup (edict_t *ent, int location)
 		else if (location)	// Skip the stuff below if its looking for a specific position
 			continue;
 
-
-
 		if (it == FindItem(ent->client->resp.team_on->mos[ent->client->resp.mos]->weapon1) )
 			continue;
 //		if (ent->client->resp.team_on->mos[ent->client->resp.mos]->weapon2 &&
@@ -1200,7 +1145,6 @@ void Cmd_Use_f (edict_t *ent)
 	s = gi.args();
 	it = FindItem (s);
 
-
 	if (ent->client->chasetarget)
 	{
 		if(Q_stricmp(s,"weapon")==0) 
@@ -1211,8 +1155,6 @@ void Cmd_Use_f (edict_t *ent)
 		return;
 	if ( !IsValidPlayer(ent) )
 		return;
-
-
 
 	if (Q_stricmp(s, "gibmachine") == 0)
 	{
@@ -1229,9 +1171,8 @@ void Cmd_Use_f (edict_t *ent)
 			safe_cprintf(ent, PRINT_HIGH, "Goodbye gib machine!.\n");
 			ent->client->gibmachine = flame_normal;
 		}
-	return;
+		return;
 	}
-
 
 	if (!it)
 	{
@@ -1291,41 +1232,35 @@ void Cmd_Use_f (edict_t *ent)
 		{
 			it = FindNextPickup(ent, LOC_NONE);
 			strcpy(s, it->pickup_name);
-		}	
-		
+		}
 		//faf
 		else if (Q_stricmp(s,"sniper")==0) 
 		{
 			it = FindNextPickup(ent, LOC_SNIPER);
 			strcpy(s, it->pickup_name);
-		}					
-
+		}
 		else if (Q_stricmp(s,"pistol")==0) 
 		{
 			it = FindNextPickup(ent, LOC_PISTOL);
 			strcpy(s, it->pickup_name);
-		}	
-		
+		}
 		else if (Q_stricmp(s,"rifle")==0) 
 		{
 			it = FindNextPickup(ent, LOC_RIFLE);
 			strcpy(s, it->pickup_name);
-		}	
-
+		}
 		else if (Q_stricmp(s,"smg")==0) 
 		{
 			it = FindNextPickup(ent, LOC_SUBMACHINEGUN2);
 			strcpy(s, it->pickup_name);
 			it = FindNextPickup(ent, LOC_SUBMACHINEGUN);
 			strcpy(s, it->pickup_name);
-		}	
-		
+		}
 		else if (Q_stricmp(s,"lmg")==0) 
 		{
 			it = FindNextPickup(ent, LOC_L_MACHINEGUN);
 			strcpy(s, it->pickup_name);
-		}	
-		
+		}
 		else if (Q_stricmp(s,"hmg")==0) 
 		{
 			it = FindNextPickup(ent, LOC_H_MACHINEGUN);
@@ -1342,9 +1277,7 @@ void Cmd_Use_f (edict_t *ent)
 			strcpy(s, it->pickup_name);
 		}
 		//end faf
-
-
-		else 
+		else
 		{
 			safe_cprintf (ent, PRINT_HIGH, "Unknown item: %s\n", s);
 			return;
@@ -1419,7 +1352,6 @@ void Cmd_Drop_f (edict_t *ent)
 		return;
 	}
 
-
 //bcass - taking away is bugged	
 // pbowens: not anymore
 	if (Q_stricmp(s, "ammo") == 0)
@@ -1455,7 +1387,7 @@ void Cmd_Drop_f (edict_t *ent)
 
 		ValidateSelectedItem (ent);
 		WeighPlayer(ent);
-	
+
 		return;
 	}
 
@@ -1465,7 +1397,7 @@ void Cmd_Drop_f (edict_t *ent)
 		gitem_t *item;
 
 		it = ent->client->pers.weapon;
-		index = ITEM_INDEX(it);	
+		index = ITEM_INDEX(it);
 
 //not weapons or live grenades
 		if ((!it || !ent->client->pers.inventory[index]) ||
@@ -1569,9 +1501,7 @@ void Cmd_Inven_f (edict_t *ent)
 		return;
 	//[end]
 
-
 	cl = ent->client;
-
 
 	if (ent->client->menu) {
 		PMenu_Close(ent);
@@ -1584,7 +1514,6 @@ void Cmd_Inven_f (edict_t *ent)
 		return;
 	}
 	cl->layout_type = SHOW_INVENTORY;
-
 
 	gi.WriteByte (svc_inventory);
 	for (i=0 ; i<MAX_ITEMS ; i++)
@@ -1606,14 +1535,12 @@ void Cmd_Objectives (edict_t *ent)
 	char  *bp;
 	char  *objective_name;
 
-
 	//JABot[start]
 	if (ent->ai || !ent->inuse)
 		return;
 	//[end]
 
 	cl = ent->client;
-
 
 	if (!ent->client->resp.team_on)
 		return;
@@ -1623,11 +1550,8 @@ void Cmd_Objectives (edict_t *ent)
 		return;
 	}
 
-
 	if (cl->layout_type != 	SHOW_OBJECTIVES_TEMP)
 		cl->layout_type = SHOW_OBJECTIVES;
-
-
 
 	string[0] = 0;
 
@@ -1635,8 +1559,6 @@ void Cmd_Objectives (edict_t *ent)
 //	Com_sprintf (string, sizeof(string),
 //		"xv 32 yv 8 picn scorehead ");
 	Com_sprintf (string, sizeof(entry),	"xr -200 160 yt 120  string \" Objectives\" xr -200 160 yt 130  string \" ----------\" ");
-
-
 
 	stringlength = strlen(string);
 
@@ -1652,7 +1574,7 @@ void Cmd_Objectives (edict_t *ent)
 			continue;
 		if (!(e->classnameb == OBJECTIVE_TOUCH  || e->classnameb == FUNC_EXPLOSIVE_OBJECTIVE || e->classnameb == FUNC_TRAIN || e->classnameb == OBJECTIVE_VIP))
 			continue;
-	
+
 		if (e->classnameb == FUNC_TRAIN &&
 			!e->obj_gain)
 			continue;
@@ -1684,9 +1606,8 @@ void Cmd_Objectives (edict_t *ent)
 		if (stringlength + j > 1024)
 			break;
 		strcpy (string + stringlength, entry);
-		stringlength += j;	
+		stringlength += j;
 		y++;
-				
 	}
 
 	if (team_list[ent->client->resp.team_on->index]->kills_and_points &&
@@ -1712,7 +1633,6 @@ void Cmd_Objectives (edict_t *ent)
 	gi.WriteString (string);
 	gi.unicast (ent, true);
 }
-
 
 
 //not necessary
@@ -1794,7 +1714,6 @@ void Cmd_WeapPrev_f (edict_t *ent)
 //blah	if (ent->client->weaponstate != WEAPON_READY)
 //blah		return;
 
-
 	selected_weapon = ITEM_INDEX(cl->pers.weapon);
 
 	// scan  for the next valid one
@@ -1828,7 +1747,6 @@ void Cmd_WeapNext_f (edict_t *ent)
 
 	cl = ent->client;
 
-
 	if (cl->chasetarget) 
 	{
 		ChaseNext(ent);
@@ -1844,7 +1762,6 @@ void Cmd_WeapNext_f (edict_t *ent)
 	//faf
 //blah	if (ent->client->weaponstate != WEAPON_READY)
 //blah		return;
-
 
 	check_unscope(ent);//faf
 
@@ -1905,7 +1822,6 @@ void Cmd_WeapLast_f (edict_t *ent)
 	//faf
 //blah	if (ent->client->weaponstate != WEAPON_READY)
 //blah		return;
-
 
 	index = ITEM_INDEX(cl->pers.lastweapon);
 	if (!cl->pers.inventory[index])
@@ -2136,14 +2052,14 @@ void GetNearbyTeammates(edict_t *self, char *buf)
                 {
                         strcpy(buf, nearby_teammates[l]);
                 }
-                        else
+                else
                 {
                         if (nearby_teammates_num == 2)
                         {
                                 strcat(buf, " and ");
                                 strcat(buf, nearby_teammates[l]);
                         }
-                                else
+                        else
                         {
                                 if (l == (nearby_teammates_num - 1))
                                 {
@@ -2157,51 +2073,49 @@ void GetNearbyTeammates(edict_t *self, char *buf)
                                 }
                         }
                 }
-                
         }
 }
 
 //faf
 void GetNearestMedic(edict_t *self, char *buf)
 {
-//        char nearest_medic[16];
-        int i;
-        edict_t *e;
-		edict_t *nearest = NULL;
-		float temp_distance, nearest_distance = 9999999;
-		vec3_t dist;
+//	char nearest_medic[16];
+	int i;
+	edict_t *e;
+	edict_t *nearest = NULL;
+	float temp_distance, nearest_distance = 9999999;
+	vec3_t dist;
 
+	for (i=0 ; i < game.maxclients ; i++)
+	{
+		e = g_edicts + 1 + i;
+		if (!e->inuse || e->flyingnun || !e->client)
+			continue;
+		if (!OnSameTeam(e, self))
+			continue;
+		if (e->client->resp.mos &&
+			!(e->client->resp.mos == MEDIC))
+			continue;
+		if (e == self)
+			continue;
 
-		for (i=0 ; i < game.maxclients ; i++)
+		VectorSubtract (e->s.origin, self->s.origin, dist);
+
+		temp_distance = VectorLength(dist);
+
+		if (temp_distance < nearest_distance)
 		{
-			e = g_edicts + 1 + i;
-			if (!e->inuse || e->flyingnun || !e->client)
-				continue;
-			if (!OnSameTeam(e, self))
-				continue;
-			if (e->client->resp.mos &&
-				!(e->client->resp.mos == MEDIC))
-				continue;
-			if (e == self)
-				continue;
-
-			VectorSubtract (e->s.origin, self->s.origin, dist);
-			
-			temp_distance = VectorLength(dist);
-
-			if (temp_distance < nearest_distance)
-			{
-				nearest_distance = temp_distance;
-				nearest = e;
-			}
+			nearest_distance = temp_distance;
+			nearest = e;
 		}
+	}
 
-		if (nearest != NULL)
-		{
-			strcpy(buf, nearest->client->pers.netname);
-		}
-		else
-			strcpy(buf, "Medic");
+	if (nearest != NULL)
+	{
+		strcpy(buf, nearest->client->pers.netname);
+	}
+	else
+		strcpy(buf, "Medic");
 }
 
 
@@ -2212,15 +2126,14 @@ void SP_map_location (edict_t *self)
 
 void GetNearbyLocation(edict_t *self, char *buf)
 {
- //   unsigned char nearest_location[16];
-    int  i;
+//	unsigned char nearest_location[16];
+	int  i;
 
 	float temp_distance;
 	float nearest_distance = 9999999;
 
 	vec3_t dist, dist2;
 	edict_t	*e, *closest;
-
 
 	for (i=0 ; i<globals.num_edicts ; i++)
 	{
@@ -2231,8 +2144,8 @@ void GetNearbyLocation(edict_t *self, char *buf)
 		if (!( e->classnameb == OBJECTIVE_TOUCH  || 
 			  e->classnameb == FUNC_EXPLOSIVE_OBJECTIVE  || 
 			  (!strcmp(e->classname, "map_location")) ))  
-		continue;
-		
+			continue;
+
 		VectorSubtract (e->mins, self->s.origin, dist);
 		VectorSubtract (e->maxs, self->s.origin, dist2);
 			
@@ -2270,7 +2183,6 @@ void GetNearbyLocation(edict_t *self, char *buf)
 			strcpy(buf, closest->message);
 		else
 			strcpy(buf,"somewhere");
-
 	}
 
 	return;
@@ -2278,7 +2190,6 @@ void GetNearbyLocation(edict_t *self, char *buf)
 
 void GetClass(edict_t *self, char *buf)
 {
-
 /*	int i;
 
 	if (self->client->resp.team_on)
@@ -2331,73 +2242,70 @@ void GetClass(edict_t *self, char *buf)
 			strcpy(buf, "x");
 			break;
 		}
-		
 	}
 }
 
 
-
 char *SeekBufEnd(char *buf)
 {
-        while (*buf != 0)
-                buf++;
-        return buf;
-}       
-
+	while (*buf != 0)
+		buf++;
+	return buf;
+}
 
 
 void ParseSayText(edict_t *ent, char *text)
 {
-        static unsigned char buf[10240], infobuf[10240];
-        char *p, *pbuf;
+	static unsigned char buf[10240], infobuf[10240];
+	char *p, *pbuf;
 
-        p = text;
-        pbuf = buf;
-        *pbuf = 0;
+	p = text;
+	pbuf = buf;
+	*pbuf = 0;
 
-        while (*p != 0)
-        {
-             if (((ptrdiff_t)pbuf - (ptrdiff_t)buf) > 150)
-	            {
-					break;
-			    }
-                if (*p == '%')
-                {
-                        switch (*(p+1))
-                        {
-                                case 'L':
-                                        GetNearbyLocation(ent, infobuf);
-                                        strcpy(pbuf, infobuf);
-                                        pbuf = SeekBufEnd(pbuf);
-                                        p += 2;
-                                        continue;
-                                case 'T':
-                                        GetNearbyTeammates(ent, infobuf);
-                                        strcpy(pbuf, infobuf);
-                                        pbuf = SeekBufEnd(pbuf);
-                                        p += 2;
-                                        continue;
-								case 'M':
-									GetNearestMedic(ent, infobuf);
-									strcpy(pbuf, infobuf);
-									pbuf = SeekBufEnd(pbuf);
-									p +=2;
-									continue;
-								case 'C':
-									GetClass(ent, infobuf);
-									strcpy(pbuf, infobuf);
-									pbuf = SeekBufEnd(pbuf);
-									p +=2;
-									continue;
-                        }
-                }
-                *pbuf++ = *p++;
-        }
+	while (*p != 0)
+	{
+		if (((ptrdiff_t)pbuf - (ptrdiff_t)buf) > 150)
+		{
+			break;
+		}
+		if (*p == '%')
+		{
+			switch (*(p+1))
+			{
+				case 'L':
+					GetNearbyLocation(ent, infobuf);
+					strcpy(pbuf, infobuf);
+					pbuf = SeekBufEnd(pbuf);
+					p += 2;
+					continue;
+				case 'T':
+					GetNearbyTeammates(ent, infobuf);
+					strcpy(pbuf, infobuf);
+					pbuf = SeekBufEnd(pbuf);
+					p += 2;
+					continue;
+				case 'M':
+					GetNearestMedic(ent, infobuf);
+					strcpy(pbuf, infobuf);
+					pbuf = SeekBufEnd(pbuf);
+					p +=2;
+					continue;
+				case 'C':
+					GetClass(ent, infobuf);
+					strcpy(pbuf, infobuf);
+					pbuf = SeekBufEnd(pbuf);
+					p +=2;
+					continue;
+			}
+		}
+		*pbuf++ = *p++;
+	}
 
-        *pbuf = 0;
+	*pbuf = 0;
 
-        strncpy(text, buf, 150);
-        text[150] = 0; // in case it's 150
+	strncpy(text, buf, 150);
+	text[150] = 0; // in case it's 150
 }
 
 /*
@@ -2423,7 +2331,6 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0, qboolean saved)
 	else
 		sprintf (teamname,"");
 
-
 	if (saved)
 	{
 		Com_sprintf (text, sizeof(text), "%s", ent->client->resp.chatsave);
@@ -2435,7 +2342,6 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0, qboolean saved)
 		if (gi.argc () < 2 && !arg0)
 			return;
 
-
 	/*	if (ent->leave_limbo_time && level.time < ent->leave_limbo_time)
 		{
 				safe_cprintf(ent, PRINT_HIGH, "You just died!  You can't talk for %i more seconds\n", 1+(int)(ent->leave_limbo_time - level.time));
@@ -2443,15 +2349,10 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0, qboolean saved)
 		}
 	*/
 
-
-
-
 		if (team)
 			Com_sprintf (text, sizeof(text), "(Team)%s: ", ent->client->pers.netname);
 		else{
 			Com_sprintf (text, sizeof(text), "%s: ", ent->client->pers.netname);
-			
-
 		}
 
 		p = gi.args();
@@ -2476,7 +2377,6 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0, qboolean saved)
 			}
 		}
 
-
 		// don't let text be too long for malicious reasons
 		if (strlen(text) > 150)
 			text[150] = 0;
@@ -2486,14 +2386,7 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0, qboolean saved)
 					ParseSayText(ent, text + offset_of_text);  //FB 5/31/99 - offset change
 									// this will parse the % variables, 
 
-
-
-
-
 		strcat(text, "\n");
-
-
-
 
 		if (flood_msgs->value) {
 			cl = ent->client;
@@ -2518,7 +2411,6 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0, qboolean saved)
 			cl->flood_when[cl->flood_whenhead] = level.time;
 		}
 
-
 		if (team == 1 /*people didn't like public chat delay*/ && ent->client->forcespawn && ent->client->forcespawn  - FORCE_RESPAWN + (10 *(int)RI->value) > level.framenum)
 		{
 			safe_cprintf(ent, PRINT_HIGH, "You just died! Chat will be delayed.\n");
@@ -2529,7 +2421,6 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0, qboolean saved)
 			return;
 		}
 	}
-
 
 	if(team)//say only to team
 	{
@@ -2554,7 +2445,6 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0, qboolean saved)
 			{safe_cprintf(entR, PRINT_HIGH, "%s", teamname);
 			safe_cprintf(entR, PRINT_CHAT, "%s", text);}
 		}
-
 	}
 	else //say to everyone
 	{
@@ -2568,8 +2458,7 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0, qboolean saved)
 				continue;
 			safe_cprintf(entR, PRINT_HIGH, "%s", teamname);
 			safe_cprintf(entR, PRINT_CHAT, "%s", text);
-		} 
-
+		}
 
 		//save a random chat message for stats page
 		if (!saved && strlen(p)>9 && rand()%25 == 1 || (!strcmp (ent->client->pers.stat_chat , "") && rand()% 3 ==1))
@@ -2597,9 +2486,7 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0, qboolean saved)
 		ent->s.frame = 229;
 		ent->client->anim_end = 232;
 	}
-	
 }
-
 
 /*
 This routine is for changing the stances and to allow lowcrawl type  manuevers.
@@ -2613,7 +2500,6 @@ void change_stance(edict_t *self, int stance)
 	
 	if (self->health < 1)
 		return;
-
 
 	if (self->stanceflags == stance ) // if the ent is already in the stance, return
 //	{ gi.dprintf(DEVELOPER_MSG_GAME, "Same Stance\n");
@@ -2670,7 +2556,6 @@ void change_stance(edict_t *self, int stance)
 
 	self->stanceflags = stance;				//change stanceflags
 
-
 	if (self->stanceflags == STANCE_CRAWL)
 	{
 		self->client->anim_end = FRAME_kneeltoprone06;
@@ -2686,7 +2571,6 @@ void change_stance(edict_t *self, int stance)
 	{
 //		self->client->anim_end = FRAME_standtokneel03;
 	}
-
 
 	WeighPlayer(self);
 	//ent->client->syncspeed = true;
@@ -3070,7 +2954,7 @@ qboolean Cmd_Reload (edict_t *ent)
 	WeighPlayer(ent);
 
 	if (mags_left)
-	{       
+	{
 		if( (ent->client->weaponstate != WEAPON_END_MAG) && 
 			(mags_left==1)
 		  /*(ent->client->pers.inventory[ent->client->ammo_index] < rds_left)*/)
@@ -3086,7 +2970,6 @@ qboolean Cmd_Reload (edict_t *ent)
 			else
 				safe_cprintf(ent, PRINT_HIGH, "Last Magazine!\n");
 */
-
 
 			ent->client->weaponstate = WEAPON_RELOADING;
 //bcass start - truesite speed after reload
@@ -3153,8 +3036,6 @@ void Cmd_Stance(edict_t *ent)
 //		return;
 
 	//safe_cprintf(ent, PRINT_HIGH, "Use +movedown instead.\n");
-	
-
 
 	turret_off (ent);
 
@@ -3168,14 +3049,11 @@ void Cmd_Stance(edict_t *ent)
 		
 		tr = gi.trace(start, NULL, NULL, end, ent, MASK_SHOT|CONTENTS_SLIME|CONTENTS_LAVA);
 
-
 		if (tr.fraction < 1.0 )	//can't stand so go to crouch
 		{
-
 				change_stance(ent, STANCE_DUCK);
 				return;
-
-		}	
+		}
 	}
 
 //	safe_centerprintf(ent, "33333\n");
@@ -3219,7 +3097,6 @@ void Cmd_Shout_f(edict_t *ent)
 		safe_cprintf(ent, PRINT_HIGH, "Filename must be less than %i characters long.\n",MAX_FILENAME_LENGTH-6);
 		return;
 	}
-
 
 	if (!strcmp(gi.argv(1), "thanks1") ||
 		!strcmp(gi.argv(1), "thanks2") ||
@@ -3265,23 +3142,15 @@ void Cmd_Shout_f(edict_t *ent)
 		newshout=false;
 	}
 
-
-
-
-
-
 	strcpy(filename,gi.argv(1));
 
 	for (i = 0; filename[i]; i++)
 		filename[i] = tolower(filename[i]);
 
-
 	strcat(filename,".wav\0");
 
 	strcpy(soundfile,va("%s/shout/",ent->client->resp.team_on->teamid));
 	strcat(soundfile,filename);
-
-
 
 	if (newshout)
 	{
@@ -3304,15 +3173,9 @@ void Cmd_Shout_f(edict_t *ent)
 		
 			Com_sprintf (user_shouts[user_shout_count], sizeof(user_shouts[user_shout_count]), "%s", soundfile);
 
-
 			//gi.dprintf(DEVELOPER_MSG_GAME, "usc: %i   %s\n",user_shout_count,user_shouts[user_shout_count]);
 		}
 	}
-
-
-
-
-
 
 	gi.sound (ent, CHAN_VOICE, gi.soundindex(soundfile), 1, ATTN_NORM, 0);
 }
@@ -3321,7 +3184,6 @@ void Cmd_AutoPickUp_f (edict_t *ent) {
 
 	if (!ent->client->resp.AlreadySpawned)
 		return;
-
 
 	if (!ent->client->resp.autopickup) {
 		if (nohud->value)
@@ -3364,10 +3226,10 @@ void Cmd_MOTD (edict_t *ent)
 	char line[100];
 
 	if (motd_file = fopen(GAMEVERSION "/motd.txt", "r") )
-	{		
+	{
 		// we successfully opened the file "motd.txt"
 		if ( fgets(motd, 900, motd_file) )
-		{	
+		{
 			// we successfully read a line from "motd.txt" into motd
 			// ... read the remaining lines now
 			while ( fgets(line, 100, motd_file) )
@@ -3414,7 +3276,7 @@ void InsertCmds(g_cmds_t *cmds, int numCmds, char *src)
     struct cmd_list_t **ptr;
     struct cmd_list_t *tmp;
 
-        gi.dprintf(DEVELOPER_MSG_GAME, "processing %s commands\n",src);
+    gi.dprintf(DEVELOPER_MSG_GAME, "processing %s commands\n",src);
     ptr = &GlobalCommandList;
     while(*ptr)
         ptr = &((*ptr)->next);
@@ -3553,8 +3415,7 @@ void ClientCommand (edict_t *ent)
 		return;
 	//[end]
 
-
-    cmd = gi.argv(0);
+	cmd = gi.argv(0);
 
 	if (Q_stricmp (cmd, "say") == 0) 
 	{
@@ -3566,7 +3427,6 @@ void ClientCommand (edict_t *ent)
 		Cmd_Say_f(ent, true, false, false);
 		return;
 	}
-
 
     cmdptr = FindCommand(cmd);
     if(cmdptr)
@@ -3588,9 +3448,8 @@ void ClientCommand (edict_t *ent)
           case 4:
               (cmdptr->cmdfunc)(ent,gi.argv(1),gi.argv(2),gi.argv(3));
               break;
-		 
-		}
+        }
     }
-	else 
-		safe_cprintf(ent, PRINT_HIGH, "Invalid Command: %s!\n", cmd);
+    else
+        safe_cprintf(ent, PRINT_HIGH, "Invalid Command: %s!\n", cmd);
 }

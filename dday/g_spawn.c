@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "g_local.h"
+#include <ctype.h> /* tolower */
 
 //Ok, since we are modifying this file, we might as well declare the
 //item spawning functions here. These are the functions that actually 

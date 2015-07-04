@@ -29,6 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "g_local.h"
 #include "x_fire.h"
+#include <ctype.h> /* tolower */
 
 void Spawn_Chute(edict_t *ent);
 
