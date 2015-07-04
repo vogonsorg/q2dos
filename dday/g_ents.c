@@ -291,7 +291,8 @@ spawn_t sp_usm[MAX_TEAM_ITEMS];
 SMos_t USM_MOS_List[NUM_CLASSES];
 void USM_UserPrecache(void);
 
-InitTeam (char *team, int i)
+
+void InitTeam (char *team, int i)
 {
 	int j;
 
