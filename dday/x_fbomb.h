@@ -24,16 +24,18 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
- 
- /*==========================================================================
+
+/*==========================================================================
 //  x_fbomb.h -- by Patrick Martin              Last updated:  3-5-1998
 //--------------------------------------------------------------------------
 //  This is the header file for x_fbomb.c.
 //========================================================================*/
 
+#if 0
 static void FireGrenade_Explode (edict_t *ent);
 static void FireGrenade_Touch
  (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf);
+#endif
 void fire_flamegrenade
  (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed,
   float timer, float damage_radius);
