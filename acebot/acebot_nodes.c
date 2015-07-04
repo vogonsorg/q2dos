@@ -655,11 +655,12 @@ void ACEND_UpdateNodeEdge(int from, int to)
 	// Now for the self-referencing part, linear time for each link added
 	for(i=0;i<numnodes;i++)
 		if(path_table[i][from] != INVALID)
+		{
 			if(i == to)
 				path_table[i][to] = INVALID; // make sure we terminate
 			else
 				path_table[i][to] = path_table[i][from];
-		
+		}
 	if(debug_mode)
 		debug_printf("Link %d -> %d\n", from, to);
 }
@@ -705,10 +706,12 @@ void ACEND_ResolveAllPaths()
 			// Now for the self-referencing part linear time for each link added
 			for(i=0;i<numnodes;i++)
 				if(path_table[i][from] != -1)
+				{
 					if(i == to)
 						path_table[i][to] = -1; // make sure we terminate
 					else
 						path_table[i][to] = path_table[i][from];
+				}
 		}
 	}
 
@@ -774,7 +777,7 @@ void ACEND_LoadNodes(void)
 	strcat(filename,".nod");
 
 	if((pIn = fopen(filename, "rb" )) == NULL)
-    {
+	{
 		// Create item table
 		safe_bprintf(PRINT_MEDIUM, "ACE: No node file found, creating new one...");
 		ACEIT_BuildItemNodeTable(false);
@@ -813,6 +816,5 @@ void ACEND_LoadNodes(void)
 	safe_bprintf(PRINT_MEDIUM, "done.\n");
 	
 	ACEIT_BuildItemNodeTable(true);
-
 }
 
