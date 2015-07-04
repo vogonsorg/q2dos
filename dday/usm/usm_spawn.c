@@ -57,7 +57,6 @@ void SP_item_weapon_sniper(edict_t *self);
 void SP_item_weapon_thompson(edict_t *self);
 
 
-
 //ammo
 void SP_item_ammo_grenades_usa(edict_t *self);
 void SP_item_ammo_colt45(edict_t *self);
@@ -77,35 +76,32 @@ void SP_item_ammo_m1903(edict_t *self);
 void SP_item_ammo_HMG(edict_t *self);
 void SP_item_ammo_thompson(edict_t *self);
 
+
 // Misc stuff
 
-
 void SP_misc_banner_usa (edict_t *ent);
-
-
 
 
 /////////////////////////////////////////////////////////////
 
 spawn_t sp_usm[MAX_TEAM_ITEMS] =
-
 {
-    "weapon_colt45", SP_item_weapon_colt45,
-	"weapon_m1",SP_item_weapon_m1,
-	"weapon_shotgun", SP_item_weapon_shotgun,
-	"weapon_BAR", SP_item_weapon_BAR,
-	"weapon_30cal", SP_item_weapon_30cal,
-	"weapon_bazooka",SP_item_weapon_bazooka,
-	"weapon_sniper",SP_item_weapon_sniper,
-	"weapon_thompson", SP_item_weapon_thompson,
-	"ammo_grenades_usa",SP_item_ammo_grenades_usa,
-	"ammo_colt45",SP_item_ammo_colt45,
-	"ammo_m1",SP_item_ammo_m1,
-	"ammo_shotgun",SP_item_ammo_shotgun,
-	"ammo_BAR",SP_item_ammo_BAR,
-	"ammo_HMG",SP_item_ammo_HMG,
-	"ammo_rockets",SP_item_ammo_rockets,
-	"ammo_m1903",SP_item_ammo_m1903,
-	"ammo_thompson",SP_item_ammo_thompson,
-	"misc_banner_usa",SP_misc_banner_usa
+	{"weapon_colt45", SP_item_weapon_colt45},
+	{"weapon_m1",SP_item_weapon_m1},
+	{"weapon_shotgun", SP_item_weapon_shotgun},
+	{"weapon_BAR", SP_item_weapon_BAR},
+	{"weapon_30cal", SP_item_weapon_30cal},
+	{"weapon_bazooka",SP_item_weapon_bazooka},
+	{"weapon_sniper",SP_item_weapon_sniper},
+	{"weapon_thompson", SP_item_weapon_thompson},
+	{"ammo_grenades_usa",SP_item_ammo_grenades_usa},
+	{"ammo_colt45",SP_item_ammo_colt45},
+	{"ammo_m1",SP_item_ammo_m1},
+	{"ammo_shotgun",SP_item_ammo_shotgun},
+	{"ammo_BAR",SP_item_ammo_BAR},
+	{"ammo_HMG",SP_item_ammo_HMG},
+	{"ammo_rockets",SP_item_ammo_rockets},
+	{"ammo_m1903",SP_item_ammo_m1903},
+	{"ammo_thompson",SP_item_ammo_thompson},
+	{"misc_banner_usa",SP_misc_banner_usa}
 };

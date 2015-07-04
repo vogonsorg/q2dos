@@ -118,29 +118,25 @@ void SP_item_ammo_mg34(edict_t *self)
 void SP_item_ammo_piat(edict_t *self);
 
 
-
 spawn_t sp_pol[MAX_TEAM_ITEMS] =
-
 {
-    "weapon_vis", SP_item_weapon_vis,
-	"weapon_svt",SP_item_weapon_svt,
-//	"weapon_sten", SP_item_weapon_sten,
-	"weapon_mors", SP_item_weapon_mors,
-	"weapon_RKM", SP_item_weapon_RKM,
-	"weapon_mg34", SP_item_weapon_mg34,
-	"weapon_piat",SP_item_weapon_piat,
-	"weapon_pol_m98ks",SP_item_weapon_POL_mauser98ks,
-    "weapon_sabre", SP_item_weapon_sabre,
-	"ammo_vis",SP_item_ammo_vis,
-	"ammo_svt",SP_item_ammo_svt,
-//	"ammo_sten",SP_item_ammo_sten,
-	"ammo_mors",SP_item_ammo_mors,
-	"ammo_pol_m98k",SP_item_ammo_pol_mauser98k,
-	"ammo_RKM",SP_item_ammo_RKM,
-	"ammo_mg34",SP_item_ammo_mg34,
-	"ammo_PIAT",SP_item_ammo_piat,
-	"ammo_grenades_pol", SP_item_ammo_grenades_pol
+	{"weapon_vis", SP_item_weapon_vis},
+	{"weapon_svt",SP_item_weapon_svt},
+//	{"weapon_sten", SP_item_weapon_sten},
+	{"weapon_mors", SP_item_weapon_mors},
+	{"weapon_RKM", SP_item_weapon_RKM},
+	{"weapon_mg34", SP_item_weapon_mg34},
+	{"weapon_piat",SP_item_weapon_piat},
+	{"weapon_pol_m98ks",SP_item_weapon_POL_mauser98ks},
+	{"weapon_sabre", SP_item_weapon_sabre},
+	{"ammo_vis",SP_item_ammo_vis},
+	{"ammo_svt",SP_item_ammo_svt},
+//	{"ammo_sten",SP_item_ammo_sten},
+	{"ammo_mors",SP_item_ammo_mors},
+	{"ammo_pol_m98k",SP_item_ammo_pol_mauser98k},
+	{"ammo_RKM",SP_item_ammo_RKM},
+	{"ammo_mg34",SP_item_ammo_mg34},
+	{"ammo_PIAT",SP_item_ammo_piat},
+	{"ammo_grenades_pol", SP_item_ammo_grenades_pol}
 };
-
-
 

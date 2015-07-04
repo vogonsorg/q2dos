@@ -64,8 +64,6 @@
 #define MODEL_SCALE				1.000000
 
 
-
-
 void civilian_think (edict_t *self);
 void civilian_stand (edict_t *self);
 void civilian_dead (edict_t *self);
@@ -77,81 +75,75 @@ void monster_footstep (edict_t *ent);
 
 mframe_t civilian_frames_stand [] =
 {
-	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,
-	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,
-	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,
-	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,
-	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL,	ai_stand, 0, NULL
+	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},
+	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},
+	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},
+	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},
+	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL},	{ai_stand, 0, NULL}
 };
 mmove_t civilian_move_stand = {FRAME_stand1, FRAME_stand35, civilian_frames_stand, civilian_stand};
 
 
-
 mframe_t civilian_frames_walk [] =
 {
-	ai_walk,	5,	monster_footstep,
-	ai_walk,	5,	NULL,
-	ai_walk,	5,	NULL,
-	ai_walk,	5,	NULL,
-	ai_walk,	5,	NULL,
-	ai_walk,	5,	monster_footstep,
-	ai_walk,	5,	NULL,
-	ai_walk,	5,	NULL,
-	ai_walk,	5,	NULL,
-	ai_walk,	5,	civilian_think
-
+	{ai_walk,	5,	monster_footstep},
+	{ai_walk,	5,	NULL},
+	{ai_walk,	5,	NULL},
+	{ai_walk,	5,	NULL},
+	{ai_walk,	5,	NULL},
+	{ai_walk,	5,	monster_footstep},
+	{ai_walk,	5,	NULL},
+	{ai_walk,	5,	NULL},
+	{ai_walk,	5,	NULL},
+	{ai_walk,	5,	civilian_think}
 };
 mmove_t civilian_move_walk = {FRAME_walk1, FRAME_walk10, civilian_frames_walk, civilian_walk};
 
 
 mframe_t civilian_frames_slow_run [] =
 {
-	ai_walk,	20,	NULL,
-	ai_walk,	20,	monster_footstep,
-	ai_walk,	20,	NULL,
-	ai_walk,	20,	NULL,
-	ai_walk,	20,	monster_footstep,
-	ai_walk,	20,	civilian_think
+	{ai_walk,	20,	NULL},
+	{ai_walk,	20,	monster_footstep},
+	{ai_walk,	20,	NULL},
+	{ai_walk,	20,	NULL},
+	{ai_walk,	20,	monster_footstep},
+	{ai_walk,	20,	civilian_think}
 };
 mmove_t civilian_move_slow_run = {FRAME_run1, FRAME_run6, civilian_frames_slow_run, civilian_run};
 
 
 mframe_t civilian_frames_run [] =
 {
-	ai_walk,	28,	NULL,
-	ai_walk,	28,	monster_footstep,
-	ai_walk,	28,	civilian_think,
-	ai_walk,	28,	NULL,
-	ai_walk,	28,	monster_footstep,
-	ai_walk,	28,	civilian_think
+	{ai_walk,	28,	NULL},
+	{ai_walk,	28,	monster_footstep},
+	{ai_walk,	28,	civilian_think},
+	{ai_walk,	28,	NULL},
+	{ai_walk,	28,	monster_footstep},
+	{ai_walk,	28,	civilian_think}
 };
 mmove_t civilian_move_run = {FRAME_run1, FRAME_run6, civilian_frames_run, civilian_run};
 
 
-
 mframe_t civilian_frames_death [] =
 {
-	ai_move,	0,		NULL,
-	ai_move,	0,		NULL,
-	ai_move,	0,		NULL,
-	ai_move,	0,		NULL,
-	ai_move,	0,		NULL,
-	ai_move,	0,		NULL
-
+	{ai_move,	0,		NULL},
+	{ai_move,	0,		NULL},
+	{ai_move,	0,		NULL},
+	{ai_move,	0,		NULL},
+	{ai_move,	0,		NULL},
+	{ai_move,	0,		NULL}
 };
 mmove_t civilian_move_death = {FRAME_death1, FRAME_death6, civilian_frames_death, civilian_dead};
 
 
 mframe_t civilian_frames_pain [] =
 {
-	ai_move,	0,		NULL,
-	ai_move,	0,		NULL,
-	ai_move,	0,		NULL,
-	ai_move,	0,		NULL
-
+	{ai_move,	0,		NULL},
+	{ai_move,	0,		NULL},
+	{ai_move,	0,		NULL},
+	{ai_move,	0,		NULL}
 };
 mmove_t civilian_move_pain = {FRAME_pain1, FRAME_pain4, civilian_frames_pain, civilian_stand};
-
 
 
 qboolean Surface(char *name, int type);
@@ -165,19 +157,12 @@ void monster_footstep (edict_t *ent)
 	VectorMA (ent->s.origin, 50, end, end);
 	tr = gi.trace (ent->s.origin, NULL, NULL, end, ent, MASK_ALL);
 
-
-
 	if (!ent->groundentity)
 		return;
-	
 
-
-
-	
 //		float volume = (float)(VectorLength(ent->velocity))/200;
 
 	volume = .4;
-
 
 	VectorMA (ent->s.origin, 50, down, end);
 	tr = gi.trace (ent->s.origin, NULL, NULL, end, ent, CONTENTS_SOLID);
@@ -230,9 +215,7 @@ void monster_footstep (edict_t *ent)
 	}		
 		
 	gi.sound (ent, CHAN_AUTO, sound, volume, ATTN_NORM, 0);
-
 }
-
 
 
 void civilian_walk (edict_t *self)
@@ -252,9 +235,7 @@ void civilian_run (edict_t *self)
 			self->monsterinfo.currentmove = &civilian_move_run;
 										
 	}
-
 }
-
 
 void civilian_pain (edict_t *self, edict_t *other, float kick, int damage)
 {
@@ -272,7 +253,6 @@ void civilian_pain (edict_t *self, edict_t *other, float kick, int damage)
 	s = (1 +(rand()&3))*25;
 	gi.sound (self, CHAN_VOICE, gi.soundindex (va("../players/usa/pain%i_%i.wav", s,r)), 1, ATTN_IDLE, 0);
 	self->monsterinfo.currentmove = &civilian_move_pain;
-
 }
 
 void civilian_stand (edict_t *self)
@@ -326,7 +306,6 @@ void civilian_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int dam
 }
 
 
-
 void civilian_think (edict_t *self)
 {
 	vec3_t v,temp,dist;
@@ -335,14 +314,12 @@ void civilian_think (edict_t *self)
 	float temp_distance, nearest_distance;
 	nearest_distance = 9999999999;
 
-
 	if (level.intermissiontime)
 	{
 		self->think = G_FreeEdict;
 		self->nextthink = level.time +.1;
 		return;
 	}
-
 
 	if (self->wait)
 	{
@@ -371,8 +348,6 @@ void civilian_think (edict_t *self)
 		}
 	}
 
-
-	
 	//make the nearest info_reinforcement_start belong to the team that owns you, all others belong to other team
 	if (self->obj_owner != -1/* &&
 		(self->monsterinfo.currentmove == &civilian_move_run ||
@@ -382,8 +357,8 @@ void civilian_think (edict_t *self)
 		float temp_distance,nearest_distance;
 
 		nearest_distance = 9999999999;
-        for (e = g_edicts; e < &g_edicts[globals.num_edicts]; e++)
-        {
+		for (e = g_edicts; e < &g_edicts[globals.num_edicts]; e++)
+		{
 			if (!e->inuse)
 				continue;
 			if (strcmp(e->classname, "info_reinforcements_start"))
@@ -401,14 +376,13 @@ void civilian_think (edict_t *self)
 				nearest_distance = temp_distance;
 				nearest = e;
 			}
-        }
+		}
 		if (nearest)
 		{	
 			nearest->obj_owner = self->obj_owner;
 //			gi.dprintf(DEVELOPER_MSG_GAME, "%s\n",vtos(nearest->s.origin));
 		}
 	}
-
 
 	if (self->master && self->master->health <= 0)
 	{
@@ -437,7 +411,6 @@ void civilian_think (edict_t *self)
 			self->ideal_yaw = vectoyaw(temp);
 			M_ChangeYaw(self);
 		}
-
 	}
 	else
 	{
@@ -457,7 +430,6 @@ void civilian_think (edict_t *self)
 				nearest_distance = temp_distance;
 				nearest = e;
 			}
-
 		}
 
 		if (nearest)
@@ -468,15 +440,9 @@ void civilian_think (edict_t *self)
 		}
 	}
 
-
-
-
-
-
 	//self->enemy = NULL;
 
 	self->health = 1000000000;
-
 }
 
 void SP_misc_civilian (edict_t *self)
@@ -522,8 +488,6 @@ void SP_misc_civilian (edict_t *self)
 	
 	self->monsterinfo.scale = MODEL_SCALE;
 
-
-
 	walkmonster_start (self);
 	if (self->style)
 		self->s.skinnum = self->style;//rand()%2;
@@ -537,9 +501,7 @@ void SP_misc_civilian (edict_t *self)
 	self->flags |= FL_NO_KNOCKBACK;
 	self->s.renderfx   = RF_FULLBRIGHT;
 	self->flags |= FL_IMMUNE_LAVA;
-
 }
-
 
 
 void VIP_pain (edict_t *self, edict_t *other, float kick, int damage)
@@ -616,7 +578,6 @@ void VIP_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, 
 		attacker->client->pers.netname,
 		team_list[attacker->client->resp.team_on->index]->teamname);
 
-
 //		if (!team_list[otherteam]->kills_and_points && team_list[otherteam]->score < team_list[otherteam]->need_points ||
 //			(team_list[otherteam]->kills_and_points && 
 //				team_list[otherteam]->kills < team_list[otherteam]->need_kills))
@@ -630,16 +591,11 @@ void VIP_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, 
 	}
 
 	self->solid = SOLID_NOT;
-
-
-
-
 }
 
 
 void VIP_think (edict_t *self)
 {
-
 	if (self->s.frame < 34)
 		self->s.frame++;
 	else if (self->s.frame == 34)
@@ -676,8 +632,6 @@ void VIP_think (edict_t *self)
 				cl_ent->solid = SOLID_TRIGGER;
 			}
 		}
-
-
 
 		self->nextthink = 0;
 		if (self->wait)
@@ -721,7 +675,6 @@ void SP_objective_VIP (edict_t *self)
 	self->flags |= FL_NO_KNOCKBACK;
 	self->s.renderfx   = RF_FULLBRIGHT;
 	//self->flags |= FL_IMMUNE_LAVA;
-
 
 	VectorCopy (self->s.origin, self->obj_origin);
 	self->obj_origin[2]+=15;

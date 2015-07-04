@@ -111,28 +111,25 @@ void SP_item_ammo_mg42(edict_t *self);
 //}
 
 
-
 spawn_t sp_jpn[MAX_TEAM_ITEMS] =
-
 {
-    "weapon_nambu", SP_item_weapon_nambu,
-	"weapon_arisaka",SP_item_weapon_arisaka,
-	"weapon_type_100", SP_item_weapon_type_100,
-	"weapon_type_99", SP_item_weapon_type_99,
-//	"weapon_m1carb", SP_item_weapon_m1carb,
-	"weapon_arisakas",SP_item_weapon_arisakas,
-    "weapon_katana", SP_item_weapon_katana,
-	"weapon_molotov", SP_item_molotov,
-	"weapon_mg42", SP_item_weapon_mg42,
-	"ammo_nambu",SP_item_ammo_nambu,
-	"ammo_arisaka",SP_item_ammo_arisaka,
-	"ammo_arisakas",SP_item_ammo_arisakas,
-	"ammo_type_100",SP_item_ammo_type_100,
-	"ammo_type_99",SP_item_ammo_type_99,
-//	"ammo_m1carb",SP_item_ammo_m1carb,
-	"ammo_grenades_jpn", SP_item_ammo_grenades_jpn,
-	"ammo_mg42",SP_item_ammo_mg42
-
+	{"weapon_nambu", SP_item_weapon_nambu},
+	{"weapon_arisaka",SP_item_weapon_arisaka},
+	{"weapon_type_100", SP_item_weapon_type_100},
+	{"weapon_type_99", SP_item_weapon_type_99},
+//	{"weapon_m1carb", SP_item_weapon_m1carb},
+	{"weapon_arisakas",SP_item_weapon_arisakas},
+	{"weapon_katana", SP_item_weapon_katana},
+	{"weapon_molotov", SP_item_molotov},
+	{"weapon_mg42", SP_item_weapon_mg42},
+	{"ammo_nambu",SP_item_ammo_nambu},
+	{"ammo_arisaka",SP_item_ammo_arisaka},
+	{"ammo_arisakas",SP_item_ammo_arisakas},
+	{"ammo_type_100",SP_item_ammo_type_100},
+	{"ammo_type_99",SP_item_ammo_type_99},
+//	{"ammo_m1carb",SP_item_ammo_m1carb},
+	{"ammo_grenades_jpn", SP_item_ammo_grenades_jpn},
+	{"ammo_mg42",SP_item_ammo_mg42}
 };
 
 

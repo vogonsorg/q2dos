@@ -115,26 +115,23 @@ void SP_item_ammo_breda(edict_t *self)
 }
 
 
-
-
 spawn_t sp_ita[MAX_TEAM_ITEMS] =
-
 {
-    "weapon_b34", SP_item_weapon_b34,
-	"weapon_carcano",SP_item_weapon_carcano,
-	"weapon_b38", SP_item_weapon_b38,
-	"weapon_k43", SP_item_weapon_k43,
-	"weapon_b3842", SP_item_weapon_b3842,
-	"weapon_panzerfaust",SP_item_weapon_panzer,
-	"weapon_m98ks",SP_item_weapon_m98ks,
-	"weapon_breda", SP_item_weapon_breda,
-	"ammo_b34",SP_item_ammo_b34,
-	"ammo_carcano",SP_item_ammo_carcano,
-	"ammo_b38",SP_item_ammo_b38,
-	"ammo_k43",SP_item_ammo_k43,
-	"ammo_b3842",SP_item_ammo_b3842,
-	"ammo_rocketsI",SP_item_ammo_rocketsI,
-	"ammo_mauser98k",SP_item_ammo_mauser98k,
-	"ammo_grenades_ita", SP_item_ammo_grenades_ita,
-	"ammo_breda",SP_item_ammo_breda
+	{"weapon_b34", SP_item_weapon_b34},
+	{"weapon_carcano",SP_item_weapon_carcano},
+	{"weapon_b38", SP_item_weapon_b38},
+	{"weapon_k43", SP_item_weapon_k43},
+	{"weapon_b3842", SP_item_weapon_b3842},
+	{"weapon_panzerfaust",SP_item_weapon_panzer},
+	{"weapon_m98ks",SP_item_weapon_m98ks},
+	{"weapon_breda", SP_item_weapon_breda},
+	{"ammo_b34",SP_item_ammo_b34},
+	{"ammo_carcano",SP_item_ammo_carcano},
+	{"ammo_b38",SP_item_ammo_b38},
+	{"ammo_k43",SP_item_ammo_k43},
+	{"ammo_b3842",SP_item_ammo_b3842},
+	{"ammo_rocketsI",SP_item_ammo_rocketsI},
+	{"ammo_mauser98k",SP_item_ammo_mauser98k},
+	{"ammo_grenades_ita", SP_item_ammo_grenades_ita},
+	{"ammo_breda",SP_item_ammo_breda}
 };

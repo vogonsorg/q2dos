@@ -105,24 +105,22 @@ void SP_item_ammo_rocketsG(edict_t *self)
 }
 
 
-
 spawn_t sp_grm[MAX_TEAM_ITEMS] =
-
 {
-    "weapon_p38", SP_item_weapon_p38,
-	"weapon_mauser98k",SP_item_weapon_mauser98k,
-	"weapon_mp40", SP_item_weapon_mp40,
-	"weapon_mp43", SP_item_weapon_mp43,
-	"weapon_mg42", SP_item_weapon_mg42,
-	"weapon_panzer",SP_item_weapon_panzer,
-	"weapon_mauser98ks",SP_item_weapon_mauser98ks,
-	"ammo_p38",SP_item_ammo_p38,
-	"ammo_mauser98k",SP_item_ammo_mauser98k,
-	"ammo_mp40",SP_item_ammo_mp40,
-	"ammo_mp43",SP_item_ammo_mp43,
-	"ammo_mg42",SP_item_ammo_mg42,
-	"ammo_rocketsG",SP_item_ammo_rocketsG,
-	"ammo_grenades_grm", SP_item_ammo_grenades_grm
+	{"weapon_p38", SP_item_weapon_p38},
+	{"weapon_mauser98k",SP_item_weapon_mauser98k},
+	{"weapon_mp40", SP_item_weapon_mp40},
+	{"weapon_mp43", SP_item_weapon_mp43},
+	{"weapon_mg42", SP_item_weapon_mg42},
+	{"weapon_panzer",SP_item_weapon_panzer},
+	{"weapon_mauser98ks",SP_item_weapon_mauser98ks},
+	{"ammo_p38",SP_item_ammo_p38},
+	{"ammo_mauser98k",SP_item_ammo_mauser98k},
+	{"ammo_mp40",SP_item_ammo_mp40},
+	{"ammo_mp43",SP_item_ammo_mp43},
+	{"ammo_mg42",SP_item_ammo_mg42},
+	{"ammo_rocketsG",SP_item_ammo_rocketsG},
+	{"ammo_grenades_grm", SP_item_ammo_grenades_grm}
 };
 
 

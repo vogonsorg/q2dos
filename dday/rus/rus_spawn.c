@@ -114,23 +114,22 @@ void SP_item_molotov(edict_t *self)
 
 
 spawn_t sp_rus[MAX_TEAM_ITEMS] =
-
 {
-    "weapon_tt33", SP_item_weapon_tt33,
-	"weapon_m9130",SP_item_weapon_m9130,
-	"weapon_ppsh41", SP_item_weapon_ppsh41,
-	"weapon_pps43", SP_item_weapon_pps43,
-	"weapon_dpm", SP_item_weapon_dpm,
-	"weapon_rpg1",SP_item_weapon_rpg1,
-	"weapon_m9130s",SP_item_weapon_m9130s,
-	"weapon_molotov", SP_item_molotov,
-	"ammo_tt33",SP_item_ammo_tt33,
-	"ammo_m9130",SP_item_ammo_m9130,
-	"ammo_ppsh41",SP_item_ammo_ppsh41,
-	"ammo_pps43",SP_item_ammo_pps43,
-	"ammo_dpm",SP_item_ammo_dpm,
-	"ammo_rocketsR",SP_item_ammo_rocketsR,
-	"ammo_grenades_rus", SP_item_ammo_grenades_rus
+	{"weapon_tt33", SP_item_weapon_tt33},
+	{"weapon_m9130",SP_item_weapon_m9130},
+	{"weapon_ppsh41", SP_item_weapon_ppsh41},
+	{"weapon_pps43", SP_item_weapon_pps43},
+	{"weapon_dpm", SP_item_weapon_dpm},
+	{"weapon_rpg1",SP_item_weapon_rpg1},
+	{"weapon_m9130s",SP_item_weapon_m9130s},
+	{"weapon_molotov", SP_item_molotov},
+	{"ammo_tt33",SP_item_ammo_tt33},
+	{"ammo_m9130",SP_item_ammo_m9130},
+	{"ammo_ppsh41",SP_item_ammo_ppsh41},
+	{"ammo_pps43",SP_item_ammo_pps43},
+	{"ammo_dpm",SP_item_ammo_dpm},
+	{"ammo_rocketsR",SP_item_ammo_rocketsR},
+	{"ammo_grenades_rus", SP_item_ammo_grenades_rus}
 };
 
 
