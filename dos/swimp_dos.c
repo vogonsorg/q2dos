@@ -22,19 +22,28 @@ void	SWimp_EndFrame (void)
 		else // FS: Credit to ggorts
 		{
 			int bank_number=0;
-			int todo=307199; //307200;
+			int todo=vid_resolutions[currentvideomode].height*vid_resolutions[currentvideomode].width;
 			int copy_size;
 			__dpmi_regs r;
 
 			while (todo>0)
 			{
+#if 0 // FS: I thought this was bank swapping but it's not
+				r.x.ax = 0x4F07;
+				r.x.bx = 0;
+				r.x.cx = bank_number % vid_resolutions[currentvideomode].width;
+				r.x.dx = bank_number / vid_resolutions[currentvideomode].width;
+				__dpmi_int(0x10, &r);
+#endif
 				r.x.ax = 0x4F05;
 				r.x.bx = 0;
-				r.x.dx = bank_number;
+				r.x.dx = bank_number; // FS: FIXME bank buffer need to be swapped!
 				__dpmi_int(0x10, &r);
-			
-				if (todo>65536)
+
+				if (todo>65536) // FS: 320x240
 				{
+					// FS: FIXME, is this right?  According to http://www.neuraldk.org/document.php?djgppGraphics it is but we can't write 320x240 to 0xA0000 I thought?
+					//     If I try 64000 then bank swapping needs to happen
 					copy_size=65536;
 				}
 				else
@@ -43,10 +52,17 @@ void	SWimp_EndFrame (void)
 				}
 
 				dosmemput(vid.buffer, copy_size, 0xA0000);
+
 				todo-=copy_size;
 				vid.buffer+=copy_size;
 				bank_number++;
 			}
+			// FS: FIXME: I don't think the next line is the right thing to do?
+			vid.buffer-=vid_resolutions[currentvideomode].height*vid_resolutions[currentvideomode].width; // FS: Move back to the beginning, this was the cause of the crash after a few frames
+			r.x.ax = 0x4f05;
+			r.x.bx = 0;
+			r.x.dx = 0;
+			__dpmi_int(0x10, &r);
 		}
 	}
 	else
@@ -129,6 +145,7 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 		}
 
 		vid.buffer=malloc(vid.width*vid.height*1);
+
 		if(!vid_resolutions[mode].isBanked)
 		{	//mode 13
 
@@ -136,8 +153,9 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 		}
 		else
 		{
+			ri.Con_Printf(PRINT_ALL, "\x02Setting banked mode!\n");
 			r.x.ax = 0x4F02;
-			r.x.bx = 0x0101;
+			r.x.bx = 0x0101; // FS: FIXME: This is setting it to 640x480
 		}
 
 		__dpmi_int(0x10, &r);

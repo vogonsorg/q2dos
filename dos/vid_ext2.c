@@ -461,7 +461,16 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 				vid_resolutions[num_vid_resolutions].height=modeinfo.height;
 				vid_resolutions[num_vid_resolutions].width=modeinfo.width;
 				vid_resolutions[num_vid_resolutions].address=real2ptr(modeinfo.pptr);//(void *)modeinfo.pptr; // FS: Real2ptr returns a (void *)
-				vid_resolutions[num_vid_resolutions].isLFB=true; // FS: Added
+
+				if ( !(COM_CheckParm("-bankedvga")) ) // FS: FIXME, just add all modes for banked
+				{
+					vid_resolutions[num_vid_resolutions].isLFB=true; // FS: Added
+				}
+				else
+				{
+					vid_resolutions[num_vid_resolutions].isLFB=false; // FS: Added
+					vid_resolutions[num_vid_resolutions].isBanked=true; // FS: Added
+				}
 				Com_sprintf(vid_resolutions[num_vid_resolutions].menuname, sizeof(vid_resolutions[num_vid_resolutions].menuname), "[VESA %dx%d]",modeinfo.width,modeinfo.height);
 				num_vid_resolutions++;
 			}
