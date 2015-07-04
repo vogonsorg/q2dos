@@ -1457,10 +1457,10 @@ int Play_Bullet_Hit(edict_t *ent, char *surface, vec3_t endpos, edict_t *impact_
 qboolean Surface(char *name, int type);
 void Blade_touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
-	qboolean fistarmed=Q_stricmp(self->classname,"blade");
+//	qboolean fistarmed=Q_stricmp(self->classname,"blade");
 	gitem_t *item= FindItem("Knife");
 	edict_t         *dropped;
-    vec3_t          move_angles;//, origin;
+	vec3_t          move_angles;//, origin;
 
 	if (other == self->owner)
 		return;
@@ -1633,7 +1633,7 @@ void Helmet_Drop (edict_t *self)
 
 void Helmet_touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
-	gitem_t *item = FindItem("Helmet");
+//	gitem_t *item = FindItem("Helmet");
 
 	self->count++;
 
@@ -1712,7 +1712,7 @@ void Helmet_touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *su
 
 void Knife_Throw (edict_t *self, vec3_t start, vec3_t dir, int damage)
 {
-	int effect=EF_ANIM01;
+//	int effect=EF_ANIM01;
 	edict_t	*blade;
 	trace_t	tr;
 	qboolean fistarmed = Q_stricmp(self->client->pers.weapon->pickup_name, "Knife");

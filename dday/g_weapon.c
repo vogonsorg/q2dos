@@ -920,7 +920,7 @@ void tracer_effect_delay (edict_t *self)
 void fire_tracer (edict_t *self, vec3_t start, vec3_t dir, int damage, int mod)
 {
 	int speed=2100;//1500;//850;  //bullet speed
-	int effect=EF_HYPERBLASTER;
+	//int effect=EF_HYPERBLASTER;
 	edict_t	*bolt;
 	trace_t	tr;
 
@@ -990,7 +990,7 @@ void make_splash (edict_t *ent)
 void fire_underwater (edict_t *self, vec3_t start, vec3_t dir, int damage, int mod)
 {
 	int speed= 400 + random()*500;//1500;//850;  //bullet speed
-	int effect=EF_HYPERBLASTER;
+	//int effect=EF_HYPERBLASTER;
 	edict_t	*underwater_bullet;
 	trace_t	tr;
 
@@ -1063,7 +1063,7 @@ void fire_underwater (edict_t *self, vec3_t start, vec3_t dir, int damage, int m
 void fire_hmg_bullet (edict_t *self, vec3_t start, vec3_t dir, int damage, int mod)
 {
 	int speed=2100;//1500;//850;  //bullet speed
-	int effect=EF_HYPERBLASTER;
+	//int effect=EF_HYPERBLASTER;
 	edict_t	*hmg_bullet;
 	trace_t	tr;
 
@@ -3570,8 +3570,8 @@ void Weapon_Rocket_Fire (edict_t *ent)
 
 	GunInfo_t *guninfo=ent->client->pers.weapon->guninfo;	
 	int mag_index=ent->client->pers.weapon->mag_index;
-	int mod=guninfo->MeansOfDeath;
-	int	radius_damage = guninfo->damage_radius; //The *damage* within the radius
+//	int mod=guninfo->MeansOfDeath;
+//	int	radius_damage = guninfo->damage_radius; //The *damage* within the radius
 	int	damage		= guninfo->damage_direct;
 
 	float	damage_radius; // The *radius* of the damage
@@ -4163,7 +4163,7 @@ void fire_tnt (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed
 void Weapon_Vickers_Fire (edict_t *ent)  //faf:  this was taken from the game dll- weapon_ hmg_fire base
 {
 	int			i;
-	int			shots=1;
+//	int			shots=1;
 	vec3_t		start;
 	vec3_t		forward, right, up;
 	vec3_t		offset;
@@ -4174,7 +4174,7 @@ void Weapon_Vickers_Fire (edict_t *ent)  //faf:  this was taken from the game dl
 	int mod=guninfo->MeansOfDeath;
 	int	damage=guninfo->damage_direct;
 	trace_t tr; //faf
-    vec3_t end; //faf
+	vec3_t end; //faf
 	vec3_t g_offset; //faf
 
 	if (ent->client->next_fire_frame > level.framenum)
@@ -4430,7 +4430,7 @@ void Weapon_PIAT_Fire (edict_t *ent)
 
 	GunInfo_t *guninfo=ent->client->pers.weapon->guninfo;	
 	int mag_index=ent->client->pers.weapon->mag_index;
-	int mod=guninfo->MeansOfDeath;
+//	int mod=guninfo->MeansOfDeath;
 	int	radius_damage = guninfo->damage_radius; //The *damage* within the radius
 	int	damage		= guninfo->damage_direct;
 
@@ -5173,7 +5173,7 @@ void Weapon_Shotgun_Fire (edict_t *ent)
 	GunInfo_t *guninfo=ent->client->pers.weapon->guninfo;
 	
 	int mag_index=ent->client->pers.weapon->mag_index;
-	int mod=guninfo->MeansOfDeath;
+//	int mod=guninfo->MeansOfDeath;
 	int	damage=guninfo->damage_direct;
 	
 	//ent->client->aim = false;
@@ -5618,7 +5618,7 @@ void Weapon_Molotov_Fire (edict_t *ent)
     vec3_t  offset;
 	vec3_t g_offset;
 
-	int mag_index=ent->client->pers.weapon->mag_index;
+//	int mag_index=ent->client->pers.weapon->mag_index;
 
 
 	ent->client->ps.gunframe++;//faf
@@ -5967,7 +5967,7 @@ void Weapon_Pps43_Fire (edict_t *ent)
 void Weapon_MG34_Fire (edict_t *ent)
 {
 	int			i;
-	int			shots=1;
+//	int			shots=1;
 	vec3_t		start;
 	vec3_t		forward, right, up;
 	vec3_t		offset;
@@ -5978,7 +5978,7 @@ void Weapon_MG34_Fire (edict_t *ent)
 	int mod=guninfo->MeansOfDeath;
 	int	damage=guninfo->damage_direct;
 	trace_t tr; //faf
-    vec3_t end; //faf
+	vec3_t end; //faf
 	vec3_t g_offset; //faf
 
 
@@ -6477,7 +6477,7 @@ void Weapon_Panzerfaust_Fire (edict_t *ent)
 
 	GunInfo_t *guninfo=ent->client->pers.weapon->guninfo;	
 	int mag_index=ent->client->pers.weapon->mag_index;
-	int mod=guninfo->MeansOfDeath;
+//	int mod=guninfo->MeansOfDeath;
 	int	radius_damage = guninfo->damage_radius; //The *damage* within the radius
 	int	damage		= guninfo->damage_direct;
 

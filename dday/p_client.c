@@ -3543,9 +3543,9 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	int			 nWoundFrame;
 
 	// dday
-	qboolean oob_pitch=false;
-	qboolean found = false;
-	int CT_DUCKED=0;
+	//qboolean oob_pitch=false;
+	//qboolean found = false;
+	//int CT_DUCKED=0;
 	int pronedist=12;//8 causes getting stuck in doors;//faf 12;
 	char cmd[MAX_CMD_BUFFER];
 
@@ -4860,7 +4860,7 @@ void SetPlayerRating(edict_t *ent)
 	char *statsc;
 
 	char *name;
-	float ratio = 0.0;
+	//float ratio = 0.0;
 	int games = 0;
 	int ping = 0;
 	int	human_kills = 0;

@@ -862,7 +862,7 @@ continue;
 void M_Team_Join(edict_t *ent, pmenu_t *p, int choice)
 {
 
-	qboolean foundspot=false;
+//	qboolean foundspot=false;
 	int i,j,k,l,m;
 
 	if (ent->client->menu)

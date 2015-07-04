@@ -2317,7 +2317,7 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0, qboolean saved)
 {
 	int			i,j, offset_of_text;
 	edict_t		*entR = NULL;
-	edict_t		*entG = NULL;
+	//edict_t	*entG = NULL;
 	char		*p;
 	char		text[2048];
 	gclient_t	*cl;

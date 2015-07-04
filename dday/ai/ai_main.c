@@ -385,12 +385,11 @@ void AI_PickLongRangeGoal(edict_t *self)
 	edict_t *goal_ent = NULL;
 	float	cost;
 	int nearest = -1;
-	float temp_distance, nearest_distance = 9999999,nearest_distanceb = 9999999;
+	float temp_distance, nearest_distance = 9999999;
 	vec3_t distb;
 
 	int j,randseed,k;
 
-	edict_t *closest = NULL;
 	edict_t *e = NULL;
 
 
@@ -1046,7 +1045,7 @@ void AI_Think (edict_t *self)
 		if (self->ai->chatdelay == 0)
 		{
 			edict_t		*entR = NULL;
-			edict_t		*entG = NULL;
+			//edict_t	*entG = NULL;
 			char teamname[5];
 			int j;
 
