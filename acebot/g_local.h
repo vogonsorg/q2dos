@@ -1165,8 +1165,6 @@ struct edict_s
 	int node_timeout;
 	int last_node;
 	int tries;
-	
-	
 
 	int state;
 // ACEBOT_END
