@@ -944,11 +944,12 @@ void ACEND_ReverseLink( edict_t *self, int from, int to )
 	// Now for the self-referencing part, linear time for each link added
 	for(i=0;i<numnodes;i++)
 		if(path_table[i][from] != INVALID)
+		{
 			if(i == to)
 				path_table[i][to] = INVALID; // make sure we terminate
 			else
 				path_table[i][to] = path_table[i][from];
-		
+		}
 //	if(debug_mode)
 //		debug_printf("ReverseLink %d -> %d\n", from, to);
 }
@@ -1033,11 +1034,12 @@ void ACEND_UpdateNodeEdge(edict_t *self, int from, int to)
 	// Now for the self-referencing part, linear time for each link added
 	for(i=0;i<numnodes;i++)
 		if(path_table[i][from] != INVALID)
+		{
 			if(i == to)
 				path_table[i][to] = INVALID; // make sure we terminate
 			else
 				path_table[i][to] = path_table[i][from];
-		
+		}
 //	if(debug_mode)
 //		debug_printf("Link %d -> %d\n", from, to);
 	// RiEvEr - check for the link going back the other way
@@ -1090,10 +1092,12 @@ void ACEND_ResolveAllPaths()
 				// Now for the self-referencing part linear time for each link added
 				for(i=0;i<numnodes;i++)
 					if(path_table[i][from] != -1)
+					{
 						if(i == to)
 							path_table[i][to] = -1; // make sure we terminate
 						else
 							path_table[i][to] = path_table[i][from];
+					}
 			}
 		}
 	}
