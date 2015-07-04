@@ -219,6 +219,8 @@ qboolean Pickup_Navi (edict_t *ent, edict_t *other)
 	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value))
 	if(	ent->item->quantity && ent->classname[6] != 'F') SetRespawn (ent, ent->item->quantity);
 
+	flg = false;/* silence compiler */
+
 	//on door(up & down)
 	if( ent->classname[6] == '3' && ent->union_ent)
 	{

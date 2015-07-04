@@ -541,6 +541,7 @@ void CTFFragBonuses(edict_t *targ, edict_t *inflictor, edict_t *attacker)
 		}
 	}
 //PONKO
+	carrier = NULL;
 	// find attacker's team's flag carrier
 	for (i = 1; i <= maxclients->value; i++) {
 		carrier = g_edicts + i;

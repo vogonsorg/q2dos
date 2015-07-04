@@ -2319,6 +2319,8 @@ void Bots_Move_NORM (edict_t *ent)
 
 	ent->client->buttons &= ~BUTTON_ATTACK;
 
+	yaw = 0;/* silence compiler */
+
 	//--------------------------------------------------------------------------------------
 	//Solid Check
 	i = gi.pointcontents (ent->s.origin);
