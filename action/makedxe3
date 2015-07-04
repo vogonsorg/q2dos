@@ -51,6 +51,7 @@ gamex86.dxe:	$(OBJECTS)
 
 clean:
 	rm -f *.o
+	rm -f acesrc/*.o
 
 DO_AS=$(CC) -x assembler-with-cpp
 
@@ -62,3 +63,4 @@ DO_AS=$(CC) -x assembler-with-cpp
 
 %.o: %.s
 	$(DO_AS) $(CFLAGS) -c $< -o $@
+
