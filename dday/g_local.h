@@ -2157,7 +2157,6 @@ int		mapvotes[5];
 #define NUM_CLASSES 10
 #define MAX_TEAM_GUNS 8
 
-
 qboolean objective_hittable (edict_t *self, edict_t *objective, vec3_t orig);
 void change_stance(edict_t *self, int stance);
 qboolean Cmd_Scope_f(edict_t *ent);
@@ -2234,3 +2233,7 @@ int  botchat_self_count[MAX_TEAMS];
 
 char user_shouts[20][100];
 int user_shout_count;
+
+
+#define BIG_DISTANCE 2147418112 /* 32767<<16 ,  for nearest distance checks  */
+

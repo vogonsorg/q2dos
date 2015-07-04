@@ -226,7 +226,7 @@ void SV_Remove_Node (edict_t *ent)
 	if (sv_cheats->value == 0)
 		return;
 
-	nearest_distance = 9999999999;
+	nearest_distance = BIG_DISTANCE;
 	nearest = -1;
 	for (i=1; i<MAX_NODES; i++)
 	{
