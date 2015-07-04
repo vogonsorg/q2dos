@@ -95,7 +95,7 @@ char *ltk_insults[DBC_INSULTS] =
 void LTK_Chat (edict_t *bot, edict_t *object, int speech)
 {
         char final[150];
-        char *text;
+        char *text = "";
 
         if ((!object) || (!object->client))
                 return;

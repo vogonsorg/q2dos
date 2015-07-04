@@ -134,7 +134,7 @@ qboolean	AntStartSearch(edict_t *ent, int from, int to )
 qboolean	AntQuickPath(edict_t *ent, int from, int to)
 {
 	int	newNode = from;
-	int	oldNode;
+	int	oldNode = INVALID;/* silence compiler */
 
 	// Clean out the arrays, etc.
 	AntInitSearch(ent);

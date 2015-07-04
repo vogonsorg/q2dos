@@ -435,6 +435,8 @@ void G_SetStats (edict_t *ent)
         int                     index, cells, index2;
         int                     power_armor_type;
 
+        cells = 0;/* silence compiler */
+
         if (!ent->client->chase_mode)
         {
                 //

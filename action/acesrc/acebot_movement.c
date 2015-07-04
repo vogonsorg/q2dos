@@ -985,7 +985,7 @@ void ACEMV_Attack (edict_t *self, usercmd_t *ucmd)
 //
 qboolean	AntPathMove( edict_t *self )
 {
-	node_t *temp = &nodes[self->current_node];	// For checking our position
+//	node_t *temp = &nodes[self->current_node];	// For checking our position
 
 	if( level.time == (float)((int)level.time) )
 	{

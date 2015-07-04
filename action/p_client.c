@@ -457,8 +457,10 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
         char      death_msg[2048];  // enough in all situations? -FB
         qboolean  ff;
         int       special = 0;
-        int       n; 
-        
+        int       n;
+
+        death_msg[0] = 0;/* silence compiler */
+
         if (coop->value && attacker->client)
                 meansOfDeath |= MOD_FRIENDLY_FIRE;
         

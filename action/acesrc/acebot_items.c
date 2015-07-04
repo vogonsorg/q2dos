@@ -107,7 +107,7 @@ void ACEIT_PlayerRemoved(edict_t *ent)
 	}
 
 	// Find the player
-	for(i=0;i<num_players;i++)
+	for(i=0,pos=0;i<num_players;i++)
 		if(ent == players[i])
 			pos = i;
 

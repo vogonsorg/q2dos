@@ -217,7 +217,9 @@ void ACESP_LoadBotConfig()
 {
     FILE	*pIn;
 	cvar_t	*game_dir;
+#ifdef	_WIN32
 	int		i;
+#endif
 	char	filename[60];
 	// Scanner stuff
 	int		fileVersion = 0;
@@ -435,7 +437,7 @@ void	ACESP_SpawnBotFromConfig( char *inString )
 		ACESP_PutClientInServer (bot,true, team);
 	}
 	else
- 		ACESP_PutClientInServer (bot,true,0);
+		ACESP_PutClientInServer (bot,true,0);
 
 
 	// make sure all view stuff is valid
@@ -920,7 +922,8 @@ edict_t *ACESP_FindFreeClient (void)
 	edict_t *bot;
 	int	i;
 	int max_count=0;
-	
+
+	bot = NULL;/* silence compiler */
 	// This is for the naming of the bots
 	for (i = maxclients->value; i > 0; i--)
 	{
