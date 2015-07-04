@@ -92,7 +92,7 @@ qboolean ACEMV_CanMove(edict_t *self, int direction)
 	
 	tr = gi.trace(start, NULL, NULL, end, self, MASK_OPAQUE);
 	
-	if(tr.fraction > 0.3 && tr.fraction != 1 || tr.contents & (CONTENTS_LAVA|CONTENTS_SLIME))
+	if((tr.fraction > 0.3 && tr.fraction != 1) || tr.contents & (CONTENTS_LAVA|CONTENTS_SLIME))
 	{
 		if(debug_mode)
 			debug_printf("%s: move blocked\n",self->client->pers.netname);
@@ -557,7 +557,6 @@ void ACEMV_Wander(edict_t *self, usercmd_t *ucmd)
 			self->next_move_time = level.time + 0.5;
 			return;
 		}
-	
 	
 	// Is there a target to move to
 	if (self->movetarget)

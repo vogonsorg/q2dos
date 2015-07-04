@@ -182,13 +182,13 @@ void ACEAI_PickLongRangeGoal(edict_t *self)
 
 		// If I am on team one and I have the flag for the other team....return it
 		if(ctf->value && (item_table[i].item == ITEMLIST_FLAG2 || item_table[i].item == ITEMLIST_FLAG1) &&
-		  (self->client->resp.ctf_team == CTF_TEAM1 && self->client->pers.inventory[ITEMLIST_FLAG2] ||
-		   self->client->resp.ctf_team == CTF_TEAM2 && self->client->pers.inventory[ITEMLIST_FLAG1]))
+		   ((self->client->resp.ctf_team == CTF_TEAM1 && self->client->pers.inventory[ITEMLIST_FLAG2]) ||
+		    (self->client->resp.ctf_team == CTF_TEAM2 && self->client->pers.inventory[ITEMLIST_FLAG1])) )
 			weight = 10.0;
 
 		weight *= random(); // Allow random variations
 		weight /= cost; // Check against cost of getting there
-				
+
 		if(weight > best_weight)
 		{
 			best_weight = weight;
