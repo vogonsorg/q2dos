@@ -546,6 +546,8 @@ void ED_ParseField (char *key, char *value, edict_t *ent)
 				break;
 			case F_IGNORE:
 				break;
+			default:
+				break;
 			}
 			return;
 		}
