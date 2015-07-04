@@ -239,12 +239,13 @@ void Killed (edict_t *targ, edict_t *inflictor, edict_t *attacker, int damage, v
 					attacker->client->resp.stat_human_plus++;
 
 				if (targ->client)
+				{
 					//targ->client->resp.plus_minus--;
 					if (attacker->ai)
 						targ->client->resp.stat_bot_minus++;
 					else
 						targ->client->resp.stat_human_minus++;
-
+				}
 			}
 			targ->client->resp.team_on->losses++;
 

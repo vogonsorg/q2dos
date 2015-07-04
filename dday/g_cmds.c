@@ -1147,7 +1147,7 @@ void Cmd_Use_f (edict_t *ent)
 
 	if (ent->client->chasetarget)
 	{
-		if(Q_stricmp(s,"weapon")==0) 
+		if(Q_stricmp(s,"weapon")==0)
 			Cmd_Scope_f(ent);
 	}
 
@@ -1179,7 +1179,7 @@ void Cmd_Use_f (edict_t *ent)
 //////////////
 /// NEW USE SYSTEM
 //////////////
-		if(Q_stricmp(s,"weapon")==0) 
+		if(Q_stricmp(s,"weapon")==0)
 		{
 			if (Cmd_Scope_f(ent) == false)
 				ent->client->scopetry = true;
@@ -1188,75 +1188,75 @@ void Cmd_Use_f (edict_t *ent)
 			
 			return;
 		}
-		else if (Q_stricmp(s,"weapon1")==0) 
+		else if (Q_stricmp(s,"weapon1")==0)
 		{
-			if (it = FindItem(ent->client->resp.team_on->mos[ent->client->resp.mos]->weapon1))
+			if ((it = FindItem(ent->client->resp.team_on->mos[ent->client->resp.mos]->weapon1)) != NULL)
 				strcpy(s, ent->client->resp.team_on->mos[ent->client->resp.mos]->weapon1);
 			else
 				it = ent->client->pers.weapon;
 		}
-		else if (Q_stricmp(s,"weapon2")==0) 
+		else if (Q_stricmp(s,"weapon2")==0)
 		{
-			if (it = FindItem(ent->client->resp.team_on->mos[ent->client->resp.mos]->weapon2))
+			if ((it = FindItem(ent->client->resp.team_on->mos[ent->client->resp.mos]->weapon2)) != NULL)
 				strcpy(s, ent->client->resp.team_on->mos[ent->client->resp.mos]->weapon2);
 			else
 				it = ent->client->pers.weapon;
 		}
 		/*
-		else if (Q_stricmp(s,"grenades")==0) 
+		else if (Q_stricmp(s,"grenades")==0)
 		{
-			if (it = FindItem(ent->client->resp.team_on->mos[ent->client->resp.mos]->grenades))
+			if ((it = FindItem(ent->client->resp.team_on->mos[ent->client->resp.mos]->grenades)) != NULL)
 				strcpy(s, ent->client->resp.team_on->mos[ent->client->resp.mos]->grenades);
 			else
 				it = ent->client->pers.weapon;
 		}
 		*/
-		else if (Q_stricmp(s,"special")==0) 
+		else if (Q_stricmp(s,"special")==0)
 		{
-			if (it = FindItem(ent->client->resp.team_on->mos[ent->client->resp.mos]->special))
+			if ((it = FindItem(ent->client->resp.team_on->mos[ent->client->resp.mos]->special)) != NULL)
 				strcpy(s, ent->client->resp.team_on->mos[ent->client->resp.mos]->special);
 			else
 				it = ent->client->pers.weapon;
 		}
-		else if (Q_stricmp(s,"grenades")==0) 
+		else if (Q_stricmp(s,"grenades")==0)
 		{
 			it = FindNextPickup(ent, LOC_GRENADES);
 			strcpy(s, it->pickup_name);
 		}
-		else if (Q_stricmp(s,"melee")==0) 
+		else if (Q_stricmp(s,"melee")==0)
 		{
 			it = FindNextPickup(ent, LOC_KNIFE);
 			strcpy(s, it->pickup_name);
 		}
-		else if (Q_stricmp(s,"pickup")==0) 
+		else if (Q_stricmp(s,"pickup")==0)
 		{
 			it = FindNextPickup(ent, LOC_NONE);
 			strcpy(s, it->pickup_name);
 		}
 		//faf
-		else if (Q_stricmp(s,"sniper")==0) 
+		else if (Q_stricmp(s,"sniper")==0)
 		{
 			it = FindNextPickup(ent, LOC_SNIPER);
 			strcpy(s, it->pickup_name);
 		}
-		else if (Q_stricmp(s,"pistol")==0) 
+		else if (Q_stricmp(s,"pistol")==0)
 		{
 			it = FindNextPickup(ent, LOC_PISTOL);
 			strcpy(s, it->pickup_name);
 		}
-		else if (Q_stricmp(s,"rifle")==0) 
+		else if (Q_stricmp(s,"rifle")==0)
 		{
 			it = FindNextPickup(ent, LOC_RIFLE);
 			strcpy(s, it->pickup_name);
 		}
-		else if (Q_stricmp(s,"smg")==0) 
+		else if (Q_stricmp(s,"smg")==0)
 		{
 			it = FindNextPickup(ent, LOC_SUBMACHINEGUN2);
 			strcpy(s, it->pickup_name);
 			it = FindNextPickup(ent, LOC_SUBMACHINEGUN);
 			strcpy(s, it->pickup_name);
 		}
-		else if (Q_stricmp(s,"lmg")==0) 
+		else if (Q_stricmp(s,"lmg")==0)
 		{
 			it = FindNextPickup(ent, LOC_L_MACHINEGUN);
 			strcpy(s, it->pickup_name);
@@ -1266,7 +1266,7 @@ void Cmd_Use_f (edict_t *ent)
 			it = FindNextPickup(ent, LOC_H_MACHINEGUN);
 			strcpy(s, it->pickup_name);
 		}	
-		else if (Q_stricmp(s,"rocket")==0) 
+		else if (Q_stricmp(s,"rocket")==0)
 		{
 			it = FindNextPickup(ent, LOC_ROCKET);
 			strcpy(s, it->pickup_name);
@@ -1282,7 +1282,6 @@ void Cmd_Use_f (edict_t *ent)
 			safe_cprintf (ent, PRINT_HIGH, "Unknown item: %s\n", s);
 			return;
 		}
-				
 	}
 	if (!it || (it && !it->use))
 	{
@@ -3225,7 +3224,7 @@ void Cmd_MOTD (edict_t *ent)
 	char motd[1000];
 	char line[100];
 
-	if (motd_file = fopen(GAMEVERSION "/motd.txt", "r") )
+	if ((motd_file = fopen(GAMEVERSION "/motd.txt", "r")) != NULL)
 	{
 		// we successfully opened the file "motd.txt"
 		if ( fgets(motd, 900, motd_file) )
@@ -3315,7 +3314,7 @@ void PrintCmds()
                 gi.dprintf(DEVELOPER_MSG_GAME, "%s has %d args.\n",tmp->command, tmp->numArgs);
         ptr = ptr->next;
     }
-	gi.dprintf(DEVELOPER_MSG_GAME, "%i\n",game.num_items);
+    gi.dprintf(DEVELOPER_MSG_GAME, "%i\n",game.num_items);
 }
 
 
@@ -3355,7 +3354,7 @@ g_cmds_t *FindCommand(char *cmd)
     int i, found;
     char nmspace[64], *ptr;
 
-        //we first need to find the namespace, if any
+    //we first need to find the namespace, if any
     nmspace[0] = '\0';
     ptr = cmd; i = found = 0;
     while (*ptr && i<32 && !found)
@@ -3390,12 +3389,12 @@ g_cmds_t *FindCommand(char *cmd)
         cmds = sets->commands;
 
         for (i=0;i<sets->numCmds;i++) {
-			if (!cmd || !cmds[i].command)
-				return NULL;
+            if (!cmd || !cmds[i].command)
+                return NULL;
 
             if(Q_stricmp(cmd,cmds[i].command) == 0)
                 return &(cmds[i]);
-		}
+        }
         sets = sets->next;
     }
     return NULL;

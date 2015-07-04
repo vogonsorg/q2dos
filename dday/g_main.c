@@ -306,9 +306,7 @@ void ClientEndServerFrames (void)
 			continue;
 		ClientEndServerFrame (ent);
 	}
-
 }
-
 
 
 /*        //faf:  from original q2 code
@@ -329,27 +327,25 @@ edict_t *CreateTargetChangeLevel(char *map)
 	return ent;
 }
 
-
-
 qboolean MapExists (char *map)
 {
 	FILE *check;
-   char filename[256];
+	char filename[256];
 
-   strcpy(filename, GAMEVERSION "/maps/");
-   strcat(filename, map);
-   strcat(filename, ".bsp");
+	strcpy(filename, GAMEVERSION "/maps/");
+	strcat(filename, map);
+	strcat(filename, ".bsp");
 
-   if (check = fopen(filename, "r") )
-   {
+	if ((check = fopen(filename, "r")) != NULL)
+	{
 		fclose (check);
 		return true;
-   }
+	}
 
 	strcpy(filename, "baseq2/maps/");
 	strcat(filename, map);
 	strcat(filename, ".bsp");
-	if (check = fopen(filename, "r") )
+	if ((check = fopen(filename, "r")) != NULL)
 	{
 		fclose (check);
 		return true;
@@ -359,14 +355,13 @@ qboolean MapExists (char *map)
 	strcat(filename, map);
 	strcat(filename, ".bsp.override");
 
-	if (check = fopen(filename, "r") )
-	{		
+	if ((check = fopen(filename, "r")) != NULL)
+	{
 		fclose (check);
 		return true;
 	}
 
 	return false;
-
 }
 
 
