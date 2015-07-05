@@ -135,7 +135,6 @@ void VGA_BankedBeginDirectRect (viddef_t *lvid, struct vmode_s *pcurrentmode,
 	int x, int y, byte *pbitmap, int width, int height);
 void VGA_BankedEndDirectRect (viddef_t *lvid, struct vmode_s *pcurrentmode,
 	int x, int y, int width, int height);
-void *VID_ExtraFarToLinear (void *ptr);
 qboolean VID_ExtraGetModeInfo(int modenum);
 //to make standalone
 void Sys_Error (char *error, ...);
@@ -147,6 +146,16 @@ void VID_AddBankedModes(void);
 
 /*
 ================
+VID_ExtraFarToLinear
+================
+*/
+static void *VID_ExtraFarToLinear (unsigned long addr)
+{
+	return real2ptr(((addr & 0xFFFF0000) >> 12) + (addr & 0xFFFF));
+}
+
+/*
+================
 VID_InitExtra
 ================
 */
@@ -155,16 +164,20 @@ void VID_InitExtra (void)
 	int		nummodes;
 	short		*pmodenums;
 	vbeinfoblock_t	*pinfoblock;
+	unsigned long	addr;
 	__dpmi_meminfo	phys_mem_info;
 
-	pinfoblock = dos_getmemory(sizeof(vbeinfoblock_t));
+	pinfoblock = (vbeinfoblock_t *) dos_getmemory(sizeof(vbeinfoblock_t));
 
 	if(!pinfoblock)
 	{
 		Sys_Error("pinfoblock NULL!");
 	}
 
-	*(long *)pinfoblock->VbeSignature = 'V' + ('B'<<8) + ('E'<<16) + ('2'<<24);
+	pinfoblock->VbeSignature[0] = 'V';
+	pinfoblock->VbeSignature[1] = 'B';
+	pinfoblock->VbeSignature[2] = 'E';
+	pinfoblock->VbeSignature[3] = '2';
 
 	// We always have mode 13 VGA
 	memset(vid_resolutions,0x0,sizeof(vid_resolutions));
@@ -195,23 +208,32 @@ void VID_InitExtra (void)
 
 	if (regs.x.ax != 0x4f)
 	{
-		dos_freememory(pinfoblock); // FS: from HOT
+		dos_freememory(pinfoblock);
 		return;		// no VESA support
 	}
 
 	if (pinfoblock->VbeVersion[1] < 0x02)
 	{
-		dos_freememory(pinfoblock); // FS: from HOT
+		dos_freememory(pinfoblock);
 		return;		// not VESA 2.0 or greater
 	}
 
+	addr = ( (pinfoblock->OemStringPtr[0]      ) |
+		 (pinfoblock->OemStringPtr[1] <<  8) |
+		 (pinfoblock->OemStringPtr[2] << 16) |
+		 (pinfoblock->OemStringPtr[3] << 24));
 	Com_Printf ("VESA 2.0 compliant adapter:\n%s\n",
-				VID_ExtraFarToLinear (*(byte **)&pinfoblock->OemStringPtr[0]));
+			(char *) VID_ExtraFarToLinear(addr));
 
-	totalvidmem = *(unsigned short *)&pinfoblock->TotalMemory[0] << 16;
+	totalvidmem  = ( (pinfoblock->TotalMemory[0]     ) |
+			 (pinfoblock->TotalMemory[1] << 8) ) << 16;
+//	Com_Printf ("%dk video memory\n", totalvidmem >> 10);
 
-	pmodenums = (short *)
-			VID_ExtraFarToLinear (*(byte **)&pinfoblock->VideoModePtr[0]);
+	addr = ( (pinfoblock->VideoModePtr[0]      ) |
+		 (pinfoblock->VideoModePtr[1] <<  8) |
+		 (pinfoblock->VideoModePtr[2] << 16) |
+		 (pinfoblock->VideoModePtr[3] << 24));
+	pmodenums = (short *) VID_ExtraFarToLinear(addr);
 
 // find 8 bit modes until we either run out of space or run out of modes
 	nummodes = 0;
@@ -256,8 +278,7 @@ void VID_InitExtra (void)
 			vesa_modes[nummodes].width = modeinfo.width;
 			vesa_modes[nummodes].height = modeinfo.height;
 			vesa_modes[nummodes].aspect =
-					((float)modeinfo.height / (float)modeinfo.width) *
-					(320.0 / 240.0);
+					((float)modeinfo.height / (float)modeinfo.width) * (320.0 / 240.0);
 			vesa_modes[nummodes].rowbytes = modeinfo.bytes_per_scanline;
 			vesa_modes[nummodes].planar = 0;
 			vesa_modes[nummodes].pextradata = &vesa_extra[nummodes];
@@ -316,7 +337,7 @@ NextMode:
 		vesa_modes[nummodes-1].pnext = pvidmodes;
 		pvidmodes = &vesa_modes[0];
 		numvidmodes += nummodes;
-		ppal = dos_getmemory(256*4);
+		ppal = (byte *) dos_getmemory(256 * 4);
 	}
 
 	dos_freememory(pinfoblock);
@@ -370,20 +391,6 @@ void VID_AddBankedModes(void)
 	Com_sprintf(vid_resolutions[num_vid_resolutions].menuname, sizeof(vid_resolutions[num_vid_resolutions].menuname), "[VGA-B 1024x768]");
 	num_vid_resolutions++;
 }
-
-/*
-================
-VID_ExtraFarToLinear
-================
-*/
-void *VID_ExtraFarToLinear (void *ptr)
-{
-	int		temp;
-
-	temp = (int)ptr;
-	return real2ptr(((temp & 0xFFFF0000) >> 12) + (temp & 0xFFFF));
-}
-
 
 
 /*

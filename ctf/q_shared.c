@@ -1249,7 +1249,7 @@ void Com_sprintf (char *dest, int size, char *fmt, ...)
 	va_end (argptr);
 	if (len < 0)
 	{
-		Com_Printf ("Com_sprintf: overflow in temp buffer of size %i\n", sizeof(bigbuffer));
+		Com_Printf ("Com_sprintf: overflow in temp buffer of size %i\n", (int)sizeof(bigbuffer));
 	}
 	else if (len >= size)
 	{

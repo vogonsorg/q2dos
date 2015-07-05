@@ -762,7 +762,7 @@ void	R_InitImages (void)
 
 	if ( !sw_state.d_16to8table )
 	{
-		Sys_Error( ERR_FATAL, "Couldn't load pics/16to8.dat");
+		ri.Sys_Error( ERR_FATAL, "Couldn't load pics/16to8.dat");
 	}
 }
 
