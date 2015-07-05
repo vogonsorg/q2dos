@@ -4,6 +4,10 @@
 #include "../ref_soft/r_local.h"
 #include "vid_dos.h"
 
+// FS: For planar modes
+#include "vregset.h"
+#include "vgamodes.h"
+
 int currentvideomode = 0;
 
 void	SWimp_BeginFrame( float camera_separation )
@@ -25,15 +29,22 @@ void	SWimp_EndFrame (void)
 			int todo=vid_resolutions[currentvideomode].height*vid_resolutions[currentvideomode].width;
 			int copy_size;
 			__dpmi_regs r;
-
 			while (todo>0)
 			{
-#if 0 // FS: I thought this was bank swapping but it's not
+#if 0
 				r.x.ax = 0x4F07;
 				r.x.bx = 0;
 				r.x.cx = bank_number % vid_resolutions[currentvideomode].width;
 				r.x.dx = bank_number / vid_resolutions[currentvideomode].width;
 				__dpmi_int(0x10, &r);
+#endif
+
+#if 0 // FS: I don't know what I'm doing
+		// select the correct plane for reading and writing
+			outportb (SC_INDEX, MAP_MASK);
+			outportb (SC_DATA, 1 << bank_number);
+			outportb (GC_INDEX, READ_MAP);
+			outportb (GC_DATA, bank_number);
 #endif
 				r.x.ax = 0x4F05;
 				r.x.bx = 0;
@@ -42,8 +53,6 @@ void	SWimp_EndFrame (void)
 
 				if (todo>65536) // FS: 320x240
 				{
-					// FS: FIXME, is this right?  According to http://www.neuraldk.org/document.php?djgppGraphics it is but we can't write 320x240 to 0xA0000 I thought?
-					//     If I try 64000 then bank swapping needs to happen
 					copy_size=65536;
 				}
 				else
@@ -156,7 +165,8 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 			ri.Con_Printf(PRINT_ALL, "\x02Setting banked mode!\n");
 			r.x.ax = 0x4F02;
 			r.x.bx = vid_resolutions[mode].vesa_mode;
-}
+//			VideoRegisterSet(vrs320x240x256planar); // FS: Not used yet.  TODO -- Check for vid_resolutions[mode].planar, etc, etc.
+		}
 
 		__dpmi_int(0x10, &r);
 	}

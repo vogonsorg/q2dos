@@ -494,6 +494,7 @@ vextra_t	extra320x240x256planar = {
 // base mode descriptors, in ascending order of number of pixels
 //
 
+#if 0
 vmode_t	vgavidmodes[] = {
 {
 	NULL,
@@ -517,3 +518,4 @@ vmode_t	vgavidmodes[] = {
 	VGA_SetPalette, VGA_BeginDirectRect, VGA_EndDirectRect
 },
 };
+#endif

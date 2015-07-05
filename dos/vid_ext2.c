@@ -44,7 +44,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "dosisms.h"
 
 vid_resolutions_t vid_resolutions[MAX_RESOLUTIONS];
-int num_vid_resolutions=1;	//we always have mode 13
+int num_vid_resolutions=0;	//we always have mode 13
 
 #define MODE_SUPPORTED_IN_HW		0x0001
 #define COLOR_MODE			0x0008
@@ -140,6 +140,9 @@ qboolean VID_ExtraGetModeInfo(int modenum);
 //to make standalone
 void Sys_Error (char *error, ...);
 
+// FS: New stuff for planar/banked modes
+void VID_AddPlanarModes(void);
+void VID_AddBankedModes(void);
 
 
 /*
@@ -166,17 +169,21 @@ void VID_InitExtra (void)
 	// We always have mode 13 VGA
 	memset(vid_resolutions,0x0,sizeof(vid_resolutions));
 
-	vid_resolutions[0].mode=0;
-	vid_resolutions[0].vesa_mode=-1;
-	vid_resolutions[0].height=200;
-	vid_resolutions[0].width=320;
-	vid_resolutions[0].isLFB=false;
-	vid_resolutions[0].isBanked=false;
+	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
+	vid_resolutions[num_vid_resolutions].vesa_mode=-1;
+	vid_resolutions[num_vid_resolutions].height=200;
+	vid_resolutions[num_vid_resolutions].width=320;
+	vid_resolutions[num_vid_resolutions].isLFB=false;
+	vid_resolutions[num_vid_resolutions].isBanked=false;
 
-	Com_sprintf(vid_resolutions[0].menuname, sizeof(vid_resolutions[0].menuname), "[VGA 320x200]");
+	Com_sprintf(vid_resolutions[num_vid_resolutions].menuname, sizeof(vid_resolutions[num_vid_resolutions].menuname), "[VGA 320x200]");
+	num_vid_resolutions++;
+
+	VID_AddPlanarModes(); // FS
 
 	if(COM_CheckParm("-vgaonly"))
 	{
+		VID_AddBankedModes(); // FS
 		return;	//test for VGA only
 	}
 
@@ -313,8 +320,57 @@ NextMode:
 	}
 
 	dos_freememory(pinfoblock);
+	VID_AddBankedModes(); // FS: Added banked modes at the end.
 }
 
+void VID_AddPlanarModes(void)
+{
+#if 0
+	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
+	vid_resolutions[num_vid_resolutions].vesa_mode=-1;
+	vid_resolutions[num_vid_resolutions].height=240;
+	vid_resolutions[num_vid_resolutions].width = (320 + 0x1F) & ~0x1F;
+//	vid_resolutions[num_vid_resolutions].width=320;
+	vid_resolutions[num_vid_resolutions].isLFB=false;
+	vid_resolutions[num_vid_resolutions].isBanked=true;
+
+	Com_sprintf(vid_resolutions[1].menuname, sizeof(vid_resolutions[1].menuname), "[VGA-X 320x240]");
+	num_vid_resolutions++;
+#endif
+}
+
+void VID_AddBankedModes(void)
+{
+	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
+	vid_resolutions[num_vid_resolutions].vesa_mode=0x0101;
+	vid_resolutions[num_vid_resolutions].height=480;
+	vid_resolutions[num_vid_resolutions].width=640;
+	vid_resolutions[num_vid_resolutions].isLFB=false;
+	vid_resolutions[num_vid_resolutions].isBanked=true;
+
+	Com_sprintf(vid_resolutions[num_vid_resolutions].menuname, sizeof(vid_resolutions[num_vid_resolutions].menuname), "[VGA-B 640x480]");
+	num_vid_resolutions++;
+
+	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
+	vid_resolutions[num_vid_resolutions].vesa_mode=0x0103;
+	vid_resolutions[num_vid_resolutions].height=600;
+	vid_resolutions[num_vid_resolutions].width = 800;
+	vid_resolutions[num_vid_resolutions].isLFB=false;
+	vid_resolutions[num_vid_resolutions].isBanked=true;
+
+	Com_sprintf(vid_resolutions[num_vid_resolutions].menuname, sizeof(vid_resolutions[num_vid_resolutions].menuname), "[VGA-B 800x600]");
+	num_vid_resolutions++;
+
+	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
+	vid_resolutions[num_vid_resolutions].vesa_mode=0x0105;
+	vid_resolutions[num_vid_resolutions].height=768;
+	vid_resolutions[num_vid_resolutions].width = 1024;
+	vid_resolutions[num_vid_resolutions].isLFB=false;
+	vid_resolutions[num_vid_resolutions].isBanked=true;
+
+	Com_sprintf(vid_resolutions[num_vid_resolutions].menuname, sizeof(vid_resolutions[num_vid_resolutions].menuname), "[VGA-B 1024x768]");
+	num_vid_resolutions++;
+}
 
 /*
 ================
