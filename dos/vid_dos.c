@@ -241,9 +241,15 @@ void	VID_Init (void)
     memset(vid_resolutions,0x0,sizeof(vid_resolutions));
     VID_InitExtra(); //probe VESA
 
+#if 0
     currentvideomode=0; //hope this means start in mode 0
     viddef.width = 320;
     viddef.height = 200; //was originally 240
+#else
+    currentvideomode=0;
+    viddef.width = 320;
+    viddef.height = 240;
+#endif
 
     ri.Cmd_AddCommand = Cmd_AddCommand;
     ri.Cmd_RemoveCommand = Cmd_RemoveCommand;

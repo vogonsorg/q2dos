@@ -182,6 +182,8 @@ void VID_InitExtra (void)
 	// We always have mode 13 VGA
 	memset(vid_resolutions,0x0,sizeof(vid_resolutions));
 
+	VID_AddPlanarModes(); // FS
+
 	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
 	vid_resolutions[num_vid_resolutions].vesa_mode=-1;
 	vid_resolutions[num_vid_resolutions].height=200;
@@ -191,8 +193,6 @@ void VID_InitExtra (void)
 
 	Com_sprintf(vid_resolutions[num_vid_resolutions].menuname, sizeof(vid_resolutions[num_vid_resolutions].menuname), "[VGA 320x200]");
 	num_vid_resolutions++;
-
-	VID_AddPlanarModes(); // FS
 
 	if(COM_CheckParm("-vgaonly"))
 	{
@@ -355,7 +355,7 @@ void VID_AddPlanarModes(void)
 	vid_resolutions[num_vid_resolutions].isBanked=false;
 	vid_resolutions[num_vid_resolutions].isPlanar=true;
 
-	Com_sprintf(vid_resolutions[1].menuname, sizeof(vid_resolutions[1].menuname), "[VGA-X 320x240]");
+	Com_sprintf(vid_resolutions[num_vid_resolutions].menuname, sizeof(vid_resolutions[num_vid_resolutions].menuname), "[VGA-X 320x240]");
 	num_vid_resolutions++;
 }
 

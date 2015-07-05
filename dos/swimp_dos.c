@@ -97,6 +97,8 @@ void	SWimp_Shutdown( void )
 
 rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
 {
+	__dpmi_regs r;
+
 	Com_Printf("SWimp_SetMode %d fullscreen %d\n",mode,fullscreen); 
 
 	if ( !ri.Vid_GetModeInfo( pwidth, pheight, mode ) )
@@ -110,21 +112,19 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 
 	currentvideomode=mode;
 
+	vid.height=vid_resolutions[mode].height;
+	vid.width=vid_resolutions[mode].width;
+	vid.rowbytes=vid.width;
+
+	if(vid.buffer)
+	{
+		free(vid.buffer);
+	}
+
+	vid.buffer=malloc(vid.width*vid.height*1);
+
 	if(!vid_resolutions[mode].isLFB)
 	{
-		__dpmi_regs r;
-
-		vid.height=vid_resolutions[mode].height;
-		vid.width=vid_resolutions[mode].width;
-		vid.rowbytes=vid.width;
-
-		if(vid.buffer)
-		{
-			free(vid.buffer);
-		}
-
-		vid.buffer=malloc(vid.width*vid.height*1);
-
 		if(!vid_resolutions[mode].isBanked && !vid_resolutions[mode].isPlanar)
 		{	//mode 13
 			r.x.ax = 0x13;
@@ -165,26 +165,14 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 	}
 	else
 	{
-		vid.height=vid_resolutions[mode].height;
-		vid.width=vid_resolutions[mode].width;
-		vid.rowbytes=vid.width;
+	    //VESA LFB
+		r.x.ax = 0x4F02;
+		r.x.bx = vid_resolutions[mode].vesa_mode+0x4000; //0x4000 for Linear access
+		__dpmi_int(0x10, &r);
 
-		if(vid.buffer)
+		if (r.h.ah)
 		{
-			free(vid.buffer);
-		}
-
-		vid.buffer=malloc(vid.width*vid.height*1);
-		{    //VESA 
-			__dpmi_regs r;
-			r.x.ax = 0x4F02;
-			r.x.bx = vid_resolutions[mode].vesa_mode+0x4000; //0x4000 for Linear access
-			__dpmi_int(0x10, &r);
-
-			if (r.h.ah)
-			{
-				Sys_Error("Error setting VESA LFB mode 0x%0x",vid_resolutions[mode].vesa_mode);
-			}
+			Sys_Error("Error setting VESA LFB mode 0x%0x",vid_resolutions[mode].vesa_mode);
 		}
 	}
 
