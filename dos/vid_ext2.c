@@ -329,8 +329,8 @@ void VID_AddPlanarModes(void)
 	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
 	vid_resolutions[num_vid_resolutions].vesa_mode=-1;
 	vid_resolutions[num_vid_resolutions].height=240;
-	vid_resolutions[num_vid_resolutions].width = (320 + 0x1F) & ~0x1F;
-//	vid_resolutions[num_vid_resolutions].width=320;
+//	vid_resolutions[num_vid_resolutions].width = (320 + 0x1F) & ~0x1F;
+	vid_resolutions[num_vid_resolutions].width=320;
 	vid_resolutions[num_vid_resolutions].isLFB=false;
 	vid_resolutions[num_vid_resolutions].isBanked=false;
 	vid_resolutions[num_vid_resolutions].isPlanar=true;

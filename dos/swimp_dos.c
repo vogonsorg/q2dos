@@ -119,9 +119,8 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 
 		vid.buffer=malloc(vid.width*vid.height*1);
 
-		if(!vid_resolutions[mode].isBanked)
+		if(!vid_resolutions[mode].isBanked && !vid_resolutions[mode].isPlanar)
 		{	//mode 13
-
 			r.x.ax = 0x13;
 		}
 		else
@@ -132,8 +131,13 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 
 			if(vid_resolutions[mode].isPlanar)
 			{
-//				VideoRegisterSet(vrs320x240x256planar);
+				ri.Con_Printf(PRINT_ALL, "\x02Setting VGA-X mode!\n");
+				// enable all planes for writing
+				outportb (SC_INDEX, MAP_MASK);
+				outportb (SC_DATA, 0x0F);
+				VideoRegisterSet(vrs320x240x256planar);
 			}
+
 		}
 
 		__dpmi_int(0x10, &r);
@@ -219,54 +223,37 @@ void VID_DrawBanked(void)
 
 void VID_DrawPlanar(void)
 {
+ // FS: All wrong!! :(
 #if 0
 	int j,plane;
 	int screen_offset;
 	int bitmap_offset;
 
-	/* Setup VGA Registers */
-
-	/* turn off chain-4 mode */
-	outportb (0x03c4, 0x04);
-	outportb (0x03c5, 0x06);
-
-	/* TODO: Insert code to clear the screen here.
-	   (the BIOS only sets every fourth byte
-	   to zero -- the rest needs to be set to
-	   zero, too) */
-
-	/* turn off long mode */
-	outportb (0x03d4, 0x14);
-	outportb (0x03d5, 0x00);
-	/* turn on byte mode */
-	outportb (0x03d4, 0x17);
-	outportb (0x03d5, 0xe3);
-
 	for(plane=0; plane<4; plane++)
 	{
-#if 0 // FS: I don't know what I'm doing
 		// select the correct plane for reading and writing
 		outportb (SC_INDEX, MAP_MASK);
-		outportb (SC_DATA, 1 << ????);
+		outportb (SC_DATA, 1 << plane);
 		outportb (GC_INDEX, READ_MAP);
-		outportb (GC_DATA, ????);
-#endif
+		outportb (GC_DATA, plane);
 
+#if 0
    		outportb (0x03c4, 0x02);          /* select plane */
 //		outp(SC_DATA,  1 << ((plane+x)&3) );
 		outportb (0x03c5,  1 << ((plane)&3) );
-		bitmap_offset=0;
-		//screen_offset = ((dword)320+plane) >> 2;
-		screen_offset = (320+plane) >> 2;
+#endif
 
-		for(j=0; j<240; j++)
+		bitmap_offset=0;
+//		screen_offset = ((dword)y*screen_width+x+plane) >> 2;
+		screen_offset = ((vid_resolutions[currentvideomode].width / 4)+plane);// >> 2;
+
+		for(j=0; j<(vid_resolutions[currentvideomode].height / 4); j++)
 		{
-//			memcpy(&VGA[screen_offset], &bmp->data[plane][bitmap_offset], (bmp->width >> 2));
-			dosmemput(vid.buffer, bitmap_offset, 320 >> 2);
+			dosmemput(vid.buffer, screen_offset, 0xA0000);
 //			bitmap_offset+=bmp->width>>2;
 //			screen_offset+=screen_width>>2;
-			bitmap_offset+=320>>2;
-			screen_offset+=240>>2;
+			bitmap_offset+=(vid_resolutions[currentvideomode].width / 4);//>>2;
+			screen_offset+=(vid_resolutions[currentvideomode].width / 4);//>>2;
 		}
 	}
 #else
