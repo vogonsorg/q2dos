@@ -234,8 +234,8 @@ InitGame(void)
 	/* items */
 	InitItems ();
 
-	Com_sprintf (game.helpmessage1, sizeof(game.helpmessage1), "");
-	Com_sprintf (game.helpmessage2, sizeof(game.helpmessage2), "");
+	game.helpmessage1[0] = 0;
+	game.helpmessage2[0] = 0;
 
 	/* initialize all entities for this game */
 	game.maxentities = maxentities->value;
@@ -632,7 +632,7 @@ ReadField(FILE *f, field_t *field, byte *base)
 				if (len > sizeof(funcStr))
 				{
 					gi.error ("ReadField: function name is longer than buffer (%i chars)",
-							sizeof(funcStr));
+							(int)sizeof(funcStr));
 				}
 
 				fread (funcStr, len, 1, f);
@@ -656,7 +656,7 @@ ReadField(FILE *f, field_t *field, byte *base)
 				if (len > sizeof(funcStr))
 				{
 					gi.error ("ReadField: mmove name is longer than buffer (%i chars)",
-						   	sizeof(funcStr));
+							(int)sizeof(funcStr));
 				}
 
 				fread (funcStr, len, 1, f);

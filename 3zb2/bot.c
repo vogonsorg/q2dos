@@ -411,7 +411,7 @@ void bInsult(edict_t *bot, edict_t *loser) {
  			else if (random() < .3)
  				gi.bprintf(PRINT_CHAT, "%s: I...I killed %s? I...don't remember... it all happened so fast!\n", bclient->pers.netname, lclient->pers.netname);
  			else if (random() < .4)
- 				gi.bprintf(PRINT_CHAT, "%s: Only pussies on this server!\n", bclient->pers.netname, lclient->pers.netname);
+ 				gi.bprintf(PRINT_CHAT, "%s: Only pussies on this server!\n", bclient->pers.netname);
  			else if (random() < .5)
  				gi.bprintf(PRINT_CHAT, "%s: Sure, I'm losing by a ton, but does that mean I suck? Probably.\n", bclient->pers.netname);
  			else
@@ -444,7 +444,7 @@ void bInsult(edict_t *bot, edict_t *loser) {
  			else if (random() < .5)
  				gi.bprintf(PRINT_CHAT, "%s: Uh oh... BRB, I have to clean this %s off my shirt before it sets in.\n", bclient->pers.netname, lclient->pers.netname);
  			else
- 				gi.bprintf(PRINT_CHAT, "%s: hiiiiiihaaaaaa\n", bclient->pers.netname, lclient->pers.netname); 
+ 				gi.bprintf(PRINT_CHAT, "%s: hiiiiiihaaaaaa\n", bclient->pers.netname);
 		}
  		else {
  			if (random() < .1)
@@ -474,7 +474,7 @@ void bInsult(edict_t *bot, edict_t *loser) {
  			else if (random() < .5)
  				gi.bprintf(PRINT_CHAT, "%s: Hey %s, are you letting your mom play again?\n", bclient->pers.netname, lclient->pers.netname);
  			else
- 				gi.bprintf(PRINT_CHAT, "%s: You do know there's an autorun option, don't you?\n", bclient->pers.netname, lclient->pers.netname); 
+ 				gi.bprintf(PRINT_CHAT, "%s: You do know there's an autorun option, don't you?\n", bclient->pers.netname);
 		}
  	else if (bclient->resp.score > lclient->resp.score + 5) {
  		if (random() < .1)
@@ -501,7 +501,7 @@ void bInsult(edict_t *bot, edict_t *loser) {
  		else if (random() < .5)
  			gi.bprintf(PRINT_CHAT, "%s: Better get that taken care of, %s. It could get infected.\n", bclient->pers.netname, lclient->pers.netname);
  		else
- 			gi.bprintf(PRINT_CHAT, "%s: Don't ya just love it?\n", bclient->pers.netname, lclient->pers.netname); }
+ 			gi.bprintf(PRINT_CHAT, "%s: Don't ya just love it?\n", bclient->pers.netname); }
  	}
  	else {
  		if (random() < .1)

@@ -366,7 +366,7 @@ qboolean ACEND_FollowPath(edict_t *self)
 			// Failed to find a path
 			if( debug_mode )
 				safe_bprintf(PRINT_HIGH,"%s: Target at(%i) - No Path \n",
-					self->client->pers.netname, self->goal_node, self->next_node);
+						self->client->pers.netname, self->goal_node);
 			return false;
 		}
 //		return true;

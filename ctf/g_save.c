@@ -141,7 +141,7 @@ void
 InitGame(void)
 {
 	gi.dprintf(DEVELOPER_MSG_GAME, "Game is starting up.\n");
-	gi.dprintf(DEVELOPER_MSG_GAME, "Game is ctf built on %s.\n", GAMEVERSION, __DATE__);
+	gi.dprintf(DEVELOPER_MSG_GAME, "Game is %s built on %s.\n", GAMEVERSION, __DATE__);
 
 	gun_x = gi.cvar("gun_x", "0", 0);
 	gun_y = gi.cvar("gun_y", "0", 0);
@@ -203,8 +203,8 @@ InitGame(void)
 	/* items */
 	InitItems();
 
-	Com_sprintf(game.helpmessage1, sizeof(game.helpmessage1), "");
-	Com_sprintf(game.helpmessage2, sizeof(game.helpmessage2), "");
+	game.helpmessage1[0] = 0;
+	game.helpmessage2[0] = 0;
 
 	/* initialize all entities for this game */
 	game.maxentities = maxentities->value;

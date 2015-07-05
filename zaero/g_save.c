@@ -232,8 +232,8 @@ InitGame(void)
 	// items
 	InitItems ();
 
-	Com_sprintf (game.helpmessage1, sizeof(game.helpmessage1), "");
-	Com_sprintf (game.helpmessage2, sizeof(game.helpmessage2), "");
+	game.helpmessage1[0] = 0;
+	game.helpmessage2[0] = 0;
 
 	// initialize all entities for this game
 	game.maxentities = maxentities->value;
@@ -436,7 +436,7 @@ WriteField1(FILE *f, field_t *field, byte *base)
 
 				if (!func)
 				{
-					gi.error ("WriteField1: function %s not in list, can't save game", p);
+					gi.error ("WriteField1: function not in list, can't save game");
 				}
 				
 				len = strlen(func->funcStr)+1;
@@ -503,7 +503,7 @@ WriteField2(FILE *f, field_t *field, byte *base)
 				
 				if (!func)
 				{
-					gi.error ("WriteField2: function %s not in list, can't save game", p);
+					gi.error ("WriteField2: function not in list, can't save game");
 				}
 				
 				len = strlen(func->funcStr)+1;
@@ -630,7 +630,7 @@ ReadField(FILE *f, field_t *field, byte *base)
 				if (len > sizeof(funcStr))
 				{
 					gi.error ("ReadField: function name is longer than buffer (%i chars)",
-							sizeof(funcStr));
+							(int)sizeof(funcStr));
 				}
 
 				fread (funcStr, len, 1, f);
@@ -654,7 +654,7 @@ ReadField(FILE *f, field_t *field, byte *base)
 				if (len > sizeof(funcStr))
 				{
 					gi.error ("ReadField: mmove name is longer than buffer (%i chars)",
-						   	sizeof(funcStr));
+							(int)sizeof(funcStr));
 				}
 
 				fread (funcStr, len, 1, f);
