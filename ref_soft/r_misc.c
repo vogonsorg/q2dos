@@ -132,7 +132,7 @@ void R_PrintTimes (void)
 
 	ms = r_time2 - r_time1;
 	
-	ri.Con_Printf (PRINT_ALL,"%5d ms %3d/%3d/%3d poly %3d surf\n",
+	ri.Con_Printf (PRINT_ALL,"%5.0f ms %3d/%3d/%3d poly %3d surf\n",
 				ms, c_faceclip, r_polycount, r_drawnpolycount, c_surf);
 	c_surf = 0;
 }
@@ -157,7 +157,7 @@ void R_PrintDSpeeds (void)
 	de_time = (de_time2 - de_time1);
 	ms = (r_time2 - r_time1);
 
-	ri.Con_Printf (PRINT_ALL,"%3i %2ip %2iw %2ib %2is %2ie %2ia\n",
+	ri.Con_Printf (PRINT_ALL,"%3.0f %2.0fp %2.0fw %2.0fb %2.0fs %2.0fe %2.0fa\n",
 				ms, dp_time, rw_time, db_time, se_time, de_time, da_time);
 }
 
