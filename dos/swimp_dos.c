@@ -13,6 +13,7 @@ int currentvideomode = 0;
 
 void VID_DrawBanked(void);
 void VID_DrawPlanar(void);
+void VGA_UpdatePlanarScreen (void *srcbuffer);
 
 void	SWimp_BeginFrame( float camera_separation )
 {
@@ -35,7 +36,7 @@ void	SWimp_EndFrame (void)
 			}
 			else
 			{
-				VID_DrawPlanar();
+				VGA_UpdatePlanarScreen(vid.buffer); // FS: Abrashes code
 			}
 		}
 	}
@@ -126,17 +127,32 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 		}
 		else
 		{
-			ri.Con_Printf(PRINT_ALL, "\x02Setting banked mode!\n");
+			if(vid_resolutions[mode].isBanked)
+			{
+				ri.Con_Printf(PRINT_ALL, "\x02Setting banked mode!\n");
+			}
+			else
+			{
+				r.x.ax = 0x13;
+				__dpmi_int(0x10, &r);
+				ri.Con_Printf(PRINT_ALL, "\x02Setting VGA-X mode!\n");
+			}
+
 			r.x.ax = 0x4F02;
 			r.x.bx = vid_resolutions[mode].vesa_mode;
 
 			if(vid_resolutions[mode].isPlanar)
 			{
-				ri.Con_Printf(PRINT_ALL, "\x02Setting VGA-X mode!\n");
 				// enable all planes for writing
 				outportb (SC_INDEX, MAP_MASK);
 				outportb (SC_DATA, 0x0F);
 				VideoRegisterSet(vrs320x240x256planar);
+				VGA_pagebase = vid_resolutions[mode].planarAddress;
+				VGA_rowbytes = vid_resolutions[mode].width / 4;
+				VGA_bufferrowbytes = vid.rowbytes;
+				VGA_width = vid.width;
+				VGA_height = vid.height;
+				
 			}
 
 		}
@@ -220,78 +236,4 @@ void VID_DrawBanked(void)
 	r.x.bx = 0;
 	r.x.dx = 0;
 	__dpmi_int(0x10, &r);
-}
-
-void VID_DrawPlanar(void)
-{
- // FS: All wrong!! :(
-#if 0
-/*
-	int j,plane;
-	int screen_offset;
-	int bitmap_offset;
-
-	for(plane=0; plane<4; plane++)
-	{
-		// select the correct plane for reading and writing
-		outportb (SC_INDEX, MAP_MASK);
-		outportb (SC_DATA, 1 << plane);
-		outportb (GC_INDEX, READ_MAP);
-		outportb (GC_DATA, plane);
-
-		bitmap_offset=0;
-//		screen_offset = ((dword)y*screen_width+x+plane) >> 2;
-		screen_offset = ((vid_resolutions[currentvideomode].width)+plane) >> 2;
-
-		for(j=0; j<(vid_resolutions[currentvideomode].height); j++)
-		{
-			dosmemput(&vid.buffer[bitmap_offset], screen_offset, 0xA0000 + screen_offset);
-//			bitmap_offset+=bmp->width>>2;
-//			screen_offset+=screen_width>>2;
-			bitmap_offset+=(vid_resolutions[currentvideomode].width / 4) >>2;
-			screen_offset+=(vid_resolutions[currentvideomode].width) >>2;
-		}
-	}
-*/
-	// FS: ID Version
-	int reps, repshift, plane, i, k, j, x, y, VGA_rowbytes;
-	float aspect = vid_resolutions[currentvideomode].width / vid_resolutions[currentvideomode].height;
-	x = 0;
-	y = 0;
-	VGA_rowbytes = vid_resolutions[currentvideomode].width / 4;
-
-	if (aspect > 1.5)
-	{
-		reps = 2;
-		repshift = 1;
-	}
-	else
-	{
-		reps = 1;
-		repshift = 0;
-	}
-
-	for (plane=0 ; plane<4 ; plane++)
-	{
-	// select the correct plane for reading and writing
-		outportb (SC_INDEX, MAP_MASK);
-		outportb (SC_DATA, 1 << plane);
-		outportb (GC_INDEX, READ_MAP);
-		outportb (GC_DATA, plane);
-
-		for (i=0 ; i<(vid_resolutions[currentvideomode].height << repshift) ; i += reps)
-		{
-			for (k=0 ; k<reps ; k++)
-			{
-				for (j=0 ; j<(vid_resolutions[currentvideomode].width >> 2) ; j++)
-				{
-					vid_resolutions[currentvideomode].planarAddress[(y + i + k) * VGA_rowbytes + (x>>2) + j] =
-							vid.buffer[(i >> repshift) * 24 + (j << 2) + plane];
-				}
-			}
-		}
-	}
-#else
-	Sys_Error("Planar mode set, but not supported!\n");
-#endif // FS: Where do we get VGA[screen_offset], bmp->data?  I assume bmp->width is screen_width or is this rowbytes?
 }

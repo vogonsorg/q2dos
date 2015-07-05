@@ -77,8 +77,8 @@ static vmode_t		vesa_modes[MAX_VESA_MODES] =
 static char			names[MAX_VESA_MODES][10];
 
 static vesa_extra_t	vesa_extra[MAX_VESA_MODES];
-
-
+int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes;
+byte	*VGA_pagebase;
 
 extern regs_t regs;
 
@@ -325,7 +325,7 @@ NextMode:
 
 void VID_AddPlanarModes(void)
 {
-#if 0
+#if 1
 	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
 	vid_resolutions[num_vid_resolutions].vesa_mode=-1;
 	vid_resolutions[num_vid_resolutions].height=240;
