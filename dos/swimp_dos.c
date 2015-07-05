@@ -12,7 +12,6 @@
 int currentvideomode = 0;
 
 void VID_DrawBanked(void);
-void VID_DrawPlanar(void);
 void VGA_UpdatePlanarScreen (void *srcbuffer);
 
 void	SWimp_BeginFrame( float camera_separation )
@@ -26,6 +25,7 @@ void	SWimp_EndFrame (void)
 	{
 		if(!(vid_resolutions[currentvideomode].isBanked) && !(vid_resolutions[currentvideomode].isPlanar))	// VGA mode 13
 		{
+			// FS: FIXME.  Someday get Abrash's VGA_UpdateLinearScreen working
 			dosmemput(vid.buffer,vid_resolutions[currentvideomode].height*vid_resolutions[currentvideomode].width,0xA0000);
 		}
 		else // FS: Credit to ggorts
@@ -36,12 +36,13 @@ void	SWimp_EndFrame (void)
 			}
 			else
 			{
-				VGA_UpdatePlanarScreen(vid.buffer); // FS: Abrashes code
+				VGA_UpdatePlanarScreen(vid.buffer); // FS: Abrash's code
 			}
 		}
 	}
 	else
 	{
+		// FS: FIXME.  Someday get Abrash's VGA_UpdateLinearScreen working
 		memcpy(vid_resolutions[currentvideomode].address, vid.buffer, (vid.height*vid.width));
 	}
 }
@@ -212,7 +213,7 @@ void VID_DrawBanked(void)
 
 		r.x.ax = 0x4F05;
 		r.x.bx = 0;
-		r.x.dx = bank_number; // FS: FIXME bank buffer need to be swapped!
+		r.x.dx = bank_number;
 		__dpmi_int(0x10, &r);
 
 		if (todo>65536) // FS: 320x240
@@ -230,7 +231,7 @@ void VID_DrawBanked(void)
 		vid.buffer+=copy_size;
 		bank_number++;
 	}
-	// FS: FIXME: I don't think the next line is the right thing to do?
+	// FS: FIXME: I don't think the next line is the right thing to do?  Should this be copied into a temporary buffer instead?
 	vid.buffer-=vid_resolutions[currentvideomode].height*vid_resolutions[currentvideomode].width; // FS: Move back to the beginning, this was the cause of the crash after a few frames
 	r.x.ax = 0x4f05;
 	r.x.bx = 0;

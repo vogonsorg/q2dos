@@ -4,7 +4,7 @@ By Neozeed, [HCI]Mara'akate, and sezero.
 
 What's required?
 * Pentium 1.  At least a 200MHz to play it at ~20-30fps.
-* 48MB RAM.  more for larger mods.
+* 48MB RAM.  More for larger mods.
 * LFN TSR.  Use the included DOSLFN.ZIP (can be loaded high with LH DLFN.COM)
 
 What works?
