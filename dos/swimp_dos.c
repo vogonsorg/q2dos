@@ -10,6 +10,9 @@
 
 int currentvideomode = 0;
 
+void VID_DrawBanked(void);
+void VID_DrawPlanar(void);
+
 void	SWimp_BeginFrame( float camera_separation )
 {
 }
@@ -19,59 +22,20 @@ void	SWimp_EndFrame (void)
 	//It's LFB only
 	if(!vid_resolutions[currentvideomode].isLFB)
 	{
-		if(!vid_resolutions[currentvideomode].isBanked)	// VGA mode 13
+		if(!(vid_resolutions[currentvideomode].isBanked) && !(vid_resolutions[currentvideomode].isPlanar))	// VGA mode 13
 		{
 			dosmemput(vid.buffer,vid_resolutions[currentvideomode].height*vid_resolutions[currentvideomode].width,0xA0000);
 		}
 		else // FS: Credit to ggorts
 		{
-			int bank_number=0;
-			int todo=vid_resolutions[currentvideomode].height*vid_resolutions[currentvideomode].width;
-			int copy_size;
-			__dpmi_regs r;
-			while (todo>0)
+			if(vid_resolutions[currentvideomode].isBanked)
 			{
-#if 0
-				r.x.ax = 0x4F07;
-				r.x.bx = 0;
-				r.x.cx = bank_number % vid_resolutions[currentvideomode].width;
-				r.x.dx = bank_number / vid_resolutions[currentvideomode].width;
-				__dpmi_int(0x10, &r);
-#endif
-
-#if 0 // FS: I don't know what I'm doing
-		// select the correct plane for reading and writing
-			outportb (SC_INDEX, MAP_MASK);
-			outportb (SC_DATA, 1 << bank_number);
-			outportb (GC_INDEX, READ_MAP);
-			outportb (GC_DATA, bank_number);
-#endif
-				r.x.ax = 0x4F05;
-				r.x.bx = 0;
-				r.x.dx = bank_number; // FS: FIXME bank buffer need to be swapped!
-				__dpmi_int(0x10, &r);
-
-				if (todo>65536) // FS: 320x240
-				{
-					copy_size=65536;
-				}
-				else
-				{
-					copy_size=todo;
-				}
-
-				dosmemput(vid.buffer, copy_size, 0xA0000);
-
-				todo-=copy_size;
-				vid.buffer+=copy_size;
-				bank_number++;
+				VID_DrawBanked();
 			}
-			// FS: FIXME: I don't think the next line is the right thing to do?
-			vid.buffer-=vid_resolutions[currentvideomode].height*vid_resolutions[currentvideomode].width; // FS: Move back to the beginning, this was the cause of the crash after a few frames
-			r.x.ax = 0x4f05;
-			r.x.bx = 0;
-			r.x.dx = 0;
-			__dpmi_int(0x10, &r);
+			else
+			{
+				VID_DrawPlanar();
+			}
 		}
 	}
 	else
@@ -165,7 +129,11 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 			ri.Con_Printf(PRINT_ALL, "\x02Setting banked mode!\n");
 			r.x.ax = 0x4F02;
 			r.x.bx = vid_resolutions[mode].vesa_mode;
-//			VideoRegisterSet(vrs320x240x256planar); // FS: Not used yet.  TODO -- Check for vid_resolutions[mode].planar, etc, etc.
+
+			if(vid_resolutions[mode].isPlanar)
+			{
+//				VideoRegisterSet(vrs320x240x256planar);
+			}
 		}
 
 		__dpmi_int(0x10, &r);
@@ -202,4 +170,105 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 
 void		SWimp_AppActivate( qboolean active )
 {
+}
+
+void VID_DrawBanked(void)
+{
+	int bank_number=0;
+	int todo=vid_resolutions[currentvideomode].height*vid_resolutions[currentvideomode].width;
+	int copy_size;
+	__dpmi_regs r;
+
+	while (todo>0)
+	{
+#if 0
+		r.x.ax = 0x4F07;
+		r.x.bx = 0;
+		r.x.cx = bank_number % vid_resolutions[currentvideomode].width;
+		r.x.dx = bank_number / vid_resolutions[currentvideomode].width;
+		__dpmi_int(0x10, &r);
+#endif
+
+#if 0 // FS: I don't know what I'm doing
+		// select the correct plane for reading and writing
+		outportb (SC_INDEX, MAP_MASK);
+		outportb (SC_DATA, 1 << bank_number);
+		outportb (GC_INDEX, READ_MAP);
+		outportb (GC_DATA, bank_number);
+#endif
+		r.x.ax = 0x4F05;
+		r.x.bx = 0;
+		r.x.dx = bank_number; // FS: FIXME bank buffer need to be swapped!
+		__dpmi_int(0x10, &r);
+
+		if (todo>65536) // FS: 320x240
+		{
+			copy_size=65536;
+		}
+		else
+		{
+			copy_size=todo;
+		}
+
+		dosmemput(vid.buffer, copy_size, 0xA0000);
+
+		todo-=copy_size;
+		vid.buffer+=copy_size;
+		bank_number++;
+	}
+	// FS: FIXME: I don't think the next line is the right thing to do?
+	vid.buffer-=vid_resolutions[currentvideomode].height*vid_resolutions[currentvideomode].width; // FS: Move back to the beginning, this was the cause of the crash after a few frames
+	r.x.ax = 0x4f05;
+	r.x.bx = 0;
+	r.x.dx = 0;
+	__dpmi_int(0x10, &r);
+}
+
+void VID_DrawPlanar(void)
+{
+#if 0
+	int j,plane;
+	int screen_offset;
+	int bitmap_offset;
+
+	/* Setup VGA Registers */
+
+	/* turn off chain-4 mode */
+	outportb (0x03c4, 0x04);
+	outportb (0x03c5, 0x06);
+
+	/* TODO: Insert code to clear the screen here.
+	   (the BIOS only sets every fourth byte
+	   to zero -- the rest needs to be set to
+	   zero, too) */
+
+	/* turn off long mode */
+	outportb (0x03d4, 0x14);
+	outportb (0x03d5, 0x00);
+	/* turn on byte mode */
+	outportb (0x03d4, 0x17);
+	outportb (0x03d5, 0xe3);
+
+	for(plane=0; plane<4; plane++)
+	{
+   		outportb (0x03c4, 0x02);          /* select plane */
+//		outp(SC_DATA,  1 << ((plane+x)&3) );
+		outportb (0x03c5,  1 << ((plane)&3) );
+		bitmap_offset=0;
+		//screen_offset = ((dword)320+plane) >> 2;
+		screen_offset = (320+plane) >> 2;
+
+		for(j=0; j<240; j++)
+		{
+//			memcpy(&VGA[screen_offset], &bmp->data[plane][bitmap_offset], (bmp->width >> 2));
+			dosmemput(vid.buffer, bitmap_offset, 320 >> 2);
+//			bitmap_offset+=bmp->width>>2;
+//			screen_offset+=screen_width>>2;
+			bitmap_offset+=320>>2;
+			screen_offset+=240>>2;
+		}
+	}
+#else
+	Sys_Error("Planar mode set, but not supported!\n");
+#endif // FS: Where do we get VGA[screen_offset], bmp->data?  I assume bmp->width is screen_width or is this rowbytes?
 }
