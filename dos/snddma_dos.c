@@ -2,6 +2,7 @@
 // snddma_null.c
 // all other sound mixing is portable
 
+#include <dos.h>
 #include "../client/client.h"
 #include "../client/snd_loc.h"
 #include "dosisms.h"

@@ -23,24 +23,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Author(s): Jayeson Lee-Steere
 //=============================================================================
 
-//#include "quakedef.h"
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <errno.h>
-#include <stdio.h>
-#include <dirent.h>
-#include <unistd.h>
-#include <sys/mman.h>
-#include <sys/time.h>
-#include <sys/nearptr.h>
-#include <dpmi.h>
-#include <conio.h>
-#include <bios.h>
-#include <crt0.h> // FS: Fake Mem Fix (QIP)
+#include <dos.h>
 #include "../client/client.h"
 #include "../client/snd_loc.h"
 #include "dosisms.h"
-
 
 //=============================================================================
 // Author(s): Jayeson Lee-Steere
@@ -85,10 +71,11 @@ static struct section_buffer section_buffers[NUM_SECTION_BUFFERS];
 static struct field_buffer field_buffers[NUM_FIELD_BUFFERS];
 byte	extVoices,extCodecVoices; // FS: GUS clicking sounds during map transitions and pauseing fix
 int	havegus; // FS
+
 //***************************************************************************
 // Internal routines
 //***************************************************************************
-static char toupper(char c)
+static char my_toupper(char c)
 {
 	if (c>='a' && c<='z')
 		c-=('a'-'A');
@@ -129,7 +116,7 @@ static int is_section(char *s,const char *name)
 	while (s[0]!=']' && s[0]!=13 && s[0]!=10 && s[0]!=0 && name[0]!=0)
 	{
 		if (!wild)
-			if (toupper(s[0])!=toupper(name[0]))
+			if (my_toupper(s[0])!=my_toupper(name[0]))
 				return(0);
 		s++;
 		if (!wild)
@@ -166,7 +153,7 @@ static int is_field(char *s,const char *name)
 	while (s[0]!='=' && s[0]!=13 && s[0]!=10 && s[0]!=0 && name[0]!=0)
 	{
 		if (!wild)
-			if (toupper(s[0])!=toupper(name[0]))
+			if (my_toupper(s[0])!=my_toupper(name[0]))
 				return(0);
 		s++;
 		if (!wild)

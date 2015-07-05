@@ -7,6 +7,7 @@
 #include <limits.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <dos.h> // FS: For detecting Windows NT
 #include <dir.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -15,10 +16,9 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <dpmi.h>
+#include <crt0.h> // FS: Fake Mem Fix (QIP)
 #include <sys/nearptr.h>
 #include <conio.h>
-#include <crt0.h> // FS: Fake Mem Fix (QIP)
-#include <dos.h> // FS: For detecting Windows NT
 
 int _crt0_startup_flags = _CRT0_FLAG_UNIX_SBRK; // FS: Fake Mem Fix (QIP)
 
@@ -467,7 +467,7 @@ void Sys_Error (char *error, ...)
 #if 0
 {	//we crash here so we can get a backtrace.  Yes it is ugly, and no this should never be in production!
 	int j,k;
-fflush(stdout);
+	fflush(stdout);
 	j=0;
 	k=5/j;	//divide by zero!
 }
