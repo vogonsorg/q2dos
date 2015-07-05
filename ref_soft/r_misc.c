@@ -91,8 +91,10 @@ void D_ViewChanged (void)
 	d_vrectx = r_refdef.vrect.x;
 	d_vrecty = r_refdef.vrect.y;
 	d_vrectright_particle = r_refdef.vrectright - d_pix_max;
+
 	d_vrectbottom_particle =
 			r_refdef.vrectbottom - d_pix_max;
+
 
 	for (i=0 ; i<vid.height; i++)
 	{
@@ -325,6 +327,7 @@ Guaranteed to be called before the first refresh
 void R_ViewChanged (vrect_t *vr)
 {
 	int		i;
+	float	screenAspect, pixelAspect; // FS: From Q1
 
 	r_refdef.vrect = *vr;
 
@@ -366,7 +369,21 @@ void R_ViewChanged (vrect_t *vr)
 
 	xOrigin = r_refdef.xOrigin;
 	yOrigin = r_refdef.yOrigin;
-	
+
+	if(r_newrefdef.width == 320.0f && r_newrefdef.height == 200.0f) // FS: Special hack for 320x200
+	{
+		pixelAspect = 0.9; //(float)r_newrefdef.width / (float)r_newrefdef.height;
+		screenAspect = r_refdef.vrect.width*pixelAspect /
+			r_refdef.vrect.height;
+
+		verticalFieldOfView = r_refdef.horizontalFieldOfView / screenAspect;
+	}
+	else
+	{
+		pixelAspect = 1.0f;
+		screenAspect = 1.0f;
+	}
+
 // values for perspective projection
 // if math were exact, the values would range from 0.5 to to range+0.5
 // hopefully they wll be in the 0.000001 to range+.999999 and truncate
@@ -384,11 +401,13 @@ void R_ViewChanged (vrect_t *vr)
 	aliasxscale = xscale * r_aliasuvscale;
 	xscaleinv = 1.0 / xscale;
 
-	yscale = xscale;
+//	yscale = xscale;
+	yscale = xscale * pixelAspect; // FS: From Q1
 	aliasyscale = yscale * r_aliasuvscale;
 	yscaleinv = 1.0 / yscale;
 	xscaleshrink = (r_refdef.vrect.width-6)/r_refdef.horizontalFieldOfView;
-	yscaleshrink = xscaleshrink;
+//	yscaleshrink = xscaleshrink;
+	yscaleshrink = xscaleshrink*pixelAspect; // FS: From Q1
 
 // left side clip
 	screenedge[0].normal[0] = -1.0 / (xOrigin*r_refdef.horizontalFieldOfView);
@@ -402,7 +421,7 @@ void R_ViewChanged (vrect_t *vr)
 	screenedge[1].normal[1] = 0;
 	screenedge[1].normal[2] = 1;
 	screenedge[1].type = PLANE_ANYZ;
-	
+
 // top side clip
 	screenedge[2].normal[0] = 0;
 	screenedge[2].normal[1] = -1.0 / (yOrigin*verticalFieldOfView);
