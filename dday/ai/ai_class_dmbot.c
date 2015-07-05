@@ -29,9 +29,10 @@ void AI_MoveToCampSpot(edict_t *self, usercmd_t *ucmd);
 //==========================================
 // Some CTF stuff
 //==========================================
+/*
 static gitem_t *redflag;
 static gitem_t *blueflag;
-
+*/
 
 //==========================================
 // BOT_DMclass_Move

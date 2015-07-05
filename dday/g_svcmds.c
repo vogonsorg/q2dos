@@ -318,7 +318,7 @@ void Update_Campaign_Info (void)
 	{
 		if (!strcmp (level.mapname,campaign_spots[i].bspname))
 		{
-			level.mapname,campaign_spots[i].owner=Last_Team_Winner;
+			campaign_spots[i].owner=Last_Team_Winner;
 			if (Last_Team_Winner == 0)
 				axisplatoons--;
 			else if (Last_Team_Winner == 1)

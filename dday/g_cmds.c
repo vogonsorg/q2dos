@@ -2328,7 +2328,7 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0, qboolean saved)
 		sprintf (teamname, "%s ",ent->client->resp.team_on->playermodel);
 	}
 	else
-		sprintf (teamname,"");
+		teamname[0] = 0;
 
 	if (saved)
 	{

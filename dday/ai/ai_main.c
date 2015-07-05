@@ -75,7 +75,7 @@ void Set_Up_CampSpots_For_Ents(void)
 		allset = false;
 		for (tm = 0; tm < 2; tm++)
 		{
-			nearest_distance = 99999999999;
+			nearest_distance = BIG_DISTANCE;
 			obj_camp = -1;
 			if (allset)
 				break;
@@ -324,7 +324,7 @@ int Closest_CMP_to_Ent (edict_t *self, edict_t *obj)
 	int obj_camp = -1;
 	
 
-	nearest_distance = 99999999999;
+	nearest_distance = BIG_DISTANCE;
 	for (j = 0; j<total_camp_spots; j++)
 	{
 		if (!camp_spots[j].type)
@@ -570,7 +570,7 @@ void AI_PickLongRangeGoal(edict_t *self)
 	// select camping spot
 	if (!self->ai->objective)
 	{
-		nearest_distance = 99999999999;
+		nearest_distance = BIG_DISTANCE;
 		randseed = (int)rand()%total_camp_spots;
 
 		//hacky stuff: if ai->camp_targ == -2, that means they want to find another camp spot,
@@ -1054,7 +1054,7 @@ void AI_Think (edict_t *self)
 				sprintf (teamname, "%s ",self->client->resp.team_on->playermodel);
 			}
 			else
-				sprintf (teamname,"");
+				teamname[0] = 0;
 
 			if (dedicated->value){
 				safe_cprintf(NULL, PRINT_HIGH, "%s", teamname);
