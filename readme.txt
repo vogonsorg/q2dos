@@ -8,7 +8,7 @@ What's required?
 * LFN TSR.  Use the included DOSLFN.ZIP (can be loaded high with LH DLFN.COM)
 
 What works?
-* VGA
+* VGA (320x200 and 320x240)
 * SVGA (Banked and LFB)
 * Mouse
 * Keyboard
@@ -28,8 +28,6 @@ What doesn't work:
 * Some models from Whale's WODX server can crash the software renderer.  I'm
   assuming they're custom player models as I tried replaying the same maps
   later and got no crashes.  Until I can spot it, be on the lookout.
-* Planar modes like 320x240 don't work.  320x240 in LFB and Banked is available
-  if your card reports it.
 
 Tips and other misc info:
 * Run /slist2 to get a gamespy list of active servers, or use the new browser
