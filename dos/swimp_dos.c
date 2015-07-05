@@ -7,6 +7,7 @@
 // FS: For planar modes
 #include "vregset.h"
 #include "vgamodes.h"
+#include "dosisms.h"
 
 int currentvideomode = 0;
 
@@ -225,6 +226,7 @@ void VID_DrawPlanar(void)
 {
  // FS: All wrong!! :(
 #if 0
+/*
 	int j,plane;
 	int screen_offset;
 	int bitmap_offset;
@@ -237,23 +239,56 @@ void VID_DrawPlanar(void)
 		outportb (GC_INDEX, READ_MAP);
 		outportb (GC_DATA, plane);
 
-#if 0
-   		outportb (0x03c4, 0x02);          /* select plane */
-//		outp(SC_DATA,  1 << ((plane+x)&3) );
-		outportb (0x03c5,  1 << ((plane)&3) );
-#endif
-
 		bitmap_offset=0;
 //		screen_offset = ((dword)y*screen_width+x+plane) >> 2;
-		screen_offset = ((vid_resolutions[currentvideomode].width / 4)+plane);// >> 2;
+		screen_offset = ((vid_resolutions[currentvideomode].width)+plane) >> 2;
 
-		for(j=0; j<(vid_resolutions[currentvideomode].height / 4); j++)
+		for(j=0; j<(vid_resolutions[currentvideomode].height); j++)
 		{
-			dosmemput(vid.buffer, screen_offset, 0xA0000);
+			dosmemput(&vid.buffer[bitmap_offset], screen_offset, 0xA0000 + screen_offset);
 //			bitmap_offset+=bmp->width>>2;
 //			screen_offset+=screen_width>>2;
-			bitmap_offset+=(vid_resolutions[currentvideomode].width / 4);//>>2;
-			screen_offset+=(vid_resolutions[currentvideomode].width / 4);//>>2;
+			bitmap_offset+=(vid_resolutions[currentvideomode].width / 4) >>2;
+			screen_offset+=(vid_resolutions[currentvideomode].width) >>2;
+		}
+	}
+*/
+	// FS: ID Version
+	int reps, repshift, plane, i, k, j, x, y, VGA_rowbytes;
+	float aspect = vid_resolutions[currentvideomode].width / vid_resolutions[currentvideomode].height;
+	x = 0;
+	y = 0;
+	VGA_rowbytes = vid_resolutions[currentvideomode].width / 4;
+
+	if (aspect > 1.5)
+	{
+		reps = 2;
+		repshift = 1;
+	}
+	else
+	{
+		reps = 1;
+		repshift = 0;
+	}
+
+	for (plane=0 ; plane<4 ; plane++)
+	{
+	// select the correct plane for reading and writing
+		outportb (SC_INDEX, MAP_MASK);
+		outportb (SC_DATA, 1 << plane);
+		outportb (GC_INDEX, READ_MAP);
+		outportb (GC_DATA, plane);
+
+		for (i=0 ; i<(vid_resolutions[currentvideomode].height << repshift) ; i += reps)
+		{
+			for (k=0 ; k<reps ; k++)
+			{
+				for (j=0 ; j<(vid_resolutions[currentvideomode].width >> 2) ; j++)
+				{
+					vid_resolutions[currentvideomode].planarAddress[(y + i + k) * VGA_rowbytes + (x>>2) + j] =
+							vid.buffer[(i >> repshift) * 24 + (j << 2) + plane];
+				}
+			}
 		}
 	}
 #else
