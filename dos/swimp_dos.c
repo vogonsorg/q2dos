@@ -133,9 +133,9 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 			}
 			else
 			{
-				r.x.ax = 0x13;
+				r.x.ax = 0x13; // FS: Make sure mode 13 is set again because if we go to high res mode and back it gets funky.
 				__dpmi_int(0x10, &r);
-				ri.Con_Printf(PRINT_ALL, "\x02Setting VGA-X mode!\n");
+				ri.Con_Printf(PRINT_DEVELOPER, "\x02Setting VGA-X mode!\n");
 			}
 
 			r.x.ax = 0x4F02;
@@ -146,7 +146,7 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 				// enable all planes for writing
 				outportb (SC_INDEX, MAP_MASK);
 				outportb (SC_DATA, 0x0F);
-				VideoRegisterSet(vrs320x240x256planar);
+				VideoRegisterSet(vrs320x240x256planar); // FS: 320x240x8 only.
 				VGA_pagebase = vid_resolutions[mode].planarAddress;
 				VGA_rowbytes = vid_resolutions[mode].width / 4;
 				VGA_bufferrowbytes = vid.rowbytes;

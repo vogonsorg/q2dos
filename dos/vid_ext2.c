@@ -325,11 +325,9 @@ NextMode:
 
 void VID_AddPlanarModes(void)
 {
-#if 1
 	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
 	vid_resolutions[num_vid_resolutions].vesa_mode=-1;
 	vid_resolutions[num_vid_resolutions].height=240;
-//	vid_resolutions[num_vid_resolutions].width = (320 + 0x1F) & ~0x1F;
 	vid_resolutions[num_vid_resolutions].planarAddress = (void *)real2ptr(0xA0000);
 	vid_resolutions[num_vid_resolutions].width=320;
 	vid_resolutions[num_vid_resolutions].isLFB=false;
@@ -338,7 +336,6 @@ void VID_AddPlanarModes(void)
 
 	Com_sprintf(vid_resolutions[1].menuname, sizeof(vid_resolutions[1].menuname), "[VGA-X 320x240]");
 	num_vid_resolutions++;
-#endif
 }
 
 void VID_AddBankedModes(void)
