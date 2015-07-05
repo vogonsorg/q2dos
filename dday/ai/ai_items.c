@@ -59,7 +59,7 @@ void AI_EnemyRemoved(edict_t *ent)
 	}
 
 	// Find the player
-	for(i=0;i<num_AIEnemies;i++)
+	for(i=0,pos=0;i<num_AIEnemies;i++)
 		if(ent == AIEnemies[i])
 			pos = i;
 

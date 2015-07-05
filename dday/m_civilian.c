@@ -356,6 +356,7 @@ void civilian_think (edict_t *self)
 		edict_t *e,*nearest;
 		float temp_distance,nearest_distance;
 
+		nearest = NULL; /* silence compiler */
 		nearest_distance = BIG_DISTANCE;
 		for (e = g_edicts; e < &g_edicts[globals.num_edicts]; e++)
 		{
@@ -363,11 +364,10 @@ void civilian_think (edict_t *self)
 				continue;
 			if (strcmp(e->classname, "info_reinforcements_start"))
 				continue;
-			
+
 			e->obj_owner = (self->obj_owner + 1)%2; //set to other team
 
 			VectorSubtract (e->s.origin, self->s.origin, dist);
-			
 			temp_distance = VectorLength(dist);
 //			gi.dprintf(DEVELOPER_MSG_GAME, "%f\n",temp_distance);
 
@@ -403,7 +403,6 @@ void civilian_think (edict_t *self)
 			self->monsterinfo.currentmove = &civilian_move_slow_run;
 		}
 		else if (VectorLength (v) <= 120)
-
 		{
 			self->goalentity = NULL;
 			self->monsterinfo.currentmove = &civilian_move_stand;
@@ -421,9 +420,8 @@ void civilian_think (edict_t *self)
 			e = g_edicts + 1 + i;
 			if (!e->inuse || !e->client || !e->client->resp.team_on || e->solid != SOLID_BBOX)
 				continue;
-			
+
 			VectorSubtract (e->s.origin, self->s.origin, dist);
-			
 			temp_distance = VectorLength(dist);
 			if (temp_distance < nearest_distance)
 			{

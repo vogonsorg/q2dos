@@ -1403,7 +1403,7 @@ void ShowCampaign (edict_t *ent)
 	if (!level.campaign)
 		return;
 
-	
+	curx = cury = 0; /* silence compiler */
 	for (i = 0; campaign_spots[i].bspname; i++)
 	{
 		if (!strcmp(level.mapname,campaign_spots[i].bspname))

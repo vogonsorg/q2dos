@@ -521,19 +521,13 @@ void EndDMLevel (void)
 
 	char *nextmap;
 	edict_t		*ent;
-	
+
 	i = 0;
-
-
-
+	ent = NULL; /* silence compiler */
 	mapname = level.mapname;
-
-
-
 
 	if (level.campaign)
 	{
-
 		for (i=0; campaign_spots[i].bspname;i++)
 		{
 			if (!strcmp (level.mapname, campaign_spots[i].bspname))
@@ -563,10 +557,8 @@ void EndDMLevel (void)
 			}
 		}
 
-	WriteCampaignTxt();
-
+		WriteCampaignTxt();
 	}
-
 
 //	if (last_maps_played[0])
 //	gi.dprintf(DEVELOPER_MSG_GAME, "xxx%s\n",last_maps_played[0]);
@@ -614,12 +606,8 @@ void EndDMLevel (void)
 				return;
 			}
 			else (Last_Team_Winner = (Last_Team_Winner+1)%2);
-
 		}
 	}
-
-		
-
 
 	// stay on same level flag
 	if ((int)dmflags->value & DF_SAME_LEVEL)
@@ -629,7 +617,6 @@ void EndDMLevel (void)
 		ent->map = mapname;
 		safe_bprintf (PRINT_HIGH, "Next map: %s \n", level.mapname);
 	}
-
 
 	// faf:  maplist code, based on baseq2 version
 	if (*sv_maplist->string) 
@@ -650,14 +637,10 @@ void EndDMLevel (void)
 				safe_bprintf (PRINT_HIGH, "Next map: %s \n", nextmap);
 				BeginIntermission (CreateTargetChangeLevel ("hill") );
 				return;
-
 			}
-
-
 		}
 		else
 		{
-
 			s = strdup(sv_maplist->string);
 			f = NULL;
 			t = strtok(s, seps);
@@ -736,10 +719,8 @@ void EndDMLevel (void)
 									return;
 								}
 							}
-
-
 						}
-					} 
+					}
 					else
 					{
 						if (MapExists(t))
@@ -763,9 +744,7 @@ void EndDMLevel (void)
 							}
 							else
 								gi.dprintf(DEVELOPER_MSG_GAME, "map doesn't exist for sv_maplist.\n");
-
 						}
-
 					}
 				}
 
@@ -782,7 +761,6 @@ void EndDMLevel (void)
 			// f becomes fb
 			// s becomes sb
 			// seps stays same
-
 
 			if (t == NULL) //faf:  happens when running a map thats not on maplist and map is to change
 			{
@@ -821,13 +799,7 @@ void EndDMLevel (void)
 		}
 	}
 
-
-
-
-
 //alternate maplist, not as good
-
-
 
 //	else if ((int)dmflags->value & DF_MAP_LIST)  // maplist active? 
 	else if ((int)dmflags->value & DF_MAP_LIST  && maplist.nummaps > 0)  // faf: fixes crash
@@ -846,7 +818,6 @@ void EndDMLevel (void)
 			i = 0; 
 		} // end switch 
 
-
 		maplist.currentmap = i; 
 		
 		ent = G_Spawn (); 
@@ -859,9 +830,7 @@ void EndDMLevel (void)
 			ent->map = level.mapname;
 
 		safe_bprintf (PRINT_HIGH, "Next map: %s \n", ent->map);
-
-	} 
-	
+	}
 	else if (Last_Team_Winner <= 1 && Last_Team_Winner > -1 && team_list[Last_Team_Winner] && team_list[Last_Team_Winner]->nextmap)
 	{
 		ent= G_Spawn();
@@ -901,7 +870,6 @@ void EndDMLevel (void)
 		}
 	}
 
-
 	BeginIntermission (ent);
 }
 
@@ -929,16 +897,15 @@ void CheckDMRules (void)
 	if (!deathmatch->value)
 		return;
 
-
 	//faf: ctb code
 	if (level.ctb_time)
 	{	
 		vec3_t		w; //faf
 		float		range;//faf
 		edict_t		*check;
-		edict_t		*usaflag;
-		edict_t     *grmflag;
-		edict_t     *e;
+		edict_t *usaflag = NULL;
+		edict_t *grmflag = NULL;
+		edict_t *e;
 
 		if (level.time == level.ctb_time)
 			gi.bprintf (PRINT_HIGH, "Timelimit hit!\n");
@@ -959,7 +926,6 @@ void CheckDMRules (void)
 				{
 					usaflag = check;
 				}
-
 			}
 
 			for (check = g_edicts; check < &g_edicts[globals.num_edicts]; check++)
@@ -973,7 +939,6 @@ void CheckDMRules (void)
 				}
 			}
 
-
 			if (grmflag && usaflag)
 			{
 				for (check = g_edicts; check < &g_edicts[globals.num_edicts]; check++)
@@ -984,10 +949,8 @@ void CheckDMRules (void)
 					if (check->deadflag)
 						continue;
 
-
 					if (!strcmp(check->classname, "briefcase"))
 					{
-
 						VectorSubtract (check->s.origin, usaflag->s.origin, w);
 						range = VectorLength (w);
 
@@ -1002,10 +965,8 @@ void CheckDMRules (void)
 						if (range < 40)  //briefcase is near grm flag at end of map
 						{
 							team_list[1]->score	+= 100;
-
 						}
 					}
-					
 				}
 				//see if anyone's carrying a briefcase near the flag
 				for (i=0 ; i < game.maxclients ; i++)
@@ -1030,25 +991,21 @@ void CheckDMRules (void)
 						if (range < 40)  //briefcase is near grm flag at end of map
 						{
 							team_list[1]->score	+= 100;
-
 						}
 					}
-				
 				}
 			}
 		}
 	}
 //faf end
 
-
 	for(i=0; i < MAX_TEAMS;i++) 
 	{
 		if (!team_list[i])
 			break;
-		
-		if (team_list[i]->time_to_win) 
-		{
 
+		if (team_list[i]->time_to_win)
+		{
 			delay = (team_list[i]->time_to_win - level.time);
 		
 		/*	gi.dprintf(DEVELOPER_MSG_GAME, "time_to_win [%i] = %f\n", i, team_list[i]->time_to_win);
@@ -1105,7 +1062,7 @@ void CheckDMRules (void)
 				axis_points_win = 0;
 			}
 		}
-			
+
 		if (allies_kills_win || allies_points_win ||
 			axis_kills_win || axis_points_win)
 		{
@@ -1123,7 +1080,7 @@ void CheckDMRules (void)
 					EndDMLevel ();
 					return;
 				}
-				else 
+				else
 				{
 					safe_bprintf( PRINT_HIGH, "Team %s is victorious (%i / %i points)!\n", 
 					team_list[0]->teamname, 
@@ -1149,7 +1106,7 @@ void CheckDMRules (void)
 					EndDMLevel ();
 					return;
 				}
-				else 
+				else
 				{
 				safe_bprintf( PRINT_HIGH, "Team %s is victorious (%i / %i points)!\n", 
 					team_list[1]->teamname, 
@@ -1173,7 +1130,6 @@ void CheckDMRules (void)
 		}
 	}
 
-		
 //faf: this is not used below
 	if(Is_Game_Over)
 	{
@@ -1189,8 +1145,6 @@ void CheckDMRules (void)
 		EndDMLevel ();
 		return;
 	}
-
-
 
 	if (timelimit->value)
 	{

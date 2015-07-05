@@ -33,7 +33,7 @@ edict_t		*LINKS_PASSENT = NULL;
 //==========================================
 char *AI_LinkString( int linktype )
 {
-	char *s;
+	char *s = "UNKNOWN";
 
 	if( linktype == LINK_MOVE )
 		s = "LINK_MOVE";

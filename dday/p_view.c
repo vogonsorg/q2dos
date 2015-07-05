@@ -25,7 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-
 #include "g_local.h"
 #include "m_player.h"
 
@@ -36,8 +35,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define FLAMER4		75
 #define FLAMERH		100
 //bcass end
-
-
 
 void SV_AddBlend (float r, float g, float b, float a, float *v_blend);
 qboolean strcmpwld (char *give, char *check);
@@ -65,20 +62,19 @@ float SV_CalcRoll (vec3_t angles, vec3_t velocity)
 	float	sign;
 	float	side;
 	float	value;
-	
+
 	side = DotProduct (velocity, right);
 	sign = side < 0 ? -1 : 1;
 	side = fabs(side);
-	
+
 	value = sv_rollangle->value;
 
 	if (side < sv_rollspeed->value)
 		side = side * value / sv_rollspeed->value;
 	else
 		side = value;
-	
+
 	return side*sign;
-	
 }
 
 
@@ -162,30 +158,29 @@ void P_DamageFeedback (edict_t *player)
 	// play an apropriate pain sound
 	if ((level.time > player->pain_debounce_time) && !(player->flags & FL_GODMODE) && (client->invincible_framenum <= level.framenum))
 	{
-
-	/*-----/ PM /-----/ MODIFIED:  Scream if on fire! /-----*/
+		/*-----/ PM /-----/ MODIFIED:  Scream if on fire! /-----*/
 		if (player->burnout > level.time)
-		{ 
+		{
 			player->pain_debounce_time = level.time + 0.7;
 
 //bcass start - flamer sound thing - copy/updated medic sound thing
-		srand(rand());
-		randnum=rand()%100;
-		
-		//let the fun begin defining sounds
-		if(randnum > FLAMER1 && randnum < FLAMER2) {
-			gi.sound (current_player, CHAN_VOICE, gi.soundindex ("player/burn1.wav"), 1.0, ATTN_NORM, 0);
-		} else if (randnum > FLAMER2 && randnum < FLAMER3) {
-			gi.sound (current_player, CHAN_VOICE, gi.soundindex ("player/burn2.wav"), 1.0, ATTN_NORM, 0);
-		} else if (randnum > FLAMER3 && randnum < FLAMER4) {
-			gi.sound (current_player, CHAN_VOICE, gi.soundindex ("player/burn3.wav"), 1.0, ATTN_NORM, 0);
-		} else if (randnum > FLAMER4 && randnum < FLAMERH) {
-			gi.sound (current_player, CHAN_VOICE, gi.soundindex ("player/burn4.wav"), 1.0, ATTN_NORM, 0);
-		} else {
-			gi.sound (current_player, CHAN_VOICE, gi.soundindex ("player/burn1.wav"), 1.0, ATTN_NORM, 0);
-		}
-//bcass end	
-			
+			srand(rand());
+			randnum=rand()%100;
+
+			//let the fun begin defining sounds
+			if(randnum > FLAMER1 && randnum < FLAMER2) {
+				gi.sound (current_player, CHAN_VOICE, gi.soundindex ("player/burn1.wav"), 1.0, ATTN_NORM, 0);
+			} else if (randnum > FLAMER2 && randnum < FLAMER3) {
+				gi.sound (current_player, CHAN_VOICE, gi.soundindex ("player/burn2.wav"), 1.0, ATTN_NORM, 0);
+			} else if (randnum > FLAMER3 && randnum < FLAMER4) {
+				gi.sound (current_player, CHAN_VOICE, gi.soundindex ("player/burn3.wav"), 1.0, ATTN_NORM, 0);
+			} else if (randnum > FLAMER4 && randnum < FLAMERH) {
+				gi.sound (current_player, CHAN_VOICE, gi.soundindex ("player/burn4.wav"), 1.0, ATTN_NORM, 0);
+			} else {
+				gi.sound (current_player, CHAN_VOICE, gi.soundindex ("player/burn1.wav"), 1.0, ATTN_NORM, 0);
+			}
+//bcass end
+
 //			if (rand()&1)
 //				gi.sound (player, CHAN_VOICE, gi.soundindex("player/burn1.wav"), 1, ATTN_NORM, 0);
 //			else
@@ -203,10 +198,9 @@ void P_DamageFeedback (edict_t *player)
 				l = 75;
 			else
 				l = 100;
-                        gi.sound (player, CHAN_VOICE, gi.soundindex(va("*pain%i_%i.wav", l, r)), 1, ATTN_NORM, 0);
+			gi.sound (player, CHAN_VOICE, gi.soundindex(va("*pain%i_%i.wav", l, r)), 1, ATTN_NORM, 0);
 		}
 	/*------------------------------------------------------*/
-
 	}
 
 	// the total alpha of the blend is always proportional to count
@@ -230,7 +224,6 @@ void P_DamageFeedback (edict_t *player)
 		VectorMA (v, (float)client->damage_blood/realcount,  bcolor, v);
 	VectorCopy (v, client->damage_blend);
 
-
 	//
 	// calculate view angle kicks
 	//
@@ -246,17 +239,16 @@ void P_DamageFeedback (edict_t *player)
 
 		VectorSubtract (client->damage_from, player->s.origin, v);
 		VectorNormalize (v);
-		
+
 		side = DotProduct (v, right);
 		client->v_dmg_roll = kick*side*0.3;
-		
+
 		side = -DotProduct (v, forward);
 		client->v_dmg_pitch = kick*side*0.3;
 
 		// divided by 3 to speed up knockback
 		client->v_dmg_time = level.time + (DAMAGE_TIME / 2);
 	}
-
 
 	//
 	// clear totals
@@ -334,14 +326,12 @@ void P_ExplosionEffects (edict_t *player)
 				break;
 			case 1: // was negative, now start incrementing
 				player->client->dmgef_sway_value++;
-			
 				if (player->client->dmgef_sway_value == SWAY_BREAK )
 					player->client->dmgef_sway_switch = -1;	// go negative
 
 				break;
 			case -1: // was positive, now decrement
 				player->client->dmgef_sway_value--;
-
 				if (player->client->dmgef_sway_value == -SWAY_BREAK )
 					player->client->dmgef_sway_switch = 1;	// go positive
 
@@ -416,16 +406,13 @@ void P_ExplosionEffects (edict_t *player)
 			player->client->dmgef_ablend = (10 - frame) * 0.01;
 		} else
 			player->client->dmgef_ablend = 0;
-
 	}
-
 
 //faf: screen shaking effect
 	intensity *=.5;
 	player->client->screen_shake[0]= (intensity/2 - crandom()* intensity)/16;
 	player->client->screen_shake[1]= (intensity/2 - crandom()* intensity)/16;
 	player->client->screen_shake[2]= (intensity/2 - crandom()* intensity)/16;
-
 
 //faf: add ground moving effect
 	if (//player->groundentity && 
@@ -441,9 +428,6 @@ void P_ExplosionEffects (edict_t *player)
 		//gi.dprintf(DEVELOPER_MSG_GAME, "%i  ",level.framenum);
 		//gi.dprintf(DEVELOPER_MSG_GAME, "%i\n",intensity);
 	}
-
-
-
 
 	return;
 }
@@ -467,7 +451,7 @@ Auto pitching on slopes?
 */
 void SV_CalcViewOffset (edict_t *ent)
 {
-    float		*angles;
+	float		*angles;
 	float		bob;
 	float		ratio;
 	float		delta;
@@ -477,20 +461,13 @@ void SV_CalcViewOffset (edict_t *ent)
 //turret
 	vec3_t	f, r, u;
 	vec3_t	start;
-
-
 //	float	scale;
 
-
-
 //===================================
-
-
 
 	// base angles
 	angles = ent->client->ps.kick_angles;
 
-	
 	// if dead, fix the angle and don't add any kick
 	if (ent->deadflag)
 	{
@@ -500,21 +477,16 @@ void SV_CalcViewOffset (edict_t *ent)
 		ent->client->ps.viewangles[PITCH] = -15;
 		ent->client->ps.viewangles[YAW] = ent->client->killer_yaw;
 	}
-	
-	
 	else
 	{
 		// add angles based on weapon kick
-
 		VectorCopy (ent->client->kick_angles, angles);
 
 		//faf:  separated kick_angles and explosion_angles calculations so explosions
 		//      dont screw up the smg kick
 		VectorAdd (angles, ent->client->explosion_angles, angles);
 
-
 		// add angles based on damage kick
-
 		ratio = (ent->client->v_dmg_time - level.time) / DAMAGE_TIME;
 		if (ratio < 0)
 		{
@@ -526,17 +498,15 @@ void SV_CalcViewOffset (edict_t *ent)
 		angles[ROLL] += ratio * ent->client->v_dmg_roll;
 
 		// add pitch based on fall kick
-
 		ratio = (ent->client->fall_time - level.time) / FALL_TIME;
 		if (ratio < 0)
 			ratio = 0;
 		angles[PITCH] += ratio * ent->client->fall_value;
 
 		// add angles based on velocity
-
 		delta = DotProduct (ent->velocity, forward);
 		angles[PITCH] += delta*run_pitch->value;
-		
+
 		delta = DotProduct (ent->velocity, right);
 		angles[ROLL] += delta*run_roll->value;
 
@@ -555,42 +525,36 @@ void SV_CalcViewOffset (edict_t *ent)
 			delta *= 4;		// crouching
 		else if(ent->stanceflags==STANCE_CRAWL)
 			delta *= 6;		// prone
-		
+
 		if (bobcycle & 1)
 			delta = -delta;
 		angles[ROLL] += delta;
-	 }
+	}
 
 //===================================
 
 	// base origin
-
 	VectorClear (v);
-
-
 	VectorAdd (v, ent->client->screen_shake, v);
 
-
 	// add view height
-
 	v[2] += ent->viewheight;
-
 
 /*
 faf:  this mades it so people's view turns in a circle instead of on a pin point.
-       some people didnt like it so removing it.*/
-/*
-  VectorCopy (v, anglesave);
+some people didnt like it so removing it.*/
+	/*
+	VectorCopy (v, anglesave);
 
-    AngleVectors (ent->s.angles, forward, NULL, NULL);
-    VectorNormalize (forward);
+	AngleVectors (ent->s.angles, forward, NULL, NULL);
+	VectorNormalize (forward);
 
 	if (ent->client->v_angle[PITCH] >= 0)
 		scale = -10 * ((ent->client->v_angle[PITCH]-10)/10);
 	else
 		scale = 10;
 
-if (scale <0) scale = 0;
+	if (scale <0) scale = 0;
 
 //	gi.dprintf(DEVELOPER_MSG_GAME, "%f\n",scale);
 
@@ -598,25 +562,20 @@ if (scale <0) scale = 0;
 		VectorScale (forward, scale, forward);
 //	else
 //		VectorScale (forward, 5, forward);
-		
 
-    VectorAdd (v, forward, v);
+	VectorAdd (v, forward, v);
 
 //	if (v[2] < (anglesave[2] -2))
 //		VectorCopy (anglesave, v);
-
 */
 
-
 	// add fall height
-
 	ratio = (ent->client->fall_time - level.time) / FALL_TIME;
 	if (ratio < 0)
 		ratio = 0;
 	v[2] -= ratio * ent->client->fall_value * 0.4;
 
 	// add bob height
-
 	bob = bobfracsin * xyspeed * bob_up->value;
 	if (bob > 6)
 		bob = 6;
@@ -624,10 +583,7 @@ if (scale <0) scale = 0;
 	v[2] += bob;
 
 	// add kick offset
-
 	VectorAdd (v, ent->client->kick_origin, v);
-
-
 
 	/* just messin
 	if (ent->s.frame == 47)
@@ -635,8 +591,6 @@ if (scale <0) scale = 0;
 		v[0]-=10;
 		gi.dprintf(DEVELOPER_MSG_GAME, "hi\n");
 	} */
-
-
 
 	// absolutely bound offsets
 	// so the view can never be outside the player box
@@ -654,32 +608,21 @@ if (scale <0) scale = 0;
 	else if (v[2] > 30)
 		v[2] = 30;
 
+	if (ent->client->turret)
+	{
+		AngleVectors (ent->client->turret->s.angles, f, r, u);
+		VectorMA (ent->client->turret->s.origin, ent->client->turret->move_origin[0], f, start);
+		VectorMA (start, ent->client->turret->move_origin[1], r, start);
+		VectorMA (start, ent->client->turret->move_origin[2], u, start);
+//		VectorSubtract (start, ent->s.origin, v);
 
-
-
-
-		if (ent->client->turret)
-		{
-			AngleVectors (ent->client->turret->s.angles, f, r, u);
-			VectorMA (ent->client->turret->s.origin, ent->client->turret->move_origin[0], f, start);
-			VectorMA (start, ent->client->turret->move_origin[1], r, start);
-			VectorMA (start, ent->client->turret->move_origin[2], u, start);
-//			VectorSubtract (start, ent->s.origin, v);
-
-			ent->client->ps.pmove.origin[0] = start[0]*8;
-            ent->client->ps.pmove.origin[1] = start[1]*8;
-            ent->client->ps.pmove.origin[2] = start[2]*8;
-
-			VectorClear (v);
-
-
-		}
+		ent->client->ps.pmove.origin[0] = start[0]*8;
+		ent->client->ps.pmove.origin[1] = start[1]*8;
+		ent->client->ps.pmove.origin[2] = start[2]*8;
+		VectorClear (v);
+	}
 
 	VectorCopy (v, ent->client->ps.viewoffset);
-	
-
-
-
 }
 
 /*
@@ -692,7 +635,6 @@ void SV_CalcGunOffset (edict_t *ent)
 	int		i;
 //	float	delta;
 
-
 	if (ent->client && 
 		ent->client->pers.weapon &&
 		ent->client->pers.weapon->classnameb == WEAPON_BINOCULARS)
@@ -701,7 +643,6 @@ void SV_CalcGunOffset (edict_t *ent)
 		return;
 	}
 	//stops binocular aim being messed up
-
 
 	// gun angles from bobbing
 	ent->client->ps.gunangles[ROLL] = xyspeed * bobfracsin * 0.005;
@@ -714,20 +655,14 @@ void SV_CalcGunOffset (edict_t *ent)
 
 	ent->client->ps.gunangles[PITCH] = xyspeed * bobfracsin * 0.005;
 
-
-
-
 	ent->client->ps.gunangles[YAW] = ent->client->ps.gunangles[YAW] + ent->client->crosshair_offset_x;
 	ent->client->ps.gunangles[PITCH] = ent->client->ps.gunangles[PITCH] + ent->client->crosshair_offset_y;
-
 
 	if (ent->client->jump_stamina < 60)
 	{
 		ent->client->ps.gunangles[PITCH] += 1.2 * sin (.75 * level.framenum);
 		ent->client->ps.gunangles[YAW] += .5 * sin (.375 * level.framenum);
 	}
-
-
 
 	//add extra gun shaking
 	if (ent->client->weaponstate == WEAPON_FIRING &&
@@ -741,11 +676,9 @@ void SV_CalcGunOffset (edict_t *ent)
 		for (i =0; i < 3 ; i ++)
 		{
 			ent->client->ps.gunangles[i] += random() -.5;
-
 		}
 	}
 
-	
 	//align weapon md2 better   should do this in md2
 	if (ent->client->pers.weapon){
 		if	(!strcmp(ent->client->pers.weapon->classname, "weapon_bazooka"))
@@ -757,27 +690,25 @@ void SV_CalcGunOffset (edict_t *ent)
 		}
 	}
 
-
-	
 	if (!chile->value && ent->client->last_jump_time > level.time - 3)
 	{
 		if (ent->client->pers.weapon &&
 			ent->client->pers.weapon->classnameb != WEAPON_MP43)
 		{
-		if (4 *(level.time - ent->client->last_jump_time) < (3.1416))
-		{
-			ent->client->ps.gunangles[PITCH] = 
-			ent->client->ps.gunangles[PITCH] - 8 * (sin (4 *(level.time - ent->client->last_jump_time)));
-		}}
+			if (4 *(level.time - ent->client->last_jump_time) < (3.1416))
+			{
+				ent->client->ps.gunangles[PITCH] = 
+				ent->client->ps.gunangles[PITCH] - 8 * (sin (4 *(level.time - ent->client->last_jump_time)));
+			}
+		}
 	}
-
 
 	/*  make this a model change later
 	//faf:  mauser tweak
 	if (ent->client->pers.weapon &&
 		!strcmp(ent->client->pers.weapon->classname, "weapon_mauser98k"))
 		ent->client->ps.gunangles[PITCH] = ent->client->ps.gunangles[PITCH] - .7;
-*/
+	*/
 
 	/*
 	// gun angles from delta movement
@@ -844,18 +775,10 @@ void SV_CalcBlend (edict_t *ent)
 	int		remaining;
 //	float	blendtime_remain;
 
-
-
-
-
-
-
-
 	if (ent->client->resp.mos && ent->client->resp.mos == MEDIC)
-      ent->client->ps.rdflags |= RDF_IRGOGGLES;
+		ent->client->ps.rdflags |= RDF_IRGOGGLES;
 	else
 		ent->client->ps.rdflags &= ~RDF_IRGOGGLES;
-
 
 	ent->client->ps.blend[0] = ent->client->ps.blend[1] = 
 		ent->client->ps.blend[2] = ent->client->ps.blend[3] = 0;
@@ -872,42 +795,31 @@ void SV_CalcBlend (edict_t *ent)
 	if (ent->burnout)
 		SV_AddBlend (0.9, 0.9, 0.6, 0.84, ent->client->ps.blend);
 
-
 	if (level.fog)
 		SV_AddBlend (1.0, 1.0, 1.0, level.fog, ent->client->ps.blend);
 
-
 	if (ent->client->smoke_effect_actual)
 		SV_AddBlend (1.0, 1.0, 1.0, ent->client->smoke_effect_actual, ent->client->ps.blend);
-
 
 	if (ent->client->smoke_effect_actual)
 		SV_AddBlend (1.0, 1.0, 1.0, ent->client->smoke_effect_actual, ent->client->ps.blend);
 
 	/*  better not to warn them
-   if (ent->client->pers.weapon && ent->client->pers.weapon->classnameb == WEAPON_MG42 
-	   && ent->client->mg42_temperature > 40) 
-   {
-	   float	hmgblend;
-
-	   hmgblend =  (0.02 * ent->client->mg42_temperature) - .8;
-	   if (hmgblend > .2)
-		   hmgblend = .2;
-
+	if (ent->client->pers.weapon && ent->client->pers.weapon->classnameb == WEAPON_MG42
+	    && ent->client->mg42_temperature > 40)
+	{
+		float	hmgblend;
+		hmgblend =  (0.02 * ent->client->mg42_temperature) - .8;
+		if (hmgblend > .2)
+			hmgblend = .2;
 		SV_AddBlend (1.0, 0.0, 0.0, hmgblend, ent->client->ps.blend);
-
 		gi.dprintf(DEVELOPER_MSG_GAME, "%f\n", hmgblend);
-   }*/
+	}*/
 
 	if (ent->health > 0 &&
 		ent->client->enter_spawn_time &&
 		ent->client->enter_spawn_time > level.time - 4)
 		SV_AddBlend (0, 0, 0, 0.5, ent->client->ps.blend);
-
-
-
-
-
 
 	// fade into lobby
 	if (level.framenum < ((int)level_wait->value * 10))
@@ -929,19 +841,14 @@ void SV_CalcBlend (edict_t *ent)
 		if (ent->client->resp.deathblend > 1)
 			ent->client->resp.deathblend = 1;
 		SV_AddBlend (0.5 - (0.5 * ent->client->resp.deathblend), 0.0, 0.0, ent->client->resp.deathblend, ent->client->ps.blend);
-
-
 	/*	if (ent->client->resp.deathblend == 1)
 		{
 			gi.dprintf(DEVELOPER_MSG_GAME, "tttt\n");
 			ent->s.origin[0] = 4075;
 			ent->s.origin[1] = 4075;
 			ent->s.origin[2] = 4075;
-
 		}
-*/
-
-
+		*/
 	} else if (ent->client->resp.deathblend) {
 		ent->client->resp.deathblend = 0;
 	}
@@ -956,7 +863,6 @@ void SV_CalcBlend (edict_t *ent)
 		//SV_AddBlend	(0.3, 0.3, 0.3, 0.7, ent->client->ps.blend);
 	else if (ent->client->dmgef_flash) //pbowens: explosion effect
 		SV_AddBlend (1, 1, 1, ent->client->dmgef_ablend,  ent->client->ps.blend);
-
 
 	// add for powerups
 	if (ent->client->quad_framenum > level.framenum)
@@ -994,7 +900,7 @@ void SV_CalcBlend (edict_t *ent)
 
 	// add for damage
 	// pbowens: long delayed damage
-	if (ent->client->damage_blendtime > level.time) 
+	if (ent->client->damage_blendtime > level.time)
 	{
 		if (ent->client->damage_alpha > 0)
 			SV_AddBlend (ent->client->damage_blend[0],
@@ -1008,7 +914,7 @@ void SV_CalcBlend (edict_t *ent)
 						 ent->client->bonus_alpha, 
 						 ent->client->ps.blend);
 	}
-	else 
+	else
 	{ // drop the damage value
 		ent->client->damage_alpha -= 0.06;
 		if (ent->client->damage_alpha < 0)
@@ -1048,43 +954,36 @@ void SV_CalcBlend (edict_t *ent)
 //		SV_AddBlend (0.0, 0.0, 0.0, .1, ent->client->ps.blend);
 //		SV_AddBlend (0.0, 0.0, 0.0, .1 + (xyspeed/1000), ent->client->ps.blend);
 		//end faf
-
-
-
-
-
 }
+
 //faf:  cause damage to whatever you fall on
 void Damage_Underneath ( edict_t *self, int damage)
-{    
-    trace_t tr; //detect whats in front of you up to range "vec3_t end"
-    vec3_t end, start;
+{
+	trace_t tr; //detect whats in front of you up to range "vec3_t end"
+	vec3_t end, start;
 	vec3_t down = { 0, 0, -1};
 
 	VectorCopy (self->s.origin, start);
 	start[2] += self->viewheight;
-    // Figure out what we hit, if anything:
+	// Figure out what we hit, if anything:
+	VectorMA (start, 100, down, end);  //calculates the range vector
+	tr = gi.trace (self->s.origin, self->mins, self->maxs, end, self, MASK_SHOT);
+				// figures out what in front of the player up till "end"
 
-    VectorMA (start, 100, down, end);  //calculates the range vector                      
-    tr = gi.trace (self->s.origin, self->mins, self->maxs, end, self, MASK_SHOT);
-                        // figures out what in front of the player up till "end"
-    
-   // Figure out what to do about what we hit, if anything
-
-    if (!((tr.surface) && (tr.surface->flags & SURF_SKY)))    
-    {
-        if (tr.fraction < 1.0)        
-        {            
-
-			if (tr.ent->takedamage)            
-            {
+	// Figure out what to do about what we hit, if anything
+	if (!((tr.surface) && (tr.surface->flags & SURF_SKY)))
+	{
+		if (tr.fraction < 1.0)
+		{
+			if (tr.ent->takedamage)
+			{
 				T_Damage (tr.ent, self, self, down, tr.endpos, tr.plane.normal, damage,  200   , 0,MOD_PLONK);
-//                gi.sound (self, CHAN_AUTO, gi.soundindex("brain/melee3.wav") , 1, ATTN_NORM, 0); 
-	        }        
-        }
-    }
-    return;
-} 
+				//gi.sound (self, CHAN_AUTO, gi.soundindex("brain/melee3.wav") , 1, ATTN_NORM, 0);
+			}
+		}
+	}
+	return;
+}
 
 void Play_Footstep_Sound (edict_t *ent);
 /*
@@ -1171,9 +1070,7 @@ void P_FallingDamage (edict_t *ent)
 
 			//if (ent->s.event == EV_FALLFAR && ent->ai)
 			//	AI_PickLongRangeGoal(ent);
-
 		}
-
 	}
 	else
 	{
@@ -1221,7 +1118,6 @@ void P_PenaltyCheck (edict_t *ent)
 	VectorSet (dir, 0, 0, 1);
 	ent->client->penalty = PENALTY_NONE;
 	T_Damage (ent, world, world, dir, ent->s.origin, vec3_origin, dmg, 0, 0, MOD_PENALTY);
-
 }
 
 /*
@@ -1233,19 +1129,18 @@ void P_ShowID (edict_t *ent)
 {
 	trace_t tr;
 	vec3_t start, forward, end;
-
 	vec3_t mins,maxs;
 
 	VectorSet (mins, -10,-10,-10);
 	VectorSet (maxs, 10,10,10);
 
 	VectorCopy(ent->s.origin, start);
-    start[2] += ent->viewheight;
-    AngleVectors(ent->client->v_angle, forward, NULL, NULL);
-    VectorMA(start, 8192, forward, end);
+	start[2] += ent->viewheight;
+	AngleVectors(ent->client->v_angle, forward, NULL, NULL);
+	VectorMA(start, 8192, forward, end);
 
-    tr = gi.trace(start, mins, maxs, end, ent, MASK_ALL); 
-    //tr = gi.trace(start, NULL, NULL, end, ent, MASK_ALL); 
+	tr = gi.trace(start, mins, maxs, end, ent, MASK_ALL); 
+	//tr = gi.trace(start, NULL, NULL, end, ent, MASK_ALL);
 
 	//faf:  if chasing someone...
 	if (ent->client->resp.show_id &&
@@ -1261,7 +1156,6 @@ void P_ShowID (edict_t *ent)
 
 //		gi.configstring(CS_GENERAL + (ent - g_edicts - 1), "Chase Mode.");
 //		ent->client->ps.stats[STAT_IDENT_HEALTH] = CS_GENERAL + (ent - g_edicts - 1);
-
 	}
 	else if (tr.ent->client && !tr.ent->deadflag)
 	{
@@ -1273,7 +1167,6 @@ void P_ShowID (edict_t *ent)
 			ent->client->ps.stats[STAT_IDENT_HEALTH] = 0;
 			ent->client->ps.stats[STAT_IDENT_ICON] = 0;
 			ent->client->last_id_time = level.time;  //faf:  to put delay on player id
-
 		}
 		else if (ent->client->resp.mos == MEDIC ||
 			ent->client->resp.show_id &&
@@ -1293,9 +1186,8 @@ void P_ShowID (edict_t *ent)
 
 				if ((tr.ent->health < tr.ent->max_health ) && OnSameTeam(ent, tr.ent)) 
 					ent->client->ps.stats[STAT_IDENT_ICON] = gi.imageindex ("i_medic");
-				else 
+				else
 					ent->client->ps.stats[STAT_IDENT_ICON] = 0;
-
 			}
 			else
 			{
@@ -1320,8 +1212,6 @@ void P_ShowID (edict_t *ent)
 		ent->client->ps.stats[STAT_IDENT_HEALTH]	= 0;
 		ent->client->ps.stats[STAT_IDENT_ICON]		= 0;
 	}
-
-
 }
 
 void P_WorldEffects (void)
@@ -1378,11 +1268,8 @@ void P_WorldEffects (void)
 			gi.sound (current_player, CHAN_BODY, gi.soundindex("player/watr_in.wav"), 1, ATTN_NORM, 0);
 		current_player->flags |= FL_INWATER;
 
-
 		// clear damage_debounce, so the pain sound will play immediately
 		current_player->damage_debounce_time = level.time - 1;
-
-
 	}
 
 	//
@@ -1397,7 +1284,6 @@ void P_WorldEffects (void)
 			gi.sound (current_player, CHAN_BODY, gi.soundindex("players/cloth.wav"), 1, ATTN_NORM, 0);
 		else
 			gi.sound (current_player, CHAN_BODY, gi.soundindex("player/watr_out.wav"), 1, ATTN_NORM, 0);
-
 
 		current_player->flags &= ~FL_INWATER;
 	}
@@ -1462,7 +1348,6 @@ void P_WorldEffects (void)
 				if (current_player->dmg > 15)
 					current_player->dmg = 15;
 
-
 				if (!level.intermissiontime)//faf: stop drowning sounds when level's over
 				{
 					// play a gurp sound instead of a normal pain sound
@@ -1499,24 +1384,23 @@ void P_WorldEffects (void)
 				&& current_player->pain_debounce_time <= level.time
 				&& current_client->invincible_framenum < level.framenum)
 			{
-
 //bcass start - flamer sound thing - copy/updated medic sound thing
-		srand(rand());
-		randnum=rand()%100;
-		
-		//let the fun begin defining sounds
-		if(randnum > FLAMER1 && randnum < FLAMER2) {
-			gi.sound (current_player, CHAN_WEAPON, gi.soundindex ("player/burn1.wav"), 1.0, ATTN_NORM, 0);
-		} else if (randnum > FLAMER2 && randnum < FLAMER3) {
-			gi.sound (current_player, CHAN_WEAPON, gi.soundindex ("player/burn2.wav"), 1.0, ATTN_NORM, 0);
-		} else if (randnum > FLAMER3 && randnum < FLAMER4) {
-			gi.sound (current_player, CHAN_WEAPON, gi.soundindex ("player/burn3.wav"), 1.0, ATTN_NORM, 0);
-		} else if (randnum > FLAMER4 && randnum < FLAMERH) {
-			gi.sound (current_player, CHAN_WEAPON, gi.soundindex ("player/burn4.wav"), 1.0, ATTN_NORM, 0);
-		} else {
-			gi.sound (current_player, CHAN_WEAPON, gi.soundindex ("player/burn1.wav"), 1.0, ATTN_NORM, 0);
-		}
-//bcass end		
+				srand(rand());
+				randnum=rand()%100;
+
+				//let the fun begin defining sounds
+				if(randnum > FLAMER1 && randnum < FLAMER2) {
+					gi.sound (current_player, CHAN_WEAPON, gi.soundindex ("player/burn1.wav"), 1.0, ATTN_NORM, 0);
+				} else if (randnum > FLAMER2 && randnum < FLAMER3) {
+					gi.sound (current_player, CHAN_WEAPON, gi.soundindex ("player/burn2.wav"), 1.0, ATTN_NORM, 0);
+				} else if (randnum > FLAMER3 && randnum < FLAMER4) {
+					gi.sound (current_player, CHAN_WEAPON, gi.soundindex ("player/burn3.wav"), 1.0, ATTN_NORM, 0);
+				} else if (randnum > FLAMER4 && randnum < FLAMERH) {
+					gi.sound (current_player, CHAN_WEAPON, gi.soundindex ("player/burn4.wav"), 1.0, ATTN_NORM, 0);
+				} else {
+					gi.sound (current_player, CHAN_WEAPON, gi.soundindex ("player/burn1.wav"), 1.0, ATTN_NORM, 0);
+				}
+//bcass end
 
 //				if (rand()&1)
 //					gi.sound (current_player, CHAN_VOICE, gi.soundindex("player/burn1.wav"), 1, ATTN_NORM, 0);
@@ -1560,12 +1444,10 @@ void G_SetClientEffects (edict_t *ent)
 	if (level.fullbright || fullbright->value)
 		ent->s.renderfx = RF_FULLBRIGHT;
 
-
-if (ent->health >0 && ent->health <100 && level.framenum %(5 +(int)(7 * ent->health / 100)) == 0)
-       ent->s.renderfx |= RF_IR_VISIBLE; 
-else
-ent->s.renderfx &= ~RF_IR_VISIBLE;
-
+	if (ent->health >0 && ent->health <100 && level.framenum %(5 +(int)(7 * ent->health / 100)) == 0)
+		ent->s.renderfx |= RF_IR_VISIBLE; 
+	else
+		ent->s.renderfx &= ~RF_IR_VISIBLE;
 
 	if (ent->powerarmor_time > level.time)
 	{
@@ -1588,7 +1470,6 @@ ent->s.renderfx &= ~RF_IR_VISIBLE;
 			ent->s.effects |= EF_COLOR_SHELL;
 			ent->s.renderfx |= RF_SHELL_RED;
 		}
-
 	}
 
 	if (ent->client->quad_framenum > level.framenum)
@@ -1614,9 +1495,6 @@ ent->s.renderfx &= ~RF_IR_VISIBLE;
 
 //if (level.time < ent->client->spawntime + invuln_spawn->value)
 //		ent->s.renderfx |= RF_TRANSLUCENT;
-
-
-
 }
 
 
@@ -1632,12 +1510,10 @@ void Play_Footstep_Sound (edict_t *ent)
 	{
 		int sound;
 		float volume = (float)((VectorLength(ent->velocity) /200) - (random() * .3));
-		
-	//		float volume = (float)(VectorLength(ent->velocity))/200;
+	//	float volume = (float)(VectorLength(ent->velocity)) /200;
 
 		vec3_t end, down = { 0, 0, -1};
 		trace_t tr;
-
 
 		if (volume > .8)
 			volume = .8;
@@ -1647,7 +1523,6 @@ void Play_Footstep_Sound (edict_t *ent)
 
 		if (volume < .3)
 			volume = .3;
-
 
 		VectorMA (ent->s.origin, 50, down, end);
 		tr = gi.trace (ent->s.origin, NULL, NULL, end, ent, CONTENTS_SOLID);
@@ -1704,7 +1579,6 @@ void Play_Footstep_Sound (edict_t *ent)
 }
 
 
-
 /*
 ===============
 G_SetClientEvent
@@ -1712,8 +1586,6 @@ G_SetClientEvent
 */
 void G_SetClientEvent (edict_t *ent)
 {
-
-
 	/*
 	// pbowens: the rest of this is modified for surface types
 
@@ -1729,7 +1601,7 @@ void G_SetClientEvent (edict_t *ent)
 
 	if (!ent->groundentity || ent->stanceflags != STANCE_STAND)
 		return;
-	
+
 	if (!ent->client->movement)
 		return;
 
@@ -1739,11 +1611,10 @@ void G_SetClientEvent (edict_t *ent)
 	else //if (!ent->client->footstep_framenum) 
 		ent->client->footstep_framenum = level.framenum;
 
-
 	Play_Footstep_Sound(ent);
 
 	if (ent->client->aim)
-	{	
+	{
 		ent->client->footstep_framenum = level.framenum + 5;
 		if 	(ent->client->pers.weapon)
 		{
@@ -1751,7 +1622,6 @@ void G_SetClientEvent (edict_t *ent)
 				ent->client->footstep_framenum = level.framenum + 4;}
 			if (!Q_stricmp(ent->client->pers.weapon->pickup_name,"Fists"))		{
 				ent->client->footstep_framenum = level.framenum + 4;}
-
 		}
 	}
 	else if (ent->wound_location == LEG_WOUND)
@@ -1760,14 +1630,10 @@ void G_SetClientEvent (edict_t *ent)
 			ent->client->footstep_framenum = level.framenum + 2;
 		else
 			ent->client->footstep_framenum = level.framenum + 5;
-	}			
+	}
 	else
 		ent->client->footstep_framenum = level.framenum +4;
-
-
-
 }
-
 
 
 /*
@@ -1777,7 +1643,7 @@ G_SetClientSound
 */
 void G_SetClientSound (edict_t *ent)
 {
-	int weap;
+	int weap = 0;
 
 	if (ent->client->resp.game_helpchanged != game.helpchanged)
 	{
@@ -1796,39 +1662,37 @@ void G_SetClientSound (edict_t *ent)
 	if (ent->client->pers.weapon)
 		weap = ent->client->pers.weapon->classnameb;
 
-
-	if (ent->waterlevel && (ent->watertype&(CONTENTS_LAVA|CONTENTS_SLIME))) 
+	if (ent->waterlevel && (ent->watertype&(CONTENTS_LAVA|CONTENTS_SLIME)))
 	{
 		//ent->s.sound = snd_fry;
-	} 
+	}
 	// Nick - to stop Flamer making noise when empty.
 	else if (weap == WEAPON_FLAMETHROWER)
 	{
-		if (ent->client->flame_rnd && ent->waterlevel < 3) 
+		if (ent->client->flame_rnd && ent->waterlevel < 3)
 		{
 			ent->s.sound = gi.soundindex("weapons/flamer/fireitup.wav");
-		} 
+		}
 		else
 		{
 			ent->s.sound = 0;
-		} 
+		}
 	}
 	else if (weap == WEAPON_MOLOTOV)
 	{
-		if(ent->client->ps.gunframe == 16 && ent->waterlevel < 3) 
+		if(ent->client->ps.gunframe == 16 && ent->waterlevel < 3)
 		{
 			ent->s.sound = gi.soundindex("inland/fire.wav");
-		} 
+		}
 		else
 		{
 			ent->s.sound = 0;
-		} 
+		}
 	}
-
-	else if (ent->client->weapon_sound) 
+	else if (ent->client->weapon_sound)
 	{
 		ent->s.sound = ent->client->weapon_sound;
-	} 
+	}
 	else if (ent->client->last_jump_time > level.time -1)
 	{
 		ent->s.sound = 0;
@@ -1841,7 +1705,6 @@ void G_SetClientSound (edict_t *ent)
 	}
 	// End Nick
 }
-
 
 
 /*
@@ -1858,8 +1721,6 @@ void G_SetClientFrame (edict_t *ent)
 		return;		// not in the player model
 
 	client = ent->client;
-
-
 
 	if (ent->client->turret &&
 		!ent->client->movement)
@@ -1882,11 +1743,8 @@ void G_SetClientFrame (edict_t *ent)
 		return;
 	}
 
-
 	if (client->anim_priority > ANIM_CHANGESTANCE)
 		ent->oldstance = ent->stanceflags;//faf:  end any stance changing anim
-
-
 
 	//faf: stops delay on crawl to standing animation:
 	if (ent->stanceflags==STANCE_CRAWL)
@@ -1909,7 +1767,6 @@ void G_SetClientFrame (edict_t *ent)
 	else
 		aim = false;
 	//faf: end
-
 
 	// check for stand/duck and stop/go transitions
 	if (crawl != client->anim_crawl && client->anim_priority < ANIM_DEATH)
@@ -1938,21 +1795,20 @@ void G_SetClientFrame (edict_t *ent)
 		&& !ent->deadflag)
 			goto newanim;
 
-
 	if (client->anim_priority == ANIM_CHANGESTANCE)
 		goto newanim;
 
 	//pbowens: v_wep
-    if (client->anim_priority == ANIM_REVERSE)
-    {
-        if(ent->s.frame > client->anim_end)
-        {
-            ent->s.frame--;
-            return;
-        }
-    }
-    else if (ent->s.frame < client->anim_end) 
-	{	
+	if (client->anim_priority == ANIM_REVERSE)
+	{
+		if(ent->s.frame > client->anim_end)
+		{
+			ent->s.frame--;
+			return;
+		}
+	}
+	else if (ent->s.frame < client->anim_end)
+	{
 		//falling dead, don't go to impact animation until on ground
 		if ( ent->deadflag && !ent->groundentity &&
 			(ent->s.frame == 174 ||
@@ -1970,10 +1826,10 @@ void G_SetClientFrame (edict_t *ent)
 			VectorCopy (ent->s.origin, start);
 			// Figure out what we hit, if anything:
 
-			VectorMA (start, 50, down, end);  //calculates the range vector                      
+			VectorMA (start, 50, down, end);  //calculates the range vector
 			tr = gi.trace (ent->s.origin, ent->mins, ent->maxs, end, ent, MASK_SHOT);
-			if (tr.fraction < 1.0)        
-			{            
+			if (tr.fraction < 1.0)
+			{
 				ent->s.frame++;// continue an animation
 			}
 		}
@@ -1996,13 +1852,12 @@ void G_SetClientFrame (edict_t *ent)
 		{
 			ent->s.frame = FRAME_crawlidle01;
 			ent->client->anim_end = FRAME_crawlidle03;
-
 		}
 		else if (ent->stanceflags == STANCE_DUCK)
 		{
 			ent->s.frame = FRAME_crstnd01;
 			ent->client->anim_end = FRAME_crstnd03;
-		} 
+		}
 		else // standing
 		{
 			ent->s.frame = FRAME_jump3;
@@ -2034,24 +1889,20 @@ newanim:
 			if (ent->s.frame != FRAME_crawlidle02)
 				ent->s.frame = FRAME_crawlidle01;
 			client->anim_end = FRAME_crawlidle02;
-
 		}
 		else if (ent->stanceflags == STANCE_DUCK)
 		{
 			if (ent->s.frame != FRAME_crstnd02)
 				ent->s.frame = FRAME_crstnd01;
 			client->anim_end = FRAME_crstnd02;
-		} 
+		}
 		else // standing
 		{
 			if (ent->s.frame != FRAME_jump2)
 				ent->s.frame = FRAME_jump1;
 			client->anim_end = FRAME_jump2;
 		}
-
-
 	}
-
 	//faf
 	//changing stances
 //	else if ((ent->stanceflags != ent->oldstance  ||
@@ -2063,7 +1914,6 @@ newanim:
 		(ent->s.frame > FRAME_standtokneel03 && ent->s.frame < FRAME_kneeltoprone06)
 		&& !ent->deadflag))
 	{
-
 			if(ent->s.frame < FRAME_standtokneel03  ||
 				ent->s.frame > FRAME_kneeltoprone06)//not changing yet
 			{
@@ -2132,16 +1982,8 @@ newanim:
 					ent->s.frame--;
 					client->anim_priority = ANIM_CHANGESTANCE;
 				}
-
-				
 			}
-
-	}			
-
-
-
-
-
+	}
 	else if (run)
 	{	// running
 		if (duck)
@@ -2231,11 +2073,8 @@ newanim:
 						client->anim_end = FRAME_run4;
 					else
 						client->anim_end = FRAME_run6;
-
 				}
 			}
-
-
 
 			if (extra_anims->value != 1)
 			{
@@ -2248,9 +2087,6 @@ newanim:
 					client->anim_end = FRAME_run6;
 			}
 			client->last_sidestep_anim = client->sidestep_anim;
-
-
-
 		}
 	}
 	else
@@ -2294,10 +2130,6 @@ newanim:
 			}
 		}
 	}
-
-
-
-
 }
 
 
@@ -2312,30 +2144,30 @@ and right after spawning
 
 edict_t *FindOverlap(edict_t *ent, edict_t *last_overlap)
 {
-        int i;
-        edict_t *other;
-        vec3_t diff;
+	int i;
+	edict_t *other;
+	vec3_t diff;
 
-        for (i = last_overlap ? last_overlap - g_edicts : 0; i < game.maxclients; i++)
-        {
-                other = &g_edicts[i+1];
+	for (i = last_overlap ? last_overlap - g_edicts : 0; i < game.maxclients; i++)
+	{
+		other = &g_edicts[i+1];
 
-                if (!other->inuse || !other->client->resp.team_on
+		if (!other->inuse || !other->client->resp.team_on
 								  || !other->client->resp.mos
-                                  || other == ent 
-                                  || other->solid == SOLID_NOT
-                                  || other->deadflag == DEAD_DEAD)
-                        continue;
+								  || other == ent 
+								  || other->solid == SOLID_NOT
+								  || other->deadflag == DEAD_DEAD)
+			continue;
 
-                VectorSubtract(ent->s.origin, other->s.origin, diff);
+		VectorSubtract(ent->s.origin, other->s.origin, diff);
 
-                if (diff[0] >= -33 && diff[0] <= 33 &&
-                                diff[1] >= -33 && diff[1] <= 33 &&
-                                diff[2] >= -65 && diff[2] <= 65)
-                        return other;
-        }
+		if (diff[0] >= -33 && diff[0] <= 33 &&
+		    diff[1] >= -33 && diff[1] <= 33 &&
+		    diff[2] >= -65 && diff[2] <= 65)
+			return other;
+	}
 
-        return NULL;
+	return NULL;
 }
 
 qboolean Cmd_Scope_f(edict_t *ent);
@@ -2347,23 +2179,15 @@ void ClientEndServerFrame (edict_t *ent)
 {
 	float	bobtime;
 	int		i;
-
-
 	vec3_t	start;
 	vec3_t	end;
 	vec3_t  up;
 	trace_t	tr;
-
 	vec3_t offset, right;
-
 //	int oldframe, oldanimend, newframe, newanimend;//faf
-
-
-
 
 	if (ent->client)
 	{
-
 		if (level.framenum - ent->client->resp.enterframe == 10)
 			Cmd_MOTD(ent);
 
@@ -2371,12 +2195,10 @@ void ClientEndServerFrame (edict_t *ent)
 			safe_centerprintf(ent, "Server is running in \"No Hud\" mode.\nRealism!!!\n");
 
 		//		gi.dprintf(DEVELOPER_MSG_GAME, "%i frame\n", (level.framenum - ent->client->resp.enterframe) );
-	
 	}
 
 	if (ent->client->smoke_effect_goal <= .005)
 		ent->client->smoke_effect_goal = 0;
-
 
 	if (ent->client->smoke_effect_goal){
 		ent->client->smoke_effect_goal -= .0013;
@@ -2386,18 +2208,8 @@ void ClientEndServerFrame (edict_t *ent)
 	if (ent->client->smoke_effect_actual != ent->client->smoke_effect_goal)
 		ent->client->smoke_effect_actual = (ent->client->smoke_effect_goal + ent->client->smoke_effect_actual)/2;
 
-
-
-
-
-
 //	if (ent->client->turret)
-
-
 //			VectorCopy (self->target_ent->move_origin, self->s.origin);
-
-
-
 
 	//faf:  keep player's view inside the map
 	if (ent->stanceflags == STANCE_DUCK)
@@ -2406,18 +2218,16 @@ void ClientEndServerFrame (edict_t *ent)
 		start[2] += ent->viewheight;
 		VectorSet(up, 0, 0, 1);
 		VectorMA(start, 48, up, end);
-		
+
 		tr = gi.trace(start, ent->mins, ent->maxs, end, ent, MASK_SHOT|CONTENTS_SLIME|CONTENTS_LAVA);
 
-
-		if (tr.fraction < 1.0 )	
+		if (tr.fraction < 1.0 )
 		{
 			if (ent->stance_view == -1)
 				VectorMA(start, 10, up, end);
 			else
 				VectorMA(start, 5, up, end);
 
-		
 			tr = gi.trace(start, ent->mins, ent->maxs, end, ent, MASK_SHOT|CONTENTS_SLIME|CONTENTS_LAVA);
 
 			if (tr.fraction < 1.0)
@@ -2425,17 +2235,14 @@ void ClientEndServerFrame (edict_t *ent)
 				ent->viewheight= -1;
 				ent->stance_view = -1;
 				//if (ent->client->v_angle[0] > 40)
-
 			}
 			else
 				ent->stance_view = 4;
 				ent->viewheight = 4;
-
-		}	
+		}
 	}
 
-
-//safe_bprintf (PRINT_HIGH, "1 %i ent->viewheight  %i stance\n", ent->viewheight, ent->stance_view);
+	//safe_bprintf (PRINT_HIGH, "1 %i ent->viewheight  %i stance\n", ent->viewheight, ent->stance_view);
 
 	//faf:  slow down view when changing stances
 	if (ent->stance_view > ent->viewheight + 10)
@@ -2448,14 +2255,7 @@ void ClientEndServerFrame (edict_t *ent)
 	if (extra_anims->value != 1)
 		ent->viewheight = ent->stance_view;
 
-
-//safe_bprintf (PRINT_HIGH, "2 %i ent->viewheight  %i stance\n", ent->viewheight, ent->stance_view);
-
-
-
-
-
-
+	//safe_bprintf (PRINT_HIGH, "2 %i ent->viewheight  %i stance\n", ent->viewheight, ent->stance_view);
 
 	current_player = ent;
 	current_client = ent->client;
@@ -2466,16 +2266,15 @@ void ClientEndServerFrame (edict_t *ent)
 		if (ent->client->damage_div<0)
 			ent->client->damage_div=0;
 	}
-	
+
 	//
 	// If the origin or velocity have changed since ClientThink(),
 	// update the pmove values.  This will happen when the client
 	// is pushed by a bmodel or kicked by an explosion.
-	// 
+	//
 	// If it wasn't updated here, the view position would lag a frame
 	// behind the body position when pushed -- "sinking into plats"
 	//
-
 
 	for (i=0 ; i<3 ; i++)
 	{
@@ -2528,11 +2327,9 @@ void ClientEndServerFrame (edict_t *ent)
 		  //for vote menu
 			PMenu_Update(ent);
 			gi.unicast (ent, true);
-
 		}
 		if (level.time == delay + 1)
 			safe_cprintf (ent, PRINT_HIGH, "Please report bugs @ http://www.ddaydev.com/bugtracker\n");
-
 
 		return;
 	}
@@ -2574,7 +2371,7 @@ void ClientEndServerFrame (edict_t *ent)
 		else
 			bobmove = 0.0625;
 	}
-	
+
 	bobtime = (current_client->bobtime += bobmove);
 
 	if (current_client->ps.pmove.pm_flags & PMF_DUCKED)
@@ -2597,7 +2394,6 @@ void ClientEndServerFrame (edict_t *ent)
 
 	// pbowens: player id's
 //	P_ShowID (ent);
-
 
 	// determine the view offsets
 	SV_CalcViewOffset (ent);
@@ -2633,7 +2429,6 @@ void ClientEndServerFrame (edict_t *ent)
 		newframe = ent->s.frame;
 		newanimend = ent->client->anim_end;
 	}
-	
 
 	if (extra_anims->value == 1)
 	{
@@ -2651,86 +2446,67 @@ void ClientEndServerFrame (edict_t *ent)
 		ent->s.modelindex4 = ent->s.frame;
 		ent->s.frame = newframe;
 	}*/
-	
+
 	//faf
 	// Do Jump-Stamina increase
-	    if (ent->client->jump_stamina < JUMP_MAX)
-		{
-			if (!ent->client->movement)
-				ent->client->jump_stamina += JUMP_REGEN * 6.5;
-			else if (ent->client->jump_stamina >60)
-				ent->client->jump_stamina += JUMP_REGEN * 2;
-			else
-				ent->client->jump_stamina += JUMP_REGEN;
+	if (ent->client->jump_stamina < JUMP_MAX)
+	{
+		if (!ent->client->movement)
+			ent->client->jump_stamina += JUMP_REGEN * 6.5;
+		else if (ent->client->jump_stamina >60)
+			ent->client->jump_stamina += JUMP_REGEN * 2;
+		else
+			ent->client->jump_stamina += JUMP_REGEN;
 
-			if (ent->ai)
-				ent->client->jump_stamina += JUMP_REGEN * 6.5;
-		}
-
-
+		if (ent->ai)
+			ent->client->jump_stamina += JUMP_REGEN * 6.5;
+	}
 
 	if (ent->client->resp.chatsave[0] != '\0' &&  ent->client->resp.chatsavetime +5 < level.framenum)
 		Cmd_Say_f (ent, ent->client->resp.chatsavetype, false, true);
 
+	//should be done with the gun instead of client, but it won't matter 99% of the time
+	if (ent->client->mg42_temperature > 0)
+	{
+		ent->client->mg42_temperature -=.15;
+		//gi.dprintf(DEVELOPER_MSG_GAME, "%f \n", ent->client->mg42_temperature);
 
-
-		//should be done with the gun instead of client, but it won't matter 99% of the time
-		if (ent->client->mg42_temperature > 0)
+		if (ent->client->pers.weapon &&
+			ent->client->pers.weapon->classnameb == WEAPON_MG42 &&
+			ent->client->mg42_temperature > 33)
 		{
-			ent->client->mg42_temperature -=.15;
-			//gi.dprintf(DEVELOPER_MSG_GAME, "%f \n", ent->client->mg42_temperature);
+			edict_t *smoke;
+			vec3_t pos, forward;
 
-			if (ent->client->pers.weapon &&
-				ent->client->pers.weapon->classnameb == WEAPON_MG42 &&
-				ent->client->mg42_temperature > 33)
-			{
-				edict_t *smoke;
-				vec3_t pos, forward;
-				
+			AngleVectors (ent->client->v_angle, forward, NULL, NULL);
+			VectorMA (ent->s.origin, 20, forward, pos);  //calculates the range vector  //faf: 10 = range
+			pos[2]+=ent->viewheight;
 
-				AngleVectors (ent->client->v_angle, forward, NULL, NULL);
-				VectorMA (ent->s.origin, 20, forward, pos);  //calculates the range vector  //faf: 10 = range
-				pos[2]+=ent->viewheight;
-
-
-				smoke = G_Spawn ();
-				VectorCopy (pos, smoke->s.origin);
-				smoke->s.modelindex = gi.modelindex ("sprites/null.sp2");
-				smoke->s.frame      = 0;
-				smoke->s.skinnum    = 0;
-				smoke->touch        = NULL;
-				smoke->solid        = SOLID_NOT;
-				smoke->takedamage   = DAMAGE_NO;
-				smoke->clipmask     = 0;
-				smoke->s.effects    = EF_GRENADE;
-				smoke->movetype     = MOVETYPE_FLY;
-				VectorSet(smoke->velocity, 0, 0, 400);
-				smoke->nextthink    = level.time + .2;
-				smoke->think        = G_FreeEdict;
-				VectorAdd(smoke->velocity, ent->velocity, smoke->velocity);
-				gi.linkentity (smoke);
-			}
+			smoke = G_Spawn ();
+			VectorCopy (pos, smoke->s.origin);
+			smoke->s.modelindex = gi.modelindex ("sprites/null.sp2");
+			smoke->s.frame      = 0;
+			smoke->s.skinnum    = 0;
+			smoke->touch        = NULL;
+			smoke->solid        = SOLID_NOT;
+			smoke->takedamage   = DAMAGE_NO;
+			smoke->clipmask     = 0;
+			smoke->s.effects    = EF_GRENADE;
+			smoke->movetype     = MOVETYPE_FLY;
+			VectorSet(smoke->velocity, 0, 0, 400);
+			smoke->nextthink    = level.time + .2;
+			smoke->think        = G_FreeEdict;
+			VectorAdd(smoke->velocity, ent->velocity, smoke->velocity);
+			gi.linkentity (smoke);
 		}
+	}
 
-		
-
-        
-
-        
-		//we moved player to the void when first joining game, now move them to
-		//death view room
-		if (!ent->ai && ent->client->resp.enterframe == level.framenum - 2)
-		{
-			SelectSpawnPoint (ent, ent->s.origin, ent->s.angles);
-		}
-
-
-
-
-
-
-
-
+	//we moved player to the void when first joining game, now move them to
+	//death view room
+	if (!ent->ai && ent->client->resp.enterframe == level.framenum - 2)
+	{
+		SelectSpawnPoint (ent, ent->s.origin, ent->s.angles);
+	}
 
 	VectorCopy (ent->velocity, ent->client->oldvelocity);
 	VectorCopy (ent->client->ps.viewangles, ent->client->oldviewangles);
@@ -2746,11 +2522,10 @@ void ClientEndServerFrame (edict_t *ent)
 	}*/
 	// if the scoreboard is up, update it
 
-
 	if (!ent->ai || !ent->inuse)
 	{
 		if (ent->client->layout_type == SHOW_SCORES && !(level.framenum & 31) )
-		{ 
+		{
 			if (ent->client->menu)
 				PMenu_Update(ent);
 			else
@@ -2762,7 +2537,7 @@ void ClientEndServerFrame (edict_t *ent)
 			gi.unicast (ent, false);
 		}
 		if ((ent->client->layout_type == SHOW_OBJECTIVES_TEMP || ent->client->layout_type == SHOW_OBJECTIVES) && !(level.framenum & 40) )
-		{ 
+		{
 			if (ent->client->show_obj_temp_time < level.time - 5.5){
 				ent->client->show_obj_temp_time = 0;
 				ent->client->layout_type = SHOW_NONE;
@@ -2773,8 +2548,7 @@ void ClientEndServerFrame (edict_t *ent)
 			}
 		}
 		if (ent->client->layout_type == SHOW_MEDIC_SCREEN 
-			//&& 			level.framenum%2 == 0
-			)
+		    /*&& level.framenum%2 == 0*/)
 		{
 			Medic_Screen (ent);
 		}
@@ -2783,26 +2557,19 @@ void ClientEndServerFrame (edict_t *ent)
 			ent->client->resp.mos == MEDIC &&
 			ent->client->layout_type == SHOW_NONE)
 			ent->client->layout_type = SHOW_MEDIC_SCREEN;
-
-
-
 	}
-
-
 
 	// This was absolutely 100% borrowed from AQ2. 
 	if (ent->solid == SOLID_TRIGGER)
-	{       
+	{
 		edict_t *overlap;
-
-
 
 		if ((overlap = FindOverlap(ent, NULL)) == NULL)
 		{
-			ent->solid = SOLID_BBOX;	
+			ent->solid = SOLID_BBOX;
 			gi.linkentity(ent);
 		}
-		else    
+		else
 		{
 			do
 			{
@@ -2839,12 +2606,11 @@ void ClientEndServerFrame (edict_t *ent)
 					VectorSet (mins, -5,-5,0);
 					VectorSet (maxs, 5,5,11);
 
-
 					VectorCopy (ent->client->chasetarget->s.origin, start);
-					VectorMA (start, 310, up, end);              
+					VectorMA (start, 310, up, end);
 
 					tr = gi.trace (ent->client->chasetarget->s.origin, mins, maxs, end, ent->client->chasetarget, MASK_SOLID);
-					if (tr.fraction < 1.0 )	
+					if (tr.fraction < 1.0 )
 					{
 						//VectorSubtract (ent->client->chasetarget->s.origin, tr.endpos, distv);
 						//dist = VectorLength (distv);
@@ -2859,29 +2625,23 @@ void ClientEndServerFrame (edict_t *ent)
 
 					height = targetview[2] - ent->client->chasetarget->s.origin[2];
 
-	
 					//move the view forward as much as it is high
 					VectorCopy(ent->client->chasetarget->client->ps.viewangles, ent->client->ps.viewangles);
 					VectorCopy(ent->client->chasetarget->client->v_angle, ent->client->v_angle);
 					ent->client->v_angle[0] = 0;
 
-
 					dist =  .5 * height  + 125;
 					dist = 0.8 *height  + 39;
 					//dist = height-10;
 
-
 					//gi.dprintf(DEVELOPER_MSG_GAME, "%f %f\n",height,dist);
 
-
-						
 					VectorCopy (targetview, start);
 					AngleVectors (ent->client->v_angle, forward, right, NULL);
-					VectorMA (start, dist, forward, end);              
-
+					VectorMA (start, dist, forward, end);
 
 					tr = gi.trace (targetview, mins, maxs, end, ent, MASK_SOLID);
-					if (tr.fraction < 1.0 )	
+					if (tr.fraction < 1.0 )
 					{
 						VectorSubtract (targetview, tr.endpos, distv);
 						dist = VectorLength(distv);
@@ -2894,13 +2654,10 @@ void ClientEndServerFrame (edict_t *ent)
 						G_ProjectSource (targetview,offset,forward,right,targetview);
 					}
 
-	
-
 				//	VectorSubtract (ent->client->chasetarget->s.origin, targetview,distv);
 				//	dist = VectorLength (distv);
 
 				/*	targetfov = abs(-0.074 * height + 122);
-					
 					if (targetfov > 140)
 						targetfov=140;
 					if (targetfov < 100)
@@ -2909,11 +2666,10 @@ void ClientEndServerFrame (edict_t *ent)
 
 					ent->client->ps.fov = (ent->client->ps.fov + targetfov)/2;*/
 					ent->client->ps.fov = 100;
-					
+
 					VectorSubtract (ent->s.origin, targetview,distv);
 					dist = VectorLength (distv);
 
-					
 					if (//dist < 100 ||//pretty close, just move it there
 						dist > 500) //pretty far, just move it there
 					{
@@ -2922,7 +2678,7 @@ void ClientEndServerFrame (edict_t *ent)
 					else //go 100 units towards targetview
 					{
 						VectorSubtract(targetview, ent->s.origin, transition_dir );
-					    VectorNormalize(transition_dir);
+						VectorNormalize(transition_dir);
 						VectorMA (ent->s.origin, dist/4.5, transition_dir, ent->s.origin);
 						//gi.dprintf(DEVELOPER_MSG_GAME, "%s %s %f\n", vtos(targetview), vtos(ent->s.origin), level.time);
 						//gi.dprintf(DEVELOPER_MSG_GAME, "%f\n",dist);
@@ -2935,12 +2691,7 @@ void ClientEndServerFrame (edict_t *ent)
 						{
 							VectorCopy (targetview, ent->s.origin);
 						}
-
-
-
 					}
-
-					
 
 					ent->client->ps.pmove.pm_type = PM_FREEZE;
 
@@ -2951,14 +2702,9 @@ void ClientEndServerFrame (edict_t *ent)
 					ent->client->v_angle[1]=ent->client->v_angle[2]=0;
 					ent->client->ps.viewangles[1]=ent->client->ps.viewangles[2]=0;
 
-
-
 					ent->client->ps.gunindex = 0;
 					ent->client->ps.gunframe = 0;
 					VectorClear (ent->client->ps.gunangles);
-
-
-
 			}
 			else
 			{
@@ -2966,7 +2712,6 @@ void ClientEndServerFrame (edict_t *ent)
 
 				for (i=0 ; i<3 ; i++)
 					ent->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(ent->client->chasetarget->s.angles[i] - ent->client->resp.cmd_angles[i]);
-
 
 				VectorCopy(ent->client->chasetarget->client->ps.viewangles, ent->client->ps.viewangles);
 				VectorCopy(ent->client->chasetarget->client->v_angle, ent->client->v_angle);
@@ -2982,18 +2727,18 @@ void ClientEndServerFrame (edict_t *ent)
 
 					G_ProjectSource (ent->s.origin, offset, forward, right, ent->s.origin);
 					if ((ent->client->aim && ent->client->chasetarget->client->aim) || ent->client->aim == 1 || ent->client->aim == 2)
-					{}else ent->s.origin[2]+=13;
+					{
+					} else ent->s.origin[2]+=13;
 				}
 				else if (ent->client->chasetarget->stanceflags == STANCE_STAND)
 				{
 					AngleVectors (ent->client->chasetarget->client->v_angle, forward, right, NULL);
 					if ((ent->client->aim && ent->client->chasetarget->client->aim) || ent->client->aim == 1 || ent->client->aim == 2)
-					{	
+					{
 						VectorSet(offset, 30, 0, 0);
 					}
 					else
 						VectorSet(offset, -7, 0, 5);
-						
 
 					G_ProjectSource (ent->s.origin, offset, forward, right, ent->s.origin);
 				}
@@ -3023,15 +2768,9 @@ void ClientEndServerFrame (edict_t *ent)
 					VectorCopy (ent->client->chasetarget->client->ps.gunangles,ent->client->ps.gunangles);
 				}
 
-
-
-
 		//		VectorCopy (ent->client->chasetarget->velocity,ent->velocity);
 		//		ent->client->ps.gunindex = ent->client->chasetarget->client->ps.gunindex;
 		//		ent->client->ps.gunframe = ent->client->chasetarget->client->ps.gunframe;
-
-
-
 			}
 		}
 		else
@@ -3052,124 +2791,110 @@ void ClientEndServerFrame (edict_t *ent)
 			ent->client->ps.fov = MAX_FOV;
 	}
 
-/*
-if (ent->client->turret)
-{
-	vec3_t x;
+	/*
+	if (ent->client->turret)
+	{
+		vec3_t x;
 
-	//ent->client->turret->move_angles
-	
-//	VectorClear (ent->avelocity);
+		//ent->client->turret->move_angles
 
-//	for (i=0; i<3; i++)
-//	{
-//		x[i]= (cos(ent->client->turret->s.angles[i]) + cos(ent->client->turret->move_angles[i]))/2;
-//	}
-//	gi.dprintf(DEVELOPER_MSG_GAME, "%s, %s\n", vtos(ent->client->turret->s.angles),vtos(ent->client->turret->move_angles));
-	VectorCopy (ent->client->turret->move_angles, x);
-//	VectorCopy (ent->client->turret->s.angles, x);
+	//	VectorClear (ent->avelocity);
 
-	ent->client->ps.pmove.pm_type = PM_FREEZE;
+	//	for (i=0; i<3; i++)
+	//	{
+	//		x[i]= (cos(ent->client->turret->s.angles[i]) + cos(ent->client->turret->move_angles[i]))/2;
+	//	}
+	//	gi.dprintf(DEVELOPER_MSG_GAME, "%s, %s\n", vtos(ent->client->turret->s.angles),vtos(ent->client->turret->move_angles));
+		VectorCopy (ent->client->turret->move_angles, x);
+	//	VectorCopy (ent->client->turret->s.angles, x);
+
+		ent->client->ps.pmove.pm_type = PM_FREEZE;
 
 		for (i=0 ; i<3 ; i++)
 			ent->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(x[i] - ent->client->resp.cmd_angles[i]);
 
 		VectorCopy(x, ent->client->ps.viewangles);
 		VectorCopy(x, ent->client->v_angle);
-			
-}
+	}
+	*/
 
-*/
-
-
-
+//	if (ent->client->resp.accuracy_misses)
+//		gi.dprintf(DEVELOPER_MSG_GAME, "%i %i\n",ent->client->resp.accuracy_hits,ent->client->resp.accuracy_misses);
 
 
-
-
-//		if (ent->client->resp.accuracy_misses)
-//			gi.dprintf(DEVELOPER_MSG_GAME, "%i %i\n",ent->client->resp.accuracy_hits,ent->client->resp.accuracy_misses);
-
-
-//faf test 		gi.dprintf(DEVELOPER_MSG_GAME, "    %i\n", ent->client->ps.gunframe);
+//faf test 	gi.dprintf(DEVELOPER_MSG_GAME, "    %i\n", ent->client->ps.gunframe);
 //faf test 	gi.dprintf(DEVELOPER_MSG_GAME, "    %i\n", ent->client->weaponstate);
 
-//		gi.dprintf(DEVELOPER_MSG_GAME, "%s %s\n", vtos(ent->mins), vtos(ent->maxs)  );
-		if (ent->client->scopetry)
-		{
-			if (Cmd_Scope_f(ent) == true)
-				ent->client->scopetry = false;
-		}
-		if (ent->client->reloadtry)
-		{
-			if (Cmd_Reload(ent) == true)
-				ent->client->reloadtry = false;
-		}
- //	gi.dprintf(DEVELOPER_MSG_GAME, "    %i\n", ent->client->scopetry);
- //gi.dprintf(DEVELOPER_MSG_GAME, "  %s\n", vtos(ent->maxs));
-
+//	gi.dprintf(DEVELOPER_MSG_GAME, "%s %s\n", vtos(ent->mins), vtos(ent->maxs)  );
+	if (ent->client->scopetry)
+	{
+		if (Cmd_Scope_f(ent) == true)
+			ent->client->scopetry = false;
+	}
+	if (ent->client->reloadtry)
+	{
+		if (Cmd_Reload(ent) == true)
+			ent->client->reloadtry = false;
+	}
+//	gi.dprintf(DEVELOPER_MSG_GAME, "    %i\n", ent->client->scopetry);
+//	gi.dprintf(DEVELOPER_MSG_GAME, "  %s\n", vtos(ent->maxs));
 
 //	gi.dprintf(DEVELOPER_MSG_GAME, "%i\n", ent->s.frame);
 //	gi.dprintf(DEVELOPER_MSG_GAME, "%i\n", ent->client->showobjectives);
 //	gi.dprintf(DEVELOPER_MSG_GAME, "%i\n", (int)(random() *4));
 //	gi.dprintf(DEVELOPER_MSG_GAME, "%f\n",ent->client->v_angle[PITCH]);
 
-//safe_cprintf(ent, PRINT_HIGH, "%i\n", ent->health);
+//	safe_cprintf(ent, PRINT_HIGH, "%i\n", ent->health);
 
-//safe_cprintf(ent, PRINT_HIGH, "sf %i\n", ent->stanceflags);
-//safe_cprintf(ent, PRINT_HIGH, "w %i\n", ent->waterlevel);
-//safe_cprintf(ent, PRINT_HIGH, "jump_stuck %i\n", ent->client->jump_stuck);
+//	safe_cprintf(ent, PRINT_HIGH, "sf %i\n", ent->stanceflags);
+//	safe_cprintf(ent, PRINT_HIGH, "w %i\n", ent->waterlevel);
+//	safe_cprintf(ent, PRINT_HIGH, "jump_stuck %i\n", ent->client->jump_stuck);
 
 //	safe_centerprintf(ent, "%i\n", ent->stanceflags);
 
-		if (ent->deadflag)
+	if (ent->deadflag)
+	{
+		//float vol;
+
+		if (ent->s.frame == 175 ||
+			ent->s.frame == 181 ||
+			ent->s.frame == 187 ||
+			ent->s.frame == 195)
 		{
-			//float vol;
-				
-			if (ent->s.frame == 175 ||
-				ent->s.frame == 181 ||
-				ent->s.frame == 187 ||
-				ent->s.frame == 195)
-			{
-			//vol = (250 + (ent->velocity[2] * (-1)))/1250;
-			//gi.dprintf(DEVELOPER_MSG_GAME, "%f\n",vol);
-				gi.sound (ent, CHAN_BODY, gi.soundindex ("player/bodyfall.wav"), .3, ATTN_NORM, 0);
-			}
+		//vol = (250 + (ent->velocity[2] * (-1)))/1250;
+		//gi.dprintf(DEVELOPER_MSG_GAME, "%f\n",vol);
+			gi.sound (ent, CHAN_BODY, gi.soundindex ("player/bodyfall.wav"), .3, ATTN_NORM, 0);
 		}
+	}
 
+	/*
+	if (ent->client->chasetarget && ent->client->chasetarget->ai)
+	{
+		edict_t *e = ent->client->chasetarget;
 
-/*
-	
+		if (e->ai->objective)
+			gi.dprintf(DEVELOPER_MSG_GAME, "obj: %s/%s ", e->ai->objective->obj_name,e->ai->objective->message);
 
-		if (ent->client->chasetarget && ent->client->chasetarget->ai)
-		{
-			edict_t *e = ent->client->chasetarget;
+		gi.dprintf(DEVELOPER_MSG_GAME, "camptarg: %i ", e->ai->camp_targ);
 
-			if (e->ai->objective)
-				gi.dprintf(DEVELOPER_MSG_GAME, "obj: %s/%s ", e->ai->objective->obj_name,e->ai->objective->message);
+		if (e->ai->next_node)
+			gi.dprintf(DEVELOPER_MSG_GAME, "current_node: %i ", e->ai->current_node);
+		if (e->ai->next_node)
+			gi.dprintf(DEVELOPER_MSG_GAME, "next_node: %i ", e->ai->next_node);
+		if (e->ai->goal_node)
+			gi.dprintf(DEVELOPER_MSG_GAME, "goal_node: %i ", e->ai->goal_node);
 
-			gi.dprintf(DEVELOPER_MSG_GAME, "camptarg: %i ", e->ai->camp_targ);
+		gi.dprintf(DEVELOPER_MSG_GAME, "state:%i \n", e->ai->state);
+	}
 
-			if (e->ai->next_node)
-				gi.dprintf(DEVELOPER_MSG_GAME, "current_node: %i ", e->ai->current_node);
-			if (e->ai->next_node)
-				gi.dprintf(DEVELOPER_MSG_GAME, "next_node: %i ", e->ai->next_node);
-			if (e->ai->goal_node)
-				gi.dprintf(DEVELOPER_MSG_GAME, "goal_node: %i ", e->ai->goal_node);
+//	if (g_edicts[globals.num_edicts].classname)
+//		gi.dprintf(DEVELOPER_MSG_GAME, "%i %s \n", globals.num_edicts, "X");// g_edicts[globals.num_edicts].classname);
 
-			gi.dprintf(DEVELOPER_MSG_GAME, "state:%i \n", e->ai->state);
-	
-		}
-
-
-//if (g_edicts[globals.num_edicts].classname)
-//gi.dprintf(DEVELOPER_MSG_GAME, "%i %s \n", globals.num_edicts, "X");// g_edicts[globals.num_edicts].classname);
-
-/*
+	/*
 	if (1)
 	{
 		int o;
-        
+
 		o = level.framenum%globals.num_edicts;
 		gi.dprintf(DEVELOPER_MSG_GAME, "%i ",o);
 		if (g_edicts[o].classname)
@@ -3177,8 +2902,8 @@ if (ent->client->turret)
 		gi.dprintf(DEVELOPER_MSG_GAME, "\n");
 	}*/
 
-
-/*	if (level.framenum%10 ==1)
+	/*
+	if (level.framenum%10 ==1)
 	{
 		gi.dprintf(DEVELOPER_MSG_GAME, "Owned campspots:");
 		for (i=0; i< total_camp_spots; i++)
@@ -3187,8 +2912,8 @@ if (ent->client->turret)
 				gi.dprintf(DEVELOPER_MSG_GAME, "%i ",i);
 		}
 		gi.dprintf(DEVELOPER_MSG_GAME, "\n"); 
-	} */
-
+	}
+	*/
 
 	//stores player's old position so bots can shoot at (pseudo lag simulator)
 	if (ent->client->last_pos2)
@@ -3198,16 +2923,13 @@ if (ent->client->turret)
 
 	VectorCopy (ent->s.origin, ent->client->last_pos1);
 
-
-//if (ent->client && ent->client->ps.gunframe)
-//	gi.dprintf(DEVELOPER_MSG_GAME, "%i\n", ent->client->ps.gunframe);
-
-
+//	if (ent->client && ent->client->ps.gunframe)
+//		gi.dprintf(DEVELOPER_MSG_GAME, "%i\n", ent->client->ps.gunframe);
 
 	if (afk_time->value && level.framenum %10==0 && ent->client->resp.team_on && !level.intermissiontime)
 	{
 		//gi.dprintf(DEVELOPER_MSG_GAME, "checktime: %i   time:%i  lastorg %s \n",  ent->client->pers.afk_check_time, level.framenum, vtos(ent->client->pers.last_angles));
-		
+
 		if (!VectorCompare (ent->s.angles, ent->client->pers.last_angles))
 			ent->client->pers.afk_check_time = level.framenum;
 		VectorCopy(ent->s.angles, ent->client->pers.last_angles); 
@@ -3227,6 +2949,5 @@ if (ent->client->turret)
 
 		if (ent->oldwaterlevel != ent->waterlevel || ent->oldstance!= ent->stanceflags)
 			WeighPlayer(ent);
-
 }
 

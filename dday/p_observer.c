@@ -40,36 +40,28 @@ int PlayerCountForTeam (int team_number, qboolean countbots)
 {
 	int i;
 	int playercount = 0;
-    edict_t *check_ent;
+	edict_t *check_ent;
 
-        
 	for (i = 1; i <= maxclients->value; i++)
-    {
-         check_ent = g_edicts + i;
-         if (!check_ent->inuse)
-			 continue;
-		 if (!check_ent->client ||
-			 !check_ent->client->resp.team_on)
-			 continue;
-
-		 if (countbots == false && check_ent->ai)
-			 continue;
-
-		 if (check_ent->client->resp.team_on->index == team_number)
-			 playercount++;
-
+	{
+		check_ent = g_edicts + i;
+		if (!check_ent->inuse)
+			continue;
+		if (!check_ent->client || !check_ent->client->resp.team_on)
+			continue;
+		if (countbots == false && check_ent->ai)
+			continue;
+		if (check_ent->client->resp.team_on->index == team_number)
+			playercount++;
 	}
 	return playercount;
-                              
 }
-
 
 
 // clients will use these
 
 void SwitchToObserver(edict_t *ent)
 {
-
 // start as observer 
 	ent->movetype = MOVETYPE_NOCLIP; 
 	ent->solid = SOLID_NOT; 
@@ -80,16 +72,12 @@ void SwitchToObserver(edict_t *ent)
 	ent->client->limbo_mode=true;
 //	ent->client->deathfade = 0;
 
-
 	if (!ent->client->display_info && ent->client->layout_type != SHOW_CAMPAIGN)
 	{
 		if(team_list[0])
 			MainMenu(ent);
 	}
 }
-
-
-
 
 
 //faf    parachutes :P
@@ -101,7 +89,6 @@ void Chute_Think(edict_t *ent)
 		ent->nextthink = level.time + .1;
 		return;
 	}
-
 
 	//done with it
 	if (ent->s.frame == 10)
@@ -148,7 +135,6 @@ void Chute_Think(edict_t *ent)
 		ent->s.sound = gi.soundindex("faf/flag.wav");
 		ent->owner->client->landed = false;
 		ent->owner->client->ps.pmove.gravity = .25 * (sv_gravity->value) ; //parchute factor
-
 	}
 	else
 	{
@@ -158,12 +144,11 @@ void Chute_Think(edict_t *ent)
 		ent->s.sound = gi.soundindex("faf/flag.wav");
 		ent->movetype = MOVETYPE_TOSS;
 		ent->owner->client->landed = false;
-
 	}
 
 	if (ent->velocity[2] <-500)
 		ent->velocity [2] = -500;
-/*	
+	/*
 	if (ent->s.frame < 10 && 
 		!ent->owner->groundentity)
 	{
@@ -171,12 +156,8 @@ void Chute_Think(edict_t *ent)
 		VectorCopy (ent->owner->s.origin, ent->s.origin);
 		ent->movetype = MOVETYPE_TOSS;
 		ent->s.sound = gi.soundindex("faf/flag.wav");
-
 	} */
 }
-
-
-	
 
 
 void Spawn_Chute(edict_t *ent)
@@ -185,18 +166,15 @@ void Spawn_Chute(edict_t *ent)
 	vec3_t	start;
 	vec3_t	end;
 	vec3_t world_up, down;
-
 	trace_t	tr;
-
 	edict_t *chute;
-
 
 	ent->client->landed = true;
 
 	VectorCopy(ent->s.origin, start);
 	VectorSet(world_up, 0, 0, 1);
 	VectorMA(start, 8192, world_up, end);
-		
+
 	tr = gi.trace(start, NULL, NULL, end, ent, MASK_SHOT|CONTENTS_SLIME|CONTENTS_LAVA);
 
 	if ( tr.surface && !(tr.surface->flags & SURF_SKY))  //under a roof
@@ -216,7 +194,6 @@ void Spawn_Chute(edict_t *ent)
 
 	ent->client->landed = false;
 
-
 	chute = G_Spawn();
 	chute->movetype = MOVETYPE_TOSS;
 	chute->solid = SOLID_TRIGGER;
@@ -227,20 +204,16 @@ void Spawn_Chute(edict_t *ent)
 	chute->think = Chute_Think;
 	chute->nextthink = level.time + .1;
 	chute->owner = ent;
-	
+
 	chute->clipmask = MASK_SHOT;
-	
+
 	VectorClear (chute->mins);
 	VectorClear (chute->maxs);
-	
+
 	chute->classname = "chute";
 
 	VectorCopy (ent->s.origin, chute->s.origin);
-
-
 }
-
-
 
 
 void Spawn_Chute_Special(edict_t *ent)
@@ -249,14 +222,11 @@ void Spawn_Chute_Special(edict_t *ent)
 	vec3_t	start;
 	vec3_t	end;
 	vec3_t world_up, down;
-
 	trace_t	tr;
-
 	edict_t *chute;
 
 	if (ent->client->has_chute == false)
 		return;
-
 
 	ent->client->landed = true;
 
@@ -284,7 +254,6 @@ void Spawn_Chute_Special(edict_t *ent)
 	ent->client->landed = false;
 	ent->client->has_chute = false;
 
-
 	chute = G_Spawn();
 	chute->movetype = MOVETYPE_TOSS;
 	chute->solid = SOLID_TRIGGER;
@@ -295,22 +264,16 @@ void Spawn_Chute_Special(edict_t *ent)
 	chute->think = Chute_Think;
 	chute->nextthink = level.time + .1;
 	chute->owner = ent;
-	
+
 	chute->clipmask = MASK_SHOT;
-	
+
 	VectorClear (chute->mins);
 	VectorClear (chute->maxs);
-	
+
 	chute->classname = "chute";
 
 	VectorCopy (ent->s.origin, chute->s.origin);
-
-
 }
-
-
-
-
 
 
 //this function exits observer mode, presumably after they have chosen mos. They must have
@@ -318,8 +281,8 @@ void Spawn_Chute_Special(edict_t *ent)
 
 void Find_Mission_Start_Point(edict_t *ent, vec3_t origin, vec3_t angles);
 
-void EndObserverMode(edict_t* ent) 
-{ 
+void EndObserverMode(edict_t* ent)
+{
 	vec3_t	spawn_origin, spawn_angles;
 
 	if (!ent->client->limbo_mode) 
@@ -327,7 +290,6 @@ void EndObserverMode(edict_t* ent)
 
 	if (ent->leave_limbo_time > level.time)
 		return;
-
 
 	if( !team_list[0] || !ent->client->resp.team_on)
 	{
@@ -360,7 +322,7 @@ void EndObserverMode(edict_t* ent)
 
 	// unlink to make sure it can't possibly interfere with KillBox	
 	gi.unlinkentity (ent);
-	
+
 	ent->client->ps.pmove.origin[0] = spawn_origin[0]*8;
 	ent->client->ps.pmove.origin[1] = spawn_origin[1]*8;
 	ent->client->ps.pmove.origin[2] = spawn_origin[2]*8;
@@ -392,21 +354,16 @@ if (ent->client->resp.mos == SPECIAL)
 	else
 		ent->client->landed = true;
 */
-ent->client->landed = true;
+	ent->client->landed = true;
 	//faf
 /*requires model*/
 	if (ent->client->resp.mos == SPECIAL)
 	{
 		ent->client->has_chute = true;
-
 		Spawn_Chute(ent);
 	}
 
-
 	Remove_Nearby_Sandbags(ent);
-
-
-
 }
 
 void sandbag_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point);
@@ -416,7 +373,6 @@ void Remove_Nearby_Sandbags(edict_t *ent)
 	float tdist;
 	int i;
 	edict_t *e;
-
 
 	for (i=0 ; i<game.maxentities ; i++)
 	{
@@ -429,19 +385,15 @@ void Remove_Nearby_Sandbags(edict_t *ent)
 		if (e->classnameb != SANDBAGS)
 			continue;
 
-
 		VectorSubtract (e->s.origin, ent->s.origin, vdist);
 
 		tdist = VectorLength (vdist);
-		
 		if (tdist > 64) 
 			continue;
-
 
 		//gi.dprintf(DEVELOPER_MSG_GAME, "djksflsdfjklsdfjkl\n");
 
 		sandbag_die (e, ent, ent, 99999999, e->s.origin);
-
 	}
 }
 
@@ -496,9 +448,6 @@ qboolean OpenSpot (edict_t *ent, mos_t class)
 			taken++;
 	}
 
-
-
-
 	// Not-so-good way of doing things, but it gets the job done
 	switch (class)
 	{
@@ -515,7 +464,7 @@ qboolean OpenSpot (edict_t *ent, mos_t class)
 		team->mos[L_GUNNER]->available	= MAX_L_GUNNER	- taken;
 		break;
 	case H_GUNNER:
-		spots							= MAX_H_GUNNER;			
+		spots							= MAX_H_GUNNER;
 		team->mos[H_GUNNER]->available	= MAX_H_GUNNER	- taken;
 		break;
 	case SNIPER:
@@ -567,10 +516,8 @@ qboolean OpenSpot (edict_t *ent, mos_t class)
 }
 
 
-
 void DoEndOM(edict_t *ent /*,qboolean notOfficer*/)
 {
-
 	/*if (!ent->client->resp.mos) {
 		safe_cprintf(ent, PRINT_HIGH, "You aren't assigned to a class!\n");
 		return;
@@ -595,25 +542,23 @@ void DoEndOM(edict_t *ent /*,qboolean notOfficer*/)
 				ent->client->resp.mos =  ent->client->resp.newmos;
 				ent->client->resp.team_on->mos[ent->client->resp.mos]->available--;
 			}
-			else 
-			{	
+			else
+			{
 				if (ent->client->resp.mos == NONE)
 				{
 					safe_centerprintf(ent, "Request for class denied: Infantry\n");
 					ent->client->resp.mos = INFANTRY;						
-				} 
+				}
 				else
 					safe_centerprintf(ent, "Your new selected class already\nhas enough players. Retain your\nassignment.\n");
-
 			}
 			ent->client->resp.newmos = NONE;
 		}
 	}
 
-
 	// reset playermodel with team's
 	SyncUserInfo(ent, true); 
-	
+
 	ent->takedamage = DAMAGE_YES;
 	ent->movetype = MOVETYPE_WALK;
 	ent->viewheight = 20;//faf 22;
@@ -625,7 +570,7 @@ void DoEndOM(edict_t *ent /*,qboolean notOfficer*/)
 	ent->deadflag = DEAD_NO;
 	ent->air_finished = level.time + 12;
 	ent->clipmask = MASK_PLAYERSOLID;
-    ent->svflags &= ~SVF_NOCLIENT; 
+	ent->svflags &= ~SVF_NOCLIENT;
 	ent->wound_location=0;
 	Give_Class_Weapon(ent);
 	Give_Class_Ammo(ent);
@@ -639,16 +584,12 @@ void DoEndOM(edict_t *ent /*,qboolean notOfficer*/)
 	ent->client->resp.changeteam = false;
 	ent->client->respawn_time = level.time;
 
-
 	ent->client->layout_type = SHOW_OBJECTIVES_TEMP;
 	ent->client->show_obj_temp_time = level.time;
 	Cmd_Objectives(ent);
 
 	ent->client->mg42_temperature = 0;
-
-
-} 
-
+}
 
 
 void M_MOS_Join(edict_t *ent, pmenu_t *p, int choice)
@@ -681,7 +622,6 @@ void M_MOS_Join(edict_t *ent, pmenu_t *p, int choice)
 //		EndObserverMode(ent);//faf: handle this in begin client frame
 //	else if (level.framenum >   ((int)(level_wait->value * 10) +  (ent->client->spawn_delay * 10))   )
 //		EndObserverMode(ent);
-
 }
 
 /*
@@ -700,7 +640,8 @@ void SMOS_Join(edict_t *ent,int choice)
 
 
 // There are many ways to do this.. but this way was easier on the eyes
-void client_menu(edict_t *ent, int entry, char *text, int align, void *arg, void (*SelectFunc)(edict_t *ent, struct pmenu_s *entry, int choice)) {
+void client_menu(edict_t *ent, int entry, char *text, int align, void *arg, void (*SelectFunc)(edict_t *ent, struct pmenu_s *entry, int choice))
+{
 	ent->client->menu_cur[entry].text		= text;
 	ent->client->menu_cur[entry].align		= align;
 	ent->client->menu_cur[entry].arg		= arg;
@@ -757,23 +698,18 @@ void M_ChooseMOS(edict_t *ent)
 				!cl_ent->client->resp.team_on ||
 				!cl_ent->client->resp.team_on->mos ||
 				cl_ent->client->resp.team_on->index != ent->client->resp.team_on->index)
-				continue; 
-			
-//			if (cl_ent == ent && ent->client->resp.mos == INFANTRY)
-if (cl_ent == ent && (!ent->client->resp.AlreadySpawned || ent->client->resp.changeteam))
-continue;
+				continue;
 
+//			if (cl_ent == ent && ent->client->resp.mos == INFANTRY)
+			if (cl_ent == ent && (!ent->client->resp.AlreadySpawned || ent->client->resp.changeteam))
+				continue;
 
 			if (ent->client->resp.team_on->mos[i]->mos ==
 				cl_ent->client->resp.mos)
 				taken++;
 		}
 
-
-
 		// Now set the available for this class
-
-		
 		switch (ent->client->resp.team_on->mos[i]->mos) //crash
 		{
 		case INFANTRY:
@@ -827,8 +763,6 @@ continue;
 		if (maxSlots < 0)
 			maxSlots = 0;
 
-
-
 		// Setup text variable
 		theText = gi.TagMalloc(sizeof("123456789012 [00/00]"), TAG_GAME);
 		if (maxSlots == 0)
@@ -839,13 +773,9 @@ continue;
 			strcpy(theText, va("%12s [%i/%i]", ent->client->resp.team_on->mos[i]->name, taken, maxSlots));
 
 		ent->client->menu_cur[i+6].text  = (class_limits->value)?(char *)theText:ent->client->resp.team_on->mos[i]->name;
-		
-		
-		
 		ent->client->menu_cur[i+6].align = PMENU_ALIGN_LEFT;
 		ent->client->menu_cur[i+6].arg   = NULL;
 		ent->client->menu_cur[i+6].SelectFunc = M_MOS_Join;
-
 	}
 
 	// You can't go back and change stuff before you've spawned
@@ -861,7 +791,6 @@ continue;
 
 void M_Team_Join(edict_t *ent, pmenu_t *p, int choice)
 {
-
 //	qboolean foundspot=false;
 	int i,j,k,l,m;
 
@@ -869,8 +798,6 @@ void M_Team_Join(edict_t *ent, pmenu_t *p, int choice)
 		PMenu_Close(ent);
 
 	choice -= 11;//7;
-
-
 
 	if (choice == -2) { // auto team
 		i = j = k = 0;
@@ -899,10 +826,9 @@ void M_Team_Join(edict_t *ent, pmenu_t *p, int choice)
 			ent->client->resp.team_on->index == 1)
 			j--;
 
-
-		if (i > j) 
+		if (i > j)
 			choice = 1;
-		else if (i < j) 
+		else if (i < j)
 			choice = 0;
 
 		//else if there are bots, go to the team with fewer humans
@@ -961,9 +887,6 @@ void M_Team_Join(edict_t *ent, pmenu_t *p, int choice)
 		}
 	}*/
 
-
-
-
 	if (ent->client->resp.AlreadySpawned) // used choose_team cmd
 	{
 		if (ent->health ==100)
@@ -971,7 +894,7 @@ void M_Team_Join(edict_t *ent, pmenu_t *p, int choice)
 		else
 			T_Damage(ent, world, world, vec3_origin, ent->s.origin, vec3_origin, ent->health + 999, 0, DAMAGE_NO_PROTECTION, MOD_CHANGETEAM_WOUNDED);
 	}
-	
+
 	if (ent->client->resp.team_on)
 	{
 		ent->client->resp.team_on=team_list[choice];
@@ -990,21 +913,15 @@ void M_Team_Join(edict_t *ent, pmenu_t *p, int choice)
 	ent->client->resp.changeteam = true;
 	ent->client->forcespawn = level.time + .5;//faf: fixes standing corpse bug
 
-
 //	stuffcmd(ent, va("play %s/shout/yes1.wav", team_list[choice]->teamid));
-				
 
 	M_ChooseMOS(ent);
 	//EndObserverMode(ent);	// *RSH Copied this from SMOS_Join code to try and start the game. 
 
 	return;
 
-
 //	gi.dprintf(DEVELOPER_MSG_GAME, "warning: %s got to end of M_Team_Join().\n", ent->client->pers.netname);
-
-
 }
-
 
 
 void ChooseTeam(edict_t *ent) {
@@ -1025,8 +942,6 @@ void ChooseTeam(edict_t *ent) {
 //		return;
 //	}
 
-
-
 	// rezmoth - must wait until end of lobby time //faf:  not
 //faf	if (level.framenum < ((int)level_wait->value * 10))
 //faf		return;
@@ -1038,17 +953,14 @@ void ChooseTeam(edict_t *ent) {
 		return;
 	}
 
-
 	client_menu(ent, 4, "*D-DAY: NORMANDY "  /*DEVVERSION*/,PMENU_ALIGN_CENTER, NULL, NULL );
 	client_menu(ent, 5, "*by Vipersoft",			PMENU_ALIGN_CENTER, NULL, NULL );
 //	client_menu(ent, 2, NULL,						PMENU_ALIGN_CENTER, NULL, NULL );
 	client_menu(ent, 7, "*Choose a Team",				PMENU_ALIGN_CENTER, NULL, NULL );
 //	client_menu(ent, 4, NULL,						PMENU_ALIGN_CENTER, NULL, NULL );
 
-
 	if (!force_auto_select->value)//faf
 	{
-
 		for(i=0;i<MAX_TEAMS;i++)
 		{
 			if (!team_list[i]) 
@@ -1065,7 +977,7 @@ void ChooseTeam(edict_t *ent) {
 						continue;
 					}
 				}
-			}				
+			}
 
 			if (i == 1)
 			{
@@ -1077,9 +989,7 @@ void ChooseTeam(edict_t *ent) {
 						continue;
 					}
 				}
-			}				
-
-
+			}
 
 //			for (j=0; team_list[i]->units[j]; j++);
 
@@ -1100,7 +1010,7 @@ void ChooseTeam(edict_t *ent) {
 			(Q_stricmp(allied_password->string, "none") == 0)) && 
 			((Q_stricmp(axis_password->string, "") == 0) ||
 			(Q_stricmp(axis_password->string, "none") == 0)))
-			client_menu(ent, 9, "Auto Select",		PMENU_ALIGN_CENTER,	NULL, M_Team_Join );		
+			client_menu(ent, 9, "Auto Select",		PMENU_ALIGN_CENTER,	NULL, M_Team_Join );
 	}
 
 //	client_menu(ent, 9, NULL,				PMENU_ALIGN_RIGHT,	NULL, NULL );
@@ -1108,29 +1018,26 @@ void ChooseTeam(edict_t *ent) {
 //	client_menu(ent, 11, NULL,				PMENU_ALIGN_RIGHT,	NULL, NULL );
 	client_menu(ent, 17, "*Use [ and ] to select", PMENU_ALIGN_CENTER,	NULL, NULL );
 
-
 	PMenu_Open(ent, ent->client->menu_cur , 5, sizeof(ent->client->menu_cur) / sizeof(pmenu_t));
 	//gi.TagFree(theText);
+}
 
-
-} 
-void M_Observe_Choose (edict_t *ent, pmenu_t *p, int choice) 
+void M_Observe_Choose (edict_t *ent, pmenu_t *p, int choice)
 {
 	PMenu_Close(ent);
-
 	Cmd_FlyingNunMode_f(ent);
 }
-void M_Binds_Choose (edict_t *ent, pmenu_t *p, int choice) 
+
+void M_Binds_Choose (edict_t *ent, pmenu_t *p, int choice)
 {
 	PMenu_Close(ent);
-
 	Cmd_DDHelp_f(ent);
 	stuffcmd(ent, "toggleconsole;");
 }
-void M_Name_Choose (edict_t *ent, pmenu_t *p, int choice) 
+
+void M_Name_Choose (edict_t *ent, pmenu_t *p, int choice)
 {
 	PMenu_Close(ent);
-
 	stuffcmd(ent, "menu_playerconfig;");
 }
 
@@ -1168,37 +1075,38 @@ void MainMenu(edict_t *ent)
 //	client_menu(ent, 7,  NULL,				PMENU_ALIGN_RIGHT,	NULL, NULL );
 	client_menu(ent, 17, "*Use [ and ] to select",			PMENU_ALIGN_CENTER,	NULL, NULL );
 
-
 	PMenu_Open(ent, ent->client->menu_cur, 9, sizeof(ent->client->menu_cur) / sizeof(pmenu_t));
 }
 
-void M_Main_Menu (edict_t *ent, pmenu_t *p, int choice) 
-{ MainMenu(ent); }
+void M_Main_Menu (edict_t *ent, pmenu_t *p, int choice)
+{
+	MainMenu(ent);
+}
 
-void M_Team_Choose (edict_t *ent, pmenu_t *p, int choice) 
+void M_Team_Choose (edict_t *ent, pmenu_t *p, int choice)
 {
 	PMenu_Close(ent);
-
 	ChooseTeam(ent);
 }
-void M_Class_Choose (edict_t *ent, pmenu_t *p, int choice) 
+
+void M_Class_Choose (edict_t *ent, pmenu_t *p, int choice)
+{
+	PMenu_Close(ent);
+	M_ChooseMOS(ent);
+}
+
+void M_View_Credits (edict_t *ent, pmenu_t *p, int choice)
 {
 	PMenu_Close(ent);
 
-	M_ChooseMOS(ent);
-}
-void M_View_Credits (edict_t *ent, pmenu_t *p, int choice) 
-{
-		PMenu_Close(ent);
-
-		client_menu(ent, 0, "*D-DAY: NORMANDY " /*DEVVERSION*/,		PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 1, "*by Vipersoft",					PMENU_ALIGN_CENTER, NULL, NULL );
-//		client_menu(ent, 2, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 3, "*Development Credits",				PMENU_ALIGN_CENTER, NULL, NULL );
-//		client_menu(ent, 4, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
-//		client_menu(ent, 5, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 5, "D-Day: Normandy",				PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 6, "Was Created By",				PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 0, "*D-DAY: NORMANDY " /*DEVVERSION*/,		PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 1, "*by Vipersoft",					PMENU_ALIGN_CENTER, NULL, NULL );
+//	client_menu(ent, 2, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 3, "*Development Credits",				PMENU_ALIGN_CENTER, NULL, NULL );
+//	client_menu(ent, 4, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
+//	client_menu(ent, 5, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 5, "D-Day: Normandy",				PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 6, "Was Created By",				PMENU_ALIGN_CENTER, NULL, NULL );
 	client_menu(ent, 7,  "*Vipersoft",		PMENU_ALIGN_CENTER,	NULL, M_View_Credits_Vipersoft);
 //	client_menu(ent, 8,  NULL,				PMENU_ALIGN_CENTER, NULL, NULL );
 	client_menu(ent, 9, "Further",				PMENU_ALIGN_CENTER, NULL, NULL );
@@ -1214,13 +1122,11 @@ void M_View_Credits (edict_t *ent, pmenu_t *p, int choice)
 	client_menu(ent, 24, "Main Menu",						PMENU_ALIGN_RIGHT,	NULL, M_Main_Menu );
 	client_menu(ent, 25, "*Use [ and ] to select",			PMENU_ALIGN_CENTER,	NULL, NULL );
 
-
 	PMenu_Open(ent, ent->client->menu_cur, 7, sizeof(ent->client->menu_cur) / sizeof(pmenu_t));
 }
 
-void credit_sound (edict_t *ent, pmenu_t *p, int choice) 
+void credit_sound (edict_t *ent, pmenu_t *p, int choice)
 {
-
 	switch (choice)
 	{
 	case 6:
@@ -1241,171 +1147,168 @@ void credit_sound (edict_t *ent, pmenu_t *p, int choice)
 	M_View_Credits_Vipersoft (ent, p, choice);
 }
 
-void M_View_Credits_Vipersoft (edict_t *ent, pmenu_t *p, int choice) 
+void M_View_Credits_Vipersoft (edict_t *ent, pmenu_t *p, int choice)
 {
-		PMenu_Close(ent);
+	PMenu_Close(ent);
 
-		client_menu(ent, 0, "*D-DAY: NORMANDY" /*DEVVERSION*/,		PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 1, "*by Vipersoft",					PMENU_ALIGN_CENTER, NULL, NULL );
-//		client_menu(ent, 2, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 3, "*Development Credits",				PMENU_ALIGN_CENTER, NULL, NULL );
-//		client_menu(ent, 4, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 0, "*D-DAY: NORMANDY" /*DEVVERSION*/,		PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 1, "*by Vipersoft",					PMENU_ALIGN_CENTER, NULL, NULL );
+//	client_menu(ent, 2, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 3, "*Development Credits",				PMENU_ALIGN_CENTER, NULL, NULL );
+//	client_menu(ent, 4, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
 
-		client_menu(ent, 5, "Project Leader",					PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 6, "*Jason 'Abaris' Mohr",				PMENU_ALIGN_CENTER,	NULL, credit_sound );
-//		client_menu(ent, 7, NULL,								PMENU_ALIGN_LEFT,	NULL, NULL );
-		client_menu(ent, 8, "Programming",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 9, "*Phil Bowens",						PMENU_ALIGN_CENTER,	NULL, credit_sound );
-		client_menu(ent, 10, "*Species",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 11, "*Adam 'RezMoth' Sherburne",		PMENU_ALIGN_CENTER,	NULL, NULL );
-//		client_menu(ent, 12, NULL,								PMENU_ALIGN_LEFT,	NULL, NULL );
-		client_menu(ent, 13, "Level Design",					PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 14, "*Peter 'Castrator' Lipman",		PMENU_ALIGN_CENTER,	NULL, credit_sound );
-//		client_menu(ent, 15, NULL,								PMENU_ALIGN_LEFT,	NULL, NULL );
-		client_menu(ent, 16, "Visual Artist",					PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 17, "*Darwin Allen",					PMENU_ALIGN_CENTER,	NULL, credit_sound );
-//		client_menu(ent, 18, NULL,								PMENU_ALIGN_LEFT,	NULL, NULL );
-//		client_menu(ent, XX, "Sound Engineer",					PMENU_ALIGN_CENTER,	NULL, NULL );
-//		client_menu(ent, XX, "*Oliver 'JumperDude' Snavely",	PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 19, NULL,								PMENU_ALIGN_LEFT,	NULL, NULL );
-		client_menu(ent, 20, "Webmistress",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 21, "*Wheaty",							PMENU_ALIGN_CENTER,	NULL, NULL );
-//		client_menu(ent, 22, NULL,								PMENU_ALIGN_LEFT,	NULL, NULL );
+	client_menu(ent, 5, "Project Leader",					PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 6, "*Jason 'Abaris' Mohr",				PMENU_ALIGN_CENTER,	NULL, credit_sound );
+//	client_menu(ent, 7, NULL,								PMENU_ALIGN_LEFT,	NULL, NULL );
+	client_menu(ent, 8, "Programming",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 9, "*Phil Bowens",						PMENU_ALIGN_CENTER,	NULL, credit_sound );
+	client_menu(ent, 10, "*Species",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 11, "*Adam 'RezMoth' Sherburne",		PMENU_ALIGN_CENTER,	NULL, NULL );
+//	client_menu(ent, 12, NULL,								PMENU_ALIGN_LEFT,	NULL, NULL );
+	client_menu(ent, 13, "Level Design",					PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 14, "*Peter 'Castrator' Lipman",		PMENU_ALIGN_CENTER,	NULL, credit_sound );
+//	client_menu(ent, 15, NULL,								PMENU_ALIGN_LEFT,	NULL, NULL );
+	client_menu(ent, 16, "Visual Artist",					PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 17, "*Darwin Allen",					PMENU_ALIGN_CENTER,	NULL, credit_sound );
+//	client_menu(ent, 18, NULL,								PMENU_ALIGN_LEFT,	NULL, NULL );
+//	client_menu(ent, XX, "Sound Engineer",					PMENU_ALIGN_CENTER,	NULL, NULL );
+//	client_menu(ent, XX, "*Oliver 'JumperDude' Snavely",	PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 19, NULL,								PMENU_ALIGN_LEFT,	NULL, NULL );
+	client_menu(ent, 20, "Webmistress",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 21, "*Wheaty",							PMENU_ALIGN_CENTER,	NULL, NULL );
+//	client_menu(ent, 22, NULL,								PMENU_ALIGN_LEFT,	NULL, NULL );
 
-	
-		client_menu(ent, 25, "Back",						PMENU_ALIGN_RIGHT,	NULL, M_View_Credits );
+	client_menu(ent, 25, "Back",						PMENU_ALIGN_RIGHT,	NULL, M_View_Credits );
 
-		if (choice == 7)
-			choice = 25;
+	if (choice == 7)
+		choice = 25;
 	PMenu_Open(ent, ent->client->menu_cur, choice, sizeof(ent->client->menu_cur) / sizeof(pmenu_t));
 }
 
 void M_View_Credits_Shaef (edict_t *ent, pmenu_t *p, int choice) 
 {
-		PMenu_Close(ent);
+	PMenu_Close(ent);
 
-		client_menu(ent, 0, "*D-DAY: NORMANDY " /*DEVVERSION*/,		PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 1, "*by Vipersoft",					PMENU_ALIGN_CENTER, NULL, NULL );
-//		client_menu(ent, 2, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 3, "*Supreme Headquarters,",				PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 4, "*Allied Expeditionary",				PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 5, "*Forces",				PMENU_ALIGN_CENTER, NULL, NULL );
-//		client_menu(ent, 6, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 7, "(Tons of bug fixes and",								PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 8, "gameplay enhancements)",								PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 0, "*D-DAY: NORMANDY " /*DEVVERSION*/,		PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 1, "*by Vipersoft",					PMENU_ALIGN_CENTER, NULL, NULL );
+//	client_menu(ent, 2, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 3, "*Supreme Headquarters,",				PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 4, "*Allied Expeditionary",				PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 5, "*Forces",				PMENU_ALIGN_CENTER, NULL, NULL );
+//	client_menu(ent, 6, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 7, "(Tons of bug fixes and",								PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 8, "gameplay enhancements)",								PMENU_ALIGN_CENTER, NULL, NULL );
 
+	client_menu(ent, 10, "Programming",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 11, "*Fafner",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 12, "*Bill Stokes",						PMENU_ALIGN_CENTER,	NULL, NULL );
+//	client_menu(ent, 14, NULL,								PMENU_ALIGN_LEFT,	NULL, NULL );
+	client_menu(ent, 13, "Modelling",					PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 14, "*Parts",						PMENU_ALIGN_CENTER,	NULL, NULL );
+//	client_menu(ent, 17, NULL,								PMENU_ALIGN_LEFT,	NULL, NULL );
+//	client_menu(ent, 18, NULL,								PMENU_ALIGN_LEFT,	NULL, NULL );
 
-		client_menu(ent, 10, "Programming",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 11, "*Fafner",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 12, "*Bill Stokes",						PMENU_ALIGN_CENTER,	NULL, NULL );
-//		client_menu(ent, 14, NULL,								PMENU_ALIGN_LEFT,	NULL, NULL );
-		client_menu(ent, 13, "Modelling",					PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 14, "*Parts",						PMENU_ALIGN_CENTER,	NULL, NULL );
-//		client_menu(ent, 17, NULL,								PMENU_ALIGN_LEFT,	NULL, NULL );
-//		client_menu(ent, 18, NULL,								PMENU_ALIGN_LEFT,	NULL, NULL );
-
-	
-		client_menu(ent, 25, "Back",						PMENU_ALIGN_RIGHT,	NULL, M_View_Credits );
+	client_menu(ent, 25, "Back",						PMENU_ALIGN_RIGHT,	NULL, M_View_Credits );
 
 	PMenu_Open(ent, ent->client->menu_cur, -1, sizeof(ent->client->menu_cur) / sizeof(pmenu_t));
 }
-void M_View_Credits_GBR (edict_t *ent, pmenu_t *p, int choice) 
+
+void M_View_Credits_GBR (edict_t *ent, pmenu_t *p, int choice)
 {
-		PMenu_Close(ent);
+	PMenu_Close(ent);
 
-		client_menu(ent, 0, "*D-DAY: NORMANDY " /*DEVVERSION*/,		PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 1, "*by Vipersoft",					PMENU_ALIGN_CENTER, NULL, NULL );
-//		client_menu(ent, 2, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 3, "British and Russian",				PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 4, "Add-ons Dev Team",					PMENU_ALIGN_CENTER, NULL, NULL );
-//		client_menu(ent, 6, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 0, "*D-DAY: NORMANDY " /*DEVVERSION*/,		PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 1, "*by Vipersoft",					PMENU_ALIGN_CENTER, NULL, NULL );
+//	client_menu(ent, 2, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 3, "British and Russian",				PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 4, "Add-ons Dev Team",					PMENU_ALIGN_CENTER, NULL, NULL );
+//	client_menu(ent, 6, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
 
+	client_menu(ent, 6, "*Mjr Parts",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 7, "GBR Models/Skins",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 9, "*Bill Stokes",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 10, "Programming",								PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 12, "*Gen Pepper",					PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 13, "GBR Shouts",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 15, "*Karr",					PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 16, "RUS Shouts",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 18, "*Afrow UK",					PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 19, "Maps",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 21, "*Fafner",					PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 22, "Code/RUS weaps",						PMENU_ALIGN_CENTER,	NULL, NULL );
 
-		client_menu(ent, 6, "*Mjr Parts",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 7, "GBR Models/Skins",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 9, "*Bill Stokes",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 10, "Programming",								PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 12, "*Gen Pepper",					PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 13, "GBR Shouts",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 15, "*Karr",					PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 16, "RUS Shouts",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 18, "*Afrow UK",					PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 19, "Maps",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 21, "*Fafner",					PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 22, "Code/RUS weaps",						PMENU_ALIGN_CENTER,	NULL, NULL );
-
-	
-		client_menu(ent, 25, "Back",						PMENU_ALIGN_RIGHT,	NULL, M_View_Credits );
+	client_menu(ent, 25, "Back",						PMENU_ALIGN_RIGHT,	NULL, M_View_Credits );
 
 	PMenu_Open(ent, ent->client->menu_cur, -1, sizeof(ent->client->menu_cur) / sizeof(pmenu_t));
 }
-void M_View_Credits_JPN (edict_t *ent, pmenu_t *p, int choice) 
+
+void M_View_Credits_JPN (edict_t *ent, pmenu_t *p, int choice)
 {
-		PMenu_Close(ent);
+	PMenu_Close(ent);
 
-		client_menu(ent, 0, "*D-DAY: NORMANDY " /*DEVVERSION*/,		PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 1, "*by Vipersoft",					PMENU_ALIGN_CENTER, NULL, NULL );
-//		client_menu(ent, 2, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 3, "Japan and USMC",				PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 4, "Add-on Dev Team",					PMENU_ALIGN_CENTER, NULL, NULL );
-//		client_menu(ent, 6, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 0, "*D-DAY: NORMANDY " /*DEVVERSION*/,		PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 1, "*by Vipersoft",					PMENU_ALIGN_CENTER, NULL, NULL );
+//	client_menu(ent, 2, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 3, "Japan and USMC",				PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 4, "Add-on Dev Team",					PMENU_ALIGN_CENTER, NULL, NULL );
+//	client_menu(ent, 6, NULL,								PMENU_ALIGN_CENTER, NULL, NULL );
 
+	client_menu(ent, 6, "*Julhelm",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 7, "Weapon Models/Skins",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 9, "*EON_Magicman",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 10, "Player Skins",								PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 12, "*Mjr Parts",					PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 13, "Player Models",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 15, "*Karr",					PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 16, "Shouts",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 18, "*Fafner & Van Wilder",					PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 19, "Code",						PMENU_ALIGN_CENTER,	NULL, NULL );
 
-		client_menu(ent, 6, "*Julhelm",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 7, "Weapon Models/Skins",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 9, "*EON_Magicman",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 10, "Player Skins",								PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 12, "*Mjr Parts",					PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 13, "Player Models",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 15, "*Karr",					PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 16, "Shouts",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 18, "*Fafner & Van Wilder",					PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 19, "Code",						PMENU_ALIGN_CENTER,	NULL, NULL );
-	
-		client_menu(ent, 25, "Back",						PMENU_ALIGN_RIGHT,	NULL, M_View_Credits );
+	client_menu(ent, 25, "Back",						PMENU_ALIGN_RIGHT,	NULL, M_View_Credits );
 
 	PMenu_Open(ent, ent->client->menu_cur, -1, sizeof(ent->client->menu_cur) / sizeof(pmenu_t));
 }
-void M_View_Credits_ITA (edict_t *ent, pmenu_t *p, int choice) 
+
+void M_View_Credits_ITA (edict_t *ent, pmenu_t *p, int choice)
 {
-		PMenu_Close(ent);
+	PMenu_Close(ent);
 
-		client_menu(ent, 0, "*D-DAY: NORMANDY " /*DEVVERSION*/,		PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 1, "*by Vipersoft",					PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 0, "*D-DAY: NORMANDY " /*DEVVERSION*/,		PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 1, "*by Vipersoft",					PMENU_ALIGN_CENTER, NULL, NULL );
 
-		client_menu(ent, 3, "Polish and Italian",				PMENU_ALIGN_CENTER, NULL, NULL );
-		client_menu(ent, 4, "Add-ons Dev Team",					PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 3, "Polish and Italian",				PMENU_ALIGN_CENTER, NULL, NULL );
+	client_menu(ent, 4, "Add-ons Dev Team",					PMENU_ALIGN_CENTER, NULL, NULL );
 
-		client_menu(ent, 6, "*Wolf",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 7, "Models and POL maps",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 9, "*Fernan",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 10, "Models",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 12, "*Rab,d",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 13, "ITA Skins",								PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 15, "*Gypsyllama",					PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 16, "*Tanatovago",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 17, "*Mr. YOur no fun",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 18, "Maps",					PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 20, "*Mieker",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 21, "POL Shouts",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 23, "*Fafner",						PMENU_ALIGN_CENTER,	NULL, NULL );
-		client_menu(ent, 24, "Code",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 6, "*Wolf",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 7, "Models and POL maps",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 9, "*Fernan",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 10, "Models",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 12, "*Rab,d",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 13, "ITA Skins",								PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 15, "*Gypsyllama",					PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 16, "*Tanatovago",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 17, "*Mr. YOur no fun",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 18, "Maps",					PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 20, "*Mieker",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 21, "POL Shouts",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 23, "*Fafner",						PMENU_ALIGN_CENTER,	NULL, NULL );
+	client_menu(ent, 24, "Code",						PMENU_ALIGN_CENTER,	NULL, NULL );
 
-		client_menu(ent, 25, "Back",						PMENU_ALIGN_RIGHT,	NULL, M_View_Credits );
+	client_menu(ent, 25, "Back",						PMENU_ALIGN_RIGHT,	NULL, M_View_Credits );
 
 	PMenu_Open(ent, ent->client->menu_cur, -1, sizeof(ent->client->menu_cur) / sizeof(pmenu_t));
 }
 
-void VoteMap (edict_t *ent, pmenu_t *p, int choice) 
+void VoteMap (edict_t *ent, pmenu_t *p, int choice)
 {
 	PMenu_Close(ent);
 
 	choice = (choice - 7)/2;
 
-	//safe_bprintf (PRINT_HIGH, "%s voted for %s.\n", ent->client->pers.netname, votemaps[choice]); 
-	safe_bprintf (PRINT_HIGH, "1 vote for %s.\n", votemaps[choice]); 
+	//safe_bprintf (PRINT_HIGH, "%s voted for %s.\n", ent->client->pers.netname, votemaps[choice]);
+	safe_bprintf (PRINT_HIGH, "1 vote for %s.\n", votemaps[choice]);
 
-    mapvotes[choice]++;
+	mapvotes[choice]++;
 
 	ent->client->voted = true;
 	gi.WriteByte (svc_layout);
@@ -1428,7 +1331,6 @@ void MapVote(edict_t *ent)
 	PMenu_Close(ent);
 
 	client_menu(ent, 4, "*VOTE FOR THE NEXT MAP! " , PMENU_ALIGN_CENTER, NULL, NULL );
-	
 
 	for (i=0; i <4; i++)
 	{
@@ -1439,14 +1341,13 @@ void MapVote(edict_t *ent)
 			sprintf(filename, "dday/navigation/%s.cmp", votemaps[i]);
 			f = fopen (filename, "rb");
 
-			if (f){
+			if (f) {
 				fclose (f);
 				add = "*";
 				botmap = true;
 			}
 			else
 				add = " ";
-
 		}
 		else
 			add = "";
@@ -1456,10 +1357,9 @@ void MapVote(edict_t *ent)
 
 		client_menu(ent, 7+(i*2),  theText,		PMENU_ALIGN_LEFT,	NULL, VoteMap );
 	}
-		
 
-	if (bots->value){
-        client_menu(ent, 18, "** = Has bot support",			PMENU_ALIGN_CENTER,	NULL, NULL );
+	if (bots->value) {
+		client_menu(ent, 18, "** = Has bot support",			PMENU_ALIGN_CENTER,	NULL, NULL );
 		client_menu(ent, 21, "Use [ and ] to select",			PMENU_ALIGN_CENTER,	NULL, NULL );
 	}
 	else
@@ -1467,5 +1367,4 @@ void MapVote(edict_t *ent)
 
 	PMenu_Open(ent, ent->client->menu_cur, 7, sizeof(ent->client->menu_cur) / sizeof(pmenu_t));
 }
-
 

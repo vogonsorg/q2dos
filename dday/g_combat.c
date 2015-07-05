@@ -771,12 +771,11 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		int d;
 		edict_t *check_ent;
 
-		qboolean sniper;
+	qboolean sniper;
+
+	qboolean saved=false;
 
 
-
-    qboolean saved=false;
-	
 	if (!(dflags & DAMAGE_NO_PROTECTION) && IsValidPlayer(targ) && level.time < targ->client->spawntime + invuln_spawn->value) // pbowens: invulnerability
 		return;
 
@@ -792,10 +791,6 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	//hacky
 	if (attacker && attacker->ai && targ->classnameb && targ->classnameb == SANDBAGS)
 		damage = 1000;
-
-
-
-
 
 
 //JABOT:  if someone attacks this guy, the teammate bots go into aim mode                         ///make attacker their enemy: //needs work 
@@ -845,14 +840,7 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	}
 //END JABOT
 
-
-
-
-
-
-
-
-
+	result = 0; /* silence compiler */
 
 	wound_location = die_time = 0;
 	height = abs(targ->mins[2]) + targ->maxs[2];

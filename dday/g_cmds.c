@@ -1561,6 +1561,7 @@ void Cmd_Objectives (edict_t *ent)
 
 	stringlength = strlen(string);
 
+	objective_name = "";/* silence compiler */
 	y=2;
 	for (i=0 ; i<globals.num_edicts ; i++)
 	{
@@ -2134,6 +2135,8 @@ void GetNearbyLocation(edict_t *self, char *buf)
 	vec3_t dist, dist2;
 	edict_t	*e, *closest;
 
+	closest = NULL;/* silence compiler */
+
 	for (i=0 ; i<globals.num_edicts ; i++)
 	{
 		e = &g_edicts[i];
@@ -2332,6 +2335,7 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0, qboolean saved)
 
 	if (saved)
 	{
+		p = ""; /* silence compiler */
 		Com_sprintf (text, sizeof(text), "%s", ent->client->resp.chatsave);
 		team =  ent->client->resp.chatsavetype;
 		ent->client->resp.chatsave[0] = '\0';	
@@ -2875,9 +2879,10 @@ Handles weapon reload requests
 
 qboolean Cmd_Reload (edict_t *ent)
 {
+	static int zero = 0;
+
 	//int rds_left;           //+BD - Variable to handle rounds left
 	int mags_left;
-
 	gitem_t *ammo_item;
 	int		ammo_index, *ammo_amount;
 
@@ -2918,6 +2923,12 @@ qboolean Cmd_Reload (edict_t *ent)
 		ammo_item = FindItem(ent->client->pers.weapon->ammo);
 		ammo_index = ITEM_INDEX(ammo_item);
 		ammo_amount = &ent->client->pers.inventory[ammo_index];
+	}
+	else
+	{
+		ammo_item = NULL;
+		ammo_index = 0;
+		ammo_amount=&zero;
 	}
 
     // Grab the current magazine max count...

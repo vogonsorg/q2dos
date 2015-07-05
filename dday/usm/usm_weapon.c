@@ -144,6 +144,8 @@ void Shotgun_Reload (edict_t *ent,
 					 int FRAME_RAISE_LAST,		int FRAME_AFIRE_LAST,	int FRAME_AIDLE_LAST,
 					 int *pause_frames,			int *fire_frames,		void (*fire)(edict_t *ent))
 {
+	static int zero = 0;
+
 	gitem_t *ammo_item;
 	int		ammo_index,	*ammo_amount;
 	int		FRAME_IDLE_FIRST = (ent->client->aim)?FRAME_AIDLE_FIRST:FRAME_LIDLE_FIRST;
@@ -154,42 +156,46 @@ void Shotgun_Reload (edict_t *ent,
 		ammo_index = ent->client->ammo_index;
 		ammo_amount=&ent->client->pers.inventory[ammo_index];
 	}
+	else
+	{
+		ammo_item = NULL;
+		ammo_index = 0;
+		ammo_amount=&zero;
+	}
 
 	ent->client->ps.fov=STANDARD_FOV;
 
 	if (ent->client->ps.gunframe == FRAME_RELOAD_FIRST)
 	{
 		ent->client->anim_priority = ANIM_REVERSE;
-        if (ent->stanceflags == STANCE_STAND)
-        {
-            ent->s.frame = FRAME_pain304+1;
-            ent->client->anim_end = FRAME_pain301;            
-        }
-        else if (ent->stanceflags == STANCE_DUCK)
-        {
-            ent->s.frame = FRAME_crpain4+1;
-            ent->client->anim_end = FRAME_crpain1;
-        }
-        else if (ent->stanceflags == STANCE_CRAWL)
-        {
-            ent->s.frame = FRAME_crawlpain04+1;
-            ent->client->anim_end = FRAME_crawlpain01;
-        }
+		if (ent->stanceflags == STANCE_STAND)
+		{
+			ent->s.frame = FRAME_pain304+1;
+			ent->client->anim_end = FRAME_pain301;
+		}
+		else if (ent->stanceflags == STANCE_DUCK)
+		{
+			ent->s.frame = FRAME_crpain4+1;
+			ent->client->anim_end = FRAME_crpain1;
+		}
+		else if (ent->stanceflags == STANCE_CRAWL)
+		{
+			ent->s.frame = FRAME_crawlpain04+1;
+			ent->client->anim_end = FRAME_crawlpain01;
+		}
 	}
-        
+
 	if (ent->client->aim) 
 	{
 		if(ent->client->ps.gunframe==FRAME_RAISE_FIRST)
 			ent->client->aim=false;
 		else if (ent->client->ps.gunframe > FRAME_RAISE_LAST || ent->client->ps.gunframe < FRAME_RAISE_FIRST)
 			ent->client->ps.gunframe=FRAME_RAISE_LAST;
-		else  
+		else
 			ent->client->ps.gunframe--;
 
 		return;
 	}
-	
-
 
 	if (ent->client->ps.gunframe ==63)
 	{
@@ -200,12 +206,10 @@ void Shotgun_Reload (edict_t *ent,
 		}
 	}
 
-
-
 	if (ent->client->ps.gunframe < FRAME_RELOAD_FIRST 
 		|| ent->client->ps.gunframe > FRAME_RELOAD_LAST)
 		ent->client->ps.gunframe = FRAME_RELOAD_FIRST;
-    else if (ent->client->ps.gunframe == FRAME_RELOAD_LAST -2 
+	else if (ent->client->ps.gunframe == FRAME_RELOAD_LAST -2 
 		&& ent->client->mags[ent->client->pers.weapon->mag_index].shotgun_rnd < 6 
 		&& ent->client->pers.inventory[ammo_index]>0)
 	{
@@ -213,16 +217,17 @@ void Shotgun_Reload (edict_t *ent,
 	}
 	else if(ent->client->ps.gunframe < FRAME_RELOAD_LAST-1)
 	{ 
-		ent->client->ps.gunframe++;             
+		ent->client->ps.gunframe++;
 		if ((ent->client->pers.weapon->guninfo) && (ent->client->ps.gunframe == 0/*RELOAD SOUND FRAME*/))
 			gi.sound(ent, CHAN_WEAPON, gi.soundindex(ent->client->pers.weapon->guninfo->ReloadSound1), 1, ATTN_NORM, 0);
 	}
 	else
 	{
 		ent->client->ps.gunframe = FRAME_IDLE_FIRST;
-        ent->client->weaponstate = WEAPON_READY;
-	} 
+		ent->client->weaponstate = WEAPON_READY;
+	}
 }
+
 void Weapon_Shotgun (edict_t * ent)
 {
 	static int	pause_frames[]	= {0};

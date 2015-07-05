@@ -2034,7 +2034,7 @@ void BotWarnThink (edict_t *ent)
 	//this "turns it on" //not sure this even works
 	ent->classnameb = BOTWARN;
 
-	if (!ent->owner || ent->owner && !ent->owner->inuse)
+	if (!ent->owner || (ent->owner && !ent->owner->inuse))
 	{
 		ent->think = G_FreeEdict;
 	}
@@ -2320,7 +2320,7 @@ void fire_gun (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick,
 	int			mask;
 	qboolean	water;
 
-	int     soundtype;
+	int     soundtype = 0;
 	int		ric_chance;
 
 	float dot;
@@ -2332,21 +2332,17 @@ void fire_gun (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick,
 	float r,u;
 	vec3_t forward, right, up; 
 
-	AngleVectors(aimdir, forward, right, up);
 
+	AngleVectors(aimdir, forward, right, up);
 
 //	VectorMA (start, 8192, aimdir, end);
 	VectorCopy (start, from);
-
-
 
 	if ((gi.pointcontents(start) & MASK_WATER) > 0)
 	{
 		fire_underwater (self, start, aimdir, damage, mod);
 		return;
 	}
-
-
 
 	//faf
 	if (self->client)
@@ -2380,69 +2376,62 @@ void fire_gun (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick,
 
 			VectorMA (end, (self->client->explosion_angles[PITCH]) * (-143), up, end);
 */
-	}	
+	}
 
+	if (self->client->jump_stamina < 60 && self->client->pers.weapon->position == LOC_SNIPER)
+	{
+		hspread += 200;
+		vspread += 200;
+	}
 
-		if (self->client->jump_stamina < 60 && self->client->pers.weapon->position == LOC_SNIPER)
+	// add spread to hip shots
+	if (self->client && !self->client->aim)
+	{
+		r = 300 - crandom() * 600;
+		u = crandom() * 600;
+	}
+	else
+	{
+		r = (crandom() * (hspread)) - ((hspread)/2);
+		u = (crandom() * (vspread));
+	}
+
+	if (self->burnout) //on fire
+	{
+		r= crandom() * 2000;
+		u = crandom() * 2000;
+	}
+
+	//gi.dprintf(DEVELOPER_MSG_GAME, "%f %f\n", r ,u);
+
+	// end = start[i] + 8192 * forward[i]
+	VectorMA (start, 8192, aimdir, end); //faf:  aim fix by kermit, "forward" changed to "aimdir"
+	// scale right angle by calculated horizontal spread
+	VectorMA (end, r, right, end);
+	// scale up angle by calculated vertical spread
+	VectorMA (end, u, up, end);
+
+	//faf
+	if (self->client)
+	{
+		AngleVectors (self->client->v_angle, NULL, right, up);
+
+		if (self->client->pers.hand == LEFT_HANDED)
+			VectorMA (end, (self->client->ps.gunangles[YAW]) * 143, right, end);
+		else
 		{
-			hspread += 200;
-			vspread += 200;
+			VectorMA (end, (self->client->ps.gunangles[YAW]) * (-143), right, end);
 		}
 
-		// add spread to hip shots
-		if (self->client && !self->client->aim)
-		{
-			r = 300 - crandom() * 600;
-			u = crandom() * 600;
-		}
-		else 
-		{
-			r = (crandom() * (hspread)) - ((hspread)/2);
-			u = (crandom() * (vspread));
-		}
+		VectorMA (end, (self->client->ps.gunangles[PITCH]) * (-143), up, end);
 
-		if (self->burnout) //on fire
-		{
-			r= crandom() * 2000;
-			u = crandom() * 2000;
-		}
+		if (self->client->pers.hand == LEFT_HANDED)
+			VectorMA (end, (self->client->explosion_angles[YAW]) * 143, right, end);
+		else
+			VectorMA (end, (self->client->explosion_angles[YAW]) * (-143), right, end);
 
-
-
-		//gi.dprintf(DEVELOPER_MSG_GAME, "%f %f\n", r ,u);
-
-		// end = start[i] + 8192 * forward[i]
-		VectorMA (start, 8192, aimdir, end); //faf:  aim fix by kermit, "forward" changed to "aimdir"
-		// scale right angle by calculated horizontal spread
-		VectorMA (end, r, right, end);
-		// scale up angle by calculated vertical spread
-		VectorMA (end, u, up, end);
-
-			//faf
-			if (self->client)
-			{
-				AngleVectors (self->client->v_angle, NULL, right, up);
-			
-					if (self->client->pers.hand == LEFT_HANDED)
-						VectorMA (end, (self->client->ps.gunangles[YAW]) * 143, right, end);
-					else
-					{
-						VectorMA (end, (self->client->ps.gunangles[YAW]) * (-143), right, end);
-					}
-
-					VectorMA (end, (self->client->ps.gunangles[PITCH]) * (-143), up, end);
-
-					if (self->client->pers.hand == LEFT_HANDED)
-						VectorMA (end, (self->client->explosion_angles[YAW]) * 143, right, end);
-					else
-						VectorMA (end, (self->client->explosion_angles[YAW]) * (-143), right, end);
-
-
-					VectorMA (end, (self->client->explosion_angles[PITCH]) * (-143), up, end);
-			}
-
-
-
+		VectorMA (end, (self->client->explosion_angles[PITCH]) * (-143), up, end);
+	}
 
 	ignore = self;
 	water = false;
@@ -2462,8 +2451,8 @@ void fire_gun (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick,
 				ignore = tr.ent;
 			else
 			{	ignore = NULL;
-							soundtype = Play_Bullet_Hit(self, tr.surface->name, tr.endpos, tr.ent);
-							//gi.dprintf(DEVELOPER_MSG_GAME, "hit\n");
+				soundtype = Play_Bullet_Hit(self, tr.surface->name, tr.endpos, tr.ent);
+				//gi.dprintf(DEVELOPER_MSG_GAME, "hit\n");
 			}
 
 			if ((tr.ent != self) && (tr.ent->takedamage))
@@ -2479,13 +2468,10 @@ void fire_gun (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick,
 		VectorCopy (tr.endpos, from);
 	}
 
-
-
 	if (hits)
 		self->client->resp.accuracy_hits+=hits;
 	else
 		self->client->resp.accuracy_misses++;
-
 
 	// send gun puff / flash
 	if (!((tr.surface) && (tr.surface->flags & SURF_SKY)))
@@ -2503,52 +2489,44 @@ void fire_gun (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick,
 	}
 	else
 		return;
-	
+
 //	gi.dprintf(DEVELOPER_MSG_GAME, "a %f %f %f\n", aimdir[0],aimdir[1],aimdir[2]);
 //	gi.dprintf(DEVELOPER_MSG_GAME, "s %f %f %f\n", tr.plane.normal[0],tr.plane.normal[1],tr.plane.normal[2]);
 
-dot = DotProduct (tr.plane.normal, aimdir);
-// gi.dprintf(DEVELOPER_MSG_GAME, "%f\n",fabs(dot));
+	dot = DotProduct (tr.plane.normal, aimdir);
+//	gi.dprintf(DEVELOPER_MSG_GAME, "%f\n",fabs(dot));
 
- 
-ric_chance = random();
+	ric_chance = random();
 
-if (soundtype != SOUND_SAND && ric_chance < .4 && .4-random() > fabs(dot) 
-	//&&		!(gi.pointcontents (tr.endpos) & MASK_WATER)
-	)
-{
-	vec3_t ricvec;
-	int randn;
-edict_t *ricochet;
-randn = rand()%2+1;
+	if (soundtype != SOUND_SAND && ric_chance < .4 && .4-random() > fabs(dot)
+	    /*&& !(gi.pointcontents (tr.endpos) & MASK_WATER)*/ )
+	{
+		vec3_t ricvec;
+		int randn;
+		edict_t *ricochet;
 
-gi.positioned_sound (tr.endpos, g_edicts, CHAN_AUTO, gi.soundindex(va("world/ric%i.wav",randn)), 1, ATTN_NORM, 0);	
-gi.positioned_sound (tr.endpos, g_edicts, CHAN_AUTO, gi.soundindex(va("world/ric%i.wav",randn)), 1, ATTN_NORM, 0);	
+		randn = rand()%2+1;
+		gi.positioned_sound (tr.endpos, g_edicts, CHAN_AUTO, gi.soundindex(va("world/ric%i.wav",randn)), 1, ATTN_NORM, 0);
+		gi.positioned_sound (tr.endpos, g_edicts, CHAN_AUTO, gi.soundindex(va("world/ric%i.wav",randn)), 1, ATTN_NORM, 0);
 
+		//r = a - 2<a, n> n
 
-//r = a - 2<a, n> n
+		ricvec[0] = aimdir[0] -2*(dot)* tr.plane.normal[0];
+		ricvec[1] = aimdir[1] -2*(dot)* tr.plane.normal[1];
+		ricvec[2] = aimdir[2] -2*(dot)* tr.plane.normal[2];
 
-
-ricvec[0] = aimdir[0] -2*(dot)* tr.plane.normal[0];
-ricvec[1] = aimdir[1] -2*(dot)* tr.plane.normal[1];
-ricvec[2] = aimdir[2] -2*(dot)* tr.plane.normal[2];
-
-
-	ricochet = G_Spawn ();
-	ricochet->owner = self;
-	VectorCopy (tr.endpos,ricochet->s.origin);
-	VectorCopy (ricvec, ricochet->s.angles);
-	ricochet->dmg = damage/2;
-	ricochet->count= kick;
-	ricochet->style = mod;
-	ricochet->is_step = calcv;
-	ricochet->think = ricochetthink;
-	ricochet->nextthink = level.time+.1;
-	gi.linkentity (ricochet);
-
-
-
-}
+		ricochet = G_Spawn ();
+		ricochet->owner = self;
+		VectorCopy (tr.endpos,ricochet->s.origin);
+		VectorCopy (ricvec, ricochet->s.angles);
+		ricochet->dmg = damage/2;
+		ricochet->count= kick;
+		ricochet->style = mod;
+		ricochet->is_step = calcv;
+		ricochet->think = ricochetthink;
+		ricochet->nextthink = level.time+.1;
+		gi.linkentity (ricochet);
+	}
 
 	if (water)
 	{
@@ -2561,8 +2539,6 @@ ricvec[2] = aimdir[2] -2*(dot)* tr.plane.normal[2];
 
 	if (self->client)
 		PlayerNoise(self, tr.endpos, PNOISE_IMPACT);
-
-
 }
 
 
@@ -2621,12 +2597,12 @@ edict_t *ApplyFirstAid (edict_t *ent)
 int DoAnarchyStuff(edict_t *ent,char *sound)
 {
 	static int lastone;
-	int soundindexM,soundindexF;
+	int soundindexM=0,soundindexF=0;
 	float RanMale,RanFemale;
 
 	if(!ent->sexpistols) return gi.soundindex(sound);
-	
-	srand((unsigned)time( NULL ) );
+
+	srand((unsigned)time( NULL ));
 	RanMale=rand()%26;
 	RanFemale=rand()%26;
 	ent->anarchy++;
@@ -2675,7 +2651,7 @@ int DoAnarchyStuff(edict_t *ent,char *sound)
 	}
 //	gi.dprintf(DEVELOPER_MSG_GAME, "m: %f f: %f\n",RanMale,RanFemale);
 	return( (lastone==0)?soundindexM:soundindexF);			
-} 
+}
 
 void Weapon_Pistol_Fire (edict_t *ent)
 {
@@ -3583,10 +3559,10 @@ void Weapon_Rocket_Fire (edict_t *ent)
 
 	if (ent->stanceflags == STANCE_STAND ||
 		ent->stanceflags == STANCE_CRAWL ||
-//faf		ent->client->movement			 ||
-	    !ent->client->aim				 ||
-	    gi.pointcontents(ent->s.origin) & MASK_WATER && //Wheaty: Don't let them fire in water
-		ent->client->weaponstate == WEAPON_READY) //faf
+//faf		ent->client->movement		 ||
+		!ent->client->aim		 ||
+	      ( gi.pointcontents(ent->s.origin) & MASK_WATER && //Wheaty: Don't let them fire in water
+		ent->client->weaponstate == WEAPON_READY) ) //faf
 	{
 		if (ent->client->gunwarntime && ent->client->gunwarntime > level.time - 1)
 		{}else{
@@ -4036,28 +4012,20 @@ void TNT_Think (edict_t *ent)
 
 	srand(rand());
 
-
 	//gi.dprintf(DEVELOPER_MSG_GAME, "%i    %i \n",ent->owner->client->resp.team_on->index, ent->obj_owner);
 
 	//switch teams exploit fix
 	if (ent->owner && ent->owner->client)
 	{
 		if (!ent->owner->client->resp.team_on ||
-			ent->owner->client->resp.team_on &&
-			ent->owner->client->resp.team_on->index != ent->obj_owner)
+		    (ent->owner->client->resp.team_on &&
+		     ent->owner->client->resp.team_on->index != ent->obj_owner) )
 		{
 			ent->think = G_FreeEdict;
 			ent->nextthink = level.time + .1;
 			return;
 		}
 	}
-
-
-
-
-
-
-
 
 	if (level.time > ent->delay)
 	{
@@ -4077,36 +4045,34 @@ void TNT_Think (edict_t *ent)
 				ent->dmg_radius = 600;
 				TNT_Explode(ent);
 			}
-
 		}
 		else
 			TNT_Explode(ent);
 	}
 /*
-gi.WriteByte (svc_temp_entity); 
+gi.WriteByte (svc_temp_entity);
 gi.WriteByte (TE_BLASTER);
 gi.WriteDir (normal);
-gi.WritePosition(ent->s.origin); 
+gi.WritePosition(ent->s.origin);
 */
 
-		if(easter_egg->value==808)
-		{
-			gi.WriteByte (svc_temp_entity); 
-			gi.WriteByte (TE_BOSSTPORT);
-			gi.WritePosition(ent->s.origin); 
-			gi.multicast (ent->s.origin, MULTICAST_PVS);
-		}
-		else
-		{
-			gi.WriteByte (svc_temp_entity);
-			gi.WriteByte (TE_SPARKS);
-			gi.WritePosition (ent->s.origin);
-			gi.WriteDir (vec3_origin);
-			gi.multicast (ent->s.origin, MULTICAST_PVS);
-		}
+	if(easter_egg->value==808)
+	{
+		gi.WriteByte (svc_temp_entity); 
+		gi.WriteByte (TE_BOSSTPORT);
+		gi.WritePosition(ent->s.origin); 
+		gi.multicast (ent->s.origin, MULTICAST_PVS);
+	}
+	else
+	{
+		gi.WriteByte (svc_temp_entity);
+		gi.WriteByte (TE_SPARKS);
+		gi.WritePosition (ent->s.origin);
+		gi.WriteDir (vec3_origin);
+		gi.multicast (ent->s.origin, MULTICAST_PVS);
+	}
 
-		//gi.sound (ent, CHAN_VOICE, gi.soundindex ("weapons/hgrenb1a.wav"), 1, ATTN_NORM, 0);
-		
+	//gi.sound (ent, CHAN_VOICE, gi.soundindex ("weapons/hgrenb1a.wav"), 1, ATTN_NORM, 0);
 	ent->think = TNT_Think;
 	ent->nextthink = level.time + .1;
 }

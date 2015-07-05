@@ -57,14 +57,14 @@ void Weapon_Generic (edict_t *ent,
 					 int FRAME_RAISE_LAST,		int FRAME_AFIRE_LAST,	int FRAME_AIDLE_LAST,
 					 int *pause_frames,			int *fire_frames,		void (*fire)(edict_t *ent))
 {
+	static int zero = 0;
+
 	int		i, n;
 	gitem_t *ammo_item;
-
 	int		ammo_index,	*ammo_amount;
 	int		FRAME_FIRE_FIRST,FRAME_IDLE_FIRST,FRAME_IDLE_LAST;
 
 //	vec3_t	vieworg;
-
 
 	if (ent->ai)
 	{
@@ -72,15 +72,10 @@ void Weapon_Generic (edict_t *ent,
 		ent->client->crosshair_offset_y = 0;
 	}
 
-
-
-	
 	FRAME_FIRE_FIRST = (ent->client->aim)?FRAME_AFIRE_FIRST:FRAME_LFIRE_FIRST;
 	//FRAME_FIRE_LAST = (ent->client->aim)?FRAME_AFIRE_LAST:FRAME_LFIRE_LAST;
 	FRAME_IDLE_FIRST = (ent->client->aim)?FRAME_AIDLE_FIRST:FRAME_LIDLE_FIRST;
 	FRAME_IDLE_LAST = (ent->client->aim)?FRAME_AIDLE_LAST:FRAME_LIDLE_LAST;
-
-
 
 	if (ent->client->pers.weapon &&
 		ent->client->pers.weapon->pickup_name &&
@@ -93,6 +88,12 @@ void Weapon_Generic (edict_t *ent,
 		ammo_index = ITEM_INDEX(ammo_item);
 		ammo_amount=&ent->client->pers.inventory[ammo_index];
 	}
+	else
+	{
+		ammo_item = NULL;
+		ammo_index = 0;
+		ammo_amount=&zero;
+	}
 
 //	gi.dprintf(DEVELOPER_MSG_GAME, " %i < %i < %i\n",FRAME_RAISE_FIRST, ent->client->ps.gunframe, FRAME_RAISE_LAST);
 
@@ -103,18 +104,13 @@ void Weapon_Generic (edict_t *ent,
 		ent->client->pers.weapon->position != LOC_HELMET &&
 		ent->client->ps.gunframe >= FRAME_RAISE_LAST - 1 )
 			ent->client->ps.fov = TS_FOV;
-
-//	else if (!ent->client->aim && ent->client->pers.weapon->position != LOC_SNIPER)		
+//	else if (!ent->client->aim && ent->client->pers.weapon->position != LOC_SNIPER)
 //faf			ent->client->ps.fov = STANDARD_FOV;
-		else if (!ent->client->aim && ent->client->pers.weapon->position != LOC_SNIPER)		
-		{
-			check_unscope(ent);//faf
-
-			ent->client->ps.fov = STANDARD_FOV;
-		}
-
-
-
+	else if (!ent->client->aim && ent->client->pers.weapon->position != LOC_SNIPER)
+	{
+		check_unscope(ent);//faf
+		ent->client->ps.fov = STANDARD_FOV;
+	}
 
 	//faf: add player anims for mauser bolting
 	if (ent->oldstance == ent->stanceflags //faf: not changing stances
@@ -124,26 +120,22 @@ void Weapon_Generic (edict_t *ent,
 	{
 		ent->client->anim_priority = ANIM_REVERSE;
 		if (ent->stanceflags == STANCE_STAND)
-        {
-            ent->s.frame = FRAME_pain304+1;
-            ent->client->anim_end = FRAME_pain301;            
-        }
-        else if (ent->stanceflags == STANCE_DUCK)
-        {
-            ent->s.frame = FRAME_crpain4+1;
-            ent->client->anim_end = FRAME_crpain1;
-        }
-        else if (ent->stanceflags == STANCE_CRAWL)
-        {
-            ent->s.frame = FRAME_crawlpain04+1;
-            ent->client->anim_end = FRAME_crawlpain01;
-        }
+		{
+			ent->s.frame = FRAME_pain304+1;
+			ent->client->anim_end = FRAME_pain301;
+		}
+		else if (ent->stanceflags == STANCE_DUCK)
+		{
+			ent->s.frame = FRAME_crpain4+1;
+			ent->client->anim_end = FRAME_crpain1;
+		}
+		else if (ent->stanceflags == STANCE_CRAWL)
+		{
+			ent->s.frame = FRAME_crawlpain04+1;
+			ent->client->anim_end = FRAME_crawlpain01;
+		}
 	}
 
-
-
-
-	
 	if( ent->client->weaponstate == WEAPON_RELOADING)
 	{
 		check_unscope(ent);//faf
@@ -152,7 +144,6 @@ void Weapon_Generic (edict_t *ent,
 
 		if (ent->client->pers.weapon->position == LOC_SNIPER)
 			ent->client->sniper_loaded[ent->client->resp.team_on->index] = true;
-
 
 /*
 		if (pause_frames[0])
@@ -176,80 +167,71 @@ void Weapon_Generic (edict_t *ent,
 		}
 */
 
-
-
-
-
-
-			// pbowens: show reloading
+		// pbowens: show reloading
 		if (ent->client->ps.gunframe == FRAME_RELOAD_FIRST
 			&& ent->oldstance == ent->stanceflags) //faf:  not changing stances 
 		{
 			ent->client->anim_priority = ANIM_REVERSE;
-            if (ent->stanceflags == STANCE_STAND)
-            {
-                ent->s.frame = FRAME_pain304+1;
-                ent->client->anim_end = FRAME_pain301;            
-            }
-            else if (ent->stanceflags == STANCE_DUCK)
-            {
-                ent->s.frame = FRAME_crpain4+1;
-                ent->client->anim_end = FRAME_crpain1;
-            }
-            else if (ent->stanceflags == STANCE_CRAWL)
-            {
-                ent->s.frame = FRAME_crawlpain04+1;
-                ent->client->anim_end = FRAME_crawlpain01;
-            }
+			if (ent->stanceflags == STANCE_STAND)
+			{
+				ent->s.frame = FRAME_pain304+1;
+				ent->client->anim_end = FRAME_pain301;
+			}
+			else if (ent->stanceflags == STANCE_DUCK)
+			{
+				ent->s.frame = FRAME_crpain4+1;
+				ent->client->anim_end = FRAME_crpain1;
+			}
+			else if (ent->stanceflags == STANCE_CRAWL)
+			{
+				ent->s.frame = FRAME_crawlpain04+1;
+				ent->client->anim_end = FRAME_crawlpain01;
+			}
 		}
 
 		// faf: show finish of reloading
 		if (ent->client->ps.gunframe == FRAME_RELOAD_LAST -10
-		&& ent->oldstance == ent->stanceflags) //faf:  not changing stances
-
+		    && ent->oldstance == ent->stanceflags) //faf:  not changing stances
 		{
 			ent->client->anim_priority = ANIM_REVERSE;
-            if (ent->stanceflags == STANCE_STAND)
-            {
-                ent->s.frame = FRAME_pain304+1;
-                ent->client->anim_end = FRAME_pain301;            
-            }
-            else if (ent->stanceflags == STANCE_DUCK)
-            {
-                ent->s.frame = FRAME_crpain4+1;
-                ent->client->anim_end = FRAME_crpain1;
-            }
-            else if (ent->stanceflags == STANCE_CRAWL)
-            {
-                ent->s.frame = FRAME_crawlpain04+1;
-                ent->client->anim_end = FRAME_crawlpain01;
-            }
+			if (ent->stanceflags == STANCE_STAND)
+			{
+				ent->s.frame = FRAME_pain304+1;
+				ent->client->anim_end = FRAME_pain301;
+			}
+			else if (ent->stanceflags == STANCE_DUCK)
+			{
+				ent->s.frame = FRAME_crpain4+1;
+				ent->client->anim_end = FRAME_crpain1;
+			}
+			else if (ent->stanceflags == STANCE_CRAWL)
+			{
+				ent->s.frame = FRAME_crawlpain04+1;
+				ent->client->anim_end = FRAME_crawlpain01;
+			}
 		}//faf: end
 
-            
-		if (ent->client->aim) 
+		if (ent->client->aim)
 		{
 			if(ent->client->ps.gunframe==FRAME_RAISE_FIRST)
 			{
 				ent->client->aim=false;
 				//ent->client->weaponstate=WEAPON_READY;
-			} 
+			}
 			else if (ent->client->ps.gunframe > FRAME_RAISE_LAST || ent->client->ps.gunframe < FRAME_RAISE_FIRST)
 				ent->client->ps.gunframe=FRAME_RAISE_LAST;
-			else  
+			else
 				ent->client->ps.gunframe--;
 
 			return;
 		}
-		
 
-		
 		if (ent->client->ps.gunframe < FRAME_RELOAD_FIRST || ent->client->ps.gunframe > FRAME_RELOAD_LAST)
 			ent->client->ps.gunframe = FRAME_RELOAD_FIRST;
 
 		else if(ent->client->ps.gunframe < FRAME_RELOAD_LAST)
-		{ 
-			ent->client->ps.gunframe++;             
+		{
+			ent->client->ps.gunframe++;
 			//Check weapon to find out when to play reload sounds
 			//pbowens: it's now defined in the user dll
 
@@ -261,15 +243,14 @@ void Weapon_Generic (edict_t *ent,
 				}
 				for (i = 0; ent->client->pers.weapon->guninfo->RSoundFrames2[i]; i++) {
 					if (ent->client->ps.gunframe == ent->client->pers.weapon->guninfo->RSoundFrames2[i]) 
-	 					gi.sound(ent, CHAN_AUTO, gi.soundindex(ent->client->pers.weapon->guninfo->ReloadSound2), 1, ATTN_NORM, 0);
+						gi.sound(ent, CHAN_AUTO, gi.soundindex(ent->client->pers.weapon->guninfo->ReloadSound2), 1, ATTN_NORM, 0);
 				}
 			}
 		}
-        else
+		else
 		{
 			ent->client->ps.gunframe = FRAME_IDLE_FIRST;
-            ent->client->weaponstate = WEAPON_READY;
-
+			ent->client->weaponstate = WEAPON_READY;
 
 			if (ent->client->pers.weapon->topoff==1)
 			{
@@ -284,14 +265,12 @@ void Weapon_Generic (edict_t *ent,
 						ent->client->pers.inventory[ammo_index]++;
 					}
 
-					if (ent->client->pers.inventory[ammo_index]) 
+					if (ent->client->pers.inventory[ammo_index])
 						*ent->client->p_rnd = ammo_item->quantity;
-					else 
-						*ent->client->p_rnd= *ent->client->p_fract;				
+					else
+						*ent->client->p_rnd= *ent->client->p_fract;
 				}
-               
 			}
-
 			else if(ent->client->pers.weapon->topoff==2)//for beltfed
 			{
 				if(*ammo_amount)
@@ -301,8 +280,7 @@ void Weapon_Generic (edict_t *ent,
 					*ent->client->p_rnd = ammo_item->quantity;
 				}
 			}
-			
-			else 
+			else
 			{
 				if(*ammo_amount) //feeder clips (not topoffable
 				{
@@ -311,14 +289,11 @@ void Weapon_Generic (edict_t *ent,
 					*ent->client->p_rnd = ammo_item->quantity;		
 				}
 			}
-
-			
-		} 
-	} 
+		}
+	}
 //Empty or unloaded weapon
 	if( ent->client->weaponstate == WEAPON_END_MAG)
 	{
-
 		//gi.dprintf(DEVELOPER_MSG_GAME, "%i - %i\n", FRAME_LASTRD_FIRST, FRAME_LASTRD_LAST);
 
 		check_unscope(ent);//faf
@@ -352,10 +327,9 @@ void Weapon_Generic (edict_t *ent,
 
 		return;
 	}
- 
+
 	if(ent->s.modelindex != (MAX_MODELS-1)) //pbowens: v_wep
-        return; // not on client, so VWep animations could do wacky things
-	
+		return; // not on client, so VWep animations could do wacky things
 
 	if (ent->client->weaponstate == WEAPON_DROPPING)
 	{
@@ -365,38 +339,33 @@ void Weapon_Generic (edict_t *ent,
 			ent->client->aim  = false;
 			ChangeWeapon (ent);
 			return;
-		}		
-        else if((FRAME_DEACTIVATE_LAST - ent->client->ps.gunframe) == 4 //pbowens: v_wep
-				&& ent->oldstance == ent->stanceflags) //faf:  not changing stances
+		}
+		else if((FRAME_DEACTIVATE_LAST - ent->client->ps.gunframe) == 4 //pbowens: v_wep
+			&& ent->oldstance == ent->stanceflags) //faf:  not changing stances
+		{
+			ent->client->anim_priority = ANIM_REVERSE;
 
-        {
-            ent->client->anim_priority = ANIM_REVERSE;
-
-            if (ent->stanceflags == STANCE_STAND)
-            {
-                ent->s.frame = FRAME_pain304+1;
-                ent->client->anim_end = FRAME_pain301;            
-            }
-            else if (ent->stanceflags == STANCE_DUCK)
-            {
-                ent->s.frame = FRAME_crpain4+1;
-                ent->client->anim_end = FRAME_crpain1;
-            }
-            else if (ent->stanceflags == STANCE_CRAWL)
-            {
-                ent->s.frame = FRAME_crawlpain04+1;
-                ent->client->anim_end = FRAME_crawlpain01;
-            }
-
-
-			
-
-        } //end v_wep
+			if (ent->stanceflags == STANCE_STAND)
+			{
+				ent->s.frame = FRAME_pain304+1;
+				ent->client->anim_end = FRAME_pain301;
+			}
+			else if (ent->stanceflags == STANCE_DUCK)
+			{
+				ent->s.frame = FRAME_crpain4+1;
+				ent->client->anim_end = FRAME_crpain1;
+			}
+			else if (ent->stanceflags == STANCE_CRAWL)
+			{
+				ent->s.frame = FRAME_crawlpain04+1;
+				ent->client->anim_end = FRAME_crawlpain01;
+			}
+		} //end v_wep
 
 		ent->client->ps.gunframe++;
 		return;
 	}
-	
+
 	if (ent->client->weaponstate == WEAPON_ACTIVATING)
 	{
 		
@@ -427,9 +396,9 @@ void Weapon_Generic (edict_t *ent,
 					}
 
 					//ent->client->pers.inventory[ITEM_INDEX(ammo_item)]--;
-				}  
+				}
 			}
-			
+
 			ent->client->weaponstate = WEAPON_READY;
 			ent->client->ps.gunframe = FRAME_IDLE_FIRST;
 			return;
@@ -443,9 +412,9 @@ void Weapon_Generic (edict_t *ent,
 				gi.sound(ent,CHAN_WEAPON,gi.soundindex("weapons/grenl1b1.wav"), 1, ATTN_NORM, 0);
 		}
 
- 		//if(ent->client->ps.gunframe>FRAME_ACTIVATE_LAST)
+		//if(ent->client->ps.gunframe>FRAME_ACTIVATE_LAST)
 		//	ent->client->ps.gunframe=FRAME_ACTIVATE_LAST;
- 		//else 
+		//else
 		//  ent->client->ps.gunframe++;
 
 		ent->client->ps.gunframe++;
@@ -454,32 +423,30 @@ void Weapon_Generic (edict_t *ent,
 
 	if ((ent->client->newweapon) && (ent->client->weaponstate != WEAPON_FIRING))
 	{
-		
 		ent->client->weaponstate = WEAPON_DROPPING;
 		ent->client->ps.gunframe = FRAME_DEACTIVATE_FIRST;
 
 		//pbowens: v_wep
 		if((FRAME_DEACTIVATE_LAST - FRAME_DEACTIVATE_FIRST) < 4
-		&& ent->oldstance == ent->stanceflags) //faf:  not changing stances
-
-        {
-            ent->client->anim_priority = ANIM_REVERSE;
-            if (ent->stanceflags == STANCE_STAND)
-            {
-                ent->s.frame = FRAME_pain304+1;
-                ent->client->anim_end = FRAME_pain301;            
-            }
-            else if (ent->stanceflags == STANCE_DUCK)
-            {
-                ent->s.frame = FRAME_crpain4+1;
-                ent->client->anim_end = FRAME_crpain1;
-            }
-            else if (ent->stanceflags == STANCE_CRAWL)
-            {
-                ent->s.frame = FRAME_crawlpain04+1;
-                ent->client->anim_end = FRAME_crawlpain01;
-            }
-        }
+		   && ent->oldstance == ent->stanceflags) //faf:  not changing stances
+		{
+			ent->client->anim_priority = ANIM_REVERSE;
+			if (ent->stanceflags == STANCE_STAND)
+			{
+				ent->s.frame = FRAME_pain304+1;
+				ent->client->anim_end = FRAME_pain301;
+			}
+			else if (ent->stanceflags == STANCE_DUCK)
+			{
+				ent->s.frame = FRAME_crpain4+1;
+				ent->client->anim_end = FRAME_crpain1;
+			}
+			else if (ent->stanceflags == STANCE_CRAWL)
+			{
+				ent->s.frame = FRAME_crawlpain04+1;
+				ent->client->anim_end = FRAME_crawlpain01;
+			}
+		}
 
 		return;
 	}
@@ -542,8 +509,7 @@ void Weapon_Generic (edict_t *ent,
 				ent->client->ps.gunframe = guninfo->AFO[3];
 			}
 			else
-			{		
-
+			{
 				if (ent->client->ps.gunframe >= FRAME_IDLE_LAST ||
 					ent->client->ps.gunframe < FRAME_IDLE_FIRST ||
 					ent->client->weaponstate_last == WEAPON_END_MAG )
@@ -587,12 +553,11 @@ void Weapon_Generic (edict_t *ent,
 				goto no_fire;
 			}*/
 		}
-		
+
 		for (n = 0; fire_frames[n]; n++)
 		{
 			if (ent->client->ps.gunframe == fire_frames[n])
 			{
-			
 				// pbowens: weapons may not fire in water (in case they jump in while firing)
 /*				if (ent->waterlevel > 2 && 
 					ent->client->pers.weapon->position != LOC_KNIFE &&
@@ -613,15 +578,12 @@ void Weapon_Generic (edict_t *ent,
 				{
 					fire (ent);
 					break;
-
 				}
 			}
-
 		}
 
 		if (!fire_frames[n])
 			ent->client->ps.gunframe++;
-
 
 		if ( ((ent->client->latched_buttons|ent->client->buttons) & BUTTON_ATTACK) )
 		{
@@ -634,7 +596,6 @@ void Weapon_Generic (edict_t *ent,
 			if (ent->oldstance != ent->stanceflags) //faf:  changing stances
 				goto skip_anim;
 
-
 			ent->client->anim_priority = ANIM_ATTACK;
 			if (!(ent->client->pers.weapon && ent->client->pers.weapon->classnameb == WEAPON_FISTS))
 			{
@@ -643,7 +604,6 @@ void Weapon_Generic (edict_t *ent,
 					ent->s.frame = FRAME_crattak1 + (ent->client->ps.gunframe % 2);
 					ent->client->anim_end = FRAME_crattak9;//faf3;
 				}
-
 				else if (ent->stanceflags == STANCE_CRAWL)
 				{
 					ent->s.frame = FRAME_crawlattck01 + (ent->client->ps.gunframe % 2);
@@ -651,7 +611,6 @@ void Weapon_Generic (edict_t *ent,
 				}
 				else
 				{
-
 					if (extra_anims->value != 1)
 					{
 						if (ent->client->movement && !ent->client->aim) 
@@ -671,7 +630,6 @@ void Weapon_Generic (edict_t *ent,
 						}
 					}
 
-
 					if (ent->client->aim ||
 						extra_anims->value != 1)
 					{
@@ -681,21 +639,16 @@ void Weapon_Generic (edict_t *ent,
 							ent->client->anim_end = FRAME_attack4;
 						else
 							ent->client->anim_end = FRAME_attack8;
-
-
-
 					}
 					else//faf:  Parts' new hip firing anims
 					{
 						ent->s.frame = FRAME_hipattack1 + (ent->client->ps.gunframe % 2);
 						ent->client->anim_end = FRAME_hipattack5;
 					}
-
 				}
 			}
 		}
 skip_anim:
-			
 		if (ent->client->ps.gunframe >= FRAME_IDLE_FIRST) // last firing frame
 			//ent->client->ps.gunframe = FRAME_FIRE_FIRST;
 			ent->client->weaponstate = WEAPON_READY;
@@ -712,10 +665,7 @@ skip_anim:
 			return;
 		}
 
-
 		ent->client->aim=true;
-
-
 
 		if (ent->client->pers.weapon->position == LOC_SNIPER &&
 			!ent->client->sniper_loaded[ent->client->resp.team_on->index])
@@ -724,7 +674,6 @@ skip_anim:
 
 			ent->client->crosshair = false;
 			ent->client->aim=false;
-
 
 			// if the frames are out of bounds, reset it to the first
 			if (ent->client->ps.gunframe < guninfo->AFO[1] ||
@@ -738,7 +687,6 @@ skip_anim:
 					if (ent->client->ps.gunframe == guninfo->AFO[2] - 6)
 						ent->client->scopetry = false;
 
-
 					if (ent->client->ps.gunframe == ent->client->pers.weapon->guninfo->sniper_bolt_frame ) 
 					{
 	 					//gi.sound(ent, CHAN_AUTO, gi.soundindex(ent->client->pers.weapon->guninfo->sniper_bolt_wav), 1, ATTN_NORM, 0);
@@ -746,7 +694,6 @@ skip_anim:
 						// faf: show player bolting rifle
 						if (ent->oldstance == ent->stanceflags) //faf:  not changing stances
 						{
-
 							ent->client->anim_priority = ANIM_REVERSE;
 							if (ent->stanceflags == STANCE_STAND)
 							{
@@ -779,7 +726,6 @@ skip_anim:
 			return;
 		}
 
-
 		//faf:  anti-diving measures to replace slope bug version
 		if (!chile->value && ent->client->last_jump_time > level.time - 1 &&
 			!ent->groundentity &&
@@ -789,7 +735,6 @@ skip_anim:
 		{
 				ent->client->jump_pause_time = level.time + .3;
 				return;
-
 		}
 		if (ent->client->jump_pause_time)
 		{
@@ -798,8 +743,6 @@ skip_anim:
 			else
 				ent->client->jump_pause_time = 0;
 		}
-
-
 
 		if(ent->client->ps.gunframe < FRAME_RAISE_FIRST)
 			ent->client->ps.gunframe = FRAME_RAISE_FIRST;
@@ -813,11 +756,8 @@ skip_anim:
 				ent->client->ps.fov = SCOPE_FOV;
 				ent->client->scopetime = level.time;//faf
 			}
-
 		}
 		else ent->client->ps.gunframe++;
-
-		
 	}
 
 	if(ent->client->weaponstate==WEAPON_LOWER)
@@ -825,33 +765,33 @@ skip_anim:
 		//faf:  moving this from cmd_scope to avoid slowdown on mauser
 		// Nick - Hack to allow a bolt action rifle reload animation to play the entirety.
 		if (ent->client->pers.weapon &&
-		(ent->client->pers.weapon->classnameb == WEAPON_MAUSER98K || 
-		ent->client->pers.weapon->classnameb == WEAPON_CARCANO ||
-		ent->client->pers.weapon->classnameb == WEAPON_M9130) &&
-		(ent->client->ps.gunframe >= 4 && ent->client->ps.gunframe <= 15 ||
-		ent->client->ps.gunframe >=86 && ent->client->ps.gunframe <=97))
+		    (ent->client->pers.weapon->classnameb == WEAPON_MAUSER98K ||
+		     ent->client->pers.weapon->classnameb == WEAPON_CARCANO ||
+		     ent->client->pers.weapon->classnameb == WEAPON_M9130) &&
+		    ((ent->client->ps.gunframe >= 4 && ent->client->ps.gunframe <= 15) ||
+		     (ent->client->ps.gunframe >=86 && ent->client->ps.gunframe <= 97)) )
 		{
 			ent->client->ps.gunframe++;//faf
 		}
-		else if ((ent->client->pers.weapon &&
-		ent->client->pers.weapon->classnameb == WEAPON_ENFIELD) &&
-		(ent->client->ps.gunframe >= 4 && ent->client->ps.gunframe <= 15 ||
-		ent->client->ps.gunframe >=89 && ent->client->ps.gunframe <=102))
+		else
+		if ((ent->client->pers.weapon && ent->client->pers.weapon->classnameb == WEAPON_ENFIELD) &&
+		    ((ent->client->ps.gunframe >= 4 && ent->client->ps.gunframe <= 15) ||
+		     (ent->client->ps.gunframe >=89 && ent->client->ps.gunframe <=102)) )
+		{
 			ent->client->ps.gunframe++;//faf
-		else if ((ent->client->pers.weapon &&
-		ent->client->pers.weapon->classnameb == WEAPON_ARISAKA) &&
-		(ent->client->ps.gunframe >= 4 && ent->client->ps.gunframe <= 15 ||
-		ent->client->ps.gunframe >=62 && ent->client->ps.gunframe <=72))
+		}
+		else
+		if ((ent->client->pers.weapon && ent->client->pers.weapon->classnameb == WEAPON_ARISAKA) &&
+		    ((ent->client->ps.gunframe >= 4 && ent->client->ps.gunframe <= 15) ||
+		     (ent->client->ps.gunframe >=62 && ent->client->ps.gunframe <= 72)) )
+		{
 			ent->client->ps.gunframe++;//faf
-
-
-
+		}
 		// End Nick
 		else
 		{
-
 			if (FRAME_RAISE_LAST == 0) {
-				ent->client->aim = false;	
+				ent->client->aim = false;
 				ent->client->weaponstate = WEAPON_READY;
 				return;
 			}
@@ -870,18 +810,8 @@ skip_anim:
 				ent->client->ps.gunframe=FRAME_RAISE_LAST;
 			else  ent->client->ps.gunframe--;
 		}
-		
 	}
-
-
-
-
-
-
-
 }
-  
-  
 
 void ifchangewep(edict_t *ent)
 {

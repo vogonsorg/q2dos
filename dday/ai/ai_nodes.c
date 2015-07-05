@@ -188,11 +188,10 @@ qboolean AI_PredictJumpadDestity( edict_t *ent, vec3_t out )
 	//trace from target origin to endPoint.
 //	trap_Trace ( &trace, target_origin, tv(-15, -15, -8), tv(15, 15, 8), floor_target_origin, NULL, MASK_NODESOLID);
 	trace = gi.trace(  target_origin, tv(-15, -15, -8), tv(15, 15, 8), floor_target_origin, NULL, MASK_NODESOLID);
-	if (trace.fraction == 1.0 && trace.startsolid || trace.allsolid && trace.startsolid){
+	if ((trace.fraction == 1.0 && trace.startsolid) || (trace.allsolid && trace.startsolid)){
 //		G_Printf("JUMPAD LAND: ERROR: trace was in solid.\n"); //started inside solid (target should never be inside solid, this is a mapper error)
 		return false;
 	} else if ( trace.fraction == 1.0 ) {
-		
 		//didn't find solid. Extend Down (I have to improve this part)
 		vec3_t	target_origin2, extended_endpoint, extend_dist_vec;
 		
@@ -748,7 +747,7 @@ int AI_IsPlatformLink( int n1, int n2 )
 	if( nodes[n1].flags & NODEFLAGS_PLATFORM && !(nodes[n2].flags & NODEFLAGS_PLATFORM) )
 	{
 		edict_t *n1ent = NULL;
-		int		othernode;
+		int		othernode = -1;
 
 		// find ent
 		for(i=0;i<nav.num_ents;i++) {
@@ -794,7 +793,7 @@ int AI_IsPlatformLink( int n1, int n2 )
 	if( !(nodes[n1].flags & NODEFLAGS_PLATFORM) && nodes[n2].flags & NODEFLAGS_PLATFORM )
 	{
 		edict_t *n2ent = NULL;
-		int		othernode;
+		int		othernode = -1;
 
 		// find ent
 		for(i=0;i<nav.num_ents;i++) {

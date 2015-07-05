@@ -127,7 +127,7 @@ void BOT_DMclass_Move(edict_t *self, usercmd_t *ucmd)
 		v1[2] += self->mins[2];
 		trace = gi.trace( v1, tv(-2, -2, -AI_JUMPABLE_HEIGHT), tv(2, 2, 0), v1, self, MASK_AISOLID );
 		if( !trace.startsolid && trace.fraction == 1.0 )
-	{
+		{
 			//jump!
 			ucmd->forwardmove = 400;
 			//prevent double jumping on crates
@@ -140,21 +140,13 @@ void BOT_DMclass_Move(edict_t *self, usercmd_t *ucmd)
 		}
 	}
 
-
-
-
-		//don't think this works...
-		if (self->ai->door_touch_time && self->ai->door_touch_time > level.time - .5)
-		{
-			//gi.dprintf(DEVELOPER_MSG_GAME, "back\n");
-			ucmd->forwardmove = -400;
-			return;
-		}
-
-
-
-
-
+	//don't think this works...
+	if (self->ai->door_touch_time && self->ai->door_touch_time > level.time - .5)
+	{
+		//gi.dprintf(DEVELOPER_MSG_GAME, "back\n");
+		ucmd->forwardmove = -400;
+		return;
+	}
 
 	// Move To Short Range goal (not following paths)
 	// plats, grapple, etc have higher priority than SR Goals, cause the bot will 
@@ -176,7 +168,7 @@ void BOT_DMclass_Move(edict_t *self, usercmd_t *ucmd)
 	}
 
 	// Check to see if stuck, and if so try to free us
- 	if(!level.intermissiontime && self->ai->state != BOT_STATE_CAMP && VectorLength(self->velocity) < 50 &&
+	if(!level.intermissiontime && self->ai->state != BOT_STATE_CAMP && VectorLength(self->velocity) < 50 &&
 		self->stanceflags == STANCE_STAND && self->oldstance == STANCE_STAND)//37)
 	{
 		if (1 || self->ai->last_jump_try < level.time - 3)
@@ -194,7 +186,7 @@ void BOT_DMclass_Move(edict_t *self, usercmd_t *ucmd)
 			VectorAdd (offset, g_offset, offset);
 			P_ProjectSource (self->client, self->s.origin, offset, forward, right, start);
 			VectorScale (forward, -2, self->client->kick_origin);
-			
+
 			VectorMA (start, 15, forward, end);  //calculates the range vector  //faf: 10 = range
 			tr = gi.trace (self->s.origin, NULL, NULL, end, self, MASK_SHOT);// figures out what in front of the player up till "end"
 
@@ -214,16 +206,13 @@ void BOT_DMclass_Move(edict_t *self, usercmd_t *ucmd)
 			return;
 
 		self->s.angles[YAW] += random() * 180 - 90;
-
 		if (self->ai->last_jump_try < level.time - 3)
 			AI_ChangeAngle(self);
-
 
 		ucmd->forwardmove = 400;
 
 		return;
 	}
-
 
 	AI_ChangeAngle(self);
 
@@ -264,7 +253,7 @@ void BOT_DMclass_Wander(edict_t *self, usercmd_t *ucmd)
 	// Move To Goal (Short Range Goal, not following paths)
 	if (AI_MoveToGoalEntity(self,ucmd))
 		return;
-	
+
 	// Swimming?
 	VectorCopy(self->s.origin,temp);
 	temp[2]+=24;
@@ -285,7 +274,6 @@ void BOT_DMclass_Wander(edict_t *self, usercmd_t *ucmd)
 	}
 	// else self->client->next_drown_time = 0; // probably shound not be messing with this, but
 
-
 	// Lava?
 	temp[2]-=48;
 	//if(trap_PointContents(temp) & (CONTENTS_LAVA|CONTENTS_SLIME))
@@ -299,7 +287,6 @@ void BOT_DMclass_Wander(edict_t *self, usercmd_t *ucmd)
 			ucmd->upmove = 0;
 		return;
 	}
-
 
 	// Check for special movement
 	if(VectorLength(self->velocity) < 37) 
@@ -316,7 +303,6 @@ void BOT_DMclass_Wander(edict_t *self, usercmd_t *ucmd)
 
 		return;
 	}
-
 
 	// Otherwise move slowly, walking wondering what's going on
 	if( AI_CanMove( self, BOT_MOVE_FORWARD))
@@ -362,7 +348,6 @@ void BOT_DMclass_CombatMovement( edict_t *self, usercmd_t *ucmd )
 		ucmd->forwardmove += 400;
 	else if(c < 0.8 && AI_CanMove(self,BOT_MOVE_BACK))
 		ucmd->forwardmove -= 400;
-
 
 	if (self->client->pers.weapon && self->client->pers.weapon->position != LOC_KNIFE &&
 		self->client->pers.weapon->position != LOC_FLAME &&
@@ -420,7 +405,7 @@ qboolean BOT_DMclass_FindEnemy(edict_t *self)
 
 	edict_t		*bestenemy = NULL;
 	float		bestweight = 99999;
-	float		weight;
+	float		weight = 0;
 	vec3_t		dist;
 	int wrange;
 	int camp_targ_save;
@@ -454,10 +439,8 @@ qboolean BOT_DMclass_FindEnemy(edict_t *self)
 			if (cl_ent == self)
 				continue;
 
-           // gi.dprintf(DEVELOPER_MSG_GAME, "%s %i\n", cl_ent->client->pers.netname, cl_ent->health);
+			// gi.dprintf(DEVELOPER_MSG_GAME, "%s %i\n", cl_ent->client->pers.netname, cl_ent->health);
 			self->enemy = cl_ent;
-
-
 		}
 		if (self->enemy)
 		{
@@ -476,9 +459,8 @@ qboolean BOT_DMclass_FindEnemy(edict_t *self)
 //			if (self->ai->state != BOT_STATE_WANDER)
 //			{
 				self->ai->state = BOT_STATE_MOVE;
-  //              AI_SetUpMoveWander(self);
-	//		}
-
+//				AI_SetUpMoveWander(self);
+//			}
 
 			self->client->aim = false;
 			if (self->stanceflags != STANCE_STAND)
@@ -502,7 +484,6 @@ qboolean BOT_DMclass_FindEnemy(edict_t *self)
 				AI_ResetWeights(self);
 				AI_ResetNavigation(self);
 
-
 				it = FindNextPickup(self, LOC_PISTOL);
 				index = ITEM_INDEX(it);
 				if (self->client->pers.inventory[index])
@@ -511,13 +492,9 @@ qboolean BOT_DMclass_FindEnemy(edict_t *self)
 				}
 			}
 		}
-
 	}
 	else if(self->enemy != NULL)
 		return true;
-
-
-
 
 	if (self->ai->objective && self->ai->state == BOT_STATE_CAMP  && self->ai->actual_camp_start > 0)
 	{
@@ -529,7 +506,7 @@ qboolean BOT_DMclass_FindEnemy(edict_t *self)
 		{
 			VectorSet (ent_orig, -211, -544, 352);
 		}
-			
+
 		if (BOT_DMclass_CheckShot(self, ent_orig) &&
 			objective_hittable(self, self->ai->objective, ent_orig))
 		{
@@ -540,7 +517,6 @@ qboolean BOT_DMclass_FindEnemy(edict_t *self)
 		else if (self->ai->actual_camp_start > 0 && 
 			( (self->ai->objective->classnameb != FUNC_TRAIN && self->ai->actual_camp_start < level.time - 2) ||
 			self->ai->actual_camp_start < level.time - 5) )
-
 		{
 			//gi.dprintf(DEVELOPER_MSG_GAME, "CHANGINGG OBJJJECTIVE\n");
 			camp_targ_save = self->ai->camp_targ;
@@ -551,29 +527,17 @@ qboolean BOT_DMclass_FindEnemy(edict_t *self)
 
 			if (self->ai->camp_targ != camp_targ_save)
 				camp_spots[camp_targ_save].owner = NULL;
-		
 		}
 	//	else
-		//	gi.dprintf(DEVELOPER_MSG_GAME, "obj not hittable\n");
+	//		gi.dprintf(DEVELOPER_MSG_GAME, "obj not hittable\n");
 	}
-
-
-
-
-
-
-
-
-
-
-
 
 	if (self->client->pers.weapon)
 	{
 		if (self->client->pers.weapon->position == LOC_FLAME ||
 			self->client->pers.weapon->position == LOC_KNIFE)
 			wrange = AIWEAP_MELEE_RANGE;
- 		else if (self->client->pers.weapon->position == LOC_RIFLE ||
+		else if (self->client->pers.weapon->position == LOC_RIFLE ||
 			self->client->pers.weapon->position == LOC_SNIPER)
 			wrange = AIWEAP_LONG_RANGE;
 		else if (self->client->pers.weapon->position == LOC_SUBMACHINEGUN ||
@@ -585,7 +549,7 @@ qboolean BOT_DMclass_FindEnemy(edict_t *self)
 			wrange = AIWEAP_SHORT_RANGE;
 		else
 			wrange = AIWEAP_MEDIUM_RANGE;
-	}else
+	} else
 		return false;
 
 	//self->client->aim = false;
@@ -643,7 +607,6 @@ qboolean BOT_DMclass_FindEnemy(edict_t *self)
 				(wrange == AIWEAP_SHORT_RANGE && weight < 1000) ||
 				(wrange == AIWEAP_MELEE_RANGE && weight < 200) ||
 				wrange == AIWEAP_LONG_RANGE)))
-
 			{
 				// Check if best target, or better than current target
 				if (weight < bestweight)
@@ -654,8 +617,6 @@ qboolean BOT_DMclass_FindEnemy(edict_t *self)
 			}
 		}
 	}
-
-
 
 	// If best enemy, set up
 	if(bestenemy)
@@ -724,7 +685,6 @@ void BOT_DMclass_ChooseWeapon(edict_t *self)
 	gitem_t	*it;
 	int index;
 
-
 	if (!self->enemy && self->client->resp.mos == SNIPER && self->client->pers.weapon->position != LOC_SNIPER && 
 		self->ai->last_enemy_time && self->ai->last_enemy_time < level.time - 3)
 	{
@@ -751,8 +711,6 @@ void BOT_DMclass_ChooseWeapon(edict_t *self)
 		return;
 	}
 
-
-
 	// if no enemy, then what are we doing here?
 	if(!self->enemy)
 		return;
@@ -769,16 +727,12 @@ void BOT_DMclass_ChooseWeapon(edict_t *self)
 
 	if(dist < 150)
 		weapon_range = AIWEAP_MELEE_RANGE;
-
 	else if(dist < 500)	//Medium range limit is Grenade Laucher range
 		weapon_range = AIWEAP_SHORT_RANGE;
-
 	else if(dist < 900)
 		weapon_range = AIWEAP_MEDIUM_RANGE;
-
-	else 
+	else
 		weapon_range = AIWEAP_LONG_RANGE;
-
 
 	//if we've just fired sniper and an enemy is close by.  switch to pistol
 	if (dist < 500 && self->client->pers.weapon && self->client->pers.weapon->position == LOC_SNIPER &&
@@ -814,7 +768,6 @@ void BOT_DMclass_ChooseWeapon(edict_t *self)
 		}
 	}
 
-
 	return;
 }
 
@@ -824,14 +777,13 @@ qboolean hmgvisible (edict_t *self, edict_t *other)
 	vec3_t	spot2;
 	trace_t	trace;
 
-
 	VectorCopy (self->s.origin, spot1);
 	//don't adjust for viewheight, just go by view at waste/crouch height
 
 	VectorCopy (other->s.origin, spot2);
 	spot2[2] += other->viewheight;
 	trace = gi.trace (spot1, vec3_origin, vec3_origin, spot2, self, MASK_SHOT);
-	
+
 /*test
 	if (self->client->resp.team_on->index == 1)
 	{
@@ -876,15 +828,14 @@ qboolean hmgvisible (edict_t *self, edict_t *other)
 	if (trace.fraction < 1.0 && trace.ent == other)
 		return true;
 
-
 	return false;
 }
+
 qboolean pronevisible (edict_t *self, edict_t *other)
 {
 	vec3_t	spot1;
 	vec3_t	spot2;
 	trace_t	trace;
-
 
 	VectorCopy (self->s.origin, spot1);
 	spot1[2] -= 16;
@@ -913,6 +864,7 @@ qboolean eng_hittable (vec3_t spot1, vec3_t spot2, edict_t *self, edict_t *enemy
 	//Com_Printf("Bloqued");
 	return false;
 }
+
 //==========================================
 // BOT_DMclass_FireWeapon
 // Fire if needed
@@ -938,6 +890,9 @@ void BOT_CheckFireWeapon (edict_t *self, usercmd_t *ucmd)
 	vec3_t vdist;
 	float dist;
 
+	/* silence 'might be used uninitialized' warnings: */
+	dist = 0;
+	enemystance = 0;
 
 	if (self->ai->state != BOT_STATE_CAMP && 
 		self->client->weaponstate != WEAPON_READY && 
@@ -949,12 +904,9 @@ void BOT_CheckFireWeapon (edict_t *self, usercmd_t *ucmd)
 		return;
 	}
 
-
-
-
 	if (self->client->pers.weapon)
 	{
-        if (self->client->pers.weapon->position == LOC_SUBMACHINEGUN ||
+		if (self->client->pers.weapon->position == LOC_SUBMACHINEGUN ||
 			self->client->pers.weapon->position == LOC_SUBMACHINEGUN2 ||
 			self->client->pers.weapon->position == LOC_L_MACHINEGUN ||
 			self->client->pers.weapon->position == LOC_H_MACHINEGUN)
@@ -975,43 +927,30 @@ void BOT_CheckFireWeapon (edict_t *self, usercmd_t *ucmd)
 	}else
 		return;
 
-
-
-
-
-
 	//medibot: if no enemy & wounded, heal yourself
 	if (self->ai->last_enemy_time < level.time - 5 &&
 		self->client->resp.mos && self->client->resp.mos == MEDIC && self->health < 100)
 	{
-			if (self->client->pers.weapon && self->client->pers.weapon->classnameb != WEAPON_MORPHINE)
-			{
-				gitem_t	*it;
-				int index;
+		if (self->client->pers.weapon && self->client->pers.weapon->classnameb != WEAPON_MORPHINE)
+		{
+			gitem_t	*it;
+			int index;
 
-				it = FindItem("Morphine");
-				index = ITEM_INDEX(it);
-				if (self->client->pers.inventory[index])
-				{
-					it->use (self, it);
-				}
-				return;
-			}
-			else 
+			it = FindItem("Morphine");
+			index = ITEM_INDEX(it);
+			if (self->client->pers.inventory[index])
 			{
-				self->client->aim = true;
-				ucmd->buttons = BUTTON_ATTACK;
-				return;
-		
+				it->use (self, it);
 			}
+			return;
+		}
+		else
+		{
+			self->client->aim = true;
+			ucmd->buttons = BUTTON_ATTACK;
+			return;
+		}
 	}
-
-
-
-
-
-
-
 
 	//go to prone sometimes
 	if (self->enemy)
@@ -1020,16 +959,10 @@ void BOT_CheckFireWeapon (edict_t *self, usercmd_t *ucmd)
 		//if (VectorCompare(vec3_origin, self->ai->last_enemy_origin))
 		VectorCopy (self->enemy->s.origin,self->ai->last_enemy_origin);
 
-
-
-
-        if (weapon != WEAP_ROCKETLAUNCHER && weapon != WEAP_FLAMER && weapon != WEAP_MELEE &&  self->client->pers.weapon && self->client->pers.weapon->classnameb != WEAPON_MORPHINE
+		if (weapon != WEAP_ROCKETLAUNCHER && weapon != WEAP_FLAMER && weapon != WEAP_MELEE &&  self->client->pers.weapon && self->client->pers.weapon->classnameb != WEAPON_MORPHINE
 			&& self->client->landed && self->client->aim && random() < .05 && pronevisible(self, self->enemy) &&
 			!self->ai->teammatedodge)//try to avoid crawlin on top of people
 			change_stance (self, STANCE_CRAWL);
-
-
-
 	}
 
 	if (self->ai->last_enemy_time < level.time - .7 &&  !self->enemy)
@@ -1045,22 +978,14 @@ void BOT_CheckFireWeapon (edict_t *self, usercmd_t *ucmd)
 		if (VectorCompare(vec3_origin, self->ai->last_enemy_origin))
 			return;
 
-
 //	if (self->ai->state != BOT_STATE_CAMP)
 //		BOT_DMclass_CombatMovement (self,ucmd);
-
-
 
 	if (self->client->p_rnd && *self->client->p_rnd == 0)
 		return;
 
-
 //	self->ai->state = BOT_STATE_ATTACK;
 //	self->ai->state_combat_timeout = level.time + 1.0;
-
-
-
-
 
 	//so m1's and pistols don't get stuck with button held down
 	if (self->client->pers.weapon && 
@@ -1073,8 +998,6 @@ void BOT_CheckFireWeapon (edict_t *self, usercmd_t *ucmd)
 		self->client->buttons &= ~BUTTON_ATTACK;
 		return;
 	}
-	
-
 
 	if ((self->client->resp.mos == H_GUNNER || self->client->resp.mos == ENGINEER) && self->ai->state != BOT_STATE_CAMP && self->stanceflags == STANCE_STAND)
 	{
@@ -1113,16 +1036,12 @@ void BOT_CheckFireWeapon (edict_t *self, usercmd_t *ucmd)
 		dist = VectorLength (vdist);
 	}
 
-
-
-
 	if (weapon == WEAP_MELEE && dist > 100)
 		return;
 	if (weapon == WEAP_FLAMER && dist > 250)
 		return;
 //	if (self->client->pers.weapon && self->client->pers.weapon->classnameb == WEAPON_MORPHINE && dist > 100)
 //		return;
-
 
 	if (!self->client->aim && weapon != WEAP_MELEE && weapon != WEAP_FLAMER && self->client->pers.weapon && self->client->pers.weapon->classnameb != WEAPON_MORPHINE)
 	{
@@ -1131,10 +1050,10 @@ void BOT_CheckFireWeapon (edict_t *self, usercmd_t *ucmd)
 			Cmd_Scope_f(self);
 			return; 
 		}
-		if (self->client->pers.weapon->position == LOC_PISTOL || 
-			self->client->pers.weapon->position == LOC_SHOTGUN || 			
-			self->client->pers.weapon->position == LOC_RIFLE || 
-			self->client->pers.weapon->position == LOC_SUBMACHINEGUN || 
+		if (self->client->pers.weapon->position == LOC_PISTOL ||
+			self->client->pers.weapon->position == LOC_SHOTGUN ||
+			self->client->pers.weapon->position == LOC_RIFLE ||
+			self->client->pers.weapon->position == LOC_SUBMACHINEGUN ||
 			self->client->pers.weapon->position == LOC_L_MACHINEGUN)
 		{
 			if (dist && dist > 600)
@@ -1149,14 +1068,11 @@ void BOT_CheckFireWeapon (edict_t *self, usercmd_t *ucmd)
 			{
 				if ( !(self->enemy && hmgvisible(self, self->enemy)))
 					return;
-
 			}
 			Cmd_Scope_f(self);
 			return;
 		}
-
 	}
-
 
 	//weapon = self->s.skinnum & 0xff;
 /*	if (self->client->pers.weapon)
@@ -1165,20 +1081,15 @@ void BOT_CheckFireWeapon (edict_t *self, usercmd_t *ucmd)
 		weapon = 0;
 */
 
-
-
 	//jalToDo: Add different aiming types (explosive aim to legs, hitscan aim to body)
 
 	//was find range. I might use it later
 	//VectorSubtract( self->s.origin, self->enemy->s.origin, attackvector);
 	//dist = VectorLength( attackvector);
 
-	
 	// func_explosives etc have 0,0,0 origin, use absmin/absmax
 
-
 	// Aim
-	
 	VectorCopy(self->s.origin, fireorig);
 	fireorig[2]+= self->viewheight;
 
@@ -1196,8 +1107,6 @@ void BOT_CheckFireWeapon (edict_t *self, usercmd_t *ucmd)
 		}
 		else
 			VectorCopy(self->enemy->s.origin, enemyorig);
-		
-
 
 		if (self->enemy->stanceflags)
 			enemystance = self->enemy->stanceflags;
@@ -1219,9 +1128,8 @@ void BOT_CheckFireWeapon (edict_t *self, usercmd_t *ucmd)
 			VectorCopy (self->enemy->obj_origin, target);
 		else //func_train
 			VectorSet (target, (self->enemy->absmax[0] + self->enemy->absmin[0])/2,(self->enemy->absmax[1] + self->enemy->absmin[1])/2,(self->enemy->absmax[2] + self->enemy->absmin[2])/2);
-	
 	}
-	else 
+	else
 	{
 		//VectorCopy(self->enemy->s.origin,target);
 		VectorCopy(enemyorig,target);
@@ -1239,7 +1147,7 @@ void BOT_CheckFireWeapon (edict_t *self, usercmd_t *ucmd)
 			{target[2] += -5; //gi.dprintf(DEVELOPER_MSG_GAME, "LOW\n");
 			}
 		}
-		else 
+		else
 		{
 			if ((int)rand()%2 ==1)
 			{target[2] += 10; //gi.dprintf(DEVELOPER_MSG_GAME, "HIGH\n");
@@ -1247,7 +1155,7 @@ void BOT_CheckFireWeapon (edict_t *self, usercmd_t *ucmd)
 			else
 			{target[2] += 20; //gi.dprintf(DEVELOPER_MSG_GAME, "LOW\n");
 			}
-		}	
+		}
 	}
 
 	if (!strcmp(level.mapname,"dday4")&&
@@ -1257,9 +1165,8 @@ void BOT_CheckFireWeapon (edict_t *self, usercmd_t *ucmd)
 		VectorSet (target, -211, -544, 352);
 	}
 
-    VectorCopy (enemyorig, self->ai->last_enemy_origin);
+	VectorCopy (enemyorig, self->ai->last_enemy_origin);
 	self->ai->last_enemy_stance = enemystance;
-
 
 	// find out our weapon AIM style
 	if( AIWeapons[weapon].aimType == AI_AIMSTYLE_PREDICTION_EXPLOSIVE )
@@ -1271,12 +1178,10 @@ void BOT_CheckFireWeapon (edict_t *self, usercmd_t *ucmd)
 	else if ( AIWeapons[weapon].aimType == AI_AIMSTYLE_PREDICTION )
 	{
 		//jalToDo
-
 	}
 	else if ( AIWeapons[weapon].aimType == AI_AIMSTYLE_DROP )
 	{
 		//jalToDo
-
 	} else { //AI_AIMSTYLE_INSTANTHIT
 
 	}
@@ -1297,10 +1202,9 @@ void BOT_CheckFireWeapon (edict_t *self, usercmd_t *ucmd)
 	else if (skilloffset > 30)
 		skilloffset = 30;
 
+/*	needs work
 
-/*	  needs work
-
-if (self->client->pers.weapon->classnameb == WEAPON_PIAT  && self->enemy)
+	if (self->client->pers.weapon->classnameb == WEAPON_PIAT  && self->enemy)
 	{
 		vec3_t dist;
 		float distf;
@@ -1310,10 +1214,8 @@ if (self->client->pers.weapon->classnameb == WEAPON_PIAT  && self->enemy)
 		gi.dprintf(DEVELOPER_MSG_GAME, "distf: %f\n", distf);
 		gi.dprintf(DEVELOPER_MSG_GAME, "target: %s\n", vtos(target));
 		target [2]+= distf/3;
-
 	}
 	else  */
-		
 	if (self->client->pers.weapon->position == LOC_ROCKET && self->enemy && self->enemy->client)
 	{
 		qboolean gotspot;
@@ -1333,7 +1235,7 @@ if (self->client->pers.weapon->classnameb == WEAPON_PIAT  && self->enemy)
 		VectorCopy (self->s.origin, start);
 		start[2]+=self->viewheight;
 		AngleVectors (self->client->v_angle, forward, right, NULL);
-		
+
 		gotspot = false;
 
 		VectorMA (enspot, 150, down, checktarg); 
@@ -1343,11 +1245,11 @@ if (self->client->pers.weapon->classnameb == WEAPON_PIAT  && self->enemy)
 			{	VectorCopy (tr.endpos,target);
 				//gi.dprintf(DEVELOPER_MSG_GAME, "DOWN\n");
 				gotspot = true;
-			}		
+			}
 		}
 
 		if (!gotspot){
-            VectorMA (enspot, 150, up, checktarg); 
+			VectorMA (enspot, 150, up, checktarg); 
 			tr = gi.trace (enspot, vec3_origin, vec3_origin, checktarg, self->enemy, MASK_SHOT);
 			if (tr.fraction < 1.0 && !(tr.surface && tr.surface->flags & SURF_SKY))	{
 				if (eng_hittable (start, tr.endpos, self, self->enemy))
@@ -1391,7 +1293,7 @@ if (self->client->pers.weapon->classnameb == WEAPON_PIAT  && self->enemy)
 				}
 			}
 		}
-		if (!gotspot){	
+		if (!gotspot){
 			VectorMA (enspot, 150, forward, checktarg); 
 			tr = gi.trace (enspot, vec3_origin, vec3_origin, checktarg, self->enemy, MASK_SHOT);
 			if (tr.fraction < 1.0 && !(tr.surface && tr.surface->flags & SURF_SKY)){
@@ -1403,7 +1305,6 @@ if (self->client->pers.weapon->classnameb == WEAPON_PIAT  && self->enemy)
 		}
 	}
 	//ShowSpot (target, false);
-
 
 	// modify attack angles based on accuracy (mess this up to make the bot's aim not so deadly)
 //	target[0] += (random()-0.5) * ((MAX_BOT_SKILL - self->ai->pers.skillLevel) *2);
@@ -1422,14 +1323,11 @@ if (self->client->pers.weapon->classnameb == WEAPON_PIAT  && self->enemy)
 		target[1] += 4 * (random()-0.5);
 	}
 
-
 	// Set direction
 	VectorSubtract (target, fireorig, self->ai->move_vector);
 	vectoangles (self->ai->move_vector, angles);
 	VectorCopy(angles,self->s.angles);
 
-
-	
 /*	if (skill->value == 0)
 		skilldelay = 2;
 	else if (skill->value == 1)
@@ -1447,10 +1345,9 @@ if (self->client->pers.weapon->classnameb == WEAPON_PIAT  && self->enemy)
 
 	//gi.dprintf(DEVELOPER_MSG_GAME, "%f %f\n",skilloffset, skilldelay);
 
-
 	randnum = (int)rand()%((int)((1 + (40*skilldelay))));
 	//gi.dprintf(DEVELOPER_MSG_GAME, "         %i\n",randnum);
-	
+
 	//already firing auto, keep firing for a bit
 	if ((self->client->pers.weapon->position == LOC_SUBMACHINEGUN ||
 		self->client->pers.weapon->position == LOC_L_MACHINEGUN ||
@@ -1529,12 +1426,11 @@ void BOT_DMclass_WeightPlayers(edict_t *self)
 	//clear
 	memset(self->ai->status.playersWeights, 0, sizeof (self->ai->status.playersWeights));
 
-	for( i=0; i<num_AIEnemies; i++ )
+	for (i = 0; i < num_AIEnemies; i++)
 	{
-		if( AIEnemies[i] == NULL )
+		if(AIEnemies[i] == NULL)
 			continue;
-
-		if( AIEnemies[i] == self )
+		if(AIEnemies[i] == self)
 			continue;
 
 		//ignore spectators and dead players
@@ -1550,10 +1446,9 @@ void BOT_DMclass_WeightPlayers(edict_t *self)
 			)
 		{}
 		else
-		self->ai->status.playersWeights[i] = 0.3;
+			self->ai->status.playersWeights[i] = 0.3;
 
-
-/*		if( ctf->value )
+/*		if(ctf->value)
 		{
 			if( AIEnemies[i]->client->resp.ctf_team != self->client->resp.ctf_team )
 			{
@@ -1579,8 +1474,7 @@ void BOT_DMclass_WeightPlayers(edict_t *self)
 		}
 		else	//if not at ctf every player has some value
 			self->ai->status.playersWeights[i] = 0.3;
-	*/
-
+		*/
 	}
 }
 
@@ -1589,16 +1483,17 @@ void BOT_DMclass_WeightPlayers(edict_t *self)
 // BOT_DMclass_WantedFlag
 // find needed flag
 //==========================================
-/*gitem_t	*BOT_DMclass_WantedFlag (edict_t *self)
+/*
+gitem_t	*BOT_DMclass_WantedFlag (edict_t *self)
 {
 	qboolean	hasflag;
 
 	if (!ctf->value)
 		return NULL;
-	
+
 	if (!self->client || !self->client->resp.ctf_team)
 		return NULL;
-	
+
 	//find out if the player has a flag, and what flag is it
 	if (redflag && self->client->pers.inventory[ITEM_INDEX(redflag)])
 		hasflag = true;
@@ -1642,7 +1537,6 @@ void BOT_DMclass_WeightInventory(edict_t *self)
 
 	//reset with persistant values
 	memcpy(self->ai->status.inventoryWeights, self->ai->pers.inventoryWeights, sizeof(self->ai->pers.inventoryWeights));
-	
 
 	//weight ammo down if bot doesn't have the weapon for it,
 	//or denny weight for it, if bot is packed up.
@@ -1703,7 +1597,6 @@ void BOT_DMclass_WeightInventory(edict_t *self)
 	else if (!client->pers.inventory[ITEM_INDEX(AIWeapons[WEAP_RAILGUN].weaponItem)] )
 		self->ai->status.inventoryWeights[ITEM_INDEX(AIWeapons[WEAP_RAILGUN].ammoItem)] *= LowNeedFactor;
 
-
 	//WEAPONS
 	//-----------------------------------------------------
 
@@ -1728,7 +1621,6 @@ void BOT_DMclass_WeightInventory(edict_t *self)
 	if (!AI_CanUseArmor ( FindItemByClassname("item_armor_body"), self ))
 		self->ai->status.inventoryWeights[ITEM_INDEX(FindItemByClassname("item_armor_body"))] = 0.0;
 
-	
 	//TECH :
 	//-----------------------------------------------------
 	if ( self->client->pers.inventory[ITEM_INDEX( FindItemByClassname("item_tech1"))] 
@@ -1742,14 +1634,14 @@ void BOT_DMclass_WeightInventory(edict_t *self)
 		self->ai->status.inventoryWeights[ITEM_INDEX( FindItemByClassname("item_tech4"))] = 0.0;
 	}
 
-	//CTF: 
+	//CTF:
 	//-----------------------------------------------------
 	if( ctf->value )
 	{
 		gitem_t		*wantedFlag;
 
 		wantedFlag = BOT_DMclass_WantedFlag( self ); //Returns the flag gitem_t
-		
+
 		//flags have weights defined inside persistant inventory. Remove weight from the unwanted one/s.
 		if (blueflag && blueflag != wantedFlag)
 			self->ai->status.inventoryWeights[ITEM_INDEX(blueflag)] = 0.0;
@@ -1777,12 +1669,12 @@ void BOT_DMclass_UpdateStatus( edict_t *self )
 	VectorSet (self->client->ps.pmove.delta_angles, 0, 0, 0);
 
 	//JALFIXMEQ2
-/*
+	/*
 	if (self->client->jumppad_time)
 		self->ai->status.jumpadReached = true;	//jumpad time from client to botStatus
 	else
 		self->ai->status.jumpadReached = false;
-*/
+	*/
 	if (self->client->ps.pmove.pm_flags & PMF_TIME_TELEPORT)
 		self->ai->status.TeleportReached = true;
 	else
@@ -1841,18 +1733,15 @@ void BOT_DMclass_RunFrame( edict_t *self )
 	memset( &ucmd, 0, sizeof(ucmd) );
 
 
-		BOT_DMclass_FindEnemy(self);
-		
-		BOT_CheckFireWeapon( self, &ucmd );
-
-		BOT_DMclass_ChooseWeapon( self );
+	BOT_DMclass_FindEnemy(self);
+	BOT_CheckFireWeapon( self, &ucmd );
+	BOT_DMclass_ChooseWeapon( self );
 	// Look for enemies
 	/*if( )
 	{
 		self->ai->state = BOT_STATE_ATTACK;
 		self->ai->state_combat_timeout = level.time + 1.0;
-	
-	} 
+	}
 	else if( self->ai->state == BOT_STATE_ATTACK && 
 		level.time > self->ai->state_combat_timeout)
 	{
@@ -1893,9 +1782,6 @@ void BOT_DMclass_RunFrame( edict_t *self )
 	}
 	//ucmd.forwardmove = ucmd.forwardmove/2 ;
 
-
-	
-
 	//set up for pmove
 	ucmd.angles[PITCH] = ANGLE2SHORT(self->s.angles[PITCH]);
 	ucmd.angles[YAW] = ANGLE2SHORT(self->s.angles[YAW]);
@@ -1909,15 +1795,12 @@ void BOT_DMclass_RunFrame( edict_t *self )
 	// send command through id's code
 	ClientThink( self, &ucmd );
 	self->nextthink = level.time + FRAMETIME;
-
-
-
 }
 
 
 //==========================================
 // BOT_DMclass_InitPersistant
-// Persistant after respawns. 
+// Persistant after respawns.
 //==========================================
 void BOT_DMclass_InitPersistant(edict_t *self)
 {
@@ -1983,5 +1866,4 @@ void BOT_DMclass_InitPersistant(edict_t *self)
 	}
 	*/
 }
-
 

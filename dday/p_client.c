@@ -3569,7 +3569,6 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 //	gi.dprintf(DEVELOPER_MSG_GAME, "%i %s\n", ent->waterlevel, vtos(ent->client->v_angle));
 
-
 	if (!chile->value && ent->client && ent->client->pers.weapon)
 	{ 
 		time = 10 * (level.time - ent->client->last_fire_time);
@@ -3604,11 +3603,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 					ent->client->kick_angles[0] = ((3 * cos((time) -4)) * ((20 -time)/20));
 			}
 		}
-
 	}
-
-
-
 
 /*
 	if (level.intermissiontime)
@@ -3625,8 +3620,6 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 			level.exitintermission = true;
 		return;
 	}*/
-
-
 
 	if (level.intermissiontime)
 	{
@@ -3650,7 +3643,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 					level.map_vote_time = level.time;
 				else 
 					level.map_vote_time = -1;
-	}
+			}
 
 			if (level.map_vote_time != -1 && !ent->client->vote_started)
 			{
@@ -3676,9 +3669,6 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 		return;
 	}
-
-
-
 
 	//DDAY
 
@@ -3743,9 +3733,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 	//faf			ucmd->forwardmove *= .9;
 	//faf			ucmd->sidemove *= .9;
-		
-
-	}
+		}
 
 
 //		if (ent->client->aim && VectorLength(dist) > 25 && ent->velocity[2] != 0)
@@ -3794,9 +3782,6 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		else
 			client->sidestep_anim = 0; //end faf
 
-
-
-
 		// ClientSetMaxSpeed() should update cl_ prediction vars to reflect ucmd
 		// theoretically, none of these should actually be used, but there are 
 		// potential cheaters out there and the possibility of the stuffcmd NOT
@@ -3804,7 +3789,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 		//gi.dprintf(DEVELOPER_MSG_GAME, "f%i s%i u%i\n", ucmd->forwardmove, ucmd->sidemove, ucmd->upmove);
 		//gi.dprintf(DEVELOPER_MSG_GAME, " jump_push: %i\n",  client->jump_push);
-        //gi.dprintf(DEVELOPER_MSG_GAME, "    upmove: %i\n",  ucmd->upmove);
+		//gi.dprintf(DEVELOPER_MSG_GAME, "    upmove: %i\n",  ucmd->upmove);
 
 		if (ucmd->forwardmove >  (ent->client->speedmax[0] * 2)) // run
 			ucmd->forwardmove =   ent->client->speedmax[0];
@@ -3818,7 +3803,6 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		if (ucmd->sidemove    <  -(ent->client->speedmax[1] * 2)) // run
 			ucmd->sidemove    =   -ent->client->speedmax[1];
 
-
 		if (client->jump_stamina <= JUMP_MINIMUM) 
 		{
 			if (ent->velocity[2] != 0 && !client->jump_stuck) 
@@ -3829,7 +3813,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 			//ClientSetMaxSpeed(ent, true);
 			//ucmd->upmove = 0;
 		}
-		else 
+		else
 		{
 			if (client->jump_stuck) 
 			{
@@ -3852,17 +3836,14 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 			if (ent->stanceflags == STANCE_CRAWL)
 				pronedist *= 2; // double 'length'
 		}
-		else 
+		else
 		{
 			ent->stance_max=24;//faf32;
 		}
 
-
 		if (ent->stanceflags != STANCE_STAND && ent->waterlevel == 3)
 			if (ucmd->upmove > 0)
-                	change_stance (ent, STANCE_STAND);
-	
-
+				change_stance (ent, STANCE_STAND);
 	}
 
 	if (ucmd->buttons & BUTTON_ATTACK) 
@@ -3875,7 +3856,6 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 			if (ent->client->layout_type == SHOW_SERVERIMG)
 				ent->client->layout_type = SHOW_NONE;
 
-
 			ent->client->display_info = false;
 			//faf
 			if (!ent->client->resp.team_on)
@@ -3884,7 +3864,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 		if (ent->client->aim &&  (
 			(ent->stanceflags == STANCE_CRAWL && ent->client->pers.weapon && ent->client->pers.weapon->position != LOC_GRENADES) ||
-			ent->client->pers.weapon && ent->client->pers.weapon->classnameb == WEAPON_MORPHINE) )			
+			(ent->client->pers.weapon && ent->client->pers.weapon->classnameb == WEAPON_MORPHINE) ) )
 		{
 			// pbowens: this directly undermines the purpose of ClientSetMaxSpeed :(
 			for (i = 0; i < 3; i++) {
@@ -3899,13 +3879,11 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	} else
 		WeighPlayer(ent);
 //		ClientSetMaxSpeed(ent, true);
-	
-
 
 	// spits out commands to make sure they are taken
 	if (level.time >= ent->client->cmdtime || client->syncspeed == true) 
 	{
-		if (client->syncspeed) 
+		if (client->syncspeed)
 		{
 			//faf : player properly frozen in death view
 			if (ent->client->limbo_mode &&
@@ -3915,10 +3893,6 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 				ent->client->speedmax[1]=0;
 				ent->client->speedmax[2]=0;
 			}
-
-
-
-
 
 			// be careful with this. it can overflow clients if used too much
 			Com_sprintf(cmd, sizeof(cmd), "cl_forwardspeed %i; cl_sidespeed %i; cl_upspeed %i;",
@@ -3930,9 +3904,6 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 			client->cmdtime = CMD_DELAY + level.time;
 			stuffcmd(ent, cmd);
-
-	
-
 		}
 		/*else
 		{
@@ -3942,13 +3913,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 			else
 				strcpy(cmd, "crosshair 0");
 		}*/
-
 	}
-
-	
-
-
-
 
 	//ClientSetMaxSpeed(ent, true);
 
@@ -3995,7 +3960,6 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		client->ps.pmove.gravity = sv_gravity->value;
 	//END DDAY
 
-
 	pm.s = client->ps.pmove;
 
 	for (i=0 ; i<3 ; i++)
@@ -4006,11 +3970,9 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 	if (memcmp(&client->old_pmove, &pm.s, sizeof(pm.s)))
 	{
-
 		pm.snapinitial = true;
 //		gi.dprintf(DEVELOPER_MSG_GAME, "pmove changed!\n");
 	}
-
 
 	pm.cmd = *ucmd;
 
@@ -4033,10 +3995,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	//DDAY
 	if (!ent->deadflag)
 	{
-
-		if (ent->s.frame > 197 &&
-		ent->s.frame < 235 ||
-		ent->s.frame > 290)
+		if ((ent->s.frame > 197 && ent->s.frame < 235) || ent->s.frame > 290)
 			pronedist = 24;
 		else
 			pronedist = 16;
@@ -4070,7 +4029,6 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		if (!ent->burnout) //on fire
 			gi.sound(ent, CHAN_VOICE, gi.soundindex("*jump1.wav"), 1, ATTN_NORM, 0);
 
-
 		PlayerNoise(ent, ent->s.origin, PNOISE_SELF);
 		
 		//if (!ent->ai)
@@ -4087,34 +4045,23 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 			ent->client->pers.weapon->position != LOC_KNIFE  &&
 			ent->client->pers.weapon->position != LOC_HELMET &&
 			ent->client->pers.weapon->classnameb != WEAPON_BINOCULARS)
-
 		{
 			ent->client->aim = false;
-
 			check_unscope(ent);//faf
-
 			ent->client->ps.fov = STANDARD_FOV;
 		}
 
 		turret_off (ent);
-
 	}
 
 //	ent->viewheight = pm.viewheight;
 	ent->waterlevel = pm.waterlevel;
 	ent->watertype = pm.watertype;
 	ent->groundentity = pm.groundentity;
-	
 
 	SetWaterLevel(ent);
 
-
-//gi.dprintf(DEVELOPER_MSG_GAME, "%i\n",ent->waterlevel);
-
-
-
-
-
+	//gi.dprintf(DEVELOPER_MSG_GAME, "%i\n",ent->waterlevel);
 
 	if (pm.groundentity)
 		ent->groundentity_linkcount = pm.groundentity->linkcount;
@@ -4127,9 +4074,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	}
 	else
 	{
-
-
-		VectorCopy (pm.viewangles, client->v_angle);		
+		VectorCopy (pm.viewangles, client->v_angle);
 		VectorCopy (pm.viewangles, client->ps.viewangles);
 /* faf
 		//Wheaty: Limit the PITCH angle when in prone mode
@@ -4156,10 +4101,6 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		*/
 		//END DDAY
 	}
-
-
-
-
 
 	gi.linkentity (ent);
 
@@ -4199,8 +4140,6 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	// monster sighting AI
 	ent->light_level = ucmd->lightlevel;
 
-
-
 	// fire weapon from final position if needed
 	if (client->latched_buttons & BUTTON_ATTACK)
 	{
@@ -4212,7 +4151,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	}
 
 	if (client->weaponstate != client->weaponstate_last) {
-		if (client->weaponstate_last == WEAPON_RAISE ||			
+		if (client->weaponstate_last == WEAPON_RAISE ||
 			client->weaponstate_last == WEAPON_LOWER )
 		{
 //			ClientSetMaxSpeed(ent, true);
@@ -4221,13 +4160,12 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		
 		client->weaponstate_last = client->weaponstate;
 	}
-	
+
 	// DDAY
 #if 0	// Check to see if they are still feeding ammo...
 		if (ent->client->feedammo == true)
 			Feed_Ammo(ent);
 #endif //0
-
 
 	/*faf:  moved to somewhere else
 	// Do Jump-Stamina increase
@@ -4237,7 +4175,6 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		if (ent->die_time &&
 			!ent->client->movement)
 			ent->die_time = level.time + .5;
-
 
 	// Check to see if its time to die from a wound...		
 		if ( (ent->die_time) && (level.time > ent->die_time))//faf
@@ -4259,8 +4196,6 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 			// rezmoth - made bleed interval random
 			//ent->die_time = level.time + (crandom() + 1) * 2;
 			ent->die_time = level.time + 2;
-
-
 
 			//faf: making it so you only bleed when you are moving
 			if (!ent->client->bleedwarn && temp_damage != 0)
@@ -4292,20 +4227,17 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 			client->grenade->s.origin[2]+= 100;//faf:  this helps fix nade slope bug
 		}*/
 
-
 //bcass start - TNT
 		if (client->tnt)
 		{
 			VectorCopy(ent->s.origin, client->tnt->s.origin);
 			client->tnt->s.modelindex = 0; // set model to nulllient->tnt_blew_up = true;
 		}
-
 //bcass end
-		
+
 	//JABot[start]
 	AITools_DropNodes(ent);
 	//JABot[end]
-
 
 /*		if (ent->waterlevel > 1)
 		{

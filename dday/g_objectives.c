@@ -52,7 +52,7 @@ void objective_area_think (edict_t *self) {
 
 	edict_t *ent  = NULL;
 	int count = 0;
-	int newteam;
+	int newteam = 0;
 	int delay;
 
 	self->nextthink = level.time + FRAMETIME;
@@ -370,16 +370,12 @@ void timed_objective_touch_think (edict_t *self)
 void timed_objective_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf) 
 {
 	int otherteam;
-	
-
 	//edict_t *entC = NULL;
 
-	if (!IsValidPlayer(other))  
+	if (!IsValidPlayer(other))
 		return;
 
 //	gi.dprintf(DEVELOPER_MSG_GAME, "touch %i:%i (%i)\n", level.framenum, self->obj_count, (level.framenum - self->obj_count));
-
-
 
 	if (self->obj_owner ==-1 ||
 		other->client->resp.team_on->index != self->obj_owner) 
@@ -396,11 +392,9 @@ void timed_objective_touch (edict_t *self, edict_t *other, cplane_t *plane, csur
 //		team_list[self->obj_owner]->score += self->health;
 
 		otherteam = (self->obj_owner+1)%2;
-		if (!team_list[otherteam]->kills_and_points && team_list[otherteam]->score < team_list[otherteam]->need_points ||
-			(team_list[otherteam]->kills_and_points && 
-				team_list[otherteam]->kills < team_list[otherteam]->need_kills))
-		gi.sound(self, CHAN_NO_PHS_ADD, gi.soundindex(va("%s/objectives/touch_cap.wav", team_list[self->obj_owner]->teamid)), 1, 0, 0);
-		
+		if ((!team_list[otherteam]->kills_and_points && team_list[otherteam]->score < team_list[otherteam]->need_points) ||
+		    (team_list[otherteam]->kills_and_points && team_list[otherteam]->kills < team_list[otherteam]->need_kills))
+		  gi.sound(self, CHAN_NO_PHS_ADD, gi.soundindex(va("%s/objectives/touch_cap.wav", team_list[self->obj_owner]->teamid)), 1, 0, 0);
 
 		if (dedicated->value)
 			safe_cprintf(NULL, PRINT_HIGH, "%s taken by %s [%s]\n", 
@@ -624,10 +618,9 @@ void func_explosive_objective_explode (edict_t *self, edict_t *inflictor, edict_
 
 
 	otherteam = (self->obj_owner+1)%2;
-		if (!team_list[otherteam]->kills_and_points && team_list[otherteam]->score < team_list[otherteam]->need_points ||
-			(team_list[otherteam]->kills_and_points && 
-				team_list[otherteam]->kills < team_list[otherteam]->need_kills))
-			gi.sound(self, CHAN_NO_PHS_ADD, gi.soundindex(va("%s/objectives/touch_cap.wav", team_list[otherteam]->teamid)), 1, 0, 0);
+	if ((!team_list[otherteam]->kills_and_points && team_list[otherteam]->score < team_list[otherteam]->need_points) ||
+	    (team_list[otherteam]->kills_and_points && team_list[otherteam]->kills < team_list[otherteam]->need_kills))
+	  gi.sound(self, CHAN_NO_PHS_ADD, gi.soundindex(va("%s/objectives/touch_cap.wav", team_list[otherteam]->teamid)), 1, 0, 0);
 
 //		gi.dprintf(DEVELOPER_MSG_GAME, "pts:%i  ndpts:%i  kills:%i  ndkills:%i\n",team_list[(self->obj_owner+1)%2]->score,team_list[(self->obj_owner+1)%2]->need_points,
 //team_list[(self->obj_owner+1)%2]->kills,team_list[(self->obj_owner+1)%2]->need_kills);
