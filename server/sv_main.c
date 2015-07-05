@@ -461,7 +461,7 @@ void SVC_DirectConnect (void)
 			&& ( cl->netchan.qport == qport 
 			|| adr.port == cl->netchan.remote_address.port ) )
 		{
-			if (!NET_IsLocalAddress (adr) && (svs.realtime - cl->lastconnect) < ((int)sv_reconnect_limit->value * 1000))
+			if (!NET_IsLocalAddress (adr) && (svs.realtime - cl->lastconnect) < ((int)sv_reconnect_limit->value * 1000.0f))
 			{
 				Com_DPrintf(DEVELOPER_MSG_SERVER, "%s:reconnect rejected : too soon\n", NET_AdrToString (adr));
 				return;
@@ -796,11 +796,11 @@ void SV_CheckTimeouts (void)
 {
 	int		i;
 	client_t	*cl;
-	int			droppoint;
-	int			zombiepoint;
+	double			droppoint;
+	double			zombiepoint;
 
-	droppoint = svs.realtime - 1000*timeout->value;
-	zombiepoint = svs.realtime - 1000*zombietime->value;
+	droppoint = svs.realtime - 1000.0f*timeout->value;
+	zombiepoint = svs.realtime - 1000.0f*zombietime->value;
 
 	for (i=0,cl=svs.clients ; i<maxclients->value ; i++,cl++)
 	{

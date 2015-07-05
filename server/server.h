@@ -126,8 +126,8 @@ typedef struct client_s
 	int				downloadsize;		// total bytes (can't use EOF because of paks)
 	int				downloadcount;		// bytes sent
 
-	int				lastmessage;		// sv.framenum when packet was last received
-	int				lastconnect;
+	double				lastmessage;		// sv.framenum when packet was last received
+	double				lastconnect;
 
 	int				challenge;			// challenge of this user, randomly generated
 
