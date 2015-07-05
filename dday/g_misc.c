@@ -3020,6 +3020,7 @@ qboolean strcmpwld (char *give, char *check)
 		for (j=i; j<checklength+i; j++)
 		{
 			// pbowens: use tolower() for editors like worldcraft
+			// SZO: WTF???
 			Com_sprintf (checked, sizeof(checked), "%s%c", &checked, tolower(give[j]));
 		}
 		if (!strcmp(check, (char *)(&checked)))

@@ -1414,7 +1414,7 @@ void ShowCampaign (edict_t *ent)
 	}
 
 	// send the layout
-	Com_sprintf (string, sizeof(string), "");
+	string[0] = 0;
 //	sprintf (string, "%sxv -16 yv 10 picn %s ", string, campaign->string);
 	sprintf (string, "%sxv 7 yv 7 picn %s ", string, level.campaign);
 
@@ -1466,7 +1466,7 @@ void ShowServerImg (edict_t *ent)
 
 
 	// send the layout
-	Com_sprintf (string, sizeof(string), "");
+	string[0] = 0;
 //	sprintf (string, "%sxv -16 yv 10 picn %s ", string, campaign->string);
 	sprintf (string, "%sxv 7 yv 7 picn %s ", string, serverimg->string);
 
