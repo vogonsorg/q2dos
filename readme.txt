@@ -9,7 +9,7 @@ What's required?
 
 What works?
 * VGA
-* SVGA (LFB modes only)
+* SVGA (Banked and LFB)
 * Mouse
 * Keyboard
 * SoundBlaster and Gravis UltraSound Family
@@ -28,6 +28,8 @@ What doesn't work:
 * Some models from Whale's WODX server can crash the software renderer.  I'm
   assuming they're custom player models as I tried replaying the same maps
   later and got no crashes.  Until I can spot it, be on the lookout.
+* Planar modes like 320x240 don't work.  320x240 in LFB and Banked is available
+  if your card reports it.
 
 Tips and other misc info:
 * Run /slist2 to get a gamespy list of active servers, or use the new browser
