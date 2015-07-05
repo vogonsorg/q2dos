@@ -690,9 +690,9 @@ void CL_ParseFrame (void)
 	CL_ClearProjectiles(); // clear projectiles for new frame
 #endif
 
-	cl.frame.serverframe = MSG_ReadLong (&net_message);
+	cl.frame.serverframe = MSG_ReadLong (&net_message); // FS: Regular Q2 Protocol is going to send this is a long instead of float
 	cl.frame.deltaframe = MSG_ReadLong (&net_message);
-	cl.frame.servertime = cl.frame.serverframe*100;
+	cl.frame.servertime = cl.frame.serverframe*100.0f;
 
 	// BIG HACK to let old demos continue to work
 	if (cls.serverProtocol != 26)
@@ -735,8 +735,8 @@ void CL_ParseFrame (void)
 	// clamp time 
 	if (cl.time > cl.frame.servertime)
 		cl.time = cl.frame.servertime;
-	else if (cl.time < cl.frame.servertime - 100)
-		cl.time = cl.frame.servertime - 100;
+	else if (cl.time < cl.frame.servertime - 100.0f)
+		cl.time = cl.frame.servertime - 100.0f;
 
 	// read areabits
 	len = MSG_ReadByte (&net_message);
@@ -1636,15 +1636,15 @@ void CL_AddEntities (void)
 	if (cl.time > cl.frame.servertime)
 	{
 		if (cl_showclamp->value)
-			Com_Printf ("high clamp %i\n", cl.time - cl.frame.servertime);
+			Com_Printf ("high clamp %f\n", cl.time - cl.frame.servertime);
 		cl.time = cl.frame.servertime;
 		cl.lerpfrac = 1.0;
 	}
-	else if (cl.time < cl.frame.servertime - 100)
+	else if (cl.time < cl.frame.servertime - 100.0f)
 	{
 		if (cl_showclamp->value)
-			Com_Printf ("low clamp %i\n", cl.frame.servertime-100 - cl.time);
-		cl.time = cl.frame.servertime - 100;
+			Com_Printf ("low clamp %f\n", cl.frame.servertime-100.0f - cl.time);
+		cl.time = cl.frame.servertime - 100.0f;
 		cl.lerpfrac = 0;
 	}
 	else
