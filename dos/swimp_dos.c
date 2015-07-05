@@ -181,7 +181,7 @@ void VID_DrawBanked(void)
 
 	while (todo>0)
 	{
-#if 0
+#if 0 // FS: For page flipping?
 		r.x.ax = 0x4F07;
 		r.x.bx = 0;
 		r.x.cx = bank_number % vid_resolutions[currentvideomode].width;
@@ -189,13 +189,6 @@ void VID_DrawBanked(void)
 		__dpmi_int(0x10, &r);
 #endif
 
-#if 0 // FS: I don't know what I'm doing
-		// select the correct plane for reading and writing
-		outportb (SC_INDEX, MAP_MASK);
-		outportb (SC_DATA, 1 << bank_number);
-		outportb (GC_INDEX, READ_MAP);
-		outportb (GC_DATA, bank_number);
-#endif
 		r.x.ax = 0x4F05;
 		r.x.bx = 0;
 		r.x.dx = bank_number; // FS: FIXME bank buffer need to be swapped!
@@ -251,6 +244,14 @@ void VID_DrawPlanar(void)
 
 	for(plane=0; plane<4; plane++)
 	{
+#if 0 // FS: I don't know what I'm doing
+		// select the correct plane for reading and writing
+		outportb (SC_INDEX, MAP_MASK);
+		outportb (SC_DATA, 1 << ????);
+		outportb (GC_INDEX, READ_MAP);
+		outportb (GC_DATA, ????);
+#endif
+
    		outportb (0x03c4, 0x02);          /* select plane */
 //		outp(SC_DATA,  1 << ((plane+x)&3) );
 		outportb (0x03c5,  1 << ((plane)&3) );
