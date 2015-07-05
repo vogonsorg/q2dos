@@ -27,6 +27,7 @@ DOS = 	dos/cd_dos.o \
 	game/m_flash.o \
 	game/q_shared.o \
 	dos/dxe.o \
+	dos/vregset.o \
 	dos/swimp_dos.o
 
 CLIENT =	client/cl_input.o \
