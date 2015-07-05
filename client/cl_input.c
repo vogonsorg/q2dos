@@ -92,7 +92,7 @@ void KeyDown (kbutton_t *b)
 
 	// save timestamp
 	c = Cmd_Argv(2);
-	b->downtime = atoi(c);
+	b->downtime = atof(c); // FS: Double conversion, watch this -- atoi(c);
 	if (!b->downtime)
 		b->downtime = sys_frame_time - 100;
 

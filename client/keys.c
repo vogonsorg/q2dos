@@ -937,7 +937,7 @@ void Key_Event (int key, qboolean down, double time)
 		kb = keybindings[key];
 		if (kb && kb[0] == '+')
 		{
-			Com_sprintf (cmd, sizeof(cmd), "-%s %i %i\n", kb+1, key, time);
+			Com_sprintf (cmd, sizeof(cmd), "-%s %i %f\n", kb+1, key, time); // FS: Precision error from double conversion.  Watch this
 			Cbuf_AddText (cmd);
 		}
 		if (keyshift[key] != key)
@@ -945,7 +945,7 @@ void Key_Event (int key, qboolean down, double time)
 			kb = keybindings[keyshift[key]];
 			if (kb && kb[0] == '+')
 			{
-				Com_sprintf (cmd, sizeof(cmd), "-%s %i %i\n", kb+1, key, time);
+				Com_sprintf (cmd, sizeof(cmd), "-%s %i %f\n", kb+1, key, time); // FS: Precision error from double conversion.  Watch this
 				Cbuf_AddText (cmd);
 			}
 		}
@@ -964,7 +964,7 @@ void Key_Event (int key, qboolean down, double time)
 		{
 			if (kb[0] == '+')
 			{	// button commands add keynum and time as a parm
-				Com_sprintf (cmd, sizeof(cmd), "%s %i %i\n", kb, key, time);
+				Com_sprintf (cmd, sizeof(cmd), "%s %i %f\n", kb, key, time); // FS: Precision error from double conversion.  Watch this
 				Cbuf_AddText (cmd);
 			}
 			else
