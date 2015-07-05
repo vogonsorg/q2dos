@@ -115,6 +115,7 @@ double Sys_FloatTime (void);
 
 int                     end_of_memory;
 qboolean        lockmem, lockunlockmem, unlockmem;
+qboolean		bSkipWinCheck, bSkipLFNCheck; // FS
 static int      win95;
 static int                      minmem;
 
@@ -129,6 +130,11 @@ static int                      minmem;
 void Sys_DetectLFN (void)
 {
 	unsigned int fd = _get_volume_info (NULL, 0, 0, NULL);
+
+	if(bSkipLFNCheck)
+	{
+		return;
+	}
 
 	if(!(fd & _FILESYS_LFN_SUPPORTED))
 	{
@@ -155,7 +161,7 @@ void Sys_DetectWin95 (void)
 	r.x.ax = 0x160a;                /* Get Windows Version */
 	__dpmi_int(0x2f, &r);
 
-	if( ((r.x.ax) || (r.h.bh < 4)) && !(Sys_DetectWinNT()) )        /* Not windows or earlier than Win95 */
+	if((bSkipWinCheck) || (((r.x.ax) || (r.h.bh < 4)) && !(Sys_DetectWinNT())) )        /* Not windows or earlier than Win95 */
 	{
 		win95 = 0;
 		lockmem = true;
@@ -644,12 +650,32 @@ double Sys_FloatTime (void)
 	return (double) uclock() / (double) UCLOCKS_PER_SEC; // FS: Win9X/Fast PC Fix (QIP)
 }
 
+void Sys_ParseEarlyArgs(int argc, char **argv) // FS: Parse some very specific args before Qcommon_Init
+{
+	int i = 0;
+
+	for (i = 1; i < argc; i++)
+	{
+		if(strncasecmp((char*)argv[i] + 1,"skipwincheck", 12) == 0)
+		{
+			bSkipWinCheck = true;
+		}
+
+		if(strncasecmp((char*)argv[i] + 1,"skiplfncheck", 12) == 0)
+		{
+			bSkipLFNCheck = true;
+		}
+
+	}
+}
+
 //=============================================================================
 
 int main (int argc, char **argv)
 {
 	double time, oldtime, newtime;
 
+	Sys_ParseEarlyArgs(argc, argv);
 	Sys_DetectLFN();
 	Sys_DetectWin95 ();
 	Sys_PageInProgram ();
