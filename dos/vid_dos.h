@@ -19,8 +19,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // vid_dos.h: header file for DOS-specific video stuff
 
-typedef byte planar_pixel_t;
-
 typedef struct vmode_s {
 	struct vmode_s	*pnext;
 	char		*name;
@@ -53,7 +51,7 @@ typedef struct vid_resolutions_s {
 	int height;
 	int width;
 	void *address;
-	planar_pixel_t	*planarAddress; // FS
+	byte *planarAddress; // FS
 	qboolean isLFB; // FS: Added
 	qboolean isBanked; // FS: Added
 	qboolean isPlanar; // FS: Added
