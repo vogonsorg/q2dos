@@ -13,6 +13,9 @@ int currentvideomode = 0;
 
 void VID_DrawBanked(void);
 void VGA_UpdatePlanarScreen (void *srcbuffer);
+void VGA_UpdateLinearScreen (void *srcptr, void *destptr, int width, int height, int srcrowbytes, int destrowbytes);
+void VID_ExtraSwapBuffers(vrect_t *rects);
+extern vrect_t		scr_vrect;		// position of render window on screen
 
 void	SWimp_BeginFrame( float camera_separation )
 {
@@ -237,4 +240,20 @@ void VID_DrawBanked(void)
 	r.x.bx = 0;
 	r.x.dx = 0;
 	__dpmi_int(0x10, &r);
+}
+
+void VID_ExtraSwapBuffers(vrect_t *rects) // FS: This bombs, investigate.
+{
+	while (rects)
+	{
+		VGA_UpdateLinearScreen (
+				vid.buffer + rects->x + (rects->y * vid.rowbytes),
+				vid_resolutions[currentvideomode].address + rects->x + (rects->y * vid.rowbytes),
+				rects->width,
+				rects->height,
+				vid.rowbytes,
+				vid.rowbytes);
+
+		rects = rects->pnext;
+	}
 }
