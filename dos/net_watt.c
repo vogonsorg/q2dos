@@ -387,7 +387,7 @@ void NET_SendPacket (netsrc_t sock, int length, void *data, netadr_t to)
 				(struct sockaddr *)&addr, sizeof(addr) );
 	if (ret == SOCKET_ERROR)
 	{
-		Com_Printf ("NET_SendPacket ERROR: %i\n", NET_ErrorString());
+		Com_Printf ("NET_SendPacket ERROR: %s\n", NET_ErrorString());
 	}
 }
 
@@ -508,21 +508,21 @@ int NET_Socket (char *net_interface, int port)
 
 	if ((newsocket = socket (PF_INET, SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET)
 	{
-		Com_Printf ("ERROR: UDP_OpenSocket: socket:", NET_ErrorString());
+		Com_Printf ("ERROR: UDP_OpenSocket: socket: %s", NET_ErrorString());
 		return 0;
 	}
 
 	// make it non-blocking
 	if (ioctlsocket (newsocket, FIONBIO, (char *) &_true) == SOCKET_ERROR)
 	{
-		Com_Printf ("ERROR: UDP_OpenSocket: ioctl FIONBIO:%s\n", NET_ErrorString());
+		Com_Printf ("ERROR: UDP_OpenSocket: ioctl FIONBIO: %s\n", NET_ErrorString());
 		return 0;
 	}
 
 	// make it broadcast capable
 	if (setsockopt(newsocket, SOL_SOCKET, SO_BROADCAST, (char *)&i, sizeof(i)) == SOCKET_ERROR)
 	{
-		Com_Printf ("ERROR: UDP_OpenSocket: setsockopt SO_BROADCAST:%s\n", NET_ErrorString());
+		Com_Printf ("ERROR: UDP_OpenSocket: setsockopt SO_BROADCAST: %s\n", NET_ErrorString());
 		return 0;
 	}
 

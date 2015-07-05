@@ -245,7 +245,8 @@ void PF_Configstring (int index, char *val)
 	maxlen = CS_SIZE(index);
 	if (len >= maxlen)
 	{
-		Com_Printf("PF_Configstring: index %d overflowed: %d > %d\n", index, len, maxlen);
+		Com_Printf("PF_Configstring: index %d overflowed: %u > %u\n",
+				index,(unsigned int)len,(unsigned int)maxlen);
 		len = maxlen - 1;
 	}
 
@@ -255,7 +256,7 @@ void PF_Configstring (int index, char *val)
 	dest = sv.configstrings[index];
 	memcpy(dest, val, len);
 	dest[len] = 0;
-	
+
 	if (sv.state != ss_loading)
 	{	// send the update to everyone
 		SZ_Clear (&sv.multicast);

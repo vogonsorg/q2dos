@@ -635,7 +635,7 @@ void Mod_LoadFaces (lump_t *l)
 		out->firstedge = LittleLong(in->firstedge);
 		out->numedges = LittleShort(in->numedges);		
 		if (out->numedges < 3)
-			ri.Sys_Error (ERR_DROP,"Surface with %s edges", out->numedges);
+			ri.Sys_Error (ERR_DROP,"Surface with %d edges", out->numedges);
 		out->flags = 0;
 		// Knightmare added
 		lastedge = out->firstedge + out->numedges;
