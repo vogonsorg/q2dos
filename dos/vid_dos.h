@@ -19,8 +19,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // vid_dos.h: header file for DOS-specific video stuff
 
-typedef byte pixel_t;
-
 typedef struct vmode_s {
 	struct vmode_s	*pnext;
 	char		*name;
