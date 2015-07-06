@@ -12,8 +12,7 @@
 extern	void vectoangles2 (vec3_t value1, vec3_t angles);
 extern	vec3_t monster_flash_offset [];
 
-// FS: The following is gross, but I just figured this out.
-
+/* FS: The following is gross, but I just figured this out. */
 DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (FS_Gamedir)
 	DXE_EXPORT (__dj_assert)
@@ -107,16 +106,16 @@ static int lastresort ()
 	return 0;
 }
 
-void *dxe_res (const char *symname)
+static void *dxe_res (const char *symname)
 {
-	printf ("%s: undefined symbol in dynamic module.  Please report this as a bug!\n", symname);
-	Com_Printf ("%s: undefined symbol in dynamic module.  Please report this as a bug!\n", symname);
-
 	union
 	{
 		int (*from)(void);
 		void *to;
 	} func_ptr_cast;
+
+	printf ("%s: undefined symbol in dynamic module.  Please report this as a bug!\n", symname);
+	Com_Printf ("%s: undefined symbol in dynamic module.  Please report this as a bug!\n", symname);
 
 	func_ptr_cast.from = lastresort;
 	return func_ptr_cast.to;
@@ -134,27 +133,25 @@ void *Sys_GetGameAPI (void *parms)
 
 	Com_Printf("------- Loading %s -------\n", gamename);
 
-	  // Set the error callback function
+	/* Set the error callback function */
 	_dlsymresolver = dxe_res;
 
-	// Register the symbols exported into dynamic modules
+	/* Register the symbols exported into dynamic modules */
 	dlregsym (syms);
 
-	// now run through the search paths
+	/* now run through the search paths */
 	path = NULL;
 
 	while (1)
 	{
 		path = FS_NextPath (path);
-
 		if (!path)
 		{
-			return NULL;		// couldn't find one anywhere
+			return NULL; /* couldn't find one anywhere */
 		}
 
 		Com_sprintf (name, sizeof(name), "%s/%s/%s", curpath, path, gamename);
 		game_library = dlopen (name, RTLD_LAZY);
-
 		if (game_library)
 		{
 			Com_Printf ("LoadLibrary (%s)\n",name);
@@ -163,14 +160,13 @@ void *Sys_GetGameAPI (void *parms)
 	}
 
 	*(void **) (&GetGameAPI) = dlsym (game_library, "_GetGameAPI");
-
 	if (!GetGameAPI)
 	{
-		Sys_UnloadGame ();		
+		Sys_UnloadGame ();
 		return NULL;
 	}
 
 	return GetGameAPI (parms);
 }
 
-#endif // GAME_HARD_LINKED
+#endif /* GAME_HARD_LINKED */
