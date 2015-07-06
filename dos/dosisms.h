@@ -25,9 +25,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef _DOSISMS_H_
 #define _DOSISMS_H_
 
-int dos_lockmem(void *addr, int size);
-int dos_unlockmem(void *addr, int size);
+#include <dpmi.h>
 
+#if defined(DEBUG) &&		\
+   !defined(DJGPP_NO_INLINES)
+#define DJGPP_NO_INLINES	1
+#endif
+
+#if 0	/* same as __dpmi_regs */
 typedef union {
 	struct {
 		unsigned long edi;
@@ -69,35 +74,48 @@ typedef union {
 		unsigned char al, ah, eax_b2, eax_b3;
 	} h;
 } regs_t;
+#endif	/* #if 0 */
 
-unsigned int ptr2real(void *ptr);
-void *real2ptr(unsigned int real);
-void *far2ptr(unsigned int farptr);
-unsigned int ptr2far(void *ptr);
+int dos_lockmem (void *addr, int size);
+int dos_unlockmem (void *addr, int size);
 
-int	dos_inportb(int port);
-int	dos_inportw(int port);
-void dos_outportb(int port, int val);
-void dos_outportw(int port, int val);
+void *dos_getmemory (int size);
+void dos_freememory (void *ptr);
 
-void dos_irqenable(void);
-void dos_irqdisable(void);
-void dos_registerintr(int intr, void (*handler)(void));
-void dos_restoreintr(int intr);
+#define dos_getheapsize _go32_dpmi_remaining_physical_memory
 
-int	dos_int86(int vec);
+unsigned int ptr2real (void *ptr);
+void *real2ptr (unsigned int real);
+void *far2ptr (unsigned int farptr);
+unsigned int ptr2far (void *ptr);
 
-void *dos_getmemory(int size);
-void dos_freememory(void *ptr);
+#if !defined(DJGPP_NO_INLINES)
+/* shortcuts for when we aren't debugging */
+#include <dos.h>
 
-void	dos_usleep(int usecs);
+#define dos_inportb		inportb
+#define dos_inportw		inportw
+#define dos_outportb		outportb
+#define dos_outportw		outportw
 
-int dos_getheapsize(void);
+#else	/* DJGPP_NO_INLINES */
 
-extern regs_t regs;
-void Sys_LowFPPrecision (void);
-void Sys_HighFPPrecision (void);
-void Sys_SetFPCW (void);
+int dos_inportb (int port);
+int dos_inportw (int port);
+void dos_outportb (int port, int val);
+void dos_outportw (int port, int val);
+#endif	/* DJGPP_NO_INLINES */
 
-#endif	// _DOSISMS_H_
+void dos_irqenable (void);
+void dos_irqdisable (void);
+void dos_registerintr (int intr, void (*handler)(void));
+void dos_restoreintr (int intr);
+
+int dos_int86 (int vec);
+int dos_int386 (int vec, __dpmi_regs *inregs, __dpmi_regs *outregs);
+
+/* global variables: */
+extern __dpmi_regs	regs;
+
+#endif	/* _DOSISMS_H_ */
 

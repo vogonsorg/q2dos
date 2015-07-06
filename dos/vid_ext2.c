@@ -80,8 +80,6 @@ static vesa_extra_t	vesa_extra[MAX_VESA_MODES];
 int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes;
 byte	*VGA_pagebase;
 
-extern regs_t regs;
-
 
 typedef struct vbeinfoblock_s {
      byte			VbeSignature[4];

@@ -107,6 +107,7 @@ int	sys_checksum;
 void MaskExceptions (void);
 void Sys_PushFPCW_SetHigh (void);
 void Sys_PopFPCW (void);
+void Sys_SetFPCW (void);
 double Sys_FloatTime (void);
 
 #define LEAVE_FOR_CACHE (512*1024)              //FIXME: tune
@@ -308,7 +309,7 @@ void *dos_getmaxlockedmem(int *size)
 			}
 		}
 
-	Sys_Error ("Can't lock memory; %ld Mb lockable RAM required. "
+		Sys_Error ("Can't lock memory; %ld Mb lockable RAM required. "
 				"Try shrinking smartdrv.", info.size / 0x100000);
 
 Locked:
