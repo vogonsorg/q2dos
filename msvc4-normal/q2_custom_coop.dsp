@@ -728,7 +728,7 @@ SOURCE=..\dos\vid_dos.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\dos\vid_ext2.c
+SOURCE=..\dos\vid_ext.c
 # PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File
