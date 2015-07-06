@@ -20,7 +20,7 @@ What works?
 
 What works but needs more testing?
 * Modern sound cards like AC'97 or HDA
-* Mouse wheel support. (See other misc info below.)
+* Mouse wheel support. (see info below.)
 
 What doesn't work:
 * Playing in a Win9x or NTVDM DOS box.

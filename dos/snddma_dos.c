@@ -565,11 +565,9 @@ qboolean PCI_Init(void)
 {
 struct mpxplay_audioout_info_s *aui=&au_infos;
 
-	char    *c;
-	char thing[20]; // FS: GCC hates this and I don't understand it?
+	const char *c;
 
-	sprintf(thing,"-spk");		//sample code had this in
-	c=AU_search(&thing);
+	c = AU_search(1);/* 1: stereo speaker output (meaningful only for Intel HDA chips) */
 
 	if(c)
 	{
@@ -593,7 +591,6 @@ struct mpxplay_audioout_info_s *aui=&au_infos;
 		dma.channels=aui->chan_set;
 		if(dma.speed != s_khz->intValue) // FS: In theory, our rate was not liked, so force the change.
 			Cvar_SetValue("s_khz", dma.speed);
-
 #endif
 
 		Com_DPrintf(DEVELOPER_MSG_SOUND, "Post AU_setrate %d/%d/%d\n",dma.speed,dma.samplebits,dma.channels);
