@@ -72,7 +72,8 @@ Various code from
 * cURL -- (http://curl.haxx.se/)
 * DJGPP community -- (http://www.delorie.com/djgpp/)
 * Gamespy SDK -- release publically in 2014.
-* ggorts -- Ported 3ZB2, Action, Chaos, and DDay to Q2DOS
+* ggorts -- Ported 3ZB2, Action, Chaos, and DDay to Q2DOS.  Banked VGA code and
+            Planar mode help.
 * Knightmare -- Ref_soft help.
                 KMQuake II (http://www.markshan.com/knightmare/)
 * Mpxplay -- (http://mpxplay.sourceforge.net/)
