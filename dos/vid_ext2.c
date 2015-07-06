@@ -168,10 +168,9 @@ void VID_InitExtra (void)
 	__dpmi_meminfo	phys_mem_info;
 
 	pinfoblock = (vbeinfoblock_t *) dos_getmemory(sizeof(vbeinfoblock_t));
-
-	if(!pinfoblock)
-	{
-		Sys_Error("pinfoblock NULL!");
+	if (!pinfoblock) {
+		Com_DPrintf (DEVELOPER_MSG_GFX, "VID_InitExtra: Unable to allocate low memory.\n");
+		return;
 	}
 
 	pinfoblock->VbeSignature[0] = 'V';
