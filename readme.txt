@@ -42,6 +42,7 @@ Tips and other misc info:
   you load Q2DOS load Ultramid -Q then Ultramid -Q -F.  If you don't have
   Ultramid for some reason, you can get the fix (with a batch included) at
   http://dk.toastednet.org/QDOS/GUSFIX.ZIP.
+  You also may need to set s_mixahed to 0.3 and use high IRQs.
 * Make sure you are using the included CWSDPMI.EXE in your Q2 directory or you
   may get some issues with running out of memory.
 * To hear Ogg Vorbis tracks ingame, rip the Q2 CD's audio tracks (2-11) to 
