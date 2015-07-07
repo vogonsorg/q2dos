@@ -57,8 +57,9 @@ void S_WriteLinearBlastStereo16 (void)
 			snd_out[i+1] = val;
 	}
 }
-//#else
-#if 0
+#endif
+
+#if (id386) && defined(_MSC_VER)
 __declspec( naked ) void S_WriteLinearBlastStereo16 (void)
 {
 	__asm {
@@ -103,7 +104,6 @@ LClampDone2:
 	}
 }
 
-#endif
 #endif
 
 void S_TransferStereo16 (unsigned long *pbuf, int endtime)
@@ -396,9 +396,9 @@ void S_PaintChannelFrom8 (channel_t *ch, sfxcache_t *sc, int count, int offset)
 	
 	ch->pos += count;
 }
+#endif
 
-#if 0
-
+#if (id386) && defined(_MSC_VER)
 __declspec( naked ) void S_PaintChannelFrom8 (channel_t *ch, sfxcache_t *sc, int count, int offset)
 {
 	__asm {
@@ -469,7 +469,6 @@ LDone:
 	}
 }
 
-#endif
 #endif
 
 void S_PaintChannelFrom16 (channel_t *ch, sfxcache_t *sc, int count, int offset)
