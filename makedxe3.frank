@@ -25,7 +25,7 @@ WATT32_CFLAGS = -Iwattcp/inc -DWATT32_NO_OLDIES
 WATT32_LIBS = -Lwattcp/lib -lwatt
 
 ifeq ($(USE_ASM),1)
-CPPFLAGS+= -Did386
+CPPFLAGS+= -Did386=1
 endif
 
 ifeq ($(USE_GAMESPY),1)

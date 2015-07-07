@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
-SFLAGS = -Did386 -DWITH_ACEBOT
+CPPFLAGS = -Did386=1 -DWITH_ACEBOT
 DXE3GEN = dxe3gen
 
 GAME = p_client.o \
@@ -56,11 +56,11 @@ clean:
 DO_AS=$(CC) -x assembler-with-cpp
 
 %.o : %.c
-	$(CC) $(CFLAGS) $(SFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 %.o: %.S
-	$(DO_AS) $(CFLAGS) -c $< -o $@
+	$(DO_AS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 %.o: %.s
-	$(DO_AS) $(CFLAGS) -c $< -o $@
+	$(DO_AS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 

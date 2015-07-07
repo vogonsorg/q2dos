@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
-#CFLAGS+= -g
+CPPFLAGS =
 DXE3GEN = dxe3gen
 
 GAME = dm_ball.o \
@@ -82,11 +82,10 @@ clean:
 DO_AS=$(CC) -x assembler-with-cpp
 
 %.o : %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 %.o: %.S
-	$(DO_AS) $(CFLAGS) -c $< -o $@
+	$(DO_AS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 %.o: %.s
-	$(DO_AS) $(CFLAGS) -c $< -o $@
-
+	$(DO_AS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
