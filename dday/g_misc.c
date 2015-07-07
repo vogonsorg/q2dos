@@ -1202,7 +1202,7 @@ void barrel_delay (edict_t *self, edict_t *inflictor, edict_t *attacker, int dam
 
 void SP_misc_explobox (edict_t *self)
 {
-	if (deathmatch->value)
+//	if (deathmatch->value) // FS: D-Day is multiplayer only
 	{	// auto-remove for deathmatch
 		G_FreeEdict (self);
 		return;

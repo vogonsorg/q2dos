@@ -2717,13 +2717,8 @@ void ClientBegin (edict_t *ent)
 	
 	num_clients++;
 
-
-
 	ent->client = game.clients + (ent - g_edicts - 1);
 	ent->client->resp.AlreadySpawned=false;
-
-
-
 
 	if (deathmatch->value)
 	{
@@ -2732,6 +2727,10 @@ void ClientBegin (edict_t *ent)
 
 		stuffcmd(ent, "cl_forwardspeed 200;cl_sidespeed 200;cl_upspeed 200;");
 		return;
+	}
+	else // FS: Don't allow singleplayer, the code is way too far off for it to load properly.
+	{
+		gi.error("D-Day Normandy is multiplayer only");
 	}
 
 	// if there is already a body waiting for us (a loadgame), just
