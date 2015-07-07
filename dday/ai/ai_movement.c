@@ -233,7 +233,7 @@ qboolean AI_SpecialMove(edict_t *self, usercmd_t *ucmd)
 	}
 
 	if ( (self->ai->pers.moveTypesMask & LINK_CROUCH && 
-		self->stanceflags == STANCE_STAND == self->oldstance)
+		self->stanceflags == STANCE_STAND && self->oldstance == STANCE_STAND)
 		|| self->is_swim )
 	{
 		//crouch box
