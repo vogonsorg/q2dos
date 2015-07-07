@@ -12,12 +12,71 @@
 int currentvideomode = 0;
 
 void VID_DrawBanked(void);
-#if id386
 void VGA_UpdatePlanarScreen (void *srcbuffer);
 void VGA_UpdateLinearScreen (void *srcptr, void *destptr, int width, int height, int srcrowbytes, int destrowbytes);
-#endif
 void VID_ExtraSwapBuffers(vrect_t *rects);
 extern vrect_t		scr_vrect;		// position of render window on screen
+
+#if	!id386
+void VGA_UpdatePlanarScreen (void *srcbuffer)
+{
+/* based on vga_copytoplanar256() of SVGAlib */
+	byte *p;
+	int ofs;
+	int plane, x, y;
+
+	plane = 0;
+	/* Copy pixels that belong in plane. */
+	_docopy:
+	outportb(SC_INDEX, MAP_MASK);
+	outportb(SC_DATA, 1 << plane);
+	p = (byte *) srcbuffer;
+	ofs = 0;
+	for (y = 0; y < VGA_height; y++)
+	{
+		x = 0;
+		while (x * 4 + 32 < VGA_width)
+		{
+			VGA_pagebase[ofs + x + 0] = p[x * 4 + plane + 0];
+			VGA_pagebase[ofs + x + 1] = p[x * 4 + plane + 4];
+			VGA_pagebase[ofs + x + 2] = p[x * 4 + plane + 8];
+			VGA_pagebase[ofs + x + 3] = p[x * 4 + plane + 12];
+			VGA_pagebase[ofs + x + 4] = p[x * 4 + plane + 16];
+			VGA_pagebase[ofs + x + 5] = p[x * 4 + plane + 20];
+			VGA_pagebase[ofs + x + 6] = p[x * 4 + plane + 24];
+			VGA_pagebase[ofs + x + 7] = p[x * 4 + plane + 28];
+			x += 8;
+		}
+		while (x * 4 < VGA_width)
+		{
+			VGA_pagebase[ofs + x] = p[x * 4 + plane];
+			x++;
+		}
+		p += VGA_bufferrowbytes;	/* Next line. */
+		ofs += VGA_rowbytes;
+	}
+	if (++plane < 4)
+		goto _docopy;
+}
+
+void VGA_UpdateLinearScreen (	void *srcptr, void *destptr,
+				int width, int height,
+				int srcrowbytes, int destrowbytes)
+{
+/* quick'n'dirty C-only version */
+	byte *s, *d;
+	int y;
+
+	s = (byte *) srcptr;
+	d = (byte *) destptr;
+	for (y = 0; y < height; y++)
+	{
+		memcpy (d, s, width);
+		s += srcrowbytes;
+		d += destrowbytes;
+	}
+}
+#endif	/* !id386 */
 
 void	SWimp_BeginFrame( float camera_separation )
 {
@@ -41,9 +100,7 @@ void	SWimp_EndFrame (void)
 			}
 			else
 			{
-#if id386
 				VGA_UpdatePlanarScreen(vid.buffer); // FS: Abrash's code
-#endif
 			}
 		}
 	}
@@ -234,7 +291,6 @@ void VID_DrawBanked(void)
 	__dpmi_int(0x10, &r);
 }
 
-#if id386
 void VID_ExtraSwapBuffers(vrect_t *rects) // FS: This bombs, investigate.
 {
 	while (rects)
@@ -250,4 +306,3 @@ void VID_ExtraSwapBuffers(vrect_t *rects) // FS: This bombs, investigate.
 		rects = rects->pnext;
 	}
 }
-#endif
