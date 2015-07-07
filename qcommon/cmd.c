@@ -1012,7 +1012,7 @@ retryPartial:
 	foundPartialCount = 0;
 	for (cmd=cmd_functions ; cmd ; cmd=cmd->next)
 	{
-		if (/*!strncmp (partial,cmd->name, len)*/ Sort_Possible_Strtolower(partial, cmd->name))
+		if (Sort_Possible_Strtolower(partial, cmd->name))
 		{
 			foundPartialCount++;
 
@@ -1024,7 +1024,7 @@ retryPartial:
 	}
 	for (a=cmd_alias ; a ; a=a->next)
 	{
-		if (/*!strncmp (partial, a->name, len)*/Sort_Possible_Strtolower(partial, a->name))
+		if (Sort_Possible_Strtolower(partial, a->name))
 		{
 			foundPartialCount++;
 
@@ -1036,7 +1036,7 @@ retryPartial:
 	}
 	for (cvar=cvar_vars ; cvar ; cvar=cvar->next)
 	{
-		if (/*!strncmp (partial,cvar->name, len)*/Sort_Possible_Strtolower(partial, cvar->name))
+		if (Sort_Possible_Strtolower(partial, cvar->name))
 		{
 			foundPartialCount++;
 
@@ -1079,7 +1079,10 @@ qboolean	Sort_Possible_Strtolower (char *partial, char *complete)
 	while(x < partialLength)
 	{
 		if(tolower(partial[x]) != tolower(complete[x]))
+		{
 			return false;
+		}
+
 		x++;
 	}
 

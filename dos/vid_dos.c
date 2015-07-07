@@ -45,11 +45,7 @@ static menuframework_s  s_software_menu;
 static menuframework_s *s_current_menu;
 static int				s_current_menu_index;
 
-#ifndef JASON_VIDMENU_SLIDER
 static menulist_s		s_mode_list[NUM_VID_DRIVERS];
-#else
-static menuslider_s		s_mode_list[NUM_VID_DRIVERS];
-#endif
 static menuslider_s		s_screensize_slider[NUM_VID_DRIVERS];
 static menuslider_s		s_brightness_slider[NUM_VID_DRIVERS];
 static menulist_s  		s_stipple_box;
@@ -129,14 +125,8 @@ qboolean VID_GetModeInfo( int *width, int *height, int mode )
 
 static void ResolutionCallback( void *s )
 {
-#ifndef JASON_VIDMENU_SLIDER
 	menulist_s		*slist = (menulist_s *) s;
 	slist->itemnames[slist->curvalue] = vid_resolutions[slist->curvalue].menuname;
-#else
-	menuslider_s *slider = ( menuslider_s * ) s;
-	Cvar_SetValue( "sw_mode", slider->curvalue);
-	M_ForceMenuOff();
-#endif
 }
 
 static void ScreenSizeCallback( void *s )
@@ -228,9 +218,7 @@ void	VID_LoadRefresh (void) // FS: Needed for dynamic changing game modes/vid_re
 		Com_Error (ERR_FATAL, "Couldn't start refresh");
 
 	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
-	vid_ref->description = "Video renderer to use.  Locked to software in Q2DOS.";
 	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE|CVAR_NOSET);
-	vid_fullscreen->description = "Enable fullscreen video.  Locked to fullscreen in Q2DOS.";
 	vid_gamma = Cvar_Get( "vid_gamma", "1", CVAR_ARCHIVE );
 }
 
@@ -241,15 +229,9 @@ void	VID_Init (void)
     memset(vid_resolutions,0x0,sizeof(vid_resolutions));
     VID_InitExtra(); //probe VESA
 
-#if 0
-    currentvideomode=0; //hope this means start in mode 0
-    viddef.width = 320;
-    viddef.height = 200; //was originally 240
-#else
     currentvideomode=0;
     viddef.width = 320;
     viddef.height = 240;
-#endif
 
     ri.Cmd_AddCommand = Cmd_AddCommand;
     ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
@@ -278,7 +260,9 @@ void	VID_Init (void)
 		Com_Error (ERR_FATAL, "Couldn't start refresh");
 
 	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
-	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE);
+	vid_ref->description = "Video renderer to use.  Locked to software in Q2DOS.";
+	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE|CVAR_NOSET);
+	vid_fullscreen->description = "Enable fullscreen video.  Locked to fullscreen in Q2DOS.";
 	vid_gamma = Cvar_Get( "vid_gamma", "1", CVAR_ARCHIVE );
 	Cmd_AddCommand("vid_restart", VID_Restart_f);
 	Cmd_AddCommand("vid_listmodes", VID_ListModes_f); // FS: Added
@@ -314,33 +298,32 @@ void	VID_CheckChanges (void)
 	}
 }
 
-#ifndef JASON_VIDMENU_SLIDER
-	// FS: Bah, this is kind of dumb.  Oh well.
-	static const char *resolutions[] = 
-	{
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		0
+// FS: Bah, this is kind of dumb.  Oh well.
+static const char *resolutions[] = 
+{
+	"[]",
+	"[]",
+	"[]",
+	"[]",
+	"[]",
+	"[]",
+	"[]",
+	"[]",
+	"[]",
+	"[]",
+	"[]",
+	"[]",
+	"[]",
+	"[]",
+	"[]",
+	"[]",
+	"[]",
+	"[]",
+	"[]",
+	"[]",
+	0
 	};
-#endif
+
 void	VID_MenuInit (void)
 {
 
@@ -379,10 +362,6 @@ void	VID_MenuInit (void)
 
 	for ( i = 0; i < NUM_VID_DRIVERS; i++ )
 	{
-#ifndef JASON_VIDMENU_SLIDER
-//		Before the Video Resolution menu was a static
-//		list, but you can't update it..
-// FS: Now you can :P
 		s_mode_list[i].generic.type = MTYPE_SPINCONTROL;
 		s_mode_list[i].generic.name = "video resolution";
 		s_mode_list[i].generic.x = 0;
@@ -391,15 +370,6 @@ void	VID_MenuInit (void)
 		s_mode_list->itemnames[i] = vid_resolutions[s_mode_list->curvalue].menuname;
 		s_mode_list->itemnames[num_vid_resolutions] = 0; // FS: Put 0 in the middle of the resolutions array so we don't spill over to non-existant modes
 		s_mode_list[i].generic.callback = ResolutionCallback;
-#else
-		s_mode_list[i].generic.type     = MTYPE_SLIDER;
-		s_mode_list[i].generic.name = "video resolution";
-		s_mode_list[i].generic.x = 0;
-		s_mode_list[i].generic.y = num_vid_resolutions-1;
-		s_mode_list[i].minvalue = 0;
-		s_mode_list[i].maxvalue = num_vid_resolutions-1;
-		s_mode_list[i].generic.callback = ResolutionCallback;
-#endif
 
 		s_screensize_slider[i].generic.type	= MTYPE_SLIDER;
 		s_screensize_slider[i].generic.x		= 0;
@@ -491,10 +461,8 @@ void	VID_MenuDraw (void)
 	*/
 	Menu_Draw( s_current_menu );
 
-#ifndef JASON_VIDMENU_SLIDER
 	if (s_current_menu_index == 0) // FS: Hack, first time its drawn stupid shit happens, so update it immediately.
 		ResolutionCallback(&s_mode_list[SOFTWARE_MENU]);
-#endif
 }
 
 const char *VID_MenuKey( int k)

@@ -239,6 +239,7 @@ cvar_t *Cvar_Set2 (char *var_name, char *value, qboolean force)
 				var->string = CopyString(value);
 				var->value = atof (var->string);
 				var->intValue = atoi(var->string); // FS: So we don't need to cast shit all the time
+
 				if (!strcmp(var->name, "game"))
 				{
 					FS_SetGamedir (var->string);
@@ -510,7 +511,10 @@ void Cvar_List_f (void)
 			if(!var->next)
 			{
 				if(strstr(var->name, Cmd_Argv(1))) // FS: The last one in the search actually matches, so don't break out
+				{
 					endIsAMatch = true;
+				}
+
 				endReached = true;
 			}
 		}

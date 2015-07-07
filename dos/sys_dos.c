@@ -670,11 +670,42 @@ void Sys_ParseEarlyArgs(int argc, char **argv) // FS: Parse some very specific a
 	}
 }
 
+/*
+================
+Sys_NoFPUExceptionHandler
+================
+*/
+void Sys_NoFPUExceptionHandler(int whatever)
+{
+	printf ("\nError: Quake requires a floating-point processor\n");
+	exit (0);
+}
+
+
+/*
+================
+Sys_DefaultExceptionHandler
+================
+*/
+void Sys_DefaultExceptionHandler(int whatever)
+{
+}
+
 //=============================================================================
 
 int main (int argc, char **argv)
 {
 	double time, oldtime, newtime;
+
+	printf ("Quake 2 DOS v%4.2f\n", VERSION);
+
+// make sure there's an FPU
+	signal(SIGNOFP, Sys_NoFPUExceptionHandler);
+	signal(SIGABRT, Sys_DefaultExceptionHandler);
+	signal(SIGALRM, Sys_DefaultExceptionHandler);
+	signal(SIGKILL, Sys_DefaultExceptionHandler);
+	signal(SIGQUIT, Sys_DefaultExceptionHandler);
+	signal(SIGINT, Sys_DefaultExceptionHandler);
 
 	Sys_ParseEarlyArgs(argc, argv);
 	Sys_DetectLFN();
