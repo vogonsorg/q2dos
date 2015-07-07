@@ -12,8 +12,10 @@
 int currentvideomode = 0;
 
 void VID_DrawBanked(void);
+#if id386
 void VGA_UpdatePlanarScreen (void *srcbuffer);
 void VGA_UpdateLinearScreen (void *srcptr, void *destptr, int width, int height, int srcrowbytes, int destrowbytes);
+#endif
 void VID_ExtraSwapBuffers(vrect_t *rects);
 extern vrect_t		scr_vrect;		// position of render window on screen
 
@@ -39,7 +41,9 @@ void	SWimp_EndFrame (void)
 			}
 			else
 			{
+#if id386
 				VGA_UpdatePlanarScreen(vid.buffer); // FS: Abrash's code
+#endif
 			}
 		}
 	}
@@ -230,6 +234,7 @@ void VID_DrawBanked(void)
 	__dpmi_int(0x10, &r);
 }
 
+#if id386
 void VID_ExtraSwapBuffers(vrect_t *rects) // FS: This bombs, investigate.
 {
 	while (rects)
@@ -245,3 +250,4 @@ void VID_ExtraSwapBuffers(vrect_t *rects) // FS: This bombs, investigate.
 		rects = rects->pnext;
 	}
 }
+#endif

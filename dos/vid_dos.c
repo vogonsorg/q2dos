@@ -226,9 +226,15 @@ void	VID_Init (void)
 	memset(vid_resolutions,0x0,sizeof(vid_resolutions));
 	VID_InitExtra(); //probe VESA
 
+#if id386 /* FS: Planar modes requires Abrash's ASM */
 	currentvideomode=0;
 	viddef.width = 320;
 	viddef.height = 240;
+#else
+	currentvideomode=0;
+	viddef.width = 320;
+	viddef.height = 200;
+#endif
 
 	ri.Cmd_AddCommand = Cmd_AddCommand;
 	ri.Cmd_RemoveCommand = Cmd_RemoveCommand;

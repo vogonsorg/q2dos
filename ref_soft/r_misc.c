@@ -200,7 +200,6 @@ void R_TransformFrustum (void)
 	}
 }
 
-
 #if !(defined __DJGPP__ && defined __i386__) // FS: Now using math.s thanks to ggorts on vogons.org
 #if !id386
 
@@ -209,6 +208,7 @@ void R_TransformFrustum (void)
 TransformVector
 ================
 */
+/* FS: FIXME: Make this work with id386 being undefined */
 void TransformVector (vec3_t in, vec3_t out)
 {
 	out[0] = DotProduct(in,vright);
