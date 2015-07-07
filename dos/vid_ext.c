@@ -178,9 +178,9 @@ void VID_InitExtra (void)
 
 	memset(vid_resolutions,0x0,sizeof(vid_resolutions));
 
-	VID_AddPlanarModes(); // FS
+	VID_AddPlanarModes(); /* FS */
 
-	// We always have mode 13 VGA
+	/* We always have mode 13 VGA */
 	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
 	vid_resolutions[num_vid_resolutions].vesa_mode=-1;
 	vid_resolutions[num_vid_resolutions].height=200;
