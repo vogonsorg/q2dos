@@ -91,30 +91,30 @@ void ReadConfigFile()
                                 {
                                         strcpy(team1_name, buf);
                                 }
-                                        else if (lines_into_section == 1)
+                                else if (lines_into_section == 1)
                                 {
                                         strcpy(team1_skin, buf);
                                 }
                         }
-                                else if (!strcmp(reading_section, "team2"))
+                        else if (!strcmp(reading_section, "team2"))
                         {
                                 if (lines_into_section == 0)
                                 {
                                         strcpy(team2_name, buf);
                                 }
-                                        else if (lines_into_section == 1)
+                                else if (lines_into_section == 1)
                                 {
                                         strcpy(team2_skin, buf);
                                 }
                         }
-                                else if (!strcmp(reading_section, "maplist"))
+                        else if (!strcmp(reading_section, "maplist"))
                         {
                                 map_rotation[num_maps] = (char *)gi.TagMalloc(strlen(buf) + 1, TAG_GAME);
                                 strcpy(map_rotation[num_maps], buf);
                                 num_maps++;
                         }
                         lines_into_section++;
-                }       
+                }
         }
 
         sprintf(team1_skin_index, "../players/%s_i", team1_skin);
@@ -148,7 +148,6 @@ void ReadMOTDFile()
                         buf[40] = 0;
 
                 strcpy(motd_lines[motd_num_lines], buf);
-                
                 motd_num_lines++;
 
                 if (motd_num_lines >= MAX_TOTAL_MOTD_LINES)
@@ -164,10 +163,9 @@ void PrintMOTD(edict_t *ent)
         int max_lines = MAX_TOTAL_MOTD_LINES;  
         char msg_buf[16384], *server_type;  
 
-        /* 
+        /*
          * Welcome message
          */
-
         // 3 lines for version number & website (third blank)
         strcpy(msg_buf, "Welcome to Action Quake v" ACTION_VERSION "\n"
                         "http://aq2.action-web.net/\n"
@@ -185,37 +183,36 @@ void PrintMOTD(edict_t *ent)
                         lines++;
                 }
 
-                /* 
+                /*
                 * Server-specific settings information
                 */
-        
                 // Line for game type
                 if (teamplay->value)
                 {
                         server_type = "teamplay";
                 }
-                        else
+                else
                 {
                         if ((int)dmflags->value & DF_MODELTEAMS)
                                 server_type = "deathmatch (teams by model)";
-                                else if ((int)dmflags->value & DF_SKINTEAMS)
+                        else if ((int)dmflags->value & DF_SKINTEAMS)
                                 server_type = "deathmatch (teams by skin)";
-                                else
+                        else
                                 server_type = "deathmatch (no teams)";
                 }
                 sprintf(msg_buf + strlen(msg_buf),
                                 "Game type: %s\n", 
                         server_type);
                 lines++;
-        
+
                 // Line for frag and time limit
                 if ((int)fraglimit->value)
                         sprintf(msg_buf + strlen(msg_buf), "Frag limit: %d", (int)fraglimit->value);
-                        else
+                else
                         strcat(msg_buf, "Frag limit: none");
                 if ((int)timelimit->value)
                         sprintf(msg_buf + strlen(msg_buf), " Time limit: %d\n", (int)timelimit->value);
-                        else
+                else
                         strcat(msg_buf, " Time limit: none\n");
                 lines++;
 
@@ -224,15 +221,15 @@ void PrintMOTD(edict_t *ent)
                 {
                         if ((int)roundlimit->value)
                                 sprintf(msg_buf + strlen(msg_buf), "Round limit: %d", (int)roundlimit->value);
-                                else
+                        else
                                 strcat(msg_buf, "Round limit: none");
                         if ((int)roundtimelimit->value)
                                 sprintf(msg_buf + strlen(msg_buf), " Round time limit: %d\n", (int)roundtimelimit->value);
-                                else
+                        else
                                 strcat(msg_buf, " Round time limit: none\n");
                         lines++;
                 }
-        
+
                 // Check for weird unique items/weapons settings, and inform with a line
                 if ((int)unique_weapons->value != 1 || 
                 (int)unique_items->value != 1)
@@ -275,26 +272,25 @@ void PrintMOTD(edict_t *ent)
 			sprintf(msg_buf + strlen(msg_buf), "Friendly fire enabled\n");
 			lines++;
 		}
-        
+
                 // Teamplay: 2 lines (one blank) for menu instructions
                 if (teamplay->value)
                 {
                         strcat(msg_buf, "\nHit tab to open the team selection menu\n");
                         lines += 2;
                 }
-        
-                /* 
+
+                /*
                 * If actionmaps, put a blank line then the maps list
                 */
-        
                 // hopefully no one will run enough maps to exceed the line limit, if so, oh well... -FB
                 if (actionmaps->value && num_maps > 0)
                 {
                         int chars_on_line, len_mr;
-        
+
                         strcat(msg_buf, "\nRunning the following maps in order:\n");
                         lines += 2;
-        
+
                         chars_on_line = 0;
                         for (mapnum = 0; mapnum < num_maps; mapnum++)
                         {
@@ -330,10 +326,9 @@ void PrintMOTD(edict_t *ent)
                 }
         }
 
-        /* 
+        /*
          * Insert action/motd.txt contents (whole MOTD gets truncated after 30 lines)
          */
-
         if (motd_num_lines)
         {
                 if (lines < max_lines)
@@ -365,7 +360,6 @@ void stuffcmd(edict_t *ent, char *c)
 }
 
 
-
 /********************************************************************************
 *
 *  zucc: following are EjectBlooder, EjectShell, AddSplat, and AddDecal
@@ -389,7 +383,6 @@ void BlooderTouch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *su
 {
 	G_FreeEdict(self);
 }
-	
 
 void EjectBlooder (edict_t *self, vec3_t start, vec3_t veloc )
 {
@@ -403,14 +396,10 @@ void EjectBlooder (edict_t *self, vec3_t start, vec3_t veloc )
 
 	VectorCopy (start , blooder->s.origin);
 
-
-
 	spd = 0;
-	
-
 
 	VectorScale (forward, spd, blooder->velocity);
-	
+
 	blooder->solid = SOLID_NOT;
 	blooder->movetype = MOVETYPE_TOSS;
 
@@ -423,16 +412,12 @@ void EjectBlooder (edict_t *self, vec3_t start, vec3_t veloc )
 	blooder->think = BlooderDie;
 	blooder->classname = "blooder";
 
-
 	gi.linkentity (blooder);
 }
 
 
 // zucc - Adding EjectShell code from action quake, modified for Axshun.
 /********* SHELL EJECTION **************/
-
-
-
 
 void ShellTouch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
@@ -447,7 +432,6 @@ void ShellTouch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf
 void ShellDie(edict_t *self)
 {
 	G_FreeEdict(self);
-	
 	--shells;
 }
 
@@ -474,26 +458,25 @@ void EjectShell (edict_t *self, vec3_t start, int toggle )
 	AngleVectors (self->client->v_angle, forward, right, up);
 
 	if (self->client->pers.hand == LEFT_HANDED)
-		{
-			left = 1;
-			fix = -1.0;
-		}
+	{
+		left = 1;
+		fix = -1.0;
+	}
 	else if ( self->client->pers.hand == CENTER_HANDED)
 		fix = 0;
 
-
-		// zucc spent a fair amount of time hacking these until they look ok,
-		// several of them could be improved however.
+	// zucc spent a fair amount of time hacking these until they look ok,
+	// several of them could be improved however.
 
 	if (self->client->curr_weap == MK23_NUM )
 	{
-				VectorMA (start, left?-7:.4, right, start);
+		VectorMA (start, left?-7:.4, right, start);
 		VectorMA (start, left?5:2, forward, start);
 		VectorMA (start, left?-10:-8 , up, start);
-	}               
+	}
 	else if (self->client->curr_weap == M4_NUM)
-	{               
-				VectorMA (start, left?-10:5, right, start);
+	{
+		VectorMA (start, left?-10:5, right, start);
 		VectorMA (start, left?6:12, forward, start);
 		VectorMA (start, left?-9:-11, up, start);
 	}
@@ -508,127 +491,151 @@ void EjectShell (edict_t *self, vec3_t start, int toggle )
 		VectorMA (start, fix*11, right, start);
 		VectorMA (start, 2, forward, start);
 		VectorMA (start, -11, up, start);
-		
 	}
-		else if (self->client->curr_weap == M3_NUM)
-		{
-				VectorMA(start, left?-9:3, right, start);
-				VectorMA(start, left?4:4, forward, start);
-				VectorMA(start, left?-1:-1, up, start);
-		}
-	
-		else if (self->client->curr_weap == DUAL_NUM)
+	else if (self->client->curr_weap == M3_NUM)
 	{
-			   if (self->client->pers.hand == LEFT_HANDED)
-					VectorMA (start, ((toggle==1)?8:-8), right, start);
-	       else
-					VectorMA (start, ((toggle==1)?-4:4), right, start);
-			   VectorMA (start, 6, forward, start);
-	       VectorMA (start, -9, up, start);
-		
+		VectorMA(start, left?-9:3, right, start);
+		VectorMA(start, left?4:4, forward, start);
+		VectorMA(start, left?-1:-1, up, start);
+	}
+	else if (self->client->curr_weap == DUAL_NUM)
+	{
+		if (self->client->pers.hand == LEFT_HANDED)
+			VectorMA (start, ((toggle==1)?8:-8), right, start);
+		else
+			VectorMA (start, ((toggle==1)?-4:4), right, start);
+		VectorMA (start, 6, forward, start);
+		VectorMA (start, -9, up, start);
 	}
 
-
-	if ( (forward[2] >= -1) && (forward[2] < -0.99) ) {   
+	if ( (forward[2] >= -1) && (forward[2] < -0.99) ) {
 		VectorMA (start, 5, forward, start);
-		VectorMA (start, -0.5, up, start); }
-
-	else if ( (forward[2] >= -0.99) && (forward[2] < -0.98) ) {   
+		VectorMA (start, -0.5, up, start);
+	}
+	else if ( (forward[2] >= -0.99) && (forward[2] < -0.98) ) {
 		VectorMA (start, 5, forward, start);
-		VectorMA (start, -.1, up, start); }
-	else if ( (forward[2] >= -0.98) && (forward[2] < -0.97) ) {   
+		VectorMA (start, -.1, up, start);
+	}
+	else if ( (forward[2] >= -0.98) && (forward[2] < -0.97) ) {
 		VectorMA (start, 5.1, forward, start);
-		VectorMA (start, 0.3, up, start); }
-	else if ( (forward[2] >= -0.97) && (forward[2] < -0.96) ) {   
+		VectorMA (start, 0.3, up, start);
+	}
+	else if ( (forward[2] >= -0.97) && (forward[2] < -0.96) ) {
 		VectorMA (start, 5.2, forward, start);
-		VectorMA (start, 0.7, up, start); }
-	else if ( (forward[2] >= -0.96) && (forward[2] < -0.95) ) {   
+		VectorMA (start, 0.7, up, start);
+	}
+	else if ( (forward[2] >= -0.96) && (forward[2] < -0.95) ) {
 		VectorMA (start, 5.2, forward, start);
-		VectorMA (start, 1.1, up, start); }
-	else if ( (forward[2] >= -0.95) && (forward[2] < -0.94) ) {   
+		VectorMA (start, 1.1, up, start);
+	}
+	else if ( (forward[2] >= -0.95) && (forward[2] < -0.94) ) {
 		VectorMA (start, 5.3, forward, start);
-		VectorMA (start, 1.5, up, start); }
-	else if ( (forward[2] >= -0.94) && (forward[2] < -0.93) ) {   
+		VectorMA (start, 1.5, up, start);
+	}
+	else if ( (forward[2] >= -0.94) && (forward[2] < -0.93) ) {
 		VectorMA (start, 5.4, forward, start);
-		VectorMA (start, 1.9, up, start); }
-	else if ( (forward[2] >= -0.93) && (forward[2] < -0.92) ) {   
+		VectorMA (start, 1.9, up, start);
+	}
+	else if ( (forward[2] >= -0.93) && (forward[2] < -0.92) ) {
 		VectorMA (start, 5.5, forward, start);
-		VectorMA (start, 2.3, up, start); }
-	else if ( (forward[2] >= -0.92) && (forward[2] < -0.91) ) {   
+		VectorMA (start, 2.3, up, start);
+	}
+	else if ( (forward[2] >= -0.92) && (forward[2] < -0.91) ) {
 		VectorMA (start, 5.6, forward, start);
-		VectorMA (start, 2.7, up, start); }
-	else if ( (forward[2] >= -0.91) && (forward[2] < -0.9) ) {   
+		VectorMA (start, 2.7, up, start);
+	}
+	else if ( (forward[2] >= -0.91) && (forward[2] < -0.9) ) {
 		VectorMA (start, 5.7, forward, start);
-		VectorMA (start, 3.1, up, start); }
-
-	else if ( (forward[2] >= -0.9) && (forward[2] < -0.85) ) {   
+		VectorMA (start, 3.1, up, start);
+	}
+	else if ( (forward[2] >= -0.9) && (forward[2] < -0.85) ) {
 		VectorMA (start, 5.8, forward, start);
-		VectorMA (start, 3.5, up, start); }
-	else if ( (forward[2] >= -0.85) && (forward[2] < -0.8) ) {   
+		VectorMA (start, 3.5, up, start);
+	}
+	else if ( (forward[2] >= -0.85) && (forward[2] < -0.8) ) {
 		VectorMA (start, 6, forward, start);
-		VectorMA (start, 4, up, start); }
-	else if ( (forward[2] >= -0.8) && (forward[2] < -0.6) ) {   
+		VectorMA (start, 4, up, start);
+	}
+	else if ( (forward[2] >= -0.8) && (forward[2] < -0.6) ) {
 		VectorMA (start, 6.5, forward, start);
-		VectorMA (start, 4.5, up , start); }
-	else if ( (forward[2] >= -0.6) && (forward[2] < -0.4) ) {   
+		VectorMA (start, 4.5, up , start);
+	}
+	else if ( (forward[2] >= -0.6) && (forward[2] < -0.4) ) {
 		VectorMA (start, 8, forward, start);
-		VectorMA (start, 5.5, up , start); }
-	else if ( (forward[2] >= -0.4) && (forward[2] < -0.2) ) {   
+		VectorMA (start, 5.5, up , start);
+	}
+	else if ( (forward[2] >= -0.4) && (forward[2] < -0.2) ) {
 		VectorMA (start, 9.5, forward, start);
-		VectorMA (start, 6, up , start); }
-	else if ( (forward[2] >= -0.2) && (forward[2] < 0) ) {   
+		VectorMA (start, 6, up , start);
+	}
+	else if ( (forward[2] >= -0.2) && (forward[2] < 0) ) {
 		VectorMA (start, 11, forward, start);
-		VectorMA (start, 6.5, up , start); }
-	else if ( (forward[2] >= 0) && (forward[2] < 0.2) ) {   
+		VectorMA (start, 6.5, up , start);
+	}
+	else if ( (forward[2] >= 0) && (forward[2] < 0.2) ) {
 		VectorMA (start, 12, forward, start);
-		VectorMA (start, 7, up, start); }
-	else if ( (forward[2] >= 0.2) && (forward[2] < 0.4) ) {   
+		VectorMA (start, 7, up, start);
+	}
+	else if ( (forward[2] >= 0.2) && (forward[2] < 0.4) ) {
 		VectorMA (start, 14, forward, start);
-		VectorMA (start, 6.5, up, start); }
-	else if ( (forward[2] >= 0.4) && (forward[2] < 0.6) ) {   
+		VectorMA (start, 6.5, up, start);
+	}
+	else if ( (forward[2] >= 0.4) && (forward[2] < 0.6) ) {
 		VectorMA (start, 16, forward, start);
-		VectorMA (start, 6, up, start); }
-	else if ( (forward[2] >= 0.6) && (forward[2] < 0.8) ) {   
+		VectorMA (start, 6, up, start);
+	}
+	else if ( (forward[2] >= 0.6) && (forward[2] < 0.8) ) {
 		VectorMA (start, 18, forward, start);
-		VectorMA (start, 5, up, start); }
-	else if ( (forward[2] >= 0.8) && (forward[2] < 0.85) ) {   
+		VectorMA (start, 5, up, start);
+	}
+	else if ( (forward[2] >= 0.8) && (forward[2] < 0.85) ) {
 		VectorMA (start, 18, forward, start);
-		VectorMA (start, 4, up, start); }
-	else if ( (forward[2] >= 0.85) && (forward[2] < 0.9) ) {   
+		VectorMA (start, 4, up, start);
+	}
+	else if ( (forward[2] >= 0.85) && (forward[2] < 0.9) ) {
 		VectorMA (start, 18, forward, start);
-		VectorMA (start, 2.5, up, start); }
-
-	else if ( (forward[2] >= 0.9) && (forward[2] < 0.91) ) {   
+		VectorMA (start, 2.5, up, start);
+	}
+	else if ( (forward[2] >= 0.9) && (forward[2] < 0.91) ) {
 		VectorMA (start, 18.2, forward, start);
-		VectorMA (start, 2.2, up, start); }
-	else if ( (forward[2] >= 0.91) && (forward[2] < 0.92) ) {   
+		VectorMA (start, 2.2, up, start);
+	}
+	else if ( (forward[2] >= 0.91) && (forward[2] < 0.92) ) {
 		VectorMA (start, 18.4, forward, start);
-		VectorMA (start, 1.9, up, start); }
-	else if ( (forward[2] >= 0.92) && (forward[2] < 0.93) ) {   
+		VectorMA (start, 1.9, up, start);
+	}
+	else if ( (forward[2] >= 0.92) && (forward[2] < 0.93) ) {
 		VectorMA (start, 18.6, forward, start);
-		VectorMA (start, 1.6, up, start); }
-	else if ( (forward[2] >= 0.93) && (forward[2] < 0.94) ) {   
+		VectorMA (start, 1.6, up, start);
+	}
+	else if ( (forward[2] >= 0.93) && (forward[2] < 0.94) ) {
 		VectorMA (start, 18.8, forward, start);
-		VectorMA (start, 1.3, up, start); }
-	else if ( (forward[2] >= 0.94) && (forward[2] < 0.95) ) {   
+		VectorMA (start, 1.3, up, start);
+	}
+	else if ( (forward[2] >= 0.94) && (forward[2] < 0.95) ) {
 		VectorMA (start, 19, forward, start);
-		VectorMA (start, 1, up, start); }
-	else if ( (forward[2] >= 0.95) && (forward[2] < 0.96) ) {   
+		VectorMA (start, 1, up, start);
+	}
+	else if ( (forward[2] >= 0.95) && (forward[2] < 0.96) ) {
 		VectorMA (start, 19.2, forward, start);
-		VectorMA (start, 0.7, up, start); }
-	else if ( (forward[2] >= 0.96) && (forward[2] < 0.97) ) {   
+		VectorMA (start, 0.7, up, start);
+	}
+	else if ( (forward[2] >= 0.96) && (forward[2] < 0.97) ) {
 		VectorMA (start, 19.4, forward, start);
-		VectorMA (start, 0.4, up, start); }
-	else if ( (forward[2] >= 0.97) && (forward[2] < 0.98) ) {   
+		VectorMA (start, 0.4, up, start);
+	}
+	else if ( (forward[2] >= 0.97) && (forward[2] < 0.98) ) {
 		VectorMA (start, 19.6, forward, start);
-		VectorMA (start, -0.2, up, start); }
-	else if ( (forward[2] >= 0.98) && (forward[2] < 0.99) ) {   
+		VectorMA (start, -0.2, up, start);
+	}
+	else if ( (forward[2] >= 0.98) && (forward[2] < 0.99) ) {
 		VectorMA (start, 19.8, forward, start);
-		VectorMA (start, -0.6, up, start); }
-
-	else if ( (forward[2] >= 0.99) && (forward[2] <= 1) ) {   
-		VectorMA (start, 20, forward, start); 
-		VectorMA (start, -1, up , start); }
+		VectorMA (start, -0.6, up, start);
+	}
+	else if ( (forward[2] >= 0.99) && (forward[2] <= 1) ) {
+		VectorMA (start, 20, forward, start);
+		VectorMA (start, -1, up , start);
+	}
 
 	VectorCopy (start , shell->s.origin);
 	if (fix == 0) // we want some velocity on those center handed ones
@@ -677,20 +684,17 @@ void EjectShell (edict_t *self, vec3_t start, int toggle )
 		shell->s.frame = 6;
 	else if (r < 0.9)
 		shell->s.frame = 7;
-	else 
+	else
 		shell->s.frame = 8;
-		
+
 	shell->owner = self;
 	shell->touch = ShellTouch;
 	shell->nextthink = level.time + 1.2 - (shells * .05);
 	shell->think = ShellDie;
 	shell->classname = "shell";
 
-
-
 	gi.linkentity (shell);
 }
-
 
 
 /*
@@ -702,7 +706,6 @@ edict_t *FindEdictByClassnum (char *classname, int classnum)
 {
 	int             i;
 	edict_t *it;
-
 
 	for (i=0 ; i<globals.num_edicts ; i++)
 	{
@@ -716,16 +719,10 @@ edict_t *FindEdictByClassnum (char *classname, int classnum)
 			if (it->classnum == classnum)
 				return it;
 		}
-
 	}
 
 	return NULL;
-
-
 }
-
-
-
 
 
 /********* Bulletholes/wall stuff ***********/
@@ -753,10 +750,9 @@ void AddDecal (edict_t *self, trace_t* tr)
 
 	if (dec)
 	{
-//              gi.bprintf (PRINT_HIGH, "Decal->classnum == %i\n", dec->classnum);
+//		gi.bprintf (PRINT_HIGH, "Decal->classnum == %i\n", dec->classnum);
 		dec->nextthink = level.time + .1;
 	}
-	
 
 	decal->solid = SOLID_NOT;
 	decal->movetype = MOVETYPE_NONE;
@@ -777,9 +773,9 @@ void AddDecal (edict_t *self, trace_t* tr)
 	gi.linkentity (decal);
 //glass
 	if ((tr->ent) && (0 == Q_stricmp("func_explosive", tr->ent->classname)))
-	  {
-	    CGF_SFX_AttachDecalToGlass(tr->ent, decal);
-	  }
+	{
+		CGF_SFX_AttachDecalToGlass(tr->ent, decal);
+	}
 //---
 }
 
@@ -794,7 +790,6 @@ void AddSplat (edict_t *self, vec3_t point, trace_t* tr)
 	edict_t *spt;
 	float   r;
 
-
 	if (splatlimit->value < 1)
 		return;
 
@@ -808,7 +803,7 @@ void AddSplat (edict_t *self, vec3_t point, trace_t* tr)
 
 	if (spt)
 	{
-//              gi.bprintf (PRINT_HIGH, "Decal->classnum == %i\n", dec->classnum);
+//		gi.bprintf (PRINT_HIGH, "Decal->classnum == %i\n", dec->classnum);
 		spt->nextthink = level.time + .1;
 	}
 
@@ -837,9 +832,9 @@ void AddSplat (edict_t *self, vec3_t point, trace_t* tr)
 	gi.linkentity (splat);
 //glass
 	if ((tr->ent) && (0 == Q_stricmp("func_explosive", tr->ent->classname)))
-	  {
+	{
 	    CGF_SFX_AttachDecalToGlass(tr->ent, splat);
-	  }
+	}
 //---
 }
 
@@ -940,12 +935,12 @@ void GetAmmo(edict_t *ent, char *buf)
 
 void GetNearbyTeammates(edict_t *self, char *buf)
 {
-        unsigned char nearby_teammates[10][16];
+        char nearby_teammates[10][16];
         int nearby_teammates_num, l;
         edict_t *ent = NULL;
 
         nearby_teammates_num = 0;
-        
+
         while ((ent = findradius(ent, self->s.origin, 1500)) != NULL)
         {
                 if (ent == self || !ent->client || !CanDamage(ent, self) || 
@@ -958,7 +953,7 @@ void GetNearbyTeammates(edict_t *self, char *buf)
                 if (nearby_teammates_num >= 10)
                         break;
         }
-        
+
         if (nearby_teammates_num == 0)
         {
                 strcpy(buf, "nobody");
@@ -971,28 +966,27 @@ void GetNearbyTeammates(edict_t *self, char *buf)
                 {
                         strcpy(buf, nearby_teammates[l]);
                 }
-                        else
+                else
                 {
                         if (nearby_teammates_num == 2)
                         {
                                 strcat(buf, " and ");
                                 strcat(buf, nearby_teammates[l]);
                         }
-                                else
+                        else
                         {
                                 if (l == (nearby_teammates_num - 1))
                                 {
                                         strcat(buf, ", and ");
                                         strcat(buf, nearby_teammates[l]);
                                 }
-                                        else
+                                else
                                 {
                                         strcat(buf, ", ");
                                         strcat(buf, nearby_teammates[l]);
                                 }
                         }
                 }
-                
         }
 }
 
@@ -1001,11 +995,11 @@ char *SeekBufEnd(char *buf)
         while (*buf != 0)
                 buf++;
         return buf;
-}       
+}
 
 void ParseSayText(edict_t *ent, char *text)
 {
-        static unsigned char buf[10240], infobuf[10240];
+        static char buf[10240], infobuf[10240];
         char *p, *pbuf;
 
         p = text;

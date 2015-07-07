@@ -2021,7 +2021,7 @@ void Cmd_Wave_f (edict_t *ent, int wave)
 //faf:  based on aq2 code
 void GetNearbyTeammates(edict_t *self, char *buf)
 {
-        unsigned char nearby_teammates[10][16];
+        char nearby_teammates[10][16];
         int nearby_teammates_num, l;
         edict_t *ent = NULL;
 
@@ -2066,7 +2066,7 @@ void GetNearbyTeammates(edict_t *self, char *buf)
                                         strcat(buf, ", and ");
                                         strcat(buf, nearby_teammates[l]);
                                 }
-                                        else
+                                else
                                 {
                                         strcat(buf, ", ");
                                         strcat(buf, nearby_teammates[l]);
@@ -2170,7 +2170,6 @@ void GetNearbyLocation(edict_t *self, char *buf)
 		{
 			nearest_distance = temp_distance;
 			closest = e;
-			
 		}
 	}
 	if (nearest_distance > 500)
@@ -2186,8 +2185,6 @@ void GetNearbyLocation(edict_t *self, char *buf)
 		else
 			strcpy(buf,"somewhere");
 	}
-
-	return;
 }
 
 void GetClass(edict_t *self, char *buf)
@@ -2258,7 +2255,7 @@ char *SeekBufEnd(char *buf)
 
 void ParseSayText(edict_t *ent, char *text)
 {
-	static unsigned char buf[10240], infobuf[10240];
+	static char buf[10240], infobuf[10240];
 	char *p, *pbuf;
 
 	p = text;
@@ -2896,9 +2893,11 @@ qboolean Cmd_Reload (edict_t *ent)
 
 	//hack
 	if (ent->client->pers.weapon->classnameb != WEAPON_PANZERFAUST)
-	{if (ent->client->weaponstate == WEAPON_FIRING ||
-		ent->client->weaponstate == WEAPON_LOWER)
-		return false;}
+	{
+		if (ent->client->weaponstate == WEAPON_FIRING ||
+				ent->client->weaponstate == WEAPON_LOWER)
+			return false;
+	}
 
 	if (ent->client->weaponstate &&
 		ent->client->weaponstate == WEAPON_RELOADING &&
@@ -2990,7 +2989,7 @@ qboolean Cmd_Reload (edict_t *ent)
 
 			return true;
 		}
-        else
+		else
 		{
 			ent->client->weaponstate = WEAPON_RELOADING;
 //bcass start - truesite speed after reload
@@ -3001,7 +3000,7 @@ qboolean Cmd_Reload (edict_t *ent)
 			return true;
 		}
 	}
-    else
+	else
 	{
 		ent->client->weaponstate = WEAPON_READY;
 		safe_cprintf(ent,PRINT_HIGH,"You're out of ammo!\n");
