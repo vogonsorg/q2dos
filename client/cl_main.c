@@ -125,11 +125,13 @@ extern	cvar_t *allow_download_sounds;
 extern	cvar_t *allow_download_maps;
 
 
+#ifdef GAMESPY
 // FS: For Gamespy
 static    GServerList serverlist; // FS: Moved outside so we can abort whenever we need to
-void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2);
+static void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2);
 void CL_PingNetServers_f (void);
 void CL_PrintBrowserList_f (void);
+#endif
 
 #ifdef __DJGPP__
 void Sys_Memory_Stats_f (void); // FS: Added
@@ -282,7 +284,6 @@ void CL_Record_f (void)
 			MSG_WriteShort (&buf, i);
 			MSG_WriteString (&buf, cl.configstrings[i]);
 		}
-
 	}
 
 	// baselines
@@ -649,7 +650,6 @@ void CL_ClearState (void)
 	memset (&cl_entities, 0, sizeof(cl_entities));
 
 	SZ_Clear (&cls.netchan.message);
-
 }
 
 /*
@@ -719,7 +719,6 @@ void CL_Disconnect (void)
 
 void CL_Disconnect_f (void)
 {
-
 #ifdef GAMESPY
 	if(serverlist != NULL) // FS: Immediately abort gspy scans
 	{
@@ -729,7 +728,7 @@ void CL_Disconnect_f (void)
 		S_GamespySound ("gamespy/abort.wav");
 		ServerListHalt( serverlist );
 		ServerListClear( serverlist );
-	    ServerListFree(serverlist);
+		ServerListFree(serverlist);
 		serverlist = NULL; // FS: This is on purpose so future ctrl+c's won't try to close empty serverlists
 	}
 #endif
@@ -737,10 +736,8 @@ void CL_Disconnect_f (void)
 	Com_Error (ERR_DROP, "Disconnected from server");
 }
 
-
 void CL_Gspystop_f (void)
 {
-
 #ifdef GAMESPY
 	if(serverlist != NULL) // FS: Immediately abort gspy scans
 	{
@@ -1107,7 +1104,7 @@ void CL_ReadPackets (void)
 {
 	while (NET_GetPacket (NS_CLIENT, &net_from, &net_message))
 	{
-//	Com_Printf ("packet\n");
+//		Com_Printf ("packet\n");
 		//
 		// remote command packet
 		//
@@ -1302,7 +1299,6 @@ void CL_RequestNextDownload (void)
 				// checking for skins in the model
 				if (!precache_model)
 				{
-
 					FS_LoadFile (cl.configstrings[precache_check], (void **)&precache_model);
 					if (!precache_model) {
 						precache_model_skin = 0;
@@ -1313,11 +1309,11 @@ void CL_RequestNextDownload (void)
 					{	// is it a sprite?
 						if (LittleLong(*(unsigned *)precache_model) != IDSPRITEHEADER)
 						{	// not a recognized model
-						FS_FreeFile(precache_model);
-						precache_model = 0;
-						precache_model_skin = 0;
-						precache_check++;
-						continue;
+							FS_FreeFile(precache_model);
+							precache_model = 0;
+							precache_model_skin = 0;
+							precache_check++;
+							continue;
 						}
 						else
 						{	// get sprite header
@@ -1334,7 +1330,7 @@ void CL_RequestNextDownload (void)
 					}
 					else
 					{	// get md2 header
-					pheader = (dmdl_t *)precache_model;
+						pheader = (dmdl_t *)precache_model;
 						if (LittleLong (pheader->version) != ALIAS_VERSION)
 						{	// not a recognized md2
 							FS_FreeFile(precache_model);
@@ -1362,7 +1358,7 @@ void CL_RequestNextDownload (void)
 
 				if (LittleLong(*(unsigned *)precache_model) == IDALIASHEADER) // md2
 				{
-				pheader = (dmdl_t *)precache_model;
+					pheader = (dmdl_t *)precache_model;
 
 					while (precache_model_skin - 1 < LittleLong(pheader->num_skins))
 					{
@@ -1583,7 +1579,6 @@ void CL_RequestNextDownload (void)
 		if (allow_download->value && allow_download_maps->value) {
 			while (precache_tex < numtexinfo) {
 				char fn[MAX_OSPATH];
-
 				sprintf(fn, "textures/%s.wal", map_surfaces[precache_tex++].rname);
 				if (!CL_CheckOrDownloadFile(fn))
 					return; // started a download
@@ -2118,14 +2113,12 @@ void CL_Frame_Async (double msec)
 			if (cl_sleep->value)
 			{
 				int temptime = min( (1000.0 / net_maxfps->value - packetDelta), (1000.0 / r_maxfps->value - renderDelta) );
-
 				if (temptime > 1)
 				{
 					Sys_Sleep (1);
 				}
 			} // end CPU usage fix
 #endif
-
 			return;
 		}
 		
@@ -2166,7 +2159,7 @@ void CL_Frame_Async (double msec)
 		CL_RunHTTPDownloads ();
 #endif	// USE_CURL
 	}
-	
+
 	if (renderFrame)
 	{
 		renderDelta = 0;
@@ -2214,7 +2207,7 @@ void CL_Frame_Async (double msec)
 
 		// Update audio
 		S_Update (cl.refdef.vieworg, cl.v_forward, cl.v_right, cl.v_up);
-		
+
 		if (miscFrame)
 		{
 			CDAudio_Update();
@@ -2315,7 +2308,6 @@ void CL_Frame (double msec)
 #endif
 
 	extratime += msec;
-
 
 	if (cl_maxfps->value)
 	{
@@ -2485,13 +2477,13 @@ void CL_Init (void)
 	VID_Init ();
 	S_Init ();	// sound must be initialized after window is created
 #endif
-	
+
 	V_Init ();
-	
+
 	net_message.data = net_message_buffer;
 	net_message.maxsize = sizeof(net_message_buffer);
 
-	M_Init ();	
+	M_Init ();
 	
 	SCR_Init ();
 	cls.disable_screen = true;	// don't draw yet
@@ -2522,7 +2514,7 @@ to run quit through here before the final handoff to the sys code.
 void CL_Shutdown(void)
 {
 	static qboolean isdown = false;
-	
+
 	if (isdown)
 	{
 		printf ("recursive shutdown\n");
@@ -2564,7 +2556,7 @@ void CL_PrintBrowserList_f (void)
 	}
 }
 
-void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2)
+static void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2)
 {
 	GServer server;
 
@@ -2634,7 +2626,7 @@ void CL_PingNetServers_f (void)
 	SCR_UpdateScreen(); // FS: Force an update so the percentage bar shows some progress
 
 	serverlist = ServerListNew("quake2","quake2",goa_secret_key,allocatedSockets,ListCallBack,GCALLBACK_FUNCTION,NULL);
-    error = ServerListUpdate(serverlist,false);
+	error = ServerListUpdate(serverlist,false);
 
 	if (error != GE_NOERROR) // FS: Grab the error code
 	{
@@ -2649,7 +2641,7 @@ void CL_PingNetServers_f (void)
 	cls.gamespyupdate = 0;
 	cls.gamespypercent = 0;
 	ServerListClear( serverlist );
-    ServerListFree(serverlist);
+	ServerListFree(serverlist);
 	serverlist = NULL; // FS: This is on purpose so future ctrl+c's won't try to close empty serverlists
 }
 #endif // GAMESPY

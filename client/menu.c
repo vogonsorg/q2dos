@@ -512,7 +512,9 @@ MULTIPLAYER MENU
 =======================================================================
 */
 static menuframework_s	s_multiplayer_menu;
+#ifdef GAMESPY
 static menuaction_s		s_join_gamespy_server_action; // FS
+#endif
 static menuaction_s		s_join_network_server_action;
 static menuaction_s		s_start_network_server_action;
 static menuaction_s		s_player_setup_action;
@@ -2839,10 +2841,10 @@ void FormatGamespyList (void)
 #endif
 }
 
-static char	found[64];
 void SearchGamespyGames (void)
 {
 #ifdef GAMESPY
+	static char	found[64];
 	int		i;
 
 	if (cls.netchan.remote_address.type != NA_LOOPBACK) // FS: If we're not single player, check to see if we're actually disconnected first because DOS takes a while to do this
@@ -2896,7 +2898,7 @@ void SearchGamespyGames (void)
 	Com_Printf(found);
 #else
 	Com_Printf("Q2DOS compiled without GAMESPY!\n");
-#endif // GAMESPY
+#endif /* GAMESPY */
 }
 
 void SearchLocalGames( void )
@@ -4093,7 +4095,9 @@ static menuframework_s s_downloadoptions_menu;
 
 static menuseparator_s	s_download_title;
 static menulist_s	s_allow_download_box;
+#ifdef USE_CURL
 static menulist_s	s_allow_download_http_box; // FS
+#endif
 static menulist_s	s_allow_download_maps_box;
 static menulist_s	s_allow_download_models_box;
 static menulist_s	s_allow_download_players_box;
@@ -4107,14 +4111,12 @@ static void DownloadCallback( void *self )
 	{
 		Cvar_SetValue("allow_download", f->curvalue);
 	}
-
 #ifdef USE_CURL
 	else if (f == &s_allow_download_http_box)
 	{
 		Cvar_SetValue("cl_http_downloads", f->curvalue);
 	}
 #endif
-
 	else if (f == &s_allow_download_maps_box)
 	{
 		Cvar_SetValue("allow_download_maps", f->curvalue);

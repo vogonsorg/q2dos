@@ -1,16 +1,48 @@
+# features selection :
+#
+# gamespy/server browser:
+USE_GAMESPY=1
+# libcurl/http downloads:
+USE_CURL=1
+# ogg/vorbis music:
+USE_OGG=1
+# cd audio support:
+USE_CDAUDIO=1
+
 CC = gcc
 CFLAGS = -g -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
+CPPFLAGS = -Did386 -DREF_HARD_LINKED -DCLIENT_SPLIT_NETFRAME
+LDFLAGS =
+
+# libau for pci sound cards support :
 CFLAGS+= -Idos/3rdparty/include
-SFLAGS = -Did386 -DREF_HARD_LINKED -DUSE_DOS_CD -DOGG_SUPPORT -DCLIENT_SPLIT_NETFRAME -DGAMESPY -DUSE_CURL
-LDFLAGS = -Ldos/3rdparty/lib -lau
+LDFLAGS+= -Ldos/3rdparty/lib -lau
+
+# net -- watt-32 tcp/ip library :
 WATT32_CFLAGS = -Iwattcp/inc -DWATT32_NO_OLDIES
 WATT32_LIBS = -Lwattcp/lib -lwatt
+
+ifeq ($(USE_GAMESPY),1)
+CPPFLAGS+= -DGAMESPY
+endif
+
+ifeq ($(USE_CDAUDIO),1)
+CPPFLAGS+= -DUSE_DOS_CD
+endif
+
+ifeq ($(USE_OGG),1)
+CPPFLAGS+= -DOGG_SUPPORT
 #OGG_CFLAGS = -Idos/3rdparty/include
 OGG_LIBS = -Ldos/3rdparty/lib -logg
-#VORBIS_CFLAGS = -Idos/3rdparty/include
+VORBIS_CFLAGS = -Idos/3rdparty/include
 VORBIS_LIBS = -Ldos/3rdparty/lib -lvorbisfile -lvorbis
+endif
+
+ifeq ($(USE_CURL),1)
+CPPFLAGS+= -DUSE_CURL
 CURL_CFLAGS = -Ilibcurl/include
 CURL_LIBS = -Llibcurl/lib -lcurl
+endif
 
 DOS = 	dos/cd_dos.o \
 	dos/vid_dos.o \
@@ -50,16 +82,18 @@ CLIENT =	client/cl_input.o \
 	client/snd_mix.o \
 	client/snd_stream.o \
 	client/qmenu.o \
-	client/cl_newfx.o 
+	client/cl_newfx.o
 
+ifeq ($(USE_GAMESPY),1)
 GAMESPY = Goa/CEngine/darray.o \
 	Goa/CEngine/gserver.o \
 	Goa/CEngine/gserverlist.o \
 	Goa/CEngine/gutil.o \
 	Goa/CEngine/hashtable.o \
 	Goa/nonport.o
+endif
 
-QCOMMON = 	qcommon/cmd.o \
+QCOMMON = qcommon/cmd.o \
 	qcommon/cmodel.o \
 	qcommon/common.o \
 	qcommon/crc.o \
@@ -67,7 +101,7 @@ QCOMMON = 	qcommon/cmd.o \
 	qcommon/files.o \
 	qcommon/md4.o \
 	qcommon/net_chan.o \
-	qcommon/pmove.o 
+	qcommon/pmove.o
 
 SERVER = server/sv_ccmds.o \
 	server/sv_ents.o \
@@ -96,8 +130,8 @@ REFSOFT = ref_soft/r_alias.o \
 	ref_soft/r_edge.o \
 	ref_soft/r_image.o
 
-REFASM = linux/snd_mixa.o \
-	linux/math.o \
+REFASM = linux/math.o \
+	dos/d_copy.o \
 	linux/d_polysa.o \
 	linux/r_aclipa.o \
 	linux/r_draw16.o \
@@ -106,8 +140,8 @@ REFASM = linux/snd_mixa.o \
 	linux/r_scana.o \
 	linux/r_spr8.o \
 	linux/r_surf8.o \
-	dos/d_copy.o \
-	linux/r_varsa.o 
+	linux/r_varsa.o \
+	linux/snd_mixa.o
 
 .PHONY: all test clean
 #
@@ -133,7 +167,7 @@ clean:
 DO_AS=$(CC) -x assembler-with-cpp
 
 %.o : %.c
-	$(CC) $(CFLAGS) $(SFLAGS) $(WATT32_CFLAGS) $(OGG_CFLAGS) $(VORBIS_CFLAGS) $(CURL_CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(WATT32_CFLAGS) $(OGG_CFLAGS) $(VORBIS_CFLAGS) $(CURL_CFLAGS) -c $< -o $@
 
 %.o: %.S
 	$(DO_AS) $(CFLAGS) -c $< -o $@
