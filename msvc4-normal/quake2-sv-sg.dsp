@@ -70,7 +70,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "OGG_SUPPORT" /D "USE_CURL" /D "USE_JOYSTICK" /FR /YX /FD /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS"  /D "id386" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "OGG_SUPPORT" /D "USE_CURL" /D "USE_JOYSTICK" /FR /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x1009 /d "_DEBUG"
@@ -492,6 +492,16 @@ InputName=r_aclipa
 
 !ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
 
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft\r_aclipa.asm
+InputName=r_aclipa
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
 !ENDIF 
 
 # End Source File
@@ -525,6 +535,16 @@ InputName=r_draw16
 
 !ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
 
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft\r_draw16.asm
+InputName=r_draw16
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
 !ENDIF 
 
 # End Source File
@@ -545,6 +565,16 @@ InputName=r_drawa
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft\r_drawa.asm
+InputName=r_drawa
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
 
 !ENDIF 
 
@@ -570,6 +600,16 @@ InputName=r_edgea
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft\r_edgea.asm
+InputName=r_edgea
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
 
 !ENDIF 
 
@@ -620,6 +660,16 @@ InputName=r_polysa
 
 !ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
 
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft\r_polysa.asm
+InputName=r_polysa
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
 !ENDIF 
 
 # End Source File
@@ -653,6 +703,16 @@ InputName=r_scana
 
 !ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
 
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft\r_scana.asm
+InputName=r_scana
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
 !ENDIF 
 
 # End Source File
@@ -673,6 +733,16 @@ InputName=r_spr8
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft\r_spr8.asm
+InputName=r_spr8
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
 
 !ENDIF 
 
@@ -703,6 +773,16 @@ InputName=r_surf8
 
 !ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
 
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft\r_surf8.asm
+InputName=r_surf8
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
 !ENDIF 
 
 # End Source File
@@ -723,6 +803,16 @@ InputName=r_varsa
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft\r_varsa.asm
+InputName=r_varsa
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
 
 !ENDIF 
 

@@ -324,12 +324,12 @@ Guaranteed to be called before the first refresh
 void R_ViewChanged (vrect_t *vr)
 {
 	int		i;
-	float	screenAspect, pixelAspect; // FS: From Q1
+	float	screenAspect, pixelAspect; /* FS: From Q1 */
 
 	r_refdef.vrect = *vr;
 
 	r_refdef.horizontalFieldOfView = 2*tan((float)r_newrefdef.fov_x/360*M_PI);
- 	// Knightmare- catch 5:4 modes pushing top and bottom clips beyond screen buffer
+	/* Knightmare- catch 5:4 modes pushing top and bottom clips beyond screen buffer */
  	if ( (r_refdef.vrect.width != r_newrefdef.width || r_refdef.vrect.height != r_newrefdef.height)
  		&& (((float)r_newrefdef.width / (float)r_newrefdef.height) < (640.0f/480.0f)) )
  	{
@@ -339,7 +339,7 @@ void R_ViewChanged (vrect_t *vr)
  	}
  	else
  		verticalFieldOfView = 2*tan((float)r_newrefdef.fov_y/360*M_PI);
- 	// end Knightmare
+	/* end Knightmare */
 
 	r_refdef.fvrectx = (float)r_refdef.vrect.x;
 	r_refdef.fvrectx_adj = (float)r_refdef.vrect.x - 0.5;
@@ -367,26 +367,20 @@ void R_ViewChanged (vrect_t *vr)
 	xOrigin = r_refdef.xOrigin;
 	yOrigin = r_refdef.yOrigin;
 
-	if(r_newrefdef.width == 320.0f && r_newrefdef.height == 200.0f) // FS: Special hack for 320x200
-	{
-		pixelAspect = 0.9; //(float)r_newrefdef.width / (float)r_newrefdef.height;
-		screenAspect = r_refdef.vrect.width*pixelAspect /
-			r_refdef.vrect.height;
+/* leilei - Aspect stuff nicked from Q1 */
+	pixelAspect = 1.000 + (1.3333 - ((float)vid.width / (float)vid.height));
 
-		verticalFieldOfView = r_refdef.horizontalFieldOfView / screenAspect;
-	}
-	else
-	{
-		pixelAspect = 1.0f;
-		screenAspect = 1.0f;
-	}
+	screenAspect = r_refdef.vrect.width*pixelAspect /
+		r_refdef.vrect.height;
+	verticalFieldOfView = r_refdef.horizontalFieldOfView / screenAspect; /* FS: FIXME Knightmare's code is already modifying the vert FOV so whatdo? */
 
-// values for perspective projection
-// if math were exact, the values would range from 0.5 to to range+0.5
-// hopefully they wll be in the 0.000001 to range+.999999 and truncate
-// the polygon rasterization will never render in the first row or column
-// but will definately render in the [range] row and column, so adjust the
-// buffer origin to get an exact edge to edge fill
+/* values for perspective projection
+   if math were exact, the values would range from 0.5 to to range+0.5
+   hopefully they wll be in the 0.000001 to range+.999999 and truncate
+   the polygon rasterization will never render in the first row or column
+   but will definately render in the [range] row and column, so adjust the
+   buffer origin to get an exact edge to edge fill
+*/
 	xcenter = ((float)r_refdef.vrect.width * XCENTERING) +
 			r_refdef.vrect.x - 0.5;
 	aliasxcenter = xcenter * r_aliasuvscale;
@@ -399,12 +393,12 @@ void R_ViewChanged (vrect_t *vr)
 	xscaleinv = 1.0 / xscale;
 
 //	yscale = xscale;
-	yscale = xscale * pixelAspect; // FS: From Q1
+	yscale = xscale * pixelAspect; /* FS: From Q1 */
 	aliasyscale = yscale * r_aliasuvscale;
 	yscaleinv = 1.0 / yscale;
 	xscaleshrink = (r_refdef.vrect.width-6)/r_refdef.horizontalFieldOfView;
 //	yscaleshrink = xscaleshrink;
-	yscaleshrink = xscaleshrink*pixelAspect; // FS: From Q1
+	yscaleshrink = xscaleshrink*pixelAspect; /* FS: From Q1 */
 
 // left side clip
 	screenedge[0].normal[0] = -1.0 / (xOrigin*r_refdef.horizontalFieldOfView);
