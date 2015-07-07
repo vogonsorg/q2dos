@@ -12,7 +12,6 @@
 
 #include "../qcommon/qcommon.h"
 #include "../client/keys.h"
-#include "errno.h"
 
 static qboolean CompareAttributes(char *path, char *name,
         unsigned musthave, unsigned canthave );
@@ -356,7 +355,7 @@ static  DIR             *fdir;
 
 
 
-char *Sys_FindFirst (char *path, unsigned musthave, unsigned canhave)
+char *Sys_FindFirst (char *path, unsigned musthave, unsigned canthave)
 {
         struct dirent *d;
         char *p;
@@ -382,7 +381,7 @@ char *Sys_FindFirst (char *path, unsigned musthave, unsigned canhave)
                 if (!*findpattern || glob_match(findpattern, d->d_name)) {
 //                      if (*findpattern)
 //                              printf("%s matched %s\n", findpattern, d->d_name);
-                        if (CompareAttributes(findbase, d->d_name, musthave, canhave)) {
+                        if (CompareAttributes(findbase, d->d_name, musthave, canthave)) {
                                 sprintf (findpath, "%s/%s", findbase, d->d_name);
                                 return findpath;
                         }
@@ -391,7 +390,7 @@ char *Sys_FindFirst (char *path, unsigned musthave, unsigned canhave)
         return NULL;
 }
 
-char *Sys_FindNext (unsigned musthave, unsigned canhave)
+char *Sys_FindNext (unsigned musthave, unsigned canthave)
 {
         struct dirent *d;
 
@@ -401,7 +400,7 @@ char *Sys_FindNext (unsigned musthave, unsigned canhave)
                 if (!*findpattern || glob_match(findpattern, d->d_name)) {
 //                      if (*findpattern)
 //                              printf("%s matched %s\n", findpattern, d->d_name);
-                        if (CompareAttributes(findbase, d->d_name, musthave, canhave)) {
+                        if (CompareAttributes(findbase, d->d_name, musthave, canthave)) {
                                 sprintf (findpath, "%s/%s", findbase, d->d_name);
                                 return findpath;
                         }

@@ -33,9 +33,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define INI_STRING_SIZE 0x100
 
-FILE *ini_fopen(const char *filename, const char *modes);
-int ini_fclose(FILE *f);
-void ini_fgets(FILE *f, const char *section, const char *field, char *s);
+static FILE *ini_fopen(const char *filename, const char *modes);
+static int ini_fclose(FILE *f);
+static void ini_fgets(FILE *f, const char *section, const char *field, char *s);
 
 // Routines for reading from .INI files
 // The read routines are fairly efficient.
@@ -61,7 +61,7 @@ struct field_buffer
 	char name[MAX_FIELD_WIDTH+1];
 };
 
-static FILE *current_file=NULL;
+static FILE *current_file = NULL;
 static int	current_section;
 
 static int current_section_buffer=0;
@@ -69,7 +69,7 @@ static int current_field_buffer=0;
 
 static struct section_buffer section_buffers[NUM_SECTION_BUFFERS];
 static struct field_buffer field_buffers[NUM_FIELD_BUFFERS];
-byte	extVoices,extCodecVoices; // FS: GUS clicking sounds during map transitions and pauseing fix
+static byte	extVoices,extCodecVoices; // FS: GUS clicking sounds during map transitions and pauseing fix
 int	havegus; // FS
 
 //***************************************************************************
@@ -335,17 +335,14 @@ static char *stripped_fgets(char *s, int n, FILE *f)
 	return(s);
 }
 
-//***************************************************************************
-// Externally accessable routines
-//***************************************************************************
 // Opens an .INI file. Works like fopen
-FILE *ini_fopen(const char *filename, const char *modes)
+static FILE *ini_fopen(const char *filename, const char *modes)
 {
 	return(fopen(filename,modes));
 }
 
 // Closes a .INI file. Works like fclose
-int ini_fclose(FILE *f)
+static int ini_fclose(FILE *f)
 {
 	if (f==current_file)
 		reset_buffer(NULL);
@@ -355,7 +352,7 @@ int ini_fclose(FILE *f)
 // Puts "field" from "section" from .ini file "f" into "s".
 // If "section" does not exist or "field" does not exist in
 // section then s="";
-void ini_fgets(FILE *f, const char *section, const char *field, char *s)
+static void ini_fgets(FILE *f, const char *section, const char *field, char *s)
 {
 	int i;
 	long start_pos,string_start_pos;
@@ -604,31 +601,31 @@ static struct Gf1RateStruct Gf1Rates[]=
 //=============================================================================
 // Basic GF1 functions
 //=============================================================================
-void SetGf18(BYTE reg,BYTE data)
+static void SetGf18(BYTE reg,BYTE data)
 {
 	dos_outportb(Gf1RegisterSelect,reg);
 	dos_outportb(Gf1DataHigh,data);
 }
 
-void SetGf116(BYTE reg,WORD data)
+static void SetGf116(BYTE reg,WORD data)
 {
 	dos_outportb(Gf1RegisterSelect,reg);
 	dos_outportw(Gf1DataLow,data);
 }
 
-BYTE GetGf18(BYTE reg)
+static BYTE GetGf18(BYTE reg)
 {
 	dos_outportb(Gf1RegisterSelect,reg);
 	return(dos_inportb(Gf1DataHigh));
 }
 
-WORD GetGf116(BYTE reg)
+static WORD GetGf116(BYTE reg)
 {
 	dos_outportb(Gf1RegisterSelect,reg);
 	return(dos_inportw(Gf1DataLow));
 }
 
-void Gf1Delay(void)
+static void Gf1Delay(void)
 {
 	int i;
 
@@ -636,12 +633,12 @@ void Gf1Delay(void)
 		dos_inportb(Gf1TimerControl);
 }
 
-DWORD ConvertTo16(DWORD Address)
+static DWORD ConvertTo16(DWORD Address)
 {
 	return( ((Address>>1) & 0x0001FFFF) | (Address & 0x000C0000L) );
 }
 
-void ClearGf1Ints(void)
+static void ClearGf1Ints(void)
 {
 	int i;
 
@@ -1266,26 +1263,25 @@ int GUS_GetDMAPos(void)
 	if (HaveCodec)
 	{
 		// clear 16-bit reg flip-flop
- 	  // load the current dma count register
- 	  if (DmaChannel < 4)
- 	  {
- 		  dos_outportb(0x0C, 0);
- 		  count = dos_inportb(CountReg);
- 		  count += dos_inportb(CountReg) << 8;
- 		  if (dma.samplebits == 16)
- 			  count /= 2;
- 		  count = dma.samples - (count+1);
- 	  }
- 	  else
- 	  {
- 		  dos_outportb(0xD8, 0);
- 		  count = dos_inportb(CountReg);
- 		  count += dos_inportb(CountReg) << 8;
- 		  if (dma.samplebits == 8)
- 			  count *= 2;
- 		  count = dma.samples - (count+1);
- 	  }
-
+		// load the current dma count register
+		if (DmaChannel < 4)
+		{
+			dos_outportb(0x0C, 0);
+			count = dos_inportb(CountReg);
+			count += dos_inportb(CountReg) << 8;
+			if (dma.samplebits == 16)
+				count /= 2;
+			count = dma.samples - (count+1);
+		}
+		else
+		{
+			dos_outportb(0xD8, 0);
+			count = dos_inportb(CountReg);
+			count += dos_inportb(CountReg) << 8;
+			if (dma.samplebits == 8)
+				count *= 2;
+			count = dma.samples - (count+1);
+		}
 	}
 	else
 	{
@@ -1343,6 +1339,7 @@ void GUS_Shutdown (void)
 	dos_freememory (dma_dosadr);
 	dma_dosadr = NULL; // sezero
 }
+
 void GUS_ClearDMA (void) // FS: This stops the constant clicking sound during map loads and pause screens
 {
 	memset(dma_buffer, 0, SND_BUFFER_SIZE);
@@ -1386,5 +1383,5 @@ void GUS_ClearDMA (void) // FS: This stops the constant clicking sound during ma
 			SetGf18(DMA_CONTROL,0x45);
 		GUS_StartGf1(SND_BUFFER_SIZE,extVoices);
 	}
-        Com_DPrintf(DEVELOPER_MSG_SOUND, "Cleared GUS DMA Buffer!\n");
+	Com_DPrintf(DEVELOPER_MSG_SOUND, "Cleared GUS DMA Buffer!\n");
 }

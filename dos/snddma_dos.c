@@ -18,8 +18,8 @@ typedef enum
 	dma_gus
 } dmacard_t;
 
-dmacard_t		 dmacard;
-int BLASTER_GetDMAPos(void);
+static dmacard_t		 dmacard;
+static int BLASTER_GetDMAPos(void);
 
 /*
 ===============================================================================
@@ -54,12 +54,13 @@ static  int high_dma;
 static  int mixer_port;
 static  int mpu401_port;
 
-int	dsp_version;
-int	dsp_minor_version;
+static int	dsp_version;
+static int	dsp_minor_version;
 
-int	timeconstant=-1;
+static int	timeconstant=-1;
 
-void PrintBits (byte b)
+#if 0
+static void PrintBits (byte b)
 {
 	int		i;
 	char	str[9];
@@ -70,8 +71,9 @@ void PrintBits (byte b)
 	str[8] = 0;
 	Com_Printf ("%s (%i)", str, b);
 }
+#endif
 
-void SB_Info_f(void)
+static void SB_Info_f(void)
 {
 	Com_Printf ("BLASTER=%s\n", getenv("BLASTER"));
 	Com_Printf("dsp version=%d.%d\n", dsp_version, dsp_minor_version);
@@ -85,7 +87,7 @@ void SB_Info_f(void)
 // Interprets BLASTER variable
 // =======================================================================
 
-int GetBLASTER(void)
+static int GetBLASTER(void)
 {
 	char *BLASTER;
 	char *param;
@@ -143,7 +145,7 @@ int GetBLASTER(void)
 // Resets DSP.  Returns 0 on success.
 // ==================================================================
 
-int ResetDSP(void)
+static int ResetDSP(void)
 {
 	volatile int i;
 
@@ -157,34 +159,33 @@ int ResetDSP(void)
 	}
 	if (i) return 0;
 	else return 1;
-
 }
 
-int ReadDSP(void)
+static int ReadDSP(void)
 {
 	while (!(dos_inportb(dsp_port+0xe)&0x80)) ;
 	return dos_inportb(dsp_port+0xa);
 }
 
-void WriteDSP(int val)
+static void WriteDSP(int val)
 {
 	while ((dos_inportb(dsp_port+0xc)&0x80)) ;
 	dos_outportb(dsp_port+0xc, val);
 }
 
-int ReadMixer(int addr)
+static int ReadMixer(int addr)
 {
 	dos_outportb(mixer_port+4, addr);
 	return dos_inportb(mixer_port+5);
 }
 
-void WriteMixer(int addr, int val)
+static void WriteMixer(int addr, int val)
 {
 	dos_outportb(mixer_port+4, addr);
 	dos_outportb(mixer_port+5, val);
 }
 
-int				 oldmixervalue;
+static int	oldmixervalue;
 
 /*
 ================
@@ -192,7 +193,7 @@ StartSB
 
 ================
 */
-void StartSB(void)
+static void StartSB(void)
 {
 	int	i;
 
@@ -273,7 +274,7 @@ StartDMA
 
 ================
 */
-void StartDMA(void)
+static void StartDMA(void)
 {
 	int mode;
 	int realaddr;
@@ -367,11 +368,8 @@ qboolean BLASTER_Init(void)
 //
 	if (!GetBLASTER())
 	{
-		Com_Printf (
-		"The BLASTER environment variable\n"
-		"is not set, sound effects are\n"
-		"disabled.  See README.TXT for help.\n"
-		);							 
+		Com_Printf ("The BLASTER environment variable is not set,\n"
+				"Sound Blaster support is disabled.\n");
 		return 0;
 	}
 
@@ -563,8 +561,7 @@ Returns false if nothing is found.
 */
 qboolean PCI_Init(void)
 {
-struct mpxplay_audioout_info_s *aui=&au_infos;
-
+	struct mpxplay_audioout_info_s *aui=&au_infos;
 	const char *c;
 
 	c = AU_search(1);/* 1: stereo speaker output (meaningful only for Intel HDA chips) */
@@ -585,7 +582,7 @@ struct mpxplay_audioout_info_s *aui=&au_infos;
 		dma.channels=channels;
 		AU_setrate(&speed,&samplebits,&channels);
 		
-#if 1		//not sure but I think it can change in the setrate
+#if 1		/* not sure but I think it can change in the setrate */
 		dma.speed=aui->freq_card;
 		dma.samplebits=aui->bits_set;
 		dma.channels=aui->chan_set;
@@ -754,5 +751,5 @@ void SNDDMA_Submit(void)
 
 void S_Activate (qboolean active)
 {
-	Com_Printf("S_Activate %d", active);
+	Com_Printf("S_Activate %d\n", active);
 }
