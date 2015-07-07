@@ -8,10 +8,12 @@ USE_CURL=1
 USE_OGG=1
 # cd audio support:
 USE_CDAUDIO=1
+# abrash's asm optimizations:
+USE_ASM=1
 
 CC = gcc
 CFLAGS = -g -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
-CPPFLAGS = -Did386 -DREF_HARD_LINKED -DCLIENT_SPLIT_NETFRAME
+CPPFLAGS = -DREF_HARD_LINKED -DCLIENT_SPLIT_NETFRAME
 LDFLAGS =
 
 # libau for pci sound cards support :
@@ -21,6 +23,10 @@ LDFLAGS+= -Ldos/3rdparty/lib -lau
 # net -- watt-32 tcp/ip library :
 WATT32_CFLAGS = -Iwattcp/inc -DWATT32_NO_OLDIES
 WATT32_LIBS = -Lwattcp/lib -lwatt
+
+ifeq ($(USE_ASM),1)
+CPPFLAGS+= -Did386
+endif
 
 ifeq ($(USE_GAMESPY),1)
 CPPFLAGS+= -DGAMESPY
@@ -130,6 +136,7 @@ REFSOFT = ref_soft/r_alias.o \
 	ref_soft/r_edge.o \
 	ref_soft/r_image.o
 
+ifeq ($(USE_ASM),1)
 REFASM = linux/math.o \
 	dos/d_copy.o \
 	linux/d_polysa.o \
@@ -142,6 +149,7 @@ REFASM = linux/math.o \
 	linux/r_surf8.o \
 	linux/r_varsa.o \
 	linux/snd_mixa.o
+endif
 
 .PHONY: all test clean
 #
