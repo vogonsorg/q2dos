@@ -4978,6 +4978,7 @@ const char *M_Quit_Key (int key)
 		M_PopMenu ();
 		break;
 
+	case K_ENTER: // FS: Press enter to quit as well
 	case 'Y':
 	case 'y':
 		cls.key_dest = key_console;

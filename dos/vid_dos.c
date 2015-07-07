@@ -298,34 +298,33 @@ void	VID_CheckChanges (void)
 	}
 }
 
-// FS: Bah, this is kind of dumb.  Oh well.
-static const char *resolutions[] = 
-{
-	"[]",
-	"[]",
-	"[]",
-	"[]",
-	"[]",
-	"[]",
-	"[]",
-	"[]",
-	"[]",
-	"[]",
-	"[]",
-	"[]",
-	"[]",
-	"[]",
-	"[]",
-	"[]",
-	"[]",
-	"[]",
-	"[]",
-	"[]",
-	0
-	};
-
 void	VID_MenuInit (void)
 {
+	// FS: Bah, this is kind of dumb.  Oh well.
+	static const char *resolutions[] = 
+	{
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		"[]",
+		0
+		};
 
 	static const char *yesno_names[] =
 	{
@@ -333,6 +332,7 @@ void	VID_MenuInit (void)
 		"yes",
 		0
 	};
+
 	int i;
 
 
