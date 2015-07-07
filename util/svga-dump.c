@@ -49,19 +49,15 @@ typedef struct {
 } vesa_extra_t;
 
 
-#define MAX_VESA_MODES			30
+#define MAX_VESA_MODES	30	// we'll just take the first 30 if there
+				//  are more
+
 static vmode_t		vesa_modes[MAX_VESA_MODES] = 
 	{{NULL, NULL, "    ********* VESA modes *********    "}};
 static char			names[MAX_VESA_MODES][10];
 
 static vesa_extra_t	vesa_extra[MAX_VESA_MODES];
 
-
-
-extern regs_t regs;
-
-#define MAX_VESA_MODES	30	// we'll just take the first 30 if there
-				//  are more
 
 
 typedef struct vbeinfoblock_s {
