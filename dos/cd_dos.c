@@ -27,36 +27,27 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../client/client.h"
 
 #ifndef USE_DOS_CD
-void CDAudio_Activate (qboolean active)
-{
-}
-
 void CDAudio_Play(int track, qboolean looping)
 {
 }
-
 
 void CDAudio_Stop(void)
 {
 }
 
-
 void CDAudio_Resume(void)
 {
 }
 
-
 void CDAudio_Update(void)
 {
 }
-
 
 int CDAudio_Init(void)
 {
 	Com_Printf("CD Audio is disabled in this build.\n");
 	return 0;
 }
-
 
 void CDAudio_Shutdown(void)
 {
@@ -380,7 +371,7 @@ static int CDAudio_GetAudioTrackInfo (byte track, int *start)
 
 	if (cdRequest->status & STATUS_ERROR_BIT)
 	{
-		Com_DPrintf(DEVELOPER_MSG_CD, "CDAudio_GetAudioTrackInfo %04x\n", cdRequest->status & 	0xffff);
+		Com_DPrintf(DEVELOPER_MSG_CD, "CDAudio_GetAudioTrackInfo %04x\n", cdRequest->status & 0xffff);
 		return -1;
 	}
 
@@ -416,7 +407,7 @@ static int CDAudio_GetAudioDiskInfo (void)
 
 	if (cdRequest->status & STATUS_ERROR_BIT)
 	{
-		Com_DPrintf(DEVELOPER_MSG_CD, "CDAudio_GetAudioDiskInfo %04x\n", cdRequest->status & 	0xffff);
+		Com_DPrintf(DEVELOPER_MSG_CD, "CDAudio_GetAudioDiskInfo %04x\n", cdRequest->status & 0xffff);
 		return -1;
 	}
 
@@ -496,7 +487,7 @@ static int CDAudio_MediaChange (void)
 
 // we set the volume to 0 first and then to the desired volume
 // some cd-rom drivers seem to need it done this way
-void CDAudio_SetVolume (byte volume)
+static void CDAudio_SetVolume (byte volume)
 {
 	if (!initialized || !enabled)
 		return;
@@ -917,12 +908,7 @@ int CDAudio_Init (void)
 	dos_int86 (0x2f);
 	if (regs.x.bx == 0)
 	{
-		Com_Printf(
-			"MSCDEX not loaded, CD Audio is\n"
-			"disabled.  Use \"-nocdaudio\" if you\n"
-			"wish to avoid this message in the\n"
-			"future.  See README.TXT for help.\n"
-			);
+		Com_Printf ("MSCDEX not loaded, CD Audio is disabled.\n");
 		return -1;
 	}
 
@@ -935,9 +921,7 @@ int CDAudio_Init (void)
 	dos_int86 (0x2f);
 	if (regs.x.bx == 0)
 	{
-		Com_Printf ("MSCDEX version 2.00 or later\n"
-				"required for CD Audio.\n"
-				"See README.TXT for help.\n");
+		Com_Printf("%s: MSCDEX version 2.00 or later required.\n", __FUNCTION__);
 		return -1;
 	}
 
@@ -966,7 +950,7 @@ int CDAudio_Init (void)
 	memory = (char *) dos_getmemory(sizeof(struct cd_request) + sizeof(union readInfo_u));
 	if (memory == NULL)
 	{
-		Com_DPrintf(DEVELOPER_MSG_CD, "CDAudio_Init: Unable to allocate low memory.\n");
+		Com_DPrintf(DEVELOPER_MSG_CD, "%s: Unable to allocate low memory.\n", __FUNCTION__);
 		return -1;
 	}
 
@@ -997,7 +981,7 @@ int CDAudio_Init (void)
 }
 
 
-void CDAudio_Shutdown(void)
+void CDAudio_Shutdown (void)
 {
 	if (!initialized)
 		return;
@@ -1015,4 +999,4 @@ qboolean CDAudio_Active (void)
 	return playing;
 }
 
-#endif // USE_DOS_CD
+#endif /* USE_DOS_CD */

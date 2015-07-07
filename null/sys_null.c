@@ -27,7 +27,6 @@
 
 #include "../qcommon/qcommon.h"
 #include "../client/keys.h"
-#include "errno.h"
 
 #ifdef __DJGPP__
 // FS: TODO FIXME FIXME PLEASE PLEASE.  >> Take DOS_V2.C from Quake1 and SYS_DOS.C from Quake1.  Clean up this crap :S

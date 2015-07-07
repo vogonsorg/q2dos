@@ -3,20 +3,12 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <stdio.h>
+#include <dos.h>
 #include <dirent.h>
-#include <unistd.h>
-#include <sys/mman.h>
+#include <io.h>
 #include <sys/time.h>
-#include <sys/nearptr.h>
-#include <dpmi.h>
-#include <conio.h>
-#include <bios.h>
-#include <crt0.h> // FS: Fake Mem Fix (QIP)
 
-#include "dosisms.h"
 #include "../qcommon/qcommon.h"
-#include "../client/keys.h"
-#include "errno.h"
 #include "glob.h"
 
 static byte	*membase;
@@ -25,33 +17,25 @@ static int	curhunksize;
 
 void	*Hunk_Begin (int maxsize)
 {
-	// reserve a huge chunk of memory, but don't commit any yet
+	/* reserve a huge chunk of memory, but don't commit any yet */
 	maxhunksize = maxsize;
 	curhunksize = 0;
 	membase = malloc (maxhunksize);
-
 	if (!membase)
-	{
 		Sys_Error ("VirtualAlloc reserve failed %d bytes",maxsize);
-	}
 
 	memset (membase, 0, maxsize);
 	return (void *)membase;
-
 }
 
 void	*Hunk_Alloc (int size)
 {
-//	void	*buf;
-
-	// round to cacheline
+	/* round to cacheline */
 	size = (size+31)&~31;
 
 	curhunksize += size;
 	if (curhunksize > maxhunksize)
-	{
 		Sys_Error ("Hunk_Alloc overflow");
-	}
 
 	return (void *)(membase+curhunksize-size);
 }
@@ -66,7 +50,7 @@ int	Hunk_End (void)
 	byte *n = realloc(membase, curhunksize);
 	if (n != membase)
 		Sys_Error("Hunk_End:  Could not remap virtual block (%d)", errno);
-	
+
 	return curhunksize;
 }
 
@@ -83,11 +67,10 @@ int	Sys_LinuxTime (void) // FS: DOS needs this for random qport
 {
 	int linuxtime;
 	struct timeval tp;
-	struct timezone tzp;
 	static int		secbase;
 
-	gettimeofday(&tp, &tzp);
-	
+	gettimeofday(&tp, NULL);
+
 	if (!secbase)
 	{
 		secbase = tp.tv_sec;
@@ -95,7 +78,7 @@ int	Sys_LinuxTime (void) // FS: DOS needs this for random qport
 	}
 
 	linuxtime = (tp.tv_sec - secbase)*1000 + tp.tv_usec/1000;
-	
+
 	return linuxtime;
 }
 
@@ -110,30 +93,31 @@ static	char	findpath[MAX_OSPATH];
 static	char	findpattern[MAX_OSPATH];
 
 static qboolean CompareAttributes(char *path, char *name,
-	unsigned musthave, unsigned canthave )
+				  unsigned musthave, unsigned canthave)
 {
-	struct stat st;
+	int attr;
 	char fn[MAX_OSPATH];
 
-// . and .. never match
+	/* . and .. never match */
 	if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
 		return false;
 
 	return true;
 
-	if (stat(fn, &st) == -1)
-		return false; // shouldn't happen
-
-	if ( ( st.st_mode & S_IFDIR ) && ( canthave & SFF_SUBDIR ) )
+	sprintf (fn, "%s/%s", path, name);
+	if ((attr = _chmod(path, 0)) == -1) /* shouldn't happen */
 		return false;
 
-	if ( ( musthave & SFF_SUBDIR ) && !( st.st_mode & S_IFDIR ) )
+	if ((attr & _A_SUBDIR) && (canthave & SFF_SUBDIR))
+		return false;
+
+	if ((musthave & SFF_SUBDIR) && !(attr & _A_SUBDIR))
 		return false;
 
 	return true;
 }
 
-char *Sys_FindFirst (char *path, unsigned musthave, unsigned canhave)
+char *Sys_FindFirst (char *path, unsigned musthave, unsigned canthave)
 {
 	struct dirent *d;
 	char *p;
@@ -159,7 +143,7 @@ char *Sys_FindFirst (char *path, unsigned musthave, unsigned canhave)
 		if (!*findpattern || glob_match(findpattern, d->d_name)) {
 //			if (*findpattern)
 //				printf("%s matched %s\n", findpattern, d->d_name);
-			if (CompareAttributes(findbase, d->d_name, musthave, canhave)) {
+			if (CompareAttributes(findbase, d->d_name, musthave, canthave)) {
 				sprintf (findpath, "%s/%s", findbase, d->d_name);
 				return findpath;
 			}
@@ -168,7 +152,7 @@ char *Sys_FindFirst (char *path, unsigned musthave, unsigned canhave)
 	return NULL;
 }
 
-char *Sys_FindNext (unsigned musthave, unsigned canhave)
+char *Sys_FindNext (unsigned musthave, unsigned canthave)
 {
 	struct dirent *d;
 
@@ -178,7 +162,7 @@ char *Sys_FindNext (unsigned musthave, unsigned canhave)
 		if (!*findpattern || glob_match(findpattern, d->d_name)) {
 //			if (*findpattern)
 //				printf("%s matched %s\n", findpattern, d->d_name);
-			if (CompareAttributes(findbase, d->d_name, musthave, canhave)) {
+			if (CompareAttributes(findbase, d->d_name, musthave, canthave)) {
 				sprintf (findpath, "%s/%s", findbase, d->d_name);
 				return findpath;
 			}

@@ -30,9 +30,9 @@ int maxclients;
 #endif
 
 #ifdef __DJGPP__
-	extern int	havegus; // FS: DOS GUS
+extern int	havegus; /* FS: DOS GUS */
 #else
-	int havegus = 0;
+static const int havegus = 0;
 #endif
 
 static int	m_main_cursor;

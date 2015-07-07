@@ -25,21 +25,19 @@ int _crt0_startup_flags = _CRT0_FLAG_UNIX_SBRK; // FS: Fake Mem Fix (QIP)
 #include "dosisms.h"
 #include "../qcommon/qcommon.h"
 #include "../client/keys.h"
-#include "errno.h"
 #include "glob.h"
 
-#define MINIMUM_WIN_MEMORY                      0x800000
-#define MINIMUM_WIN_MEMORY_LEVELPAK     (MINIMUM_WIN_MEMORY + 0x100000)
+#define MINIMUM_WIN_MEMORY		0x800000
+#define MINIMUM_WIN_MEMORY_LEVELPAK	(MINIMUM_WIN_MEMORY + 0x100000)
 
-#define KEYBUF_SIZE     256
-static unsigned char    keybuf[KEYBUF_SIZE];
-static int                              keybuf_head=0;
-static int                              keybuf_tail=0;
+#define	KEYBUF_SIZE	256
+static unsigned char	keybuf[KEYBUF_SIZE];
+static int	keybuf_head = 0;
+static int	keybuf_tail = 0;
 
 extern char     start_of_memory __asm__("start");
 
-byte        scantokey[128] = 
-					{ 
+static byte scantokey[128] = { 
 //  0           1       2       3       4       5       6       7 
 //  8           9       A       B       C       D       E       F 
 	0  ,    27,     '1',    '2',    '3',    '4',    '5',    '6', 
@@ -58,10 +56,10 @@ byte        scantokey[128] =
 	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 6 
 	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
 	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0         // 7 
-					}; 
+}; 
 
-byte        shiftscantokey[128] = 
-					{ 
+#if 0
+static byte shiftscantokey[128] = { 
 //  0           1       2       3       4       5       6       7 
 //  8           9       A       B       C       D       E       F 
 	0  ,    27,     '!',    '@',    '#',    '$',    '%',    '^', 
@@ -80,9 +78,10 @@ byte        shiftscantokey[128] =
 	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 6 
 	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
 	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0         // 7 
-					}; 
+}; 
+#endif
 
-void TrapKey(void)
+static void TrapKey(void)
 {
 	keybuf[keybuf_head] = dos_inportb(0x60);
 	dos_outportb(0x20, 0x20);
@@ -114,11 +113,10 @@ double Sys_FloatTime (void);
 #define LOCKED_FOR_MALLOC (128*1024)    //FIXME: tune
 
 
-int                     end_of_memory;
-qboolean        lockmem, lockunlockmem, unlockmem;
-qboolean		bSkipWinCheck, bSkipLFNCheck; // FS
-static int      win95;
-static int                      minmem;
+int		end_of_memory;
+static qboolean	lockmem, lockunlockmem, unlockmem;
+static qboolean	bSkipWinCheck, bSkipLFNCheck; // FS
+static int	win95;
 
 // FS: Q2 needs it badly
 // FS: See http://www.delorie.com/djgpp/doc/libc/libc_380.html for more information
@@ -128,7 +126,7 @@ static int                      minmem;
    WEIRD SHIT HAPPENS
    DON'T SEND ME BUG REPORTS FROM A SESSION WITH NO LFN DRIVER LOADED!
 */
-void Sys_DetectLFN (void)
+static void Sys_DetectLFN (void)
 {
 	unsigned int fd = _get_volume_info (NULL, 0, 0, NULL);
 
@@ -145,7 +143,7 @@ void Sys_DetectLFN (void)
 	}
 }
 
-qboolean Sys_DetectWinNT (void) // FS: Wisdom from Gisle Vanem
+static qboolean Sys_DetectWinNT (void) // FS: Wisdom from Gisle Vanem
 {
 	if(_get_dos_version(1) == 0x0532)
 	{
@@ -155,7 +153,7 @@ qboolean Sys_DetectWinNT (void) // FS: Wisdom from Gisle Vanem
 	return false;
 }
 
-void Sys_DetectWin95 (void)
+static void Sys_DetectWin95 (void)
 {
 	__dpmi_regs                             r;
 
@@ -175,18 +173,18 @@ void Sys_DetectWin95 (void)
 	}
 }
 
-__dpmi_meminfo	info; // FS: Sigh, moved this here because everyone wants me to free this shit at exit.  Again, I'm pretty sure CWSDPMI is already taking care of this...
-void *dos_getmaxlockedmem(int *size)
+static __dpmi_meminfo	info; // FS: Sigh, moved this here because everyone wants me to free this shit at exit.  Again, I'm pretty sure CWSDPMI is already taking care of this...
+#if 0
+static int	minmem;
+static void *dos_getmaxlockedmem(int *size)
 {
-	__dpmi_free_mem_info    meminfo;
-	int	working_size;
-	void	*working_memory;
-	int	last_locked;
-//	int	extra,  i, j, allocsize;
-	int	i, j, extra, allocsize; // FS: 2GB Fix
+	__dpmi_free_mem_info	meminfo;
+	int		working_size;
+	void		*working_memory;
+	int		last_locked;
+	int		i, j, extra, allocsize;
 	static char	*msg = "Locking data...";
-	// int	m, n;
-	byte	*x;
+	byte		*x;
 	unsigned long	ul; // FS: 2GB Fix
 
 // first lock all the current executing image so the locked count will
@@ -206,28 +204,24 @@ void *dos_getmaxlockedmem(int *size)
 
 	__dpmi_get_free_memory_information(&meminfo);
 
-	if (!win95)             /* Not windows or earlier than Win95 */
+	if (!win95)	/* Not windows or earlier than Win95 */
 	{
 		ul = meminfo.maximum_locked_page_allocation_in_pages * 4096; // FS: 2GB fix
 	}
 	else
 	{
-		ul = meminfo.largest_available_free_block_in_bytes -
-		LEAVE_FOR_CACHE; // FS: 2GB fix
+		ul = meminfo.largest_available_free_block_in_bytes - LEAVE_FOR_CACHE; // FS: 2GB fix
 	}
 
 	if (ul > 0x7fffffff)
-	{
-		ul = 0x7fffffff; /* limit to 2GB */
-	}
-
+		ul = 0x7fffffff;	/* limit to 2GB */
 	working_size = (int) ul;
-	working_size &= ~0xffff;                /* Round down to 64K */
+	working_size &= ~0xffff;	/* Round down to 64K */
 	working_size += 0x10000;
 
 	do
 	{
-		working_size -= 0x10000;                /* Decrease 64K and try again */
+		working_size -= 0x10000;	/* Decrease 64K and try again */
 		working_memory = sbrk(working_size);
 	}
 	while (working_memory == (void *)-1);
@@ -245,7 +239,7 @@ void *dos_getmaxlockedmem(int *size)
 
 	if (!win95)
 	{
-	    info.size = __djgpp_selector_limit + 1 - last_locked;
+		info.size = __djgpp_selector_limit + 1 - last_locked;
 
 		while (info.size > 0 && __dpmi_lock_linear_region(&info))
 		{
@@ -255,7 +249,7 @@ void *dos_getmaxlockedmem(int *size)
 		}
 	}
 	else
-	{                       /* Win95 section */
+	{	/* Win95 section */
 		j = COM_CheckParm("-winmem");
 
 		minmem = MINIMUM_WIN_MEMORY;
@@ -322,7 +316,6 @@ UpdateSbrk:
 		sbrk(info.address-(int)sbrk(0));                // negative adjustment
 	}
 
-
 	if (lockunlockmem)
 	{
 		__dpmi_unlock_linear_region (&info);
@@ -342,9 +335,9 @@ UpdateSbrk:
 // doing that, of course, but there's no reason we shouldn't)
 	x = (byte *)working_memory;
 
-	for (j=0 ; j<4 ; j++) // FS: 2GB Fix
+	for (j = 0; j < 4; j++)
 	{
-		for (i=0 ; i<(working_size - 16 * 0x1000) ; i += 4)
+		for (i = 0; i < (working_size - 16 * 0x1000); i += 4)
 		{
 			sys_checksum += *(int *)&x[i];
 			sys_checksum += *(int *)&x[i + 16 * 0x1000];
@@ -359,22 +352,18 @@ UpdateSbrk:
 
 	return working_memory;
 }
+#endif
 
-/*
-int virtualmemsize;
-byte *virtualmembase;
-*/
-
-int Sys_Get_Physical_Memory(void) // FS: From DJGPP tutorial
+static int Sys_Get_Physical_Memory(void) /* FS: From DJGPP tutorial */
 {
-	_go32_dpmi_meminfo info;
-	_go32_dpmi_get_free_memory_information(&info);
+	_go32_dpmi_meminfo meminfo;
+	_go32_dpmi_get_free_memory_information(&meminfo);
 
-	if (info.available_physical_pages != -1)
+	if (meminfo.available_physical_pages != -1)
 	{
-		return info.available_physical_pages * 4096;
+		return meminfo.available_physical_pages * 4096;
 	}
-	return info.available_memory;
+	return meminfo.available_memory;
 }
 
 void Sys_Memory_Stats_f (void)
@@ -390,9 +379,9 @@ walks the text, data, and bss to make sure it's all paged in so that the
 actual physical memory detected by Sys_GetMemory is correct.
 ================
 */
-void Sys_PageInProgram(void)
+static void Sys_PageInProgram(void)
 {
-	int             i, j;
+	int		i, j;
 
 	end_of_memory = (int)sbrk(0);
 
@@ -436,7 +425,7 @@ void Sys_PageInProgram(void)
 	printf("%lu Virtual Mb available for Q2DOS.\n", (_go32_dpmi_remaining_virtual_memory() / 0x100000) ); // FS: Added
 }
 
-void Sys_SetTextMode (void) // FS: This was used twice, let's make it a little cleaner if we can.
+static void Sys_SetTextMode (void) // FS: This was used twice, let's make it a little cleaner if we can.
 {
 	__dpmi_regs r;
 
@@ -461,8 +450,8 @@ void Sys_Error (char *error, ...)
 	vprintf (error,argptr);
 	va_end (argptr);
 	printf ("\n");
-	
-	__dpmi_free_physical_address_mapping(&info);	
+
+	__dpmi_free_physical_address_mapping(&info);
 	__djgpp_nearptr_disable(); // FS: Everyone else is a master DOS DPMI programmer.  Pretty sure CWSDPMI is already taking care of this...
 
 #if 0
@@ -491,14 +480,14 @@ void Sys_Quit (void)
 
 	Sys_SetTextMode();
 	
-	__dpmi_free_physical_address_mapping(&info);	
+	__dpmi_free_physical_address_mapping(&info);
 	__djgpp_nearptr_disable(); // FS: Everyone else is a master DOS DPMI programmer.  Pretty sure CWSDPMI is already taking care of this...
 
 	exit (0);
 }
 
-void *GetGameAPI (void *import);
 #ifdef GAME_HARD_LINKED
+void *GetGameAPI (void *import);
 void	Sys_UnloadGame (void)
 {
 }
@@ -651,7 +640,14 @@ double Sys_FloatTime (void)
 	return (double) uclock() / (double) UCLOCKS_PER_SEC; // FS: Win9X/Fast PC Fix (QIP)
 }
 
-void Sys_ParseEarlyArgs(int argc, char **argv) // FS: Parse some very specific args before Qcommon_Init
+void Sys_MakeCodeWriteable(void)
+{
+/* MS-DOS is always writeable */
+}
+
+//=============================================================================
+
+static void Sys_ParseEarlyArgs(int argc, char **argv) // FS: Parse some very specific args before Qcommon_Init
 {
 	int i = 0;
 
@@ -661,16 +657,12 @@ void Sys_ParseEarlyArgs(int argc, char **argv) // FS: Parse some very specific a
 		{
 			bSkipWinCheck = true;
 		}
-
 		if(strncasecmp((char*)argv[i] + 1,"skiplfncheck", 12) == 0)
 		{
 			bSkipLFNCheck = true;
 		}
-
 	}
 }
-
-//=============================================================================
 
 int main (int argc, char **argv)
 {
@@ -706,9 +698,4 @@ int main (int argc, char **argv)
 		sys_frame_time = newtime; // FS: Need to update this for input to work properly
 		oldtime = newtime;
 	}
-}
-
-void Sys_MakeCodeWriteable(void)
-{
-// MS-DOS is always writeable
 }
