@@ -748,11 +748,10 @@ void Spawn_Plane(edict_t *ent)
 	else
 		return;
 
- 	VectorClear(longest);
+	VectorClear(plane_start);/* silence compiler */
+	VectorClear(longest);
 
 	/*
-
- 
 	for(i=-1; i<=1 ;i++)  //faf:  goes through all direction n, ne, e, se etc.
 	{
 		for(j=-1; j<=1 ;j++)
@@ -765,12 +764,9 @@ void Spawn_Plane(edict_t *ent)
 
 			tr = gi.trace(start, NULL, NULL, end, ent, MASK_SHOT|CONTENTS_SLIME|CONTENTS_LAVA);
 
-
 			VectorSubtract (tr.endpos, start, temp);
 
 //			safe_bprintf (PRINT_HIGH, "%s    %f\n", vtos(test), VectorLength(temp)); 
-
-
 
 			if (VectorLength(temp) > VectorLength(longest))
 			{
@@ -780,15 +776,11 @@ void Spawn_Plane(edict_t *ent)
 				direction[1]= -1 * direction[1];
 //				VectorSet (direction, (-1 * test[0]), (-1 * test[1]), 0);//reversed
 				VectorCopy (tr.endpos, plane_start);
-
 			}
 		}
 	}*/
 
 //	safe_bprintf (PRINT_HIGH, "%s\n", vtos(direction)); 
-
-
-
 
 	VectorSet(left, 1, 0, 0);
 	VectorSet(right, -1, 0, 0);
@@ -834,7 +826,7 @@ void Spawn_Plane(edict_t *ent)
 	VectorMA(start, 8192, back, end);
 
 	tr = gi.trace(start, NULL, NULL, end, ent, MASK_ALL);//MASK_SHOT|CONTENTS_SLIME|CONTENTS_LAVA);
-	
+
 	VectorSubtract (tr.endpos, start, temp);
 	if (VectorLength(temp) > VectorLength(longest) &&
 		VectorLength(temp)< 8000)
@@ -843,7 +835,6 @@ void Spawn_Plane(edict_t *ent)
 		VectorCopy (tr.endpos, plane_start);
 		VectorCopy (forward, direction);
 	}
-		
 
 //	safe_bprintf (PRINT_HIGH, "%f .\n", VectorLength(longest)); 
 //	safe_bprintf (PRINT_HIGH, "%s .\n", vtos(direction)); 
@@ -852,12 +843,11 @@ void Spawn_Plane(edict_t *ent)
 	plane->movetype = MOVETYPE_PUSH;
 	plane->solid = SOLID_TRIGGER;
 	plane->s.modelindex = gi.modelindex ("models/ships/viper/tris.md2");
-	
-//faf: requires models	
+
+//faf: requires models
 	plane->s.modelindex = gi.modelindex (va("models/ships/%splane/tris.md2", team_list[ent->client->resp.team_on->index]->teamid));
 
 	plane->owner = ent;
-	
 
 	VectorClear (plane->mins);
 	VectorClear (plane->maxs);
@@ -878,7 +868,6 @@ void Spawn_Plane(edict_t *ent)
 	VectorCopy (direction, plane->movedir);
 	vectoangles (direction, plane->s.angles);
 
-
 	if (VectorLength(longest) > 4000)
 		speed = 800;
 	else if (VectorLength(longest) > 2000)
@@ -896,13 +885,9 @@ void Spawn_Plane(edict_t *ent)
 
 //	plane->s.origin[2] -= 1;
 
-
 	plane->leave_limbo_time = level.time;
-plane->s.renderfx   = RF_FULLBRIGHT;
+	plane->s.renderfx   = RF_FULLBRIGHT;
 	gi.linkentity (plane);
-	
-
-
 }
 
 //faf
@@ -1145,7 +1130,8 @@ void Spawn_Plane_i(edict_t *ent)
 	edict_t *plane;
 
 	VectorCopy (ent->move_origin, start);
- 	VectorClear(longest);
+	VectorClear(plane_start);/* silence compiler */
+	VectorClear(longest);
 	VectorSet(left, 1, 0, 0);
 	VectorSet(right, -1, 0, 0);
 	VectorSet(forward, 0, 1, 0);
@@ -1224,9 +1210,7 @@ void Spawn_Plane_i(edict_t *ent)
 	VectorCopy (plane_start, plane->s.origin);
 	plane->leave_limbo_time = level.time;
 
-
 	gi.linkentity (plane);
-	
 }
 
 //faf

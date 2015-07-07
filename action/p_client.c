@@ -2181,6 +2181,7 @@ void PutClientInServer (edict_t *ent)
 	
 	if (client->ipaddr)
 		strncpy(save_ipaddr, client->ipaddr, sizeof(save_ipaddr)-1);
+	else	save_ipaddr[0] = 0;
 //FF
 
         memset (client, 0, sizeof(*client));
@@ -2189,7 +2190,7 @@ void PutClientInServer (edict_t *ent)
 	client->team_wounds = save_team_wounds;
 	client->team_kills = save_team_kills;
 		
-	if (save_ipaddr && client->ipaddr)
+	if (save_ipaddr[0] && client->ipaddr)
 		strncpy(client->ipaddr, save_ipaddr, sizeof(client->ipaddr));
 //FF
 

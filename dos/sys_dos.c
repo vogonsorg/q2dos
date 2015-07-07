@@ -35,7 +35,9 @@ static unsigned char	keybuf[KEYBUF_SIZE];
 static int	keybuf_head = 0;
 static int	keybuf_tail = 0;
 
-extern char     start_of_memory __asm__("start");
+float			fptest_temp;
+
+extern char	start_of_memory __asm__("start");
 
 static byte scantokey[128] = { 
 //  0           1       2       3       4       5       6       7 
@@ -675,7 +677,6 @@ void Sys_NoFPUExceptionHandler(int whatever)
 	exit (0);
 }
 
-
 /*
 ================
 Sys_DefaultExceptionHandler
@@ -700,6 +701,9 @@ int main (int argc, char **argv)
 	signal(SIGKILL, Sys_DefaultExceptionHandler);
 	signal(SIGQUIT, Sys_DefaultExceptionHandler);
 	signal(SIGINT, Sys_DefaultExceptionHandler);
+
+	if (fptest_temp >= 0.0)
+		fptest_temp += 0.1;
 
 	Sys_ParseEarlyArgs(argc, argv);
 	Sys_DetectLFN();

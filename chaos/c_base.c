@@ -1067,9 +1067,9 @@ void ThrowUpNow(edict_t *self)
 	rn = random();
 	if (rn < 0.25)
 		gi.sound (self, CHAN_VOICE, gi.soundindex("misc/vomit1.wav"), 1, ATTN_NORM, 0);
-	else if (0.25 <= rn < 0.5)
+	else if (0.25 <= rn && rn < 0.5)
 		gi.sound (self, CHAN_VOICE, gi.soundindex("misc/vomit2.wav"), 1, ATTN_NORM, 0);
-	else if (0.5 <= rn < 0.75)
+	else if (0.5 <= rn && rn < 0.75)
 		gi.sound (self, CHAN_VOICE, gi.soundindex("misc/vomit3.wav"), 1, ATTN_NORM, 0);
 	else
 		gi.sound (self, CHAN_VOICE, gi.soundindex("misc/vomit4.wav"), 1, ATTN_NORM, 0);

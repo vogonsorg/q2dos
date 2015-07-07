@@ -29,6 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "dosisms.h"
 #include "vregset.h"
 
+#if 0
 //#define outportb	loutportb
 
 void loutportb (int port, int val)
@@ -36,13 +37,14 @@ void loutportb (int port, int val)
 	printf ("port, val: %x %x\n", port, val);
 	getch ();
 }
+#endif
 
 /*
 ================
 VideoRegisterSet
 ================
 */
-void VideoRegisterSet (int *pregset)
+void VideoRegisterSet (const int *pregset)
 {
 	int		port, temp0, temp1, temp2;
 

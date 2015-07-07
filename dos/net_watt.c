@@ -591,6 +591,7 @@ void NET_Sleep(double msec)
 		return; // we're not a server, just run full speed
 	}
 
+	FD_ZERO(&fdset);
 	FD_SET(ip_sockets[NS_SERVER], &fdset); // network socket
 	timeout.tv_sec = (long)msec/1000;
 	timeout.tv_usec = ((long)msec%1000)*1000;

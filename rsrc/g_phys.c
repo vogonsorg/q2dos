@@ -508,6 +508,7 @@ SV_PushEntity(edict_t *ent, vec3_t push)
 
 	if (!ent)
 	{
+		memset(&trace,0,sizeof(trace_t));
 		return trace;
 	}
 
@@ -515,7 +516,6 @@ SV_PushEntity(edict_t *ent, vec3_t push)
 	VectorAdd(start, push, end);
 
 retry:
-
 	if (ent->clipmask)
 	{
 		mask = ent->clipmask;

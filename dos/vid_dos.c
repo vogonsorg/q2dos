@@ -36,21 +36,22 @@ static cvar_t *sw_stipplealpha;
 static cvar_t *sw_waterwarp; // FS
 static cvar_t *r_contentblend; // FS
 
-extern void M_ForceMenuOff( void );
-void VID_ListModes_f (void); // FS: Added
+extern void M_ForceMenuOff (void);
+static void VID_ListModes_f (void); // FS: Added
+static void VID_Restart_f (void); // FS: Currently does nothing
 
 #define SOFTWARE_MENU 0
 
 static menuframework_s  s_software_menu;
 static menuframework_s *s_current_menu;
-static int				s_current_menu_index;
+static int		s_current_menu_index;
 
 static menulist_s		s_mode_list[NUM_VID_DRIVERS];
 static menuslider_s		s_screensize_slider[NUM_VID_DRIVERS];
 static menuslider_s		s_brightness_slider[NUM_VID_DRIVERS];
-static menulist_s  		s_stipple_box;
-static menulist_s  		s_contentblend_box; // FS
-static menulist_s  		s_waterwarp_box; // FS
+static menulist_s		s_stipple_box;
+static menulist_s		s_contentblend_box; // FS
+static menulist_s		s_waterwarp_box; // FS
 static menuaction_s		s_cancel_action[NUM_VID_DRIVERS];
 static menuaction_s		s_defaults_action[NUM_VID_DRIVERS];
 
@@ -71,34 +72,34 @@ DIRECT LINK GLUE
 */
 
 #define	MAXPRINTMSG	4096
-void VID_Printf (int print_level, char *fmt, ...)
+static void VID_Printf (int print_level, char *fmt, ...)
 {
-        va_list		argptr;
-        char		msg[MAXPRINTMSG];
+	va_list		argptr;
+	char		msg[MAXPRINTMSG];
 
-        va_start (argptr,fmt);
-        vsprintf (msg,fmt,argptr);
-        va_end (argptr);
+	va_start (argptr,fmt);
+	vsprintf (msg,fmt,argptr);
+	va_end (argptr);
 
-        if (print_level == PRINT_ALL)
-			Com_Printf ("%s", msg);
-        else
-			Com_DPrintf(DEVELOPER_MSG_GFX, "%s", msg);
+	if (print_level == PRINT_ALL)
+		Com_Printf ("%s", msg);
+	else
+		Com_DPrintf(DEVELOPER_MSG_GFX, "%s", msg);
 }
 
-void VID_Error (int err_level, char *fmt, ...)
+static void VID_Error (int err_level, char *fmt, ...)
 {
-        va_list		argptr;
-        char		msg[MAXPRINTMSG];
+	va_list		argptr;
+	char		msg[MAXPRINTMSG];
 
-        va_start (argptr,fmt);
-        vsprintf (msg,fmt,argptr);
-        va_end (argptr);
+	va_start (argptr,fmt);
+	vsprintf (msg,fmt,argptr);
+	va_end (argptr);
 
-		Com_Error (err_level, "%s", msg);
+	Com_Error (err_level, "%s", msg);
 }
 
-void VID_NewWindow (int width, int height)
+static void VID_NewWindow (int width, int height)
 {
 	viddef.width = width;
 	viddef.height = height;
@@ -109,51 +110,47 @@ void VID_NewWindow (int width, int height)
 /*
 ** VID_GetModeInfo
 */
-
-qboolean VID_GetModeInfo( int *width, int *height, int mode )
+static qboolean VID_GetModeInfo(int *width, int *height, int mode)
 {
-    if ( mode < 0 || mode >= num_vid_resolutions) //VID_NUM_MODES )
-        return false;
+	if (mode < 0 || mode >= num_vid_resolutions) //VID_NUM_MODES
+		return false;
 
-    *width  = vid_resolutions[mode].width;//vid_modes[mode].width;
-    *height = vid_resolutions[mode].height;//vid_modes[mode].height;
+	*width  = vid_resolutions[mode].width;//vid_modes[mode].width;
+	*height = vid_resolutions[mode].height;//vid_modes[mode].height;
 
-    //Com_Printf("VID_GetModeInfo %dx%d mode %d\n",*width,*height,mode);
-
-    return true;
+	//Com_Printf("VID_GetModeInfo %dx%d mode %d\n",*width,*height,mode);
+	return true;
 }
 
-static void ResolutionCallback( void *s )
+static void ResolutionCallback(void *s)
 {
 	menulist_s		*slist = (menulist_s *) s;
 	slist->itemnames[slist->curvalue] = vid_resolutions[slist->curvalue].menuname;
 }
 
-static void ScreenSizeCallback( void *s )
+static void ScreenSizeCallback(void *s)
 {
-	menuslider_s *slider = ( menuslider_s * ) s;
-
-	Cvar_SetValue( "viewsize", slider->curvalue * 10 );
+	menuslider_s *slider = (menuslider_s *) s;
+	Cvar_SetValue("viewsize", slider->curvalue * 10);
 }
 
-static void BrightnessCallback( void *s )
+static void BrightnessCallback(void *s)
 {
-	menuslider_s *slider = ( menuslider_s * ) s;
+	menuslider_s *slider = (menuslider_s *) s;
 
-	if ( stricmp( vid_ref->string, "soft" ) == 0 )
+	if (stricmp(vid_ref->string,"soft") == 0)
 	{
-		float gamma = ( 0.8 - ( slider->curvalue/10.0 - 0.5 ) ) + 0.5;
-
+		float gamma = (0.8 - (slider->curvalue/10.0 - 0.5)) + 0.5;
 		Cvar_SetValue( "vid_gamma", gamma );
 	}
 }
 
-static void ResetDefaults( void *unused )
+static void ResetDefaults(void *unused)
 {
 	VID_MenuInit();
 }
 
-static void ApplyChanges( void *unused )
+static void ApplyChanges(void *unused)
 {
 	float gamma;
 
@@ -165,98 +162,98 @@ static void ApplyChanges( void *unused )
 	/*
 	** invert sense so greater = brighter, and scale to a range of 0.5 to 1.3
 	*/
-	gamma = ( 0.8 - ( s_brightness_slider[s_current_menu_index].curvalue/10.0 - 0.5 ) ) + 0.5;
+	gamma = (0.8 - (s_brightness_slider[s_current_menu_index].curvalue/10.0 - 0.5)) + 0.5;
 
-	Cvar_SetValue( "vid_gamma", gamma );
-	Cvar_SetValue( "sw_stipplealpha", s_stipple_box.curvalue );
-	Cvar_SetValue( "sw_mode", s_mode_list[SOFTWARE_MENU].curvalue );
-	Cvar_SetValue( "r_contentblend", s_contentblend_box.curvalue ); // FS
-	Cvar_SetValue( "sw_waterwarp", s_waterwarp_box.curvalue ); // FS
+	Cvar_SetValue("vid_gamma", gamma);
+	Cvar_SetValue("sw_stipplealpha", s_stipple_box.curvalue);
+	Cvar_SetValue("sw_mode", s_mode_list[SOFTWARE_MENU].curvalue);
+	Cvar_SetValue("r_contentblend", s_contentblend_box.curvalue); // FS
+	Cvar_SetValue("sw_waterwarp", s_waterwarp_box.curvalue); // FS
 
-	Cvar_Set( "vid_ref", "soft" );
+	Cvar_Set("vid_ref", "soft");
 
 	M_ForceMenuOff();
 }
 
-static void CancelChanges( void *unused )
+static void CancelChanges(void *unused)
 {
-	extern void M_PopMenu( void );
+	extern void M_PopMenu(void);
 
 	M_PopMenu();
 }
 
-void	VID_LoadRefresh (void) // FS: Needed for dynamic changing game modes/vid_restart
+static void VID_LoadRefresh (void) // FS: Needed for dynamic changing game modes/vid_restart
 {
-    refimport_t	ri;
+	refimport_t	ri;
 
 	re.Shutdown();
 
-    ri.Cmd_AddCommand = Cmd_AddCommand;
-    ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
-    ri.Cmd_Argc = Cmd_Argc;
-    ri.Cmd_Argv = Cmd_Argv;
-    ri.Cmd_ExecuteText = Cbuf_ExecuteText;
-    ri.Con_Printf = VID_Printf;
-    ri.Sys_Error = VID_Error;
-    ri.FS_LoadFile = FS_LoadFile;
-    ri.FS_FreeFile = FS_FreeFile;
-    ri.FS_Gamedir = FS_Gamedir;
-    ri.Vid_NewWindow = VID_NewWindow;
-    ri.Cvar_Get = Cvar_Get;
-    ri.Cvar_Set = Cvar_Set;
-    ri.Cvar_SetValue = Cvar_SetValue;
-    ri.Vid_GetModeInfo = VID_GetModeInfo;
+	ri.Cmd_AddCommand = Cmd_AddCommand;
+	ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
+	ri.Cmd_Argc = Cmd_Argc;
+	ri.Cmd_Argv = Cmd_Argv;
+	ri.Cmd_ExecuteText = Cbuf_ExecuteText;
+	ri.Con_Printf = VID_Printf;
+	ri.Sys_Error = VID_Error;
+	ri.FS_LoadFile = FS_LoadFile;
+	ri.FS_FreeFile = FS_FreeFile;
+	ri.FS_Gamedir = FS_Gamedir;
+	ri.Vid_NewWindow = VID_NewWindow;
+	ri.Cvar_Get = Cvar_Get;
+	ri.Cvar_Set = Cvar_Set;
+	ri.Cvar_SetValue = Cvar_SetValue;
+	ri.Vid_GetModeInfo = VID_GetModeInfo;
 
-    //JASON this is called from the video DLL
-    re = GetRefAPI(ri);
+	//JASON this is called from the video DLL
+	re = GetRefAPI(ri);
 
-    if (re.api_version != API_VERSION)
-        Com_Error (ERR_FATAL, "Re has incompatible api_version");
-    
-        // call the init function
-    if (re.Init (NULL, NULL) == -1)
+	if (re.api_version != API_VERSION)
+		Com_Error (ERR_FATAL, "Re has incompatible api_version");
+
+	// call the init function
+	if (re.Init (NULL, NULL) == -1)
 		Com_Error (ERR_FATAL, "Couldn't start refresh");
 
 	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
 	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE|CVAR_NOSET);
-	vid_gamma = Cvar_Get( "vid_gamma", "1", CVAR_ARCHIVE );
+	vid_gamma = Cvar_Get("vid_gamma", "1", CVAR_ARCHIVE);
 }
 
 void	VID_Init (void)
 {
-    refimport_t	ri;
+	refimport_t	ri;
 
-    memset(vid_resolutions,0x0,sizeof(vid_resolutions));
-    VID_InitExtra(); //probe VESA
+	memset(vid_resolutions,0x0,sizeof(vid_resolutions));
+	VID_InitExtra(); //probe VESA
 
-    currentvideomode=0;
-    viddef.width = 320;
-    viddef.height = 240;
+	currentvideomode=0;
+	viddef.width = 320;
+	viddef.height = 240;
 
-    ri.Cmd_AddCommand = Cmd_AddCommand;
-    ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
-    ri.Cmd_Argc = Cmd_Argc;
-    ri.Cmd_Argv = Cmd_Argv;
-    ri.Cmd_ExecuteText = Cbuf_ExecuteText;
-    ri.Con_Printf = VID_Printf;
-    ri.Sys_Error = VID_Error;
-    ri.FS_LoadFile = FS_LoadFile;
-    ri.FS_FreeFile = FS_FreeFile;
-    ri.FS_Gamedir = FS_Gamedir;
-    ri.Vid_NewWindow = VID_NewWindow;
-    ri.Cvar_Get = Cvar_Get;
-    ri.Cvar_Set = Cvar_Set;
-    ri.Cvar_SetValue = Cvar_SetValue;
-    ri.Vid_GetModeInfo = VID_GetModeInfo;
+	ri.Cmd_AddCommand = Cmd_AddCommand;
+	ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
+	ri.Cmd_Argc = Cmd_Argc;
+	ri.Cmd_Argv = Cmd_Argv;
+	ri.Cmd_ExecuteText = Cbuf_ExecuteText;
+	ri.Con_Printf = VID_Printf;
+	ri.Sys_Error = VID_Error;
+	ri.FS_LoadFile = FS_LoadFile;
+	ri.FS_FreeFile = FS_FreeFile;
+	ri.FS_Gamedir = FS_Gamedir;
+	ri.Vid_NewWindow = VID_NewWindow;
+	ri.Cvar_Get = Cvar_Get;
+	ri.Cvar_Set = Cvar_Set;
+	ri.Cvar_SetValue = Cvar_SetValue;
+	ri.Vid_GetModeInfo = VID_GetModeInfo;
 
-    //JASON this is called from the video DLL
-    re = GetRefAPI(ri);
+	//JASON this is called from the video DLL
+	re = GetRefAPI(ri);
 
-    if (re.api_version != API_VERSION)
-        Com_Error (ERR_FATAL, "Re has incompatible api_version");
-    
-        // call the init function
-    if (re.Init (NULL, NULL) == -1)
+	if (re.api_version != API_VERSION)
+		Com_Error (ERR_FATAL, "Re has incompatible api_version");
+
+	// call the init function
+	if (re.Init (NULL, NULL) == -1)
 		Com_Error (ERR_FATAL, "Couldn't start refresh");
 
 	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
@@ -270,8 +267,8 @@ void	VID_Init (void)
 
 void	VID_Shutdown (void)
 {
-    if (re.Shutdown)
-	    re.Shutdown ();
+	if (re.Shutdown)
+		re.Shutdown ();
 }
 
 void	VID_CheckChanges (void)
@@ -293,7 +290,7 @@ void	VID_CheckChanges (void)
 
 		VID_LoadRefresh();
 
-		Cvar_Set( "vid_ref", "soft" );
+		Cvar_Set("vid_ref", "soft");
 		cls.disable_screen = false;
 	}
 }
@@ -326,32 +323,30 @@ void	VID_MenuInit (void)
 		0
 		};
 
-	static const char *yesno_names[] =
-	{
+	static const char *yesno_names[] = {
 		"no",
 		"yes",
-		0
+		NULL
 	};
 
 	int i;
 
+	if (!sw_mode)
+		sw_mode = Cvar_Get("sw_mode", "0", 0);
 
-	if ( !sw_mode )
-		sw_mode = Cvar_Get( "sw_mode", "0", 0 );
+	if (!sw_stipplealpha)
+		sw_stipplealpha = Cvar_Get("sw_stipplealpha", "0", CVAR_ARCHIVE);
 
-	if ( !sw_stipplealpha )
-		sw_stipplealpha = Cvar_Get( "sw_stipplealpha", "0", CVAR_ARCHIVE );
+	if (!r_contentblend) // FS
+		r_contentblend = Cvar_Get( "r_contentblend", "1", CVAR_ARCHIVE);
 
-	if ( !r_contentblend ) // FS
-		r_contentblend = Cvar_Get( "r_contentblend", "1", CVAR_ARCHIVE );
+	if (!sw_waterwarp) // FS
+		sw_waterwarp = Cvar_Get( "sw_waterwarp", "1", CVAR_ARCHIVE);
 
-	if ( !sw_waterwarp ) // FS
-		sw_waterwarp = Cvar_Get( "sw_waterwarp", "1", CVAR_ARCHIVE );
-	
 	s_mode_list[SOFTWARE_MENU].curvalue = sw_mode->value;
 
-	if ( !scr_viewsize )
-		scr_viewsize = Cvar_Get ("viewsize", "100", CVAR_ARCHIVE);
+	if (!scr_viewsize)
+		scr_viewsize = Cvar_Get("viewsize", "100", CVAR_ARCHIVE);
 
 	s_screensize_slider[SOFTWARE_MENU].curvalue = scr_viewsize->value/10;
 
@@ -360,7 +355,7 @@ void	VID_MenuInit (void)
 	s_software_menu.x = viddef.width * 0.50;
 	s_software_menu.nitems = 0;
 
-	for ( i = 0; i < NUM_VID_DRIVERS; i++ )
+	for (i = 0; i < NUM_VID_DRIVERS; i++)
 	{
 		s_mode_list[i].generic.type = MTYPE_SPINCONTROL;
 		s_mode_list[i].generic.name = "video resolution";
@@ -425,17 +420,17 @@ void	VID_MenuInit (void)
 	s_waterwarp_box.itemnames = yesno_names;
 
 	// FS: ATTN  AddItem order has to be the order you want to see it in or else the cursor gets wonky!
-	Menu_AddItem( &s_software_menu, ( void * ) &s_mode_list[SOFTWARE_MENU] );
-	Menu_AddItem( &s_software_menu, ( void * ) &s_screensize_slider[SOFTWARE_MENU] );
-	Menu_AddItem( &s_software_menu, ( void * ) &s_brightness_slider[SOFTWARE_MENU] );
-	Menu_AddItem( &s_software_menu, ( void * ) &s_stipple_box );
-	Menu_AddItem( &s_software_menu, ( void * ) &s_contentblend_box ); // FS
-	Menu_AddItem( &s_software_menu, ( void * ) &s_waterwarp_box ); // FS
+	Menu_AddItem(&s_software_menu, (void *) &s_mode_list[SOFTWARE_MENU]);
+	Menu_AddItem(&s_software_menu, (void *) &s_screensize_slider[SOFTWARE_MENU]);
+	Menu_AddItem(&s_software_menu, (void *) &s_brightness_slider[SOFTWARE_MENU]);
+	Menu_AddItem(&s_software_menu, (void *) &s_stipple_box);
+	Menu_AddItem(&s_software_menu, (void *) &s_contentblend_box); // FS
+	Menu_AddItem(&s_software_menu, (void *) &s_waterwarp_box); // FS
 
-	Menu_AddItem( &s_software_menu, ( void * ) &s_defaults_action[SOFTWARE_MENU] );
-	Menu_AddItem( &s_software_menu, ( void * ) &s_cancel_action[SOFTWARE_MENU] );
+	Menu_AddItem(&s_software_menu, (void *) &s_defaults_action[SOFTWARE_MENU]);
+	Menu_AddItem(&s_software_menu, (void *) &s_cancel_action[SOFTWARE_MENU]);
 
-	Menu_Center( &s_software_menu );
+	Menu_Center(&s_software_menu);
 	s_software_menu.x -= 8;
 }
 
@@ -465,52 +460,51 @@ void	VID_MenuDraw (void)
 		ResolutionCallback(&s_mode_list[SOFTWARE_MENU]);
 }
 
-const char *VID_MenuKey( int k)
+const char *VID_MenuKey (int k)
 {
 	menuframework_s *m = s_current_menu;
 	static const char *sound = "misc/menu1.wav";
 
-	switch ( k )
+	switch (k)
 	{
 	case K_ESCAPE:
-		ApplyChanges( 0 );
+		ApplyChanges(0);
 		return NULL;
 	case K_KP_UPARROW:
 	case K_UPARROW:
 		m->cursor--;
-		Menu_AdjustCursor( m, -1 );
+		Menu_AdjustCursor(m, -1);
 		break;
 	case K_KP_DOWNARROW:
 	case K_DOWNARROW:
 		m->cursor++;
-		Menu_AdjustCursor( m, 1 );
+		Menu_AdjustCursor(m, 1);
 		break;
 	case K_KP_LEFTARROW:
 	case K_LEFTARROW:
-		Menu_SlideItem( m, -1 );
+		Menu_SlideItem(m, -1);
 		break;
 	case K_KP_RIGHTARROW:
 	case K_RIGHTARROW:
-		Menu_SlideItem( m, 1 );
+		Menu_SlideItem(m, 1);
 		break;
 	case K_KP_ENTER:
 	case K_ENTER:
-		if ( !Menu_SelectItem( m ) )
-			ApplyChanges( NULL );
+		if (!Menu_SelectItem(m))
+			ApplyChanges(NULL);
 		break;
 	}
 
-	return sound;
-//	return NULL;
+	return sound;//NULL
 }
 
-void VID_Restart_f (void)
+static void VID_Restart_f (void)
 {
 	vid_ref->modified = true;
 	return;
 }
 
-void VID_ListModes_f (void) // FS: Added
+static void VID_ListModes_f (void) // FS: Added
 {
 	int i = 0;
 
@@ -520,7 +514,6 @@ void VID_ListModes_f (void) // FS: Added
 		{
 			Com_Printf("[Mode %02d] %s\n", i, vid_resolutions[i].menuname);
 		}
-
 	}
 	Com_Printf("Available modes: %d\n", num_vid_resolutions);
 }

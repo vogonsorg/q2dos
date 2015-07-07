@@ -585,7 +585,7 @@ void fire_gun_old(edict_t *self, vec3_t start, vec3_t aimdir, int damage, int ki
 					{
 						if (tr.ent->health > 0)
 						{
-							if (tr.ent->classnameb != OBJECTIVE_VIP && !tr.ent->svflags & SVF_DEADMONSTER)
+							if (tr.ent->classnameb != OBJECTIVE_VIP && !(tr.ent->svflags & SVF_DEADMONSTER))
 								ThrowDebris (self, "models/objects/debris2/tris.md2", 1, tr.endpos);
 						}
 					}
