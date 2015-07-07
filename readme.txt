@@ -37,7 +37,7 @@ Tips and other misc info:
 * Use FastVid for some faster linear frame buffering if you a P1 or P2-era PC.
   Download it at http://dk.toastednet.org/QDOS/FASTV110.ZIP.
 * UNIRV can enable custom refresh rates.  Great if you have a large CRT monitor.
-  Download it at http://dk.toastednet.org/QDOS/FASTV110.ZIP.
+  Download it at http://dk.toastednet.org/QDOS/UNIRV142.ZIP.
 * Gravis UltraSound Users:  If you have a "stuck" or "repeating" sound as soon
   you load Q2DOS load Ultramid -Q then Ultramid -Q -F.  If you don't have
   Ultramid for some reason, you can get the fix (with a batch included) at
