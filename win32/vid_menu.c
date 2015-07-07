@@ -125,7 +125,7 @@ void VID_MenuInit( void )
 {
 	static const char *resolutions[] = 
 	{
-		"[320 200  ]",
+		"[320 240  ]",
 		"[400 300  ]",
 		"[512 384  ]",
 		"[640 480  ]",
