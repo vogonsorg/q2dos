@@ -318,7 +318,7 @@ Called every time the vid structure or r_refdef changes.
 Guaranteed to be called before the first refresh
 ===============
 */
-void R_ViewChanged (vrect_t *vr)
+void R_ViewChanged (vrect_t *vr, float aspect)
 {
 	int		i;
 	float	screenAspect, pixelAspect; /* FS: From Q1 */
@@ -352,6 +352,7 @@ void R_ViewChanged (vrect_t *vr)
 	xOrigin = r_refdef.xOrigin;
 	yOrigin = r_refdef.yOrigin;
 
+#if 0
 	/* Knightmare- catch 5:4 modes pushing top and bottom clips beyond screen buffer */
 	if ( (r_refdef.vrect.width != r_newrefdef.width || r_refdef.vrect.height != r_newrefdef.height)
 		&& (((float)r_newrefdef.width / (float)r_newrefdef.height) < (640.0f/480.0f)) )
@@ -367,6 +368,22 @@ void R_ViewChanged (vrect_t *vr)
 	pixelAspect = 1.000 + (1.3333 - ((float)vid.width / (float)vid.height));
 	screenAspect = r_refdef.vrect.width*pixelAspect / r_refdef.vrect.height;
 	verticalFieldOfView = r_refdef.horizontalFieldOfView / screenAspect; /* FS: FIXME Knightmare's code is already modifying the vert FOV so whatdo? */
+#else
+	// 320*200 1.0 pixelAspect = 1.6 screenAspect
+	// 320*240 1.0 pixelAspect = 1.3333 screenAspect
+	// proper 320*200 pixelAspect = 0.8333333
+	if (r_newrefdef.rdflags & 0x40000000)
+	{
+		pixelAspect = 1;
+		verticalFieldOfView = 2.0 * tan (r_newrefdef.fov_y/360*M_PI);
+	}
+	else
+	{
+		pixelAspect = aspect;
+		screenAspect = r_refdef.vrect.width*pixelAspect / r_refdef.vrect.height;
+		verticalFieldOfView = r_refdef.horizontalFieldOfView / screenAspect;
+	}
+#endif
 
 /* values for perspective projection
    if math were exact, the values would range from 0.5 to to range+0.5
@@ -434,6 +451,7 @@ R_SetupFrame
 void R_SetupFrame (void)
 {
 	int			i;
+	float			aspect;
 	vrect_t		vrect;
 
 	if (r_fullbright->modified)
@@ -463,6 +481,8 @@ void R_SetupFrame (void)
 	else
 		r_dowarp = false;
 
+	aspect = ((float)r_newrefdef.height/(float)r_newrefdef.width)*(320.0f/240.0f);
+
 	if (r_dowarp)
 	{	// warp into off screen buffer
 		if (r_newrefdef.width <= WARP_WIDTH && r_newrefdef.height <= WARP_HEIGHT)
@@ -475,6 +495,7 @@ void R_SetupFrame (void)
 		}
 		else
 		{
+#if 0
 			int adj_warp_height; // Knightmare added
 			vrect.x = 0;
 			vrect.y = 0;
@@ -491,6 +512,28 @@ void R_SetupFrame (void)
 			}
 			vrect.height = r_newrefdef.height < adj_warp_height ? r_newrefdef.height : adj_warp_height;
 			// end Knightmare
+#endif
+			// the following adapted from Q1
+			float w = r_newrefdef.width;
+			float h = r_newrefdef.height;
+
+			if (w > WARP_WIDTH)
+			{
+				h *= (float)WARP_WIDTH / w;
+				w = WARP_WIDTH;
+			}
+			if (h > WARP_HEIGHT)
+			{
+				h = WARP_HEIGHT;
+				w *= (float)WARP_HEIGHT / h;
+			}
+
+			vrect.x = 0;
+			vrect.y = 0;
+			vrect.width = (int)w;
+			vrect.height = (int)h;
+			aspect *= (h / w);
+			aspect *= ((float)r_newrefdef.width / (float)r_newrefdef.height);
 		}
 		d_viewbuffer = r_warpbuffer;
 		r_screenwidth = WARP_WIDTH;
@@ -506,7 +549,7 @@ void R_SetupFrame (void)
 		r_screenwidth = vid.rowbytes;
 	}
 	
-	R_ViewChanged (&vrect);
+	R_ViewChanged (&vrect, aspect);
 
 // start off with just the four screen edge clip planes
 	R_TransformFrustum ();

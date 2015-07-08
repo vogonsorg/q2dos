@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 extern	struct model_s	*cl_mod_powerscreen;
 extern void vectoangles2 (vec3_t value1, vec3_t angles);
+extern	cvar_t	*fov_adapt;
 
 //PGM
 int	vidref_val;
@@ -1472,6 +1473,33 @@ void CL_AddViewWeapon (player_state_t *ps, player_state_t *ops)
 
 
 /*
+====================
+AdaptFovx
+Adapt a 4:3 horizontal FOV to the current screen size using the "Hor+" scaling:
+2.0 * atan(width / height * 3.0 / 4.0 * tan(fov43 / 2.0))
+====================
+*/
+static float AdaptFovx (float fov_x, float width, float height)
+{
+	float	a, x;
+
+	if (fov_x < 1 || fov_x > 179)
+		Com_Error (ERR_DROP, "Bad fov: %f", fov_x);
+
+#if defined(__MSDOS__)
+	if ((height / width) * (320.0f / 240.0f) > 1.10f)
+		return fov_x;		/* no fov_adapt for weird VGA modes */
+#endif
+	if (!fov_adapt->value)
+		return fov_x;
+	if ((x = height / width) == 0.75)
+		return fov_x;
+	a = atan(0.75 / x * tan(fov_x / 360 * M_PI));
+	a = a * 360 / M_PI;
+	return a;
+}
+
+/*
 ===============
 CL_CalcViewValues
 
@@ -1481,7 +1509,7 @@ Sets cl.refdef view values
 void CL_CalcViewValues (void)
 {
 	int			i;
-	float		lerp, backlerp;
+	float		lerp, backlerp, ifov;
 //	centity_t	*ent; // FS: Unused
 	frame_t		*oldframe;
 	player_state_t	*ps, *ops;
@@ -1568,7 +1596,8 @@ void CL_CalcViewValues (void)
 	AngleVectors (cl.refdef.viewangles, cl.v_forward, cl.v_right, cl.v_up);
 
 	// interpolate field of view
-	cl.refdef.fov_x = ops->fov + lerp * (ps->fov - ops->fov);
+	ifov = ops->fov + lerp * (ps->fov - ops->fov);
+	cl.refdef.fov_x = AdaptFovx(ifov, cl.refdef.width, cl.refdef.height);
 
 	// don't interpolate blend color
 	for (i=0 ; i<4 ; i++)
