@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "OGG_SUPPORT" /D "USE_CURL" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "id386" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "OGG_SUPPORT" /D "USE_CURL" /D "USE_JOYSTICK" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x1009 /d "NDEBUG"
@@ -54,6 +54,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /pdb:none /machine:I386 /nodefaultlib:"libcmtd.lib"
+# SUBTRACT LINK32 /force
 
 !ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
 
@@ -69,7 +70,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "OGG_SUPPORT" /D "USE_CURL" /FR /YX /FD /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "id386" /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "OGG_SUPPORT" /D "USE_CURL" /D "USE_JOYSTICK" /FR /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x1009 /d "_DEBUG"
@@ -79,8 +80,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /map /debug /machine:I386 /nodefaultlib:"msvcrt.lib"
-# SUBTRACT LINK32 /nodefaultlib
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /map /debug /machine:I386 /nodefaultlib:"libcmt.lib"
 
 !ENDIF 
 
@@ -404,6 +404,37 @@ SOURCE=..\REF_SOFT\r_aclip.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\ref_soft\r_aclipa.asm
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+# Begin Custom Build
+OutDir=.\Release
+InputPath=..\ref_soft\r_aclipa.asm
+InputName=r_aclipa
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft\r_aclipa.asm
+InputName=r_aclipa
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\REF_SOFT\r_alias.c
 # End Source File
 # Begin Source File
@@ -416,7 +447,100 @@ SOURCE=..\REF_SOFT\r_draw.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\ref_soft\r_draw16.asm
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+# Begin Custom Build
+OutDir=.\Release
+InputPath=..\ref_soft\r_draw16.asm
+InputName=r_draw16
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft\r_draw16.asm
+InputName=r_draw16
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\ref_soft\r_drawa.asm
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+# Begin Custom Build
+OutDir=.\Release
+InputPath=..\ref_soft\r_drawa.asm
+InputName=r_drawa
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft\r_drawa.asm
+InputName=r_drawa
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\REF_SOFT\r_edge.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\ref_soft\r_edgea.asm
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+# Begin Custom Build
+OutDir=.\Release
+InputPath=..\ref_soft\r_edgea.asm
+InputName=r_edgea
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft\r_edgea.asm
+InputName=r_edgea
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -448,6 +572,37 @@ SOURCE=..\REF_SOFT\r_poly.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\ref_soft\r_polysa.asm
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+# Begin Custom Build
+OutDir=.\Release
+InputPath=..\ref_soft\r_polysa.asm
+InputName=r_polysa
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft\r_polysa.asm
+InputName=r_polysa
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\REF_SOFT\r_polyse.c
 # End Source File
 # Begin Source File
@@ -460,11 +615,134 @@ SOURCE=..\REF_SOFT\r_scan.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\ref_soft\r_scana.asm
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+# Begin Custom Build
+OutDir=.\Release
+InputPath=..\ref_soft\r_scana.asm
+InputName=r_scana
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft\r_scana.asm
+InputName=r_scana
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\ref_soft\r_spr8.asm
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+# Begin Custom Build
+OutDir=.\Release
+InputPath=..\ref_soft\r_spr8.asm
+InputName=r_spr8
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft\r_spr8.asm
+InputName=r_spr8
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\REF_SOFT\r_sprite.c
 # End Source File
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_surf.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\ref_soft\r_surf8.asm
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+# Begin Custom Build
+OutDir=.\Release
+InputPath=..\ref_soft\r_surf8.asm
+InputName=r_surf8
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft\r_surf8.asm
+InputName=r_surf8
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\ref_soft\r_varsa.asm
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+# Begin Custom Build
+OutDir=.\Release
+InputPath=..\ref_soft\r_varsa.asm
+InputName=r_varsa
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft\r_varsa.asm
+InputName=r_varsa
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
 # End Source File
 # End Group
 # Begin Group "Win32"
