@@ -95,7 +95,6 @@ void D_ViewChanged (void)
 	d_vrectbottom_particle =
 			r_refdef.vrectbottom - d_pix_max;
 
-
 	for (i=0 ; i<vid.height; i++)
 	{
 		d_scantable[i] = i*r_screenwidth;
@@ -173,7 +172,6 @@ void R_PrintAliasStats (void)
 }
 
 
-
 /*
 ===================
 R_TransformFrustum
@@ -206,7 +204,6 @@ void R_TransformFrustum (void)
 TransformVector
 ================
 */
-/* FS: FIXME: Make this work with id386 being undefined */
 void TransformVector (vec3_t in, vec3_t out)
 {
 	out[0] = DotProduct(in,vright);
@@ -329,18 +326,6 @@ void R_ViewChanged (vrect_t *vr)
 	r_refdef.vrect = *vr;
 
 	r_refdef.horizontalFieldOfView = 2*tan((float)r_newrefdef.fov_x/360*M_PI);
-	/* Knightmare- catch 5:4 modes pushing top and bottom clips beyond screen buffer */
- 	if ( (r_refdef.vrect.width != r_newrefdef.width || r_refdef.vrect.height != r_newrefdef.height)
- 		&& (((float)r_newrefdef.width / (float)r_newrefdef.height) < (640.0f/480.0f)) )
- 	{
- 		float	x;
- 		x = r_refdef.vrect.width/tan(r_newrefdef.fov_x/360*M_PI);
- 		verticalFieldOfView = 2*(r_refdef.vrect.height/x);
- 	}
- 	else
- 		verticalFieldOfView = 2*tan((float)r_newrefdef.fov_y/360*M_PI);
-	/* end Knightmare */
-
 	r_refdef.fvrectx = (float)r_refdef.vrect.x;
 	r_refdef.fvrectx_adj = (float)r_refdef.vrect.x - 0.5;
 	r_refdef.vrect_x_adj_shift20 = (r_refdef.vrect.x<<20) + (1<<19) - 1;
@@ -367,11 +352,20 @@ void R_ViewChanged (vrect_t *vr)
 	xOrigin = r_refdef.xOrigin;
 	yOrigin = r_refdef.yOrigin;
 
-/* leilei - Aspect stuff nicked from Q1 */
+	/* Knightmare- catch 5:4 modes pushing top and bottom clips beyond screen buffer */
+	if ( (r_refdef.vrect.width != r_newrefdef.width || r_refdef.vrect.height != r_newrefdef.height)
+		&& (((float)r_newrefdef.width / (float)r_newrefdef.height) < (640.0f/480.0f)) )
+	{
+		float	x;
+		x = r_refdef.vrect.width/tan(r_newrefdef.fov_x/360*M_PI);
+		verticalFieldOfView = 2*(r_refdef.vrect.height/x);
+	}
+	else
+		verticalFieldOfView = 2*tan((float)r_newrefdef.fov_y/360*M_PI);
+	/* end Knightmare */
+	/* leilei - Aspect stuff nicked from Q1 */
 	pixelAspect = 1.000 + (1.3333 - ((float)vid.width / (float)vid.height));
-
-	screenAspect = r_refdef.vrect.width*pixelAspect /
-		r_refdef.vrect.height;
+	screenAspect = r_refdef.vrect.width*pixelAspect / r_refdef.vrect.height;
 	verticalFieldOfView = r_refdef.horizontalFieldOfView / screenAspect; /* FS: FIXME Knightmare's code is already modifying the vert FOV so whatdo? */
 
 /* values for perspective projection
@@ -470,24 +464,33 @@ void R_SetupFrame (void)
 	else
 		r_dowarp = false;
 
- 	if (r_dowarp)
- 	{	// warp into off screen buffer
- 		vrect.x = 0;
- 		vrect.y = 0;
- 		vrect.width = r_newrefdef.width < WARP_WIDTH ? r_newrefdef.width : WARP_WIDTH;
+	if (r_dowarp)
+	{	// warp into off screen buffer
+		if (r_newrefdef.width <= WARP_WIDTH && r_newrefdef.height <= WARP_HEIGHT)
+		{
+			vrect.x = 0;
+			vrect.y = 0;
+			vrect.width = r_newrefdef.width;
+			vrect.height = r_newrefdef.height;
+		}
+		else
+		{
+			vrect.x = 0;
+			vrect.y = 0;
+			vrect.width = r_newrefdef.width < WARP_WIDTH ? r_newrefdef.width : WARP_WIDTH;
 		//	vrect.height = r_newrefdef.height < WARP_HEIGHT ? r_newrefdef.height : WARP_HEIGHT;
- 		// Knightmare- adjust warp height for widescreen aspect ratio
- 		if ( ((float)r_newrefdef.width / (float)r_newrefdef.height) > (640.0f/480.0f) )
-		{
- 			adj_warp_height = (int)( ((float)r_newrefdef.height / (float)r_newrefdef.width) * (float)WARP_WIDTH );
+			// Knightmare- adjust warp height for widescreen aspect ratio
+			if ( ((float)r_newrefdef.width / (float)r_newrefdef.height) > (640.0f/480.0f) )
+			{
+				adj_warp_height = (int)( ((float)r_newrefdef.height / (float)r_newrefdef.width) * (float)WARP_WIDTH );
+			}
+			else
+			{
+				adj_warp_height = WARP_HEIGHT;
+			}
+			vrect.height = r_newrefdef.height < adj_warp_height ? r_newrefdef.height : adj_warp_height;
+			// end Knightmare
 		}
- 		else
-		{
- 			adj_warp_height = WARP_HEIGHT;
-		}
- 		vrect.height = r_newrefdef.height < adj_warp_height ? r_newrefdef.height : adj_warp_height;
- 		// end Knightmare
-
 		d_viewbuffer = r_warpbuffer;
 		r_screenwidth = WARP_WIDTH;
 	}
@@ -538,22 +541,6 @@ void R_SetupFrame (void)
 
 	d_aflatcolor = 0;
 }
-
-
-#if	!id386
-
-/*
-================
-R_SurfacePatch
-================
-why is this here, it's also in r_edge
-void R_SurfacePatch (void)
-{
-	// we only patch code on Intel
-}
-*/
-
-#endif	// !id386
 
 
 /* 
