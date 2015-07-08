@@ -673,6 +673,8 @@ done_with_steps:
 	__asm mov a_ststepxwhole, eax
 }
 #else /* FIXME: GAS version in d_polysa.s is if 0'ed out */
+/* FS: It gets slightly weirder because this code is almost exactly the same in Q1 except for the if/else statement at the end */
+#if 1
 void R_PolysetCalcGradients (int skinwidth)
 {
 	float	xstepdenominv, ystepdenominv, t0, t1;
@@ -736,6 +738,7 @@ void R_PolysetCalcGradients (int skinwidth)
 
 	a_ststepxwhole = skinwidth * (r_tstepx >> 16) + (r_sstepx >> 16);
 }
+#endif /* 1 */
 #endif /* !id386 */
 
 /*

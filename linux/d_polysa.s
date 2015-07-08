@@ -34,16 +34,14 @@ lzistepx:		.long	0
 
 	.text
 
-#ifndef NeXT
 	.extern C(D_PolysetSetEdgeTable)
 	.extern C(D_RasterizeAliasPolySmooth)
-#endif
 
 //----------------------------------------------------------------------
 // affine triangle gradient calculation code
 //----------------------------------------------------------------------
 
-#if 0
+#if 0 /* FS: Crashes as soon as the map is loaded */
 #define skinwidth	4+0
 
 .globl C(R_PolysetCalcGradients)
@@ -426,19 +424,35 @@ C(R_PolysetCalcGradients):
 							//  ystepdenominv
 	fistpl	C(r_zistepy)
 
-//	a_sstepxfrac = r_sstepx << 16;
-//	a_tstepxfrac = r_tstepx << 16;
-//
-//	a_ststepxwhole = r_affinetridesc.skinwidth * (r_tstepx >> 16) +
-//			(r_sstepx >> 16);
+//	if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
+//	{
+//		a_sstepxfrac = r_sstepx << 16;
+//		a_tstepxfrac = r_tstepx << 16;
+//	}
+//	else
+//	{
+//		a_sstepxfrac = r_sstepx & 0xFFFF;
+//		a_tstepxfrac = r_tstepx & 0xFFFF;
+//	}
 
+	movl	C(d_pdrawspans),%eax
+	cmpl	$1, %eax /* FS: FIXME.  I don't know how to compare to R_PolySetDrawSpans8_Opaque */
+	jnz	translucent
 	movl	C(r_sstepx),%eax
 	movl	C(r_tstepx),%edx
+
 	shll	$16,%eax
 	shll	$16,%edx
+	jne	done_with_steps
+translucent:
+	andl	$65535, %eax
+	andl	$65535, %edx
+
+done_with_steps:
 	movl	%eax,C(a_sstepxfrac)
 	movl	%edx,C(a_tstepxfrac)
 
+//	a_ststepxwhole = skinwidth * (r_tstepx >> 16) + (r_sstepx >> 16);
 	movl	C(r_sstepx),%ecx
 	movl	C(r_tstepx),%eax
 	sarl	$16,%ecx
@@ -448,8 +462,7 @@ C(R_PolysetCalcGradients):
 	movl	%eax,C(a_ststepxwhole)
 
 	ret
-
-#endif
+#endif /* 0 */
 
 //----------------------------------------------------------------------
 // recursive subdivision affine triangle drawing code
