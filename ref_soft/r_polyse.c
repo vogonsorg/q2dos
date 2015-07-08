@@ -672,9 +672,7 @@ done_with_steps:
 	__asm add eax, ecx
 	__asm mov a_ststepxwhole, eax
 }
-#endif /* id386 && _MSC_VER */
-
-#if !id386
+#else /* FIXME: GUS version in d_polysa.s is if 0'ed out */
 void R_PolysetCalcGradients (int skinwidth)
 {
 	float	xstepdenominv, ystepdenominv, t0, t1;
