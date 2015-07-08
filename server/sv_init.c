@@ -460,9 +460,18 @@ void SV_Map (qboolean attractloop, char *levelstring, qboolean loadgame)
 	if (l > 4 && !strcmp (level+l-4, ".cin") )
 	{
 		if (!dedicated->value)
-		SCR_BeginLoadingPlaque ();			// for local system
+			SCR_BeginLoadingPlaque ();			// for local system
+
 		SV_BroadcastCommand ("changing\n");
-		SV_SpawnServer (level, spawnpoint, ss_cinematic, attractloop, loadgame);
+		if (sv_skipcinematics->intValue) /* FS: Skip cinematics if we want to */
+		{
+			Cbuf_Execute(); /* FS: Add everything to the Cbuf buffer now because the alias for demo loops won't update nextserver */
+			SV_Nextserver();
+		}
+		else
+		{
+			SV_SpawnServer (level, spawnpoint, ss_cinematic, attractloop, loadgame);
+		}
 	}
 	else if (l > 4 && !strcmp (level+l-4, ".dm2") )
 	{

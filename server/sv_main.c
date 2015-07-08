@@ -54,6 +54,7 @@ cvar_t  *public_server;                 // should heartbeats be sent
 cvar_t  *sv_iplimit;                    // r1ch: max connections from a single IP (prevent DoS)
 cvar_t  *sv_reconnect_limit;    // minimum seconds between connect messages
 cvar_t	*sv_entfile;	// Knightmare 6/25/12- cvar to control use of .ent files
+cvar_t	*sv_skipcinematics; /* FS: Skip cinematics if we chose to do so */
 
 void Master_Shutdown (void);
 
@@ -1109,6 +1110,9 @@ void SV_Init (void)
 // Knightmare 6/25/12- cvar to control use of .ent files
 	sv_entfile = Cvar_Get ("sv_entfile", "1", CVAR_ARCHIVE);
 	sv_entfile->description = "Toggle the use of .ent files.";
+/* FS: Added */
+	sv_skipcinematics = Cvar_Get ("sv_skipcinematics", "0", CVAR_ARCHIVE);
+	sv_skipcinematics->description = "Skip the loading of *.cin cinematics";
 
 	sv_noreload = Cvar_Get ("sv_noreload", "0", 0);
 
