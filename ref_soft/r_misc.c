@@ -434,7 +434,6 @@ R_SetupFrame
 void R_SetupFrame (void)
 {
 	int			i;
-	int			adj_warp_height;	// Knightmare added
 	vrect_t		vrect;
 
 	if (r_fullbright->modified)
@@ -468,6 +467,7 @@ void R_SetupFrame (void)
 	{	// warp into off screen buffer
 		if (r_newrefdef.width <= WARP_WIDTH && r_newrefdef.height <= WARP_HEIGHT)
 		{
+			// shortcut for 320x240 and lower -- from Q1
 			vrect.x = 0;
 			vrect.y = 0;
 			vrect.width = r_newrefdef.width;
@@ -475,6 +475,7 @@ void R_SetupFrame (void)
 		}
 		else
 		{
+			int adj_warp_height; // Knightmare added
 			vrect.x = 0;
 			vrect.y = 0;
 			vrect.width = r_newrefdef.width < WARP_WIDTH ? r_newrefdef.width : WARP_WIDTH;
