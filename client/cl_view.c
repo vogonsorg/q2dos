@@ -39,6 +39,7 @@ cvar_t		*r_contentblend; // FS: Fucking hate palette blends from gun fire, etc.
 
 cvar_t		*cl_stats;
 extern	cvar_t	*skin; // FS: From KMQ2
+extern	cvar_t	*fov_adapt;
 
 int			r_numdlights;
 dlight_t	r_dlights[MAX_DLIGHTS];
@@ -558,6 +559,7 @@ void V_RenderView( float stereo_separation )
 		cl.refdef.lightstyles = r_lightstyles;
 
 		cl.refdef.rdflags = cl.frame.playerstate.rdflags;
+		if (fov_adapt->value) cl.refdef.rdflags |= 0x40000000;
 
 		// sort entities for better cache locality
         qsort( cl.refdef.entities, cl.refdef.num_entities, sizeof( cl.refdef.entities[0] ), (int (*)(const void *, const void *))entitycmpfnc );
