@@ -430,7 +430,7 @@ int FS_FOpenFile (char *filename, FILE **file)
 	hash = Com_HashFileName(filename, 0, false);
 
 	// get config from directory, everything else from pak
-	if (!strcmp(filename, "config.cfg") || !strncmp(filename, "players/", 8))
+	if (/*!strcmp(filename, "config.cfg")*/ !strcmp(filename, "q2dos.cfg") || !strncmp(filename, "players/", 8)) /* FS: We use q2dos.cfg now */
 	{
 		Com_sprintf (netpath, sizeof(netpath), "%s/%s",FS_Gamedir(), filename);
 		
@@ -682,6 +682,7 @@ char *pakfile_ignore_names[] =
 	"scrnshot/",
 	"autoexec.cfg",
 	"config.cfg",
+	"q2dos.cfg", /* FS: Added */
 	0
 };
 

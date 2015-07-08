@@ -248,7 +248,7 @@ cvar_t *Cvar_Set2 (char *var_name, char *value, qboolean force)
 				{
 					FS_SetGamedir (var->string);
 					FS_ExecAutoexec ();
-					Cbuf_AddText ("exec config.cfg\n"); // FS: If we switch game modes dynamically load that dirs config
+					Cbuf_AddText ("exec q2dos.cfg\n"); // FS: If we switch game modes dynamically load that dirs config
 				}
 			}
 			return var;

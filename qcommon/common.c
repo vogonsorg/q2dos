@@ -1460,7 +1460,8 @@ void Qcommon_Init (int argc, char **argv)
 	FS_InitFilesystem ();
 
 	Cbuf_AddText ("exec default.cfg\n");
-	Cbuf_AddText ("exec config.cfg\n");
+//	Cbuf_AddText ("exec config.cfg\n");
+	Cbuf_AddText ("exec q2dos.cfg\n"); /* FS: Use our own so other ports won't stomp over it */
 
 	Cbuf_AddEarlyCommands (true);
 	Cbuf_Execute ();

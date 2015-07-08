@@ -940,6 +940,40 @@ void SV_DumpUser_f (void)
 
 }
 
+/* FS: From KMQ2 */
+/*
+===================
+SV_StartMod
+===================
+*/
+void SV_StartMod (char *mod)
+{
+	// killserver, start mod, unbind keys, exec configs, and start demos
+	Cbuf_AddText ("killserver\n");
+	Cbuf_AddText (va("game %s\n", mod));
+	Cbuf_AddText ("unbindall\n");
+	Cbuf_AddText ("exec default.cfg\n");
+	Cbuf_AddText ("exec q2dos.cfg\n");
+	Cbuf_AddText ("exec autoexec.cfg\n");
+	Cbuf_AddText ("d1\n");
+}
+
+/*
+===================
+SV_ChangeGame_f
+
+switch to a different mod
+===================
+*/
+void SV_ChangeGame_f (void)
+{
+	if (Cmd_Argc() < 2)
+	{
+		Com_Printf ("changegame <gamedir> : change game directory\n");
+		return;
+	}
+	SV_StartMod (Cmd_Argv(1));
+}
 
 /*
 ==============
@@ -1158,6 +1192,8 @@ void SV_InitOperatorCommands (void)
 	Cmd_AddCommand ("serverinfo", SV_Serverinfo_f);
 	Cmd_AddCommand ("dumpuser", SV_DumpUser_f);
 
+	Cmd_AddCommand ("changegame", SV_ChangeGame_f); // Knightmare added
+
 	Cmd_AddCommand ("map", SV_Map_f);
 	Cmd_AddCommand ("demomap", SV_DemoMap_f);
 	Cmd_AddCommand ("gamemap", SV_GameMap_f);
@@ -1177,6 +1213,6 @@ void SV_InitOperatorCommands (void)
 	Cmd_AddCommand ("killserver", SV_KillServer_f);
 
 	Cmd_AddCommand ("sv", SV_ServerCommand_f);
-	Cmd_AddCommand ("sv_dumpentities", SV_DumpEntities_f); // FS
+	Cmd_AddCommand ("sv_dumpentities", SV_DumpEntities_f); /* FS */
 }
 
