@@ -468,5 +468,5 @@ void Sys_SetFPCW( void )
 	__asm mov fpu_sp24_ceil_cw, eax
 }
 #else
-/* gcc version is in sys_dosa.s */
+/* GAS version is in sys_dosa.s */
 #endif
