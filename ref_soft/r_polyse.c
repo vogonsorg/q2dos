@@ -1088,7 +1088,7 @@ void R_PolysetDrawSpans8_Opaque (spanpackage_t *pspanpackage)
 				if ((lzi >> 16) >= *lpz)
 				{
 //PGM
-					if(r_newrefdef.rdflags & RDF_IRGOGGLES && currententity->flags & RF_IR_VISIBLE)
+					if(r_newrefdef.rdflags & RDF_IRGOGGLES && currententity->flags & RF_IR_VISIBLE) /* FIXME FS: This isn't in the ASM */
 						*lpdest = ((byte *)vid.colormap)[irtable[*lptex]];
 					else
 						*lpdest = ((byte *)vid.colormap)[*lptex + (llight & 0xFF00)]; // FS: This line is crashing in Whale's WOD!  Lptex has junk data in it

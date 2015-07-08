@@ -436,10 +436,10 @@ C(R_PolysetCalcGradients):
 //	}
 
 	movl	C(d_pdrawspans),%eax
-	cmpl	$1, %eax /* FS: FIXME.  I don't know how to compare to R_PolySetDrawSpans8_Opaque */
-	jnz	translucent
+	cmpl	$(C(R_PolysetDrawSpans8_Opaque)),%eax /* FS: FIXME.  I don't know how to compare to R_PolySetDrawSpans8_Opaque */
 	movl	C(r_sstepx),%eax
 	movl	C(r_tstepx),%edx
+	jnz	translucent
 
 	shll	$16,%eax
 	shll	$16,%edx

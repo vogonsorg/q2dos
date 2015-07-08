@@ -199,6 +199,7 @@
 	.extern C(r_zistepy)
 	.extern C(D_PolysetSetEdgeTable)
 	.extern C(D_RasterizeAliasPolySmooth)
+	.extern C(d_pdrawspans) /* FS: For R_PolysetCalcGradients */
 
 	.extern float_point5
 	.extern Float2ToThe31nd
