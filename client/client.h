@@ -723,7 +723,7 @@ void CL_DrawInventory (void);
 //
 void CL_PredictMovement (void);
 
-#if id386
+#if (id386) && defined(_MSC_VER)
 void x86_TimerStart( void );
 void x86_TimerStop( void );
 void x86_TimerInit( unsigned long smallest, unsigned longest );

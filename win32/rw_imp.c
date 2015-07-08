@@ -437,7 +437,7 @@ void Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length)
 void Sys_SetFPCW (void)
 {
 }
-#else
+#elif defined(_MSC_VER)
 unsigned fpu_ceil_cw, fpu_chop_cw, fpu_full_cw, fpu_cw, fpu_pushed_cw;
 unsigned fpu_sp24_cw, fpu_sp24_ceil_cw;
 
@@ -467,5 +467,6 @@ void Sys_SetFPCW( void )
 	__asm or  ah, 008h          ; 
 	__asm mov fpu_sp24_ceil_cw, eax
 }
+#else
+/* gcc version is in sys_dosa.s */
 #endif
-

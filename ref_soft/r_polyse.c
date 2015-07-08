@@ -414,7 +414,7 @@ void R_PolysetSetUpForLineScan(fixed8_t startvertu, fixed8_t startvertv,
 R_PolysetCalcGradients
 ================
 */
-#if id386 && !defined __DJGPP__ //__linux__
+#if (id386) && defined(_MSC_VER)
 void R_PolysetCalcGradients( int skinwidth )
 {
 	static float xstepdenominv, ystepdenominv, t0, t1;
@@ -672,7 +672,9 @@ done_with_steps:
 	__asm add eax, ecx
 	__asm mov a_ststepxwhole, eax
 }
-#else
+#endif /* id386 && _MSC_VER */
+
+#if !id386
 void R_PolysetCalcGradients (int skinwidth)
 {
 	float	xstepdenominv, ystepdenominv, t0, t1;
@@ -736,7 +738,7 @@ void R_PolysetCalcGradients (int skinwidth)
 
 	a_ststepxwhole = skinwidth * (r_tstepx >> 16) + (r_sstepx >> 16);
 }
-#endif
+#endif /* !id386 */
 
 /*
 ================

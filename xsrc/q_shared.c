@@ -327,7 +327,7 @@ BoxOnPlaneSide
 Returns 1, 2, or 1 + 2
 ==================
 */
-#if !id386 || defined __linux__ // FS: Now using math.s.  Thanks to ggorts on vogons
+#if !id386
 int BoxOnPlaneSide (vec3_t emins, vec3_t emaxs, struct cplane_s *p)
 {
 	float	dist1, dist2;
@@ -394,8 +394,9 @@ dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
 
 	return sides;
 }
-#else
-#ifdef WIN32
+#endif
+
+#if (id386) && defined(_MSC_VER)
 #pragma warning( disable: 4035 )
 
 __declspec( naked ) int BoxOnPlaneSide (vec3_t emins, vec3_t emaxs, struct cplane_s *p)
@@ -628,7 +629,6 @@ Lerror:
 	}
 }
 #pragma warning( default: 4035 )
-#endif
 #endif
 
 /*
