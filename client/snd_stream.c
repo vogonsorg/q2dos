@@ -218,101 +218,6 @@ static void S_CloseBackgroundTrack (bgTrack_t *track)
 	}
 }
 
-#if 0
-/*
-=================
-S_StreamBackgroundTrack
-=================
-*/
-void S_StreamBackgroundTrack (void)
-{
-	byte		data[BUFFER_SIZE];
-	int			queued = 0; //, processed, state;
-	int			size, read, dummy;
-	//unsigned	buffer;
-	int			samples; // Knightmare added
-
-	if (!s_bgTrack.file || !s_musicvolume->value)
-		return;
-
-	if (!s_streamingChannel)
-		return;
-
-	// Unqueue and delete any processed buffers
-	/*qalGetSourcei(s_streamingChannel->sourceNum, AL_BUFFERS_PROCESSED, &processed);
-	if (processed > 0){
-		while (processed--){
-			qalSourceUnqueueBuffers(s_streamingChannel->sourceNum, 1, &buffer);
-			qalDeleteBuffers(1, &buffer);
-		}
-	}*/
-
-	//Com_Printf("Streaming background track\n");
-
-	// Make sure we always have at least 4 buffers in the queue
-	//qalGetSourcei(s_streamingChannel->sourceNum, AL_BUFFERS_QUEUED, &queued);
-	while (queued < 4)
-	{
-		size = 0;
-		// Stream from disk
-		while (size < BUFFER_SIZE)
-		{
-			read = ov_read(s_bgTrack.vorbisFile, data + size, BUFFER_SIZE - size, 0, 2, 1, &dummy);
-			if (read == 0)
-			{	// End of file
-				if (!s_bgTrack.looping)
-				{	// Close the intro track
-					S_CloseBackgroundTrack(&s_bgTrack);
-
-					// Open the loop track
-					if (!S_OpenBackgroundTrack(s_bgTrack.loopName, &s_bgTrack))
-					{
-						S_StopBackgroundTrack();
-						return;
-					}
-					s_bgTrack.looping = true;
-				}
-
-				// Restart the track, skipping over the header
-				ov_raw_seek(s_bgTrack.vorbisFile, (ogg_int64_t)s_bgTrack.start);
-
-				// Try streaming again
-				read = ov_read(s_bgTrack.vorbisFile, data + size, BUFFER_SIZE - size, 0, 2, 1, &dummy);
-			}
-
-			if (read <= 0)
-			{	// An error occurred
-				S_StopBackgroundTrack();
-				return;
-			}
-
-			size += read;
-		}
-
-		// Knightmare added
-		samples = size / (s_bgTrack.width * s_bgTrack.channels);
-		S_RawSamples(samples, s_bgTrack.rate,s_bgTrack. width, s_bgTrack.channels, data, true);
-
-		// Upload and queue the new buffer
-		/*qalGenBuffers(1, &buffer);
-		qalBufferData(buffer, s_bgTrack.format, data, size, s_bgTrack.rate);
-		qalSourceQueueBuffers(s_streamingChannel->sourceNum, 1, &buffer);*/
-
-		queued++;
-	}
-
-
-	// Update volume
-	//qalSourcef(s_streamingChannel->sourceNum, AL_GAIN, s_musicVolume->value);
-
-	// If not playing, then do so
-	/*qalGetSourcei(s_streamingChannel->sourceNum, AL_SOURCE_STATE, &state);
-	if (state != AL_PLAYING)
-		qalSourcePlay(s_streamingChannel->sourceNum);*/
-}
-
-#else
-
 /*
 ============
 S_StreamBackgroundTrack
@@ -385,34 +290,11 @@ void S_StreamBackgroundTrack (void)
 				ov_raw_seek(s_bgTrack.vorbisFile, (ogg_int64_t)s_bgTrack.start);
 			}
 
-			/*if (s_bgTrack.read)
-				read = s_bgTrack->read( s_bgTrack, data + total, maxRead - total );
-			else
-				read = FS_Read( data + total, maxRead - total, s_bgTrack->file );
-
-			if (!read)
-			{
-				if (s_bgTrackIntro.file != s_bgTrackLoop.file)
-				{
-					if (s_bgTrackIntro.close)
-						s_bgTrackIntro.close(&s_bgTrackIntro);
-					else
-						FS_FCloseFile(s_bgTrackIntro.file);
-					s_bgTrackIntro = s_bgTrackLoop;
-				}
-				s_bgTrack = &s_bgTrackLoop;
-
-				if (s_bgTrack->seek)
-					s_bgTrack->seek( s_bgTrack, s_bgTrack->info.dataofs );
-				else
-					FS_Seek(s_bgTrack->file, s_bgTrack->info.dataofs, FS_SEEK_SET);
-			}*/
 			total += read;
 		}
 		S_RawSamples (samples, s_bgTrack.rate, s_bgTrack.width, s_bgTrack.channels, data, true );
 	}
 }
-#endif
 
 /*
 ============
@@ -451,7 +333,6 @@ void S_StartBackgroundTrack (const char *introTrack, const char *loopTrack)
 
 	// set a loop counter so that this track will change to the ambient track later
 	ogg_loopcounter = 0;
-//	Cvar_ForceSet ("ogg_loopcount", va("%i", Cvar_VariableValue("cd_loopcount")-1));
 
 	S_StartStreaming();
 
@@ -504,20 +385,6 @@ void S_StartStreaming (void)
 		return;
 
 	s_streamingChannel->streaming = true;
-
-	// FIXME: OpenAL bug?
-	/*qalDeleteSources(1, &s_streamingChannel->sourceNum);
-	qalGenSources(1, &s_streamingChannel->sourceNum);*/
-
-	// Set up the source
-	/*qalSourcei(s_streamingChannel->sourceNum, AL_BUFFER, 0);
-	qalSourcei(s_streamingChannel->sourceNum, AL_LOOPING, AL_FALSE);
-	qalSourcei(s_streamingChannel->sourceNum, AL_SOURCE_RELATIVE, AL_TRUE);
-	qalSourcefv(s_streamingChannel->sourceNum, AL_POSITION, vec3_origin);
-	qalSourcefv(s_streamingChannel->sourceNum, AL_VELOCITY, vec3_origin);
-	qalSourcef(s_streamingChannel->sourceNum, AL_REFERENCE_DISTANCE, 1.0);
-	qalSourcef(s_streamingChannel->sourceNum, AL_MAX_DISTANCE, 1.0);
-	qalSourcef(s_streamingChannel->sourceNum, AL_ROLLOFF_FACTOR, 0.0);*/
 }
 
 /*
@@ -527,9 +394,6 @@ S_StopStreaming
 */
 void S_StopStreaming (void)
 {
-	//int			processed;
-	//unsigned	buffer;
-
 	if (!ogg_started) // was sound_started
 		return;
 
@@ -537,23 +401,6 @@ void S_StopStreaming (void)
 		return;		// Already stopped
 
 	s_streamingChannel->streaming = false;
-
-	// Clean up the source
-	/*qalSourceStop(s_streamingChannel->sourceNum);
-
-	qalGetSourcei(s_streamingChannel->sourceNum, AL_BUFFERS_PROCESSED, &processed);
-	if (processed > 0){
-		while (processed--){
-			qalSourceUnqueueBuffers(s_streamingChannel->sourceNum, 1, &buffer);
-			qalDeleteBuffers(1, &buffer);
-		}
-	}
-
-	qalSourcei(s_streamingChannel->sourceNum, AL_BUFFER, 0);
-
-	// FIXME: OpenAL bug?
-	qalDeleteSources(1, &s_streamingChannel->sourceNum);
-	qalGenSources(1, &s_streamingChannel->sourceNum);*/
 
 	s_streamingChannel = NULL;
 }
@@ -853,11 +700,6 @@ void S_OGG_ParseCmd (void)
 		return;
 	}
 
-	/*if (Q_strcasecmp(command, "seek") == 0) {
-		Com_Printf ("Ogg Vorbis seek command\n");
-		return;
-	}*/
-
 	if (Q_strcasecmp(command, "status") == 0) {
 		S_OGG_StatusCmd ();
 		return;
@@ -870,68 +712,5 @@ void S_OGG_ParseCmd (void)
 
 	Com_Printf("Usage: ogg {play | pause | resume | stop | status | list}\n");
 }
-
-
-#if 0
-/*
-=================
-S_StreamRawSamples
-
-Cinematic streaming
-=================
-*/
-void S_StreamRawSamples (const byte *data, int samples, int rate, int width, int channels)
-{
-	int			processed, state, size;
-	unsigned	format, buffer;
-
-	if (!s_initialized)
-		return;
-
-	if (!s_streamingChannel)
-		return;
-
-	// Unqueue and delete any processed buffers
-	qalGetSourcei(s_streamingChannel->sourceNum, AL_BUFFERS_PROCESSED, &processed);
-	if (processed > 0){
-		while (processed--){
-			qalSourceUnqueueBuffers(s_streamingChannel->sourceNum, 1, &buffer);
-			qalDeleteBuffers(1, &buffer);
-		}
-	}
-
-	// Calculate buffer size
-	size = samples * width * channels;
-
-	// Set buffer format
-	if (width == 2)
-	{
-		if (channels == 2)
-			format = AL_FORMAT_STEREO16;
-		else
-			format = AL_FORMAT_MONO16;
-	}
-	else
-	{
-		if (channels == 2)
-			format = AL_FORMAT_STEREO8;
-		else
-			format = AL_FORMAT_MONO8;
-	}
-
-	// Upload and queue the new buffer
-	qalGenBuffers(1, &buffer);
-	qalBufferData(buffer, format, (byte *)data, size, rate);
-	qalSourceQueueBuffers(s_streamingChannel->sourceNum, 1, &buffer);
-
-	// Update volume
-	qalSourcef(s_streamingChannel->sourceNum, AL_GAIN, s_sfxVolume->value);
-
-	// If not playing, then do so
-	qalGetSourcei(s_streamingChannel->sourceNum, AL_SOURCE_STATE, &state);
-	if (state != AL_PLAYING)
-		qalSourcePlay(s_streamingChannel->sourceNum);
-}
-#endif
 
 #endif // OGG_SUPPORT

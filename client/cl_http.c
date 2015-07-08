@@ -1164,4 +1164,4 @@ void CL_RunHTTPDownloads (void)
 		CL_StartNextHTTPDownload ();
 }
 
-#endif
+#endif /* USE_CURL */
