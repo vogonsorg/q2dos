@@ -736,7 +736,14 @@ void R_PolysetCalcGradients (int skinwidth)
 	}
 //#endif
 
-	a_ststepxwhole = skinwidth * (r_tstepx >> 16) + (r_sstepx >> 16);
+//	a_ststepxwhole = skinwidth * (r_tstepx >> 16) + (r_sstepx >> 16);
+	__asm__ ("movl	%0,%%ecx"::"m"(r_sstepx));
+	__asm__ ("movl	%0,%%eax"::"m"(r_tstepx));
+	__asm__ ("sarl	$16,%ecx");
+	__asm__ ("sarl	$16,%eax");
+	__asm__ ("imull	%0"::"m"(skinwidth));
+	__asm__ ("addl	%ecx,%eax");
+	__asm__ ("movl	%%eax,%0"::"m"(a_ststepxwhole));
 }
 #endif /* 1 */
 #endif /* !id386 */
