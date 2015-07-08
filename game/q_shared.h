@@ -267,11 +267,13 @@ void Com_PageInMemory (byte *buffer, int size);
 int Q_stricmp (char *s1, char *s2);
 int Q_strcasecmp (char *s1, char *s2);
 int Q_strncasecmp (char *s1, char *s2, int n);
-// FS: From KMQ2
+/* FS: From KMQ2 */
 void Q_strncpyz (char *dst, const char *src, int dstSize);
 void Q_strncatz (char *dst, const char *src, int dstSize);
 char *Q_strlwr (char *string);
 char *Q_strupr (char *string);
+/* FS: From FreeBSD */
+char *Q_strtok_r(char *s, const char *delim, char **last);
 
 //=============================================
 

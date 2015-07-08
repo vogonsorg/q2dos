@@ -22,9 +22,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "qcommon.h"
 
 cvar_t	*cvar_vars;
-cvar_t	*con_show_description; // FS
-cvar_t	*con_show_dev_flags; // FS
-void Cvar_ParseDeveloperFlags (void); // FS: Special stuff for showing all the dev flags
+cvar_t	*con_show_description; /* FS */
+cvar_t	*con_show_dev_flags; /* FS */
+void Cvar_ParseDeveloperFlags (void); /* FS: Special stuff for showing all the dev flags */
+void Cvar_Force_f (void); /* FS: Force a NOSET CVAR (within reason) */
+void Cvar_Toggle_f (void); /* FS: Toggle a CVAR */
+void Cvar_Reset_f (void); /* FS: Reset a CVAR to it's default value */
+qboolean Cvar_Never_Reset_Cmds(char *var_name); /* FS: Tired of copying CVARs everywhere */
 
 /*
 ============
@@ -597,17 +601,166 @@ Reads in all archived cvars
 */
 void Cvar_Init (void)
 {
-	con_show_description = Cvar_Get("con_show_description", "1", CVAR_ARCHIVE); // FS
+	con_show_description = Cvar_Get("con_show_description", "1", CVAR_ARCHIVE); /* FS */
 	con_show_description->description = "Toggle descriptions for CVARs.  This CVAR (con_show_description) will always show this description.";
-	con_show_dev_flags = Cvar_Get ("con_show_dev_flags", "1", CVAR_ARCHIVE); // FS
+	con_show_dev_flags = Cvar_Get ("con_show_dev_flags", "1", CVAR_ARCHIVE); /* FS */
 	con_show_dev_flags->description = "Show toggled developer flags when using the developer CVAR.";
 
 	Cmd_AddCommand ("set", Cvar_Set_f);
 	Cmd_AddCommand ("cvarlist", Cvar_List_f);
+	Cmd_AddCommand ("togglecvar", Cvar_Toggle_f); /* FS */
+	Cmd_AddCommand ("forcecvar", Cvar_Force_f); /* FS */
+	Cmd_AddCommand ("resetcvar", Cvar_Reset_f); /* FS */
 
 }
 
-void Cvar_ParseDeveloperFlags (void) // FS: Special stuff for showing all the dev flags
+static cvar_t *Cvar_IsNoset (const char *var_name) // FS: Make sure this isn't a NOSET CVAR!
+{
+	cvar_t	*var;
+	
+	for (var=cvar_vars ; var ; var=var->next)
+	{
+		if( var->name )
+		{
+			if (!strcmp (var_name, var->name))
+			{
+				if (var->flags & CVAR_NOSET)
+				{
+					return var;
+				}
+			}
+		}
+	}
+	return NULL;
+}
+
+void Cvar_Toggle_f (void) // FS
+{
+	if(Cmd_Argc() == 2 && Cmd_Argv(1))
+	{
+		char *cvar_name = Cmd_Argv(1);
+		float cur_value;
+
+		if (cvar_name == NULL || cvar_name[0] == '\0' || Cvar_FindVar(cvar_name) == NULL) // FS: Check for NULL sillies
+		{
+			Com_Printf("%s not found!\n", Cmd_Argv(1));
+			return;
+		}
+
+		if (Cvar_IsNoset(cvar_name))
+		{
+			Com_Printf("%s is write protected.\n", cvar_name);
+			return;
+		}
+
+	    //get the value of the cvar.
+		cur_value = Cvar_VariableValue(cvar_name);
+
+		//set it to the opposite value.
+		if (cur_value != 0.0f)
+			Cvar_ForceSet(cvar_name, "0");
+		else
+			Cvar_ForceSet(cvar_name, "1");
+
+		Com_Printf("%s set to %0.0f\n", cvar_name, Cvar_VariableValue(cvar_name));
+
+	}
+	else
+	{
+		Com_Printf("USAGE: togglecvar <console variable>\n");
+		return;
+	}
+}
+
+void Cvar_Force_f (void) // FS
+{
+	if(Cmd_Argc() == 3 && Cmd_Argv(1))
+	{
+		char *cvar_name = Cmd_Argv(1);
+		char *cvar_value;
+
+		if (cvar_name == NULL || cvar_name[0] == '\0' || Cvar_FindVar(cvar_name) == NULL) // FS: Check for NULL sillies
+		{
+			Com_Printf("%s not found!\n", Cmd_Argv(1));
+			return;
+		}
+
+		// Knightmare 2/24/13- prevent dedicated from being changed!
+		// FS: sv_rcon_banned_commands too!
+		// FS: and version too.
+		// FS: Consolidated all of these into a special function because resetcvar bans them too
+		if (Cvar_Never_Reset_Cmds(cvar_name))
+		{
+			Com_Printf("Error: %s cannot be changed from console!\n", cvar_name);
+			return;
+		}
+
+		cvar_value = Cmd_Argv(2);
+
+		Cvar_ForceSet(cvar_name, cvar_value);
+
+		Com_Printf("%s set to %s\n", cvar_name, cvar_value);
+
+	}
+	else
+	{
+		Com_Printf("USAGE: forcecvar <console variable> <value>\n");
+		return;
+	}
+}
+
+qboolean Cvar_Never_Reset_Cmds(char *var_name) /* FS: Tired of copying CVARs everywhere */
+{
+	if(!strcmp(var_name, "dedicated"))
+		return true;
+	if(!strcmp(var_name, "port"))
+		return true;
+	if(!strcmp(var_name, "qport"))
+		return true;
+	if(!strcmp(var_name, "version"))
+		return true;
+	if(!strcmp(var_name, "ref_soft"))
+		return true;
+
+	return false;
+}
+
+void Cvar_Reset_f (void) /* FS: Reset a CVAR to its default value */
+{
+	int args;
+	cvar_t *var;
+	char *var_name;
+
+	args = Cmd_Argc();
+
+	if (args != 2)
+	{
+		Com_Printf("usage: resetcvar <variable>.  Resets CVARs to their default values\n");
+		return;
+	}
+
+	var_name = Cmd_Argv(1);
+
+	if (Cvar_Never_Reset_Cmds(var_name))
+	{
+		Com_Printf("Error: you can not reset this value: %s!\n", var_name);
+		return;
+	}
+
+	var = Cvar_FindVar(var_name);
+
+	if (!var)
+	{
+		Com_Printf("Error: %s is not a valid CVAR!\n", var_name);
+		return;
+	}
+
+	Com_Printf("Resetting %s to default value of %s, Flags Value: %i\n", var_name, var->defaultValue, var->defaultFlags);
+	var->flags = var->defaultFlags;
+	Cvar_ForceSet(var_name, var->defaultValue);
+}
+
+void Cvar_ParseDeveloperFlags (void) /* FS: Special stuff for showing all the dev flags */
 {
 	extern cvar_t	*developer;
 
