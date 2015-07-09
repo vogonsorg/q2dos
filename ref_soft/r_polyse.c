@@ -689,43 +689,400 @@ void R_PolysetCalcGradients (int skinwidth)
 
 	ystepdenominv = -xstepdenominv;
 
+/*
+	__asm__ ("fildl	%0+0"::"m"(r_p0));		// r_p0[0]
+	__asm__ ("fildl	%0+0"::"m"(r_p2));		// r_p2[0] | r_p0[0]
+	__asm__ ("fildl	%0+4"::"m"(r_p0));		// r_p0[1] | r_p2[0] | r_p0[0]
+	__asm__ ("fildl	%0+4"::"m"(r_p2));		// r_p2[1] | r_p0[1] | r_p2[0] | r_p0[0]
+	__asm__ ("fildl	%0+0"::"m"(r_p1));		// r_p1[0] | r_p2[1] | r_p0[1] | r_p2[0] | r_p0[0]
+	__asm__ ("fildl	%0+4"::"m"(r_p1));		// r_p1[1] | r_p1[0] | r_p2[1] | r_p0[1] |
+							//  r_p2[0] | r_p0[0]
+	__asm__ ("fxch	%st(3)");			// r_p0[1] | r_p1[0] | r_p2[1] | r_p1[1] |
+							//  r_p2[0] | r_p0[0]
+	__asm__ ("fsub	%st(2),%st(0)");	// p01_minus_p21 | r_p1[0] | r_p2[1] | r_p1[1] |
+							//  r_p2[0] | r_p0[0]
+	__asm__ ("fxch	%st(1)");			// r_p1[0] | p01_minus_p21 | r_p2[1] | r_p1[1] |
+							//  r_p2[0] | r_p0[0]
+	__asm__ ("fsub	%st(4),%st(0)");	// p10_minus_p20 | p01_minus_p21 | r_p2[1] |
+							//  r_p1[1] | r_p2[0] | r_p0[0]
+	__asm__ ("fxch	%st(5)");			// r_p0[0] | p01_minus_p21 | r_p2[1] |
+							//  r_p1[1] | r_p2[0] | p10_minus_p20
+	__asm__ ("fsubp	%st(0),%st(4)");	// p01_minus_p21 | r_p2[1] | r_p1[1] |
+							//  p00_minus_p20 | p10_minus_p20
+	__asm__ ("fxch	%st(2)");			// r_p1[1] | r_p2[1] | p01_minus_p21 |
+							//  p00_minus_p20 | p10_minus_p20
+	__asm__ ("fsubp	%st(0),%st(1)");	// p11_minus_p21 | p01_minus_p21 |
+							//  p00_minus_p20 | p10_minus_p20
+	__asm__ ("fxch	%st(1)");			// p01_minus_p21 | p11_minus_p21 |
+							//  p00_minus_p20 | p10_minus_p20
+	__asm__ ("flds	%0"::"m"(d_xdenom));		// d_xdenom | p01_minus_p21 | p11_minus_p21 |
+							//  p00_minus_p20 | p10_minus_p20
+	__asm__ ("fxch	%st(4)");			// p10_minus_p20 | p01_minus_p21 | p11_minus_p21 |
+							//  p00_minus_p20 | d_xdenom
+	__asm__ ("fstps	%0"::"m"(p10_minus_p20));	// p01_minus_p21 | p11_minus_p21 |
+							//  p00_minus_p20 | d_xdenom
+	__asm__ ("fstps	%0"::"m"(p01_minus_p21));	// p11_minus_p21 | p00_minus_p20 | xstepdenominv
+	__asm__ ("fxch	%st(2)");			// xstepdenominv | p00_minus_p20 | p11_minus_p21
+*/
+
 // ceil () for light so positive steps are exaggerated, negative steps
 // diminished,  pushing us away from underflow toward overflow. Underflow is
 // very visible, overflow is very unlikely, because of ambient lighting
 	t0 = r_p0[4] - r_p2[4];
 	t1 = r_p1[4] - r_p2[4];
+/*
+	__asm__ ("fildl	%0+16"::"m"(r_p2));		// r_p2[4] | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fildl	%0+16"::"m"(r_p0));		// r_p0[4] | r_p2[4] | xstepdenominv |
+							//  p00_minus_p20 | p11_minus_p21
+	__asm__ ("fildl	%0+16"::"m"(r_p1));		// r_p1[4] | r_p0[4] | r_p2[4] | xstepdenominv |
+							//  p00_minus_p20 | p11_minus_p21
+	__asm__ ("fxch	%st(2)");			// r_p2[4] | r_p0[4] | r_p1[4] | xstepdenominv |
+							//  p00_minus_p20 | p11_minus_p21
+	__asm__ ("fld		%st(0)");			// r_p2[4] | r_p2[4] | r_p0[4] | r_p1[4] |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fsubrp	%st(0),%st(2)");	// r_p2[4] | t0 | r_p1[4] | xstepdenominv |
+							//  p00_minus_p20 | p11_minus_p21
+	__asm__ ("fsubrp	%st(0),%st(2)");	// t0 | t1 | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+*/
 	r_lstepx = (int)
 			ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
 	r_lstepy = (int)
 			ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
-
+/*
+	__asm__ ("fld		%st(0)");			// t0 | t0 | t1 | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fmul	%st(5),%st(0)");	// t0*p11_minus_p21 | t0 | t1 | xstepdenominv |
+							//  p00_minus_p20 | p11_minus_p21
+	__asm__ ("fxch	%st(2)");			// t1 | t0 | t0*p11_minus_p21 | xstepdenominv |
+							//  p00_minus_p20 | p11_minus_p21
+	__asm__ ("fld		%st(0)");			// t1 | t1 | t0 | t0*p11_minus_p21 |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fmuls	%0"::"m"(p01_minus_p21));	// t1*p01_minus_p21 | t1 | t0 | t0*p11_minus_p21 |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fxch	%st(2)");			// t0 | t1 | t1*p01_minus_p21 | t0*p11_minus_p21 |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fmuls	%0"::"m"(p10_minus_p20));	// t0*p10_minus_p20 | t1 | t1*p01_minus_p21 |
+							//  t0*p11_minus_p21 | xstepdenominv |
+							//  p00_minus_p20 | p11_minus_p21
+	__asm__ ("fxch	%st(1)");			// t1 | t0*p10_minus_p20 | t1*p01_minus_p21 |
+							//  t0*p11_minus_p21 | xstepdenominv |
+							//  p00_minus_p20 | p11_minus_p21
+	__asm__ ("fmul	%st(5),%st(0)");	// t1*p00_minus_p20 | t0*p10_minus_p20 |
+							//  t1*p01_minus_p21 | t0*p11_minus_p21 |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fxch	%st(2)");			// t1*p01_minus_p21 | t0*p10_minus_p20 |
+							//  t1*p00_minus_p20 | t0*p11_minus_p21 |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fsubp	%st(0),%st(3)");	// t0*p10_minus_p20 | t1*p00_minus_p20 |
+							//  t1*p01_minus_p21 - t0*p11_minus_p21 |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fsubrp	%st(0),%st(1)");	// t1*p00_minus_p20 - t0*p10_minus_p20 |
+							//  t1*p01_minus_p21 - t0*p11_minus_p21 |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fld		%st(2)");			// xstepdenominv |
+							//  t1*p00_minus_p20 - t0*p10_minus_p20 |
+							//  t1*p01_minus_p21 - t0*p11_minus_p21 |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fmuls	float_minus_1");	// ystepdenominv |
+							//  t1*p00_minus_p20 - t0*p10_minus_p20 |
+							//  t1*p01_minus_p21 - t0*p11_minus_p21 |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fxch	%st(2)");			// t1*p01_minus_p21 - t0*p11_minus_p21 |
+							//  t1*p00_minus_p20 - t0*p10_minus_p20 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fmul	%st(3),%st(0)");	// (t1*p01_minus_p21 - t0*p11_minus_p21)*
+							//   xstepdenominv |
+							//  t1*p00_minus_p20 - t0*p10_minus_p20 |
+							//   | ystepdenominv | xstepdenominv |
+							//   p00_minus_p20 | p11_minus_p21
+	__asm__ ("fxch	%st(1)");			// t1*p00_minus_p20 - t0*p10_minus_p20 |
+							//  (t1*p01_minus_p21 - t0*p11_minus_p21)*
+							//   xstepdenominv | ystepdenominv |
+							//   xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fmul	%st(2),%st(0)");	// (t1*p00_minus_p20 - t0*p10_minus_p20)*
+							//  ystepdenominv |
+							//  (t1*p01_minus_p21 - t0*p11_minus_p21)*
+							//  xstepdenominv | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fldcw	ceil_cw");
+	__asm__ ("fistpl	%0"::"m"(r_lstepy));		// r_lstepx | ystepdenominv | xstepdenominv |
+							//  p00_minus_p20 | p11_minus_p21
+	__asm__ ("fistpl	%0"::"m"(r_lstepx));		// ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fldcw	single_cw");
+*/
 	t0 = r_p0[2] - r_p2[2];
 	t1 = r_p1[2] - r_p2[2];
+/*
+	__asm__ ("fildl	%0+8"::"m"(r_p2));		// r_p2[2] | ystepdenominv | xstepdenominv |
+							//  p00_minus_p20 | p11_minus_p21
+	__asm__ ("fildl	%0+8"::"m"(r_p0));		// r_p0[2] | r_p2[2] | ystepdenominv |
+							//   xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fildl	%0+8"::"m"(r_p1));		// r_p1[2] | r_p0[2] | r_p2[2] | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fxch	%st(2)");			// r_p2[2] | r_p0[2] | r_p1[2] | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fld		%st(0)");			// r_p2[2] | r_p2[2] | r_p0[2] | r_p1[2] |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fsubrp	%st(0),%st(2)");	// r_p2[2] | t0 | r_p1[2] | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fsubrp	%st(0),%st(2)");	// t0 | t1 | ystepdenominv | xstepdenominv |
+							//  p00_minus_p20 | p11_minus_p21
+
+*/
 	r_sstepx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) *
 			xstepdenominv);
-	r_sstepy = (int)((t1 * p00_minus_p20 - t0* p10_minus_p20) *
+	r_sstepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) *
 			ystepdenominv);
-
+/*
+	__asm__ ("fld		%st(0)");			// t0 | t0 | t1 | ystepdenominv | xstepdenominv
+	__asm__ ("fmul	%st(6),%st(0)");	// t0*p11_minus_p21 | t0 | t1 | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fxch	%st(2)");			// t1 | t0 | t0*p11_minus_p21 | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fld		%st(0)");			// t1 | t1 | t0 | t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fmuls	%0"::"m"(p01_minus_p21));	// t1*p01_minus_p21 | t1 | t0 | t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fxch	%st(2)");			// t0 | t1 | t1*p01_minus_p21 | t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fmuls	%0"::"m"(p10_minus_p20));	// t0*p10_minus_p20 | t1 | t1*p01_minus_p21 |
+							//  t0*p11_minus_p21 | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fxch	%st(1)");			// t1 | t0*p10_minus_p20 | t1*p01_minus_p21 |
+							//  t0*p11_minus_p21 | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fmul	%st(6),%st(0)");	// t1*p00_minus_p20 | t0*p10_minus_p20 |
+							//  t1*p01_minus_p21 | t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fxch	%st(2)");			// t1*p01_minus_p21 | t0*p10_minus_p20 |
+							//  t1*p00_minus_p20 | t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fsubp	%st(0),%st(3)");	// t0*p10_minus_p20 | t1*p00_minus_p20 |
+							//  t1*p01_minus_p21 - t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fsubrp	%st(0),%st(1)");	// t1*p00_minus_p20 - t0*p10_minus_p20 |
+							//  t1*p01_minus_p21 - t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fmul	%st(2),%st(0)");	// (t1*p00_minus_p20 - t0*p10_minus_p20)*
+							//   ystepdenominv |
+							//  t1*p01_minus_p21 - t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fxch	%st(1)");			// t1*p01_minus_p21 - t0*p11_minus_p21 |
+							//  (t1*p00_minus_p20 - t0*p10_minus_p20)*
+							//   ystepdenominv | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fmul	%st(3),%st(0)");	// (t1*p01_minus_p21 - t0*p11_minus_p21)*
+							//  xstepdenominv |
+							//  (t1*p00_minus_p20 - t0*p10_minus_p20)*
+							//  ystepdenominv | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fxch	%st(1)");			// (t1*p00_minus_p20 - t0*p10_minus_p20)*
+							//  ystepdenominv |
+							//  (t1*p01_minus_p21 - t0*p11_minus_p21)*
+							//  xstepdenominv | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fistpl	%0"::"m"(r_sstepy));		// r_sstepx | ystepdenominv | xstepdenominv |
+							//  p00_minus_p20 | p11_minus_p21
+	__asm__ ("fistpl	%0"::"m"(r_sstepx));		// ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+*/
 	t0 = r_p0[3] - r_p2[3];
 	t1 = r_p1[3] - r_p2[3];
+/*
+	__asm__ ("fildl	%0+12"::"m"(r_p2));		// r_p2[2] | ystepdenominv | xstepdenominv |
+							//  p00_minus_p20 | p11_minus_p21
+	__asm__ ("fildl	%0+12"::"m"(r_p0));		// r_p0[2] | r_p2[2] | ystepdenominv |
+							//   xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fildl	%0+12"::"m"(r_p1));		// r_p1[2] | r_p0[2] | r_p2[2] | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fxch	%st(2)");			// r_p2[2] | r_p0[2] | r_p1[2] | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fld		%st(0)");			// r_p2[2] | r_p2[2] | r_p0[2] | r_p1[2] |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fsubrp	%st(0),%st(2)");	// r_p2[2] | t0 | r_p1[2] | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fsubrp	%st(0),%st(2)");	// t0 | t1 | ystepdenominv | xstepdenominv |
+							//  p00_minus_p20 | p11_minus_p21
+*/
 	r_tstepx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) *
 			xstepdenominv);
 	r_tstepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) *
 			ystepdenominv);
+/*
+	__asm__ ("fld		%st(0)");			// t0 | t0 | t1 | ystepdenominv | xstepdenominv
+	__asm__ ("fmul	%st(6),%st(0)");	// t0*p11_minus_p21 | t0 | t1 | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fxch	%st(2)");			// t1 | t0 | t0*p11_minus_p21 | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fld		%st(0)");			// t1 | t1 | t0 | t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fmuls	%0"::"m"(p01_minus_p21));	// t1*p01_minus_p21 | t1 | t0 | t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fxch	%st(2)");			// t0 | t1 | t1*p01_minus_p21 | t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fmuls	%0"::"m"(p10_minus_p20));	// t0*p10_minus_p20 | t1 | t1*p01_minus_p21 |
+							//  t0*p11_minus_p21 | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fxch	%st(1)");			// t1 | t0*p10_minus_p20 | t1*p01_minus_p21 |
+							//  t0*p11_minus_p21 | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fmul	%st(6),%st(0)");	// t1*p00_minus_p20 | t0*p10_minus_p20 |
+							//  t1*p01_minus_p21 | t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fxch	%st(2)");			// t1*p01_minus_p21 | t0*p10_minus_p20 |
+							//  t1*p00_minus_p20 | t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fsubp	%st(0),%st(3)");	// t0*p10_minus_p20 | t1*p00_minus_p20 |
+							//  t1*p01_minus_p21 - t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fsubrp	%st(0),%st(1)");	// t1*p00_minus_p20 - t0*p10_minus_p20 |
+							//  t1*p01_minus_p21 - t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fmul	%st(2),%st(0)");	// (t1*p00_minus_p20 - t0*p10_minus_p20)*
+							//   ystepdenominv |
+							//  t1*p01_minus_p21 - t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fxch	%st(1)");			// t1*p01_minus_p21 - t0*p11_minus_p21 |
+							//  (t1*p00_minus_p20 - t0*p10_minus_p20)*
+							//   ystepdenominv | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fmul	%st(3),%st(0)");	// (t1*p01_minus_p21 - t0*p11_minus_p21)*
+							//  xstepdenominv |
+							//  (t1*p00_minus_p20 - t0*p10_minus_p20)*
+							//  ystepdenominv | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fxch	%st(1)");			// (t1*p00_minus_p20 - t0*p10_minus_p20)*
+							//  ystepdenominv |
+							//  (t1*p01_minus_p21 - t0*p11_minus_p21)*
+							//  xstepdenominv | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fistpl	%0"::"m"(r_tstepy));		// r_sstepx | ystepdenominv | xstepdenominv |
+							//  p00_minus_p20 | p11_minus_p21
+	__asm__ ("fistpl	%0"::"m"(r_tstepx));		// ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+*/
 
 	t0 = r_p0[5] - r_p2[5];
 	t1 = r_p1[5] - r_p2[5];
+
+/*
+	__asm__ ("fildl	%0+20"::"m"(r_p2));		// r_p2[2] | ystepdenominv | xstepdenominv |
+							//  p00_minus_p20 | p11_minus_p21
+	__asm__ ("fildl	%0+20"::"m"(r_p0));		// r_p0[2] | r_p2[2] | ystepdenominv |
+							//   xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fildl	%0+20"::"m"(r_p1));		// r_p1[2] | r_p0[2] | r_p2[2] | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fxch	%st(2)");			// r_p2[2] | r_p0[2] | r_p1[2] | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fld		%st(0)");			// r_p2[2] | r_p2[2] | r_p0[2] | r_p1[2] |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fsubrp	%st(0),%st(2)");	// r_p2[2] | t0 | r_p1[2] | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fsubrp	%st(0),%st(2)");	// t0 | t1 | ystepdenominv | xstepdenominv |
+							//  p00_minus_p20 | p11_minus_p21
+*/
 	r_zistepx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) *
 			xstepdenominv);
 	r_zistepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) *
 			ystepdenominv);
-
+/*
+	__asm__ ("fld		%st(0)");			// t0 | t0 | t1 | ystepdenominv | xstepdenominv
+	__asm__ ("fmul	%st(6),%st(0)");	// t0*p11_minus_p21 | t0 | t1 | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fxch	%st(2)");			// t1 | t0 | t0*p11_minus_p21 | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fld		%st(0)");			// t1 | t1 | t0 | t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fmuls	%0"::"m"(p01_minus_p21));	// t1*p01_minus_p21 | t1 | t0 | t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fxch	%st(2)");			// t0 | t1 | t1*p01_minus_p21 | t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fmuls	%0"::"m"(p10_minus_p20));	// t0*p10_minus_p20 | t1 | t1*p01_minus_p21 |
+							//  t0*p11_minus_p21 | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fxch	%st(1)");			// t1 | t0*p10_minus_p20 | t1*p01_minus_p21 |
+							//  t0*p11_minus_p21 | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fmul	%st(6),%st(0)");	// t1*p00_minus_p20 | t0*p10_minus_p20 |
+							//  t1*p01_minus_p21 | t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fxch	%st(2)");			// t1*p01_minus_p21 | t0*p10_minus_p20 |
+							//  t1*p00_minus_p20 | t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fsubp	%st(0),%st(3)");	// t0*p10_minus_p20 | t1*p00_minus_p20 |
+							//  t1*p01_minus_p21 - t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fsubrp	%st(0),%st(1)");	// t1*p00_minus_p20 - t0*p10_minus_p20 |
+							//  t1*p01_minus_p21 - t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fmul	%st(2),%st(0)");	// (t1*p00_minus_p20 - t0*p10_minus_p20)*
+							//   ystepdenominv |
+							//  t1*p01_minus_p21 - t0*p11_minus_p21 |
+							//  ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+	__asm__ ("fxch	%st(1)");			// t1*p01_minus_p21 - t0*p11_minus_p21 |
+							//  (t1*p00_minus_p20 - t0*p10_minus_p20)*
+							//   ystepdenominv | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fmul	%st(3),%st(0)");	// (t1*p01_minus_p21 - t0*p11_minus_p21)*
+							//  xstepdenominv |
+							//  (t1*p00_minus_p20 - t0*p10_minus_p20)*
+							//  ystepdenominv | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fxch	%st(1)");			// (t1*p00_minus_p20 - t0*p10_minus_p20)*
+							//  ystepdenominv |
+							//  (t1*p01_minus_p21 - t0*p11_minus_p21)*
+							//  xstepdenominv | ystepdenominv |
+							//  xstepdenominv | p00_minus_p20 | p11_minus_p21
+	__asm__ ("fistpl	%0"::"m"(r_zistepy));		// r_sstepx | ystepdenominv | xstepdenominv |
+							//  p00_minus_p20 | p11_minus_p21
+	__asm__ ("fistpl	%0"::"m"(r_zistepx));		// ystepdenominv | xstepdenominv | p00_minus_p20 |
+							//  p11_minus_p21
+*/
 //#if	id386ALIAS
 #if id386
+/* FS: The inlines here work, but there is no speed increase */
 	if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
 	{
 		a_sstepxfrac = r_sstepx << 16;
 		a_tstepxfrac = r_tstepx << 16;
+/*		__asm__ ("movl	%0,%%eax"::"m"(r_sstepx));
+		__asm__ ("movl	%0,%%edx"::"m"(r_tstepx));
+		__asm__ ("shll	$16,%eax");
+		__asm__ ("shll	$16,%edx");
+		__asm__ ("movl	%%eax,%0"::"m"(a_sstepxfrac));
+		__asm__ ("movl	%%edx,%0"::"m"(a_tstepxfrac));
+*/
 	}
 	else
 #endif
@@ -733,10 +1090,19 @@ void R_PolysetCalcGradients (int skinwidth)
 //#else
 		a_sstepxfrac = r_sstepx & 0xFFFF;
 		a_tstepxfrac = r_tstepx & 0xFFFF;
+/*
+		__asm__ ("movl	%0,%%eax"::"m"(r_sstepx));
+		__asm__ ("movl	%0,%%edx"::"m"(r_tstepx));
+		__asm__ ("andl	$0xFFFF,%eax");
+		__asm__ ("andl	$0xFFFF,%edx");
+		__asm__ ("movl	%%eax,%0"::"m"(a_sstepxfrac));
+		__asm__ ("movl	%%edx,%0"::"m"(a_tstepxfrac));
+*/
 	}
 //#endif
 
-//	a_ststepxwhole = skinwidth * (r_tstepx >> 16) + (r_sstepx >> 16);
+	a_ststepxwhole = skinwidth * (r_tstepx >> 16) + (r_sstepx >> 16);
+/*
 	__asm__ ("movl	%0,%%ecx"::"m"(r_sstepx));
 	__asm__ ("movl	%0,%%eax"::"m"(r_tstepx));
 	__asm__ ("sarl	$16,%ecx");
@@ -744,6 +1110,7 @@ void R_PolysetCalcGradients (int skinwidth)
 	__asm__ ("imull	%0"::"m"(skinwidth));
 	__asm__ ("addl	%ecx,%eax");
 	__asm__ ("movl	%%eax,%0"::"m"(a_ststepxwhole));
+*/
 }
 #endif /* 1 */
 #endif /* !id386 */
