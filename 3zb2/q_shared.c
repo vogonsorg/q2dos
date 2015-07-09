@@ -260,7 +260,7 @@ float Q_fabs (float f)
 	return *(float*)&tmp;
 }
 
-#if defined _M_IX86 && !defined C_ONLY
+#if defined(_MSC_VER) && defined(_M_IX86) && !defined(C_ONLY)
 #pragma warning (disable:4035)
 __declspec( naked ) long Q_ftol( float f )
 {
