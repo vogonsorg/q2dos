@@ -85,7 +85,7 @@ void Load_BotInfo()
 	gamepath = gi.cvar ("game", "", CVAR_NOSET);
 
 	//load info	
-	sprintf(Buff,"%s/3ZB.cfg",FS_Gamedir());
+	sprintf(Buff,"%s/3ZB.cfg",gamepath->string);
 	fp = fopen(Buff,"rt");
 	if(fp == NULL)
 	{

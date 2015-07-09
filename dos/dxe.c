@@ -14,7 +14,6 @@ extern	vec3_t monster_flash_offset [];
 
 /* FS: The following is gross, but I just figured this out. */
 DXE_EXPORT_TABLE (syms)
-	DXE_EXPORT (FS_Gamedir)
 	DXE_EXPORT (__dj_assert)
 	DXE_EXPORT (__dj_ctype_tolower)
 	DXE_EXPORT (__dj_ctype_toupper)
@@ -93,10 +92,7 @@ static void (*game_library)(void);
 void Sys_UnloadGame (void)
 {
 	if (game_library)
-	{
 		dlclose (game_library);
-	}
-
 	game_library = NULL;
 }
 
@@ -140,15 +136,10 @@ void *Sys_GetGameAPI (void *parms)
 	dlregsym (syms);
 
 	/* now run through the search paths */
-	path = NULL;
-
-	while (1)
+	for (path = NULL; ; )
 	{
 		path = FS_NextPath (path);
-		if (!path)
-		{
-			return NULL; /* couldn't find one anywhere */
-		}
+		if (!path) return NULL; /* couldn't find one anywhere */
 
 		Com_sprintf (name, sizeof(name), "%s/%s/%s", curpath, path, gamename);
 		game_library = dlopen (name, RTLD_LAZY);
