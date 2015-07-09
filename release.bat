@@ -56,6 +56,7 @@ copy readme.txt release
 copy game\gamex86.dxe release\baseq2
 copy ctf\gamex86.dxe release\ctf
 copy 3zb2\gamex86.dxe release\3zb2
+copy 3zb2\3ZB.cfg release\3zb2
 copy acebot\gamex86.dxe release\ace
 copy action\gamex86.dxe release\action
 copy chaos\gamex86.dxe release\chaos
