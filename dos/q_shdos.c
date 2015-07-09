@@ -57,13 +57,13 @@ int	Hunk_End (void)
 double	curtime;
 double	Sys_Milliseconds (void)
 {
-	// FS: Needed *1000 to work properly
-	curtime = (double) uclock() / (double) UCLOCKS_PER_SEC*1000; // FS: Win9X/Fast PC Fix (QIP)
+	/* FS: Needed *1000 to work properly */
+	curtime = (double) uclock() / (double) UCLOCKS_PER_SEC*1000; /* FS: From Q1 -- Win9X/Fast PC Fix (QIP) */
 
 	return curtime;
 }
 
-int	Sys_LinuxTime (void) // FS: DOS needs this for random qport
+int	Sys_LinuxTime (void) /* FS: DOS needs this for random qport */
 {
 	int linuxtime;
 	struct timeval tp;
