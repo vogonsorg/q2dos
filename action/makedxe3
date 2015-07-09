@@ -27,6 +27,7 @@ GAME = p_client.o \
 	g_turret.o \
 	g_utils.o \
 	g_weapon.o \
+	m_flash.o \
 	m_move.o \
 	m_tank.o \
 	acesrc/acebot_ai.o acesrc/acebot_compress.o \
