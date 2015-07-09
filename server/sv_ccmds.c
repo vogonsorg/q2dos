@@ -486,8 +486,16 @@ qboolean SV_NotCinematic (char *map)
 {
 	char mapTemp[MAX_OSPATH];
 	char *ch;
+	int x, stringLen;
 
 	Q_strncpyz(mapTemp, map, sizeof(mapTemp));
+	stringLen = strlen(mapTemp);
+
+	/* FS: Not sure if DOS actually needs this, but I guess it doesn't hurt to be safe */
+	for (x = 0; x <=stringLen ; x++)
+	{
+		tolower(mapTemp[x]);
+	}
 
 	if(strstr(mapTemp, ".cin") || strstr(mapTemp, ".pcx"))
 	{
