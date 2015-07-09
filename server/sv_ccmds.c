@@ -486,22 +486,15 @@ qboolean SV_NotCinematic (char *map)
 {
 	char mapTemp[MAX_OSPATH];
 	char *ch;
-	int x, stringLen;
 
 	Q_strncpyz(mapTemp, map, sizeof(mapTemp));
-	stringLen = strlen(mapTemp);
-
 	/* FS: Not sure if DOS actually needs this, but I guess it doesn't hurt to be safe */
-	for (x = 0; x <=stringLen ; x++)
-	{
-		tolower(mapTemp[x]);
-	}
+	Q_strlwr(mapTemp);
 
 	if(strstr(mapTemp, ".cin") || strstr(mapTemp, ".pcx"))
 	{
 //		Com_Printf("Found cin\n");
 		ch = strstr(mapTemp, "+");
-
 		if (ch && (strstr(ch, ".cin") || strstr(ch, ".pcx")) ) /* FS: Stepped forward and it's level+cinematic */
 		{
 //			Com_Printf("Found cinematic at the end: %s\n", ch);
