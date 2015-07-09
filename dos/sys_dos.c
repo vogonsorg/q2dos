@@ -60,29 +60,6 @@ static byte scantokey[128] = {
 	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0         // 7 
 }; 
 
-#if 0
-static byte shiftscantokey[128] = { 
-//  0           1       2       3       4       5       6       7 
-//  8           9       A       B       C       D       E       F 
-	0  ,    27,     '!',    '@',    '#',    '$',    '%',    '^', 
-	'&',    '*',    '(',    ')',    '_',    '+',    K_BACKSPACE, 9, // 0 
-	'Q',    'W',    'E',    'R',    'T',    'Y',    'U',    'I', 
-	'O',    'P',    '{',    '}',    13 ,    K_CTRL,'A',  'S',      // 1 
-	'D',    'F',    'G',    'H',    'J',    'K',    'L',    ':', 
-	'"' ,    '~',    K_SHIFT,'|',  'Z',    'X',    'C',    'V',      // 2 
-	'B',    'N',    'M',    '<',    '>',    '?',    K_SHIFT,'*', 
-	K_ALT,' ',   0  ,    K_F1, K_F2, K_F3, K_F4, K_F5,   // 3 
-	K_F6, K_F7, K_F8, K_F9, K_F10,0  ,    0  , K_HOME, 
-	K_UPARROW,K_PGUP,'_',K_LEFTARROW,'%',K_RIGHTARROW,'+',K_END, //4 
-	K_DOWNARROW,K_PGDN,K_INS,K_DEL,0,0,             0,              K_F11, 
-	K_F12,0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 5 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 6 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0         // 7 
-}; 
-#endif
-
 static void TrapKey(void)
 {
 	keybuf[keybuf_head] = dos_inportb(0x60);
@@ -120,9 +97,13 @@ static qboolean	lockmem, lockunlockmem, unlockmem;
 static qboolean	bSkipWinCheck, bSkipLFNCheck; // FS
 static int	win95;
 
-// FS: Q2 needs it badly
-// FS: See http://www.delorie.com/djgpp/doc/libc/libc_380.html for more information
-/* ATTENTION FORKERS
+/* FS: Stuff for /memstats */
+static int physicalMemStart;
+static unsigned long virtualMemStart;
+
+/* FS: Q2 needs it badly -- See http://www.delorie.com/djgpp/doc/libc/libc_380.html for more information
+
+   ATTENTION FORKERS
    DO NOT REMOVE THE SLEEP OR WARNING!
    THIS IS SERIOUS, NO LFN AND SOME SKIN NAMES GET TRUNCATED
    WEIRD SHIT HAPPENS
@@ -145,7 +126,7 @@ static void Sys_DetectLFN (void)
 	}
 }
 
-static qboolean Sys_DetectWinNT (void) // FS: Wisdom from Gisle Vanem
+static qboolean Sys_DetectWinNT (void) /* FS: Wisdom from Gisle Vanem */
 {
 	if(_get_dos_version(1) == 0x0532)
 	{
@@ -171,190 +152,11 @@ static void Sys_DetectWin95 (void)
 	}
 	else
 	{
-		Sys_Error("Microsoft Windows detected.  You must run Q2DOS in MS-DOS."); // FS: Warning.  Too many issues in Win9x and even XP.  QDOS is the same way.  So forget it.
+		Sys_Error("Microsoft Windows detected.  You must run Q2DOS in MS-DOS."); /* FS: Warning.  Too many issues in Win9x and even XP.  QDOS is the same way.  So forget it. */
 	}
 }
 
-static __dpmi_meminfo	info; // FS: Sigh, moved this here because everyone wants me to free this shit at exit.  Again, I'm pretty sure CWSDPMI is already taking care of this...
-#if 0
-static int	minmem;
-static void *dos_getmaxlockedmem(int *size)
-{
-	__dpmi_free_mem_info	meminfo;
-	int		working_size;
-	void		*working_memory;
-	int		last_locked;
-	int		i, j, extra, allocsize;
-	static char	*msg = "Locking data...";
-	byte		*x;
-	unsigned long	ul; // FS: 2GB Fix
-
-// first lock all the current executing image so the locked count will
-// be accurate.  It doesn't hurt to lock the memory multiple times
-	last_locked = __djgpp_selector_limit + 1;
-	info.size = last_locked - 4096;
-	info.address = __djgpp_base_address + 4096;
-
-	if (lockmem)
-	{
-		if(__dpmi_lock_linear_region(&info))
-		{
-			Sys_Error ("Lock of current memory at 0x%lx for %ldKb failed!",
-						info.address, info.size/1024);
-		}
-	}
-
-	__dpmi_get_free_memory_information(&meminfo);
-
-	if (!win95)	/* Not windows or earlier than Win95 */
-	{
-		ul = meminfo.maximum_locked_page_allocation_in_pages * 4096; // FS: 2GB fix
-	}
-	else
-	{
-		ul = meminfo.largest_available_free_block_in_bytes - LEAVE_FOR_CACHE; // FS: 2GB fix
-	}
-
-	if (ul > 0x7fffffff)
-		ul = 0x7fffffff;	/* limit to 2GB */
-	working_size = (int) ul;
-	working_size &= ~0xffff;	/* Round down to 64K */
-	working_size += 0x10000;
-
-	do
-	{
-		working_size -= 0x10000;	/* Decrease 64K and try again */
-		working_memory = sbrk(working_size);
-	}
-	while (working_memory == (void *)-1);
-
-	extra = 0xfffc - ((unsigned)sbrk(0) & 0xffff);
-
-	if (extra > 0)
-	{
-		sbrk(extra);
-		working_size += extra;
-	}
-
-// now grab the memory
-	info.address = last_locked + __djgpp_base_address;
-
-	if (!win95)
-	{
-		info.size = __djgpp_selector_limit + 1 - last_locked;
-
-		while (info.size > 0 && __dpmi_lock_linear_region(&info))
-		{
-			info.size -= 0x1000;
-			working_size -= 0x1000;
-			sbrk(-0x1000);
-		}
-	}
-	else
-	{	/* Win95 section */
-		j = COM_CheckParm("-winmem");
-
-		minmem = MINIMUM_WIN_MEMORY;
-
-		if (j)
-		{
-			allocsize = ((int)(Q_atoi(com_argv[j+1]))) * 0x100000 +
-					LOCKED_FOR_MALLOC;
-
-			if (allocsize < (minmem + LOCKED_FOR_MALLOC))
-			{
-				allocsize = minmem + LOCKED_FOR_MALLOC;
-			}
-		}
-		else
-		{
-			allocsize = minmem + LOCKED_FOR_MALLOC;
-		}
-
-		if (!lockmem)
-		{
-		// we won't lock, just sbrk the memory
-			info.size = allocsize;
-			goto UpdateSbrk;
-		}
-
-		// lock the memory down
-		write (STDOUT, msg, strlen (msg));
-
-		for (j=allocsize ; j>(minmem + LOCKED_FOR_MALLOC) ;
-			 j -= 0x100000)
-		{
-			info.size = j;
-	
-			if (!__dpmi_lock_linear_region(&info))
-			{
-				goto Locked;
-			}
-	
-			write (STDOUT, ".", 1);
-		}
-
-	// finally, try with the absolute minimum amount
-		for (i=0 ; i<10 ; i++)
-		{
-			info.size = minmem + LOCKED_FOR_MALLOC;
-
-			if (!__dpmi_lock_linear_region(&info))
-			{
-				goto Locked;
-			}
-		}
-
-		Sys_Error ("Can't lock memory; %ld Mb lockable RAM required. "
-				"Try shrinking smartdrv.", info.size / 0x100000);
-
-Locked:
-
-UpdateSbrk:
-
-		info.address += info.size;
-		info.address -= __djgpp_base_address + 4; // ending point, malloc align
-		working_size = info.address - (int)working_memory;
-		sbrk(info.address-(int)sbrk(0));                // negative adjustment
-	}
-
-	if (lockunlockmem)
-	{
-		__dpmi_unlock_linear_region (&info);
-		printf ("Locked and unlocked %d Mb data\n", working_size / 0x100000);
-	}
-	else if (lockmem)
-	{
-		printf ("Locked %d Mb data\n", working_size / 0x100000);
-	}
-	else
-	{
-		printf ("Allocated %d Mb data\n", working_size / 0x100000);
-	}
-
-// touch all the memory to make sure it's there. The 16-page skip is to
-// keep Win 95 from thinking we're trying to page ourselves in (we are
-// doing that, of course, but there's no reason we shouldn't)
-	x = (byte *)working_memory;
-
-	for (j = 0; j < 4; j++)
-	{
-		for (i = 0; i < (working_size - 16 * 0x1000); i += 4)
-		{
-			sys_checksum += *(int *)&x[i];
-			sys_checksum += *(int *)&x[i + 16 * 0x1000];
-		}
-	}
-
-// give some of what we locked back for malloc before returning.  Done
-// by cheating and passing a negative value to sbrk
-	working_size -= LOCKED_FOR_MALLOC;
-	sbrk( -(LOCKED_FOR_MALLOC));
-	*size = working_size;
-
-	return working_memory;
-}
-#endif
+static __dpmi_meminfo	info; /* FS: Sigh, moved this here because everyone wants me to free this shit at exit.  Again, I'm pretty sure CWSDPMI is already taking care of this... */
 
 static int Sys_Get_Physical_Memory(void) /* FS: From DJGPP tutorial */
 {
@@ -368,10 +170,11 @@ static int Sys_Get_Physical_Memory(void) /* FS: From DJGPP tutorial */
 	return meminfo.available_memory;
 }
 
+/* FS: For /memstats */
 void Sys_Memory_Stats_f (void)
 {
-	Com_Printf("%d Mb available for Q2DOS.\n", (Sys_Get_Physical_Memory() / 0x100000) ); // FS: Added
-	Com_Printf("%lu Virtual Mb available for Q2DOS.\n", (_go32_dpmi_remaining_virtual_memory() / 0x100000) ); // FS: Added
+	Com_Printf("%d Mb available for Q2DOS.  Started with %d.\n", (Sys_Get_Physical_Memory() / 0x100000), physicalMemStart );
+	Com_Printf("%lu Virtual Mb available for Q2DOS. Started with %lu.\n", (_go32_dpmi_remaining_virtual_memory() / 0x100000), virtualMemStart );
 }
 /*
 ================
@@ -422,12 +225,16 @@ static void Sys_PageInProgram(void)
 			sys_checksum += *(int *)(i + 16 * 0x1000);
 		}
 	}
-	
-	printf("%d Mb available for Q2DOS.\n", (Sys_Get_Physical_Memory() / 0x100000) ); // FS: Added
-	printf("%lu Virtual Mb available for Q2DOS.\n", (_go32_dpmi_remaining_virtual_memory() / 0x100000) ); // FS: Added
+
+	/* FS: Report total amount available and save it for later if we run /memstats */
+	physicalMemStart = (Sys_Get_Physical_Memory() / 0x100000);
+	virtualMemStart = (_go32_dpmi_remaining_virtual_memory() / 0x100000);
+
+	printf("%d Mb available for Q2DOS.\n", physicalMemStart);
+	printf("%lu Virtual Mb available for Q2DOS.\n", virtualMemStart);
 }
 
-static void Sys_SetTextMode (void) // FS: This was used twice, let's make it a little cleaner if we can.
+static void Sys_SetTextMode (void) /* FS: This was used twice, let's make it a little cleaner if we can. */
 {
 	__dpmi_regs r;
 
@@ -442,7 +249,7 @@ void Sys_Error (char *error, ...)
 
 	if (!dedicated || !dedicated->value)
 	{
-		dos_restoreintr(9); // FS: Give back the keyboard
+		dos_restoreintr(9); /* FS: Give back the keyboard */
 	}
 
 	Sys_SetTextMode();
@@ -454,7 +261,7 @@ void Sys_Error (char *error, ...)
 	printf ("\n");
 
 	__dpmi_free_physical_address_mapping(&info);
-	__djgpp_nearptr_disable(); // FS: Everyone else is a master DOS DPMI programmer.  Pretty sure CWSDPMI is already taking care of this...
+	__djgpp_nearptr_disable(); /* FS: Everyone else is a master DOS DPMI programmer.  Pretty sure CWSDPMI is already taking care of this... */
 
 #if 0
 {	//we crash here so we can get a backtrace.  Yes it is ugly, and no this should never be in production!
@@ -471,7 +278,7 @@ void Sys_Quit (void)
 {
 	if(!dedicated || !dedicated->value)
 	{
-		dos_restoreintr(9); // FS: Give back the keyboard
+		dos_restoreintr(9); /* FS: Give back the keyboard */
 	}
 
 	if (unlockmem)
@@ -483,7 +290,7 @@ void Sys_Quit (void)
 	Sys_SetTextMode();
 	
 	__dpmi_free_physical_address_mapping(&info);
-	__djgpp_nearptr_disable(); // FS: Everyone else is a master DOS DPMI programmer.  Pretty sure CWSDPMI is already taking care of this...
+	__djgpp_nearptr_disable(); /* FS: Everyone else is a master DOS DPMI programmer.  Pretty sure CWSDPMI is already taking care of this... */
 
 	exit (0);
 }
@@ -574,7 +381,7 @@ void Sys_SendKeyEvents (void)
 
 	while (keybuf_head != keybuf_tail)
 	{
-		sys_msg_time = Sys_Milliseconds();//Sys_FloatTime();
+		sys_msg_time = Sys_Milliseconds();
 		k = keybuf[keybuf_tail++];
 		keybuf_tail &= (KEYBUF_SIZE-1);
 
@@ -639,7 +446,7 @@ void	Sys_Init (void)
 
 double Sys_FloatTime (void)
 {
-	return (double) uclock() / (double) UCLOCKS_PER_SEC; // FS: Win9X/Fast PC Fix (QIP)
+	return (double) uclock() / (double) UCLOCKS_PER_SEC; /* FS: From Q1--Win9X/Fast PC Fix (QIP) */
 }
 
 void Sys_MakeCodeWriteable(void)
@@ -649,7 +456,7 @@ void Sys_MakeCodeWriteable(void)
 
 //=============================================================================
 
-static void Sys_ParseEarlyArgs(int argc, char **argv) // FS: Parse some very specific args before Qcommon_Init
+static void Sys_ParseEarlyArgs(int argc, char **argv) /* FS: Parse some very specific args before Qcommon_Init */
 {
 	int i = 0;
 
@@ -673,7 +480,7 @@ Sys_NoFPUExceptionHandler
 */
 void Sys_NoFPUExceptionHandler(int whatever)
 {
-	printf ("\nError: Quake requires a floating-point processor\n");
+	printf ("\nError: Quake 2 for MS-DOS requires a floating-point processor\n");
 	exit (0);
 }
 
@@ -732,7 +539,7 @@ int main (int argc, char **argv)
 		while (time < 1);
 
 		Qcommon_Frame (time);
-		sys_frame_time = newtime; // FS: Need to update this for input to work properly
+		sys_frame_time = newtime; /* FS: Need to update this for input to work properly */
 		oldtime = newtime;
 	}
 }
