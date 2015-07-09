@@ -176,7 +176,7 @@ extern vec3_t vec3_origin;
 //float Q_fabs (float f);
 //#define       fabs(f) Q_fabs(f)
 // next define line was changed by 3.20  -FB
-#if !defined C_ONLY && !defined __linux__ && !defined __sgi
+#if defined(_MSC_VER) && defined(_M_IX86) && !defined(C_ONLY)
 extern long Q_ftol( float f );
 #else
 #define Q_ftol( f ) ( long ) (f)
