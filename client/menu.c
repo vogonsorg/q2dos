@@ -2535,7 +2535,7 @@ void Create_Savestrings (void)
 
 	for (i=0 ; i<MAX_SAVEGAMES ; i++)
 	{
-		Com_sprintf (name, sizeof(name), "%s/save/save%i/server.ssv", FS_Gamedir(), i);
+		Com_sprintf (name, sizeof(name), "%s/save/dossv%i/server.ssv", FS_Gamedir(), i);
 		f = fopen (name, "rb");
 		if (!f)
 		{
@@ -2556,7 +2556,7 @@ void LoadGameCallback( void *self )
 	menuaction_s *a = ( menuaction_s * ) self;
 
 	if ( m_savevalid[ a->generic.localdata[0] ] )
-		Cbuf_AddText (va("load save%i\n",  a->generic.localdata[0] ) );
+		Cbuf_AddText (va("load dossv%i\n",  a->generic.localdata[0] ) );
 	M_ForceMenuOff ();
 }
 
@@ -2627,7 +2627,7 @@ void SaveGameCallback( void *self )
 {
 	menuaction_s *a = ( menuaction_s * ) self;
 
-	Cbuf_AddText (va("save save%i\n", a->generic.localdata[0] ));
+	Cbuf_AddText (va("save dossv%i\n", a->generic.localdata[0] ));
 	M_ForceMenuOff ();
 }
 

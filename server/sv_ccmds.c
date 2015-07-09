@@ -293,7 +293,7 @@ void SV_WriteLevelFile (void)
 
 	Com_DPrintf(DEVELOPER_MSG_SAVE, "SV_WriteLevelFile()\n");
 
-	Com_sprintf (name, sizeof(name), "%s/save/current/%s.sv2", FS_Gamedir(), sv.name);
+	Com_sprintf (name, sizeof(name), "%s/save/doscursv/%s.sv2", FS_Gamedir(), sv.name);
 	f = fopen(name, "wb");
 	if (!f)
 	{
@@ -304,7 +304,7 @@ void SV_WriteLevelFile (void)
 	CM_WritePortalState (f);
 	fclose (f);
 
-	Com_sprintf (name, sizeof(name), "%s/save/current/%s.sav", FS_Gamedir(), sv.name);
+	Com_sprintf (name, sizeof(name), "%s/save/doscursv/%s.sav", FS_Gamedir(), sv.name);
 	ge->WriteLevel (name);
 }
 
@@ -321,7 +321,7 @@ void SV_ReadLevelFile (void)
 
 	Com_DPrintf(DEVELOPER_MSG_SAVE, "SV_ReadLevelFile()\n");
 
-	Com_sprintf (name, sizeof(name), "%s/save/current/%s.sv2", FS_Gamedir(), sv.name);
+	Com_sprintf (name, sizeof(name), "%s/save/doscursv/%s.sv2", FS_Gamedir(), sv.name);
 	f = fopen(name, "rb");
 	if (!f)
 	{
@@ -332,7 +332,7 @@ void SV_ReadLevelFile (void)
 	CM_ReadPortalState (f);
 	fclose (f);
 
-	Com_sprintf (name, sizeof(name), "%s/save/current/%s.sav", FS_Gamedir(), sv.name);
+	Com_sprintf (name, sizeof(name), "%s/save/doscursv/%s.sav", FS_Gamedir(), sv.name);
 	ge->ReadLevel (name);
 }
 
@@ -353,7 +353,7 @@ void SV_WriteServerFile (qboolean autosave)
 
 	Com_DPrintf(DEVELOPER_MSG_SAVE, "SV_WriteServerFile(%s)\n", autosave ? "true" : "false");
 
-	Com_sprintf (fileName, sizeof(fileName), "%s/save/current/server.ssv", FS_Gamedir());
+	Com_sprintf (fileName, sizeof(fileName), "%s/save/doscursv/server.ssv", FS_Gamedir());
 	f = fopen (fileName, "wb");
 	if (!f)
 	{
@@ -407,7 +407,7 @@ void SV_WriteServerFile (qboolean autosave)
 	fclose (f);
 
 	// write game state
-	Com_sprintf (fileName, sizeof(fileName), "%s/save/current/game.ssv", FS_Gamedir());
+	Com_sprintf (fileName, sizeof(fileName), "%s/save/doscursv/game.ssv", FS_Gamedir());
 	ge->WriteGame (fileName, autosave);
 }
 
@@ -426,7 +426,7 @@ void SV_ReadServerFile (void)
 
 	Com_DPrintf(DEVELOPER_MSG_SAVE, "SV_ReadServerFile()\n");
 
-	Com_sprintf (fileName, sizeof(fileName), "%s/save/current/server.ssv", FS_Gamedir());
+	Com_sprintf (fileName, sizeof(fileName), "%s/save/doscursv/server.ssv", FS_Gamedir());
 	f = fopen (fileName, "rb");
 	if (!f)
 	{
@@ -459,7 +459,7 @@ void SV_ReadServerFile (void)
 	Q_strncpyz (svs.mapcmd, mapcmd, sizeof(svs.mapcmd));
 
 	// read game state
-	Com_sprintf (fileName, sizeof(fileName), "%s/save/current/game.ssv", FS_Gamedir());
+	Com_sprintf (fileName, sizeof(fileName), "%s/save/doscursv/game.ssv", FS_Gamedir());
 	ge->ReadGame (fileName);
 }
 
@@ -479,6 +479,34 @@ Puts the server in demo mode on a specific map/cinematic
 void SV_DemoMap_f (void)
 {
 	SV_Map (true, Cmd_Argv(1), false );
+}
+
+/* FS: Check to see if this is a cinematic in the gamemap <string> */
+qboolean SV_NotCinematic (char *map)
+{
+	char mapTemp[MAX_OSPATH];
+	char *ch;
+
+	Q_strncpyz(mapTemp, map, sizeof(mapTemp));
+
+	if(strstr(mapTemp, ".cin") || strstr(mapTemp, ".pcx"))
+	{
+//		Com_Printf("Found cin\n");
+		ch = strstr(mapTemp, "+");
+
+		if (ch && (strstr(ch, ".cin") || strstr(ch, ".pcx")) ) /* FS: Stepped forward and it's level+cinematic */
+		{
+//			Com_Printf("Found cinematic at the end: %s\n", ch);
+			return true;
+		}
+		else
+		{
+//			Com_Printf("Cinematic at the beginning, skipping autosave\n");
+			return false;
+		}
+	}
+
+	return true;
 }
 
 /*
@@ -502,7 +530,7 @@ goes to map jail.bsp.
 void SV_GameMap_f (void)
 {
 	char		*map;
-	int			i, l;
+	int			i;
 	client_t	*cl;
 	qboolean	*savedInuse;
 
@@ -514,14 +542,14 @@ void SV_GameMap_f (void)
 
 	Com_DPrintf(DEVELOPER_MSG_SAVE, "SV_GameMap(%s)\n", Cmd_Argv(1));
 
-	FS_CreatePath (va("%s/save/current/", FS_Gamedir()));
+	FS_CreatePath (va("%s/save/doscursv/", FS_Gamedir()));
 
 	// check for clearing the current savegame
 	map = Cmd_Argv(1);
 	if (map[0] == '*')
 	{
 		// wipe all the *.sav files
-		SV_WipeSavegame ("current");
+		SV_WipeSavegame ("doscursv");
 	}
 	else
 	{	// save the map just exited
@@ -554,12 +582,10 @@ void SV_GameMap_f (void)
 
 	// copy off the level to the autosave slot
 	// Knightmare- don't do this in deathmatch or for cinematics
-	l = strlen(map);
-	if ( !dedicated->value && !Cvar_VariableValue("deathmatch")
-		&& Q_strcasecmp (map+l-4, ".cin") && Q_strcasecmp (map+l-4, ".pcx") )
+	if ( !dedicated->value && !Cvar_VariableValue("deathmatch") && SV_NotCinematic(map)) /* FS: Made it a function because it didn't work */
 	{
 		SV_WriteServerFile (true);
-		SV_CopySaveGame ("current", "save0");
+		SV_CopySaveGame ("doscursv", "dossv0");
 	}
 }
 
@@ -597,7 +623,7 @@ void SV_Map_f (void)
 	}
 
 	sv.state = ss_dead;		// don't save current level when changing
-	SV_WipeSavegame("current");
+	SV_WipeSavegame("doscursv");
 	SV_GameMap_f ();
 }
 
@@ -646,7 +672,7 @@ void SV_Loadgame_f (void)
 	}
 	fclose (f);
 
-	SV_CopySaveGame (Cmd_Argv(1), "current");
+	SV_CopySaveGame (Cmd_Argv(1), "doscursv");
 
 	SV_ReadServerFile ();
 
@@ -695,9 +721,9 @@ void SV_Savegame_f (void)
 		return;
 	}
 
-	if (!strcmp (Cmd_Argv(1), "current"))
+	if (!strcmp (Cmd_Argv(1), "doscursv"))
 	{
-		Com_Printf ("Can't save to 'current'\n");
+		Com_Printf ("Can't save to 'doscursv'\n");
 		return;
 	}
 
@@ -724,7 +750,7 @@ void SV_Savegame_f (void)
 	SV_WriteServerFile (false);
 
 	// copy it off
-	SV_CopySaveGame ("current", dir);
+	SV_CopySaveGame ("doscursv", dir);
 
 	Com_Printf ("Done.\n");
 }
