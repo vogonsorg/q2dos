@@ -9,9 +9,6 @@
 
 #include "../qcommon/qcommon.h"
 
-extern	void vectoangles2 (vec3_t value1, vec3_t angles);
-extern	vec3_t monster_flash_offset [];
-
 /* FS: The following is gross, but I just figured this out. */
 DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (__dj_assert)
@@ -51,7 +48,6 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (memcmp)
 	DXE_EXPORT (memcpy)
 	DXE_EXPORT (memset)
-	DXE_EXPORT (monster_flash_offset)
 	DXE_EXPORT (printf)
 	DXE_EXPORT (putc)
 	DXE_EXPORT (puts)
@@ -83,7 +79,6 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (tan)
 	DXE_EXPORT (time)
 	DXE_EXPORT (tolower)
-	DXE_EXPORT (vectoangles2)
 	DXE_EXPORT (vsprintf)
 DXE_EXPORT_END
 
@@ -161,3 +156,4 @@ void *Sys_GetGameAPI (void *parms)
 }
 
 #endif /* GAME_HARD_LINKED */
+
