@@ -55,6 +55,8 @@ static menulist_s		s_waterwarp_box; // FS
 static menuaction_s		s_cancel_action[NUM_VID_DRIVERS];
 static menuaction_s		s_defaults_action[NUM_VID_DRIVERS];
 
+static const char *		resolution_names[MAX_RESOLUTIONS + 1];
+				// namelist initialized by VID_Init()
 
 viddef_t	viddef;				// global video state
 
@@ -120,12 +122,6 @@ static qboolean VID_GetModeInfo(int *width, int *height, int mode)
 
 	//Com_Printf("VID_GetModeInfo %dx%d mode %d\n",*width,*height,mode);
 	return true;
-}
-
-static void ResolutionCallback(void *s)
-{
-	menulist_s		*slist = (menulist_s *) s;
-	slist->itemnames[slist->curvalue] = vid_resolutions[slist->curvalue].menuname;
 }
 
 static void ScreenSizeCallback(void *s)
@@ -222,6 +218,7 @@ static void VID_LoadRefresh (void) // FS: Needed for dynamic changing game modes
 void	VID_Init (void)
 {
 	refimport_t	ri;
+	int		i;
 
 	memset(vid_resolutions,0x0,sizeof(vid_resolutions));
 	VID_InitExtra(); //probe VESA
@@ -229,6 +226,13 @@ void	VID_Init (void)
 	currentvideomode=0;
 	viddef.width = 320;
 	viddef.height = 240;
+
+	for (i = 0; i < MAX_RESOLUTIONS; ++i)
+	{
+		resolution_names[i] = (i < num_vid_resolutions)?
+					vid_resolutions[i].menuname : NULL;
+	}
+	resolution_names[MAX_RESOLUTIONS] = NULL;
 
 	ri.Cmd_AddCommand = Cmd_AddCommand;
 	ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
@@ -297,32 +301,6 @@ void	VID_CheckChanges (void)
 
 void	VID_MenuInit (void)
 {
-	// FS: Bah, this is kind of dumb.  Oh well.
-	static const char *resolutions[] = 
-	{
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		"[]",
-		0
-		};
-
 	static const char *yesno_names[] = {
 		"no",
 		"yes",
@@ -361,10 +339,8 @@ void	VID_MenuInit (void)
 		s_mode_list[i].generic.name = "video resolution";
 		s_mode_list[i].generic.x = 0;
 		s_mode_list[i].generic.y = 10; // FS: Y position for where the spin control ends up
-		s_mode_list[i].itemnames = resolutions;
-		s_mode_list->itemnames[i] = vid_resolutions[s_mode_list->curvalue].menuname;
-		s_mode_list->itemnames[num_vid_resolutions] = 0; // FS: Put 0 in the middle of the resolutions array so we don't spill over to non-existant modes
-		s_mode_list[i].generic.callback = ResolutionCallback;
+		s_mode_list[i].generic.callback = NULL;
+		s_mode_list[i].itemnames = resolution_names;
 
 		s_screensize_slider[i].generic.type	= MTYPE_SLIDER;
 		s_screensize_slider[i].generic.x		= 0;
@@ -455,9 +431,6 @@ void	VID_MenuDraw (void)
 	** draw the menu
 	*/
 	Menu_Draw( s_current_menu );
-
-	if (s_current_menu_index == 0) // FS: Hack, first time its drawn stupid shit happens, so update it immediately.
-		ResolutionCallback(&s_mode_list[SOFTWARE_MENU]);
 }
 
 const char *VID_MenuKey (int k)
@@ -508,7 +481,7 @@ static void VID_ListModes_f (void) // FS: Added
 {
 	int i = 0;
 
-	for(i = 0; i <= num_vid_resolutions; i++)
+	for(i = 0; i < num_vid_resolutions; i++)
 	{
 		if(vid_resolutions[i].menuname[0] != 0)
 		{
