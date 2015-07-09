@@ -90,7 +90,7 @@ DXE_EXPORT_END
 
 static void (*game_library)(void);
 
-void    Sys_UnloadGame (void)
+void Sys_UnloadGame (void)
 {
 	if (game_library)
 	{
@@ -159,7 +159,7 @@ void *Sys_GetGameAPI (void *parms)
 		}
 	}
 
-	*(void **) (&GetGameAPI) = dlsym (game_library, "_GetGameAPI");
+	GetGameAPI = (void *) dlsym (game_library, "_GetGameAPI");
 	if (!GetGameAPI)
 	{
 		Sys_UnloadGame ();
