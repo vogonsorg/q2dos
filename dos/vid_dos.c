@@ -211,7 +211,7 @@ static void VID_LoadRefresh (void) // FS: Needed for dynamic changing game modes
 		Com_Error (ERR_FATAL, "Couldn't start refresh");
 
 	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
-	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE|CVAR_NOSET);
+	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE);
 	vid_gamma = Cvar_Get("vid_gamma", "1", CVAR_ARCHIVE);
 }
 
@@ -262,7 +262,7 @@ void	VID_Init (void)
 
 	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
 	vid_ref->description = "Video renderer to use.  Locked to software in Q2DOS.";
-	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE|CVAR_NOSET);
+	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE);
 	vid_fullscreen->description = "Enable fullscreen video.  Locked to fullscreen in Q2DOS.";
 	vid_gamma = Cvar_Get( "vid_gamma", "1", CVAR_ARCHIVE );
 	Cmd_AddCommand("vid_restart", VID_Restart_f);

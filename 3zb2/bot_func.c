@@ -82,7 +82,7 @@ void Load_BotInfo()
 
 	//botlist value
 	botlist = gi.cvar ("botlist", "default", CVAR_SERVERINFO | CVAR_LATCH);
-	gamepath = gi.cvar ("game", "", CVAR_NOSET);
+	gamepath = gi.cvar ("game", "", 0); /* FS: CVAR_SERVERINFO | CVAR_LATCH are setup later in qcommon\files.c */
 
 	//load info	
 	sprintf(Buff,"%s/3ZB.cfg",gamepath->string);
