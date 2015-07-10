@@ -559,7 +559,11 @@ void V_RenderView( float stereo_separation )
 		cl.refdef.lightstyles = r_lightstyles;
 
 		cl.refdef.rdflags = cl.frame.playerstate.rdflags;
-		if (fov_adapt->value) cl.refdef.rdflags |= 0x40000000;
+		if (fov_adapt->value)
+#ifdef __MSDOS__
+		    if ((cl.refdef.height / cl.refdef.width) * (320.0f / 240.0f) <= 1.10f)
+#endif
+			cl.refdef.rdflags |= 0x40000000;
 
 		// sort entities for better cache locality
         qsort( cl.refdef.entities, cl.refdef.num_entities, sizeof( cl.refdef.entities[0] ), (int (*)(const void *, const void *))entitycmpfnc );

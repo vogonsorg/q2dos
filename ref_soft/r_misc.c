@@ -372,7 +372,7 @@ void R_ViewChanged (vrect_t *vr, float aspect)
 	// 320*200 1.0 pixelAspect = 1.6 screenAspect
 	// 320*240 1.0 pixelAspect = 1.3333 screenAspect
 	// proper 320*200 pixelAspect = 0.8333333
-	if (r_newrefdef.rdflags & 0x40000000)
+	if (r_newrefdef.rdflags & 0x40000000) /* fov_adapt in effect */
 	{
 		pixelAspect = 1;
 		verticalFieldOfView = 2.0 * tan (r_newrefdef.fov_y/360*M_PI);
@@ -404,7 +404,9 @@ void R_ViewChanged (vrect_t *vr, float aspect)
 	xscaleinv = 1.0 / xscale;
 
 //	yscale = xscale;
-	yscale = xscale * pixelAspect; /* FS: From Q1 */
+	yscale = (r_newrefdef.rdflags & 0x40000000)? /* fov_adapt ?? */
+			  r_refdef.vrect.height / verticalFieldOfView :
+			  xscale * pixelAspect;
 	aliasyscale = yscale * r_aliasuvscale;
 	yscaleinv = 1.0 / yscale;
 	xscaleshrink = (r_refdef.vrect.width-6)/r_refdef.horizontalFieldOfView;
