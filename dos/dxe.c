@@ -114,6 +114,8 @@ static void *dxe_res (const char *symname)
 
 void *Sys_GetGameAPI (void *parms)
 {
+	static int	firsttime = 1;
+
 	void	*(*GetGameAPI) (void *);
 	char	name[MAX_OSPATH];
 	char	curpath[MAX_OSPATH];
@@ -124,11 +126,14 @@ void *Sys_GetGameAPI (void *parms)
 
 	Com_Printf("------- Loading %s -------\n", gamename);
 
-	/* Set the error callback function */
-	_dlsymresolver = dxe_res;
-
-	/* Register the symbols exported into dynamic modules */
-	dlregsym (syms);
+	if (firsttime)
+	{
+		firsttime = 0;
+		/* Set the error callback function */
+		_dlsymresolver = dxe_res;
+		/* Register the symbols exported into dynamic modules */
+		dlregsym (syms);
+	}
 
 	/* now run through the search paths */
 	for (path = NULL; ; )
