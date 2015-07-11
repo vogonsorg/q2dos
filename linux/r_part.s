@@ -17,7 +17,7 @@
 .global C(BlendParticle33)
 C(BlendParticle33):
 	//	return vid.alphamap[pcolor + dstcolor*256];
-	movl C(vid.alphamap), %ebp
+	movl C(alphamap), %ebp
 	xor %ebx, %ebx
 
 	movb (%edi, %ebx), %bl
@@ -35,7 +35,7 @@ C(BlendParticle33):
 .global C(BlendParticle66)
 C(BlendParticle66):
 	//	return vid.alphamap[pcolor*256 + dstcolor];
-	movl C(vid.alphamap), %ebp
+	movl C(alphamap), %ebp
 	xor %ebx, %ebx
 
 	shl $8, %eax
@@ -71,8 +71,10 @@ C(D_DrawParticle):
 //	static float    point_five         = 0.5F;
 //	static float    eight_thousand_hex = 0x8000;
 
-	pushl	%ebp				// preserve caller's stack frame
-	pushl	%esi				// preserve register variables
+// preserve caller's stack frame
+	pushl	%ebp
+// preserve register variables
+	pushl	%esi
 	pushl	%edi
 
 	movl	ebpsave(%esp),%edi
@@ -80,52 +82,53 @@ C(D_DrawParticle):
 // transform the particle
 	// VectorSubtract (pparticle->origin, r_origin, local);
 	movl C(partparms.particle), %esi
-	fld  dword ptr [esi+0]          // p_o.x
-	fsub dword ptr [r_origin+0]     // p_o.x-r_o.x
-	fld  dword ptr [esi+4]          // p_o.y | p_o.x-r_o.x
-	fsubs C(r_origin)+4     // p_o.y-r_o.y | p_o.x-r_o.x
-	fld  dword ptr [esi+8]          // p_o.z | p_o.y-r_o.y | p_o.x-r_o.x
-	fsubs C(r_origin)+8     // p_o.z-r_o.z | p_o.y-r_o.y | p_o.x-r_o.x
-	fxch %st(2)                      // p_o.x-r_o.x | p_o.y-r_o.y | p_o.z-r_o.z
-	fstp dword ptr [local+0]        // p_o.y-r_o.y | p_o.z-r_o.z
-	fstp dword ptr [local+4]        // p_o.z-r_o.z
-	fstp dword ptr [local+8]        // (empty)
+
+	fld  dword ptr [esi+0]
+	fsub dword ptr [r_origin+0]
+	fld  dword ptr [esi+4]
+	fsubs C(r_origin)+4
+	fld  dword ptr [esi+8]
+	fsubs C(r_origin)+8
+	fxch %st(2)
+	fstp dword ptr [local+0]
+	fstp dword ptr [local+4]
+	fstp dword ptr [local+8]
 
 	// transformed[0] = DotProduct(local, r_pright);
 	// transformed[1] = DotProduct(local, r_pup);
 	// transformed[2] = DotProduct(local, r_ppn);
-	__asm fld  dword ptr [local+0]        ; l.x
-	__asm fmul dword ptr [r_pright+0]     ; l.x*pr.x
-	__asm fld  dword ptr [local+4]        ; l.y | l.x*pr.x
-	__asm fmul dword ptr [r_pright+4]     ; l.y*pr.y | l.x*pr.x
-	__asm fld  dword ptr [local+8]        ; l.z | l.y*pr.y | l.x*pr.x
-	__asm fmul dword ptr [r_pright+8]     ; l.z*pr.z | l.y*pr.y | l.x*pr.x
-	fxch %st(2)                      ; l.x*pr.x | l.y*pr.y | l.z*pr.z
-	__asm faddp st(1), st                 ; l.x*pr.x + l.y*pr.y | l.z*pr.z
-	__asm faddp st(1), st                 ; l.x*pr.x + l.y*pr.y + l.z*pr.z
-	__asm fstp  dword ptr [transformed+0] ; (empty)
+	__asm fld  dword ptr [local+0]
+	__asm fmul dword ptr [r_pright+0]
+	__asm fld  dword ptr [local+4]
+	__asm fmul dword ptr [r_pright+4]
+	__asm fld  dword ptr [local+8]
+	__asm fmul dword ptr [r_pright+8]
+	fxch %st(2)
+	__asm faddp st(1), st
+	__asm faddp st(1), st
+	__asm fstp  dword ptr [transformed+0]
 
-	__asm fld  dword ptr [local+0]        ; l.x
-	__asm fmul dword ptr [r_pup+0]        ; l.x*pr.x
-	__asm fld  dword ptr [local+4]        ; l.y | l.x*pr.x
-	__asm fmul dword ptr [r_pup+4]        ; l.y*pr.y | l.x*pr.x
-	__asm fld  dword ptr [local+8]        ; l.z | l.y*pr.y | l.x*pr.x
-	__asm fmul dword ptr [r_pup+8]        ; l.z*pr.z | l.y*pr.y | l.x*pr.x
-	fxch %st(2)                      ; l.x*pr.x | l.y*pr.y | l.z*pr.z
-	__asm faddp st(1), st                 ; l.x*pr.x + l.y*pr.y | l.z*pr.z
-	__asm faddp st(1), st                 ; l.x*pr.x + l.y*pr.y + l.z*pr.z
-	__asm fstp  dword ptr [transformed+4] ; (empty)
+	__asm fld  dword ptr [local+0]
+	__asm fmul dword ptr [r_pup+0]
+	__asm fld  dword ptr [local+4]
+	__asm fmul dword ptr [r_pup+4]
+	__asm fld  dword ptr [local+8]
+	__asm fmul dword ptr [r_pup+8]
+	fxch %st(2)
+	__asm faddp st(1), st
+	__asm faddp st(1), st
+	__asm fstp  dword ptr [transformed+4]
 
-	__asm fld  dword ptr [local+0]        ; l.x
-	__asm fmul dword ptr [r_ppn+0]        ; l.x*pr.x
-	__asm fld  dword ptr [local+4]        ; l.y | l.x*pr.x
-	__asm fmul dword ptr [r_ppn+4]        ; l.y*pr.y | l.x*pr.x
-	__asm fld  dword ptr [local+8]        ; l.z | l.y*pr.y | l.x*pr.x
-	__asm fmul dword ptr [r_ppn+8]        ; l.z*pr.z | l.y*pr.y | l.x*pr.x
-	fxch %st(2)                      ; l.x*pr.x | l.y*pr.y | l.z*pr.z
-	__asm faddp st(1), st                 ; l.x*pr.x + l.y*pr.y | l.z*pr.z
-	__asm faddp st(1), st                 ; l.x*pr.x + l.y*pr.y + l.z*pr.z
-	__asm fstp  dword ptr [transformed+8] ; (empty)
+	__asm fld  dword ptr [local+0]
+	__asm fmul dword ptr [r_ppn+0]
+	__asm fld  dword ptr [local+4]
+	__asm fmul dword ptr [r_ppn+4]
+	__asm fld  dword ptr [local+8]
+	__asm fmul dword ptr [r_ppn+8]
+	fxch %st(2)
+	__asm faddp st(1), st
+	__asm faddp st(1), st
+	__asm fstp  dword ptr [transformed+8]
 
 	/*
 	** make sure that the transformed particle is not in front of
@@ -182,22 +185,22 @@ done_selecting_blend_func:
 
 	// u = (int)(xcenter + zi * transformed[0] + 0.5);
 	// v = (int)(ycenter - zi * transformed[1] + 0.5);
-	__asm fld   zi                           ; zi
-	__asm fmul  dword ptr [transformed+0]    ; zi * transformed[0]
-	__asm fld   zi                           ; zi | zi * transformed[0]
-	__asm fmul  dword ptr [transformed+4]    ; zi * transformed[1] | zi * transformed[0]
-	fxch  %st(1)                        ; zi * transformed[0] | zi * transformed[1]
-	__asm fadd  xcenter                      ; xcenter + zi * transformed[0] | zi * transformed[1]
-	fxch  %st(1)                        ; zi * transformed[1] | xcenter + zi * transformed[0]
-	__asm fld   ycenter                      ; ycenter | zi * transformed[1] | xcenter + zi * transformed[0]
-    __asm fsubrp st(1), st(0)                ; ycenter - zi * transformed[1] | xcenter + zi * transformed[0]
-  	fxch  %st(1)                        ; xcenter + zi * transformed[0] | ycenter + zi * transformed[1]
-  	__asm fadd  point_five                   ; xcenter + zi * transformed[0] + 0.5 | ycenter - zi * transformed[1]
-  	fxch  %st(1)                        ; ycenter - zi * transformed[1] | xcenter + zi * transformed[0] + 0.5 
-  	__asm fadd  point_five                   ; ycenter - zi * transformed[1] + 0.5 | xcenter + zi * transformed[0] + 0.5 
-  	fxch  %st(1)                        ; u | v
-  	__asm fistp dword ptr [u]                ; v
-  	__asm fistp dword ptr [v]                ; (empty)
+	__asm fld   zi
+	__asm fmul  dword ptr [transformed+0]
+	__asm fld   zi
+	__asm fmul  dword ptr [transformed+4]
+	fxch  %st(1)
+	__asm fadd  xcenter
+	fxch  %st(1)
+	__asm fld   ycenter
+	__asm fsubrp st(1), st(0)
+  	fxch  %st(1)
+  	__asm fadd  point_five
+  	fxch  %st(1)
+  	__asm fadd  point_five
+  	fxch  %st(1)
+  	__asm fistp dword ptr [u]
+  	__asm fistp dword ptr [v]
 
 	/*
 	** clip out the particle
@@ -249,7 +252,7 @@ done_selecting_blend_func:
 	// EDI = pdest = d_viewbuffer + d_scantable[v] + u;
 	__asm lea edi, [d_scantable+ecx*4]
 	__asm mov edi, [edi]
-	addl C(d_viewbuffer), %edi // FS: vid.buffer?
+	addl C(d_viewbuffer), %edi
 	addl %ebx, %edi
 
 	// complete
@@ -371,7 +374,7 @@ end_of_horiz_loop:
 end:
 	popl %edi
 	popl %esi
-	movl %epbsave, %ebp
+	movl epbsave, %ebp
 	ret
 
 #endif /* id386 */

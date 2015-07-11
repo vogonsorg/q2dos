@@ -200,6 +200,7 @@
 	.extern C(D_PolysetSetEdgeTable)
 	.extern C(D_RasterizeAliasPolySmooth)
 	.extern C(d_pdrawspans) /* FS: For R_PolysetCalcGradients */
+	.extern C(alphamap) /* FS: For r_part.s TODO: from vid.alpha */
 
 	.extern float_point5
 	.extern Float2ToThe31nd
