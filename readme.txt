@@ -60,7 +60,7 @@ Tips and other misc info:
   - Note: As of cutemouse-2.1-beta4 version (cutemouse21b4.zip), the wheel is
     not enabled by default: you must use their /O switch.
 * Hor+ style field of view (FOV) scaling: Useful for widescreen resolutions.
-  Configured by new cvar fov_adapt: set it to 1 and your fov will be scaled
+  Configured by new cvar fov_adapt: set it to 1 and your FOV will be scaled
   automatically according to the resolution. It is enabled by default.
 * MEMSTATS command will report available Physical and Virtual Memory in Mb.
   You will notice the number will never rise, this is on purpose.

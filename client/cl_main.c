@@ -1744,6 +1744,7 @@ void CL_InitLocal (void)
 	hand = Cvar_Get ("hand", "0", CVAR_USERINFO | CVAR_ARCHIVE);
 	fov = Cvar_Get ("fov", "90", CVAR_USERINFO | CVAR_ARCHIVE);
 	fov_adapt = Cvar_Get ("fov_adapt", "1", CVAR_ARCHIVE);
+	fov_adapt->description = "Hor+ style field of view (FOV) scaling: Useful for widescreen resolutions. If enabled your FOV will be scaled automatically according to the resolution.";
 	gender = Cvar_Get ("gender", "male", CVAR_USERINFO | CVAR_ARCHIVE);
 	gender_auto = Cvar_Get ("gender_auto", "1", CVAR_ARCHIVE);
 	gender->modified = false; // clear this so we know when user sets it manually

@@ -679,6 +679,8 @@ typedef struct
 #define RDF_UVGOGGLES		8
 //ROGUE
 
+#define RDF_FOVADAPT		0x40000000 /* FS: For sezeros fov_adapt CVAR */
+
 //
 // muzzle flashes / player effects
 //

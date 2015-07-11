@@ -23,7 +23,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 extern	struct model_s	*cl_mod_powerscreen;
 extern void vectoangles2 (vec3_t value1, vec3_t angles);
-extern	cvar_t	*fov_adapt;
 
 //PGM
 int	vidref_val;

@@ -39,7 +39,6 @@ cvar_t		*r_contentblend; // FS: Fucking hate palette blends from gun fire, etc.
 
 cvar_t		*cl_stats;
 extern	cvar_t	*skin; // FS: From KMQ2
-extern	cvar_t	*fov_adapt;
 
 int			r_numdlights;
 dlight_t	r_dlights[MAX_DLIGHTS];
@@ -563,7 +562,7 @@ void V_RenderView( float stereo_separation )
 #ifdef __MSDOS__
 		    if ((cl.refdef.height / cl.refdef.width) * (320.0f / 240.0f) <= 1.10f)
 #endif
-			cl.refdef.rdflags |= 0x40000000;
+			cl.refdef.rdflags |= RDF_FOVADAPT;
 
 		// sort entities for better cache locality
         qsort( cl.refdef.entities, cl.refdef.num_entities, sizeof( cl.refdef.entities[0] ), (int (*)(const void *, const void *))entitycmpfnc );

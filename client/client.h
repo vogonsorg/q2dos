@@ -56,7 +56,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define CURL_ERROR(x)	curl_easy_strerror(x)
 //#endif
 
-#define MAX_HTTP_HANDLES 4 // FS: If I want to be nasty and change the value
+#define MAX_HTTP_HANDLES 4 /* FS: If I want to be nasty and change the value */
 
 #endif	// USE_CURL
 // end HTTP downloading from R1Q2
@@ -120,7 +120,7 @@ void CL_RunHTTPDownloads (void);
 qboolean CL_PendingHTTPDownloads (void);
 void CL_SetHTTPServer (const char *URL);
 void CL_HTTP_Cleanup (qboolean fullShutdown);
-void CL_HTTP_ResetMapAbort (void);	// Knightmare added
+void CL_HTTP_ResetMapAbort (void);	/* Knightmare added */
 
 typedef enum
 {
@@ -221,7 +221,7 @@ typedef struct
 	int			servercount;	// server identification for prespawns
 	char		gamedir[MAX_QPATH];
 	int			playernum;
-	int			maxclients; // FS: From R1Q2
+	int			maxclients; /* FS: From R1Q2 */
 
 	char		configstrings[MAX_CONFIGSTRINGS][MAX_QPATH];
 
@@ -273,8 +273,8 @@ typedef struct
 	keydest_t	key_dest;
 
 	int			framecount;
-	double		spamTime; // FS: From R1Q2
-	double		lastSpamTime; // FS: From R1Q2
+	double		spamTime; /* FS: From R1Q2 */
+	double		lastSpamTime; /* FS: From R1Q2 */
 	double		realtime;			// always increasing, no clamping, etc
 	double		frametime;			// seconds since last frame
 	double		netFrameTime;		// seconds since last packet frame
@@ -306,9 +306,9 @@ typedef struct
 	dltype_t	downloadtype;
 	size_t		downloadposition;	// added for HTTP downloads
 	int			downloadpercent;
-	float		downloadrate;		// Knightmare- to display KB/s
-	int			gamespypercent; // FS: For gamespy
-	int			gamespyupdate; // FS: For gamespy
+	float		downloadrate;		/* Knightmare- to display KB/s */
+	int			gamespypercent; /* FS: For gamespy */
+	int			gamespyupdate; /* FS: For gamespy */
 
 // demo recording info must be here, so it isn't cleared on level change
 	qboolean	demorecording;
@@ -327,7 +327,7 @@ typedef struct
 	//large files.
 
 	char			downloadServer[512];	//base url prefix to download from
-	char			downloadServerRetry[512]; // FS: Added because Whale's Weapons HTTP server rejects you after a lot of 404s.  Then you lose HTTP until a hard reconnect.
+	char			downloadServerRetry[512]; /* FS: Added because Whale's Weapons HTTP server rejects you after a lot of 404s.  Then you lose HTTP until a hard reconnect. */
 	char			downloadReferer[32];	//libcurl requires a static string :(
 #endif	// USE_CURL
 } client_static_t;
@@ -352,7 +352,7 @@ extern	cvar_t	*cl_footsteps;
 extern	cvar_t	*cl_noskins;
 extern	cvar_t	*cl_autoskins;
 
-// Knightmare- whether to try to play OGGs instead of CD tracks
+/* Knightmare- whether to try to play OGGs instead of CD tracks */
 extern	cvar_t	*cl_ogg_music;
 extern	cvar_t	*cl_rogue_music; // whether to play Rogue tracks
 extern	cvar_t	*cl_xatrix_music; // whether to play Xatrix tracks
@@ -394,18 +394,20 @@ extern	cvar_t	*cl_async;
 
 extern	cvar_t	*cl_vwep;
 
-// FS: Gamespy stuff
+/* FS: Gamespy stuff */
 extern	cvar_t	*cl_master_server_ip;
 extern	cvar_t	*cl_master_server_port;
 extern	cvar_t	*s_gamespy_sounds;
 extern	cvar_t	*cl_master_server_timeout;
 
-#ifdef USE_CURL	// HTTP downloading from R1Q2
+#ifdef USE_CURL	/* HTTP downloading from R1Q2 */
 extern	cvar_t	*cl_http_downloads;
 extern	cvar_t	*cl_http_filelists;
 extern	cvar_t	*cl_http_proxy;
 extern	cvar_t	*cl_http_max_connections;
-#endif	// USE_CURL
+#endif	/* USE_CURL */
+
+extern	cvar_t	*fov_adapt; /* sezero */
 
 typedef struct
 {
@@ -538,7 +540,7 @@ void CL_ParseFrame (void);
 
 void CL_ParseTEnt (void);
 void CL_ParseConfigString (void);
-void CL_PlayBackgroundTrack (void); // Knightmare added
+void CL_PlayBackgroundTrack (void); /* Knightmare added */
 void CL_ParseMuzzleFlash (void);
 void CL_ParseMuzzleFlash2 (void);
 void SmokeAndFlash(vec3_t origin);
@@ -581,7 +583,7 @@ void CL_GetChallengePacket (void);
 void CL_PingServers_f (void);
 void CL_Snd_Restart_f (void);
 void CL_RequestNextDownload (void);
-void CL_WriteConfig_f (void);	// Knightmare- added writeconfig command
+void CL_WriteConfig_f (void);	/* Knightmare- added writeconfig command */
 
 //
 // cl_input
@@ -639,8 +641,8 @@ void CL_LoadClientinfo (clientinfo_t *ci, char *s);
 void SHOWNET(char *s);
 void CL_ParseClientinfo (int player);
 void CL_Download_f (void);
-void CL_Download_Reset_KBps_counter (void); // FS
-void CL_Download_Calculate_KBps (int byteDistance, int totalSize); // FS
+void CL_Download_Reset_KBps_counter (void); /* FS: Added KB/s download counter */
+void CL_Download_Calculate_KBps (int byteDistance, int totalSize); /* FS: Added KB/s download counter */
 
 //
 // cl_view.c
@@ -689,7 +691,7 @@ void CL_TrapParticles (entity_t *ent);
 //
 
 #define MAX_SERVERS 50
-// FS: Gamespy browser
+/* FS: Gamespy browser */
 typedef struct
 {
 	char ip[15];
