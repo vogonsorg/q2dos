@@ -40,10 +40,8 @@ endif
 
 ifeq ($(USE_OGG),1)
 CPPFLAGS+= -DOGG_SUPPORT
-#OGG_CFLAGS = -Idos/3rdparty/include
-OGG_LIBS = -Ldos/3rdparty/lib -logg
 VORBIS_CFLAGS = -Idos/3rdparty/include
-VORBIS_LIBS = -Ldos/3rdparty/lib -lvorbisfile -lvorbis
+VORBIS_LIBS = -Ldos/3rdparty/lib -lvorbisfile -lvorbis -logg
 endif
 
 ifeq ($(USE_CURL),1)
@@ -161,7 +159,7 @@ OBJECTS =  $(CLIENT) $(QCOMMON) $(SERVER) $(GAMESPY) $(REFSOFT) $(REFASM) $(DOS)
 all: q2sse.exe
 
 q2sse.exe:	$(OBJECTS)
-	$(CC) $(OBJECTS) -o q2sse.exe $(LDFLAGS) $(VORBIS_LIBS) $(OGG_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm
+	$(CC) $(OBJECTS) -o q2sse.exe $(LDFLAGS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm
 
 clean:
 	rm -f qcommon/*.o
@@ -177,7 +175,7 @@ clean:
 DO_AS=$(CC) -x assembler-with-cpp
 
 %.o : %.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(WATT32_CFLAGS) $(OGG_CFLAGS) $(VORBIS_CFLAGS) $(CURL_CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(WATT32_CFLAGS) $(VORBIS_CFLAGS) $(CURL_CFLAGS) -c $< -o $@
 
 %.o: %.S
 	$(DO_AS) $(CFLAGS) -c $< -o $@
