@@ -561,6 +561,7 @@ vectoangles(vec3_t value1, vec3_t angles)
 	angles[ROLL] = 0;
 }
 
+#ifndef GAME_HARD_LINKED
 /* vectoangles2() is duplicated at the engine side in client/cl_newfx.c
  * remember that if you ever attempt to change it!!
  */
@@ -617,6 +618,7 @@ vectoangles2(vec3_t value1, vec3_t angles)
 	angles[YAW] = yaw;
 	angles[ROLL] = 0;
 }
+#endif /* !GAME_HARD_LINKED */
 
 char *
 G_CopyString(char *in)
