@@ -1,21 +1,57 @@
+# features selection :
+#
+# gamespy/server browser:
+USE_GAMESPY=1
+# libcurl/http downloads:
+USE_CURL=1
+# ogg/vorbis music:
+USE_OGG=1
+# cd audio support:
+USE_CDAUDIO=1
+# abrash's asm optimizations:
+USE_ASM=1
+
 CC = gcc
-CFLAGS = -g -Wall -O2
-CFLAGS+= -Idos/3rdparty/include
-SFLAGS = -Did386 -DREF_HARD_LINKED -DGAME_HARD_LINKED -DUSE_DOS_NOCD -DOGG_SUPPORT -DCLIENT_SPLIT_NETFRAME -DGAMESPY -DUSE_CURL
+CFLAGS = -g -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
+CPPFLAGS = -DREF_HARD_LINKED -DGAME_HARD_LINKED -DCLIENT_SPLIT_NETFRAME
 LDFLAGS =
+
+# wss library for sound
+CPPFLAGS+= -DUSE_WSS
+
+# net -- watt-32 tcp/ip library :
 WATT32_CFLAGS = -Iwattcp/inc -DWATT32_NO_OLDIES
 WATT32_LIBS = -Lwattcp/lib -lwatt
-#OGG_CFLAGS = -Idos/3rdparty/include
-OGG_LIBS = -Ldos/3rdparty/lib -logg
-#VORBIS_CFLAGS = -Idos/3rdparty/include
-VORBIS_LIBS = -Ldos/3rdparty/lib -lvorbisfile -lvorbis
+
+ifeq ($(USE_ASM),1)
+CPPFLAGS+= -Did386=1
+endif
+
+ifeq ($(USE_GAMESPY),1)
+CPPFLAGS+= -DGAMESPY
+endif
+
+ifeq ($(USE_CDAUDIO),1)
+CPPFLAGS+= -DUSE_DOS_CD
+endif
+
+ifeq ($(USE_OGG),1)
+CPPFLAGS+= -DOGG_SUPPORT
+VORBIS_CFLAGS = -Idos/3rdparty/include
+VORBIS_LIBS = -Ldos/3rdparty/lib -lvorbisfile -lvorbis -logg
+endif
+
+ifeq ($(USE_CURL),1)
+CPPFLAGS+= -DUSE_CURL
 CURL_CFLAGS = -Ilibcurl/include
 CURL_LIBS = -Llibcurl/lib -lcurl
+endif
 
 DOS = 	dos/cd_dos.o \
 	dos/vid_dos.o \
 	dos/vid_ext.o \
 	dos/snddma_wss.o \
+	dos/wss.o \
 	dos/sys_dos.o \
 	dos/in_dos.o \
 	dos/net_watt.o \
@@ -23,8 +59,7 @@ DOS = 	dos/cd_dos.o \
 	dos/glob.o \
 	dos/sys_dosa.o \
 	dos/q_shdos.o \
-	dos/dxe.o \
-	dos/wss.o \
+	dos/vregset.o \
 	dos/swimp_dos.o
 
 CLIENT =	client/cl_input.o \
@@ -47,16 +82,18 @@ CLIENT =	client/cl_input.o \
 	client/snd_mix.o \
 	client/snd_stream.o \
 	client/qmenu.o \
-	client/cl_newfx.o 
+	client/cl_newfx.o
 
+ifeq ($(USE_GAMESPY),1)
 GAMESPY = Goa/CEngine/darray.o \
 	Goa/CEngine/gserver.o \
 	Goa/CEngine/gserverlist.o \
 	Goa/CEngine/gutil.o \
 	Goa/CEngine/hashtable.o \
 	Goa/nonport.o
+endif
 
-QCOMMON = 	qcommon/cmd.o \
+QCOMMON = qcommon/cmd.o \
 	qcommon/cmodel.o \
 	qcommon/common.o \
 	qcommon/crc.o \
@@ -64,7 +101,7 @@ QCOMMON = 	qcommon/cmd.o \
 	qcommon/files.o \
 	qcommon/md4.o \
 	qcommon/net_chan.o \
-	qcommon/pmove.o 
+	qcommon/pmove.o
 
 SERVER = server/sv_ccmds.o \
 	server/sv_ents.o \
@@ -93,7 +130,9 @@ REFSOFT = ref_soft/r_alias.o \
 	ref_soft/r_edge.o \
 	ref_soft/r_image.o
 
-REFASM = linux/snd_mixa.o \
+ifeq ($(USE_ASM),1)
+REFASM = linux/math.o \
+	dos/d_copy.o \
 	linux/d_polysa.o \
 	linux/r_aclipa.o \
 	linux/r_draw16.o \
@@ -102,7 +141,9 @@ REFASM = linux/snd_mixa.o \
 	linux/r_scana.o \
 	linux/r_spr8.o \
 	linux/r_surf8.o \
-	linux/r_varsa.o 
+	linux/r_varsa.o \
+	linux/snd_mixa.o
+endif
 
 GAME = game/m_tank.o \
 	game/p_client.o \
@@ -161,15 +202,23 @@ OBJECTS =  $(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(GAMESPY) $(REFSOFT) $(REFASM
 all: q2.exe
 
 q2.exe:	$(OBJECTS)
-	$(CC) $(OBJECTS) -o q2.exe $(LDFLAGS) $(VORBIS_LIBS) $(OGG_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm
+	$(CC) $(OBJECTS) -o q2.exe $(LDFLAGS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm
 
 clean:
-	find ./ -name '*.o' -exec rm {} \;
+	rm -f qcommon/*.o
+	rm -f client/*.o
+	rm -f server/*.o
+	rm -f ref_soft/*.o
+	rm -f dos/*.o
+	rm -f linux/*.o
+	rm -f Goa/*.o
+	rm -f Goa/CEngine/*.o
+	rm -f game/*.o
 
 DO_AS=$(CC) -x assembler-with-cpp
 
 %.o : %.c
-	$(CC) $(CFLAGS) $(SFLAGS) $(WATT32_CFLAGS) $(OGG_CFLAGS) $(VORBIS_CFLAGS) $(CURL_CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(WATT32_CFLAGS) $(VORBIS_CFLAGS) $(CURL_CFLAGS) -c $< -o $@
 
 %.o: %.S
 	$(DO_AS) $(CFLAGS) -c $< -o $@

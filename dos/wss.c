@@ -1,5 +1,4 @@
-
-#ifdef USE_WSS // FS: Not really needed anymore AFAIK...
+#ifdef USE_WSS /* FS: Not really needed anymore AFAIK... */
 // WSS audio library, latest update: 17.9.2013
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,7 +12,6 @@
 #include <ctype.h>
 #include <stdarg.h>
 #include "wss.h"
-
 
 
 static void logerror_(const char *text,...)
@@ -36,9 +34,7 @@ typedef INT64 cycles_t;
 #define osd_cycles_per_second() UCLOCKS_PER_SEC
 
 
-
 /***********************  COMMON  *************************/
-
 
 #define _8BITMONO		1
 #define _8BITSTEREO 	2
@@ -2578,7 +2574,8 @@ static BOOL hda_parse_node(DWORD codecaddr, HDAFUNCINFO * nodeinfo, int subnodes
 static BOOL hda_node_init(DWORD codecaddr, DWORD nid)
 {
 	DWORD d0;
-	int d1, d2, d3, firstnode, subnodes;
+	int d1, d2, d3, subnodes;
+	//int firstnode;
 	BOOL b0 = FALSE;
 	
 	d0 = hda_send_codec_cmd(HDAPARAM1(codecaddr, nid, GET_PARAM, FUNC_TYPE), TRUE);
@@ -6216,17 +6213,10 @@ void w_set_device_master_volume(int volume)
 }
 
 
-
-
-
-
 /////////////////////////////////////////////////////////////////////
 // main
 
-
-
 #ifdef TEST_PROGRAM
-
 
 static double sin1dt;
 static double sin2ldt;
@@ -6275,7 +6265,6 @@ static short sin_stream2r(void)
 }
 
 
-
 #define NORMAL							 1
 #define VSYNC							 2
 
@@ -6305,13 +6294,12 @@ int main()
 	
 	printf("%s\n", w_get_device_name() );
 	printf("nominal rate : %d Hz\n", w_get_nominal_sample_rate());
-if(0){
+#if 0
 	actual_sample_rate = w_get_actual_sample_rate();
 	printf("actual rate  : %d Hz\n", actual_sample_rate);
-}else{
+#endif
 	actual_sample_rate = w_get_nominal_sample_rate();
-}
-	
+
 	sin_stream_init(actual_sample_rate);
 	
 	samples_this_frame = actual_sample_rate / FRAMES_PER_SEC;
@@ -6327,7 +6315,7 @@ if(0){
 		samples_left_over = 0;
 	}
 
-if(0){
+#if 0
 	while(1){
 		static DWORD prevc = 0;
 		static DWORD currc = 0;
@@ -6342,8 +6330,8 @@ if(0){
 
 	w_sound_device_exit();
 	return 1;
-}
-	
+#endif
+
 	while(1){
 		if(mode == NORMAL){
 			samples_left_over += samples_per_frame;
@@ -6416,7 +6404,6 @@ if(0){
 				g_dma_overflow, g_dma_underflow, ofdt, ufdt, dma_dt);
 		}
 
-
 		if(use_joystickbutton == TRUE){
 				// for debug
 				// Try push joystick button.
@@ -6457,8 +6444,6 @@ if(0){
 
 	return 0;
 }
-
-
 #endif
 
-#endif // USE_WSS
+#endif /* USE_WSS */
