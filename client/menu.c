@@ -5089,10 +5089,10 @@ void M_Draw (void)
 M_Keydown
 =================
 */
+extern	qboolean keydown[256];
 void M_Keydown (int key)
 {
 	const char *s;
-	extern	qboolean keydown[256];
 
 	if (m_keyfunc)
 	{
