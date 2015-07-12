@@ -694,7 +694,8 @@ void CL_TrapParticles (entity_t *ent);
 // menus
 //
 
-#define MAX_SERVERS 50
+#ifdef GAMESPY
+#define MAX_SERVERS 300 /* FS: There's barely 200 active servers existing, but OK. */
 /* FS: Gamespy browser */
 typedef struct
 {
@@ -709,6 +710,7 @@ typedef struct
 gamespyBrowser_t;
 extern gamespyBrowser_t browserList[MAX_SERVERS];
 void CL_PingNetServers_f (void);
+#endif
 
 void M_Init (void);
 void M_Keydown (int key);

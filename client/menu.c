@@ -2695,7 +2695,7 @@ JOIN SERVER MENU
 =============================================================================
 */
 #define MAX_LOCAL_SERVERS 12 // FS: Was 8 -- Max 320x200 can handle
-#define MAX_GAMESPY_SERVERS 60 // FS
+#define MAX_GAMESPY_SERVERS 60 /* FS: Maximum number of servers to show in the browser */
 
 static menuframework_s	s_joinserver_menu;
 static menuframework_s	s_joingamespyserver_menu; // FS
