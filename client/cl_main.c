@@ -20,7 +20,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // cl_main.c  -- client main loop
 
 #include "client.h"
-#include "../Goa/CEngine/goaceng.h" // FS: For Gamespy SDK
+
+#ifdef GAMESPY
+#include "../Goa/CEngine/goaceng.h"
+#include "../Goa/CEngine/darray.h"
+#endif
 
 cvar_t	*cl_3dcam;
 cvar_t	*cl_3dcam_angle;
@@ -128,8 +132,8 @@ extern	cvar_t *allow_download_maps;
 
 #ifdef GAMESPY
 // FS: For Gamespy
-static    GServerList serverlist; // FS: Moved outside so we can abort whenever we need to
-static void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2);
+static	GServerList	serverlist; // FS: Moved outside so we can abort whenever we need to
+static	void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2);
 void CL_PingNetServers_f (void);
 void CL_PrintBrowserList_f (void);
 #endif
@@ -2563,6 +2567,7 @@ void CL_PrintBrowserList_f (void)
 static void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2)
 {
 	GServer server;
+	int percent;
 
 	if (msg == LIST_PROGRESS)
 	{
@@ -2584,6 +2589,12 @@ static void ListCallBack(GServerList serverlist, int msg, void *instance, void *
 			}
 
 			gspyCur++;
+		}
+
+		if(param2)
+		{
+			percent = (int)(param2);
+			cls.gamespypercent = percent;
 		}
 	}
 }
@@ -2624,6 +2635,8 @@ void CL_PingNetServers_f (void)
 
 	cls.gamespyupdate = 1;
 	cls.gamespypercent = 0;
+	cls.gamespystarttime = (int)Sys_Milliseconds();
+	cls.gamespytotalservers = 0;
 
 	allocatedSockets = bound(5, cl_master_server_queries->value, 40);
 
@@ -2634,12 +2647,15 @@ void CL_PingNetServers_f (void)
 
 	if (error != GE_NOERROR) // FS: Grab the error code
 	{
-		cls.gamespyupdate = 0;
-		cls.gamespypercent = 0;
 		Com_Printf("\x02GameSpy Error: ");
 		Com_Printf("%s.\n", ServerListErrorDesc(serverlist, error));
-		ServerListHalt( serverlist );
-		ServerListClear( serverlist );
+	}
+	else
+	{
+		if (cls.key_dest != key_menu) // FS: Only print this from an slist2 command, not the server browser.
+		{
+			Com_Printf("Found %i active servers out of %i in %i seconds.\n", gspyCur, cls.gamespytotalservers, (((int)Sys_Milliseconds()-cls.gamespystarttime) / 1000) );
+		}
 	}
 
 	cls.gamespyupdate = 0;
