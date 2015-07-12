@@ -34,6 +34,7 @@ Fax(714)549-0757
 
 #ifndef _WIN32
 #include <sys/ioctl.h>
+#define WSAGetLastError() errno
 #endif
 
 extern char *NET_ErrorString (void);
@@ -78,7 +79,39 @@ struct GServerListImplementation
 };
 
 GServerList g_sortserverlist; //global serverlist for sorting info!!
+int totalRetry = 20; /* FS: Total retry attempts waiting for the gamespy validate stuff */
 
+/* FS: Set a socket to be non-blocking */
+int Set_Non_Blocking_Socket (unsigned int socket)
+{
+	int error = 0;
+	qboolean _true = true;
+
+	error = ioctlsocket( socket, FIONBIO,IOCTLARG_T &_true);
+
+	return error;
+}
+
+#ifdef WIN32
+	#define TCP_BLOCKING_ERROR WSAEWOULDBLOCK
+#else
+	#define TCP_BLOCKING_ERROR EWOULDBLOCK
+#endif
+
+int Get_Last_Error(void)
+{
+#ifdef WIN32
+	return WSAGetLastError();
+#else
+	return errno;
+#endif
+}
+
+void Close_TCP_Socket(unsigned int socket)
+{
+	closesocket(socket);
+	socket = INVALID_SOCKET;
+}
 
 /* ServerListNew
 ----------------
@@ -124,16 +157,17 @@ void ServerListFree(GServerList serverlist)
 static GError InitUpdateList(GServerList serverlist)
 {
 	int i;
-	qboolean _true = true;
 
 	for (i = 0 ; i < serverlist->maxupdates ; i++)
 	{
 		serverlist->updatelist[i].s = socket (AF_INET, SOCK_DGRAM,IPPROTO_UDP);
 		if (serverlist->updatelist[i].s == INVALID_SOCKET)
+		{
 			return GE_NOSOCKET;
+		}
 
 		/* FS: Set non-blocking sockets */
-		if (ioctlsocket( serverlist->updatelist[i].s, FIONBIO,IOCTLARG_T &_true) == SOCKET_ERROR)
+		if (Set_Non_Blocking_Socket(serverlist->updatelist[i].s) == SOCKET_ERROR)
 		{
 			Com_Printf("ERROR: InitUpdateList: ioctl FIOBNIO:%s\n", NET_ErrorString());
 			return GE_NOSOCKET;
@@ -179,30 +213,38 @@ static GError CreateServerListSocket(GServerList serverlist)
 		Cvar_Set("cl_master_server_port", CL_MASTER_PORT);
 	}
 
-	/* FS: TODO: Make this non-blocking and do the appropriate checks.
-			I think a 10 second timeout should be good enough.
-			This needs to be non-blocking at some point because very
-			rarely (mostly if you just keep flooding my master server)
-			a packet gets refused during part of the handshake
-			and you end up staying there forever.
-	*/
 	serverlist->slsocket = socket ( AF_INET, SOCK_STREAM, IPPROTO_TCP );
 	if (serverlist->slsocket == INVALID_SOCKET)
 		return GE_NOSOCKET;
+
 	saddr.sin_family = AF_INET;
 	saddr.sin_port = htons((unsigned short)cl_master_server_port->value);
 	hent = gethostbyname(cl_master_server_ip->string);
+
 	if (!hent)
+	{
+		Close_TCP_Socket(serverlist->slsocket);
 		return GE_NODNS; 
+	}
+
 	saddr.sin_addr.s_addr = *(u_long *)hent->h_addr_list[0];
 	memset ( saddr.sin_zero, 0, 8 ); 
-	if (connect ( serverlist->slsocket, (struct sockaddr *) &saddr, sizeof saddr ) != 0)
-		return GE_NOCONNECT; 
+
+	if (connect ( serverlist->slsocket, (struct sockaddr *) &saddr, sizeof saddr ) != 0 )
+	{
+		Close_TCP_Socket(serverlist->slsocket);
+		return GE_NOSOCKET;
+	}
+
+	if(Set_Non_Blocking_Socket(serverlist->slsocket) == SOCKET_ERROR)
+	{
+		Com_Printf("ERROR: CreateServerListSocket: ioctl FIOBNIO:%s\n", NET_ErrorString());
+		Close_TCP_Socket(serverlist->slsocket);
+		return GE_NOSOCKET;
+	}
 
 	//else we are connected
 	return 0;
-
-
 }
 
 
@@ -215,7 +257,11 @@ static GError CreateServerListLANSocket(GServerList serverlist)
 	if (serverlist->slsocket == INVALID_SOCKET)
 		return GE_NOSOCKET;
 	if (setsockopt(serverlist->slsocket, SOL_SOCKET, SO_BROADCAST, (char *)&optval, sizeof(optval)) != 0)
+	{
+		Com_Printf("ERROR: CreateServerListLANSocket: setsockopt SOL_SOCKET, SO_BROADCAST:%s\n", NET_ErrorString());
+		Close_TCP_Socket(serverlist->slsocket);
 		return GE_NOSOCKET;
+	}
 
 	//else we are ready to broadcast
 	return 0;
@@ -238,11 +284,32 @@ static GError SendListRequest(GServerList serverlist)
 {
 	char data[256], *ptr, result[64];
 	int len;
+	int error = 0;
+	int retry = 0;
+	int sleepMs = 50;
 
-	
+retryRecv:
 	len = recv(serverlist->slsocket, data, sizeof(data) - 1, 0);
+
 	if (len == SOCKET_ERROR)
-		return GE_NOCONNECT;
+	{
+		error = Get_Last_Error();
+
+		if(error == TCP_BLOCKING_ERROR && (retry < totalRetry))
+		{
+			retry++;
+			Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Retrying Gamespy TCP Validate Handshake, Attempt %i of %i.\n", retry, totalRetry);
+			msleep(sleepMs);
+			sleepMs = sleepMs + 10;
+			Sys_SendKeyEvents (); /* FS: Check for aborts */
+			goto retryRecv;
+		}
+		else
+		{
+			Close_TCP_Socket(serverlist->slsocket);
+			return GE_NOCONNECT;
+		}
+	}
 	data[len] = '\0'; //null terminate it
 	
 	ptr = strstr ( data, SECURE ) + strlen(SECURE);
@@ -255,13 +322,19 @@ static GError SendListRequest(GServerList serverlist)
 	
 	len = send ( serverlist->slsocket, data, strlen(data), 0 );
 	if (len == SOCKET_ERROR || len == 0)
+	{
+		Close_TCP_Socket(serverlist->slsocket);
 		return GE_NOCONNECT;
+	}
 
 	//send the list request
 	sprintf(data, "\\list\\gamename\\%s\\final\\", serverlist->gamename);
 	len = send ( serverlist->slsocket, data, strlen(data), 0 );
 	if (len == SOCKET_ERROR || len == 0)
+	{
+		Close_TCP_Socket(serverlist->slsocket);
 		return GE_NOCONNECT;
+	}
 
 	ServerListModeChange(serverlist, sl_listxfer);
 	return 0;
@@ -319,6 +392,7 @@ GError ServerListUpdate(GServerList serverlist, gbool async)
 	Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListUpdate: Created ServerListSocket list\n");
 	if (error)
 		return error;
+	Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Sending the actual List Request\n");
 	error = SendListRequest(serverlist);
 	Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListUpdate: Send List Request\n");
 	if (error)
@@ -408,11 +482,34 @@ static GError ServerListReadList(GServerList serverlist)
 	static char data[2048]; //static input buffer
 	int len, oldlen;
 	char *p, ip[32], port[16],*q, *lastip;
+	int retry = 0;
+	int error = 0;
+	int sleepMs = 50;
+
 //append to data
 	oldlen = strlen(data);
+
+retryRecv:
 	len = recv(serverlist->slsocket, data + oldlen, sizeof(data) - oldlen - 1, 0);
 	if (len == SOCKET_ERROR || len == 0)
-		return GE_NOCONNECT;
+	{
+		error = Get_Last_Error();
+
+		if(error == TCP_BLOCKING_ERROR && (retry < totalRetry))
+		{
+			retry++;
+			Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Retrying Gamespy TCP List RECV, Attempt %i of %i.\n", retry, totalRetry);
+			msleep(sleepMs);
+			sleepMs = sleepMs + 10;
+			Sys_SendKeyEvents (); /* FS: Check for aborts */
+			goto retryRecv;
+		}
+		else
+		{
+			Close_TCP_Socket(serverlist->slsocket);
+			return GE_NOCONNECT;
+		}
+	}
 
 	data[len + oldlen] = 0; //null terminate it
 	// data is in the form of '\ip\1.2.3.4:1234\ip\1.2.3.4:1234\final\'
@@ -517,13 +614,8 @@ static GError ServerListQueryLoop(GServerList serverlist)
 				}
 				else
 				{
-					if (
-#ifdef WIN32
-						(WSAGetLastError() == WSAEWOULDBLOCK)
-#else
-						(errno == EWOULDBLOCK)
-#endif
-						&& (current_time() - serverlist->updatelist[i].starttime < server_timeout) )
+					error = Get_Last_Error();
+					if ((error == TCP_BLOCKING_ERROR) && (current_time() - serverlist->updatelist[i].starttime < server_timeout) )
 					{
 //						Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Slow down cowboy..\n");
 						continue;
