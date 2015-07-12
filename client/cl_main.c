@@ -110,11 +110,14 @@ cvar_t	*gender_auto;
 cvar_t	*cl_vwep;
 cvar_t	*console_old_complete; // FS: Old style command completing
 
-cvar_t	*cl_master_server_ip; // FS: For gamespy
-cvar_t	*cl_master_server_port; // FS: For gamespy
-cvar_t	*cl_master_server_queries; // FS: For gamespy
-cvar_t	*cl_master_server_timeout; // FS: For gamespy
-cvar_t	*s_gamespy_sounds; // FS: For gamespy
+#ifdef GAMESPY
+/* FS: Gamespy CVARs */
+cvar_t	*cl_master_server_ip;
+cvar_t	*cl_master_server_port;
+cvar_t	*cl_master_server_queries;
+cvar_t	*cl_master_server_timeout;
+cvar_t	*s_gamespy_sounds;
+#endif
 
 client_static_t	cls;
 client_state_t	cl;
@@ -131,9 +134,12 @@ extern	cvar_t *allow_download_maps;
 
 
 #ifdef GAMESPY
-// FS: For Gamespy
-static	GServerList	serverlist; // FS: Moved outside so we can abort whenever we need to
+/* FS: For Gamespy */
+static	GServerList	serverlist;
+static int gspyCur;
+gamespyBrowser_t browserList[MAX_SERVERS];
 static	void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2);
+void CL_Gspystop_f (void);
 void CL_PingNetServers_f (void);
 void CL_PrintBrowserList_f (void);
 #endif
@@ -741,19 +747,6 @@ void CL_Disconnect_f (void)
 	Com_Error (ERR_DROP, "Disconnected from server");
 }
 
-void CL_Gspystop_f (void)
-{
-#ifdef GAMESPY
-	if(serverlist != NULL) // FS: Immediately abort gspy scans
-	{
-		Com_Printf("\x02Server scan aborted!\n");
-		cls.gamespyupdate = 0;
-		cls.gamespypercent = 0;
-		S_GamespySound ("gamespy/abort.wav");
-		ServerListHalt( serverlist );
-	}
-#endif
-}
 /*
 ====================
 CL_Packet_f
@@ -1758,7 +1751,8 @@ void CL_InitLocal (void)
 	// FS: New stuff
 	console_old_complete = Cvar_Get("console_old_complete", "0", CVAR_ARCHIVE); // FS: Old style command completing
 
-	// FS: For gamespy
+#ifdef GAMESPY
+	/* FS: For gamespy */
 	cl_master_server_ip = Cvar_Get("cl_master_server_ip", CL_MASTER_ADDR, CVAR_ARCHIVE);
 	cl_master_server_ip->description = "Master server IP to use with the gamespy browser.";
 	cl_master_server_port = Cvar_Get("cl_master_server_port", CL_MASTER_PORT, CVAR_ARCHIVE);
@@ -1768,6 +1762,8 @@ void CL_InitLocal (void)
 	cl_master_server_timeout = Cvar_Get("cl_master_server_timeout", "3000", CVAR_ARCHIVE);
 	cl_master_server_timeout->description = "Timeout (in milliseconds) to give up on pinging a server.";
 	s_gamespy_sounds = Cvar_Get("s_gamespysounds", "0", CVAR_ARCHIVE);
+	s_gamespy_sounds->description = "Play the complete.wav and abort.wav from GameSpy3D if it exists in sounds/gamespy.";
+#endif
 
 #ifdef USE_CURL	// HTTP downloading from R1Q2
 	cl_http_proxy = Cvar_Get ("cl_http_proxy", "", 0);
@@ -1790,7 +1786,10 @@ void CL_InitLocal (void)
 
 	Cmd_AddCommand ("changing", CL_Changing_f);
 	Cmd_AddCommand ("disconnect", CL_Disconnect_f);
+
+#ifdef GAMESPY
 	Cmd_AddCommand ("gspystop", CL_Gspystop_f); // FS
+#endif
 	Cmd_AddCommand ("record", CL_Record_f);
 	Cmd_AddCommand ("stop", CL_Stop_f);
 
@@ -2542,10 +2541,19 @@ void CL_Shutdown(void)
 	VID_Shutdown();
 }
 
-//GAMESPY
+/* FS: Gamespy Server Browser */
 #ifdef GAMESPY
-static int gspyCur;
-gamespyBrowser_t browserList[MAX_SERVERS];
+void CL_Gspystop_f (void)
+{
+	if(serverlist != NULL) // FS: Immediately abort gspy scans
+	{
+		Com_Printf("\x02Server scan aborted!\n");
+		cls.gamespyupdate = 0;
+		cls.gamespypercent = 0;
+		S_GamespySound ("gamespy/abort.wav");
+		ServerListHalt( serverlist );
+	}
+}
 
 void CL_PrintBrowserList_f (void)
 {

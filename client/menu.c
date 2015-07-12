@@ -5102,6 +5102,7 @@ void M_Keydown (int key)
 		}
 	}
 
+#ifdef GAMESPY
 	if( key == 'c' ) // FS: Added
 	{
 		if ( keydown[K_CTRL] )
@@ -5114,5 +5115,5 @@ void M_Keydown (int key)
 			return;
 		}
 	}
-
+#endif
 }

@@ -793,11 +793,13 @@ void S_StartLocalSound (char *sound)
 	S_StartSound (NULL, cl.playernum+1, 0, sfx, 1, 1, 0);
 }
 
-void S_GamespySound (char *sound) // FS
+#ifdef GAMESPY
+void S_GamespySound (char *sound) /* FS: Play the complete.wav and abort.wav from gamespy3d if it's in sounds/gamespy */
 {
-	if (s_gamespy_sounds->value)
+	if (s_gamespy_sounds->intValue)
 		S_StartLocalSound(sound);
 }
+#endif
 
 /*
 ==================

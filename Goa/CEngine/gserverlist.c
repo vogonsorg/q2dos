@@ -16,6 +16,9 @@ Fax(714)549-0757
  information
 
 ******/
+
+#ifdef GAMESPY /* FS: This way we can still leave the files in the VS6 makefile and not hear complaints about missing CVARs */
+
 #include "goaceng.h"
 #include "gserver.h"
 #include "darray.h"
@@ -32,6 +35,7 @@ Fax(714)549-0757
 #ifndef _WIN32
 #include <sys/ioctl.h>
 #endif
+
 extern char *NET_ErrorString (void);
 
 #define MSHOST	"maraakate.org" /* FS: Gamespy dead: "master.gamespy.com" */
@@ -778,3 +782,4 @@ void ServerListSort(GServerList serverlist, gbool ascending, char *sortkey, GCom
 }
 #endif
 
+#endif /* GAMESPPY */
