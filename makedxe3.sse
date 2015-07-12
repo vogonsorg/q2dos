@@ -6,6 +6,8 @@ USE_GAMESPY=1
 USE_CURL=1
 # ogg/vorbis music:
 USE_OGG=1
+# use tremor library for ogg/vorbis:
+USE_TREMOR=1
 # cd audio support:
 USE_CDAUDIO=1
 # abrash's asm optimizations:
@@ -41,7 +43,12 @@ endif
 ifeq ($(USE_OGG),1)
 CPPFLAGS+= -DOGG_SUPPORT
 VORBIS_CFLAGS = -Idos/3rdparty/include
+ifneq ($(USE_TREMOR),1)
 VORBIS_LIBS = -Ldos/3rdparty/lib -lvorbisfile -lvorbis -logg
+else
+CPPFLAGS+= -DVORBIS_USE_TREMOR
+VORBIS_LIBS = -Ldos/3rdparty/lib -lvorbisidec -logg
+endif
 endif
 
 ifeq ($(USE_CURL),1)
