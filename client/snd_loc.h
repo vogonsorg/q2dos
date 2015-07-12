@@ -63,7 +63,6 @@ typedef struct {
 	int					rate;
 	int					width;
 	int					channels;
-	unsigned			format;
 	void				*vorbisFile;
 } bgTrack_t;
 
