@@ -1839,6 +1839,8 @@ void CL_InitLocal (void)
 #ifdef GAMESPY
 	Cmd_AddCommand ("slist2", CL_PingNetServers_f); // FS: For Gamespy
 	Cmd_AddCommand ("srelist", CL_PrintBrowserList_f);
+
+	memset(&browserList, 0, sizeof(browserList));
 #endif
 
 #ifdef __DJGPP__
