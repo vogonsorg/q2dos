@@ -21,7 +21,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef OGG_SUPPORT	// Knightmare added- vorbis support
 #define OV_EXCLUDE_STATIC_CALLBACKS
+#if defined(VORBIS_USE_TREMOR)
+/* for Tremor / Vorbisfile api differences,
+ * see doc/diff.html in the Tremor package. */
+#include <tremor/ivorbisfile.h>
+#else
 #include <vorbis/vorbisfile.h>
+#endif
 #include "snd_ogg.h"
 #endif
 // !!! if this is changed, the asm code must change !!!

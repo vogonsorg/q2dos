@@ -253,7 +253,18 @@ void S_StreamBackgroundTrack (void)
 		total = 0;
 		while (total < maxRead)
 		{
-			read = ov_read(s_bgTrack.vorbisFile, (char *)(data + total), maxRead - total, 0, 2, 1, &dummy);
+			/* # ov_read() from libvorbisfile returns the decoded PCM audio
+			 *   in requested endianness, signedness and word size.
+			 * # ov_read() from Tremor (libvorbisidec) returns decoded audio
+			 *   always in host-endian, signed 16 bit PCM format.
+			 * # For both of the libraries, if the audio is multichannel,
+			 *   the channels are interleaved in the output buffer.
+			 */
+			read = ov_read(s_bgTrack.vorbisFile, (char *)(data + total), maxRead - total,
+#if !defined(VORBIS_USE_TREMOR)
+											0, 2, 1,
+#endif /* ! VORBIS_USE_TREMOR */
+											&dummy);
 			if (!read)
 			{	// End of file
 				if (!s_bgTrack.looping)
