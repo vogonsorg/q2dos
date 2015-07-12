@@ -22,7 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef OGG_SUPPORT	// Knightmare added- vorbis support
 #define OV_EXCLUDE_STATIC_CALLBACKS
 #include <vorbis/vorbisfile.h>
-#include "../include/al/altypes.h"
 #include "snd_ogg.h"
 #endif
 // !!! if this is changed, the asm code must change !!!
