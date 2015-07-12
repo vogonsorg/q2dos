@@ -34,7 +34,6 @@ Fax(714)549-0757
 
 #ifndef _WIN32
 #include <sys/ioctl.h>
-#define WSAGetLastError() errno
 #endif
 
 extern char *NET_ErrorString (void);
