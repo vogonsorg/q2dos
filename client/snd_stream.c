@@ -631,12 +631,22 @@ void S_OGG_StatusCmd (void)
 
 	switch (ogg_status) {
 	case PLAY:
+#if !defined(VORBIS_USE_TREMOR)
 		Com_Printf("Playing file %s at %0.2f seconds.\n",
 		    trackName, ov_time_tell(s_bgTrack.vorbisFile));
+#else
+		Com_Printf("Playing file %s at %0.2f seconds.\n",
+		    trackName, ov_time_tell(s_bgTrack.vorbisFile)/1000.0);
+#endif
 		break;
 	case PAUSE:
+#if !defined(VORBIS_USE_TREMOR)
 		Com_Printf("Paused file %s at %0.2f seconds.\n",
 		    trackName, ov_time_tell(s_bgTrack.vorbisFile));
+#else
+		Com_Printf("Paused file %s at %0.2f seconds.\n",
+		    trackName, ov_time_tell(s_bgTrack.vorbisFile)/1000.0);
+#endif
 		break;
 	case STOP:
 		Com_Printf("Stopped.\n");
