@@ -307,8 +307,12 @@ typedef struct
 	size_t		downloadposition;	// added for HTTP downloads
 	int			downloadpercent;
 	float		downloadrate;		/* Knightmare- to display KB/s */
-	int			gamespypercent; /* FS: For gamespy */
-	int			gamespyupdate; /* FS: For gamespy */
+
+	 /* FS: For gamespy */
+	int			gamespypercent;
+	int			gamespyupdate;
+	int			gamespytotalservers;
+	int			gamespystarttime;
 
 // demo recording info must be here, so it isn't cleared on level change
 	qboolean	demorecording;

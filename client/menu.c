@@ -2893,7 +2893,7 @@ void SearchGamespyGames (void)
 
 	FormatGamespyList();
 
-	Com_sprintf(found, sizeof(found), "Found %d servers\n", m_num_gamespy_servers);
+	Com_sprintf(found, sizeof(found), "Found %d servers in %i seconds\n", m_num_gamespy_servers, (((int)Sys_Milliseconds()-cls.gamespystarttime) / 1000));
 	s_joingamespyserver_search_action.generic.statusbar = found;
 	Com_Printf(found);
 #else

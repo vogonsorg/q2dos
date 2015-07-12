@@ -20,22 +20,21 @@ Fax(714)549-0757
 #include "gserver.h"
 #include "darray.h"
 #include "../nonport.h"
-//#include "../../server/server.h" // FS
-#include "../../client/client.h" // FS
+#include "../../client/client.h" /* FS: For the cl_gamespy CVARs */
 #include "gutil.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <fcntl.h> // FS
-#include <errno.h> // FS
+#include <fcntl.h> /* FS: Needed for non-blocking sockets */
+#include <errno.h> /* FS: Needed for non-blocking sockets */
 
 #ifndef _WIN32
 #include <sys/ioctl.h>
 #endif
 extern char *NET_ErrorString (void);
 
-#define MSHOST	"maraakate.org" // FS: Gamespy dead "master.gamespy.com"
+#define MSHOST	"maraakate.org" /* FS: Gamespy dead: "master.gamespy.com" */
 #define MSPORT	28900
 #define SERVER_GROWBY 32
 #define LAN_SEARCH_TIME 3000 //3 sec
@@ -129,7 +128,7 @@ static GError InitUpdateList(GServerList serverlist)
 		if (serverlist->updatelist[i].s == INVALID_SOCKET)
 			return GE_NOSOCKET;
 
-		// FS: Set non-blocking sockets
+		/* FS: Set non-blocking sockets */
 		if (ioctlsocket( serverlist->updatelist[i].s, FIONBIO,IOCTLARG_T &_true) == SOCKET_ERROR)
 		{
 			Com_Printf("ERROR: InitUpdateList: ioctl FIOBNIO:%s\n", NET_ErrorString());
@@ -148,7 +147,7 @@ static GError FreeUpdateList(GServerList serverlist)
 	int i;
 
 #ifdef __DJGPP__
-	Com_Printf("Freeing gamespy query sockets, please wait. . .\n"); // FS: This has a little bit of a delay in DOS, so give a warning about it
+	Com_Printf("Freeing gamespy query sockets, please wait. . .\n"); /* FS: This can have a little bit of a delay in DOS, so give a warning about it */
 #endif
 	for (i = 0 ; i < serverlist->maxupdates ; i++)
 	{
@@ -176,6 +175,13 @@ static GError CreateServerListSocket(GServerList serverlist)
 		Cvar_Set("cl_master_server_port", CL_MASTER_PORT);
 	}
 
+	/* FS: TODO: Make this non-blocking and do the appropriate checks.
+			I think a 10 second timeout should be good enough.
+			This needs to be non-blocking at some point because very
+			rarely (mostly if you just keep flooding my master server)
+			a packet gets refused during part of the handshake
+			and you end up staying there forever.
+	*/
 	serverlist->slsocket = socket ( AF_INET, SOCK_STREAM, IPPROTO_TCP );
 	if (serverlist->slsocket == INVALID_SOCKET)
 		return GE_NOSOCKET;
@@ -447,124 +453,7 @@ static GError ServerListReadList(GServerList serverlist)
 #define OOB_SEQ "\xff\xff\xff\xff" //32 bit integer (-1) as string sequence for out of band data
 #define STATUS "\xff\xff\xff\xffstatus"
 
-#ifdef WIN32
-static GError ServerListQueryLoop(GServerList serverlist)
-{
-	int i, scount = 0, error;
-	fd_set set;
-	struct timeval timeout = {1,0};
-	char indata[1500];
-	struct sockaddr_in saddr;
-	int saddrlen = sizeof(saddr);
-	int server_timeout = bound(100, cl_master_server_timeout->intValue, 9000); // FS: Now a CVAR
-	GServer server;
-
-//first, check for available data
-	FD_ZERO(&set);
-	for (i = 0 ; i < serverlist->maxupdates ; i++)
-	{
-		if (serverlist->updatelist[i].serverindex >= 0) //there is a server waiting
-		{
-			scount++;
-//			Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Server waiting [%i]\n", scount);
-			FD_SET( serverlist->updatelist[i].s, &set);
-		}
-	}
-
-	if (scount > 0) //there are sockets to check for data
-	{
-		error = selectsocket(serverlist->maxupdates + 1, &set, NULL, NULL, &timeout);
-#ifdef __DJGPP__
-		if ((SOCKET_ERROR != errno) && (!error)) // FS: WATT32 reports error code 0 for an OK select.
-#else
-		if ((SOCKET_ERROR != errno) && (0 != error))
-#endif
-		{
-//			Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Got sockets to check\n");
-			for (i = 0 ; i < serverlist->maxupdates ; i++)
-			{
-				if (serverlist->updatelist[i].serverindex >= 0 && FD_ISSET(serverlist->updatelist[i].s, &set) ) //there is a server waiting
-				{ //we can read data!!
-					error = recvfrom(serverlist->updatelist[i].s, indata, sizeof(indata) - 1, 0, (struct sockaddr *)&saddr, &saddrlen );
-					if (SOCKET_ERROR != error) //we got data
-					{
-						indata[error] = 0; //truncate and parse it
-						server = *(GServer *)ArrayNth(serverlist->servers,serverlist->updatelist[i].serverindex);
-						if (server->ping == 9999) //set the ping
-						{
-							server->ping = current_time() - serverlist->updatelist[i].starttime;
-						}
-						ServerParseKeyVals(server, indata); 
-						serverlist->CallBackFn(serverlist, 
-												LIST_PROGRESS,
-												serverlist->instance,
-												server,
-												(void *)((serverlist->nextupdate * 100) / ArrayLength(serverlist->servers))); //percent done
-						serverlist->updatelist[i].serverindex = -1; //reuse the updatelist
-					}
-					else
-					{
-						Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Socket error during recv: %s\n", NET_ErrorString());
-//						serverlist->updatelist[i].serverindex = -1; //reuse the updatelist
-					}
-				}
-				Sys_SendKeyEvents (); // FS: Check for aborts
-			}
-		}
-	}
-
-	//kill expired ones
-	for (i = 0 ; i < serverlist->maxupdates ; i++)
-	{
-		if (serverlist->updatelist[i].serverindex >= 0 && current_time() - serverlist->updatelist[i].starttime > server_timeout )
-		{
-			server = *(GServer *)ArrayNth(serverlist->servers,serverlist->updatelist[i].serverindex);
-			Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Removing server %s from list\n", ServerGetAddress(server));
-			serverlist->updatelist[i].serverindex = -1; //reuse the updatelist
-		}
-	}
-
-	if (serverlist->abortupdate || ((serverlist->nextupdate >= ArrayLength(serverlist->servers) && scount == 0))) 
-	{ //we are done!!
-		if(!serverlist->abortupdate) // FS: Don't print if this was a forced abort
-		{
-			Com_Printf("\x02Server scan complete!\n");
-			S_GamespySound ("gamespy/complete.wav");
-		}
-		cls.gamespytotalservers = ArrayLength(serverlist->servers);
-		FreeUpdateList(serverlist);
-		ServerListModeChange(serverlist, sl_idle);
-		return 0;
-	}
-
-//now, send out queries on available sockets
-	for (i = 0 ; i < serverlist->maxupdates && serverlist->nextupdate < ArrayLength(serverlist->servers) ; i++)
-	{
-		if (serverlist->updatelist[i].serverindex < 0) //it's availalbe
-		{
-			serverlist->updatelist[i].serverindex = serverlist->nextupdate++;
-
-			server = *(GServer *)ArrayNth(serverlist->servers,serverlist->updatelist[i].serverindex);
-			saddr.sin_family = AF_INET;
-			saddr.sin_addr.s_addr = inet_addr(ServerGetAddress(server));
-			saddr.sin_port = htons((short)ServerGetQueryPort(server));
-
-			error = sendto(serverlist->updatelist[i].s,STATUS,strlen(STATUS), 0, (struct sockaddr *) &saddr, saddrlen);
-			serverlist->updatelist[i].starttime = current_time();
-			Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Attempting to ping[%i]: %s:%i\n", i, ServerGetAddress(server), ServerGetQueryPort(server));
-		}
-		SCR_UpdateScreen(); // FS: Force an update so the percentage bar shows some progress
-		Sys_SendKeyEvents (); // FS: Check for aborts
-	}
-	return 0;
-}
-#else // DOS
-
-#ifdef WIN32 // FS: For testing in Win32
-#define EWOULDBLOCK 2//WSAEWOULDBLOCK
-#endif
-
-// FS: DOS is all sorts of fucked with the original version of the code.
+/* FS: Redone.  Now works properly at the same speed in DOS and WIN32 */
 static GError ServerListQueryLoop(GServerList serverlist)
 {
 	int i, error;
@@ -573,7 +462,7 @@ static GError ServerListQueryLoop(GServerList serverlist)
 	char indata[1500];
 	struct sockaddr_in saddr;
 	int saddrlen = sizeof(saddr);
-	int server_timeout = bound(100, cl_master_server_timeout->intValue, 9000); // FS: Now a CVAR
+	int server_timeout = bound(100, cl_master_server_timeout->intValue, 9000); /* FS: Now a CVAR */
 	int scount = 0;
 	static qboolean firsttime = true;
 	GServer server;
@@ -582,9 +471,9 @@ static GError ServerListQueryLoop(GServerList serverlist)
 
 	if(!firsttime)
 	{
-		for (i = 0 ; i < serverlist->maxupdates /*&& serverlist->nextupdate < ArrayLength(serverlist->servers)*/ ; i++)
+		for (i = 0 ; i < serverlist->maxupdates; i++)
 		{
-			if (serverlist->abortupdate) // FS: Check if we want to stop.
+			if (serverlist->abortupdate) /* FS: Check for aborts */
 			{
 				goto abort;
 			}
@@ -624,28 +513,33 @@ static GError ServerListQueryLoop(GServerList serverlist)
 				}
 				else
 				{
-					if ( (errno == EWOULDBLOCK) && (current_time() - serverlist->updatelist[i].starttime < server_timeout) )
+					if (
+#ifdef WIN32
+						(WSAGetLastError() == WSAEWOULDBLOCK)
+#else
+						(errno == EWOULDBLOCK)
+#endif
+						&& (current_time() - serverlist->updatelist[i].starttime < server_timeout) )
 					{
-						Sys_SendKeyEvents (); // FS: Check for aborts because this takes a while in DOS
-//						Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Slow down cowboy[]..\n");
+//						Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Slow down cowboy..\n");
 						continue;
 					}
-					else // FS: If we got didn't get EWOULDBLOCK or if it just kept going past the server_timeout threshold then just give up.
+					else /* FS: If we got didn't get WOULDBLOCK or if it just kept going past the server_timeout threshold then just give up. */
 					{
-						Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Error during gamespy recv [%i]%s.  Removing server from list.\n", errno, NET_ErrorString());
+						Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Error during gamespy recv %s.  Removing server from list.\n", NET_ErrorString());
 						serverlist->updatelist[i].serverindex = -1; //reuse the updatelist
 					}
 				}
 			}
 
 			SCR_UpdateScreen(); // FS: Force an update so the percentage bar shows some progress
-			Sys_SendKeyEvents (); // FS: Check for aborts because this takes a while in DOS
+			Sys_SendKeyEvents (); /* FS: Check for aborts */
 		}
 	}
 
 	if ( (serverlist->abortupdate) || (serverlist->nextupdate >= ArrayLength(serverlist->servers) && scount == 0) ) 
 	{ //we are done!!
-		if(!serverlist->abortupdate) // FS: Don't print if this was a forced abort
+		if(!serverlist->abortupdate) /* FS: Don't print that the scan is complete if this was a forced abort */
 		{
 			Com_Printf("\x02Server scan complete!\n");
 			S_GamespySound ("gamespy/complete.wav");
@@ -662,7 +556,7 @@ abort:
 
 	for (i = 0 ; i < serverlist->maxupdates && serverlist->nextupdate < ArrayLength(serverlist->servers) ; i++)
 	{
-		if (serverlist->abortupdate) // FS: Check if we want to stop.
+		if (serverlist->abortupdate) /* FS: Check for aborts */
 		{
 			goto abort;
 		}
@@ -696,7 +590,6 @@ abort:
 	firsttime = false;
 	return 0;
 }
-#endif // WIN32
 
 /* ServerListThink
 ------------------
@@ -733,7 +626,7 @@ GError ServerListThink(GServerList serverlist)
 Halts the current update batch */
 GError ServerListHalt(GServerList serverlist)
 {
-//	if (serverlist->state != sl_idle) // FS: Immediately abort.
+//	if (serverlist->state != sl_idle) /* FS: Immediately abort. */
 		serverlist->abortupdate = 1;
 
 	return 0;
@@ -856,7 +749,8 @@ specified comparemode.
 sortkey can be a normal server key, or "ping" or "hostaddr" */
 void ServerListSort(GServerList serverlist, gbool ascending, char *sortkey, GCompareMode comparemode)
 {
-	ArrayCompareFn comparator = 0; // FS: Compiler warning
+	ArrayCompareFn comparator = 0; /* FS: Compiler warning */
+
 	switch (comparemode)
 	{
 		case cm_int:
