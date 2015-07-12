@@ -116,6 +116,7 @@ cvar_t	*cl_master_server_ip;
 cvar_t	*cl_master_server_port;
 cvar_t	*cl_master_server_queries;
 cvar_t	*cl_master_server_timeout;
+cvar_t	*cl_master_server_retries;
 cvar_t	*s_gamespy_sounds;
 #endif
 
@@ -1761,6 +1762,8 @@ void CL_InitLocal (void)
 	cl_master_server_queries->description = "Maximum number of query (ping) requests to use per loop with the gamespy browser.";
 	cl_master_server_timeout = Cvar_Get("cl_master_server_timeout", "3000", CVAR_ARCHIVE);
 	cl_master_server_timeout->description = "Timeout (in milliseconds) to give up on pinging a server.";
+	cl_master_server_retries = Cvar_Get("cl_master_server_retries", "20", CVAR_ARCHIVE);
+	cl_master_server_retries->description = "Number of retries to attempt for receiving the server list.  Formula is 50ms + 10ms for each retry.";
 	s_gamespy_sounds = Cvar_Get("s_gamespysounds", "0", CVAR_ARCHIVE);
 	s_gamespy_sounds->description = "Play the complete.wav and abort.wav from GameSpy3D if it exists in sounds/gamespy.";
 #endif

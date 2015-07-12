@@ -242,6 +242,8 @@ static GError CreateServerListSocket(GServerList serverlist)
 		return GE_NOSOCKET;
 	}
 
+	totalRetry = bound(1,cl_master_server_retries->intValue,100);
+
 	//else we are connected
 	return 0;
 }
