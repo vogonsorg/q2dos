@@ -25,9 +25,6 @@ $(CURL_LIB): $(OBJECTS)
 config.h: config.dos
 	cp $^ $@
 
-../include/curl/curlbuild.h: ../include/curl/curlbuild.h.dist
-	cp $^ $@
-
 clean:
 	- rm -f $(OBJECTS)
 

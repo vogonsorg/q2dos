@@ -51,7 +51,7 @@ default: all
 # Root directory for Waterloo tcp/ip etc. Change to suite.
 # WATT_ROOT should be set during Watt-32 install.
 #
-WATT32_ROOT  = -I ../../wattcp/inc
+WATT32_ROOT  = ../../wattcp
 OPENSSL_ROOT = e:/net/openssl.099
 ZLIB_ROOT    = $(DJDIR)/contrib/zlib
 LIBIDN_ROOT  = $(TOPDIR)/../IDN/libidn
@@ -61,7 +61,7 @@ CC   = gcc
 AR   = ar
 YACC = bison -y
 
-CFLAGS = -g -O2 -I. -I$(TOPDIR)/include -I$(TOPDIR)/lib $(WATT32_ROOT) -Wall -DHAVE_CONFIG_H
+CFLAGS = -g -O2 -Wall -I. -I$(TOPDIR)/include -I$(TOPDIR)/lib -I$(WATT32_ROOT)/inc -DWATT32_NO_OLDIES -DHAVE_CONFIG_H
 
 ifeq ($(USE_SSL),1)
   CFLAGS += -DUSE_SSLEAY -DUSE_OPENSSL -I$(OPENSSL_ROOT)

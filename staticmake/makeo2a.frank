@@ -50,7 +50,7 @@ endif
 endif
 
 ifeq ($(USE_CURL),1)
-CPPFLAGS+= -DUSE_CURL
+CPPFLAGS+= -DUSE_CURL -DCURL_NO_OLDIES
 CURL_CFLAGS = -Ilibcurl/include
 CURL_LIBS = -Llibcurl/lib -lcurl
 endif
