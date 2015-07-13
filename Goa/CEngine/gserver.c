@@ -48,7 +48,7 @@ GServer ServerNew(char *ip, int port)
 	return server;
 }
 
-char *mytok(char *instr, char delim)
+static char *mytok(char *instr, char delim)
 {
 	char *result;
 	static char *thestr;
