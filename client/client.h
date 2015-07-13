@@ -710,6 +710,7 @@ typedef struct
 	int curPlayers;
 	int maxPlayers;
 	char mapname[32];
+	int menuNumber;
 }
 gamespyBrowser_t;
 extern gamespyBrowser_t browserList[MAX_SERVERS];
