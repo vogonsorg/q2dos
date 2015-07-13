@@ -574,11 +574,6 @@ static GError ServerListQueryLoop(GServerList serverlist)
 	{
 		for (i = 0 ; i < serverlist->maxupdates; i++)
 		{
-			if (serverlist->abortupdate) /* FS: Check for aborts */
-			{
-				goto abort;
-			}
-
 			FD_SET(serverlist->updatelist[i].s, &read_fd);
 			selectsocket(serverlist->updatelist[i].s + 1, NULL, &read_fd, NULL, &timeout);
 
@@ -627,9 +622,6 @@ static GError ServerListQueryLoop(GServerList serverlist)
 					}
 				}
 			}
-
-			SCR_UpdateScreen(); // FS: Force an update so the percentage bar shows some progress
-			Sys_SendKeyEvents (); /* FS: Check for aborts */
 		}
 	}
 
@@ -640,7 +632,6 @@ static GError ServerListQueryLoop(GServerList serverlist)
 			Com_Printf("\x02Server scan complete!\n");
 			S_GamespySound ("gamespy/complete.wav");
 		}
-abort:
 		cls.gamespytotalservers = ArrayLength(serverlist->servers);
 		firsttime = true;
 		FreeUpdateList(serverlist);
@@ -652,11 +643,6 @@ abort:
 
 	for (i = 0 ; i < serverlist->maxupdates && serverlist->nextupdate < ArrayLength(serverlist->servers) ; i++)
 	{
-		if (serverlist->abortupdate) /* FS: Check for aborts */
-		{
-			goto abort;
-		}
-
 		if (serverlist->updatelist[i].serverindex < 0) //it's available
 		{
 			serverlist->updatelist[i].serverindex = serverlist->nextupdate++;
@@ -722,7 +708,7 @@ GError ServerListThink(GServerList serverlist)
 Halts the current update batch */
 GError ServerListHalt(GServerList serverlist)
 {
-//	if (serverlist->state != sl_idle) /* FS: Immediately abort. */
+	if (serverlist->state != sl_idle)
 		serverlist->abortupdate = 1;
 
 	return 0;

@@ -2841,20 +2841,23 @@ void FormatGamespyList (void)
 #endif
 }
 
-void SearchGamespyGames (void)
+void Update_Gamespy_Menu (void)
 {
 #ifdef GAMESPY
 	static char	found[64];
-	int		i;
 
-	if (cls.netchan.remote_address.type != NA_LOOPBACK) // FS: If we're not single player, check to see if we're actually disconnected first because DOS takes a while to do this
-	{
-		if(cls.state != ca_disconnected)
-		{
-			s_joingamespyserver_search_action.generic.statusbar = "You must be disconnected to use this command!\n";
-			return;
-		}
-	}
+	FormatGamespyList();
+
+	Com_sprintf(found, sizeof(found), "Found %d servers in %i seconds\n", m_num_gamespy_servers, (((int)Sys_Milliseconds()-cls.gamespystarttime) / 1000));
+	s_joingamespyserver_search_action.generic.statusbar = found;
+	Com_Printf(found);
+#endif
+}
+
+void SearchGamespyGames (void)
+{
+#ifdef GAMESPY
+	int		i;
 
 	m_num_gamespy_servers = 0;
 	for (i=0 ; i<MAX_GAMESPY_SERVERS ; i++)
@@ -2871,31 +2874,9 @@ void SearchGamespyGames (void)
 		s_joingamespyserver_search_action.generic.statusbar = "Querying GameSpy for servers, please wait. . .";
 	}
 
-	SCR_UpdateScreen();
-
-	M_DrawTextBox( 8, 120 - 48, 36, 4 );
-	M_Print( 16 + 16, 120 - 48 + 8,  "Querying GameSpy for servers, this" );
-	M_Print( 16 + 16, 120 - 48 + 16, "could take up to a minute, so" );
-	M_Print( 16 + 16, 120 - 48 + 24, "please be patient." );
-	M_Print( 16 + 16, 120 - 48 + 32, "Use CTRL+C to abort." );
-
-	S_StopAllSounds(); // FS: So we don't hear a repeating menu sound.
-
-	// the text box won't show up unless we do a buffer swap
-	re.EndFrame();
-	cls.disable_screen = Sys_Milliseconds();
-
 	// send out info packets
 	CL_PingNetServers_f ();
 
-	cls.disable_screen = false;
-	SCR_UpdateScreen();
-
-	FormatGamespyList();
-
-	Com_sprintf(found, sizeof(found), "Found %d servers in %i seconds\n", m_num_gamespy_servers, (((int)Sys_Milliseconds()-cls.gamespystarttime) / 1000));
-	s_joingamespyserver_search_action.generic.statusbar = found;
-	Com_Printf(found);
 #else
 	Com_Printf("Q2DOS compiled without GAMESPY!\n");
 #endif /* GAMESPY */
@@ -5107,12 +5088,10 @@ void M_Keydown (int key)
 	{
 		if ( keydown[K_CTRL] )
 		{
-			Cbuf_AddText ("gspystop\n");
 			if (cls.gamespyupdate)
 			{
-				Cbuf_Execute(); // FS: Fire immediately because of gamespy crap
+				Cbuf_AddText ("gspystop\n");
 			}
-			return;
 		}
 	}
 #endif
