@@ -393,7 +393,6 @@ GError ServerListUpdate(GServerList serverlist, gbool async)
 	Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListUpdate: Created ServerListSocket list\n");
 	if (error)
 		return error;
-	Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Sending the actual List Request\n");
 	error = SendListRequest(serverlist);
 	Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListUpdate: Send List Request\n");
 	if (error)
