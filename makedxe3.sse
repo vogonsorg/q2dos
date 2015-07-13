@@ -62,6 +62,8 @@ DOS = 	dos/cd_dos.o \
 	dos/vid_ext.o \
 	dos/snddma_dos.o \
 	dos/snd_gus.o \
+	dos/snd_sb.o \
+	dos/snd_pci.o \
 	dos/sys_dos.o \
 	dos/in_dos.o \
 	dos/net_watt.o \
