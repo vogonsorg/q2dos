@@ -3002,38 +3002,6 @@ void JoinServer_MenuInit( void )
 	SearchLocalGames();
 }
 
-static int gspyCurPage;
-void JoinGamespyServer_Redraw( int serverscale );
-static void JoinGamespyServer_NextPageFunc (void *unused)
-{
-	int i = 0;
-	int vidscale = Get_Vidscale();
-	int serverscale = Get_Vidscale();
-
-	if(gspyCurPage == 1)
-		serverscale = 0;
-
-	for ( i = 0; i < vidscale; i++ )
-	{
-		if (i+serverscale > MAX_GAMESPY_MENU_SERVERS)
-		{
-			gspyCurPage = gspyCurPage - 1;
-			JoinGamespyServer_Redraw(serverscale);
-			break;
-		}
-		s_joingamespyserver_server_actions[i].generic.type	= MTYPE_ACTION;
-		s_joingamespyserver_server_actions[i].generic.name	= gamespy_server_names[i+serverscale];
-		s_joingamespyserver_server_actions[i].generic.flags	= QMF_LEFT_JUSTIFY;
-		s_joingamespyserver_server_actions[i].generic.x		= 0;
-		s_joingamespyserver_server_actions[i].generic.y		= 30 + i*10;
-		s_joingamespyserver_server_actions[i].generic.callback = ConnectGamespyServerFunc;
-		s_joingamespyserver_server_actions[i].generic.statusbar = "press ENTER to connect";
-	}
-
-	gspyCurPage++;
-//	M_Menu_JoinGamespyServerPage2_f();
-}
-
 void JoinGamespyServer_MenuInit( void )
 {
 	int i, vidscale;
@@ -3060,7 +3028,7 @@ void JoinGamespyServer_MenuInit( void )
 
 	for (i = 0; i <= MAX_GAMESPY_MENU_SERVERS; i++)
 	{
-		strcpy (gamespy_server_names[i], NO_SERVER_STRING);
+			strcpy (gamespy_server_names[i], NO_SERVER_STRING);
 	}
 
 	i = 0;
@@ -3087,87 +3055,14 @@ void JoinGamespyServer_MenuInit( void )
 	}
 
 	s_joingamespyserver_page2_action.generic.type = MTYPE_ACTION;
-	s_joingamespyserver_page2_action.generic.name	= "<More Servers>";
+	s_joingamespyserver_page2_action.generic.name	= "<Page 2>";
 	s_joingamespyserver_page2_action.generic.flags	= QMF_LEFT_JUSTIFY;
 	s_joingamespyserver_page2_action.generic.x	= 0;
 	s_joingamespyserver_page2_action.generic.y	= 30 + i*10;
-//	s_joingamespyserver_page2_action.generic.callback = JoinGamespyServerPage2Func;
-	s_joingamespyserver_page2_action.generic.callback = JoinGamespyServer_NextPageFunc;
-	s_joingamespyserver_page2_action.generic.statusbar = "continue browsing list";
+	s_joingamespyserver_page2_action.generic.callback = JoinGamespyServerPage2Func;
+	s_joingamespyserver_page2_action.generic.statusbar = "continue to page 2";
 
 	Menu_AddItem (&s_joingamespyserver_menu, &s_joingamespyserver_page2_action );
-	gspyCurPage = 0;
-	FormatGamespyList(); /* FS: Incase we changed resolution or ran slist2 in the console and went back to this menu... */
-}
-
-void JoinGamespyServer_Redraw( int serverscale )
-{
-	int i, vidscale;
-
-	s_joingamespyserver_menu.x = viddef.width * 0.50 - 120;
-	s_joingamespyserver_menu.y = viddef.height * 0.50 - 118;
-	s_joingamespyserver_menu.nitems = 0;
-	s_joingamespyserver_page2_menu.cursor = 0; /* FS: Set the cursor at the top */
-
-	s_joingamespyserver_search_action.generic.type = MTYPE_ACTION;
-	s_joingamespyserver_search_action.generic.name	= "Query server list";
-	s_joingamespyserver_search_action.generic.flags	= QMF_LEFT_JUSTIFY;
-	s_joingamespyserver_search_action.generic.x	= 0;
-	s_joingamespyserver_search_action.generic.y	= 0;
-	s_joingamespyserver_search_action.generic.callback = SearchGamespyGamesFunc;
-	s_joingamespyserver_search_action.generic.statusbar = "search for servers";
-
-	s_joingamespyserver_server_title.generic.type = MTYPE_SEPARATOR;
-	s_joingamespyserver_server_title.generic.name = "connect to...";
-	s_joingamespyserver_server_title.generic.x    = 80;
-	s_joingamespyserver_server_title.generic.y	   = 20;
-
-	vidscale = Get_Vidscale() - 1;
-
-	for (i = 0; i <= MAX_GAMESPY_MENU_SERVERS; i++)
-	{
-		strcpy (gamespy_server_names[i], NO_SERVER_STRING);
-	}
-
-	i = 0;
-
-	for ( i = 0; i < vidscale; i++ )
-	{
-		s_joingamespyserver_server_actions[i].generic.type	= MTYPE_ACTION;
-		s_joingamespyserver_server_actions[i].generic.name	= gamespy_server_names[i+serverscale];
-		s_joingamespyserver_server_actions[i].generic.flags	= QMF_LEFT_JUSTIFY;
-		s_joingamespyserver_server_actions[i].generic.x		= 0;
-		s_joingamespyserver_server_actions[i].generic.y		= 30 + i*10;
-		s_joingamespyserver_server_actions[i].generic.callback = ConnectGamespyServerFunc;
-		s_joingamespyserver_server_actions[i].generic.statusbar = "press ENTER to connect";
-	}
-
-	Menu_AddItem( &s_joingamespyserver_menu, &s_joingamespyserver_search_action );
-	Menu_AddItem( &s_joingamespyserver_menu, &s_joingamespyserver_server_title );
-
-	i = 0;
-
-	for ( i = 0; i < vidscale; i++ )
-	{
-		if (i+serverscale > MAX_GAMESPY_MENU_SERVERS)
-		{
-			break;
-		}
-
-		Menu_AddItem( &s_joingamespyserver_menu, &s_joingamespyserver_server_actions[i] );
-	}
-
-	s_joingamespyserver_page2_action.generic.type = MTYPE_ACTION;
-	s_joingamespyserver_page2_action.generic.name	= "<More Servers>";
-	s_joingamespyserver_page2_action.generic.flags	= QMF_LEFT_JUSTIFY;
-	s_joingamespyserver_page2_action.generic.x	= 0;
-	s_joingamespyserver_page2_action.generic.y	= 30 + i*10;
-//	s_joingamespyserver_page2_action.generic.callback = JoinGamespyServerPage2Func;
-	s_joingamespyserver_page2_action.generic.callback = JoinGamespyServer_NextPageFunc;
-	s_joingamespyserver_page2_action.generic.statusbar = "continue browsing list";
-
-	Menu_AddItem (&s_joingamespyserver_menu, &s_joingamespyserver_page2_action );
-	gspyCurPage = 0;
 	FormatGamespyList(); /* FS: Incase we changed resolution or ran slist2 in the console and went back to this menu... */
 }
 
