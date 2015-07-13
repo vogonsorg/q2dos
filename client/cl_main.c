@@ -138,7 +138,8 @@ extern	cvar_t *allow_download_maps;
 /* FS: For Gamespy */
 static	GServerList	serverlist;
 static int gspyCur;
-gamespyBrowser_t browserList[MAX_SERVERS];
+gamespyBrowser_t browserList[MAX_SERVERS]; /* FS: Browser list for active servers */
+gamespyBrowser_t browserListAll[MAX_SERVERS]; /* FS: Browser list for ALL servers */
 
 void GameSpy_Async_Think(void);
 static	void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2);
@@ -1832,6 +1833,7 @@ void CL_InitLocal (void)
 	Cmd_AddCommand ("srelist", CL_PrintBrowserList_f);
 
 	memset(&browserList, 0, sizeof(browserList));
+	memset(&browserListAll, 0, sizeof(browserListAll));
 #endif
 
 #ifdef __DJGPP__
@@ -2594,11 +2596,6 @@ void CL_PrintBrowserList_f (void)
 	{
 		if(browserList[i].hostname[0] != 0)
 		{
-			if(showAll)
-			{
-				num_active_servers = i; /* FS: So the server number in the list stays in sync */
-			}
-
 			if (browserList[i].curPlayers > 0)
 			{
 				Com_Printf("%02d:  %s:%d [%d] %s ", num_active_servers+1, browserList[i].ip, browserList[i].port, browserList[i].ping, browserList[i].hostname);
@@ -2606,14 +2603,29 @@ void CL_PrintBrowserList_f (void)
 				Com_Printf("/%d %s\n", browserList[i].maxPlayers, browserList[i].mapname);
 				num_active_servers++;
 			}
-			else if(showAll)
-			{
-				Com_Printf("%02d:  %s:%d [%d] %s %d/%d %s\n", i+1, browserList[i].ip, browserList[i].port, browserList[i].ping, browserList[i].hostname, browserList[i].curPlayers, browserList[i].maxPlayers, browserList[i].mapname);
-			}
 		}
 		else /* FS: if theres nothing there the rest of the list is old garbage, bye. */
 		{
 			break;
+		}
+	}
+
+	if (showAll)
+	{
+		int skip = 0;
+		i = 0;
+
+		for ( i = 0; i < MAX_SERVERS; i++)
+		{
+			if(browserListAll[i].hostname[0] != 0)
+			{
+				Com_Printf("%02d:  %s:%d [%d] %s %d/%d %s\n", (i+num_active_servers+1)-(skip), browserListAll[i].ip, browserListAll[i].port, browserListAll[i].ping, browserListAll[i].hostname, browserListAll[i].curPlayers, browserListAll[i].maxPlayers, browserListAll[i].mapname);
+			}
+			else /* FS: The next one could be 0 if we skipped over it perviously in GameSpy_Sort_By_Ping.  So increment the number of skips counter so the server number shows sequentially */
+			{
+				skip++;
+				continue;
+			}
 		}
 	}
 }
@@ -2628,18 +2640,47 @@ static void GameSpy_Sort_By_Ping(GServerList serverlist)
 		GServer server = ServerListGetServer( serverlist, i );
 		if (server)
 		{
-				Q_strncpyz(browserList[i].ip, ServerGetAddress(server), sizeof(browserList[i].ip));
-				browserList[i].port = ServerGetQueryPort(server);
-				browserList[i].ping = ServerGetPing(server);
-				Q_strncpyz(browserList[i].hostname, ServerGetStringValue(server, "hostname","(NONE)"), sizeof(browserList[i].hostname));
-				Q_strncpyz(browserList[i].mapname, ServerGetStringValue(server,"mapname","(NO MAP)"), sizeof(browserList[i].mapname));
-				browserList[i].curPlayers = ServerGetIntValue(server,"numplayers",0);
-				browserList[i].maxPlayers = ServerGetIntValue(server,"maxclients",0);
+			if(ServerGetIntValue(server, "numplayers", 0) <= 0)
+				continue;
 
-				if(browserList[i].curPlayers > 0)
-				{
-					gspyCur++;
-				}
+			if(i == MAX_SERVERS)
+				break;
+
+			Q_strncpyz(browserList[gspyCur].ip, ServerGetAddress(server), sizeof(browserList[gspyCur].ip));
+			browserList[gspyCur].port = ServerGetQueryPort(server);
+			browserList[gspyCur].ping = ServerGetPing(server);
+			Q_strncpyz(browserList[gspyCur].hostname, ServerGetStringValue(server, "hostname","(NONE)"), sizeof(browserList[gspyCur].hostname));
+			Q_strncpyz(browserList[gspyCur].mapname, ServerGetStringValue(server,"mapname","(NO MAP)"), sizeof(browserList[gspyCur].mapname));
+			browserList[gspyCur].curPlayers = ServerGetIntValue(server,"numplayers",0);
+			browserList[gspyCur].maxPlayers = ServerGetIntValue(server,"maxclients",0);
+
+			gspyCur++;
+		}
+	}
+
+	i = 0;
+
+	for (i = 0; i < cls.gamespytotalservers; i++)
+	{
+		GServer server = ServerListGetServer( serverlist, i );
+
+		if (server)
+		{
+			if(ServerGetIntValue(server, "numplayers", 0) > 0) /* FS: We already added this so skip it */
+			{
+				continue;
+			}
+
+			if(i == MAX_SERVERS)
+				break;
+
+			Q_strncpyz(browserListAll[i].ip, ServerGetAddress(server), sizeof(browserListAll[i].ip));
+			browserListAll[i].port = ServerGetQueryPort(server);
+			browserListAll[i].ping = ServerGetPing(server);
+			Q_strncpyz(browserListAll[i].hostname, ServerGetStringValue(server, "hostname","(NONE)"), sizeof(browserListAll[i].hostname));
+			Q_strncpyz(browserListAll[i].mapname, ServerGetStringValue(server,"mapname","(NO MAP)"), sizeof(browserListAll[i].mapname));
+			browserListAll[i].curPlayers = ServerGetIntValue(server,"numplayers",0);
+			browserListAll[i].maxPlayers = ServerGetIntValue(server,"maxclients",0);
 		}
 	}
 }
@@ -2706,6 +2747,7 @@ void CL_PingNetServers_f (void)
 
 	gspyCur = 0;
 	memset(&browserList, 0, sizeof(browserList));
+	memset(&browserListAll, 0, sizeof(browserListAll));
 
 	goa_secret_key[0] = 'r';
 	goa_secret_key[1] = 't';

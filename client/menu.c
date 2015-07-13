@@ -2782,8 +2782,6 @@ void ConnectGamespyServerFunc( void *self ) /* FS: GameSpy Browser Connect Funct
 		return;
 	}
 
-	index = browserList[index].menuNumber; /* FS: Redirect because we're sorting stuff by ping and allowing huge lists now */
-
 	Com_sprintf (buffer, sizeof(buffer), "connect %s:%d\n", browserList[index].ip, browserList[index].port);
 	Cbuf_AddText (buffer);
 	M_ForceMenuOff ();
@@ -2839,7 +2837,6 @@ void FormatGamespyList (void)
 				{
 					Com_sprintf(gamespy_server_names[m_num_gamespy_servers], sizeof(gamespy_server_names[m_num_gamespy_servers]), "%s [%d] %d/%d", browserList[j].hostname, browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
 				}
-				browserList[m_num_gamespy_servers].menuNumber = j; /* FS: Redirect because we're sorting stuff by ping and allowing huge lists now */
 				m_num_gamespy_servers++;
 			}
 		}
