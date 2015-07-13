@@ -2590,36 +2590,30 @@ void CL_PrintBrowserList_f (void)
 		showAll = true;
 	}
 
-	if(showAll)
+	for ( i = 0; i < MAX_SERVERS; i++)
 	{
-		for ( i = 0; i < MAX_SERVERS; i++)
+		if(browserList[i].hostname[0] != 0)
 		{
-			if(browserList[i].hostname[0] != 0)
+			if(showAll)
 			{
-					Com_Printf("%02d:  %s:%d [%d] %s %d/%d %s\n", i+1, browserList[i].ip, browserList[i].port, browserList[i].ping, browserList[i].hostname, browserList[i].curPlayers, browserList[i].maxPlayers, browserList[i].mapname);
+				num_active_servers = i; /* FS: So the server number in the list stays in sync */
 			}
-			else // FS: if theres nothing there the rest of the list is old garbage, bye.
+
+			if (browserList[i].curPlayers > 0)
 			{
-				break;
+				Com_Printf("%02d:  %s:%d [%d] %s ", num_active_servers+1, browserList[i].ip, browserList[i].port, browserList[i].ping, browserList[i].hostname);
+				Com_Printf("\x02%d", browserList[i].curPlayers); /* FS: Show the current players number in the green font */
+				Com_Printf("/%d %s\n", browserList[i].maxPlayers, browserList[i].mapname);
+				num_active_servers++;
+			}
+			else if(showAll)
+			{
+				Com_Printf("%02d:  %s:%d [%d] %s %d/%d %s\n", i+1, browserList[i].ip, browserList[i].port, browserList[i].ping, browserList[i].hostname, browserList[i].curPlayers, browserList[i].maxPlayers, browserList[i].mapname);
 			}
 		}
-	}
-	else
-	{
-		for ( i = 0; i < MAX_SERVERS; i++)
+		else /* FS: if theres nothing there the rest of the list is old garbage, bye. */
 		{
-			if(browserList[i].hostname[0] != 0)
-			{
-				if (browserList[i].curPlayers > 0)
-				{
-					Com_Printf("%02d:  %s:%d [%d] %s %d/%d %s\n", num_active_servers+1, browserList[i].ip, browserList[i].port, browserList[i].ping, browserList[i].hostname, browserList[i].curPlayers, browserList[i].maxPlayers, browserList[i].mapname);
-					num_active_servers++;
-				}
-			}
-			else // FS: if theres nothing there the rest of the list is old garbage, bye.
-			{
-				break;
-			}
+			break;
 		}
 	}
 }
@@ -2654,21 +2648,25 @@ static void ListCallBack(GServerList serverlist, int msg, void *instance, void *
 {
 	GServer server;
 	int percent;
+	int numplayers;
 
 	if (msg == LIST_PROGRESS)
 	{
 		server = (GServer)param1;
+		numplayers = ServerGetIntValue(server,"numplayers",0);
 
-		if(ServerGetIntValue(server,"numplayers",0)) /* FS: Only show populated servers */
+		if(numplayers > 0) /* FS: Only show populated servers */
 		{
-			if (cls.key_dest != key_menu) // FS: Only print this from an slist2 command, not the server browser.
+			if (cls.key_dest != key_menu) /* FS: Only print this from an slist2 command, not the server browser. */
 			{
-				Com_Printf("%s:%d [%d] %s %d/%d %s\n", ServerGetAddress(server), ServerGetQueryPort(server), ServerGetPing(server), ServerGetStringValue(server, "hostname","(NONE)"), ServerGetIntValue(server,"numplayers",0), ServerGetIntValue(server,"maxclients",0), ServerGetStringValue(server,"mapname","(NO MAP)"));
+				Com_Printf("%s:%d [%d] %s ", ServerGetAddress(server), ServerGetQueryPort(server), ServerGetPing(server), ServerGetStringValue(server, "hostname","(NONE)"));
+				Com_Printf("\x02%d", numplayers); /* FS: Show the current players number in the green font */
+				Com_Printf("/%d %s\n", ServerGetIntValue(server,"maxclients",0), ServerGetStringValue(server,"mapname","(NO MAP)"));
 			}
 		}
 		else if (cls.gamespyupdate == SHOW_ALL_SERVERS)
 		{
-			if (cls.key_dest != key_menu) // FS: Only print this from an slist2 command, not the server browser.
+			if (cls.key_dest != key_menu) /* FS: Only print this from an slist2 command, not the server browser. */
 			{
 				Com_Printf("%s:%d [%d] %s %d/%d %s\n", ServerGetAddress(server), ServerGetQueryPort(server), ServerGetPing(server), ServerGetStringValue(server, "hostname","(NONE)"), ServerGetIntValue(server,"numplayers",0), ServerGetIntValue(server,"maxclients",0), ServerGetStringValue(server,"mapname","(NO MAP)"));
 			}
