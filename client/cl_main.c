@@ -2582,16 +2582,44 @@ void CL_Gspystop_f (void)
 void CL_PrintBrowserList_f (void)
 {
 	int i = 0;
+	int num_active_servers = 0;
+	qboolean showAll = false;
 
-	for ( i = 0; i < MAX_SERVERS; i++)
+	if(Cmd_Argc() > 1)
 	{
-		if(browserList[i].hostname[0] != 0)
+		showAll = true;
+	}
+
+	if(showAll)
+	{
+		for ( i = 0; i < MAX_SERVERS; i++)
 		{
-			Com_Printf("%02d:  %s:%d [%d] %s %d/%d %s\n", i+1, browserList[i].ip, browserList[i].port, browserList[i].ping, browserList[i].hostname, browserList[i].curPlayers, browserList[i].maxPlayers, browserList[i].mapname);
+			if(browserList[i].hostname[0] != 0)
+			{
+					Com_Printf("%02d:  %s:%d [%d] %s %d/%d %s\n", i+1, browserList[i].ip, browserList[i].port, browserList[i].ping, browserList[i].hostname, browserList[i].curPlayers, browserList[i].maxPlayers, browserList[i].mapname);
+			}
+			else // FS: if theres nothing there the rest of the list is old garbage, bye.
+			{
+				break;
+			}
 		}
-		else // FS: if theres nothing there the rest of the list is old garbage, bye.
+	}
+	else
+	{
+		for ( i = 0; i < MAX_SERVERS; i++)
 		{
-			break;
+			if(browserList[i].hostname[0] != 0)
+			{
+				if (browserList[i].curPlayers > 0)
+				{
+					Com_Printf("%02d:  %s:%d [%d] %s %d/%d %s\n", num_active_servers+1, browserList[i].ip, browserList[i].port, browserList[i].ping, browserList[i].hostname, browserList[i].curPlayers, browserList[i].maxPlayers, browserList[i].mapname);
+					num_active_servers++;
+				}
+			}
+			else // FS: if theres nothing there the rest of the list is old garbage, bye.
+			{
+				break;
+			}
 		}
 	}
 }
@@ -2606,17 +2634,18 @@ static void GameSpy_Sort_By_Ping(GServerList serverlist)
 		GServer server = ServerListGetServer( serverlist, i );
 		if (server)
 		{
-			if(ServerGetIntValue(server,"numplayers",0) && gspyCur <= MAX_SERVERS) /* FS: Only show populated servers */
-			{
-				Q_strncpyz(browserList[gspyCur].ip, ServerGetAddress(server), sizeof(browserList[gspyCur].ip));
-				browserList[gspyCur].port = ServerGetQueryPort(server);
-				browserList[gspyCur].ping = ServerGetPing(server);
-				Q_strncpyz(browserList[gspyCur].hostname, ServerGetStringValue(server, "hostname","(NONE)"), sizeof(browserList[gspyCur].hostname));
-				Q_strncpyz(browserList[gspyCur].mapname, ServerGetStringValue(server,"mapname","(NO MAP)"), sizeof(browserList[gspyCur].mapname));
-				browserList[gspyCur].curPlayers = ServerGetIntValue(server,"numplayers",0);
-				browserList[gspyCur].maxPlayers = ServerGetIntValue(server,"maxclients",0);
-				gspyCur++;
-			}
+				Q_strncpyz(browserList[i].ip, ServerGetAddress(server), sizeof(browserList[i].ip));
+				browserList[i].port = ServerGetQueryPort(server);
+				browserList[i].ping = ServerGetPing(server);
+				Q_strncpyz(browserList[i].hostname, ServerGetStringValue(server, "hostname","(NONE)"), sizeof(browserList[i].hostname));
+				Q_strncpyz(browserList[i].mapname, ServerGetStringValue(server,"mapname","(NO MAP)"), sizeof(browserList[i].mapname));
+				browserList[i].curPlayers = ServerGetIntValue(server,"numplayers",0);
+				browserList[i].maxPlayers = ServerGetIntValue(server,"maxclients",0);
+
+				if(browserList[i].curPlayers > 0)
+				{
+					gspyCur++;
+				}
 		}
 	}
 }
@@ -2630,27 +2659,19 @@ static void ListCallBack(GServerList serverlist, int msg, void *instance, void *
 	{
 		server = (GServer)param1;
 
-		if(ServerGetIntValue(server,"numplayers",0) && gspyCur < MAX_SERVERS) /* FS: Only show populated servers */
+		if(ServerGetIntValue(server,"numplayers",0)) /* FS: Only show populated servers */
 		{
-#ifdef NO_GSPY_SORTING
-			Q_strncpyz(browserList[gspyCur].ip, ServerGetAddress(server), sizeof(browserList[gspyCur].ip));
-			browserList[gspyCur].port = ServerGetQueryPort(server);
-			browserList[gspyCur].ping = ServerGetPing(server);
-			Q_strncpyz(browserList[gspyCur].hostname, ServerGetStringValue(server, "hostname","(NONE)"), sizeof(browserList[gspyCur].hostname));
-			Q_strncpyz(browserList[gspyCur].mapname, ServerGetStringValue(server,"mapname","(NO MAP)"), sizeof(browserList[gspyCur].mapname));
-			browserList[gspyCur].curPlayers = ServerGetIntValue(server,"numplayers",0);
-			browserList[gspyCur].maxPlayers = ServerGetIntValue(server,"maxclients",0);
-#endif
 			if (cls.key_dest != key_menu) // FS: Only print this from an slist2 command, not the server browser.
 			{
-#ifdef NO_GSPY_SORTING
-				Com_Printf("%s:%d [%d] %s %d/%d %s\n", browserList[gspyCur].ip, browserList[gspyCur].port, browserList[gspyCur].ping, browserList[gspyCur].hostname, browserList[gspyCur].curPlayers, browserList[gspyCur].maxPlayers, browserList[gspyCur].mapname);
-#else
 				Com_Printf("%s:%d [%d] %s %d/%d %s\n", ServerGetAddress(server), ServerGetQueryPort(server), ServerGetPing(server), ServerGetStringValue(server, "hostname","(NONE)"), ServerGetIntValue(server,"numplayers",0), ServerGetIntValue(server,"maxclients",0), ServerGetStringValue(server,"mapname","(NO MAP)"));
-#endif
 			}
-
-			gspyCur++;
+		}
+		else if (cls.gamespyupdate == SHOW_ALL_SERVERS)
+		{
+			if (cls.key_dest != key_menu) // FS: Only print this from an slist2 command, not the server browser.
+			{
+				Com_Printf("%s:%d [%d] %s %d/%d %s\n", ServerGetAddress(server), ServerGetQueryPort(server), ServerGetPing(server), ServerGetStringValue(server, "hostname","(NONE)"), ServerGetIntValue(server,"numplayers",0), ServerGetIntValue(server,"maxclients",0), ServerGetStringValue(server,"mapname","(NO MAP)"));
+			}
 		}
 
 		if(param2)
@@ -2664,10 +2685,8 @@ static void ListCallBack(GServerList serverlist, int msg, void *instance, void *
 		switch( ServerListState( serverlist ) )
 		{
 			case sl_idle:
-#ifndef NO_GSPY_SORTING
 				ServerListSort( serverlist, true, "ping", cm_int );
 				GameSpy_Sort_By_Ping(serverlist);
-#endif
 				break;
 			default:
 				break;
@@ -2698,9 +2717,17 @@ void CL_PingNetServers_f (void)
 	goa_secret_key[5] = 'g';
 	goa_secret_key[6] = '\0'; /* FS: Gamespy requires a null terminator at the end of the secret key */
 
-	Com_Printf("\x02Grabbing populated server list from GameSpy master. . .\n");
+	if ((Cmd_Argc() == 1) || (cls.key_dest == key_menu))
+	{
+		cls.gamespyupdate = SHOW_POPULATED_SERVERS;;
+		Com_Printf("\x02Grabbing populated server list from GameSpy master. . .\n");
+	}
+	else
+	{
+		cls.gamespyupdate = SHOW_ALL_SERVERS;
+		Com_Printf("\x02Grabbing all servers from GameSpy master. . .\n");
+	}
 
-	cls.gamespyupdate = 1;
 	cls.gamespypercent = 0;
 	cls.gamespystarttime = (int)Sys_Milliseconds();
 	cls.gamespytotalservers = 0;

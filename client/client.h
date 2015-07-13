@@ -697,6 +697,9 @@ void CL_TrapParticles (entity_t *ent);
 
 #ifdef GAMESPY
 #define MAX_SERVERS 300 /* FS: There's barely 200 active servers existing, but OK. */
+#define SHOW_POPULATED_SERVERS 1
+#define SHOW_ALL_SERVERS 2
+
 /* FS: Gamespy browser */
 typedef struct
 {

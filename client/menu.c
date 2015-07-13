@@ -2695,7 +2695,7 @@ JOIN SERVER MENU
 =============================================================================
 */
 #define MAX_LOCAL_SERVERS 12 // FS: Was 8 -- Max 320x200 can handle
-#define MAX_GAMESPY_SERVERS 60 /* FS: Maximum number of servers to show in the browser */
+#define MAX_GAMESPY_MENU_SERVERS 60 /* FS: Maximum number of servers to show in the browser */
 
 static menuframework_s	s_joinserver_menu;
 static menuframework_s	s_joingamespyserver_menu; // FS
@@ -2709,16 +2709,15 @@ static menuaction_s		s_joingamespyserver_page2_action; // FS
 static menuaction_s		s_joingamespyserver_page3_action; // FS
 static menuaction_s		s_joinserver_address_book_action;
 static menuaction_s		s_joinserver_server_actions[MAX_LOCAL_SERVERS];
-static menuaction_s		s_joingamespyserver_server_actions[MAX_GAMESPY_SERVERS]; // FS
+static menuaction_s		s_joingamespyserver_server_actions[MAX_GAMESPY_MENU_SERVERS]; // FS
 
 int		m_num_servers;
 int		m_num_gamespy_servers; // FS
-static	qboolean	gamespy_initialized; // FS
 #define	NO_SERVER_STRING	"<no server>"
 
 // user readable information
 static char local_server_names[MAX_LOCAL_SERVERS][80];
-static char gamespy_server_names[MAX_GAMESPY_SERVERS][80];
+static char gamespy_server_names[MAX_GAMESPY_MENU_SERVERS][80];
 
 // network address
 static netadr_t local_server_netadr[MAX_LOCAL_SERVERS];
@@ -2806,32 +2805,40 @@ void FormatGamespyList (void)
 #ifdef GAMESPY
 	int j;
 
-	for (j = 0; j<MAX_GAMESPY_SERVERS; j++)
+	m_num_gamespy_servers = 0;
+
+	for (j = 0; j< MAX_SERVERS; j++)
 	{
-		if (browserList[j].hostname[0] != 0)
+		if (m_num_gamespy_servers == MAX_GAMESPY_MENU_SERVERS)
+			break;
+
+		if ((browserList[j].hostname[0] != 0)) /* FS: Only show populated servers in the browser list */
 		{
-			if(viddef.height <= 300) // FS: Special formatting for low res.
+			if(browserList[j].curPlayers > 0)
 			{
-				char buffer[80];
-
-				Q_strncpyz(gamespy_server_names[j], browserList[j].hostname, 20);
-
-				if(Q_strlen(browserList[j].hostname) >= 20)
+				if(viddef.height <= 300) // FS: Special formatting for low res.
 				{
-					Com_sprintf(buffer, sizeof(buffer), "... [%d] %d/%d", browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
+					char buffer[80];
+
+					Q_strncpyz(gamespy_server_names[m_num_gamespy_servers], browserList[j].hostname, 20);
+
+					if(Q_strlen(browserList[j].hostname) >= 20)
+					{
+						Com_sprintf(buffer, sizeof(buffer), "... [%d] %d/%d", browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
+					}
+					else
+					{
+						Com_sprintf(buffer, sizeof(buffer), "... [%d] %d/%d", browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
+					}
+
+					Com_strcat(gamespy_server_names[m_num_gamespy_servers], sizeof(gamespy_server_names[m_num_gamespy_servers]), buffer);
 				}
 				else
 				{
-					Com_sprintf(buffer, sizeof(buffer), "... [%d] %d/%d", browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
+					Com_sprintf(gamespy_server_names[m_num_gamespy_servers], sizeof(gamespy_server_names[m_num_gamespy_servers]), "%s [%d] %d/%d", browserList[j].hostname, browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
 				}
-
-				Com_strcat(gamespy_server_names[j], sizeof(gamespy_server_names[j]), buffer);
+				m_num_gamespy_servers++;
 			}
-			else
-			{
-				Com_sprintf(gamespy_server_names[j], sizeof(gamespy_server_names[j]), "%s [%d] %d/%d", browserList[j].hostname, browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
-			}
-			m_num_gamespy_servers++;
 		}
 		else
 		{
@@ -2860,7 +2867,7 @@ void SearchGamespyGames (void)
 	int		i;
 
 	m_num_gamespy_servers = 0;
-	for (i=0 ; i<MAX_GAMESPY_SERVERS ; i++)
+	for (i=0 ; i<=MAX_GAMESPY_MENU_SERVERS ; i++)
 	{
 		strcpy (gamespy_server_names[i], NO_SERVER_STRING);
 	}
@@ -3021,12 +3028,9 @@ void JoinGamespyServer_MenuInit( void )
 
 	vidscale = Get_Vidscale() - 1;
 
-	for (i = 0; i <= MAX_GAMESPY_SERVERS; i++)
+	for (i = 0; i <= MAX_GAMESPY_MENU_SERVERS; i++)
 	{
-		if(!gamespy_initialized)
-		{
 			strcpy (gamespy_server_names[i], NO_SERVER_STRING);
-		}
 	}
 
 	i = 0;
@@ -3061,7 +3065,6 @@ void JoinGamespyServer_MenuInit( void )
 	s_joingamespyserver_page2_action.generic.statusbar = "continue to page 2";
 
 	Menu_AddItem (&s_joingamespyserver_menu, &s_joingamespyserver_page2_action );
-	gamespy_initialized = true;
 	FormatGamespyList(); // FS: Incase we changed resolution and went back to this menu...
 }
 
@@ -3091,7 +3094,7 @@ void JoinGamespyServerPage2_MenuInit( void )
 
 	for ( i = 0; i < vidscale; i++ )
 	{
-		if (i+vidscale > MAX_GAMESPY_SERVERS)
+		if (i+vidscale > MAX_GAMESPY_MENU_SERVERS)
 		{
 			break;
 		}
@@ -3112,7 +3115,7 @@ void JoinGamespyServerPage2_MenuInit( void )
 
 	for ( i = 0; i < vidscale; i++ )
 	{
-		if (i+vidscale > MAX_GAMESPY_SERVERS)
+		if (i+vidscale > MAX_GAMESPY_MENU_SERVERS)
 		{
 			break;
 		}
@@ -3170,7 +3173,7 @@ void JoinGamespyServerPage3_MenuInit( void )
 
 	for ( i = 0; i < vidscale; i++ )
 	{
-		if (i+vidscale+vidscale > MAX_GAMESPY_SERVERS)
+		if (i+vidscale+vidscale > MAX_GAMESPY_MENU_SERVERS)
 		{
 			break;
 		}
@@ -3191,7 +3194,7 @@ void JoinGamespyServerPage3_MenuInit( void )
 
 	for ( i = 0; i < vidscale; i++ )
 	{
-		if (i+vidscale+vidscale > MAX_GAMESPY_SERVERS)
+		if (i+vidscale+vidscale > MAX_GAMESPY_MENU_SERVERS)
 		{
 			break;
 		}
