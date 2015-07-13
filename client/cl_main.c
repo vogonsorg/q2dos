@@ -2298,7 +2298,9 @@ void CL_Frame (double msec)
 		return;
 	}
 
-	GameSpy_Async_Think();
+#ifdef GAMESPY
+	GameSpy_Async_Think(); /* FS: Update the query loop if we're pinging some servers */
+#endif
 
 #ifdef CLIENT_SPLIT_NETFRAME
 	if (cl_async->value && !cl_timedemo->value)
