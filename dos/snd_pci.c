@@ -1,6 +1,6 @@
-
-// snd_pci.c
-// PCI sound card support through libau
+/* snd_pci.c
+ * PCI sound card support through libau
+ */
 
 #include <dos.h>
 #include "../client/client.h"
@@ -24,44 +24,40 @@ qboolean PCI_Init(void)
 
 	if(c)
 	{
-		unsigned int speed=22050; // FS: AU_setrate wants uints
-		unsigned int samplebits=16; // FS: AU_setrate wants uints
-		unsigned int channels=2; // FS: AU_setrate wants uints
-		Com_DPrintf(DEVELOPER_MSG_SOUND, "PCI Audio: Adding PCI\n");
+		unsigned int speed=22050;
+		unsigned int samplebits=16;
+		unsigned int channels=2;
+
 		Com_Printf("PCI Audio: %s\n",c);
-
-		if(s_khz->intValue >= 11025) // FS
+		if(s_khz->intValue >= 11025) /* FS */
 			speed = s_khz->intValue;
-
 		dma.speed=speed;
 		dma.samplebits=samplebits;
 		dma.channels=channels;
 		AU_setrate(&speed,&samplebits,&channels);
-		
-#if 1		/* not sure but I think it can change in the setrate */
+
+		/* not sure but I think these can change in the setrate */
 		dma.speed=aui->freq_card;
 		dma.samplebits=aui->bits_set;
 		dma.channels=aui->chan_set;
-		if(dma.speed != s_khz->intValue) // FS: In theory, our rate was not liked, so force the change.
+		if(dma.speed != s_khz->intValue) /* FS: In theory, our rate was not liked, so force the change. */
 			Cvar_SetValue("s_khz", dma.speed);
-#endif
-
 		Com_DPrintf(DEVELOPER_MSG_SOUND, "Post AU_setrate %d/%d/%d\n",dma.speed,dma.samplebits,dma.channels);
 
 		dma.samples = aui->card_dmasize/aui->bytespersample_card;
 		dma.samplepos = 0;
 		dma.submission_chunk = 1;
 
-		memset(aui->card_DMABUFF, 0, aui->card_dmasize); // FS: Clear the dma buffer on Init
-
+		memset(aui->card_DMABUFF, 0, aui->card_dmasize); /* FS: Clear the dma buffer on Init */
 		dma.buffer = (unsigned char *) aui->card_DMABUFF;
-		AU_setmixer_all(80);   //80% volume
+
+		AU_setmixer_all(80); /* 80% volume */
 		AU_start();
 
 		return true;
 	}
 
-	Com_DPrintf(DEVELOPER_MSG_SOUND, "PCI Audio: Detection failed.  Attempting SB init.\n");
+	Com_Printf("PCI Audio: Detection failed.\n");
 
 	return false;
 }
