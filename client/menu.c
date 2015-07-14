@@ -2701,6 +2701,7 @@ int		m_num_servers;
 
 /* FS: GameSpy Browser Stuff*/
 int		m_num_gamespy_servers;
+int		m_num_active_gamespy_servers;
 static int curPageScale;
 static int gspyCurPage;
 static int totalAllowedBrowserPages;
@@ -2801,6 +2802,7 @@ void FormatGamespyList (void)
 	int skip = 0;
 
 	m_num_gamespy_servers = 0;
+	m_num_active_gamespy_servers = 0;
 
 	for (j = 0; j< MAX_SERVERS; j++)
 	{
@@ -2834,6 +2836,7 @@ void FormatGamespyList (void)
 				}
 				Com_sprintf(gamespy_connect_string[m_num_gamespy_servers], sizeof(gamespy_server_names[m_num_gamespy_servers]), "connect %s:%d", browserList[j].ip, browserList[j].port);
 				m_num_gamespy_servers++;
+				m_num_active_gamespy_servers++;
 			}
 		}
 		else
@@ -2891,7 +2894,7 @@ void Update_Gamespy_Menu (void)
 
 	FormatGamespyList();
 
-	Com_sprintf(found, sizeof(found), "Found %d servers in %i seconds\n", m_num_gamespy_servers, (((int)Sys_Milliseconds()-cls.gamespystarttime) / 1000));
+	Com_sprintf(found, sizeof(found), "Found %d servers (%d active) in %i seconds\n", m_num_gamespy_servers, m_num_active_gamespy_servers, (((int)Sys_Milliseconds()-cls.gamespystarttime) / 1000));
 	s_joingamespyserver_search_action.generic.statusbar = found;
 	Com_Printf(found);
 #endif
@@ -3040,7 +3043,6 @@ void JoinServer_MenuInit( void )
 
 void JoinGamespyServer_NextPageFunc (void *unused)
 {
-	int i = 0;
 	int vidscale = Get_Vidscale();
 	int serverscale = Get_Vidscale();
 
@@ -3058,7 +3060,6 @@ void JoinGamespyServer_NextPageFunc (void *unused)
 
 void JoinGamespyServer_PrevPageFunc (void *unused)
 {
-	int i = 0;
 	int vidscale = Get_Vidscale();
 	int serverscale = Get_Vidscale();
 
