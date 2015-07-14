@@ -131,7 +131,6 @@ int goa_init(int queryport, char *gamename, char *ip, void *userdata)
 	if (saddr.sin_addr.s_addr == 0x0100007F) //localhost -- we don't want that!
 		saddr.sin_addr.s_addr = INADDR_ANY;
 
-
 	lasterror = bind(querysock, (struct sockaddr *)&saddr, sizeof(saddr));
 	if (lasterror)
 	{
@@ -140,16 +139,14 @@ int goa_init(int queryport, char *gamename, char *ip, void *userdata)
 
 	get_sockaddrin(sv_master_server_ip->string,sv_master_server_port->intValue,&saddr,NULL);
 
-
 	lasterror = connect (hbsock, (struct sockaddr *) &saddr, sizeof(saddr));
 	
 	if (lasterror)
 	{
 		return E_GOA_CONNERROR;
 	}
-  
-	return 0;
 
+	return 0;
 }
 
 /* goa_process_queries: Processes any waiting queries, and sends a
@@ -174,18 +171,13 @@ void goa_process_queries(void)
 	FD_ZERO ( &set );
 	FD_SET ( querysock, &set );
 
-
 	while (1)
 	{
 		error = selectsocket(FD_SETSIZE, &set, NULL, NULL, &timeout);
 		if (SOCKET_ERROR == error || 0 == error)
 			return;
 		//else we have data
-#ifndef _MSC_VER
-		error = recvfrom(querysock, indata, INBUF_LEN - 1, 0, &saddr, (socklen_t*)&saddrlen);
-#else
 		error = recvfrom(querysock, indata, INBUF_LEN - 1, 0, &saddr, &saddrlen);
-#endif
 		if (error != SOCKET_ERROR)
 		{
 			indata[error] = '\0';
@@ -193,7 +185,6 @@ void goa_process_queries(void)
 			parse_query(indata, &saddr);
 		}
 	}
-		
 }
 
 /* goa_send_statechanged: Sends a statechanged heartbeat, call when
@@ -246,9 +237,7 @@ int get_sockaddrin(char *host, int port, struct sockaddr_in *saddr, struct hoste
 	if (savehent != NULL)
 		*savehent = hent;
 	return 1;
-
-} 
-
+}
 
 
 /* value_for_key: this returns a value for a certain key in s, where s is a string
@@ -281,10 +270,10 @@ char *value_for_key(const char *s, const char *key)
 
 void swap_byte ( uchar *a, uchar *b )
 {
-	uchar swapByte; 
+	uchar swapByte;
 	
-	swapByte = *a; 
-	*a = *b;      
+	swapByte = *a;
+	*a = *b;
 	*b = swapByte;
 }
 
@@ -346,8 +335,8 @@ void gs_encrypt ( uchar *key, int key_len, uchar *buffer_ptr, int buffer_len )
 		buffer_ptr[counter] ^= state[xorIndex];
 	}
 }
-/*****************************************************************************/
 
+/*****************************************************************************/
 
 /* packet_send: sends a key\value packet. Appends the queryid
 key\value pair. Clears the buffer */
@@ -403,7 +392,6 @@ void buffer_send(struct sockaddr *sender, char *buffer, char *newdata)
 			strcpy(buffer,newdata);
 		}
 	}
-
 }
 
 /* send_basic: sends a response to the basic query */
@@ -425,7 +413,6 @@ void send_info(struct sockaddr *sender, char *outbuf)
 	assert(goa_info_callback);
 	goa_info_callback(keyvalue, sizeof(keyvalue), udata);
 	buffer_send(sender, outbuf, keyvalue);
-
 }
 
 /* send_rules: sends a response to the rules query. */
@@ -436,7 +423,6 @@ void send_rules(struct sockaddr *sender, char *outbuf)
 	assert(goa_rules_callback);
 	goa_rules_callback(keyvalue, sizeof(keyvalue), udata);
 	buffer_send(sender, outbuf, keyvalue);
-
 }
 
 /* send_players: sends the players and their information.*/
@@ -447,7 +433,6 @@ void send_players(struct sockaddr *sender, char *outbuf)
 	assert(goa_players_callback);
 	goa_players_callback(keyvalue, sizeof(keyvalue), udata);
 	buffer_send(sender, outbuf, keyvalue);
-
 }
 
 /* send_echo: bounces the echostr back to sender 
@@ -461,7 +446,6 @@ void send_echo(struct sockaddr *sender, char *outbuf,char *echostr)
 // SCG[1/16/00]: 	sprintf(keyvalue,"\\echo\\%s",echostr);
 	Com_sprintf(keyvalue,sizeof(keyvalue),"\\echo\\%s",echostr);
 	buffer_send(sender, outbuf, keyvalue);
-
 }
 
 /* send_final: sends the remaining data in outbuf. Appends the final
@@ -544,7 +528,6 @@ void parse_query(char *query, struct sockaddr *sender)
 					break;
 				case qtunknown:
 					break;
-
 			}
 	}
 	send_final(sender,buffer,validation);
@@ -556,9 +539,9 @@ void send_heartbeat(int statechanged)
 {
 	char buf[256];
 	
-    if (!dedicated || !dedicated->value)
+	if (!dedicated || !dedicated->value)
 		return;		// only dedicated servers send heartbeats
-  
+
 	if (!public_server->value)
 		return;		// a private dedicated game
 
