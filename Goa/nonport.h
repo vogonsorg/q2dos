@@ -32,7 +32,7 @@ Fax(714)549-0757
 	#include <ctype.h>
 	#include <errno.h>
 	#include <sys/time.h>
-#ifdef __DJGPP__
+#ifdef __DJGPP__ /* WATT-32 library */
 	#include <tcp.h>  /* select_s() */
 #endif
 #endif
