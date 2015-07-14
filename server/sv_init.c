@@ -452,11 +452,14 @@ void SV_Map (qboolean attractloop, char *levelstring, qboolean loadgame)
 	else
 		spawnpoint[0] = 0;
 
+	l = strlen(level);
 	// skip the end-of-unit flag if necessary
 	if (level[0] == '*')
-		strcpy (level, level+1);
+	{
+		memmove (level, level+1, l);
+		--l;
+	}
 
-	l = strlen(level);
 	if (l > 4 && !strcmp (level+l-4, ".cin") )
 	{
 		if (!dedicated->value)
