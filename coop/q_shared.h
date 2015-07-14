@@ -71,7 +71,7 @@ int vsnprintf(char *str, size_t n, const char *fmt, va_list ap);
 #define CL_MASTER_PORT "28900"
 #define SV_MASTER_IP "maraakate.org" // FS: gamespy dead "master.gamespy.com"
 #define SV_MASTER_PORT "27900"
-	
+
 // angle indexes
 #define	PITCH				0		// up / down
 #define	YAW					1		// left / right
@@ -267,7 +267,7 @@ void Com_PageInMemory (byte *buffer, int size);
 int Q_stricmp (char *s1, char *s2);
 int Q_strcasecmp (char *s1, char *s2);
 int Q_strncasecmp (char *s1, char *s2, int n);
-// FS: From KMQ2
+/* FS: From KMQ2 */
 void Q_strncpyz (char *dst, const char *src, int dstSize);
 void Q_strncatz (char *dst, const char *src, int dstSize);
 char *Q_strlwr (char *string);

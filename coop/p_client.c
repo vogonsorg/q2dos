@@ -871,7 +871,6 @@ player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 		LookAtKiller(self, inflictor, attacker);
 		self->client->ps.pmove.pm_type = PM_DEAD;
 		ClientObituary(self, inflictor, attacker);
-
 		TossClientWeapon(self);
 
 		if (deathmatch->value)
@@ -899,7 +898,6 @@ player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 					self->client->pers.inventory[n];
 			}
 		}
-
 	}
 
 	/* remove powerups */
@@ -1031,18 +1029,12 @@ InitClientCoopPersistant(edict_t *ent) // FS: Give some of this back on respawn
 	gitem_t *item;
 	edict_t *it_ent;
 
-	client = ent->client;
-
 	if (!ent || !ent->client)
-	{
 		return;
-	}
-
 	if (!coop->intValue)
-	{
 		return;
-	}
 
+	client = ent->client;
 	client->pers.max_bullets = 200;
 	client->pers.max_shells = 100;
 	client->pers.max_rockets = 50;
@@ -1075,8 +1067,6 @@ InitClientCoopPersistant(edict_t *ent) // FS: Give some of this back on respawn
 			G_FreeEdict(it_ent);
 		}
 	}
-
-
 }
 
 void
@@ -2320,7 +2310,7 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 	}
 	else
 	{
-		int tmpVel = 0;
+		int tmpVel;
 		/* set up for pmove */
 		memset(&pm, 0, sizeof(pm));
 
