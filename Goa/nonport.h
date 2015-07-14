@@ -16,7 +16,7 @@ Fax(714)549-0757
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
-	#include <winsock.h>
+	#include <winsock2.h>
 	#include <windows.h>
 #else
 	#include <unistd.h>
