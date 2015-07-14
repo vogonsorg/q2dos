@@ -19,7 +19,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // net_null.c
 
-//#include "winsock.h"
 #include "../qcommon/qcommon.h"
 
 #define	MAX_LOOPBACK	4
@@ -305,7 +304,6 @@ NET_Init
 */
 void NET_Init (void)
 {
-
 	Com_Printf("NULLsock Initialized\n");
 
 	noudp = Cvar_Get ("noudp", "0", CVAR_NOSET);
@@ -333,7 +331,5 @@ NET_ErrorString
 */
 char *NET_ErrorString (void)
 {
-
 	return "NO ERROR";
-	
 }

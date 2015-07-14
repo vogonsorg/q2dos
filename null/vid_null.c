@@ -1,16 +1,32 @@
+/*
+Copyright (C) 1997-2001 Id Software, Inc.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+*/
 // vid_null.c -- null video driver to aid porting efforts
 // this assumes that one of the refs is statically linked to the executable
 
 #include "../client/client.h"
-#include "../client/qmenu.h"
-//#include "vid_dos.h"
 
 viddef_t	viddef;				// global video state
 
 refexport_t	re;
 
 refexport_t GetRefAPI (refimport_t rimp);
-
 
 /*
 ==========================================================================
@@ -31,9 +47,9 @@ void VID_Printf (int print_level, char *fmt, ...)
         va_end (argptr);
 
         if (print_level == PRINT_ALL)
-			Com_Printf ("%s", msg);
+                Com_Printf ("%s", msg);
         else
-			Com_DPrintf(DEVELOPER_MSG_GFX, "%s", msg);
+                Com_DPrintf ("%s", msg);
 }
 
 void VID_Error (int err_level, char *fmt, ...)
@@ -52,7 +68,6 @@ void VID_NewWindow (int width, int height)
 {
         viddef.width = width;
         viddef.height = height;
-		printf("VID_NewWindow %d %\n",width,height);
 }
 
 /*
@@ -67,7 +82,7 @@ typedef struct vidmode_s
 
 vidmode_t vid_modes[] =
 {
-    /*{ "Mode 0: 320x240",   320, 240,   0 },
+    { "Mode 0: 320x240",   320, 240,   0 },
     { "Mode 1: 400x300",   400, 300,   1 },
     { "Mode 2: 512x384",   512, 384,   2 },
     { "Mode 3: 640x480",   640, 480,   3 },
@@ -76,9 +91,8 @@ vidmode_t vid_modes[] =
     { "Mode 6: 1024x768",  1024, 768,  6 },
     { "Mode 7: 1152x864",  1152, 864,  7 },
     { "Mode 8: 1280x960",  1280, 960, 8 },
-    { "Mode 9: 1600x1200", 1600, 1200, 9 }
-*/
-    { "Mode 0: 320x200", 320, 200, 0 }
+    { "Mode 9: 1600x1200", 1600, 1200, 9 },
+	{ "Mode 10: 2048x1536", 2048, 1536, 10 }
 };
 #define VID_NUM_MODES ( sizeof( vid_modes ) / sizeof( vid_modes[0] ) )
 
@@ -89,7 +103,6 @@ qboolean VID_GetModeInfo( int *width, int *height, int mode )
 
     *width  = vid_modes[mode].width;
     *height = vid_modes[mode].height;
-    Com_Printf("VID_GetModeInfo %dx%d mode %d\n",*width,*height,mode);
 
     return true;
 }
@@ -100,7 +113,7 @@ void	VID_Init (void)
     refimport_t	ri;
 
     viddef.width = 320;
-    viddef.height = 200; //was originally 240
+    viddef.height = 240;
 
     ri.Cmd_AddCommand = Cmd_AddCommand;
     ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
@@ -112,13 +125,12 @@ void	VID_Init (void)
     ri.FS_LoadFile = FS_LoadFile;
     ri.FS_FreeFile = FS_FreeFile;
     ri.FS_Gamedir = FS_Gamedir;
-    ri.Vid_NewWindow = VID_NewWindow;
+	ri.Vid_NewWindow = VID_NewWindow;
     ri.Cvar_Get = Cvar_Get;
     ri.Cvar_Set = Cvar_Set;
     ri.Cvar_SetValue = Cvar_SetValue;
     ri.Vid_GetModeInfo = VID_GetModeInfo;
 
-    //JASON this is called from the video DLL
     re = GetRefAPI(ri);
 
     if (re.api_version != API_VERSION)
