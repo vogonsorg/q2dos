@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // net_wins.c
 
-#include "winsock.h"
-#include "wsipx.h"
+#include <winsock.h>
+#include <wsipx.h>
 #include "../qcommon/qcommon.h"
 
 #define	MAX_LOOPBACK	4
@@ -353,8 +353,8 @@ qboolean	NET_GetPacket (netsrc_t sock, netadr_t *net_from, sizebuf_t *net_messag
 			continue;
 
 		fromlen = sizeof(from);
-		ret = recvfrom (net_socket, net_message->data, net_message->maxsize
-			, 0, (struct sockaddr *)&from, &fromlen);
+		ret = recvfrom (net_socket, (char *)net_message->data, net_message->maxsize, 0,
+				(struct sockaddr *)&from, &fromlen);
 
 		SockadrToNetadr (&from, net_from);
 
@@ -431,7 +431,10 @@ void NET_SendPacket (netsrc_t sock, int length, void *data, netadr_t to)
 			return;
 	}
 	else
+	{
+		net_socket = INVALID_SOCKET; /* silence compiler */
 		Com_Error (ERR_FATAL, "NET_SendPacket: bad address type");
+	}
 
 	NetadrToSockadr (&to, &addr);
 
@@ -482,7 +485,7 @@ int NET_IPSocket (char *net_interface, int port)
 {
 	int					newsocket;
 	struct sockaddr_in	address;
-	qboolean			_true = true;
+	u_long			_true = true;
 	int					i = 1;
 	int					err;
 
@@ -592,7 +595,7 @@ int NET_IPXSocket (int port)
 {
 	int					newsocket;
 	struct sockaddr_ipx	address;
-	int					_true = 1;
+	u_long					_true = 1;
 	int					err;
 
 	if ((newsocket = socket (PF_IPX, SOCK_DGRAM, NSPROTO_IPX)) == -1)
@@ -763,10 +766,10 @@ NET_Init
 */
 void NET_Init (void)
 {
-	WORD	wVersionRequested; 
+	WORD	wVersionRequested;
 	int		r;
 
-	wVersionRequested = MAKEWORD(1, 1); 
+	wVersionRequested = MAKEWORD(1, 1);
 
 	r = WSAStartup (MAKEWORD(1, 1), &winsockdata);
 

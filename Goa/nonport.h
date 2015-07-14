@@ -11,10 +11,13 @@ Costa Mesa, CA 92626
 Fax(714)549-0757
 
 ******/
+
 #ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
-	#include <windows.h>
+#endif
 	#include <winsock.h>
+	#include <windows.h>
 #else
 	#include <unistd.h>
 	#include <sys/types.h>
@@ -29,14 +32,14 @@ Fax(714)549-0757
 	#include <ctype.h>
 	#include <errno.h>
 	#include <sys/time.h>
-    #ifdef __DJGPP__
+#ifdef __DJGPP__
 	#include <tcp.h>  /* select_s() */
-    #endif
 #endif
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 unsigned long current_time();
 void msleep(unsigned long msec);
@@ -44,11 +47,11 @@ void msleep(unsigned long msec);
 void SocketStartUp();
 void SocketShutDown();
 
-#ifndef SOCKET_ERROR 
+#ifndef SOCKET_ERROR
 	#define SOCKET_ERROR (-1)
 #endif
 
-#ifndef INVALID_SOCKET 
+#ifndef INVALID_SOCKET
 	#define INVALID_SOCKET (-1)
 #endif
 
@@ -56,14 +59,16 @@ void SocketShutDown();
 	#define strcasecmp _stricmp
 	#define selectsocket select
 	#define IOCTLARG_T
+	typedef int socklen_t;
 #elif defined(__DJGPP__)
 	#define _strdup strdup
 	#define IOCTLARG_T	(char*)
 	#define SOCKET int
 	#define selectsocket select_s
+	typedef int socklen_t;
 #else
 	#define _strdup strdup
-	#define SOCKET int	
+	#define SOCKET int
 	#define ioctlsocket ioctl
 	#define closesocket close
 	#define selectsocket select
