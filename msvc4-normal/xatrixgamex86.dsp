@@ -1,24 +1,24 @@
-# Microsoft Developer Studio Project File - Name="gamex86" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="xatrixgamex86" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
 
-CFG=gamex86 - Win32 Release
+CFG=xatrixgamex86 - Win32 Release
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "gamex86.mak".
+!MESSAGE NMAKE /f "xatrixgamex86.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "gamex86.mak" CFG="gamex86 - Win32 Release"
+!MESSAGE NMAKE /f "xatrixgamex86.mak" CFG="xatrixgamex86 - Win32 Release"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "gamex86 - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "gamex86 - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "xatrixgamex86 - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "xatrixgamex86 - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
@@ -29,7 +29,7 @@ CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "gamex86 - Win32 Release"
+!IF  "$(CFG)" == "xatrixgamex86 - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -38,8 +38,9 @@ RSC=rc.exe
 # PROP BASE Target_Dir "."
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir ".\Release"
-# PROP Intermediate_Dir ".\Release"
+# PROP Output_Dir ".\Xatrix\Release"
+# PROP Intermediate_Dir ".\Xatrix\Release"
+# PROP Ignore_Export_Lib 0
 # PROP Target_Dir "."
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
 # ADD CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "id386" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
@@ -52,9 +53,9 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:".\Xatrix\Release/gamex86.dll"
 
-!ELSEIF  "$(CFG)" == "gamex86 - Win32 Debug"
+!ELSEIF  "$(CFG)" == "xatrixgamex86 - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -63,8 +64,9 @@ LINK32=link.exe
 # PROP BASE Target_Dir "."
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir ".\Debug"
-# PROP Intermediate_Dir ".\Debug"
+# PROP Output_Dir ".\Xatrix\Debug"
+# PROP Intermediate_Dir ".\Xatrix\Debug"
+# PROP Ignore_Export_Lib 0
 # PROP Target_Dir "."
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
 # ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
@@ -77,88 +79,88 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:".\Xatrix\Debug/gamex86.dll"
 
 !ENDIF 
 
 # Begin Target
 
-# Name "gamex86 - Win32 Release"
-# Name "gamex86 - Win32 Debug"
+# Name "xatrixgamex86 - Win32 Release"
+# Name "xatrixgamex86 - Win32 Debug"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;for;f90"
 # Begin Source File
 
-SOURCE=..\GAME\g_ai.c
+SOURCE=..\xsrc\g_ai.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\g_chase.c
+SOURCE=..\xsrc\g_chase.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\g_cmds.c
+SOURCE=..\xsrc\g_cmds.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\g_combat.c
+SOURCE=..\xsrc\g_combat.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\g_func.c
+SOURCE=..\xsrc\g_func.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\g_items.c
+SOURCE=..\xsrc\g_items.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\g_main.c
+SOURCE=..\xsrc\g_main.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\g_misc.c
+SOURCE=..\xsrc\g_misc.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\g_monster.c
+SOURCE=..\xsrc\g_monster.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\g_phys.c
+SOURCE=..\xsrc\g_phys.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\g_save.c
+SOURCE=..\xsrc\g_save.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\g_spawn.c
+SOURCE=..\xsrc\g_spawn.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\g_svcmds.c
+SOURCE=..\xsrc\g_svcmds.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\g_target.c
+SOURCE=..\xsrc\g_target.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\g_trigger.c
+SOURCE=..\xsrc\g_trigger.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\g_turret.c
+SOURCE=..\xsrc\g_turret.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\g_utils.c
+SOURCE=..\xsrc\g_utils.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\g_weapon.c
+SOURCE=..\xsrc\g_weapon.c
 # End Source File
 # Begin Source File
 
@@ -166,123 +168,143 @@ SOURCE=..\GAME\game.def
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_actor.c
+SOURCE=..\xsrc\m_actor.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_berserk.c
+SOURCE=..\xsrc\m_berserk.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_boss2.c
+SOURCE=..\xsrc\m_boss2.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_boss3.c
+SOURCE=..\xsrc\m_boss3.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_boss31.c
+SOURCE=..\xsrc\m_boss31.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_boss32.c
+SOURCE=..\xsrc\m_boss32.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_brain.c
+SOURCE=..\xsrc\m_boss5.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_chick.c
+SOURCE=..\xsrc\m_brain.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_flash.c
+SOURCE=..\xsrc\m_chick.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_flipper.c
+SOURCE=..\xsrc\m_fixbot.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_float.c
+SOURCE=..\xsrc\m_flash.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_flyer.c
+SOURCE=..\xsrc\m_flipper.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_gladiator.c
+SOURCE=..\xsrc\m_float.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_gunner.c
+SOURCE=..\xsrc\m_flyer.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_hover.c
+SOURCE=..\xsrc\m_gekk.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_infantry.c
+SOURCE=..\xsrc\m_gladb.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_insane.c
+SOURCE=..\xsrc\m_gladiator.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_medic.c
+SOURCE=..\xsrc\m_gunner.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_move.c
+SOURCE=..\xsrc\m_hover.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_mutant.c
+SOURCE=..\xsrc\m_infantry.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_parasite.c
+SOURCE=..\xsrc\m_insane.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_soldier.c
+SOURCE=..\xsrc\m_medic.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_supertank.c
+SOURCE=..\xsrc\m_move.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\m_tank.c
+SOURCE=..\xsrc\m_mutant.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\p_client.c
+SOURCE=..\xsrc\m_parasite.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\p_hud.c
+SOURCE=..\xsrc\m_soldier.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\p_trail.c
+SOURCE=..\xsrc\m_supertank.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\p_view.c
+SOURCE=..\xsrc\m_tank.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\p_weapon.c
+SOURCE=..\xsrc\p_client.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\q_shared.c
+SOURCE=..\xsrc\p_hud.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\xsrc\p_trail.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\xsrc\p_view.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\xsrc\p_weapon.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\xsrc\q_shared.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\xsrc\rand.c
 # End Source File
 # End Group
 # Begin Group "Header Files"

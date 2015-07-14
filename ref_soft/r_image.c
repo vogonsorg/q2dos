@@ -758,7 +758,7 @@ void	R_InitImages (void)
 	registration_sequence = 1;
 
 	// www.quakewiki.net/quakesrc/39.html
-	FS_LoadFile( "pics/16to8.dat", (void **)&sw_state.d_16to8table );
+	ri.FS_LoadFile( "pics/16to8.dat", (void **)&sw_state.d_16to8table );
 
 	if ( !sw_state.d_16to8table )
 	{

@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <io.h>
 #endif
 #include "client.h"
-#include "../client/qmenu.h"
+#include "qmenu.h"
 #include "snd_loc.h"
 
 #ifndef GAME_HARD_LINKED
@@ -2695,7 +2695,9 @@ static menuaction_s		s_joingamespyserver_prevpage_action; /* FS: GameSpy Browser
 static menuaction_s		s_joingamespyserver_nextpage_action; /* FS: GameSpy Browser */
 static menuaction_s		s_joinserver_address_book_action;
 static menuaction_s		s_joinserver_server_actions[MAX_LOCAL_SERVERS];
+#ifdef GAMESPY
 static menuaction_s		s_joingamespyserver_server_actions[MAX_GAMESPY_MENU_SERVERS]; /* FS: GameSpy Browser */
+#endif
 
 int		m_num_servers;
 
@@ -2711,8 +2713,10 @@ void JoinGamespyServer_Redraw( int serverscale );
 
 // user readable information
 static char local_server_names[MAX_LOCAL_SERVERS][80];
+#ifdef GAMESPY
 static char gamespy_server_names[MAX_GAMESPY_MENU_SERVERS][80]; /* FS: GameSpy Browser */
 static char gamespy_connect_string[MAX_GAMESPY_MENU_SERVERS][128]; /* FS: GameSpy Browser: Connect string */
+#endif
 
 // network address
 static netadr_t local_server_netadr[MAX_LOCAL_SERVERS];
@@ -3077,6 +3081,7 @@ void JoinGamespyServer_PrevPageFunc (void *unused)
 
 void JoinGamespyServer_MenuInit( void )
 {
+#ifdef GAMESPY
 	int i, vidscale;
 
 	s_joingamespyserver_menu.x = viddef.width * 0.50 - 120;
@@ -3145,10 +3150,12 @@ void JoinGamespyServer_MenuInit( void )
 	gspyCurPage = 0;
 
 	FormatGamespyList(); /* FS: Incase we changed resolution or ran slist2 in the console and went back to this menu... */
+#endif
 }
 
 void JoinGamespyServer_Redraw( int serverscale )
 {
+#ifdef GAMESPY
 	int i, vidscale;
 	qboolean didBreak = false;
 
@@ -3235,6 +3242,7 @@ void JoinGamespyServer_Redraw( int serverscale )
 	}
 
 	FormatGamespyList(); /* FS: Incase we changed resolution or ran slist2 in the console and went back to this menu... */
+#endif
 }
 
 void JoinServer_MenuDraw(void)

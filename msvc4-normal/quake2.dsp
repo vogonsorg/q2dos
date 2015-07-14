@@ -40,9 +40,10 @@ RSC=rc.exe
 # PROP Use_Debug_Libraries 0
 # PROP Output_Dir ".\Release"
 # PROP Intermediate_Dir ".\Release"
+# PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "../win32/include" /D "NDEBUG" /D "id386" /D "WIN32" /D "_WINDOWS" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "OGG_SUPPORT" /D "USE_CURL" /D "USE_JOYSTICK" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x1009 /d "NDEBUG"
@@ -52,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /machine:I386
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /machine:I386 /nodefaultlib:"libcmtd.lib"
 
 !ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
 
@@ -67,7 +68,7 @@ LINK32=link.exe
 # PROP Intermediate_Dir ".\Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "id386" /D "WIN32" /D "_WINDOWS" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "USE_CURL" /D "OGG_SUPPORT" /D "USE_JOYSTICK" /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x1009 /d "_DEBUG"
@@ -82,11 +83,40 @@ LINK32=link.exe
 !ENDIF 
 
 # Begin Target
+
 # Name "quake2 - Win32 Release"
 # Name "quake2 - Win32 Debug"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;for;f90"
+# Begin Group "Gamespy"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\Goa\CEngine\darray.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\Goa\CEngine\gserver.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\Goa\CEngine\gserverlist.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\Goa\CEngine\gutil.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\Goa\CEngine\hashtable.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\Goa\nonport.c
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=..\WIN32\cd_win.c
@@ -102,6 +132,10 @@ SOURCE=..\CLIENT\cl_ents.c
 # Begin Source File
 
 SOURCE=..\CLIENT\cl_fx.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\client\cl_http.c
 # End Source File
 # Begin Source File
 
@@ -229,6 +263,10 @@ SOURCE=..\CLIENT\snd_mix.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\client\snd_stream.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\WIN32\snd_win.c
 # End Source File
 # Begin Source File
@@ -288,5 +326,17 @@ SOURCE=..\CLIENT\x86.c
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
 # End Group
+# Begin Source File
+
+SOURCE=..\win32\libcurl.lib
+# End Source File
+# Begin Source File
+
+SOURCE=..\win32\libogg.lib
+# End Source File
+# Begin Source File
+
+SOURCE=..\win32\libvorbis.lib
+# End Source File
 # End Target
 # End Project

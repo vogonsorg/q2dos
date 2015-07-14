@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "gamex86"=".\gamex86\gamex86.dsp" - Package Owner=<4>
+Project: "gamex86"=".\gamex86.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -33,7 +33,43 @@ Package=<4>
 
 ###############################################################################
 
-Project: "ref_soft"=".\ref_soft\ref_soft.dsp" - Package Owner=<4>
+Project: "ref_soft"=".\ref_soft.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "roguegamex86"=".\roguegamex86.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "xatrixgamex86"=".\xatrixgamex86.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "zaerogamex86"=".\zaerogamex86.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{

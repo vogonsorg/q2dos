@@ -597,7 +597,7 @@
 {"landing_goal", (byte *)landing_goal},
 {"fixbot_search", (byte *)fixbot_search},
 {"fixbot_FindDeadMonster", (byte *)fixbot_FindDeadMonster},
-{"crand", (byte *)crand},
+//{"crand", (byte *)crand},
 {"SP_monster_chick_heat", (byte *)SP_monster_chick_heat},
 {"SP_monster_chick", (byte *)SP_monster_chick},
 {"chick_sight", (byte *)chick_sight},

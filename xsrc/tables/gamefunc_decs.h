@@ -597,7 +597,7 @@ extern void takeoff_goal ( edict_t * self ) ;
 extern void landing_goal ( edict_t * self ) ;
 extern int fixbot_search ( edict_t * self ) ;
 extern edict_t * fixbot_FindDeadMonster ( edict_t * self ) ;
-extern float crand ( void ) ;
+//extern float crand ( void ) ;
 extern void SP_monster_chick_heat ( edict_t * self ) ;
 extern void SP_monster_chick ( edict_t * self ) ;
 extern void chick_sight ( edict_t * self , edict_t * other ) ;
