@@ -2621,7 +2621,7 @@ void CL_PrintBrowserList_f (void)
 			{
 				Com_Printf("%02d:  %s:%d [%d] %s %d/%d %s\n", (i+num_active_servers+1)-(skip), browserListAll[i].ip, browserListAll[i].port, browserListAll[i].ping, browserListAll[i].hostname, browserListAll[i].curPlayers, browserListAll[i].maxPlayers, browserListAll[i].mapname);
 			}
-			else /* FS: The next one could be 0 if we skipped over it perviously in GameSpy_Sort_By_Ping.  So increment the number of skips counter so the server number shows sequentially */
+			else /* FS: The next one could be 0 if we skipped over it previously in GameSpy_Sort_By_Ping.  So increment the number of skips counter so the server number shows sequentially */
 			{
 				skip++;
 				continue;
@@ -2667,6 +2667,11 @@ static void GameSpy_Sort_By_Ping(GServerList serverlist)
 		if (server)
 		{
 			if(ServerGetIntValue(server, "numplayers", 0) > 0) /* FS: We already added this so skip it */
+			{
+				continue;
+			}
+
+			if(Q_strncmp(ServerGetStringValue(server, "hostname","(NONE)"), "(NONE)", 6) == 0) /* FS: A server that timed-out or we aborted early */
 			{
 				continue;
 			}

@@ -714,6 +714,7 @@ typedef struct
 }
 gamespyBrowser_t;
 extern gamespyBrowser_t browserList[MAX_SERVERS];
+extern gamespyBrowser_t browserListAll[MAX_SERVERS];
 void CL_PingNetServers_f (void);
 #endif
 

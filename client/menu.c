@@ -53,8 +53,6 @@ void M_Menu_Main_f (void);
 	void M_Menu_Multiplayer_f( void );
 		void M_Menu_JoinServer_f (void);
 		void M_Menu_JoinGamespyServer_f (void); /* FS: GameSpy Browser */
-			void M_Menu_JoinGamespyServerPage2_f (void); /* FS: GameSpy Browser */
-			void M_Menu_JoinGamespyServerPage3_f (void); /* FS: GameSpy Browser */
 			void M_Menu_AddressBook_f( void );
 		void M_Menu_StartServer_f (void);
 			void M_Menu_DMOptions_f (void);
@@ -540,16 +538,6 @@ static void JoinNetworkServerFunc( void *unused )
 static void JoinGamespyServerFunc( void *unused )
 {
 	M_Menu_JoinGamespyServer_f();
-}
-
-static void JoinGamespyServerPage2Func( void *unused )
-{
-	M_Menu_JoinGamespyServerPage2_f();
-}
-
-static void JoinGamespyServerPage3Func( void *unused )
-{
-	M_Menu_JoinGamespyServerPage3_f();
 }
 
 static void StartNetworkServerFunc( void *unused )
@@ -2695,7 +2683,7 @@ JOIN SERVER MENU
 =============================================================================
 */
 #define MAX_LOCAL_SERVERS 12 /* FS: Was 8 -- Max 320x200 can handle */
-#define MAX_GAMESPY_MENU_SERVERS 60 /* FS: Maximum number of servers to show in the browser */
+#define MAX_GAMESPY_MENU_SERVERS MAX_SERVERS /* FS: Maximum number of servers to show in the browser */
 
 static menuframework_s	s_joinserver_menu;
 static menuframework_s	s_joingamespyserver_menu; /* FS: GameSpy Browser */
@@ -2710,13 +2698,20 @@ static menuaction_s		s_joinserver_server_actions[MAX_LOCAL_SERVERS];
 static menuaction_s		s_joingamespyserver_server_actions[MAX_GAMESPY_MENU_SERVERS]; /* FS: GameSpy Browser */
 
 int		m_num_servers;
-int		m_num_gamespy_servers; /* FS: GameSpy Browser */
+
+/* FS: GameSpy Browser Stuff*/
+int		m_num_gamespy_servers;
 static int curPageScale;
+static int gspyCurPage;
+static int totalAllowedBrowserPages;
+void JoinGamespyServer_Redraw( int serverscale );
+
 #define	NO_SERVER_STRING	"<no server>"
 
 // user readable information
 static char local_server_names[MAX_LOCAL_SERVERS][80];
-static char gamespy_server_names[MAX_GAMESPY_MENU_SERVERS][80];
+static char gamespy_server_names[MAX_GAMESPY_MENU_SERVERS][80]; /* FS: GameSpy Browser */
+static char gamespy_connect_string[MAX_GAMESPY_MENU_SERVERS][128]; /* FS: GameSpy Browser: Connect string */
 
 // network address
 static netadr_t local_server_netadr[MAX_LOCAL_SERVERS];
@@ -2781,7 +2776,7 @@ void ConnectGamespyServerFunc( void *self ) /* FS: GameSpy Browser Connect Funct
 		return;
 	}
 
-	Com_sprintf (buffer, sizeof(buffer), "connect %s:%d\n", browserList[index].ip, browserList[index].port);
+	Com_sprintf (buffer, sizeof(buffer), "%s\n", gamespy_connect_string[index]);
 	Cbuf_AddText (buffer);
 	M_ForceMenuOff ();
 #else
@@ -2803,6 +2798,7 @@ void FormatGamespyList (void)
 {
 #ifdef GAMESPY
 	int j;
+	int skip = 0;
 
 	m_num_gamespy_servers = 0;
 
@@ -2811,7 +2807,7 @@ void FormatGamespyList (void)
 		if (m_num_gamespy_servers == MAX_GAMESPY_MENU_SERVERS)
 			break;
 
-		if ((browserList[j].hostname[0] != 0)) /* FS: Only show populated servers in the browser list */
+		if ((browserList[j].hostname[0] != 0)) /* FS: Only show populated servers first */
 		{
 			if(browserList[j].curPlayers > 0)
 			{
@@ -2836,12 +2832,53 @@ void FormatGamespyList (void)
 				{
 					Com_sprintf(gamespy_server_names[m_num_gamespy_servers], sizeof(gamespy_server_names[m_num_gamespy_servers]), "%s [%d] %d/%d", browserList[j].hostname, browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
 				}
+				Com_sprintf(gamespy_connect_string[m_num_gamespy_servers], sizeof(gamespy_server_names[m_num_gamespy_servers]), "connect %s:%d", browserList[j].ip, browserList[j].port);
 				m_num_gamespy_servers++;
 			}
 		}
 		else
 		{
 			break;
+		}
+	}
+
+	j = 0;
+
+	for(j = 0; j< MAX_SERVERS; j++)
+	{
+		if (m_num_gamespy_servers == MAX_GAMESPY_MENU_SERVERS)
+			break;
+
+		if ((browserListAll[j].hostname[0] != 0))
+		{
+			if(viddef.height <= 300) /* FS: Special formatting for low res. */
+			{
+				char buffer[80];
+
+				Q_strncpyz(gamespy_server_names[m_num_gamespy_servers-skip], browserListAll[j].hostname, 20);
+
+				if(Q_strlen(browserListAll[j].hostname) >= 20)
+				{
+					Com_sprintf(buffer, sizeof(buffer), "... [%d] %d/%d", browserListAll[j].ping, browserListAll[j].curPlayers, browserListAll[j].maxPlayers);
+				}
+				else
+				{
+					Com_sprintf(buffer, sizeof(buffer), "... [%d] %d/%d", browserListAll[j].ping, browserListAll[j].curPlayers, browserListAll[j].maxPlayers);
+				}
+
+				Com_strcat(gamespy_server_names[m_num_gamespy_servers-skip], sizeof(gamespy_server_names[m_num_gamespy_servers-skip]), buffer);
+			}
+			else
+			{
+				Com_sprintf(gamespy_server_names[m_num_gamespy_servers-skip], sizeof(gamespy_server_names[m_num_gamespy_servers-skip]), "%s [%d] %d/%d", browserListAll[j].hostname, browserListAll[j].ping, browserListAll[j].curPlayers, browserListAll[j].maxPlayers);
+			}
+			Com_sprintf(gamespy_connect_string[m_num_gamespy_servers-skip], sizeof(gamespy_server_names[m_num_gamespy_servers-skip]), "connect %s:%d", browserListAll[j].ip, browserListAll[j].port);
+			m_num_gamespy_servers++;
+		}
+		else
+		{
+			skip++;
+			continue;
 		}
 	}
 #endif
@@ -3001,14 +3038,16 @@ void JoinServer_MenuInit( void )
 	SearchLocalGames();
 }
 
-static int gspyCurPage;
-void JoinGamespyServer_Redraw( int serverscale );
-
-static void JoinGamespyServer_NextPageFunc (void *unused)
+void JoinGamespyServer_NextPageFunc (void *unused)
 {
 	int i = 0;
 	int vidscale = Get_Vidscale();
 	int serverscale = Get_Vidscale();
+
+	if((gspyCurPage + 1) > totalAllowedBrowserPages)
+	{
+		return;
+	}
 
 	gspyCurPage++;
 	serverscale = vidscale*gspyCurPage;
@@ -3017,11 +3056,16 @@ static void JoinGamespyServer_NextPageFunc (void *unused)
 	curPageScale = serverscale;
 }
 
-static void JoinGamespyServer_PrevPageFunc (void *unused)
+void JoinGamespyServer_PrevPageFunc (void *unused)
 {
 	int i = 0;
 	int vidscale = Get_Vidscale();
 	int serverscale = Get_Vidscale();
+
+	if((gspyCurPage - 1) < 0)
+	{
+		return;
+	}
 
 	gspyCurPage--;
 	serverscale = (vidscale*gspyCurPage);
@@ -3057,8 +3101,10 @@ void JoinGamespyServer_MenuInit( void )
 	for (i = 0; i <= MAX_GAMESPY_MENU_SERVERS; i++)
 	{
 		strcpy (gamespy_server_names[i], NO_SERVER_STRING);
+		memset (&gamespy_connect_string, 0, sizeof(gamespy_connect_string));
 	}
 
+	totalAllowedBrowserPages = (MAX_GAMESPY_MENU_SERVERS/vidscale);
 	i = 0;
 
 	for ( i = 0; i < vidscale; i++ )
@@ -3215,6 +3261,49 @@ void JoinGamespyServer_MenuDraw(void)
 
 const char *JoinGamespyServer_MenuKey( int key )
 {
+#ifdef GAMESPY
+	extern	qboolean keydown[256];
+
+	if(key == K_HOME || key == K_KP_HOME)
+	{
+		JoinGamespyServer_MenuInit();
+		S_StartLocalSound(menu_move_sound);
+		return NULL;
+	}
+
+	if(key == K_END || key == K_KP_END)
+	{
+		gspyCurPage = totalAllowedBrowserPages-1;
+		JoinGamespyServer_NextPageFunc(NULL);
+		S_StartLocalSound(menu_move_sound);
+		return NULL;
+	}
+
+	if(key == K_PGDN || key == K_KP_PGDN)
+	{
+		JoinGamespyServer_NextPageFunc(NULL);
+		S_StartLocalSound(menu_move_sound);
+		return NULL;
+	}
+
+	if(key == K_PGUP || key == K_KP_PGUP)
+	{
+		JoinGamespyServer_PrevPageFunc(NULL);
+		S_StartLocalSound(menu_move_sound);
+		return NULL;
+	}
+
+	if( key == 'c' ) /* FS: Added ability to press ctrl+c to abort a GameSpy list update */
+	{
+		if ( keydown[K_CTRL] )
+		{
+			if (cls.gamespyupdate)
+			{
+				Cbuf_AddText ("gspystop\n");
+			}
+		}
+	}
+#endif
 	return Default_MenuKey( &s_joingamespyserver_menu, key );
 }
 
@@ -5016,17 +5105,4 @@ void M_Keydown (int key)
 			S_StartLocalSound( ( char * ) s );
 		}
 	}
-
-#ifdef GAMESPY
-	if( key == 'c' ) /* FS: Added ability to press ctrl+c to abort a GameSpy list update */
-	{
-		if ( keydown[K_CTRL] )
-		{
-			if (cls.gamespyupdate)
-			{
-				Cbuf_AddText ("gspystop\n");
-			}
-		}
-	}
-#endif
 }
