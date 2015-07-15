@@ -936,6 +936,10 @@ SOURCE=..\QCOMMON\pmove.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\win32\q2.rc
+# End Source File
+# Begin Source File
+
 SOURCE=..\CLIENT\qmenu.c
 # End Source File
 # End Group

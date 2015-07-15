@@ -743,6 +743,7 @@ InputName=r_varsa
 # End Custom Build
 
 !ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "Win32"
@@ -880,6 +881,10 @@ SOURCE=..\QCOMMON\net_chan.c
 # Begin Source File
 
 SOURCE=..\QCOMMON\pmove.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\win32\q2.rc
 # End Source File
 # Begin Source File
 

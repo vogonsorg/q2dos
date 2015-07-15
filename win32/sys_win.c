@@ -593,6 +593,43 @@ void ParseCommandLine (LPSTR lpCmdLine)
 
 }
 
+void Detect_WinNT() /* FS: Detect if we're using Windows XP for alt+tab appcompat */
+{
+	DWORD WinVersion;
+	DWORD WinLowByte, WinHiByte;
+	DWORD dwDisp, dwDisp2;
+	DWORD dwAppCompat = 1;
+
+	HKEY hk, hk2;
+
+	WinVersion = GetVersion();
+	WinLowByte = (DWORD)(LOBYTE(LOWORD(WinVersion)));
+	WinHiByte = (DWORD)(HIBYTE(HIWORD(WinVersion)));
+
+	if(WinLowByte == 5 && WinHiByte > 0) /* FS: Because Win2k is version 5.0 and XP is 5.1 and 2003 is 5.2 */
+	{
+		RegCreateKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hk, &dwDisp);
+		RegCreateKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hk2, &dwDisp2);
+		RegCreateKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hk2, &dwDisp2);
+
+		RegSetValueEx(hk, "{b1899c0f-fdfd-42d0-b489-c254bdbb539d}", 0, REG_DWORD, (const byte *) &dwAppCompat, sizeof(DWORD));
+		RegCloseKey(hk);
+		Com_DPrintf(DEVELOPER_MSG_STANDARD, "Windows NT Version: %d\n", WinLowByte);
+	}
+
+	if(WinLowByte == 6) /* FS: Windows 7 */
+	{
+		dwAppCompat = 119; /* FS: Different value for updated AppCompat */
+		RegCreateKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hk, &dwDisp);
+		RegCreateKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hk2, &dwDisp2);
+		RegCreateKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hk2, &dwDisp2);
+
+		RegSetValueEx(hk, "{b1899c0f-fdfd-42d0-b489-c254bdbb539d}", 0, REG_DWORD, (const byte *) &dwAppCompat, sizeof(DWORD));
+		RegCloseKey(hk);
+		Com_DPrintf(DEVELOPER_MSG_STANDARD, "Windows NT Version: %d\n", WinLowByte);
+	}
+}
+
 /*
 ==================
 WinMain
@@ -633,6 +670,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		}
 	}
 
+	Detect_WinNT();
 	Qcommon_Init (argc, argv);
 	oldtime = Sys_Milliseconds ();
 

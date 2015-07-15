@@ -325,6 +325,14 @@ SOURCE=..\CLIENT\x86.c
 # Begin Group "Resource Files"
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
+# Begin Source File
+
+SOURCE=..\win32\q2.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\win32\q2.rc
+# End Source File
 # End Group
 # Begin Source File
 

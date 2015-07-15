@@ -97,68 +97,26 @@ LINK32=link.exe
 # Begin Source File
 
 SOURCE=..\Goa\CEngine\darray.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\Goa\CEngine\gserver.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\Goa\CEngine\gserverlist.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\Goa\CEngine\gutil.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\Goa\CEngine\hashtable.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\Goa\nonport.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # End Group
 # Begin Group "Client"
@@ -1005,6 +963,10 @@ SOURCE=..\QCOMMON\net_chan.c
 # Begin Source File
 
 SOURCE=..\QCOMMON\pmove.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\win32\q2.rc
 # End Source File
 # Begin Source File
 

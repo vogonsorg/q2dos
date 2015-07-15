@@ -40,7 +40,7 @@ swwstate_t sww_state;
 /*
 ** VID_CreateWindow
 */
-#define	WINDOW_CLASS_NAME "Quake 2"
+#define	WINDOW_CLASS_NAME "Q2DOS"
 
 void VID_CreateWindow( int width, int height, int stylebits )
 {
@@ -89,7 +89,7 @@ void VID_CreateWindow( int width, int height, int stylebits )
 	sww_state.hWnd = CreateWindowEx (
 		exstyle,
 		 WINDOW_CLASS_NAME,
-		 "Quake 2",
+		 "Q2DOS",
 		 stylebits,
 		 x, y, w, h,
 		 NULL,
