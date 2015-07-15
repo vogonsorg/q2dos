@@ -156,7 +156,7 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 		Com_sprintf(players, sizeof(players), "%i", numplayers/*-2*/);
 		kvpair.value = _strdup(players);
 		TableEnter(server->keyvals, &kvpair);
-	}	
+	}
 }
 
 
