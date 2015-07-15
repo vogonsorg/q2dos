@@ -1,7 +1,7 @@
 /******
 gutil.h
 GameSpy C Engine SDK
-  
+
 Copyright 1999 GameSpy Industries, Inc
 
 Suite E-204
@@ -16,19 +16,19 @@ Fax(714)549-0757
  information
 
 ******/
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 typedef unsigned char uchar;
 
+void swap_byte (uchar *a, uchar *b);
+uchar encode_ct (uchar c);
 
-void swap_byte ( uchar *a, uchar *b );
-uchar encode_ct ( uchar c );
+void gs_encode (uchar *ins, int size, uchar *result);
+void gs_encrypt (uchar *key, int key_len, uchar *buffer_ptr, int buffer_len);
 
-//#ifdef _MSC_VER
-void gs_encode ( uchar *ins, int size, uchar *result );
-void gs_encrypt ( uchar *key, int key_len, uchar *buffer_ptr, int buffer_len );
-//#endif
 #ifdef __cplusplus
 }
 #endif

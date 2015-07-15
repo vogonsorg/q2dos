@@ -1,7 +1,7 @@
 /******
 goautil.h
-GameSpy Developer SDK 
-  
+GameSpy Developer SDK
+
 Copyright 1999 GameSpy Industries, Inc
 
 Suite E-204
@@ -124,8 +124,8 @@ Also use it before your game exits by changing the gamestate to "exiting"
 and sending a statechanged heartbeat.
 *******************/
 void goa_send_statechanged(int state);
-#define STATE_UPDATE 1 // FS: Map or game name change
-#define STATE_SHUTDOWN 2 // FS: Actually shutting down
+#define STATE_UPDATE 1 /* FS: Map or game name change */
+#define STATE_SHUTDOWN 2 /* FS: Actually shutting down */
 
 /*****************
 GOA_SHUTDOWN

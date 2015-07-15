@@ -1,7 +1,7 @@
 /******
 gserver.c
 GameSpy C Engine SDK
-  
+
 Copyright 1999 GameSpy Industries, Inc
 
 Suite E-204
@@ -11,7 +11,7 @@ Costa Mesa, CA 92626
 Fax(714)549-0757
 
 ******/
-#include "../../server/server.h" // FS
+#include "../../server/server.h" /* FS */
 #include "../nonport.h"
 #include "goaceng.h"
 #include "gserver.h"
@@ -121,7 +121,6 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 			TableEnter(server->keyvals, &kvpair);
 		}
 		k = mytok(NULL,'\\');
-
 	}
 
 	if (numplayers) // FS: Q2 sends shit with \n as players and their data :/
@@ -156,7 +155,7 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 		Com_sprintf(players, sizeof(players), "%i", numplayers/*-2*/);
 		kvpair.value = _strdup(players);
 		TableEnter(server->keyvals, &kvpair);
-	}	
+	}
 }
 
 
@@ -189,7 +188,6 @@ GKeyValuePair *ServerRuleLookup(GServer server, char *key)
 	GKeyValuePair kvp;
 	kvp.key = key;
 	return (GKeyValuePair *)TableLookup(server->keyvals, &kvp);
-
 }
 
 /* ServerGet[]Value
@@ -237,25 +235,25 @@ char *ServerGetPlayerStringValue(GServer server, int playernum, char *key, char 
 	sprintf(newkey,"%s_%d",key,playernum);
 	return ServerGetStringValue(server, newkey, sdefault);
 }
+
 int ServerGetPlayerIntValue(GServer server, int playernum, char *key, int idefault)
 {
 	char newkey[32];
 	
 	sprintf(newkey,"%s_%d",key,playernum);
 	return ServerGetIntValue(server, newkey, idefault);
-
 }
+
 double ServerGetPlayerFloatValue(GServer server, int playernum, char *key, double fdefault)
 {
 	char newkey[32];
 	
 	sprintf(newkey,"%s_%d",key,playernum);
 	return ServerGetFloatValue(server, newkey, fdefault);
-
 }
 
 
-/* ServerEnumKeys 
+/* ServerEnumKeys
 -----------------
 Enumerates the keys/values for a given server by calling KeyEnumFn with each
 key/value. The user-defined instance data will be passed to the KeyFn callback */
@@ -279,15 +277,13 @@ void ServerEnumKeys(GServer server, KeyEnumFn KeyFn, void *instance)
 }
 
 
-
-
 /***********
  * UTILITY FUNCTIONS
  **********/
 
 static char safetolower(char ch)
 {
-  return (isascii(ch) ? tolower(ch) : ch);
+	return (isascii(ch) ? tolower(ch) : ch);
 }
 
 /* NonTermHash
@@ -298,24 +294,22 @@ static char safetolower(char ch)
 #define MULTIPLIER -1664117991
 static int KeyValHash(const void *elem, int numbuckets)
 {
-    unsigned int i;
-    unsigned long hashcode = 0;
+	unsigned int i;
+	unsigned long hashcode = 0;
 	char *s = ((GKeyValuePair *)elem)->key;
-    
-    for (i = 0; i < strlen(s); i++)
-	  hashcode = hashcode * MULTIPLIER + safetolower(s[i]);
-    return (hashcode % numbuckets);
-}
 
+	for (i = 0; i < strlen(s); i++)
+		hashcode = hashcode * MULTIPLIER + safetolower(s[i]);
+	return (hashcode % numbuckets);
+}
 
 /* keyval
  * Compares two gkeyvaluepair  (case insensative)
  */
 static int KeyValCompare(const void *entry1, const void *entry2)
 {
-  	
-   	return CaseInsensitiveCompare(&((GKeyValuePair *)entry1)->key, 
-									  &((GKeyValuePair *)entry2)->key);
+	return CaseInsensitiveCompare(&((GKeyValuePair *)entry1)->key, 
+					  &((GKeyValuePair *)entry2)->key);
 }
 
 /* CaseInsensitiveCompare
@@ -327,7 +321,7 @@ static int KeyValCompare(const void *entry1, const void *entry2)
  */
 static int CaseInsensitiveCompare(const void *entry1, const void *entry2)
 {
-    return strcasecmp(*(char **)entry1,*(char **)entry2);
+	return strcasecmp(*(char **)entry1,*(char **)entry2);
 }
 
 /* KeyValFree
@@ -337,5 +331,4 @@ static void KeyValFree(void *elem)
 {
 	free(((GKeyValuePair *)elem)->key);
 	free(((GKeyValuePair *)elem)->value);
-
 }

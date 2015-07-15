@@ -1,7 +1,7 @@
 /******
 goautil.c
-GameSpy Developer SDK 
-  
+GameSpy Developer SDK
+
 Copyright 1999 GameSpy Industries, Inc
 
 Suite E-204
@@ -33,7 +33,7 @@ INCLUDES
 #include <string.h>
 #include <assert.h>
 
-extern cvar_t	*public_server;			// should heartbeats be sent
+extern cvar_t	*public_server; /* should heartbeats be sent */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -41,7 +41,7 @@ extern "C" {
 /********
 DEFINES
 ********/
-#define HB_TIME 300000 //5 minutes
+#define HB_TIME 300000 /* 5 minutes */
 #define MAX_DATA_SIZE 1400
 #define INBUF_LEN 256
 #define BUF_SIZE 1400
@@ -268,32 +268,32 @@ char *value_for_key(const char *s, const char *key)
 /*****************************************************************************/
 /* Various encryption / encoding routines */
 
-void swap_byte ( uchar *a, uchar *b )
+void swap_byte (uchar *a, uchar *b)
 {
 	uchar swapByte;
-	
+
 	swapByte = *a;
 	*a = *b;
 	*b = swapByte;
 }
 
-uchar encode_ct ( uchar c )
+uchar encode_ct (uchar c)
 {
 	if (c <  26) return ('A'+c);
 	if (c <  52) return ('a'+c-26);
 	if (c <  62) return ('0'+c-52);
 	if (c == 62) return ('+');
 	if (c == 63) return ('/');
-	
+
 	return 0;
 }
 
-void gs_encode ( uchar *ins, int size, uchar *result )
+void gs_encode (uchar *ins, int size, uchar *result)
 {
 	int    i,pos;
 	uchar  trip[3];
 	uchar  kwart[4];
-	
+
 	i=0;
 	while (i < size)
 	{
@@ -309,14 +309,14 @@ void gs_encode ( uchar *ins, int size, uchar *result )
 	*result='\0';
 }
 
-void gs_encrypt ( uchar *key, int key_len, uchar *buffer_ptr, int buffer_len )
-{ 
-	short counter;     
+void gs_encrypt (uchar *key, int key_len, uchar *buffer_ptr, int buffer_len)
+{
+	short counter;
 	uchar x, y, xorIndex;
-	uchar state[256];       
-	
+	uchar state[256];
+
 	for ( counter = 0; counter < 256; counter++) state[counter] = (uchar) counter;
-	
+
 	x = 0; y = 0;
 	for ( counter = 0; counter < 256; counter++)
 	{
@@ -324,7 +324,7 @@ void gs_encrypt ( uchar *key, int key_len, uchar *buffer_ptr, int buffer_len )
 		x = (x + 1) % key_len;
 		swap_byte ( &state[counter], &state[y] );
 	}
-	
+
 	x = 0; y = 0;
 	for ( counter = 0; counter < buffer_len; counter ++)
 	{
@@ -343,7 +343,7 @@ key\value pair. Clears the buffer */
 void packet_send(struct sockaddr *addr, char *buffer)
 {
 	char keyvalue[80];
-	
+
 	if (strlen(buffer) == 0)
 		return; //dont need to send an empty one!
 	packetnumber++; //packet numbers start at 1
@@ -538,7 +538,7 @@ adds \statechanged\ if statechanged != 0 */
 void send_heartbeat(int statechanged)
 {
 	char buf[256];
-	
+
 	if (!dedicated || !dedicated->value)
 		return;		// only dedicated servers send heartbeats
 

@@ -1,7 +1,7 @@
 /******
 gserverlist.c
 GameSpy C Engine SDK
-  
+
 Copyright 1999 GameSpy Industries, Inc
 
 Suite E-204
@@ -41,7 +41,7 @@ extern char *NET_ErrorString (void);
 #define MSHOST	"maraakate.org" /* FS: Gamespy dead: "master.gamespy.com" */
 #define MSPORT	28900
 #define SERVER_GROWBY 32
-#define LAN_SEARCH_TIME 3000 //3 sec
+#define LAN_SEARCH_TIME 3000 /* 3 sec */
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,7 +49,7 @@ extern "C" {
 
 
 //todo: check state changes on error
-typedef struct 
+typedef struct
 {
 	SOCKET s;
 	int serverindex;
@@ -534,7 +534,6 @@ retryRecv:
 	}
 	memmove(data,lastip,strlen(lastip) + 1); //shift it over
 	return 0;
-
 }
 
 //loop through pending queries and send out new ones
@@ -624,8 +623,6 @@ static GError ServerListQueryLoop(GServerList serverlist)
 		ServerListModeChange(serverlist, sl_idle);
 		return 0;
 	}
-
-	i = 0;
 
 	for (i = 0 ; i < serverlist->maxupdates && serverlist->nextupdate < ArrayLength(serverlist->servers) ; i++)
 	{

@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * File: hashtable.c
  * ---------------
@@ -16,7 +16,7 @@
 #include "darray.h"
 #include "hashtable.h"
 
-struct HashImplementation 
+struct HashImplementation
 {
 	DArray *buckets;
 	int nbuckets;
@@ -26,9 +26,9 @@ struct HashImplementation
 };
 
 
-HashTable TableNew(int elemSize, int nBuckets, 
-                   TableHashFn hashFn, TableCompareFn compFn, 
- 					 TableElementFreeFn freeFn)
+HashTable TableNew(int elemSize, int nBuckets,
+                   TableHashFn hashFn, TableCompareFn compFn,
+                   TableElementFreeFn freeFn)
 {
 	HashTable table;
 	int i;
@@ -40,7 +40,7 @@ HashTable TableNew(int elemSize, int nBuckets,
 
 	table = (HashTable)malloc(sizeof(struct HashImplementation));
 	assert(table);
-	
+
 	table->buckets = (DArray *)malloc(nBuckets * sizeof(DArray));
 	assert(table->buckets);
 	for (i = 0; i < nBuckets; i++) //ArrayNew will assert if allocation fails
@@ -53,13 +53,12 @@ HashTable TableNew(int elemSize, int nBuckets,
 	return table;
 }
 
-
 void TableFree(HashTable table)
 {
 	int i;
-	
+
 	assert(table);
-	
+
 	for (i = 0 ; i < table->nbuckets ; i++)
 	{
 		ArrayFree(table->buckets[i]);
@@ -72,53 +71,46 @@ void TableFree(HashTable table)
 	table = NULL;
 }
 
-
 int TableCount(HashTable table)
 {
 	int i, count = 0;
-	
+
 	for (i = 0 ; i < table->nbuckets ; i++)
 		count += ArrayLength(table->buckets[i]);
-	
+
 	return count;
 }
-
 
 void TableEnter(HashTable table, const void *newElem)
 {
 	int hash, itempos;
-	
+
 	hash = table->hashfn(newElem, table->nbuckets);
-	itempos = ArraySearch(table->buckets[hash], newElem, table->compfn, 0,
-						  0);
+	itempos = ArraySearch(table->buckets[hash], newElem, table->compfn, 0, 0);
 	if (itempos == NOT_FOUND)
 		ArrayAppend(table->buckets[hash], newElem);
 	else
 		ArrayReplaceAt(table->buckets[hash], newElem, itempos);
 }
 
-
 void *TableLookup(HashTable table, const void *elemKey)
 {
 	int hash, itempos;
-	
+
 	hash = table->hashfn(elemKey, table->nbuckets);
-	itempos = ArraySearch(table->buckets[hash], elemKey, table->compfn, 0,
-						  0);
+	itempos = ArraySearch(table->buckets[hash], elemKey, table->compfn, 0, 0);
 	if (itempos == NOT_FOUND)
 		return NULL;
 	else
 		return ArrayNth(table->buckets[hash], itempos);
 }
 
-
 void TableMap(HashTable table, TableMapFn fn, void *clientData)
 {
 	int i;
-	
+
 	assert(fn);
-	
+
 	for (i = 0 ; i < table->nbuckets ; i++)
 		ArrayMap(table->buckets[i], fn, clientData);
-	
 }
