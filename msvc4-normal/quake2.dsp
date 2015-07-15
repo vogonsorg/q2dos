@@ -96,92 +96,32 @@ LINK32=link.exe
 # Begin Source File
 
 SOURCE=..\Goa\CEngine\darray.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\Goa\CEngine\gserver.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\Goa\CEngine\gserverlist.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\Goa\CEngine\gutil.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\Goa\CEngine\hashtable.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\Goa\nonport.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # End Group
 # Begin Source File
@@ -388,6 +328,90 @@ SOURCE=..\CLIENT\x86.c
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
+# Begin Source File
+
+SOURCE=..\client\adivtab.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\client\anorms.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\client\asm_i386.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\client\block16.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\client\block8.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\client\cdaudio.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\client\client.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\client\console.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\qcommon\crc.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\client\input.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\client\keys.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\qcommon\qcommon.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\qcommon\qfiles.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\client\qmenu.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\client\ref.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\client\screen.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\server\server.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\client\snd_loc.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\client\snd_ogg.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\client\sound.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\client\vid.h
+# End Source File
 # End Group
 # Begin Group "Resource Files"
 
