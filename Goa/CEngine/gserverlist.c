@@ -79,6 +79,35 @@ struct GServerListImplementation
 static GServerList g_sortserverlist; /* global serverlist for sorting info */
 static int totalRetry = 20; /* FS: Total retry attempts waiting for the gamespy validate stuff */
 
+gspyimport_t gspyi;
+
+gspyexport_t GetGameSpyAPI (gspyimport_t import)
+{
+	gspyexport_t gspye;
+
+	gspyi = import;
+
+	gspye.api_version = API_VERSION;
+	gspye.Init = NULL;
+	gspye.Shutdown = NULL;
+	gspye.ServerListNew = ServerListNew;
+	gspye.ServerListFree = ServerListFree;
+	gspye.ServerListUpdate = ServerListUpdate;
+	gspye.ServerListThink = ServerListThink;
+	gspye.ServerListHalt = ServerListHalt;
+	gspye.ServerListClear = ServerListClear;
+	gspye.ServerListState = ServerListState;
+	gspye.ServerListErrorDesc = ServerListErrorDesc;
+	gspye.ServerListSort = ServerListSort;
+
+	gspye.ServerGetPing = ServerGetPing;
+	gspye.ServerGetAddress = ServerGetAddress;
+	gspye.ServerGetIntValue = ServerGetIntValue;
+	gspye.ServerGetQueryPort = ServerGetQueryPort;
+	gspye.ServerGetStringValue = ServerGetStringValue;
+	return gspye;
+}
+
 /* FS: Set a socket to be non-blocking */
 int Set_Non_Blocking_Socket (unsigned int socket)
 {
@@ -164,7 +193,7 @@ static GError InitUpdateList(GServerList serverlist)
 		/* FS: Set non-blocking sockets */
 		if (Set_Non_Blocking_Socket(serverlist->updatelist[i].s) == SOCKET_ERROR)
 		{
-			Com_Printf("ERROR: InitUpdateList: ioctl FIOBNIO:%s\n", NET_ErrorString());
+//			Com_Printf("ERROR: InitUpdateList: ioctl FIOBNIO:%s\n", NET_ErrorString());
 			return GE_NOSOCKET;
 		}
 

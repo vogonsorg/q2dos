@@ -13,10 +13,36 @@ Fax(714)549-0757
 ******/
 #include "nonport.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+// this is only here so the functions in q_shared.c and q_shwin.c can link
+void Sys_Error (char *error, ...)
+{
+	va_list		argptr;
+	char		text[1024];
+
+	va_start (argptr, error);
+//	vsprintf (text, error, argptr);
+	Q_vsnprintf (text, sizeof(text), error, argptr);	// Knightmare- buffer overflow fix
+	va_end (argptr);
+
+//	gspyi.Sys_Error (ERR_DROP, "%s", text);
+}
+
+void Com_Printf (char *msg, ...)
+{
+	va_list		argptr;
+	char		text[1024];
+
+	va_start (argptr, msg);
+//	vsprintf (text, msg, argptr);
+	Q_vsnprintf (text, sizeof(text), msg, argptr);	// Knightmare- buffer overflow fix
+	va_end (argptr);
+
+//	gspyi.Con_Printf(DEVELOPER_MSG_GAMESPY, "%s", text);
+}
 
 unsigned long current_time()  //returns current time in msec
 { 

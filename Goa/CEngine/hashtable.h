@@ -1,4 +1,4 @@
- #ifndef _HASHTABLE_H
+#ifndef _HASHTABLE_H
 #define _HASHTABLE_H
 
 /* File: hashtable.h

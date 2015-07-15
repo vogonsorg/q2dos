@@ -37,6 +37,8 @@ Fax(714)549-0757
 #endif
 #endif
 
+#include "../client/gspy.h" /* FS: For the cl_gamespy CVARs */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,6 +48,9 @@ void msleep(unsigned long msec);
 
 void SocketStartUp();
 void SocketShutDown();
+
+extern gspyimport_t gspyi;
+extern gspyexport_t gspye;
 
 #ifndef SOCKET_ERROR
 	#define SOCKET_ERROR (-1)

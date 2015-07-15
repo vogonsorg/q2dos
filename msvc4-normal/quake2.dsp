@@ -95,26 +95,80 @@ LINK32=link.exe
 # Begin Source File
 
 SOURCE=..\Goa\CEngine\darray.c
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\Goa\CEngine\gserver.c
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\Goa\CEngine\gserverlist.c
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\Goa\CEngine\gutil.c
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\Goa\CEngine\hashtable.c
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\Goa\nonport.c
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Source File

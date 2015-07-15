@@ -20,7 +20,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // qcommon.h -- definitions common between client and server, but not game.dll
 
+#ifndef _QCOMMON_H
+#define _QCOMMON_H
+
 #include "../game/q_shared.h"
+
+#ifdef GAMESPY
+#include "../client/gspy.h"
+#endif
 
 #define	VERSION		3.24
 
@@ -882,3 +889,5 @@ int Q_strncmp (char *s1, char *s2, int count);
 int Q_atoi (char *str);
 float Q_atof (char *str);
 const char *MakePrintable (const void *subject, size_t numchars); // FS: From R1Q2
+
+#endif // _QCOMMON_H

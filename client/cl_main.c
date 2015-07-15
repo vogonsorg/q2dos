@@ -1622,18 +1622,21 @@ void CL_Precache_f (void)
 	CL_RequestNextDownload();
 }
 
-
 /*
 =================
 CL_InitLocal
 =================
 */
+extern qboolean Sys_LoadGameSpy(char *name);
+
 void CL_InitLocal (void)
 {
 	cls.state = ca_disconnected;
 	cls.realtime = Sys_Milliseconds ();
 
 	CL_InitInput ();
+
+	Sys_LoadGameSpy("gamespy.dll");
 
 	adr0 = Cvar_Get( "adr0", "", CVAR_ARCHIVE );
 	adr1 = Cvar_Get( "adr1", "", CVAR_ARCHIVE );
@@ -2549,7 +2552,7 @@ void GameSpy_Async_Think(void)
 	if(!serverlist)
 		return;
 
-	if(ServerListState(serverlist) == sl_idle && cls.gamespyupdate)
+	if(gspye.ServerListState(serverlist) == sl_idle && cls.gamespyupdate)
 	{
 		if (cls.key_dest != key_menu) // FS: Only print this from an slist2 command, not the server browser.
 		{
@@ -2561,13 +2564,13 @@ void GameSpy_Async_Think(void)
 		}
 		cls.gamespyupdate = 0;
 		cls.gamespypercent = 0;
-		ServerListClear( serverlist );
-		ServerListFree(serverlist);
+		gspye.ServerListClear( serverlist );
+		gspye.ServerListFree(serverlist);
 		serverlist = NULL; // FS: This is on purpose so future ctrl+c's won't try to close empty serverlists
 	}
 	else
 	{
-		ServerListThink(serverlist);
+		gspye.ServerListThink(serverlist);
 	}
 }
 
@@ -2577,7 +2580,7 @@ void CL_Gspystop_f (void)
 	{
 		Com_Printf("\x02Server scan aborted!\n");
 		S_GamespySound ("gamespy/abort.wav");
-		ServerListHalt( serverlist );
+		gspye.ServerListHalt( serverlist );
 	}
 }
 
@@ -2637,22 +2640,22 @@ static void GameSpy_Sort_By_Ping(GServerList serverlist)
 
 	for (i = 0; i < cls.gamespytotalservers; i++)
 	{
-		GServer server = ServerListGetServer( serverlist, i );
+		GServer server = gspye.ServerListGetServer( serverlist, i );
 		if (server)
 		{
-			if(ServerGetIntValue(server, "numplayers", 0) <= 0)
+			if(gspye.ServerGetIntValue(server, "numplayers", 0) <= 0)
 				continue;
 
 			if(i == MAX_SERVERS)
 				break;
 
-			Q_strncpyz(browserList[gspyCur].ip, ServerGetAddress(server), sizeof(browserList[gspyCur].ip));
-			browserList[gspyCur].port = ServerGetQueryPort(server);
-			browserList[gspyCur].ping = ServerGetPing(server);
-			Q_strncpyz(browserList[gspyCur].hostname, ServerGetStringValue(server, "hostname","(NONE)"), sizeof(browserList[gspyCur].hostname));
-			Q_strncpyz(browserList[gspyCur].mapname, ServerGetStringValue(server,"mapname","(NO MAP)"), sizeof(browserList[gspyCur].mapname));
-			browserList[gspyCur].curPlayers = ServerGetIntValue(server,"numplayers",0);
-			browserList[gspyCur].maxPlayers = ServerGetIntValue(server,"maxclients",0);
+			Q_strncpyz(browserList[gspyCur].ip, gspye.ServerGetAddress(server), sizeof(browserList[gspyCur].ip));
+			browserList[gspyCur].port = gspye.ServerGetQueryPort(server);
+			browserList[gspyCur].ping = gspye.ServerGetPing(server);
+			Q_strncpyz(browserList[gspyCur].hostname, gspye.ServerGetStringValue(server, "hostname","(NONE)"), sizeof(browserList[gspyCur].hostname));
+			Q_strncpyz(browserList[gspyCur].mapname, gspye.ServerGetStringValue(server,"mapname","(NO MAP)"), sizeof(browserList[gspyCur].mapname));
+			browserList[gspyCur].curPlayers = gspye.ServerGetIntValue(server,"numplayers",0);
+			browserList[gspyCur].maxPlayers = gspye.ServerGetIntValue(server,"maxclients",0);
 
 			gspyCur++;
 		}
@@ -2662,16 +2665,16 @@ static void GameSpy_Sort_By_Ping(GServerList serverlist)
 
 	for (i = 0; i < cls.gamespytotalservers; i++)
 	{
-		GServer server = ServerListGetServer( serverlist, i );
+		GServer server = gspye.ServerListGetServer( serverlist, i );
 
 		if (server)
 		{
-			if(ServerGetIntValue(server, "numplayers", 0) > 0) /* FS: We already added this so skip it */
+			if(gspye.ServerGetIntValue(server, "numplayers", 0) > 0) /* FS: We already added this so skip it */
 			{
 				continue;
 			}
 
-			if(Q_strncmp(ServerGetStringValue(server, "hostname","(NONE)"), "(NONE)", 6) == 0) /* FS: A server that timed-out or we aborted early */
+			if(Q_strncmp(gspye.ServerGetStringValue(server, "hostname","(NONE)"), "(NONE)", 6) == 0) /* FS: A server that timed-out or we aborted early */
 			{
 				continue;
 			}
@@ -2679,13 +2682,13 @@ static void GameSpy_Sort_By_Ping(GServerList serverlist)
 			if(i == MAX_SERVERS)
 				break;
 
-			Q_strncpyz(browserListAll[i].ip, ServerGetAddress(server), sizeof(browserListAll[i].ip));
-			browserListAll[i].port = ServerGetQueryPort(server);
-			browserListAll[i].ping = ServerGetPing(server);
-			Q_strncpyz(browserListAll[i].hostname, ServerGetStringValue(server, "hostname","(NONE)"), sizeof(browserListAll[i].hostname));
-			Q_strncpyz(browserListAll[i].mapname, ServerGetStringValue(server,"mapname","(NO MAP)"), sizeof(browserListAll[i].mapname));
-			browserListAll[i].curPlayers = ServerGetIntValue(server,"numplayers",0);
-			browserListAll[i].maxPlayers = ServerGetIntValue(server,"maxclients",0);
+			Q_strncpyz(browserListAll[i].ip, gspye.ServerGetAddress(server), sizeof(browserListAll[i].ip));
+			browserListAll[i].port = gspye.ServerGetQueryPort(server);
+			browserListAll[i].ping = gspye.ServerGetPing(server);
+			Q_strncpyz(browserListAll[i].hostname, gspye.ServerGetStringValue(server, "hostname","(NONE)"), sizeof(browserListAll[i].hostname));
+			Q_strncpyz(browserListAll[i].mapname, gspye.ServerGetStringValue(server,"mapname","(NO MAP)"), sizeof(browserListAll[i].mapname));
+			browserListAll[i].curPlayers = gspye.ServerGetIntValue(server,"numplayers",0);
+			browserListAll[i].maxPlayers = gspye.ServerGetIntValue(server,"maxclients",0);
 		}
 	}
 }
@@ -2699,22 +2702,22 @@ static void ListCallBack(GServerList serverlist, int msg, void *instance, void *
 	if (msg == LIST_PROGRESS)
 	{
 		server = (GServer)param1;
-		numplayers = ServerGetIntValue(server,"numplayers",0);
+		numplayers = gspye.ServerGetIntValue(server,"numplayers",0);
 
 		if(numplayers > 0) /* FS: Only show populated servers */
 		{
 			if (cls.key_dest != key_menu) /* FS: Only print this from an slist2 command, not the server browser. */
 			{
-				Com_Printf("%s:%d [%d] %s ", ServerGetAddress(server), ServerGetQueryPort(server), ServerGetPing(server), ServerGetStringValue(server, "hostname","(NONE)"));
+				Com_Printf("%s:%d [%d] %s ", gspye.ServerGetAddress(server), gspye.ServerGetQueryPort(server), gspye.ServerGetPing(server), gspye.ServerGetStringValue(server, "hostname","(NONE)"));
 				Com_Printf("\x02%d", numplayers); /* FS: Show the current players number in the green font */
-				Com_Printf("/%d %s\n", ServerGetIntValue(server,"maxclients",0), ServerGetStringValue(server,"mapname","(NO MAP)"));
+				Com_Printf("/%d %s\n", gspye.ServerGetIntValue(server,"maxclients",0), gspye.ServerGetStringValue(server,"mapname","(NO MAP)"));
 			}
 		}
 		else if (cls.gamespyupdate == SHOW_ALL_SERVERS)
 		{
 			if (cls.key_dest != key_menu) /* FS: Only print this from an slist2 command, not the server browser. */
 			{
-				Com_Printf("%s:%d [%d] %s %d/%d %s\n", ServerGetAddress(server), ServerGetQueryPort(server), ServerGetPing(server), ServerGetStringValue(server, "hostname","(NONE)"), ServerGetIntValue(server,"numplayers",0), ServerGetIntValue(server,"maxclients",0), ServerGetStringValue(server,"mapname","(NO MAP)"));
+				Com_Printf("%s:%d [%d] %s %d/%d %s\n", gspye.ServerGetAddress(server), gspye.ServerGetQueryPort(server), gspye.ServerGetPing(server), gspye.ServerGetStringValue(server, "hostname","(NONE)"), gspye.ServerGetIntValue(server,"numplayers",0), gspye.ServerGetIntValue(server,"maxclients",0), gspye.ServerGetStringValue(server,"mapname","(NO MAP)"));
 			}
 		}
 
@@ -2726,10 +2729,10 @@ static void ListCallBack(GServerList serverlist, int msg, void *instance, void *
 	}
 	else if (msg == LIST_STATECHANGED)
 	{
-		switch( ServerListState( serverlist ) )
+		switch( gspye.ServerListState( serverlist ) )
 		{
 			case sl_idle:
-				ServerListSort( serverlist, true, "ping", cm_int );
+				gspye.ServerListSort( serverlist, true, "ping", cm_int );
 				GameSpy_Sort_By_Ping(serverlist);
 				break;
 			default:
@@ -2781,13 +2784,13 @@ void CL_PingNetServers_f (void)
 
 	SCR_UpdateScreen(); /* FS: Force an update so the percentage bar shows some progress */
 
-	serverlist = ServerListNew("quake2","quake2",goa_secret_key,allocatedSockets,ListCallBack,GCALLBACK_FUNCTION,NULL);
-	error = ServerListUpdate(serverlist,true); /* FS: Use Async now! */
+	serverlist = gspye.ServerListNew("quake2","quake2",goa_secret_key,allocatedSockets,ListCallBack,GCALLBACK_FUNCTION,NULL);
+	error = gspye.ServerListUpdate(serverlist,true); /* FS: Use Async now! */
 
 	if (error != GE_NOERROR) /* FS: Grab the error code */
 	{
 		Com_Printf("\x02GameSpy Error: ");
-		Com_Printf("%s.\n", ServerListErrorDesc(serverlist, error));
+		Com_Printf("%s.\n", gspye.ServerListErrorDesc(serverlist, error));
 	}
 }
 #endif // GAMESPY

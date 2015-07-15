@@ -709,3 +709,30 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	// never gets here
     return TRUE;
 }
+
+static HINSTANCE	gamespy_library;;
+gspyexport_t	gspye;
+
+qboolean Sys_LoadGameSpy(char *name)
+{
+	gspyimport_t gspyi;
+	GetGameSpyAPI_t GetGameSpyAPI;
+
+	gspyi.Cvar_Get = Cvar_Get;
+	gspyi.Cvar_Set = Cvar_Set;
+	gspyi.Cvar_SetValue = Cvar_SetValue;
+
+	if ( ( gamespy_library = LoadLibrary( name ) ) == 0 )
+	{
+		Com_Printf( "LoadLibrary(\"%s\") failed\n", name );
+
+		return false;
+	}
+
+	if ( ( GetGameSpyAPI = (void *) GetProcAddress( gamespy_library, "GetGameSpyAPI" ) ) == 0 )
+		Com_Error( ERR_FATAL, "GetProcAddress failed on %s", name );
+	gspye = GetGameSpyAPI(gspyi);
+
+	return true;
+	//	gspye = GetGameSpyAPI(gspyi);
+}
