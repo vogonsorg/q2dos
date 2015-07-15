@@ -21,11 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "client.h"
 
-#ifdef GAMESPY
-//#include "../Goa/CEngine/goaceng.h"
-//#include "../Goa/CEngine/darray.h"
-#endif
-
 cvar_t	*cl_3dcam;
 cvar_t	*cl_3dcam_angle;
 cvar_t	*cl_3dcam_dist;
@@ -1628,6 +1623,7 @@ CL_InitLocal
 =================
 */
 extern qboolean Sys_LoadGameSpy(char *name);
+void CL_LoadGameSpy_f (void);
 
 void CL_InitLocal (void)
 {
@@ -1636,7 +1632,11 @@ void CL_InitLocal (void)
 
 	CL_InitInput ();
 
-	Sys_LoadGameSpy("gamespy.dll");
+//#if _MSC_VER
+//	Sys_LoadGameSpy("gamespy.dll");
+//#else
+//	Sys_LoadGameSpy("gamespy.dxe");
+//#endif
 
 	adr0 = Cvar_Get( "adr0", "", CVAR_ARCHIVE );
 	adr1 = Cvar_Get( "adr1", "", CVAR_ARCHIVE );
@@ -1834,6 +1834,7 @@ void CL_InitLocal (void)
 #ifdef GAMESPY
 	Cmd_AddCommand ("slist2", CL_PingNetServers_f); // FS: For Gamespy
 	Cmd_AddCommand ("srelist", CL_PrintBrowserList_f);
+	Cmd_AddCommand ("loadgspy", CL_LoadGameSpy_f);
 
 	memset(&browserList, 0, sizeof(browserList));
 	memset(&browserListAll, 0, sizeof(browserListAll));
@@ -2800,6 +2801,14 @@ void CL_Gamespy_Update_Num_Servers(int numServers)
 	cls.gamespytotalservers = numServers;
 }
 
+void CL_LoadGameSpy_f(void)
+{
+#if _MSC_VER
+	Sys_LoadGameSpy("gamespy.dll");
+#else
+	Sys_LoadGameSpy("gamespy.dxe");
+#endif
+}
 #endif // GAMESPY
 
 //=============================================================================

@@ -7,6 +7,14 @@
 #include <unistd.h>
 #include <sys/dxe.h>
 
+#ifdef GAMESPY
+#include <io.h>
+#include <signal.h>
+#include <tcp.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#endif
+
 #include "../qcommon/qcommon.h"
 
 /* FS: The following is gross, but I just figured this out. */
@@ -80,6 +88,30 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (time)
 	DXE_EXPORT (tolower)
 	DXE_EXPORT (vsprintf)
+#ifdef GAMESPY
+	DXE_EXPORT(usleep)
+	DXE_EXPORT(vsnprintf)
+	DXE_EXPORT(bsearch)
+	DXE_EXPORT(Q_strncpyz)
+	DXE_EXPORT(calloc)
+	DXE_EXPORT(realloc)
+	DXE_EXPORT(Com_sprintf)
+	DXE_EXPORT(gettimeofday)
+	DXE_EXPORT(memmove)
+	DXE_EXPORT(sendto)
+	DXE_EXPORT(socket)
+	DXE_EXPORT(inet_ntoa)
+	DXE_EXPORT(recvfrom)
+	DXE_EXPORT(gethostbyname)
+	DXE_EXPORT(connect)
+	DXE_EXPORT(setsockopt)
+	DXE_EXPORT(send)
+	DXE_EXPORT(recv)
+	DXE_EXPORT(ioctlsocket)
+	DXE_EXPORT(closesocket)
+	DXE_EXPORT(select_s)
+	DXE_EXPORT(inet_addr)
+#endif
 DXE_EXPORT_END
 
 static void (*game_library)(void);
@@ -158,6 +190,69 @@ void *Sys_GetGameAPI (void *parms)
 	}
 
 	return GetGameAPI (parms);
+}
+
+#ifdef GAMESPY
+static void (*gamespy_library)(void);
+gspyexport_t	gspye;
+
+extern void S_GamespySound (char *sound);
+extern char* NET_ErrorString(void);
+extern void CL_Gamespy_Update_Num_Servers(int numServers);
+#endif
+
+qboolean Sys_LoadGameSpy(char *name)
+{
+#ifdef GAMESPY
+	char curpath[MAX_OSPATH];
+	char gspyLoad[MAX_OSPATH];
+
+	gspyimport_t gspyi;
+	GetGameSpyAPI_t GetGameSpyAPI;
+
+	gspyi.Cvar_Get = Cvar_Get;
+	gspyi.Cvar_Set = Cvar_Set;
+	gspyi.Cvar_SetValue = Cvar_SetValue;
+	gspyi.Con_Printf = Com_Printf;
+	gspyi.Con_DPrintf = Com_DPrintf;
+	gspyi.NET_ErrorString = NET_ErrorString;
+	gspyi.Sys_SendKeyEvents = Sys_SendKeyEvents;
+	gspyi.S_GamespySound = S_GamespySound;
+	gspyi.CL_Gamespy_Update_Num_Servers = CL_Gamespy_Update_Num_Servers;
+
+	getcwd(curpath, sizeof(curpath));
+	Com_sprintf(gspyLoad, sizeof(gspyLoad), "%s/%s", curpath, name);
+	gamespy_library = dlopen(gspyLoad, RTLD_LAZY);
+
+	if (!gamespy_library)
+	{
+		Com_Printf( "LoadLibrary(\"%s\") failed\n", gspyLoad );
+
+		return false;
+	}
+	else
+	{
+		Com_Printf("LoadLibrary(\"%s\") successful\n", gspyLoad);
+	}
+
+	GetGameSpyAPI = (void *) dlsym (gamespy_library, "_GetGameSpyAPI");
+
+	if (!GetGameSpyAPI)
+	{
+		Com_Error( ERR_FATAL, "GetProcAddress failed on %s", gspyLoad );
+	}
+	else
+	{
+		Com_Printf("Found GetGameSpyAPI\n");
+	}
+
+	gspye = GetGameSpyAPI(gspyi);
+
+	return true;
+	//	gspye = GetGameSpyAPI(gspyi);
+#else
+	return false;
+#endif /* GAMESPY */
 }
 
 #endif /* GAME_HARD_LINKED */
