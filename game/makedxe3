@@ -1,7 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 CPPFLAGS = -Did386=1
-#id386 in this specific one because its shared by the engine
 DXE3GEN = dxe3gen
 
 GAME = m_tank.o \
