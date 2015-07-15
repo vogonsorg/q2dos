@@ -1504,10 +1504,9 @@ Handles offseting and rotation of the end points for moving and
 rotating entities
 ==================
 */
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma optimize( "", off )
 #endif
-
 
 trace_t		CM_TransformedBoxTrace (vec3_t start, vec3_t end,
 						  vec3_t mins, vec3_t maxs,
@@ -1527,7 +1526,7 @@ trace_t		CM_TransformedBoxTrace (vec3_t start, vec3_t end,
 
 	// rotate start and end into the models frame of reference
 	if (headnode != box_headnode && 
-	(angles[0] || angles[1] || angles[2]) )
+	    (angles[0] || angles[1] || angles[2]) )
 		rotated = true;
 	else
 		rotated = false;
@@ -1569,10 +1568,9 @@ trace_t		CM_TransformedBoxTrace (vec3_t start, vec3_t end,
 	return trace;
 }
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma optimize( "", on )
 #endif
-
 
 
 /*

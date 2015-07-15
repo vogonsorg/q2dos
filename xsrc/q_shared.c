@@ -4,7 +4,7 @@
 #include <errno.h>
 #include <libc/file.h>
 #endif
-#include <ctype.h> // FS: For tolower
+#include <ctype.h> /* tolower */
 #include "q_shared.h"
 
 //#define DEG2RAD( a ) ( a * M_PI ) / 180.0F
@@ -13,7 +13,7 @@ vec3_t vec3_origin = {0,0,0};
 
 //============================================================================
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma optimize( "", off )
 #endif
 
@@ -72,10 +72,9 @@ void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, 
 	}
 }
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma optimize( "", on )
 #endif
-
 
 
 void AngleVectors (vec3_t angles, vec3_t forward, vec3_t right, vec3_t up)
