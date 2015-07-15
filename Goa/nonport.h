@@ -1,7 +1,7 @@
 /******
 nonport.h
-GameSpy Developer SDK 
-  
+GameSpy Developer SDK
+
 Copyright 1999 GameSpy Industries, Inc
 
 Suite E-204
@@ -43,11 +43,11 @@ Fax(714)549-0757
 extern "C" {
 #endif
 
-unsigned long current_time();
+unsigned long current_time(void);
 void msleep(unsigned long msec);
 
-void SocketStartUp();
-void SocketShutDown();
+void SocketStartUp(void);
+void SocketShutDown(void);
 
 extern gspyimport_t gspyi;
 extern gspyexport_t gspye;

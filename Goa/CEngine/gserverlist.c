@@ -1,7 +1,7 @@
 /******
 gserverlist.c
 GameSpy C Engine SDK
-  
+
 Copyright 1999 GameSpy Industries, Inc
 
 Suite E-204
@@ -39,7 +39,7 @@ Fax(714)549-0757
 #define MSHOST	"maraakate.org" /* FS: Gamespy dead: "master.gamespy.com" */
 #define MSPORT	28900
 #define SERVER_GROWBY 32
-#define LAN_SEARCH_TIME 3000 //3 sec
+#define LAN_SEARCH_TIME 3000 /* 3 sec */
 
 cvar_t	*cl_master_server_retries;
 cvar_t	*cl_master_server_port;
@@ -52,7 +52,7 @@ extern "C" {
 
 
 //todo: check state changes on error
-typedef struct 
+typedef struct
 {
 	SOCKET s;
 	int serverindex;
@@ -119,23 +119,23 @@ gspyexport_t GetGameSpyAPI (gspyimport_t import)
 }
 
 /* FS: Set a socket to be non-blocking */
-int Set_Non_Blocking_Socket (unsigned int socket)
-{
-	int error;
-	qboolean _true = true;
-
-	error = ioctlsocket( socket, FIONBIO,IOCTLARG_T &_true);
-
-	return error;
-}
-
 #ifdef _WIN32
 #define TCP_BLOCKING_ERROR WSAEWOULDBLOCK
+static int Set_Non_Blocking_Socket (SOCKET socket) {
+	u_long _true = true;
+	return ioctlsocket( socket, FIONBIO, &_true);
+}
+
 static __inline int Get_Last_Error(void) {
 	return WSAGetLastError();
 }
 #else
 #define TCP_BLOCKING_ERROR EWOULDBLOCK
+static int Set_Non_Blocking_Socket (SOCKET socket) {
+	int _true = true;
+	return ioctlsocket( socket, FIONBIO, IOCTLARG_T &_true);
+}
+
 static __inline int Get_Last_Error(void) {
 	return errno;
 }
@@ -573,7 +573,6 @@ retryRecv:
 	}
 	memmove(data,lastip,strlen(lastip) + 1); //shift it over
 	return 0;
-
 }
 
 //loop through pending queries and send out new ones
@@ -663,8 +662,6 @@ static GError ServerListQueryLoop(GServerList serverlist)
 		ServerListModeChange(serverlist, sl_idle);
 		return 0;
 	}
-
-	i = 0;
 
 	for (i = 0 ; i < serverlist->maxupdates && serverlist->nextupdate < ArrayLength(serverlist->servers) ; i++)
 	{

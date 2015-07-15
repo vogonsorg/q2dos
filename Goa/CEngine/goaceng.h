@@ -5,7 +5,7 @@ GameSpy Open Architecture
 /******
 goaceng.h
 GameSpy C Engine SDK
-  
+
 Copyright 1999 GameSpy Industries, Inc
 
 Suite E-204
@@ -95,12 +95,7 @@ maxconcupdates - max number of concurent updates (10-15 for modem users, 30-40 f
 CallBackFn - The function or handle used for progress updates
 CallBackFnType - The type of the CallBackFn parameter (from the #define list above)
 instance - user-defined instance data (e.g. structure or object pointer) */
-
-//#ifdef _MSC_VER // FS: Unix crud
-	GServerList	ServerListNew(char *gamename,char *enginename, char *seckey, int maxconcupdates, void *CallBackFn, int CallBackFnType, void *instance);
-//#else
-//	GServerList ServerListNew (char *gamename, char *enginename, char *seckey, int maxconcupdates, void (*CallBackFn)(GServerList serverlist, int msg, void *instance, void *param1, void *param2), int CallBackFnType, void *instance);
-//#endif
+GServerList	ServerListNew(char *gamename,char *enginename, char *seckey, int maxconcupdates, void *CallBackFn, int CallBackFnType, void *instance);
 
 /* ServerListFree
 -----------------
@@ -138,7 +133,7 @@ GError ServerListLANUpdate(GServerList serverlist, gbool async, int startsearchp
 ------------------
 For use with Async Updates. This needs to be called every ~10ms for list processing and
 updating to occur during async server list updates */
-GError ServerListThink(GServerList serverlist); 
+GError ServerListThink(GServerList serverlist);
 
 /* ServerListHalt
 -----------------
@@ -218,7 +213,7 @@ char *ServerGetPlayerStringValue(GServer server, int playernum, char *key, char 
 int ServerGetPlayerIntValue(GServer server, int playernum, char *key, int idefault);
 double ServerGetPlayerFloatValue(GServer server, int playernum, char *key, double fdefault);
 
-/* ServerEnumKeys 
+/* ServerEnumKeys
 -----------------
 Enumerates the keys/values for a given server by calling KeyEnumFn with each
 key/value. The user-defined instance data will be passed to the KeyFn callback */
@@ -228,4 +223,4 @@ void ServerEnumKeys(GServer server, KeyEnumFn KeyFn, void *instance);
 }
 #endif
 
-#endif // _GOACENG_H
+#endif /* _GOACENG_H */

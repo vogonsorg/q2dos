@@ -229,7 +229,11 @@ qboolean	AntFindPath( edict_t *ent, int from, int to)
 		atNode = SLLfront(&openList);
 
 		// Safety check
-		assert( atNode > INVALID);
+		//assert(atNode > INVALID);
+		if (atNode < 0) {
+			gi.error ("AntFindPath: Assertion 'atNode > INVALID' failed");
+			return false;
+		}
 
 		// Get a pointer to all the node information
 		tempNode = &nodes[atNode];

@@ -1,16 +1,16 @@
-/* 
+/*
  *
  * File: darray.c
  * ---------------
  *	David Wright
  *	10/8/98
- * 
+ *
  *  See darray.h for function descriptions
  */
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include "darray.h" 
+#include "darray.h"
 
 #define DEF_GROWBY 8
 
@@ -127,7 +127,7 @@ void ArrayInsertAt(DArray array, const void *newElem, int n)
 
 void ArrayDeleteAt(DArray array, int n)
 {
-   	assert( (n >= 0) && (n < array->count));
+	assert( (n >= 0) && (n < array->count));
 
 	FreeElement(array,n);
 	if (n < array->count - 1) //if not last element
@@ -160,7 +160,7 @@ int ArraySearch(DArray array, const void *key, ArrayCompareFn comparator,
 	if (array->count == 0)
 		return NOT_FOUND;
 
-   	if (isSorted)
+	if (isSorted)
 		res=bsearch(key, ArrayNth(array,fromIndex),
 					array->count - fromIndex, array->elemsize, comparator);
 	else
@@ -181,7 +181,6 @@ void ArrayMap(DArray array, ArrayMapFn fn, void *clientData)
 
 	for (i = 0; i < array->count; i++)
 		fn(ArrayNth(array,i), clientData);
-		
 }
 
 /* mylsearch
