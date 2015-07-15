@@ -200,7 +200,7 @@ static GError CreateServerListSocket(GServerList serverlist)
 		Com_Printf("Error: cl_master_server_ip is blank!  Setting to default: %s\n", CL_MASTER_ADDR);
 		Cvar_Set("cl_master_server_ip", CL_MASTER_ADDR);
 	}
-	if (cl_master_server_port->value <= 0)
+	if (cl_master_server_port->intValue <= 0)
 	{
 		Com_Printf("Error: cl_master_server_port is invalid!  Setting to default: %s\n", CL_MASTER_PORT);
 		Cvar_Set("cl_master_server_port", CL_MASTER_PORT);
@@ -303,6 +303,7 @@ retryRecv:
 		}
 	}
 	data[len] = '\0'; //null terminate it
+	Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy validate server key: %s\n", data);
 	
 	ptr = strstr ( data, SECURE ) + strlen(SECURE);
 	gs_encrypt   ( (uchar *) serverlist->seckey, 6, (uchar *)ptr, 6 );
@@ -311,6 +312,7 @@ retryRecv:
 	//validate to the master
 	sprintf(data, "\\gamename\\%s\\gamever\\%s\\location\\0\\validate\\%s\\final\\\\queryid\\1.1\\",
 			serverlist->enginename, ENGINE_VERSION, result); //validate us		
+	Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy validate to the master: %s\n", data);
 	
 	len = send ( serverlist->slsocket, data, strlen(data), 0 );
 	if (len == SOCKET_ERROR || len == 0)
@@ -536,7 +538,6 @@ retryRecv:
 }
 
 //loop through pending queries and send out new ones
-#define OOB_SEQ "\xff\xff\xff\xff" //32 bit integer (-1) as string sequence for out of band data
 #define STATUS "\xff\xff\xff\xffstatus"
 
 /* FS: Redone.  Now works properly at the same speed in DOS and WIN32 */
