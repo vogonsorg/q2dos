@@ -66,9 +66,10 @@ LINK32=link.exe
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir ".\Debug"
 # PROP Intermediate_Dir ".\Debug"
+# PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "id386" /D "WIN32" /D "_WINDOWS" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "USE_CURL" /D "OGG_SUPPORT" /D "USE_JOYSTICK" /YX /FD /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../win32/include" /D "_DEBUG" /D "id386" /D "WIN32" /D "_WINDOWS" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "USE_CURL" /D "OGG_SUPPORT" /D "USE_JOYSTICK" /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x1009 /d "_DEBUG"
@@ -102,6 +103,8 @@ SOURCE=..\Goa\CEngine\darray.c
 
 !ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
 
+# PROP Exclude_From_Build 1
+
 !ENDIF 
 
 # End Source File
@@ -114,6 +117,8 @@ SOURCE=..\Goa\CEngine\gserver.c
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+# PROP Exclude_From_Build 1
 
 !ENDIF 
 
@@ -128,6 +133,8 @@ SOURCE=..\Goa\CEngine\gserverlist.c
 
 !ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
 
+# PROP Exclude_From_Build 1
+
 !ENDIF 
 
 # End Source File
@@ -140,6 +147,8 @@ SOURCE=..\Goa\CEngine\gutil.c
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+# PROP Exclude_From_Build 1
 
 !ENDIF 
 
@@ -154,6 +163,8 @@ SOURCE=..\Goa\CEngine\hashtable.c
 
 !ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
 
+# PROP Exclude_From_Build 1
+
 !ENDIF 
 
 # End Source File
@@ -166,6 +177,8 @@ SOURCE=..\Goa\nonport.c
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+# PROP Exclude_From_Build 1
 
 !ENDIF 
 

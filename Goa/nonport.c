@@ -28,7 +28,7 @@ void Sys_Error (char *error, ...)
 	Q_vsnprintf (text, sizeof(text), error, argptr);	// Knightmare- buffer overflow fix
 	va_end (argptr);
 
-//	gspyi.Sys_Error (ERR_DROP, "%s", text);
+	gspyi.Sys_Error (ERR_DROP, "%s", text);
 }
 
 void Com_Printf (char *msg, ...)
@@ -41,7 +41,7 @@ void Com_Printf (char *msg, ...)
 	Q_vsnprintf (text, sizeof(text), msg, argptr);	// Knightmare- buffer overflow fix
 	va_end (argptr);
 
-//	gspyi.Con_Printf(DEVELOPER_MSG_GAMESPY, "%s", text);
+	gspyi.Con_Printf("%s", text);
 }
 
 unsigned long current_time()  //returns current time in msec

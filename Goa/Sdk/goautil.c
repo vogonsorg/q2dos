@@ -181,7 +181,7 @@ void goa_process_queries(void)
 		if (error != SOCKET_ERROR)
 		{
 			indata[error] = '\0';
-			Com_DPrintf(DEVELOPER_MSG_GAMESPY, "Query parse: %s\n", indata);
+			gspyi.Con_DPrintf(DEVELOPER_MSG_GAMESPY, "Query parse: %s\n", indata);
 			parse_query(indata, &saddr);
 		}
 	}
@@ -545,7 +545,7 @@ void send_heartbeat(int statechanged)
 	if (!public_server->value)
 		return;		// a private dedicated game
 
-	Com_DPrintf(DEVELOPER_MSG_SERVER, "Sending a heartbeat to the GameSpy Master Server.\n"); // FS
+	gspyi.Con_DPrintf(DEVELOPER_MSG_SERVER, "Sending a heartbeat to the GameSpy Master Server.\n"); // FS
 // SCG[1/16/00]:     sprintf(buf,"\\heartbeat\\%d\\gamename\\%s",qport, gname);
     Com_sprintf(buf,sizeof(buf),"\\heartbeat\\%d\\gamename\\%s",qport, gname);
 	if (statechanged)

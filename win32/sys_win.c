@@ -713,6 +713,10 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 static HINSTANCE	gamespy_library;;
 gspyexport_t	gspye;
 
+extern void S_GamespySound (char *sound);
+extern char* NET_ErrorString(void);
+extern void CL_Gamespy_Update_Num_Servers(int numServers);
+
 qboolean Sys_LoadGameSpy(char *name)
 {
 	gspyimport_t gspyi;
@@ -721,6 +725,12 @@ qboolean Sys_LoadGameSpy(char *name)
 	gspyi.Cvar_Get = Cvar_Get;
 	gspyi.Cvar_Set = Cvar_Set;
 	gspyi.Cvar_SetValue = Cvar_SetValue;
+	gspyi.Con_Printf = Com_Printf;
+	gspyi.Con_DPrintf = Com_DPrintf;
+	gspyi.NET_ErrorString = NET_ErrorString;
+	gspyi.Sys_SendKeyEvents = Sys_SendKeyEvents;
+	gspyi.S_GamespySound = S_GamespySound;
+	gspyi.CL_Gamespy_Update_Num_Servers = CL_Gamespy_Update_Num_Servers;
 
 	if ( ( gamespy_library = LoadLibrary( name ) ) == 0 )
 	{

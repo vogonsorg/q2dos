@@ -22,8 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "client.h"
 
 #ifdef GAMESPY
-#include "../Goa/CEngine/goaceng.h"
-#include "../Goa/CEngine/darray.h"
+//#include "../Goa/CEngine/goaceng.h"
+//#include "../Goa/CEngine/darray.h"
 #endif
 
 cvar_t	*cl_3dcam;
@@ -2546,6 +2546,7 @@ void CL_Shutdown(void)
 /* FS: Gamespy Server Browser */
 #ifdef GAMESPY
 extern void Update_Gamespy_Menu (void);
+extern gspyexport_t	gspye;
 
 void GameSpy_Async_Think(void)
 {
@@ -2633,7 +2634,7 @@ void CL_PrintBrowserList_f (void)
 	}
 }
 
-static void GameSpy_Sort_By_Ping(GServerList serverlist)
+void GameSpy_Sort_By_Ping(GServerList serverlist)
 {
 	int i = 0;
 	gspyCur = 0;
@@ -2729,10 +2730,10 @@ static void ListCallBack(GServerList serverlist, int msg, void *instance, void *
 	}
 	else if (msg == LIST_STATECHANGED)
 	{
-		switch( gspye.ServerListState( serverlist ) )
+		switch(gspye.ServerListState(serverlist))
 		{
 			case sl_idle:
-				gspye.ServerListSort( serverlist, true, "ping", cm_int );
+				gspye.ServerListSort(serverlist, true, "ping", cm_int);
 				GameSpy_Sort_By_Ping(serverlist);
 				break;
 			default:
@@ -2793,6 +2794,12 @@ void CL_PingNetServers_f (void)
 		Com_Printf("%s.\n", gspye.ServerListErrorDesc(serverlist, error));
 	}
 }
+
+void CL_Gamespy_Update_Num_Servers(int numServers)
+{
+	cls.gamespytotalservers = numServers;
+}
+
 #endif // GAMESPY
 
 //=============================================================================
