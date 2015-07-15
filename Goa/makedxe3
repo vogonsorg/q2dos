@@ -5,7 +5,7 @@ DXE3GEN = dxe3gen
 
 # net -- watt-32 tcp/ip library :
 WATT32_CFLAGS = -I../wattcp/inc -DWATT32_NO_OLDIES
-WATT32_LIBS =# -L../wattcp/lib -lwatt
+WATT32_LIBS =# FS: Don't link WATT32 in here, it causes problems
 
 GAMESPY = CEngine/darray.o \
 	CEngine/gserver.o \

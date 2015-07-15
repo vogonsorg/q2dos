@@ -7,6 +7,11 @@ make -f makedxe3.frank
 strip q2.exe
 upx -9 q2.exe
 
+cd Goa
+make -f makedxe3 clean
+make -f makedxe3
+cd..
+
 cd game
 make -f makedxe3 clean
 make -f makedxe3

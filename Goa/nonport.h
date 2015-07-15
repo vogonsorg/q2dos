@@ -37,7 +37,7 @@ Fax(714)549-0757
 #endif
 #endif
 
-#include "../client/gspy.h" /* FS: For the cl_gamespy CVARs */
+#include "../client/gspy.h" /* FS: GameSpy DLL */
 
 #ifdef __cplusplus
 extern "C" {

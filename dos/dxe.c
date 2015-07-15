@@ -13,6 +13,7 @@
 #include <tcp.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include "../client/gspy.h"
 #endif
 
 #include "../qcommon/qcommon.h"
@@ -144,10 +145,10 @@ static void *dxe_res (const char *symname)
 	return func_ptr_cast.to;
 }
 
+static int	firsttime = 1; /* FS: Moved this to the outside so gamespy will load if we do q2.exe +disconnect */
+
 void *Sys_GetGameAPI (void *parms)
 {
-	static int	firsttime = 1;
-
 	void	*(*GetGameAPI) (void *);
 	char	name[MAX_OSPATH];
 	char	curpath[MAX_OSPATH];
@@ -210,15 +211,14 @@ qboolean Sys_LoadGameSpy(char *name)
 	gspyimport_t gspyi;
 	GetGameSpyAPI_t GetGameSpyAPI;
 
-	gspyi.Cvar_Get = Cvar_Get;
-	gspyi.Cvar_Set = Cvar_Set;
-	gspyi.Cvar_SetValue = Cvar_SetValue;
-	gspyi.Con_Printf = Com_Printf;
-	gspyi.Con_DPrintf = Com_DPrintf;
-	gspyi.NET_ErrorString = NET_ErrorString;
-	gspyi.Sys_SendKeyEvents = Sys_SendKeyEvents;
-	gspyi.S_GamespySound = S_GamespySound;
-	gspyi.CL_Gamespy_Update_Num_Servers = CL_Gamespy_Update_Num_Servers;
+	if (firsttime)
+	{
+		firsttime = 0;
+		/* Set the error callback function */
+		_dlsymresolver = dxe_res;
+		/* Register the symbols exported into dynamic modules */
+		dlregsym (syms);
+	}
 
 	getcwd(curpath, sizeof(curpath));
 	Com_sprintf(gspyLoad, sizeof(gspyLoad), "%s/%s", curpath, name);
@@ -230,10 +230,6 @@ qboolean Sys_LoadGameSpy(char *name)
 
 		return false;
 	}
-	else
-	{
-		Com_Printf("LoadLibrary(\"%s\") successful\n", gspyLoad);
-	}
 
 	GetGameSpyAPI = (void *) dlsym (gamespy_library, "_GetGameSpyAPI");
 
@@ -241,15 +237,20 @@ qboolean Sys_LoadGameSpy(char *name)
 	{
 		Com_Error( ERR_FATAL, "GetProcAddress failed on %s", gspyLoad );
 	}
-	else
-	{
-		Com_Printf("Found GetGameSpyAPI\n");
-	}
+
+	gspyi.Cvar_Get = Cvar_Get;
+	gspyi.Cvar_Set = Cvar_Set;
+	gspyi.Cvar_SetValue = Cvar_SetValue;
+	gspyi.Con_Printf = Com_Printf;
+	gspyi.Con_DPrintf = Com_DPrintf;
+	gspyi.NET_ErrorString = NET_ErrorString;
+	gspyi.Sys_SendKeyEvents = Sys_SendKeyEvents;
+	gspyi.S_GamespySound = S_GamespySound;
+	gspyi.CL_Gamespy_Update_Num_Servers = CL_Gamespy_Update_Num_Servers;
 
 	gspye = GetGameSpyAPI(gspyi);
 
 	return true;
-	//	gspye = GetGameSpyAPI(gspyi);
 #else
 	return false;
 #endif /* GAMESPY */

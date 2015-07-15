@@ -710,6 +710,9 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
     return TRUE;
 }
 
+#ifdef GAMESPY
+#include "../client/gspy.h"
+
 static HINSTANCE	gamespy_library;;
 gspyexport_t	gspye;
 
@@ -722,6 +725,16 @@ qboolean Sys_LoadGameSpy(char *name)
 	gspyimport_t gspyi;
 	GetGameSpyAPI_t GetGameSpyAPI;
 
+	if ( ( gamespy_library = LoadLibrary( name ) ) == 0 )
+	{
+		Com_Printf( "LoadLibrary(\"%s\") failed\n", name );
+
+		return false;
+	}
+
+	if ( ( GetGameSpyAPI = (void *) GetProcAddress( gamespy_library, "GetGameSpyAPI" ) ) == 0 )
+		Com_Error( ERR_FATAL, "GetProcAddress failed on %s", name );
+
 	gspyi.Cvar_Get = Cvar_Get;
 	gspyi.Cvar_Set = Cvar_Set;
 	gspyi.Cvar_SetValue = Cvar_SetValue;
@@ -732,17 +745,8 @@ qboolean Sys_LoadGameSpy(char *name)
 	gspyi.S_GamespySound = S_GamespySound;
 	gspyi.CL_Gamespy_Update_Num_Servers = CL_Gamespy_Update_Num_Servers;
 
-	if ( ( gamespy_library = LoadLibrary( name ) ) == 0 )
-	{
-		Com_Printf( "LoadLibrary(\"%s\") failed\n", name );
-
-		return false;
-	}
-
-	if ( ( GetGameSpyAPI = (void *) GetProcAddress( gamespy_library, "GetGameSpyAPI" ) ) == 0 )
-		Com_Error( ERR_FATAL, "GetProcAddress failed on %s", name );
 	gspye = GetGameSpyAPI(gspyi);
 
 	return true;
-	//	gspye = GetGameSpyAPI(gspyi);
 }
+#endif

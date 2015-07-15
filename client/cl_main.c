@@ -21,6 +21,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "client.h"
 
+#ifdef GAMESPY
+#include "../client/gspy.h"
+#endif
+
 cvar_t	*cl_3dcam;
 cvar_t	*cl_3dcam_angle;
 cvar_t	*cl_3dcam_dist;
@@ -131,6 +135,7 @@ extern	cvar_t *allow_download_maps;
 
 #ifdef GAMESPY
 /* FS: For Gamespy */
+static qboolean gamespyLoaded = false;
 static	GServerList	serverlist;
 static int gspyCur;
 gamespyBrowser_t browserList[MAX_SERVERS]; /* FS: Browser list for active servers */
@@ -1832,16 +1837,22 @@ void CL_InitLocal (void)
 	Cmd_AddCommand ("weapprev", NULL);
 
 #ifdef GAMESPY
-	Cmd_AddCommand ("slist2", CL_PingNetServers_f); // FS: For Gamespy
+	Cmd_AddCommand ("slist2", CL_PingNetServers_f);
 	Cmd_AddCommand ("srelist", CL_PrintBrowserList_f);
-	Cmd_AddCommand ("loadgspy", CL_LoadGameSpy_f);
 
 	memset(&browserList, 0, sizeof(browserList));
 	memset(&browserListAll, 0, sizeof(browserListAll));
+
+#if _MSC_VER
+	gamespyLoaded = Sys_LoadGameSpy("gamespy.dll");
+#else
+	gamespyLoaded = Sys_LoadGameSpy("gamespy.dxe");
 #endif
 
+#endif /* GAMESPY */
+
 #ifdef __DJGPP__
-	Cmd_AddCommand ("memstats", Sys_Memory_Stats_f); // FS: Added
+	Cmd_AddCommand ("memstats", Sys_Memory_Stats_f); /* FS: Added to keep track of memory usage in DOS */
 #endif
 }
 
@@ -2755,6 +2766,12 @@ void CL_PingNetServers_f (void)
 		return;
 	}
 
+	if(!gamespyLoaded)
+	{
+		Com_Printf("Error: GameSpy DLL not loaded!\n");
+		return;
+	}
+
 	gspyCur = 0;
 	memset(&browserList, 0, sizeof(browserList));
 	memset(&browserListAll, 0, sizeof(browserListAll));
@@ -2801,15 +2818,7 @@ void CL_Gamespy_Update_Num_Servers(int numServers)
 	cls.gamespytotalservers = numServers;
 }
 
-void CL_LoadGameSpy_f(void)
-{
-#if _MSC_VER
-	Sys_LoadGameSpy("gamespy.dll");
-#else
-	Sys_LoadGameSpy("gamespy.dxe");
-#endif
-}
-#endif // GAMESPY
+#endif /* GAMESPY */
 
 //=============================================================================
 

@@ -99,15 +99,6 @@ CLIENT =	client/cl_input.o \
 	client/qmenu.o \
 	client/cl_newfx.o
 
-ifeq ($(USE_GAMESPY),1)
-GAMESPY = Goa/CEngine/darray.o \
-	Goa/CEngine/gserver.o \
-	Goa/CEngine/gserverlist.o \
-	Goa/CEngine/gutil.o \
-	Goa/CEngine/hashtable.o \
-	Goa/nonport.o
-endif
-
 QCOMMON = qcommon/cmd.o \
 	qcommon/cmodel.o \
 	qcommon/common.o \
