@@ -80,23 +80,23 @@ static GServerList g_sortserverlist; /* global serverlist for sorting info */
 static int totalRetry = 20; /* FS: Total retry attempts waiting for the gamespy validate stuff */
 
 /* FS: Set a socket to be non-blocking */
-int Set_Non_Blocking_Socket (unsigned int socket)
-{
-	int error;
-	qboolean _true = true;
-
-	error = ioctlsocket( socket, FIONBIO,IOCTLARG_T &_true);
-
-	return error;
-}
-
 #ifdef _WIN32
 #define TCP_BLOCKING_ERROR WSAEWOULDBLOCK
+static int Set_Non_Blocking_Socket (SOCKET socket) {
+	u_long _true = true;
+	return ioctlsocket( socket, FIONBIO, &_true);
+}
+
 static __inline int Get_Last_Error(void) {
 	return WSAGetLastError();
 }
 #else
 #define TCP_BLOCKING_ERROR EWOULDBLOCK
+static int Set_Non_Blocking_Socket (SOCKET socket) {
+	int _true = true;
+	return ioctlsocket( socket, FIONBIO, IOCTLARG_T &_true);
+}
+
 static __inline int Get_Last_Error(void) {
 	return errno;
 }
