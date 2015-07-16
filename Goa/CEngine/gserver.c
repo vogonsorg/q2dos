@@ -119,7 +119,7 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 
 	if (numplayers) /* FS: Q2 sends shit with \n as players and their data :/ */
 	{
-		char players[4]; /* FS: 9999 players */
+		char players[12];
 		char tokenSeparators[] = "\n";
 		char *s = strdup(savedkeyvals);
 		char *test = strtok(s, tokenSeparators);
@@ -146,7 +146,7 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 		free(test);
 
 		kvpair.key = _strdup("numplayers");
-		sprintf(players, "%i", numplayers); /* FS: FIXME Use safe_sprintf from goautil.c ? */
+		sprintf(players, "%i", numplayers);
 		kvpair.value = _strdup(players);
 		TableEnter(server->keyvals, &kvpair);
 	}
