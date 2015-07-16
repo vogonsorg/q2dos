@@ -168,8 +168,6 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 			kvpair.key = _strdup(k);
 			kvpair.value = _strdup(v);
 
-			gspyi.print("Adding: %s %s\n", k, v);
-
 			TableEnter(server->keyvals, &kvpair);
 
 			if(strstr(kvpair.value, "\n")) /* FS: Anything after a newline may contain players.  So don't add them as rules.  Just cut off the newline.  It has to happen at the end or else an important rule, like maxclients could get cut off. */
