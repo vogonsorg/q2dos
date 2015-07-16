@@ -93,7 +93,8 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 	*keyvals = *keyvals++; // newline
 */
 //	gspyi.print("Keyvals before[%i]: %s\n", strlen(keyvals), keyvals);
-	memmove(keyvals, keyvals+10, strlen(keyvals));
+//	memmove(keyvals, keyvals+10, strlen(keyvals));
+	keyvals += 10;
 //	gspyi.print("Keyvals now[%i]: %s\n", strlen(keyvals), keyvals);
 
 	strncpy(savedkeyvals, keyvals, sizeof(savedkeyvals));
