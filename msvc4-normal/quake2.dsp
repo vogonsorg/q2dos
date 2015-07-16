@@ -366,6 +366,10 @@ SOURCE=..\qcommon\crc.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\client\gspy.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\client\input.h
 # End Source File
 # Begin Source File

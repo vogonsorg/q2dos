@@ -140,7 +140,7 @@ SOURCE=..\Goa\CEngine\gserver.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\client\gspy.h
+SOURCE=..\Goa\gspy.h
 # End Source File
 # Begin Source File
 
