@@ -117,9 +117,9 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 		k = mytok(NULL,'\\');
 	}
 
-	if (numplayers) // FS: Q2 sends shit with \n as players and their data :/
+	if (numplayers) /* FS: Q2 sends shit with \n as players and their data :/ */
 	{
-		char players[4];
+		char players[4]; /* FS: 9999 players */
 		char tokenSeparators[] = "\n";
 		char *s = strdup(savedkeyvals);
 		char *test = strtok(s, tokenSeparators);
@@ -133,7 +133,7 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 		{
 			numplayers++;
 
-			if(strstr(test, "WallFly[BZZZ]") || strstr(test, "127.0.0.1")) // FS: Don't report servers that just have WallFly in them.
+			if(strstr(test, "WallFly[BZZZ]") || strstr(test, "127.0.0.1")) /* FS: Don't report servers that just have WallFly in them.  127.0.0.1 in any player parse is a bot from Alien Arena */
 			{
 				hasBots = true;
 				numplayers--;
@@ -146,7 +146,7 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 		free(test);
 
 		kvpair.key = _strdup("numplayers");
-		Com_sprintf(players, sizeof(players), "%i", numplayers);
+		sprintf(players, "%i", numplayers); /* FS: FIXME Use safe_sprintf from goautil.c ? */
 		kvpair.value = _strdup(players);
 		TableEnter(server->keyvals, &kvpair);
 	}
