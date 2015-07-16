@@ -43,13 +43,13 @@ Fax(714)549-0757
 extern "C" {
 #endif
 
+extern gspyimport_t		gspyi;
+
 unsigned long current_time(void);
 void msleep(unsigned long msec);
 
 void SocketStartUp(void);
 void SocketShutDown(void);
-
-extern gspyimport_t gspyi;
 
 #ifndef SOCKET_ERROR
 	#define SOCKET_ERROR (-1)

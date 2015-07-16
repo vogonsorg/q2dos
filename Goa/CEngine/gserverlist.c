@@ -44,10 +44,11 @@ cvar_t	*cl_master_server_port;
 cvar_t	*cl_master_server_ip;
 cvar_t	*cl_master_server_timeout;
 
+gspyimport_t gspyi;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 //todo: check state changes on error
 typedef struct
@@ -93,11 +94,9 @@ void ShutdownGamespy (void)
 	/* FS: No clean-up afaik */
 }
 
-static gspyexport_t gspye;
-gspyimport_t gspyi;
-
 gspyexport_t *GetGameSpyAPI (gspyimport_t *import)
 {
+	static gspyexport_t gspye;
 
 	gspyi = *import;
 

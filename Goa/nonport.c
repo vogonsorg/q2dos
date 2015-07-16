@@ -14,15 +14,14 @@ Fax(714)549-0757
 #include "nonport.h"
 
 #ifndef GAMESPY_HARD_LINKED
-// this is only here so the functions in q_shared.c and q_shwin.c can link
+/* ... so that q2 engine symbols are not needed */
 void Sys_Error (char *error, ...)
 {
 	va_list		argptr;
 	char		text[1024];
 
 	va_start (argptr, error);
-//	vsprintf (text, error, argptr);
-	Q_vsnprintf (text, sizeof(text), error, argptr);	// Knightmare- buffer overflow fix
+	Q_vsnprintf (text, sizeof(text), error, argptr);
 	va_end (argptr);
 
 	gspyi.Sys_Error (ERR_DROP, "%s", text);
@@ -34,13 +33,40 @@ void Com_Printf (char *msg, ...)
 	char		text[1024];
 
 	va_start (argptr, msg);
-//	vsprintf (text, msg, argptr);
-	Q_vsnprintf (text, sizeof(text), msg, argptr);	// Knightmare- buffer overflow fix
+	Q_vsnprintf (text, sizeof(text), msg, argptr);
 	va_end (argptr);
 
 	gspyi.Con_Printf("%s", text);
 }
-#endif
+
+void Q_strncpyz (char *dst, const char *src, int dstSize)
+{
+	if (!dst) return;
+	if (!src) return;
+	if (dstSize < 1) return;
+	strncpy(dst, src, dstSize-1);
+	dst[dstSize-1] = 0;
+}
+
+void Com_sprintf (char *dest, int size, char *fmt, ...)
+{
+	int		len;
+	va_list		argptr;
+	char	bigbuffer[0x10000];
+
+	va_start (argptr,fmt);
+	len = Q_vsnprintf (bigbuffer, sizeof(bigbuffer), fmt, argptr);
+	va_end (argptr);
+	if (len < 0) {
+		Com_Printf ("Com_sprintf: overflow in temp buffer of size %i\n", (int)sizeof(bigbuffer));
+	}
+	else if (len >= size) {
+		Com_Printf ("Com_sprintf: overflow of %i in %i\n", len, size);
+	}
+	strncpy (dest, bigbuffer, size-1);
+	dest[size-1] = 0;
+}
+#endif /* ! GAMESPY_HARD_LINKED */
 
 unsigned long current_time(void) /* returns current time in msec */
 {
