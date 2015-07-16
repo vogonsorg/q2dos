@@ -48,6 +48,52 @@ GServer ServerNew(char *ip, int port)
 	return server;
 }
 
+/* FS: From FreeBSD */
+char *Goa_strtok_r(char *s, const char *delim, char **last)
+{
+	char *spanp, *tok;
+	int c, sc;
+
+	if (s == NULL && (s = *last) == NULL)
+		return (NULL);
+
+	/*
+	 * Skip (span) leading delimiters (s += strspn(s, delim), sort of).
+	 */
+cont:
+	c = *s++;
+	for (spanp = (char *)delim; (sc = *spanp++) != 0;) {
+		if (c == sc)
+			goto cont;
+	}
+
+	if (c == 0) {		/* no non-delimiter characters */
+		*last = NULL;
+		return (NULL);
+	}
+	tok = s - 1;
+
+	/*
+	 * Scan token (scan for delimiters: s += strcspn(s, delim), sort of).
+	 * Note that delim must have one NUL; we stop if we see that, too.
+	 */
+	for (;;) {
+		c = *s++;
+		spanp = (char *)delim;
+		do {
+			if ((sc = *spanp++) == c) {
+				if (c == 0)
+					s = NULL;
+				else
+					s[-1] = '\0';
+				*last = s;
+				return (tok);
+			}
+		} while (sc != 0);
+	}
+	/* NOTREACHED */
+}
+
 static char *mytok(char *instr, char delim)
 {
 	char *result;
@@ -67,10 +113,49 @@ static char *mytok(char *instr, char delim)
 	return result;
 }
 
+void ServerParsePlayerCount(GServer server, char *savedkeyvals)
+{
+	int numplayers = 0;
+	char players[12];
+	char playerSeperators[] = "\n";
+	char *s = strdup(savedkeyvals);
+	char *test = strtok(s, playerSeperators);
+	GKeyValuePair kvpair;
+	qboolean	hasBots = false;
+
+	test = strtok(NULL, playerSeperators);
+
+	numplayers = 0;
+
+	while (test != NULL)
+	{
+		numplayers++;
+
+		if(strstr(test, "WallFly[BZZZ]") || strstr(test, "127.0.0.1")) /* FS: Don't report servers that just have WallFly in them.  127.0.0.1 in any player parse is a bot from Alien Arena */
+		{
+			hasBots = true;
+			numplayers--;
+		}
+
+		test = strtok(NULL, playerSeperators);
+	}
+
+	if(s) /* FS: Sezero is this right? */
+		free(test);
+
+	kvpair.key = _strdup("numplayers");
+	sprintf(players, "%i", numplayers);
+	kvpair.value = _strdup(players);
+	TableEnter(server->keyvals, &kvpair);
+}
+
 
 void ServerParseKeyVals(GServer server, char *keyvals)
 {
-	char *k, *v;
+	char *k = NULL;
+	char *v = NULL;
+	char tokenSeperators[] = "\\";
+	char *kPtr = NULL;
 	char savedkeyvals[MAX_MSGLEN];
 	GKeyValuePair kvpair;
 	int numplayers = 0;
@@ -95,61 +180,34 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 	strncpy(savedkeyvals, keyvals, sizeof(savedkeyvals));
 	savedkeyvals[sizeof(savedkeyvals) - 1] = '\0';
 
-	k = mytok(++keyvals,'\\'); /* skip over starting backslash */
-	while (!numplayers || k != NULL)
+	k = Goa_strtok_r(keyvals, tokenSeperators, &kPtr);
+
+	while (k != NULL)
 	{
-		v = mytok(NULL,'\\');
+		v = Goa_strtok_r(NULL, tokenSeperators, &kPtr);
 
 		if (v != NULL)
 		{
 			kvpair.key = _strdup(k);
 			kvpair.value = _strdup(v);
 
-			if(strstr(kvpair.value, "\n")) /* FS: FIXME this is actually the end of the status packet from Q2 regardless.  the mytok is only going to separate the rules, but gets in infinite loop.  Change to strtok_r from FreeBSD */
+			gspyi.print("Adding: %s %s\n", k, v);
+
+			TableEnter(server->keyvals, &kvpair);
+
+			if(strstr(kvpair.value, "\n")) /* FS: Anything after a newline may contain players.  So don't add them as rules.  Just cut off the newline.  It has to happen at the end or else an important rule, like maxclients could get cut off. */
 			{
 				char *cutoffLen;
 				cutoffLen = strchr(kvpair.value, '\n');
 				kvpair.value[cutoffLen-kvpair.value] = '\0';
-				numplayers++;
+				k = NULL;
 			}
-			TableEnter(server->keyvals, &kvpair);
-		}
-		k = mytok(NULL,'\\');
-	}
-
-	if (numplayers) /* FS: Q2 sends shit with \n as players and their data :/ */
-	{
-		char players[12];
-		char tokenSeparators[] = "\n";
-		char *s = strdup(savedkeyvals);
-		char *test = strtok(s, tokenSeparators);
-		qboolean	hasBots = false;
-
-		test = strtok(NULL, tokenSeparators);
-
-		numplayers = 0;
-
-		while (test != NULL)
-		{
-			numplayers++;
-
-			if(strstr(test, "WallFly[BZZZ]") || strstr(test, "127.0.0.1")) /* FS: Don't report servers that just have WallFly in them.  127.0.0.1 in any player parse is a bot from Alien Arena */
-			{
-				hasBots = true;
-				numplayers--;
-			}
-
-			test = strtok(NULL, "\n");
 		}
 
-		free(s);
-		free(test);
-
-		kvpair.key = _strdup("numplayers");
-		sprintf(players, "%i", numplayers);
-		kvpair.value = _strdup(players);
-		TableEnter(server->keyvals, &kvpair);
+		k = Goa_strtok_r(NULL, tokenSeperators, &kPtr);
 	}
+
+	ServerParsePlayerCount(server, savedkeyvals);
 }
 
 
