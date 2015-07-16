@@ -1637,7 +1637,7 @@ void CL_InitLocal (void)
 
 	CL_InitInput ();
 
-//#if _MSC_VER
+//#if _WIN32
 //	Sys_LoadGameSpy("gamespy.dll");
 //#else
 //	Sys_LoadGameSpy("gamespy.dxe");
@@ -1843,7 +1843,7 @@ void CL_InitLocal (void)
 	memset(&browserList, 0, sizeof(browserList));
 	memset(&browserListAll, 0, sizeof(browserListAll));
 
-#if _MSC_VER
+#if _WIN32
 	gamespyLoaded = Sys_LoadGameSpy("gamespy.dll");
 #else
 	gamespyLoaded = Sys_LoadGameSpy("gamespy.dxe");

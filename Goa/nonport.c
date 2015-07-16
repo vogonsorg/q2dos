@@ -13,10 +13,6 @@ Fax(714)549-0757
 ******/
 #include "nonport.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 // this is only here so the functions in q_shared.c and q_shwin.c can link
 void Sys_Error (char *error, ...)
 {
