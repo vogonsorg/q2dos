@@ -88,6 +88,18 @@ int get_sockaddrin(char *host, int port, struct sockaddr_in *saddr, struct hoste
 
 
 /****************************************************************************/
+
+static void safe_sprintf (char *dest, size_t size, const char *fmt, ...)
+{
+	va_list		argptr;
+
+	va_start (argptr,fmt);
+	Q_vsnprintf (dest, size, fmt, argptr);
+	va_end (argptr);
+	if (size) dest[size - 1] = 0;
+}
+
+/****************************************************************************/
 /* PUBLIC FUNCTIONS */
 /****************************************************************************/
 
@@ -347,8 +359,7 @@ void packet_send(struct sockaddr *addr, char *buffer)
 	if (strlen(buffer) == 0)
 		return; //dont need to send an empty one!
 	packetnumber++; //packet numbers start at 1
-// SCG[1/16/00]: 	sprintf(keyvalue,"\\queryid\\%d.%d",queryid, packetnumber);
-	Com_sprintf(keyvalue,sizeof(keyvalue),"\\queryid\\%d.%d",queryid, packetnumber);
+	safe_sprintf(keyvalue,sizeof(keyvalue),"\\queryid\\%d.%d",queryid, packetnumber);
 	strcat(buffer,keyvalue);
 	sendto(querysock, buffer, strlen(buffer), 0, addr, sizeof(struct sockaddr));
 	buffer[0]='\0';
@@ -443,8 +454,7 @@ void send_echo(struct sockaddr *sender, char *outbuf,char *echostr)
 
 	if (strlen(echostr) > MAX_DATA_SIZE - 50)
 		return;
-// SCG[1/16/00]: 	sprintf(keyvalue,"\\echo\\%s",echostr);
-	Com_sprintf(keyvalue,sizeof(keyvalue),"\\echo\\%s",echostr);
+	safe_sprintf(keyvalue,sizeof(keyvalue),"\\echo\\%s",echostr);
 	buffer_send(sender, outbuf, keyvalue);
 }
 
@@ -464,13 +474,11 @@ void send_final(struct sockaddr *sender, char *outbuf,char *validation)
 		strcpy(encrypted_val, validation);
 		gs_encrypt((unsigned char *)goa_secret_key, strlen(goa_secret_key), (unsigned char *)encrypted_val, keylen);
 		gs_encode((unsigned char *)encrypted_val,keylen, (unsigned char *)encoded_val);
-// SCG[1/16/00]: 		sprintf(keyvalue,"\\validate\\%s",encoded_val);
-		Com_sprintf(keyvalue,sizeof(keyvalue),"\\validate\\%s",encoded_val);
+		safe_sprintf(keyvalue,sizeof(keyvalue),"\\validate\\%s",encoded_val);
 		buffer_send(sender, outbuf, keyvalue);
 	}
-	
-// SCG[1/16/00]: 	sprintf(keyvalue,"\\final\\");
-	Com_sprintf(keyvalue,sizeof(keyvalue),"\\final\\");
+
+	safe_sprintf(keyvalue,sizeof(keyvalue),"\\final\\");
 	buffer_send(sender, outbuf, keyvalue);
 	packet_send(sender, outbuf);
 }
@@ -546,13 +554,12 @@ void send_heartbeat(int statechanged)
 		return;		// a private dedicated game
 
 	gspyi.dprint(DEVELOPER_MSG_SERVER, "Sending a heartbeat to the GameSpy Master Server.\n"); // FS
-// SCG[1/16/00]:     sprintf(buf,"\\heartbeat\\%d\\gamename\\%s",qport, gname);
-    Com_sprintf(buf,sizeof(buf),"\\heartbeat\\%d\\gamename\\%s",qport, gname);
+	safe_sprintf(buf,sizeof(buf),"\\heartbeat\\%d\\gamename\\%s",qport, gname);
 	if (statechanged)
 	{
 		char statechangedBuf[16];
 
-		Com_sprintf(statechangedBuf, sizeof(statechangedBuf), "\\statechanged\\%i", statechanged);
+		safe_sprintf(statechangedBuf, sizeof(statechangedBuf), "\\statechanged\\%i", statechanged);
 //		strcat(buf,"\\statechanged\\");
 		strcat(buf,statechangedBuf);
 	}

@@ -120,7 +120,7 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 
 	if (numplayers) // FS: Q2 sends shit with \n as players and their data :/
 	{
-		char players[4];
+		char players[12];
 		char *test = strchr(savedkeyvals, '\n');
 		qboolean	hasBots = false;
 
@@ -147,7 +147,7 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 		}
 
 		kvpair.key = _strdup("numplayers");
-		Com_sprintf(players, sizeof(players), "%i", numplayers/*-2*/);
+		sprintf(players, "%i", numplayers/*-2*/);
 		kvpair.value = _strdup(players);
 		TableEnter(server->keyvals, &kvpair);
 	}
