@@ -105,14 +105,13 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 			kvpair.key = _strdup(k);
 			kvpair.value = _strdup(v);
 
-			if(strstr(kvpair.value, "\n"))
+			if(strstr(kvpair.value, "\n")) /* FS: FIXME this is actually the end of the status packet from Q2 regardless.  the mytok is only going to separate the rules, but gets in infinite loop.  Change to strtok_r from FreeBSD */
 			{
 				char *cutoffLen;
 				cutoffLen = strchr(kvpair.value, '\n');
 				kvpair.value[cutoffLen-kvpair.value] = '\0';
 				numplayers++;
 			}
-
 			TableEnter(server->keyvals, &kvpair);
 		}
 		k = mytok(NULL,'\\');
@@ -121,33 +120,33 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 	if (numplayers) // FS: Q2 sends shit with \n as players and their data :/
 	{
 		char players[4];
-		char *test = strchr(savedkeyvals, '\n');
+		char tokenSeparators[] = "\n";
+		char *s = strdup(savedkeyvals);
+		char *test = strtok(s, tokenSeparators);
 		qboolean	hasBots = false;
+
+		test = strtok(NULL, tokenSeparators);
+
+		numplayers = 0;
 
 		while (test != NULL)
 		{
-			if(strstr(test, "WallFly[BZZZ]")) // FS: Don't report servers that just have WallFly in them.
+			numplayers++;
+
+			if(strstr(test, "WallFly[BZZZ]") || strstr(test, "127.0.0.1")) // FS: Don't report servers that just have WallFly in them.
 			{
 				hasBots = true;
+				numplayers--;
 			}
 
-			numplayers++;
-			test = strchr(test+1, '\n');
+			test = strtok(NULL, "\n");
 		}
 
-		numplayers = numplayers-2;
-
-		if (numplayers == 1 && hasBots == true)
-		{
-			return;
-		}
-		else if(numplayers > 1 && hasBots == true)
-		{
-			numplayers = numplayers-1; // FS: Remove wallfly from total output
-		}
+		free(s);
+		free(test);
 
 		kvpair.key = _strdup("numplayers");
-		Com_sprintf(players, sizeof(players), "%i", numplayers/*-2*/);
+		Com_sprintf(players, sizeof(players), "%i", numplayers);
 		kvpair.value = _strdup(players);
 		TableEnter(server->keyvals, &kvpair);
 	}
