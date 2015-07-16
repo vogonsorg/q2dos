@@ -111,12 +111,12 @@ cvar_t	*console_old_complete; // FS: Old style command completing
 
 #ifdef GAMESPY
 /* FS: Gamespy CVARs */
-cvar_t	*cl_master_server_ip;
-cvar_t	*cl_master_server_port;
-cvar_t	*cl_master_server_queries;
-cvar_t	*cl_master_server_timeout;
-cvar_t	*cl_master_server_retries;
-cvar_t	*s_gamespy_sounds;
+static cvar_t	*cl_master_server_ip;
+static cvar_t	*cl_master_server_port;
+static cvar_t	*cl_master_server_queries;
+static cvar_t	*cl_master_server_timeout;
+static cvar_t	*cl_master_server_retries;
+/*static */cvar_t	*s_gamespy_sounds;
 #endif
 
 client_static_t	cls;
@@ -721,14 +721,14 @@ void CL_Disconnect (void)
 		cls.download = NULL;
 	}
 
-#ifdef USE_CURL	// HTTP downloading from R1Q2
+#ifdef USE_CURL /* HTTP downloading from R1Q2 */
 	CL_CancelHTTPDownloads (true);
 	cls.downloadReferer[0] = 0;
 	cls.downloadname[0] = 0;
 	cls.downloadposition = 0;
 	cls.downloadrate = 0.0f;
 	CL_Download_Reset_KBps_counter();
-#endif	// USE_CURL
+#endif
 
 	cls.state = ca_disconnected;
 }
@@ -1002,7 +1002,7 @@ void CL_ConnectionlessPacket (void)
 					Com_Printf ("HTTP downloading enabled, URL: %s\n", cls.downloadServer);
 #else
 				Com_Printf ("HTTP downloading supported by server but this client was built without libcurl.\n");
-#endif	// USE_CURL
+#endif	/* USE_CURL */
 			}
 		}
 		// end HTTP downloading from R1Q2
@@ -1280,11 +1280,11 @@ void CL_RequestNextDownload (void)
 					}
 					precache_model_skin = 1;
 				}
-#ifdef USE_CURL	// HTTP downloading from R1Q2
+#ifdef USE_CURL /* HTTP downloading from R1Q2 */
 				// pending downloads (models), let's wait here before we can check skins.
 				if ( CL_PendingHTTPDownloads() )
 					return;
-#endif	// USE_CURL
+#endif
 				// checking for skins in the model
 				if (!precache_model)
 				{
@@ -1515,11 +1515,11 @@ void CL_RequestNextDownload (void)
 		// precache phase completed
 		precache_check = ENV_CNT;
 	}
-#ifdef USE_CURL	// HTTP downloading from R1Q2
+#ifdef USE_CURL /* HTTP downloading from R1Q2 */
 	// pending downloads (possibly the map), let's wait here.
 	if ( CL_PendingHTTPDownloads() )
 		return;
-#endif	// USE_CURL
+#endif
 	if (precache_check == ENV_CNT)
 	{
 		if (localServer)	// if on local server, skip checking textures
@@ -1575,11 +1575,11 @@ void CL_RequestNextDownload (void)
 		}
 		precache_check = TEXTURE_CNT+999;
 	}
-#ifdef USE_CURL	// HTTP downloading from R1Q2
+#ifdef USE_CURL /* HTTP downloading from R1Q2 */
 	// pending downloads (possibly textures), let's wait here.
 	if ( CL_PendingHTTPDownloads() )
 		return;
-#endif	// USE_CURL
+#endif
 //ZOID
 	CL_RegisterSounds ();
 	CL_PrepRefresh ();
@@ -1616,9 +1616,9 @@ void CL_Precache_f (void)
 	precache_model_skin = 0;
 	precache_pak = 0;	// Knightmare added
 
-#ifdef USE_CURL	// HTTP downloading from R1Q2
+#ifdef USE_CURL /* HTTP downloading from R1Q2 */
 	CL_HTTP_ResetMapAbort ();	// Knightmare- reset the map abort flag
-#endif	// USE_CURL
+#endif
 
 	CL_RequestNextDownload();
 }
@@ -1757,14 +1757,14 @@ void CL_InitLocal (void)
 	s_gamespy_sounds->description = "Play the complete.wav and abort.wav from GameSpy3D if it exists in sounds/gamespy.";
 #endif
 
-#ifdef USE_CURL	// HTTP downloading from R1Q2
+#ifdef USE_CURL /* HTTP downloading from R1Q2 */
 	cl_http_proxy = Cvar_Get ("cl_http_proxy", "", 0);
 	cl_http_filelists = Cvar_Get ("cl_http_filelists", "1", 0);
 	cl_http_downloads = Cvar_Get ("cl_http_downloads", "1", CVAR_ARCHIVE);
 	cl_http_downloads->description = "Enable HTTP downloading.";
 	cl_http_max_connections = Cvar_Get ("cl_http_max_connections", "4", 0);
 	cl_http_max_connections->description = "Maximum number of connections to open up during HTTP downloading.  Currently limited to 4.";
-#endif	// USE_CURL
+#endif
 	//
 	// register our commands
 	//
@@ -2128,13 +2128,13 @@ void CL_Frame_Async (double msec)
 		return;
 	}
 
-#ifdef USE_CURL	// HTTP downloading from R1Q2
+#ifdef USE_CURL /* HTTP downloading from R1Q2 */
 	if (cls.state == ca_connected)
 	{
 		// downloads run full speed when connecting
 		CL_RunHTTPDownloads ();
 	}
-#endif	// USE_CURL
+#endif
 
 	// Update the inputs (keyboard, mouse, console)
 	if (packetFrame || renderFrame)
@@ -2154,10 +2154,10 @@ void CL_Frame_Async (double msec)
 		packetDelta = 0;
 		CL_SendCommand_Async ();
 
-#ifdef USE_CURL	// HTTP downloading from R1Q2
+#ifdef USE_CURL /* HTTP downloading from R1Q2 */
 		// downloads run less often in game
 		CL_RunHTTPDownloads ();
-#endif	// USE_CURL
+#endif
 	}
 
 	if (renderFrame)
@@ -2371,9 +2371,9 @@ void CL_Frame (double msec)
 		cls.netchan.last_received = Sys_Milliseconds ();
 	}
 
-#ifdef USE_CURL	// HTTP downloading from R1Q2
+#ifdef USE_CURL /* HTTP downloading from R1Q2 */
 	CL_RunHTTPDownloads ();
-#endif	// USE_CURL
+#endif
 
 	// fetch results from server
 	CL_ReadPackets ();
@@ -2496,9 +2496,9 @@ void CL_Init (void)
 	CL_InitLocal ();
 	IN_Init ();
 
-#ifdef USE_CURL	// HTTP downloading from R1Q2
+#ifdef USE_CURL /* HTTP downloading from R1Q2 */
 	CL_InitHTTPDownloads ();
-#endif	// USE_CURL
+#endif
 
 //	Cbuf_AddText ("exec autoexec.cfg\n");
 	FS_ExecAutoexec ();
@@ -2526,9 +2526,9 @@ void CL_Shutdown(void)
 	}
 	isdown = true;
 
-#ifdef USE_CURL	// HTTP downloading from R1Q2
+#ifdef USE_CURL /* HTTP downloading from R1Q2 */
 	CL_HTTP_Cleanup (true);
-#endif	// USE_CURL
+#endif
 
 	/* FS: Changed config to q2dos for WriteConfig */
 	CL_WriteConfiguration ("q2dos");	// Knightmare- changed to take config name as a parameter

@@ -39,10 +39,10 @@ Fax(714)549-0757
 #define SERVER_GROWBY 32
 #define LAN_SEARCH_TIME 3000 /* 3 sec */
 
-cvar_t	*cl_master_server_retries;
-cvar_t	*cl_master_server_port;
-cvar_t	*cl_master_server_ip;
-cvar_t	*cl_master_server_timeout;
+static cvar_t	*cl_master_server_retries;
+static cvar_t	*cl_master_server_port;
+static cvar_t	*cl_master_server_ip;
+static cvar_t	*cl_master_server_timeout;
 
 gspyimport_t gspyi;
 

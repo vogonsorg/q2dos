@@ -399,11 +399,7 @@ extern	cvar_t	*cl_async;
 extern	cvar_t	*cl_vwep;
 
 /* FS: Gamespy stuff */
-extern	cvar_t	*cl_master_server_ip;
-extern	cvar_t	*cl_master_server_port;
 extern	cvar_t	*s_gamespy_sounds;
-extern	cvar_t	*cl_master_server_timeout;
-extern	cvar_t	*cl_master_server_retries;
 
 #ifdef USE_CURL	/* HTTP downloading from R1Q2 */
 extern	cvar_t	*cl_http_downloads;
