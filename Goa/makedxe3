@@ -18,9 +18,9 @@ GAMESPY = CEngine/darray.o \
 
 OBJECTS =  $(GAMESPY)
 
-all: gamex86.dxe
+all: gamespy.dxe
 
-gamex86.dxe:	$(OBJECTS)
+gamespy.dxe:	$(OBJECTS)
 	$(DXE3GEN) -U -E _GetGameSpyAPI $(OBJECTS) -o gamespy.dxe
 
 clean:
