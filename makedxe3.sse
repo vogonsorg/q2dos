@@ -2,6 +2,8 @@
 #
 # gamespy/server browser:
 USE_GAMESPY=1
+# dynamically linked gamespy:
+GAMESPY_DXE=1
 # libcurl/http downloads:
 USE_CURL=1
 # ogg/vorbis music:
@@ -34,6 +36,9 @@ endif
 
 ifeq ($(USE_GAMESPY),1)
 CPPFLAGS+= -DGAMESPY
+ifneq ($(GAMESPY_DXE),1)
+CPPFLAGS+= -DGAMESPY_HARD_LINKED
+endif
 endif
 
 ifeq ($(USE_CDAUDIO),1)
@@ -98,6 +103,17 @@ CLIENT =	client/cl_input.o \
 	client/snd_stream.o \
 	client/qmenu.o \
 	client/cl_newfx.o
+
+ifeq ($(USE_GAMESPY),1)
+ifneq ($(GAMESPY_DXE),1)
+GAMESPY = Goa/CEngine/darray.o \
+	Goa/CEngine/gserver.o \
+	Goa/CEngine/gserverlist.o \
+	Goa/CEngine/gutil.o \
+	Goa/CEngine/hashtable.o \
+	Goa/nonport.o
+endif
+endif
 
 QCOMMON = qcommon/cmd.o \
 	qcommon/cmodel.o \
