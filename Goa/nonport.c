@@ -13,6 +13,7 @@ Fax(714)549-0757
 ******/
 #include "nonport.h"
 
+#ifndef GAMESPY_HARD_LINKED
 // this is only here so the functions in q_shared.c and q_shwin.c can link
 void Sys_Error (char *error, ...)
 {
@@ -39,6 +40,7 @@ void Com_Printf (char *msg, ...)
 
 	gspyi.Con_Printf("%s", text);
 }
+#endif
 
 unsigned long current_time(void) /* returns current time in msec */
 {

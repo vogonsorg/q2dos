@@ -193,6 +193,7 @@ void *Sys_GetGameAPI (void *parms)
 }
 
 #ifdef GAMESPY
+#ifndef GAMESPY_HARD_LINKED
 static void (*gamespy_library)(void);
 gspyexport_t	gspye;
 
@@ -257,8 +258,8 @@ qboolean Sys_LoadGameSpy(char *name)
 	return true;
 #else
 	return false;
+#endif /* GAMESPY_HARD_LINKED */
 #endif /* GAMESPY */
 }
 
 #endif /* GAME_HARD_LINKED */
-

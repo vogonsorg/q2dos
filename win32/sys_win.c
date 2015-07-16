@@ -713,11 +713,19 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 #ifdef GAMESPY
 #include "../client/gspy.h"
 
+#ifndef GAMESPY_HARD_LINKED
 static HINSTANCE	gamespy_library;
+#else
+gspyimport_t gspyi;
+extern void InitGamespy(void);
+extern void ShutdownGamespy(void);
+#endif
+
 gspyexport_t	gspye;
 
 qboolean Sys_LoadGameSpy(char *name)
 {
+#ifndef GAMESPY_HARD_LINKED
 	gspyimport_t gspyi;
 	GetGameSpyAPI_t GetGameSpyAPI;
 
@@ -732,6 +740,7 @@ qboolean Sys_LoadGameSpy(char *name)
 
 	if ( ( GetGameSpyAPI = (void *) GetProcAddress( gamespy_library, "GetGameSpyAPI" ) ) == 0 )
 		Com_Error( ERR_FATAL, "GetProcAddress failed on %s", name );
+#endif
 
 	gspyi.Cvar_Get = Cvar_Get;
 	gspyi.Cvar_Set = Cvar_Set;
@@ -743,8 +752,29 @@ qboolean Sys_LoadGameSpy(char *name)
 	gspyi.S_GamespySound = S_GamespySound;
 	gspyi.CL_Gamespy_Update_Num_Servers = CL_Gamespy_Update_Num_Servers;
 
+#ifndef GAMESPY_HARD_LINKED
 	gspye = GetGameSpyAPI(gspyi);
+#else
+	gspye.api_version = API_VERSION;
+	gspye.Init = InitGamespy;
+	gspye.Shutdown = ShutdownGamespy;
+	gspye.ServerListNew = ServerListNew;
+	gspye.ServerListFree = ServerListFree;
+	gspye.ServerListUpdate = ServerListUpdate;
+	gspye.ServerListThink = ServerListThink;
+	gspye.ServerListHalt = ServerListHalt;
+	gspye.ServerListClear = ServerListClear;
+	gspye.ServerListState = ServerListState;
+	gspye.ServerListErrorDesc = ServerListErrorDesc;
+	gspye.ServerListSort = ServerListSort;
+	gspye.ServerListGetServer = ServerListGetServer;
 
+	gspye.ServerGetPing = ServerGetPing;
+	gspye.ServerGetAddress = ServerGetAddress;
+	gspye.ServerGetIntValue = ServerGetIntValue;
+	gspye.ServerGetQueryPort = ServerGetQueryPort;
+	gspye.ServerGetStringValue = ServerGetStringValue;
+#endif
 	gspye.Init(); /* FS: Grab the cl_master_server_* CVARs */
 
 	return true;
