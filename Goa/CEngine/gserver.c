@@ -141,14 +141,13 @@ void ServerParsePlayerCount(GServer server, char *savedkeyvals)
 	}
 
 	if(s) /* FS: Sezero is this right? */
-		free(test);
+		free(s);
 
 	kvpair.key = _strdup("numplayers");
 	sprintf(players, "%i", numplayers);
 	kvpair.value = _strdup(players);
 	TableEnter(server->keyvals, &kvpair);
 }
-
 
 void ServerParseKeyVals(GServer server, char *keyvals)
 {
