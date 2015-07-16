@@ -55,14 +55,14 @@ static char *mytok(char *instr, char delim)
 
 	if (instr)
 		thestr = instr;
-	result=thestr;
+	result = thestr;
 	while (*thestr && *thestr != delim)
 	{
 		thestr++;
 	}
 	if (thestr == result)
 		result = NULL;
-	if (*thestr) //not the null term
+	if (*thestr) /* not the null term */
 		*thestr++ = '\0';
 	return result;
 }
@@ -75,12 +75,10 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 	GKeyValuePair kvpair;
 	int numplayers = 0;
 
-	if(!keyvals || strlen(keyvals) < 11) // FS: Some kind of bad status packet, forget it.
-	{
+	if(!keyvals || strlen(keyvals) < 11) /* FS: Some kind of bad status packet, forget it. */
 		return;
-	}
 
-/*
+	/*
 	*keyvals = *keyvals++; // FS: Skip past the OOB_SEQ
 	*keyvals = *keyvals++;
 	*keyvals = *keyvals++;
@@ -91,16 +89,13 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 	*keyvals = *keyvals++; // N
 	*keyvals = *keyvals++; // T
 	*keyvals = *keyvals++; // newline
-*/
-//	gspyi.print("Keyvals before[%i]: %s\n", strlen(keyvals), keyvals);
-//	memmove(keyvals, keyvals+10, strlen(keyvals));
+	*/
 	keyvals += 10;
-//	gspyi.print("Keyvals now[%i]: %s\n", strlen(keyvals), keyvals);
 
 	strncpy(savedkeyvals, keyvals, sizeof(savedkeyvals));
 	savedkeyvals[sizeof(savedkeyvals) - 1] = '\0';
 
-	k = mytok(++keyvals,'\\'); //skip over starting backslash
+	k = mytok(++keyvals,'\\'); /* skip over starting backslash */
 	while (!numplayers || k != NULL)
 	{
 		v = mytok(NULL,'\\');
