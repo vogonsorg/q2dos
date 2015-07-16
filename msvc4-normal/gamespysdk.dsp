@@ -118,10 +118,6 @@ SOURCE=..\Goa\CEngine\hashtable.c
 
 SOURCE=..\Goa\nonport.c
 # End Source File
-# Begin Source File
-
-SOURCE=..\game\q_shared.c
-# End Source File
 # End Group
 # Begin Group "Header Files"
 
