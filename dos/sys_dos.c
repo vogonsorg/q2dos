@@ -338,7 +338,7 @@ qboolean Sys_LoadGameSpy(char *name)
 	gspyi.S_GamespySound = S_GamespySound;
 	gspyi.CL_Gamespy_Update_Num_Servers = CL_Gamespy_Update_Num_Servers;
 
-	gspye.api_version = API_VERSION;
+	gspye.api_version = GAMESPY_API_VERSION;
 	gspye.Init = InitGamespy;
 	gspye.Shutdown = ShutdownGamespy;
 	gspye.ServerListNew = ServerListNew;
