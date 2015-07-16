@@ -27,12 +27,6 @@ int _crt0_startup_flags = _CRT0_FLAG_UNIX_SBRK; // FS: Fake Mem Fix (QIP)
 #include "../client/keys.h"
 #include "glob.h"
 
-#ifdef GAMESPY
-#ifdef GAMESPY_HARD_LINKED
-#include "../client/gspy.h"
-#endif /* GAMESPY_HARD_LINKED */
-#endif /* GAMESPY */
-
 #define MINIMUM_WIN_MEMORY		0x800000
 #define MINIMUM_WIN_MEMORY_LEVELPAK	(MINIMUM_WIN_MEMORY + 0x100000)
 
@@ -305,66 +299,23 @@ void Sys_Quit (void)
 void *GetGameAPI (void *import);
 void	Sys_UnloadGame (void)
 {
-
 }
-
 void	*Sys_GetGameAPI (void *parms)
 {
 	return GetGameAPI (parms);
 }
-/* needs to be statically linked for null
- * otherwise it sits here to satisfy the linker AFAIK
-*/
-#else
-
 #endif
 
-#ifdef GAMESPY
-#ifdef GAMESPY_HARD_LINKED
-gspyimport_t gspyi;
-extern void InitGamespy(void);
-extern void ShutdownGamespy(void);
-gspyexport_t	gspye;
-
-qboolean Sys_LoadGameSpy(char *name)
+#if defined(GAMESPY) && defined(GAMESPY_HARD_LINKED)
+void *GetGameSpyAPI (void *import); /* need prototype. */
+void	Sys_UnloadGameSpy (void)
 {
-	gspyi.Cvar_Get = Cvar_Get;
-	gspyi.Cvar_Set = Cvar_Set;
-	gspyi.Cvar_SetValue = Cvar_SetValue;
-	gspyi.Con_Printf = Com_Printf;
-	gspyi.Con_DPrintf = Com_DPrintf;
-	gspyi.NET_ErrorString = NET_ErrorString;
-	gspyi.Sys_SendKeyEvents = Sys_SendKeyEvents;
-	gspyi.S_GamespySound = S_GamespySound;
-	gspyi.CL_Gamespy_Update_Num_Servers = CL_Gamespy_Update_Num_Servers;
-
-	gspye.api_version = GAMESPY_API_VERSION;
-	gspye.Init = InitGamespy;
-	gspye.Shutdown = ShutdownGamespy;
-	gspye.ServerListNew = ServerListNew;
-	gspye.ServerListFree = ServerListFree;
-	gspye.ServerListUpdate = ServerListUpdate;
-	gspye.ServerListThink = ServerListThink;
-	gspye.ServerListHalt = ServerListHalt;
-	gspye.ServerListClear = ServerListClear;
-	gspye.ServerListState = ServerListState;
-	gspye.ServerListErrorDesc = ServerListErrorDesc;
-	gspye.ServerListSort = ServerListSort;
-	gspye.ServerListGetServer = ServerListGetServer;
-
-	gspye.ServerGetPing = ServerGetPing;
-	gspye.ServerGetAddress = ServerGetAddress;
-	gspye.ServerGetIntValue = ServerGetIntValue;
-	gspye.ServerGetQueryPort = ServerGetQueryPort;
-	gspye.ServerGetStringValue = ServerGetStringValue;
-	gspye.Init(); /* FS: Grab the cl_master_server_* CVARs */
-
-	return true;
 }
-#else
-
-#endif /* GAMESPY_HARD_LINKED */
-#endif /* GAMESPY */
+void	*Sys_GetGameSpyAPI (void *parms)
+{
+	return GetGameSpyAPI (parms);
+}
+#endif /* GAMESPY ... */
 
 char *Sys_ConsoleInput (void)
 {

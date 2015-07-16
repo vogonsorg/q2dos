@@ -72,7 +72,7 @@ typedef void (*KeyEnumFn)(char *key, char *value, void *instance);
 
 
 /* Callback parameter types (e.g. window handle, thread window, event, function etc) */
-#define GCALLBACK_FUNCTION 1	//only currently supported callback type
+#define GSPYCALLBACK_FUNCTION	1	// only currently supported callback type
 
 #define GE_NOERROR		0
 #define GE_NOSOCKET		1

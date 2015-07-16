@@ -78,7 +78,4 @@ typedef struct
 } gspyimport_t;
 
 
-/* this is the only function actually exported at the linker level */
-typedef	gspyexport_t	(*GetGameSpyAPI_t) (gspyimport_t);
-
 #endif /* __GSPY_H */

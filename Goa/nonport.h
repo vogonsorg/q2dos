@@ -50,7 +50,6 @@ void SocketStartUp(void);
 void SocketShutDown(void);
 
 extern gspyimport_t gspyi;
-extern gspyexport_t gspye;
 
 #ifndef SOCKET_ERROR
 	#define SOCKET_ERROR (-1)

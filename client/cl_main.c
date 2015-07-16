@@ -135,7 +135,7 @@ extern	cvar_t *allow_download_maps;
 
 #ifdef GAMESPY
 /* FS: For Gamespy */
-static qboolean gamespyLoaded = false;
+static	gspyexport_t	*gspye = NULL;
 static	GServerList	serverlist;
 static int gspyCur;
 gamespyBrowser_t browserList[MAX_SERVERS]; /* FS: Browser list for active servers */
@@ -146,6 +146,7 @@ static	void ListCallBack(GServerList serverlist, int msg, void *instance, void *
 void CL_Gspystop_f (void);
 void CL_PingNetServers_f (void);
 void CL_PrintBrowserList_f (void);
+static void CL_LoadGameSpy (void);
 #endif
 
 #ifdef __DJGPP__
@@ -1778,9 +1779,6 @@ void CL_InitLocal (void)
 	Cmd_AddCommand ("changing", CL_Changing_f);
 	Cmd_AddCommand ("disconnect", CL_Disconnect_f);
 
-#ifdef GAMESPY
-	Cmd_AddCommand ("gspystop", CL_Gspystop_f); // FS
-#endif
 	Cmd_AddCommand ("record", CL_Record_f);
 	Cmd_AddCommand ("stop", CL_Stop_f);
 
@@ -1828,25 +1826,20 @@ void CL_InitLocal (void)
 	Cmd_AddCommand ("weapprev", NULL);
 
 #ifdef GAMESPY
+	Cmd_AddCommand ("gspystop", CL_Gspystop_f);
 	Cmd_AddCommand ("slist2", CL_PingNetServers_f);
 	Cmd_AddCommand ("srelist", CL_PrintBrowserList_f);
 
 	memset(&browserList, 0, sizeof(browserList));
 	memset(&browserListAll, 0, sizeof(browserListAll));
 
-#if _WIN32
-	gamespyLoaded = Sys_LoadGameSpy("gamespy.dll");
-#else
-	gamespyLoaded = Sys_LoadGameSpy("gamespy.dxe");
-#endif
-
+	CL_LoadGameSpy ();
 #endif /* GAMESPY */
 
 #ifdef __DJGPP__
 	Cmd_AddCommand ("memstats", Sys_Memory_Stats_f); /* FS: Added to keep track of memory usage in DOS */
 #endif
 }
-
 
 
 /*
@@ -2555,7 +2548,7 @@ void GameSpy_Async_Think(void)
 	if(!serverlist)
 		return;
 
-	if(gspye.ServerListState(serverlist) == sl_idle && cls.gamespyupdate)
+	if(gspye->ServerListState(serverlist) == sl_idle && cls.gamespyupdate)
 	{
 		if (cls.key_dest != key_menu) // FS: Only print this from an slist2 command, not the server browser.
 		{
@@ -2567,13 +2560,13 @@ void GameSpy_Async_Think(void)
 		}
 		cls.gamespyupdate = 0;
 		cls.gamespypercent = 0;
-		gspye.ServerListClear( serverlist );
-		gspye.ServerListFree(serverlist);
+		gspye->ServerListClear(serverlist);
+		gspye->ServerListFree(serverlist);
 		serverlist = NULL; // FS: This is on purpose so future ctrl+c's won't try to close empty serverlists
 	}
 	else
 	{
-		gspye.ServerListThink(serverlist);
+		gspye->ServerListThink(serverlist);
 	}
 }
 
@@ -2583,7 +2576,7 @@ void CL_Gspystop_f (void)
 	{
 		Com_Printf("\x02Server scan aborted!\n");
 		S_GamespySound ("gamespy/abort.wav");
-		gspye.ServerListHalt( serverlist );
+		gspye->ServerListHalt(serverlist);
 	}
 }
 
@@ -2643,22 +2636,22 @@ void GameSpy_Sort_By_Ping(GServerList serverlist)
 
 	for (i = 0; i < cls.gamespytotalservers; i++)
 	{
-		GServer server = gspye.ServerListGetServer( serverlist, i );
+		GServer server = gspye->ServerListGetServer(serverlist, i);
 		if (server)
 		{
-			if(gspye.ServerGetIntValue(server, "numplayers", 0) <= 0)
+			if(gspye->ServerGetIntValue(server, "numplayers", 0) <= 0)
 				continue;
 
 			if(i == MAX_SERVERS)
 				break;
 
-			Q_strncpyz(browserList[gspyCur].ip, gspye.ServerGetAddress(server), sizeof(browserList[gspyCur].ip));
-			browserList[gspyCur].port = gspye.ServerGetQueryPort(server);
-			browserList[gspyCur].ping = gspye.ServerGetPing(server);
-			Q_strncpyz(browserList[gspyCur].hostname, gspye.ServerGetStringValue(server, "hostname","(NONE)"), sizeof(browserList[gspyCur].hostname));
-			Q_strncpyz(browserList[gspyCur].mapname, gspye.ServerGetStringValue(server,"mapname","(NO MAP)"), sizeof(browserList[gspyCur].mapname));
-			browserList[gspyCur].curPlayers = gspye.ServerGetIntValue(server,"numplayers",0);
-			browserList[gspyCur].maxPlayers = gspye.ServerGetIntValue(server,"maxclients",0);
+			Q_strncpyz(browserList[gspyCur].ip, gspye->ServerGetAddress(server), sizeof(browserList[gspyCur].ip));
+			browserList[gspyCur].port = gspye->ServerGetQueryPort(server);
+			browserList[gspyCur].ping = gspye->ServerGetPing(server);
+			Q_strncpyz(browserList[gspyCur].hostname, gspye->ServerGetStringValue(server, "hostname","(NONE)"), sizeof(browserList[gspyCur].hostname));
+			Q_strncpyz(browserList[gspyCur].mapname, gspye->ServerGetStringValue(server,"mapname","(NO MAP)"), sizeof(browserList[gspyCur].mapname));
+			browserList[gspyCur].curPlayers = gspye->ServerGetIntValue(server,"numplayers",0);
+			browserList[gspyCur].maxPlayers = gspye->ServerGetIntValue(server,"maxclients",0);
 
 			gspyCur++;
 		}
@@ -2668,16 +2661,16 @@ void GameSpy_Sort_By_Ping(GServerList serverlist)
 
 	for (i = 0; i < cls.gamespytotalservers; i++)
 	{
-		GServer server = gspye.ServerListGetServer( serverlist, i );
+		GServer server = gspye->ServerListGetServer(serverlist, i);
 
 		if (server)
 		{
-			if(gspye.ServerGetIntValue(server, "numplayers", 0) > 0) /* FS: We already added this so skip it */
+			if(gspye->ServerGetIntValue(server, "numplayers", 0) > 0) /* FS: We already added this so skip it */
 			{
 				continue;
 			}
 
-			if(Q_strncmp(gspye.ServerGetStringValue(server, "hostname","(NONE)"), "(NONE)", 6) == 0) /* FS: A server that timed-out or we aborted early */
+			if(Q_strncmp(gspye->ServerGetStringValue(server, "hostname","(NONE)"), "(NONE)", 6) == 0) /* FS: A server that timed-out or we aborted early */
 			{
 				continue;
 			}
@@ -2685,13 +2678,13 @@ void GameSpy_Sort_By_Ping(GServerList serverlist)
 			if(i == MAX_SERVERS)
 				break;
 
-			Q_strncpyz(browserListAll[i].ip, gspye.ServerGetAddress(server), sizeof(browserListAll[i].ip));
-			browserListAll[i].port = gspye.ServerGetQueryPort(server);
-			browserListAll[i].ping = gspye.ServerGetPing(server);
-			Q_strncpyz(browserListAll[i].hostname, gspye.ServerGetStringValue(server, "hostname","(NONE)"), sizeof(browserListAll[i].hostname));
-			Q_strncpyz(browserListAll[i].mapname, gspye.ServerGetStringValue(server,"mapname","(NO MAP)"), sizeof(browserListAll[i].mapname));
-			browserListAll[i].curPlayers = gspye.ServerGetIntValue(server,"numplayers",0);
-			browserListAll[i].maxPlayers = gspye.ServerGetIntValue(server,"maxclients",0);
+			Q_strncpyz(browserListAll[i].ip, gspye->ServerGetAddress(server), sizeof(browserListAll[i].ip));
+			browserListAll[i].port = gspye->ServerGetQueryPort(server);
+			browserListAll[i].ping = gspye->ServerGetPing(server);
+			Q_strncpyz(browserListAll[i].hostname, gspye->ServerGetStringValue(server, "hostname","(NONE)"), sizeof(browserListAll[i].hostname));
+			Q_strncpyz(browserListAll[i].mapname, gspye->ServerGetStringValue(server,"mapname","(NO MAP)"), sizeof(browserListAll[i].mapname));
+			browserListAll[i].curPlayers = gspye->ServerGetIntValue(server,"numplayers",0);
+			browserListAll[i].maxPlayers = gspye->ServerGetIntValue(server,"maxclients",0);
 		}
 	}
 }
@@ -2705,22 +2698,22 @@ static void ListCallBack(GServerList serverlist, int msg, void *instance, void *
 	if (msg == LIST_PROGRESS)
 	{
 		server = (GServer)param1;
-		numplayers = gspye.ServerGetIntValue(server,"numplayers",0);
+		numplayers = gspye->ServerGetIntValue(server,"numplayers",0);
 
 		if(numplayers > 0) /* FS: Only show populated servers */
 		{
 			if (cls.key_dest != key_menu) /* FS: Only print this from an slist2 command, not the server browser. */
 			{
-				Com_Printf("%s:%d [%d] %s ", gspye.ServerGetAddress(server), gspye.ServerGetQueryPort(server), gspye.ServerGetPing(server), gspye.ServerGetStringValue(server, "hostname","(NONE)"));
+				Com_Printf("%s:%d [%d] %s ", gspye->ServerGetAddress(server), gspye->ServerGetQueryPort(server), gspye->ServerGetPing(server), gspye->ServerGetStringValue(server, "hostname","(NONE)"));
 				Com_Printf("\x02%d", numplayers); /* FS: Show the current players number in the green font */
-				Com_Printf("/%d %s\n", gspye.ServerGetIntValue(server,"maxclients",0), gspye.ServerGetStringValue(server,"mapname","(NO MAP)"));
+				Com_Printf("/%d %s\n", gspye->ServerGetIntValue(server,"maxclients",0), gspye->ServerGetStringValue(server,"mapname","(NO MAP)"));
 			}
 		}
 		else if (cls.gamespyupdate == SHOW_ALL_SERVERS)
 		{
 			if (cls.key_dest != key_menu) /* FS: Only print this from an slist2 command, not the server browser. */
 			{
-				Com_Printf("%s:%d [%d] %s %d/%d %s\n", gspye.ServerGetAddress(server), gspye.ServerGetQueryPort(server), gspye.ServerGetPing(server), gspye.ServerGetStringValue(server, "hostname","(NONE)"), gspye.ServerGetIntValue(server,"numplayers",0), gspye.ServerGetIntValue(server,"maxclients",0), gspye.ServerGetStringValue(server,"mapname","(NO MAP)"));
+				Com_Printf("%s:%d [%d] %s %d/%d %s\n", gspye->ServerGetAddress(server), gspye->ServerGetQueryPort(server), gspye->ServerGetPing(server), gspye->ServerGetStringValue(server, "hostname","(NONE)"), gspye->ServerGetIntValue(server,"numplayers",0), gspye->ServerGetIntValue(server,"maxclients",0), gspye->ServerGetStringValue(server,"mapname","(NO MAP)"));
 			}
 		}
 
@@ -2732,10 +2725,10 @@ static void ListCallBack(GServerList serverlist, int msg, void *instance, void *
 	}
 	else if (msg == LIST_STATECHANGED)
 	{
-		switch(gspye.ServerListState(serverlist))
+		switch(gspye->ServerListState(serverlist))
 		{
 			case sl_idle:
-				gspye.ServerListSort(serverlist, true, "ping", cm_int);
+				gspye->ServerListSort(serverlist, true, "ping", cm_int);
 				GameSpy_Sort_By_Ping(serverlist);
 				break;
 			default:
@@ -2756,7 +2749,7 @@ void CL_PingNetServers_f (void)
 		return;
 	}
 
-	if(!gamespyLoaded)
+	if(!gspye)
 	{
 		Com_Printf("Error: GameSpy DLL not loaded!\n");
 		return;
@@ -2793,13 +2786,13 @@ void CL_PingNetServers_f (void)
 
 	SCR_UpdateScreen(); /* FS: Force an update so the percentage bar shows some progress */
 
-	serverlist = gspye.ServerListNew("quake2","quake2",goa_secret_key,allocatedSockets,ListCallBack,GCALLBACK_FUNCTION,NULL);
-	error = gspye.ServerListUpdate(serverlist,true); /* FS: Use Async now! */
+	serverlist = gspye->ServerListNew("quake2","quake2",goa_secret_key,allocatedSockets,ListCallBack,GSPYCALLBACK_FUNCTION,NULL);
+	error = gspye->ServerListUpdate(serverlist,true); /* FS: Use Async now! */
 
 	if (error != GE_NOERROR) /* FS: Grab the error code */
 	{
 		Com_Printf("\x02GameSpy Error: ");
-		Com_Printf("%s.\n", gspye.ServerListErrorDesc(serverlist, error));
+		Com_Printf("%s.\n", gspye->ServerListErrorDesc(serverlist, error));
 	}
 }
 
@@ -2808,6 +2801,38 @@ void CL_Gamespy_Update_Num_Servers(int numServers)
 	cls.gamespytotalservers = numServers;
 }
 
+static void CL_LoadGameSpy (void)
+{
+	gspyimport_t	import;
+
+	import.Cvar_Get = Cvar_Get;
+	import.Cvar_Set = Cvar_Set;
+	import.Cvar_SetValue = Cvar_SetValue;
+	import.Con_Printf = Com_Printf;
+	import.Con_DPrintf = Com_DPrintf;
+	import.NET_ErrorString = NET_ErrorString;
+	import.Sys_SendKeyEvents = Sys_SendKeyEvents;
+	import.S_GamespySound = S_GamespySound;
+	import.CL_Gamespy_Update_Num_Servers = CL_Gamespy_Update_Num_Servers;
+
+	gspye = (gspyexport_t *) Sys_GetGameSpyAPI (&import);
+	if (!gspye)
+	{
+		Com_Printf ("failed to load GameSpy DLL");
+		return;
+	}
+	else if (gspye->api_version != GAMESPY_API_VERSION)
+	{
+		Com_Printf("Error: Unsupported GameSpy DLL version %i (need %i)\n", gspye->api_version, GAMESPY_API_VERSION);
+		Sys_UnloadGameSpy();
+		gspye = NULL;
+		return;
+	}
+	else /* all good */
+	{
+		gspye->Init ();
+	}
+}
 #endif /* GAMESPY */
 
 //=============================================================================

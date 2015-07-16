@@ -93,13 +93,13 @@ void ShutdownGamespy (void)
 	/* FS: No clean-up afaik */
 }
 
+static gspyexport_t gspye;
 gspyimport_t gspyi;
 
-gspyexport_t GetGameSpyAPI (gspyimport_t import)
+gspyexport_t *GetGameSpyAPI (gspyimport_t *import)
 {
-	gspyexport_t gspye;
 
-	gspyi = import;
+	gspyi = *import;
 
 	gspye.api_version = GAMESPY_API_VERSION;
 	gspye.Init = InitGamespy;
@@ -121,7 +121,7 @@ gspyexport_t GetGameSpyAPI (gspyimport_t import)
 	gspye.ServerGetQueryPort = ServerGetQueryPort;
 	gspye.ServerGetStringValue = ServerGetStringValue;
 
-	return gspye;
+	return &gspye;
 }
 
 /* FS: Set a socket to be non-blocking */

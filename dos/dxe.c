@@ -7,13 +7,12 @@
 #include <unistd.h>
 #include <sys/dxe.h>
 
-#ifdef GAMESPY
+#if defined(GAMESPY) && !defined(GAMESPY_HARD_LINKED)
 #include <io.h>
 #include <signal.h>
 #include <tcp.h>
 #include <netdb.h>
 #include <arpa/inet.h>
-#include "../client/gspy.h"
 #endif
 
 #include "../qcommon/qcommon.h"
@@ -89,7 +88,7 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (time)
 	DXE_EXPORT (tolower)
 	DXE_EXPORT (vsprintf)
-#ifdef GAMESPY
+#if defined(GAMESPY) && !defined(GAMESPY_HARD_LINKED)
 	DXE_EXPORT(usleep)
 	DXE_EXPORT(vsnprintf)
 	DXE_EXPORT(bsearch)
@@ -192,28 +191,19 @@ void *Sys_GetGameAPI (void *parms)
 	return GetGameAPI (parms);
 }
 
-#ifdef GAMESPY
-#ifndef GAMESPY_HARD_LINKED
+#if defined(GAMESPY) && !defined(GAMESPY_HARD_LINKED)
 static void (*gamespy_library)(void);
-gspyexport_t	gspye;
 
-extern void S_GamespySound (char *sound);
-extern char* NET_ErrorString(void);
-extern void CL_Gamespy_Update_Num_Servers(int numServers);
-#endif
-
-qboolean Sys_LoadGameSpy(char *name)
+void *Sys_GetGameSpyAPI(void *parms)
 {
-#ifdef GAMESPY
+	const char *dxename = "gamespy.dxe";
+	char name[MAX_OSPATH];
 	char curpath[MAX_OSPATH];
-	char gspyLoad[MAX_OSPATH];
-
-	gspyimport_t gspyi;
-	GetGameSpyAPI_t GetGameSpyAPI;
+	void	*(*GetGameSpyAPI) (void *);
 
 	getcwd(curpath, sizeof(curpath));
 
-	Com_Printf("------- Loading %s -------\n", name);
+	Com_Printf("------- Loading %s -------\n", dxename);
 
 	if (firsttime)
 	{
@@ -224,49 +214,28 @@ qboolean Sys_LoadGameSpy(char *name)
 		dlregsym (syms);
 	}
 
-	Com_sprintf(gspyLoad, sizeof(gspyLoad), "%s/%s", curpath, name);
-	gamespy_library = dlopen(gspyLoad, RTLD_LAZY);
-
+	Com_sprintf(name, sizeof(name), "%s/%s", curpath, dxename);
+	gamespy_library = dlopen (name, RTLD_LAZY);
 	if (!gamespy_library)
-	{
-		Com_Printf( "LoadLibrary(\"%s\") failed\n", gspyLoad );
-
-		return false;
-	}
+		return NULL;
 
 	GetGameSpyAPI = (void *) dlsym (gamespy_library, "_GetGameSpyAPI");
-
 	if (!GetGameSpyAPI)
 	{
-		Com_Error( ERR_FATAL, "GetProcAddress failed on %s", gspyLoad );
+		dlclose(gamespy_library);
+		gamespy_library = NULL;
+		return NULL;
 	}
 
-	gspyi.Cvar_Get = Cvar_Get;
-	gspyi.Cvar_Set = Cvar_Set;
-	gspyi.Cvar_SetValue = Cvar_SetValue;
-	gspyi.Con_Printf = Com_Printf;
-	gspyi.Con_DPrintf = Com_DPrintf;
-	gspyi.NET_ErrorString = NET_ErrorString;
-	gspyi.Sys_SendKeyEvents = Sys_SendKeyEvents;
-	gspyi.S_GamespySound = S_GamespySound;
-	gspyi.CL_Gamespy_Update_Num_Servers = CL_Gamespy_Update_Num_Servers;
-
-	gspye = GetGameSpyAPI(gspyi);
-
-	if(gspye.api_version != GAMESPY_API_VERSION)
-	{
-		gspye.Shutdown();
-		Com_Printf("Error: GameSpy DXE reported version %i.  Supported version by Q2DOS %i\n", gspye.api_version, GAMESPY_API_VERSION);
-		return false;
-	}
-
-	gspye.Init(); /* FS: Grab the cl_master_server_* CVARs */
-
-	return true;
-#else
-	return false;
-#endif /* GAMESPY_HARD_LINKED */
-#endif /* GAMESPY */
+	return GetGameSpyAPI (parms);
 }
+
+void Sys_UnloadGameSpy(void)
+{
+	if (gamespy_library)
+		dlclose(gamespy_library);
+	gamespy_library = NULL;
+}
+#endif /* GAMESPY ... */
 
 #endif /* GAME_HARD_LINKED */

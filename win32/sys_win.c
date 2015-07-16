@@ -711,79 +711,45 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 }
 
 #ifdef GAMESPY
-#include "../client/gspy.h"
 
-#ifndef GAMESPY_HARD_LINKED
+#ifndef GAMESPY_HARD_LINKED /* dynamic linking */
 static HINSTANCE	gamespy_library;
-#else
-gspyimport_t gspyi;
-extern void InitGamespy(void);
-extern void ShutdownGamespy(void);
+#enlse
+void *GetGameSpyAPI (void *import); /* need prototype. */
 #endif
 
-gspyexport_t	gspye;
-
-qboolean Sys_LoadGameSpy(char *name)
+void *Sys_GetGameSpyAPI(void *parms)
 {
 #ifndef GAMESPY_HARD_LINKED
-	gspyimport_t gspyi;
-	GetGameSpyAPI_t GetGameSpyAPI;
+	const char *dllname = "gamespy.dll";
+	void	*(*GetGameSpyAPI) (void *);
 
-	Com_Printf("------- Loading %s -------\n", name);
+	Com_Printf("------- Loading %s -------\n", dllname);
 
-	if ( ( gamespy_library = LoadLibrary( name ) ) == 0 )
+	if ((gamespy_library = LoadLibrary(dllname)) == NULL)
 	{
 		Com_Printf( "LoadLibrary(\"%s\") failed\n", name );
-
-		return false;
+		return NULL;
 	}
-
-	if ( ( GetGameSpyAPI = (void *) GetProcAddress( gamespy_library, "GetGameSpyAPI" ) ) == 0 )
-		Com_Error( ERR_FATAL, "GetProcAddress failed on %s", name );
-#endif
-
-	gspyi.Cvar_Get = Cvar_Get;
-	gspyi.Cvar_Set = Cvar_Set;
-	gspyi.Cvar_SetValue = Cvar_SetValue;
-	gspyi.Con_Printf = Com_Printf;
-	gspyi.Con_DPrintf = Com_DPrintf;
-	gspyi.NET_ErrorString = NET_ErrorString;
-	gspyi.Sys_SendKeyEvents = Sys_SendKeyEvents;
-	gspyi.S_GamespySound = S_GamespySound;
-	gspyi.CL_Gamespy_Update_Num_Servers = CL_Gamespy_Update_Num_Servers;
-
-#ifndef GAMESPY_HARD_LINKED
-	gspye = GetGameSpyAPI(gspyi);
-
-	if(gspye.api_version != GAMESPY_API_VERSION)
+	if ((GetGameSpyAPI = (void *) GetProcAddress(gamespy_library, "GetGameSpyAPI")) == NULL)
 	{
-		gspye.Shutdown();
-		Com_Printf("Error: GameSpy DLL reported version %i.  Supported version by Q2DOS %i\n", gspye.api_version, GAMESPY_API_VERSION);
-		return false;
+		FreeLibrary (gamespy_library);
+		gamespy_library = NULL;
+		Com_Printf("GetProcAddress failed on %s", dllname);
+		return NULL;
 	}
-#else
-	gspye.api_version = GAMESPY_API_VERSION;
-	gspye.Init = InitGamespy;
-	gspye.Shutdown = ShutdownGamespy;
-	gspye.ServerListNew = ServerListNew;
-	gspye.ServerListFree = ServerListFree;
-	gspye.ServerListUpdate = ServerListUpdate;
-	gspye.ServerListThink = ServerListThink;
-	gspye.ServerListHalt = ServerListHalt;
-	gspye.ServerListClear = ServerListClear;
-	gspye.ServerListState = ServerListState;
-	gspye.ServerListErrorDesc = ServerListErrorDesc;
-	gspye.ServerListSort = ServerListSort;
-	gspye.ServerListGetServer = ServerListGetServer;
-
-	gspye.ServerGetPing = ServerGetPing;
-	gspye.ServerGetAddress = ServerGetAddress;
-	gspye.ServerGetIntValue = ServerGetIntValue;
-	gspye.ServerGetQueryPort = ServerGetQueryPort;
-	gspye.ServerGetStringValue = ServerGetStringValue;
 #endif
-	gspye.Init(); /* FS: Grab the cl_master_server_* CVARs */
 
-	return true;
+	return GetGameSpyAPI (parms);
 }
+
+void *Sys_GetGameSpyAPI(void *parms)
+{
+#ifndef GAMESPY_HARD_LINKED
+	if (gamespy_library)
+		FreeLibrary (gamespy_library);
+	gamespy_library = NULL;
 #endif
+}
+
+#endif /* GAMESPY ... */

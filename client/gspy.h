@@ -37,7 +37,7 @@ typedef enum {cm_int, cm_float, cm_strcase, cm_stricase} GCompareMode;
 #define	LIST_STATECHANGED		1
 #define LIST_PROGRESS			2
 
-#define GCALLBACK_FUNCTION 1
+#define GSPYCALLBACK_FUNCTION	1
 
 #define GE_NOERROR		0
 
@@ -92,15 +92,10 @@ typedef struct
 } gspyimport_t;
 
 
-/* this is the only function actually exported at the linker level */
-typedef	gspyexport_t	(*GetGameSpyAPI_t) (gspyimport_t);
-
 /* FS: Binary stuff the DLL needs to access */
 extern void S_GamespySound (char *sound);
 extern char* NET_ErrorString(void);
-extern void CL_Gamespy_Update_Num_Servers(int numServers);
-extern qboolean Sys_LoadGameSpy(char *name);
-
-extern gspyexport_t	gspye; /* FS: Used across the game binary */
+extern void *Sys_GetGameSpyAPI(void *parms);
+extern void Sys_UnloadGameSpy(void);
 
 #endif /* __GSPY_H */
