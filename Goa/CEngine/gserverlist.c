@@ -36,8 +36,6 @@ Fax(714)549-0757
 #include <sys/ioctl.h>
 #endif
 
-#define MSHOST	"maraakate.org" /* FS: Gamespy dead: "master.gamespy.com" */
-#define MSPORT	28900
 #define SERVER_GROWBY 32
 #define LAN_SEARCH_TIME 3000 /* 3 sec */
 
@@ -103,7 +101,7 @@ gspyexport_t GetGameSpyAPI (gspyimport_t import)
 
 	gspyi = import;
 
-	gspye.api_version = API_VERSION;
+	gspye.api_version = GAMESPY_API_VERSION;
 	gspye.Init = InitGamespy;
 	gspye.Shutdown = ShutdownGamespy;
 	gspye.ServerListNew = ServerListNew;

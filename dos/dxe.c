@@ -253,6 +253,13 @@ qboolean Sys_LoadGameSpy(char *name)
 
 	gspye = GetGameSpyAPI(gspyi);
 
+	if(gspye.api_version != GAMESPY_API_VERSION)
+	{
+		gspye.Shutdown();
+		Com_Printf("Error: GameSpy DXE reported version %i.  Supported version by Q2DOS %i\n", gspye.api_version, GAMESPY_API_VERSION);
+		return false;
+	}
+
 	gspye.Init(); /* FS: Grab the cl_master_server_* CVARs */
 
 	return true;

@@ -754,8 +754,15 @@ qboolean Sys_LoadGameSpy(char *name)
 
 #ifndef GAMESPY_HARD_LINKED
 	gspye = GetGameSpyAPI(gspyi);
+
+	if(gspye.api_version != GAMESPY_API_VERSION)
+	{
+		gspye.Shutdown();
+		Com_Printf("Error: GameSpy DLL reported version %i.  Supported version by Q2DOS %i\n", gspye.api_version, GAMESPY_API_VERSION);
+		return false;
+	}
 #else
-	gspye.api_version = API_VERSION;
+	gspye.api_version = GAMESPY_API_VERSION;
 	gspye.Init = InitGamespy;
 	gspye.Shutdown = ShutdownGamespy;
 	gspye.ServerListNew = ServerListNew;

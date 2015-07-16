@@ -21,25 +21,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define __GSPY_H
 
 #include "../qcommon/qcommon.h"
+#include "CEngine/goaceng.h"
 
 /* FS: IF THIS FILE IS CHANGED IT MUST BE CHANGED IN CLIENT/GSPY.H! */
 
 #define	GAMESPY_API_VERSION		1
-
-/* FS: Stuff we need to be able to link without goaceng.h */
-typedef struct GServerListImplementation *GServerList;
-typedef struct GServerImplementation *GServer;
-typedef int GError;
-typedef int gbool;
-typedef enum {sl_idle, sl_listxfer, sl_lanlist, sl_querying} GServerListState;
-typedef enum {cm_int, cm_float, cm_strcase, cm_stricase} GCompareMode;
-
-#define	LIST_STATECHANGED		1
-#define LIST_PROGRESS			2
-
-#define GCALLBACK_FUNCTION 1
-
-#define GE_NOERROR		0
 
 /*
  * these are the functions exported by the gamespy module
@@ -94,13 +80,5 @@ typedef struct
 
 /* this is the only function actually exported at the linker level */
 typedef	gspyexport_t	(*GetGameSpyAPI_t) (gspyimport_t);
-
-/* FS: Binary stuff the DLL needs to access */
-extern void S_GamespySound (char *sound);
-extern char* NET_ErrorString(void);
-extern void CL_Gamespy_Update_Num_Servers(int numServers);
-extern qboolean Sys_LoadGameSpy(char *name);
-
-extern gspyexport_t	gspye; /* FS: Used across the game binary */
 
 #endif /* __GSPY_H */
