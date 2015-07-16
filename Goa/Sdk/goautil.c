@@ -98,18 +98,18 @@ int goa_init(int queryport, char *gamename, char *ip, void *userdata)
 	int lasterror;
 	struct sockaddr_in saddr;
 
-	Com_Printf("Initializing GameSpy\n");
+	gspyi.print("Initializing GameSpy\n");
 
 	// FS: Now CVARs
 	if (sv_master_server_ip->string[0] == '\0')
 	{
-		Com_Printf("Error: sv_master_server_ip is blank!  Setting to default: %s\n", SV_MASTER_ADDR);
-		Cvar_ForceSet("sv_master_server_ip", CL_MASTER_ADDR);
+		gspyi.print("Error: sv_master_server_ip is blank!  Setting to default: %s\n", SV_MASTER_ADDR);
+		gspyi.cvar_forceset("sv_master_server_ip", CL_MASTER_ADDR);
 	}
 	if (sv_master_server_port->intValue <= 0)
 	{
-		Com_Printf("Error: sv_master_server_port is invalid!  Setting to default: %s\n", SV_MASTER_PORT);
-		Cvar_ForceSet("sv_master_server_port", CL_MASTER_PORT);
+		gspyi.print("Error: sv_master_server_port is invalid!  Setting to default: %s\n", SV_MASTER_PORT);
+		gspyi.cvar_forceset("sv_master_server_port", CL_MASTER_PORT);
 	}
 
 	//save off query port,gamename and userdata
@@ -181,7 +181,7 @@ void goa_process_queries(void)
 		if (error != SOCKET_ERROR)
 		{
 			indata[error] = '\0';
-			gspyi.Con_DPrintf(DEVELOPER_MSG_GAMESPY, "Query parse: %s\n", indata);
+			gspyi.dprint(DEVELOPER_MSG_GAMESPY, "Query parse: %s\n", indata);
 			parse_query(indata, &saddr);
 		}
 	}
@@ -545,7 +545,7 @@ void send_heartbeat(int statechanged)
 	if (!public_server->value)
 		return;		// a private dedicated game
 
-	gspyi.Con_DPrintf(DEVELOPER_MSG_SERVER, "Sending a heartbeat to the GameSpy Master Server.\n"); // FS
+	gspyi.dprint(DEVELOPER_MSG_SERVER, "Sending a heartbeat to the GameSpy Master Server.\n"); // FS
 // SCG[1/16/00]:     sprintf(buf,"\\heartbeat\\%d\\gamename\\%s",qport, gname);
     Com_sprintf(buf,sizeof(buf),"\\heartbeat\\%d\\gamename\\%s",qport, gname);
 	if (statechanged)

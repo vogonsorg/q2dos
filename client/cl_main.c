@@ -2813,15 +2813,15 @@ static void CL_LoadGameSpy (void)
 {
 	gspyimport_t	import;
 
-	import.Cvar_Get = Cvar_Get;
-	import.Cvar_Set = Cvar_Set;
-	import.Cvar_SetValue = Cvar_SetValue;
-	import.Con_Printf = Com_Printf;
-	import.Con_DPrintf = Com_DPrintf;
-	import.NET_ErrorString = NET_ErrorString;
-	import.Sys_SendKeyEvents = Sys_SendKeyEvents;
-	import.S_GamespySound = S_GamespySound;
-	import.CL_Gamespy_Update_Num_Servers = CL_Gamespy_Update_Num_Servers;
+	import.print = Com_Printf;
+	import.dprint = Com_DPrintf;
+	import.cvar = Cvar_Get;
+	import.cvar_set = Cvar_Set;
+	import.cvar_forceset = Cvar_ForceSet;
+	import.net_strerror = NET_ErrorString;
+	import.run_keyevents = Sys_SendKeyEvents;
+	import.play_sound = S_GamespySound;
+	import.update_numservers = CL_Gamespy_Update_Num_Servers;
 
 	gspye = (gspyexport_t *) Sys_GetGameSpyAPI (&import);
 	if (!gspye)

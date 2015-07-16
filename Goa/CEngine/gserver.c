@@ -92,9 +92,9 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 	*keyvals = *keyvals++; // T
 	*keyvals = *keyvals++; // newline
 */
-//	Com_Printf("Keyvals before[%i]: %s\n", strlen(keyvals), keyvals);
+//	gspyi.print("Keyvals before[%i]: %s\n", strlen(keyvals), keyvals);
 	memmove(keyvals, keyvals+10, strlen(keyvals));
-//	Com_Printf("Keyvals now[%i]: %s\n", strlen(keyvals), keyvals);
+//	gspyi.print("Keyvals now[%i]: %s\n", strlen(keyvals), keyvals);
 
 	Q_strncpyz(savedkeyvals, keyvals, sizeof(savedkeyvals));
 //	Q_strcpy(savedkeyvals, keyvals);

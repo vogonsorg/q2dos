@@ -64,18 +64,15 @@ typedef struct
  */
 typedef struct
 {
-	void	(*Sys_Error)(int err_level, char *str, ...);
-
-	void	(*Con_Printf)(char *str, ...);
-	void	(*Con_DPrintf)(unsigned long developerFlags, char *fmt, ...);
-	cvar_t	*(*Cvar_Get)(char *name, char *value, int flags);
-	cvar_t	*(*Cvar_Set)(char *name, char *value );
-	void	 (*Cvar_SetValue)(char *name, float value );
-	char	*(*NET_ErrorString)(void);
-	void	(*Sys_SendKeyEvents)(void);
-	void	(*S_GamespySound)(char *s);
-	void	(*CL_Gamespy_Update_Num_Servers)(int numServers);
+	void	(*print)(char *str, ...);
+	void	(*dprint)(unsigned long developerFlags, char *fmt, ...);
+	cvar_t	*(*cvar)(char *name, char *value, int flags);
+	cvar_t	*(*cvar_set)(char *name, char *value);
+	cvar_t	*(*cvar_forceset)(char *name, char *value);
+	char	*(*net_strerror)(void);
+	void	(*run_keyevents)(void);
+	void	(*play_sound)(char *s);
+	void	(*update_numservers)(int numServers);
 } gspyimport_t;
-
 
 #endif /* __GSPY_H */

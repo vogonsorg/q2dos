@@ -83,10 +83,10 @@ static int totalRetry = 20; /* FS: Total retry attempts waiting for the gamespy 
 
 void InitGamespy(void)
 {
-	cl_master_server_retries = gspyi.Cvar_Get("cl_master_server_retries", "20", CVAR_ARCHIVE);
-	cl_master_server_port = gspyi.Cvar_Get("cl_master_server_port", "28900", CVAR_ARCHIVE);
-	cl_master_server_ip = gspyi.Cvar_Get("cl_master_server_ip", "maraakate.org", CVAR_ARCHIVE);
-	cl_master_server_timeout = gspyi.Cvar_Get("cl_master_server_timeout", "3000", CVAR_ARCHIVE);
+	cl_master_server_retries = gspyi.cvar("cl_master_server_retries", "20", CVAR_ARCHIVE);
+	cl_master_server_port = gspyi.cvar("cl_master_server_port", "28900", CVAR_ARCHIVE);
+	cl_master_server_ip = gspyi.cvar("cl_master_server_ip", "maraakate.org", CVAR_ARCHIVE);
+	cl_master_server_timeout = gspyi.cvar("cl_master_server_timeout", "3000", CVAR_ARCHIVE);
 }
 
 void ShutdownGamespy (void)
@@ -209,7 +209,7 @@ static GError InitUpdateList(GServerList serverlist)
 		/* FS: Set non-blocking sockets */
 		if (Set_Non_Blocking_Socket(serverlist->updatelist[i].s) == SOCKET_ERROR)
 		{
-//			Com_Printf("ERROR: InitUpdateList: ioctl FIOBNIO:%s\n", gspyi.NET_ErrorString());
+//			gspyi.print("ERROR: InitUpdateList: ioctl FIOBNIO:%s\n", gspyi.net_strerror());
 			return GE_NOSOCKET;
 		}
 
@@ -225,7 +225,7 @@ static GError FreeUpdateList(GServerList serverlist)
 	int i;
 
 #ifdef __DJGPP__
-	Com_Printf("Freeing gamespy query sockets, please wait. . .\n"); /* FS: This can have a little bit of a delay in DOS, so give a warning about it */
+	gspyi.print("Freeing gamespy query sockets, please wait. . .\n"); /* FS: This can have a little bit of a delay in DOS, so give a warning about it */
 #endif
 	for (i = 0 ; i < serverlist->maxupdates ; i++)
 	{
@@ -242,13 +242,13 @@ static GError CreateServerListSocket(GServerList serverlist)
 
 	if (cl_master_server_ip->string[0] == '\0')
 	{
-		Com_Printf("Error: cl_master_server_ip is blank!  Setting to default: %s\n", CL_MASTER_ADDR);
-		gspyi.Cvar_Set("cl_master_server_ip", CL_MASTER_ADDR);
+		gspyi.print("Error: cl_master_server_ip is blank!  Setting to default: %s\n", CL_MASTER_ADDR);
+		gspyi.cvar_set("cl_master_server_ip", CL_MASTER_ADDR);
 	}
 	if (cl_master_server_port->intValue <= 0)
 	{
-		Com_Printf("Error: cl_master_server_port is invalid!  Setting to default: %s\n", CL_MASTER_PORT);
-		gspyi.Cvar_Set("cl_master_server_port", CL_MASTER_PORT);
+		gspyi.print("Error: cl_master_server_port is invalid!  Setting to default: %s\n", CL_MASTER_PORT);
+		gspyi.cvar_set("cl_master_server_port", CL_MASTER_PORT);
 	}
 
 	serverlist->slsocket = socket ( AF_INET, SOCK_STREAM, IPPROTO_TCP );
@@ -276,7 +276,7 @@ static GError CreateServerListSocket(GServerList serverlist)
 
 	if(Set_Non_Blocking_Socket(serverlist->slsocket) == SOCKET_ERROR)
 	{
-		Com_Printf("ERROR: CreateServerListSocket: ioctl FIOBNIO:%s\n", gspyi.NET_ErrorString());
+		gspyi.print("ERROR: CreateServerListSocket: ioctl FIOBNIO:%s\n", gspyi.net_strerror());
 		Close_TCP_Socket(serverlist->slsocket);
 		return GE_NOSOCKET;
 	}
@@ -298,7 +298,7 @@ static GError CreateServerListLANSocket(GServerList serverlist)
 		return GE_NOSOCKET;
 	if (setsockopt(serverlist->slsocket, SOL_SOCKET, SO_BROADCAST, (char *)&optval, sizeof(optval)) != 0)
 	{
-		Com_Printf("ERROR: CreateServerListLANSocket: setsockopt SOL_SOCKET, SO_BROADCAST:%s\n", gspyi.NET_ErrorString());
+		gspyi.print("ERROR: CreateServerListLANSocket: setsockopt SOL_SOCKET, SO_BROADCAST:%s\n", gspyi.net_strerror());
 		Close_TCP_Socket(serverlist->slsocket);
 		return GE_NOSOCKET;
 	}
@@ -335,10 +335,10 @@ retryRecv:
 		if(error == TCP_BLOCKING_ERROR && (retry < totalRetry))
 		{
 			retry++;
-			gspyi.Con_DPrintf(DEVELOPER_MSG_GAMESPY, "Retrying Gamespy TCP Validate Handshake, Attempt %i of %i.\n", retry, totalRetry);
+			gspyi.dprint(DEVELOPER_MSG_GAMESPY, "Retrying Gamespy TCP Validate Handshake, Attempt %i of %i.\n", retry, totalRetry);
 			msleep(sleepMs);
 			sleepMs = sleepMs + 10;
-			gspyi.Sys_SendKeyEvents (); /* FS: Check for aborts */
+			gspyi.run_keyevents (); /* FS: Check for aborts */
 			goto retryRecv;
 		}
 		else
@@ -348,8 +348,8 @@ retryRecv:
 		}
 	}
 	data[len] = '\0'; //null terminate it
-	gspyi.Con_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy validate server key: %s\n", data);
-	
+	gspyi.dprint(DEVELOPER_MSG_GAMESPY, "Gamespy validate server key: %s\n", data);
+
 	ptr = strstr ( data, SECURE ) + strlen(SECURE);
 	gs_encrypt   ( (uchar *) serverlist->seckey, 6, (uchar *)ptr, 6 );
 	gs_encode ( (uchar *)ptr, 6, (uchar *)result );
@@ -357,8 +357,8 @@ retryRecv:
 	//validate to the master
 	sprintf(data, "\\gamename\\%s\\gamever\\%s\\location\\0\\validate\\%s\\final\\\\queryid\\1.1\\",
 			serverlist->enginename, ENGINE_VERSION, result); //validate us		
-	gspyi.Con_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy validate to the master: %s\n", data);
-	
+	gspyi.dprint(DEVELOPER_MSG_GAMESPY, "Gamespy validate to the master: %s\n", data);
+
 	len = send ( serverlist->slsocket, data, strlen(data), 0 );
 	if (len == SOCKET_ERROR || len == 0)
 	{
@@ -419,15 +419,15 @@ GError ServerListUpdate(GServerList serverlist, gbool async)
 
 	error = InitUpdateList(serverlist);
 
-	gspyi.Con_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListUpdate: Created Update list\n");
+	gspyi.dprint(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListUpdate: Created Update list\n");
 	if (error)
 		return error;
 	error = CreateServerListSocket(serverlist);
-	gspyi.Con_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListUpdate: Created ServerListSocket list\n");
+	gspyi.dprint(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListUpdate: Created ServerListSocket list\n");
 	if (error)
 		return error;
 	error = SendListRequest(serverlist);
-	gspyi.Con_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListUpdate: Send List Request\n");
+	gspyi.dprint(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListUpdate: Send List Request\n");
 	if (error)
 		return error;
 
@@ -536,15 +536,15 @@ retryRecv:
 		if(error == TCP_BLOCKING_ERROR && (retry < totalRetry))
 		{
 			retry++;
-			gspyi.Con_DPrintf(DEVELOPER_MSG_GAMESPY, "Retrying Gamespy TCP List RECV, Attempt %i of %i.\n", retry, totalRetry);
+			gspyi.dprint(DEVELOPER_MSG_GAMESPY, "Retrying Gamespy TCP List RECV, Attempt %i of %i.\n", retry, totalRetry);
 			msleep(sleepMs);
 			sleepMs = sleepMs + 10;
-			gspyi.Sys_SendKeyEvents (); /* FS: Check for aborts */
+			gspyi.run_keyevents (); /* FS: Check for aborts */
 			goto retryRecv;
 		}
 		else
 		{
-			gspyi.Con_DPrintf(DEVELOPER_MSG_GAMESPY,"Error during TCP List RECV: %s\n", gspyi.NET_ErrorString());
+			gspyi.dprint(DEVELOPER_MSG_GAMESPY,"Error during TCP List RECV: %s\n", gspyi.net_strerror());
 abort:
 			Close_TCP_Socket(serverlist->slsocket);
 			data[0] = 0;
@@ -555,7 +555,7 @@ abort:
 
 	data[len + oldlen] = 0; //null terminate it
 	// data is in the form of '\ip\1.2.3.4:1234\ip\1.2.3.4:1234\final\'
-	gspyi.Con_DPrintf(DEVELOPER_MSG_GAMESPY, "List xfer data: %s\n", data);
+	gspyi.dprint(DEVELOPER_MSG_GAMESPY, "List xfer data: %s\n", data);
 
 	lastip = data;
 	while (*lastip != '\0')
@@ -652,12 +652,12 @@ static GError ServerListQueryLoop(GServerList serverlist)
 					error = Get_Last_Error();
 					if ((error == TCP_BLOCKING_ERROR) && (current_time() - serverlist->updatelist[i].starttime < server_timeout) )
 					{
-//						gspyi.Con_DPrintf(DEVELOPER_MSG_GAMESPY, "Slow down cowboy..\n");
+//						gspyi.dprint(DEVELOPER_MSG_GAMESPY, "Slow down cowboy..\n");
 						continue;
 					}
 					else /* FS: If we got didn't get WOULDBLOCK or if it just kept going past the server_timeout threshold then just give up. */
 					{
-						gspyi.Con_DPrintf(DEVELOPER_MSG_GAMESPY, "Error during gamespy recv %s.  Removing server from list.\n", gspyi.NET_ErrorString());
+						gspyi.dprint(DEVELOPER_MSG_GAMESPY, "Error during gamespy recv %s.  Removing server from list.\n", gspyi.net_strerror());
 						serverlist->updatelist[i].serverindex = -1; //reuse the updatelist
 					}
 				}
@@ -669,10 +669,10 @@ static GError ServerListQueryLoop(GServerList serverlist)
 	{ //we are done!!
 		if(!serverlist->abortupdate) /* FS: Don't print that the scan is complete if this was a forced abort */
 		{
-			Com_Printf("\x02Server scan complete!\n");
-			gspyi.S_GamespySound ("gamespy/complete.wav");
+			gspyi.print("\x02Server scan complete!\n");
+			gspyi.play_sound ("gamespy/complete.wav");
 		}
-		gspyi.CL_Gamespy_Update_Num_Servers(ArrayLength(serverlist->servers));
+		gspyi.update_numservers(ArrayLength(serverlist->servers));
 		firsttime = true;
 		FreeUpdateList(serverlist);
 		ServerListModeChange(serverlist, sl_idle);
@@ -689,7 +689,7 @@ static GError ServerListQueryLoop(GServerList serverlist)
 			saddr.sin_family = AF_INET;
 			saddr.sin_addr.s_addr = inet_addr(ServerGetAddress(server));
 
-			gspyi.Con_DPrintf(DEVELOPER_MSG_GAMESPY, "Attempting to ping[%i]: %s:%i\n", i, ServerGetAddress(server), ServerGetQueryPort(server));
+			gspyi.dprint(DEVELOPER_MSG_GAMESPY, "Attempting to ping[%i]: %s:%i\n", i, ServerGetAddress(server), ServerGetQueryPort(server));
 
 			saddr.sin_port = htons((short)ServerGetQueryPort(server));
 
@@ -701,7 +701,7 @@ static GError ServerListQueryLoop(GServerList serverlist)
 			}
 			else
 			{
-				gspyi.Con_DPrintf(DEVELOPER_MSG_GAMESPY, "Error pinging server[%i] %s: %s\n", i, ServerGetAddress(server), gspyi.NET_ErrorString());
+				gspyi.dprint(DEVELOPER_MSG_GAMESPY, "Error pinging server[%i] %s: %s\n", i, ServerGetAddress(server), gspyi.net_strerror());
 				serverlist->updatelist[i].serverindex = -1; // reuse the update index
 			}
 		}
@@ -722,15 +722,15 @@ GError ServerListThink(GServerList serverlist)
 		case sl_idle:
 			return 0;
 		case sl_listxfer:
-				gspyi.Con_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListThink: Server List xfer\n");
+				gspyi.dprint(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListThink: Server List xfer\n");
 				 //read the data
 				return ServerListReadList(serverlist);
 		case sl_lanlist:
-				gspyi.Con_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListThink: Server Lan List Query\n");
+				gspyi.dprint(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListThink: Server Lan List Query\n");
 				return ServerListLANList(serverlist);
 		case sl_querying: 
 				//do some queries
-				gspyi.Con_DPrintf(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListThink: Server List Query Loop\n");
+				gspyi.dprint(DEVELOPER_MSG_GAMESPY, "Gamespy ServerListThink: Server List Query Loop\n");
 				return ServerListQueryLoop(serverlist);
 	}
 
