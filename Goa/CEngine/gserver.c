@@ -94,25 +94,6 @@ cont:
 	/* NOTREACHED */
 }
 
-static char *mytok(char *instr, char delim)
-{
-	char *result;
-	static char *thestr;
-
-	if (instr)
-		thestr = instr;
-	result = thestr;
-	while (*thestr && *thestr != delim)
-	{
-		thestr++;
-	}
-	if (thestr == result)
-		result = NULL;
-	if (*thestr) /* not the null term */
-		*thestr++ = '\0';
-	return result;
-}
-
 void ServerParsePlayerCount(GServer server, char *savedkeyvals)
 {
 	int numplayers = 0;
@@ -121,7 +102,6 @@ void ServerParsePlayerCount(GServer server, char *savedkeyvals)
 	char *s = strdup(savedkeyvals);
 	char *test = strtok(s, playerSeperators);
 	GKeyValuePair kvpair;
-	qboolean	hasBots = false;
 
 	test = strtok(NULL, playerSeperators);
 
@@ -133,7 +113,6 @@ void ServerParsePlayerCount(GServer server, char *savedkeyvals)
 
 		if(strstr(test, "WallFly[BZZZ]") || strstr(test, "127.0.0.1")) /* FS: Don't report servers that just have WallFly in them.  127.0.0.1 in any player parse is a bot from Alien Arena */
 		{
-			hasBots = true;
 			numplayers--;
 		}
 
@@ -157,7 +136,6 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 	char *kPtr = NULL;
 	char savedkeyvals[MAX_MSGLEN];
 	GKeyValuePair kvpair;
-	int numplayers = 0;
 
 	if(!keyvals || strlen(keyvals) < 11) /* FS: Some kind of bad status packet, forget it. */
 		return;
