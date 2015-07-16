@@ -1627,21 +1627,12 @@ void CL_Precache_f (void)
 CL_InitLocal
 =================
 */
-extern qboolean Sys_LoadGameSpy(char *name);
-void CL_LoadGameSpy_f (void);
-
 void CL_InitLocal (void)
 {
 	cls.state = ca_disconnected;
 	cls.realtime = Sys_Milliseconds ();
 
 	CL_InitInput ();
-
-//#if _WIN32
-//	Sys_LoadGameSpy("gamespy.dll");
-//#else
-//	Sys_LoadGameSpy("gamespy.dxe");
-//#endif
 
 	adr0 = Cvar_Get( "adr0", "", CVAR_ARCHIVE );
 	adr1 = Cvar_Get( "adr1", "", CVAR_ARCHIVE );

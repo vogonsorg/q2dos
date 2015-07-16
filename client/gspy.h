@@ -83,5 +83,6 @@ extern void S_GamespySound (char *sound);
 extern char* NET_ErrorString(void);
 extern void CL_Gamespy_Update_Num_Servers(int numServers);
 extern gspyexport_t	gspye;
+extern qboolean Sys_LoadGameSpy(char *name);
 
 #endif // __GSPY_H
