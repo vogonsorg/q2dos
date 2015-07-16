@@ -137,15 +137,15 @@ extern	cvar_t *allow_download_maps;
 /* FS: For Gamespy */
 static	gspyexport_t	*gspye = NULL;
 static	GServerList	serverlist;
-static int gspyCur;
+static	int		gspyCur;
 gamespyBrowser_t browserList[MAX_SERVERS]; /* FS: Browser list for active servers */
 gamespyBrowser_t browserListAll[MAX_SERVERS]; /* FS: Browser list for ALL servers */
 
-void GameSpy_Async_Think(void);
-static	void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2);
-void CL_Gspystop_f (void);
-void CL_PingNetServers_f (void);
-void CL_PrintBrowserList_f (void);
+static void GameSpy_Async_Think(void);
+static void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2);
+static void CL_Gspystop_f (void);
+       void CL_PingNetServers_f (void);
+static void CL_PrintBrowserList_f (void);
 static void CL_LoadGameSpy (void);
 #endif
 
@@ -2021,7 +2021,7 @@ static void CL_SendCommand_Async (void)
 CL_Frame_Async
 ==================
 */
-#define FRAMETIME_MAX 0.5 // was 0.2
+#define FRAMETIME_MAX 0.5 /* was 0.2 */
 void CL_Frame_Async (double msec)
 {
 	static double	packetDelta = 0;
@@ -2108,8 +2108,9 @@ void CL_Frame_Async (double msec)
 		}
 		
 		if (!packetFrame && !renderFrame && !cls.forcePacket && !userinfo_modified)
-		{	// Pooy's CPU usage fix
-#if 0 // FS: Don't need this in DOS
+		{
+#if 0 /* FS: Don't need this in DOS */
+			// Pooy's CPU usage fix
 			if (cl_sleep->value)
 			{
 				int temptime = min( (1000.0 / net_maxfps->value - packetDelta), (1000.0 / r_maxfps->value - renderDelta) );
@@ -2249,7 +2250,7 @@ void CL_Frame_Async (double msec)
 		}
 	}
 }
-#endif // CLIENT_SPLIT_NETFRAME
+#endif /* CLIENT_SPLIT_NETFRAME */
 
 
 //============================================================================
@@ -2473,14 +2474,9 @@ void CL_Init (void)
 
 	// all archived variables will now be loaded
 
-	Con_Init ();	
-#if defined __linux__ || defined __sgi
-	S_Init ();	
-	VID_Init ();
-#else
+	Con_Init ();
 	VID_Init ();
 	S_Init ();	// sound must be initialized after window is created
-#endif
 
 	V_Init ();
 
@@ -2549,15 +2545,12 @@ static void CL_Gamespy_Check_Error(int error)
 	{
 		Com_Printf("\x02GameSpy Error: ");
 		Com_Printf("%s.\n", gspye->ServerListErrorDesc(serverlist, error));
-
 		if(cls.state == ca_disconnected)
-		{
 			NET_Config(false);
-		}
 	}
 }
 
-void GameSpy_Async_Think(void)
+static void GameSpy_Async_Think(void)
 {
 	int error;
 
@@ -2579,21 +2572,17 @@ void GameSpy_Async_Think(void)
 		gspye->ServerListClear(serverlist);
 		gspye->ServerListFree(serverlist);
 		serverlist = NULL; // FS: This is on purpose so future ctrl+c's won't try to close empty serverlists
-
 		if(cls.state == ca_disconnected)
-		{
 			NET_Config(false);
-		}
 	}
 	else
 	{
 		error = gspye->ServerListThink(serverlist);
-
 		CL_Gamespy_Check_Error(error);
 	}
 }
 
-void CL_Gspystop_f (void)
+static void CL_Gspystop_f (void)
 {
 	if(serverlist != NULL && cls.gamespyupdate) // FS: Immediately abort gspy scans
 	{
@@ -2603,9 +2592,9 @@ void CL_Gspystop_f (void)
 	}
 }
 
-void CL_PrintBrowserList_f (void)
+static void CL_PrintBrowserList_f (void)
 {
-	int i = 0;
+	int i;
 	int num_active_servers = 0;
 	qboolean showAll = false;
 
@@ -2614,7 +2603,7 @@ void CL_PrintBrowserList_f (void)
 		showAll = true;
 	}
 
-	for ( i = 0; i < MAX_SERVERS; i++)
+	for (i = 0; i < MAX_SERVERS; i++)
 	{
 		if(browserList[i].hostname[0] != 0)
 		{
@@ -2635,9 +2624,8 @@ void CL_PrintBrowserList_f (void)
 	if (showAll)
 	{
 		int skip = 0;
-		i = 0;
 
-		for ( i = 0; i < MAX_SERVERS; i++)
+		for (i = 0; i < MAX_SERVERS; i++)
 		{
 			if(browserListAll[i].hostname[0] != 0)
 			{
@@ -2654,7 +2642,7 @@ void CL_PrintBrowserList_f (void)
 
 void GameSpy_Sort_By_Ping(GServerList serverlist)
 {
-	int i = 0;
+	int i;
 	gspyCur = 0;
 
 	for (i = 0; i < cls.gamespytotalservers; i++)
@@ -2679,8 +2667,6 @@ void GameSpy_Sort_By_Ping(GServerList serverlist)
 			gspyCur++;
 		}
 	}
-
-	i = 0;
 
 	for (i = 0; i < cls.gamespytotalservers; i++)
 	{
@@ -2763,18 +2749,18 @@ static void ListCallBack(GServerList serverlist, int msg, void *instance, void *
 void CL_PingNetServers_f (void)
 {
 	char goa_secret_key[7];
-	int error = 0; /* FS: Grab the error code */
+	int error; /* FS: Grab the error code */
 	int allocatedSockets;
-
-	if(cls.gamespyupdate)
-	{
-		Com_Printf("Error: Already querying the GameSpy Master!\n");
-		return;
-	}
 
 	if(!gspye)
 	{
 		Com_Printf("Error: GameSpy DLL not loaded!\n");
+		return;
+	}
+
+	if(cls.gamespyupdate)
+	{
+		Com_Printf("Error: Already querying the GameSpy Master!\n");
 		return;
 	}
 
@@ -2813,11 +2799,10 @@ void CL_PingNetServers_f (void)
 
 	serverlist = gspye->ServerListNew("quake2","quake2",goa_secret_key,allocatedSockets,ListCallBack,GSPYCALLBACK_FUNCTION,NULL);
 	error = gspye->ServerListUpdate(serverlist,true); /* FS: Use Async now! */
-
 	CL_Gamespy_Check_Error(error);
 }
 
-void CL_Gamespy_Update_Num_Servers(int numServers)
+static void CL_Gamespy_Update_Num_Servers(int numServers)
 {
 	cls.gamespytotalservers = numServers;
 }
