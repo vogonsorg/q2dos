@@ -96,9 +96,8 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 	memmove(keyvals, keyvals+10, strlen(keyvals));
 //	gspyi.print("Keyvals now[%i]: %s\n", strlen(keyvals), keyvals);
 
-	Q_strncpyz(savedkeyvals, keyvals, sizeof(savedkeyvals));
-//	Q_strcpy(savedkeyvals, keyvals);
-	savedkeyvals[strlen(keyvals)] = '\0';
+	strncpy(savedkeyvals, keyvals, sizeof(savedkeyvals));
+	savedkeyvals[sizeof(savedkeyvals) - 1] = '\0';
 
 	k = mytok(++keyvals,'\\'); //skip over starting backslash
 	while (!numplayers || k != NULL)

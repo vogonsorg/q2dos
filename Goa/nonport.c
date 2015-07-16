@@ -15,15 +15,6 @@ Fax(714)549-0757
 
 #ifndef GAMESPY_HARD_LINKED
 /* ... so that q2 engine symbols are not needed */
-void Q_strncpyz (char *dst, const char *src, int dstSize)
-{
-	if (!dst) return;
-	if (!src) return;
-	if (dstSize < 1) return;
-	strncpy(dst, src, dstSize-1);
-	dst[dstSize-1] = 0;
-}
-
 void Com_sprintf (char *dest, int size, char *fmt, ...)
 {
 	int		len;
