@@ -53,7 +53,7 @@ cd ..
 copy q2.exe release
 copy cwsdpmi.exe release
 copy readme.txt release
-copy goa\gamespy.dxe release
+copy Goa\gamespy.dxe release
 copy game\gamex86.dxe release\baseq2
 copy ctf\gamex86.dxe release\ctf
 copy 3zb2\gamex86.dxe release\3zb2

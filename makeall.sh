@@ -14,3 +14,5 @@ make CC=$TARGET-gcc -C action -f makedxe3 $* || exit 1
 make CC=$TARGET-gcc -C chaos -f makedxe3 $*  || exit 1
 make CC=$TARGET-gcc -C dday -f makedxe3 $*   || exit 1
 make CC=$TARGET-gcc -C zaero -f makedxe3 $*  || exit 1
+# gamespy shit
+make CC=$TARGET-gcc -C Goa -f makedxe3 $*    || exit 1

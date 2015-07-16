@@ -15,6 +15,8 @@ mkdir -p _build || exit 1
 cp -p q2.exe _build
 cp -p CWSDPMI.EXE _build
 cp -p readme.txt _build
+# gamespy shit
+cp -p Goa/gamespy.dxe _build
 
 mkdir -p _build/baseq2
 cp -p game/gamex86.dxe _build/baseq2
