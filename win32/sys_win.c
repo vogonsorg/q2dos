@@ -39,7 +39,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 qboolean s_win95;
 
 int			starttime;
-int			ActiveApp;
+qboolean	ActiveApp;
 qboolean	Minimized;
 
 static HANDLE		hinput, houtput;
@@ -264,8 +264,8 @@ Sys_ConsoleInput
 char *Sys_ConsoleInput (void)
 {
 	INPUT_RECORD	recs[1024];
-	int		dummy;
-	int		ch, numread, numevents;
+	int		ch;
+	DWORD		dummy, numread, numevents;
 
 	if (!dedicated || !dedicated->value)
 		return NULL;
@@ -343,7 +343,7 @@ Print text to the dedicated console
 */
 void Sys_ConsoleOutput (char *string)
 {
-	int		dummy;
+	DWORD		dummy;
 	char	text[256];
 
 	if (!dedicated || !dedicated->value)
@@ -714,7 +714,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 #ifndef GAMESPY_HARD_LINKED /* dynamic linking */
 static HINSTANCE	gamespy_library;
-#enlse
+#else
 void *GetGameSpyAPI (void *import); /* need prototype. */
 #endif
 
@@ -728,7 +728,7 @@ void *Sys_GetGameSpyAPI(void *parms)
 
 	if ((gamespy_library = LoadLibrary(dllname)) == NULL)
 	{
-		Com_Printf( "LoadLibrary(\"%s\") failed\n", name );
+		Com_Printf( "LoadLibrary(\"%s\") failed\n", dllname);
 		return NULL;
 	}
 	if ((GetGameSpyAPI = (void *) GetProcAddress(gamespy_library, "GetGameSpyAPI")) == NULL)
@@ -743,7 +743,7 @@ void *Sys_GetGameSpyAPI(void *parms)
 	return GetGameSpyAPI (parms);
 }
 
-void *Sys_GetGameSpyAPI(void *parms)
+void Sys_UnloadGameSpy(void)
 {
 #ifndef GAMESPY_HARD_LINKED
 	if (gamespy_library)
