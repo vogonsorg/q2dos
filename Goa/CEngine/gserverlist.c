@@ -128,6 +128,7 @@ gspyexport_t *GetGameSpyAPI (gspyimport_t *import)
 #define TCP_BLOCKING_ERROR WSAEWOULDBLOCK
 static int Set_Non_Blocking_Socket (SOCKET socket) {
 	u_long _true = true;
+
 	return ioctlsocket( socket, FIONBIO, &_true);
 }
 
@@ -510,18 +511,24 @@ static GError ServerListLANList(GServerList serverlist)
 //reads the server list from the socket and parses it
 static GError ServerListReadList(GServerList serverlist)
 {
-	static char data[2048]; //static input buffer
+	static char data[4096]; //static input buffer
 	int len, oldlen;
 	char *p, ip[32], port[16],*q, *lastip;
 	int retry = 0;
 	int error = 0;
 	int sleepMs = 50;
 
-//append to data
+	if(serverlist->abortupdate)
+	{
+		goto abort;
+	}
+
+	//append to data
 	oldlen = strlen(data);
 
 retryRecv:
 	len = recv(serverlist->slsocket, data + oldlen, sizeof(data) - oldlen - 1, 0);
+
 	if (len == SOCKET_ERROR || len == 0)
 	{
 		error = Get_Last_Error();
@@ -537,7 +544,11 @@ retryRecv:
 		}
 		else
 		{
+			gspyi.Con_DPrintf(DEVELOPER_MSG_GAMESPY,"Error during TCP List RECV: %s\n", gspyi.NET_ErrorString());
+abort:
 			Close_TCP_Socket(serverlist->slsocket);
+			data[0] = 0;
+			ServerListModeChange(serverlist, sl_idle);
 			return GE_NOCONNECT;
 		}
 	}

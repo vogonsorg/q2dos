@@ -2545,6 +2545,8 @@ extern void Update_Gamespy_Menu (void);
 
 void GameSpy_Async_Think(void)
 {
+	int error;
+
 	if(!serverlist)
 		return;
 
@@ -2566,7 +2568,13 @@ void GameSpy_Async_Think(void)
 	}
 	else
 	{
-		gspye->ServerListThink(serverlist);
+		error = gspye->ServerListThink(serverlist);
+
+		if (error != GE_NOERROR) /* FS: Grab the error code */
+		{
+			Com_Printf("\x02GameSpy Error: ");
+			Com_Printf("%s.\n", gspye->ServerListErrorDesc(serverlist, error));
+		}
 	}
 }
 
