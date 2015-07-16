@@ -2543,6 +2543,20 @@ void CL_Shutdown(void)
 #ifdef GAMESPY
 extern void Update_Gamespy_Menu (void);
 
+static void CL_Gamespy_Check_Error(int error)
+{
+	if (error != GE_NOERROR) /* FS: Grab the error code */
+	{
+		Com_Printf("\x02GameSpy Error: ");
+		Com_Printf("%s.\n", gspye->ServerListErrorDesc(serverlist, error));
+
+		if(cls.state == ca_disconnected)
+		{
+			NET_Config(false);
+		}
+	}
+}
+
 void GameSpy_Async_Think(void)
 {
 	int error;
@@ -2565,16 +2579,17 @@ void GameSpy_Async_Think(void)
 		gspye->ServerListClear(serverlist);
 		gspye->ServerListFree(serverlist);
 		serverlist = NULL; // FS: This is on purpose so future ctrl+c's won't try to close empty serverlists
+
+		if(cls.state == ca_disconnected)
+		{
+			NET_Config(false);
+		}
 	}
 	else
 	{
 		error = gspye->ServerListThink(serverlist);
 
-		if (error != GE_NOERROR) /* FS: Grab the error code */
-		{
-			Com_Printf("\x02GameSpy Error: ");
-			Com_Printf("%s.\n", gspye->ServerListErrorDesc(serverlist, error));
-		}
+		CL_Gamespy_Check_Error(error);
 	}
 }
 
@@ -2763,6 +2778,8 @@ void CL_PingNetServers_f (void)
 		return;
 	}
 
+	NET_Config(true); /* FS: Retrieve a MOTD.  This is reset again later if we error out, abort, or if the server completes as long as we are disconnected */
+
 	gspyCur = 0;
 	memset(&browserList, 0, sizeof(browserList));
 	memset(&browserListAll, 0, sizeof(browserListAll));
@@ -2797,11 +2814,7 @@ void CL_PingNetServers_f (void)
 	serverlist = gspye->ServerListNew("quake2","quake2",goa_secret_key,allocatedSockets,ListCallBack,GSPYCALLBACK_FUNCTION,NULL);
 	error = gspye->ServerListUpdate(serverlist,true); /* FS: Use Async now! */
 
-	if (error != GE_NOERROR) /* FS: Grab the error code */
-	{
-		Com_Printf("\x02GameSpy Error: ");
-		Com_Printf("%s.\n", gspye->ServerListErrorDesc(serverlist, error));
-	}
+	CL_Gamespy_Check_Error(error);
 }
 
 void CL_Gamespy_Update_Num_Servers(int numServers)
