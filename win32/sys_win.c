@@ -713,17 +713,15 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 #ifdef GAMESPY
 #include "../client/gspy.h"
 
-static HINSTANCE	gamespy_library;;
+static HINSTANCE	gamespy_library;
 gspyexport_t	gspye;
-
-extern void S_GamespySound (char *sound);
-extern char* NET_ErrorString(void);
-extern void CL_Gamespy_Update_Num_Servers(int numServers);
 
 qboolean Sys_LoadGameSpy(char *name)
 {
 	gspyimport_t gspyi;
 	GetGameSpyAPI_t GetGameSpyAPI;
+
+	Com_Printf("------- Loading %s -------\n", name);
 
 	if ( ( gamespy_library = LoadLibrary( name ) ) == 0 )
 	{
@@ -746,6 +744,8 @@ qboolean Sys_LoadGameSpy(char *name)
 	gspyi.CL_Gamespy_Update_Num_Servers = CL_Gamespy_Update_Num_Servers;
 
 	gspye = GetGameSpyAPI(gspyi);
+
+	gspye.Init(); /* FS: Grab the cl_master_server_* CVARs */
 
 	return true;
 }

@@ -82,6 +82,19 @@ struct GServerListImplementation
 static GServerList g_sortserverlist; /* global serverlist for sorting info */
 static int totalRetry = 20; /* FS: Total retry attempts waiting for the gamespy validate stuff */
 
+void InitGamespy(void)
+{
+	cl_master_server_retries = gspyi.Cvar_Get("cl_master_server_retries", "20", CVAR_ARCHIVE);
+	cl_master_server_port = gspyi.Cvar_Get("cl_master_server_port", "28900", CVAR_ARCHIVE);
+	cl_master_server_ip = gspyi.Cvar_Get("cl_master_server_ip", "maraakate.org", CVAR_ARCHIVE);
+	cl_master_server_timeout = gspyi.Cvar_Get("cl_master_server_timeout", "3000", CVAR_ARCHIVE);
+}
+
+void ShutdownGamespy (void)
+{
+	/* FS: No clean-up afaik */
+}
+
 gspyimport_t gspyi;
 
 gspyexport_t GetGameSpyAPI (gspyimport_t import)
@@ -91,8 +104,8 @@ gspyexport_t GetGameSpyAPI (gspyimport_t import)
 	gspyi = import;
 
 	gspye.api_version = API_VERSION;
-	gspye.Init = NULL;
-	gspye.Shutdown = NULL;
+	gspye.Init = InitGamespy;
+	gspye.Shutdown = ShutdownGamespy;
 	gspye.ServerListNew = ServerListNew;
 	gspye.ServerListFree = ServerListFree;
 	gspye.ServerListUpdate = ServerListUpdate;
@@ -109,11 +122,6 @@ gspyexport_t GetGameSpyAPI (gspyimport_t import)
 	gspye.ServerGetIntValue = ServerGetIntValue;
 	gspye.ServerGetQueryPort = ServerGetQueryPort;
 	gspye.ServerGetStringValue = ServerGetStringValue;
-
-	cl_master_server_retries = gspyi.Cvar_Get("cl_master_server_retries", "20", CVAR_ARCHIVE);
-	cl_master_server_port = gspyi.Cvar_Get("cl_master_server_port", "28900", CVAR_ARCHIVE);
-	cl_master_server_ip = gspyi.Cvar_Get("cl_master_server_ip", "maraakate.org", CVAR_ARCHIVE);
-	cl_master_server_timeout = gspyi.Cvar_Get("cl_master_server_timeout", "3000", CVAR_ARCHIVE);
 
 	return gspye;
 }

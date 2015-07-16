@@ -2558,7 +2558,6 @@ void CL_Shutdown(void)
 /* FS: Gamespy Server Browser */
 #ifdef GAMESPY
 extern void Update_Gamespy_Menu (void);
-extern gspyexport_t	gspye;
 
 void GameSpy_Async_Think(void)
 {

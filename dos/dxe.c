@@ -116,6 +116,7 @@ DXE_EXPORT_TABLE (syms)
 DXE_EXPORT_END
 
 static void (*game_library)(void);
+static int	firsttime = 1; /* FS: Moved this to the outside so gamespy will load if we do q2.exe +disconnect */
 
 void Sys_UnloadGame (void)
 {
@@ -144,8 +145,6 @@ static void *dxe_res (const char *symname)
 	func_ptr_cast.from = lastresort;
 	return func_ptr_cast.to;
 }
-
-static int	firsttime = 1; /* FS: Moved this to the outside so gamespy will load if we do q2.exe +disconnect */
 
 void *Sys_GetGameAPI (void *parms)
 {
@@ -211,6 +210,10 @@ qboolean Sys_LoadGameSpy(char *name)
 	gspyimport_t gspyi;
 	GetGameSpyAPI_t GetGameSpyAPI;
 
+	getcwd(curpath, sizeof(curpath));
+
+	Com_Printf("------- Loading %s -------\n", name);
+
 	if (firsttime)
 	{
 		firsttime = 0;
@@ -220,7 +223,6 @@ qboolean Sys_LoadGameSpy(char *name)
 		dlregsym (syms);
 	}
 
-	getcwd(curpath, sizeof(curpath));
 	Com_sprintf(gspyLoad, sizeof(gspyLoad), "%s/%s", curpath, name);
 	gamespy_library = dlopen(gspyLoad, RTLD_LAZY);
 
@@ -249,6 +251,8 @@ qboolean Sys_LoadGameSpy(char *name)
 	gspyi.CL_Gamespy_Update_Num_Servers = CL_Gamespy_Update_Num_Servers;
 
 	gspye = GetGameSpyAPI(gspyi);
+
+	gspye.Init(); /* FS: Grab the cl_master_server_* CVARs */
 
 	return true;
 #else

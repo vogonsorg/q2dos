@@ -34,7 +34,7 @@ typedef struct
 	int		api_version;
 
 	// called when the library is loaded
-	qboolean	(*Init) ( void *hinstance, void *wndproc );
+	void	(*Init) (void);
 
 	// called before the library is unloaded
 	void	(*Shutdown) (void);
@@ -78,5 +78,10 @@ typedef struct
 
 // this is the only function actually exported at the linker level
 typedef	gspyexport_t	(*GetGameSpyAPI_t) (gspyimport_t);
+
+extern void S_GamespySound (char *sound);
+extern char* NET_ErrorString(void);
+extern void CL_Gamespy_Update_Num_Servers(int numServers);
+extern gspyexport_t	gspye;
 
 #endif // __GSPY_H
