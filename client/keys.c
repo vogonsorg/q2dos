@@ -252,21 +252,16 @@ void Key_Console (int key)
 	if ( ( Q_toupper( key ) == 'V' && keydown[K_CTRL] ) ||
 		 ( ( ( key == K_INS ) || ( key == K_KP_INS ) ) && keydown[K_SHIFT] ) )
 	{
-		char *cbd;
-		char *cbdPtr = NULL;
 		static const char *seperators = "\n\r\b";
-		
-		if ( ( cbd = Sys_GetClipboardData() ) != 0 )
+		char *cbd, *cbdPtr;
+		if ((cbd = Sys_GetClipboardData()) != NULL)
 		{
 			int i;
-
 			strtok_r(cbd, seperators, &cbdPtr);
-
 			i = strlen( cbd );
-			if ( i + key_linepos >= MAXCMDLINE)
-				i= MAXCMDLINE - key_linepos;
-
-			if ( i > 0 )
+			if (i + key_linepos >= MAXCMDLINE)
+				i = MAXCMDLINE - key_linepos;
+			if (i > 0)
 			{
 				cbd[i]=0;
 				strcat( key_lines[edit_line], cbd );

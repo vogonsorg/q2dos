@@ -197,20 +197,16 @@ qboolean Field_Key( menufield_s *f, int key )
 	if ( ( Q_toupper( key ) == 'V' && keydown[K_CTRL] ) ||
 		 ( ( ( key == K_INS ) || ( key == K_KP_INS ) ) && keydown[K_SHIFT] ) )
 	{
-		char *cbd;
-		char *cbdPtr = NULL;
 		static const char *seperators = "\n\r\b";
-		
-		if ( ( cbd = Sys_GetClipboardData() ) != 0 )
+		char *cbd, *cbdPtr;
+		if ((cbd = Sys_GetClipboardData()) != NULL)
 		{
 			strtok_r(cbd, seperators, &cbdPtr);
-
 			strncpy( f->buffer, cbd, f->length - 1 );
 			f->cursor = strlen( f->buffer );
 			f->visible_offset = f->cursor - f->visible_length;
 			if ( f->visible_offset < 0 )
 				f->visible_offset = 0;
-
 			free( cbd );
 		}
 		return true;

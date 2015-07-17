@@ -2777,12 +2777,11 @@ void parseTargets(edict_t *self)
 	self->numTargets = 0;
 	if (self->target)
 	{
-		char *str = NULL;
 		char *targets[16];
-		char *targPtr = NULL;
+		char *targPtr, *str;
 		static const char *seperators = ";";
-		int i = 0;
-		
+		int i;
+
 		// do we have a series of targets to choose from randomly?
 		str = Z_MALLOC(strlen(self->target)+1);
 		strcpy(str, self->target);
@@ -2795,7 +2794,6 @@ void parseTargets(edict_t *self)
 			targets[numTargets] = strtok_r(NULL, seperators, &targPtr);
 			if (targets[numTargets] == NULL)
 				break;
-
 			numTargets++;
 		}
 
@@ -2806,7 +2804,7 @@ void parseTargets(edict_t *self)
 		}
 		self->target = NULL;
 		Z_FREE(str);
-	}	
+	}
 
 	self->numTargets = numTargets;
 }

@@ -5239,8 +5239,7 @@ void
 CTFWarp(edict_t *ent)
 {
 	char text[1024];
-	char *mlist, *token;
-	char *tPtr = NULL;
+	char *mlist, *token, *tPtr;
 	static const char *seps = " \t\n\r";
 
 	if (gi.argc() < 2)

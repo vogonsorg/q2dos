@@ -207,8 +207,7 @@ The timelimit or fraglimit has been exceeded
 void EndDMLevel (void)
 {
 	edict_t		*ent;
-	char *s, *t, *f;
-	char *tPtr = NULL;
+	char *s, *t, *tPtr, *f;
 	static const char *seps = " ,\n\r";
 
 	// stay on same level flag
