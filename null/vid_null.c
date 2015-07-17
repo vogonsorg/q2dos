@@ -49,7 +49,7 @@ void VID_Printf (int print_level, char *fmt, ...)
         if (print_level == PRINT_ALL)
                 Com_Printf ("%s", msg);
         else
-                Com_DPrintf ("%s", msg);
+                Com_DPrintf (DEVELOPER_MSG_GFX, "%s", msg);
 }
 
 void VID_Error (int err_level, char *fmt, ...)

@@ -133,7 +133,7 @@ void	Sys_Init (void)
 
 //=============================================================================
 
-void main (int argc, char **argv)
+int main (int argc, char **argv)
 {
 	Qcommon_Init (argc, argv);
 
@@ -141,6 +141,7 @@ void main (int argc, char **argv)
 	{
 		Qcommon_Frame (0.1);
 	}
-}
 
+	return 0;  /* NOT REACHED */
+}
 

@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -g -O0 -Uid386
+CFLAGS = -g -O0 -Uid386 -Wall
 CPPFLAGS = -DREF_HARD_LINKED -DGAME_HARD_LINKED
 
 NULL = 	null/cd_null.o \
