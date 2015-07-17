@@ -382,7 +382,7 @@ void Write_Last_Maps(void){
 
 void Read_Last_Maps()
 {
-	int		i,c;
+	int		i;
 	char	*s, *f;
 	char	*fPtr = NULL;
 	char	*lastmaps;
@@ -391,7 +391,6 @@ void Read_Last_Maps()
 
 	if (lastmaps)
 	{  
-		c = 0;
 		f = strdup (lastmaps);
 		s = strtok_r(f, "\n", &fPtr);
 
@@ -415,6 +414,7 @@ char *Get_Next_MaplistTxt_Map ()
 	int		i,j,c;
 	
 	char *s, *f;
+	char *fPtr = NULL;
 
 	int mapcount;
 	int	newmapcount;
@@ -424,7 +424,6 @@ char *Get_Next_MaplistTxt_Map ()
 	char *possible_maps[300];
 	char *maplisttxt[300];
 
-
 	maps = ReadEntFile("dday/maplist.txt");
 
 	mapcount = 0;
@@ -433,7 +432,8 @@ char *Get_Next_MaplistTxt_Map ()
 	{
 		c = 0;
 		f = strdup (maps);
-		s = strtok(f, "\n");
+		s = strtok_r(f, "\n", &fPtr);
+
 		while (c < 300)
 		{
 			if (s != NULL) 
@@ -445,18 +445,18 @@ char *Get_Next_MaplistTxt_Map ()
 					c++;
 				}
 				else
+				{
 					gi.dprintf(DEVELOPER_MSG_GAME, "WARNING: Map '%s' in maplist.txt not found on server!\n",s);
+				}
 
-
-
-				s = strtok (NULL, "\n");
+				s = strtok_r(NULL, "\n", &fPtr);
 			}
 			else
-			{maplisttxt[c] = ""; 
-			c++;}
-
+			{
+				maplisttxt[c] = ""; 
+				c++;
+			}
 		}
-
 	}
 	else
 	{
@@ -471,9 +471,6 @@ char *Get_Next_MaplistTxt_Map ()
 		{
 			if (!strcmp (maplisttxt[j],""))
 				continue;
-
-
-
 
 			if (!strcmp (last_maps_played[i], maplisttxt[j]))
 			{	
@@ -491,22 +488,17 @@ char *Get_Next_MaplistTxt_Map ()
 	for (x=0; x < 300; x++)
 	{
 		if (!strcmp (maplisttxt[x],""))
+		{
 			continue;
+		}
 		possible_maps[newmapcount] = maplisttxt[x];
 
 		newmapcount++;
 	}
 
-/*	for (j = 0; j<50; j++)	{
-		if (possible_maps[j] > -1)	{
-			gi.dprintf(DEVELOPER_MSG_GAME, "%s\n",campaign_spots[possible_maps[j]].bspname);
-		}
-	}	*/
 	randnum = (int)(random()*newmapcount);
-
 	
 	return possible_maps[randnum];
-	
 }
 
 char *Get_Next_Campaign_Map ();
@@ -519,7 +511,9 @@ The timelimit or fraglimit has been exceeded
 */
 void EndDMLevel (void)
 {
-	char *s, *t, *f, *sb, *tb;// *fb;
+	char *s, *t, *f, *tb;// *fb;
+	char *tPtr = NULL;
+	char *tbPtr = NULL;
 	static const char *seps = " ,\n\r";
 	char *mapname,*check;
 	int i, axiscount=0,alliedcount=0;
@@ -648,7 +642,7 @@ void EndDMLevel (void)
 		{
 			s = strdup(sv_maplist->string);
 			f = NULL;
-			t = strtok(s, seps);
+			t = strtok_r(s, seps, &tPtr);
 			while (t != NULL) 
 			{
 				//add campaigns to maplist
@@ -680,18 +674,18 @@ void EndDMLevel (void)
 				}
 				if (!f)
 				f = t;
-				t = strtok(NULL, seps);
+				t = strtok_r(NULL, seps, &tPtr);
 			}
 			s = strdup(sv_maplist->string);
 			f = NULL;
-			t = strtok(s, seps);
+			t = strtok_r(s, seps, &tPtr);
 			while (t != NULL) 
 			{
 				if (Q_stricmp(t, mapname) == 0)   //if the running map is on maplist
 				{
 					//safe_bprintf (PRINT_HIGH,"sdf %s %s\n",mapname, t);
 					// it's in the list, go to the next one
-					t = strtok(NULL, seps);
+					t = strtok_r(NULL, seps, &tPtr);
 					if (t == NULL) // end of list, go to first one
 					{ 
 						if (f == NULL) // there isn't a first one, same level
@@ -755,7 +749,7 @@ void EndDMLevel (void)
 
 				if (!f)
 					f = t;
-				t = strtok(NULL, seps);
+				t = strtok_r(NULL, seps, &tPtr);
 
 			}
 				// if last_maplist_map_played == 0, then start at first maplist map
@@ -764,7 +758,6 @@ void EndDMLevel (void)
 			
 			// t becomes tb
 			// f becomes fb
-			// s becomes sb
 			// seps stays same
 
 			if (t == NULL) //faf:  happens when running a map thats not on maplist and map is to change
@@ -778,9 +771,7 @@ void EndDMLevel (void)
 				}
 				else
 				{
-					//restart maplist
-					sb = strdup(sv_maplist->string);
-					tb = strtok(s, seps);
+					tb = strtok_r(s, seps, &tbPtr);
 
 					if (MapExists(tb))
 					{
