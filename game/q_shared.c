@@ -1643,11 +1643,12 @@ char *Q_strupr (char *string)
 	return string;
 }
 
-/* FS: From FreeBSD */
-char *Q_strtok_r(char *s, const char *delim, char **last)
+char * /* from OpenBSD */
+strtok_r(char *s, const char *delim, char **last)
 {
-	char *spanp, *tok;
+	const char *spanp;
 	int c, sc;
+	char *tok;
 
 	if (s == NULL && (s = *last) == NULL)
 		return (NULL);
@@ -1657,7 +1658,7 @@ char *Q_strtok_r(char *s, const char *delim, char **last)
 	 */
 cont:
 	c = *s++;
-	for (spanp = (char *)delim; (sc = *spanp++) != 0;) {
+	for (spanp = delim; (sc = *spanp++) != 0;) {
 		if (c == sc)
 			goto cont;
 	}
@@ -1674,7 +1675,7 @@ cont:
 	 */
 	for (;;) {
 		c = *s++;
-		spanp = (char *)delim;
+		spanp = delim;
 		do {
 			if ((sc = *spanp++) == c) {
 				if (c == 0)
@@ -1688,3 +1689,4 @@ cont:
 	}
 	/* NOTREACHED */
 }
+

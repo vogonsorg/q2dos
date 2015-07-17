@@ -94,7 +94,7 @@ static void safe_sprintf (char *dest, size_t size, const char *fmt, ...)
 	va_list		argptr;
 
 	va_start (argptr,fmt);
-	Q_vsnprintf (dest, size, fmt, argptr);
+	gs_vsnprintf (dest, size, fmt, argptr);
 	va_end (argptr);
 	if (size) dest[size - 1] = 0;
 }

@@ -48,52 +48,6 @@ GServer ServerNew(char *ip, int port)
 	return server;
 }
 
-/* FS: From FreeBSD */
-char *Goa_strtok_r(char *s, const char *delim, char **last)
-{
-	char *spanp, *tok;
-	int c, sc;
-
-	if (s == NULL && (s = *last) == NULL)
-		return (NULL);
-
-	/*
-	 * Skip (span) leading delimiters (s += strspn(s, delim), sort of).
-	 */
-cont:
-	c = *s++;
-	for (spanp = (char *)delim; (sc = *spanp++) != 0;) {
-		if (c == sc)
-			goto cont;
-	}
-
-	if (c == 0) {		/* no non-delimiter characters */
-		*last = NULL;
-		return (NULL);
-	}
-	tok = s - 1;
-
-	/*
-	 * Scan token (scan for delimiters: s += strcspn(s, delim), sort of).
-	 * Note that delim must have one NUL; we stop if we see that, too.
-	 */
-	for (;;) {
-		c = *s++;
-		spanp = (char *)delim;
-		do {
-			if ((sc = *spanp++) == c) {
-				if (c == 0)
-					s = NULL;
-				else
-					s[-1] = '\0';
-				*last = s;
-				return (tok);
-			}
-		} while (sc != 0);
-	}
-	/* NOTREACHED */
-}
-
 static
 void ServerParsePlayerCount(GServer server, char *savedkeyvals)
 {
@@ -104,9 +58,9 @@ void ServerParsePlayerCount(GServer server, char *savedkeyvals)
 	GKeyValuePair kvpair;
 
 	numplayers = 0;
-	test = Goa_strtok_r(savedkeyvals, playerSeperators, &p);
+	test = strtok_r(savedkeyvals, playerSeperators, &p);
 	if (test) {
-		test = Goa_strtok_r(NULL, playerSeperators, &p);
+		test = strtok_r(NULL, playerSeperators, &p);
 	}
 
 	while (test != NULL)
@@ -118,7 +72,7 @@ void ServerParsePlayerCount(GServer server, char *savedkeyvals)
 			numplayers++;
 		}
 
-		test = Goa_strtok_r(NULL, playerSeperators, &p);
+		test = strtok_r(NULL, playerSeperators, &p);
 	}
 
 	kvpair.key = _strdup("numplayers");
@@ -156,11 +110,11 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 	strncpy(savedkeyvals, keyvals, sizeof(savedkeyvals));
 	savedkeyvals[sizeof(savedkeyvals) - 1] = '\0';
 
-	k = Goa_strtok_r(keyvals, tokenSeperators, &kPtr);
+	k = strtok_r(keyvals, tokenSeperators, &kPtr);
 
 	while (k != NULL)
 	{
-		v = Goa_strtok_r(NULL, tokenSeperators, &kPtr);
+		v = strtok_r(NULL, tokenSeperators, &kPtr);
 
 		if (v != NULL)
 		{
@@ -178,7 +132,7 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 			}
 		}
 
-		k = Goa_strtok_r(NULL, tokenSeperators, &kPtr);
+		k = strtok_r(NULL, tokenSeperators, &kPtr);
 	}
 
 	ServerParsePlayerCount(server, savedkeyvals);

@@ -79,6 +79,18 @@ void SocketShutDown(void);
 	#define IOCTLARG_T
 #endif
 
+#ifdef _WIN32
+#define gs_vsnprintf _vsnprintf
+#else
+#define gs_vsnprintf  vsnprintf
+#endif
+
+#ifndef GAMESPY_HARD_LINKED
+/* not all libc may have strtok_r() */
+#define strtok_r gs_strtok
+char *strtok_r(char *s, const char *delim, char **last);
+#endif
+
 #ifdef __cplusplus
 }
 #endif
