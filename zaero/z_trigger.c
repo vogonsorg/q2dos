@@ -43,15 +43,13 @@ void initSoundList()
 
 int internalSoundIndex(char *name)
 {
-	int idx = 0;
+	int i, idx;
 	int numSounds = listLength(soundList);
 	modelsound *sound;
-	int i = 0;
 
 	// convert name to lowercase
-	for (i = 0; i < strlen(name); i++) 
-		name[i] = tolower(name[i]);
-	
+	Q_strlwr(name);
+
 	// do we already have this sound?
 	for (i = 0; i < numSounds; i++)
 	{
@@ -71,7 +69,7 @@ int internalSoundIndex(char *name)
 			gi.dprintf(DEVELOPER_MSG_GAME, "%s precache rejected\n", name);
 		return 0;
 	}
-	
+
 	idx = (*actual_soundindex)(name);
 	if (idx == 0)
 		return 0;
@@ -79,7 +77,7 @@ int internalSoundIndex(char *name)
 	sound = gi.TagMalloc (sizeof(modelsound), TAG_LEVEL);
 	sound->name = gi.TagMalloc (strlen(name) + 1, TAG_LEVEL);
 	strcpy(sound->name, name);
-	
+
 	addTail(soundList, sound);
 	//gi.dprintf(DEVELOPER_MSG_GAME, "numSounds = %i\n", listLength(&soundList));
 
