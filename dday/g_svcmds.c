@@ -26,7 +26,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "g_local.h"
-#include <ctype.h> /* tolower */
 
 
 void Svcmd_Teamswitch_f (void)
@@ -360,7 +359,7 @@ void SetupCampaign (qboolean restart)
 {
 	char	campaignfilename[MAX_QPATH];
 	char	*campinfo;
-	int		i,c;
+	int		c;
 	char *s, *f, *fPtr;
 
 	char *bspname;
@@ -376,8 +375,7 @@ void SetupCampaign (qboolean restart)
 
 	sprintf(campaignfilename, "dday/campaigns/%s.campaign", campaign->string);
 	// convert string to all lowercase (for Linux)
-	for (i = 0; campaignfilename[i]; i++)
-		campaignfilename[i] = tolower(campaignfilename[i]);
+	Q_strlwr(campaignfilename);
 
 	if (restart == true || !(check = fopen(campaignfilename, "r") ))//no current campaign
 	{
@@ -385,7 +383,6 @@ void SetupCampaign (qboolean restart)
 	}
 
 	campinfo = ReadEntFile(campaignfilename);
-
 	if (campinfo)
 	{   //leave these dprints active they show up in the server init console section
 		gi.dprintf(DEVELOPER_MSG_GAME, "%s.cpgntemplate Loaded\n", campaign->string);

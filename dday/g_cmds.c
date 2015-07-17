@@ -30,7 +30,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "g_cmds.h"
 #include "stddef.h"
 //#include "p_classes.h"
-#include <ctype.h> /* tolower */
 
 void EndObserverMode(edict_t *ent);
 void Show_Mos(edict_t *ent);
@@ -451,7 +450,6 @@ qboolean CheckForTurret(edict_t *ent);
 
 qboolean Cmd_Scope_f(edict_t *ent)
 {
-
 	if (ent->client->chasetarget)
 	{
 		if(ent->client->aim == 0)
@@ -484,8 +482,8 @@ qboolean Cmd_Scope_f(edict_t *ent)
 	}
 
 	if (!ent->client->pers.weapon ||
- 		 ent->client->pers.weapon->classnameb == WEAPON_SANDBAGS ||
- 	//	 ent->client->pers.weapon->position== LOC_GRENADES ||
+		 ent->client->pers.weapon->classnameb == WEAPON_SANDBAGS ||
+	//	 ent->client->pers.weapon->position== LOC_GRENADES ||
 //bcass start - TNT
 		 ent->client->pers.weapon->position== LOC_TNT)
 //bcass end
@@ -568,14 +566,14 @@ qboolean Cmd_Scope_f(edict_t *ent)
 	}
 
 //faf
-       if (ent->client->pers.weapon &&
+	if (ent->client->pers.weapon &&
 		   (ent->client->pers.weapon->classnameb == WEAPON_MAUSER98K ||
 			ent->client->pers.weapon->classnameb == WEAPON_ARISAKA ||
 			ent->client->pers.weapon->classnameb == WEAPON_CARCANO ||
 			ent->client->pers.weapon->classnameb == WEAPON_ENFIELD) &&
 			(ent->client->weaponstate == WEAPON_LOWER ||
 			   (!ent->client->aim && ent->client->weaponstate == WEAPON_FIRING)))
-               return false;
+		return false;
 
 	// do not let a sniper reload bolt if there is no ammo
 	if (ent->client->pers.weapon &&
@@ -1439,11 +1437,11 @@ void Cmd_Drop_f (edict_t *ent)
 				ent->client->pers.inventory[ammo_index] = 0;
 			}
 		}
-		
+
 //move us to a new weapon
 		ent->client->drop = true;
 		Cmd_WeapNext_f (ent);
-		
+
 //take is from the inventory and drop it
 		it->drop (ent, it);
 		WeighPlayer(ent);
@@ -1456,11 +1454,11 @@ void Cmd_Drop_f (edict_t *ent)
 	{
 		if(easter_egg->value==0)
 			return;
-		
+
 		safe_bprintf(PRINT_CHAT, "***NOTICE*** Species loves Gerbil Pr0n\n");
 		return;
 	}
-//bcass end	
+//bcass end
 
 	if (!it)
 	{
@@ -1592,9 +1590,12 @@ void Cmd_Objectives (edict_t *ent)
 		if (ent->client->resp.team_on &&
 			e->obj_perm_owner &&
 			e->obj_perm_owner%2 == ent->client->resp.team_on->index)
-		{ bp ="!";}
-		else
-		{ bp = " ";}
+		{
+			bp ="!";
+		}
+		else {
+			bp = " ";
+		}
 
 		if (ent->client->resp.team_on &&
 			e->obj_owner == ent->client->resp.team_on->index)
@@ -1617,7 +1618,6 @@ void Cmd_Objectives (edict_t *ent)
 		{
 			Com_sprintf (entryb, sizeof(entryb),	"xr -200 yt %i string \" %i Kills\" ",120+(y*10),team_list[ent->client->resp.team_on->index]->need_kills);
 			strcpy (string + strlen(string), entryb);
-
 		}
 		y++;
 	}
@@ -1649,6 +1649,7 @@ void Cmd_Objectives_ToggleX (edict_t *ent)
 		Cmd_Objectives (ent);
 	}
 }
+
 /*
 =================
 Cmd_InvUse_f
@@ -1657,7 +1658,7 @@ Cmd_InvUse_f
 void Cmd_InvUse_f (edict_t *ent)
 {
 	gitem_t		*it;
-   
+
 	if (ent->client->menu) {
 		PMenu_Select(ent);
 		return;
@@ -1699,7 +1700,7 @@ void Cmd_WeapPrev_f (edict_t *ent)
 		ChasePrev(ent);
 		return;
 	}
-	
+
 	check_unscope(ent);//faf
 
 	cl->ps.fov = STANDARD_FOV;
@@ -2021,59 +2022,59 @@ void Cmd_Wave_f (edict_t *ent, int wave)
 //faf:  based on aq2 code
 void GetNearbyTeammates(edict_t *self, char *buf)
 {
-        char nearby_teammates[10][16];
-        int nearby_teammates_num, l;
-        edict_t *ent = NULL;
+	char nearby_teammates[10][16];
+	int nearby_teammates_num, l;
+	edict_t *ent = NULL;
 
-        nearby_teammates_num = 0;
-        
-        while ((ent = findradius(ent, self->s.origin, 750)) != NULL)
-        {
-                if (ent == self || !ent->client || !CanDamage(ent, self) || 
-                        !OnSameTeam(ent, self))
-                        continue;
+	nearby_teammates_num = 0;
 
-                strncpy(nearby_teammates[nearby_teammates_num], ent->client->pers.netname, 15);
-                nearby_teammates[nearby_teammates_num][15] = 0; // in case their name is 15 chars...
-                nearby_teammates_num++;
-                if (nearby_teammates_num >= 10)
-                        break;
-        }
-        
-        if (nearby_teammates_num == 0)
-        {
-                strcpy(buf, "");
-                return;
-        }
+	while ((ent = findradius(ent, self->s.origin, 750)) != NULL)
+	{
+		if (ent == self || !ent->client || !CanDamage(ent, self) || 
+						   !OnSameTeam(ent, self))
+			continue;
 
-        for (l = 0; l < nearby_teammates_num; l++)
-        {
-                if (l == 0)
-                {
-                        strcpy(buf, nearby_teammates[l]);
-                }
-                else
-                {
-                        if (nearby_teammates_num == 2)
-                        {
-                                strcat(buf, " and ");
-                                strcat(buf, nearby_teammates[l]);
-                        }
-                        else
-                        {
-                                if (l == (nearby_teammates_num - 1))
-                                {
-                                        strcat(buf, ", and ");
-                                        strcat(buf, nearby_teammates[l]);
-                                }
-                                else
-                                {
-                                        strcat(buf, ", ");
-                                        strcat(buf, nearby_teammates[l]);
-                                }
-                        }
-                }
-        }
+		strncpy(nearby_teammates[nearby_teammates_num], ent->client->pers.netname, 15);
+		nearby_teammates[nearby_teammates_num][15] = 0; // in case their name is 15 chars...
+		nearby_teammates_num++;
+		if (nearby_teammates_num >= 10)
+			break;
+	}
+
+	if (nearby_teammates_num == 0)
+	{
+		strcpy(buf, "");
+		return;
+	}
+
+	for (l = 0; l < nearby_teammates_num; l++)
+	{
+		if (l == 0)
+		{
+			strcpy(buf, nearby_teammates[l]);
+		}
+		else
+		{
+			if (nearby_teammates_num == 2)
+			{
+				strcat(buf, " and ");
+				strcat(buf, nearby_teammates[l]);
+			}
+			else
+			{
+				if (l == (nearby_teammates_num - 1))
+				{
+					strcat(buf, ", and ");
+					strcat(buf, nearby_teammates[l]);
+				}
+				else
+				{
+					strcat(buf, ", ");
+					strcat(buf, nearby_teammates[l]);
+				}
+			}
+		}
+	}
 }
 
 //faf
@@ -2541,7 +2542,6 @@ void change_stance(edict_t *self, int stance)
 		if (!self->waterlevel) //Wheaty: Don't play sound if they are in water
 			gi.sound (self, CHAN_BODY, gi.soundindex ("misc/prone2.wav"), .4, ATTN_NORM, 0);
 //bcass end
-
 	}
 	else // 					//if we're supposed to stand
 	{
@@ -2577,6 +2577,7 @@ void change_stance(edict_t *self, int stance)
 
 	gi.linkentity (self);
 }
+
 /*********************************************************************************************
 **  This command is for joining teams, and should be done by each captain
 **
@@ -2681,10 +2682,8 @@ void AfterSwitch(edict_t *ent, int type)
 		M_ChooseMOS(ent);
 		return;
 		break;
-
 	}
 }
-
 
 void Cmd_Join_team(edict_t *ent)
 {
@@ -2800,8 +2799,8 @@ void Cmd_Quit_team(edict_t *ent)
 {
 	int					j;
 	TeamS_t				*temp;
-	
-    if(!ent->client->resp.team_on) 
+
+	if(!ent->client->resp.team_on) 
 	{
 		safe_cprintf(ent, PRINT_HIGH, "Not on any teams.\n");
 		return;
@@ -2813,7 +2812,6 @@ void Cmd_Quit_team(edict_t *ent)
 		return;
 	}
 
-	
 	for(j=0;j<MAX_TEAM_MATES;j++)
 	{
 		if(ent->client->resp.team_on->units[j]==ent)
@@ -2909,13 +2907,11 @@ qboolean Cmd_Reload (edict_t *ent)
 		return true;
 	}
 
-
 	if (ent->client->pers.weapon->position == LOC_SUBMACHINEGUN)
 	{
 		ent->client->crosshair_offset_x = 0;
 		ent->client->crosshair_offset_y = 0;
 	}
-
 
 	if (ent->client->pers.weapon->ammo)
 	{
@@ -2933,7 +2929,6 @@ qboolean Cmd_Reload (edict_t *ent)
     // Grab the current magazine max count...
 	if( ent->client->pers.weapon->topoff)
 	{
-
 		// rezmoth - bug here crashes because of a null round variable?
 		// hardcode a full clip into each gun on weapon pickup to prevent it?
 		if(ent->client->pers.weapon->topoff==3 && 
@@ -2986,7 +2981,6 @@ qboolean Cmd_Reload (edict_t *ent)
 //			ClientSetMaxSpeed(ent, true); //make them move the right speed
 			WeighPlayer(ent);
 //bcass end
-
 			return true;
 		}
 		else
@@ -3017,6 +3011,7 @@ void Cmd_Reload_f (edict_t *ent)
 	
 	return;
 }
+
 void turret_off (edict_t *self);
 
 void Cmd_Stance(edict_t *ent)
@@ -3071,7 +3066,7 @@ void Cmd_Stance(edict_t *ent)
 	else if(ent->stanceflags == STANCE_DUCK) change_stance(ent, STANCE_CRAWL);
 	else if(ent->stanceflags == STANCE_CRAWL) change_stance(ent, STANCE_STAND);
 	WeighPlayer(ent);
-} 
+}
 
 
 #define MAX_FILENAME_LENGTH 20
@@ -3152,10 +3147,7 @@ void Cmd_Shout_f(edict_t *ent)
 	}
 
 	strcpy(filename,gi.argv(1));
-
-	for (i = 0; filename[i]; i++)
-		filename[i] = tolower(filename[i]);
-
+	Q_strlwr(filename);
 	strcat(filename,".wav\0");
 
 	strcpy(soundfile,va("%s/shout/",ent->client->resp.team_on->teamid));
@@ -3168,7 +3160,6 @@ void Cmd_Shout_f(edict_t *ent)
 			//gi.dprintf(DEVELOPER_MSG_GAME, "s:%s  u:%s\n", soundfile, user_shouts[i]);
 			if (!strcmp (soundfile, user_shouts[i]) )
 				newshout= false;
-
 		}
 		if (newshout)
 		{
@@ -3179,9 +3170,7 @@ void Cmd_Shout_f(edict_t *ent)
 			}
 
 			user_shout_count++;
-		
 			Com_sprintf (user_shouts[user_shout_count], sizeof(user_shouts[user_shout_count]), "%s", soundfile);
-
 			//gi.dprintf(DEVELOPER_MSG_GAME, "usc: %i   %s\n",user_shout_count,user_shouts[user_shout_count]);
 		}
 	}
@@ -3189,8 +3178,8 @@ void Cmd_Shout_f(edict_t *ent)
 	gi.sound (ent, CHAN_VOICE, gi.soundindex(soundfile), 1, ATTN_NORM, 0);
 }
 
-void Cmd_AutoPickUp_f (edict_t *ent) {
-
+void Cmd_AutoPickUp_f (edict_t *ent)
+{
 	if (!ent->client->resp.AlreadySpawned)
 		return;
 
@@ -3205,7 +3194,8 @@ void Cmd_AutoPickUp_f (edict_t *ent) {
 	}
 }
 
-void Cmd_PlayerID_f (edict_t *ent) {
+void Cmd_PlayerID_f (edict_t *ent)
+{
 //	if (!ent->client->resp.AlreadySpawned)
 //		return;
 
@@ -3216,13 +3206,11 @@ void Cmd_PlayerID_f (edict_t *ent) {
 		safe_cprintf(ent, PRINT_HIGH, "player id disabled\n");
 		ent->client->resp.show_id = false;
 	}
-
 }
 
-void Cmd_Medic_Call_f (edict_t *ent) {
-
+void Cmd_Medic_Call_f (edict_t *ent)
+{
 	//gi.sound (ent, CHAN_VOICE, gi.soundindex("shout/medic.wav"), 1, ATTN_NORM, 0);
-
 	if (ent->client->medic_call < level.framenum)
 		ent->client->medic_call = (level.framenum + MEDIC_CALL_TIME);
 }
@@ -3282,27 +3270,27 @@ ClientCommand
   */
 void InsertCmds(g_cmds_t *cmds, int numCmds, char *src)
 {
-    struct cmd_list_t **ptr;
-    struct cmd_list_t *tmp;
+	struct cmd_list_t **ptr;
+	struct cmd_list_t *tmp;
 
-    gi.dprintf(DEVELOPER_MSG_GAME, "processing %s commands\n",src);
-    ptr = &GlobalCommandList;
-    while(*ptr)
-        ptr = &((*ptr)->next);
+	gi.dprintf(DEVELOPER_MSG_GAME, "processing %s commands\n",src);
+	ptr = &GlobalCommandList;
+	while(*ptr)
+		ptr = &((*ptr)->next);
 
-      /*at this point, ptr is pointing to a pointer var whose value is NULL*/
-      /*not sure if I should be using malloc*/
-    tmp = (struct cmd_list_t *) gi.TagMalloc(sizeof(struct cmd_list_t), TAG_GAME);
-    tmp->commands = cmds;
-    //tmp->numCmds = sizeof(cmds) / sizeof(struct g_cmds_s);
-    tmp->numCmds = numCmds;
-    strncpy(tmp->source,src,32);
-    tmp->next = NULL;
+	/*at this point, ptr is pointing to a pointer var whose value is NULL*/
+	/*not sure if I should be using malloc*/
+	tmp = (struct cmd_list_t *) gi.TagMalloc(sizeof(struct cmd_list_t), TAG_GAME);
+	tmp->commands = cmds;
+	//tmp->numCmds = sizeof(cmds) / sizeof(struct g_cmds_s);
+	tmp->numCmds = numCmds;
+	strncpy(tmp->source,src,32);
+	tmp->next = NULL;
 
-//      gi.dprintf(DEVELOPER_MSG_GAME, "sizeof(*cmds) = %d, sizeof(struct g_cmds_s) = %d\n", sizeof(*cmds),sizeof(struct g_cmds_s));
-//      gi.dprintf(DEVELOPER_MSG_GAME, "number of commands processed = %d\n",tmp->numCmds);
+//	gi.dprintf(DEVELOPER_MSG_GAME, "sizeof(*cmds) = %d, sizeof(struct g_cmds_s) = %d\n", sizeof(*cmds),sizeof(struct g_cmds_s));
+//	gi.dprintf(DEVELOPER_MSG_GAME, "number of commands processed = %d\n",tmp->numCmds);
 
-    *ptr = tmp;
+	*ptr = tmp;
 }
 
 
@@ -3311,20 +3299,20 @@ void InsertCmds(g_cmds_t *cmds, int numCmds, char *src)
 */
 void PrintCmds()
 {
-    struct cmd_list_t *ptr;
-    g_cmds_t *tmp;
-        int i;
+	struct cmd_list_t *ptr;
+	g_cmds_t *tmp;
+	int i;
 
-    ptr = GlobalCommandList;
-    while(ptr)
-    {
-        gi.dprintf(DEVELOPER_MSG_GAME, "printing <%s> commands:\n",ptr->source);
-        tmp = ptr->commands;
-        for(i=0;i < ptr->numCmds; i++, tmp++)
-                gi.dprintf(DEVELOPER_MSG_GAME, "%s has %d args.\n",tmp->command, tmp->numArgs);
-        ptr = ptr->next;
-    }
-    gi.dprintf(DEVELOPER_MSG_GAME, "%i\n",game.num_items);
+	ptr = GlobalCommandList;
+	while(ptr)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "printing <%s> commands:\n",ptr->source);
+		tmp = ptr->commands;
+		for(i=0;i < ptr->numCmds; i++, tmp++)
+			gi.dprintf(DEVELOPER_MSG_GAME, "%s has %d args.\n",tmp->command, tmp->numArgs);
+		ptr = ptr->next;
+	}
+	gi.dprintf(DEVELOPER_MSG_GAME, "%i\n",game.num_items);
 }
 
 
@@ -3334,16 +3322,16 @@ void PrintCmds()
 */
 void CleanUpCmds()
 {
-    struct cmd_list_t *tmp1, *tmp2;
+	struct cmd_list_t *tmp1, *tmp2;
 
-    tmp1 = GlobalCommandList;
-    while (tmp1)
-    {
-        tmp2 = tmp1->next;
-        gi.TagFree(tmp1);
-        tmp1 = tmp2;
-    }
-    GlobalCommandList = NULL;
+	tmp1 = GlobalCommandList;
+	while (tmp1)
+	{
+		tmp2 = tmp1->next;
+		gi.TagFree(tmp1);
+		tmp1 = tmp2;
+	}
+	GlobalCommandList = NULL;
 }
 
 
@@ -3359,65 +3347,65 @@ void CleanUpCmds()
   */
 g_cmds_t *FindCommand(char *cmd)
 {
-    struct cmd_list_t *sets;
-    g_cmds_t *cmds;
-    int i, found;
-    char nmspace[64], *ptr;
+	struct cmd_list_t *sets;
+	g_cmds_t *cmds;
+	int i, found;
+	char nmspace[64], *ptr;
 
-    //we first need to find the namespace, if any
-    nmspace[0] = '\0';
-    ptr = cmd; i = found = 0;
-    while (*ptr && i<32 && !found)
-    {
-        if(*ptr == '.')
-            found = 1;
-        else
-        {
-            nmspace[i] = *ptr;
-            i++;
-            ptr++;
-        }
-    }
-    if(found)
-    {
-        cmd = ++ptr;
-        nmspace[i] = '\0';
-    }
-    else
-        nmspace[0] = '\0';
+	//we first need to find the namespace, if any
+	nmspace[0] = '\0';
+	ptr = cmd; i = found = 0;
+	while (*ptr && i<32 && !found)
+	{
+		if(*ptr == '.')
+			found = 1;
+		else
+		{
+			nmspace[i] = *ptr;
+			i++;
+			ptr++;
+		}
+	}
+	if(found)
+	{
+		cmd = ++ptr;
+		nmspace[i] = '\0';
+	}
+	else
+		nmspace[0] = '\0';
 
-    sets = GlobalCommandList;
-    while (sets)
-    {
-        if(found)
-            if(strcmp(nmspace,sets->source))
-            {
-                sets = sets->next;
-                continue;
-            }
+	sets = GlobalCommandList;
+	while (sets)
+	{
+		if(found)
+			if(strcmp(nmspace,sets->source))
+			{
+				sets = sets->next;
+				continue;
+			}
 
-        cmds = sets->commands;
+		cmds = sets->commands;
 
-        for (i=0;i<sets->numCmds;i++) {
-            if (!cmd || !cmds[i].command)
-                return NULL;
+		for (i=0;i<sets->numCmds;i++) {
+			if (!cmd || !cmds[i].command)
+				return NULL;
 
-            if(Q_stricmp(cmd,cmds[i].command) == 0)
-                return &(cmds[i]);
-        }
-        sets = sets->next;
-    }
-    return NULL;
+			if(Q_stricmp(cmd,cmds[i].command) == 0)
+				return &(cmds[i]);
+		}
+		sets = sets->next;
+	}
+	return NULL;
 }
 
 
 void ClientCommand (edict_t *ent)
 {
-    char        *cmd;
-    g_cmds_t *cmdptr;
+	char *cmd;
+	g_cmds_t *cmdptr;
 
-    if (!ent->client)
-        return;         // not fully in game yet
+	if (!ent->client)
+		return; // not fully in game yet
 
 	//JABot[start]
 	if(BOT_Commands(ent))
@@ -3437,28 +3425,28 @@ void ClientCommand (edict_t *ent)
 		return;
 	}
 
-    cmdptr = FindCommand(cmd);
-    if(cmdptr)
-    {
-        switch (cmdptr->numArgs)
-        {
-          case 0:
-              (cmdptr->cmdfunc)();
-              break;
-          case 1:
-              (cmdptr->cmdfunc)(ent);
-              break;
-          case 2:
-              (cmdptr->cmdfunc)(ent,gi.argv(1));
-              break;
-          case 3:
-              (cmdptr->cmdfunc)(ent,gi.argv(1),gi.argv(2));
-              break;
-          case 4:
-              (cmdptr->cmdfunc)(ent,gi.argv(1),gi.argv(2),gi.argv(3));
-              break;
-        }
-    }
-    else
-        safe_cprintf(ent, PRINT_HIGH, "Invalid Command: %s!\n", cmd);
+	cmdptr = FindCommand(cmd);
+	if(cmdptr)
+	{
+		switch (cmdptr->numArgs)
+		{
+		case 0:
+			(cmdptr->cmdfunc)();
+			break;
+		case 1:
+			(cmdptr->cmdfunc)(ent);
+			break;
+		case 2:
+			(cmdptr->cmdfunc)(ent,gi.argv(1));
+			break;
+		case 3:
+			(cmdptr->cmdfunc)(ent,gi.argv(1),gi.argv(2));
+			break;
+		case 4:
+			(cmdptr->cmdfunc)(ent,gi.argv(1),gi.argv(2),gi.argv(3));
+			break;
+		}
+	}
+	else
+		safe_cprintf(ent, PRINT_HIGH, "Invalid Command: %s!\n", cmd);
 }

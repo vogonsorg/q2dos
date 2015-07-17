@@ -27,7 +27,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "g_local.h"
 #include "g_cmds.h"
-#include <ctype.h> /* tolower */
 
 // g_ents.c
 // D-Day: Normandy Old / Unsorted Entities
@@ -478,20 +477,17 @@ void LoadBotChat (int teamnum, char *teamid)
 
 void SP_info_team_start(edict_t *ent)
 {
-	int i,k;
-
-	i=ent->obj_owner;
+	int i = ent->obj_owner;
 
 	//mapper set fullbright to 1 in info_team_start
 	if (ent->groundentity_linkcount == true)
 		level.fullbright = true;
-	
+
 	if (ent->teleport_time)
 		level.fog = ent->teleport_time;
 
 	//fix for mappers who use capital letters for teamid
-	for (k = 0; ent->pathtarget[k]; k++)
-		ent->pathtarget[k] = tolower(ent->pathtarget[k]);
+	Q_strlwr (ent->pathtarget);
 
 	team_list[i]=gi.TagMalloc(sizeof(TeamS_t),TAG_LEVEL);
 	team_list[i]->teamname=gi.TagMalloc(sizeof(ent->message + 2),TAG_LEVEL);
@@ -639,7 +635,7 @@ void SP_info_team_start(edict_t *ent)
 		team_list[i]->delay = 0;
 
 	// now is the time to hook up the mos .dll files...
-//    InitializeUserDLLs(LoadUserDLLs(ent, i),i);
+//	InitializeUserDLLs(LoadUserDLLs(ent, i),i);
 
 	InitTeam(ent->pathtarget,i);
 

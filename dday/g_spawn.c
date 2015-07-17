@@ -26,7 +26,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "g_local.h"
-#include <ctype.h> /* tolower */
 
 //Ok, since we are modifying this file, we might as well declare the
 //item spawning functions here. These are the functions that actually 
@@ -37,7 +36,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //and we need to manage the spawns[] lists. When a level is brought up, the
 //first thing that is does is run through the list of things in it and spawns
 //them.
-
 
 void SP_item_armor_body(edict_t *self);
 void SP_item_armor_combat(edict_t *self);
@@ -64,7 +62,6 @@ void SP_item_powerup_breather(edict_t *self);
 void SP_item_powerup_enviro(edict_t *self);
 void SP_item_powerup_adrenaline(edict_t *self);
 void SP_item_powerup_pack(edict_t *self);
-
 
 //end of added item spawn functions
 
@@ -217,7 +214,6 @@ void SP_item_botroam (edict_t *self);	//JABot
 void SP_briefcase(edict_t *self);//faf  ctb code
 
 
-
 spawn_t spawns[MAX_EDICTS] = {
 	{"item_health", SP_item_health},
 	{"item_health_small", SP_item_health_small},
@@ -284,7 +280,6 @@ spawn_t spawns[MAX_EDICTS] = {
 	{"info_special_start",SP_info_Special_Start},
 	{"info_flamethrower_start",SP_info_Flamethrower_Start},
 
-
 /*	{"info_infantry_start", SP_info_reinforcement_start},
 	{"info_officer_start",SP_info_reinforcement_start},
 	{"info_lgunner_start",SP_info_reinforcement_start},
@@ -294,15 +289,11 @@ spawn_t spawns[MAX_EDICTS] = {
 	{"info_medic_start",SP_info_reinforcement_start},
 	{"info_special_start",SP_info_reinforcement_start},
 	{"info_flamethrower_start",SP_info_reinforcement_start},
-
 */
-
-
 
 	{"info_mission_results",SP_info_Mission_Results},
 	{"info_Mission_Results",SP_info_Mission_Results},
 	{"SP_info_Mission_Results",SP_info_Mission_Results},
-
 
 //end add
 	{"target_temp_entity", SP_target_temp_entity},
@@ -378,7 +369,6 @@ spawn_t spawns[MAX_EDICTS] = {
 	{"monster_soldier", SP_monster_soldier},
 	{"monster_soldier_ss", SP_monster_soldier_ss},
 	
-	
 	{"monster_medic", SP_monster_medic},
 */
 	{"turret_breach", SP_turret_breach},
@@ -386,15 +376,10 @@ spawn_t spawns[MAX_EDICTS] = {
 	{"turret_range", SP_turret_range},
 	{"turret_driver", SP_turret_driver},
 
-	 
-
-    
-    {"ammo_grenades", SP_item_ammo_grenades},
+	{"ammo_grenades", SP_item_ammo_grenades},
 	{"weapon_flamethrower",SP_item_weapon_flamethrower},
 
 	{"ammo_napalm",SP_item_ammo_napalm},
-
-   
 
 //	{"dday_tank1", SP_tank_Tank1}, 
 	{"objective_flag", SP_objective_flag},
@@ -415,7 +400,6 @@ spawn_t spawns[MAX_EDICTS] = {
 	{"item_botroam", SP_item_botroam},	//JABot
 
 	{"briefcase", SP_briefcase},//faf:ctb code
-
 
 	{NULL, NULL}
 };
@@ -494,8 +478,6 @@ char *ED_NewString (char *string)
 	
 	return newb;
 }
-
-
 
 
 /*
@@ -593,7 +575,7 @@ char *ED_ParseEdict (char *data, edict_t *ent)
 		if (com_token[0] == '}')
 			gi.error ("ED_ParseEntity: closing brace without data");
 
-		init = true;	
+		init = true;
 
 	// keynames with a leading underscore are used for utility comments,
 	// and are immediately discarded by quake
@@ -686,7 +668,6 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 //	if (skill->value != skill_level)
 //		gi.cvar_forceset("skill", va("%f", skill_level));
 
-
 	SaveClientData ();
 
 	gi.FreeTags (TAG_LEVEL);
@@ -754,7 +735,7 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 		}
 
 		ED_CallSpawn (ent);
-	}	
+	}
 
 	gi.dprintf(DEVELOPER_MSG_GAME, "%i entities inhibited\n", inhibit);
 
@@ -775,41 +756,30 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	//pbowens: this is actually very handy
 	gi.dprintf(DEVELOPER_MSG_GAME, "server map: %s\n", mapname);
 
-
 	AI_NewMap();//JABot
-
 }
 
-
-
-
-
-
-
-
-
-char *ReadEntFile(char *filename) 
+char *ReadEntFile(char *filename)
 {
-
 	FILE		*fp;
 	char		*filestring = NULL;
 	long int	i = 0;
 	int			ch;
 
-	while (true) 
+	while (true)
 	{
 		fp = fopen(filename, "r");
 		if (!fp) break;
 
 		for (i=0; (ch = fgetc(fp)) != EOF; i++)
-		;
+			;
 
 		filestring = gi.TagMalloc(i+1, TAG_LEVEL);
 		if (!filestring) break;
 
 		fseek(fp, 0, SEEK_SET);
 		for (i=0; (ch = fgetc(fp)) != EOF; i++)
-		filestring[i] = ch;
+			filestring[i] = ch;
 		filestring[i] = '\0';
 
 		break;
@@ -824,7 +794,6 @@ char *LoadEntFile(char *mapname, char *entities)
 {
 	char	entfilename[MAX_QPATH];
 	char	*newentities;
-	int		i;
 
 	if (ent_files->value == 0)
 		return(entities);
@@ -839,8 +808,7 @@ char *LoadEntFile(char *mapname, char *entities)
 
 	sprintf(entfilename, "dday/ents/%s.ent", mapname);
 	// convert string to all lowercase (for Linux)
-	for (i = 0; entfilename[i]; i++)
-		entfilename[i] = tolower(entfilename[i]);
+	Q_strlwr(entfilename);
 
 	newentities = ReadEntFile(entfilename);
 	if (newentities)
@@ -855,17 +823,14 @@ char *LoadEntFile(char *mapname, char *entities)
 	}
 }
 
-
 char *LoadCTCFile(char *mapname, char *entities)
 {
 	char	entfilename[MAX_QPATH];
 	char	*newentities;
-	int		i;
 
 	sprintf(entfilename, "dday/ents/%s.ctc", mapname);
 	// convert string to all lowercase (for Linux)
-	for (i = 0; entfilename[i]; i++)
-		entfilename[i] = tolower(entfilename[i]);
+	Q_strlwr(entfilename);
 
 	newentities = ReadEntFile(entfilename);
 	if (newentities)
@@ -880,13 +845,12 @@ char *LoadCTCFile(char *mapname, char *entities)
 	}
 }
 
-
 void LoadCampFile(void)
 {
 	char	cmpfilename[MAX_QPATH];
 	char	*camplocs;
-	int		i,c;
-	
+	int		c;
+
 	char *s, *f, *fPtr;
 
 	vec3_t	loc;
@@ -900,15 +864,12 @@ void LoadCampFile(void)
 		sprintf(cmpfilename, "dday/navigation/%s.cmp", level.botfiles);
 	else
 		sprintf(cmpfilename, "dday/navigation/%s.cmp", level.mapname);
-
 	//gi.dprintf(DEVELOPER_MSG_GAME, "sdfl %s\n", cmpfilename);
 
 	// convert string to all lowercase (for Linux)
-	for (i = 0; cmpfilename[i]; i++)
-		cmpfilename[i] = tolower(cmpfilename[i]);
+	Q_strlwr(cmpfilename);
 
 	camplocs = ReadEntFile(cmpfilename);
-
 	if (camplocs)
 	{   //leave these dprints active they show up in the server init console section
 		gi.dprintf(DEVELOPER_MSG_GAME, "%s.cmp Loaded\n", level.mapname);
@@ -998,8 +959,6 @@ void SpawnEntities2 (char *mapname, char *entities, char *spawnpoint)
 
 	gi.FreeTags (TAG_LEVEL);
 
-
-
 	memset (&level, 0, sizeof(level));
 	memset (g_edicts, 0, game.maxentities * sizeof (g_edicts[0]));
 
@@ -1013,10 +972,7 @@ void SpawnEntities2 (char *mapname, char *entities, char *spawnpoint)
 	ent = NULL;
 	inhibit = 0;
 
-
-
-InitItems ();
-
+	InitItems ();
 
 	if (ctc->value)
 		entities = LoadCTCFile(mapname,entities);
@@ -1072,7 +1028,7 @@ InitItems ();
 		}
 
 		ED_CallSpawn (ent);
-	}	
+	}
 
 	gi.dprintf(DEVELOPER_MSG_GAME, "%i entities inhibited\n", inhibit);
 
@@ -1088,7 +1044,6 @@ InitItems ();
 
 	G_FindTeams ();
 
-
 	PlayerTrail_Init ();
 
 	//pbowens: this is actually very handy
@@ -1097,17 +1052,7 @@ InitItems ();
 	LoadCampFile();
 
 	AI_NewMap();//JABot
-
 }
-
-
-
-
-
-
-
-
-
 
 
 //===================================================================
@@ -1398,7 +1343,6 @@ void SP_worldspawn (edict_t *ent)
 	if (st.nextmap)
 		strcpy (level.nextmap, st.nextmap);
 
-
 //	map_tree[0][0]=0;
 	// make some data visible to the server
 
@@ -1432,7 +1376,6 @@ void SP_worldspawn (edict_t *ent)
 	gi.configstring (CS_STATUSBAR, dday_statusbar);
 
 	//---------------
-
 
 	// help icon for statusbar
 	gi.imageindex ("i_help");
@@ -1480,7 +1423,6 @@ void SP_worldspawn (edict_t *ent)
 	else if (skill->value > 3)
 		gi.cvar_forceset ("skill", "3");
 
-
 	//snd_fry = gi.soundindex ("player/fry.wav");	// standing in lava / slime
 	snd_fry = gi.soundindex ("players/tear.wav");	// standing in lava / slime
 	gi.soundindex ("players/cloth.wav");
@@ -1503,7 +1445,6 @@ void SP_worldspawn (edict_t *ent)
 		gi.imageindex(va("%s", serverimg->string));
 	}
 
-
 	gi.soundindex("bullet/wood1.wav");
 	gi.soundindex("bullet/wood2.wav");
 	gi.soundindex("bullet/wood3.wav");
@@ -1520,9 +1461,6 @@ void SP_worldspawn (edict_t *ent)
 	gi.soundindex("bullet/concrete3.wav");
 	gi.soundindex("bullet/water1.wav");
 	gi.soundindex("bullet/water2.wav");
-
-
-
 
 //	PrecacheItem (FindItem ("Colt .45"));
 
@@ -1573,7 +1511,6 @@ void SP_worldspawn (edict_t *ent)
 
 	// for dday generic vwep
 	// this defeats the purpose of team dlls, but owell
-
 
 	//faf: going to try to remove this.  this should stop
 	//     gbr map crashes.
@@ -1645,18 +1582,11 @@ void SP_worldspawn (edict_t *ent)
 
 //	gi.soundindex ("infantry/inflies1.wav");
 
-
 	gi.soundindex ("player/bodyfall.wav");
 	gi.soundindex ("weapons/gundrop.wav");
 	gi.soundindex ("weapons/ammodrop.wav");
 
-
 	gi.soundindex ("player/breathe.wav"); //faf
-
-
-
-
-
 
 	sm_meat_index = gi.modelindex ("models/objects/gibs/sm_meat/tris.md2");
 	gi.modelindex ("models/objects/gibs/arm/tris.md2");
@@ -1672,10 +1602,8 @@ void SP_worldspawn (edict_t *ent)
 	gi.soundindex ("misc/hithelm.wav");
 	gi.soundindex ("misc/hithead.wav");
 
-
 	gi.soundindex ("misc/gibs1.wav");
 	gi.soundindex ("misc/gibs2.wav");
-
 
 	// pbowens: precache these here b/c players use them
 	PrecacheItem ( FindItem("Morphine")		);
@@ -1689,7 +1617,6 @@ void SP_worldspawn (edict_t *ent)
 //
 // Setup light animation tables. 'a' is total darkness, 'z' is doublebright.
 //
-
 	// 0 normal
 	gi.configstring(CS_LIGHTS+0, "m");
 	
@@ -1732,6 +1659,4 @@ void SP_worldspawn (edict_t *ent)
 	gi.configstring(CS_LIGHTS+63, "a");
 
 	GetMapObjective();
-
 }
-
