@@ -48,7 +48,6 @@ void check_unscope (edict_t *ent);//faf
 void turret_off (edict_t *self);
 
 
-
 //
 // Gross, ugly, disgustuing hack section
 //
@@ -152,10 +151,9 @@ void Create_InfoTeamStarts (edict_t *self)
 
 	SP_info_team_start(spot);
 
-   	
 	spot = G_Spawn();
 	spot->classname = "info_team_start";
-   	spot->dmg = 50;
+	spot->dmg = 50;
 	spot->map = "dday1";
 	spot->count = 99;
 	spot->pathtarget = "grm";
@@ -164,8 +162,6 @@ void Create_InfoTeamStarts (edict_t *self)
 
 	SP_info_team_start(spot);
 }
-
-
 */
 
 /*QUAKED info_player_start (1 0 0) (-16 -16 -24) (16 16 32)
@@ -174,7 +170,8 @@ the normal starting point for a level.
 void Create_CTB_Entities (edict_t *self);
 
 void SP_info_player_start(edict_t *self)
-{Create_CTB_Entities (self);
+{
+	Create_CTB_Entities (self);
 
 	//faf
 //	Create_InfoTeamStarts(self);
@@ -209,7 +206,6 @@ potential spawning position for coop games
 
 void SP_info_player_coop(edict_t *self)
 {
-
 	if (!coop->value)
 	{
 		G_FreeEdict (self);
@@ -255,56 +251,67 @@ void SP_info_Special_Start(edict_t *ent){SP_info_reinforcement_start(ent);}
 void SP_info_Officer_Start(edict_t *ent) {SP_info_reinforcement_start(ent);}
 */
 
-void SP_info_player_intermission(void){}
+void SP_info_player_intermission(void) {
+}
+
 void SP_info_reinforcement_start(edict_t *ent);
+
 void SP_info_Infantry_Start(edict_t *ent)
 {
 	if (ent->count)
 		mapclasslimits[ent->obj_owner][INFANTRY].limit = ent->count;
 	SP_info_reinforcement_start(ent);
 }
+
 void SP_info_L_Gunner_Start(edict_t *ent)
 {
 	if (ent->count)
 		mapclasslimits[ent->obj_owner][L_GUNNER].limit = ent->count;
 	SP_info_reinforcement_start(ent);
 }
+
 void SP_info_H_Gunner_Start(edict_t *ent)
 {
 	if (ent->count)
 		mapclasslimits[ent->obj_owner][H_GUNNER].limit = ent->count;
 	SP_info_reinforcement_start(ent);
 }
+
 void SP_info_Sniper_Start(edict_t *ent)
 {
 	if (ent->count)
 		mapclasslimits[ent->obj_owner][SNIPER].limit = ent->count;
 	SP_info_reinforcement_start(ent);
 }
+
 void SP_info_Engineer_Start(edict_t *ent)
 {
 	if (ent->count)
 		mapclasslimits[ent->obj_owner][ENGINEER].limit = ent->count;
 	SP_info_reinforcement_start(ent);
 }
+
 void SP_info_Medic_Start(edict_t *ent)
 {
 	if (ent->count)
 		mapclasslimits[ent->obj_owner][MEDIC].limit = ent->count;
 	SP_info_reinforcement_start(ent);
 }
+
 void SP_info_Flamethrower_Start(edict_t *ent)
 {
 	if (ent->count)
 		mapclasslimits[ent->obj_owner][FLAMER].limit = ent->count;
 	SP_info_reinforcement_start(ent);
 }
+
 void SP_info_Special_Start(edict_t *ent)
 {
 	if (ent->count)
 		mapclasslimits[ent->obj_owner][SPECIAL].limit = ent->count;
 	SP_info_reinforcement_start(ent);
 }
+
 void SP_info_Officer_Start(edict_t *ent) 
 {
 	if (ent->count)
@@ -336,9 +343,6 @@ qboolean IsFemale (edict_t *ent)
 }
 
 
-
-
-
 qboolean OnSameTeam(edict_t *self,edict_t *target);
 void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 {
@@ -350,8 +354,6 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 	qboolean	ff;
 	edict_t *Tent;
 
-
-	
 /*-----/ PM /-----/ MODIFIED:  Condition split up for portability. /-----*/
 	if (coop->value)
 		if (attacker->client)
@@ -420,7 +422,6 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 			break;
 		}
 
-
 		if (message) //already have message = killed self somehow
 		{
 			if (self->ai && self->client && self->client->resp.team_on)
@@ -450,13 +451,11 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 				}
 			}
 
-
-
 			switch (mod)
 			{
 			case MOD_HELD_TNT:
 				message = "forgot to drop the TNT";
-				break;				
+				break;
 
 			case MOD_HELD_GRENADE:
 				message = "tried to put the pin back in";
@@ -484,20 +483,18 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 					message = "called an airstrike on himself";
 				break;
 
-		
 /*-----/ PM /-----/ NEW:  Fire related obituaries for suicides. /-----*/
-                        case MOD_FIRE_SPLASH:
-                        case MOD_FIREBALL:
+			case MOD_FIRE_SPLASH:
+			case MOD_FIREBALL:
 				if (IsFemale(self))
-                                        message = "burned herself";
+					message = "burned herself";
 				else
-                                        message = "burned himself";
+					message = "burned himself";
 				break;
-                        case MOD_ON_FIRE:
-                                message = "became toast";
+			case MOD_ON_FIRE:
+				message = "became toast";
 				break;
 /*--------------------------------------------------------------------*/
-
 			default:
 				if (IsFemale(self))
 					message = "killed herself";
@@ -505,9 +502,6 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 					message = "killed himself";
 				break;
 			}
-
-
-
 		}
 		if (message)
 		{
@@ -519,8 +513,6 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 				message2 = "(kill credited to";
 //				if (OnSameTeam (self->client->last_wound_inflictor, self)
 //				{}
-
-			
 
 				// Means of Death msgs now server customizable
 				if (death_msg->value == 0)	// print to self only
@@ -535,19 +527,20 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 
 //						if (self->client->resp.team_on->index == Tent->client->resp.team_on->index)
 //						{
-						if (OnSameTeam(Tent,self)){
-							safe_cprintf (Tent, PRINT_MEDIUM, "\2%s ", self->client->pers.netname);}
-						else{
-							safe_cprintf (Tent, PRINT_MEDIUM, "%s ", self->client->pers.netname);}
-
-							safe_cprintf (Tent, PRINT_MEDIUM, "%s %s ", message, message2);
-
-						if (OnSameTeam(Tent,self->client->last_wound_inflictor)){
-							safe_cprintf (Tent, PRINT_MEDIUM, "\2%s", self->client->last_wound_inflictor->client->pers.netname);}
-						else{
-							safe_cprintf (Tent, PRINT_MEDIUM, "%s", self->client->last_wound_inflictor->client->pers.netname);}
-							safe_cprintf (Tent, PRINT_MEDIUM, ").\n");
-                            							
+						if (OnSameTeam(Tent,self)) {
+							safe_cprintf (Tent, PRINT_MEDIUM, "\2%s ", self->client->pers.netname);
+						}
+						else {
+							safe_cprintf (Tent, PRINT_MEDIUM, "%s ", self->client->pers.netname);
+						}
+						safe_cprintf (Tent, PRINT_MEDIUM, "%s %s ", message, message2);
+						if (OnSameTeam(Tent,self->client->last_wound_inflictor)) {
+							safe_cprintf (Tent, PRINT_MEDIUM, "\2%s", self->client->last_wound_inflictor->client->pers.netname);
+						}
+						else {
+							safe_cprintf (Tent, PRINT_MEDIUM, "%s", self->client->last_wound_inflictor->client->pers.netname);
+						}
+						safe_cprintf (Tent, PRINT_MEDIUM, ").\n");
 					}
 					if (death_msg->value == 3)
 					{
@@ -555,9 +548,7 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 						gi.cprintf (NULL, PRINT_MEDIUM, "%s %s ", message, message2);
 						gi.cprintf (NULL, PRINT_MEDIUM, "%s", self->client->last_wound_inflictor->client->pers.netname);
 						gi.cprintf (NULL, PRINT_MEDIUM, ").\n");
-
 					}
-							
 				}
 				else if (death_msg->value == 2)  // print to team
 				{
@@ -610,9 +601,6 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 				}
 			}
 
-
-
-
 			if (deathmatch->value)
 				self->client->resp.score--;
 			if (!self->ai)
@@ -620,12 +608,9 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 			return;
 		}
 
-
-
 		self->enemy = attacker;
 		if (attacker && attacker->client)
-		{			
-
+		{
 			switch (mod)
 			{
 			case MOD_PISTOL:
@@ -693,13 +678,13 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 			case MOD_TNT_SPLASH:
 				message = "didn't see";
 				message2 = "'s TNT";
-				break;				
+				break;
 			case MOD_TNT1_SPLASH:
 				if (IsFemale(self))
 				message = "tripped on her own TNT";
 				else
 				message = "tripped on his own TNT";
-				break;				
+				break;
 //bcass end
 			case MOD_HG_SPLASH:
 				message = "didn't see";
@@ -721,15 +706,14 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 			case MOD_FIRE_SPLASH:
 				message = "was scorched by";
 				break;
-            case MOD_ON_FIRE:
+			case MOD_ON_FIRE:
 				message = "was cremated by";
 				break;
-            case MOD_FIREBALL:
+			case MOD_FIREBALL:
 				message = "got flamed by";
 				break;
 /*-----------------------------------------------------------------*/
 			case MOD_KNIFE:
-	
 				if (attacker->client->pers.weapon && 
 					attacker->client->pers.weapon->classnameb == WEAPON_KATANA)
 					message = "was sliced in half by";
@@ -765,11 +749,6 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 			case MOD_TANKHIT:
 				message = "got blown up by";
 				break;
-
-
-
-
-
 			}
 
 			//faf:  announce team kills
@@ -796,7 +775,6 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 						ParseBotChat (self->ai->chat, attacker);
 					}
 				}
-
 			}
 			else
 			{
@@ -812,9 +790,7 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 						ParseBotChat (self->ai->chat, attacker);
 					}
 				}
-
 			}
-
 
 			if (message)
 			{
@@ -831,15 +807,20 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 
 //						if (self->client->resp.team_on->index == Tent->client->resp.team_on->index)
 //						{
-						if (OnSameTeam(Tent,self)){
-							safe_cprintf (Tent, PRINT_MEDIUM,"\2%s", self->client->pers.netname);}
-						else{safe_cprintf (Tent, PRINT_MEDIUM,"%s", self->client->pers.netname);}
-
-							safe_cprintf (Tent, PRINT_MEDIUM," %s ", message);
-						if (OnSameTeam(Tent,attacker)){
-							safe_cprintf (Tent, PRINT_MEDIUM,"\2%s", attacker->client->pers.netname);}
-						else{safe_cprintf (Tent, PRINT_MEDIUM,"%s", attacker->client->pers.netname);}
-							safe_cprintf (Tent, PRINT_MEDIUM,"%s%s", message2, message3);
+						if (OnSameTeam(Tent,self)) {
+							safe_cprintf (Tent, PRINT_MEDIUM,"\2%s", self->client->pers.netname);
+						}
+						else {
+							safe_cprintf (Tent, PRINT_MEDIUM,"%s", self->client->pers.netname);
+						}
+						safe_cprintf (Tent, PRINT_MEDIUM," %s ", message);
+						if (OnSameTeam(Tent,attacker)) {
+							safe_cprintf (Tent, PRINT_MEDIUM,"\2%s", attacker->client->pers.netname);
+						}
+						else {
+							safe_cprintf (Tent, PRINT_MEDIUM,"%s", attacker->client->pers.netname);
+						}
+						safe_cprintf (Tent, PRINT_MEDIUM,"%s%s", message2, message3);
 
 						if (OnSameTeam(attacker, self) && attacker != self)
 						{
@@ -849,24 +830,19 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 									safe_cprintf (Tent, PRINT_MEDIUM,"\2%s", self->client->last_wound_inflictor->client->pers.netname);
 								else
 									safe_cprintf (Tent, PRINT_MEDIUM,"%s", self->client->last_wound_inflictor->client->pers.netname);
-
 							}
-
 							safe_cprintf (Tent,PRINT_MEDIUM,")\n");
 						}
 						else safe_cprintf (Tent,PRINT_MEDIUM,"\n");
-						
-							
-
-
 					}
-						if (death_msg->value == 3) //print to server console
-						{
-							gi.cprintf (NULL, PRINT_MEDIUM,"%s", self->client->pers.netname);
-							gi.cprintf (NULL, PRINT_MEDIUM," %s ", message);
-							gi.cprintf (NULL, PRINT_MEDIUM,"%s", attacker->client->pers.netname);
-							gi.cprintf (NULL, PRINT_MEDIUM,"%s%s\n", message2, message3);
-						}
+
+					if (death_msg->value == 3) //print to server console
+					{
+						gi.cprintf (NULL, PRINT_MEDIUM,"%s", self->client->pers.netname);
+						gi.cprintf (NULL, PRINT_MEDIUM," %s ", message);
+						gi.cprintf (NULL, PRINT_MEDIUM,"%s", attacker->client->pers.netname);
+						gi.cprintf (NULL, PRINT_MEDIUM,"%s%s\n", message2, message3);
+					}
 				}
 				else if (death_msg->value == 2) // print to team
 				{
@@ -879,7 +855,6 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 						if (self->client->resp.team_on->index == Tent->client->resp.team_on->index)
 							safe_cprintf(Tent, PRINT_MEDIUM, "%s %s %s%s%s\n", self->client->pers.netname, message, attacker->client->pers.netname, message2, message3);
 					}
-
 				}
 
 				//give credit to original attacker when wounded player is tk'ed.
@@ -893,9 +868,7 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 							self->client->last_wound_inflictor->client->resp.stat_bot_plus++;
 						else
 							self->client->last_wound_inflictor->client->resp.stat_human_plus++;
-
 					}
-
 				}
 
 				if (deathmatch->value)
@@ -931,11 +904,8 @@ void TossClientWeapon (edict_t *self)
 	if (!deathmatch->value)
 		return;
 
-
 	if (self->client->weaponstate == WEAPON_DROPPING)
 		return;//faf:  fixes dropping 2 weaps with drop_shot
-
-
 
 	item = self->client->pers.weapon;
 	if (! self->client->pers.inventory[self->client->ammo_index] )
@@ -947,7 +917,6 @@ void TossClientWeapon (edict_t *self)
 		 (Q_stricmp (item->pickup_name, "Sandbags")      == 0) ||
 		 (Q_stricmp (item->pickup_name, "Binoculars") == 0) ))
 		item = NULL;
-
 
 	if (!((int)(dmflags->value) & DF_QUAD_DROP))
 		quad = false;
@@ -996,7 +965,6 @@ void TossClientWeapon (edict_t *self)
 		}
 
 		Drop_Weapon(self, item);
-
 	}
 /*
 	if (quad)
@@ -1039,14 +1007,15 @@ void LookAtKiller (edict_t *self, edict_t *inflictor, edict_t *attacker)
 
 	self->client->killer_yaw = 180/M_PI*atan2(dir[1], dir[0]);
 }
+
 /*
 =====================
 SyncUserInfo
 This is called to update the player status
 =====================
 */
-void SyncUserInfo(edict_t *ent, qboolean pers) {
-
+void SyncUserInfo(edict_t *ent, qboolean pers)
+{
 	char		userinfo[MAX_INFO_STRING];
 
 	memcpy (userinfo, ent->client->pers.userinfo, sizeof(userinfo));
@@ -1058,10 +1027,7 @@ void SyncUserInfo(edict_t *ent, qboolean pers) {
 }
 
 
-
-
 /*
-
 void Bloodpool_Think(edict_t *ent)
 {
 	if (!ent->owner->inuse)
@@ -1094,14 +1060,10 @@ void Bloodpool_Think(edict_t *ent)
 		ent->think = G_FreeEdict;
 		ent->nextthink = level.time + 20;
 	}
-
 }
-
-
 
 void Spawn_Bloodpool(edict_t *ent)
 {
-
 	edict_t *bloodpool;
 	trace_t tr;
 	vec3_t end, norm, start;
@@ -1168,7 +1130,7 @@ void AlignToGround(edict_t *ent)
 
 	VectorMA (start, 100, down, end);
 	tr = gi.trace (start, NULL, NULL, end, ent, MASK_SHOT);
-	
+
 	if (tr.fraction < 1.0)
 	{
 		safe_bprintf (PRINT_HIGH, "xxx\n"); 
@@ -1178,17 +1140,16 @@ void AlignToGround(edict_t *ent)
 			angle = atan (norm[0]/norm[2]);
 		else
 			angle = atan (norm[0]/.000001);
-	
+
 		ent->s.angles[0] = (cos((M_PI*ent->s.angles[1])/180) * angle)* 180 / M_PI;
 		ent->s.angles[2] = -(sin((M_PI*ent->s.angles[1])/180) * angle)* 180 / M_PI;
-
 
 		VectorCopy (tr.endpos, ent->s.origin);
 
 	}
-
 }
 */
+
 void turret_off (edict_t *self);
 void CopyToBodyQue (edict_t *ent);
 /*
@@ -1201,7 +1162,7 @@ void temp_player_corpse_die (edict_t *self, edict_t *inflictor, edict_t *attacke
 //	int		 n;
 
 	if (self->health < -400)
-{
+	{
 		gi.sound (self, CHAN_BODY, gi.soundindex ("misc/udeath.wav"), 1, ATTN_NORM, 0);
 //		for (n= 0; n < 4; n++)
 //			ThrowGib (self, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
@@ -1217,10 +1178,9 @@ void temp_player_corpse_die (edict_t *self, edict_t *inflictor, edict_t *attacke
 		ThrowClientHead (self, damage);
 		self->takedamage = DAMAGE_NO;
 		self->solid = SOLID_NOT;
+	}
 }
-	
 
-}
 void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point)
 {
 	int		i, n;
@@ -1233,7 +1193,6 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 	self->s.modelindex3 = 0;//faf:  ctb code
 	if(self->client->pers.inventory[ITEM_INDEX(FindItem("briefcase"))])
 		Drop_Briefcase (self, FindItemByClassname("briefcase"));
-
 
 	VectorClear (self->avelocity);
 	self->takedamage = DAMAGE_YES;
@@ -1251,7 +1210,6 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 
 	turret_off (self);
 
-	
 	if (!self->deadflag)
 	{
 		self->leave_limbo_time = level.time + RI->value; //faf
@@ -1273,7 +1231,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 			meansOfDeath != MOD_CHANGETEAM_WOUNDED) {
 			if (deathmatch->value && !self->client->menu)
 				Cmd_Help_f (self);		// show scores
-		} 
+		}
 
 		if (self->client->grenade)
 			weapon_grenade_fire(self);
@@ -1285,7 +1243,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 		}
 		//bcass end
 	}
-	
+
 	// remove powerups
 	self->client->quad_framenum = 0;
 	self->client->invincible_framenum = 0;
@@ -1296,13 +1254,13 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 	memset(self->client->pers.inventory, 0, sizeof(self->client->pers.inventory));
 	mod = meansOfDeath & ~MOD_FRIENDLY_FIRE;
 
-	if ((mod == MOD_HELD_GRENADE) 
-		|| (mod == MOD_GRENADE) 
-		|| (mod == MOD_HANDGRENADE) 
-		|| (mod == MOD_ROCKET) 
+	if ((mod == MOD_HELD_GRENADE)
+		|| (mod == MOD_GRENADE)
+		|| (mod == MOD_HANDGRENADE)
+		|| (mod == MOD_ROCKET)
 		|| (mod == MOD_R_SPLASH)
-		|| (mod == MOD_G_SPLASH) 
-		|| (mod == MOD_HG_SPLASH)		
+		|| (mod == MOD_G_SPLASH)
+		|| (mod == MOD_HG_SPLASH)
 		|| (mod == MOD_EXPLOSIVE)
 		|| (mod == MOD_TANKHIT)
 		|| (mod == MOD_TNT)
@@ -1311,8 +1269,6 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 		|| (mod == MOD_TNT_SPLASH)
 		|| (mod == MOD_TNT1_SPLASH)) 
 	{	//Wheaty: Explosive death --  gib 'em
-
-
 		gi.sound (self, CHAN_BODY, gi.soundindex ("misc/udeath.wav"), 1, ATTN_NORM, 0);
 		for (n=0; n<3; n++)
 		{
@@ -1341,13 +1297,10 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 		if (!self->deadflag)
 		{
 			static int i;
-				i = (i+1)%3;
 
+			i = (i+1)%3;
 
-
-				
-				
-				// start a death animation
+			// start a death animation
 			self->client->anim_priority = ANIM_DEATH;
 			if (self->stanceflags==STANCE_DUCK)
 			{
@@ -1380,7 +1333,6 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 				break;
 			}
 
-
 			/* Wheaty 10/27/01: Moved inside initial 'deadflag' if statement
 			to reduce code redundancy. */
 
@@ -1391,7 +1343,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 				point[2] = point[2] + self->viewheight;//faf
 				HeadShotGib (self, point, forward, right, self->velocity);
 			}
-	
+
 			//faf:  dont play 2 death sounds
 			if (meansOfDeath != MOD_FALLING || (self->client->resp.team_on && !strcmp(self->client->resp.team_on->teamid, "gbr")))
 				gi.sound (self, CHAN_VOICE, gi.soundindex(va("*death%i.wav", (rand()%4)+1)), 1, ATTN_NORM, 0);
@@ -1416,9 +1368,9 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 		self->client->mags[i].sniper_fract	= 0;
 		self->client->mags[i].sniper_rnd	= 0;
 		self->client->mags[i].submg_fract	= 0;
-		self->client->mags[i].submg_rnd		= 0;		
-		self->client->mags[i].submg2_rnd		= 0;		
-		self->client->mags[i].shotgun_rnd		= 0;		
+		self->client->mags[i].submg_rnd		= 0;
+		self->client->mags[i].submg2_rnd		= 0;
+		self->client->mags[i].shotgun_rnd		= 0;
 	}
 
 	self->client->last_wound_inflictor = NULL;//faf
@@ -1426,7 +1378,6 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 	gi.linkentity (self);
 
 //	Spawn_Bloodpool(self);
-
 
 	//jabot
 	if (self->ai)
@@ -1443,15 +1394,12 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 		}
 		self->ai->actual_camp_start = -1;
 		self->ai->start_camp_time = 0;
-
 	}
-	
- 
+
 	/*temp removing corpse stuff 
 	self->svflags = self->svflags | SVF_MONSTER | SVF_DEADMONSTER;
-     self->monsterinfo.aiflags |= AI_GOOD_GUY; 
-	*/ 
-
+	self->monsterinfo.aiflags |= AI_GOOD_GUY;
+	*/
 }
 
 //=======================================================================
@@ -1484,7 +1432,6 @@ void InitClientPersistant (gclient_t *client)
 
 	memset (&client->pers, 0, sizeof(client->pers));
 
-
 //	client->pers.weapon=item;
 
 	client->pers.health			= 100;
@@ -1502,7 +1449,7 @@ void InitClientPersistant (gclient_t *client)
 	client->pers.max_flame		= 6;
 
 	client->pers.connected = true;
-    
+
 	client->pers.stat_human_kills = human_kills_save;
 	client->pers.stat_human_deaths = human_deaths_save;
 	client->pers.stat_bot_kills = bot_kills_save;
@@ -1513,8 +1460,6 @@ void InitClientPersistant (gclient_t *client)
 
 	client->pers.afk_check_time = afk_check_time;
 	VectorCopy (last_angles, client->pers.last_angles);
-
-
 }
 
 
@@ -1564,7 +1509,6 @@ void FetchClientEntData (edict_t *ent)
 }
 
 
-
 /*
 ======================================================================
   SelectSpawnPoint
@@ -1586,12 +1530,10 @@ float	PlayersRangeFromSpot (vec3_t spot_origin)
 	int		n;
 	float	playerdistance;
 
-
 	bestplayerdistance = 9999999;
 	for (n = 1; n <= maxclients->value; n++)
 	{
 		player = &g_edicts[n];
-
 
 		if (!player->inuse)
 			continue;
@@ -1624,14 +1566,12 @@ edict_t *SelectRandomDeathmatchSpawnPoint (void)
 	int		selection;
 	float	range, range1, range2;
 
-
 	spot = NULL;
 	range1 = range2 = 99999;
 	spot1 = spot2 = NULL;
 
 	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL)
 	{
-	
 		count++;
 		range = PlayersRangeFromSpot(spot->s.origin);
 		if (range < range1)
@@ -1656,16 +1596,13 @@ edict_t *SelectRandomDeathmatchSpawnPoint (void)
 	else
 		count -= 2;
 
-
 	selection = rand() % count;
 
 	spot = NULL;
 	do
 	{
 		spot = G_Find (spot, FOFS(classname), "info_player_deathmatch");
-
 		if (spot == spot1 || spot == spot2)
-
 			selection++;
 	} while(selection--);
 
@@ -1720,28 +1657,22 @@ edict_t *SelectRandomDDaySpawnPoint (char *spawn_point, int team)
 //	else
 //		count -= 2;
 
-
 //	gi.dprintf(DEVELOPER_MSG_GAME, "count: %i ********\n",count);
 
 	selection = (int) (random() * count);
 //	gi.dprintf(DEVELOPER_MSG_GAME, "selection: %i ********\n",selection);
 
-
 	spot = NULL;
 	do
 	{
 		spot = G_Find_Team (spot, FOFS(classname), spawn_point, team);
-
 //		if (spot == spot1 || spot == spot2)
-
 //			selection++;
 	} while(selection--);
 
 	if (spot->obj_owner == -1)
 		spot->obj_owner = team;
 	else return spot;
-
-
 
 //this team just took a -1 spawn point, make sure other team has a spawn point or give it them here
 	otherteam = (team+1)%2;
@@ -1757,8 +1688,6 @@ edict_t *SelectRandomDDaySpawnPoint (char *spawn_point, int team)
 		if (e->obj_owner == otherteam)
 			return spot;  //they already have one, get out
 	}
-
-
 
 	spotb = NULL;
 	range1 = range2 = 99999;
@@ -1781,13 +1710,8 @@ edict_t *SelectRandomDDaySpawnPoint (char *spawn_point, int team)
 
 	spotb->obj_owner = otherteam;
 
-
-
-
-
 	return spot;
 }
-
 
 
 edict_t *SelectNearestSpawnPoint (int team)
@@ -1797,27 +1721,27 @@ edict_t *SelectNearestSpawnPoint (int team)
 	edict_t	*spot;
 	vec3_t mean_origin;
 	int i;
-    edict_t *check_ent;
+	edict_t *check_ent;
 	float temp_distance, nearest_distance = 9999999;
 	vec3_t dist;
 	int playercount = 0;
 	bestdistance = 0;
 
 	VectorClear (mean_origin);
- 	spot = NULL;
+	spot = NULL;
 	bestspot = NULL;
-       
+
 	for (i = 1; i <= maxclients->value; i++)
-    {
-         check_ent = g_edicts + i;
-         if (!check_ent->inuse)
+	{
+		check_ent = g_edicts + i;
+		if (!check_ent->inuse)
 			 continue;
-		 if (!check_ent->client ||
+		if (!check_ent->client ||
 			 !check_ent->client->resp.team_on ||
 			 check_ent->health <1)
-			 continue;
-		 if (check_ent->deadflag)
-			 continue;
+			continue;
+		if (check_ent->deadflag)
+			continue;
 		if (check_ent->client->resp.AlreadySpawned == false)
 			continue;
 		if (check_ent->client->limbo_mode == true)
@@ -1825,16 +1749,13 @@ edict_t *SelectNearestSpawnPoint (int team)
 		if (check_ent->client->spawntime > level.time - 1)
 			continue;
 
-
-		 if (check_ent->client->resp.team_on->index == team)
-		 {
-			 playercount++;
-			 mean_origin[0] = mean_origin[0] + check_ent->s.origin [0];
-			 mean_origin[1] = mean_origin[1] + check_ent->s.origin [1];
-			 mean_origin[2] = mean_origin[2] + check_ent->s.origin [2];
-		 }
-
-
+		if (check_ent->client->resp.team_on->index == team)
+		{
+			playercount++;
+			mean_origin[0] = mean_origin[0] + check_ent->s.origin [0];
+			mean_origin[1] = mean_origin[1] + check_ent->s.origin [1];
+			mean_origin[2] = mean_origin[2] + check_ent->s.origin [2];
+		}
 	}
 
 	if (playercount < 1)
@@ -1857,9 +1778,7 @@ edict_t *SelectNearestSpawnPoint (int team)
 		if (spot->obj_owner != team)
 			continue;
 
-
 		VectorSubtract (spot->s.origin, mean_origin, dist);
-		
 		temp_distance = VectorLength(dist);
 
 //		gi.dprintf(DEVELOPER_MSG_GAME, "%s %f \n", vtos(spot->s.origin),temp_distance);
@@ -1869,18 +1788,12 @@ edict_t *SelectNearestSpawnPoint (int team)
 			nearest_distance = temp_distance;
 			bestspot = spot;
 		}
-
 	}
-
 
 	if (bestspot)
-
 	{
-
 		return bestspot;
-
 	}
-
 
 	return spot;
 }
@@ -1907,7 +1820,6 @@ edict_t *SelectFarthestDeathmatchSpawnPoint (void)
 
 	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL)
 	{
-
 		bestplayerdistance = PlayersRangeFromSpot (spot->s.origin);
 
 		if (bestplayerdistance > bestdistance)
@@ -1918,10 +1830,8 @@ edict_t *SelectFarthestDeathmatchSpawnPoint (void)
 	}
 
 	if (bestspot)
-
 	{
 		return bestspot;
-
 	}
 
 	// if there is a player just spawned on each and every start spot
@@ -2059,12 +1969,8 @@ void Find_Mission_Start_Point(edict_t *ent, vec3_t origin, vec3_t angles)
 	if (!spot)
 		spot = SelectNearestSpawnPoint(team);
 
-
 	if (ent->ai)
 		spot = SelectRandomDDaySpawnPoint ("bot_spawn", team);
-
-
-
 
 	// first, find the class spot
 	if (!spot)
@@ -2075,11 +1981,8 @@ void Find_Mission_Start_Point(edict_t *ent, vec3_t origin, vec3_t angles)
 	if (!spot)
 		spot = SelectRandomDDaySpawnPoint ("info_reinforcements_nearest", team);
 
-
-
-	if (!spot) 
+	if (!spot)
 		spot = G_Find (spot, FOFS(classname),"info_player_start");
-	
 
 	VectorCopy (spot->s.origin, origin);
 	origin[2] += 9;
@@ -2087,15 +1990,12 @@ void Find_Mission_Start_Point(edict_t *ent, vec3_t origin, vec3_t angles)
 	VectorCopy (spot->s.angles, ent->s.angles);
 	VectorCopy (spot->s.angles, ent->client->ps.viewangles);
 	VectorCopy (spot->s.angles, ent->client->v_angle);
-
-
 }
 
 void InitBodyQue (void)
 {
 	int		i;
 	edict_t	*ent;
-
 
 	level.body_que = 0;
 	for (i=0; i<BODY_QUEUE_SIZE ; i++)
@@ -2123,17 +2023,11 @@ void body_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage,
 		ThrowGib (self, "models/objects/gibs/sexyleg/tris.md2", damage, GIB_ORGANIC);
 		ThrowGib (self, "models/objects/gibs/skull/tris.md2", damage, GIB_ORGANIC);
 
-
 		self->s.origin[2] -= 48;
 		ThrowClientHead (self, damage);
 		self->takedamage = DAMAGE_NO;
-
 	}
 }
-
-
-
-
 
 
 void CopyToBodyQue (edict_t *ent)
@@ -2155,13 +2049,12 @@ void CopyToBodyQue (edict_t *ent)
 	body->s = ent->s;
 	body->s.number = body - g_edicts;
 /*-----/ PM /-----/ NEW:  Don't let body make sounds. /-----*/
-        body->s.sound = 0;
+	body->s.sound = 0;
 /*----------------------------------------------------------*/
 
-
 /*-----/ PM /-----/ MODIFIED:  Treat body as a dead monster. /-----*/
-        body->svflags = ent->svflags | SVF_MONSTER | SVF_DEADMONSTER;
-        body->monsterinfo.aiflags |= AI_GOOD_GUY;
+	body->svflags = ent->svflags | SVF_MONSTER | SVF_DEADMONSTER;
+	body->monsterinfo.aiflags |= AI_GOOD_GUY;
 /*-----------------------------------------------------------------*/
 
 	body->svflags = ent->svflags;
@@ -2171,19 +2064,15 @@ void CopyToBodyQue (edict_t *ent)
 	VectorCopy (ent->absmax, body->absmax);
 	VectorCopy (ent->size, body->size);
 
-
 	//in case it didn't get to end of death sequence (could happen when killed on ladder)
 	if (ent->client && ent->client->anim_end)
 	{
 		body->s.frame = ent->client->anim_end;
 	}
-		
-
-
 
 // use prone vaules so gibs dont block shots	
 //faf:  handle in player_die	body->mins[2]	= -24;
-//								body->maxs[2]   = -12;//faf 8; 
+//								body->maxs[2]   = -12;//faf 8;
 
 //	safe_bprintf (PRINT_HIGH, "frame %i .\n", ent->s.frame); 
 //	safe_bprintf (PRINT_HIGH, "ang %s .\n", vtos(ent->s.angles)); 
@@ -2216,16 +2105,14 @@ void CopyToBodyQue (edict_t *ent)
 		VectorSet (body->maxs, 10, 10, -14);
 	}
 
+//	safe_bprintf (PRINT_HIGH, "ent mins1 %s .\n", vtos(body->mins));
+//	safe_bprintf (PRINT_HIGH, "ent maxs1 %s .\n", vtos(body->maxs));
 
-//	safe_bprintf (PRINT_HIGH, "ent mins1 %s .\n", vtos(body->mins)); 
-//	safe_bprintf (PRINT_HIGH, "ent maxs1 %s .\n", vtos(body->maxs)); 
-
-//	safe_bprintf (PRINT_HIGH, "ang %f .\n", body->s.angles[1]); 
+//	safe_bprintf (PRINT_HIGH, "ang %f .\n", body->s.angles[1]);
 
 	ang = anglemod (body->s.angles[1]);
 
-//	safe_bprintf (PRINT_HIGH, "ang %f .\n", ang); 
-
+//	safe_bprintf (PRINT_HIGH, "ang %f .\n", ang);
 
 	VectorCopy (body->mins,a);
 	VectorCopy (body->maxs,b);
@@ -2267,7 +2154,6 @@ void CopyToBodyQue (edict_t *ent)
 //	body->maxs[0] = body->maxs[0] * cos(angle) - body->maxs[1] * sin (angle);
 //	body->maxs[1] = body->maxs[1] * cos(angle) - body->maxs[0] * sin (angle);
 
-	
 	if (body->mins[0] > body->maxs[0])
 	{//switch mins and maxs if needed
 		temp1 = body->mins[0];
@@ -2281,16 +2167,13 @@ void CopyToBodyQue (edict_t *ent)
 		body->maxs[1] = temp1;
 	}
 
-	
 //	X' = X cos(T) - Y sin(T) 
 //	Y' = Y cos(T) + X sin(T) 
 
 //safe_bprintf (PRINT_HIGH, "ent mins2 %s angles %s.\n", vtos(body->mins), vtos(ent->s.angles)); 
 //safe_bprintf (PRINT_HIGH, "ent maxs1 %s .\n", vtos(body->maxs)); 
 
-
 //safe_bprintf (PRINT_HIGH, "ent mins1 %s .\n", vtos(ent->mins)); 
-
 
 	body->absmax[2] = body->absmin[2] + 16;
 	body->size[2]   = 16;
@@ -2303,31 +2186,29 @@ void CopyToBodyQue (edict_t *ent)
 	body->owner = ent->owner;
 	body->movetype = ent->movetype;
 /*-----/ PM /-----/ NEW:  Tranfer fire from entity to body. /-----*/
-    if (ent->health > 0)
+	if (ent->health > 0)
 		body->health = 0;
-    else
+	else
 		body->health = ent->health;
 
 	//body->health = 10000;
-    body->gib_health = ent->gib_health;
-    body->groundentity = ent->groundentity;
-    body->mass = ent->mass;
-    body->burnout = ent->burnout;
-    if (ent->burner)
+	body->gib_health = ent->gib_health;
+	body->groundentity = ent->groundentity;
+	body->mass = ent->mass;
+	body->burnout = ent->burnout;
+	if (ent->burner)
 	{
 		body->burner = ent->burner;
-        body->burner->enemy = body;
-        ent->burner = NULL;
+		body->burner->enemy = body;
+		ent->burner = NULL;
 	}
-    body->fireflags = ent->fireflags & ~FIREFLAG_DELTA_VIEW;
+	body->fireflags = ent->fireflags & ~FIREFLAG_DELTA_VIEW;
 /*----------------------------------------------------------------*/
-
 
 	body->die = body_die;
 	body->takedamage = DAMAGE_YES;
 
 	gi.linkentity (body);
-
 }
 
 
@@ -2366,14 +2247,14 @@ void respawn (edict_t *self)
 			gi.linkentity (self);
 			return;
 //		}
-		gi.linkentity (self);		
+		gi.linkentity (self);
 
 		DoEndOM(self);
 		//
 		return;
 	//}
 	// restart the entire server
-//gi.AddCommandString ("menu_loadgame\n");
+	//gi.AddCommandString ("menu_loadgame\n");
 }
 
 //==============================================================
@@ -2398,12 +2279,11 @@ void PutClientInServer (edict_t *ent)
 
 	int		i;
 
-
 	client_persistant_t	saved;
 	client_respawn_t	resp;
 
-	ent->stanceflags = STANCE_STAND;
 
+	ent->stanceflags = STANCE_STAND;
 
 	// find a spawn point
 	// do it before setting health back up, so farthest
@@ -2415,12 +2295,9 @@ void PutClientInServer (edict_t *ent)
 	if (!level.intermissiontime && !ent->ai && ent->client->resp.enterframe > level.framenum - 1)
 		VectorSet (spawn_origin, -4032, -4032, -4032);
 
-
-
 	//the above line should put the player in a staging room...
 	index = ent-g_edicts-1;
 	client = ent->client;
-
 
 	// deathmatch wipes most client data every spawn
 	if (deathmatch->value)
@@ -2446,7 +2323,7 @@ void PutClientInServer (edict_t *ent)
 //		if (resp.score > client->pers.score)
 //			client->pers.score = resp.score;
 	}
-	else 
+	else
 	{
 		memset (&resp, 0, sizeof(resp));
 	}
@@ -2486,14 +2363,11 @@ void PutClientInServer (edict_t *ent)
 /*-----/ PM /-----/ NEW:  Kill any flames and set new attributes. /-----*/
 	ent->burnout = 0;
 	ent->gib_health = -30;
-    ent->fireflags = 18 | FIREFLAG_DOWN | FIREFLAG_DELTA_VIEW | FIREFLAG_IGNITE;
-    ent->style = 1;
+	ent->fireflags = 18 | FIREFLAG_DOWN | FIREFLAG_DELTA_VIEW | FIREFLAG_IGNITE;
+	ent->style = 1;
 /*----------------------------------------------------------------------*/
 
-	if (   ent->client->resp.team_on 
-		&& ent->client->resp.mos
-		&& ent->client->resp.AlreadySpawned)
-
+	if (ent->client->resp.team_on && ent->client->resp.mos && ent->client->resp.AlreadySpawned)
 		ent->model = va("players/%s/tris.md2", ent->client->resp.team_on->playermodel);
 	else
 	{
@@ -2501,7 +2375,6 @@ void PutClientInServer (edict_t *ent)
 
 //faf: removed for team dll support		ent->model = "players/usa/tris.md2";
 	}
-		
 
 	gi.setmodel (ent, ent->model);
 
@@ -2510,7 +2383,6 @@ void PutClientInServer (edict_t *ent)
 	VectorClear (ent->velocity);
 // clear playerstate values
 	memset (&ent->client->ps, 0, sizeof(client->ps));
-
 
 	client->ps.pmove.origin[0] = spawn_origin[0]*8;
 	client->ps.pmove.origin[1] = spawn_origin[1]*8;
@@ -2545,9 +2417,7 @@ void PutClientInServer (edict_t *ent)
 	VectorCopy (ent->s.origin, ent->s.old_origin);
 
 	// set the delta angle
-
 	for (i=0 ; i<3 ; i++)
-
 		client->ps.pmove.delta_angles[i] = ANGLE2SHORT(spawn_angles[i] - client->resp.cmd_angles[i]);
 
 	ent->s.angles[PITCH] = 0;
@@ -2560,17 +2430,14 @@ void PutClientInServer (edict_t *ent)
 	client->gibmachine = flame_normal;
 //bcass end
 
-
 	VectorCopy (ent->s.origin, ent->client->last_pos1);
 	VectorCopy (ent->s.origin, ent->client->last_pos2);
 	VectorCopy (ent->s.origin, ent->client->last_pos3);
-
 
 	//JABot[start]
 	if (ent->ai && ent->ai->is_bot == true)
 		return;
 	//JABot[end]
-
 
 	//pbowens: this caused telefrags
 /*
@@ -2581,8 +2448,6 @@ void PutClientInServer (edict_t *ent)
 */
 	//if (!client->resp.team_on)
 		gi.linkentity (ent);
-
-
 
 	// force the current weapon up
 	//client->newweapon = client->pers.weapon;
@@ -2605,8 +2470,6 @@ void PutClientInServer (edict_t *ent)
 	ent->client->last_fire_time = 0;
 
 	stuffcmd(ent, "crosshair 0;");
-
-
 }
 
 /*
@@ -2623,30 +2486,20 @@ void ClientBeginDeathmatch (edict_t *ent)
 
 	InitClientResp (ent->client);
 
-
-
-
-
-
-
-
 //faf	if (level.framenum > ((int)level_wait->value * 10))
 	ent->client->resp.scopewobble = 192;
 	
 	ent->client->resp.AlreadySpawned=false;
 	ent->client->resp.mos = NONE;
 
-
 	// locate ent at a spawn point
 	PutClientInServer (ent);
 	//SyncUserInfo(ent, false);
 
-
-		if (level.objectivepic)
-			ent->client->display_info = true;
-		else
-			ent->client->display_info = false;
-
+	if (level.objectivepic)
+		ent->client->display_info = true;
+	else
+		ent->client->display_info = false;
 
 	if (level.campaign)
 	{
@@ -2658,8 +2511,6 @@ void ClientBeginDeathmatch (edict_t *ent)
 		ent->client->layout_type = SHOW_SERVERIMG;
 		ShowServerImg (ent);
 	}
-
-
 
 	ent->client->resp.autopickup = false; // default to OFF
 	ent->client->resp.show_id	 = true;  // default to ON
@@ -2688,17 +2539,12 @@ void ClientBeginDeathmatch (edict_t *ent)
 //faf	if (level.framenum > ((int)level_wait->value * 10))
 //		Cmd_MOTD(ent);
 
-
 	//JABot[start]
 	AI_EnemyAdded(ent);
 	//[end]
 
-
-
 	// make sure all view stuff is valid
 	ClientEndServerFrame (ent);
-
-
 }
 
 
@@ -2713,8 +2559,7 @@ to be placed into the game.  This will happen every level load.
 void ClientBegin (edict_t *ent)
 {
 	int		i;
-	
-	
+
 	num_clients++;
 
 	ent->client = game.clients + (ent - g_edicts - 1);
@@ -2777,12 +2622,10 @@ void ClientBegin (edict_t *ent)
 		}
 	}
 
-
 	// make sure all view stuff is valid
 	ClientEndServerFrame (ent);
 
 	//LevelStartUserDLLs(ent);
-
 }
 
 /*
@@ -2799,7 +2642,6 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 {
 	char	*s;
 	int		playernum;
-
 
 	//gi.dprintf(DEVELOPER_MSG_GAME, "+ %s->userinfo changed\n", ent->client->pers.netname);
 
@@ -2822,9 +2664,6 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 	{
 		char skin[64];
 
-
-
-
 		if (ent->client->resp.team_on && ent->client->resp.mos) 
 		{
 			//faf:  has the mapper set a custom skin?
@@ -2836,10 +2675,6 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 				if (ent->client->resp.mos == MEDIC)
 					strcat(skin, "_medic");
 			}*/
-
-
-
-
 
 			if (team_list[ent->client->resp.team_on->index]->skin)
 			{
@@ -2867,10 +2702,9 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 					strcat (skin, "flamethrower");
 				else 
 					strcat (skin, "infantry");
-
 			}
 			else
-			{			
+			{
 				strcpy(skin, va("%s/%s",
 					ent->client->resp.team_on->playermodel, 
 					ent->client->resp.team_on->mos[ent->client->resp.mos]->skinname) );
@@ -2878,9 +2712,6 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 
 			gi.configstring (CS_PLAYERSKINS + playernum, va("%s\\%s", ent->client->pers.netname, skin));
 
-			
-			
-			
 			//Info_SetValueForKey (userinfo, "skin", skin);
 
 //			if ( Q_stricmp(s, skin) )
@@ -2911,22 +2742,14 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 			gi.configstring (CS_PLAYERSKINS + playernum, va("%s\\%s",
 				ent->client->pers.netname, skin) );
 		}*/
-
-
 	}
-
 	// combine name and skin into a configstring
-	else 
+	else
 		gi.configstring (CS_PLAYERSKINS+playernum, va("%s\\%s", ent->client->pers.netname, s) );
-
-
-    
-
 
 	// handedness
 	s = Info_ValueForKey (userinfo, "hand");
-
-	if (strlen(s))
+	if (*s)
 	{
 		ent->client->pers.hand = atoi(s);
 	}
@@ -2955,18 +2778,20 @@ loadgames will.
 qboolean ClientConnect (edict_t *ent, char *userinfo)
 {
 	static int Already_Done=0;
-	char	*value, *f, *ip;
-	char	*fPtr = NULL;
+	char	*value, *f, *fPtr, *ip;
 
 	// check to see if they are on the banned IP list
 	value = Info_ValueForKey (userinfo, "ip");
 
 	f = strdup (value);
-	ip = strtok_r(f, ":", &fPtr); /* FS: FIXME: Does this really need to be strtok_r for this? */
+	ip = strtok_r(f, ":", &fPtr);
 
 	//for people with dynamic ip's, let them save their stats by name if they set gender to cyborg
 	if (!strcmp (Info_ValueForKey (userinfo, "gender"), "cyborg"))
+	{
+		free (f);
 		ent->client->pers.ip = ent->client->pers.netname;
+	}
 	else
 		ent->client->pers.ip = ip;
 	//gi.dprintf(DEVELOPER_MSG_GAME, "xxxx %s\n", userinfo);
@@ -2974,11 +2799,10 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 	if (ent->ai)
 		BOT_RemoveBot("",ent);
 
-
 	//faf:  using this from the quake 3.21 source code
 	value = Info_ValueForKey (userinfo, "password");
 	if (*password->string && strcmp(password->string, "none") && 
-	strcmp(password->string, value)) 
+	    strcmp(password->string, value))
 	{
 		Info_SetValueForKey(userinfo, "rejmsg", "Password required or incorrect.");
 		// Nick - This next lines to stop the passworded (Quake2) server crash
@@ -2992,18 +2816,17 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 		return false;
 	}
 
-
 	// check for a password
 //	value = Info_ValueForKey (userinfo, "password");
 //	if (strcmp(password->string, value) != 0)
 //		return false;
 
 	if(!Already_Done)
-	{ 
+	{
 		//the client connect function gets called a number of times. we need to set
-        //this variable up to allow functions to be called only once.
-        Already_Done = 1;
-        InsertCmds(id_GameCmds, NUM_ID_CMDS, "id");
+		//this variable up to allow functions to be called only once.
+		Already_Done = 1;
+		InsertCmds(id_GameCmds, NUM_ID_CMDS, "id");
 	}
 
 	// they can connect
@@ -3026,10 +2849,8 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 
 	ent->client->pers.connected = true;
 
-
 	if (stats->value)
 		SetPlayerRating(ent);
-
 
 	return true;
 }
@@ -3050,30 +2871,23 @@ void ClientDisconnect (edict_t *ent)
 	if (!ent->client)
 		return;
 
-
-
 	if (!level.intermissiontime)
 		Write_Player_Stats(ent);
 
 	num_clients--;
 
-
 	change_stance(ent, STANCE_STAND);
-	
+
 	turret_off(ent);
 
 	stuffcmd(ent, "cl_forwardspeed 200;cl_sidespeed 200;cl_upspeed 200;");
 	safe_bprintf (PRINT_HIGH, "%s disconnected\n", ent->client->pers.netname);
 
-
 	//faf:  ctb code
 	if(ent->client->pers.inventory[ITEM_INDEX(FindItem("briefcase"))])
 		Drop_Briefcase (ent, FindItemByClassname("briefcase"));
 
-
-
 	// Remove them from team
-
 	if (ent->client->resp.team_on)
 	{
 //faf:  not used now		team_list[ent->client->resp.team_on->index]->total--;
@@ -3097,7 +2911,6 @@ void ClientDisconnect (edict_t *ent)
 	playernum = ent-g_edicts-1;
 
 	gi.configstring (CS_PLAYERSKINS+playernum, "");
-
 
 	//JABot[start]
 	AI_EnemyRemoved (ent);
@@ -3146,7 +2959,7 @@ void ClientSetMaxSpeed (edict_t *ent, qboolean sync)
 	qboolean	truesight = true;
 
 	if (!ent || !ent->client || ent->client->resp.changeteam || ent->deadflag) // morphine_use on other ents
-		return; 
+		return;
 
 	// We're going under the assumption that most clients have run enabled
 	speed_standard[0] = PSPEED_FORWARD;
@@ -3154,7 +2967,7 @@ void ClientSetMaxSpeed (edict_t *ent, qboolean sync)
 	speed_standard[2] = PSPEED_UP;
 
 	if (!ent->client->limbo_mode)
-	{ 
+	{
 		// TRUE-SIGHT exceptions
 		if (!ent->client->pers.weapon ||
 			ent->client->pers.weapon->position == LOC_KNIFE		||
@@ -3163,22 +2976,18 @@ void ClientSetMaxSpeed (edict_t *ent, qboolean sync)
 //faf			ent->client->pers.weapon->position == LOC_ROCKET	||
 			ent->client->pers.weapon->position == LOC_GRENADES	||
 			ent->client->pers.weapon->position == LOC_TNT)
-			truesight = false;
-			
+		    truesight = false;
+
 		for (i = 0; i < 3; i++) {
 			if (ent->client->aim) 
 			{
 				// standing 
 				if (ent->stanceflags == STANCE_STAND) 
 				{
-
 					if (!truesight)
 						speed_new[i] = speed_standard[i] * ent->client->speedmod;
 					else
 						speed_new[i] = speed_standard[i] * ent->client->speedmod/TRUESIGHT_FACTOR;
-
-			
-				
 				}
 				//crouching
 				else if (ent->stanceflags == STANCE_DUCK)
@@ -3207,12 +3016,9 @@ void ClientSetMaxSpeed (edict_t *ent, qboolean sync)
 				//ent->client->pers.weapon->position == LOC_FLAME &&
 				//ent->client->buttons & BUTTON_ATTACK)
 				//	speed_new[i]=0;
-
 			}
 			else
 				speed_new[i] = speed_standard[i] * ent->client->speedmod;
-
-
 
 			// Nick - Lower speed for flamer.
 			//faf
@@ -3222,34 +3028,26 @@ void ClientSetMaxSpeed (edict_t *ent, qboolean sync)
 		//	{
 		//		speed_new[i] *= .75;
 		//	}
-
 		}
 
-		
 		if ((ent->stanceflags != STANCE_STAND && ent->waterlevel != 3) || 
-			 ent->client->jump_stuck == true)
-
+		    ent->client->jump_stuck == true)
 			speed_new[2] = 0;
-	} 	
+	}
 	else	// they are in limbo so freeze 'em
 	{
 		for (i = 0; i < 3; i++)
 			speed_new[i] = 0;
 	}
 
-
-
-
 	for (i = 0; i <3; i++)
 	{
 		if (ent->ai)
 			speed_new[i]*=2;
 
-		
 		// sometimes, there's no difference, so don't call it twice if unneeded
 		if (ent->client->speedmax[i] != speed_new[i])  {
 			ent->client->speedmax[i]  = speed_new[i];// for clients with run enabled
-
 			ent->client->syncspeed = (sync) ? true : false;
 		}
 	}
@@ -3277,18 +3075,13 @@ void Set_Stance_Max(edict_t *ent)
 	else if (ent->stanceflags == STANCE_DUCK) ent->stance_max = 4;
 	else if (ent->stanceflags == STANCE_CRAWL) ent->stance_max = -15; //changing this to -16 causes weird  2 player crawl to sky bug
 
-
 	else ent->stance_max = 24;//23;
-
-
 }
-			
-	
+
 void SetWaterLevel (edict_t *ent)
 {
 	vec3_t		point;
 	int			cont;
-
 
 //
 // get waterlevel
@@ -3334,7 +3127,7 @@ void SetWaterLevel (edict_t *ent)
 		//	change_stance (ent, STANCE_STAND);
 	}
 }
-	
+
 
 void Count_Votes (void)
 {
@@ -3352,17 +3145,14 @@ void Count_Votes (void)
 	}
 
 	level.changemap = votemaps[highmap];
-
-
 }
 
 qboolean Setup_Map_Vote (void)
 {
 	char	*maps;
 	int		i,j,k,c;
-	
-	char *s, *f;
-	char *fPtr = NULL;
+
+	char *s, *f, *fPtr;
 
 	int mapcount;
 	int	newmapcount;
@@ -3376,7 +3166,6 @@ qboolean Setup_Map_Vote (void)
 	qboolean changefirstmap;
 
 	maps = ReadEntFile("dday/votemaps.txt");
-
 	mapcount = 0;
 
 	if (maps)
@@ -3387,7 +3176,7 @@ qboolean Setup_Map_Vote (void)
 
 		while (c < 300)
 		{
-			if (s != NULL) 
+			if (s != NULL)
 			{
 				if (MapExists(s))
 				{
@@ -3404,12 +3193,10 @@ qboolean Setup_Map_Vote (void)
 			}
 			else
 			{
-				maplisttxt[c] = ""; 
+				maplisttxt[c] = "";
 				c++;
 			}
-
 		}
-
 	}
 	else
 	{
@@ -3434,8 +3221,7 @@ qboolean Setup_Map_Vote (void)
 				break;
 			}
 		}
-	} 
-
+	}
 
 	newmapcount = 0;
 	//sort possible_maps
@@ -3474,7 +3260,7 @@ qboolean Setup_Map_Vote (void)
 				votemaps[0] = level.nextmap;
 				continue;
 			}
-		} 
+		}
 
 		if (i==3 && changefirstmap)
 		{
@@ -3482,7 +3268,6 @@ qboolean Setup_Map_Vote (void)
 				continue;
 		}
 
-	
 		gotmap = false;
 		count = 0;
 		while (!gotmap && count < 1000)
@@ -3529,12 +3314,11 @@ usually be a couple times for each server frame.
 
 void ClientThink (edict_t *ent, usercmd_t *ucmd)
 {
-
 	gclient_t	*client;
 	edict_t		*other;
 	pmove_t		pm;
 	int			i, j;
-	int			 nWoundFrame;
+	int			nWoundFrame;
 
 	// dday
 	//qboolean oob_pitch=false;
@@ -3564,7 +3348,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 //	gi.dprintf(DEVELOPER_MSG_GAME, "%i %s\n", ent->waterlevel, vtos(ent->client->v_angle));
 
 	if (!chile->value && ent->client && ent->client->pers.weapon)
-	{ 
+	{
 		time = 10 * (level.time - ent->client->last_fire_time);
 
 		if (time < 30)
@@ -3574,7 +3358,6 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 			{
 				if ((time < 20) && time != 0)
 					ent->client->kick_angles[0] = ((2 * cos((time/4) -4)) * ((20 -time)/20));
-
 			}
 			else if (ent->client->pers.weapon->position == LOC_RIFLE)
 			{
@@ -4246,11 +4029,10 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 edict_t *Nearest_Player(edict_t *ent)
 {
 	int i;
-    edict_t *e;
+	edict_t *e;
 	edict_t *nearest = NULL;
 	float temp_distance, nearest_distance = 9999999;
 	vec3_t dist;
-
 
 	for (i=0 ; i < game.maxclients ; i++)
 	{
@@ -4275,9 +4057,6 @@ edict_t *Nearest_Player(edict_t *ent)
 	else 
 		return NULL;
 }
-	
-   
-
 
 
 void EndObserverMode(edict_t *ent);
@@ -4304,36 +4083,26 @@ void ClientBeginServerFrame (edict_t *ent)
 
 //		gi.dprintf(DEVELOPER_MSG_GAME, "    %i\n", ent->client->ps.gunframe);//faf test
 
-
 	// run weapon animations if it hasn't been done by a ucmd_t
 	if (!client->weapon_thunk)
 		Think_Weapon (ent);
 	else
 		client->weapon_thunk = false;
 
-
-
-
-		if (!ent->groundentity)
+	if (!ent->groundentity)
+	{
+		ent->client->in_air = true;
+	}
+	else
+	{
+		if (ent->client->in_air)//landed
 		{
-			ent->client->in_air = true;
+			ent->client->footstep_framenum = level.framenum;
+			if (ent->stanceflags == STANCE_STAND)
+				Play_Footstep_Sound(ent);
+			ent->client->in_air = false;
 		}
-		else
-		{
-			if (ent->client->in_air)//landed
-			{
-				ent->client->footstep_framenum = level.framenum;
-				if (ent->stanceflags == STANCE_STAND)
-					Play_Footstep_Sound(ent);
-				ent->client->in_air = false;
-			}
-		}
-
-
-
-
-
-
+	}
 
 	//faf:  moved from clientthink
 	if (client->grenade) // disable the grenade from triggering self, but still leave timers on
@@ -4347,13 +4116,11 @@ void ClientBeginServerFrame (edict_t *ent)
 		if (gi.pointcontents(ent->client->grenade->s.origin) & MASK_SOLID)
 		{
 			client->grenade->s.origin[2]-= 58;
-
 		}
-
 	}
 
 	/*
- 	if (client->jump_stamina <= JUMP_MINIMUM  &&
+	if (client->jump_stamina <= JUMP_MINIMUM  &&
 		level.framenum%13 ==0)		 
 	{
 		stuffcmd(ent, "play inland/heart.wav");
@@ -4364,12 +4131,11 @@ void ClientBeginServerFrame (edict_t *ent)
 		if (ent->client->chasetarget && !ent->client->chasetarget->inuse)
 			ent->client->chasetarget=NULL;
 
-
 		if (client->latched_buttons & BUTTON_ATTACK)
 		{
 			if (ent->client->chasetarget)
 				ent->client->chasetarget = NULL;
-			else 
+			else
 			{
 				/*for (n = 1; n <= maxclients->value; n++)
 				{
@@ -4389,7 +4155,6 @@ void ClientBeginServerFrame (edict_t *ent)
 				{
 					//safe_cprintf (ent, PRINT_HIGH, "No one to chase.\n");
 					ent->client->chasetarget = NULL;
-					
 				}
 				else
 					ent->client->chasetarget= chase;
@@ -4399,9 +4164,6 @@ void ClientBeginServerFrame (edict_t *ent)
 		return;
 	}
 
-
-
-
 //faf:  players press fire to bring up class or team menu when they need it
 	else if (ent->client->limbo_mode)
 	{
@@ -4410,7 +4172,6 @@ void ClientBeginServerFrame (edict_t *ent)
 			delay = 0;
 			if (ent->client->resp.team_on)
 				delay = ent->client->resp.team_on->delay;
-
 
 			if (!ent->client->resp.team_on)
 				MainMenu(ent);
@@ -4428,9 +4189,6 @@ void ClientBeginServerFrame (edict_t *ent)
 			}
 		}
 	}
-
-
-
 
 	if (ent->deadflag)
 	{
@@ -4466,17 +4224,13 @@ void ClientBeginServerFrame (edict_t *ent)
 		return;
 	}
 
-
-
-
-
 	// add player trail so monsters can follow
 	if (!deathmatch->value)
 		if (!visible (ent, PlayerTrail_LastSpot() ) )
 			PlayerTrail_Add (ent->s.old_origin);
 
 	client->latched_buttons = 0;
-	
+
 	delay = 0;
 	if (ent->client->resp.team_on)
 		delay = ent->client->resp.team_on->delay;
@@ -4498,22 +4252,17 @@ void ClientBeginServerFrame (edict_t *ent)
 		}
 //		else if	(!ent->client->display_info)
 //			MainMenu(ent);
-		
-	}	
-
+	}
 }
-
-
 
 
 void Write_Player_Stats (edict_t *ent)
 {
-	char	statsfilename[MAX_QPATH] = "";
+	char	statsfilename[MAX_QPATH];
 	char	*ip;
 	int		c;
 
-	char *s, *f;
-	char *fPtr = NULL;
+	char *s, *f, *fPtr;
 
 	char *statsc;
 
@@ -4542,31 +4291,25 @@ void Write_Player_Stats (edict_t *ent)
 	int fists = 0;
 	char *chat;
 
-
- 	char	filename[MAX_QPATH] = "";
+	char	filename[MAX_QPATH];
 	FILE *fn;
-
 
 	//gi.dprintf(DEVELOPER_MSG_GAME, "Write_Player_Stats\n");
 
 	if (ent->ai)
 		return;
 
-
 	//dont count maps that end really fast
 //	if (level.time < 60)
 //		return;
 
-
 	ip = ent->client->pers.ip;
-
 	if (!ip)
 		return;
 
-
 	sprintf(statsfilename, "dday/stats/%s.stats", ip);
 
-    statsc = ReadEntFile(statsfilename);
+	statsc = ReadEntFile(statsfilename);
 
 	if (statsc)
 	{
@@ -4694,7 +4437,6 @@ void Write_Player_Stats (edict_t *ent)
 			chat = s;
 			s = strtok_r(NULL, "\n", &fPtr);
 		}
-
 	}
 
 	if (level.intermissiontime && ent->client->resp.team_on)
@@ -4708,7 +4450,6 @@ void Write_Player_Stats (edict_t *ent)
 			played_allies++;
 		else
 			played_axis++;
-
 
 		if (ent->client->resp.mos)
 		{
@@ -4730,9 +4471,7 @@ void Write_Player_Stats (edict_t *ent)
 				medic++;
 			if (ent->client->resp.mos == FLAMER)
 				flamer++;
-
 		}
-
 	}
 
 	//if (level.intermissiontime)
@@ -4748,7 +4487,6 @@ void Write_Player_Stats (edict_t *ent)
 
 	average = ((average * (games - 1)) + plus_minus)/games;	 */
 
-
 	//gi.dprintf(DEVELOPER_MSG_GAME, "%i %f\n", deaths, ratio);
 
 	human_kills = human_kills + ent->client->resp.stat_human_plus;
@@ -4759,8 +4497,6 @@ void Write_Player_Stats (edict_t *ent)
 	castrations = castrations + ent->client->resp.stat_castrations;
 	helmets = helmets + ent->client->resp.stat_helmets;
 	fists = fists + ent->client->resp.stat_fists;
-
-
 
 	sprintf(filename, "dday/stats/%s.stats", ip);
 	fn = fopen (filename, "w");
@@ -4794,19 +4530,16 @@ void Write_Player_Stats (edict_t *ent)
 	fprintf (fn, "%i\n", fists);
 	fprintf (fn, "%s\n", ent->client->pers.stat_chat);
 
-
 	fclose (fn);
-
 }
 
 //writes players stat average from .stat file to pers
 void SetPlayerRating(edict_t *ent)
 {
-	char	statsfilename[MAX_QPATH] = "";
+	char	statsfilename[MAX_QPATH];
 	int		c;
-	
-	char *s, *f;
-	char *fPtr = NULL;
+
+	char *s, *f, *fPtr;
 
 	char *statsc;
 
@@ -4825,21 +4558,17 @@ void SetPlayerRating(edict_t *ent)
 		return;
 
 	sprintf(statsfilename, "dday/stats/%s.stats", ent->client->pers.ip);
-
 	//gi.dprintf(DEVELOPER_MSG_GAME, "%s   \n",statsfilename);
-
-    statsc = ReadEntFile(statsfilename);
+	statsc = ReadEntFile(statsfilename);
 
 	if (!statsc)
 		return;
-
 
 	if (stats->value)
 	{
 		c = 0;
 		f = strdup (statsc);
 		s = strtok_r(f, "\n", &fPtr);
-
 
 		if (s != NULL)
 		{
@@ -4895,7 +4624,6 @@ void SetPlayerRating(edict_t *ent)
 		}
 	}
 
-
 	//gi.dprintf(DEVELOPER_MSG_GAME, "ratio: %f\n",ratio);
 				
 	ent->client->pers.stat_human_kills = human_kills;
@@ -4904,6 +4632,6 @@ void SetPlayerRating(edict_t *ent)
 	ent->client->pers.stat_bot_deaths = bot_deaths;
 
 	Com_sprintf (ent->client->pers.stat_chat, sizeof(ent->client->pers.stat_chat), "%s", chat);
-	//ent->client->pers.stat_chat[0] = '\0';	
-
+	//ent->client->pers.stat_chat[0] = '\0';
 }
+

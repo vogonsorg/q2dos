@@ -822,26 +822,20 @@ char *ReadEntFile(char *filename)
 
 char *LoadEntFile(char *mapname, char *entities)
 {
-	char	entfilename[MAX_QPATH] = "";
+	char	entfilename[MAX_QPATH];
 	char	*newentities;
 	int		i;
-	
 
 	if (ent_files->value == 0)
 		return(entities);
-
 
 	//hack so civ override files load
 	if (strstr(entities, "misc_civilian"))
 		return(entities);
 
-
 	//can put the word "override" in the override ents somewhere so the ent file doesnt load
 	if (strstr(entities, "override"))
-	{
 		return(entities);
-	}
-
 
 	sprintf(entfilename, "dday/ents/%s.ent", mapname);
 	// convert string to all lowercase (for Linux)
@@ -849,7 +843,6 @@ char *LoadEntFile(char *mapname, char *entities)
 		entfilename[i] = tolower(entfilename[i]);
 
 	newentities = ReadEntFile(entfilename);
-
 	if (newentities)
 	{   //leave these dprints active they show up in the server init console section
 		gi.dprintf(DEVELOPER_MSG_GAME, "%s.ent Loaded\n", mapname);
@@ -865,11 +858,9 @@ char *LoadEntFile(char *mapname, char *entities)
 
 char *LoadCTCFile(char *mapname, char *entities)
 {
-	char	entfilename[MAX_QPATH] = "";
+	char	entfilename[MAX_QPATH];
 	char	*newentities;
 	int		i;
-	
-
 
 	sprintf(entfilename, "dday/ents/%s.ctc", mapname);
 	// convert string to all lowercase (for Linux)
@@ -877,7 +868,6 @@ char *LoadCTCFile(char *mapname, char *entities)
 		entfilename[i] = tolower(entfilename[i]);
 
 	newentities = ReadEntFile(entfilename);
-
 	if (newentities)
 	{   //leave these dprints active they show up in the server init console section
 		gi.dprintf(DEVELOPER_MSG_GAME, "%s.ctc Loaded\n", mapname);
@@ -912,7 +902,6 @@ void LoadCampFile(void)
 		sprintf(cmpfilename, "dday/navigation/%s.cmp", level.mapname);
 
 	//gi.dprintf(DEVELOPER_MSG_GAME, "sdfl %s\n", cmpfilename);
-
 
 	// convert string to all lowercase (for Linux)
 	for (i = 0; cmpfilename[i]; i++)

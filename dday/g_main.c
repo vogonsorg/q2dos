@@ -1172,7 +1172,7 @@ void ExitLevel (void)
 	int		i;
 	edict_t	*ent;
 	char	command [256];
-	char	campaignfilename[MAX_QPATH] = "";
+	char	campaignfilename[MAX_QPATH];
 
 	WriteCampaignTxt();
 

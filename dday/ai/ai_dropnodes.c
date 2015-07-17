@@ -107,10 +107,8 @@ void AI_UpdateNodeEdge( int from, int to )
 	if(AI_PlinkExists(from, to))
 	{
 		link = AI_PlinkMoveType(from, to);
-
 	} else
 		link = AI_FindLinkType( from, to );
-
 
 	//Com_Printf("Link: %d -> %d. ", from, to);
 	//Com_Printf("%s\n", AI_LinkString(link) );
@@ -389,7 +387,6 @@ void AI_PathMap( qboolean force )
 	//fall inside it they don't know how to get out
 	// Lava/Slime
 
-
 	// Iterate through all nodes to make sure far enough apart
 	closest_node = AI_FindClosestReachableNode( player.ent->s.origin, player.ent, NODE_DENSITY, NODE_ALL );
 
@@ -571,16 +568,13 @@ void AITools_SaveNodes( void )
 }
 
 
-
 void Camp_Spot( void )
 {
-	char	filename[MAX_QPATH] = "";
+	char	filename[MAX_QPATH];
 	FILE *f;
 
-	
 	if (!player.ent || !player.ent->client->resp.team_on)
 		return;
-
 
 	if (level.botfiles)
 		sprintf(filename, "dday/navigation/%s.cmp", level.botfiles);
