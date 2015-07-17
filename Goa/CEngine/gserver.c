@@ -94,33 +94,32 @@ cont:
 	/* NOTREACHED */
 }
 
+static
 void ServerParsePlayerCount(GServer server, char *savedkeyvals)
 {
 	int numplayers = 0;
 	char players[12];
 	char playerSeperators[] = "\n";
-	char *s = strdup(savedkeyvals);
-	char *test = strtok(s, playerSeperators);
+	char *test, *p;
 	GKeyValuePair kvpair;
 
-	test = strtok(NULL, playerSeperators);
-
 	numplayers = 0;
+	test = Goa_strtok_r(savedkeyvals, playerSeperators, &p);
+	if (test) {
+		test = Goa_strtok_r(NULL, playerSeperators, &p);
+	}
 
 	while (test != NULL)
 	{
-		numplayers++;
-
-		if(strstr(test, "WallFly[BZZZ]") || strstr(test, "127.0.0.1")) /* FS: Don't report servers that just have WallFly in them.  127.0.0.1 in any player parse is a bot from Alien Arena */
+		/* FS: Don't report servers that just have WallFly in them.
+		 * 127.0.0.1 in any player parse is a bot from Alien Arena. */
+		if(!strstr(test, "WallFly[BZZZ]") && !strstr(test, "127.0.0.1"))
 		{
-			numplayers--;
+			numplayers++;
 		}
 
-		test = strtok(NULL, playerSeperators);
+		test = Goa_strtok_r(NULL, playerSeperators, &p);
 	}
-
-	if(s) /* FS: Sezero is this right? */
-		free(s);
 
 	kvpair.key = _strdup("numplayers");
 	sprintf(players, "%i", numplayers);
