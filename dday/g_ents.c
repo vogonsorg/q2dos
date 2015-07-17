@@ -394,102 +394,85 @@ void InitTeam (char *team, int i)
 void LoadBotChat (int teamnum, char *teamid)
 {
 	char *tempchat;
-	char *s, *f;
-	char *fPtr = NULL;
+	char *s, *f, *fPtr;
 	int c;
-	char	filename[MAX_QPATH] = "";
+	char	filename[MAX_QPATH];
 
 	c=0;
 	sprintf(filename, "dday/botchat/%s-sorry.txt", teamid);
 	tempchat = ReadEntFile(filename);
-
 	if (!tempchat)
 		tempchat = ReadEntFile("dday/botchat/usa-sorry.txt");
-
 	if (tempchat)
 	{
 		f = strdup (tempchat);
-		s = strtok_r(f, "\n", &fPtr);		
-		Com_sprintf (botchat_sorry[teamnum][c], sizeof(botchat_sorry[teamnum][c]), "%s", s);
-
+		s = strtok_r(f, "\n", &fPtr);
 		while (s!= NULL)
 		{
-			s = strtok_r(NULL, "\n", &fPtr);
-			c++;
 			Com_sprintf (botchat_sorry[teamnum][c], sizeof(botchat_sorry[teamnum][c]), "%s", s);
+			c++;
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-
-		botchat_sorry_count[teamnum] = c;
+		free(f);
 	}
+	botchat_sorry_count[teamnum] = c;
 
 	c=0;
 	sprintf(filename, "dday/botchat/%s-killed.txt", teamid);
 	tempchat = ReadEntFile(filename);
-
 	if (!tempchat)
 		tempchat = ReadEntFile("dday/botchat/usa-killed.txt");
-
 	if (tempchat)
 	{
 		f = strdup (tempchat);
-		s = strtok_r(f, "\n", &fPtr);		
-		Com_sprintf (botchat_killed[teamnum][c], sizeof(botchat_killed[teamnum][c]), "%s", s);
-
+		s = strtok_r(f, "\n", &fPtr);
 		while (s!= NULL)
 		{
-			s = strtok_r(NULL, "\n", &fPtr);
-			c++;
 			Com_sprintf (botchat_killed[teamnum][c], sizeof(botchat_killed[teamnum][c]), "%s", s);
+			c++;
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-
-		botchat_killed_count[teamnum] = c;
+		free(f);
 	}
+	botchat_killed_count[teamnum] = c;
 
 	c=0;
 	sprintf(filename, "dday/botchat/%s-forgive.txt", teamid);
 	tempchat = ReadEntFile(filename);
-
 	if (!tempchat)
 		tempchat = ReadEntFile("dday/botchat/usa-forgive.txt");
-
 	if (tempchat)
 	{
 		f = strdup (tempchat);
-		s = strtok_r(f, "\n", &fPtr);		
-		Com_sprintf (botchat_forgive[teamnum][c], sizeof(botchat_forgive[teamnum][c]), "%s", s);
-
+		s = strtok_r(f, "\n", &fPtr);
 		while (s!= NULL)
 		{
-			s = strtok_r(NULL, "\n", &fPtr);
+			Com_sprintf (botchat_forgive[teamnum][c], sizeof(botchat_forgive[teamnum][c]), "%s", s);
 			c++;
-			Com_sprintf (botchat_forgive[teamnum][c], sizeof(botchat_forgive[teamnum][c]), "%s", s);	
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-
-		botchat_forgive_count[teamnum] = c;
+		free(f);
 	}
+	botchat_forgive_count[teamnum] = c;
 
 	c=0;
 	sprintf(filename, "dday/botchat/%s-self.txt", teamid);
 	tempchat = ReadEntFile(filename);
-
 	if (!tempchat)
 		tempchat = ReadEntFile("dday/botchat/usa-self.txt");
-
 	if (tempchat)
 	{
 		f = strdup (tempchat);
-		s = strtok_r(f, "\n", &fPtr);		
-		Com_sprintf (botchat_self[teamnum][c], sizeof(botchat_self[teamnum][c]), "%s", s);
-
+		s = strtok_r(f, "\n", &fPtr);
 		while (s!= NULL)
 		{
-			s = strtok_r(NULL, "\n", &fPtr);
+			Com_sprintf (botchat_self[teamnum][c], sizeof(botchat_self[teamnum][c]), "%s", s);
 			c++;
-			Com_sprintf (botchat_self[teamnum][c], sizeof(botchat_self[teamnum][c]), "%s", s);	
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-
-		botchat_self_count[teamnum] = c;
+		free(f);
 	}
+	botchat_self_count[teamnum] = c;
 }
 
 
