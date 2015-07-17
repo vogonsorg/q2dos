@@ -893,12 +893,11 @@ char *LoadCTCFile(char *mapname, char *entities)
 
 void LoadCampFile(void)
 {
-	char	cmpfilename[MAX_QPATH] = "";
+	char	cmpfilename[MAX_QPATH];
 	char	*camplocs;
 	int		i,c;
 	
-	char *s, *f;
-	char *fPtr = NULL;
+	char *s, *f, *fPtr;
 
 	vec3_t	loc;
 	int x,y,z;
@@ -929,7 +928,7 @@ void LoadCampFile(void)
 		f = strdup (camplocs);
 		s = strtok_r(f, "\n", &fPtr);
 
-		while (s !=NULL)
+		while (s != NULL)
 		{
 			if (s != NULL)
 			{
@@ -940,8 +939,6 @@ void LoadCampFile(void)
 					level.allied_cmps = true;
 				else if (team == 1)
 					level.axis_cmps = true;
-
-
 			}
 			if (s != NULL)
 			{
@@ -981,10 +978,9 @@ void LoadCampFile(void)
 				camp_spots[c].type = CAMP_NORMAL;
 				c++;
 				total_camp_spots = c;
-
-
 			}
 		}
+		free(f);
 	}
 	else
 	{
