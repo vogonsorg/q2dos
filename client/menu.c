@@ -2687,31 +2687,29 @@ JOIN SERVER MENU
 =============================================================================
 */
 #define MAX_LOCAL_SERVERS 12 /* FS: Was 8 -- Max 320x200 can handle */
-#define MAX_GAMESPY_MENU_SERVERS MAX_SERVERS /* FS: Maximum number of servers to show in the browser */
 
 static menuframework_s	s_joinserver_menu;
 static menuseparator_s	s_joinserver_server_title;
 static menuaction_s		s_joinserver_search_action;
 static menuaction_s		s_joinserver_address_book_action;
 static menuaction_s		s_joinserver_server_actions[MAX_LOCAL_SERVERS];
+
+static int	m_num_servers;
+
 #ifdef GAMESPY /* FS: GameSpy Browser */
+#define MAX_GAMESPY_MENU_SERVERS MAX_SERVERS /* FS: Maximum number of servers to show in the browser */
 static menuframework_s	s_joingamespyserver_menu;
 static menuseparator_s	s_joingamespyserver_server_title;
 static menuaction_s		s_joingamespyserver_search_action;
 static menuaction_s		s_joingamespyserver_prevpage_action;
 static menuaction_s		s_joingamespyserver_nextpage_action;
 static menuaction_s		s_joingamespyserver_server_actions[MAX_GAMESPY_MENU_SERVERS];
-#endif
 
-static int	m_num_servers;
-
-/* FS: GameSpy Browser Stuff*/
-#ifdef GAMESPY
 static int	m_num_gamespy_servers;
 static int	m_num_active_gamespy_servers;
-static int curPageScale;
-static int gspyCurPage;
-static int totalAllowedBrowserPages;
+static int	curPageScale;
+static int	gspyCurPage;
+static int	totalAllowedBrowserPages;
 static void JoinGamespyServer_Redraw(int serverscale);
 #endif
 
@@ -2746,8 +2744,7 @@ void M_AddToServerList (netadr_t adr, char *info)
 	m_num_servers++;
 }
 
-
-void JoinServerFunc( void *self )
+static void JoinServerFunc(void *self)
 {
 	char	buffer[128];
 	int		index;
@@ -2769,9 +2766,9 @@ void JoinServerFunc( void *self )
 	M_ForceMenuOff ();
 }
 
-void ConnectGamespyServerFunc( void *self ) /* FS: GameSpy Browser Connect Function */
-{
 #ifdef GAMESPY
+static void ConnectGamespyServerFunc(void *self) /* FS: GameSpy Browser Connect Function */
+{
 	char	buffer[128];
 	int		index;
 
@@ -2790,20 +2787,19 @@ void ConnectGamespyServerFunc( void *self ) /* FS: GameSpy Browser Connect Funct
 	Com_sprintf (buffer, sizeof(buffer), "%s\n", gamespy_connect_string[index]);
 	Cbuf_AddText (buffer);
 	M_ForceMenuOff ();
-#else
-	Com_Printf("Q2DOS compiled without GAMEPSY!\n");
-	M_ForceMenuOff ();
-#endif
 }
+#endif
 
-void AddressBookFunc( void *self )
+static void AddressBookFunc(void *self)
 {
 	M_Menu_AddressBook_f();
 }
 
-void NullCursorDraw( void *self )
+#if 0 /* unused */
+void NullCursorDraw(void *self)
 {
 }
+#endif
 
 #ifdef GAMESPY
 static void FormatGamespyList (void)
