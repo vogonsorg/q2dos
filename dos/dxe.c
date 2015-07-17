@@ -86,7 +86,10 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (strrchr)
 	DXE_EXPORT (strstr)
 	DXE_EXPORT (strtod)
+#if 0
 	DXE_EXPORT (strtok)
+	DXE_EXPORT (strtok_r)
+#endif
 	DXE_EXPORT (strtol)
 	DXE_EXPORT (tan)
 	DXE_EXPORT (time)
