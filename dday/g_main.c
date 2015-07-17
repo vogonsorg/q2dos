@@ -172,7 +172,6 @@ void CleanUpCmds();
 void PBM_KillAllFires (void);
 
 
-
 //===================================================================
 
 
@@ -186,7 +185,6 @@ void stuffcmd(edict_t *ent, char *s)
 	if (ent->ai || !ent->inuse)
 		return;
 	//[end]
-
 
 	gi.WriteByte(11);
 	gi.WriteString(s);
@@ -281,11 +279,9 @@ void Com_Printf (char *msg, ...)
 
 	gi.dprintf(DEVELOPER_MSG_GAME, "%s", text);
 }
-
 #endif
 
 //======================================================================
-
 
 /*
 =================
@@ -383,14 +379,13 @@ void Write_Last_Maps(void){
 void Read_Last_Maps()
 {
 	int		i;
-	char	*s, *f;
-	char	*fPtr = NULL;
+	char	*s, *f, *fPtr;
 	char	*lastmaps;
 
 	lastmaps = ReadEntFile("dday/lastmaps.txt");
 
 	if (lastmaps)
-	{  
+	{
 		f = strdup (lastmaps);
 		s = strtok_r(f, "\n", &fPtr);
 
@@ -406,15 +401,12 @@ void Read_Last_Maps()
 }
 
 
-
-
 char *Get_Next_MaplistTxt_Map ()
 {
 	char	*maps;
 	int		i,j,c;
 	
-	char *s, *f;
-	char *fPtr = NULL;
+	char *s, *f, *fPtr;
 
 	int mapcount;
 	int	newmapcount;
@@ -436,7 +428,7 @@ char *Get_Next_MaplistTxt_Map ()
 
 		while (c < 300)
 		{
-			if (s != NULL) 
+			if (s != NULL)
 			{
 				if (MapExists(s))
 				{
@@ -480,8 +472,7 @@ char *Get_Next_MaplistTxt_Map ()
 				break;
 			}
 		}
-	} 
-
+	}
 
 	newmapcount = 0;
 	//sort possible_maps
@@ -1185,25 +1176,18 @@ void ExitLevel (void)
 
 	WriteCampaignTxt();
 
-
-if (campaign_winner>-1)
-{
-	sprintf(campaignfilename, "dday/campaigns/%s.campaign", level.campaign);
+	if (campaign_winner>-1)
+	{
+		sprintf(campaignfilename, "dday/campaigns/%s.campaign", level.campaign);
 /*	won't work  if (remove (campaignfilename))
 		gi.dprintf(DEVELOPER_MSG_GAME, "removed %s\n",campaignfilename); */
-	SetupCampaign (true);
-	gi.cvar_set("campaign", "");
-
-}
+		SetupCampaign (true);
+		gi.cvar_set("campaign", "");
+	}
 
 	//JABot[start] (Disconnect all bots before changing map)
 	BOT_RemoveBot("all", NULL);
 	//[end]
-
-
-
-
- 
 
 	Com_sprintf (command, sizeof(command), "map \"%s\"\n", level.changemap);
 //	Com_sprintf (command, sizeof(command), "gamemap \"%s\"\n", level.changemap);
@@ -1213,9 +1197,8 @@ if (campaign_winner>-1)
 	level.intermissiontime = 0;
 	ClientEndServerFrames ();
 /*-----/ PM /-----/ NEW:  Remove all flames before leaving level. /-----*/
-    PBM_KillAllFires ();
+	PBM_KillAllFires ();
 /*----------------------------------------------------------------------*/
-
 
 	// clear some things before going to next level
 	for (i=0 ; i<maxclients->value ; i++)
@@ -1231,34 +1214,27 @@ if (campaign_winner>-1)
 }
 
 
-
 int HumanPlayerCount(void)
 {
 	int i;
 	int playercount = 0;
-    edict_t *check_ent;
+	edict_t *check_ent;
 
-        
 	for (i = 1; i <= maxclients->value; i++)
-    {
-         check_ent = g_edicts + i;
-         if (!check_ent->inuse)
+	{
+		check_ent = g_edicts + i;
+		if (!check_ent->inuse)
 			 continue;
-		 if (!check_ent->client ||
+		if (!check_ent->client ||
 			 !check_ent->client->resp.team_on)
 			 continue;
-		 if (check_ent->ai)
+		if (check_ent->ai)
 			 continue;
 
 		 playercount++;
-
 	}
 	return playercount;
-                              
 }
-
-
-
 
 
 /*
@@ -1288,7 +1264,6 @@ void G_RunFrame (void)
 		return;
 	}
 
-
 	//Add bots (JABOT)
 	// if (bots->value) // alter this if the BOTS don't load
 	if ((bots->value && !qbots && level.framenum > 30 && playerminforbots->value < num_clients) && (playerminforbots->value > num_clients) && (!playermaxforbots->value || playermaxforbots->value > num_clients))
@@ -1299,15 +1274,18 @@ void G_RunFrame (void)
 
 		allied = alliedbots->value;
 		axis = axisbots->value;
-		while (allied + axis > 0)		{
+		while (allied + axis > 0)
+		{
 			if (allied >0)
 			{
 				BOT_SpawnBot ( 0, "", "", NULL);
-				allied --;			}
+				allied --;
+			}
 			if (axis > 0)
 			{
 				BOT_SpawnBot ( 1, "", "", NULL);
-				axis --;			}
+				axis --;
+			}
 		}
 	}
 
@@ -1318,7 +1296,6 @@ void G_RunFrame (void)
 		
 		))
 	{
-
 		qbots = false;
 		for (i = 1; i <= maxclients->value; i++)
 		{
@@ -1330,7 +1307,6 @@ void G_RunFrame (void)
 
 			if (check_ent->ai)
 				BOT_RemoveBot("",check_ent);
-
 		}
 	}
 
@@ -1388,7 +1364,6 @@ void G_RunFrame (void)
 					if (PlayerCountForTeam(1, true) <= axislevel->value)
 						break;
 				}
-
 			}
 		}
 		else if (level.axis_cmps && axislevel->value && axiscount < axislevel->value &&
@@ -1446,7 +1421,5 @@ void G_RunFrame (void)
 
 	if (nohud->value && level.framenum %100 == 1)
 			gi.configstring (CS_STATUSBAR, " if 21 xr 1 0 yb 0 xv  0 yv  0 pic 21 endif "); //just crosshair
-
-
 }
 
