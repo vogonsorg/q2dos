@@ -511,9 +511,7 @@ The timelimit or fraglimit has been exceeded
 */
 void EndDMLevel (void)
 {
-	char *s, *t, *f, *tb;// *fb;
-	char *tPtr = NULL;
-	char *tbPtr = NULL;
+	char *s, *t, *tPtr, *f, *tb;
 	static const char *seps = " ,\n\r";
 	char *mapname,*check;
 	int i, axiscount=0,alliedcount=0;
@@ -537,7 +535,6 @@ void EndDMLevel (void)
 				{	campaign_winner = 1;}
 				else if (axisplatoons == 0)
 					campaign_winner = 0;
-
 				else
 				{
 					for (i=0; campaign_spots[i].bspname; i++)
@@ -548,10 +545,14 @@ void EndDMLevel (void)
 							axiscount++;
 					}
 					if  (alliedneedspots > 0 &&	alliedcount >= alliedneedspots)
-					{campaign_winner = 0;}
+					{
+						campaign_winner = 0;
+					}
 					else if (axisneedspots > 0 && axiscount >= axisneedspots)
-					{	campaign_winner = 1;}
-				}			
+					{
+						campaign_winner = 1;
+					}
+				}
 				break;
 			}
 		}
@@ -585,8 +586,8 @@ void EndDMLevel (void)
 			ent = G_Spawn ();
 			ent->classname = "target_changelevel";
 			ent->map = nextmap;
-			safe_bprintf (PRINT_HIGH, "Next map: %s \n", nextmap);		
-			BeginIntermission (ent);	
+			safe_bprintf (PRINT_HIGH, "Next map: %s \n", nextmap);
+			BeginIntermission (ent);
 			return;
 		}
 		else
@@ -600,8 +601,8 @@ void EndDMLevel (void)
 				ent = G_Spawn ();
 				ent->classname = "target_changelevel";
 				ent->map = nextmap;
-				safe_bprintf (PRINT_HIGH, "Next map: %s \n", nextmap);		
-				BeginIntermission (ent);	
+				safe_bprintf (PRINT_HIGH, "Next map: %s \n", nextmap);
+				BeginIntermission (ent);
 				return;
 			}
 			else (Last_Team_Winner = (Last_Team_Winner+1)%2);
@@ -643,7 +644,7 @@ void EndDMLevel (void)
 			s = strdup(sv_maplist->string);
 			f = NULL;
 			t = strtok_r(s, seps, &tPtr);
-			while (t != NULL) 
+			while (t != NULL)
 			{
 				//add campaigns to maplist
 				if (strstr (mapname,t) && strcmp(mapname,t))
@@ -654,12 +655,12 @@ void EndDMLevel (void)
 						//if campaign points back to first map, move on in maplist
 						char ck[20];
 						sprintf(ck,"%s",t);
-						strcat (ck,"1");	
+						strcat (ck,"1");
 						//gi.dprintf(DEVELOPER_MSG_GAME, "crere %s %s\n",ck, t);
 						if (strcmp(ck,team_list[0]->nextmap)) 
 						{
 							safe_bprintf (PRINT_HIGH, "Next map: %s \n", team_list[0]->nextmap);
-							BeginIntermission (CreateTargetChangeLevel (team_list[0]->nextmap) );
+							BeginIntermission (CreateTargetChangeLevel (team_list[0]->nextmap));
 							//last_maplist_map_played = team_list[0]->nextmap;
 							//first_non_maplist_map = NULL;
 							return;
@@ -673,13 +674,13 @@ void EndDMLevel (void)
 					}
 				}
 				if (!f)
-				f = t;
+					f = t;
 				t = strtok_r(NULL, seps, &tPtr);
 			}
 			s = strdup(sv_maplist->string);
 			f = NULL;
 			t = strtok_r(s, seps, &tPtr);
-			while (t != NULL) 
+			while (t != NULL)
 			{
 				if (Q_stricmp(t, mapname) == 0)   //if the running map is on maplist
 				{
@@ -687,13 +688,13 @@ void EndDMLevel (void)
 					// it's in the list, go to the next one
 					t = strtok_r(NULL, seps, &tPtr);
 					if (t == NULL) // end of list, go to first one
-					{ 
+					{
 						if (f == NULL) // there isn't a first one, same level
 						{
 							if (MapExists(mapname))
 							{
 								safe_bprintf (PRINT_HIGH, "Next map: %s \n", mapname);
-								BeginIntermission (CreateTargetChangeLevel (mapname) );
+								BeginIntermission (CreateTargetChangeLevel (mapname));
 								//last_maplist_map_played = mapname;
 								//first_non_maplist_map = NULL;
 								return;
@@ -704,10 +705,10 @@ void EndDMLevel (void)
 							if (MapExists(f))
 							{
 								safe_bprintf (PRINT_HIGH, "Next map: %s \n", f);
-								BeginIntermission (CreateTargetChangeLevel (f) );
+								BeginIntermission (CreateTargetChangeLevel (f));
 								return;
 							}
-							else 
+							else
 							{
 								check = t;
 								strcat (check,"1");
@@ -725,10 +726,10 @@ void EndDMLevel (void)
 						if (MapExists(t))
 						{
 							safe_bprintf (PRINT_HIGH, "Next map: %s \n", t);
-							BeginIntermission (CreateTargetChangeLevel (t) );
+							BeginIntermission (CreateTargetChangeLevel (t));
 							return;
 						}
-						else 
+						else
 						{
 							//last_maplist_map_played = t;
 							//first_non_maplist_map = NULL;
@@ -738,7 +739,7 @@ void EndDMLevel (void)
 							if (MapExists(check))
 							{
 								safe_bprintf (PRINT_HIGH, "Next map: %s \n", check);
-								BeginIntermission (CreateTargetChangeLevel (check) );
+								BeginIntermission (CreateTargetChangeLevel (check));
 								return;
 							}
 							else
@@ -750,14 +751,13 @@ void EndDMLevel (void)
 				if (!f)
 					f = t;
 				t = strtok_r(NULL, seps, &tPtr);
-
 			}
-				// if last_maplist_map_played == 0, then start at first maplist map
-				// if it has a value, play the map after that
-				// if it has a value and map after that is null, play first map in maplist
-			
+
+			// if last_maplist_map_played == 0, then start at first maplist map
+			// if it has a value, play the map after that
+			// if it has a value and map after that is null, play first map in maplist
+
 			// t becomes tb
-			// f becomes fb
 			// seps stays same
 
 			if (t == NULL) //faf:  happens when running a map thats not on maplist and map is to change
@@ -771,7 +771,7 @@ void EndDMLevel (void)
 				}
 				else
 				{
-					tb = strtok_r(s, seps, &tbPtr);
+					tb = strtok_r(s, seps, &tPtr);
 
 					if (MapExists(tb))
 					{
@@ -797,29 +797,29 @@ void EndDMLevel (void)
 
 //alternate maplist, not as good
 
-//	else if ((int)dmflags->value & DF_MAP_LIST)  // maplist active? 
+//	else if ((int)dmflags->value & DF_MAP_LIST) // maplist active?
 	else if ((int)dmflags->value & DF_MAP_LIST  && maplist.nummaps > 0)  // faf: fixes crash
-	{ 
-		switch (maplist.rotationflag)        // choose next map in list 
-		{ 
-		case ML_ROTATE_SEQ:        // sequential rotation 
-			i = (maplist.currentmap + 1) % maplist.nummaps; 
-			break; 
-		
-		case ML_ROTATE_RANDOM:     // random rotation 
-			i = (int) (random() * maplist.nummaps); 
+	{
+		switch (maplist.rotationflag)       // choose next map in list
+		{
+		case ML_ROTATE_SEQ:        // sequential rotation
+			i = (maplist.currentmap + 1) % maplist.nummaps;
 			break;
 		
-		default:       // should never happen, but set to first map if it does 
-			i = 0; 
-		} // end switch 
-
-		maplist.currentmap = i; 
+		case ML_ROTATE_RANDOM:     // random rotation
+			i = (int) (random() * maplist.nummaps);
+			break;
 		
-		ent = G_Spawn (); 
-		ent->classname = "target_changelevel"; 
+		default:       // should never happen, but set to first map if it does
+			i = 0;
+		} // end switch
+
+		maplist.currentmap = i;
+		
+		ent = G_Spawn ();
+		ent->classname = "target_changelevel";
 		if (maplist.mapnames[i] && !level.nextmap[0])
-			ent->map = maplist.mapnames[i]; 
+			ent->map = maplist.mapnames[i];
 		else if (level.nextmap[0])
 			ent->map = level.nextmap;
 		else
