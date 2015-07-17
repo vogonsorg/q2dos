@@ -74,8 +74,6 @@ void Svcmd_Teamswitch_f (void)
 	ent->client->forcespawn = level.time + .5;//faf: fixes standing corpse bug
 
 	M_ChooseMOS(ent);
-
-	return;
 }
 
 
@@ -87,7 +85,7 @@ void Svcmd_Teams_f (void)
 	if (!team_list[0] || !team_list[1])
 		return;
 
-	gi.dprintf(DEVELOPER_MSG_GAME, "%s (%i)\n",		team_list[0]->teamid, PlayerCountForTeam(0, true));//faf team_list[0]->total);
+	gi.dprintf(DEVELOPER_MSG_GAME, "%s (%i)\n", team_list[0]->teamid, PlayerCountForTeam(0, true));//faf team_list[0]->total);
 	for (i=0 ; i< maxclients->value ; i++)
 	{
 		e = g_edicts + 1 + i;
@@ -183,13 +181,13 @@ char *Get_Next_Campaign_Map ()
 			(Last_Team_Winner == 1 && campaign_spots[i].axisstart == true && campaign_spots[i].owner == 0))
 		{
 			add = true;
-			for (j = 0; j<50; j++){
+			for (j = 0; j<50; j++) {
 				if (possible_maps[j] == i)
 					add = false;
 			}
-			if (add){
-				for (k = 0; k<50; k++){
-					if (possible_maps[k]==-1){
+			if (add) {
+				for (k = 0; k<50; k++) {
+					if (possible_maps[k]==-1) {
 						possible_maps[k] = i;
 						break;
 					}
@@ -205,13 +203,13 @@ char *Get_Next_Campaign_Map ()
 			if (checkexit > -1 && campaign_spots[checkexit].owner != Last_Team_Winner)
 			{
 				add = true;
-				for (j = 0; j<50; j++){
+				for (j = 0; j<50; j++) {
 					if (possible_maps[j] > -1 && possible_maps[j] == checkexit)
-						add = false;				
+						add = false;
 				}
-				if (add){
-					for (k = 0; k<50; k++){
-						if (checkexit > -1 && possible_maps[k]==-1){
+				if (add) {
+					for (k = 0; k<50; k++) {
+						if (checkexit > -1 && possible_maps[k]==-1) {
 							possible_maps[k] = checkexit;
 							break;
 						}
@@ -222,13 +220,13 @@ char *Get_Next_Campaign_Map ()
 			if (checkexit > -1 && campaign_spots[checkexit].owner != Last_Team_Winner)
 			{
 				add = true;
-				for (j = 0; j<50; j++)			{
+				for (j = 0; j<50; j++) {
 					if (possible_maps[j] > -1 && possible_maps[j] == checkexit)
-						add = false;				
+						add = false;
 				}
-				if (add){
-					for (k = 0; k<50; k++){
-						if (checkexit > -1 && possible_maps[k]==-1){
+				if (add) {
+					for (k = 0; k<50; k++) {
+						if (checkexit > -1 && possible_maps[k]==-1) {
 							possible_maps[k] = checkexit;
 							break;
 						}
@@ -239,13 +237,13 @@ char *Get_Next_Campaign_Map ()
 			if (checkexit > -1 && campaign_spots[checkexit].owner != Last_Team_Winner)
 			{
 				add = true;
-				for (j = 0; j<50; j++)			{
+				for (j = 0; j<50; j++) {
 					if (possible_maps[j] > -1 && possible_maps[j] == checkexit)
-						add = false;				
+						add = false;
 				}
-				if (add){
-					for (k = 0; k<50; k++){
-						if (checkexit > -1 && possible_maps[k]==-1){
+				if (add) {
+					for (k = 0; k<50; k++) {
+						if (checkexit > -1 && possible_maps[k]==-1) {
 							possible_maps[k] = checkexit;
 							break;
 						}
@@ -255,8 +253,8 @@ char *Get_Next_Campaign_Map ()
 		}
 	}
 	mapcount = 0;
-	for (i = 0; i<50; i++)	{
-		if (possible_maps[i] > -1)	{
+	for (i = 0; i<50; i++) {
+		if (possible_maps[i] > -1) {
 			mapcount++;
 			//gi.dprintf(DEVELOPER_MSG_GAME, "%s\n",campaign_spots[possible_maps[i]].bspname);
 		}
@@ -297,17 +295,9 @@ char *Get_Next_Campaign_Map ()
 			}
 		}
 	}
-/*	for (j = 0; j<50; j++)	{
-		if (possible_maps[j] > -1)	{
-			gi.dprintf(DEVELOPER_MSG_GAME, "%s\n",campaign_spots[possible_maps[j]].bspname);
-		}
-	}	*/
+
 	randnum = (int)(random()*mapcount);
-	
-	if (campaign_spots[possible_maps[randnum]].bspname != NULL)
-		return campaign_spots[possible_maps[randnum]].bspname;
-	
-	return NULL;
+	return campaign_spots[possible_maps[randnum]].bspname;
 }
 
 //1 team just won map
@@ -332,7 +322,7 @@ void Update_Campaign_Info (void)
 void WriteCampaignTxt(void)
 {
 	FILE *fp;
-	char	campaignfilename[MAX_QPATH] = "";
+	char	campaignfilename[MAX_QPATH];
 	int i;
 
 	if (!campaign->string || !level.campaign)
@@ -365,15 +355,13 @@ void WriteCampaignTxt(void)
 }
 
 
-
 //called when first creating campaign, or at map start.  Creates new [campaign].campaign file if needed or loads existing one
 void SetupCampaign (qboolean restart)
 {
-	char	campaignfilename[MAX_QPATH] = "";
+	char	campaignfilename[MAX_QPATH];
 	char	*campinfo;
 	int		i,c;
-	char *s, *f;
-	char *fPtr = NULL;
+	char *s, *f, *fPtr;
 
 	char *bspname;
 	char *exita,*exitb,*exitc;
@@ -387,11 +375,9 @@ void SetupCampaign (qboolean restart)
 		return;
 
 	sprintf(campaignfilename, "dday/campaigns/%s.campaign", campaign->string);
-
 	// convert string to all lowercase (for Linux)
 	for (i = 0; campaignfilename[i]; i++)
 		campaignfilename[i] = tolower(campaignfilename[i]);
-
 
 	if (restart == true || !(check = fopen(campaignfilename, "r") ))//no current campaign
 	{
@@ -492,6 +478,7 @@ void SetupCampaign (qboolean restart)
 				//gi.dprintf(DEVELOPER_MSG_GAME, "axisstart: %i\n",axisstart);
 				s = strtok_r(NULL, "\n", &fPtr);
 
+				// THIS WILL LEAK !!
 				campaign_spots[c].bspname = bspname;
 				campaign_spots[c].exita = exita;
 				campaign_spots[c].exitb = exitb;
