@@ -384,18 +384,23 @@ void Read_Last_Maps()
 {
 	int		i,c;
 	char	*s, *f;
+	char	*fPtr = NULL;
 	char	*lastmaps;
 
 	lastmaps = ReadEntFile("dday/lastmaps.txt");
 
-	if (lastmaps)	{  
+	if (lastmaps)
+	{  
 		c = 0;
 		f = strdup (lastmaps);
-		s = strtok(f, "\n");
-		for (i=1; i<20; i++)		{
-			if (s != NULL) {
+		s = strtok_r(f, "\n", &fPtr);
+
+		for (i=1; i<20; i++)
+		{
+			if (s != NULL)
+			{
 				last_maps_played[i]= s;
-				s = strtok (NULL, "\n");
+				s = strtok_r(NULL, "\n", &fPtr);
 			}
 		}
 	}

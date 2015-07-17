@@ -373,6 +373,7 @@ void SetupCampaign (qboolean restart)
 	char	*campinfo;
 	int		i,c;
 	char *s, *f;
+	char *fPtr = NULL;
 
 	char *bspname;
 	char *exita,*exitb,*exitc;
@@ -407,76 +408,89 @@ void SetupCampaign (qboolean restart)
 
 		c = 0;
 		f = strdup (campinfo);
-		s = strtok(f, "\n");
+		s = strtok_r(f, "\n", &fPtr);
 
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			alliedplatoons = atoi (s);
 			//gi.dprintf(DEVELOPER_MSG_GAME, "alliedplatoons: %s\n",s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
 
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			axisplatoons = atoi (s);
 			//gi.dprintf(DEVELOPER_MSG_GAME, "axisplatoons: %s\n",s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			alliedneedspots = atoi (s);
 			//gi.dprintf(DEVELOPER_MSG_GAME, "alliedneedspots: %s\n",s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
 
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			axisneedspots = atoi (s);
 			//gi.dprintf(DEVELOPER_MSG_GAME, "axisneedspots: %s\n",s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
 		while (s !=NULL)
 		{
-			if (s != NULL) {
+			if (s != NULL)
+			{
 				bspname = s;
 				//gi.dprintf(DEVELOPER_MSG_GAME, "bsp: %s\n",s);
-				s = strtok (NULL, "\n");
+				s = strtok_r(NULL, "\n", &fPtr);
 			}
-			if (s != NULL) {
+			if (s != NULL)
+			{
 				exita = s;
 				//gi.dprintf(DEVELOPER_MSG_GAME, "exita: %s\n",exita);
-				s = strtok (NULL, "\n");
+				s = strtok_r(NULL, "\n", &fPtr);
 			}
-			if (s != NULL) {
+			if (s != NULL)
+			{
 				exitb = s;
 				//gi.dprintf(DEVELOPER_MSG_GAME, "exitb: %s\n",exitb);
-				s = strtok (NULL, "\n");
+				s = strtok_r(NULL, "\n", &fPtr);
 			}
-			if (s != NULL) {
+			if (s != NULL)
+			{
 				exitc = s;
 				//gi.dprintf(DEVELOPER_MSG_GAME, "exitc: %s\n",exitc);
-				s = strtok (NULL, "\n");
+				s = strtok_r(NULL, "\n", &fPtr);
 			}
-			if (s != NULL) {
+			if (s != NULL)
+			{
 				owner = atoi (s);
 				//gi.dprintf(DEVELOPER_MSG_GAME, "owner: %i\n",owner);
-				s = strtok (NULL, "\n");
+				s = strtok_r(NULL, "\n", &fPtr);
 			}
-			if (s != NULL) {
+			if (s != NULL)
+			{
 				xpos = atoi (s);
 				//gi.dprintf(DEVELOPER_MSG_GAME, "xpos: %i\n",xpos);
-				s = strtok (NULL, "\n");
+				s = strtok_r(NULL, "\n", &fPtr);
 			}
-			if (s != NULL) {
+			if (s != NULL)
+			{
 				ypos = atoi (s);
 				//gi.dprintf(DEVELOPER_MSG_GAME, "ypos: %i\n",ypos);
-				s = strtok (NULL, "\n");
+				s = strtok_r(NULL, "\n", &fPtr);
 			}
-			if (s != NULL) {
+			if (s != NULL)
+			{
 				alliedstart = atoi (s);
 				//gi.dprintf(DEVELOPER_MSG_GAME, "alliedstart: %i\n",alliedstart);
-				s = strtok (NULL, "\n");
+				s = strtok_r(NULL, "\n", &fPtr);
 			}
-			if (s != NULL) {
+			if (s != NULL)
+			{
 				axisstart = atoi (s);
 				//gi.dprintf(DEVELOPER_MSG_GAME, "axisstart: %i\n",axisstart);
-				s = strtok (NULL, "\n");
+				s = strtok_r(NULL, "\n", &fPtr);
 
 				campaign_spots[c].bspname = bspname;
 				campaign_spots[c].exita = exita;

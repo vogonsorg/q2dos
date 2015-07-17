@@ -898,7 +898,7 @@ void LoadCampFile(void)
 	int		i,c;
 	
 	char *s, *f;
-
+	char *fPtr = NULL;
 
 	vec3_t	loc;
 	int x,y,z;
@@ -927,13 +927,15 @@ void LoadCampFile(void)
 
 		c = 0;
 		f = strdup (camplocs);
-		s = strtok(f, "\n");
+		s = strtok_r(f, "\n", &fPtr);
+
 		while (s !=NULL)
 		{
-			if (s != NULL) {
+			if (s != NULL)
+			{
 				team = atoi (s);
 				//gi.dprintf(DEVELOPER_MSG_GAME, "s: %s\n",s);
-				s = strtok (NULL, "\n");
+				s = strtok_r(NULL, "\n", &fPtr);
 				if (team == 0)
 					level.allied_cmps = true;
 				else if (team == 1)
@@ -941,48 +943,35 @@ void LoadCampFile(void)
 
 
 			}
-			if (s != NULL) {
+			if (s != NULL)
+			{
 				x = atoi (s);
 				//gi.dprintf(DEVELOPER_MSG_GAME, "s: %i\n",x);
-				s = strtok (NULL, "\n");
+				s = strtok_r(NULL, "\n", &fPtr);
 			}
-			if (s != NULL) {
+			if (s != NULL)
+			{
 				y = atoi (s);
 				//gi.dprintf(DEVELOPER_MSG_GAME, "s: %i\n",y);
-				s = strtok (NULL, "\n");
+				s = strtok_r(NULL, "\n", &fPtr);
 			}
-			if (s != NULL) {
+			if (s != NULL)
+			{
 				z = atoi (s);
 				//gi.dprintf(DEVELOPER_MSG_GAME, "s: %i\n",z);
-				s = strtok (NULL, "\n");
+				s = strtok_r(NULL, "\n", &fPtr);
 			}
-			if (s != NULL) {
+			if (s != NULL)
+			{
 				angle = atoi (s);
 				//gi.dprintf(DEVELOPER_MSG_GAME, "s: %i\n",z);
-				s = strtok (NULL, "\n");
+				s = strtok_r(NULL, "\n", &fPtr);
 			}
-			if (s != NULL) {
+			if (s != NULL)
+			{
 				stance = atoi (s);
 				//gi.dprintf(DEVELOPER_MSG_GAME, "s: %i\n",stance);
-				s = strtok (NULL, "\n");
-/*			}
-			if (s != NULL) {
-				//= atoi (s);
-				//gi.dprintf(DEVELOPER_MSG_GAME, "s: %i\n",);
-				s = strtok (NULL, "\n");
-
-			}
-			if (s != NULL) {
-				//= atoi (s);
-				//gi.dprintf(DEVELOPER_MSG_GAME, "s: %i\n",);
-				s = strtok (NULL, "\n");
-
-			}
-			if (s != NULL) {
-				//= atoi (s);
-				//gi.dprintf(DEVELOPER_MSG_GAME, "s: %i\n",);
-				s = strtok (NULL, "\n");
-*/
+				s = strtok_r(NULL, "\n", &fPtr);
 
 				VectorSet (loc, x,y,z);
 				camp_spots[c].angle = angle;
@@ -995,10 +984,7 @@ void LoadCampFile(void)
 
 
 			}
-			//
-
 		}
-
 	}
 	else
 	{

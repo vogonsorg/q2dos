@@ -2956,13 +2956,13 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 {
 	static int Already_Done=0;
 	char	*value, *f, *ip;
+	char	*fPtr = NULL;
 
 	// check to see if they are on the banned IP list
 	value = Info_ValueForKey (userinfo, "ip");
 
 	f = strdup (value);
-	ip = strtok(f, ":");
-
+	ip = strtok_r(f, ":", &fPtr); /* FS: FIXME: Does this really need to be strtok_r for this? */
 
 	//for people with dynamic ip's, let them save their stats by name if they set gender to cyborg
 	if (!strcmp (Info_ValueForKey (userinfo, "gender"), "cyborg"))
@@ -3358,11 +3358,11 @@ void Count_Votes (void)
 
 qboolean Setup_Map_Vote (void)
 {
-
 	char	*maps;
 	int		i,j,k,c;
 	
 	char *s, *f;
+	char *fPtr = NULL;
 
 	int mapcount;
 	int	newmapcount;
@@ -3373,9 +3373,7 @@ qboolean Setup_Map_Vote (void)
 	char *maplisttxt[300];
 	qboolean gotmap;
 	int count = 0;
-
 	qboolean changefirstmap;
-
 
 	maps = ReadEntFile("dday/votemaps.txt");
 
@@ -3385,7 +3383,8 @@ qboolean Setup_Map_Vote (void)
 	{
 		c = 0;
 		f = strdup (maps);
-		s = strtok(f, "\n");
+		s = strtok_r(f, "\n", &fPtr);
+
 		while (c < 300)
 		{
 			if (s != NULL) 
@@ -3397,15 +3396,17 @@ qboolean Setup_Map_Vote (void)
 					c++;
 				}
 				else
+				{
 					gi.dprintf(DEVELOPER_MSG_GAME, "WARNING: Map '%s' in maplist.txt not found on server!\n",s);
+				}
 
-
-
-				s = strtok (NULL, "\n");
+				s = strtok_r(NULL, "\n", &fPtr);
 			}
 			else
-			{maplisttxt[c] = ""; 
-			c++;}
+			{
+				maplisttxt[c] = ""; 
+				c++;
+			}
 
 		}
 
@@ -3446,12 +3447,6 @@ qboolean Setup_Map_Vote (void)
 
 		newmapcount++;
 	}
-
-/*	for (j = 0; j<50; j++)	{
-		if (possible_maps[j] > -1)	{
-			gi.dprintf(DEVELOPER_MSG_GAME, "%s\n",campaign_spots[possible_maps[j]].bspname);
-		}
-	}	*/
 
 	changefirstmap = false;
 	for (i = 0; i < 4; i++)
@@ -4517,8 +4512,8 @@ void Write_Player_Stats (edict_t *ent)
 	char	*ip;
 	int		c;
 
-	
 	char *s, *f;
+	char *fPtr = NULL;
 
 	char *statsc;
 
@@ -4577,103 +4572,127 @@ void Write_Player_Stats (edict_t *ent)
 	{
 		c = 0;
 		f = strdup (statsc);
-		s = strtok(f, "\n");
+		s = strtok_r(f, "\n", &fPtr);
 
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			name = s;
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			games = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			ping = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			human_kills = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			human_deaths = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			bot_kills = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			bot_deaths = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			games_won = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			games_lost = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			played_allies = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			played_axis = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			infantry = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			officer = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			lgunner = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			hgunner = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			sniper = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			special = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			engineer = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			medic = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			flamer = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			castrations = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			helmets = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			fists = atoi (s);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}	
-		if (s != NULL) {//not used here
+		if (s != NULL)
+		{//not used here
 			chat = s;
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
 
 	}
@@ -4787,6 +4806,7 @@ void SetPlayerRating(edict_t *ent)
 	int		c;
 	
 	char *s, *f;
+	char *fPtr = NULL;
 
 	char *statsc;
 
@@ -4804,8 +4824,6 @@ void SetPlayerRating(edict_t *ent)
 	if (!ent->client->pers.ip)
 		return;
 
-
-
 	sprintf(statsfilename, "dday/stats/%s.stats", ent->client->pers.ip);
 
 	//gi.dprintf(DEVELOPER_MSG_GAME, "%s   \n",statsfilename);
@@ -4820,53 +4838,61 @@ void SetPlayerRating(edict_t *ent)
 	{
 		c = 0;
 		f = strdup (statsc);
-		s = strtok(f, "\n");
+		s = strtok_r(f, "\n", &fPtr);
 
 
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			name = s;
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			games = atoi (s);
 			//gi.dprintf(DEVELOPER_MSG_GAME, "s: %i\n",games);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			ping = atoi (s);
 			//gi.dprintf(DEVELOPER_MSG_GAME, "s: %i\n",games);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			human_kills = atoi (s);
 			//gi.dprintf(DEVELOPER_MSG_GAME, "s: %i\n",kills);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			human_deaths = atoi (s);
 			//gi.dprintf(DEVELOPER_MSG_GAME, "s: %f\n",deaths);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			bot_kills = atoi (s);
 			//gi.dprintf(DEVELOPER_MSG_GAME, "s: %i\n",kills);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+		if (s != NULL)
+		{
 			bot_deaths = atoi (s);
 			//gi.dprintf(DEVELOPER_MSG_GAME, "dfssdf s: %i\n",bot_deaths);
-			s = strtok (NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
 		//don't need next 16 stats
-		for (i=0; i<16; i++){
-			s= strtok (NULL, "\n");
+		for (i=0; i<16; i++)
+		{
+			s= strtok_r(NULL, "\n", &fPtr);
 		}
-		if (s != NULL) {
+
+		if (s != NULL)
+		{
 			chat = s;
-			s = strtok(NULL, "\n");
+			s = strtok_r(NULL, "\n", &fPtr);
 		}
-
-
 	}
 
 
