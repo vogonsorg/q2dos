@@ -52,7 +52,9 @@ void M_Menu_Main_f (void);
 		void M_Menu_Credits_f( void );
 	void M_Menu_Multiplayer_f( void );
 		void M_Menu_JoinServer_f (void);
+#ifdef GAMESPY
 		void M_Menu_JoinGamespyServer_f (void); /* FS: GameSpy Browser */
+#endif
 			void M_Menu_AddressBook_f( void );
 		void M_Menu_StartServer_f (void);
 			void M_Menu_DMOptions_f (void);
@@ -535,10 +537,12 @@ static void JoinNetworkServerFunc( void *unused )
 	M_Menu_JoinServer_f();
 }
 
+#ifdef GAMESPY
 static void JoinGamespyServerFunc( void *unused )
 {
 	M_Menu_JoinGamespyServer_f();
 }
+#endif
 
 static void StartNetworkServerFunc( void *unused )
 {
@@ -2686,28 +2690,30 @@ JOIN SERVER MENU
 #define MAX_GAMESPY_MENU_SERVERS MAX_SERVERS /* FS: Maximum number of servers to show in the browser */
 
 static menuframework_s	s_joinserver_menu;
-static menuframework_s	s_joingamespyserver_menu; /* FS: GameSpy Browser */
 static menuseparator_s	s_joinserver_server_title;
-static menuseparator_s	s_joingamespyserver_server_title; /* FS: GameSpy Browser */
 static menuaction_s		s_joinserver_search_action;
-static menuaction_s		s_joingamespyserver_search_action; /* FS: GameSpy Browser */
-static menuaction_s		s_joingamespyserver_prevpage_action; /* FS: GameSpy Browser */
-static menuaction_s		s_joingamespyserver_nextpage_action; /* FS: GameSpy Browser */
 static menuaction_s		s_joinserver_address_book_action;
 static menuaction_s		s_joinserver_server_actions[MAX_LOCAL_SERVERS];
-#ifdef GAMESPY
-static menuaction_s		s_joingamespyserver_server_actions[MAX_GAMESPY_MENU_SERVERS]; /* FS: GameSpy Browser */
+#ifdef GAMESPY /* FS: GameSpy Browser */
+static menuframework_s	s_joingamespyserver_menu;
+static menuseparator_s	s_joingamespyserver_server_title;
+static menuaction_s		s_joingamespyserver_search_action;
+static menuaction_s		s_joingamespyserver_prevpage_action;
+static menuaction_s		s_joingamespyserver_nextpage_action;
+static menuaction_s		s_joingamespyserver_server_actions[MAX_GAMESPY_MENU_SERVERS];
 #endif
 
-int		m_num_servers;
+static int	m_num_servers;
 
 /* FS: GameSpy Browser Stuff*/
-int		m_num_gamespy_servers;
-int		m_num_active_gamespy_servers;
+#ifdef GAMESPY
+static int	m_num_gamespy_servers;
+static int	m_num_active_gamespy_servers;
 static int curPageScale;
 static int gspyCurPage;
 static int totalAllowedBrowserPages;
-void JoinGamespyServer_Redraw( int serverscale );
+static void JoinGamespyServer_Redraw(int serverscale);
+#endif
 
 #define	NO_SERVER_STRING	"<no server>"
 
@@ -2799,9 +2805,9 @@ void NullCursorDraw( void *self )
 {
 }
 
-void FormatGamespyList (void)
-{
 #ifdef GAMESPY
+static void FormatGamespyList (void)
+{
 	int j;
 	int skip = 0;
 
@@ -2888,12 +2894,10 @@ void FormatGamespyList (void)
 			continue;
 		}
 	}
-#endif
 }
 
 void Update_Gamespy_Menu (void)
 {
-#ifdef GAMESPY
 	static char	found[64];
 
 	FormatGamespyList();
@@ -2901,12 +2905,10 @@ void Update_Gamespy_Menu (void)
 	Com_sprintf(found, sizeof(found), "Found %d servers (%d active) in %i seconds\n", m_num_gamespy_servers, m_num_active_gamespy_servers, (((int)Sys_Milliseconds()-cls.gamespystarttime) / 1000));
 	s_joingamespyserver_search_action.generic.statusbar = found;
 	Com_Printf(found);
-#endif
 }
 
-void SearchGamespyGames (void)
+static void SearchGamespyGames (void)
 {
-#ifdef GAMESPY
 	int		i;
 
 	m_num_gamespy_servers = 0;
@@ -2926,13 +2928,10 @@ void SearchGamespyGames (void)
 
 	// send out info packets
 	CL_PingNetServers_f ();
-
-#else
-	Com_Printf("Q2DOS compiled without GAMESPY!\n");
-#endif /* GAMESPY */
 }
+#endif /* GAMESPY */
 
-void SearchLocalGames( void )
+static void SearchLocalGames(void)
 {
 	int		i;
 
@@ -2952,48 +2951,38 @@ void SearchLocalGames( void )
 	CL_PingServers_f();
 }
 
-void SearchLocalGamesFunc( void *self )
+static void SearchLocalGamesFunc(void *self)
 {
 	SearchLocalGames();
 }
 
-void SearchGamespyGamesFunc( void *self )
+#ifdef GAMESPY
+static void SearchGamespyGamesFunc(void *self)
 {
 	SearchGamespyGames();
 }
 
-int Get_Vidscale(void)
+static int Get_Vidscale(void)
 {
 	/* FS: Special function for some what scaling of the server browser depending on video resolution height. */
 	if (viddef.height <= 240)
-	{
 		return 18;
-	}
-	else if (viddef.height <= 300)
-	{
+	if (viddef.height <= 300)
 		return 21;
-	}
-	else if (viddef.height <= 400)
-	{
+	if (viddef.height <= 400)
 		return 25;
-	}
-	else if (viddef.height <= 480)
-	{
+	if (viddef.height <= 480)
 		return 30;
-	}
-	else if (viddef.height <= 800)
-	{
+	if (viddef.height <= 800)
 		return 36;
-	}
-	else if (viddef.height > 800)
-	{
+	if (viddef.height > 800)
 		return 38;
-	}
-
 	/* FS: We must have some weirdo mode, so 20 should be OK. */
 	return 18;
 }
-void JoinServer_MenuInit( void )
+#endif /* GAMESPY */
+
+static void JoinServer_MenuInit(void)
 {
 	int i;
 
@@ -3045,7 +3034,8 @@ void JoinServer_MenuInit( void )
 	SearchLocalGames();
 }
 
-void JoinGamespyServer_NextPageFunc (void *unused)
+#ifdef GAMESPY
+static void JoinGamespyServer_NextPageFunc (void *unused)
 {
 	int vidscale = Get_Vidscale();
 	int serverscale = Get_Vidscale();
@@ -3062,7 +3052,7 @@ void JoinGamespyServer_NextPageFunc (void *unused)
 	curPageScale = serverscale;
 }
 
-void JoinGamespyServer_PrevPageFunc (void *unused)
+static void JoinGamespyServer_PrevPageFunc (void *unused)
 {
 	int vidscale = Get_Vidscale();
 	int serverscale = Get_Vidscale();
@@ -3079,9 +3069,8 @@ void JoinGamespyServer_PrevPageFunc (void *unused)
 	curPageScale = serverscale;
 }
 
-void JoinGamespyServer_MenuInit( void )
+static void JoinGamespyServer_MenuInit(void)
 {
-#ifdef GAMESPY
 	int i, vidscale;
 
 	s_joingamespyserver_menu.x = viddef.width * 0.50 - 120;
@@ -3150,12 +3139,10 @@ void JoinGamespyServer_MenuInit( void )
 	gspyCurPage = 0;
 
 	FormatGamespyList(); /* FS: Incase we changed resolution or ran slist2 in the console and went back to this menu... */
-#endif
 }
 
-void JoinGamespyServer_Redraw( int serverscale )
+static void JoinGamespyServer_Redraw( int serverscale )
 {
-#ifdef GAMESPY
 	int i, vidscale;
 	qboolean didBreak = false;
 
@@ -3242,8 +3229,8 @@ void JoinGamespyServer_Redraw( int serverscale )
 	}
 
 	FormatGamespyList(); /* FS: Incase we changed resolution or ran slist2 in the console and went back to this menu... */
-#endif
 }
+#endif
 
 void JoinServer_MenuDraw(void)
 {
@@ -3262,15 +3249,15 @@ void M_Menu_JoinServer_f (void)
 	M_PushMenu( JoinServer_MenuDraw, JoinServer_MenuKey );
 }
 
-void JoinGamespyServer_MenuDraw(void)
+#ifdef GAMESPY
+static void JoinGamespyServer_MenuDraw(void)
 {
 //	M_Banner( "m_banner_join_server" );
 	Menu_Draw( &s_joingamespyserver_menu );
 }
 
-const char *JoinGamespyServer_MenuKey( int key )
+static const char *JoinGamespyServer_MenuKey( int key )
 {
-#ifdef GAMESPY
 	extern	qboolean keydown[256];
 
 	if(key == K_HOME || key == K_KP_HOME)
@@ -3312,7 +3299,6 @@ const char *JoinGamespyServer_MenuKey( int key )
 			}
 		}
 	}
-#endif
 	return Default_MenuKey( &s_joingamespyserver_menu, key );
 }
 
@@ -3321,6 +3307,7 @@ void M_Menu_JoinGamespyServer_f (void)
 	JoinGamespyServer_MenuInit();
 	M_PushMenu( JoinGamespyServer_MenuDraw, JoinGamespyServer_MenuKey );
 }
+#endif
 
 
 /*
