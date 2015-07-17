@@ -136,13 +136,13 @@ extern	cvar_t *allow_download_maps;
 #ifdef GAMESPY
 /* FS: For Gamespy */
 static	gspyexport_t	*gspye = NULL;
-static	GServerList	serverlist;
+static	GServerList	serverlist = NULL;
 static	int		gspyCur;
 gamespyBrowser_t browserList[MAX_SERVERS]; /* FS: Browser list for active servers */
 gamespyBrowser_t browserListAll[MAX_SERVERS]; /* FS: Browser list for ALL servers */
 
 static void GameSpy_Async_Think(void);
-static void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2);
+static void ListCallBack(GServerList lst, int msg, void *instance, void *param1, void *param2);
 static void CL_Gspystop_f (void);
        void CL_PingNetServers_f (void);
 static void CL_PrintBrowserList_f (void);
@@ -2539,12 +2539,12 @@ void CL_Shutdown(void)
 #ifdef GAMESPY
 extern void Update_Gamespy_Menu (void);
 
-static void CL_Gamespy_Check_Error(int error)
+static void CL_Gamespy_Check_Error(GServerList lst, int error)
 {
 	if (error != GE_NOERROR) /* FS: Grab the error code */
 	{
 		Com_Printf("\x02GameSpy Error: ");
-		Com_Printf("%s.\n", gspye->ServerListErrorDesc(serverlist, error));
+		Com_Printf("%s.\n", gspye->ServerListErrorDesc(lst, error));
 		if(cls.state == ca_disconnected)
 			NET_Config(false);
 	}
@@ -2578,7 +2578,7 @@ static void GameSpy_Async_Think(void)
 	else
 	{
 		error = gspye->ServerListThink(serverlist);
-		CL_Gamespy_Check_Error(error);
+		CL_Gamespy_Check_Error(serverlist, error);
 	}
 }
 
@@ -2640,14 +2640,14 @@ static void CL_PrintBrowserList_f (void)
 	}
 }
 
-void GameSpy_Sort_By_Ping(GServerList serverlist)
+static void GameSpy_Sort_By_Ping(GServerList lst)
 {
 	int i;
 	gspyCur = 0;
 
 	for (i = 0; i < cls.gamespytotalservers; i++)
 	{
-		GServer server = gspye->ServerListGetServer(serverlist, i);
+		GServer server = gspye->ServerListGetServer(lst, i);
 		if (server)
 		{
 			if(gspye->ServerGetIntValue(server, "numplayers", 0) <= 0)
@@ -2670,7 +2670,7 @@ void GameSpy_Sort_By_Ping(GServerList serverlist)
 
 	for (i = 0; i < cls.gamespytotalservers; i++)
 	{
-		GServer server = gspye->ServerListGetServer(serverlist, i);
+		GServer server = gspye->ServerListGetServer(lst, i);
 
 		if (server)
 		{
@@ -2698,7 +2698,7 @@ void GameSpy_Sort_By_Ping(GServerList serverlist)
 	}
 }
 
-static void ListCallBack(GServerList serverlist, int msg, void *instance, void *param1, void *param2)
+static void ListCallBack(GServerList lst, int msg, void *instance, void *param1, void *param2)
 {
 	GServer server;
 	int percent;
@@ -2734,11 +2734,11 @@ static void ListCallBack(GServerList serverlist, int msg, void *instance, void *
 	}
 	else if (msg == LIST_STATECHANGED)
 	{
-		switch(gspye->ServerListState(serverlist))
+		switch(gspye->ServerListState(lst))
 		{
 			case sl_idle:
-				gspye->ServerListSort(serverlist, true, "ping", cm_int);
-				GameSpy_Sort_By_Ping(serverlist);
+				gspye->ServerListSort(lst, true, "ping", cm_int);
+				GameSpy_Sort_By_Ping(lst);
 				break;
 			default:
 				break;
@@ -2749,7 +2749,7 @@ static void ListCallBack(GServerList serverlist, int msg, void *instance, void *
 void CL_PingNetServers_f (void)
 {
 	char goa_secret_key[7];
-	int error; /* FS: Grab the error code */
+	int error;
 	int allocatedSockets;
 
 	if(!gspye)
@@ -2799,7 +2799,7 @@ void CL_PingNetServers_f (void)
 
 	serverlist = gspye->ServerListNew("quake2","quake2",goa_secret_key,allocatedSockets,ListCallBack,GSPYCALLBACK_FUNCTION,NULL);
 	error = gspye->ServerListUpdate(serverlist,true); /* FS: Use Async now! */
-	CL_Gamespy_Check_Error(error);
+	CL_Gamespy_Check_Error(serverlist, error);
 }
 
 static void CL_Gamespy_Update_Num_Servers(int numServers)
