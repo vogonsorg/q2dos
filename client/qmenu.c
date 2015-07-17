@@ -198,10 +198,12 @@ qboolean Field_Key( menufield_s *f, int key )
 		 ( ( ( key == K_INS ) || ( key == K_KP_INS ) ) && keydown[K_SHIFT] ) )
 	{
 		char *cbd;
+		char *cbdPtr = NULL;
+		static const char *seperators = "\n\r\b";
 		
 		if ( ( cbd = Sys_GetClipboardData() ) != 0 )
 		{
-			strtok( cbd, "\n\r\b" );
+			strtok_r(cbd, seperators, &cbdPtr);
 
 			strncpy( f->buffer, cbd, f->length - 1 );
 			f->cursor = strlen( f->buffer );

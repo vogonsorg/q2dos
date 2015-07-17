@@ -253,12 +253,14 @@ void Key_Console (int key)
 		 ( ( ( key == K_INS ) || ( key == K_KP_INS ) ) && keydown[K_SHIFT] ) )
 	{
 		char *cbd;
+		char *cbdPtr = NULL;
+		static const char *seperators = "\n\r\b";
 		
 		if ( ( cbd = Sys_GetClipboardData() ) != 0 )
 		{
 			int i;
 
-			strtok( cbd, "\n\r\b" );
+			strtok_r(cbd, seperators, &cbdPtr);
 
 			i = strlen( cbd );
 			if ( i + key_linepos >= MAXCMDLINE)

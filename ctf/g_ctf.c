@@ -5240,6 +5240,7 @@ CTFWarp(edict_t *ent)
 {
 	char text[1024];
 	char *mlist, *token;
+	char *tPtr = NULL;
 	static const char *seps = " \t\n\r";
 
 	if (gi.argc() < 2)
@@ -5252,7 +5253,7 @@ CTFWarp(edict_t *ent)
 
 	mlist = strdup(warp_list->string);
 
-	token = strtok(mlist, seps);
+	token = strtok_r(mlist, seps, &tPtr);
 
 	while (token != NULL)
 	{
@@ -5261,7 +5262,7 @@ CTFWarp(edict_t *ent)
 			break;
 		}
 
-		token = strtok(NULL, seps);
+		token = strtok_r(NULL, seps, &tPtr);
 	}
 
 	if (token == NULL)

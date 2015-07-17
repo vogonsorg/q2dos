@@ -234,6 +234,7 @@ void EndDMLevel (void)
 {
 	edict_t *ent;
 	char *s, *t, *f;
+	char *tPtr = NULL;
 	static const char *seps = " ,\n\r";
 
 	/* stay on same level flag */
@@ -248,14 +249,14 @@ void EndDMLevel (void)
 	{
 		s = strdup(sv_maplist->string);
 		f = NULL;
-		t = strtok(s, seps);
+		t = strtok_r(s, seps, &tPtr);
 
 		while (t != NULL)
 		{
 			if (Q_stricmp(t, level.mapname) == 0)
 			{
 				/* it's in the list, go to the next one */
-				t = strtok(NULL, seps);
+				t = strtok_r(NULL, seps, &tPtr);
 
 				if (t == NULL) /* end of list, go to first one */
 				{
@@ -282,7 +283,7 @@ void EndDMLevel (void)
 				f = t;
 			}
 
-			t = strtok(NULL, seps);
+			t = strtok_r(NULL, seps, &tPtr);
 		}
 
 		free(s);

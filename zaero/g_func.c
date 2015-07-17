@@ -2779,6 +2779,8 @@ void parseTargets(edict_t *self)
 	{
 		char *str = NULL;
 		char *targets[16];
+		char *targPtr = NULL;
+		static const char *seperators = ";";
 		int i = 0;
 		
 		// do we have a series of targets to choose from randomly?
@@ -2786,11 +2788,11 @@ void parseTargets(edict_t *self)
 		strcpy(str, self->target);
 
 		// split up the targets
-		targets[0] = strtok(str, ";");
+		targets[0] = strtok_r(str, seperators, &targPtr);
 		numTargets = 1;
 		while(numTargets < 16)
 		{
-			targets[numTargets] = strtok(NULL, ";");
+			targets[numTargets] = strtok_r(NULL, seperators, &targPtr);
 			if (targets[numTargets] == NULL)
 				break;
 
