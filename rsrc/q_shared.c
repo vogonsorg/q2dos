@@ -1239,22 +1239,14 @@ void Com_sprintf (char *dest, int size, char *fmt, ...)
 {
 	int		len;
 	va_list		argptr;
-	char	bigbuffer[0x10000];
 
 	va_start (argptr,fmt);
-//	len = vsprintf (bigbuffer, fmt, argptr);
-	len = Q_vsnprintf (bigbuffer, sizeof(bigbuffer), fmt, argptr);	// Knightmare- buffer overflow fix
+	len = Q_vsnprintf (dest, size, fmt, argptr);
 	va_end (argptr);
-	if (len < 0)
-	{
-		Com_Printf ("Com_sprintf: overflow in temp buffer of size %i\n", (int)sizeof(bigbuffer));
-	}
-	else if (len >= size)
-	{
+	if (size > 0) dest[size - 1] = 0;
+	if (len < 0 || len >= size) {
 		Com_Printf ("Com_sprintf: overflow of %i in %i\n", len, size);
 	}
-	strncpy (dest, bigbuffer, size-1);
-	dest[size-1] = 0;	// Knightmare- null terminate
 }
 
 // Knightmare added
