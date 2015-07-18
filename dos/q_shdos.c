@@ -47,6 +47,9 @@ void	Hunk_Free (void *buf)
 
 int	Hunk_End (void)
 {
+/* for realloc() to be useful here: you either need DJGPP-2.05 or newer,
+ * or you need to replace malloc() & friends in any older DJGPP version
+ * with nmalloc() as in DJGPP-2.05. */
 	byte *n = realloc(membase, curhunksize);
 	if (n != membase)
 		Sys_Error("Hunk_End:  Could not remap virtual block (%d)", errno);
