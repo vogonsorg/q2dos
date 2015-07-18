@@ -184,7 +184,7 @@ void LoadMaplist(char	*filename)
 	cvar_t	*game_dir;
 	int		i = 0;
 	char	file[256];
-	char	line[MAX_MAPNAME_LEN + 3];
+	char	line[MAX_MAPNAME_LEN + 8];
 
 	game_dir = gi.cvar ("game", "", 0);
 
@@ -203,7 +203,7 @@ void LoadMaplist(char	*filename)
 	{
 		int		len;
 
-		fgets (line, MAX_MAPNAME_LEN + 3, fp);
+		fgets (line, MAX_MAPNAME_LEN + 8, fp);
 		len=strlen(line);
 
 		if (len < 5) //invalid
