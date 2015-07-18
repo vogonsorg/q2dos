@@ -164,7 +164,7 @@ SOURCE=..\xsrc\g_weapon.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\game.def
+SOURCE=..\xsrc\xatrix.def
 # End Source File
 # Begin Source File
 

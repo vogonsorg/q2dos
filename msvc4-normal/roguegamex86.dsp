@@ -200,7 +200,7 @@ SOURCE=..\rsrc\g_weapon.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\GAME\game.def
+SOURCE=..\rsrc\rogue.def
 # End Source File
 # Begin Source File
 

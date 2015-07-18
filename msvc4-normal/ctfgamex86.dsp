@@ -164,7 +164,7 @@ SOURCE=..\ctf\g_weapon.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\ctf\game.def
+SOURCE=..\ctf\ctf.def
 # End Source File
 # Begin Source File
 
