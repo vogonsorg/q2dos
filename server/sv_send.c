@@ -66,15 +66,15 @@ void SV_ClientPrintf (client_t *cl, int level, char *fmt, ...)
 {
 	va_list		argptr;
 	char		string[1024];
-	
+
 	if (level < cl->messagelevel)
 		return;
-	
+
 	va_start (argptr,fmt);
-//	vsprintf (string, fmt, argptr);
 	Q_vsnprintf (string, sizeof(string), fmt, argptr);
 	va_end (argptr);
-	
+	string[sizeof(string)-1] = 0;
+
 	MSG_WriteByte (&cl->netchan.message, svc_print);
 	MSG_WriteByte (&cl->netchan.message, level);
 	MSG_WriteString (&cl->netchan.message, string);
@@ -95,16 +95,16 @@ void SV_BroadcastPrintf (int level, char *fmt, ...)
 	int			i;
 
 	va_start (argptr,fmt);
-//	vsprintf (string, fmt, argptr);
 	Q_vsnprintf (string, sizeof(string), fmt, argptr);
 	va_end (argptr);
-	
+	string[sizeof(string)-1] = 0;
+
 	// echo to console
 	if (dedicated->value)
 	{
 		char	copy[1024];
 		int		i;
-		
+
 		// mask off high bits
 		for (i=0 ; i<1023 && string[i] ; i++)
 			copy[i] = string[i]&127;
@@ -135,13 +135,13 @@ void SV_BroadcastCommand (char *fmt, ...)
 {
 	va_list		argptr;
 	char		string[1024];
-	
+
 	if (!sv.state)
 		return;
 	va_start (argptr,fmt);
-//	vsprintf (string, fmt, argptr);
 	Q_vsnprintf (string, sizeof(string), fmt, argptr);
 	va_end (argptr);
+	string[sizeof(string)-1] = 0;
 
 	MSG_WriteByte (&sv.multicast, svc_stufftext);
 	MSG_WriteString (&sv.multicast, string);
@@ -186,7 +186,7 @@ void SV_Multicast (vec3_t origin, multicast_t to)
 	// if doing a serverrecord, store everything
 	if (svs.demofile)
 		SZ_Write (&svs.demo_multicast, sv.multicast.data, sv.multicast.cursize);
-	
+
 	switch (to)
 	{
 	case MULTICAST_ALL_R:
@@ -277,8 +277,8 @@ void SV_StartSound (vec3_t origin, edict_t *entity, int channel,
 					float attenuation, float timeofs)
 {       
 	int			sendchan;
-    int			flags;
-    int			i;
+	int			flags;
+	int			i;
 	int			ent;
 	vec3_t		origin_v;
 	qboolean	use_phs;
@@ -380,7 +380,7 @@ void SV_StartSound (vec3_t origin, edict_t *entity, int channel,
 		else
 			SV_Multicast (origin, MULTICAST_ALL);
 	}
-}           
+}
 
 
 /*
@@ -390,7 +390,6 @@ FRAME UPDATES
 
 ===============================================================================
 */
-
 
 
 /*

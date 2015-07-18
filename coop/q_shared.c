@@ -1067,11 +1067,11 @@ char	*va(char *format, ...)
 	static char		string[1024];
 	
 	va_start (argptr, format);
-//	vsprintf (string, format, argptr);
-	Q_vsnprintf (string, sizeof(string), format, argptr);	// Knightmare- buffer overflow fix
+	Q_vsnprintf (string, sizeof(string), format, argptr);
 	va_end (argptr);
+	string[sizeof(string)-1] = 0;
 
-	return string;	
+	return string;
 }
 
 

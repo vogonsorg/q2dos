@@ -262,8 +262,9 @@ void Sys_Error (char *error, ...)
 	char		text[1024];
 
 	va_start (argptr, error);
-	vsprintf (text, error, argptr);
+	Q_vsnprintf (text, sizeof(text), error, argptr);
 	va_end (argptr);
+	text[sizeof(text)-1] = 0;
 
 	gi.error ("%s", text);
 }
@@ -274,8 +275,9 @@ void Com_Printf (char *msg, ...)
 	char		text[1024];
 
 	va_start (argptr, msg);
-	vsprintf (text, msg, argptr);
+	Q_vsnprintf (text, sizeof(text), msg, argptr);
 	va_end (argptr);
+	text[sizeof(text)-1] = 0;
 
 	gi.dprintf(DEVELOPER_MSG_GAME, "%s", text);
 }

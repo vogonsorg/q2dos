@@ -136,11 +136,11 @@ void Netchan_OutOfBandPrint (int net_socket, netadr_t adr, char *format, ...)
 {
 	va_list		argptr;
 	static char		string[MAX_MSGLEN - 4];
-	
+
 	va_start (argptr, format);
-//	vsprintf (string, format, argptr);
 	Q_vsnprintf (string, sizeof(string), format, argptr);
 	va_end (argptr);
+	string[sizeof(string)-1] = 0;
 
 	Netchan_OutOfBand (net_socket, adr, strlen(string), (byte *)string);
 }
@@ -240,7 +240,6 @@ void Netchan_Transmit (netchan_t *chan, int length, byte *data)
 		chan->reliable_sequence ^= 1;
 	}
 
-
 // write the packet header
 	SZ_Init (&send, send_buf, sizeof(send_buf));
 
@@ -324,7 +323,7 @@ qboolean Netchan_Process (netchan_t *chan, sizebuf_t *msg)
 	reliable_ack = sequence_ack >> 31;
 
 	sequence &= ~(1<<31);
-	sequence_ack &= ~(1<<31);	
+	sequence_ack &= ~(1<<31);
 
 	if (showpackets->value)
 	{

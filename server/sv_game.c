@@ -88,9 +88,9 @@ void PF_dprintf (unsigned long developerFlags, char *fmt, ...)
 		return;
 
 	va_start (argptr,fmt);
-//	vsprintf (msg, fmt, argptr);
 	Q_vsnprintf (msg, sizeof(msg), fmt, argptr);
 	va_end (argptr);
+	msg[sizeof(msg)-1] = 0;
 
 	Com_Printf ("%s", msg);
 }
@@ -120,9 +120,9 @@ void PF_cprintf (edict_t *ent, int level, char *fmt, ...)
 	}
 
 	va_start (argptr,fmt);
-//	vsprintf (msg, fmt, argptr);
 	Q_vsnprintf (msg, sizeof(msg), fmt, argptr);
 	va_end (argptr);
+	msg[sizeof(msg)-1] = 0;
 
 	if (ent)
 	{
@@ -146,7 +146,7 @@ void PF_centerprintf (edict_t *ent, char *fmt, ...)
 	char		msg[1024];
 	va_list		argptr;
 	int			n;
-	
+
 	n = NUM_FOR_EDICT(ent);
 	if ((n < 1) || (n > maxclients->value))
 	{
@@ -154,9 +154,9 @@ void PF_centerprintf (edict_t *ent, char *fmt, ...)
 	}
 
 	va_start (argptr,fmt);
-//	vsprintf (msg, fmt, argptr);
 	Q_vsnprintf (msg, sizeof(msg), fmt, argptr);
 	va_end (argptr);
+	msg[sizeof(msg)-1] = 0;
 
 	MSG_WriteByte (&sv.multicast,svc_centerprint);
 	MSG_WriteString (&sv.multicast,msg);
@@ -175,11 +175,11 @@ void PF_error (char *fmt, ...)
 {
 	char		msg[1024];
 	va_list		argptr;
-	
+
 	va_start (argptr,fmt);
-//	vsprintf (msg, fmt, argptr);
 	Q_vsnprintf (msg, sizeof(msg), fmt, argptr);
 	va_end (argptr);
+	msg[sizeof(msg)-1] = 0;
 
 	Com_Error (ERR_DROP, "Game Error: %s", msg);
 }

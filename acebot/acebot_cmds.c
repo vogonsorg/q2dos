@@ -133,13 +133,13 @@ void debug_printf(char *fmt, ...)
 {
 	int     i;
 	char	bigbuffer[0x10000];
-	int		len;
 	va_list	argptr;
 	edict_t	*cl_ent;
 	
 	va_start (argptr,fmt);
-	len = vsprintf (bigbuffer,fmt,argptr);
+	Q_vsnprintf (bigbuffer,sizeof(bigbuffer),fmt,argptr);
 	va_end (argptr);
+	bigbuffer[sizeof(bigbuffer)-1] = 0;
 
 	if (dedicated->value)
 		gi.cprintf(NULL, PRINT_MEDIUM, bigbuffer);
@@ -152,7 +152,6 @@ void debug_printf(char *fmt, ...)
 
 		gi.cprintf(cl_ent,  PRINT_MEDIUM, bigbuffer);
 	}
-
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -162,17 +161,16 @@ void safe_cprintf (edict_t *ent, int printlevel, char *fmt, ...)
 {
 	char	bigbuffer[0x10000];
 	va_list		argptr;
-	int len;
 
 	if (ent && (!ent->inuse || ent->is_bot))
 		return;
 
 	va_start (argptr,fmt);
-	len = vsprintf (bigbuffer,fmt,argptr);
+	Q_vsnprintf (bigbuffer,sizeof(bigbuffer),fmt,argptr);
 	va_end (argptr);
+	bigbuffer[sizeof(bigbuffer)-1] = 0;
 
 	gi.cprintf(ent, printlevel, bigbuffer);
-	
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -182,17 +180,16 @@ void safe_centerprintf (edict_t *ent, char *fmt, ...)
 {
 	char	bigbuffer[0x10000];
 	va_list		argptr;
-	int len;
 
 	if (!ent->inuse || ent->is_bot)
 		return;
-	
+
 	va_start (argptr,fmt);
-	len = vsprintf (bigbuffer,fmt,argptr);
+	Q_vsnprintf (bigbuffer,sizeof(bigbuffer),fmt,argptr);
 	va_end (argptr);
-	
+	bigbuffer[sizeof(bigbuffer)-1] = 0;
+
 	gi.centerprintf(ent, bigbuffer);
-	
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -202,13 +199,13 @@ void safe_bprintf (int printlevel, char *fmt, ...)
 {
 	int i;
 	char	bigbuffer[0x10000];
-	int		len;
 	va_list		argptr;
 	edict_t	*cl_ent;
 
 	va_start (argptr,fmt);
-	len = vsprintf (bigbuffer,fmt,argptr);
+	Q_vsnprintf (bigbuffer,sizeof(bigbuffer),fmt,argptr);
 	va_end (argptr);
+	bigbuffer[sizeof(bigbuffer)-1] = 0;
 
 	if (dedicated->value)
 		gi.cprintf(NULL, printlevel, bigbuffer);

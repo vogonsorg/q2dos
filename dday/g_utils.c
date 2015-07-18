@@ -755,24 +755,20 @@ qboolean WeighPlayer(edict_t *ent)
 // based off of Com_sprintf
 void centerprintall (char *mesg, ...)
 {
-	int		i,len,size;
+	int		i, len;
 	edict_t *ent;
 	va_list	argptr;
-	char	buffer[0x10000];
 	char	print[0x10000];
 
-	size = sizeof(print);
-
 	va_start (argptr, mesg);
-	len = vsprintf (buffer, mesg, argptr);
+	len = Q_vsnprintf (print, sizeof(print), mesg, argptr);
 	va_end (argptr);
+	print[sizeof(print)-1] = 0;
 
 	// erm this should never happen at all but it's here incase
-	if (len >= size)
-		Com_Printf ("centerprintall: overflow of %i in %i\n", len, size);
+	if (len < 0 || len >= (int)sizeof(print))
+		Com_Printf ("centerprintall: overflow of %i in %i\n", len, (int)sizeof(print));
 
-	strncpy (print, buffer, size-1);
-	
 	for (i = 1; i <= game.maxclients; i++)
 	{
 			ent = &g_edicts[i];

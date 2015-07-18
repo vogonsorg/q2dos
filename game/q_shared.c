@@ -1004,7 +1004,6 @@ float FloatSwap (float f)
 		byte	b[4];
 	} dat1, dat2;
 	
-	
 	dat1.f = f;
 	dat2.b[0] = dat1.b[3];
 	dat2.b[1] = dat1.b[2];
@@ -1048,7 +1047,6 @@ void Swap_Init (void)
 		_BigFloat = FloatNoSwap;
 		_LittleFloat = FloatSwap;
 	}
-
 }
 
 
@@ -1068,11 +1066,11 @@ char	*va(char *format, ...)
 	static char		string[1024];
 	
 	va_start (argptr, format);
-//	vsprintf (string, format, argptr);
-	Q_vsnprintf (string, sizeof(string), format, argptr);	// Knightmare- buffer overflow fix
+	Q_vsnprintf (string, sizeof(string), format, argptr);
 	va_end (argptr);
+	string[sizeof(string)-1] = 0;
 
-	return string;	
+	return string;
 }
 
 

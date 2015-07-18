@@ -113,9 +113,9 @@ void Com_Printf (char *fmt, ...)
 	char		msg[MAXPRINTMSG];
 
 	va_start (argptr,fmt);
-//	vsprintf (msg, fmt, argptr);
 	Q_vsnprintf (msg, sizeof(msg), fmt, argptr);
 	va_end (argptr);
+	msg[sizeof(msg)-1] = 0;
 
 	if (rd_target)
 	{
@@ -130,7 +130,7 @@ void Com_Printf (char *fmt, ...)
 	}
 
 	Con_Print (msg);
-		
+
 	// also echo to debugging console
 	if (msg[strlen(msg)-1] != '\r') // skip overwrittten outputs
 	Sys_ConsoleOutput (msg);
@@ -181,10 +181,10 @@ void Com_DPrintf (unsigned long developerFlags, char *fmt, ...) // FS: Added dev
 		return;
 
 	va_start (argptr,fmt);
-//	vsprintf (msg, fmt, argptr);
 	Q_vsnprintf (msg, sizeof(msg), fmt, argptr);
 	va_end (argptr);
-	
+	msg[sizeof(msg)-1] = 0;
+
 	Com_Printf ("%s", msg);
 }
 
@@ -208,10 +208,10 @@ void Com_Error (int code, char *fmt, ...)
 	recursive = true;
 
 	va_start (argptr,fmt);
-//	vsprintf (msg, fmt, argptr);
 	Q_vsnprintf (msg, sizeof(msg), fmt, argptr);
 	va_end (argptr);
-	
+	msg[sizeof(msg)-1] = 0;
+
 	if (code == ERR_DISCONNECT)
 	{
 		CL_Drop ();
