@@ -648,13 +648,9 @@ void LoadMOTD()
 	cvar_t	*game_dir;
 	int i;
 
-#ifdef _WIN32
-	int i;
-#endif
-
 	game_dir = gi.cvar ("game", "", 0);
 
-#ifdef	_WIN32
+#ifdef	_WIN32 /* FS: FIXME.  Can't DJGPP be using sprintf as well?  Or better yet, Com_sprintf? */
 	i =  sprintf(file, ".\\");
 	i += sprintf(file + i, game_dir->string);
 	i += sprintf(file + i, "\\motd.txt");
