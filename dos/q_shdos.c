@@ -108,7 +108,7 @@ static qboolean CompareAttributes(char *path, char *name,
 	return true;
 
 	sprintf (fn, "%s/%s", path, name);
-	if ((attr = _chmod(path, 0)) == -1) /* shouldn't happen */
+	if ((attr = _chmod(fn, 0)) == -1) /* shouldn't happen */
 		return false;
 
 	if ((attr & _A_SUBDIR) && (canthave & SFF_SUBDIR))
@@ -128,9 +128,7 @@ char *Sys_FindFirst (char *path, unsigned musthave, unsigned canthave)
 	if (fdir)
 		Sys_Error ("Sys_BeginFind without close");
 
-//	COM_FilePath (path, findbase);
 	strcpy(findbase, path);
-
 	if ((p = strrchr(findbase, '/')) != NULL) {
 		*p = 0;
 		strcpy(findpattern, p + 1);
