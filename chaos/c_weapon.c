@@ -3989,23 +3989,21 @@ void BlackHole_Think (edict_t *ent)
  */
 int Valid_Target( edict_t *ent, edict_t *blip )
 {
-int dummy;
-
-  	/*
+	/*
 	 * For every item we never allow it to legally target itself
 	 */
 	if (blip == ent)
 	  return false;
 
-	/* 
+	/*
 	 * The Vortex doesn't care who launched it or who is one what team,
 	 * it just eats everything in it's path
 	 */
 	if(Q_stricmp(ent->classname, "vortex") /*== 0)*/)
-	  /*
+	/*
 	{
 	  if (blip->item || blip->client)
-	  	  return true;
+		  return true;
 	}
 	else // These are the quick rules for Turret's, Proxies, ect...
 	*/
@@ -4019,14 +4017,13 @@ int dummy;
 		 * havok bot's should likely use the same function to decide
 		 * if a target is visible.
 		 */
-	  /*		if( !visible(ent,blip) ||
+	/*	if( !visible(ent,blip) ||
 		    !infront(ent,blip) ||
 		    blip->health <= 0 )
 		  return false;
- 
-	  */
-	          if (blip->health <= 0)
-                      return false;
+		*/
+		if (blip->health <= 0)
+		  return false;
 
 		/*
 		 * Turret's and Proxies should only be attacking other
@@ -4036,21 +4033,17 @@ int dummy;
 		if( !blip->takedamage )
 		  return false;
 
-
 		/* Check for invisible?  */
 		if( blip->client && blip->health > 0 && 
 		    blip->client->invisible)
 		  return false;
 
-
-		/*		if( blip == ent->owner ||
+		/*if( blip == ent->owner ||
 		    blip->owner == ent->owner ||
 		    TeamMembers(ent->owner, blip) ||
-		    TeamMembers(ent->owner, blip->owner) ) 
+		    TeamMembers(ent->owner, blip->owner) )
 		  return false;
-		  
 		*/
-
 
 		/*
 		 * Here we need to do a check to settup Evil Proxies
@@ -4058,65 +4051,52 @@ int dummy;
 		 * if the roll fails then we fall back to the turret/proxy
 		 * rules, else we are an evil proxy and that's life. */
 
-
 		if( Q_stricmp(ent->classname, "proxymine") == 0 )
 		{
-
-
-                  dummy = 0;
-
 		  if(( Q_stricmp(blip->classname, "rocket_turret") == 0 ) &&
-                              (blip->owner != ent->owner))   
-		  return true; 
-                  
+			(blip->owner != ent->owner))
+		   return true;
 
-		if (( Q_stricmp(blip->classname, "laser_turret") == 0 ) &&
-                             (blip->owner != ent->owner))
-		  return true;
+		  if (( Q_stricmp(blip->classname, "laser_turret") == 0 ) &&
+			(blip->owner != ent->owner))
+		   return true;
 
+		  if ((Q_stricmp(blip->classname, "player") == 0) &&
+			(blip != ent->owner) && !TeamMembers(ent->owner, blip->owner))
+		   return true;
 
-                if ((Q_stricmp(blip->classname, "player") == 0) &&
-                     (blip != ent->owner) && !TeamMembers(ent->owner, blip->owner))
-                   return true;
+		  if ((Q_stricmp(blip->classname, "bot") == 0) &&
+			(blip != ent->owner) && !TeamMembers(ent->owner, blip->owner))
+		   return true;
 
-
-                if ((Q_stricmp(blip->classname, "bot") == 0) &&
-                     (blip != ent->owner) && !TeamMembers(ent->owner, blip->owner))
-                   return true;
-
-                if (Q_stricmp(blip->classname, "proxymine") == 0) 
-		{
-                    if (blip->owner == ent->owner)
-		    { 
+		  if (Q_stricmp(blip->classname, "proxymine") == 0) 
+		  {
+		    if (blip->owner == ent->owner)
 			 return (false);
-		    }
-		    else
-		    {
-			return (true);
-                    }
-		}
+		    else return (true);
+		  }
 
 		  /* Roll for an EvilProxy */
-                	if ( random() < 0.05 && 
-			     ent->owner && 
-			     (Q_stricmp(ent->owner->classname, "bot") != 0) )
-			{
-			  	if( blip == ent->owner ||
-			       	    blip->owner == ent->owner ||
-			       	    TeamMembers(ent->owner, blip) ||
-			       	    TeamMembers(ent->owner, blip->owner) ) 
-				  return true;
-			}
+		  if ( random() < 0.05 && 
+		       ent->owner && 
+		       (Q_stricmp(ent->owner->classname, "bot") != 0) )
+		  {
+			if( blip == ent->owner ||
+			    blip->owner == ent->owner ||
+			    TeamMembers(ent->owner, blip) ||
+			    TeamMembers(ent->owner, blip->owner) ) 
+			  return true;
+		  }
 
 		}
 
-		//		else	// Something other then Evil Proxies, at the time of
+		//else	// Something other then Evil Proxies, at the time of
 		//{ 	// this writting this was only Proxies and Turrets
 		
-		// }
+		//}
 		if(blip->client && blip->client->camera)
 			return false;
- 
+
 		return false;
 	} else {
 
@@ -4135,11 +4115,11 @@ int dummy;
 	 */
 	switch(blip->classname[0])
 	{
-	  	case 'a':
+		case 'a':
 			if( Q_stricmp(blip->classname, "arrow") == 0 )
 			  return true;
 			break;
-	  	case 'b':
+		case 'b':
 			if( Q_stricmp(blip->classname, "bolt") == 0
 			 || Q_stricmp(blip->classname, "buzz") == 0
 			 || Q_stricmp(blip->classname, "bfg blast") == 0
@@ -4170,12 +4150,12 @@ int dummy;
 			break;
 		case 'i':
 			if( Q_stricmp(blip->classname, "item_flag_team1") == 0
- 			 || Q_stricmp(blip->classname, "item_flag_team2") == 0
- 			 || Q_stricmp(blip->classname, "item_tech1") == 0
- 			 || Q_stricmp(blip->classname, "item_tech2") == 0
- 			 || Q_stricmp(blip->classname, "item_tech3") == 0
- 			 || Q_stricmp(blip->classname, "item_tech4") == 0)
-  			return false;
+			 || Q_stricmp(blip->classname, "item_flag_team2") == 0
+			 || Q_stricmp(blip->classname, "item_tech1") == 0
+			 || Q_stricmp(blip->classname, "item_tech2") == 0
+			 || Q_stricmp(blip->classname, "item_tech3") == 0
+			 || Q_stricmp(blip->classname, "item_tech4") == 0)
+			return false;
 
 		case 'l':
 			if( Q_stricmp(blip->classname, "lasermine") == 0 

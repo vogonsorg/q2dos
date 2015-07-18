@@ -62,9 +62,8 @@ void ShowGun(edict_t *ent)	//vwep
 		ent->s.modelindex2 = 0;
 		return;
 	}
-	
-	// Determine the weapon's precache index.
 
+	// Determine the weapon's precache index.
 	nIndex = 0;
 	pszIcon = ent->client->pers.weapon->icon;
 
@@ -203,7 +202,7 @@ void LoadMaplist(char	*filename)
 	{
 		int		len;
 
-		fgets (line, MAX_MAPNAME_LEN + 8, fp);
+		fgets(line, (int)sizeof(line), fp);
 		len=strlen(line);
 
 		if (len < 5) //invalid
@@ -540,7 +539,6 @@ void PreCacheAll()
 	gi.modelindex ("models/items/invis/tris.md2");
 	gi.modelindex ("models/items/jet/tris.md2");
 
-
 	//sound
 	gi.soundindex ("hook/hit.wav");
 	gi.soundindex ("hook/chain1.wav");
@@ -647,7 +645,7 @@ void LoadMOTD()
 	{
 		int		len;
 
-		fgets (line, 80, fp);
+		fgets(line, (int)sizeof(line), fp);
 		len=strlen(line);
 
 		while(len >= 0 && (line[len] == '\n'||line[len] == '\r'))
@@ -661,19 +659,17 @@ void LoadMOTD()
 
 		i+=len;
 	}
-
 	fclose(fp);
 }
 
 void FakeDeath(edict_t *self)
 {
 	int i;
-	vec3_t              mins = {-16, -16, -24};
-	vec3_t              maxs = {16, 16, 32};
+	vec3_t mins = {-16, -16, -24};
+	vec3_t maxs = {16, 16, 32};
 
 	if (Q_stricmp (self->classname, "camera") == 0)
 	  return;
-
 
 	if (self->client->fakedeath == 0)	//fake
 	{
@@ -818,7 +814,6 @@ void FakeDeath(edict_t *self)
 		// force the current weapon up
 		self->client->newweapon = self->client->pers.weapon;
 		ChangeWeapon (self);
-		                 
 	}
 }
 
@@ -909,13 +904,13 @@ void bprintf2 (int printlevel, char *fmt, ...)
 {
 	int i;
 	char	bigbuffer[0x10000];
-	int		len;
 	va_list		argptr;
 	edict_t	*cl_ent;
 
 	va_start (argptr,fmt);
-	len = vsprintf (bigbuffer,fmt,argptr);
+	Q_vsnprintf (bigbuffer,sizeof(bigbuffer),fmt,argptr);
 	va_end (argptr);
+	bigbuffer[sizeof(bigbuffer)-1] = 0;
 
 	if (dedicated->value)
 		gi.cprintf(NULL, printlevel, bigbuffer);
@@ -933,15 +928,15 @@ void bprintf2 (int printlevel, char *fmt, ...)
 void cprintf2 (edict_t *ent, int printlevel, char *fmt, ...)
 {
 	char	bigbuffer[0x10000];
-	int		len;
 	va_list		argptr;
 
 	if (!ent)
 		return;
 
 	va_start (argptr,fmt);
-	len = vsprintf (bigbuffer,fmt,argptr);
+	Q_vsnprintf (bigbuffer,sizeof(bigbuffer),fmt,argptr);
 	va_end (argptr);
+	bigbuffer[sizeof(bigbuffer)-1] = 0;
 
 	if (ent->inuse && (Q_stricmp(ent->classname, "bot") != 0))
 	{
@@ -953,7 +948,6 @@ void nprintf (int printlevel, char *fmt, ...)
 {
 	int i;
 	char	bigbuffer[0x10000];
-	int		len;
 	va_list		argptr;
 	edict_t	*cl_ent;
 
@@ -961,8 +955,9 @@ void nprintf (int printlevel, char *fmt, ...)
 		return;
 
 	va_start (argptr,fmt);
-	len = vsprintf (bigbuffer,fmt,argptr);
+	Q_vsnprintf (bigbuffer,sizeof(bigbuffer),fmt,argptr);
 	va_end (argptr);
+	bigbuffer[sizeof(bigbuffer)-1] = 0;
 
 	for (i=0 ; i<maxclients->value ; i++)
 	{
@@ -1575,7 +1570,7 @@ void ClientCommand2 (edict_t *ent)
 		}
 	}
 	else if (Q_stricmp (cmd, "zoom") == 0)
-    {
+	{
 		int zoomtype=atoi(gi.argv(1));
 
 		if (ent->health <= 0)
@@ -1591,11 +1586,11 @@ void ClientCommand2 (edict_t *ent)
 			else if (ent->client->ps.fov == 40) ent->client->ps.fov = 20;
 			else if (ent->client->ps.fov == 20) ent->client->ps.fov = 10;
 			else ent->client->ps.fov = 90;
-        }
-    }
+		}
+	}
 	else if (Q_stricmp (cmd, "camera") == 0)
-    {
-        if (Q_stricmp(gi.argv(1), "0") == 0)	//cam off
+	{
+		if (Q_stricmp(gi.argv(1), "0") == 0)	//cam off
 		{
 			if (ent->client->camera)
 			{
@@ -1647,9 +1642,9 @@ void ClientCommand2 (edict_t *ent)
 			ent->client->cammode = 4;
 			cprintf2 (ent, PRINT_HIGH, "TV-Cam Mode!\n");
 		}
-    }
+	}
 	else if (Q_stricmp (cmd, "pathdebug") == 0)
-    {
+	{
 		if(!ent->client->b_target)
 		{
 			if (!ent->client->b_target)
@@ -1678,11 +1673,11 @@ void ClientCommand2 (edict_t *ent)
 		}
 	}
 	else if (Q_stricmp (cmd, "scanner") == 0)
-    {
+	{
 		Toggle_Scanner (ent);
 	}
 	else if (Q_stricmp (cmd, "placenode") == 0)
-    {
+	{
 		if (dntg->value)
 		{
 			vec3_t	end, spot;
@@ -1727,7 +1722,7 @@ void ClientCommand2 (edict_t *ent)
 			cprintf2 (ent, PRINT_HIGH, "Dynamic Node Table Generation is off activate it with <set dntg 1>!\n");
 	}
 	else if (Q_stricmp (cmd, "belt") == 0)
-    {
+	{
 		if (ent->client->fakedeath > 0)
 			return;
 		if (ent->health <= 0)
@@ -1768,17 +1763,17 @@ void ClientCommand2 (edict_t *ent)
 			cprintf2 (ent, PRINT_HIGH, "Flashlight OFF\n");
 		}               
 		else
-        {
+		{
 			vec3_t  start,forward,right,end;
-                
-                        ent->client->flashlightactive = true;
+
+			ent->client->flashlightactive = true;
 
 			AngleVectors (ent->client->v_angle, forward, right, NULL);
 
 			VectorSet(end,100 , 0, 0);
 			G_ProjectSource (ent->s.origin, end, forward, right, start);
- 
-          		ent->client->flashlight = G_Spawn();
+
+			ent->client->flashlight = G_Spawn();
 			ent->client->flashlight->think = FlashLightThink;
 			ent->client->flashlight->nextthink = level.time +0.1;
 			ent->client->flashlight->s.effects = EF_HYPERBLASTER;
@@ -1793,7 +1788,7 @@ void ClientCommand2 (edict_t *ent)
 			gi.linkentity(ent->client->flashlight);
 
 			cprintf2 (ent, PRINT_HIGH, "Flashlight ON\n");
-        }
+		}
 	}
 	else if (Q_stricmp (cmd, "teleport") == 0)
 	{
@@ -1978,7 +1973,6 @@ void ClientCommand2 (edict_t *ent)
 		edict_t *current = NULL;
 
 		current = weapon_list;	// start with the head
-	
 
 		//go through all items in the list
 		while (current)
@@ -1992,7 +1986,6 @@ void ClientCommand2 (edict_t *ent)
 		edict_t *current = NULL;
 
 		current = health_list;	// start with the head
-	
 
 		//go through all items in the list
 		while (current)
@@ -2006,7 +1999,6 @@ void ClientCommand2 (edict_t *ent)
 		edict_t *current = NULL;
 
 		current = ammo_list;	// start with the head
-	
 
 		//go through all items in the list
 		while (current)
@@ -2020,7 +2012,6 @@ void ClientCommand2 (edict_t *ent)
 		edict_t *current = NULL;
 
 		current = powerup_list;	// start with the head
-	
 
 		//go through all items in the list
 		while (current)

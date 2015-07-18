@@ -614,11 +614,11 @@ void Bot_Think(edict_t *ent)
 		}
 		else
 		{
+			/*
 			int	lastnodeflag = NORMAL_NODE;
-
 			if (n > 0)
 				lastnodeflag = nodes[ent->client->b_path[n-1]].flag;
-
+			*/
 			VectorSubtract(nodes[ent->client->b_path[n]].origin, ent->s.origin, dvec);
 			dist = VectorLength(dvec);
 
@@ -830,7 +830,7 @@ void Bot_Think(edict_t *ent)
 	else
 	{
 		vec3_t	forward, dir, oorigin, wallangles;
-		vec_t	dist;
+		//vec_t	dist;
 		trace_t	tr;
 
 		it_lturret = FindItem("automatic defence turret");	//bugfix
@@ -899,7 +899,7 @@ void Bot_Think(edict_t *ent)
 			{
 				ent->client->b_waittime = 0;
 				VectorSubtract(ent->client->b_nopathitem->s.origin, ent->s.origin, dir);
-				dist = VectorLength(dir);
+				//dist = VectorLength(dir);
 				Bot_Aim(ent, ent->client->b_nopathitem->s.origin, angles);
 
 				if(SaveMoveDir(ent, RUN_SPEED, 0, angles))
@@ -1031,7 +1031,7 @@ edict_t *Bot_FindBestWeapon(edict_t *ent)
 		if (current->avoidtime > level.time)
 			goto next;
 
-		if (!current->solid == SOLID_TRIGGER)	// is it currently there
+		if (current->solid != SOLID_TRIGGER)	// is it currently there
 			goto next;
 
 		if (!current->item)
@@ -1967,7 +1967,7 @@ void Bot_Wave (edict_t *ent, int i, float time)
 	if (ent->client->fakedeath > 0)
 		return;
 
-	if (!ent->health > 0)
+	if (ent->health <= 0)
 		return;
 
 	// can't wave when ducked
@@ -2015,7 +2015,6 @@ void Bot_Say (edict_t *ent, qboolean team, char *fmt, ...)
 {
 	int i;
 	char	bigbuffer[0x10000];
-	int		len;
 	va_list		argptr;
 	edict_t	*cl_ent;
 
@@ -2023,8 +2022,9 @@ void Bot_Say (edict_t *ent, qboolean team, char *fmt, ...)
 		return;
 
 	va_start (argptr,fmt);
-	len = vsprintf (bigbuffer,fmt,argptr);
+	Q_vsnprintf (bigbuffer,sizeof(bigbuffer),fmt,argptr);
 	va_end (argptr);
+	bigbuffer[sizeof(bigbuffer)-1] = 0;
 
 	if (dedicated->value)
 		gi.cprintf(NULL, PRINT_CHAT, bigbuffer);
