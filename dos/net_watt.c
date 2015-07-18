@@ -508,7 +508,7 @@ int NET_Socket (char *net_interface, int port)
 
 	if ((newsocket = socket (PF_INET, SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET)
 	{
-		Com_Printf ("ERROR: UDP_OpenSocket: socket: %s", NET_ErrorString());
+		Com_Printf ("ERROR: UDP_OpenSocket: socket: %s\n", NET_ErrorString());
 		return 0;
 	}
 

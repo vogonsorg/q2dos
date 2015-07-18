@@ -493,7 +493,7 @@ int NET_IPSocket (char *net_interface, int port)
 	{
 		err = WSAGetLastError();
 		if (err != WSAEAFNOSUPPORT)
-			Com_Printf ("WARNING: UDP_OpenSocket: socket: %s", NET_ErrorString());
+			Com_Printf ("WARNING: UDP_OpenSocket: socket: %s\n", NET_ErrorString());
 		return 0;
 	}
 
