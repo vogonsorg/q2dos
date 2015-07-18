@@ -650,46 +650,19 @@ void LoadMOTD()
 
 	game_dir = gi.cvar ("game", "", 0);
 
-#ifdef	_WIN32 /* FS: FIXME.  Can't DJGPP be using sprintf as well?  Or better yet, Com_sprintf? */
-	i =  sprintf(file, ".\\");
-	i += sprintf(file + i, game_dir->string);
-	i += sprintf(file + i, "\\motd.txt");
-#else
-    strcpy(file, "./");
-    strcat(file, game_dir->string);
-    strcat(file, "/motd.txt");
-#endif
-
-    /* 	if ((fp = fopen(file, "r")) != NULL)
-	{
-		if (fgets(motd, 500, fp) )
-		{
-		        charcnt = 0;
-			while (charcnt < 559 && ( fgets(line, 80,fp) ))
-			{
-				strcat(motd, line);
-				charcnt += 80;
-			}
-		        if (charcnt >= 559)
-			   gi.dprintf(DEVELOPER_MSG_GAME, "MOTD length exceeded maximum (560) , may be truncated.\n");
-		}
-		fclose(fp);
-	}
-
-    */
-
+	Com_sprintf (file, sizeof(file), "./%s/motd.txt", game_dir->string);
 
 	if ((fp = fopen(file, "r")) == NULL)
-    { 
+	{
 		gi.cprintf (NULL, PRINT_HIGH, "Could not find file \"%s\".\n\n", file); 
 		return;
-    }
-	if (fp)
-	{ 
+	}
+	else
+	{
 		i = 0;
 
 		while ((!feof(fp)) && (i < 560)) 
-		{ 
+		{
 			int		len;
 
 			fgets (line, 256, fp);
@@ -703,14 +676,11 @@ void LoadMOTD()
 			else
 			  gi.dprintf(DEVELOPER_MSG_GAME, "MOTD is too long (> 560 chars), truncated\n");
 
-			i+=len; 
-		} 
-	} 
-	//close file
-	if (fp)
-		fclose(fp); 
+			i+=len;
+		}
 
-
+		fclose(fp);
+	}
 }
 
 void FakeDeath(edict_t *self)
