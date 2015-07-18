@@ -178,8 +178,8 @@ void ClearMaplist(void)
 	}
 }
 
-void LoadMaplist(char	*filename) 
-{ 
+void LoadMaplist(char	*filename)
+{
 	FILE	*fp = NULL;
 	cvar_t	*game_dir;
 	int		i = 0;
@@ -188,76 +188,59 @@ void LoadMaplist(char	*filename)
 
 	game_dir = gi.cvar ("game", "", 0);
 
-#ifdef	_WIN32
-	i =  sprintf(file, ".\\");
-	i += sprintf(file + i, game_dir->string);
-	i += sprintf(file + i, "\\maplists\\");
-	i += sprintf(file + i, filename);
-	i += sprintf(file + i, ".txt");
-#else
-      strcpy(file, "./");
-      strcat(file, game_dir->string);
-      strcat(file, "/maplists/");
-	  strcat(file, filename);
-	  strcat(file, ".txt");
-#endif
+	Com_sprintf (file, sizeof(file), "./%s/maplists/%s.txt", game_dir->string, filename);
 
 	//open the maplist file
 	if ((fp = fopen(file, "r")) == NULL)
-    { 
-		gi.cprintf (NULL, PRINT_HIGH, "Could not find file \"%s\".\n\n", file); 
+	{
+		gi.cprintf (NULL, PRINT_HIGH, "Could not find file \"%s\".\n\n", file);
 		return;
-    }
-	maplist.nummaps = 0;	//reset maplist counter
+	}
 
-	if (fp)
-	{ 
-		i = 0;
+	i = 0;
 
-		while ((!feof(fp)) && (i < MAX_MAPS)) 
-		{ 
-			int		len;
+	while ((!feof(fp)) && (i < MAX_MAPS))
+	{
+		int		len;
 
-			fgets (line, 256, fp);
-			len=strlen(line);
+		fgets (line, MAX_MAPNAME_LEN + 3, fp);
+		len=strlen(line);
 
-			if (len < 5) //invalid
-				continue;
-			if (line[0] == ';') //comment
-				continue;
+		if (len < 5) //invalid
+			continue;
+		if (line[0] == ';') //comment
+			continue;
 
-			len--;
-			while(line[len] == '\n'||line[len] == '\r')
-			  len--;
+		len--;
+		while(len >= 0 && (line[len] == '\n'||line[len] == '\r'))
+		  len--;
+		if (len < 3) continue;
 
-			// lightsoff
-			maplist.lightsoff[i] = line[len--];
+		// lightsoff
+		maplist.lightsoff[i] = line[len--];
 
-			// ctf
-			maplist.ctf[i] = line[len--];
+		// ctf
+		maplist.ctf[i] = line[len--];
 
-			// mapname
-			strncpy(maplist.mapnames[i], line, len);
-			
-			gi.cprintf(NULL, PRINT_HIGH, "...%s,ctf=%c,lightsoff=%c\n", maplist.mapnames[i], maplist.ctf[i], maplist.lightsoff[i]);
-			i++; 
-		} 
-	} 
-	//close file
-	if (fp)
-		fclose(fp); 
+		// mapname
+		strncpy(maplist.mapnames[i], line, len);
+
+		gi.cprintf(NULL, PRINT_HIGH, "...%s,ctf=%c,lightsoff=%c\n", maplist.mapnames[i], maplist.ctf[i], maplist.lightsoff[i]);
+		i++;
+	}
+	fclose(fp);
 
 	//print status
-	if (i == 0) 
-	{ 
+	if (i == 0)
+	{
 		gi.cprintf (NULL, PRINT_HIGH, "No maps listed in %s\n\n", file);
 		maplist.nummaps = 0;
 		return;
 	}
 
-	gi.cprintf (NULL, PRINT_HIGH, "%i map(s) loaded.\n\n", i); 
-	maplist.nummaps = i; 
-} 
+	gi.cprintf (NULL, PRINT_HIGH, "%i map(s) loaded.\n\n", i);
+	maplist.nummaps = i;
+}
 
 void GetSettings()
 {
@@ -657,30 +640,29 @@ void LoadMOTD()
 		gi.cprintf (NULL, PRINT_HIGH, "Could not find file \"%s\".\n\n", file); 
 		return;
 	}
-	else
+
+	i = 0;
+
+	while ((!feof(fp)) && (i < 560))
 	{
-		i = 0;
+		int		len;
 
-		while ((!feof(fp)) && (i < 560)) 
-		{
-			int		len;
+		fgets (line, 80, fp);
+		len=strlen(line);
 
-			fgets (line, 256, fp);
-			len=strlen(line);
+		while(len >= 0 && (line[len] == '\n'||line[len] == '\r'))
+		  len--;
+		if (len <= 0) continue;
 
-			while(line[len] == '\n'||line[len] == '\r')
-			  len--;
+		if ((i+len) < 560)
+		  strncpy(motd+i, line, len);
+		else
+		  gi.dprintf(DEVELOPER_MSG_GAME, "MOTD is too long (> 560 chars), truncated\n");
 
-			if ((i+len) < 560)
-			  strncpy(motd+i, line, len);
-			else
-			  gi.dprintf(DEVELOPER_MSG_GAME, "MOTD is too long (> 560 chars), truncated\n");
-
-			i+=len;
-		}
-
-		fclose(fp);
+		i+=len;
 	}
+
+	fclose(fp);
 }
 
 void FakeDeath(edict_t *self)
