@@ -1143,7 +1143,7 @@ char **FS_ListFiles( char *findname, int *numfiles, unsigned musthave, unsigned 
 {
 	char *s;
 	int nfiles = 0;
-	char **list = 0;
+	char **list = NULL;
 
 	s = Sys_FindFirst( findname, musthave, canthave );
 	while ( s )
@@ -1172,8 +1172,8 @@ char **FS_ListFiles( char *findname, int *numfiles, unsigned musthave, unsigned 
 		if ( s[strlen(s)-1] != '.' )
 		{
 			list[nfiles] = strdup( s );
-#ifdef _WIN32
-			strlwr( list[nfiles] );
+#if defined(_WIN32) || defined(__MSDOS__)
+			Q_strlwr( list[nfiles] );
 #endif
 			nfiles++;
 		}
