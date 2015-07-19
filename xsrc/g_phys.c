@@ -72,7 +72,7 @@ void SV_CheckVelocity (edict_t *ent)
 {
 	int i;
 
-  	if (!ent)
+	if (!ent)
 	{
 		return;
 	}
@@ -102,7 +102,7 @@ qboolean SV_RunThink (edict_t *ent)
 {
 	float thinktime;
 
-  	if (!ent)
+	if (!ent)
 	{
 		return false;
 	}
@@ -380,7 +380,7 @@ SV_AddGravity
 */
 void SV_AddGravity (edict_t *ent)
 {
-  	if (!ent)
+	if (!ent)
 	{
 		return;
 	}
@@ -507,6 +507,7 @@ void SV_RealBoundingBox (edict_t *ent, vec3_t mins, vec3_t maxs)
 	}
 }
 // end Knightmare
+
 trace_t SV_PushEntity(edict_t *ent, vec3_t push)
 {
 	trace_t trace;
@@ -783,7 +784,7 @@ void SV_Physics_Pusher (edict_t *ent)
 	vec3_t move, amove;
 	edict_t *part, *mv;
 
-  	if (!ent)
+	if (!ent)
 	{
 		return;
 	}
@@ -816,9 +817,9 @@ void SV_Physics_Pusher (edict_t *ent)
 		}
 	}
 
-	if (pushed_p > &pushed[MAX_EDICTS])
+	if (pushed_p > &pushed[MAX_EDICTS-1])
 	{
-		gi.error("pushed_p > &pushed[MAX_EDICTS], memory corrupted");
+		gi.error("pushed_p > &pushed[MAX_EDICTS-1], memory corrupted");
 	}
 
 	if (part)
@@ -861,7 +862,7 @@ Non moving objects can only think
 */
 void SV_Physics_None (edict_t *ent)
 {
-  	if (!ent)
+	if (!ent)
 	{
 		return;
 	}
@@ -920,7 +921,7 @@ void SV_Physics_Toss (edict_t *ent)
 	qboolean isinwater;
 	vec3_t old_origin;
 
-  	if (!ent)
+	if (!ent)
 	{
 		return;
 	}
@@ -1078,7 +1079,7 @@ void SV_AddRotationalFriction (edict_t *ent)
 	int n;
 	float adjustment;
 
-  	if (!ent)
+	if (!ent)
 	{
 		return;
 	}
@@ -1119,7 +1120,7 @@ void SV_Physics_Step (edict_t *ent)
 	edict_t *groundentity;
 	int mask;
 
-  	if (!ent)
+	if (!ent)
 	{
 		return;
 	}
@@ -1277,7 +1278,7 @@ G_RunEntity
 */
 void G_RunEntity (edict_t *ent)
 {
-  	if (!ent)
+	if (!ent)
 	{
 		return;
 	}
