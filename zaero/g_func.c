@@ -1856,6 +1856,11 @@ door_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */, csurface
 		return;
 	}
 
+	if(self->message == NULL) // FS: Zaero specific
+	{
+		return;
+	}
+
 	if (level.time < self->touch_debounce_time)
 	{
 		return;
