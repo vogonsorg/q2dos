@@ -95,6 +95,7 @@ Move_Done(edict_t *ent)
 	}
 
 	VectorClear(ent->velocity);
+	VectorClear(ent->avelocity); // FS: Zaero specific
 	ent->moveinfo.endfunc(ent);
 }
 
@@ -942,11 +943,19 @@ rotating_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */, csur
 		return;
 	}
 
+	if (self->moveinfo.state != STATE_STOPPED) // FS: Zaero specific, changed to check flag
+	{
+		T_Damage (other, self, self, vec3_origin, other->s.origin,
+			vec3_origin, self->dmg, 1, 0, MOD_CRUSH);
+	}
+
+/*
 	if (self->avelocity[0] || self->avelocity[1] || self->avelocity[2])
 	{
 		T_Damage(other, self, self, vec3_origin, other->s.origin,
 				vec3_origin, self->dmg, 1, 0, MOD_CRUSH);
 	}
+*/
 }
 
 void rotating_think(edict_t *self)
