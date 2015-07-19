@@ -2306,7 +2306,7 @@ void Bots_Move_NORM (edict_t *ent)
 	cplane_t	plane;
 
 	vec3_t		Origin,Velocity;//original param
-	float		OYaw;			//
+	float		OYaw=0;			//
 
 	qboolean	ladderdrop;		
 

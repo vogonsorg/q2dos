@@ -477,7 +477,6 @@ void G_InitEdict (edict_t *e);
 void G_RunFrame (void)
 {
 	int		i,j;
-//	static int ofs;
 	static float next_fragadd = 0;
 	edict_t	*ent;
 
@@ -492,7 +491,6 @@ void G_RunFrame (void)
 //	AI_SetSightClient ();
 
 	// exit intermissions
-
 	if (level.exitintermission)
 	{
 		ExitLevel ();

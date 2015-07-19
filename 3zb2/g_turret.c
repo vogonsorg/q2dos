@@ -271,13 +271,6 @@ Must NOT be on the team with the rest of the turret parts.
 Instead it must target the turret_breach.
 */
 
-void infantry_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage);
-/* 
-void infantry_stand (edict_t *self);
-void monster_use (edict_t *self, edict_t *other, edict_t *activator); 
-*/ 
-
-
 void turret_driver_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point)
 {
 	edict_t	*ent;
@@ -296,11 +289,7 @@ void turret_driver_die (edict_t *self, edict_t *inflictor, edict_t *attacker, in
 	self->target_ent->teammaster->owner = NULL;
 
 //	infantry_die (self, inflictor, attacker, damage);
-
 }
-
-
-//qboolean FindTarget (edict_t *self);
 
 
 void turret_driver_think (edict_t *self)
@@ -316,11 +305,10 @@ void turret_driver_think (edict_t *self)
 
 	if (!self->enemy)
 	{
-		/* 
+		/*
 		if (!FindTarget (self))
-			return; 
+			return;
 		*/
-
 		self->monsterinfo.trail_time = level.time;
 		self->monsterinfo.aiflags &= ~AI_LOST_SIGHT;
 	}
@@ -413,7 +401,6 @@ void SP_turret_driver (edict_t *self)
 	self->viewheight = 24;
 
 	self->die = turret_driver_die;
-	
 //	self->monsterinfo.stand = infantry_stand;
 
 	self->flags |= FL_NO_KNOCKBACK;
@@ -423,9 +410,7 @@ void SP_turret_driver (edict_t *self)
 	self->svflags |= SVF_MONSTER;
 	self->s.renderfx |= RF_FRAMELERP;
 	self->takedamage = DAMAGE_AIM;
-
 //	self->use = monster_use;
-
 	self->clipmask = MASK_MONSTERSOLID;
 	VectorCopy (self->s.origin, self->s.old_origin);
 	self->monsterinfo.aiflags |= AI_STAND_GROUND|AI_DUCKED;
