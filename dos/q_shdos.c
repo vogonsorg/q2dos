@@ -136,9 +136,14 @@ char *Sys_FindFirst (char *path, unsigned musthave, unsigned canthave)
 
 	COM_FilePath (path, findbase);
 	memset (&finddata, 0, sizeof(finddata));
+
 	attribs = FA_ARCH|FA_RDONLY;
 	if (!(canthave & SFF_SUBDIR))
 		attribs |= FA_DIREC;
+	if (musthave & SFF_HIDDEN)
+		attribs |= FA_HIDDEN;
+	if (musthave & SFF_SYSTEM)
+		attribs |= FA_SYSTEM;
 
 	findhandle = findfirst(path, &finddata, attribs);
 	if (findhandle != 0)
