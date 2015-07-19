@@ -123,7 +123,8 @@ SV_Configstrings_f
 */
 void SV_Configstrings_f (void)
 {
-	int			startPos, start;
+	int	startPos, start;
+	int	max_packet_len; /* FS: Added */
 
 	Com_DPrintf(DEVELOPER_MSG_SERVER, "Configstrings() from %s\n", sv_client->name);
 
@@ -151,9 +152,17 @@ void SV_Configstrings_f (void)
 	}
 	start = startPos;
 
-	// write a packet full of data
+	if((maxclients->intValue == 1) && (sv_client->netchan.remote_address.type == NA_LOOPBACK))
+	{
+		max_packet_len = MAX_MSGLEN; /* FS: For sending configstrings and baselines.  Much faster start-ups */
+	}
+	else
+	{
+		max_packet_len = MAX_MSGLEN_MP / 2;
+	}
 
-	while ( sv_client->netchan.message.cursize < MAX_MSGLEN/2 
+	// write a packet full of data
+	while ( sv_client->netchan.message.cursize < max_packet_len 
 		&& start < MAX_CONFIGSTRINGS)
 	{
 		if (sv.configstrings[start][0])
@@ -186,7 +195,8 @@ SV_Baselines_f
 */
 void SV_Baselines_f (void)
 {
-	int				startPos, start;
+	int	startPos, start;
+	int	max_packet_len; /* FS: Added */
 	entity_state_t	nullstate;
 	entity_state_t	*base;
 
@@ -216,11 +226,20 @@ void SV_Baselines_f (void)
 	}
 	start = startPos;
 
+	if((maxclients->intValue == 1) && (sv_client->netchan.remote_address.type == NA_LOOPBACK))
+	{
+		max_packet_len = MAX_MSGLEN; /* FS: For sending configstrings and baselines.  Much faster start-ups */
+	}
+	else
+	{
+		max_packet_len = MAX_MSGLEN_MP / 2;
+	}
+
 	memset (&nullstate, 0, sizeof(nullstate));
 
 	// write a packet full of data
 
-	while ( sv_client->netchan.message.cursize <  MAX_MSGLEN/2
+	while ( sv_client->netchan.message.cursize <  max_packet_len
 		&& start < MAX_EDICTS)
 	{
 		base = &sv.baselines[start];

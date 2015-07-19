@@ -542,7 +542,8 @@ NET
 
 #define	PORT_ANY	-1
 
-#define	MAX_MSGLEN		1400		// max length of a message
+#define	MAX_MSGLEN		32000		// max length of a message
+#define MAX_MSGLEN_MP	1400		/* FS: For sending configstrings and baselines.  Much faster start-ups */
 #define	PACKET_HEADER	10			// two ints and a short
 
 typedef enum {NA_LOOPBACK, NA_BROADCAST, NA_IP, NA_IPX, NA_BROADCAST_IPX} netadrtype_t;

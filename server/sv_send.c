@@ -405,6 +405,12 @@ qboolean SV_SendClientDatagram (client_t *client)
 	SV_BuildClientFrame (client);
 
 	SZ_Init (&msg, msg_buf, sizeof(msg_buf));
+
+	if ((maxclients->intValue > 1) && !(client->netchan.remote_address.type == NA_LOOPBACK))
+	{
+		msg.maxsize = MAX_MSGLEN_MP; /* FS: MAX_MSGLEN is now for single player */
+	}
+
 	msg.allowoverflow = true;
 
 	// send over all the relevant entity_state_t
