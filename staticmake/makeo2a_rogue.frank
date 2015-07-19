@@ -55,7 +55,7 @@ CURL_CFLAGS = -Ilibcurl/include
 CURL_LIBS = -Llibcurl/lib -lcurl
 endif
 
-DOS = 	dos/cd_dos.o \
+DOS = dos/cd_dos.o \
 	dos/vid_dos.o \
 	dos/vid_ext.o \
 	dos/snddma_dos.o \
@@ -66,13 +66,12 @@ DOS = 	dos/cd_dos.o \
 	dos/in_dos.o \
 	dos/net_watt.o \
 	dos/dos_v2.o \
-	dos/glob.o \
 	dos/sys_dosa.o \
 	dos/q_shdos.o \
 	dos/vregset.o \
 	dos/swimp_dos.o
 
-CLIENT =	client/cl_input.o \
+CLIENT = client/cl_input.o \
 	client/cl_inv.o \
 	client/cl_main.o \
 	client/cl_cin.o \
@@ -221,11 +220,11 @@ GAME = rsrc/dm_ball.o \
 .PHONY: all test clean
 #
 
-OBJECTS =  $(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(GAMESPY) $(REFSOFT) $(REFASM) $(DOS)
+OBJECTS = $(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(GAMESPY) $(REFSOFT) $(REFASM) $(DOS)
 
 all: q2.exe
 
-q2.exe:	$(OBJECTS)
+q2.exe: $(OBJECTS)
 	$(CC) $(OBJECTS) -o q2.exe $(LDFLAGS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm
 
 clean:

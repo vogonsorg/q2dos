@@ -1,15 +1,14 @@
 
 #include <sys/types.h>
-#include <sys/stat.h>
+#include <sys/stat.h> /* mkdir() */
 #include <errno.h>
 #include <stdio.h>
 #include <dos.h>
-#include <dirent.h>
+#include <dir.h>
 #include <io.h>
 #include <sys/time.h>
 
 #include "../qcommon/qcommon.h"
-#include "glob.h"
 
 static byte	*membase;
 static int	maxhunksize;
@@ -90,31 +89,39 @@ void	Sys_Mkdir (char *path)
 	mkdir (path, 0777);
 }
 
-static	DIR		*fdir;
+static	struct ffblk	finddata;
+static	int	findhandle = -1;
 static	char	findbase[MAX_OSPATH];
 static	char	findpath[MAX_OSPATH];
-static	char	findpattern[MAX_OSPATH];
 
-static qboolean CompareAttributes(char *path, char *name,
+static qboolean CompareAttributes(char *name, unsigned found,
 				  unsigned musthave, unsigned canthave)
 {
-	int attr;
-	char fn[MAX_OSPATH];
-
 	/* . and .. never match */
 	if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
 		return false;
 
-	return true;
-
-	sprintf (fn, "%s/%s", path, name);
-	if ((attr = _chmod(fn, 0)) == -1) /* shouldn't happen */
+	if (found & _A_VOLID) /* shouldn't happen */
 		return false;
 
-	if ((attr & _A_SUBDIR) && (canthave & SFF_SUBDIR))
+	if ((found & _A_SUBDIR) && (canthave & SFF_SUBDIR))
+		return false;
+	if ((musthave & SFF_SUBDIR) && !(found & _A_SUBDIR))
 		return false;
 
-	if ((musthave & SFF_SUBDIR) && !(attr & _A_SUBDIR))
+	if ((found & _A_RDONLY) && (canthave & SFF_RDONLY))
+		return false;
+	if ((musthave & SFF_RDONLY) && !(found & _A_RDONLY))
+		return false;
+
+	if ((found & _A_HIDDEN) && (canthave & SFF_HIDDEN))
+		return false;
+	if ((musthave & SFF_HIDDEN) && !(found & _A_HIDDEN))
+		return false;
+
+	if ((found & _A_SYSTEM) && (canthave & SFF_SYSTEM))
+		return false;
+	if ((musthave & SFF_SYSTEM) && !(found & _A_SYSTEM))
 		return false;
 
 	return true;
@@ -122,59 +129,43 @@ static qboolean CompareAttributes(char *path, char *name,
 
 char *Sys_FindFirst (char *path, unsigned musthave, unsigned canthave)
 {
-	struct dirent *d;
-	char *p;
+	int attribs;
 
-	if (fdir)
+	if (findhandle == 0)
 		Sys_Error ("Sys_BeginFind without close");
 
-	strcpy(findbase, path);
-	if ((p = strrchr(findbase, '/')) != NULL) {
-		*p = 0;
-		strcpy(findpattern, p + 1);
-	} else
-		strcpy(findpattern, "*");
+	COM_FilePath (path, findbase);
+	memset (&finddata, 0, sizeof(finddata));
+	attribs = FA_ARCH|FA_RDONLY;
+	if (!(canthave & SFF_SUBDIR))
+		attribs |= FA_DIREC;
 
-	if (strcmp(findpattern, "*.*") == 0)
-		strcpy(findpattern, "*");
-	
-	if ((fdir = opendir(findbase)) == NULL)
+	findhandle = findfirst(path, &finddata, attribs);
+	if (findhandle != 0)
 		return NULL;
-	while ((d = readdir(fdir)) != NULL) {
-		if (!*findpattern || glob_match(findpattern, d->d_name)) {
-//			if (*findpattern)
-//				printf("%s matched %s\n", findpattern, d->d_name);
-			if (CompareAttributes(findbase, d->d_name, musthave, canthave)) {
-				sprintf (findpath, "%s/%s", findbase, d->d_name);
-				return findpath;
-			}
-		}
+	if (CompareAttributes(finddata.ff_name, finddata.ff_attrib, musthave, canthave)) {
+		sprintf (findpath, "%s/%s", findbase, finddata.ff_name);
+		return findpath;
 	}
-	return NULL;
+	return Sys_FindNext(musthave, canthave);
 }
 
 char *Sys_FindNext (unsigned musthave, unsigned canthave)
 {
-	struct dirent *d;
-
-	if (fdir == NULL)
+	if (findhandle != 0)
 		return NULL;
-	while ((d = readdir(fdir)) != NULL) {
-		if (!*findpattern || glob_match(findpattern, d->d_name)) {
-//			if (*findpattern)
-//				printf("%s matched %s\n", findpattern, d->d_name);
-			if (CompareAttributes(findbase, d->d_name, musthave, canthave)) {
-				sprintf (findpath, "%s/%s", findbase, d->d_name);
-				return findpath;
-			}
+
+	while (findnext(&finddata) == 0) {
+		if (CompareAttributes(finddata.ff_name, finddata.ff_attrib, musthave, canthave)) {
+			sprintf (findpath, "%s/%s", findbase, finddata.ff_name);
+			return findpath;
 		}
 	}
+
 	return NULL;
 }
 
 void Sys_FindClose (void)
 {
-	if (fdir != NULL)
-		closedir(fdir);
-	fdir = NULL;
+	findhandle = -1;
 }
