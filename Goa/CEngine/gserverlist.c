@@ -480,7 +480,7 @@ static GError ServerListLANList(GServerList serverlist)
 {
 	struct timeval timeout = {0,0};
 	fd_set set;
-	char indata[1500];
+	char indata[GS_MSGLEN];
 	struct   sockaddr_in saddr;
 	int saddrlen = sizeof(saddr);
 	int error;
@@ -600,7 +600,7 @@ static GError ServerListQueryLoop(GServerList serverlist)
 	int i, error;
 	fd_set read_fd;
 	struct timeval timeout = {0,0};
-	char indata[1500];
+	char indata[GS_MSGLEN];
 	struct sockaddr_in saddr;
 	int saddrlen = sizeof(saddr);
 	int server_timeout = bound(100, cl_master_server_timeout->intValue, 9000); /* FS: Now a CVAR */

@@ -87,7 +87,7 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 	char *v = NULL;
 	char tokenSeperators[] = "\\";
 	char *kPtr = NULL;
-	char savedkeyvals[MAX_MSGLEN];
+	char savedkeyvals[GS_MSGLEN];
 	GKeyValuePair kvpair;
 
 	if(!keyvals || strlen(keyvals) < 11) /* FS: Some kind of bad status packet, forget it. */
