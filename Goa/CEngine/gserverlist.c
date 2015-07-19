@@ -655,7 +655,7 @@ static GError ServerListQueryLoop(GServerList serverlist)
 //						gspyi.dprint(DEVELOPER_MSG_GAMESPY, "Slow down cowboy..\n");
 						continue;
 					}
-					else /* FS: If we got didn't get WOULDBLOCK or if it just kept going past the server_timeout threshold then just give up. */
+					else /* FS: If we didn't get WOULDBLOCK or if it just kept going past the server_timeout threshold then just give up. */
 					{
 						gspyi.dprint(DEVELOPER_MSG_GAMESPY, "Error during gamespy recv %s.  Removing server from list.\n", gspyi.net_strerror());
 						serverlist->updatelist[i].serverindex = -1; //reuse the updatelist
