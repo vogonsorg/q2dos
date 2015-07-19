@@ -871,15 +871,18 @@ COM_FileBase
 void COM_FileBase (char *in, char *out)
 {
 	char *s, *s2;
-	
+
+	if (!*in) {
+		*out = 0;
+		return;
+	}
 	s = in + strlen(in) - 1;
-	
+
 	while (s != in && *s != '.')
 		s--;
-	
 	for (s2 = s ; s2 != in && *s2 != '/' ; s2--)
-	;
-	
+	 ;
+
 	if (s-s2 < 2)
 		out[0] = 0;
 	else
@@ -900,9 +903,13 @@ Returns the path up to, but not including the last /
 void COM_FilePath (char *in, char *out)
 {
 	char *s;
-	
+
+	if (!*in) {
+		*out = 0;
+		return;
+	}
 	s = in + strlen(in) - 1;
-	
+
 	while (s != in && *s != '/')
 		s--;
 
@@ -923,6 +930,7 @@ void COM_DefaultExtension (char *path, char *extension)
 // if path doesn't have a .EXT, append extension
 // (extension should include the .)
 //
+	if (!*path) return;
 	src = path + strlen(path) - 1;
 
 	while (*src != '/' && src != path)
