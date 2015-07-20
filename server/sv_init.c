@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "server.h"
 
+void SV_CheckSkillCvar(void); /* FS: Valid skill values are 0, 1, 2 and 3. */
+
 server_static_t	svs;				// persistant server info
 server_t		sv;					// local server
 
@@ -332,6 +334,8 @@ void SV_InitGame (void)
 		Cvar_FullSet ("coop", "0",  CVAR_SERVERINFO | CVAR_LATCH);
 	}
 
+	SV_CheckSkillCvar(); /* FS: Valid skill values are 0, 1, 2, and 3. */
+
 	// dedicated servers are can't be single player and are usually DM
 	// so unless they explicity set coop, force it to deathmatch
 	if (dedicated->value)
@@ -501,4 +505,19 @@ void SV_Map (qboolean attractloop, char *levelstring, qboolean loadgame)
 	}
 
 	SV_BroadcastCommand ("reconnect\n");
+}
+
+/* FS: Valid skill values are 0, 1, 2 and 3. */
+void SV_CheckSkillCvar(void)
+{
+	if (Cvar_VariableValue("skill") > 3.0f)
+	{
+		Com_Printf("Skill value greater than 3.  Valid values are 0, 1, 2 and 3.\nSetting skill to 3 (nightmare).\n");
+		Cvar_FullSet("skill", "3", CVAR_SERVERINFO | CVAR_LATCH);
+	}
+	else if (Cvar_VariableValue("skill") < 0.0f) /* FS: Someone being funny */
+	{
+		Com_Printf("Skill value less than 0.  Valid values are 0, 1, 2, and 3.\nSetting skill to 0 (easy).\n");
+		Cvar_FullSet("skill", "0", CVAR_SERVERINFO | CVAR_LATCH);
+	}
 }

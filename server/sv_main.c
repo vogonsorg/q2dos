@@ -1087,6 +1087,7 @@ void SV_Init (void)
 
 	rcon_password = Cvar_Get ("rcon_password", "", 0);
 	Cvar_Get ("skill", "1", 0);
+	Cvar_Set_Description("skill", "Skill level.  Valid values are 0 - Easy, 1 - Medium, 2 - Hard, 3 - Nightmare.");
 	Cvar_Get ("deathmatch", "0", CVAR_LATCH);
 	Cvar_Get ("coop", "0", CVAR_LATCH);
 	Cvar_Get ("dmflags", va("%i", DF_INSTANT_ITEMS), CVAR_SERVERINFO);
@@ -1121,6 +1122,7 @@ void SV_Init (void)
 	public_server = Cvar_Get ("public", "0", 0);
 
 	sv_iplimit = Cvar_Get ("sv_iplimit", "3", 0);	// r1ch: limit connections per ip address (stop zombie dos/flood)
+	sv_iplimit->description = "Limit connections per IP address.  Stops zombie DoS/Flood.";
 
 	sv_reconnect_limit = Cvar_Get ("sv_reconnect_limit", "3", CVAR_ARCHIVE);
 

@@ -811,7 +811,23 @@ void Cvar_ParseDeveloperFlags (void) /* FS: Special stuff for showing all the de
 	}
 	else
 	{
-		if (developer->description && con_show_description->intValue) // FS
+		if (developer->description && con_show_description->intValue) /* FS: Show all available flags */
 			Com_Printf("Description: %s\n", developer->description);
 	}
+}
+
+void Cvar_Set_Description (char *var_name, const char *description) /* FS: Set descriptions for CVARs that just uses Cvar_Get and Cvar_VariableValue */
+{
+	cvar_t	*var;
+	var = Cvar_FindVar (var_name);
+
+	if (!var)
+	{
+		Com_DPrintf(DEVELOPER_MSG_STANDARD, "Error: Can't set description for %s!\n", var_name);
+		return;
+	}
+
+	assert(description); /* FS: Bad C code somewhere ... */
+
+	var->description = description;
 }
