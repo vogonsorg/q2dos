@@ -740,6 +740,7 @@ void Con_DrawConsole (float frac)
 	}
 //ZOID
 
+#ifdef GAMESPY
 	if (cls.gamespyupdate) // FS: For gamespy server list
 	{
 		text = "Gamespy";
@@ -778,6 +779,7 @@ void Con_DrawConsole (float frac)
 		for (i = 0; i < strlen(dlbar); i++)
 			re.DrawChar ( (i+1)<<3, y, dlbar[i]);
 	}
+#endif
 
 // draw the input prompt, user text, and cursor if desired
 	Con_DrawInput ();

@@ -37,29 +37,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "console.h"
 #include "cdaudio.h"
 
-// HTTP downloading from R1Q2
-#ifdef USE_CURL
-
+#ifdef USE_CURL /* HTTP downloading from R1Q2 */
 #ifdef _WIN32
 #define CURL_STATICLIB
 #define CURL_HIDDEN_SYMBOLS
 #define CURL_EXTERN_SYMBOL
 #define CURL_CALLING_CONVENTION __cdecl
-#endif // _WIN32
+#endif
 
-//#if defined (_MSC_VER) && (_MSC_VER <= 1200)	// use older version of libcurl for MSVC6
-//#include "../include/curl_old/curl.h"
-//#define CURL_ERROR(x)	va("%i",(x))
-//#else
 #define CURL_STATICLIB
 #include "../libcurl/include/curl/curl.h"
 #define CURL_ERROR(x)	curl_easy_strerror(x)
-//#endif
 
 #define MAX_HTTP_HANDLES 4 /* FS: If I want to be nasty and change the value */
-
-#endif	// USE_CURL
-// end HTTP downloading from R1Q2
+#endif /* end HTTP downloading from R1Q2 */
 
 //=============================================================================
 
@@ -308,17 +299,19 @@ typedef struct
 	int			downloadpercent;
 	float		downloadrate;		/* Knightmare- to display KB/s */
 
-	 /* FS: For gamespy */
+#ifdef GAMESPY /* FS: For gamespy */
 	int			gamespypercent;
 	int			gamespyupdate;
 	int			gamespytotalservers;
 	int			gamespystarttime;
+#endif
 
 // demo recording info must be here, so it isn't cleared on level change
 	qboolean	demorecording;
 	qboolean	demowaiting;	// don't record until a non-delta message is received
 	FILE		*demofile;
-#ifdef USE_CURL	// HTTP downloading from R1Q2
+
+#ifdef USE_CURL /* HTTP downloading from R1Q2 */
 	dlqueue_t		downloadQueue;			//queue of paths we need
 	
 	dlhandle_t		HTTPHandles[MAX_HTTP_HANDLES];			//actual download handles
@@ -333,7 +326,7 @@ typedef struct
 	char			downloadServer[512];	//base url prefix to download from
 	char			downloadServerRetry[512]; /* FS: Added because Whale's Weapons HTTP server rejects you after a lot of 404s.  Then you lose HTTP until a hard reconnect. */
 	char			downloadReferer[32];	//libcurl requires a static string :(
-#endif	// USE_CURL
+#endif /* USE_CURL */
 } client_static_t;
 
 extern client_static_t	cls;

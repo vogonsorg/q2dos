@@ -273,6 +273,7 @@ void Key_Console (int key)
 		return;
 	}
 
+#ifdef GAMESPY
 	if( key == 'c' ) // FS: Added
 	{
 		if ( keydown[K_CTRL] )
@@ -288,6 +289,7 @@ void Key_Console (int key)
 			return;
 		}
 	}
+#endif
 
 	if ( key == 'l' ) 
 	{

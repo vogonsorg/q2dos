@@ -105,83 +105,78 @@ qboolean	CL_CheckOrDownloadFile (char *filename)
 	{	// it exists, no need to download
 		return true;
 	}
-#ifdef USE_CURL	// HTTP downloading from R1Q2
-	if ( CL_QueueHTTPDownload(filename) )
+#ifdef USE_CURL /* HTTP downloading from R1Q2 */
+	if (CL_QueueHTTPDownload(filename))
 	{
 		// We return true so that the precache check keeps feeding us more files.
 		// Since we have multiple HTTP connections we want to minimize latency
 		// and be constantly sending requests, not one at a time.
 		return true;
 	}
-	else
+#endif
+
+	strcpy (cls.downloadname, filename);
+
+	//r1: fix \ to /
+	p = cls.downloadname;
+	while ((p = strchr(p, '\\')))
+		p[0] = '/';
+
+	length = (int)strlen(cls.downloadname);
+
+	//normalize path
+	p = cls.downloadname;
+	while ((p = strstr (p, "./")))
 	{
-#endif	// USE_CURL
-		strcpy (cls.downloadname, filename);
+		memmove (p, p+2, length - (p - cls.downloadname) - 1);
+		length -= 2;
+	}
 
-		//r1: fix \ to /
-		p = cls.downloadname;
-		while ((p = strchr(p, '\\')))
-			p[0] = '/';
+	//r1: verify we are giving the server a legal path
+	if (cls.downloadname[length-1] == '/')
+	{
+		Com_Printf ("Refusing to download bad path (%s)\n", filename);
+		return true;
+	}
 
-		length = (int)strlen(cls.downloadname);
-
-		//normalize path
-		p = cls.downloadname;
-		while ((p = strstr (p, "./")))
-		{
-			memmove (p, p+2, length - (p - cls.downloadname) - 1);
-			length -= 2;
-		}
-
-		//r1: verify we are giving the server a legal path
-		if (cls.downloadname[length-1] == '/')
-		{
-			Com_Printf ("Refusing to download bad path (%s)\n", filename);
-			return true;
-		}
-
-		// download to a temp name, and only rename
-		// to the real name when done, so if interrupted
-		// a runt file wont be left
-		COM_StripExtension (cls.downloadname, cls.downloadtempname);
-		strcat (cls.downloadtempname, ".tmp");
+	// download to a temp name, and only rename
+	// to the real name when done, so if interrupted
+	// a runt file wont be left
+	COM_StripExtension (cls.downloadname, cls.downloadtempname);
+	strcat (cls.downloadtempname, ".tmp");
 
 //ZOID
-		// check to see if we already have a tmp for this file, if so, try to resume
-		// open the file if not opened yet
-		CL_DownloadFileName(name, sizeof(name), cls.downloadtempname);
+	// check to see if we already have a tmp for this file, if so, try to resume
+	// open the file if not opened yet
+	CL_DownloadFileName(name, sizeof(name), cls.downloadtempname);
 
 //	FS_CreatePath (name);
+	fp = fopen (name, "r+b");
+	if (fp)
+	{ // it exists
+		int len;
+		fseek(fp, 0, SEEK_END);
+		len = ftell(fp);
 
-		fp = fopen (name, "r+b");
-		if (fp)
-		{ // it exists
-			int len;
-			fseek(fp, 0, SEEK_END);
-			len = ftell(fp);
+		cls.download = fp;
 
-			cls.download = fp;
-
-			// give the server an offset to start the download
-			Com_Printf ("Resuming %s\n", cls.downloadname);
-			MSG_WriteByte (&cls.netchan.message, clc_stringcmd);
-			MSG_WriteString (&cls.netchan.message, va("download \"%s\" %i", cls.downloadname, len));
-		}
-		else
-		{
+		// give the server an offset to start the download
+		Com_Printf ("Resuming %s\n", cls.downloadname);
+		MSG_WriteByte (&cls.netchan.message, clc_stringcmd);
+		MSG_WriteString (&cls.netchan.message, va("download \"%s\" %i", cls.downloadname, len));
+	}
+	else
+	{
 		Com_Printf ("Downloading %s\n", cls.downloadname);
 		MSG_WriteByte (&cls.netchan.message, clc_stringcmd);
 		MSG_WriteString (&cls.netchan.message,
-			va("download %s", cls.downloadname));
-		}
+		va("download %s", cls.downloadname));
+	}
 
 	cls.downloadnumber++;
 	cls.forcePacket = true;
 
 	return false;
-#ifdef USE_CURL	// HTTP downloading from R1Q2
-	}
-#endif	// USE_CURL
 }
 
 /*
