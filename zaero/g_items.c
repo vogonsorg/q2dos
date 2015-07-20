@@ -3347,8 +3347,8 @@ SetItemNames(void)
 {
 	int i;
 	gitem_t *it;
-	int index;
-	for (i=0, index = 0; i<game.num_items ; i++)
+
+	for (i = 0; i < game.num_items; i++)
 	{
 		it = &itemlist[i];
 		gi.configstring(CS_ITEMS + i, it->pickup_name);
