@@ -94,17 +94,17 @@ static	int	findhandle = -1;
 static	char	findbase[MAX_OSPATH];
 static	char	findpath[MAX_OSPATH];
 
-static qboolean CompareAttributes(char *name, unsigned found,
+static qboolean CompareAttributes(const struct ffblk *ff,
 				  unsigned musthave, unsigned canthave)
 {
 	/* . and .. never match */
-	if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
+	if (strcmp(ff->ff_name, ".") == 0 || strcmp(ff->ff_name, "..") == 0)
 		return false;
 
-	if (found & _A_VOLID) /* shouldn't happen */
+	if (ff->ff_attrib & _A_VOLID) /* shouldn't happen */
 		return false;
 
-	if (found & _A_SUBDIR) {
+	if (ff->ff_attrib & _A_SUBDIR) {
 		if (canthave & SFF_SUBDIR)
 			return false;
 	}
@@ -113,7 +113,7 @@ static qboolean CompareAttributes(char *name, unsigned found,
 			return false;
 	}
 
-	if (found & _A_RDONLY) {
+	if (ff->ff_attrib & _A_RDONLY) {
 		if (canthave & SFF_RDONLY)
 			return false;
 	}
@@ -122,7 +122,7 @@ static qboolean CompareAttributes(char *name, unsigned found,
 			return false;
 	}
 
-	if (found & _A_HIDDEN) {
+	if (ff->ff_attrib & _A_HIDDEN) {
 		if (canthave & SFF_HIDDEN)
 			return false;
 	}
@@ -131,7 +131,7 @@ static qboolean CompareAttributes(char *name, unsigned found,
 			return false;
 	}
 
-	if (found & _A_SYSTEM) {
+	if (ff->ff_attrib & _A_SYSTEM) {
 		if (canthave & SFF_SYSTEM)
 			return false;
 	}
@@ -164,7 +164,7 @@ char *Sys_FindFirst (char *path, unsigned musthave, unsigned canthave)
 	findhandle = findfirst(path, &finddata, attribs);
 	if (findhandle != 0)
 		return NULL;
-	if (CompareAttributes(finddata.ff_name, finddata.ff_attrib, musthave, canthave)) {
+	if (CompareAttributes(&finddata, musthave, canthave)) {
 		sprintf (findpath, "%s/%s", findbase, finddata.ff_name);
 		return findpath;
 	}
@@ -177,7 +177,7 @@ char *Sys_FindNext (unsigned musthave, unsigned canthave)
 		return NULL;
 
 	while (findnext(&finddata) == 0) {
-		if (CompareAttributes(finddata.ff_name, finddata.ff_attrib, musthave, canthave)) {
+		if (CompareAttributes(&finddata, musthave, canthave)) {
 			sprintf (findpath, "%s/%s", findbase, finddata.ff_name);
 			return findpath;
 		}
