@@ -164,6 +164,10 @@ SOURCE=..\zaero\g_weapon.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\zaero\game.def
+# End Source File
+# Begin Source File
+
 SOURCE=..\zaero\m_actor.c
 # End Source File
 # Begin Source File
