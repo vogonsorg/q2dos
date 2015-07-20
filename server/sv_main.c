@@ -1087,7 +1087,7 @@ void SV_Init (void)
 
 	rcon_password = Cvar_Get ("rcon_password", "", 0);
 	Cvar_Get ("skill", "1", 0);
-	Cvar_Set_Description("skill", "Skill level.  Valid values are 0 - Easy, 1 - Medium, 2 - Hard, 3 - Nightmare.");
+	Cvar_Set_Description("skill", "Skill level. (0 = Easy, 1 = Medium, 2 = Hard, 3 = Nightmare.)");
 	Cvar_Get ("deathmatch", "0", CVAR_LATCH);
 	Cvar_Get ("coop", "0", CVAR_LATCH);
 	Cvar_Get ("dmflags", va("%i", DF_INSTANT_ITEMS), CVAR_SERVERINFO);
