@@ -104,25 +104,41 @@ static qboolean CompareAttributes(char *name, unsigned found,
 	if (found & _A_VOLID) /* shouldn't happen */
 		return false;
 
-	if ((found & _A_SUBDIR) && (canthave & SFF_SUBDIR))
-		return false;
-	if ((musthave & SFF_SUBDIR) && !(found & _A_SUBDIR))
-		return false;
+	if (found & _A_SUBDIR) {
+		if (canthave & SFF_SUBDIR)
+			return false;
+	}
+	else {
+		if (musthave & SFF_SUBDIR)
+			return false;
+	}
 
-	if ((found & _A_RDONLY) && (canthave & SFF_RDONLY))
-		return false;
-	if ((musthave & SFF_RDONLY) && !(found & _A_RDONLY))
-		return false;
+	if (found & _A_RDONLY) {
+		if (canthave & SFF_RDONLY)
+			return false;
+	}
+	else {
+		if (musthave & SFF_RDONLY)
+			return false;
+	}
 
-	if ((found & _A_HIDDEN) && (canthave & SFF_HIDDEN))
-		return false;
-	if ((musthave & SFF_HIDDEN) && !(found & _A_HIDDEN))
-		return false;
+	if (found & _A_HIDDEN) {
+		if (canthave & SFF_HIDDEN)
+			return false;
+	}
+	else {
+		if (musthave & SFF_HIDDEN)
+			return false;
+	}
 
-	if ((found & _A_SYSTEM) && (canthave & SFF_SYSTEM))
-		return false;
-	if ((musthave & SFF_SYSTEM) && !(found & _A_SYSTEM))
-		return false;
+	if (found & _A_SYSTEM) {
+		if (canthave & SFF_SYSTEM)
+			return false;
+	}
+	else {
+		if (musthave & SFF_SYSTEM)
+			return false;
+	}
 
 	return true;
 }
