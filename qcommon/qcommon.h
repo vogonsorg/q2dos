@@ -526,7 +526,8 @@ char	*Cvar_Userinfo (void);
 char	*Cvar_Serverinfo (void);
 // returns an info string containing all the CVAR_SERVERINFO cvars
 
-void	Cvar_Set_Description (char *var_name, const char *description); /* FS: Set descriptions for CVARs that just uses Cvar_Get and Cvar_VariableValue */
+void	Cvar_SetDescription (char *var_name, const char *description);
+// FS: Set descriptions for CVARs
 
 extern	qboolean	userinfo_modified;
 // this is set each time a CVAR_USERINFO variable is changed

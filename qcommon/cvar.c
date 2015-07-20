@@ -54,7 +54,7 @@ Cvar_FindVar
 static cvar_t *Cvar_FindVar (char *var_name)
 {
 	cvar_t	*var;
-	
+
 	for (var=cvar_vars ; var ; var=var->next)
 		if (!strcmp (var_name, var->name))
 			return var;
@@ -70,7 +70,7 @@ Cvar_VariableValue
 float Cvar_VariableValue (char *var_name)
 {
 	cvar_t	*var;
-	
+
 	var = Cvar_FindVar (var_name);
 	if (!var)
 		return 0;
@@ -86,7 +86,7 @@ Cvar_VariableString
 char *Cvar_VariableString (char *var_name)
 {
 	cvar_t *var;
-	
+
 	var = Cvar_FindVar (var_name);
 	if (!var)
 		return "";
@@ -103,12 +103,12 @@ char *Cvar_CompleteVariable (char *partial)
 {
 	cvar_t		*cvar;
 	int			len;
-	
+
 	len = strlen(partial);
-	
+
 	if (!len)
 		return NULL;
-		
+
 	// check exact match
 	for (cvar=cvar_vars ; cvar ; cvar=cvar->next)
 		if (!strcmp (partial,cvar->name))
@@ -134,7 +134,7 @@ The flags will be or'ed in if the variable exists.
 cvar_t *Cvar_Get (char *var_name, char *var_value, int flags)
 {
 	cvar_t	*var;
-	
+
 	if (flags & (CVAR_USERINFO | CVAR_SERVERINFO))
 	{
 		if (!Cvar_InfoValidate (var_name))
@@ -270,9 +270,9 @@ cvar_t *Cvar_Set2 (char *var_name, char *value, qboolean force)
 
 	if (var->flags & CVAR_USERINFO)
 		userinfo_modified = true;	// transmit at next oportunity
-	
+
 	Z_Free (var->string);	// free the old value string
-	
+
 	var->string = CopyString(value);
 	var->value = atof (var->string);
 	var->intValue = atoi(var->string); // FS: So we don't need to cast shit all the time
@@ -308,7 +308,7 @@ Cvar_FullSet
 cvar_t *Cvar_FullSet (char *var_name, char *value, int flags)
 {
 	cvar_t	*var;
-	
+
 	var = Cvar_FindVar (var_name);
 	if (!var)
 	{	// create it
@@ -319,9 +319,9 @@ cvar_t *Cvar_FullSet (char *var_name, char *value, int flags)
 
 	if (var->flags & CVAR_USERINFO)
 		userinfo_modified = true;	// transmit at next oportunity
-	
+
 	Z_Free (var->string);	// free the old value string
-	
+
 	var->string = CopyString(value);
 	var->value = atof (var->string);
 	var->intValue = atoi(var->string); // FS: So we don't need to cast shit all the time
@@ -613,7 +613,6 @@ void Cvar_Init (void)
 	Cmd_AddCommand ("togglecvar", Cvar_Toggle_f); /* FS */
 	Cmd_AddCommand ("forcecvar", Cvar_Force_f); /* FS */
 	Cmd_AddCommand ("resetcvar", Cvar_Reset_f); /* FS */
-
 }
 
 static cvar_t *Cvar_IsNoset (const char *var_name) // FS: Make sure this isn't a NOSET CVAR!
@@ -665,7 +664,6 @@ void Cvar_Toggle_f (void) // FS
 			Cvar_ForceSet(cvar_name, "1");
 
 		Com_Printf("%s set to %0.0f\n", cvar_name, Cvar_VariableValue(cvar_name));
-
 	}
 	else
 	{
@@ -702,7 +700,6 @@ void Cvar_Force_f (void) // FS
 		Cvar_ForceSet(cvar_name, cvar_value);
 
 		Com_Printf("%s set to %s\n", cvar_name, cvar_value);
-
 	}
 	else
 	{
@@ -818,18 +815,15 @@ void Cvar_ParseDeveloperFlags (void) /* FS: Special stuff for showing all the de
 	}
 }
 
-void Cvar_Set_Description (char *var_name, const char *description) /* FS: Set descriptions for CVARs that just uses Cvar_Get and Cvar_VariableValue */
+void Cvar_SetDescription (char *var_name, const char *description) /* FS: Set descriptions for CVARs */
 {
-	cvar_t	*var;
-	var = Cvar_FindVar (var_name);
-
-	if (!var)
-	{
+	cvar_t	*var = Cvar_FindVar (var_name);
+	if (!var) {
 		Com_DPrintf(DEVELOPER_MSG_STANDARD, "Error: Can't set description for %s!\n", var_name);
 		return;
 	}
-
-	assert(description); /* FS: Bad C code somewhere ... */
-
+	if (!description) {
+		Com_DPrintf(DEVELOPER_MSG_STANDARD, "NULL description for %s\n", var_name);
+	}
 	var->description = description;
 }

@@ -1083,11 +1083,11 @@ Only called at quake2.exe startup, not for each game
 */
 void SV_Init (void)
 {
-	SV_InitOperatorCommands	();
+	SV_InitOperatorCommands ();
 
 	rcon_password = Cvar_Get ("rcon_password", "", 0);
 	Cvar_Get ("skill", "1", 0);
-	Cvar_Set_Description("skill", "Skill level. (0 = Easy, 1 = Medium, 2 = Hard, 3 = Nightmare.)");
+	Cvar_SetDescription ("skill", "Skill level. (0 = Easy, 1 = Medium, 2 = Hard, 3 = Nightmare.)");
 	Cvar_Get ("deathmatch", "0", CVAR_LATCH);
 	Cvar_Get ("coop", "0", CVAR_LATCH);
 	Cvar_Get ("dmflags", va("%i", DF_INSTANT_ITEMS), CVAR_SERVERINFO);
@@ -1107,7 +1107,7 @@ void SV_Init (void)
 	allow_download_players  = Cvar_Get ("allow_download_players", "0", CVAR_ARCHIVE);
 	allow_download_models = Cvar_Get ("allow_download_models", "1", CVAR_ARCHIVE);
 	allow_download_sounds = Cvar_Get ("allow_download_sounds", "1", CVAR_ARCHIVE);
-	allow_download_maps	  = Cvar_Get ("allow_download_maps", "1", CVAR_ARCHIVE);
+	allow_download_maps = Cvar_Get ("allow_download_maps", "1", CVAR_ARCHIVE);
 // Knightmare 6/25/12- cvar to control use of .ent files
 	sv_entfile = Cvar_Get ("sv_entfile", "1", CVAR_ARCHIVE);
 	sv_entfile->description = "Toggle the use of .ent files.";
