@@ -10,6 +10,8 @@ USE_CURL=1
 USE_OGG=1
 # use tremor library for ogg/vorbis:
 USE_TREMOR=1
+# pci sound card support:
+USE_SNDPCI=1
 # cd audio support:
 USE_CDAUDIO=1
 # abrash's asm optimizations:
@@ -19,10 +21,6 @@ CC = gcc
 CFLAGS = -g -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 CPPFLAGS = -DREF_HARD_LINKED -DCLIENT_SPLIT_NETFRAME
 LDFLAGS =
-
-# libau for pci sound cards support :
-CFLAGS+= -Idos/3rdparty/include
-LDFLAGS+= -Ldos/3rdparty/lib -lau
 
 # net -- watt-32 tcp/ip library :
 WATT32_CFLAGS = -Iwattcp/inc -DWATT32_NO_OLDIES
@@ -37,6 +35,12 @@ CPPFLAGS+= -DGAMESPY
 ifneq ($(GAMESPY_DXE),1)
 CPPFLAGS+= -DGAMESPY_HARD_LINKED
 endif
+endif
+
+ifeq ($(USE_SNDPCI),1)
+CPPFLAGS+= -DUSE_SNDPCI
+CFLAGS+= -Idos/3rdparty/include
+LDFLAGS+= -Ldos/3rdparty/lib -lau
 endif
 
 ifeq ($(USE_CDAUDIO),1)

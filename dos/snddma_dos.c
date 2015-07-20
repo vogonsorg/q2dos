@@ -7,15 +7,14 @@
 #include "../client/snd_loc.h"
 #include "dosisms.h"
 
-#define USE_QDOS_SOUND
-
-#ifdef USE_QDOS_SOUND
 typedef enum
 {
 	dma_none,
 	dma_blaster,
-	dma_pci, /* FS: From ruslans patch */
-	dma_gus
+	dma_gus,
+#ifdef USE_SNDPCI
+	dma_pci /* FS: From ruslans patch */
+#endif
 } dmacard_t;
 
 static dmacard_t	dmacard;
@@ -31,10 +30,12 @@ qboolean BLASTER_Init (void);
 int BLASTER_GetDMAPos (void);
 void BLASTER_Shutdown (void);
 
+#ifdef USE_SNDPCI
 /* PCI SOUND CARD SUPPORT */
 qboolean PCI_Init(void);
 int PCI_GetDMAPos(void);
 void PCI_Shutdown(void);
+#endif
 
 /*
 ===============================================================================
@@ -49,13 +50,9 @@ static void snd_shutdown_f (void) /* FS: SND_SHUTDOWN */
 	S_Shutdown();
 	Com_Printf("\nSound Shutdown.\n");
 }
-#endif /* USE_QDOS_SOUND */
 
 qboolean SNDDMA_Init(void)
 {
-#ifndef USE_QDOS_SOUND
-	return false;
-#else
 	if (COM_CheckParm("-nosound"))
 		goto nocard;
 	if (firstInit)
@@ -63,6 +60,7 @@ qboolean SNDDMA_Init(void)
 		firstInit = false;
 		Cmd_AddCommand ("snd_shutdown", snd_shutdown_f); /* FS */
 	}
+#ifdef USE_SNDPCI
 	if (COM_CheckParm("-hda")) /* FS: Ruslans patch */
 	{
 		if(!PCI_Init())
@@ -73,6 +71,7 @@ qboolean SNDDMA_Init(void)
 		dmacard = dma_pci;
 		return true;
 	}
+#endif
 	if (GUS_Init ())
 	{
 		Com_DPrintf(DEVELOPER_MSG_SOUND, "GUS_Init\n");
@@ -89,30 +88,28 @@ qboolean SNDDMA_Init(void)
 nocard:
 	dmacard = dma_none;
 	return false;
-#endif
 }
 
 int	SNDDMA_GetDMAPos(void)
 {
-#ifdef USE_QDOS_SOUND
 	switch (dmacard)
 	{
 	case dma_blaster:
 		return BLASTER_GetDMAPos ();
 	case dma_gus:
 		return GUS_GetDMAPos ();
+#ifdef USE_SNDPCI
 	case dma_pci: /* FS: Ruslans patch */
 		return PCI_GetDMAPos ();
+#endif
 	case dma_none:
 		break;
 	}
-#endif
 	return 0;
 }
 
 void SNDDMA_Shutdown(void)
 {
-#ifdef USE_QDOS_SOUND
 	switch (dmacard)
 	{
 	case dma_blaster:
@@ -121,16 +118,16 @@ void SNDDMA_Shutdown(void)
 	case dma_gus:
 		GUS_Shutdown ();
 		break;
+#ifdef USE_SNDPCI
 	case dma_pci: /* FS: Ruslans patch */
 		PCI_Shutdown ();
 		break;
+#endif
 	case dma_none:
 		break;
 	}
 
 	dmacard = dma_none;
-	return;
-#endif
 }
 
 void SNDDMA_BeginPainting (void)

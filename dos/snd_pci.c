@@ -2,6 +2,8 @@
  * PCI sound card support through libau
  */
 
+#ifdef USE_SNDPCI
+
 #include <dos.h>
 #include "../client/client.h"
 #include "../client/snd_loc.h"
@@ -89,4 +91,6 @@ void PCI_Shutdown(void)
 {
 	AU_close();
 }
+
+#endif /* USE_SNDPCI */
 
