@@ -106,6 +106,8 @@ static void SCR_DrawUptime (void) // FS: Connection time
 		return;
 	}
 
+	SCR_DirtyScreen(); // repaint everything next frame
+
 	// time
 	if (cl_drawuptime->intValue == 1) // FS: Map time or total time playing quake time
 	{
@@ -153,6 +155,8 @@ static void SCR_DrawTime (void) // FS: show_time
 	{
 		return;
 	}
+
+	SCR_DirtyScreen(); // repaint everything next frame
 
 	utc = time (NULL);
 	local = localtime (&utc);
@@ -202,7 +206,7 @@ static void SCR_ShowFPS (void)
 	static int	previousTimes[FPS_FRAMES];
 	static int	previousTime, index, fpscounter;
 	static char	fpsText[32];
-	int			i, time, total, fps, x, y, fragsSize;
+	int			i, time, total, fps, x, y;
 
 	if ((cls.state != ca_active) || !(cl_drawfps->value))
 	{
@@ -213,6 +217,8 @@ static void SCR_ShowFPS (void)
 	{
 		fpscounter = cl.time + 100;
 	}
+
+	SCR_DirtyScreen(); // repaint everything next frame
 
 	time = Sys_Milliseconds();
 	previousTimes[index % FPS_FRAMES] = time - previousTime;
@@ -239,10 +245,9 @@ static void SCR_ShowFPS (void)
 		fpscounter = cl.time + 100;
 	}
 
-	// leave space for 3-digit frag counter
-	fragsSize = 0;//(3 * CHAR_WIDTH) + 8;
-	x = (viddef.width - strlen(fpsText)*8 - fragsSize);
+	x = (viddef.width - strlen(fpsText)*8);
 	y = (viddef.height - 33);
+
 	if(cl_drawaltcolours->intValue) // FS: Personally, I like the green.  But other people might not like it.
 	{
 		DrawAltString(x, y, fpsText);
@@ -1585,6 +1590,7 @@ void SCR_UpdateScreen (void)
 			SCR_DrawTime (); // FS
 			SCR_DrawUptime(); // FS
 			SCR_ShowFPS ();	// Knightmare- added FPS counter
+
 			M_Draw ();
 
 			SCR_DrawLoading ();
