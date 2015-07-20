@@ -408,10 +408,12 @@ qboolean Cvar_Command (void)
 		else
 			Com_Printf ("\"%s\" is \"%s\", Default: \"%s\"\n", v->name, v->string, v->defaultValue);
 
-		if (v->description && con_show_description->intValue) // FS
+		// FS: cvar descriptions
+		// FS: Always show it for con_show_description so we know what it does
+		if (v->description) {
+		    if (con_show_description->intValue || v == con_show_description)
 			Com_Printf("Description: %s\n", v->description);
-		else if (v->description && !strcmp(v->name, "con_show_description")) // FS: Always show it for con_show_description so we know what it does
-			Com_Printf("Description: %s\n", v->description);
+		}
 
 		return true;
 	}
