@@ -435,6 +435,7 @@ end:
 
 #else
 
+#if 0 /* not used -- all inlined in R_DrawParticle() */
 static byte BlendParticle33( int pcolor, int dstcolor )
 {
 	return vid.alphamap[pcolor + dstcolor*256];
@@ -450,6 +451,7 @@ static byte BlendParticle100( int pcolor, int dstcolor )
 	dstcolor = dstcolor;
 	return pcolor;
 }
+#endif /* #if 0 */
 
 /*
 ** R_DrawParticle
@@ -475,7 +477,9 @@ void R_DrawParticle( void )
 	short	*pz;
 	int      color = pparticle->color;
 	int		i, izi, pix, count, u, v;
+#if 0 /* not used -- blend functions are inlined */
 	byte  (*blendparticle)( int, int );
+#endif
 
 	/*
 	** transform the particle
@@ -484,11 +488,12 @@ void R_DrawParticle( void )
 
 	transformed[0] = DotProduct(local, r_pright);
 	transformed[1] = DotProduct(local, r_pup);
-	transformed[2] = DotProduct(local, r_ppn);		
+	transformed[2] = DotProduct(local, r_ppn);
 
 	if (transformed[2] < PARTICLE_Z_CLIP)
 		return;
 
+#if 0 /* not used -- blenders are inlined below */
 	/*
 	** bind the blend function pointer to the appropriate blender
 	*/
@@ -498,6 +503,7 @@ void R_DrawParticle( void )
 		blendparticle = BlendParticle66;
 	else 
 		blendparticle = BlendParticle100;
+#endif
 
 	/*
 	** project the point
