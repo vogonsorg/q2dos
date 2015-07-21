@@ -167,7 +167,10 @@ void S_Init (void)
 
 #ifdef OGG_SUPPORT
 //	Com_DPrintf(DEVELOPER_MSG_OGG, "S_Init: calling S_OGG_Init\n");	// debug
-	S_OGG_Init(); // Knightmare added
+	if(!COM_CheckParm("-noogg"))
+	{
+		S_OGG_Init(); // Knightmare added
+	}
 #endif
 
 	Com_Printf("------------------------------------\n");

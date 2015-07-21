@@ -26,8 +26,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef OGG_SUPPORT
 
-#define BUFFER_SIZE		16384
-
 static bgTrack_t	s_bgTrack;
 
 static channel_t	*s_streamingChannel;
@@ -227,7 +225,7 @@ void S_StreamBackgroundTrack (void)
 	int		samples, maxSamples;
 	int		read, maxRead, total, dummy;
 	float	scale;
-	byte	data[MAX_RAW_SAMPLES*4];
+	byte	data[MAX_RAW_SAMPLES]; /* FS: Was MAX_RAW_SAMPLES*4 and appears to be unnecessary */
 
 	if (!s_bgTrack.file || !s_musicvolume->value || !cl_ogg_music->intValue)
 		return;
