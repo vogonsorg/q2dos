@@ -20,19 +20,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "qcommon.h"
 
-// define this to dissalow any data but the demo pak file
-//#define	NO_ADDONS
-
 // enables faster binary pak searck, still experimental
 #define BINARY_PACK_SEARCH
 
-// if a packfile directory differs from this, it is assumed to be hacked
-// Full version
-#define	PAK0_CHECKSUM	0x40e614e0
-// Demo
-//#define	PAK0_CHECKSUM	0xb2c6d7ea
-// OEM
-//#define	PAK0_CHECKSUM	0x78e135c
+void CDAudio_Stop(void);
+#define	MAX_READ	0x10000		// read in blocks of 64k
 
 /*
 =============================================================================
@@ -313,7 +305,6 @@ a seperate file.
 ===========
 */
 int file_from_pak = 0;
-#ifndef NO_ADDONS
 int FS_FOpenFile (char *filename, FILE **file)
 {
 	searchpath_t	*search;
@@ -412,75 +403,6 @@ int FS_FOpenFile (char *filename, FILE **file)
 	return -1;
 }
 
-#else
-
-// this is just for demos to prevent add on hacking
-
-int FS_FOpenFile (char *filename, FILE **file)
-{
-	searchpath_t	*search;
-	char			netpath[MAX_OSPATH];
-	pack_t			*pak;
-	int				i;
-	// Knightmare added
-	long			hash;
-
-	file_from_pak = 0;
-	// Knightmare added
-	hash = Com_HashFileName(filename, 0, false);
-
-	// get config from directory, everything else from pak
-	if (/*!strcmp(filename, "config.cfg")*/ !strcmp(filename, "q2dos.cfg") || !strncmp(filename, "players/", 8)) /* FS: We use q2dos.cfg now */
-	{
-		Com_sprintf (netpath, sizeof(netpath), "%s/%s",FS_Gamedir(), filename);
-		
-		*file = fopen (netpath, "rb");
-		if (!*file)
-			return -1;
-		
-		Com_DPrintf(DEVELOPER_MSG_IO, "FindFile: %s\n",netpath);
-
-		return FS_filelength (*file);
-	}
-
-	for (search = fs_searchpaths ; search ; search = search->next)
-		if (search->pack)
-			break;
-	if (!search)
-	{
-		*file = NULL;
-		return -1;
-	}
-
-	pak = search->pack;
-	for (i=0 ; i<pak->numfiles ; i++)
-	{
-		if (pak->files[i].ignore)	// Knightmare- skip blacklisted files
-			continue;
-		if (hash != pak->files[i].hash)	// Knightmare- compare hash first
-			continue;
-		if (!Q_strcasecmp (pak->files[i].name, filename))
-		{	// found it!
-			file_from_pak = 1;
-			Com_DPrintf(DEVELOPER_MSG_IO, "PackFile: %s : %s\n",pak->filename, filename);
-		// open a new file on the pakfile
-			*file = fopen (pak->filename, "rb");
-			if (!*file)
-				Com_Error (ERR_FATAL, "Couldn't reopen %s", pak->filename);	
-			fseek (*file, pak->files[i].filepos, SEEK_SET);
-			return pak->files[i].filelen;
-		}
-	}
-	
-	Com_DPrintf(DEVELOPER_MSG_IO, "FindFile: can't find %s\n", filename);
-	
-	*file = NULL;
-	return -1;
-}
-
-#endif
-
-
 /*
 =================
 FS_Read
@@ -488,8 +410,6 @@ FS_Read
 Properly handles partial reads
 =================
 */
-void CDAudio_Stop(void);
-#define	MAX_READ	0x10000		// read in blocks of 64k
 void FS_Read (void *buffer, int len, FILE *f)
 {
 	int		block, remaining;
@@ -758,9 +678,6 @@ pack_t *FS_LoadPackFile (char *packfile)
 	pack_t			*pack;
 	FILE			*packhandle;
 	dpackfile_t		info[MAX_FILES_IN_PACK];
-#ifdef NO_ADDONS
-	unsigned		checksum;
-#endif
 	unsigned		contentFlags = 0;	// Knightmare added
 	int				tmpPos, tmpLen;		// Knightmare added
 #ifdef BINARY_PACK_SEARCH	//  Knightmare added
@@ -821,14 +738,6 @@ pack_t *FS_LoadPackFile (char *packfile)
 		fclose(packhandle);
 		return NULL;
 	}
-
-// crc the directory to check for modifications
-#ifdef NO_ADDONS
-	checksum = Com_BlockChecksum ((void *)info, header.dirlen);
-
-	if (checksum != PAK0_CHECKSUM)
-		return NULL;
-#endif
 
 	for (i = 0; i < numpackfiles; i++)	// Knightmare- catch bad filelen / filepos
 	{
