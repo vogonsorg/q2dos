@@ -1029,7 +1029,7 @@ void FS_SetGamedir (char *dir)
 {
 	searchpath_t	*next;
 
-	if (strstr(dir, "..") || strstr(dir, "/")
+	if (!*dir || !strcmp(dir, ".") || strstr(dir, "..") || strstr(dir, "/")
 		|| strstr(dir, "\\") || strstr(dir, ":") )
 	{
 		Com_Printf ("Gamedir should be a single filename, not a path\n");
