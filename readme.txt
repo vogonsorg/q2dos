@@ -4,15 +4,15 @@ By Neozeed, [HCI]Mara'akate, and sezero.
 
 What's required?
 * Pentium 1.  At least a 200MHz to play it at ~20-30fps.
-* 48MB RAM.  More for larger mods.
-* LFN TSR.  Use the included DOSLFN.ZIP (can be loaded high with LH DLFN.COM)
+* At least 48 MB RAM.  More for larger mods.
+* LFN TSR.  Use the included DOSLFN.ZIP (can be loaded high with LH DOSLFN.COM)
 
 What works?
 * VGA (320x200 and 320x240)
 * SVGA (Banked and LFB)
 * Mouse
 * Keyboard
-* SoundBlaster and Gravis UltraSound Family
+* Sound Blaster and Gravis UltraSound family
 * CD-ROM music
 * OGG music
 * Networking (You need a packet driver)
@@ -39,14 +39,14 @@ Tips and other misc info:
   Download it at http://dk.toastednet.org/QDOS/FASTV110.ZIP.
 * UNIRV can enable custom refresh rates.  Great if you have a large CRT monitor.
   Download it at http://dk.toastednet.org/QDOS/UNIRV142.ZIP.
-* Gravis UltraSound Users:  If you have a "stuck" or "repeating" sound as soon
+* Gravis UltraSound users:  If you have a "stuck" or "repeating" sound as soon
   you load Q2DOS load Ultramid -Q then Ultramid -Q -F.  If you don't have
   Ultramid for some reason, you can get the fix (with a batch included) at
   http://dk.toastednet.org/QDOS/GUSFIX.ZIP.
-  You also may need to set s_mixahed to 0.3 and use high IRQs.
+  You also may need to set s_mixahead to 0.3 and use high IRQs.
 * Make sure you are using the included CWSDPMI.EXE in your Q2 directory or you
   may get some issues with running out of memory.
-* To hear Ogg Vorbis tracks ingame, rip the Q2 CD's audio tracks (2-11) to 
+* To hear Ogg Vorbis tracks in game, rip the Q2 CD's audio tracks (2-11) to 
   track02-track11.ogg and put them in baseq2/music.  For the mission pack audio
   tracks, rip the Ground Zero CD's audio tracks (2-11) to track12-track21.ogg.
   Don't bother ripping the tracks from the Reckoning CD, as they're a mix of
