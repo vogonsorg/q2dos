@@ -353,7 +353,6 @@ qboolean BLASTER_Init(void)
 	if(COM_CheckParm("-nosb"))
 		return false;
 
-//	dma = 0; // FS: FIXME
 	rc = 0;
 
 //

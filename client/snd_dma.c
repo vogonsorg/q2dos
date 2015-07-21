@@ -54,7 +54,7 @@ vec3_t		listener_up;
 qboolean	s_registering;
 
 int			soundtime;		// sample PAIRS
-int   		paintedtime; 	// sample PAIRS
+int			paintedtime;		// sample PAIRS
 
 // during registration it is possible to have more sounds
 // than could actually be referenced during gameplay,
@@ -100,16 +100,15 @@ void S_SoundInfo_f(void)
 		Com_Printf ("sound system not started\n");
 		return;
 	}
-	
-    Com_Printf("%5d stereo\n", dma.channels - 1);
-    Com_Printf("%5d samples\n", dma.samples);
-    Com_Printf("%5d samplepos\n", dma.samplepos);
-    Com_Printf("%5d samplebits\n", dma.samplebits);
-    Com_Printf("%5d submission_chunk\n", dma.submission_chunk);
-    Com_Printf("%5d speed\n", dma.speed);
-    Com_Printf("%p dma buffer\n", dma.buffer);
-}
 
+	Com_Printf("%5d stereo\n", dma.channels - 1);
+	Com_Printf("%5d samples\n", dma.samples);
+	Com_Printf("%5d samplepos\n", dma.samplepos);
+	Com_Printf("%5d samplebits\n", dma.samplebits);
+	Com_Printf("%5d submission_chunk\n", dma.submission_chunk);
+	Com_Printf("%5d speed\n", dma.speed);
+	Com_Printf("%p dma buffer\n", dma.buffer);
+}
 
 
 /*
@@ -125,7 +124,10 @@ void S_Init (void)
 
 	cv = Cvar_Get ("s_initsound", "1", 0);
 	if (!cv->value)
+	{
+		dma.buffer = NULL;/* just in case */
 		Com_Printf ("not initializing.\n");
+	}
 	else
 	{
 		s_volume = Cvar_Get ("s_volume", "0.7", CVAR_ARCHIVE);
@@ -149,8 +151,10 @@ void S_Init (void)
 		if (s_khz->value < 7000) // FS: Old config, fix it up
 			Cvar_SetValue("s_khz", 11025);
 
-		if (!SNDDMA_Init())
+		if (!SNDDMA_Init()) {
+			dma.buffer = NULL;/* just in case */
 			return;
+		}
 
 		S_InitScaletable ();
 
@@ -166,11 +170,8 @@ void S_Init (void)
 	}
 
 #ifdef OGG_SUPPORT
-//	Com_DPrintf(DEVELOPER_MSG_OGG, "S_Init: calling S_OGG_Init\n");	// debug
 	if(!COM_CheckParm("-noogg"))
-	{
 		S_OGG_Init(); // Knightmare added
-	}
 #endif
 
 	Com_Printf("------------------------------------\n");
@@ -190,12 +191,12 @@ void S_Shutdown(void)
 		return;
 
 #ifdef OGG_SUPPORT
-//	Com_DPrintf(DEVELOPER_MSG_OGG, "S_Shutdown: calling S_OGG_Shutdown\n");	// debug
 	S_OGG_Shutdown(); // Knightmare added
 #endif
 
 	SNDDMA_Shutdown();
 
+	dma.buffer = NULL;
 	sound_started = 0;
 
 	Cmd_RemoveCommand("play");
@@ -381,7 +382,6 @@ void S_EndRegistration (void)
 				Com_PageInMemory ((byte *)sfx->cache, size);
 			}
 		}
-
 	}
 
 	// load everything in
@@ -411,19 +411,19 @@ S_PickChannel
 */
 channel_t *S_PickChannel(int entnum, int entchannel)
 {
-    int			ch_idx;
-    int			first_to_die;
-    int			life_left;
+	int		ch_idx;
+	int		first_to_die;
+	int		life_left;
 	channel_t	*ch;
 
 	if (entchannel<0)
 		Com_Error (ERR_DROP, "S_PickChannel: entchannel<0");
 
 // Check for replacement sound, or find the best one to replace
-    first_to_die = -1;
-    life_left = 0x7fffffff;
-    for (ch_idx=0 ; ch_idx < MAX_CHANNELS ; ch_idx++)
-    {
+	first_to_die = -1;
+	life_left = 0x7fffffff;
+	for (ch_idx=0 ; ch_idx < MAX_CHANNELS ; ch_idx++)
+	{
 	#ifdef OGG_SUPPORT	//  Knightmare added
 		// Don't let game sounds override streaming sounds
 		if (channels[ch_idx].streaming)  // Q2E
@@ -447,7 +447,7 @@ channel_t *S_PickChannel(int entnum, int entchannel)
 			life_left = channels[ch_idx].end - paintedtime;
 			first_to_die = ch_idx;
 		}
-   }
+	}
 
 	if (first_to_die == -1)
 		return NULL;
@@ -455,8 +455,8 @@ channel_t *S_PickChannel(int entnum, int entchannel)
 	ch = &channels[first_to_die];
 	memset (ch, 0, sizeof(*ch));
 
-    return ch;
-}       
+	return ch;
+}
 
 /*
 =================
@@ -467,10 +467,10 @@ Used for spatializing channels and autosounds
 */
 void S_SpatializeOrigin (vec3_t origin, float master_vol, float dist_mult, int *left_vol, int *right_vol)
 {
-    vec_t		dot;
-    vec_t		dist;
-    vec_t		lscale, rscale, scale;
-    vec3_t		source_vec;
+	vec_t		dot;
+	vec_t		dist;
+	vec_t		lscale, rscale, scale;
+	vec3_t		source_vec;
 
 	if (cls.state != ca_active)
 	{
@@ -580,7 +580,6 @@ void S_FreePlaysound (playsound_t *ps)
 }
 
 
-
 /*
 ===============
 S_IssuePlaysound
@@ -621,7 +620,7 @@ void S_IssuePlaysound (playsound_t *ps)
 
 	ch->pos = 0;
 	sc = S_LoadSound (ch->sfx);
-    ch->end = paintedtime + sc->length;
+	ch->end = paintedtime + sc->length;
 
 	// free the playsound
 	S_FreePlaysound (ps);
@@ -812,7 +811,7 @@ S_ClearBuffer
 void S_ClearBuffer (void)
 {
 	int		clear;
-		
+
 	if (!sound_started)
 		return;
 
@@ -863,7 +862,6 @@ void S_StopAllSounds(void)
 
 #ifdef OGG_SUPPORT
 	// Stop background track
-//	Com_DPrintf(DEVELOPER_MSG_OGG, "S_StopAllSounds: calling S_StopBackgroundTrack\n");	// debug
 	S_StopBackgroundTrack (); // Knightmare added
 #endif
 
@@ -994,7 +992,6 @@ S_RawSamples
 Cinematic streaming and voice over network
 ============
 */
-//void S_RawSamples (int samples, int rate, int width, int channels, byte *data)
 void S_RawSamples (int samples, int rate, int width, int channels, byte *data, qboolean music)
 {
 	int		i;
@@ -1109,7 +1106,6 @@ void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 	int			i;
 	int			total;
 	channel_t	*ch;
-//	channel_t	*combine; // FS: Unused
 
 	if (!sound_started)
 		return;
@@ -1131,8 +1127,6 @@ void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 	VectorCopy(forward, listener_forward);
 	VectorCopy(right, listener_right);
 	VectorCopy(up, listener_up);
-
-//	combine = NULL;
 
 	// update spatialization for dynamic sounds	
 	ch = channels;
@@ -1174,7 +1168,6 @@ void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 	}
 
 #ifdef OGG_SUPPORT
-//	Com_DPrintf(DEVELOPER_MSG_OGG, "S_Update: calling S_UpdateBackgroundTrack\n");	// debug
 	S_UpdateBackgroundTrack ();	//  Knightmare added
 #endif
 
@@ -1264,7 +1257,7 @@ void S_Play(void)
 	int 	i;
 	char name[256];
 	sfx_t	*sfx;
-	
+
 	i = 1;
 	while (i<Cmd_Argc())
 	{
