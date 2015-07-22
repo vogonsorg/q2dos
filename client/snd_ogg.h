@@ -42,7 +42,7 @@ extern int sound_started;
 
 void S_UpdateBackgroundTrack (void);
 void S_StartBackgroundTrack (const char *introTrack, const char *loopTrack);
-void S_StopBackgroundTrack (void);
+void S_StopOGGBackgroundTrack (void);
 void S_StartStreaming (void);
 void S_StopStreaming (void);
 void S_OGG_Init (void);

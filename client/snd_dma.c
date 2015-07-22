@@ -1316,3 +1316,12 @@ void S_SoundList(void)
 	}
 	Com_Printf ("Total resident: %i\n", total);
 }
+
+/* FS: So we can suport both */
+void S_StopBackgroundTrack(void)
+{
+	S_StopWAVBackgroundTrack();
+#ifdef OGG_SUPPORT
+	S_StopOGGBackgroundTrack();
+#endif
+}

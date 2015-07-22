@@ -203,3 +203,6 @@ channel_t *S_PickChannel(int entnum, int entchannel);
 
 // spatializes a channel
 void S_Spatialize(channel_t *ch);
+
+/* FS: So we can support WAV and OGG streamg */
+void S_StopBackgroundTrack(void);

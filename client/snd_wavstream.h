@@ -12,5 +12,6 @@ void S_StopWAVBackgroundTrack (void);
 void S_StopWAVStreaming (void);
 void S_StartWAVStreaming (void);
 void StreamWAVTrack(void);
+qboolean S_StartWAVBackgroundTrack(const char *introTrack, const char *loopTrack);
 
 

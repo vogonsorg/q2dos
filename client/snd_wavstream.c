@@ -1,3 +1,5 @@
+/* FS: WAV streaming.  Basically a paraphrased snd_stream.c for OGG/Vorbis */
+
 #include "client.h"
 #include "snd_loc.h"
 
@@ -25,7 +27,7 @@ int				wav_loopcounter;
 cvar_t			*wav_loopcount;
 cvar_t			*wav_ambient_track;
 
-static qboolean S_StartWAVBackgroundTrack(const char *introTrack, const char *loopTrack)
+qboolean S_StartWAVBackgroundTrack(const char *introTrack, const char *loopTrack)
 {
 	int streamWavLen;
 
@@ -37,13 +39,12 @@ static qboolean S_StartWAVBackgroundTrack(const char *introTrack, const char *lo
 
 	Q_strncpyz(s_bgTrack.introName, introTrack, sizeof(s_bgTrack.introName));
 	Q_strncpyz(s_bgTrack.loopName, loopTrack, sizeof(s_bgTrack.loopName));
-	Q_strncpyz(s_bgTrack.ambientName, wav_ambient_track->string, sizeof(s_bgTrack.ambientName));
+	Com_sprintf(s_bgTrack.ambientName, sizeof(s_bgTrack.ambientName), "music/%s.wav", wav_ambient_track->string);
 
 	streamWavLen = FS_FOpenFile(s_bgTrack.introName, &s_bgTrack.file);
 
 	if(streamWavLen > 0)
 	{
-//		Com_Printf("Length: %i\n", streamWavLen);
 		S_StreamWav_GetInfo(s_bgTrack.introName, streamWavLen);
 	}
 	else
@@ -109,7 +110,8 @@ void StreamWAVTrack(void)
 					S_CloseWAVBackgroundTrack();
 
 					// Open the loop track
-					if (!S_StartWAVBackgroundTrack(s_bgTrack.loopName, s_bgTrack.loopName)) {
+					if (!S_StartWAVBackgroundTrack(s_bgTrack.loopName, s_bgTrack.loopName))
+					{
 						S_StopWAVBackgroundTrack();
 						return;
 					}
@@ -122,8 +124,10 @@ void StreamWAVTrack(void)
 					{	// Close the loop track
 						S_CloseWAVBackgroundTrack();
 
-						if (!S_StartWAVBackgroundTrack(s_bgTrack.ambientName, s_bgTrack.ambientName)) {
-							if (!S_StartWAVBackgroundTrack(s_bgTrack.loopName, s_bgTrack.loopName)) {
+						if (!S_StartWAVBackgroundTrack(s_bgTrack.ambientName, s_bgTrack.ambientName))
+						{
+							if (!S_StartWAVBackgroundTrack(s_bgTrack.loopName, s_bgTrack.loopName))
+							{
 								S_StopWAVBackgroundTrack();
 								return;
 							}
@@ -280,8 +284,6 @@ void S_WAV_Init (void)
 
 	// Initialize variables
 	if (wav_first_init) {
-	//	srand(time(NULL));
-	//	ogg_curfile = -1;
 		wav_status = WAV_STOP;
 		wav_first_init = false;
 	}
@@ -320,22 +322,47 @@ void S_WAV_PlayCmd (void)
 	S_StartWAVBackgroundTrack (name, name);
 }
 
+void S_WAV_StatusCmd (void)
+{
+	char	*trackName;
+
+	if (s_bgTrack.ambient_looping)
+		trackName = s_bgTrack.ambientName;
+	else if (s_bgTrack.looping)
+		trackName = s_bgTrack.loopName;
+	else
+		trackName = s_bgTrack.introName;
+
+	switch (wav_status)
+	{
+		case PLAY:
+			Com_Printf("Playing file %s.\n", trackName);
+			break;
+		case PAUSE:
+			Com_Printf("Paused file %s.\n", trackName);
+			break;
+		case STOP:
+			Com_Printf("Stopped.\n");
+			break;
+	}
+}
+
 void S_StreamWav_GetInfo(char *fileName, int fileLen)
 {
-	byte data[256];
+	byte data[1024]; /* FS: It appears ~44 bytes in is where the data begins. */
 
 	FS_Read(data, sizeof(data), s_bgTrack.file);
 	musicWavInfo = GetWavinfo(fileName, data, sizeof(data));
 	FS_Seek(s_bgTrack.file, musicWavInfo.dataofs, FS_SEEK_SET);
 
-	Com_Printf("Rate: %i.  Data Offset: %i. Width: %i.  Channels: %i.\n", musicWavInfo.rate, musicWavInfo.dataofs, musicWavInfo.width, musicWavInfo.channels);
+//	Com_Printf("Rate: %i.  Data Offset: %i. Width: %i.  Channels: %i.\n", musicWavInfo.rate, musicWavInfo.dataofs, musicWavInfo.width, musicWavInfo.channels);
 }
 
 /*
 =================
-S_OGG_ParseCmd
+S_WAV_ParseCmd
 
-Parses OGG commands
+Parses WAV commands
 Based on code by QuDos
 =================
 */
@@ -373,7 +400,7 @@ void S_WAV_ParseCmd (void)
 	}
 
 	if (Q_strcasecmp(command, "status") == 0) {
-//		S_WAV_StatusCmd ();
+		S_WAV_StatusCmd ();
 		return;
 	}
 
