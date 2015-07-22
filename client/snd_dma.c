@@ -116,8 +116,6 @@ void S_SoundInfo_f(void)
 S_Init
 ================
 */
-void S_StreamWav_f(void);
-
 void S_Init (void)
 {
 	cvar_t	*cv;
@@ -1106,8 +1104,6 @@ S_Update
 Called once each time through the main loop
 ============
 */
-void S_UpdateWavTrack(void);
-
 void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 {
 	int			i;
@@ -1317,54 +1313,4 @@ void S_SoundList(void)
 		}
 	}
 	Com_Printf ("Total resident: %i\n", total);
-}
-
-FILE *wavFile;
-wavinfo_t musicWavInfo;
-byte musicWavData[16384];
-qboolean streamingWav = false;
-
-void S_StreamWav_GetInfo(char *fileName, int fileLen);
-
-void S_StreamWav_f(void)
-{
-	char musicWavFilename[MAX_OSPATH];
-	int streamWavLen;
-
-	Com_sprintf(musicWavFilename, sizeof(musicWavFilename), "music/track02.wav"); /* FS: Don't need FS_Gamedir as FS_FOpenFile takes care of the search */
-	streamWavLen = FS_FOpenFile(musicWavFilename, &wavFile);
-
-	if(streamWavLen > 0)
-	{
-		Com_Printf("Length: %i\n", streamWavLen);
-		S_StreamWav_GetInfo(musicWavFilename, streamWavLen);
-	}
-	else
-	{
-		Com_Printf("Error: Couldn't find %s!\n", musicWavFilename);
-	}
-}
-
-void S_StreamWav_GetInfo(char *fileName, int fileLen)
-{
-	byte data[256];
-
-	FS_Read(data, sizeof(data), wavFile);
-	musicWavInfo = GetWavinfo(fileName, data, sizeof(data));
-
-	Com_Printf("Rate: %i.  Data Offset: %i. Width: %i.  Channels: %i.\n", musicWavInfo.rate, musicWavInfo.dataofs, musicWavInfo.width, musicWavInfo.channels);
-	streamingWav = true;
-}
-
-void S_UpdateWavTrack(void)
-{
-	int count;
-
-	if (!streamingWav)
-		return;
-
-	count = 192 * (musicWavInfo.rate / dma.speed);
-//	Com_Printf("Count: %i\n", count);
-	FS_Read(musicWavData, count *musicWavInfo.width*musicWavInfo.channels, wavFile);
-	S_RawSamples (count, musicWavInfo.rate, musicWavInfo.width, musicWavInfo.channels, musicWavData, true);
 }

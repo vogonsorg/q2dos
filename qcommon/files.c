@@ -452,7 +452,6 @@ void FS_Read (void *buffer, int len, FILE *f)
 
 
 // Knightmare added
-#if 0
 /*
 =================
 FS_FRead
@@ -538,7 +537,6 @@ int FS_Tell (FILE *f)
 {
 	return ftell(f);
 }
-#endif
 // end Knightmare
 
 

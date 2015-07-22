@@ -200,3 +200,9 @@ channel_t *S_PickChannel(int entnum, int entchannel);
 
 // spatializes a channel
 void S_Spatialize(channel_t *ch);
+
+/* FS: Stuff for music WAV streaming */
+void S_StreamWav_GetInfo(char *fileName, int fileLen);
+void S_UpdateWavTrack(void);
+void S_UpdateWavTrack(void);
+void S_StreamWav_f(void);
