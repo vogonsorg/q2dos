@@ -655,8 +655,6 @@ void CL_PlayBackgroundTrack (void)
 
 #ifdef OGG_SUPPORT
 	// If an OGG file exists play it, otherwise fall back to CD audio
-	if(cl_wav_music->intValue)
-		Com_sprintf (name, sizeof(name), "music/track%02i.ogg", CL_MissionPackCDTrack(track));
 	Com_sprintf (name, sizeof(name), "music/track%02i.ogg", CL_MissionPackCDTrack(track));
 
 	if ( (FS_LoadFile(name, NULL) != -1) && cl_ogg_music->value ) {
@@ -700,9 +698,6 @@ void CL_PlayWAVBackgroundTrack (void)
 		return;
 	}
 
-	// If an OGG file exists play it, otherwise fall back to CD audio
-	if(cl_wav_music->intValue)
-		Com_sprintf (name, sizeof(name), "music/track%02i.wav", CL_MissionPackCDTrack(track));
 	Com_sprintf (name, sizeof(name), "music/track%02i.wav", CL_MissionPackCDTrack(track));
 
 	if ( cl_wav_music->value && FS_LocalFileExists(name))
