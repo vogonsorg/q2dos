@@ -41,7 +41,7 @@ typedef enum {
 extern int sound_started;
 
 void S_UpdateBackgroundTrack (void);
-void S_StartBackgroundTrack (const char *introTrack, const char *loopTrack);
+void S_StartOGGBackgroundTrack (const char *introTrack, const char *loopTrack);
 void S_StopOGGBackgroundTrack (void);
 void S_StartStreaming (void);
 void S_StopStreaming (void);

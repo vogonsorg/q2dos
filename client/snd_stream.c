@@ -325,7 +325,7 @@ void S_UpdateBackgroundTrack (void)
 S_StartBackgroundTrack
 =================
 */
-void S_StartBackgroundTrack (const char *introTrack, const char *loopTrack)
+void S_StartOGGBackgroundTrack (const char *introTrack, const char *loopTrack)
 {
 	if (!ogg_started) // was sound_started
 		return;
@@ -605,7 +605,7 @@ void S_OGG_PlayCmd (void)
 		return;
 	}
 	Com_sprintf(name, sizeof(name), "music/%s.ogg", Cmd_Argv(2) );
-	S_StartBackgroundTrack (name, name);
+	S_StartOGGBackgroundTrack (name, name);
 }
 
 

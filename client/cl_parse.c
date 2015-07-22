@@ -616,7 +616,9 @@ CL_PlayBackgroundTrack
 void CL_PlayBackgroundTrack (void)
 {
 	char	name[MAX_QPATH];
+	char	extension[12];
 	int		track;
+	qboolean musicPlayExternalFile;
 
 	Com_DPrintf(DEVELOPER_MSG_CD, "CL_PlayBackgroundTrack\n");	// debug
 
@@ -625,23 +627,49 @@ void CL_PlayBackgroundTrack (void)
 
 	if(cl_wav_music->intValue) /* FS: WAV takes precedence over OGG in my fantasy land */
 	{
-		CL_PlayWAVBackgroundTrack();
-		return;
+		Com_sprintf(extension, sizeof(extension), "wav");
+		musicPlayExternalFile = true;
+	}
+	else
+	{
+#ifdef OGG_SUPPORT
+retry:
+		Com_sprintf(extension, sizeof(extension), "ogg");
+
+		if(cl_ogg_music->intValue)
+			musicPlayExternalFile = true;
+#endif
 	}
 
-#ifdef OGG_SUPPORT
 	// using a named audio track intead of numbered
 	if (strlen(cl.configstrings[CS_CDTRACK]) > 2)
 	{
-		Com_sprintf (name, sizeof(name), "music/%s.ogg", cl.configstrings[CS_CDTRACK]);
+		Com_sprintf (name, sizeof(name), "music/%s.%s", cl.configstrings[CS_CDTRACK], extension);
 		if (FS_LoadFile(name, NULL) != -1)
 		{
 			CDAudio_Stop();
-			S_StartBackgroundTrack(name, name);
+			if(!Q_stricmp(extension, "wav"))
+			{
+				S_StartWAVBackgroundTrack(name, name);
+			}
+#ifdef OGG_SUPPORT
+			else
+			{
+				S_StartOGGBackgroundTrack(name, name);
+			}
+#endif
 			return;
 		}
-	}
+		else
+		{
+#ifdef OGG_SUPPORT
+			if(Q_stricmp(extension, "wav"))
+			{
+				goto retry;
+			}
 #endif
+		}
+	}
 
 	track = atoi(cl.configstrings[CS_CDTRACK]);
 
@@ -653,62 +681,34 @@ void CL_PlayBackgroundTrack (void)
 		return;
 	}
 
-#ifdef OGG_SUPPORT
 	// If an OGG file exists play it, otherwise fall back to CD audio
-	Com_sprintf (name, sizeof(name), "music/track%02i.ogg", CL_MissionPackCDTrack(track));
+	Com_sprintf (name, sizeof(name), "music/track%02i.%s", CL_MissionPackCDTrack(track), extension);
 
-	if ( (FS_LoadFile(name, NULL) != -1) && cl_ogg_music->value ) {
+	if ( (FS_LoadFile(name, NULL) != -1) && musicPlayExternalFile )
+	{
 		Com_DPrintf(DEVELOPER_MSG_OGG, "CL_PlayBackgroundTrack: playing track %s\n", name);	// debug
-		S_StartBackgroundTrack(name, name);
+		if(!Q_stricmp(extension, "wav"))
+		{
+			S_StartWAVBackgroundTrack(name, name);
+		}
+#ifdef OGG_SUPPORT
+		else
+		{
+			S_StartOGGBackgroundTrack(name, name);
+		}
+#endif
 	}
 	else
+	{
+#ifdef OGG_SUPPORT
+		if(!Q_stricmp(extension, "wav"))
+		{
+			goto retry;
+		}
 #endif
 		CDAudio_Play(track, true);
+	}
 }
-
-void CL_PlayWAVBackgroundTrack (void)
-{
-	char	name[MAX_QPATH];
-	int		track;
-
-	Com_DPrintf(DEVELOPER_MSG_CD, "CL_PlayWAVBackgroundTrack\n");	// debug
-
-	if (!cl.refresh_prepped)
-		return;
-
-	// using a named audio track intead of numbered
-	if (strlen(cl.configstrings[CS_CDTRACK]) > 2)
-	{
-		Com_sprintf (name, sizeof(name), "music/%s.wav", cl.configstrings[CS_CDTRACK]);
-		if (FS_LoadFile(name, NULL) != -1)
-		{
-			CDAudio_Stop();
-			S_StartBackgroundTrack(name, name);
-			return;
-		}
-	}
-
-	track = atoi(cl.configstrings[CS_CDTRACK]);
-
-	if (track == 0)
-	{	// Stop any playing track
-		Com_DPrintf(DEVELOPER_MSG_CD, "CL_PlayWAVBackgroundTrack: stopping\n");	// debug
-		CDAudio_Stop();
-		S_StopBackgroundTrack();
-		return;
-	}
-
-	Com_sprintf (name, sizeof(name), "music/track%02i.wav", CL_MissionPackCDTrack(track));
-
-	if ( (FS_LoadFile(name, NULL) != -1) && cl_wav_music->value )
-	{
-		Com_DPrintf(DEVELOPER_MSG_OGG, "CL_PlayWAVBackgroundTrack: playing track %s\n", name);	// debug
-		S_StartWAVBackgroundTrack(name, name);
-	}
-	else
-		CDAudio_Play(track, true);
-}
-
 // end Knightmare
 
 /*
