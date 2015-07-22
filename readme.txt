@@ -14,8 +14,7 @@ What works?
 * Keyboard
 * Sound Blaster and Gravis UltraSound family
 * CD-ROM music
-* OGG music
-* WAV/ADPCM music
+* OGG and WAV music
 * Networking (You need a packet driver)
 * Loading/unloading game DLLs in DXE3 format.
 
