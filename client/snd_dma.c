@@ -172,7 +172,8 @@ void S_Init (void)
 		S_OGG_Init(); // Knightmare added
 #endif
 
-	S_WAV_Init(); /* FS: Added */
+	if(!COM_CheckParm("-nowavstream"))
+		S_WAV_Init(); /* FS: Added */
 
 	Com_Printf("------------------------------------\n");
 }

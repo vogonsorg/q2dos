@@ -180,7 +180,7 @@ void S_StartWAVBackgroundTrack (const char *introTrack, const char *loopTrack)
 		return;
 	}
 
-	wav_status = PLAY;
+	wav_status = WAV_PLAY;
 
 	S_StreamWAVBackgroundTrack();
 }
@@ -349,13 +349,13 @@ void S_WAV_StatusCmd (void)
 
 	switch (wav_status)
 	{
-		case PLAY:
+		case WAV_PLAY:
 			Com_Printf("Playing file %s.\n", trackName);
 			break;
-		case PAUSE:
+		case WAV_PAUSE:
 			Com_Printf("Paused file %s.\n", trackName);
 			break;
-		case STOP:
+		case WAV_STOP:
 			Com_Printf("Stopped.\n");
 			break;
 	}

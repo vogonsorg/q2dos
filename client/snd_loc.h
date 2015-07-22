@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "snd_ogg.h"
 #endif
 
-#include "snd_wavstream.h"
+#include "snd_wavstream.h" /* FS: Added */
 
 // !!! if this is changed, the asm code must change !!!
 typedef struct
@@ -117,9 +117,7 @@ typedef struct
 	int			master_vol;		// 0-255 master volume
 	qboolean	fixed_origin;	// use origin instead of fetching entnum's origin
 	qboolean	autosound;		// from an entity->sound, cleared each frame
-#ifdef OGG_SUPPORT	// Knightmare added
-	qboolean	streaming;
-#endif
+	qboolean	streaming; // Knightmare added
 } channel_t;
 
 typedef struct
@@ -184,9 +182,7 @@ extern cvar_t	*s_show;
 extern cvar_t	*s_mixahead;
 extern cvar_t	*s_testsound;
 extern cvar_t	*s_primary;
-#ifdef OGG_SUPPORT
 extern cvar_t	*s_musicvolume;	// Knightmare added
-#endif
 
 wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength);
 
