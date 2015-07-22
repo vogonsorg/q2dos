@@ -94,6 +94,7 @@ CLIENT = client/cl_input.o \
 	client/snd_mem.o \
 	client/snd_mix.o \
 	client/snd_stream.o \
+	client/snd_wavstream.o \
 	client/qmenu.o \
 	client/cl_newfx.o
 
