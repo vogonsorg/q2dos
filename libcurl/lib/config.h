@@ -110,8 +110,11 @@
   #define USE_OPENSSL            1
 #endif
 
+#if 0
 /* to disable LDAP */
 #define CURL_DISABLE_LDAP        1
+#endif
+#define HTTP_ONLY                1 /* quake2 needs no other */
 
 #define in_addr_t  u_long
 #define socklen_t  int
