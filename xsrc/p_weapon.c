@@ -397,7 +397,7 @@ void Use_Weapon2 (edict_t *ent, gitem_t *item)
 		}
 	}
 	else if (strcmp (item->pickup_name, "Railgun") == 0)
-  	{
+	{
 		ammo_item = FindItem(item->ammo);
 		ammo_index = ITEM_INDEX(ammo_item);
 		if (!ent->client->pers.inventory[ammo_index])
@@ -443,7 +443,6 @@ void Use_Weapon2 (edict_t *ent, gitem_t *item)
 
 	// change to this weapon when down
 	ent->client->newweapon = item;
-
 }
 // END 14-APR-98
 

@@ -487,7 +487,6 @@ void Use_Weapon2 (edict_t *ent, gitem_t *item)
 {
 	int			ammo_index;
 	gitem_t		*ammo_item;
-	gitem_t		*nextitem;
 	int			index;
 
 	if (!ent || !item)
@@ -561,7 +560,6 @@ void Use_Weapon2 (edict_t *ent, gitem_t *item)
 
 	// change to this weapon when down
 	ent->client->newweapon = item;
-
 }
 
 void
