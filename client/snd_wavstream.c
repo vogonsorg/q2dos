@@ -1,27 +1,40 @@
+/*
+Copyright (C) 1997-2001 Id Software, Inc.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+*/
+
 /* FS: WAV streaming.  Basically a paraphrased snd_stream.c for OGG/Vorbis */
 
 #include "client.h"
 #include "snd_loc.h"
 
-static wavinfo_t musicWavInfo;
-static byte musicWavData[MAX_RAW_SAMPLES];
-static channel_t	*s_streamingChannel;
+static wavinfo_t	musicWavInfo;
 static bgTrack_t	s_bgTrack;
 
-typedef enum {
-	WAV_PLAY,
-	WAV_PAUSE,
-	WAV_STOP
-} wav_status_t;
-
-wav_status_t	wav_status;		// Status indicator
+static channel_t	*s_streamingChannel;
+static int			startWavTime;
 
 qboolean		wav_first_init = true;	// First initialization flag
 qboolean		wav_started = false;	// Initialization flag
+wav_status_t	wav_status;		// Status indicator
 
 #define			MAX_WAVLIST 512
 char			**wav_filelist;		// List of WAV files
-int				wav_curfile;		// Index of currently played file
 int				wav_numfiles;		// Number of WAV files
 int				wav_loopcounter;
 
@@ -76,11 +89,15 @@ static void S_CloseWAVBackgroundTrack(void)
 
 void S_StreamWAVBackgroundTrack(void)
 {
-	int samples, maxSamples;
-	int read, maxRead, total;
-	float scale;
+	int		samples, maxSamples;
+	int		read, maxRead, total;
+	float	scale;
+	byte	musicWavData[MAX_RAW_SAMPLES];
 
 	if (!s_bgTrack.file || !s_musicvolume->value || !cl_wav_music->intValue)
+		return;
+
+	if (!s_streamingChannel)
 		return;
 
 	if (s_rawend < paintedtime)
@@ -120,7 +137,7 @@ void S_StreamWAVBackgroundTrack(void)
 				}
 				else
 				{	// check if it's time to switch to the ambient track
-					if ( ++wav_loopcounter >= (int)wav_loopcount->intValue
+					if ( ++wav_loopcounter >= wav_loopcount->intValue
 						&& (!cl.configstrings[CS_MAXCLIENTS][0] || !strcmp(cl.configstrings[CS_MAXCLIENTS], "1")) )
 					{	// Close the loop track
 						S_CloseWAVBackgroundTrack();
@@ -141,6 +158,7 @@ void S_StreamWAVBackgroundTrack(void)
 				// Restart the track, skipping over the header
 				FS_Seek(s_bgTrack.file, musicWavInfo.dataofs, FS_SEEK_SET);
 			}
+
 			total+= read;
 //			Com_Printf("Read: %i, Samples: %i, Total: %i\n", read, samples, total);
 		}
@@ -229,6 +247,60 @@ void S_StopWAVStreaming (void)
 	s_streamingChannel = NULL;
 }
 
+void S_WAV_Init (void)
+{
+	if (wav_started)
+		return;
+
+	// Cvars
+	wav_loopcount = Cvar_Get ("wav_loopcount", "5", CVAR_ARCHIVE);
+	wav_ambient_track = Cvar_Get ("wav_ambient_track", "track11", CVAR_ARCHIVE);
+
+	// Console commands
+	Cmd_AddCommand("wav", S_WAV_ParseCmd);
+
+	// Build list of files
+	Com_Printf("Searching for WAV files...\n");
+	wav_numfiles = 0;
+	S_WAV_LoadFileList ();
+	Com_Printf("%d WAV files found.\n", wav_numfiles);
+
+	// Initialize variables
+	if (wav_first_init) {
+		wav_status = WAV_STOP;
+		wav_first_init = false;
+	}
+
+	wav_started = true;
+}
+
+void S_WAV_Shutdown (void)
+{
+	int		i;
+
+	if (!wav_started)
+		return;
+
+	S_StopBackgroundTrack ();
+
+	// Free the list of files
+	for (i = 0; i < wav_numfiles; i++)
+		free(wav_filelist[i]);
+	if (wav_numfiles > 0)
+		free(wav_filelist);
+
+	// Remove console commands
+	Cmd_RemoveCommand("wav");
+
+	wav_started = false;
+}
+
+void S_WAV_Restart (void)
+{
+	S_WAV_Shutdown ();
+	S_WAV_Init ();
+}
+
 void S_WAV_LoadFileList (void)
 {
 	char	*p, *path = NULL;
@@ -282,48 +354,6 @@ void S_WAV_LoadFileList (void)
 	}
 }
 
-void S_WAV_ListCmd (void)
-{
-	int i;
-
-	if (wav_numfiles <= 0) {
-		Com_Printf("No WAV files to list.\n");
-		return;
-	}
-
-	for (i = 0; i < wav_numfiles; i++)
-		Com_Printf("%d %s\n", i+1, wav_filelist[i]);
-
-	Com_Printf("%d WAV files.\n", wav_numfiles);
-}
-
-void S_WAV_Init (void)
-{
-	if (wav_started)
-		return;
-
-	// Cvars
-	wav_loopcount = Cvar_Get ("wav_loopcount", "5", CVAR_ARCHIVE);
-	wav_ambient_track = Cvar_Get ("wav_ambient_track", "track11", CVAR_ARCHIVE);
-
-	// Console commands
-	Cmd_AddCommand("wav", S_WAV_ParseCmd);
-
-	// Build list of files
-	Com_Printf("Searching for WAV files...\n");
-	wav_numfiles = 0;
-	S_WAV_LoadFileList ();
-	Com_Printf("%d WAV files found.\n", wav_numfiles);
-
-	// Initialize variables
-	if (wav_first_init) {
-		wav_status = WAV_STOP;
-		wav_first_init = false;
-	}
-
-	wav_started = true;
-}
-
 void S_WAV_PlayCmd (void)
 {
 	char	name[MAX_QPATH];
@@ -347,6 +377,7 @@ void S_WAV_StatusCmd (void)
 	else
 		trackName = s_bgTrack.introName;
 
+
 	switch (wav_status)
 	{
 		case WAV_PLAY:
@@ -361,6 +392,21 @@ void S_WAV_StatusCmd (void)
 	}
 }
 
+void S_WAV_ListCmd (void)
+{
+	int i;
+
+	if (wav_numfiles <= 0) {
+		Com_Printf("No WAV files to list.\n");
+		return;
+	}
+
+	for (i = 0; i < wav_numfiles; i++)
+		Com_Printf("%d %s\n", i+1, wav_filelist[i]);
+
+	Com_Printf("%d WAV files.\n", wav_numfiles);
+}
+
 void S_StreamWav_GetInfo(char *fileName, int fileLen)
 {
 	byte data[1024]; /* FS: It appears ~44 bytes in is where the data begins. */
@@ -372,14 +418,6 @@ void S_StreamWav_GetInfo(char *fileName, int fileLen)
 //	Com_Printf("Rate: %i.  Data Offset: %i. Width: %i.  Channels: %i.\n", musicWavInfo.rate, musicWavInfo.dataofs, musicWavInfo.width, musicWavInfo.channels);
 }
 
-/*
-=================
-S_WAV_ParseCmd
-
-Parses WAV commands
-Based on code by QuDos
-=================
-*/
 void S_WAV_ParseCmd (void)
 {
 	char	*command;
@@ -424,31 +462,4 @@ void S_WAV_ParseCmd (void)
 	}
 
 	Com_Printf("Usage: wav {play | pause | resume | stop | status | list}\n");
-}
-
-void S_WAV_Shutdown (void)
-{
-	int		i;
-
-	if (!wav_started)
-		return;
-
-	S_StopBackgroundTrack ();
-
-	// Free the list of files
-	for (i = 0; i < wav_numfiles; i++)
-		free(wav_filelist[i]);
-	if (wav_numfiles > 0)
-		free(wav_filelist);
-
-	// Remove console commands
-	Cmd_RemoveCommand("wav");
-
-	wav_started = false;
-}
-
-void S_WAV_Restart (void)
-{
-	S_WAV_Shutdown ();
-	S_WAV_Init ();
 }

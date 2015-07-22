@@ -20,7 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // snd_stream.c -- Ogg Vorbis stuff
 
-
 #include "client.h"
 #include "snd_loc.h"
 
@@ -277,7 +276,7 @@ void S_StreamBackgroundTrack (void)
 				}
 				else
 				{	// check if it's time to switch to the ambient track
-					if ( ++ogg_loopcounter >= (int)ogg_loopcount->intValue
+					if ( ++ogg_loopcounter >= ogg_loopcount->intValue
 						&& (!cl.configstrings[CS_MAXCLIENTS][0] || !strcmp(cl.configstrings[CS_MAXCLIENTS], "1")) )
 					{	// Close the loop track
 						S_CloseBackgroundTrack(&s_bgTrack);

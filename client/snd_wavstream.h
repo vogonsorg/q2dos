@@ -1,4 +1,10 @@
 /* FS: Stuff for music WAV streaming */
+typedef enum {
+	WAV_PLAY,
+	WAV_PAUSE,
+	WAV_STOP
+} wav_status_t;
+
 void S_StreamWav_GetInfo(char *fileName, int fileLen);
 void S_UpdateWavTrack(void);
 
