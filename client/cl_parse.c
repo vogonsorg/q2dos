@@ -641,14 +641,16 @@ void CL_PlayBackgroundTrack (void)
 		if (FS_LoadFile(name, NULL) != -1)
 			have_extmusic |= have_ogg;
 #endif
+		CDAudio_Stop();
 		/* play whatever is found */
 		if ((have_extmusic & have_wav) && cl_wav_music->intValue) {
-			CDAudio_Stop();
+			strcpy (p, "wav");
 			S_StartWAVBackgroundTrack(name, name);
 			return;
 		}
 #ifdef OGG_SUPPORT
 		if (have_extmusic & have_ogg) {
+			strcpy (p, "ogg");
 			S_StartOGGBackgroundTrack(name, name);
 			return;
 		}
@@ -678,10 +680,12 @@ void CL_PlayBackgroundTrack (void)
 #endif
 	/* play whatever is found */
 	if ((have_extmusic & have_wav) && cl_wav_music->intValue) {
+		strcpy (p, "wav");
 		S_StartWAVBackgroundTrack(name, name);
 	}
 #ifdef OGG_SUPPORT
 	else if (have_extmusic & have_ogg) {
+		strcpy (p, "ogg");
 		S_StartOGGBackgroundTrack(name, name);
 	}
 #endif
