@@ -30,6 +30,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 #include "snd_ogg.h"
 #endif
+
+#include "snd_wavstream.h"
+
 // !!! if this is changed, the asm code must change !!!
 typedef struct
 {
@@ -200,9 +203,3 @@ channel_t *S_PickChannel(int entnum, int entchannel);
 
 // spatializes a channel
 void S_Spatialize(channel_t *ch);
-
-/* FS: Stuff for music WAV streaming */
-void S_StreamWav_GetInfo(char *fileName, int fileLen);
-void S_UpdateWavTrack(void);
-void S_UpdateWavTrack(void);
-void S_StreamWav_f(void);

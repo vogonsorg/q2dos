@@ -354,6 +354,8 @@ extern	cvar_t	*cl_ogg_music;
 extern	cvar_t	*cl_rogue_music; // whether to play Rogue tracks
 extern	cvar_t	*cl_xatrix_music; // whether to play Xatrix tracks
 
+extern	cvar_t	*cl_wav_music;
+
 extern	cvar_t	*cl_upspeed;
 extern	cvar_t	*cl_forwardspeed;
 extern	cvar_t	*cl_sidespeed;

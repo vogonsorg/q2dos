@@ -414,6 +414,10 @@ SOURCE=..\client\snd_ogg.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\client\snd_wavstream.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\client\sound.h
 # End Source File
 # Begin Source File

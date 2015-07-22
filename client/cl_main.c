@@ -68,6 +68,8 @@ cvar_t	*cl_ogg_music;
 cvar_t	*cl_rogue_music; // whether to play Rogue tracks
 cvar_t	*cl_xatrix_music; // whether to play Xatrix tracks
 
+cvar_t	*cl_wav_music;
+
 cvar_t	*cl_add_particles;
 cvar_t	*cl_add_lights;
 cvar_t	*cl_add_entities;
@@ -1681,6 +1683,9 @@ void CL_InitLocal (void)
 	cl_ogg_music->description = "Whether to try to play OGG Vorbis files instead of CD audio tracks.";
 	cl_rogue_music = Cvar_Get ("cl_rogue_music", "0", CVAR_ARCHIVE);
 	cl_xatrix_music = Cvar_Get ("cl_xatrix_music", "0", CVAR_ARCHIVE);
+
+	cl_wav_music = Cvar_Get ("cl_wav_music", "1", CVAR_ARCHIVE);
+	cl_wav_music->description = "Whether to try to play WAV files instead of CD audio tracks.";
 
 	cl_3dcam = Cvar_Get ("cl_3dcam", "0", CVAR_ARCHIVE);
 	cl_3dcam->description = "Enables 3rd person camera.  Fine tune with cl_3dcam_angle and cl_3dcam_dist.";

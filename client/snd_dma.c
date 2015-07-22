@@ -78,10 +78,7 @@ cvar_t		*s_khz;
 cvar_t		*s_show;
 cvar_t		*s_mixahead;
 cvar_t		*s_primary;
-#ifdef OGG_SUPPORT	// Knightmare added
 cvar_t		*s_musicvolume;
-#endif
-
 
 int		s_rawend;
 portable_samplepair_t	s_rawsamples[MAX_RAW_SAMPLES];
@@ -137,9 +134,7 @@ void S_Init (void)
 		s_show = Cvar_Get ("s_show", "0", 0);
 		s_testsound = Cvar_Get ("s_testsound", "0", 0);
 		s_primary = Cvar_Get ("s_primary", "0", CVAR_ARCHIVE);	// win32 specific
-	#ifdef OGG_SUPPORT
 		s_musicvolume = Cvar_Get ("s_musicvolume", "1.0", CVAR_ARCHIVE); // Knightmare added
-	#endif
 
 		Cmd_AddCommand("play", S_Play);
 		Cmd_AddCommand("stopsound", S_StopAllSounds);
@@ -148,6 +143,8 @@ void S_Init (void)
 	#ifdef OGG_SUPPORT
 		Cmd_AddCommand("ogg_restart", S_OGG_Restart); // Knightmare added
 	#endif
+
+		Cmd_AddCommand("wav_restart", S_WAV_Restart);
 
 		Cmd_AddCommand("teststreamwav", S_StreamWav_f);
 
@@ -177,6 +174,8 @@ void S_Init (void)
 		S_OGG_Init(); // Knightmare added
 #endif
 
+	S_WAV_Init();
+
 	Com_Printf("------------------------------------\n");
 }
 
@@ -197,6 +196,8 @@ void S_Shutdown(void)
 	S_OGG_Shutdown(); // Knightmare added
 #endif
 
+	S_WAV_Shutdown();
+
 	SNDDMA_Shutdown();
 
 	dma.buffer = NULL;
@@ -209,6 +210,8 @@ void S_Shutdown(void)
 #ifdef OGG_SUPPORT
 	Cmd_RemoveCommand("ogg_restart"); // Knightmare added
 #endif
+
+	Cmd_RemoveCommand("wav_restart");
 
 	// free all sounds
 	for (i=0, sfx=known_sfx ; i < num_sfx ; i++,sfx++)
@@ -427,11 +430,9 @@ channel_t *S_PickChannel(int entnum, int entchannel)
 	life_left = 0x7fffffff;
 	for (ch_idx=0 ; ch_idx < MAX_CHANNELS ; ch_idx++)
 	{
-	#ifdef OGG_SUPPORT	//  Knightmare added
 		// Don't let game sounds override streaming sounds
 		if (channels[ch_idx].streaming)  // Q2E
 			continue;
-	#endif
 
 		if (entchannel != 0		// channel 0 never overrides
 		&& channels[ch_idx].entnum == entnum
@@ -868,6 +869,8 @@ void S_StopAllSounds(void)
 	S_StopBackgroundTrack (); // Knightmare added
 #endif
 
+	S_StopWAVBackgroundTrack();
+
 	S_ClearBuffer ();
 }
 
@@ -1006,11 +1009,9 @@ void S_RawSamples (int samples, int rate, int width, int channels, byte *data, q
 		return;
 
 // Knightmare added
-#ifdef OGG_SUPPORT
 	if (music)
 		snd_vol = (int)(s_musicvolume->value * 256);
 	else
-#endif
 		snd_vol = (int)(s_volume->value * 256);
 // end Knightmare
 
@@ -1175,7 +1176,8 @@ void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 #endif
 
 	S_UpdateWavTrack();
-// mix some sound
+
+	// mix some sound
 	S_Update_();
 }
 
