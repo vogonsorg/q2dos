@@ -451,6 +451,31 @@ const char *M_Main_Key (int key)
 
 	switch (key)
 	{
+	/* FS: Keyboard shortcuts */
+	case 'g':
+	case 'G':
+		M_Menu_Game_f ();
+		break;
+	case 'm':
+	case 'M':
+		M_Menu_Multiplayer_f();
+		break;
+
+	case 'o':
+	case 'O':
+		M_Menu_Options_f ();
+		break;
+
+	case 'v':
+	case 'V':
+		M_Menu_Video_f ();
+		break;
+
+	case 'q':
+	case 'Q':
+		M_Menu_Quit_f ();
+		break;
+
 	case K_ESCAPE:
 		M_PopMenu ();
 		break;
@@ -598,6 +623,31 @@ void Multiplayer_MenuInit( void )
 
 const char *Multiplayer_MenuKey( int key )
 {
+	switch(key)
+	{
+	/* FS: Keyboard shortcuts */
+#ifdef GAMESPY
+	case 'g':
+	case 'G':
+		M_Menu_JoinGamespyServer_f ();
+		break;
+#endif
+	case 'n':
+	case 'N':
+		M_Menu_JoinServer_f();
+		break;
+
+	case 's':
+	case 'S':
+		M_Menu_StartServer_f ();
+		break;
+
+	case 'p':
+	case 'P':
+		M_Menu_PlayerConfig_f ();
+		break;
+	}
+
 	return Default_MenuKey( &s_multiplayer_menu, key );
 }
 
@@ -2507,6 +2557,46 @@ void Game_MenuDraw( void )
 
 const char *Game_MenuKey( int key )
 {
+	switch(key)
+	{
+	/* FS: Keyboard shortcuts */
+	case 'e':
+	case 'E':
+		M_ForceMenuOff();
+		EasyGameFunc (NULL);
+		break;
+
+	case 'm':
+	case 'M':
+		MediumGameFunc(NULL);
+		break;
+
+	case 'h':
+	case 'H':
+		HardGameFunc(NULL);
+		break;
+
+	case 'n':
+	case 'N':
+		NightmareGameFunc(NULL);
+		break;
+
+	case 'l':
+	case 'L':
+		M_Menu_LoadGame_f();
+		break;
+
+	case 's':
+	case 'S':
+		M_Menu_SaveGame_f();
+		break;
+
+	case 'c':
+	case 'C':
+		M_Menu_Credits_f();
+		break;
+	}
+
 	return Default_MenuKey( &s_game_menu, key );
 }
 
@@ -2843,13 +2933,10 @@ static void FormatGamespyList (void)
 
 					if(Q_strlen(browserList[j].hostname) >= 20)
 					{
-						Com_sprintf(buffer, sizeof(buffer), "... [%d] %d/%d", browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
-					}
-					else
-					{
-						Com_sprintf(buffer, sizeof(buffer), "... [%d] %d/%d", browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
+						Q_strcat(gamespy_server_names[m_num_gamespy_servers], "...");
 					}
 
+					Com_sprintf(buffer, sizeof(buffer), " [%d] %d/%d", browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
 					Com_strcat(gamespy_server_names[m_num_gamespy_servers], sizeof(gamespy_server_names[m_num_gamespy_servers]), buffer);
 				}
 				else
@@ -2884,13 +2971,10 @@ static void FormatGamespyList (void)
 
 				if(Q_strlen(browserListAll[j].hostname) >= 20)
 				{
-					Com_sprintf(buffer, sizeof(buffer), "... [%d] %d/%d", browserListAll[j].ping, browserListAll[j].curPlayers, browserListAll[j].maxPlayers);
-				}
-				else
-				{
-					Com_sprintf(buffer, sizeof(buffer), "... [%d] %d/%d", browserListAll[j].ping, browserListAll[j].curPlayers, browserListAll[j].maxPlayers);
+					Q_strcat(gamespy_server_names[m_num_gamespy_servers-skip], "...");
 				}
 
+				Com_sprintf(buffer, sizeof(buffer), " [%d] %d/%d", browserListAll[j].ping, browserListAll[j].curPlayers, browserListAll[j].maxPlayers);
 				Com_strcat(gamespy_server_names[m_num_gamespy_servers-skip], sizeof(gamespy_server_names[m_num_gamespy_servers-skip]), buffer);
 			}
 			else
