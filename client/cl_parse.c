@@ -614,8 +614,8 @@ CL_PlayBackgroundTrack
 */
 void CL_PlayBackgroundTrack (void)
 {
-#define have_ogg (1<<0)
-#define have_wav (1<<1)
+#define BGMUSIC_WAV (1<<0)
+#define BGMUSIC_OGG (1<<1)
 
 	char	name[MAX_QPATH], *p;
 	int		track;
@@ -629,27 +629,29 @@ void CL_PlayBackgroundTrack (void)
 	/* using a named audio track intead of numbered */
 	if (strlen(cl.configstrings[CS_CDTRACK]) > 2)
 	{
+		/* check existing files with supported extensions */
 		have_extmusic = 0;
 		Com_sprintf (name, sizeof(name), "music/%s.", cl.configstrings[CS_CDTRACK]);
 		p = name + strlen(name);
-		/* check existing files with supported extensions */
 		strcpy (p, "wav");
 		if (FS_LoadFile(name, NULL) != -1)
-			have_extmusic |= have_wav;
+			have_extmusic |= BGMUSIC_WAV;
 #ifdef OGG_SUPPORT
 		strcpy (p, "ogg");
 		if (FS_LoadFile(name, NULL) != -1)
-			have_extmusic |= have_ogg;
+			have_extmusic |= BGMUSIC_OGG;
 #endif
-		CDAudio_Stop();
+
 		/* play whatever is found */
-		if ((have_extmusic & have_wav) && cl_wav_music->intValue) {
+		if ((have_extmusic&BGMUSIC_WAV) && (cl_wav_music->intValue || !(have_extmusic&BGMUSIC_OGG))) {
+			CDAudio_Stop();
 			strcpy (p, "wav");
 			S_StartWAVBackgroundTrack(name, name);
 			return;
 		}
 #ifdef OGG_SUPPORT
-		if (have_extmusic & have_ogg) {
+		if (have_extmusic&BGMUSIC_OGG) {
+			CDAudio_Stop();
 			strcpy (p, "ogg");
 			S_StartOGGBackgroundTrack(name, name);
 			return;
@@ -672,19 +674,22 @@ void CL_PlayBackgroundTrack (void)
 	p = name + strlen(name);
 	strcpy (p, "wav");
 	if (FS_LoadFile(name, NULL) != -1)
-		have_extmusic |= have_wav;
+		have_extmusic |= BGMUSIC_WAV;
 #ifdef OGG_SUPPORT
 	strcpy (p, "ogg");
 	if (FS_LoadFile(name, NULL) != -1)
-		have_extmusic |= have_ogg;
+		have_extmusic |= BGMUSIC_OGG;
 #endif
+
 	/* play whatever is found */
-	if ((have_extmusic & have_wav) && cl_wav_music->intValue) {
+	if ((have_extmusic&BGMUSIC_WAV) && (cl_wav_music->intValue || !(have_extmusic&BGMUSIC_OGG))) {
+		CDAudio_Stop();
 		strcpy (p, "wav");
 		S_StartWAVBackgroundTrack(name, name);
 	}
 #ifdef OGG_SUPPORT
-	else if (have_extmusic & have_ogg) {
+	else if (have_extmusic&BGMUSIC_OGG) {
+		CDAudio_Stop();
 		strcpy (p, "ogg");
 		S_StartOGGBackgroundTrack(name, name);
 	}
@@ -692,8 +697,6 @@ void CL_PlayBackgroundTrack (void)
 	else {
 		CDAudio_Play(track, true);
 	}
-#undef have_ogg
-#undef have_wav
 }
 // end Knightmare
 
