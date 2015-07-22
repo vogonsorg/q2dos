@@ -22,9 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "client.h"
 #include "snd_loc.h"
 
-int			cache_full_cycle;
-
-byte *S_Alloc (int size);
 
 /*
 ================
