@@ -117,6 +117,7 @@
 {"weapon_grenade_fire", (byte *)weapon_grenade_fire},
 {"Weapon_Generic", (byte *)Weapon_Generic},
 {"Drop_Weapon", (byte *)Drop_Weapon},
+{"Use_Weapon2", (byte *)Use_Weapon2},
 {"Use_Weapon", (byte *)Use_Weapon},
 {"Think_Weapon", (byte *)Think_Weapon},
 {"NoAmmoWeaponChange", (byte *)NoAmmoWeaponChange},

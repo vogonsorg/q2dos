@@ -482,6 +482,88 @@ Use_Weapon(edict_t *ent, gitem_t *item)
 	ent->client->newweapon = item;
 }
 
+/* FS: Adapated from Xatrix Code */
+void Use_Weapon2 (edict_t *ent, gitem_t *item)
+{
+	int			ammo_index;
+	gitem_t		*ammo_item;
+	gitem_t		*nextitem;
+	int			index;
+
+	if (!ent || !item)
+	{
+		return;
+	}
+
+	if (strcmp (item->pickup_name, "Blaster") == 0)
+	{
+		if (item == ent->client->pers.weapon)
+		{
+			item = FindItem ("Chainfist");
+			index = ITEM_INDEX (item);
+			if (!ent->client->pers.inventory[index])
+			{
+				item = FindItem ("Blaster");
+			}
+		}
+	}
+	else if (strcmp (item->pickup_name, "Chaingun") == 0)
+	{
+		if (item == ent->client->pers.weapon)
+		{
+			item = FindItem ("ETF Rifle");
+			index = ITEM_INDEX (item);
+			if (!ent->client->pers.inventory[index])
+			{
+				item = FindItem ("Chaingun");
+			}
+		}
+	}
+	else if (strcmp (item->pickup_name, "Grenade Launcher") == 0)
+	{
+		if (item == ent->client->pers.weapon)
+		{
+			item = FindItem ("Prox Launcher");
+			index = ITEM_INDEX (item);
+			if (!ent->client->pers.inventory[index])
+			{
+				item = FindItem ("Grenade Launcher");
+			}
+		}
+	}
+	else if (strcmp (item->pickup_name, "HyperBlaster") == 0)
+	{
+		if (item == ent->client->pers.weapon)
+		{
+			item = FindItem ("Plasma Beam");
+			index = ITEM_INDEX (item);
+			if (!ent->client->pers.inventory[index])
+			{
+				item = FindItem ("HyperBlaster");
+			}
+		}
+	}
+
+	// see if we're already using it
+	if (item == ent->client->pers.weapon)
+		return;
+
+	if (item->ammo)
+	{
+		ammo_item = FindItem(item->ammo);
+		ammo_index = ITEM_INDEX(ammo_item);
+		if (!ent->client->pers.inventory[ammo_index] && !g_select_empty->value)
+		{
+			gi.cprintf (ent, PRINT_HIGH, "No %s for %s.\n", ammo_item->pickup_name, item->pickup_name);
+			return;
+		}
+	}
+
+	// change to this weapon when down
+	ent->client->newweapon = item;
+
+}
+
 void
 Drop_Weapon(edict_t *ent, gitem_t *item)
 {

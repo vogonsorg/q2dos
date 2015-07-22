@@ -541,11 +541,54 @@ Cmd_Use_f(edict_t *ent)
 	}
 
 	index = ITEM_INDEX(it);
-
 	if (!ent->client->pers.inventory[index])
 	{
-		gi.cprintf(ent, PRINT_HIGH, "Out of item: %s\n", s);
-		return;
+		/* FS: Added dual weapon switching from Xatrix code */
+		if (strcmp (it->pickup_name, "Blaster") == 0)
+		{
+			it = FindItem ("Chainfist");
+			index = ITEM_INDEX (it);
+			if (!ent->client->pers.inventory[index])
+			{
+				gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+				return;
+			}
+		}
+		else if (strcmp (it->pickup_name, "Chaingun") == 0)
+		{
+			it = FindItem ("ETF Rifle");
+			index = ITEM_INDEX (it);
+			if (!ent->client->pers.inventory[index])
+			{
+				gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+				return;
+			}
+		}
+		else if (strcmp (it->pickup_name, "Grenade Launcher") == 0)
+		{
+			it = FindItem ("Prox Launcher");
+			index = ITEM_INDEX (it);
+			if (!ent->client->pers.inventory[index])
+			{
+				gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+				return;
+			}
+		}
+		else if (strcmp (it->pickup_name, "HyperBlaster") == 0)
+		{
+			it = FindItem ("Plasma Beam");
+			index = ITEM_INDEX (it);
+			if (!ent->client->pers.inventory[index])
+			{
+				gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+				return;
+			}
+		}
+		else
+		{
+			gi.cprintf(ent, PRINT_HIGH, "Out of item: %s\n", s);
+			return;
+		}
 	}
 
 	it->use(ent, it);
@@ -585,8 +628,52 @@ Cmd_Drop_f(edict_t *ent)
 
 	if (!ent->client->pers.inventory[index])
 	{
-		gi.cprintf(ent, PRINT_HIGH, "Out of item: %s\n", s);
-		return;
+		/* FS: Added dual weapon switching from Xatrix code */
+		if (strcmp (it->pickup_name, "Blaster") == 0)
+		{
+			it = FindItem ("Chainfist");
+			index = ITEM_INDEX (it);
+			if (!ent->client->pers.inventory[index])
+			{
+				gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+				return;
+			}
+		}
+		else if (strcmp (it->pickup_name, "Chaingun") == 0)
+		{
+			it = FindItem ("ETF Rifle");
+			index = ITEM_INDEX (it);
+			if (!ent->client->pers.inventory[index])
+			{
+				gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+				return;
+			}
+		}
+		else if (strcmp (it->pickup_name, "Grenade Launcher") == 0)
+		{
+			it = FindItem ("Prox Launcher");
+			index = ITEM_INDEX (it);
+			if (!ent->client->pers.inventory[index])
+			{
+				gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+				return;
+			}
+		}
+		else if (strcmp (it->pickup_name, "HyperBlaster") == 0)
+		{
+			it = FindItem ("Plasma Beam");
+			index = ITEM_INDEX (it);
+			if (!ent->client->pers.inventory[index])
+			{
+				gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+				return;
+			}
+		}
+		else
+		{
+			gi.cprintf(ent, PRINT_HIGH, "Out of item: %s\n", s);
+			return;
+		}
 	}
 
 	it->drop(ent, it);

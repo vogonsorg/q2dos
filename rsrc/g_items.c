@@ -5,6 +5,7 @@
 
 qboolean Pickup_Weapon(edict_t *ent, edict_t *other);
 void Use_Weapon(edict_t *ent, gitem_t *inv);
+void Use_Weapon2(edict_t *ent, gitem_t *inv);
 void Drop_Weapon(edict_t *ent, gitem_t *inv);
 
 void Weapon_Blaster(edict_t *ent);
@@ -2222,7 +2223,7 @@ gitem_t itemlist[] = {
 	{
 		"weapon_blaster",
 		NULL,
-		Use_Weapon,
+		Use_Weapon2,
 		NULL,
 		Weapon_Blaster,
 		"misc/w_pkup.wav",
@@ -2311,7 +2312,7 @@ gitem_t itemlist[] = {
 	{
 		"weapon_chaingun",
 		Pickup_Weapon,
-		Use_Weapon,
+		Use_Weapon2,
 		Drop_Weapon,
 		Weapon_Chaingun,
 		"misc/w_pkup.wav",
@@ -2379,7 +2380,7 @@ gitem_t itemlist[] = {
 	{
 		"weapon_grenadelauncher",
 		Pickup_Weapon,
-		Use_Weapon,
+		Use_Weapon2,
 		Drop_Weapon,
 		Weapon_GrenadeLauncher,
 		"misc/w_pkup.wav",
@@ -2447,7 +2448,7 @@ gitem_t itemlist[] = {
 	{
 		"weapon_hyperblaster",
 		Pickup_Weapon,
-		Use_Weapon,
+		Use_Weapon2,
 		Drop_Weapon,
 		Weapon_HyperBlaster,
 		"misc/w_pkup.wav",

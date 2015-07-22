@@ -443,7 +443,7 @@ void Use_Weapon2 (edict_t *ent, gitem_t *item)
 
 	// change to this weapon when down
 	ent->client->newweapon = item;
-	
+
 }
 // END 14-APR-98
 
