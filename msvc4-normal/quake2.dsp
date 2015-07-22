@@ -274,6 +274,10 @@ SOURCE=..\client\snd_stream.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\client\snd_wavstream.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\WIN32\snd_win.c
 # End Source File
 # Begin Source File
