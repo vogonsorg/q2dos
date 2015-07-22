@@ -15,6 +15,7 @@ What works?
 * Sound Blaster and Gravis UltraSound family
 * CD-ROM music
 * OGG music
+* WAV/ADPCM music
 * Networking (You need a packet driver)
 * Loading/unloading game DLLs in DXE3 format.
 
@@ -46,12 +47,12 @@ Tips and other misc info:
   You also may need to set s_mixahead to 0.3 and use high IRQs.
 * Make sure you are using the included CWSDPMI.EXE in your Q2 directory or you
   may get some issues with running out of memory.
-* To hear Ogg Vorbis tracks in game, rip the Q2 CD's audio tracks (2-11) to 
-  track02-track11.ogg and put them in baseq2/music.  For the mission pack audio
-  tracks, rip the Ground Zero CD's audio tracks (2-11) to track12-track21.ogg.
-  Don't bother ripping the tracks from the Reckoning CD, as they're a mix of
-  the tracks on the Q2 and Ground Zero CDs.  Everything else will be taken care
-  of internally.
+* To hear Ogg Vorbis or WAV tracks in game, rip the Q2 CD's audio tracks (2-11)
+  to track02-track11.* and put them in baseq2/music.  For the mission pack 
+  audio tracks, rip the Ground Zero CD's audio tracks (2-11) to 
+  track12-track21.*.  Don't bother ripping the tracks from the Reckoning CD, 
+  as they're a mix of the tracks on the Q2 and Ground Zero CDs.  Everything 
+  else will be taken care of internally.
 * Mouse wheel:  The code is from HoT.  If you use the latest beta version of
   cutemouse, which  is 2.1b3 (ctmouse21b3.zip), the wheel should work nicely.
   We tested with the 2.0-alpha and 2.1-beta versions. We automatically detect

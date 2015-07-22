@@ -1262,7 +1262,7 @@ static void UpdateCDVolumeFunc( void *unused )
 	Cvar_SetValue( "cd_nocd", !s_options_cdvolume_box.curvalue );
 }
 
-static void UpdateOGGVolumeFunc (void *unused) // FS: OGG Music Volume
+static void UpdateMusicVolumeFunc (void *unused) // FS: OGG Music Volume
 {
 	Cvar_SetValue ( "s_musicvolume", s_options_musicvolume_slider.curvalue / 10 );
 }
@@ -1440,12 +1440,12 @@ void Options_MenuInit( void )
 	s_options_sfxvolume_slider.maxvalue		= 10;
 	s_options_sfxvolume_slider.curvalue		= Cvar_VariableValue( "s_volume" ) * 10;
 
-// FS: For OGG
+/* FS: For Music played from WAV or OGG files */
 	s_options_musicvolume_slider.generic.type	= MTYPE_SLIDER;
 	s_options_musicvolume_slider.generic.x	= 0;
 	s_options_musicvolume_slider.generic.y	= 10;
-	s_options_musicvolume_slider.generic.name	= "ogg music volume";
-	s_options_musicvolume_slider.generic.callback	= UpdateOGGVolumeFunc;
+	s_options_musicvolume_slider.generic.name	= "music volume";
+	s_options_musicvolume_slider.generic.callback	= UpdateMusicVolumeFunc;
 	s_options_musicvolume_slider.minvalue		= 0;
 	s_options_musicvolume_slider.maxvalue		= 10;
 	s_options_musicvolume_slider.curvalue		= Cvar_VariableValue( "s_musicvolume" ) * 10;
