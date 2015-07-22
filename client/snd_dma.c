@@ -144,9 +144,7 @@ void S_Init (void)
 		Cmd_AddCommand("ogg_restart", S_OGG_Restart); // Knightmare added
 	#endif
 
-		Cmd_AddCommand("wav_restart", S_WAV_Restart);
-
-		Cmd_AddCommand("teststreamwav", S_StreamWav_f);
+		Cmd_AddCommand("wav_restart", S_WAV_Restart); /* FS: Added */
 
 		if (s_khz->value < 7000) // FS: Old config, fix it up
 			Cvar_SetValue("s_khz", 11025);
@@ -174,7 +172,7 @@ void S_Init (void)
 		S_OGG_Init(); // Knightmare added
 #endif
 
-	S_WAV_Init();
+	S_WAV_Init(); /* FS: Added */
 
 	Com_Printf("------------------------------------\n");
 }
@@ -196,7 +194,7 @@ void S_Shutdown(void)
 	S_OGG_Shutdown(); // Knightmare added
 #endif
 
-	S_WAV_Shutdown();
+	S_WAV_Shutdown(); /* FS: Added */
 
 	SNDDMA_Shutdown();
 
@@ -1175,7 +1173,7 @@ void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 	S_UpdateBackgroundTrack ();	//  Knightmare added
 #endif
 
-	S_UpdateWavTrack();
+	S_UpdateWavTrack(); /* FS: Added */
 
 	// mix some sound
 	S_Update_();

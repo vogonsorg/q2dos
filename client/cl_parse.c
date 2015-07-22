@@ -705,9 +705,10 @@ void CL_PlayWAVBackgroundTrack (void)
 		Com_sprintf (name, sizeof(name), "music/track%02i.wav", CL_MissionPackCDTrack(track));
 	Com_sprintf (name, sizeof(name), "music/track%02i.wav", CL_MissionPackCDTrack(track));
 
-	if ( cl_wav_music->value && S_StartWAVBackgroundTrack(name, name))
+	if ( cl_wav_music->value && FS_LocalFileExists(name))
 	{
 		Com_DPrintf(DEVELOPER_MSG_OGG, "CL_PlayWAVBackgroundTrack: playing track %s\n", name);	// debug
+		S_StartWAVBackgroundTrack(name, name);
 	}
 	else
 		CDAudio_Play(track, true);

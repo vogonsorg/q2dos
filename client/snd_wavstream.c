@@ -14,53 +14,54 @@ typedef enum {
 	WAV_STOP
 } wav_status_t;
 
-qboolean		wav_first_init = true;	// First initialization flag
-qboolean		wav_started = false;	// Initialization flag
 wav_status_t	wav_status;		// Status indicator
 
+qboolean		wav_first_init = true;	// First initialization flag
+qboolean		wav_started = false;	// Initialization flag
+
 #define			MAX_WAVLIST 512
-char			**wav_filelist;		// List of Ogg Vorbis files
+char			**wav_filelist;		// List of WAV files
 int				wav_curfile;		// Index of currently played file
-int				wav_numfiles;		// Number of Ogg Vorbis files
+int				wav_numfiles;		// Number of WAV files
 int				wav_loopcounter;
 
 cvar_t			*wav_loopcount;
 cvar_t			*wav_ambient_track;
 
-qboolean S_StartWAVBackgroundTrack(const char *introTrack, const char *loopTrack)
+static qboolean S_OpenWAVBackgroundTrack (char *name, bgTrack_t *track)
 {
-	int streamWavLen;
+	char	filename[1024];
+	char	*path = NULL;
+	int		streamWavLen;
 
-	if (!wav_started) // was sound_started
-		return false;
+//	Com_Printf("Opening background track: %s\n", name);
 
-	// Stop any playing tracks
-	S_StopWAVBackgroundTrack();
-
-	Q_strncpyz(s_bgTrack.introName, introTrack, sizeof(s_bgTrack.introName));
-	Q_strncpyz(s_bgTrack.loopName, loopTrack, sizeof(s_bgTrack.loopName));
-	Com_sprintf(s_bgTrack.ambientName, sizeof(s_bgTrack.ambientName), "music/%s.wav", wav_ambient_track->string);
-
-	streamWavLen = FS_FOpenFile(s_bgTrack.introName, &s_bgTrack.file);
-
-	if(streamWavLen > 0)
+	do
 	{
-		S_StreamWav_GetInfo(s_bgTrack.introName, streamWavLen);
+		path = FS_NextPath( path );
+		Com_sprintf( filename, sizeof(filename), "%s/%s", path, name );
+		streamWavLen = FS_FOpenFile(name, &track->file);
+		if ( streamWavLen != 0)
+			break;
 	}
-	else
+	while ( path );
+
+	if (!track->file)
 	{
-		Com_Printf("Error: Couldn't find %s!\n", s_bgTrack.introName);
+		Com_Printf("S_OpenWAVBackgroundTrack: couldn't find %s\n", name);
 		return false;
 	}
 
-	// set a loop counter so that this track will change to the ambient track later
-	wav_loopcounter = 0;
-	
-	S_StartWAVStreaming();
+	S_StreamWav_GetInfo(name, streamWavLen); /* FS: Get the WAV info using Q2's existing functions */
 
-	wav_status = WAV_PLAY;
+//	Com_Printf("Getting info for background track\n");
 
-	StreamWAVTrack();
+	if (musicWavInfo.channels != 1 && musicWavInfo.channels != 2)
+	{
+		Com_Printf("S_OpenWAVBackgroundTrack: only mono and stereo WAV files supported (%s)\n", name);
+		return false;
+	}
+
 	return true;
 }
 
@@ -73,7 +74,7 @@ static void S_CloseWAVBackgroundTrack(void)
 	s_bgTrack.file = NULL;
 }
 
-void StreamWAVTrack(void)
+void S_StreamWAVBackgroundTrack(void)
 {
 	int samples, maxSamples;
 	int read, maxRead, total;
@@ -110,9 +111,9 @@ void StreamWAVTrack(void)
 					S_CloseWAVBackgroundTrack();
 
 					// Open the loop track
-					if (!S_StartWAVBackgroundTrack(s_bgTrack.loopName, s_bgTrack.loopName))
+					if (!S_OpenWAVBackgroundTrack(s_bgTrack.loopName, &s_bgTrack))
 					{
-						S_StopWAVBackgroundTrack();
+						S_StopBackgroundTrack();
 						return;
 					}
 					s_bgTrack.looping = true;
@@ -124,11 +125,11 @@ void StreamWAVTrack(void)
 					{	// Close the loop track
 						S_CloseWAVBackgroundTrack();
 
-						if (!S_StartWAVBackgroundTrack(s_bgTrack.ambientName, s_bgTrack.ambientName))
+						if (!S_OpenWAVBackgroundTrack(s_bgTrack.ambientName, &s_bgTrack))
 						{
-							if (!S_StartWAVBackgroundTrack(s_bgTrack.loopName, s_bgTrack.loopName))
+							if (!S_OpenWAVBackgroundTrack(s_bgTrack.loopName, &s_bgTrack))
 							{
-								S_StopWAVBackgroundTrack();
+								S_StopBackgroundTrack();
 								return;
 							}
 						}
@@ -151,9 +152,40 @@ void S_UpdateWavTrack(void)
 {
 	// stop music if paused
 	if (wav_status == WAV_PLAY)// && !cl_paused->value)
-		StreamWAVTrack();
+		S_StreamWAVBackgroundTrack();
 }
 
+void S_StartWAVBackgroundTrack (const char *introTrack, const char *loopTrack)
+{
+	if (!wav_started) // was sound_started
+		return;
+
+	// Stop any playing tracks
+	S_StopBackgroundTrack();
+
+	// Start it up
+	Q_strncpyz(s_bgTrack.introName, introTrack, sizeof(s_bgTrack.introName));
+	Q_strncpyz(s_bgTrack.loopName, loopTrack, sizeof(s_bgTrack.loopName));
+	Q_strncpyz(s_bgTrack.ambientName, va("music/%s.wav", wav_ambient_track->string), sizeof(s_bgTrack.ambientName));
+
+	// set a loop counter so that this track will change to the ambient track later
+	wav_loopcounter = 0;
+
+	S_StartWAVStreaming();
+
+	// Open the intro track
+	if (!S_OpenWAVBackgroundTrack(s_bgTrack.introName, &s_bgTrack))
+	{
+		S_StopBackgroundTrack();
+		return;
+	}
+
+	wav_status = PLAY;
+
+	S_StreamWAVBackgroundTrack();
+}
+
+/* FS: Called from S_StopBackgroundTrack in snd_dma.c so OGG and WAV won't clash over Channel 0 */
 void S_StopWAVBackgroundTrack (void)
 {
 	if (!wav_started) // was sound_started
@@ -166,6 +198,7 @@ void S_StopWAVBackgroundTrack (void)
 	wav_status = WAV_STOP;
 
 	memset(&musicWavInfo, 0, sizeof(wavinfo_t));
+	memset(&s_bgTrack, 0, sizeof(bgTrack_t));
 }
 
 void S_StartWAVStreaming (void)
@@ -291,25 +324,6 @@ void S_WAV_Init (void)
 	wav_started = true;
 }
 
-void S_StreamWav_f(void)
-{
-	char musicWavFilename[MAX_OSPATH];
-	int streamWavLen;
-
-	Com_sprintf(musicWavFilename, sizeof(musicWavFilename), "music/track02.wav"); /* FS: Don't need FS_Gamedir as FS_FOpenFile takes care of the search */
-	streamWavLen = FS_FOpenFile(musicWavFilename, &s_bgTrack.file);
-
-	if(streamWavLen > 0)
-	{
-		Com_Printf("Length: %i\n", streamWavLen);
-		S_StreamWav_GetInfo(musicWavFilename, streamWavLen);
-	}
-	else
-	{
-		Com_Printf("Error: Couldn't find %s!\n", musicWavFilename);
-	}
-}
-
 void S_WAV_PlayCmd (void)
 {
 	char	name[MAX_QPATH];
@@ -395,7 +409,7 @@ void S_WAV_ParseCmd (void)
 	}
 
 	if (Q_strcasecmp(command, "stop") == 0) {
-		S_StopWAVBackgroundTrack ();
+		S_StopBackgroundTrack ();
 		return;
 	}
 
@@ -419,7 +433,7 @@ void S_WAV_Shutdown (void)
 	if (!wav_started)
 		return;
 
-	S_StopWAVBackgroundTrack ();
+	S_StopBackgroundTrack ();
 
 	// Free the list of files
 	for (i = 0; i < wav_numfiles; i++)

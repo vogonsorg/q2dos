@@ -36,7 +36,6 @@ ogg_status_t	ogg_status;		// Status indicator
 
 #define			MAX_OGGLIST 512
 char			**ogg_filelist;		// List of Ogg Vorbis files
-int				ogg_curfile;		// Index of currently played file
 int				ogg_numfiles;		// Number of Ogg Vorbis files
 int				ogg_loopcounter;
 
@@ -271,7 +270,7 @@ void S_StreamBackgroundTrack (void)
 
 					// Open the loop track
 					if (!S_OpenBackgroundTrack(s_bgTrack.loopName, &s_bgTrack)) {
-						S_StopOGGBackgroundTrack();
+						S_StopBackgroundTrack();
 						return;
 					}
 					s_bgTrack.looping = true;
@@ -285,7 +284,7 @@ void S_StreamBackgroundTrack (void)
 
 						if (!S_OpenBackgroundTrack(s_bgTrack.ambientName, &s_bgTrack)) {
 							if (!S_OpenBackgroundTrack(s_bgTrack.loopName, &s_bgTrack)) {
-								S_StopOGGBackgroundTrack();
+								S_StopBackgroundTrack();
 								return;
 							}
 						}
@@ -332,7 +331,7 @@ void S_StartBackgroundTrack (const char *introTrack, const char *loopTrack)
 		return;
 
 	// Stop any playing tracks
-	S_StopOGGBackgroundTrack();
+	S_StopBackgroundTrack();
 
 	// Start it up
 	Q_strncpyz(s_bgTrack.introName, introTrack, sizeof(s_bgTrack.introName));
@@ -347,7 +346,7 @@ void S_StartBackgroundTrack (const char *introTrack, const char *loopTrack)
 	// Open the intro track
 	if (!S_OpenBackgroundTrack(s_bgTrack.introName, &s_bgTrack))
 	{
-		S_StopOGGBackgroundTrack();
+		S_StopBackgroundTrack();
 		return;
 	}
 
@@ -361,6 +360,8 @@ void S_StartBackgroundTrack (const char *introTrack, const char *loopTrack)
 S_StopOGGBackgroundTrack
 =================
 */
+
+/* FS: Called from S_StopBackgroundTrack in snd_dma.c so OGG and WAV won't clash over Channel 0 */
 void S_StopOGGBackgroundTrack (void)
 {
 	if (!ogg_started) // was sound_started
@@ -445,8 +446,6 @@ void S_OGG_Init (void)
 
 	// Initialize variables
 	if (ogg_first_init) {
-	//	srand(time(NULL));
-	//	ogg_curfile = -1;
 		ogg_status = STOP;
 		ogg_first_init = false;
 	}
@@ -470,7 +469,7 @@ void S_OGG_Shutdown (void)
 	if (!ogg_started)
 		return;
 
-	S_StopOGGBackgroundTrack ();
+	S_StopBackgroundTrack ();
 
 	// Free the list of files
 	for (i = 0; i < ogg_numfiles; i++)
@@ -714,7 +713,7 @@ void S_OGG_ParseCmd (void)
 	}
 
 	if (Q_strcasecmp(command, "stop") == 0) {
-		S_StopOGGBackgroundTrack ();
+		S_StopBackgroundTrack ();
 		return;
 	}
 
