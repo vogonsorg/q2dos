@@ -186,6 +186,10 @@ void Cmd_SexPistols_f(edict_t *ent)
 		safe_cprintf(ent, PRINT_HIGH, "%s\n", "You have the Sex Pistols!");
 }
 
+static void Cmd_Scope2_f(edict_t *e) {
+	Cmd_Scope_f(e);
+}
+
 g_cmds_t id_GameCmds[NUM_ID_CMDS] = // remember to set back to NUM_ID_COMDS
 {
 	{"use",			1,	Cmd_Use_f},
@@ -223,7 +227,7 @@ g_cmds_t id_GameCmds[NUM_ID_CMDS] = // remember to set back to NUM_ID_COMDS
 //	{"feed_ammo",	1,	Feed_Ammo},
 	{"reload",		1,	(void *)Cmd_Reload_f},
 //	{"begin_mission",1,	EndObserverMode},
-	{"scope",		2,	Cmd_Scope_f},
+	{"scope",		2,	Cmd_Scope2_f},
 	{"shout",		3,	Cmd_Shout_f},
 	{"aliciamode",	1,	Cmd_AliciaMode_f},
 	{"iwannabeanarchy",1,Cmd_SexPistols_f},
@@ -1882,6 +1886,7 @@ void Cmd_Kill_f (edict_t *ent)
 
 	//T_Damage(ent,ent,ent, ent->maxs, ent->s.origin, NULL, 999, 0,  DAMAGE_NO_PROTECTION,
 	//			MOD_SUICIDE);
+	*/
 	/*
 	ent->flags &= ~FL_GODMODE;
 	ent->health = 0;
@@ -2583,9 +2588,9 @@ void change_stance(edict_t *self, int stance)
 **
 **
 *********************************************************************************************/
-//extern SMos_t def_MOS_List;
-//void SP_info_team_start(edict_t * ent );
-/*
+#if 0
+extern SMos_t def_MOS_List;
+void SP_info_team_start(edict_t * ent);
 void Cmd_Create_Team(edict_t *ent)
 {
 	char *teamname;
@@ -2660,12 +2665,12 @@ void M_ChooseMOS(edict_t *ent);
 void AfterSwitch(edict_t *ent, int type)
 {
 /*	gi.unlinkentity (ent);
-	ent->movetype = MOVETYPE_NOCLIP; 
-	ent->solid = SOLID_NOT; 
-	ent->svflags |= SVF_NOCLIENT; 
+	ent->movetype = MOVETYPE_NOCLIP;
+	ent->solid = SOLID_NOT;
+	ent->svflags |= SVF_NOCLIENT;
 	ent->client->ps.gunindex = 0; */
 
-/*	ent->client->limbo_mode=true;
+	ent->client->limbo_mode=true;
 
 	switch (type) {
 	default:
@@ -2793,8 +2798,8 @@ void Cmd_Join_team(edict_t *ent)
 
 		AfterSwitch(ent, 2);
 	}
-}*/
-/*
+}
+
 void Cmd_Quit_team(edict_t *ent)
 {
 	int					j;
@@ -2843,11 +2848,11 @@ void Cmd_Quit_team(edict_t *ent)
 
 	//SwitchToObserver(ent);
 	respawn (ent);
-	* /
+	*/
 
 	AfterSwitch(ent, 1);
 }
-*/
+#endif
 
 void Cmd_List_team(edict_t *ent)
 {

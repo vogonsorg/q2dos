@@ -390,7 +390,7 @@ void fire_blaster (edict_t *self, vec3_t start, vec3_t dir, int damage, int spee
 		VectorMA (bolt->s.origin, -10, dir, bolt->s.origin);
 		bolt->touch (bolt, tr.ent, NULL, NULL);
 	}
-}	
+}
 
 
 /*
@@ -453,7 +453,7 @@ static void Grenade_Explode (edict_t *ent)
 	gi.multicast (ent->s.origin, MULTICAST_PHS);
 
 	G_FreeEdict (ent);
-UpdateExplIndex(NULL);
+	UpdateExplIndex(NULL);
 }
 
 static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
@@ -466,7 +466,7 @@ static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurfa
 	if (surf && (surf->flags & SURF_SKY))
 	{
 		G_FreeEdict (ent);
-UpdateExplIndex(NULL);
+		UpdateExplIndex(NULL);
 		return;
 	}
 
@@ -520,7 +520,7 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 	grenade->dmg_radius = damage_radius;
 	grenade->classname = "grenade";
 
-UpdateExplIndex(grenade);
+	UpdateExplIndex(grenade);
 
 	gi.linkentity (grenade);
 }
@@ -585,7 +585,7 @@ void rocket_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *su
 	if (surf && (surf->flags & SURF_SKY))
 	{
 		G_FreeEdict (ent);
-UpdateExplIndex(NULL);
+		UpdateExplIndex(NULL);
 		return;
 	}
 
@@ -627,7 +627,7 @@ UpdateExplIndex(NULL);
 	gi.multicast (ent->s.origin, MULTICAST_PHS);
 
 	G_FreeEdict (ent);
-UpdateExplIndex(NULL);
+	UpdateExplIndex(NULL);
 }
 
 void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage)
@@ -656,13 +656,14 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 	rocket->s.sound = gi.soundindex ("weapons/rockfly.wav");
 	rocket->classname = "rocket";
 
-UpdateExplIndex(rocket);
+	UpdateExplIndex(rocket);
 
 	if (self->client)
 		check_dodge (self, rocket->s.origin, dir, speed);
 
 	gi.linkentity (rocket);
 }
+
 //ロックオンミサイル
 void think_lockon_rocket(edict_t *ent)
 {
@@ -1200,124 +1201,7 @@ void fire_ionripper (edict_t *self, vec3_t start, vec3_t dir, int damage, int sp
 		VectorMA (ion->s.origin, -10, dir, ion->s.origin);
 		ion->touch (ion, tr.ent, NULL, NULL);
 	}
-
 }
-
-
-// RAFAEL
-/*
-=================
-fire_heat
-=================
-*/
-/*
-void heat_think (edict_t *self)
-{
-	edict_t		*target = NULL;
-	edict_t		*aquire = NULL;
-	vec3_t		vec;
-	vec3_t		oldang;
-	int			len;
-	int			oldlen = 0;
-
-	VectorClear (vec);
-
-	// aquire new target
-	while (( target = findradius (target, self->s.origin, 1024)) != NULL)
-	{
-		
-		if (self->owner == target)
-			continue;
-		if (!target->svflags & SVF_MONSTER)
-			continue;
-		if (!target->client)
-			continue;
-		if (target->health <= 0)
-			continue;
-		if (!visible (self, target))
-			continue;
-		
-		// if we need to reduce the tracking cone
-		/*
-		{
-			vec3_t	vec;
-			float	dot;
-			vec3_t	forward;
-	
-			AngleVectors (self->s.angles, forward, NULL, NULL);
-			VectorSubtract (target->s.origin, self->s.origin, vec);
-			VectorNormalize (vec);
-			dot = DotProduct (vec, forward);
-	
-			if (dot > 0.6)
-				continue;
-		}
-		*/
-
-/*		if (!infront (self, target))
-			continue;
-
-		VectorSubtract (self->s.origin, target->s.origin, vec);
-		len = VectorLength (vec);
-
-		if (aquire == NULL || len < oldlen)
-		{
-			aquire = target;
-			self->target_ent = aquire;
-			oldlen = len;
-		}
-	}
-
-	if (aquire != NULL)
-	{
-		VectorCopy (self->s.angles, oldang);
-		VectorSubtract (aquire->s.origin, self->s.origin, vec);
-		
-		vectoangles (vec, self->s.angles);
-		
-		VectorNormalize (vec);
-		VectorCopy (vec, self->movedir);
-		VectorScale (vec, 500, self->velocity);
-	}
-
-	self->nextthink = level.time + 0.1;
-}
-*/
-// RAFAEL
-/*
-void fire_heat (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage)
-{
-	edict_t *heat;
-
-	heat = G_Spawn();
-	VectorCopy (start, heat->s.origin);
-	VectorCopy (dir, heat->movedir);
-	vectoangles (dir, heat->s.angles);
-	VectorScale (dir, speed, heat->velocity);
-	heat->movetype = MOVETYPE_FLYMISSILE;
-	heat->clipmask = MASK_SHOT;
-	heat->solid = SOLID_BBOX;
-	heat->s.effects |= EF_ROCKET;
-	VectorClear (heat->mins);
-	VectorClear (heat->maxs);
-	heat->s.modelindex = gi.modelindex ("models/objects/rocket/tris.md2");
-	heat->owner = self;
-	heat->touch = rocket_touch;
-
-	heat->nextthink = level.time + 0.1;
-	heat->think = heat_think;
-	
-	heat->dmg = damage;
-	heat->radius_dmg = radius_damage;
-	heat->dmg_radius = damage_radius;
-	heat->s.sound = gi.soundindex ("weapons/rockfly.wav");
-
-	if (self->client)
-		check_dodge (self, heat->s.origin, dir, speed);
-
-	gi.linkentity (heat);
-}
-*/
 
 
 // RAFAEL
@@ -1378,7 +1262,7 @@ void fire_plasma (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 
 	VectorClear (plasma->mins);
 	VectorClear (plasma->maxs);
-	
+
 	plasma->owner = self;
 	plasma->touch = plasma_touch;
 	plasma->nextthink = level.time + 8000/speed;
@@ -1395,8 +1279,6 @@ void fire_plasma (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 		check_dodge (self, plasma->s.origin, dir, speed);
 
 	gi.linkentity (plasma);
-
-	
 }
 
 
@@ -1417,7 +1299,7 @@ static void Trap_Think (edict_t *ent)
 	int		len, i;
 	int		oldlen = 8000;
 	vec3_t	forward, right, up;
-	
+
 	if (ent->timestamp < level.time)
 	{
 		BecomeExplosion1(ent);
@@ -1425,9 +1307,9 @@ static void Trap_Think (edict_t *ent)
 		// cause explosion damage???
 		return;
 	}
-	
+
 	ent->nextthink = level.time + 0.1;
-	
+
 	if (!ent->groundentity)
 		return;
 
@@ -1473,7 +1355,7 @@ static void Trap_Think (edict_t *ent)
 				best->s.origin[2] = ent->s.origin[2] + ent->wait;
 				
 				VectorCopy (ent->s.angles, best->s.angles);
-  
+
 				best->solid = SOLID_NOT;
 				best->s.effects |= EF_GIB;
 				best->takedamage = DAMAGE_YES;
@@ -1493,7 +1375,7 @@ static void Trap_Think (edict_t *ent)
 				best->think = G_FreeEdict;
 				gi.linkentity (best);
 			}
-				
+
 			if (ent->wait < 19)
 				ent->s.frame ++;
 
@@ -1523,7 +1405,6 @@ static void Trap_Think (edict_t *ent)
 		ent->s.effects |= EF_TRAP;
 		VectorClear (ent->mins);
 		VectorClear (ent->maxs);
-
 	}
 
 	if (ent->s.frame < 4)
@@ -1610,11 +1491,8 @@ static void Trap_Think (edict_t *ent)
 				// cause explosion damage???
 				return;
 			}
-				
 		}
 	}
-
-		
 }
 
 
@@ -1665,6 +1543,5 @@ void fire_trap (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int spee
 	}
 	
 	trap->timestamp = level.time + 30;
-
 }
 

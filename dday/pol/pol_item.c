@@ -437,9 +437,7 @@ gitem_t politems[MAX_TEAM_ITEMS]=
 	},
 
 /*QUAKED ammo_sten (.3 .3 1) (-16 -16 -16) (16 16 16)
-
-  
-
+*/
 
 
 /*QUAKED ammo_RKM (.3 .3 1) (-16 -16 -16) (16 16 16)

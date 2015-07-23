@@ -134,7 +134,7 @@ qboolean	CanMoveSafely(edict_t	*self, vec3_t angles)
 {
 	vec3_t	dir, angle, dest1, dest2;
 	trace_t	trace;
-	float	this_dist;
+//	float	this_dist;
 
 //	self->bot_ai.next_safety_time = level.time + EYES_FREQ;
 
@@ -160,7 +160,7 @@ qboolean	CanMoveSafely(edict_t	*self, vec3_t angles)
 		dest1[0] = trace.endpos[0];
 		dest1[1] = trace.endpos[1];
 		dest1[2] = trace.endpos[2] - 28;
-		this_dist = trace.fraction * TRACE_DIST_SHORT;
+		//this_dist = trace.fraction * TRACE_DIST_SHORT;
 
 		if (gi.pointcontents(dest1) & MASK_PLAYERSOLID)
 			return (true);

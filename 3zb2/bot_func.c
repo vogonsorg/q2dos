@@ -274,8 +274,6 @@ edict_t *Get_NewClient (void)
 //----------------------------------------------------------------
 void Bot_Think (edict_t *self)
 {
-	gclient_t	*client;
-
 	if (self->linkcount != self->monsterinfo.linkcount)
 	{
 //		self->monsterinfo.linkcount = self->linkcount;
@@ -301,16 +299,13 @@ void Bot_Think (edict_t *self)
 				self->client->respawn_time = level.time;
 				CopyToBodyQue (self);
 				PutBotInServer(self);
-			}		
+			}
 		}
 	}
 	else
 	{
 		Bots_Move_NORM (self);
 		if(!self->inuse) return;			//removed botself
-
-		client = self->client;
-
 		ClientBeginServerFrame (self);
 	}
 	if (self->linkcount != self->monsterinfo.linkcount)
@@ -321,7 +316,7 @@ void Bot_Think (edict_t *self)
 	M_CatagorizePosition (self);
 	BotEndServerFrame (self);
 	self->nextthink = level.time + FRAMETIME;
-	return;	
+	return;
 }
 
 //----------------------------------------------------------------
@@ -347,7 +342,7 @@ void InitializeBot (edict_t *ent,int botindex )
 	memset (&client->resp, 0, sizeof(client->resp));
 
 	//set botindex NO.
-	client->zc.botindex = botindex;	
+	client->zc.botindex = botindex;
 
 	client->resp.enterframe = level.framenum;
 
@@ -377,7 +372,7 @@ void InitializeBot (edict_t *ent,int botindex )
 
 	if(ctf->value)	gi.bprintf(PRINT_HIGH, "%s joined the %s team.\n",
 			client->pers.netname, CTFTeamName(ent->client->resp.ctf_team));
-	else 	gi.bprintf (PRINT_HIGH, "%s entered the game\n",
+	else	gi.bprintf (PRINT_HIGH, "%s entered the game\n",
 			client->pers.netname);
 }
 
@@ -389,16 +384,14 @@ void PutBotInServer (edict_t *ent)
 	gclient_t	*client;
 	vec3_t	spawn_origin, spawn_angles;
 	trace_t		rs_trace;
+	zgcl_t		*zc;
 
-
-	zgcl_t		*zc;		
-	
 	zc = &ent->client->zc;
 
 //test
 //	item = FindItem("Trap");
 //	ent->client->pers.inventory[ITEM_INDEX(item)] = 100;
-//test	
+//test
 
 	//current weapon
 	client = ent->client;
@@ -542,7 +535,6 @@ void PutBotInServer (edict_t *ent)
 		client->zc.ctfstate = CTFS_OFFENCER;
 	}
 
-
 	gi.linkentity (ent);
 	G_TouchTriggers (ent);
 }
@@ -561,9 +553,8 @@ qboolean SpawnBot(int i)
 	edict_t		*bot,*ent;
 	int			k,j;
 
-
 //gi.cprintf (NULL,PRINT_HIGH,"Called %s %s %s\n",Bot[i].netname,Bot[i].model,Bot[i].skin);
-//return false;	
+//return false;
 
 	if(	Get_NumOfPlayer () >= game.maxclients )
 	{
@@ -587,7 +578,7 @@ qboolean SpawnBot(int i)
 			if(Route[k].state == GRS_NORMAL)
 			{
 				if(--j <= 0) break;
-			}  
+			}
 		}
 
 		bot->client->zc.rt_locktime = level.time + FRAMETIME * 20;
@@ -648,6 +639,7 @@ void Bot_SpawnCall()
 		}
 	}
 }
+
 //----------------------------------------------------------------
 //Spawn Bot Reserving
 //
@@ -669,6 +661,7 @@ void SpawnBotReserving()
 	}
 	gi.cprintf (NULL, PRINT_HIGH, "Now max of bots(%i) already spawned.\n",MAXBOTS);
 }
+
 //----------------------------------------------------------------
 //Spawn Bot Reserving 2
 //
@@ -747,7 +740,7 @@ void RemoveBot()
 				else Bot[botindex].spflg = BOT_SPRESERVED;
 
 				gi.bprintf (PRINT_HIGH, "%s disconnected\n", e->client->pers.netname);
-	
+
 				// send effect
 				gi.WriteByte (svc_muzzleflash);
 				gi.WriteShort (e-g_edicts);
@@ -757,8 +750,8 @@ void RemoveBot()
 				e->s.modelindex = 0;
 				e->solid = SOLID_NOT;
 
-	if(ctf->value) CTFPlayerResetGrapple(e);
-				
+				if(ctf->value) CTFPlayerResetGrapple(e);
+
 				gi.linkentity (e);
 
 				e->inuse = false;
@@ -820,6 +813,7 @@ void Bot_LevelChange()
 
 	SpawnWaitingBots = k;//j;
 }
+
 //----------------------------------------------------------------
 //
 //	Ragomode menu
@@ -844,9 +838,10 @@ void ZigockClientJoin(edict_t  *ent,int zclass)
 			ent->client->pers.netname, CTFTeamName(ent->client->resp.ctf_team/*desired_team*/));
 	}
 }
+
 void ClientJoinAsAlpha(edict_t *ent,pmenu_t *entries)
 {
-	ZigockClientJoin(ent,1);		
+	ZigockClientJoin(ent,1);
 }
 
 pmenu_t zgjoinmenu[] = {
@@ -938,7 +933,7 @@ void AirSight_Think(edict_t *ent)
 	VectorCopy(ent->target_ent->s.origin,ent->s.origin);
 
 	if( ent->owner->client->resp.ctf_team == CTF_TEAM2 && ctf->value)
-	{ 
+	{
 		ent->s.frame = 1;
 	}
 	else ent->s.frame = 0;
@@ -947,6 +942,7 @@ void AirSight_Think(edict_t *ent)
 	ent->nextthink = level.time + FRAMETIME * 6;
 	gi.linkentity (ent);
 }
+
 void AirStrike_Think(edict_t *ent)
 {
 	int	i,j;
@@ -988,12 +984,12 @@ void AirStrike_Think(edict_t *ent)
 					sight->target_ent = target;
 					gi.linkentity (sight);
 					j++;
-				} 
+				}
 			}
 		}
 	}
-
 }
+
 void Cmd_AirStrike(edict_t *ent)
 {
 	edict_t	*viper;
@@ -1045,7 +1041,6 @@ void Cmd_AirStrike(edict_t *ent)
 	tts[1] = sin(f) * (-600) ;
 	VectorAdd(rs_trace.endpos,tts,tmp);
 	VectorCopy(tmp,viper->s.origin);
-
 
 	viper->velocity[0] = cos(f) * 300; 
 	viper->velocity[1] = sin(f) * 300;
