@@ -32,7 +32,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //http://uhexen2.sourceforge.net/changes.html
 // 
-//This just dumps the first 40 SVGA modes 
 
 #include <stdio.h>
 #include <dpmi.h>
@@ -55,22 +54,13 @@ int num_vid_resolutions=0;	//we always have mode 13
 
 // !!! if this is changed, MAX_HEIGHT and MAX_WIDTH must be changed in d_ifacea.h too !!!
 // !!! if this is changed, MAX_HEIGHT and MAX_WIDTH must be changed in r_local.h too !!!
-#define MAXVESAWIDTH		4000 // FS: 1600
-#define MAXVESAHEIGHT		4000 // FS: 1200
+#define MAXVESAWIDTH		4000 /* FS: Was 1600 */
+#define MAXVESAHEIGHT		4000 /* FS: Was 1200 */
 
-vmode_t	*pvidmodes;
 static int	totalvidmem;
-static byte	*ppal;
-int		numvidmodes;
 
-static vmode_t		vesa_modes[MAX_VESA_MODES] = 
-	{{NULL, NULL, "    ********* VESA modes *********    "}};
-static char			names[MAX_VESA_MODES][10];
-
-vesa_extra_t	vesa_extra[MAX_VESA_MODES];
 int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes;
 byte	*VGA_pagebase;
-
 
 typedef struct vbeinfoblock_s {
      byte			VbeSignature[4];
@@ -115,23 +105,11 @@ typedef struct
 
 static modeinfo_t modeinfo;
 
-int VID_ExtraInitMode (viddef_t *vid, vmode_t *pcurrentmode);
-void VID_ExtraSwapBuffers (viddef_t *vid, vmode_t *pcurrentmode,
-	vrect_t *rects);
-void VID_SetVESAPalette (viddef_t *lvid, vmode_t *pcurrentmode,
-	unsigned char *pal);
-void VGA_BankedBeginDirectRect (viddef_t *lvid, struct vmode_s *pcurrentmode,
-	int x, int y, byte *pbitmap, int width, int height);
-void VGA_BankedEndDirectRect (viddef_t *lvid, struct vmode_s *pcurrentmode,
-	int x, int y, int width, int height);
 qboolean VID_ExtraGetModeInfo(int modenum);
-//to make standalone
-void Sys_Error (char *error, ...);
 
-// FS: New stuff for planar/banked modes
+/* FS: New stuff for planar/banked modes */
 void VID_AddPlanarModes(void);
 void VID_AddBankedModes(void);
-
 
 /*
 ================
@@ -154,9 +132,6 @@ void VID_InitExtra (void)
 	short		*pmodenums;
 	vbeinfoblock_t	*pinfoblock;
 	unsigned long	addr;
-	__dpmi_meminfo	phys_mem_info;
-
-	memset(&vesa_extra, 0, sizeof(vesa_extra_t));
 
 	pinfoblock = (vbeinfoblock_t *) dos_getmemory(sizeof(vbeinfoblock_t));
 	if (!pinfoblock) {
@@ -171,7 +146,7 @@ void VID_InitExtra (void)
 
 	memset(vid_resolutions,0x0,sizeof(vid_resolutions));
 
-	VID_AddPlanarModes(); /* FS */
+	VID_AddPlanarModes(); /* FS: Add 320x240 Mode-X first */
 
 	/* We always have mode 13 VGA */
 	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
@@ -186,7 +161,7 @@ void VID_InitExtra (void)
 
 	if(COM_CheckParm("-vgaonly"))
 	{
-		VID_AddBankedModes(); // FS
+		VID_AddBankedModes(); /* FS: Added */
 		return;	//test for VGA only
 	}
 
@@ -228,110 +203,17 @@ void VID_InitExtra (void)
 // find 8 bit modes until we either run out of space or run out of modes
 	nummodes = 0;
 
-	while ((*pmodenums != -1) && (nummodes < MAX_VESA_MODES))
+	while ((*pmodenums != -1) && (nummodes < MAX_RESOLUTIONS))
 	{
 		if (VID_ExtraGetModeInfo (*pmodenums))
 		{
-			vesa_modes[nummodes].pnext = &vesa_modes[nummodes+1];
-			if (modeinfo.width > 999)
-			{
-				if (modeinfo.height > 999)
-				{
-					sprintf (&names[nummodes][0], "%4dx%4d", modeinfo.width,
-							 modeinfo.height);
-					names[nummodes][9] = 0;
-				}
-				else
-				{
-					sprintf (&names[nummodes][0], "%4dx%3d", modeinfo.width,
-							 modeinfo.height);
-					names[nummodes][8] = 0;
-				}
-			}
-			else
-			{
-				if (modeinfo.height > 999)
-				{
-					sprintf (&names[nummodes][0], "%3dx%4d", modeinfo.width,
-							 modeinfo.height);
-					names[nummodes][8] = 0;
-				}
-				else
-				{
-					sprintf (&names[nummodes][0], "%3dx%3d", modeinfo.width,
-							 modeinfo.height);
-					names[nummodes][7] = 0;
-				}
-			}
-
-			vesa_modes[nummodes].name = &names[nummodes][0];
-			vesa_modes[nummodes].width = modeinfo.width;
-			vesa_modes[nummodes].height = modeinfo.height;
-			vesa_modes[nummodes].aspect =
-					((float)modeinfo.height / (float)modeinfo.width) * (320.0 / 240.0);
-			vesa_modes[nummodes].rowbytes = modeinfo.bytes_per_scanline;
-			vesa_modes[nummodes].planar = 0;
-			vesa_modes[nummodes].pextradata = &vesa_extra[nummodes];
-			//vesa_modes[nummodes].setmode = VID_ExtraInitMode;
-			//vesa_modes[nummodes].swapbuffers = VID_ExtraSwapBuffers;
-			//vesa_modes[nummodes].setpalette = VID_SetVESAPalette;
-
-			if (modeinfo.mode_attributes & LINEAR_FRAME_BUFFER)
-			{
-			// add linear bit to mode for linear modes
-				vesa_extra[nummodes].vesamode = modeinfo.modenum | LINEAR_MODE;
-				vesa_extra[nummodes].pages[0] = 0;
-				vesa_extra[nummodes].pages[1] = modeinfo.pagesize;
-				vesa_extra[nummodes].pages[2] = modeinfo.pagesize * 2;
-				vesa_modes[nummodes].numpages = modeinfo.numpages;
-
-				//vesa_modes[nummodes].begindirectrect = VGA_BeginDirectRect;
-				//vesa_modes[nummodes].enddirectrect = VGA_EndDirectRect;
-
-				phys_mem_info.address = (int)modeinfo.pptr;
-				phys_mem_info.size = 0x400000;
-
-				if (__dpmi_physical_address_mapping(&phys_mem_info))
-					goto NextMode;
-
-				vesa_extra[nummodes].plinearmem =
-						 real2ptr (phys_mem_info.address);
-			}
-			else
-			{
-			// banked at 0xA0000
-				vesa_extra[nummodes].vesamode = modeinfo.modenum;
-				vesa_extra[nummodes].pages[0] = 0;
-				vesa_extra[nummodes].plinearmem =
-						real2ptr(modeinfo.winasegment<<4);
-
-				//vesa_modes[nummodes].begindirectrect = VGA_BankedBeginDirectRect;
-				//vesa_modes[nummodes].enddirectrect = VGA_BankedEndDirectRect;
-				vesa_extra[nummodes].pages[1] = modeinfo.pagesize;
-				vesa_extra[nummodes].pages[2] = modeinfo.pagesize * 2;
-				vesa_modes[nummodes].numpages = modeinfo.numpages;
-			}
-
-			vesa_extra[nummodes].vga_incompatible =
-					modeinfo.mode_attributes & VGA_INCOMPATIBLE;
-
 			nummodes++;
 		}
-NextMode:
 		pmodenums++;
 	}
 
-// add the VESA modes at the start of the mode list (if there are any)
-	if (nummodes)
-	{
-		vesa_modes[nummodes-1].pnext = pvidmodes;
-		pvidmodes = &vesa_modes[0];
-		numvidmodes += nummodes;
-		ppal = (byte *) dos_getmemory(256 * 4);
-	}
-
 	dos_freememory(pinfoblock);
-	VID_AddBankedModes(); // FS: Added banked modes at the end.
+	VID_AddBankedModes(); /* FS: Add banked modes at the end of the video list. */
 }
 
 void VID_AddPlanarModes(void)
@@ -524,12 +406,12 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 
 				if (!(COM_CheckParm("-bankedvga"))) /* FS: FIXME, just add all modes for banked */
 				{
-					vid_resolutions[num_vid_resolutions].isLFB=true; /* FS: Added */
+					vid_resolutions[num_vid_resolutions].isLFB=true;
 				}
 				else
 				{
-					vid_resolutions[num_vid_resolutions].isLFB=false; /* FS: Added */
-					vid_resolutions[num_vid_resolutions].isBanked=true; /* FS: Added */
+					vid_resolutions[num_vid_resolutions].isLFB=false;
+					vid_resolutions[num_vid_resolutions].isBanked=true;
 				}
 				Com_sprintf(vid_resolutions[num_vid_resolutions].menuname, sizeof(vid_resolutions[num_vid_resolutions].menuname), "[VESA %dx%d]",modeinfo.width,modeinfo.height);
 				num_vid_resolutions++;

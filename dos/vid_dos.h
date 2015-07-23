@@ -19,40 +19,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // vid_dos.h: header file for DOS-specific video stuff
 
-typedef struct vmode_s {
-	struct vmode_s	*pnext;
-	char		*name;
-	char		*header;
-	int			width;
-	int			height;
-	float		aspect;
-	int			rowbytes;
-	int			planar;
-	int			numpages;
-	void		*pextradata;
-	int			(*setmode)(viddef_t *vid, struct vmode_s *pcurrentmode);
-	void		(*swapbuffers)(viddef_t *vid, struct vmode_s *pcurrentmode,
-							   vrect_t *rects);
-	void		(*setpalette)(viddef_t *vid, struct vmode_s *pcurrentmode,
-							  unsigned char *palette);
-	void		(*begindirectrect)(viddef_t *vid, struct vmode_s *pcurrentmode,
-								   int x, int y, byte *pbitmap, int width,
-								   int height);
-	void		(*enddirectrect)(viddef_t *vid, struct vmode_s *pcurrentmode,
-								 int x, int y, int width, int height);
-} vmode_t;
-
-typedef struct {
-	int	pages[3];	// either 2 or 3 is valid
-	int	vesamode;	// LINEAR_MODE set if linear mode
-	void	*plinearmem;	// linear address of start of frame buffer
-	qboolean	vga_incompatible;
-} vesa_extra_t;
-
-// FS: Moved this here so we don't have to call extern to places with copy/paste
+/* FS: Moved this here so we don't have to call extern to places with copy/paste */
 #define MAX_RESOLUTIONS 20
 #define VIDNAME_LEN 30
-#define MAX_VESA_MODES			MAX_RESOLUTIONS
 
 typedef struct vid_resolutions_s {
 	int mode;
@@ -60,53 +29,21 @@ typedef struct vid_resolutions_s {
 	int height;
 	int width;
 	void *address;
-	byte *planarAddress; // FS
-	qboolean isLFB; // FS: Added
-	qboolean isBanked; // FS: Added
-	qboolean isPlanar; // FS: Added
+	byte *planarAddress;
+	qboolean isLFB;
+	qboolean isBanked;
+	qboolean isPlanar;
 	char menuname[VIDNAME_LEN];
 } vid_resolutions_t;
+
 extern int num_vid_resolutions;
 extern vid_resolutions_t vid_resolutions[MAX_RESOLUTIONS];
 extern int currentvideomode;
-extern vesa_extra_t	vesa_extra[MAX_VESA_MODES];
-
-// vid_wait settings
-#define VID_WAIT_NONE			0
-#define VID_WAIT_VSYNC			1
-#define VID_WAIT_DISPLAY_ENABLE	2
-
-extern int		numvidmodes;
-extern vmode_t	*pvidmodes;
 
 extern int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes;
 extern byte		*VGA_pagebase;
-extern vmode_t	*VGA_pcurmode;
 
-extern cvar_t	vid_wait;
-extern cvar_t	vid_nopageflip;
-extern cvar_t	_vid_wait_override;
-
-extern unsigned char colormap256[32][256];
-
-extern void	*vid_surfcache;
-extern int	vid_surfcachesize;
-
-void VGA_Init (void);
-void VID_InitVESA (void);
 void VID_InitExtra (void);
-void VGA_WaitVsync (void);
-void VGA_ClearVideoMem (int planar);
-void VGA_SetPalette(viddef_t *vid, vmode_t *pcurrentmode, unsigned char *pal);
-void VGA_SwapBuffersCopy (viddef_t *vid, vmode_t *pcurrentmode,
-	vrect_t *rects);
-qboolean VGA_FreeAndAllocVidbuffer (viddef_t *vid, int allocnewbuffer);
-qboolean VGA_CheckAdequateMem (int width, int height, int rowbytes,
-	int allocnewbuffer);
-void VGA_BeginDirectRect (viddef_t *vid, struct vmode_s *pcurrentmode, int x,
-	int y, byte *pbitmap, int width, int height);
-void VGA_EndDirectRect (viddef_t *vid, struct vmode_s *pcurrentmode, int x,
-	int y, int width, int height);
 void VGA_UpdateLinearScreen (void *srcptr, void *destptr, int width,
 	int height, int srcrowbytes, int destrowbytes);
 
