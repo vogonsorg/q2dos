@@ -28,53 +28,197 @@ static bgTrack_t	s_bgTrack;
 
 static channel_t	*s_streamingChannel;
 
-qboolean		wav_first_init = true;	// First initialization flag
-qboolean		wav_started = false;	// Initialization flag
-wav_status_t	wav_status;		// Status indicator
+static qboolean		wav_first_init = true;	// First initialization flag
+static qboolean		wav_started = false;	// Initialization flag
+static bgm_status_t	trk_status;		// Status indicator
 
-#define			MAX_WAVLIST 512
-char			**wav_filelist;		// List of WAV files
-int				wav_numfiles;		// Number of WAV files
-int				wav_loopcounter;
+#define MAX_WAVLIST 512
+static char		**wav_filelist;		// List of WAV files
+static int			wav_numfiles;		// Number of WAV files
+static int			wav_loopcounter;
 
-cvar_t			*wav_loopcount;
-cvar_t			*wav_ambient_track;
+static cvar_t		*wav_loopcount;
+static cvar_t		*wav_ambient_track;
+
+static void S_WAV_LoadFileList (void);
+static void S_WAV_ParseCmd (void);
+
+
+static int FGetLittleLong (FILE *f)
+{
+	int		v;
+
+	fread(&v, 1, sizeof(v), f);
+
+	return LittleLong(v);
+}
+
+static short FGetLittleShort(FILE *f)
+{
+	short	v;
+
+	fread(&v, 1, sizeof(v), f);
+
+	return LittleShort(v);
+}
+
+static int WAV_ReadChunkInfo(FILE *f, char *name)
+{
+	int len, r;
+
+	name[4] = 0;
+
+	r = fread(name, 1, 4, f);
+	if (r != 4)
+		return -1;
+
+	len = FGetLittleLong(f);
+	if (len < 0)
+	{
+		Com_Printf("WAV: Negative chunk length\n");
+		return -1;
+	}
+
+	return len;
+}
+
+/*
+=================
+WAV_FindRIFFChunk
+
+Returns the length of the data in the chunk, or -1 if not found
+=================
+*/
+static int WAV_FindRIFFChunk(FILE *f, const char *chunk)
+{
+	char	name[5];
+	int		len;
+
+	while ((len = WAV_ReadChunkInfo(f, name)) >= 0)
+	{
+		/* If this is the right chunk, return */
+		if (!strncmp(name, chunk, 4))
+			return len;
+		len = ((len + 1) & ~1);	/* pad by 2 . */
+
+		/* Not the right chunk - skip it */
+		fseek(f, len, SEEK_CUR);
+	}
+
+	return -1;
+}
+
+/*
+=================
+WAV_ReadRIFFHeader
+=================
+*/
+static qboolean WAV_ReadRIFFHeader(const char *name, FILE *file, wavinfo_t *info)
+{
+	char dump[16];
+	int value;
+	int fmtlen = 0;
+
+	if (fread(dump, 1, 12, file) < 12 ||
+	    strncmp(dump, "RIFF", 4) != 0 ||
+	    strncmp(&dump[8], "WAVE", 4) != 0)
+	{
+		Com_Printf("%s is missing RIFF/WAVE chunks\n", name);
+		return false;
+	}
+
+	/* Scan for the format chunk */
+	if ((fmtlen = WAV_FindRIFFChunk(file, "fmt ")) < 0)
+	{
+		Com_Printf("%s is missing fmt chunk\n", name);
+		return false;
+	}
+
+	/* Save the parameters */
+	value = FGetLittleShort(file); /* wav_format */
+	if (value != WAV_FORMAT_PCM)
+	{
+		Com_Printf("%s is not Microsoft PCM format\n", name);
+		return false;
+	}
+
+	info->channels = FGetLittleShort(file);
+	info->rate = FGetLittleLong(file);
+	FGetLittleLong(file);
+	FGetLittleShort(file);
+	value = FGetLittleShort(file); /* bits */
+
+	if (value != 8 && value != 16)
+	{
+		Com_Printf("%s is not 8 or 16 bit\n", name);
+		return false;
+	}
+
+	info->width = value / 8;
+
+	/* Skip the rest of the format chunk if required */
+	if (fmtlen > 16)
+	{
+		fmtlen -= 16;
+		fseek(file, fmtlen, SEEK_CUR);
+	}
+
+	/* Scan for the data chunk */
+	if ((value = WAV_FindRIFFChunk(file, "data")) < 0) /* size */
+	{
+		Com_Printf("%s is missing data chunk\n", name);
+		return false;
+	}
+
+	info->dataofs = ftell(file);
+	fseek(file, 0, SEEK_END);
+	if (info->dataofs + value > ftell(file))
+	{
+		Com_Printf("%s data size mismatch\n", name);
+		return false;
+	}
+
+	if (info->channels != 1 && info->channels != 2)
+	{
+		Com_Printf("Unsupported number of channels %d in %s\n",
+						info->channels, name);
+		return false;
+	}
+	info->samples = (value / info->width) / info->channels;
+	if (info->samples == 0)
+	{
+		Com_Printf("%s has zero samples\n", name);
+		return false;
+	}
+
+//	Com_Printf("Rate: %i, Width: %i, CH: %i. DataOffset: %i, Samples: %i.\n",
+//		    musicWavInfo.rate, musicWavInfo.width, musicWavInfo.channels,
+//		    musicWavInfo.dataofs, musicWavInfo.samples);
+	fseek(file, info->dataofs, SEEK_SET);
+	return true;
+}
 
 static qboolean S_OpenWAVBackgroundTrack (char *name, bgTrack_t *track)
 {
-	char	filename[1024];
+	char	filename[MAX_OSPATH];
 	char	*path = NULL;
-	int		streamWavLen;
 
 //	Com_Printf("Opening background track: %s\n", name);
-
 	do
 	{
 		path = FS_NextPath( path );
 		Com_sprintf( filename, sizeof(filename), "%s/%s", path, name );
-		streamWavLen = FS_FOpenFile(name, &track->file);
-		if ( streamWavLen != 0)
+		if ((track->file = fopen(filename, "rb")) != NULL)
 			break;
-	}
-	while ( path );
+	} while ( path );
 
 	if (!track->file)
 	{
-		Com_Printf("S_OpenWAVBackgroundTrack: couldn't find %s\n", name);
+		Com_Printf("Couldn't find %s\n", name);
 		return false;
 	}
 
-	S_StreamWav_GetInfo(name, streamWavLen); /* FS: Get the WAV info using Q2's existing functions */
-
-//	Com_Printf("Getting info for background track\n");
-
-	if (musicWavInfo.channels != 1 && musicWavInfo.channels != 2)
-	{
-		Com_Printf("S_OpenWAVBackgroundTrack: only mono and stereo WAV files supported (%s)\n", name);
-		return false;
-	}
-
-	return true;
+	return WAV_ReadRIFFHeader(name, track->file, &musicWavInfo);
 }
 
 static void S_CloseWAVBackgroundTrack(void)
@@ -82,7 +226,7 @@ static void S_CloseWAVBackgroundTrack(void)
 	if(!s_bgTrack.file)
 		return;
 
-	FS_FCloseFile(s_bgTrack.file);
+	fclose(s_bgTrack.file);
 	s_bgTrack.file = NULL;
 }
 
@@ -104,7 +248,6 @@ void S_StreamWAVBackgroundTrack(void)
 
 	scale = (float)musicWavInfo.rate / dma.speed;
 	maxSamples = sizeof(musicWavData) / musicWavInfo.channels / musicWavInfo.width;
-
 //	Com_Printf("Scale: %f.  Max Samples: %i\n", scale, maxSamples);
 
 	while (1)
@@ -119,7 +262,7 @@ void S_StreamWAVBackgroundTrack(void)
 		total = 0;
 		while (total < maxRead)
 		{
-			read = FS_FRead(musicWavData, maxRead, 1, s_bgTrack.file);
+			read = fread(musicWavData, 1, maxRead, s_bgTrack.file);
 			if (!read)
 			{	// End of file
 				if (!s_bgTrack.looping)
@@ -155,7 +298,7 @@ void S_StreamWAVBackgroundTrack(void)
 				}
 
 				// Restart the track, skipping over the header
-				FS_Seek(s_bgTrack.file, musicWavInfo.dataofs, FS_SEEK_SET);
+				fseek(s_bgTrack.file, musicWavInfo.dataofs, SEEK_SET);
 			}
 
 			total+= read;
@@ -168,7 +311,7 @@ void S_StreamWAVBackgroundTrack(void)
 void S_UpdateWavTrack(void)
 {
 	// stop music if paused
-	if (wav_status == WAV_PLAY)// && !cl_paused->value)
+	if (trk_status == BGM_PLAY)// && !cl_paused->value)
 		S_StreamWAVBackgroundTrack();
 }
 
@@ -197,7 +340,7 @@ void S_StartWAVBackgroundTrack (const char *introTrack, const char *loopTrack)
 		return;
 	}
 
-	wav_status = WAV_PLAY;
+	trk_status = BGM_PLAY;
 
 	S_StreamWAVBackgroundTrack();
 }
@@ -205,14 +348,14 @@ void S_StartWAVBackgroundTrack (const char *introTrack, const char *loopTrack)
 /* FS: Called from S_StopBackgroundTrack in snd_dma.c so OGG and WAV won't clash over Channel 0 */
 void S_StopWAVBackgroundTrack (void)
 {
-	if (!wav_started) // was sound_started
+	if (!wav_started)
 		return;
 
 	S_StopWAVStreaming ();
 
 	S_CloseWAVBackgroundTrack();
 
-	wav_status = WAV_STOP;
+	trk_status = BGM_STOP;
 
 	memset(&musicWavInfo, 0, sizeof(wavinfo_t));
 	memset(&s_bgTrack, 0, sizeof(bgTrack_t));
@@ -220,7 +363,7 @@ void S_StopWAVBackgroundTrack (void)
 
 void S_StartWAVStreaming (void)
 {
-	if (!wav_started) // was sound_started
+	if (!wav_started)
 		return;
 
 	if (s_streamingChannel)
@@ -235,7 +378,7 @@ void S_StartWAVStreaming (void)
 
 void S_StopWAVStreaming (void)
 {
-	if (!wav_started) // was sound_started
+	if (!wav_started)
 		return;
 
 	if (!s_streamingChannel)
@@ -266,7 +409,7 @@ void S_WAV_Init (void)
 
 	// Initialize variables
 	if (wav_first_init) {
-		wav_status = WAV_STOP;
+		trk_status = BGM_STOP;
 		wav_first_init = false;
 	}
 
@@ -300,7 +443,7 @@ void S_WAV_Restart (void)
 	S_WAV_Init ();
 }
 
-void S_WAV_LoadFileList (void)
+static void S_WAV_LoadFileList (void)
 {
 	char	*p, *path = NULL;
 	char	**list;			// List of .ogg files
@@ -314,7 +457,7 @@ void S_WAV_LoadFileList (void)
 
 	// Set search path
 	path = FS_NextPath(path);
-	while (path) 
+	while (path)
 	{
 		// Knightmare- catch repeated paths
 		if ( strlen(lastPath) > 0 && !strcmp (path, lastPath) ) {
@@ -335,13 +478,9 @@ void S_WAV_LoadFileList (void)
 
 			if (!strstr(p, ".wav"))
 				continue;
-		//	if (!S_OGG_Check(p))
-		//		continue;
 			if (!FS_ItemInList(p, wav_numfiles, wav_filelist)) // check if already in list
 			{
-				wav_filelist[wav_numfiles] = malloc(strlen(p)+1);
-				sprintf(wav_filelist[wav_numfiles], "%s", p);
-				wav_filelist[wav_numfiles][strlen(p)] = '\0'; // FS: Compiler warning, was using %s\0 in the sprintf
+				wav_filelist[wav_numfiles] = strdup(p);
 				wav_numfiles++;
 			}
 		}
@@ -353,7 +492,7 @@ void S_WAV_LoadFileList (void)
 	}
 }
 
-void S_WAV_PlayCmd (void)
+static void S_WAV_PlayCmd (void)
 {
 	char	name[MAX_QPATH];
 
@@ -365,9 +504,9 @@ void S_WAV_PlayCmd (void)
 	S_StartWAVBackgroundTrack (name, name);
 }
 
-void S_WAV_StatusCmd (void)
+static void S_WAV_StatusCmd (void)
 {
-	char	*trackName;
+	const char	*trackName;
 
 	if (s_bgTrack.ambient_looping)
 		trackName = s_bgTrack.ambientName;
@@ -376,22 +515,21 @@ void S_WAV_StatusCmd (void)
 	else
 		trackName = s_bgTrack.introName;
 
-
-	switch (wav_status)
+	switch (trk_status)
 	{
-		case WAV_PLAY:
-			Com_Printf("Playing file %s.\n", trackName);
-			break;
-		case WAV_PAUSE:
-			Com_Printf("Paused file %s.\n", trackName);
-			break;
-		case WAV_STOP:
-			Com_Printf("Stopped.\n");
-			break;
+	case BGM_PLAY:
+		Com_Printf("Playing file %s.\n", trackName);
+		break;
+	case BGM_PAUSE:
+		Com_Printf("Paused file %s.\n", trackName);
+		break;
+	case BGM_STOP:
+		Com_Printf("Stopped.\n");
+		break;
 	}
 }
 
-void S_WAV_ListCmd (void)
+static void S_WAV_ListCmd (void)
 {
 	int i;
 
@@ -406,18 +544,7 @@ void S_WAV_ListCmd (void)
 	Com_Printf("%d WAV files.\n", wav_numfiles);
 }
 
-void S_StreamWav_GetInfo(char *fileName, int fileLen)
-{
-	byte data[1024]; /* FS: It appears ~44 bytes in is where the data begins. */
-
-	FS_Read(data, sizeof(data), s_bgTrack.file);
-	musicWavInfo = GetWavinfo(fileName, data, sizeof(data));
-	FS_Seek(s_bgTrack.file, musicWavInfo.dataofs, FS_SEEK_SET);
-
-//	Com_Printf("Rate: %i.  Data Offset: %i. Width: %i.  Channels: %i.\n", musicWavInfo.rate, musicWavInfo.dataofs, musicWavInfo.width, musicWavInfo.channels);
-}
-
-void S_WAV_ParseCmd (void)
+static void S_WAV_ParseCmd (void)
 {
 	char	*command;
 
@@ -434,14 +561,14 @@ void S_WAV_ParseCmd (void)
 	}
 
 	if (Q_strcasecmp(command, "pause") == 0) {
-		if (wav_status == WAV_PLAY)
-			wav_status = WAV_PAUSE;
+		if (trk_status == BGM_PLAY)
+			trk_status = BGM_PAUSE;
 		return;
 	}
 
 	if (Q_strcasecmp(command, "resume") == 0) {
-		if (wav_status == WAV_PAUSE)
-			wav_status = WAV_PLAY;
+		if (trk_status == BGM_PAUSE)
+			trk_status = BGM_PLAY;
 		return;
 	}
 
