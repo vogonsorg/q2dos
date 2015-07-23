@@ -2885,7 +2885,7 @@ void ClientEndServerFrame (edict_t *ent)
 			gi.dprintf(DEVELOPER_MSG_GAME, "goal_node: %i ", e->ai->goal_node);
 
 		gi.dprintf(DEVELOPER_MSG_GAME, "state:%i \n", e->ai->state);
-	}
+	}*/
 
 //	if (g_edicts[globals.num_edicts].classname)
 //		gi.dprintf(DEVELOPER_MSG_GAME, "%i %s \n", globals.num_edicts, "X");// g_edicts[globals.num_edicts].classname);
