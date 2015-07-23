@@ -186,6 +186,10 @@ void Cmd_SexPistols_f(edict_t *ent)
 		safe_cprintf(ent, PRINT_HIGH, "%s\n", "You have the Sex Pistols!");
 }
 
+static void Cmd_Scope2_f(edict_t *e) {
+	Cmd_Scope_f(e);
+}
+
 g_cmds_t id_GameCmds[NUM_ID_CMDS] = // remember to set back to NUM_ID_COMDS
 {
 	{"use",			1,	Cmd_Use_f},
@@ -223,7 +227,7 @@ g_cmds_t id_GameCmds[NUM_ID_CMDS] = // remember to set back to NUM_ID_COMDS
 //	{"feed_ammo",	1,	Feed_Ammo},
 	{"reload",		1,	(void *)Cmd_Reload_f},
 //	{"begin_mission",1,	EndObserverMode},
-	{"scope",		2,	Cmd_Scope_f},
+	{"scope",		2,	Cmd_Scope2_f},
 	{"shout",		3,	Cmd_Shout_f},
 	{"aliciamode",	1,	Cmd_AliciaMode_f},
 	{"iwannabeanarchy",1,Cmd_SexPistols_f},
