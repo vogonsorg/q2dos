@@ -2323,7 +2323,6 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0, qboolean saved)
 {
 	int			i,j, offset_of_text;
 	edict_t		*entR = NULL;
-	//edict_t	*entG = NULL;
 	char		*p;
 	char		text[2048];
 	gclient_t	*cl;
@@ -2348,12 +2347,11 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0, qboolean saved)
 		if (gi.argc () < 2 && !arg0)
 			return;
 
-	/*	if (ent->leave_limbo_time && level.time < ent->leave_limbo_time)
+		/*if (ent->leave_limbo_time && level.time < ent->leave_limbo_time)
 		{
 				safe_cprintf(ent, PRINT_HIGH, "You just died!  You can't talk for %i more seconds\n", 1+(int)(ent->leave_limbo_time - level.time));
 				return;
-		}
-	*/
+		}*/
 
 		if (team)
 			Com_sprintf (text, sizeof(text), "(Team)%s: ", ent->client->pers.netname);
@@ -2448,8 +2446,10 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0, qboolean saved)
 			if (entR->client->resp.team_on	&&
 				entR->client->resp.mos		&&
 				entR->client->resp.team_on == ent->client->resp.team_on)
-			{safe_cprintf(entR, PRINT_HIGH, "%s", teamname);
-			safe_cprintf(entR, PRINT_CHAT, "%s", text);}
+			{
+				safe_cprintf(entR, PRINT_HIGH, "%s", teamname);
+				safe_cprintf(entR, PRINT_CHAT, "%s", text);
+			}
 		}
 	}
 	else //say to everyone
@@ -2467,7 +2467,7 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0, qboolean saved)
 		}
 
 		//save a random chat message for stats page
-		if (!saved && strlen(p)>9 && rand()%25 == 1 || (!strcmp (ent->client->pers.stat_chat , "") && rand()% 3 ==1))
+		if (!saved && strlen(p)>9 && rand()%25 == 1 || (!ent->client->pers.stat_chat[0] && rand()% 3 ==1))
 		{
 			Com_sprintf (ent->client->pers.stat_chat, sizeof(ent->client->pers.stat_chat), "%s", p);
 		}
