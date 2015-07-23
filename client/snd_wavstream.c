@@ -27,7 +27,6 @@ static wavinfo_t	musicWavInfo;
 static bgTrack_t	s_bgTrack;
 
 static channel_t	*s_streamingChannel;
-static int			startWavTime;
 
 qboolean		wav_first_init = true;	// First initialization flag
 qboolean		wav_started = false;	// Initialization flag

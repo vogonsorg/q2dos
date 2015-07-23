@@ -73,16 +73,12 @@ void SCR_LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *h
 
 	*pic = NULL;
 
-	/*
-	/* load the file
-	*/
+	/* load the file */
 	len = FS_LoadFile (filename, (void **)&raw);
 	if (!raw)
 		return;	// Com_Printf ("Bad pcx file %s\n", filename);
 
-	/*
-	/* parse the PCX file
-	*/
+	/* parse the PCX file */
 	pcx = (pcx_t *)raw;
 	raw = &pcx->data;
 

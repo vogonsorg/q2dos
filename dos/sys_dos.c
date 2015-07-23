@@ -20,7 +20,7 @@
 #include <sys/nearptr.h>
 #include <conio.h>
 
-int _crt0_startup_flags = _CRT0_FLAG_UNIX_SBRK; // FS: Fake Mem Fix (QIP)
+int _crt0_startup_flags = _CRT0_FLAG_NONMOVE_SBRK; // FS: Fake Mem Fix (QIP)
 
 #include "dosisms.h"
 #include "../qcommon/qcommon.h"

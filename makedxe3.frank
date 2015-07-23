@@ -18,7 +18,7 @@ USE_CDAUDIO=1
 USE_ASM=1
 
 CC = gcc
-CFLAGS = -g -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
+CFLAGS = -g -Wall -Werror -O2 -fno-strict-aliasing -fomit-frame-pointer
 CPPFLAGS = -DREF_HARD_LINKED -DCLIENT_SPLIT_NETFRAME
 LDFLAGS =
 

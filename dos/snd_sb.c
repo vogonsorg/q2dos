@@ -458,7 +458,6 @@ qboolean BLASTER_Init(void)
 	dma.samplepos = 0;
 	dma.submission_chunk = 1;
 	dma.buffer = (unsigned char *) dma_buffer;
-	dma.samples = size/(dma.samplebits/8);
 
 	StartDMA();
 	StartSB();
