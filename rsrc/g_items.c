@@ -1930,13 +1930,6 @@ SpawnItem(edict_t *ent, gitem_t *item)
 		return;
 	}
 
-	if ((!strcmp(ent->classname, "ammo_disruptor")) ||
-		(!strcmp(ent->classname, "weapon_disintegrator")))
-	{
-		G_FreeEdict(ent);
-		return;
-	}
-
 	if (ent->spawnflags > 1)
 	{
 		if (strcmp(ent->classname, "key_power_cube") != 0)
@@ -2571,7 +2564,7 @@ gitem_t itemlist[] = {
 		0,
 		1,
 		"Rounds",
-		IT_NOT_GIVEABLE,
+		IT_WEAPON | IT_STAY_COOP,
 		WEAP_DISRUPTOR,
 		NULL,
 		1,
@@ -2790,7 +2783,7 @@ gitem_t itemlist[] = {
 		3,
 		15,
 		NULL,
-		IT_NOT_GIVEABLE,
+		IT_AMMO,
 		0,
 		NULL,
 		0,
