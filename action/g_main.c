@@ -262,7 +262,7 @@ extern void UnBan_TeamKillers (void);
 void EndDMLevel (void)
 {
         edict_t *ent;
-        char *nextmapname = NULL;
+//      char *nextmapname = NULL;
 // ACEBOT ADD
 		ACECM_Store();
 // ACEBOT END
@@ -271,7 +271,8 @@ void EndDMLevel (void)
         {
                 ent = G_Spawn ();
                 ent->classname = "target_changelevel";
-                nextmapname = ent->map = level.mapname;
+        //      nextmapname = 
+                ent->map = level.mapname;
         }
 //FIREBLADE
                 else if (!actionmaps->value || num_maps < 1)
@@ -281,7 +282,8 @@ void EndDMLevel (void)
                 {       // go to a specific map
                         ent = G_Spawn ();
                         ent->classname = "target_changelevel";
-                        nextmapname = ent->map = level.nextmap;
+                //      nextmapname = 
+                        ent->map = level.nextmap;
                 }
                 else
                 {       // search for a changelevel
@@ -291,7 +293,8 @@ void EndDMLevel (void)
                                 // so create a fake ent that goes back to the same level
                                 ent = G_Spawn ();
                                 ent->classname = "target_changelevel";
-                                nextmapname = ent->map = level.mapname;
+                        //      nextmapname = 
+                                ent->map = level.mapname;
                         }
                 }
         }
@@ -304,7 +307,8 @@ void EndDMLevel (void)
                 ent = G_Spawn();
                 ent->classname = "target_changelevel";
                 Com_sprintf(level.nextmap, sizeof(level.nextmap), "%s", map_rotation[cur_map]);
-                nextmapname = ent->map = level.nextmap;
+        //      nextmapname = 
+                ent->map = level.nextmap;
         }
 
         if (level.nextmap != NULL)

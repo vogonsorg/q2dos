@@ -926,10 +926,9 @@ void SP_func_explosive (edict_t *self)
 Large exploding box.  You can override its mass (100),
 health (80), and dmg (150).
 */
-
 void barrel_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
-
 {
+#if 0
 	float	ratio;
 	vec3_t	v;
 
@@ -938,7 +937,8 @@ void barrel_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *s
 
 	ratio = (float)other->mass / (float)self->mass;
 	VectorSubtract (self->s.origin, other->s.origin, v);
-//	M_walkmove (self, vectoyaw(v), 20 * ratio * FRAMETIME);
+	M_walkmove (self, vectoyaw(v), 20 * ratio * FRAMETIME);
+#endif
 }
 
 void barrel_explode (edict_t *self)

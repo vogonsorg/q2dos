@@ -1098,7 +1098,6 @@ void A_Scoreboard(edict_t *ent)
 void A_ScoreboardMessage (edict_t *ent, edict_t *killer)
 {
         char        string[1400], damage[50];
-        gclient_t   *cl;
         edict_t     *cl_ent;
         int         maxsize = 1000, i, j, k;
 
@@ -1215,7 +1214,6 @@ void A_ScoreboardMessage (edict_t *ent, edict_t *killer)
         
                         if (i < total[TEAM1] && stoppedat[TEAM1] == -1)  // print next team 1 member...
                         {
-                                cl = &game.clients[sorted[TEAM1][i]];
                                 cl_ent = g_edicts + 1 + sorted[TEAM1][i];
                                 if (cl_ent->solid != SOLID_NOT &&
                                         cl_ent->deadflag != DEAD_DEAD)
@@ -1233,7 +1231,6 @@ void A_ScoreboardMessage (edict_t *ent, edict_t *killer)
         
                         if (i < total[TEAM2] && stoppedat[TEAM2] == -1)  // print next team 2 member...
                         {
-                                cl = &game.clients[sorted[TEAM2][i]];
                                 cl_ent = g_edicts + 1 + sorted[TEAM2][i];
                                 if (cl_ent->solid != SOLID_NOT &&
                                         cl_ent->deadflag != DEAD_DEAD)

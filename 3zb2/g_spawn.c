@@ -781,19 +781,16 @@ G_FindRouteLink
 void G_FindRouteLink(edict_t *ent)
 {
 	trace_t	rs_trace;
-
-	gitem_t		*item;
+	//gitem_t		*item;
 	qboolean	tpbool;
-
 	int i,j,k,l,total = 0;
 	vec3_t	v,vv;
 	float	x;
 
-
 	//Šø‚ð”­¶‚³‚¹‚é
 	if(!ctf->value && zigmode->value == 1)
 	{
-		item = FindItem("Zig Flag");
+		//item = FindItem("Zig Flag");
 		SelectSpawnPoint (ent, v, vv);
 	//	VectorCopy (v, ent->s.origin);
 		if(ZIGDrop_Flag(ent,zflag_item))
@@ -803,7 +800,7 @@ void G_FindRouteLink(edict_t *ent)
 		//ZIGDrop_Flag(ent,item);
 		zigflag_spawn = 2;
 	}
-gi.dprintf(DEVELOPER_MSG_GAME, "Linking routes...\n");
+	gi.dprintf(DEVELOPER_MSG_GAME, "Linking routes...\n");
 
 	//get JumpMax
 	if(JumpMax == 0)
@@ -835,7 +832,7 @@ gi.dprintf(DEVELOPER_MSG_GAME, "Linking routes...\n");
 				if(fabs(v[2]) > 20 || VectorLength(v) > 64)
 				{
 					if(!RTJump_Chk(Route[i].Pt,Route[j].Pt))
-									continue;
+						continue;
 				}
 
 				tpbool = false;
@@ -899,7 +896,7 @@ gi.dprintf(DEVELOPER_MSG_GAME, "Linking routes...\n");
 		}
 	}
 
-gi.dprintf(DEVELOPER_MSG_GAME, "Total %i linking done.\n",total);
+	gi.dprintf(DEVELOPER_MSG_GAME, "Total %i linking done.\n",total);
 	G_FreeEdict (ent);
 }
 

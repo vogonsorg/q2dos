@@ -133,7 +133,7 @@ void P_DamageFeedback (edict_t *player)
     client->damage_alpha = 0.2;
   if (client->damage_alpha > 0.6)
     client->damage_alpha = 0.6;             // don't go too saturated
-                
+
   // the color of the blend will vary based on how much was absorbed
   // by different armors
   VectorClear (v);
@@ -161,10 +161,10 @@ void P_DamageFeedback (edict_t *player)
 
     VectorSubtract (client->damage_from, player->s.origin, v);
     VectorNormalize (v);
-                
+
     side = DotProduct (v, right);
     client->v_dmg_roll = kick*side*0.3;
-                
+
     side = -DotProduct (v, forward);
     client->v_dmg_pitch = kick*side*0.3;
 
@@ -179,8 +179,6 @@ void P_DamageFeedback (edict_t *player)
   client->damage_parmor = 0;
   client->damage_knockback = 0;
 }
-
-
 
 
 /*
@@ -251,7 +249,7 @@ void SV_CalcViewOffset (edict_t *ent)
 
     delta = DotProduct (ent->velocity, forward);
     angles[PITCH] += delta*run_pitch->value;
-                
+
     delta = DotProduct (ent->velocity, right);
     angles[ROLL] += delta*run_roll->value;
 
@@ -400,8 +398,7 @@ void SV_CalcBlend (edict_t *ent)
   int             contents;
   vec3_t  vieworg;
   int             remaining;
-        
-        
+
   // enable ir vision if appropriate
   if ( ir->value )
   {
@@ -412,7 +409,6 @@ void SV_CalcBlend (edict_t *ent)
          ent->client->chase_mode == 2 &&
          ent->client->chase_target->client->resp.ir == 0 &&
          ent->client->chase_target->client->pers.inventory[ITEM_INDEX(FindItem(BAND_NAME))]))
-                     
     {
       ent->client->ps.rdflags |= RDF_IRGOGGLES;
     }
@@ -420,14 +416,11 @@ void SV_CalcBlend (edict_t *ent)
     {
       ent->client->ps.rdflags &= ~RDF_IRGOGGLES;
     }
-                
   }
-        
-        
-        
+
   ent->client->ps.blend[0] = ent->client->ps.blend[1] = 
     ent->client->ps.blend[2] = ent->client->ps.blend[3] = 0;
-        
+
   // add for contents
   VectorAdd (ent->s.origin, ent->client->ps.viewoffset, vieworg);
   contents = gi.pointcontents (vieworg);
@@ -435,14 +428,14 @@ void SV_CalcBlend (edict_t *ent)
     ent->client->ps.rdflags |= RDF_UNDERWATER;
   else
     ent->client->ps.rdflags &= ~RDF_UNDERWATER;
-        
+
   if (contents & (CONTENTS_SOLID|CONTENTS_LAVA))
     SV_AddBlend (1.0, 0.3, 0.0, 0.6, ent->client->ps.blend);
   else if (contents & CONTENTS_SLIME)
     SV_AddBlend (0.0, 0.1, 0.05, 0.6, ent->client->ps.blend);
   else if (contents & CONTENTS_WATER)
     SV_AddBlend (0.5, 0.3, 0.2, 0.4, ent->client->ps.blend);
-        
+
   // add for powerups
   if (ent->client->quad_framenum > level.framenum)
   {
@@ -508,7 +501,7 @@ void P_FallingDamage (edict_t *ent)
   int             damage;
   vec3_t  dir;
   gitem_t* item;
-        
+
   if (teamplay->value)
   {
     if (lights_camera_action)
@@ -573,7 +566,7 @@ void P_FallingDamage (edict_t *ent)
         ent->s.event = EV_FALLFAR;
     }
     ent->pain_debounce_time = level.time;   // no normal pain sound
-                
+
     damage = (int)(((delta-30)/2));
     if (damage < 1)
       damage = 1;
@@ -588,7 +581,7 @@ void P_FallingDamage (edict_t *ent)
   }
   //zucc added check for slippers, this is just another noise
   else if ( !(ent->client->pers.inventory[ITEM_INDEX(item)]) )
-  {       
+  {
     ent->s.event = EV_FALLSHORT;
     return;
   }
@@ -828,7 +821,7 @@ G_SetClientEvent
 void G_SetClientEvent (edict_t *ent)
 {
   gitem_t* item;
-        
+
   item = FindItem(SLIP_NAME);
 
   if (ent->s.event)
@@ -985,20 +978,16 @@ void G_SetClientFrame (edict_t *ent)
 }
 
 
-
-
-
 void Do_Bleeding( edict_t *ent )
 {
   int damage;
   int temp;
-  vec3_t norm;
-  VectorSet(norm, 0.0, 0.0, 0.0 );
+
   if ( !(ent->client->bleeding) || (ent->health <= 0)  )
   {
     return;
   }
-        
+
   temp = (int)(ent->client->bleeding * .2);
   ent->client->bleeding -= temp;
   if ( temp <= 0 )
@@ -1030,14 +1019,11 @@ void Do_Bleeding( edict_t *ent )
       VectorAdd(ent->client->bleedloc_offset, ent->absmax, pos);
       //safe_cprintf(ent, PRINT_HIGH, "Bleeding now.\n");
       EjectBlooder(ent, pos, pos);
-                        
+
       // do bleeding
 
     }
-                                                
   }
-                
-                
 }
 
 
@@ -1050,13 +1036,11 @@ int canFire( edict_t* ent )
         {
         case MK23_NUM:
                 {
-                        
                         if ( ent->client->mk23_rds > 0 )
                         {
                                 result = 1;
                         }
                         break;
-                        
                 }
         case MP5_NUM:
                 {
@@ -1106,7 +1090,6 @@ int canFire( edict_t* ent )
                         }
                         break;
                 }
-                
         default:
                 result = 0;
         }

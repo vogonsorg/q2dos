@@ -1011,7 +1011,7 @@ int Bot_moveT ( edict_t *ent,float ryaw,vec3_t pos,float dist,float *bottom)
 	else VectorSet (vv,16,16,3);
 
 	if(0/*!(ent->client->ps.pmove.pm_flags & PMF_DUCKED)
-		&& (ent->client->zc.n_duckedtime < FRAMETIME * 10 /*&& !ent->client->zc.route_trace)*/) trmax[2] = 31;
+		&& (ent->client->zc.n_duckedtime < FRAMETIME * 10 *//*&& !ent->client->zc.route_trace)*/) trmax[2] = 31;
 //	else if(ent->waterlevel && !ent->groundentity) trmax[2] = 32;
 	else if(ent->client->zc.route_trace
 		&& !(ent->client->ps.pmove.pm_flags & PMF_DUCKED)
@@ -1204,8 +1204,7 @@ int Bot_Watermove ( edict_t *ent,vec3_t pos,float dist,float upd)
 	trace_t		rs_trace;
 	vec3_t		trmin,trmax,touchmin;
 	float		i,j;
-
-	float		max,vec;
+	float		vec;
 
 	VectorCopy(ent->s.origin,trmax);
 
@@ -1228,9 +1227,8 @@ int Bot_Watermove ( edict_t *ent,vec3_t pos,float dist,float upd)
 
 	VectorCopy(ent->s.origin,trmin);
 	trmin[2] += upd;
-	
+
 	vec = -1;
-	max = 0;
 	for(i = 0;i < 360; i += 10)
 	{
 		if(i && upd > -13 && upd < 0/*13*/) break;
@@ -1249,7 +1247,7 @@ int Bot_Watermove ( edict_t *ent,vec3_t pos,float dist,float upd)
 		VectorAdd(trmin,touchmin,trmax);
 		rs_trace = gi.trace (trmax/*ent->s.origin*/, ent->mins, ent->maxs, trmin,ent, MASK_BOTSOLIDX);
 
-//		yaw = VectorLength(trmax); 
+//		yaw = VectorLength(trmax);
 		if(!rs_trace.allsolid && !rs_trace.startsolid )
 		{
 			VectorAdd(rs_trace.endpos,touchmin,trmax);
@@ -1862,12 +1860,10 @@ JMPCHK:
 
 qboolean TargetJump(edict_t *ent,vec3_t tpos)
 {
-	zgcl_t	*zc;
 	float	x,l,grav,vel,ypos,yori;
 	vec3_t	v,vv;
 	int		mf = false;
 
-	zc = &ent->client->zc;
 	grav = ent->gravity * sv_gravity->value * FRAMETIME; 
 
 	vel = ent->velocity[2] + VEL_BOT_JUMP;
@@ -1907,7 +1903,7 @@ qboolean TargetJump(edict_t *ent,vec3_t tpos)
 				}
 			}
 		}
-	}	
+	}
 	VectorCopy(v,vv);
 	vv[2] = 0;
 
@@ -1922,21 +1918,19 @@ qboolean TargetJump(edict_t *ent,vec3_t tpos)
 		gi.sound(ent, CHAN_VOICE, gi.soundindex("*jump1.wav"), 1, ATTN_NORM, 0);
 		PlayerNoise(ent, ent->s.origin, PNOISE_SELF);	//pon
 		Set_BotAnim(ent,ANIM_JUMP,FRAME_jump1-1,FRAME_jump6);
-		return true;							
+		return true;
 	}
 	return false;
 }
 
 qboolean TargetJump_Turbo(edict_t *ent,vec3_t tpos)
 {
-	zgcl_t	*zc;
 	float	x,l,grav,vel,ypos,yori;
 	vec3_t	v,vv;
 	int		mf = false;
 	float	jvel;
 
-	zc = &ent->client->zc;
-	grav = ent->gravity * sv_gravity->value * FRAMETIME; 
+	grav = ent->gravity * sv_gravity->value * FRAMETIME;
 
 	vel = ent->velocity[2] + VEL_BOT_JUMP;
 
@@ -2005,13 +1999,11 @@ qboolean TargetJump_Turbo(edict_t *ent,vec3_t tpos)
 }
 qboolean TargetJump_Chk(edict_t *ent,vec3_t tpos,float defvel)
 {
-	zgcl_t	*zc;
 	float	x,l,grav,vel,ypos,yori;
 	vec3_t	v,vv;
 	int		mf = false;
 
-	zc = &ent->client->zc;
-	grav = ent->gravity * sv_gravity->value * FRAMETIME; 
+	grav = ent->gravity * sv_gravity->value * FRAMETIME;
 
 	vel = defvel + VEL_BOT_JUMP;
 	yori = ent->s.origin[2];
@@ -2299,7 +2291,8 @@ void Bots_Move_NORM (edict_t *ent)
 	edict_t		*it_ent;
 	gitem_t		*it;
 
-	edict_t		*front,*left,*right,*e;
+//	edict_t		*front,*left,*right;
+	edict_t		*e;
 
 	char		*string;
 
@@ -3816,7 +3809,7 @@ gi.bprintf(PRINT_HIGH,"OFF 10\n");
 //						else if(zc->waterstate == WAS_IN) k = true;
 
 						if(ent->groundentity /*|| ent->waterlevel ) &&  
-							/*temppos[2] < 32 || zc->waterstate != WAS_IN)*/ || ent->waterlevel/*zc->waterstate*/ )
+							temppos[2] < 32 || zc->waterstate != WAS_IN)*/ || ent->waterlevel/*zc->waterstate*/ )
 						{
 							k = false;
 							yaw = temppos[2];
@@ -4994,12 +4987,12 @@ GOMOVE:
 				else if(bottom <= f3 &&(bottom >= f1 || /*zc->waterstate*/ent->waterlevel /* 2*/)) 
 				{
 //					ent->client->anim_priority = ANIM_BASIC;
-					if(bottom < 0 && !zc->waterstate/*(ent->waterlevel && !zc->waterstate/*ent->waterlevel < 2)*/)
+					if(bottom < 0 && !zc->waterstate/*(ent->waterlevel && !zc->waterstate*//*ent->waterlevel < 2)*/)
 					{
 						f2 = FRAMETIME * (ent->velocity[2] - ent->gravity * sv_gravity->value * FRAMETIME);
 						if(bottom >= f2 && ent->velocity[2] < 0/*20*/) temppos[2] += bottom;
 						else temppos[2] += f2;//20;
-					}		
+					}
 					VectorCopy(temppos,ent->s.origin);
 					if(f1 > BOTTOM_LIMIT) ent->moveinfo.speed = 0.25;
 					if(j != true)
@@ -5095,8 +5088,8 @@ GOMOVE:
 				else if(bottom <= f3 && (bottom >= f1 || ent->waterlevel /* 2zc->waterstate*/)) 
 				{
 					//ent->client->anim_priority = ANIM_BASIC;
-					if(bottom < 0 && !zc->waterstate/*(ent->waterlevel && !zc->waterstate/*ent->waterlevel < 2)*/)
-					{					
+					if(bottom < 0 && !zc->waterstate/*(ent->waterlevel && !zc->waterstate*//*ent->waterlevel < 2)*/)
+					{
 //gi.bprintf(PRINT_HIGH,"ponko\n");
 						f2 = FRAMETIME * (ent->velocity[2] - ent->gravity * sv_gravity->value * FRAMETIME);
 						if(bottom >= f2 && ent->velocity[2] < 0/*20*/) temppos[2] += bottom;
@@ -5641,7 +5634,7 @@ GOMOVE:
 VCHCANSEL:
 	//--------------------------------------------------------------------------------------
 	//ladder check
-	front = NULL, left = NULL, right = NULL;
+	//front = NULL, left = NULL, right = NULL;
 	k = false;
 	if(zc->route_trace && (zc->routeindex + 1) < CurrentIndex)
 	{
@@ -5669,7 +5662,7 @@ VCHCANSEL:
 
 		VectorAdd(ent->s.origin,touchmin,touchmax);
 		rs_trace = gi.trace (ent->s.origin, trmin,ent->maxs, touchmax,ent, MASK_BOTSOLID );
-		front = rs_trace.ent;
+		//front = rs_trace.ent;
 
 		if(rs_trace.contents & CONTENTS_LADDER) tempflag = true;
 
@@ -5700,7 +5693,7 @@ VCHCANSEL:
 
 			VectorAdd(ent->s.origin,touchmin,touchmax);
 			rs_trace = gi.trace (ent->s.origin, trmin,ent->maxs, touchmax,ent,  MASK_BOTSOLID );
-			right = rs_trace.ent;
+			//right = rs_trace.ent;
 
 			if(rs_trace.contents & CONTENTS_LADDER) tempflag = true;
 		}
@@ -5716,7 +5709,7 @@ VCHCANSEL:
 
 			VectorAdd(ent->s.origin,touchmin,touchmax);
 			rs_trace = gi.trace (ent->s.origin, trmin,ent->maxs, touchmax,ent, MASK_BOTSOLID );
-			left = rs_trace.ent;
+			//left = rs_trace.ent;
 
 			if(rs_trace.contents & CONTENTS_LADDER)	tempflag = true;
 		}

@@ -155,8 +155,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
         int                     index, index2;
         gitem_t         *ammo;
         gitem_t         *item;
-        
-        int                     special = 0;
+//      int                     special = 0;
         int band = 0;
         
         index = ITEM_INDEX(ent->item);
@@ -199,7 +198,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
                         other->client->unique_weapon_total++;
                         if ( !(ent->spawnflags & DROPPED_ITEM) )
                                 other->client->mp5_rds = other->client->mp5_max;
-                        special = 1;
+                        //special = 1;
                         //safe_cprintf(other, PRINT_HIGH, "%s - Unique Weapon\n", ent->item->pickup_name);
                 }
                 else
@@ -213,7 +212,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
                         other->client->unique_weapon_total++;
                         if ( !(ent->spawnflags & DROPPED_ITEM) )
                                 other->client->m4_rds = other->client->m4_max;  
-                        special = 1;
+                        //special = 1;
                         //safe_cprintf(other, PRINT_HIGH, "%s - Unique Weapon\n", ent->item->pickup_name);
                 }
                 else
@@ -243,7 +242,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
                                         other->client->shot_rds = other->client->shot_max;
                                 }
                         }
-                        special = 1;
+                        //special = 1;
                         //safe_cprintf(other, PRINT_HIGH, "%s - Unique Weapon\n", ent->item->pickup_name);
                 }
                 else
@@ -265,7 +264,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
                                         other->client->pers.inventory[index2] += 5;
                         }
                         //safe_cprintf(other, PRINT_HIGH, "%s - Unique Weapon\n", ent->item->pickup_name);
-                        special = 1;
+                        //special = 1;
                 }
                 else
                         return false; // we can't get it        
@@ -292,7 +291,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
                                         other->client->sniper_rds = other->client->sniper_max;
                                 }
                         }
-                        special = 1;
+                        //special = 1;
                         //safe_cprintf(other, PRINT_HIGH, "%s - Unique Weapon\n", ent->item->pickup_name);
                 }
                 else
@@ -1927,9 +1926,7 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
         int             damage = 125;
         float   timer;
         int             speed;
-        float   radius;
 
-        radius = damage+40;
         if (is_quad)
                 damage *= 4;
 
@@ -3368,7 +3365,6 @@ void Sniper_Fire(edict_t *ent)
         int     i;
         vec3_t          start;
         vec3_t          forward, right;
-        vec3_t          angles;
         int             damage = 250;
         int             kick = 200;
         vec3_t          offset; 
@@ -3442,7 +3438,6 @@ void Sniper_Fire(edict_t *ent)
         ent->client->kick_angles[0] = ent->client->machinegun_shots * 0;
         
         // get start / end positions
-        VectorAdd (ent->client->v_angle, ent->client->kick_angles, angles);
         AngleVectors (ent->client->v_angle, forward, right, NULL);
         VectorSet(offset, 0, 0, ent->viewheight-0);
         
@@ -4104,7 +4099,6 @@ int Knife_Fire (edict_t *ent)
                                                                                 // with throwing first, unwise.
         PlayerNoise(ent, start, PNOISE_WEAPON);
         return 1;
-
 }
 
 void Weapon_Knife (edict_t *ent)
@@ -4125,14 +4119,9 @@ void gas_fire (edict_t *ent )
         vec3_t  offset;
         vec3_t  forward, right;
         vec3_t  start;
-        int             damage = GRENADE_DAMRAD;
         float   timer;
         int             speed;
-        float   radius;
-/*        int held = false;*/
         gitem_t* item;
-        
-        radius = damage + 40;
 
         VectorSet(offset, 8, 8, ent->viewheight-8);
         AngleVectors (ent->client->v_angle, forward, right, NULL);
@@ -4163,7 +4152,6 @@ void gas_fire (edict_t *ent )
                 ent->client->ps.gunframe = 0;
         }
 
-
 //      ent->client->grenade_time = level.time + 1.0;
         ent->client->ps.gunframe++;
 }
@@ -4179,7 +4167,7 @@ void gas_fire (edict_t *ent )
 // moved these up in the file (actually now in g_local.h)
 //#define GRENADE_IDLE_FIRST 40
 //#define GRENADE_IDLE_LAST 69
-                                         
+
 // the 2 deactivation frames are a joke, they look like shit, probably best to roll
 // the activation frames backwards.  Aren't really enough of them either.
 
