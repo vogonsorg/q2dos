@@ -42,9 +42,18 @@ typedef struct vmode_s {
 								 int x, int y, int width, int height);
 } vmode_t;
 
+typedef struct {
+	int	pages[3];	// either 2 or 3 is valid
+	int	vesamode;	// LINEAR_MODE set if linear mode
+	void	*plinearmem;	// linear address of start of frame buffer
+	qboolean	vga_incompatible;
+} vesa_extra_t;
+
 // FS: Moved this here so we don't have to call extern to places with copy/paste
 #define MAX_RESOLUTIONS 20
 #define VIDNAME_LEN 30
+#define MAX_VESA_MODES			MAX_RESOLUTIONS
+
 typedef struct vid_resolutions_s {
 	int mode;
 	int vesa_mode;
@@ -60,6 +69,7 @@ typedef struct vid_resolutions_s {
 extern int num_vid_resolutions;
 extern vid_resolutions_t vid_resolutions[MAX_RESOLUTIONS];
 extern int currentvideomode;
+extern vesa_extra_t	vesa_extra[MAX_VESA_MODES];
 
 // vid_wait settings
 #define VID_WAIT_NONE			0

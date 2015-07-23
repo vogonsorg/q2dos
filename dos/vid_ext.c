@@ -63,20 +63,11 @@ static int	totalvidmem;
 static byte	*ppal;
 int		numvidmodes;
 
-typedef struct {
-	int	pages[3];	// either 2 or 3 is valid
-	int	vesamode;	// LINEAR_MODE set if linear mode
-	void	*plinearmem;	// linear address of start of frame buffer
-	qboolean	vga_incompatible;
-} vesa_extra_t;
-
-
-#define MAX_VESA_MODES			40
 static vmode_t		vesa_modes[MAX_VESA_MODES] = 
 	{{NULL, NULL, "    ********* VESA modes *********    "}};
 static char			names[MAX_VESA_MODES][10];
 
-static vesa_extra_t	vesa_extra[MAX_VESA_MODES];
+vesa_extra_t	vesa_extra[MAX_VESA_MODES];
 int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes;
 byte	*VGA_pagebase;
 
@@ -164,6 +155,8 @@ void VID_InitExtra (void)
 	vbeinfoblock_t	*pinfoblock;
 	unsigned long	addr;
 	__dpmi_meminfo	phys_mem_info;
+
+	memset(&vesa_extra, 0, sizeof(vesa_extra_t));
 
 	pinfoblock = (vbeinfoblock_t *) dos_getmemory(sizeof(vbeinfoblock_t));
 	if (!pinfoblock) {
@@ -399,6 +392,7 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 {
 	char	*infobuf;
 	int		numimagepages;
+	__dpmi_meminfo	phys_mem_info;
 
 	infobuf = dos_getmemory(256);
 
@@ -519,7 +513,15 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 				vid_resolutions[num_vid_resolutions].vesa_mode=modeinfo.modenum;
 				vid_resolutions[num_vid_resolutions].height=modeinfo.height;
 				vid_resolutions[num_vid_resolutions].width=modeinfo.width;
-				vid_resolutions[num_vid_resolutions].address=real2ptr(modeinfo.pptr);//(void *)modeinfo.pptr; // FS: Real2ptr returns a (void *)
+
+				phys_mem_info.address = (int)modeinfo.pptr;
+				phys_mem_info.size = 0x400000;
+
+				if (__dpmi_physical_address_mapping(&phys_mem_info))
+					return false;
+
+				vid_resolutions[num_vid_resolutions].address = real2ptr (phys_mem_info.address);
+//				vid_resolutions[num_vid_resolutions].address=real2ptr(modeinfo.pptr);//(void *)modeinfo.pptr; // FS: Real2ptr returns a (void *)
 
 				if ( !(COM_CheckParm("-bankedvga")) ) // FS: FIXME, just add all modes for banked
 				{
