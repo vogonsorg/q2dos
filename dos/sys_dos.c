@@ -143,7 +143,7 @@ static void Sys_DetectWin95 (void)
 	r.x.ax = 0x160a;                /* Get Windows Version */
 	__dpmi_int(0x2f, &r);
 
-	if((bSkipWinCheck) || (((r.x.ax) || (r.h.bh < 4)) && !(Sys_DetectWinNT())) )        /* Not windows or earlier than Win95 */
+	if(/*(bSkipWinCheck) || */(((r.x.ax) || (r.h.bh < 4)) && !(Sys_DetectWinNT())) )        /* Not windows or earlier than Win95 */
 	{
 		win95 = 0;
 		lockmem = true;
@@ -152,7 +152,17 @@ static void Sys_DetectWin95 (void)
 	}
 	else
 	{
-		Sys_Error("Microsoft Windows detected.  You must run Q2DOS in MS-DOS."); /* FS: Warning.  Too many issues in Win9x and even XP.  QDOS is the same way.  So forget it. */
+		printf("Microsoft Windows detected.  Please run Q2DOS in pure MS-DOS for best stability.\n"); // FS: Warning
+		win95 = 1;
+		lockunlockmem = COM_CheckParm ("-winlockunlock");
+
+		if (lockunlockmem)
+			lockmem = true;
+		else
+			lockmem = COM_CheckParm ("-winlock");
+
+		unlockmem = lockmem && !lockunlockmem;
+//		Sys_Error("Microsoft Windows detected.  You must run Q2DOS in MS-DOS."); /* FS: Warning.  Too many issues in Win9x and even XP.  QDOS is the same way.  So forget it. */
 	}
 }
 

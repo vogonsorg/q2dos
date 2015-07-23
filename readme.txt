@@ -19,12 +19,13 @@ What works?
 * Loading/unloading game DLLs in DXE3 format.
 
 What works but needs more testing?
+* Playing in a Windows 9x DOS box.
 * Modern sound cards like AC'97 or HDA
 * Mouse wheel support. (see info below.)
 * Hor+ FOV scaling. (see info below.)
 
 What doesn't work:
-* Playing in a Win9x or NTVDM DOS box.
+* Playing in a Windows NT NTVDM DOS box.  If you must, +set sw_mode 1.
 * TGA files from maps that were only optimized for OpenGL.
 * Some models from Whale's WODX server can crash the software renderer.  I'm
   assuming they're custom player models as I tried replaying the same maps
