@@ -184,11 +184,15 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 
 	vid.buffer=malloc(vid.width*vid.height*1);
 
+	r.x.ax = 0x13; /* FS: Make sure mode 13 is set again because if we go to high res mode and back it gets funky with banked modes.  Also, Win9x wants this to happen before going to LFB */		
+	__dpmi_int(0x10, &r);
+
 	if(!vid_resolutions[mode].isLFB)
 	{
 		if(!vid_resolutions[mode].isBanked && !vid_resolutions[mode].isPlanar)
 		{	//mode 13
-			r.x.ax = 0x13;
+			/* FS: Do nothing, let it fall through */
+//			r.x.ax = 0x13;
 		}
 		else
 		{
@@ -198,8 +202,6 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 			}
 			else
 			{
-				r.x.ax = 0x13; // FS: Make sure mode 13 is set again because if we go to high res mode and back it gets funky.
-				__dpmi_int(0x10, &r);
 				ri.Con_Printf(PRINT_DEVELOPER, "\x02Setting VGA-X mode!\n");
 			}
 
@@ -219,10 +221,8 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 				VGA_height = vid.height;
 				
 			}
-
+			__dpmi_int(0x10, &r);
 		}
-
-		__dpmi_int(0x10, &r);
 	}
 	else
 	{
