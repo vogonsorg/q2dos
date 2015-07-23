@@ -1618,46 +1618,23 @@ specify ent, go to a random point // faf, not this:, but NOT the two points clos
 */
 edict_t *SelectRandomDDaySpawnPoint (char *spawn_point, int team)
 {
-	edict_t	*spot, *spotb, *spot1, *spot2;
+	edict_t	*spot, *spotb;
 	int		count = 0;
 	int		selection;
-	float	range1, range2;
 	edict_t *e;
 	int i,otherteam;
 
 	spot = NULL;
-	range1 = range2 = 99999;
-	spot1 = spot2 = NULL;
 
 	while ((spot = G_Find_Team (spot, FOFS(classname), spawn_point, team)) != NULL)
 	{
 		count++;
-//		range = PlayersRangeFromSpot(spot->s.origin);
-//		if (range < range1)
-//		{
-//			range1 = range;
-//			spot1 = spot;
-//		}
-//		else if (range < range2)
-//		{
-//			range2 = range;
-//			spot2 = spot;
-//		}
 	}
 
 	if (!count)
 		return NULL;
 
 	//gi.dprintf(DEVELOPER_MSG_GAME, "found %i of %s\n", count, spawn_point);
-
-//	if (count <= 2)
-//	{
-//		spot1 = spot2 = NULL;
-//	}
-//	else
-//		count -= 2;
-
-//	gi.dprintf(DEVELOPER_MSG_GAME, "count: %i ********\n",count);
 
 	selection = (int) (random() * count);
 //	gi.dprintf(DEVELOPER_MSG_GAME, "selection: %i ********\n",selection);
@@ -1666,8 +1643,6 @@ edict_t *SelectRandomDDaySpawnPoint (char *spawn_point, int team)
 	do
 	{
 		spot = G_Find_Team (spot, FOFS(classname), spawn_point, team);
-//		if (spot == spot1 || spot == spot2)
-//			selection++;
 	} while(selection--);
 
 	if (spot->obj_owner == -1)
@@ -1690,8 +1665,6 @@ edict_t *SelectRandomDDaySpawnPoint (char *spawn_point, int team)
 	}
 
 	spotb = NULL;
-	range1 = range2 = 99999;
-	spot1 = spot2 = NULL;
 	count = 0;
 
 	while ((spotb = G_Find_Team (spotb, FOFS(classname), spawn_point, otherteam)) != NULL)	{
@@ -1717,7 +1690,6 @@ edict_t *SelectRandomDDaySpawnPoint (char *spawn_point, int team)
 edict_t *SelectNearestSpawnPoint (int team)
 {
 	edict_t	*bestspot;
-	float	bestdistance;
 	edict_t	*spot;
 	vec3_t mean_origin;
 	int i;
@@ -1725,7 +1697,6 @@ edict_t *SelectNearestSpawnPoint (int team)
 	float temp_distance, nearest_distance = 9999999;
 	vec3_t dist;
 	int playercount = 0;
-	bestdistance = 0;
 
 	VectorClear (mean_origin);
 	spot = NULL;
@@ -4260,15 +4231,15 @@ void Write_Player_Stats (edict_t *ent)
 {
 	char	statsfilename[MAX_QPATH];
 	char	*ip;
-	int		c;
+//	int		c;
 
 	char *s, *f, *fPtr;
 
 	char *statsc;
 
-	char *name;
+//	char *name;
 	int games = 0;
-	int ping = 0;
+//	int ping = 0;
 	int human_kills = 0;
 	int human_deaths = 0;
 	int bot_kills = 0;
@@ -4289,7 +4260,7 @@ void Write_Player_Stats (edict_t *ent)
 	int castrations = 0;
 	int helmets = 0;
 	int fists = 0;
-	char *chat;
+//	char *chat;
 
 	char	filename[MAX_QPATH];
 	FILE *fn;
@@ -4313,13 +4284,13 @@ void Write_Player_Stats (edict_t *ent)
 
 	if (statsc)
 	{
-		c = 0;
+	//	c = 0;
 		f = strdup (statsc);
 		s = strtok_r(f, "\n", &fPtr);
 
 		if (s != NULL)
 		{
-			name = s;
+		//	name = s;
 			s = strtok_r(NULL, "\n", &fPtr);
 		}
 		if (s != NULL)
@@ -4329,7 +4300,7 @@ void Write_Player_Stats (edict_t *ent)
 		}
 		if (s != NULL)
 		{
-			ping = atoi (s);
+		//	ping = atoi (s);
 			s = strtok_r(NULL, "\n", &fPtr);
 		}
 		if (s != NULL)
@@ -4434,7 +4405,7 @@ void Write_Player_Stats (edict_t *ent)
 		}	
 		if (s != NULL)
 		{//not used here
-			chat = s;
+		//	chat = s;
 			s = strtok_r(NULL, "\n", &fPtr);
 		}
 	}
@@ -4487,8 +4458,6 @@ void Write_Player_Stats (edict_t *ent)
 
 	average = ((average * (games - 1)) + plus_minus)/games;	 */
 
-	//gi.dprintf(DEVELOPER_MSG_GAME, "%i %f\n", deaths, ratio);
-
 	human_kills = human_kills + ent->client->resp.stat_human_plus;
 	human_deaths = human_deaths + ent->client->resp.stat_human_minus;
 	bot_kills = bot_kills + ent->client->resp.stat_bot_plus;
@@ -4537,16 +4506,15 @@ void Write_Player_Stats (edict_t *ent)
 void SetPlayerRating(edict_t *ent)
 {
 	char	statsfilename[MAX_QPATH];
-	int		c;
+//	int		c;
 
 	char *s, *f, *fPtr;
 
 	char *statsc;
 
-	char *name;
-	//float ratio = 0.0;
-	int games = 0;
-	int ping = 0;
+//	char *name;
+//	int games = 0;
+//	int ping = 0;
 	int	human_kills = 0;
 	int human_deaths = 0;
 	int	bot_kills = 0;
@@ -4566,24 +4534,24 @@ void SetPlayerRating(edict_t *ent)
 
 	if (stats->value)
 	{
-		c = 0;
+	//	c = 0;
 		f = strdup (statsc);
 		s = strtok_r(f, "\n", &fPtr);
 
 		if (s != NULL)
 		{
-			name = s;
+		//	name = s;
 			s = strtok_r(NULL, "\n", &fPtr);
 		}
 		if (s != NULL)
 		{
-			games = atoi (s);
+		//	games = atoi (s);
 			//gi.dprintf(DEVELOPER_MSG_GAME, "s: %i\n",games);
 			s = strtok_r(NULL, "\n", &fPtr);
 		}
 		if (s != NULL)
 		{
-			ping = atoi (s);
+		//	ping = atoi (s);
 			//gi.dprintf(DEVELOPER_MSG_GAME, "s: %i\n",games);
 			s = strtok_r(NULL, "\n", &fPtr);
 		}
@@ -4624,8 +4592,6 @@ void SetPlayerRating(edict_t *ent)
 		}
 	}
 
-	//gi.dprintf(DEVELOPER_MSG_GAME, "ratio: %f\n",ratio);
-				
 	ent->client->pers.stat_human_kills = human_kills;
 	ent->client->pers.stat_bot_kills = bot_kills;
 	ent->client->pers.stat_human_deaths = human_deaths;

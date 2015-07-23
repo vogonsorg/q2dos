@@ -751,25 +751,23 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 {
 	gclient_t	*client;
 	int			take,
-
-				save,
+//				save,
 //				asave,
 //	int			psave;
 				te_sparks,
 				result,
-				height,
+//				height,
 				randnum,
-				
 				wound_location, 
 				die_time;
 
 	//faf
 	int i;
-		vec3_t	v;
-		vec3_t  blood_orig;
+	vec3_t	v;
+	vec3_t  blood_orig;
 
-		int d;
-		edict_t *check_ent;
+	int d;
+	edict_t *check_ent;
 
 	qboolean sniper;
 
@@ -781,44 +779,42 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 
 	//faf
 	if (attacker && targ &&
-		targ->client && attacker->client &&
-		targ != attacker &&
-		!OnSameTeam (targ, attacker) &&
-		mod != MOD_EXPLOSIVE)
+	    targ->client && attacker->client &&
+	    targ != attacker &&
+	    !OnSameTeam (targ, attacker) &&
+	    mod != MOD_EXPLOSIVE)
 		targ->client->last_wound_inflictor = attacker;
-
 
 	//hacky
 	if (attacker && attacker->ai && targ->classnameb && targ->classnameb == SANDBAGS)
 		damage = 1000;
 
-
 //JABOT:  if someone attacks this guy, the teammate bots go into aim mode                         ///make attacker their enemy: //needs work 
 	sniper = false;
 	for (d = 1; d<= maxclients->value; d++)
-    {
-         check_ent = g_edicts + d;
-         if (!check_ent->inuse)
-			 continue;
-		 if (!check_ent->ai)
-			 continue;
-		 if (check_ent == targ)
-			 continue;
-		 if (!check_ent->client ||
+	{
+		check_ent = g_edicts + d;
+		if (!check_ent->inuse)
+			continue;
+		if (!check_ent->ai)
+			continue;
+		if (check_ent == targ)
+			continue;
+		if (!check_ent->client ||
 			 !check_ent->client->resp.team_on ||
 			 check_ent->health < 1)
-			 continue;
-		  if (!inflictor || !inflictor->client)
-			 continue;
-		 if (!inflictor->client->resp.team_on)
-			 continue;
-		 if (check_ent->client->resp.team_on ==
+			continue;
+		if (!inflictor || !inflictor->client)
+			continue;
+		if (!inflictor->client->resp.team_on)
+			continue;
+		if (check_ent->client->resp.team_on ==
 			 inflictor->client->resp.team_on)
-			 continue;
-		 if (check_ent->enemy)
-			 continue;
-		 if (check_ent->deadflag)
-			 continue;
+			continue;
+		if (check_ent->enemy)
+			continue;
+		if (check_ent->deadflag)
+			continue;
 
 		 if (visible (check_ent, targ))
 		 {
@@ -843,9 +839,9 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	result = 0; /* silence compiler */
 
 	wound_location = die_time = 0;
-	height = abs(targ->mins[2]) + targ->maxs[2];
+//	height = abs(targ->mins[2]) + targ->maxs[2];
 
-   	if (targ->client &&((mod == MOD_PISTOL) || 
+	if (targ->client &&((mod == MOD_PISTOL) || 
 						(mod == MOD_SHOTGUN) || 
 						(mod == MOD_RIFLE) || 
 						(mod == MOD_LMG) || 
@@ -1331,7 +1327,7 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	}
 
 	take = damage;
-	save = 0;
+	//save = 0;
 
 	//psave = CheckPowerArmor (targ, point, normal, take, dflags);
 	//take -= psave;
@@ -1371,8 +1367,6 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 
 			Killed (targ, inflictor, attacker, take, point);
 
-
-
 			if (attacker && attacker->client)
 				attacker->client->last_obj_health = 0;
 
@@ -1392,7 +1386,6 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 			if (skill->value == 3)
 				targ->pain_debounce_time = level.time + 5;
 		}
-
 	}
 	else if (client)
 	{
@@ -1405,13 +1398,11 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 			targ->pain (targ, attacker, knockback, take);
 	}
 
-
 	// add to the damage inflicted on a player this frame
 	// the total will be turned into screen blends and view angle kicks
 	// at the end of the frame
 	if (client)
 	{
-
 		client->damage_blendtime = (level.time + BLEND_TIME);
 //		client->damage_parmor += psave;
 //		client->damage_armor += asave;
@@ -1419,7 +1410,6 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		client->damage_knockback += knockback;
 		VectorCopy (point, client->damage_from);
 	}
-
 
 	if (targ->classname &&
 		(targ->classnameb == FUNC_EXPLOSIVE_OBJECTIVE ||
@@ -1433,7 +1423,6 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 			attacker->client->last_obj_dmg_time = level.time;
 			attacker->client->last_obj_name = targ->obj_name;
 			//so we can show how much damage is left on objective
-
 		}
 	}
 }
@@ -1513,15 +1502,13 @@ void BloodSprayThink (edict_t *self)
 void blood_spray_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
 	//Wheaty: Borrowed from AQ
-
         if (other == ent->owner)
                 return;
 //        ent->think = G_FreeEdict;
 //		ent->think = Remove_Gib;//faf
 //      ent->nextthink = level.time + 0.1;
 
-Remove_Gib(ent);//faf
-
+        Remove_Gib(ent);//faf
 }
 
 
@@ -1538,8 +1525,6 @@ void SprayKnifeBlood(edict_t *self, vec3_t point, vec3_t angle, int damage, int 
 	if (level.gib_count > max_gibs->value)
 		return;
 
-
-
 	for (i=0 ; i<3 ; i++)
 	{
 		level.gib_count++;//faf
@@ -1555,7 +1540,6 @@ void SprayKnifeBlood(edict_t *self, vec3_t point, vec3_t angle, int damage, int 
 		vectoangles (direction, blood->s.angles);
 		VectorScale (direction, speed, blood->velocity);
 
-
 		blood->movetype = MOVETYPE_TOSS;
 		blood->clipmask = MASK_SHOT;
 		blood->solid = SOLID_BBOX;
@@ -1569,32 +1553,21 @@ void SprayKnifeBlood(edict_t *self, vec3_t point, vec3_t angle, int damage, int 
 		blood->think = BloodSprayThink;
 		blood->dmg = damage; 
 		blood->classname = "blood_spray";
-        
+
 		gi.linkentity (blood);
 	}
-	
 }
-
-
-
 
 
 void SprayBlood(edict_t *self, vec3_t point, vec3_t angle, int damage, int mod)
 {
-
 	//Wheaty: Borrowed from AQ
-	
 	edict_t *blood;
 	int		speed;
-
 
 	//faf
 	if (level.gib_count > max_gibs->value)
 		return;
-
-
-
-
 
 	//faf
 	if (damage == 0)
@@ -1607,12 +1580,8 @@ void SprayBlood(edict_t *self, vec3_t point, vec3_t angle, int damage, int mod)
 		return;
 	}
 
-
-
-
 	switch (mod)
 	{
-	
 	case MOD_PISTOL:
 		speed = 500;//250;
 		break;
@@ -1638,7 +1607,6 @@ void SprayBlood(edict_t *self, vec3_t point, vec3_t angle, int damage, int mod)
 		speed = 2000;
 	default:
 		speed = 1600;//500;
-
 	}
 
 	//Wheaty: To prevent fireworks bloodspray
@@ -1672,7 +1640,6 @@ void SprayBlood(edict_t *self, vec3_t point, vec3_t angle, int damage, int mod)
     blood->dmg = damage; 
     blood->classname = "blood_spray";
     gi.linkentity (blood);
-
 	}
 }
 
@@ -1709,7 +1676,6 @@ void SetExplosionEffect (edict_t *inflictor, float damage, float radius)
 			dmgef_ent->client->dmgef_flash = true;
 		else
 			dmgef_ent->client->dmgef_flash = false;
-
 
 	//	gi.dprintf(DEVELOPER_MSG_GAME, "dmgef_startframe = %i\n", dmgef_ent->client->dmgef_startframe);
 	//	gi.dprintf(DEVELOPER_MSG_GAME, "dmgef_intensity  = %f\n", dmgef_ent->client->dmgef_intensity);

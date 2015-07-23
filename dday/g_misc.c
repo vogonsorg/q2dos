@@ -2904,14 +2904,13 @@ void Medic_Screen (edict_t *ent)
 	vec3_t	a,b;
 	int iconpos;
 
-	qboolean qleft,qforward,qback,qright;
-	qleft = qforward = qback = qright = false;
+/*	qboolean qleft,qforward,qback,qright;
+	qleft = qforward = qback = qright = false;*/
 
 	//JABot[start]
 	if (ent->ai || !ent->inuse || !ent->client)
 		return;
 	//[end]
-
 
 	if (!ent->client->resp.team_on)
 		return;
@@ -2962,13 +2961,13 @@ void Medic_Screen (edict_t *ent)
 		AngleVectors (ent->s.angles, forward, right, NULL);
 		VectorSubtract (a, b, vec);
 		VectorNormalize (vec);
-	
+
 		dot = DotProduct (vec, forward);
-		if (dot > 0.9)
+		/*if (dot > 0.9)
 			qforward = true;
 		else if (dot < .1)
 			qback = true;
-/*		else
+		else
 		{
 			dot = DotProduct (vec, right);
 			if (dot >.1)

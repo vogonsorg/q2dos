@@ -204,9 +204,8 @@ void objective_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t
 
 			self->obj_owner = other->client->resp.team_on->index;
 			team_list[self->obj_owner]->score += self->health;
-
 		}
-		
+
 		otherteam = (self->obj_owner);
 		if (!team_list[otherteam]->need_points ||
 			(!team_list[otherteam]->kills_and_points && team_list[otherteam]->score < team_list[otherteam]->need_points) ||
@@ -231,8 +230,7 @@ void objective_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t
 
 		if (self->delay == -1)
 			self->touch = NULL;
-		
-	} 
+	}
 	else  // own team touched it
 	{
 		//gi.dprintf(DEVELOPER_MSG_GAME, "%s deadflag: %i\n", other->client->pers.netname, other->deadflag);
@@ -242,10 +240,7 @@ void objective_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t
 		if (other->deadflag == DEAD_NO)
 			self->obj_count = level.framenum; // update the last time team touched it
 	}
-
 }
-
-
 
 
 /*
@@ -256,7 +251,7 @@ objective_area
 
 /// exactly like the one above, except 1 person needs to touch the thing.
 void SP_objective_touch(edict_t *self) 
-{	
+{
 	vec3_t min;
 	vec3_t max;
 
@@ -284,10 +279,9 @@ void SP_objective_touch(edict_t *self)
 			(self->absmax[1] + self->absmin[1])/2,
 			(self->absmax[2] + self->absmin[2])/2);
 		}
-
 	}
 	else if (self->move_origin && self->move_angles)
-	{ 
+	{
 		VectorCopy (self->move_origin, min);
 		VectorCopy (self->move_angles, max);
 
@@ -312,16 +306,11 @@ void SP_objective_touch(edict_t *self)
 			self->move_angles[2]- self->s.origin[2]);
 
 		VectorCopy (self->s.origin, self->obj_origin);
-
 	}
-
-
 
 	//so bots, to find nearest campspot.  either mapper sets it or it goes to the center
 
-
 	gi.linkentity (self);
-	
 }
 
 void timed_objective_touch_think (edict_t *self) 
@@ -343,7 +332,6 @@ void timed_objective_touch_think (edict_t *self)
 		return;
 	}
 
-
 	if (level.obj_time <= 0)
 	{
 		if (dedicated->value)
@@ -362,8 +350,6 @@ void timed_objective_touch_think (edict_t *self)
 //		self->obj_count = level.framenum; // reset the touch count
 		G_FreeEdict(self);
 	}
-
-
 }
 
 
@@ -406,9 +392,9 @@ void timed_objective_touch (edict_t *self, edict_t *other, cplane_t *plane, csur
 				self->message, 
 				other->client->pers.netname,
 				team_list[self->obj_owner]->teamname);
-		
+
 		self->obj_count = level.framenum; // reset the touch count
-		
+
 		/*
 		if (self->obj_owner == 1 && self->style == 2)//hack so axis don't trigger flag on first cap
 			self->style = 0;
@@ -432,17 +418,13 @@ void timed_objective_touch (edict_t *self, edict_t *other, cplane_t *plane, csur
 						t->use (t,self, other);
 				}
 			}
-
 		}
-		else		
+		else
 		{
 			self->style = 0;
 			G_UseTargets (self, other); //faf
 		}
-
-
-
-	} 
+	}
 	else  // own team touched it
 	{
 		//gi.dprintf(DEVELOPER_MSG_GAME, "%s deadflag: %i\n", other->client->pers.netname, other->deadflag);
@@ -450,12 +432,11 @@ void timed_objective_touch (edict_t *self, edict_t *other, cplane_t *plane, csur
 		if (other->deadflag == DEAD_NO)
 			self->obj_count = level.framenum; // update the last time team touched it
 	}
-
 }
 
 /// exactly like the one above, except 1 person needs to touch the thing.
 void SP_timed_objective_touch(edict_t *self) 
-{	
+{
 	vec3_t min;
 	vec3_t max;
 
@@ -469,14 +450,13 @@ void SP_timed_objective_touch(edict_t *self)
 	self->think=timed_objective_touch_think;
 	self->nextthink = level.time + FRAMETIME;
 //self->index=st.obj_owner;
-	self->movetype = MOVETYPE_NONE;	
+	self->movetype = MOVETYPE_NONE;
 	self->solid = SOLID_TRIGGER;
-
 
 	if (self->model)
 		gi.setmodel (self, self->model);
 	else if (self->move_origin && self->move_angles)
-	{ 
+	{
 		VectorCopy (self->move_origin, min);
 		VectorCopy (self->move_angles, max);
 
@@ -499,7 +479,6 @@ void SP_timed_objective_touch(edict_t *self)
 		VectorSet (self->maxs, self->move_angles[0]- self->s.origin[0],
 			self->move_angles[1]- self->s.origin[1],
 			self->move_angles[2]- self->s.origin[2]);
-
 	}
 	else
 	{
@@ -516,7 +495,6 @@ void SP_timed_objective_touch(edict_t *self)
 	self->obj_perm_owner = -1; //for bots to work correctly
 
 	gi.linkentity (self);
-	
 }
 
 
@@ -616,7 +594,6 @@ void func_explosive_objective_explode (edict_t *self, edict_t *inflictor, edict_
 		attacker->client->pers.netname,
 		team_list[attacker->client->resp.team_on->index]->teamname);
 
-
 	otherteam = (self->obj_owner+1)%2;
 	if ((!team_list[otherteam]->kills_and_points && team_list[otherteam]->score < team_list[otherteam]->need_points) ||
 	    (team_list[otherteam]->kills_and_points && team_list[otherteam]->kills < team_list[otherteam]->need_kills))
@@ -631,8 +608,6 @@ void func_explosive_objective_explode (edict_t *self, edict_t *inflictor, edict_
 		if (self->target)
 			G_UseTargets (self, attacker);
 	}
-
-
 
 	if (self->dmg)
 		BecomeExplosion1 (self);
@@ -659,7 +634,6 @@ void SP_func_explosive_objective (edict_t *self)
 	self->classnameb = FUNC_EXPLOSIVE_OBJECTIVE;
 
 	self->movetype = MOVETYPE_PUSH;
-
 
 	gi.modelindex ("models/objects/debris1/tris.md2");
 	gi.modelindex ("models/objects/debris2/tris.md2");
@@ -699,9 +673,6 @@ void SP_func_explosive_objective (edict_t *self)
 //	if (!self->obj_loss)
 //		self->obj_loss = 5;
 
-
-
-
 	//so bots can aim at center.  either mapper sets it or it goes to the center
 	if (VectorCompare (self->obj_origin, vec3_origin))
 	{
@@ -709,7 +680,6 @@ void SP_func_explosive_objective (edict_t *self)
 		(self->absmax[1] + self->absmin[1])/2,
 		(self->absmax[2] + self->absmin[2])/2);
 	}
-
 
 	gi.linkentity (self);
 }
@@ -773,14 +743,11 @@ void Set_Briefcase_Respawn (edict_t *ent)
 }
 
 
-
 qboolean Pickup_Briefcase (edict_t *ent, edict_t *other)
 {
 	int			index;
-	gitem_t		*item;
-	index = ITEM_INDEX(ent->item);
 
-	item = ent->item;
+	index = ITEM_INDEX(ent->item);
 
 	other->client->pers.inventory[index]++;
 	other->s.modelindex3 = gi.modelindex ("models/objects/briefcase/w_briefcase.md2");
@@ -809,7 +776,6 @@ void Drop_Briefcase (edict_t *ent, gitem_t *item)
 	gi.cprintf(ent, PRINT_HIGH, "You dropped the briefcase!\n");
 
 	ent->client->has_briefcase = false;//used to display icon in hud
-
 }
 
 void briefcase_respawn (edict_t *ent)
@@ -832,10 +798,6 @@ void briefcase_respawn (edict_t *ent)
 		}
 	}*/
 }
-
-
-
-
 
 void briefcase_warn (edict_t *ent)
 {
@@ -872,7 +834,7 @@ void Create_CTB_Entities (edict_t *self)
 
 	return;
 
-	if (!stricmp(level.mapname, "dday3"))  
+	if (!stricmp(level.mapname, "dday3"))
 	{
 		spot = G_Spawn();
 		spot->classname = "usa_base";
@@ -897,9 +859,8 @@ void Create_CTB_Entities (edict_t *self)
 //		spot->s.angles[1] = 90;
 		SP_briefcase(spot);
 	}
-	else if (!stricmp(level.mapname, "dday2"))  
+	else if (!stricmp(level.mapname, "dday2"))
 	{
-
 		spot = G_Spawn();
 		spot->classname = "usa_base";
 		spot->s.origin[0] = 1288.2;
@@ -919,13 +880,11 @@ void Create_CTB_Entities (edict_t *self)
 		spot->s.origin[0] = -768.4;
 		spot->s.origin[1] = 1017.6;
 		spot->s.origin[2] = 91.9;
-		SP_briefcase(spot);		
+		SP_briefcase(spot);
 		gi.dprintf(DEVELOPER_MSG_GAME, "dfjklsdfjklsdfjklsdfjkl\n");
-		
 	}
-	else if (!stricmp(level.mapname, "invade2"))  
+	else if (!stricmp(level.mapname, "invade2"))
 	{
-
 		spot = G_Spawn();
 		spot->classname = "usa_base";
 		spot->s.origin[0] = -2498.4;
@@ -940,7 +899,6 @@ void Create_CTB_Entities (edict_t *self)
 		spot->s.origin[2] = -508.5;
 		SP_grm_base(spot);
 
-
 		spot = G_Spawn();
 		spot->classname = "briefcase";
 		spot->sounds = 2;
@@ -950,9 +908,8 @@ void Create_CTB_Entities (edict_t *self)
 		SP_briefcase(spot);
 		
 	}
-	else if (!stricmp(level.mapname, "mp1dday2"))  
+	else if (!stricmp(level.mapname, "mp1dday2"))
 	{
-
 		spot = G_Spawn();
 		spot->classname = "usa_base";
 		spot->s.origin[0] = 3326.5;
@@ -974,11 +931,9 @@ void Create_CTB_Entities (edict_t *self)
 		spot->s.origin[1] = -923.9;
 		spot->s.origin[2] = 94.3;
 		SP_briefcase(spot);
-		
 	}
-	else if (!stricmp(level.mapname, "inland4"))  
+	else if (!stricmp(level.mapname, "inland4"))
 	{
-
 		spot = G_Spawn();
 		spot->classname = "usa_base";
 		spot->s.origin[0] = -2445.6;
@@ -993,7 +948,6 @@ void Create_CTB_Entities (edict_t *self)
 		spot->s.origin[2] = -153.5;
 		SP_grm_base(spot);
 
-	
 		spot = G_Spawn();
 		spot->classname = "briefcase";
 		spot->sounds = 1;
@@ -1002,11 +956,9 @@ void Create_CTB_Entities (edict_t *self)
 		spot->s.origin[2] = -75.6;
 		spot->s.angles[1] = 270;
 		SP_briefcase(spot);
-			
 	}
-	else if (!stricmp(level.mapname, "dunkirk"))  
+	else if (!stricmp(level.mapname, "dunkirk"))
 	{
-
 		spot = G_Spawn();
 		spot->classname = "usa_base";
 		spot->s.origin[0] = -399.7;
@@ -1014,7 +966,7 @@ void Create_CTB_Entities (edict_t *self)
 		spot->s.origin[2] = -190.8;
 		spot->s.angles[1] = 90;
 		SP_usa_base(spot);
-	
+
 		spot = G_Spawn();
 		spot->classname = "grm_base";
 		spot->s.origin[0] = -646.3;
@@ -1031,9 +983,8 @@ void Create_CTB_Entities (edict_t *self)
 		spot->s.origin[2] = -165.7;
 		spot->s.angles[1] = 315;
 		SP_briefcase(spot);
-		
-	}	  
-	else if (!stricmp(level.mapname, "inland1"))  
+	}
+	else if (!stricmp(level.mapname, "inland1"))
 	{
 		spot = G_Spawn();
 		spot->classname = "usa_base";
@@ -1042,7 +993,7 @@ void Create_CTB_Entities (edict_t *self)
 		spot->s.origin[2] = -280;
 		spot->s.angles[1] = 90;
 		SP_usa_base(spot);
-	
+
 		spot = G_Spawn();
 		spot->classname = "grm_base";
 		spot->s.origin[0] = 50;
@@ -1059,8 +1010,8 @@ void Create_CTB_Entities (edict_t *self)
 		spot->s.origin[2] = 56;
 		spot->s.angles[1] = 315;
 		SP_briefcase(spot);
-	}	  
-	else if (!stricmp(level.mapname, "inland2"))  
+	}
+	else if (!stricmp(level.mapname, "inland2"))
 	{
 		spot = G_Spawn();
 		spot->classname = "usa_base";
@@ -1113,11 +1064,8 @@ void Create_CTB_Entities (edict_t *self)
 		spot->s.origin[2] = -423;
 		spot->s.angles[1] = 10;
 		SP_briefcase(spot);
-	}	  
-
-
+	}
 }
-
 
 
 //faf:  ctb code
@@ -1139,8 +1087,8 @@ void SP_usa_base (edict_t *ent)
 	ent->think = base_think;
 	ent->nextthink = level.time + FRAMETIME;
 	ent->s.sound = gi.soundindex("faf/flag.wav");
-	
 }
+
 void SP_grm_base (edict_t *ent)
 {
 	ent->movetype = MOVETYPE_NONE;
@@ -1153,9 +1101,5 @@ void SP_grm_base (edict_t *ent)
 	ent->think = base_think;
 	ent->nextthink = level.time + FRAMETIME;
 	ent->s.sound = gi.soundindex("faf/flag.wav");
-
 }
 //end faf
-
-
-

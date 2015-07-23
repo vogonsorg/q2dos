@@ -622,9 +622,9 @@ Make the weapon ready if there is ammo
 */
 void Use_Weapon (edict_t *ent, gitem_t *item)
 {
-	int			ammo_index;
+/*	int			ammo_index;
 	gitem_t		*ammo_item;
-	int			item_rounds;
+	int			item_rounds;*/
 
 	// see if we're already using it
 	if (item == ent->client->pers.weapon)
@@ -632,7 +632,7 @@ void Use_Weapon (edict_t *ent, gitem_t *item)
 
 	turret_off(ent);
 
-	if (item->ammo && !g_select_empty->value && !(item->flags & IT_AMMO))
+	/*if (item->ammo && !g_select_empty->value && !(item->flags & IT_AMMO))
 	{
 		ammo_item = FindItem(item->ammo);
 		ammo_index = ITEM_INDEX(ammo_item);
@@ -665,7 +665,7 @@ void Use_Weapon (edict_t *ent, gitem_t *item)
 			item_rounds = ent->client->mags[0].sniper_rnd;
 		else if (!strcmp(item->ammo, "flame_mag"))
 			item_rounds = ent->client->flame_rnd;
-
+	*/
 		/* RM:Future site of the team-enhanced guninfo statement
 		if ( !strcmp( item->icon, "w_pistol") )
 			item_rounds = ent->client->mags[item->guninfo->teamindex].pistol_rnd;
@@ -689,8 +689,7 @@ void Use_Weapon (edict_t *ent, gitem_t *item)
 			safe_cprintf (ent, PRINT_HIGH, "No magazines or clips for %s.\n", item->pickup_name);
 			//return;
 		}*/
-
-	}
+	/*} */
 
 	// change to this weapon when down
 	//ent->client->weaponstate=WEAPON_READY;
@@ -1215,10 +1214,10 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 	vec3_t	offset;
 	vec3_t	forward, right;
 	vec3_t	start;
-	int		damage = 120;
-	float	radius;
+//	int		damage = 120;
+//	float	radius;
 
-	radius = damage+40;
+//	radius = damage+40;
 	VectorSet(offset, 8, 8, ent->viewheight-8);
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
@@ -2227,7 +2226,7 @@ void Weapon_Morphine_Use(edict_t *ent)
 void Weapon_Morphine(edict_t *ent)
 {
 	static int		pause_frames[] = {0};//{19,32,0};
-	static int		fire_frames[2];
+	static int		fire_frames[3];
 
 	fire_frames[0] = (ent->client->aim)?53:4;
 	fire_frames[1] = (ent->client->aim)?53:5;

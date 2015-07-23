@@ -146,19 +146,16 @@ void Shotgun_Reload (edict_t *ent,
 {
 	static int zero = 0;
 
-	gitem_t *ammo_item;
 	int		ammo_index,	*ammo_amount;
 	int		FRAME_IDLE_FIRST = (ent->client->aim)?FRAME_AIDLE_FIRST:FRAME_LIDLE_FIRST;
 
 	if(ent->client->pers.weapon->ammo)
 	{
-		ammo_item = FindItem(ent->client->pers.weapon->ammo);
 		ammo_index = ent->client->ammo_index;
 		ammo_amount=&ent->client->pers.inventory[ammo_index];
 	}
 	else
 	{
-		ammo_item = NULL;
 		ammo_index = 0;
 		ammo_amount=&zero;
 	}

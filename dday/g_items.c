@@ -554,7 +554,6 @@ void Drop_Ammo (edict_t *ent, gitem_t *item)
 {
 	edict_t	*dropped;
 	int		index;
-	int		grennum; //Wheaty: Temp variable
 
 	index = ITEM_INDEX(item);
 	dropped = Drop_Item (ent, item);
@@ -562,9 +561,6 @@ void Drop_Ammo (edict_t *ent, gitem_t *item)
 		dropped->count = item->quantity;
 	else
 		dropped->count = ent->client->pers.inventory[index];
-
-	if (item->tag == AMMO_TYPE_GRENADES)
-		grennum = ent->client->pers.inventory[index];
 
 	//Wheaty: Only drop ONE grenade
 /*	if (item->tag == AMMO_TYPE_GRENADES)
@@ -577,7 +573,6 @@ void Drop_Ammo (edict_t *ent, gitem_t *item)
 		ent->client->pers.inventory[index] -= dropped->count;
 //	else
 //		ent->client->pers.inventory[index] = 0;
-
 
 	ValidateSelectedItem (ent);
 	WeighPlayer(ent);
@@ -1924,17 +1919,11 @@ void Weapon_Sandbag_Fire (edict_t *ent)
 		ent->client->ps.gunframe = 20;
 		Use_Weapon (ent, FindItem("fists"));
 		return;
-	} 
-	
+	}
 
 	G_FreeEdict (ent->client->sandbag_preview);
 	ent->client->sandbag_preview = NULL;
-
-
-
-
 }
-
 
 
 void sandbag_prev_think (edict_t *ent)
@@ -1952,22 +1941,18 @@ void sandbag_prev_think (edict_t *ent)
 
 	//gi.dprintf(DEVELOPER_MSG_GAME, "%s\n",vtos(ent->owner->s.angles));
 
-
-
 	ent->nextthink = level.time +.1;
-
 }
 
 void Weapon_Sandbag (edict_t *ent)
 {
-	static int      pause_frames[]  = {0};//{19, 32, 0};
-    int				fire_frames[] = {7};
-	vec3_t	mins,maxs;
+	static int	pause_frames[] = {0};//{19, 32, 0};
+	int			fire_frames[] = {7};
 
 	edict_t	*sandbag;
 	trace_t		tr;
 	vec3_t	end,forward,right,offset,start;
-		float ang;
+	float ang;
 
 	if (ent->client->aim)
 	{
@@ -1998,10 +1983,7 @@ void Weapon_Sandbag (edict_t *ent)
 		sandbag->owner = ent;
 	}
 
-
 	sandbag = ent->client->sandbag_preview;
-
-
 
 		ang = ent->s.angles[1];
 
@@ -2026,13 +2008,6 @@ void Weapon_Sandbag (edict_t *ent)
 			VectorSet (sandbag->maxs, 9, 19, 8);
 		}
 
-
-
-
-			VectorSet (mins, -20, -20, -10);
-			VectorSet (maxs, 20, 20, 10);
-
-    
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
     VectorSet(offset, 0, 0, ent->viewheight);
    VectorAdd (ent->s.origin, offset, start);
@@ -2040,10 +2015,9 @@ void Weapon_Sandbag (edict_t *ent)
     VectorScale (forward, -2, ent->client->kick_origin);
     ent->client->kick_angles[0] = -1;
 
-
 	AngleVectors (ent->client->v_angle, forward, NULL, NULL);
 
-    VectorMA (start, 55, forward, end);  	
+    VectorMA (start, 55, forward, end);
 	tr = gi.trace(start, sandbag->mins, sandbag->maxs, end, ent, MASK_SHOT);
 	if (tr.startsolid || tr.fraction < 1)	
 	{
@@ -2053,12 +2027,6 @@ void Weapon_Sandbag (edict_t *ent)
 	else
 	{
 		//VectorMA (start, 55, forward, end);  
-
-
-
-
-			
-
 		tr = gi.trace(tr.endpos, sandbag->mins, sandbag->maxs, tr.endpos, ent, MASK_SHOT);
 
 		if (tr.fraction < 1)
@@ -2066,15 +2034,12 @@ void Weapon_Sandbag (edict_t *ent)
 			//gi.dprintf(DEVELOPER_MSG_GAME, "blah\n");
 			VectorClear (ent->client->sandbag_pos);
 			sandbag->svflags = SVF_NOCLIENT;
-
-		}	
+		}
 		else
 		{
-
 			VectorCopy (tr.endpos, sandbag->s.origin);
 			sandbag->svflags &= ~SVF_NOCLIENT;
 			VectorCopy (tr.endpos,ent->client->sandbag_pos);
-
 
 			if (ent->client->movement || ent->client->last_jump_time > level.time - 2 || ent->client->ps.gunframe < 8 || ent->client->ps.gunframe >17)
 				sandbag->svflags = SVF_NOCLIENT;
@@ -2083,30 +2048,16 @@ void Weapon_Sandbag (edict_t *ent)
 
 	gi.linkentity(sandbag);
 
-
-
 	//ent->client->aim=false;
 	//fire_frames[0]=(ent->client->aim)?54:4;
 	ent->client->p_rnd=NULL;
-	
+
 	//faf
-		fire_frames[0]=7;
-
-
-
-
-
-
-
-
+	fire_frames[0]=7;
 
 	Weapon_Generic (ent, 
 		4,7,17,
 		17,17,20,
 		20,20,20,
 		pause_frames, fire_frames, Weapon_Sandbag_Fire);
-		
 }
-
-
-

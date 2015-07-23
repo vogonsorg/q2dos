@@ -50,7 +50,7 @@ void Weapon_Bayonet_Fire1 (edict_t *ent)
     vec3_t  start;
     vec3_t  offset;
 	vec3_t g_offset;
-	
+
 	VectorCopy (vec3_origin,g_offset);
 
     AngleVectors (ent->client->v_angle, forward, right, NULL);
@@ -60,7 +60,7 @@ void Weapon_Bayonet_Fire1 (edict_t *ent)
 
     VectorScale (forward, -2, ent->client->kick_origin);
     ent->client->kick_angles[0] = -1;
- 
+
 	//gi.dprintf(DEVELOPER_MSG_GAME, "going to fire_knife\n");
 	fire_Knife (ent, start, forward, 90, 0, "gbr/bayonet/hit.wav", 0);
 
@@ -71,8 +71,6 @@ void Weapon_Bayonet_Fire1 (edict_t *ent)
 
 	//	gi.sound(ent, CHAN_VOICE, gi.soundindex("*jump1.wav"), 1, ATTN_NORM, 0);
 	PlayerNoise(ent, ent->s.origin, PNOISE_SELF);
-
-
 
 	if (ent->oldstance == ent->stanceflags //faf: not changing stances
 		&& ent->client->pers.weapon && !ent->deadflag)
@@ -94,10 +92,8 @@ void Weapon_Bayonet_Fire1 (edict_t *ent)
             ent->client->anim_end = FRAME_crawlpain04;
         }
 	}
-
-
-
 }
+
 mmove_t civilian_move_stand;
 qboolean CheckForTurret(edict_t *ent);
 void turret_off (edict_t *self);
@@ -136,16 +132,11 @@ void Cmd_Arty_f (edict_t *ent)
 	if (!IsValidPlayer(ent))
 		return;
 
-
-
 	if (ent->deadflag)
 		return;
 
-
 	if (!ent->client->resp.team_on)
 		return;
-
-
 
 	for (i=0 ; i<game.maxentities ; i++)
 	{
@@ -176,21 +167,9 @@ void Cmd_Arty_f (edict_t *ent)
 			t->nextthink = level.time + 2;
 			t->s.sound = 0;
 			t->s.effects = 0;
-            
 			safe_centerprintf (ent, "You defused the TNT!\n");
 		}
-
-
 	}
-
-
-
-
-
-
-
-
-
 
 	Spawn_Chute_Special (ent);
 
@@ -240,7 +219,6 @@ void Cmd_Arty_f (edict_t *ent)
 		return;
 	}
 
-
 	if (ent->client &&
 		ent->client->pers.weapon &&
 		ent->client->pers.weapon->classnameb == WEAPON_ENFIELD)
@@ -257,7 +235,6 @@ void Cmd_Arty_f (edict_t *ent)
 		return;
 	}
 
-
 	if (ent->client &&
 		ent->client->pers.weapon &&
 		ent->client->pers.weapon->classnameb == WEAPON_SVT)
@@ -272,9 +249,6 @@ void Cmd_Arty_f (edict_t *ent)
 		}
 		return;
 	}
-
-
-
 
 	if (ent->client->airstrike)
 	{
@@ -294,12 +268,6 @@ void Cmd_Arty_f (edict_t *ent)
 			safe_cprintf(ent, PRINT_HIGH, "Aim and then press fire to call an airstrike!\n");
 	}
 
-
-
-
-
-
-
 //	if (ent->client->resp.mos != OFFICER) {
 //		safe_cprintf(ent, PRINT_HIGH, "You're not an officer, soldier!\n");
 //		return;
@@ -310,14 +278,8 @@ void Cmd_Arty_f (edict_t *ent)
 		return;
 	}
 
-
-
-
 	//faf:  moving this up so you dont have to look through binocs to cancel arty
 	// make sure artillary hasn't already been called
-
-	
-
 
 	check = g_edicts+1;
 	for (e = 1; e < globals.num_edicts; e++, check++)
@@ -328,7 +290,6 @@ void Cmd_Arty_f (edict_t *ent)
 			continue;
 		if (strcmp(check->classname, "misc_civilian"))
 			continue;
-
 
 		VectorSubtract (ent->s.origin, check->s.origin, v);
 
@@ -361,23 +322,15 @@ void Cmd_Arty_f (edict_t *ent)
 					check->wait =level.time;
 					//if (!check->wait) check->wait =level.time;
 				}
-
-
 			}
 			check->obj_owner = ent->client->resp.team_on->index; 
 		}
-
 	}
-
-
-
 }
-
 
 
 void fire_airstrike (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage);//faf
 
- 
 //faf:  deleted a lot of stuff here from 4.1  airstrike/arty
 
 //put back in for ddaylife
@@ -392,12 +345,10 @@ void Think_Arty (edict_t *ent)
 	trace_t	tr;
 	trace_t tr_2;
 
-
-
-		if (!ent->owner ||
-		!ent->owner->client ||
-		!ent->owner->inuse ||
-		!ent->owner->client->resp.team_on ||
+	if (!ent->owner ||
+	    !ent->owner->client ||
+	    !ent->owner->inuse ||
+	    !ent->owner->client->resp.team_on ||
 		ent->owner->flyingnun)
 	{
 		G_FreeEdict(ent);
@@ -416,11 +367,6 @@ void Think_Arty (edict_t *ent)
 		G_FreeEdict(ent);
 		return;
 	}
-
-
-
-
-
 
 	// find the target point
 	VectorCopy(ent->owner->s.origin, start);
@@ -444,11 +390,9 @@ void Think_Arty (edict_t *ent)
 		return;
 	}
 
-	
 //    gi.sound(ent, CHAN_AUTO, gi.soundindex(va("%s/arty/hit%i.wav", ent->client->resp.team_on->teamid, ent->client->arty_location)), 1, ATTN_NORM, 0);
   //		if (IsValidPlayer(ent))
 	//		gi.sound(ent->owner, CHAN_AUTO, gi.soundindex(va("%s/arty/hit%i.wav", ent->owner->client->resp.team_on->teamid, 1)), 1, ATTN_NORM, 0);
-     
 
 	// fire away!
 
@@ -482,24 +426,20 @@ void Think_Arty (edict_t *ent)
 	
 	safe_cprintf(ent->owner, PRINT_HIGH, "Artillery fire confirmed, sir!\n");
 
-
 	ent->think = G_FreeEdict;
 	ent->nextthink = level.time +.1;
 
 	ent->owner->client->airstrike = NULL;
 
 	ent->owner->client->arty_time_restrict = level.time + arty_time->value; // delay for user defined minutes
-
 }
 
 void Arty_Sound (edict_t *ent)
 {
-
-
-		if (!ent->owner ||
-		!ent->owner->client ||
-		!ent->owner->inuse ||
-		!ent->owner->client->resp.team_on ||
+	if (!ent->owner ||
+	    !ent->owner->client ||
+	    !ent->owner->inuse ||
+	    !ent->owner->client->resp.team_on ||
 		ent->owner->flyingnun)
 	{
 		G_FreeEdict(ent);
@@ -522,7 +462,6 @@ void Arty_Sound (edict_t *ent)
 	gi.sound(ent->owner, CHAN_AUTO, gi.soundindex(va("%s/arty/fire.wav",  ent->owner->client->resp.team_on->teamid)), 1, ATTN_NONE, 0);    
 	ent->think = Think_Arty;
 	ent->nextthink = level.time +3;
-
 }
 
 
@@ -536,7 +475,6 @@ void Drop_Bomb(edict_t *ent)
 	AngleVectors (ent->s.angles, forward, NULL, NULL);
 	VectorMA (ent->s.origin, -33, forward, bomb_orig);
 
-
 	bomb = G_Spawn();
 	VectorCopy (bomb_orig, bomb->s.origin);
 
@@ -548,7 +486,7 @@ void Drop_Bomb(edict_t *ent)
 	VectorClear (bomb->maxs);
 
 	bomb->owner        = ent->owner;
-    
+
 	bomb->touch        = airstrike_touch;
 
 	bomb->nextthink    = level.time + 20;
@@ -556,16 +494,13 @@ void Drop_Bomb(edict_t *ent)
 
 	bomb->dmg          = 700;
 
-
 	VectorCopy (ent->movedir, bomb->movedir);
 	VectorCopy (ent->s.angles, bomb->s.angles);
 //	bomb->s.angles[0]= bomb->s.angles[0] *-1;
 //	bomb->s.angles[1]= bomb->s.angles[1] *-1;
 //	VectorCopy (ent->velocity, bomb->velocity);
-	
 
 	bomb->s.modelindex = gi.modelindex ("models/objects/rocket/tris.md2");
-
 
 	bomb->radius_dmg = 700;
 	bomb->dmg_radius = 300;
@@ -599,7 +534,6 @@ void Plane_Fly_Off (edict_t *ent)
 		ent->nextthink= level.time + .1;
 		ent->think = G_FreeEdict;
 	}
-
 }
 
 void Plane_Fire (edict_t *ent)
@@ -610,12 +544,10 @@ void Plane_Fire (edict_t *ent)
 		ent->think = G_FreeEdict;
 	}
 
-
 	if (ent->count >= 4)
 	{
 		ent->think = Plane_Fly_Off;
 		ent->nextthink = level.time + .1;
-
 	}
 	else
 	{
@@ -625,34 +557,23 @@ void Plane_Fire (edict_t *ent)
 	if (ent->count == 0  && ent->owner->client)
 		safe_cprintf(ent->owner, PRINT_HIGH, "Airstrike confirmed, sir!\n");
 
-	
 	Drop_Bomb(ent);
 	ent->count++;
 }
-
-
-
-
 
 void Plane_Think (edict_t *ent)
 {
 	vec3_t	length;
 	float   distance;
-
-
 	edict_t *botwarn;
-	
 
 	if (!ent->owner ||
 		!ent->owner->client ||
 		ent->flyingnun)
-	
 	{
 		G_FreeEdict(ent);
 		return;
 	}
-
-
 
 	VectorSubtract(ent->s.origin, ent->owner->client->arty_entry, length);
 	distance = VectorLength(length);
@@ -682,10 +603,7 @@ void Plane_Think (edict_t *ent)
 			{
 				VectorSet (ent->avelocity, 0, 0, 10);//faf
 			}
-
 		}
-
-
 	}
 	if (ent->s.angles[2] > 15) //don't tip too far
 	{
@@ -695,7 +613,6 @@ void Plane_Think (edict_t *ent)
 	{
 			VectorSet (ent->avelocity, 0, 0, 0);//faf
 	}
-
 
 //	safe_bprintf (PRINT_HIGH, "%s \n", vtos(ent->s.angles));
 
@@ -709,8 +626,6 @@ void Plane_Think (edict_t *ent)
 	}
 	else
 		ent->nextthink = level.time +.1;
-
-
 }
 
 void plane_die(edict_t * self , edict_t * inflictor , edict_t * attacker , int damage , vec3_t point )
@@ -720,7 +635,6 @@ void plane_die(edict_t * self , edict_t * inflictor , edict_t * attacker , int d
 	gi.WritePosition (self->s.origin);
 	gi.multicast (self->s.origin, MULTICAST_PHS);
 	G_FreeEdict(self);
-
 }
 
 //faf
@@ -797,7 +711,6 @@ void Spawn_Plane(edict_t *ent)
 		VectorCopy (temp, longest);
 		VectorCopy (right, direction);
 		VectorCopy (tr.endpos, plane_start);
-
 	}
 	VectorMA(start, 8192, right, end);
 
@@ -927,8 +840,7 @@ void Airstrike_Plane_Launch(edict_t *ent)
 
 	else
 		gi.sound(ent->owner, CHAN_AUTO, gi.soundindex(va("%s/arty/fire.wav",  ent->owner->client->resp.team_on->teamid)), 1, ATTN_NONE, 0);    
-	
-	
+
 	Spawn_Plane(ent->owner); //faf
 
 	ent->think = G_FreeEdict;
@@ -936,17 +848,8 @@ void Airstrike_Plane_Launch(edict_t *ent)
 
 	ent->owner->client->airstrike = NULL;
 
-	ent->owner->client->arty_time_restrict = level.time + arty_time->value; 
-
-
+	ent->owner->client->arty_time_restrict = level.time + arty_time->value;
 }
-
-
-
-
-
-
-
 
 
 void airstrike_touch_i (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
@@ -956,7 +859,6 @@ void airstrike_touch_i (edict_t *ent, edict_t *other, cplane_t *plane, csurface_
 	vec3_t  end, world_up, start;
 	trace_t	tr;
 
-	
 	VectorSet(world_up, 0, 0, 1);
 	VectorCopy(ent->s.origin, start);
 	VectorMA(start, 8192, world_up, end);
@@ -1047,7 +949,6 @@ void Drop_Bomb_i(edict_t *ent)
 }
 
 
-
 void Plane_Fire_i (edict_t *ent)
 {
 	if (ent->leave_limbo_time < level.time - 20)
@@ -1088,7 +989,6 @@ void Plane_Think_i (edict_t *ent)
 			{
 				VectorSet (ent->avelocity, 0, 0, 10);//faf
 			}
-
 		}
 	}
 	if (ent->s.angles[2] > 15) //don't tip too far
@@ -1186,7 +1086,6 @@ void Spawn_Plane_i(edict_t *ent)
 		plane->s.modelindex = gi.modelindex ("models/ships/grmplane/tris.md2");
 	else
 		plane->s.modelindex = gi.modelindex (ent->model);
-	
 
 	VectorClear (plane->mins);
 	VectorClear (plane->maxs);
@@ -1236,5 +1135,4 @@ void SP_airstrike(edict_t *ent)
 	ent->nextthink =  level.time + ent->delay + ent->wait + crandom() * ent->random;
 	gi.linkentity (ent);
 }
-
 

@@ -1551,7 +1551,7 @@ struct gclient_s
 	//pbowens
 	int			dmgef_startframe;
 	int			dmgef_sway_value;
-	qboolean	dmgef_sway_switch;
+	int			dmgef_sway_switch;
 	float		dmgef_intensity;
 	qboolean	dmgef_flash;
 	float		dmgef_ablend;
@@ -1945,7 +1945,7 @@ typedef struct
 	vec3_t		origin;
 	int			angle;
 	int			stance;
-	qboolean	type;
+	camp_t		type;
 	edict_t		*owner;
 } camp_spots_t;
 

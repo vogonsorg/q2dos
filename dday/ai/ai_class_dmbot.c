@@ -40,12 +40,12 @@ static gitem_t *blueflag;
 //==========================================
 void BOT_DMclass_Move(edict_t *self, usercmd_t *ucmd)
 {
-	int current_node_flags = 0;
+//	int current_node_flags = 0;
 	int next_node_flags = 0;
 	int	current_link_type = 0;
 	int i;
 
-	current_node_flags = nodes[self->ai->current_node].flags;
+//	current_node_flags = nodes[self->ai->current_node].flags;
 	next_node_flags = nodes[self->ai->next_node].flags;
 	if( AI_PlinkExists( self->ai->current_node, self->ai->next_node ))
 	{
@@ -680,7 +680,7 @@ void BOT_DMclass_ChooseWeapon(edict_t *self)
 //	int		i;
 //	float	best_weight = 0.0;
 //	gitem_t	*best_weapon = NULL;
-	int		weapon_range = 0;
+//	int	weapon_range = 0;
 
 	gitem_t	*it;
 	int index;
@@ -725,14 +725,14 @@ void BOT_DMclass_ChooseWeapon(edict_t *self)
 	VectorSubtract (self->s.origin, self->enemy->s.origin, v);
 	dist = VectorLength(v);
 
-	if(dist < 150)
-		weapon_range = AIWEAP_MELEE_RANGE;
-	else if(dist < 500)	//Medium range limit is Grenade Laucher range
-		weapon_range = AIWEAP_SHORT_RANGE;
-	else if(dist < 900)
-		weapon_range = AIWEAP_MEDIUM_RANGE;
-	else
-		weapon_range = AIWEAP_LONG_RANGE;
+//	if(dist < 150)
+//		weapon_range = AIWEAP_MELEE_RANGE;
+//	else if(dist < 500)	//Medium range limit is Grenade Laucher range
+//		weapon_range = AIWEAP_SHORT_RANGE;
+//	else if(dist < 900)
+//		weapon_range = AIWEAP_MEDIUM_RANGE;
+//	else
+//		weapon_range = AIWEAP_LONG_RANGE;
 
 	//if we've just fired sniper and an enemy is close by.  switch to pistol
 	if (dist < 500 && self->client->pers.weapon && self->client->pers.weapon->position == LOC_SNIPER &&

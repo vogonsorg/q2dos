@@ -322,15 +322,15 @@ int AI_ClosestNodeToReachableSpot(edict_t *self, vec3_t origin)
 	int			node=-1;
 	vec3_t		v;
 
-	int			check[3];
+	//int			check[4];
 	int			c;
 
 
 	//gi.dprintf(DEVELOPER_MSG_GAME, "%s\n",vtos(origin));
-	check[0]=-1;
-	check[1]=-1;
-	check[2]=-1;
-	check[3]=-1;
+	//check[0]=-1;
+	//check[1]=-1;
+	//check[2]=-1;
+	//check[3]=-1;
 
 	c = 0;
 	while (c < 4)
@@ -360,7 +360,7 @@ int AI_ClosestNodeToReachableSpot(edict_t *self, vec3_t origin)
 		if( AStar_GetPath( self->ai->current_node, node, self->ai->pers.moveTypesMask, &self->ai->path ) )
 			return node;
 
-		check [c] = node;
+		//check [c] = node;
 
 		//gi.dprintf(DEVELOPER_MSG_GAME, "%s\n", vtos(nodes[node].origin));
 

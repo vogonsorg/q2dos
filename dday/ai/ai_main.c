@@ -244,7 +244,7 @@ qboolean AI_BotRoamForLRGoal(edict_t *self, int current_node)
 	float	cost;
 	float	weight, best_weight = 0.0;
 	int		goal_node = INVALID;
-	int		best_broam = INVALID;
+//	int		best_broam = INVALID;
 	float	dist;
 
 	if (!nav.num_broams)
@@ -272,7 +272,7 @@ qboolean AI_BotRoamForLRGoal(edict_t *self, int current_node)
 		{
 			best_weight = weight;
 			goal_node = nav.broams[i].node;
-			best_broam = i;
+		//	best_broam = i;
 		}
 	}
 
@@ -347,7 +347,7 @@ void AI_PickLongRangeGoal(edict_t *self)
 	int		node;
 	float	weight,best_weight=0.0;
 	int		current_node, goal_node = INVALID;
-	edict_t *goal_ent = NULL;
+//	edict_t *goal_ent = NULL;
 	float	cost;
 	int nearest = -1;
 	float temp_distance, nearest_distance = 9999999;
@@ -419,7 +419,7 @@ void AI_PickLongRangeGoal(edict_t *self)
 		{		
 			best_weight = weight;
 			goal_node = node;
-			goal_ent = AIEnemies[i];
+		//	goal_ent = AIEnemies[i];
 		}
 	}
 

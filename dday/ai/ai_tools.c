@@ -278,8 +278,7 @@ void SV_Remove_Node (edict_t *ent)
 
 void Show_Nodes_Think (edict_t *ent)
 {
-	vec3_t	last_movedir;
-
+//	vec3_t	last_movedir;
 	vec3_t	start,end;
 	float	dist;
 	vec3_t	v;
@@ -367,7 +366,7 @@ void Show_Nodes_Think (edict_t *ent)
 
 	VectorCopy (start, ent->s.origin);
 
-	VectorCopy (ent->movedir, last_movedir);
+//	VectorCopy (ent->movedir, last_movedir);
 //	VectorMA (ent->mins, 0.5, ent->size, point);
 	VectorSubtract (start, end, ent->movedir);
 	VectorNormalize (ent->movedir);
@@ -384,7 +383,7 @@ void Show_Nodes_Think (edict_t *ent)
 
 void Bot_Laser_Think (edict_t *ent)
 {
-	vec3_t	last_movedir;
+//	vec3_t	last_movedir;
 	vec3_t	start,end;
 
 	if (!ent->owner || !ent->owner->ai  || !ent->owner->client->resp.laser)
@@ -399,7 +398,7 @@ void Bot_Laser_Think (edict_t *ent)
 
 	VectorCopy (start, ent->s.origin);
 
-	VectorCopy (ent->movedir, last_movedir);
+//	VectorCopy (ent->movedir, last_movedir);
 	VectorSubtract (start, end, ent->movedir);
 	VectorNormalize (ent->movedir);
 

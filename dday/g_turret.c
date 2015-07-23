@@ -262,9 +262,6 @@ void fire_shell (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed,
 	trail->think = G_FreeEdict;
 	gi.linkentity (trail);
 
-
-
-
 	shell = G_Spawn();
 	VectorCopy (start, shell->s.origin);
 	VectorCopy (dir, shell->movedir);
@@ -279,7 +276,7 @@ void fire_shell (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed,
 	shell->touch = shell_touch;
 
 //	shell->s.effects |= EF_GRENADE;
-	shell->nextthink = shell->nextthink = level.time + 8000/speed;
+	shell->nextthink = level.time + 8000/speed;
 	shell->think = G_FreeEdict;
 
 
@@ -288,7 +285,6 @@ void fire_shell (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed,
 	shell->dmg_radius = damage_radius;
 //	shell->s.sound = gi.soundindex ("weapons/rockfly.wav");
 	shell->classname = "shell";
-
 
 	gi.linkentity (shell);
 }
@@ -300,7 +296,7 @@ void turret_breach_fire (edict_t *self)
 	int		damage;
 	int		speed;
 	vec3_t	radius_damage = {1, 1, 1};
-    vec3_t  spread = {5, 5, 0};
+	vec3_t  spread = {5, 5, 0};
 
 
 	//touchdt = last fire time.  paindt = firing rate

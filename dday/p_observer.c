@@ -1324,7 +1324,7 @@ void MapVote(edict_t *ent)
 	int i;
 	char filename[100];
 	FILE	*f;
-	qboolean botmap = false;
+	//qboolean botmap = false;
 	char* theText = NULL;
 	char *add;
 
@@ -1344,7 +1344,7 @@ void MapVote(edict_t *ent)
 			if (f) {
 				fclose (f);
 				add = "*";
-				botmap = true;
+			//	botmap = true;
 			}
 			else
 				add = " ";

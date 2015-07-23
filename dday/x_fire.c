@@ -279,7 +279,6 @@ qboolean PBM_Inflammable (edict_t *ent)
 	/* Bio-suit offers partial immunity to fire. */
                 if ((ent->client->enviro_framenum > level.framenum) && (random() < 0.8))
                         return true;
-
 	}
 
 /* The entity is flammable. */
@@ -320,11 +319,11 @@ void PBM_BurnDamage
 	int   points;
 	int   die = (int)damage[0];
 	int   base = (int)damage[1];
-	int   chance;
-	
-	chance = (int)damage[2];
+//	int   chance;
 
-    if (PBM_Inflammable(victim))
+//	chance = (int)damage[2];
+
+	if (PBM_Inflammable(victim))
 		return;
 
 /* Calculate damage. */
@@ -335,12 +334,11 @@ void PBM_BurnDamage
 
 /* Check if entity will catch on fire. */
 //	if ((rand() % 100) < chance)
-			if (fire->master != fire);
-                PBM_Ignite (victim, fire->master, point);
+		if (fire->master != fire);
+			PBM_Ignite (victim, fire->master, point);
 
 /* Inflict some burn damage. */
-
-        T_Damage (victim, fire, fire->master, vec3_origin, point, vec3_origin, points, 0, dflags, mod);
+	T_Damage (victim, fire, fire->master, vec3_origin, point, vec3_origin, points, 0, dflags, mod);
 }
 
 /*------------------------------------------------------/ New Code /--------
@@ -562,8 +560,8 @@ void PBM_Ignite (edict_t *victim, edict_t *attacker, vec3_t point)
                 victim->burner->master  = attacker;
                 return;
         }
-		
-		//not using this
+
+	//not using this
        // if(victim->client)
 		//Drop_Flamed(victim);
 
@@ -579,17 +577,12 @@ void PBM_Ignite (edict_t *victim, edict_t *attacker, vec3_t point)
 		gi.sound(victim, CHAN_AUTO, gi.soundindex("jpn/molotov/flareup.wav"), 1, ATTN_NORM, 0);
 	}
 
-
-
-
-
 /* Create the fire. */
 	PBM_FireSpot(spot, victim);
 
 	fire = G_Spawn();
 
 	fire->s.renderfx   = RF_FULLBRIGHT;
-
 
 	fire->s.modelindex = MD2_FIRE;
         fire->s.frame      = FRAME_FIRST_LARGEIGNITE;
@@ -615,11 +608,8 @@ void PBM_Ignite (edict_t *victim, edict_t *attacker, vec3_t point)
 	VectorCopy (burn_damage, fire->pos1);
 	VectorCopy (radius_damage, fire->pos2);
 
-
 	//faf:
 	fire->s.sound = gi.soundindex("inland/fire.wav");
-
-
 
         gi.linkentity (fire);
 
@@ -1159,19 +1149,14 @@ void PBM_FlameThrowerThink (edict_t *self)
 		self->s.skinnum += 3;
 	self->nextthink = level.time + FRAMETIME;
 
-
-		if (rand()% 100 ==1)
+	if (rand()% 100 ==1)
         PBM_FireDrop (self->master, self->s.origin, self->pos1, self->pos2, self->dmg, self->velocity);
-
-
 }
 
 
 //faf:  flame starts invisible at players origin, then becomes visible here
 void Become_Flame (edict_t *fireball)
 {
-
-
 ///	//bcass start - gibola
 //	if (self->client->gibmachine == flame_normal)
 //	{
@@ -1201,8 +1186,6 @@ fireball->s.renderfx = RF_TRANSLUCENT;
 }
 
 
-
-
 /*------------------------------------------------------/ New Code /--------
 //  Create and launch a fat fireball.
 //------------------------------------------------------------------------*/
@@ -1211,8 +1194,6 @@ void PBM_FireFlameThrower
 {
 	edict_t  *fireball;
 
-
-
 /* Adjust fireball direction with 'spread'. */
      PBM_FireAngleSpread (spread, dir);
 
@@ -1220,22 +1201,17 @@ void PBM_FireFlameThrower
 	fireball = G_Spawn();
 //        fireball->s.modelindex = gi.modelindex("models/objects/r_explode/tris.md2");
 
-
 	VectorClear (fireball->mins);
 	VectorClear (fireball->maxs);
 
-
 //	VectorSet (fireball->mins, -8, -8, -8);
 //	VectorSet (fireball->maxs, 8,8,8);
-
-
 
 	VectorCopy (start, fireball->s.origin);
 	vectoangles (dir, fireball->s.angles);
 	VectorScale (dir, speed, fireball->velocity);
 
 	VectorAdd (fireball->velocity, self->velocity, fireball->velocity);
-
 
         fireball->s.angles[PITCH] -= 90;
         fireball->s.angles[YAW]   += rand() % 360;
@@ -1263,23 +1239,13 @@ void PBM_FireFlameThrower
 
 /* If fireball is spawned in liquid, it dissolves. */
 	if (PBM_InWater (fireball))
-	{       
+	{ 
 		PBM_BecomeSteam (fireball);
 		return;
 	}
-
-
-
-
-
-
 
 /* Flamethrower is an area effect weapon, so don't bother dodging. */
 }
 
 
 /*===========================/  END OF FILE  /===========================*/
-
-
-
-

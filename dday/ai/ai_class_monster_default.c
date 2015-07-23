@@ -41,13 +41,13 @@ void BOT_DMclass_Move(edict_t *self, usercmd_t *ucmd);
 //}
 void M_default_Move(edict_t *self, usercmd_t *ucmd)
 {
-	int current_node_flags = 0;
-	int next_node_flags = 0;
+//	int current_node_flags = 0;
+//	int next_node_flags = 0;
 	int	current_link_type = 0;
 //	int i;
 
-	current_node_flags = nodes[self->ai->current_node].flags;
-	next_node_flags = nodes[self->ai->next_node].flags;
+//	current_node_flags = nodes[self->ai->current_node].flags;
+//	next_node_flags = nodes[self->ai->next_node].flags;
 	if( AI_PlinkExists( self->ai->current_node, self->ai->next_node ))
 	{
 		current_link_type = AI_PlinkMoveType( self->ai->current_node, self->ai->next_node );
@@ -375,7 +375,7 @@ int M_default_GravityBoxStep( vec3_t origin, float scale, vec3_t movedir, vec3_t
 	int		movemask = 0;
 	int		eternalfall = 0;
 	float	/*xzdist,*/ xzscale;
-	float	/*ydist,*/ yscale;
+//	float	ydist, yscale;
 //	float	dist;
 
 	//trap_Trace( &trace, origin, mins, maxs, origin, passent, solidmask );
@@ -386,9 +386,9 @@ int M_default_GravityBoxStep( vec3_t origin, float scale, vec3_t movedir, vec3_t
 //	VectorSubtract( destvec, origin, movedir);
 	VectorNormalize( movedir );
 	vectoangles( movedir, angles );
-	
+
 	xzscale = scale;
-	yscale = scale;
+//	yscale = scale;
 /*
 	//remaining distance in planes
 	if( scale < 1 )

@@ -51,10 +51,10 @@ void ClientBeginDeathmatch (edict_t *ent);
 // Ref/Observer Mode
 void Cmd_FlyingNunMode_f(edict_t *ent)
 {
-	char* pw = NULL;
-	pw = gi.args();
+//	char* pw = NULL;
+//	pw = gi.args();
 
-//		if (ent->client->resp.AlreadySpawned)
+//	if (ent->client->resp.AlreadySpawned)
 //	{
 //		safe_cprintf(ent, PRINT_HIGH, "Observer Mode is only available before you join a team.\n");
 //		return;
@@ -65,7 +65,7 @@ void Cmd_FlyingNunMode_f(edict_t *ent)
 		safe_cprintf(ent, PRINT_HIGH, "Observer Mode Not Available\n");
 		return;
 	}
-	else 
+	else
 	if (Q_stricmp(flyingnun_password->string, pw) != 0 
 		&& !ent->flyingnun) //faf
 	{

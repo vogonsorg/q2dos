@@ -807,7 +807,7 @@ void BOT_SpawnBot (int team, char *name, char *skin, char *userinfo)
 void BOT_RemoveBot(char *name, edict_t *botremove)
 {
 	int i;
-	qboolean freed=false;
+	//qboolean freed=false;
 	edict_t *bot;
 
 	for(i=0;i<maxclients->value;i++)
@@ -833,7 +833,7 @@ void BOT_RemoveBot(char *name, edict_t *botremove)
 			//bot->s.frame=197;
 			bot->s.modelindex = 0;
 			bot->inuse = false;
-			freed = true;
+			//freed = true;
 			AI_EnemyRemoved (bot);
 			G_FreeAI( bot ); //jabot092(2)
 			//safe_bprintf (PRINT_MEDIUM, "%s removed\n", bot->client->pers.netname);
