@@ -1882,6 +1882,7 @@ void Cmd_Kill_f (edict_t *ent)
 
 	//T_Damage(ent,ent,ent, ent->maxs, ent->s.origin, NULL, 999, 0,  DAMAGE_NO_PROTECTION,
 	//			MOD_SUICIDE);
+	*/
 	/*
 	ent->flags &= ~FL_GODMODE;
 	ent->health = 0;
@@ -2583,9 +2584,9 @@ void change_stance(edict_t *self, int stance)
 **
 **
 *********************************************************************************************/
-//extern SMos_t def_MOS_List;
-//void SP_info_team_start(edict_t * ent );
-/*
+#if 0
+extern SMos_t def_MOS_List;
+void SP_info_team_start(edict_t * ent);
 void Cmd_Create_Team(edict_t *ent)
 {
 	char *teamname;
@@ -2660,12 +2661,12 @@ void M_ChooseMOS(edict_t *ent);
 void AfterSwitch(edict_t *ent, int type)
 {
 /*	gi.unlinkentity (ent);
-	ent->movetype = MOVETYPE_NOCLIP; 
-	ent->solid = SOLID_NOT; 
-	ent->svflags |= SVF_NOCLIENT; 
+	ent->movetype = MOVETYPE_NOCLIP;
+	ent->solid = SOLID_NOT;
+	ent->svflags |= SVF_NOCLIENT;
 	ent->client->ps.gunindex = 0; */
 
-/*	ent->client->limbo_mode=true;
+	ent->client->limbo_mode=true;
 
 	switch (type) {
 	default:
@@ -2793,8 +2794,8 @@ void Cmd_Join_team(edict_t *ent)
 
 		AfterSwitch(ent, 2);
 	}
-}*/
-/*
+}
+
 void Cmd_Quit_team(edict_t *ent)
 {
 	int					j;
@@ -2843,11 +2844,11 @@ void Cmd_Quit_team(edict_t *ent)
 
 	//SwitchToObserver(ent);
 	respawn (ent);
-	* /
+	*/
 
 	AfterSwitch(ent, 1);
 }
-*/
+#endif
 
 void Cmd_List_team(edict_t *ent)
 {

@@ -1033,10 +1033,9 @@ void SP_turret_driver (edict_t *self)
 	self->gib_health = 0;
 	self->mass = 200;
 	self->viewheight = 24;
-/*-----/ PM /-----/ NEW:  Set fireflags. /-----*/
-  //  self->fireflags = FIREFLAG_DELTA_BASE | FIREFLAG_IGNITE;
-/*---------------------------------------------*/
-/*
+//-----/ PM /-----/ NEW:  Set fireflags. /-----
+//	self->fireflags = FIREFLAG_DELTA_BASE | FIREFLAG_IGNITE;
+//---------------------------------------------
 	self->die = turret_driver_die;
 	self->monsterinfo.stand = infantry_stand;
 
