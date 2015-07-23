@@ -507,7 +507,7 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 		{
 			Com_Printf("VESA mode 0x%0x %dx%d supported\n",modeinfo.modenum,modeinfo.width,modeinfo.height);
 
-			if(num_vid_resolutions<MAX_RESOLUTIONS)
+			if (num_vid_resolutions < MAX_RESOLUTIONS)
 			{
 				vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
 				vid_resolutions[num_vid_resolutions].vesa_mode=modeinfo.modenum;
@@ -521,16 +521,15 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 					return false;
 
 				vid_resolutions[num_vid_resolutions].address = real2ptr (phys_mem_info.address);
-//				vid_resolutions[num_vid_resolutions].address=real2ptr(modeinfo.pptr);//(void *)modeinfo.pptr; // FS: Real2ptr returns a (void *)
 
-				if ( !(COM_CheckParm("-bankedvga")) ) // FS: FIXME, just add all modes for banked
+				if (!(COM_CheckParm("-bankedvga"))) /* FS: FIXME, just add all modes for banked */
 				{
-					vid_resolutions[num_vid_resolutions].isLFB=true; // FS: Added
+					vid_resolutions[num_vid_resolutions].isLFB=true; /* FS: Added */
 				}
 				else
 				{
-					vid_resolutions[num_vid_resolutions].isLFB=false; // FS: Added
-					vid_resolutions[num_vid_resolutions].isBanked=true; // FS: Added
+					vid_resolutions[num_vid_resolutions].isLFB=false; /* FS: Added */
+					vid_resolutions[num_vid_resolutions].isBanked=true; /* FS: Added */
 				}
 				Com_sprintf(vid_resolutions[num_vid_resolutions].menuname, sizeof(vid_resolutions[num_vid_resolutions].menuname), "[VESA %dx%d]",modeinfo.width,modeinfo.height);
 				num_vid_resolutions++;
@@ -543,10 +542,8 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 		printf("  win b attrib = 0x%0x\n", *(unsigned char*)(infobuf+3));
 		printf("  win a seg 0x%0x\n", (int) modeinfo.winasegment);
 		printf("  win b seg 0x%0x\n", (int) modeinfo.winbsegment);
-		printf("  bytes per scanline = %d\n",
-				modeinfo.bytes_per_scanline);
-		printf("  width = %d, height = %d\n", modeinfo.width,
-				modeinfo.height);
+		printf("  bytes per scanline = %d\n", modeinfo.bytes_per_scanline);
+		printf("  width = %d, height = %d\n", modeinfo.width, modeinfo.height);
 		printf("  win = %c\n", 'A' + modeinfo.win);
 		printf("  win granularity = %d\n", modeinfo.granularity);
 		printf("  win size = %d\n", modeinfo.win_size);

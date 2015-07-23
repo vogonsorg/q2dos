@@ -4,7 +4,7 @@
 #include "../ref_soft/r_local.h"
 #include "vid_dos.h"
 
-// FS: For planar modes
+/* FS: For planar modes */
 #include "vregset.h"
 #include "vgamodes.h"
 #include "dosisms.h"
@@ -156,7 +156,7 @@ void	SWimp_Shutdown( void )
 	__dpmi_int(0x10, &r);
 }
 
-rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
+rserr_t SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
 {
 	__dpmi_regs r;
 
@@ -248,43 +248,37 @@ void		SWimp_AppActivate( qboolean active )
 
 void VID_DrawBanked(void)
 {
-	int bank_number=0;
-	int todo=vid_resolutions[currentvideomode].height*vid_resolutions[currentvideomode].width;
-	int copy_size;
+	const unsigned char *buf = vid.buffer;
+	int bank = 0;
+	int h = vid_resolutions[currentvideomode].height;
+	int w = vid_resolutions[currentvideomode].width;
+	int todo = h * w;
+	int copy;
 	__dpmi_regs r;
 
-	while (todo>0)
+	while (todo > 0)
 	{
-#if 0 // FS: For page flipping?
+#if 0 /* FS: For page flipping? */
 		r.x.ax = 0x4F07;
 		r.x.bx = 0;
-		r.x.cx = bank_number % vid_resolutions[currentvideomode].width;
-		r.x.dx = bank_number / vid_resolutions[currentvideomode].width;
+		r.x.cx = bank % w;
+		r.x.dx = bank / w;
 		__dpmi_int(0x10, &r);
 #endif
 
 		r.x.ax = 0x4F05;
 		r.x.bx = 0;
-		r.x.dx = bank_number;
+		r.x.dx = bank;
 		__dpmi_int(0x10, &r);
 
-		if (todo>65536) // FS: 320x240
-		{
-			copy_size=65536;
-		}
-		else
-		{
-			copy_size=todo;
-		}
+		copy = (todo > 65536)? 65536 : todo;
+		dosmemput(buf, copy, 0xA0000);
 
-		dosmemput(vid.buffer, copy_size, 0xA0000);
-
-		todo-=copy_size;
-		vid.buffer+=copy_size;
-		bank_number++;
+		todo -= copy;
+		buf += copy;
+		bank++;
 	}
-	// FS: FIXME: I don't think the next line is the right thing to do?  Should this be copied into a temporary buffer instead?
-	vid.buffer-=vid_resolutions[currentvideomode].height*vid_resolutions[currentvideomode].width; // FS: Move back to the beginning, this was the cause of the crash after a few frames
+
 	r.x.ax = 0x4f05;
 	r.x.bx = 0;
 	r.x.dx = 0;

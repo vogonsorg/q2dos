@@ -7,7 +7,7 @@
 #include <limits.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <dos.h> // FS: For detecting Windows NT
+#include <dos.h>
 #include <dir.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -16,11 +16,11 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <dpmi.h>
-#include <crt0.h> // FS: Fake Mem Fix (QIP)
+#include <crt0.h> /* FS: Fake Mem Fix (QIP) */
 #include <sys/nearptr.h>
 #include <conio.h>
 
-int _crt0_startup_flags = _CRT0_FLAG_NONMOVE_SBRK; // FS: Fake Mem Fix (QIP)
+int _crt0_startup_flags = _CRT0_FLAG_NONMOVE_SBRK; /* FS: Fake Mem Fix (QIP) */
 
 #include "dosisms.h"
 #include "../qcommon/qcommon.h"
@@ -65,15 +65,14 @@ static void TrapKey(void)
 	keybuf[keybuf_head] = dos_inportb(0x60);
 	dos_outportb(0x20, 0x20);
 
-
 	keybuf_head = (keybuf_head + 1) & (KEYBUF_SIZE-1);
 }
 
-#define SC_UPARROW              0x48
+#define SC_UPARROW      0x48
 #define SC_DOWNARROW    0x50
-#define SC_LEFTARROW            0x4b
+#define SC_LEFTARROW    0x4b
 #define SC_RIGHTARROW   0x4d
-#define SC_LEFTSHIFT   0x2a
+#define SC_LEFTSHIFT    0x2a
 #define SC_RIGHTSHIFT   0x36
 #define SC_RIGHTARROW   0x4d
 
@@ -88,13 +87,13 @@ void Sys_PopFPCW (void);
 void Sys_SetFPCW (void);
 double Sys_FloatTime (void);
 
-#define LEAVE_FOR_CACHE (512*1024)              //FIXME: tune
-#define LOCKED_FOR_MALLOC (128*1024)    //FIXME: tune
+#define LEAVE_FOR_CACHE   (512*1024)    /* FIXME: tune */
+#define LOCKED_FOR_MALLOC (128*1024)    /* FIXME: tune */
 
 
 int		end_of_memory;
 static qboolean	lockmem, lockunlockmem, unlockmem;
-static qboolean	bSkipWinCheck, bSkipLFNCheck; // FS
+static qboolean	bSkipWinCheck, bSkipLFNCheck;  /* FS */
 static int	win95;
 
 /* FS: Stuff for /memstats */
@@ -138,12 +137,12 @@ static qboolean Sys_DetectWinNT (void) /* FS: Wisdom from Gisle Vanem */
 
 static void Sys_DetectWin95 (void)
 {
-	__dpmi_regs                             r;
+	__dpmi_regs r;
 
-	r.x.ax = 0x160a;                /* Get Windows Version */
+	r.x.ax = 0x160a; /* Get Windows Version */
 	__dpmi_int(0x2f, &r);
 
-	if(/*(bSkipWinCheck) || */(((r.x.ax) || (r.h.bh < 4)) && !(Sys_DetectWinNT())) )        /* Not windows or earlier than Win95 */
+	if (/*bSkipWinCheck || */((r.x.ax || r.h.bh < 4) && !Sys_DetectWinNT())) /* Not windows or earlier than Win95 */
 	{
 		win95 = 0;
 		lockmem = true;
@@ -152,17 +151,14 @@ static void Sys_DetectWin95 (void)
 	}
 	else
 	{
-		printf("Microsoft Windows detected.  Please run Q2DOS in pure MS-DOS for best stability.\n"); // FS: Warning
+		printf("Microsoft Windows detected.  Please run Q2DOS in pure DOS for best stability.\n"); /* FS: Warning */
 		win95 = 1;
 		lockunlockmem = COM_CheckParm ("-winlockunlock");
-
 		if (lockunlockmem)
 			lockmem = true;
 		else
 			lockmem = COM_CheckParm ("-winlock");
-
 		unlockmem = lockmem && !lockunlockmem;
-//		Sys_Error("Microsoft Windows detected.  You must run Q2DOS in MS-DOS."); /* FS: Warning.  Too many issues in Win9x and even XP.  QDOS is the same way.  So forget it. */
 	}
 }
 
@@ -264,7 +260,7 @@ void Sys_Error (char *error, ...)
 
 	Sys_SetTextMode();
 
-	printf ("Sys_Error: ");	
+	printf ("Sys_Error: ");
 	va_start (argptr,error);
 	vprintf (error,argptr);
 	va_end (argptr);
@@ -274,11 +270,11 @@ void Sys_Error (char *error, ...)
 	__djgpp_nearptr_disable(); /* FS: Everyone else is a master DOS DPMI programmer.  Pretty sure CWSDPMI is already taking care of this... */
 
 #if 0
-{	//we crash here so we can get a backtrace.  Yes it is ugly, and no this should never be in production!
-	int j,k;
+{	/* we crash here so we can get a backtrace.  Yes it is ugly, and no this should never be in production! */
+	volatile int j,k;
 	fflush(stdout);
 	j=0;
-	k=5/j;	//divide by zero!
+	k=5/j;	/* divide by zero! */
 }
 #endif
 	exit (1);
