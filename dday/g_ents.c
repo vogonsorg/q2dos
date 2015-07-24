@@ -393,8 +393,8 @@ void InitTeam (char *team, int i)
 void LoadBotChat (int teamnum, char *teamid)
 {
 	char *tempchat;
-	char *s, *f, *fPtr;
-	int c;
+	char *s, *f, *fPtr = NULL;
+	int		c;
 	char	filename[MAX_QPATH];
 
 	c=0;

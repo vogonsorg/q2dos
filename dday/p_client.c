@@ -2747,7 +2747,7 @@ loadgames will.
 qboolean ClientConnect (edict_t *ent, char *userinfo)
 {
 	static int Already_Done=0;
-	char	*value, *f, *fPtr, *ip;
+	char	*value, *f, *fPtr=NULL, *ip;
 
 	// check to see if they are on the banned IP list
 	value = Info_ValueForKey (userinfo, "ip");
@@ -3121,7 +3121,7 @@ qboolean Setup_Map_Vote (void)
 	char	*maps;
 	int		i,j,k,c;
 
-	char *s, *f, *fPtr;
+	char *s, *f, *fPtr = NULL;
 
 	int mapcount;
 	int	newmapcount;
@@ -4231,7 +4231,7 @@ void Write_Player_Stats (edict_t *ent)
 	char	*ip;
 //	int		c;
 
-	char *s, *f, *fPtr;
+	char *s, *f, *fPtr = NULL;
 
 	char *statsc;
 
@@ -4506,7 +4506,7 @@ void SetPlayerRating(edict_t *ent)
 	char	statsfilename[MAX_QPATH];
 //	int		c;
 
-	char *s, *f, *fPtr;
+	char *s, *f, *fPtr = NULL;
 
 	char *statsc;
 

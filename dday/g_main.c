@@ -381,7 +381,7 @@ void Write_Last_Maps(void){
 void Read_Last_Maps()
 {
 	int		i;
-	char	*s, *f, *fPtr;
+	char	*s, *f, *fPtr = NULL;
 	char	*lastmaps;
 
 	lastmaps = ReadEntFile("dday/lastmaps.txt");
@@ -408,7 +408,7 @@ char *Get_Next_MaplistTxt_Map ()
 	char	*maps;
 	int		i,j,c;
 	
-	char *s, *f, *fPtr;
+	char *s, *f, *fPtr = NULL;
 
 	int mapcount;
 	int	newmapcount;

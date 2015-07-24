@@ -360,7 +360,7 @@ void SetupCampaign (qboolean restart)
 	char	campaignfilename[MAX_QPATH];
 	char	*campinfo;
 	int		c;
-	char *s, *f, *fPtr;
+	char *s, *f, *fPtr = NULL;
 
 	char *bspname;
 	char *exita,*exitb,*exitc;

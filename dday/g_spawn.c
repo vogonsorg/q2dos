@@ -851,7 +851,7 @@ void LoadCampFile(void)
 	char	*camplocs;
 	int		c;
 
-	char *s, *f, *fPtr;
+	char *s, *f, *fPtr = NULL;
 
 	vec3_t	loc;
 	int x,y,z;
