@@ -1,4 +1,4 @@
-/
+//
 // d_copy.s
 // x86 assembly-language screen copying code.
 //
@@ -37,7 +37,7 @@ C(VGA_UpdatePlanarScreen):
 
 	movl	$0x3C4,%edx
 	movb	$2,%al
-	outb	%al,%dx		// point the SC to the Map Mask
+	outb	%al,%dx				// point the SC to the Map Mask
 	incl	%edx
 
 	movl	bufptr(%esp),%esi
