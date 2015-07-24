@@ -4713,7 +4713,7 @@ void fire_shotgun(edict_t *self, vec3_t start, vec3_t aimdir, int damage, int ki
 	qboolean	water = false;
 	int			content_mask = MASK_SHOT | MASK_WATER;
 
-	vec3_t	diststart, dist;
+	vec3_t	diststart;
 	vec3_t	distend = {0, 0, -8192};
 	trace_t	disttr;
 
@@ -4721,7 +4721,7 @@ void fire_shotgun(edict_t *self, vec3_t start, vec3_t aimdir, int damage, int ki
 	VectorAdd(diststart, distend, distend);
 
 	disttr = gi.trace (diststart, self->mins, self->maxs, distend, self, MASK_SOLID);
-	VectorSubtract(self->s.origin, disttr.endpos, dist);
+	(void)disttr;/*** FIXME: 'disttr' is UNUSED, SO ARE ITS DEPENDENCIES 'diststart', 'distend' ***/
 	tr = gi.trace(self->s.origin, NULL, NULL, start, self, MASK_SHOT);
 
 	if (!(tr.fraction < 1.0))

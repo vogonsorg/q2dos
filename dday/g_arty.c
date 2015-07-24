@@ -374,6 +374,7 @@ void Think_Arty (edict_t *ent)
 	AngleVectors(ent->owner->client->v_angle, forward, NULL, NULL);
 	VectorMA(start, 8192, forward, end);
 	tr = gi.trace(start, NULL, NULL, end, ent->owner, MASK_SHOT|CONTENTS_SLIME|CONTENTS_LAVA);
+	(void)tr;/*** FIXME: 'tr' IS UNUSED HERE! ***/
 
 	// find the direction from the entry point to the target
     VectorSubtract(ent->owner->client->arty_target, ent->owner->client->arty_entry, targetdir);
