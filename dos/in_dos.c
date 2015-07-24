@@ -5,6 +5,7 @@
 #include "../client/client.h"
 
 extern	double		sys_msg_time;
+extern	double		sys_frame_time;
 
 static	qboolean	mouse_avail;
 static	qboolean	mouseactive;
@@ -80,6 +81,8 @@ void IN_Commands (void)
 {
 	int		i;
 
+	sys_msg_time = Sys_Milliseconds();
+
 	if (mouse_avail)
 	{
 		regs.x.ax = 3;		// read buttons
@@ -114,6 +117,7 @@ void IN_Commands (void)
 
 		mouse_oldbuttonstate = mouse_buttonstate;
 	}
+	sys_frame_time = Sys_Milliseconds();
 }
 
 static void IN_ReadMouseMove (int *x, int *y)
