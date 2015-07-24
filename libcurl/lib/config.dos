@@ -127,7 +127,7 @@
  */
 #if defined(DJGPP)
   #define HAVE_BASENAME   1
-  #define HAVE_STRCASECMP 1
+  #define HAVE_STRNICMP   1
   #define HAVE_SIGACTION  1
   #define HAVE_SIGSETJMP  1
   #define HAVE_SYS_TIME_H 1
@@ -153,4 +153,3 @@
 #undef byte
 
 #endif  /* _CURL_CONFIG_DOS_H */
-
