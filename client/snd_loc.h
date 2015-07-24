@@ -38,8 +38,8 @@ typedef struct
 	int 		speed;			// not needed, because converted on load?
 	int 		width;
 	int 		stereo;
-	qboolean	music;			// Knightmare added
 	byte		data[1];		// variable sized
+	qboolean	music;			// Knightmare added
 } sfxcache_t;
 
 typedef struct sfx_s

@@ -2,8 +2,7 @@
 // sys_dosa.s
 // x86 assembly-language DOS-dependent routines.
 
-#include "asm_i386.h"
-#include "quakeasm.h"
+#include "../linux/qasm.h"
 
 
 	.data
@@ -21,16 +20,6 @@ C(MaskExceptions):
 	fldenv	fpenv
 
 	ret
-
-#if 0
-.globl C(unmaskexceptions)
-C(unmaskexceptions):
-	fnstenv	fpenv
-	andl		$0xFFFFFFE0,fpenv
-	fldenv	fpenv
-
-	ret
-#endif
 
 	.data
 
