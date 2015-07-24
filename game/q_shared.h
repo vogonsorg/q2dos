@@ -46,7 +46,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 
 typedef unsigned char 		byte;
+#if defined(__cplusplus)
+typedef int			qboolean;
+#else
 typedef enum {false, true}	qboolean;
+#endif
 
 
 #ifndef NULL
@@ -60,19 +64,17 @@ int vsnprintf(char *str, size_t n, const char *fmt, va_list ap);
 char *strtok_r(char *s, const char *delim, char **last);
 #endif
 
-// from Quake3 source
-#ifdef WIN32
+/* from Quake3 */
+#ifdef _WIN32
 #define Q_vsnprintf _vsnprintf
 #else
-// TODO: do we need Mac define?
-#define Q_vsnprintf vsnprintf
+#define Q_vsnprintf  vsnprintf
 #endif
-// end Knightmare
 
-#define CL_MASTER_ADDR	"maraakate.org" // FS: Gamespy dead "master.gamespy.com"
-#define CL_MASTER_PORT "28900"
-#define SV_MASTER_IP "maraakate.org" // FS: gamespy dead "master.gamespy.com"
-#define SV_MASTER_PORT "27900"
+#define CL_MASTER_ADDR	"maraakate.org" /* FS: master.gamespy.com & co are dead */
+#define CL_MASTER_PORT	"28900"
+#define SV_MASTER_IP	"maraakate.org" /* FS: master.gamespy.com & co are dead */
+#define SV_MASTER_PORT	"27900"
 
 // angle indexes
 #define	PITCH				0		// up / down
@@ -274,8 +276,6 @@ void Q_strncpyz (char *dst, const char *src, int dstSize);
 void Q_strncatz (char *dst, const char *src, int dstSize);
 char *Q_strlwr (char *string);
 char *Q_strupr (char *string);
-/* FS: From FreeBSD */
-char *Q_strtok_r(char *s, const char *delim, char **last);
 
 //=============================================
 
@@ -306,12 +306,13 @@ qboolean Info_Validate (char *s);
 /* ============================================= */
 
 /* Random number generator */
-#if 0 // FS: Currently broken in DJGPP
+#if 0 /* FS: Currently broken in DJGPP */
 int  randk(void);
 float frandk(void);
 float crandk(void);
 void randk_seed(void);
 #endif
+
 /*
 ==============================================================
 
@@ -1283,4 +1284,3 @@ extern int vidref_val;
 #define DEVELOPER_MSG_UNUSED2		0x00008000 // 32768
 #define DEVELOPER_MSG_VERBOSE		0x00010000 // 65536
 #define DEVELOPER_MSG_GAMESPY		0x00020000 // 131072
-

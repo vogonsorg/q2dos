@@ -38,13 +38,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdlib.h>
 #include <time.h>
 
+
 #if defined _M_ALPHA && !defined C_ONLY
 #define idaxp	1
 #else
 #define idaxp	0
 #endif
+
 typedef unsigned char 		byte;
+#if defined(__cplusplus)
+typedef int			qboolean;
+#else
 typedef enum {false, true}	qboolean;
+#endif
 
 
 #ifndef NULL
@@ -58,19 +64,17 @@ int vsnprintf(char *str, size_t n, const char *fmt, va_list ap);
 char *strtok_r(char *s, const char *delim, char **last);
 #endif
 
-// from Quake3 source
-#ifdef WIN32
+/* from Quake3 */
+#ifdef _WIN32
 #define Q_vsnprintf _vsnprintf
 #else
-// TODO: do we need Mac define?
-#define Q_vsnprintf vsnprintf
+#define Q_vsnprintf  vsnprintf
 #endif
-// end Knightmare
 
-#define CL_MASTER_ADDR	"maraakate.org" // FS: Gamespy dead "master.gamespy.com"
-#define CL_MASTER_PORT "28900"
-#define SV_MASTER_IP "maraakate.org" // FS: gamespy dead "master.gamespy.com"
-#define SV_MASTER_PORT "27900"
+#define CL_MASTER_ADDR	"maraakate.org" /* FS: master.gamespy.com & co are dead */
+#define CL_MASTER_PORT	"28900"
+#define SV_MASTER_IP	"maraakate.org" /* FS: master.gamespy.com & co are dead */
+#define SV_MASTER_PORT	"27900"
 
 // angle indexes
 #define	PITCH				0		// up / down
@@ -168,6 +172,7 @@ typedef	int	fixed16_t;
 
 #define DEG2RAD(a)				(((a) * M_PI) / 180.0F)
 #define RAD2DEG(a)				(((a) * 180.0F) / M_PI)
+
 struct cplane_s;
 
 extern vec3_t vec3_origin;
@@ -266,7 +271,7 @@ void Com_PageInMemory (byte *buffer, int size);
 int Q_stricmp (char *s1, char *s2);
 int Q_strcasecmp (char *s1, char *s2);
 int Q_strncasecmp (char *s1, char *s2, int n);
-// FS: From KMQ2
+/* FS: From KMQ2 */
 void Q_strncpyz (char *dst, const char *src, int dstSize);
 void Q_strncatz (char *dst, const char *src, int dstSize);
 char *Q_strlwr (char *string);
@@ -301,12 +306,13 @@ qboolean Info_Validate (char *s);
 /* ============================================= */
 
 /* Random number generator */
-#if 0 // FS: Currently broken in DJGPP
+#if 0 /* FS: Currently broken in DJGPP */
 int  randk(void);
 float frandk(void);
 float crandk(void);
 void randk_seed(void);
 #endif
+
 /*
 ==============================================================
 
@@ -631,7 +637,6 @@ typedef struct
 #define EF_BOOMER			0x00100000
 #define EF_GREENGIB			0x00200000
 
-
 // entity_state_t->renderfx flags
 #define	RF_MINLIGHT			1		// allways have some light (viewmodel)
 #define	RF_VIEWERMODEL		2		// don't draw through eyes, only mirrors
@@ -672,7 +677,6 @@ typedef struct
 #define	MZ_ITEMRESPAWN		15
 #define MZ_BOOMERGUN		16
 #define MZ_SILENCED			128		// bit flag ORed with one of the above numbers
-
 
 
 extern	vec3_t monster_flash_offset [];
@@ -767,22 +771,23 @@ typedef enum
 
 
 // dmflags->value flags
-#define	DF_NO_HEALTH		1
-#define	DF_NO_ITEMS		2
-#define	DF_WEAPONS_STAY		4
-#define	DF_NO_FALLING		8
-#define	DF_INSTANT_ITEMS	16
-#define	DF_SAME_LEVEL		32
-#define DF_SKINTEAMS		64
-#define DF_MODELTEAMS		128
-#define DF_NO_FRIENDLY_FIRE	256
-#define	DF_SPAWN_FARTHEST	512
-#define DF_FORCE_RESPAWN	1024
-#define DF_NO_ARMOR		2048
-#define DF_ALLOW_EXIT		4096
-#define DF_INFINITE_AMMO	8192
-#define DF_QUAD_DROP		16384
-#define DF_FIXED_FOV		32768
+#define	DF_NO_HEALTH		0x00000001	// 1
+#define	DF_NO_ITEMS			0x00000002	// 2
+#define	DF_WEAPONS_STAY		0x00000004	// 4
+#define	DF_NO_FALLING		0x00000008	// 8
+#define	DF_INSTANT_ITEMS	0x00000010	// 16
+#define	DF_SAME_LEVEL		0x00000020	// 32
+#define DF_SKINTEAMS		0x00000040	// 64
+#define DF_MODELTEAMS		0x00000080	// 128
+#define DF_NO_FRIENDLY_FIRE	0x00000100	// 256
+#define	DF_SPAWN_FARTHEST	0x00000200	// 512
+#define DF_FORCE_RESPAWN	0x00000400	// 1024
+#define DF_NO_ARMOR			0x00000800	// 2048
+#define DF_ALLOW_EXIT		0x00001000	// 4096
+#define DF_INFINITE_AMMO	0x00002000	// 8192
+#define DF_QUAD_DROP		0x00004000	// 16384
+#define DF_FIXED_FOV		0x00008000	// 32768
+
 #define DF_INSTANT_JET		65536
 
 /*
@@ -854,7 +859,7 @@ typedef struct entity_state_s
 	int		modelindex2, modelindex3, modelindex4;	// weapons, CTF flags, etc
 	int		frame;
 	int		skinnum;
-	unsigned int             effects;
+	unsigned int		effects;		// PGM - we're filling it, so it needs to be unsigned
 	int		renderfx;
 	int		solid;			// for client side prediction, 8*(bits 0-4) is x/y radius
 							// 8*(bits 5-9) is z down distance, 8(bits10-15) is z up
@@ -898,13 +903,12 @@ typedef struct
 } player_state_t;
 
 
-// FROM 3.20 -FB
 // ==================
 // PGM 
-#define VIDREF_GL             1
-#define VIDREF_SOFT           2
-#define VIDREF_OTHER  3
- 
+#define VIDREF_GL		1
+#define VIDREF_SOFT		2
+#define VIDREF_OTHER	3
+
 extern int vidref_val;
 // PGM
 // ==================

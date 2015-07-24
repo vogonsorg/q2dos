@@ -469,18 +469,13 @@ void Sys_MakeCodeWriteable(void)
 
 static void Sys_ParseEarlyArgs(int argc, char **argv) /* FS: Parse some very specific args before Qcommon_Init */
 {
-	int i = 0;
-
+	int i;
 	for (i = 1; i < argc; i++)
 	{
-		if(strncasecmp((char*)argv[i] + 1,"skipwincheck", 12) == 0)
-		{
+		if(strnicmp((char*)argv[i] + 1,"skipwincheck", 12) == 0)
 			bSkipWinCheck = true;
-		}
-		if(strncasecmp((char*)argv[i] + 1,"skiplfncheck", 12) == 0)
-		{
+		if(strnicmp((char*)argv[i] + 1,"skiplfncheck", 12) == 0)
 			bSkipLFNCheck = true;
-		}
 	}
 }
 
@@ -489,7 +484,7 @@ static void Sys_ParseEarlyArgs(int argc, char **argv) /* FS: Parse some very spe
 Sys_NoFPUExceptionHandler
 ================
 */
-void Sys_NoFPUExceptionHandler(int whatever)
+static void Sys_NoFPUExceptionHandler(int whatever)
 {
 	printf ("\nError: Quake 2 for MS-DOS requires a floating-point processor\n");
 	exit (0);
@@ -500,7 +495,7 @@ void Sys_NoFPUExceptionHandler(int whatever)
 Sys_DefaultExceptionHandler
 ================
 */
-void Sys_DefaultExceptionHandler(int whatever)
+static void Sys_DefaultExceptionHandler(int whatever)
 {
 }
 

@@ -255,9 +255,9 @@ void R_ConcatTransforms (float in1[3][4], float in2[3][4], float out[3][4])
 
 float Q_fabs (float f)
 {
-	int tmp = *(int *)&f;
+	int tmp = *(int *) &f;
 	tmp &= 0x7FFFFFFF;
-	return *(float*)&tmp;
+	return *(float *) &tmp;
 }
 
 #if defined(_MSC_VER) && defined(_M_IX86) && !defined(C_ONLY)
@@ -769,7 +769,7 @@ vec_t VectorLength(vec3_t v)
 {
 	int		i;
 	float	length;
-	
+
 	length = 0;
 	for (i=0 ; i< 3 ; i++)
 		length += v[i]*v[i];
@@ -1061,7 +1061,7 @@ char	*va(char *format, ...)
 {
 	va_list		argptr;
 	static char		string[1024];
-	
+
 	va_start (argptr, format);
 	Q_vsnprintf (string, sizeof(string), format, argptr);
 	va_end (argptr);
@@ -1189,8 +1189,10 @@ void Com_PageInMemory (byte *buffer, int size)
 // FIXME: replace all Q_stricmp with Q_strcasecmp
 int Q_stricmp (char *s1, char *s2)
 {
-#if defined(WIN32)
+#if defined(_WIN32)
 	return _stricmp (s1, s2);
+#elif defined(__DJGPP__)
+	return stricmp (s1, s2);
 #else
 	return strcasecmp (s1, s2);
 #endif
@@ -1199,7 +1201,7 @@ int Q_stricmp (char *s1, char *s2)
 int Q_strncasecmp (char *s1, char *s2, int n)
 {
 	int		c1, c2;
-	
+
 	do
 	{
 		c1 = *s1++;
@@ -1207,7 +1209,7 @@ int Q_strncasecmp (char *s1, char *s2, int n)
 
 		if (!n--)
 			return 0;		// strings are equal until end point
-		
+
 		if (c1 != c2)
 		{
 			if (c1 >= 'a' && c1 <= 'z')

@@ -26,7 +26,11 @@
 #endif
 
 typedef unsigned char 		byte;
+#if defined(__cplusplus)
+typedef int			qboolean;
+#else
 typedef enum {false, true}	qboolean;
+#endif
 
 
 #ifndef NULL
@@ -40,20 +44,18 @@ int vsnprintf(char *str, size_t n, const char *fmt, va_list ap);
 char *strtok_r(char *s, const char *delim, char **last);
 #endif
 
-// from Quake3 source
-#ifdef WIN32
+/* from Quake3 */
+#ifdef _WIN32
 #define Q_vsnprintf _vsnprintf
 #else
-// TODO: do we need Mac define?
-#define Q_vsnprintf vsnprintf
+#define Q_vsnprintf  vsnprintf
 #endif
-// end Knightmare
 
-#define CL_MASTER_ADDR	"maraakate.org" // FS: Gamespy dead "master.gamespy.com"
-#define CL_MASTER_PORT "28900"
-#define SV_MASTER_IP "maraakate.org" // FS: gamespy dead "master.gamespy.com"
-#define SV_MASTER_PORT "27900"
-	
+#define CL_MASTER_ADDR	"maraakate.org" /* FS: master.gamespy.com & co are dead */
+#define CL_MASTER_PORT	"28900"
+#define SV_MASTER_IP	"maraakate.org" /* FS: master.gamespy.com & co are dead */
+#define SV_MASTER_PORT	"27900"
+
 // angle indexes
 #define	PITCH				0		// up / down
 #define	YAW					1		// left / right
@@ -76,7 +78,8 @@ char *strtok_r(char *s, const char *delim, char **last);
 #define	MAX_SOUNDS			256		// so they cannot be blindly increased
 #define	MAX_IMAGES			256
 #define	MAX_ITEMS			256
-#define MAX_GENERAL (MAX_CLIENTS * 2)       /* general config strings */
+#define MAX_GENERAL			(MAX_CLIENTS*2)	// general config strings
+
 
 // game print flags
 #define	PRINT_LOW			0		// pickup messages
@@ -248,7 +251,7 @@ void Com_PageInMemory (byte *buffer, int size);
 int Q_stricmp (char *s1, char *s2);
 int Q_strcasecmp (char *s1, char *s2);
 int Q_strncasecmp (char *s1, char *s2, int n);
-// FS: From KMQ2
+/* FS: From KMQ2 */
 void Q_strncpyz (char *dst, const char *src, int dstSize);
 void Q_strncatz (char *dst, const char *src, int dstSize);
 char *Q_strlwr (char *string);
@@ -283,12 +286,13 @@ qboolean Info_Validate (char *s);
 /* ============================================= */
 
 /* Random number generator */
-#if 0 // FS: Currently broken in DJGPP
+#if 0 /* FS: Currently broken in DJGPP */
 int  randk(void);
 float frandk(void);
 float crandk(void);
 void randk_seed(void);
 #endif
+
 /*
 ==============================================================
 
@@ -475,10 +479,10 @@ typedef struct csurface_s
 	int			value;
 } csurface_t;
 
-typedef struct mapsurface_s  /* used internally due to name len probs */
+typedef struct mapsurface_s  // used internally due to name len probs //ZOID
 {
-	csurface_t c;
-	char rname[32];
+	csurface_t	c;
+	char		rname[32];
 } mapsurface_t;
 
 // a trace is returned when a box is swept through the world
@@ -610,7 +614,8 @@ typedef struct
 #define	EF_TELEPORTER		0x00020000		// particle fountain
 #define EF_FLAG1			0x00040000
 #define EF_FLAG2			0x00080000
-#define EF_IONRIPPER 0x00100000
+// RAFAEL
+#define EF_IONRIPPER		0x00100000
 #define EF_GREENGIB			0x00200000
 #define	EF_BLUEHYPERBLASTER 0x00400000
 #define EF_SPINNINGLIGHTS	0x00800000
@@ -640,7 +645,8 @@ typedef struct
 #define RF_SHELL_RED		1024
 #define	RF_SHELL_GREEN		2048
 #define RF_SHELL_BLUE		4096
-#define RF_NOSHADOW 8192        /* don't draw a shadow */
+#define RF_NOSHADOW		8192		// don't draw a shadow
+
 //ROGUE
 #define RF_IR_VISIBLE		0x00008000		// 32768
 #define	RF_SHELL_DOUBLE		0x00010000		// 65536
@@ -676,20 +682,24 @@ typedef struct
 #define	MZ_SSHOTGUN			13
 #define	MZ_HYPERBLASTER		14
 #define	MZ_ITEMRESPAWN		15
-#define MZ_IONRIPPER 16
+// RAFAEL
+#define MZ_IONRIPPER		16
 #define MZ_BLUEHYPERBLASTER 17
-#define MZ_PHALANX 18
+#define MZ_PHALANX			18
 #define MZ_SILENCED			128		// bit flag ORed with one of the above numbers
-#define MZ_ETF_RIFLE 30
-#define MZ_UNUSED 31
-#define MZ_SHOTGUN2 32
-#define MZ_HEATBEAM 33
-#define MZ_BLASTER2 34
-#define MZ_TRACKER 35
-#define MZ_NUKE1 36
-#define MZ_NUKE2 37
-#define MZ_NUKE4 38
-#define MZ_NUKE8 39
+
+//ROGUE
+#define MZ_ETF_RIFLE		30
+#define MZ_UNUSED			31
+#define MZ_SHOTGUN2			32
+#define MZ_HEATBEAM			33
+#define MZ_BLASTER2			34
+#define	MZ_TRACKER			35
+#define	MZ_NUKE1			36
+#define	MZ_NUKE2			37
+#define	MZ_NUKE4			38
+#define	MZ_NUKE8			39
+//ROGUE
 
 //
 // monster muzzle flashes
@@ -847,79 +857,83 @@ typedef struct
 #define MZ2_BOSS2_MACHINEGUN_R4			136
 #define MZ2_BOSS2_MACHINEGUN_R5			137
 
-#define MZ2_CARRIER_MACHINEGUN_L1 138
-#define MZ2_CARRIER_MACHINEGUN_R1 139
-#define MZ2_CARRIER_GRENADE 140
-#define MZ2_TURRET_MACHINEGUN 141
-#define MZ2_TURRET_ROCKET 142
-#define MZ2_TURRET_BLASTER 143
-#define MZ2_STALKER_BLASTER 144
-#define MZ2_DAEDALUS_BLASTER 145
-#define MZ2_MEDIC_BLASTER_2 146
-#define MZ2_CARRIER_RAILGUN 147
-#define MZ2_WIDOW_DISRUPTOR 148
-#define MZ2_WIDOW_BLASTER 149
-#define MZ2_WIDOW_RAIL 150
-#define MZ2_WIDOW_PLASMABEAM 151 
-#define MZ2_CARRIER_MACHINEGUN_L2 152
-#define MZ2_CARRIER_MACHINEGUN_R2 153
-#define MZ2_WIDOW_RAIL_LEFT 154
-#define MZ2_WIDOW_RAIL_RIGHT 155
-#define MZ2_WIDOW_BLASTER_SWEEP1 156
-#define MZ2_WIDOW_BLASTER_SWEEP2 157
-#define MZ2_WIDOW_BLASTER_SWEEP3 158
-#define MZ2_WIDOW_BLASTER_SWEEP4 159
-#define MZ2_WIDOW_BLASTER_SWEEP5 160
-#define MZ2_WIDOW_BLASTER_SWEEP6 161
-#define MZ2_WIDOW_BLASTER_SWEEP7 162
-#define MZ2_WIDOW_BLASTER_SWEEP8 163
-#define MZ2_WIDOW_BLASTER_SWEEP9 164
-#define MZ2_WIDOW_BLASTER_100 165
-#define MZ2_WIDOW_BLASTER_90 166
-#define MZ2_WIDOW_BLASTER_80 167
-#define MZ2_WIDOW_BLASTER_70 168
-#define MZ2_WIDOW_BLASTER_60 169
-#define MZ2_WIDOW_BLASTER_50 170
-#define MZ2_WIDOW_BLASTER_40 171
-#define MZ2_WIDOW_BLASTER_30 172
-#define MZ2_WIDOW_BLASTER_20 173
-#define MZ2_WIDOW_BLASTER_10 174
-#define MZ2_WIDOW_BLASTER_0 175
-#define MZ2_WIDOW_BLASTER_10L 176
-#define MZ2_WIDOW_BLASTER_20L 177
-#define MZ2_WIDOW_BLASTER_30L 178
-#define MZ2_WIDOW_BLASTER_40L 179
-#define MZ2_WIDOW_BLASTER_50L 180
-#define MZ2_WIDOW_BLASTER_60L 181
-#define MZ2_WIDOW_BLASTER_70L 182
-#define MZ2_WIDOW_RUN_1 183
-#define MZ2_WIDOW_RUN_2 184
-#define MZ2_WIDOW_RUN_3 185
-#define MZ2_WIDOW_RUN_4 186
-#define MZ2_WIDOW_RUN_5 187
-#define MZ2_WIDOW_RUN_6 188
-#define MZ2_WIDOW_RUN_7 189
-#define MZ2_WIDOW_RUN_8 190
-#define MZ2_CARRIER_ROCKET_1 191
-#define MZ2_CARRIER_ROCKET_2 192
-#define MZ2_CARRIER_ROCKET_3 193
-#define MZ2_CARRIER_ROCKET_4 194
-#define MZ2_WIDOW2_BEAMER_1 195
-#define MZ2_WIDOW2_BEAMER_2 196
-#define MZ2_WIDOW2_BEAMER_3 197
-#define MZ2_WIDOW2_BEAMER_4 198
-#define MZ2_WIDOW2_BEAMER_5 199
-#define MZ2_WIDOW2_BEAM_SWEEP_1 200
-#define MZ2_WIDOW2_BEAM_SWEEP_2 201
-#define MZ2_WIDOW2_BEAM_SWEEP_3 202
-#define MZ2_WIDOW2_BEAM_SWEEP_4 203
-#define MZ2_WIDOW2_BEAM_SWEEP_5 204
-#define MZ2_WIDOW2_BEAM_SWEEP_6 205
-#define MZ2_WIDOW2_BEAM_SWEEP_7 206
-#define MZ2_WIDOW2_BEAM_SWEEP_8 207
-#define MZ2_WIDOW2_BEAM_SWEEP_9 208
-#define MZ2_WIDOW2_BEAM_SWEEP_10 209
-#define MZ2_WIDOW2_BEAM_SWEEP_11 210
+//ROGUE
+#define	MZ2_CARRIER_MACHINEGUN_L1		138
+#define	MZ2_CARRIER_MACHINEGUN_R1		139
+#define	MZ2_CARRIER_GRENADE				140
+#define MZ2_TURRET_MACHINEGUN			141
+#define MZ2_TURRET_ROCKET				142
+#define MZ2_TURRET_BLASTER				143
+#define MZ2_STALKER_BLASTER				144
+#define MZ2_DAEDALUS_BLASTER			145
+#define MZ2_MEDIC_BLASTER_2				146
+#define	MZ2_CARRIER_RAILGUN				147
+#define	MZ2_WIDOW_DISRUPTOR				148
+#define	MZ2_WIDOW_BLASTER				149
+#define	MZ2_WIDOW_RAIL					150
+#define	MZ2_WIDOW_PLASMABEAM			151		// PMM - not used
+#define	MZ2_CARRIER_MACHINEGUN_L2		152
+#define	MZ2_CARRIER_MACHINEGUN_R2		153
+#define	MZ2_WIDOW_RAIL_LEFT				154
+#define	MZ2_WIDOW_RAIL_RIGHT			155
+#define	MZ2_WIDOW_BLASTER_SWEEP1		156
+#define	MZ2_WIDOW_BLASTER_SWEEP2		157
+#define	MZ2_WIDOW_BLASTER_SWEEP3		158
+#define	MZ2_WIDOW_BLASTER_SWEEP4		159
+#define	MZ2_WIDOW_BLASTER_SWEEP5		160
+#define	MZ2_WIDOW_BLASTER_SWEEP6		161
+#define	MZ2_WIDOW_BLASTER_SWEEP7		162
+#define	MZ2_WIDOW_BLASTER_SWEEP8		163
+#define	MZ2_WIDOW_BLASTER_SWEEP9		164
+#define	MZ2_WIDOW_BLASTER_100			165
+#define	MZ2_WIDOW_BLASTER_90			166
+#define	MZ2_WIDOW_BLASTER_80			167
+#define	MZ2_WIDOW_BLASTER_70			168
+#define	MZ2_WIDOW_BLASTER_60			169
+#define	MZ2_WIDOW_BLASTER_50			170
+#define	MZ2_WIDOW_BLASTER_40			171
+#define	MZ2_WIDOW_BLASTER_30			172
+#define	MZ2_WIDOW_BLASTER_20			173
+#define	MZ2_WIDOW_BLASTER_10			174
+#define	MZ2_WIDOW_BLASTER_0				175
+#define	MZ2_WIDOW_BLASTER_10L			176
+#define	MZ2_WIDOW_BLASTER_20L			177
+#define	MZ2_WIDOW_BLASTER_30L			178
+#define	MZ2_WIDOW_BLASTER_40L			179
+#define	MZ2_WIDOW_BLASTER_50L			180
+#define	MZ2_WIDOW_BLASTER_60L			181
+#define	MZ2_WIDOW_BLASTER_70L			182
+#define	MZ2_WIDOW_RUN_1					183
+#define	MZ2_WIDOW_RUN_2					184
+#define	MZ2_WIDOW_RUN_3					185
+#define	MZ2_WIDOW_RUN_4					186
+#define	MZ2_WIDOW_RUN_5					187
+#define	MZ2_WIDOW_RUN_6					188
+#define	MZ2_WIDOW_RUN_7					189
+#define	MZ2_WIDOW_RUN_8					190
+#define	MZ2_CARRIER_ROCKET_1			191
+#define	MZ2_CARRIER_ROCKET_2			192
+#define	MZ2_CARRIER_ROCKET_3			193
+#define	MZ2_CARRIER_ROCKET_4			194
+#define	MZ2_WIDOW2_BEAMER_1				195
+#define	MZ2_WIDOW2_BEAMER_2				196
+#define	MZ2_WIDOW2_BEAMER_3				197
+#define	MZ2_WIDOW2_BEAMER_4				198
+#define	MZ2_WIDOW2_BEAMER_5				199
+#define	MZ2_WIDOW2_BEAM_SWEEP_1			200
+#define	MZ2_WIDOW2_BEAM_SWEEP_2			201
+#define	MZ2_WIDOW2_BEAM_SWEEP_3			202
+#define	MZ2_WIDOW2_BEAM_SWEEP_4			203
+#define	MZ2_WIDOW2_BEAM_SWEEP_5			204
+#define	MZ2_WIDOW2_BEAM_SWEEP_6			205
+#define	MZ2_WIDOW2_BEAM_SWEEP_7			206
+#define	MZ2_WIDOW2_BEAM_SWEEP_8			207
+#define	MZ2_WIDOW2_BEAM_SWEEP_9			208
+#define	MZ2_WIDOW2_BEAM_SWEEP_10		209
+#define	MZ2_WIDOW2_BEAM_SWEEP_11		210
+
+// ROGUE
+
 extern	vec3_t monster_flash_offset [];
 
 
@@ -961,6 +975,7 @@ typedef enum
 	TE_BLUEHYPERBLASTER,
 	TE_PLASMA_EXPLOSION,
 	TE_TUNNEL_SPARKS,
+//ROGUE
 	TE_BLASTER2,
 	TE_RAILTRAIL2,
 	TE_FLAME,
@@ -987,6 +1002,7 @@ typedef enum
 	TE_EXPLOSION1_BIG,
 	TE_EXPLOSION1_NP,
 	TE_FLECHETTE
+//ROGUE
 } temp_event_t;
 
 #define SPLASH_UNKNOWN		0
@@ -1036,8 +1052,8 @@ typedef enum
 #define	STAT_LAYOUTS			13
 #define	STAT_FRAGS				14
 #define	STAT_FLASHES			15		// cleared each frame, 1 = health, 2 = armor
-#define STAT_CHASE 16
-#define STAT_SPECTATOR 17
+#define STAT_CHASE				16
+#define STAT_SPECTATOR			17
 #define STAT_SHOW_ORIGIN 18
 #define STAT_ORIGIN_X 19
 #define STAT_ORIGIN_Y 20
@@ -1049,27 +1065,32 @@ typedef enum
 
 
 // dmflags->value flags
-#define DF_NO_HEALTH 0x00000001         /* 1 */
-#define DF_NO_ITEMS 0x00000002          /* 2 */
-#define DF_WEAPONS_STAY 0x00000004      /* 4 */
-#define DF_NO_FALLING 0x00000008        /* 8 */
-#define DF_INSTANT_ITEMS 0x00000010     /* 16 */
-#define DF_SAME_LEVEL 0x00000020        /* 32 */
-#define DF_SKINTEAMS 0x00000040         /* 64 */
-#define DF_MODELTEAMS 0x00000080        /* 128 */
-#define DF_NO_FRIENDLY_FIRE 0x00000100  /* 256 */
-#define DF_SPAWN_FARTHEST 0x00000200    /* 512 */
-#define DF_FORCE_RESPAWN 0x00000400     /* 1024 */
-#define DF_NO_ARMOR 0x00000800          /* 2048 */
-#define DF_ALLOW_EXIT 0x00001000        /* 4096 */
-#define DF_INFINITE_AMMO 0x00002000     /* 8192 */
-#define DF_QUAD_DROP 0x00004000         /* 16384 */
-#define DF_FIXED_FOV 0x00008000         /* 32768 */
-#define DF_QUADFIRE_DROP 0x00010000     /* 65536 */
-#define DF_NO_MINES 0x00020000
-#define DF_NO_STACK_DOUBLE 0x00040000
-#define DF_NO_NUKES 0x00080000
-#define DF_NO_SPHERES 0x00100000
+#define	DF_NO_HEALTH		0x00000001	// 1
+#define	DF_NO_ITEMS			0x00000002	// 2
+#define	DF_WEAPONS_STAY		0x00000004	// 4
+#define	DF_NO_FALLING		0x00000008	// 8
+#define	DF_INSTANT_ITEMS	0x00000010	// 16
+#define	DF_SAME_LEVEL		0x00000020	// 32
+#define DF_SKINTEAMS		0x00000040	// 64
+#define DF_MODELTEAMS		0x00000080	// 128
+#define DF_NO_FRIENDLY_FIRE	0x00000100	// 256
+#define	DF_SPAWN_FARTHEST	0x00000200	// 512
+#define DF_FORCE_RESPAWN	0x00000400	// 1024
+#define DF_NO_ARMOR			0x00000800	// 2048
+#define DF_ALLOW_EXIT		0x00001000	// 4096
+#define DF_INFINITE_AMMO	0x00002000	// 8192
+#define DF_QUAD_DROP		0x00004000	// 16384
+#define DF_FIXED_FOV		0x00008000	// 32768
+
+// RAFAEL
+#define	DF_QUADFIRE_DROP	0x00010000	// 65536
+
+//ROGUE
+#define DF_NO_MINES			0x00020000
+#define DF_NO_STACK_DOUBLE	0x00040000
+#define DF_NO_NUKES			0x00080000
+#define DF_NO_SPHERES		0x00100000
+//ROGUE
 
 /*
 ==========================================================
@@ -1095,7 +1116,7 @@ typedef enum
 #define	CS_SKYROTATE		4
 #define	CS_STATUSBAR		5		// display program string
 
-#define CS_AIRACCEL 29              /* air acceleration control */
+#define CS_AIRACCEL			29		// air acceleration control
 #define	CS_MAXCLIENTS		30
 #define	CS_MAPCHECKSUM		31		// for catching cheater maps
 
@@ -1105,8 +1126,9 @@ typedef enum
 #define	CS_LIGHTS			(CS_IMAGES+MAX_IMAGES)
 #define	CS_ITEMS			(CS_LIGHTS+MAX_LIGHTSTYLES)
 #define	CS_PLAYERSKINS		(CS_ITEMS+MAX_ITEMS)
-#define CS_GENERAL (CS_PLAYERSKINS + MAX_CLIENTS)
-#define MAX_CONFIGSTRINGS (CS_GENERAL + MAX_GENERAL)
+#define CS_GENERAL			(CS_PLAYERSKINS+MAX_CLIENTS)
+#define	MAX_CONFIGSTRINGS	(CS_GENERAL+MAX_GENERAL)
+
 
 //==============================================
 
@@ -1142,7 +1164,7 @@ typedef struct entity_state_s
 	int		modelindex2, modelindex3, modelindex4;	// weapons, CTF flags, etc
 	int		frame;
 	int		skinnum;
-	unsigned int effects;   
+	unsigned int		effects;		// PGM - we're filling it, so it needs to be unsigned
 	int		renderfx;
 	int		solid;			// for client side prediction, 8*(bits 0-4) is x/y radius
 							// 8*(bits 5-9) is z down distance, 8(bits10-15) is z up
@@ -1185,15 +1207,16 @@ typedef struct
 	short		stats[MAX_STATS];		// fast status bar updates
 } player_state_t;
 
-#define VIDREF_GL 1
-#define VIDREF_SOFT 2
-#define VIDREF_OTHER 3
+
+// ==================
+// PGM 
+#define VIDREF_GL		1
+#define VIDREF_SOFT		2
+#define VIDREF_OTHER	3
 
 extern int vidref_val;
-
-size_t verify_fread(void *, size_t, size_t, FILE *);
-size_t verify_fwrite(void *, size_t, size_t, FILE *);
-
+// PGM
+// ==================
 
 // FS: Developer flags for developer cvar and DPrintf's
 // FS: No 0x00000001 because that would be developer->value 1 and we use that to show it all!
