@@ -176,7 +176,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
         
         // zucc special cases for picking up weapons
         // the mk23 should never be dropped, probably
-        if ( stricmp(ent->item->pickup_name, MK23_NAME) == 0 )
+        if ( Q_stricmp(ent->item->pickup_name, MK23_NAME) == 0 )
         {
                 if ( other->client->pers.inventory[index] ) // already has one
                 {
@@ -190,7 +190,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
                 if ( !(ent->spawnflags & DROPPED_ITEM) )
                         other->client->mk23_rds = other->client->mk23_max;
         }
-        else if ( stricmp(ent->item->pickup_name, MP5_NAME) == 0 )
+        else if ( Q_stricmp(ent->item->pickup_name, MP5_NAME) == 0 )
         {
                 if ( other->client->unique_weapon_total < unique_weapons->value + band ) 
                 {
@@ -204,7 +204,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
                 else
                         return false; // we can't get it        
         }
-        else if ( stricmp(ent->item->pickup_name, M4_NAME) == 0 )
+        else if ( Q_stricmp(ent->item->pickup_name, M4_NAME) == 0 )
         {
                 if ( other->client->unique_weapon_total < unique_weapons->value + band ) 
                 {
@@ -218,7 +218,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
                 else
                         return false; // we can't get it
         }
-        else if ( stricmp(ent->item->pickup_name, M3_NAME) == 0 )
+        else if ( Q_stricmp(ent->item->pickup_name, M3_NAME) == 0 )
         {
                 if ( other->client->unique_weapon_total < unique_weapons->value + band ) 
                 {
@@ -248,7 +248,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
                 else
                         return false; // we can't get it        
         }
-        else if ( stricmp(ent->item->pickup_name, HC_NAME) == 0 )
+        else if ( Q_stricmp(ent->item->pickup_name, HC_NAME) == 0 )
         {
                 if ( other->client->unique_weapon_total < unique_weapons->value + band ) 
                 {
@@ -269,7 +269,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
                 else
                         return false; // we can't get it        
         }
-        else if ( stricmp(ent->item->pickup_name, SNIPER_NAME) == 0 )
+        else if ( Q_stricmp(ent->item->pickup_name, SNIPER_NAME) == 0 )
         {
                 if ( other->client->unique_weapon_total < unique_weapons->value + band ) 
                 {
@@ -297,7 +297,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
                 else
                         return false; // we can't get it
         }
-        else if ( stricmp(ent->item->pickup_name, DUAL_NAME) == 0 )
+        else if ( Q_stricmp(ent->item->pickup_name, DUAL_NAME) == 0 )
         {
                 if ( other->client->pers.inventory[index] ) // already has one
                 {
@@ -315,7 +315,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
                         other->client->mk23_rds = other->client->mk23_max; 
                 }
         }
-        else if ( stricmp(ent->item->pickup_name, KNIFE_NAME) == 0 )
+        else if ( Q_stricmp(ent->item->pickup_name, KNIFE_NAME) == 0 )
         {
                 if ( other->client->pers.inventory[index] < other->client->knife_max )
                 {
@@ -327,7 +327,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
                         return false;
                 }
         }
-        else if ( stricmp(ent->item->pickup_name, GRENADE_NAME) == 0 )
+        else if ( Q_stricmp(ent->item->pickup_name, GRENADE_NAME) == 0 )
         {
                 if ( other->client->pers.inventory[index] < other->client->grenade_max )
                 {
@@ -532,40 +532,40 @@ void ChangeWeapon (edict_t *ent)
         ShowGun(ent);
         // zucc done
 
-        if(stricmp(ent->client->pers.weapon->pickup_name, MK23_NAME) == 0)
+        if(Q_stricmp(ent->client->pers.weapon->pickup_name, MK23_NAME) == 0)
         {
                 ent->client->curr_weap = MK23_NUM;
         }
-        else if(stricmp(ent->client->pers.weapon->pickup_name, MP5_NAME) == 0)
+        else if(Q_stricmp(ent->client->pers.weapon->pickup_name, MP5_NAME) == 0)
         {
                 ent->client->curr_weap = MP5_NUM;
         }
-        else if(stricmp(ent->client->pers.weapon->pickup_name, M4_NAME) == 0)
+        else if(Q_stricmp(ent->client->pers.weapon->pickup_name, M4_NAME) == 0)
         {
                 ent->client->curr_weap = M4_NUM;
         }
-        else if(stricmp(ent->client->pers.weapon->pickup_name, M3_NAME) == 0)
+        else if(Q_stricmp(ent->client->pers.weapon->pickup_name, M3_NAME) == 0)
         {
                 ent->client->curr_weap = M3_NUM;
         }
-        else if(stricmp(ent->client->pers.weapon->pickup_name, HC_NAME) == 0)
+        else if(Q_stricmp(ent->client->pers.weapon->pickup_name, HC_NAME) == 0)
         {
                 ent->client->curr_weap = HC_NUM;
         }
 
-        else if(stricmp(ent->client->pers.weapon->pickup_name, SNIPER_NAME) == 0)
+        else if(Q_stricmp(ent->client->pers.weapon->pickup_name, SNIPER_NAME) == 0)
         {
                 ent->client->curr_weap = SNIPER_NUM;
         }
-        else if(stricmp(ent->client->pers.weapon->pickup_name, DUAL_NAME) == 0)
+        else if(Q_stricmp(ent->client->pers.weapon->pickup_name, DUAL_NAME) == 0)
         {
                 ent->client->curr_weap = DUAL_NUM;
         }
-        else if(stricmp(ent->client->pers.weapon->pickup_name, KNIFE_NAME) == 0)
+        else if(Q_stricmp(ent->client->pers.weapon->pickup_name, KNIFE_NAME) == 0)
         {
                 ent->client->curr_weap = KNIFE_NUM;
         }
-        else if(stricmp(ent->client->pers.weapon->pickup_name, GRENADE_NAME) == 0)
+        else if(Q_stricmp(ent->client->pers.weapon->pickup_name, GRENADE_NAME) == 0)
         {
                 ent->client->curr_weap = GRENADE_NUM;
         }
@@ -823,12 +823,12 @@ void Drop_Weapon (edict_t *ent, gitem_t *item)
         index = ITEM_INDEX(item);
         // see if we're already using it
         //zucc special cases for dropping       
-        if ( stricmp(item->pickup_name, MK23_NAME) == 0 )
+        if ( Q_stricmp(item->pickup_name, MK23_NAME) == 0 )
         {
                 safe_cprintf(ent, PRINT_HIGH, "Can't drop the %s.\n", MK23_NAME);
                 return;
         }
-        else if ( stricmp(item->pickup_name, MP5_NAME) == 0 )
+        else if ( Q_stricmp(item->pickup_name, MP5_NAME) == 0 )
         {
                 if ( ent->client->pers.weapon == item && (ent->client->pers.inventory[index] == 1) )
                 {
@@ -843,7 +843,7 @@ void Drop_Weapon (edict_t *ent, gitem_t *item)
                 temp->think = temp_think_specweap;
                 ent->client->pers.inventory[index]--;
         }
-        else if ( stricmp(item->pickup_name, M4_NAME) == 0 )
+        else if ( Q_stricmp(item->pickup_name, M4_NAME) == 0 )
         {
                 if ( ent->client->pers.weapon == item  && (ent->client->pers.inventory[index] == 1) )
                 {
@@ -858,7 +858,7 @@ void Drop_Weapon (edict_t *ent, gitem_t *item)
                 temp->think = temp_think_specweap;
                 ent->client->pers.inventory[index]--;
         }
-        else if ( stricmp(item->pickup_name, M3_NAME) == 0 )
+        else if ( Q_stricmp(item->pickup_name, M3_NAME) == 0 )
         {
                 if ( ent->client->pers.weapon == item && (ent->client->pers.inventory[index] == 1) )
                 {
@@ -873,7 +873,7 @@ void Drop_Weapon (edict_t *ent, gitem_t *item)
                 temp->think = temp_think_specweap;
                 ent->client->pers.inventory[index]--;
         }
-        else if ( stricmp(item->pickup_name, HC_NAME) == 0 )
+        else if ( Q_stricmp(item->pickup_name, HC_NAME) == 0 )
         {
                 if ( ent->client->pers.weapon == item && (ent->client->pers.inventory[index] == 1) )
                 {
@@ -888,7 +888,7 @@ void Drop_Weapon (edict_t *ent, gitem_t *item)
                 temp->think = temp_think_specweap;
                 ent->client->pers.inventory[index]--;
         }
-        else if ( stricmp(item->pickup_name, SNIPER_NAME) == 0 )
+        else if ( Q_stricmp(item->pickup_name, SNIPER_NAME) == 0 )
         {
                 if ( ent->client->pers.weapon == item && (ent->client->pers.inventory[index] == 1) )
                 {
@@ -906,7 +906,7 @@ void Drop_Weapon (edict_t *ent, gitem_t *item)
                 temp->think = temp_think_specweap;
                 ent->client->pers.inventory[index]--;
         }
-        else if ( stricmp(item->pickup_name, DUAL_NAME) == 0 )
+        else if ( Q_stricmp(item->pickup_name, DUAL_NAME) == 0 )
         {
                 if ( ent->client->pers.weapon == item )
                 {
@@ -918,7 +918,7 @@ void Drop_Weapon (edict_t *ent, gitem_t *item)
                 }
                 ent->client->dual_rds = ent->client->mk23_rds;
         }
-        else if ( stricmp(item->pickup_name, KNIFE_NAME) == 0 )
+        else if ( Q_stricmp(item->pickup_name, KNIFE_NAME) == 0 )
         {
                 //gi.cprintf(ent, PRINT_HIGH, "Before checking knife inven frames = %d\n", ent->client->ps.gunframe);
                 if ( ((ent->client->pers.weapon == item) ) && (ent->client->pers.inventory[index] == 1) )
@@ -935,7 +935,7 @@ void Drop_Weapon (edict_t *ent, gitem_t *item)
                         //      gi.cprintf(ent, PRINT_HIGH, "After change weap from knife drop frames = %d\n", ent->client->ps.gunframe);
                 }
         }
-        else if ( stricmp(item->pickup_name, GRENADE_NAME) == 0 )
+        else if ( Q_stricmp(item->pickup_name, GRENADE_NAME) == 0 )
         {
                 if ( (ent->client->pers.weapon == item  ) && (ent->client->pers.inventory[index] == 1) )
                 {

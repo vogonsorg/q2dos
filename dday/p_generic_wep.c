@@ -404,7 +404,7 @@ void Weapon_Generic (edict_t *ent,
 			return;
 		}
 
-		if(stricmp(ent->client->pers.weapon->pickup_name, "M1919 Browning") == 0) 
+		if(Q_stricmp(ent->client->pers.weapon->pickup_name, "M1919 Browning") == 0) 
 		{
 			if(ent->client->ps.gunframe==18)
 				gi.sound(ent,CHAN_WEAPON,gi.soundindex("weapons/sshotr1b.wav"), 1, ATTN_NORM, 0);

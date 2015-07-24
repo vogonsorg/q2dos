@@ -56,25 +56,25 @@ void Handle_Unique_Items( edict_t *ent )
         if ( !ent->item )
                 return;
 
-        if ( stricmp(ent->item->pickup_name, MP5_NAME) == 0 )
+        if ( Q_stricmp(ent->item->pickup_name, MP5_NAME) == 0 )
                 ThinkSpecWeap(ent);
-        else if ( stricmp(ent->item->pickup_name, M4_NAME) == 0 )
+        else if ( Q_stricmp(ent->item->pickup_name, M4_NAME) == 0 )
                 ThinkSpecWeap(ent);
-        else if ( stricmp(ent->item->pickup_name, M3_NAME) == 0 )
+        else if ( Q_stricmp(ent->item->pickup_name, M3_NAME) == 0 )
                 ThinkSpecWeap(ent);
-        else if ( stricmp(ent->item->pickup_name, HC_NAME) == 0 )
+        else if ( Q_stricmp(ent->item->pickup_name, HC_NAME) == 0 )
                 ThinkSpecWeap(ent);
-        else if ( stricmp(ent->item->pickup_name, SNIPER_NAME) == 0 )
+        else if ( Q_stricmp(ent->item->pickup_name, SNIPER_NAME) == 0 )
                 ThinkSpecWeap(ent);
-        else if ( stricmp(ent->item->pickup_name, SIL_NAME) == 0 )
+        else if ( Q_stricmp(ent->item->pickup_name, SIL_NAME) == 0 )
                 RespawnSpec(ent);
-        else if ( stricmp(ent->item->pickup_name, SLIP_NAME) == 0 )
+        else if ( Q_stricmp(ent->item->pickup_name, SLIP_NAME) == 0 )
                 RespawnSpec(ent);
-        else if ( stricmp(ent->item->pickup_name, BAND_NAME) == 0 )
+        else if ( Q_stricmp(ent->item->pickup_name, BAND_NAME) == 0 )
                 RespawnSpec(ent);
-        else if ( stricmp(ent->item->pickup_name, KEV_NAME) == 0 )
+        else if ( Q_stricmp(ent->item->pickup_name, KEV_NAME) == 0 )
                 RespawnSpec(ent);
-        else if ( stricmp(ent->item->pickup_name, LASER_NAME) == 0 )
+        else if ( Q_stricmp(ent->item->pickup_name, LASER_NAME) == 0 )
                 RespawnSpec(ent);
 }
 

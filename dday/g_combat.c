@@ -1085,7 +1085,7 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 			if(targ->client)
 			{
 				if(targ->client->pers.inventory[ITEM_INDEX(FindItem("Helmet"))] //if they got helmet
-				&& ( !(targ->client->pers.weapon && !stricmp(targ->client->pers.weapon->pickup_name,"Fists") && targ->client->aim))
+				&& ( !(targ->client->pers.weapon && !Q_stricmp(targ->client->pers.weapon->pickup_name,"Fists") && targ->client->aim))
 					)
 				{
 					srand(rand());

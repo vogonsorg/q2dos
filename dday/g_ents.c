@@ -559,7 +559,7 @@ void SP_info_team_start(edict_t *ent)
 	if (ent->style == 2)
 		team_list[i]->kills_and_points = true;
 
-	if (!stricmp(team_list[i]->teamid, "usm"))  
+	if (!Q_stricmp(team_list[i]->teamid, "usm"))
 	{
 		strcpy (team_list[i]->teamid , "usa");
 		strcpy (team_list[i]->playermodel , "usa");
@@ -578,7 +578,7 @@ void SP_info_team_start(edict_t *ent)
 		team_list[i]->nextmap = level.mapname;
 
 	//make it so if allies win dday5 it goes to dday1
-	if (!stricmp(level.mapname, "dday5"))  
+	if (!Q_stricmp(level.mapname, "dday5"))
 	{
 		team_list[0]->nextmap = "dday1";
 	}

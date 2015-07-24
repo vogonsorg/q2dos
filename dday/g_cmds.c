@@ -2537,7 +2537,7 @@ void change_stance(edict_t *self, int stance)
 
 	else if(stance==STANCE_CRAWL)	//if we're supposed to crawl
 	{
-		if (!stricmp(level.mapname, "soviet1")) //lolhack
+		if (!Q_stricmp(level.mapname, "soviet1")) //lolhack
 			self->stance_view = -16;
 		else
 			self->stance_view= -17;//faf -14;	//10

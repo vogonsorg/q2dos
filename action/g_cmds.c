@@ -469,29 +469,29 @@ void Cmd_Use_f (edict_t *ent)
         s = gi.args();
 
         //zucc - check for "special"
-        if ( stricmp(s, "special") == 0 )
+        if ( Q_stricmp(s, "special") == 0 )
         {
                 ReadySpecialWeapon( ent );
                 return;
         }
 
         //zucc - alias names
-        if (!stricmp(s, "blaster") || !stricmp(s, "mark 23 pistol"))
+        if (!Q_stricmp(s, "blaster") || !Q_stricmp(s, "mark 23 pistol"))
                 s = MK23_NAME;
-        if (!stricmp(s, "A 2nd pistol") || !stricmp(s, "railgun"))
+        if (!Q_stricmp(s, "A 2nd pistol") || !Q_stricmp(s, "railgun"))
                 s = DUAL_NAME;
-        if (!stricmp(s, "shotgun"))
+        if (!Q_stricmp(s, "shotgun"))
                 s = M3_NAME;
-        if (!stricmp(s, "machinegun"))
+        if (!Q_stricmp(s, "machinegun"))
                 s = HC_NAME;
-        if (!stricmp(s, "super shotgun"))
+        if (!Q_stricmp(s, "super shotgun"))
                 s = MP5_NAME;
-        if (!stricmp(s, "chaingun"))
+        if (!Q_stricmp(s, "chaingun"))
                 s = SNIPER_NAME;
-        if (!stricmp(s, "bfg10k"))
+        if (!Q_stricmp(s, "bfg10k"))
                 s = KNIFE_NAME;
                  // zucc - let people pull up a knife ready to be thrown
-                 if (!stricmp(s, "throwing combat knife"))
+                 if (!Q_stricmp(s, "throwing combat knife"))
                  {
                          if ( ent->client->curr_weap != KNIFE_NUM )
                          {
@@ -504,7 +504,7 @@ void Cmd_Use_f (edict_t *ent)
                          }
                          s = KNIFE_NAME;
                  }
-                 if (!stricmp(s, "slashing combat knife"))
+                 if (!Q_stricmp(s, "slashing combat knife"))
                  {
                          if ( ent->client->curr_weap != KNIFE_NUM )
                          {
@@ -517,9 +517,9 @@ void Cmd_Use_f (edict_t *ent)
                          }
                          s = KNIFE_NAME;
                  }
-        if (!stricmp(s, "grenade launcher"))
+        if (!Q_stricmp(s, "grenade launcher"))
                 s = M4_NAME;
-        if (!stricmp(s, "grenades"))
+        if (!Q_stricmp(s, "grenades"))
                 s = GRENADE_NAME;
 
                 it = FindItem (s);
@@ -565,14 +565,14 @@ void Cmd_Drop_f (edict_t *ent)
         s = gi.args();
         
         //zucc check to see if the string is weapon
-        if ( stricmp(s, "weapon") == 0 )
+        if ( Q_stricmp(s, "weapon") == 0 )
         {
                 DropSpecialWeapon ( ent );
                 return;
         }
 
         //zucc now for item
-        if ( stricmp(s, "item") == 0 )
+        if ( Q_stricmp(s, "item") == 0 )
         {
                 DropSpecialItem ( ent );
                 return;

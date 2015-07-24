@@ -724,28 +724,28 @@ void ACEAI_Cmd_Choose (edict_t *ent, char *s)
     if (!teamplay->value)
             return;
     
-    if ( stricmp(s, MP5_NAME) == 0 )
+    if ( Q_stricmp(s, MP5_NAME) == 0 )
             ent->client->resp.weapon = FindItem(MP5_NAME);
-    else if ( stricmp(s, M3_NAME) == 0 )
+    else if ( Q_stricmp(s, M3_NAME) == 0 )
             ent->client->resp.weapon = FindItem(M3_NAME);
-    else if ( stricmp(s, M4_NAME) == 0 )
+    else if ( Q_stricmp(s, M4_NAME) == 0 )
             ent->client->resp.weapon = FindItem(M4_NAME);
-    else if ( stricmp(s, HC_NAME) == 0 )
+    else if ( Q_stricmp(s, HC_NAME) == 0 )
             ent->client->resp.weapon = FindItem(HC_NAME);
-    else if ( stricmp(s, SNIPER_NAME) == 0 )
+    else if ( Q_stricmp(s, SNIPER_NAME) == 0 )
             ent->client->resp.weapon = FindItem(SNIPER_NAME);
-    else if ( stricmp(s, KNIFE_NAME) == 0 )
+    else if ( Q_stricmp(s, KNIFE_NAME) == 0 )
             ent->client->resp.weapon = FindItem(KNIFE_NAME);
-    else if ( stricmp(s, DUAL_NAME) == 0 )
+    else if ( Q_stricmp(s, DUAL_NAME) == 0 )
             ent->client->resp.weapon = FindItem(DUAL_NAME);
-    else if ( stricmp(s, KEV_NAME) == 0 )
+    else if ( Q_stricmp(s, KEV_NAME) == 0 )
             ent->client->resp.item = FindItem(KEV_NAME);
-    else if ( stricmp(s, LASER_NAME) == 0 )
+    else if ( Q_stricmp(s, LASER_NAME) == 0 )
             ent->client->resp.item = FindItem(LASER_NAME);
-    else if ( stricmp(s, SLIP_NAME) == 0 )
+    else if ( Q_stricmp(s, SLIP_NAME) == 0 )
             ent->client->resp.item = FindItem(SLIP_NAME);
-    else if ( stricmp(s, SIL_NAME) == 0 )
+    else if ( Q_stricmp(s, SIL_NAME) == 0 )
             ent->client->resp.item = FindItem(SIL_NAME);
-    else if ( stricmp(s, BAND_NAME) == 0 )
+    else if ( Q_stricmp(s, BAND_NAME) == 0 )
             ent->client->resp.item = FindItem(BAND_NAME);
 }

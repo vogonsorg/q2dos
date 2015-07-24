@@ -834,7 +834,7 @@ void Create_CTB_Entities (edict_t *self)
 
 	return;
 
-	if (!stricmp(level.mapname, "dday3"))
+	if (!Q_stricmp(level.mapname, "dday3"))
 	{
 		spot = G_Spawn();
 		spot->classname = "usa_base";
@@ -859,7 +859,7 @@ void Create_CTB_Entities (edict_t *self)
 //		spot->s.angles[1] = 90;
 		SP_briefcase(spot);
 	}
-	else if (!stricmp(level.mapname, "dday2"))
+	else if (!Q_stricmp(level.mapname, "dday2"))
 	{
 		spot = G_Spawn();
 		spot->classname = "usa_base";
@@ -883,7 +883,7 @@ void Create_CTB_Entities (edict_t *self)
 		SP_briefcase(spot);
 		gi.dprintf(DEVELOPER_MSG_GAME, "dfjklsdfjklsdfjklsdfjkl\n");
 	}
-	else if (!stricmp(level.mapname, "invade2"))
+	else if (!Q_stricmp(level.mapname, "invade2"))
 	{
 		spot = G_Spawn();
 		spot->classname = "usa_base";
@@ -908,7 +908,7 @@ void Create_CTB_Entities (edict_t *self)
 		SP_briefcase(spot);
 		
 	}
-	else if (!stricmp(level.mapname, "mp1dday2"))
+	else if (!Q_stricmp(level.mapname, "mp1dday2"))
 	{
 		spot = G_Spawn();
 		spot->classname = "usa_base";
@@ -932,7 +932,7 @@ void Create_CTB_Entities (edict_t *self)
 		spot->s.origin[2] = 94.3;
 		SP_briefcase(spot);
 	}
-	else if (!stricmp(level.mapname, "inland4"))
+	else if (!Q_stricmp(level.mapname, "inland4"))
 	{
 		spot = G_Spawn();
 		spot->classname = "usa_base";
@@ -957,7 +957,7 @@ void Create_CTB_Entities (edict_t *self)
 		spot->s.angles[1] = 270;
 		SP_briefcase(spot);
 	}
-	else if (!stricmp(level.mapname, "dunkirk"))
+	else if (!Q_stricmp(level.mapname, "dunkirk"))
 	{
 		spot = G_Spawn();
 		spot->classname = "usa_base";
@@ -984,7 +984,7 @@ void Create_CTB_Entities (edict_t *self)
 		spot->s.angles[1] = 315;
 		SP_briefcase(spot);
 	}
-	else if (!stricmp(level.mapname, "inland1"))
+	else if (!Q_stricmp(level.mapname, "inland1"))
 	{
 		spot = G_Spawn();
 		spot->classname = "usa_base";
@@ -1011,7 +1011,7 @@ void Create_CTB_Entities (edict_t *self)
 		spot->s.angles[1] = 315;
 		SP_briefcase(spot);
 	}
-	else if (!stricmp(level.mapname, "inland2"))
+	else if (!Q_stricmp(level.mapname, "inland2"))
 	{
 		spot = G_Spawn();
 		spot->classname = "usa_base";
@@ -1038,7 +1038,7 @@ void Create_CTB_Entities (edict_t *self)
 		spot->s.angles[1] = 10;
 		SP_briefcase(spot);
 	}
-	else if (!stricmp(level.mapname, "invade6"))
+	else if (!Q_stricmp(level.mapname, "invade6"))
 	{
 		spot = G_Spawn();
 		spot->classname = "usa_base";

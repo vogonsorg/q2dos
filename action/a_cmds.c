@@ -720,44 +720,44 @@ void Cmd_Choose_f (edict_t *ent)
                         return;
                 
                 // convert names a player might try
-                if (!stricmp(s, "A 2nd pistol") || !stricmp(s, "railgun"))
+                if (!Q_stricmp(s, "A 2nd pistol") || !Q_stricmp(s, "railgun"))
                         s = DUAL_NAME;
-                if (!stricmp(s, "shotgun"))
+                if (!Q_stricmp(s, "shotgun"))
                         s = M3_NAME;
-                if (!stricmp(s, "machinegun"))
+                if (!Q_stricmp(s, "machinegun"))
                         s = HC_NAME;
-                if (!stricmp(s, "super shotgun"))
+                if (!Q_stricmp(s, "super shotgun"))
                         s = MP5_NAME;
-                if (!stricmp(s, "chaingun"))
+                if (!Q_stricmp(s, "chaingun"))
                         s = SNIPER_NAME;
-                if (!stricmp(s, "bfg10k"))
+                if (!Q_stricmp(s, "bfg10k"))
                         s = KNIFE_NAME;
-                if (!stricmp(s, "grenade launcher"))
+                if (!Q_stricmp(s, "grenade launcher"))
                         s = M4_NAME;
 
-        if ( stricmp(s, MP5_NAME) == 0 )
+        if ( Q_stricmp(s, MP5_NAME) == 0 )
                         ent->client->resp.weapon = FindItem(MP5_NAME);
-                else if ( stricmp(s, M3_NAME) == 0 )
+                else if ( Q_stricmp(s, M3_NAME) == 0 )
                         ent->client->resp.weapon = FindItem(M3_NAME);
-                else if ( stricmp(s, M4_NAME) == 0 )
+                else if ( Q_stricmp(s, M4_NAME) == 0 )
                         ent->client->resp.weapon = FindItem(M4_NAME);
-                else if ( stricmp(s, HC_NAME) == 0 )
+                else if ( Q_stricmp(s, HC_NAME) == 0 )
                         ent->client->resp.weapon = FindItem(HC_NAME);
-                else if ( stricmp(s, SNIPER_NAME) == 0 )
+                else if ( Q_stricmp(s, SNIPER_NAME) == 0 )
                         ent->client->resp.weapon = FindItem(SNIPER_NAME);
-                else if ( stricmp(s, KNIFE_NAME) == 0 )
+                else if ( Q_stricmp(s, KNIFE_NAME) == 0 )
                         ent->client->resp.weapon = FindItem(KNIFE_NAME);
-                else if ( stricmp(s, DUAL_NAME) == 0 )
+                else if ( Q_stricmp(s, DUAL_NAME) == 0 )
                         ent->client->resp.weapon = FindItem(DUAL_NAME);
-                else if ( stricmp(s, KEV_NAME) == 0 )
+                else if ( Q_stricmp(s, KEV_NAME) == 0 )
                         ent->client->resp.item = FindItem(KEV_NAME);
-                else if ( stricmp(s, LASER_NAME) == 0 )
+                else if ( Q_stricmp(s, LASER_NAME) == 0 )
                         ent->client->resp.item = FindItem(LASER_NAME);
-                else if ( stricmp(s, SLIP_NAME) == 0 )
+                else if ( Q_stricmp(s, SLIP_NAME) == 0 )
                         ent->client->resp.item = FindItem(SLIP_NAME);
-                else if ( stricmp(s, SIL_NAME) == 0 )
+                else if ( Q_stricmp(s, SIL_NAME) == 0 )
                         ent->client->resp.item = FindItem(SIL_NAME);
-                else if ( stricmp(s, BAND_NAME) == 0 )
+                else if ( Q_stricmp(s, BAND_NAME) == 0 )
                         ent->client->resp.item = FindItem(BAND_NAME);
                 else
                 {

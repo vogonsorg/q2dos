@@ -185,12 +185,12 @@ qboolean Pickup_Special ( edict_t *ent, edict_t *other )
         {
                 other->client->pers.inventory[ITEM_INDEX(ent->item)]++;
                 other->client->unique_item_total++;
-                if ( stricmp( ent->item->pickup_name, LASER_NAME ) == 0 )
+                if ( Q_stricmp( ent->item->pickup_name, LASER_NAME ) == 0 )
                 {
                         other->client->have_laser = 1;
                         SP_LaserSight(other, ent->item);//ent->item->use(other, ent->item);
                 }
-                if ( stricmp( ent->item->pickup_name, BAND_NAME ) == 0 )
+                if ( Q_stricmp( ent->item->pickup_name, BAND_NAME ) == 0 )
                 {
                         
                         if (other->client->pers.max_bullets < 4)
@@ -227,14 +227,14 @@ qboolean Pickup_Special ( edict_t *ent, edict_t *other )
 void Drop_Special( edict_t *ent, gitem_t *item)
 {
         ent->client->unique_item_total--;
-/*      if ( stricmp( item->pickup_name, LASER_NAME ) == 0 
+/*      if ( Q_stricmp( item->pickup_name, LASER_NAME ) == 0 
                 && ent->client->pers.inventory[ITEM_INDEX(item)] <= 1 )
         {
                 ent->client->have_laser = 0;
                 item->use(ent, item);
         }
         */
-        if ( stricmp( item->pickup_name, BAND_NAME ) == 0 
+        if ( Q_stricmp( item->pickup_name, BAND_NAME ) == 0 
                         && ent->client->pers.inventory[ITEM_INDEX(item)] <= 1 )
         {
                         ent->client->pers.max_bullets = 2;
@@ -962,9 +962,9 @@ edict_t *Drop_Item (edict_t *ent, gitem_t *item)
         VectorSet (dropped->mins, -15, -15, -15);
         VectorSet (dropped->maxs, 15, 15, 15);
         // zucc dumb hack to make knife look like it is on the ground
-        if ( (stricmp(item->pickup_name, KNIFE_NAME) == 0)
-                || (stricmp(item->pickup_name, LASER_NAME) == 0) 
-                || (stricmp(item->pickup_name, GRENADE_NAME) == 0 ) )
+        if ( (Q_stricmp(item->pickup_name, KNIFE_NAME) == 0)
+                || (Q_stricmp(item->pickup_name, LASER_NAME) == 0) 
+                || (Q_stricmp(item->pickup_name, GRENADE_NAME) == 0 ) )
         {
                 VectorSet (dropped->mins, -15, -15, -1);
                 VectorSet (dropped->maxs, 15, 15, 1);
@@ -1047,9 +1047,9 @@ void droptofloor (edict_t *ent)
 
         if ( ent->item )
         {
-                if ( (stricmp(ent->item->pickup_name, KNIFE_NAME) == 0)
-                        || (stricmp(ent->item->pickup_name, LASER_NAME) == 0) 
-                        || (stricmp(ent->item->pickup_name, GRENADE_NAME) == 0 ) )
+                if ( (Q_stricmp(ent->item->pickup_name, KNIFE_NAME) == 0)
+                        || (Q_stricmp(ent->item->pickup_name, LASER_NAME) == 0) 
+                        || (Q_stricmp(ent->item->pickup_name, GRENADE_NAME) == 0 ) )
                 {
                         VectorSet (ent->mins, -15, -15, -1);
                         VectorSet (ent->maxs, 15, 15, 1);

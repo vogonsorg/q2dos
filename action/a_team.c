@@ -818,7 +818,7 @@ void SpawnPlayers()
                 if (ent->inuse && ent->client->resp.team != NOTEAM)
                 {
 // ACEBOT CHANGE
-				if( !stricmp(ent->classname, "bot") )
+				if( !Q_stricmp(ent->classname, "bot") )
 					ACESP_PutClientInServer( ent, true,ent->client->resp.team);
 				else
 					PutClientInServer(ent);

@@ -351,7 +351,7 @@ void PrintMOTD(edict_t *ent)
 void stuffcmd(edict_t *ent, char *c)
 {
 // ACEBOT ADD
-	if( !stricmp( ent->classname,"bot"))
+	if( !Q_stricmp( ent->classname,"bot"))
 		return;
 // ACEBOT END
         gi.WriteByte(svc_stufftext);

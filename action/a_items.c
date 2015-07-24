@@ -59,7 +59,7 @@ static void SpawnSpec(gitem_t *item, edict_t *spot)
         VectorSet (ent->mins, -15, -15, -15);
         VectorSet (ent->maxs, 15, 15, 15);
                 // zucc dumb hack to make laser look like it is on the ground
-        if (stricmp(item->pickup_name, LASER_NAME) == 0)                  
+        if (Q_stricmp(item->pickup_name, LASER_NAME) == 0)
         {
                 VectorSet (ent->mins, -15, -15, -1);
                 VectorSet (ent->maxs, 15, 15, 1);

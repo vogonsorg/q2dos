@@ -263,7 +263,7 @@ static void SP_FixCoopSpots (edict_t *self)
                 VectorSubtract(self->s.origin, spot->s.origin, d);
                 if (VectorLength(d) < 384)
                 {
-                        if ((!self->targetname) || stricmp(self->targetname, spot->targetname) != 0)
+                        if ((!self->targetname) || Q_stricmp(self->targetname, spot->targetname) != 0)
                         {
 //                              gi.dprintf(DEVELOPER_MSG_GAME, "FixCoopSpots changed %s at %s targetname from %s to %s\n", self->classname, vtos(self->s.origin), self->targetname, spot->targetname);
                                 self->targetname = spot->targetname;
@@ -281,7 +281,7 @@ static void SP_CreateCoopSpots (edict_t *self)
 {
         edict_t *spot;
 
-        if(stricmp(level.mapname, "security") == 0)
+        if(Q_stricmp(level.mapname, "security") == 0)
         {
                 spot = G_Spawn();
                 spot->classname = "info_player_coop";
@@ -319,7 +319,7 @@ void SP_info_player_start(edict_t *self)
 {
         if (!coop->value)
                 return;
-        if(stricmp(level.mapname, "security") == 0)
+        if(Q_stricmp(level.mapname, "security") == 0)
         {
                 // invoke one of our gross, ugly, disgusting hacks
                 self->think = SP_CreateCoopSpots;
@@ -352,20 +352,20 @@ void SP_info_player_coop(edict_t *self)
                 return;
         }
 
-        if((stricmp(level.mapname, "jail2") == 0)   ||
-           (stricmp(level.mapname, "jail4") == 0)   ||
-           (stricmp(level.mapname, "mine1") == 0)   ||
-           (stricmp(level.mapname, "mine2") == 0)   ||
-           (stricmp(level.mapname, "mine3") == 0)   ||
-           (stricmp(level.mapname, "mine4") == 0)   ||
-           (stricmp(level.mapname, "lab") == 0)     ||
-           (stricmp(level.mapname, "boss1") == 0)   ||
-           (stricmp(level.mapname, "fact3") == 0)   ||
-           (stricmp(level.mapname, "biggun") == 0)  ||
-           (stricmp(level.mapname, "space") == 0)   ||
-           (stricmp(level.mapname, "command") == 0) ||
-           (stricmp(level.mapname, "power2") == 0) ||
-           (stricmp(level.mapname, "strike") == 0))
+        if((Q_stricmp(level.mapname, "jail2") == 0)   ||
+           (Q_stricmp(level.mapname, "jail4") == 0)   ||
+           (Q_stricmp(level.mapname, "mine1") == 0)   ||
+           (Q_stricmp(level.mapname, "mine2") == 0)   ||
+           (Q_stricmp(level.mapname, "mine3") == 0)   ||
+           (Q_stricmp(level.mapname, "mine4") == 0)   ||
+           (Q_stricmp(level.mapname, "lab") == 0)     ||
+           (Q_stricmp(level.mapname, "boss1") == 0)   ||
+           (Q_stricmp(level.mapname, "fact3") == 0)   ||
+           (Q_stricmp(level.mapname, "biggun") == 0)  ||
+           (Q_stricmp(level.mapname, "space") == 0)   ||
+           (Q_stricmp(level.mapname, "command") == 0) ||
+           (Q_stricmp(level.mapname, "power2") == 0) ||
+           (Q_stricmp(level.mapname, "strike") == 0))
         {
                 // invoke one of our gross, ugly, disgusting hacks
                 self->think = SP_FixCoopSpots;
@@ -1976,7 +1976,7 @@ void EquipClient( edict_t *ent )
                 return;
         
 
-        if ( stricmp(client->resp.item->pickup_name, BAND_NAME) == 0 )
+        if ( Q_stricmp(client->resp.item->pickup_name, BAND_NAME) == 0 )
         {
                 band = 1;
                 if (tgren->value > 0) // team grenades is turned on
@@ -1995,7 +1995,7 @@ void EquipClient( edict_t *ent )
                 client->pers.inventory[ITEM_INDEX(item)] = 1;
         
 
-        if ( stricmp(client->resp.weapon->pickup_name, MP5_NAME ) == 0 )
+        if ( Q_stricmp(client->resp.weapon->pickup_name, MP5_NAME ) == 0 )
         {
                 item = FindItem(MP5_NAME);
                 client->pers.selected_item = ITEM_INDEX(item);
@@ -2010,7 +2010,7 @@ void EquipClient( edict_t *ent )
                         client->pers.inventory[ITEM_INDEX(item)] = 1;
                 client->mp5_rds = client->mp5_max;
         }
-        else if ( stricmp(client->resp.weapon->pickup_name, M4_NAME ) == 0 )
+        else if ( Q_stricmp(client->resp.weapon->pickup_name, M4_NAME ) == 0 )
         {
                 item = FindItem(M4_NAME);
                 client->pers.selected_item = ITEM_INDEX(item);
@@ -2025,7 +2025,7 @@ void EquipClient( edict_t *ent )
                         client->pers.inventory[ITEM_INDEX(item)] = 1;
                 client->m4_rds = client->m4_max;
         }
-        else if ( stricmp(client->resp.weapon->pickup_name, M3_NAME ) == 0 )
+        else if ( Q_stricmp(client->resp.weapon->pickup_name, M3_NAME ) == 0 )
         {
                 item = FindItem(M3_NAME);
                 client->pers.selected_item = ITEM_INDEX(item);
@@ -2040,7 +2040,7 @@ void EquipClient( edict_t *ent )
                         client->pers.inventory[ITEM_INDEX(item)] = 7;
                 client->shot_rds = client->shot_max;
         }
-        else if ( stricmp(client->resp.weapon->pickup_name, HC_NAME ) == 0 )
+        else if ( Q_stricmp(client->resp.weapon->pickup_name, HC_NAME ) == 0 )
         {
                 item = FindItem(HC_NAME);
                 client->pers.selected_item = ITEM_INDEX(item);
@@ -2055,7 +2055,7 @@ void EquipClient( edict_t *ent )
                         client->pers.inventory[ITEM_INDEX(item)] = 12;
                 client->cannon_rds = client->cannon_max;
         }
-        else if ( stricmp(client->resp.weapon->pickup_name, SNIPER_NAME ) == 0 )
+        else if ( Q_stricmp(client->resp.weapon->pickup_name, SNIPER_NAME ) == 0 )
         {
                 item = FindItem(SNIPER_NAME);
                 client->pers.inventory[ITEM_INDEX(item)] = 1;
@@ -2067,7 +2067,7 @@ void EquipClient( edict_t *ent )
                         client->pers.inventory[ITEM_INDEX(item)] = 10;
                 client->sniper_rds = client->sniper_max;
         }
-        else if ( stricmp(client->resp.weapon->pickup_name, DUAL_NAME ) == 0 )
+        else if ( Q_stricmp(client->resp.weapon->pickup_name, DUAL_NAME ) == 0 )
         {
                 item = FindItem(DUAL_NAME);
                 client->pers.selected_item = ITEM_INDEX(item);
@@ -2081,7 +2081,7 @@ void EquipClient( edict_t *ent )
                         client->pers.inventory[ITEM_INDEX(item)] = 2;
                 client->dual_rds = client->dual_max;
         }
-        else if ( stricmp(client->resp.weapon->pickup_name, KNIFE_NAME ) == 0 )
+        else if ( Q_stricmp(client->resp.weapon->pickup_name, KNIFE_NAME ) == 0 )
         {
                 item = FindItem(KNIFE_NAME);
                 client->pers.selected_item = ITEM_INDEX(item);
