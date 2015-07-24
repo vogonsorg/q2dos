@@ -139,7 +139,7 @@ REFSOFT = ref_soft/r_alias.o \
 
 ifeq ($(USE_ASM),1)
 REFASM = linux/math.o \
-	dos/d_copy.o \
+	linux/d_copy.o \
 	linux/d_polysa.o \
 	linux/r_aclipa.o \
 	linux/r_draw16.o \
