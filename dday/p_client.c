@@ -3315,6 +3315,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	tr = gi.trace (start, ent->mins, ent->maxs, end, ent, MASK_SOLID);
 	//tr = gi.trace (start, NULL, NULL, end, ent, MASK_SOLID);
 	VectorSubtract(ent->s.origin, tr.endpos, dist);
+	(void)dist;/** FIXME: 'dist' IS UNUSED, SO ARE ITS DEPENDENCIES 'start', 'end', 'tr' **/
 
 //	gi.dprintf(DEVELOPER_MSG_GAME, "%i %s\n", ent->waterlevel, vtos(ent->client->v_angle));
 
@@ -3458,7 +3459,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		ucmd->sidemove		 = 0;
 		ucmd->upmove		 = 0;
 	}
-	else 
+	else
 	{
 //		if ( (ent->velocity[0] != 0 || ent->velocity[1] != 0) && ent->wound_location == LEG_WOUND )
 //		{
@@ -3482,7 +3483,6 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	//faf			ucmd->forwardmove *= .9;
 	//faf			ucmd->sidemove *= .9;
 		}
-
 
 //		if (ent->client->aim && VectorLength(dist) > 25 && ent->velocity[2] != 0)
 // Nick 01/05/2003 - added && ent->stanceflags == STANCE_STAND to fix slope bug

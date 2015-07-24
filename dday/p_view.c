@@ -1501,10 +1501,11 @@ void G_SetClientEffects (edict_t *ent)
 void Play_Footstep_Sound (edict_t *ent)
 {
 	vec3_t end = { 0, 0, -200};
-	trace_t tr;
+//	trace_t tr;
 
 	VectorMA (ent->s.origin, 50, end, end);
-	tr = gi.trace (ent->s.origin, NULL, NULL, end, ent, MASK_ALL);
+//	tr = gi.trace (ent->s.origin, NULL, NULL, end, ent, MASK_ALL);
+/*** FIXME: THIS INSTANCE OF 'tr' is UNUSED! ***/
 
 	if (ent->client)
 	{
