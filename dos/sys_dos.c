@@ -25,10 +25,6 @@ int _crt0_startup_flags = _CRT0_FLAG_NONMOVE_SBRK; /* FS: Fake Mem Fix (QIP) */
 #include "dosisms.h"
 #include "../qcommon/qcommon.h"
 #include "../client/keys.h"
-#include "glob.h"
-
-#define MINIMUM_WIN_MEMORY		0x800000
-#define MINIMUM_WIN_MEMORY_LEVELPAK	(MINIMUM_WIN_MEMORY + 0x100000)
 
 #define	KEYBUF_SIZE	256
 static unsigned char	keybuf[KEYBUF_SIZE];
@@ -39,26 +35,27 @@ float			fptest_temp;
 
 extern char	start_of_memory __asm__("start");
 
-static byte scantokey[128] = { 
-//  0           1       2       3       4       5       6       7 
-//  8           9       A       B       C       D       E       F 
-	0  ,    27,     '1',    '2',    '3',    '4',    '5',    '6', 
-	'7',    '8',    '9',    '0',    '-',    '=',    K_BACKSPACE, 9, // 0 
-	'q',    'w',    'e',    'r',    't',    'y',    'u',    'i', 
-	'o',    'p',    '[',    ']',    13 ,    K_CTRL,'a',  's',      // 1 
-	'd',    'f',    'g',    'h',    'j',    'k',    'l',    ';', 
-	'\'' ,    '`',    K_SHIFT,'\\',  'z',    'x',    'c',    'v',      // 2 
-	'b',    'n',    'm',    ',',    '.',    '/',    K_SHIFT,'*', 
-	K_ALT,' ',   0  ,    K_F1, K_F2, K_F3, K_F4, K_F5,   // 3 
-	K_F6, K_F7, K_F8, K_F9, K_F10,0  ,    0  , K_HOME, 
-	K_UPARROW,K_PGUP,'-',K_LEFTARROW,'5',K_RIGHTARROW,'+',K_END, //4 
-	K_DOWNARROW,K_PGDN,K_INS,K_DEL,0,0,             0,              K_F11, 
-	K_F12,0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 5 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 6 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0         // 7 
-}; 
+static byte scantokey[128] =
+{
+//	0        1       2       3       4       5       6       7
+//	8        9       A       B       C       D       E       F
+	0  ,    27,     '1',    '2',    '3',    '4',    '5',    '6',
+	'7',    '8',    '9',    '0',    '-',    '=', K_BACKSPACE, 9,	// 0
+	'q',    'w',    'e',    'r',    't',    'y',    'u',    'i',
+	'o',    'p',    '[',    ']',     13,   K_CTRL,  'a',    's',	// 1
+	'd',    'f',    'g',    'h',    'j',    'k',    'l',    ';',
+	'\'',   '`',  K_SHIFT,  '\\',   'z',    'x',    'c',    'v',	// 2
+	'b',    'n',    'm',    ',',    '.',    '/',  K_SHIFT,  '*',
+	K_ALT,  ' ',     0 ,    K_F1,   K_F2,   K_F3,   K_F4,  K_F5,	// 3
+	K_F6,  K_F7,   K_F8,    K_F9,  K_F10,    0 ,     0 , K_HOME,
+	K_UPARROW,K_PGUP,'-',K_LEFTARROW,'5',K_RIGHTARROW,'+',K_END,	// 4
+	K_DOWNARROW,K_PGDN,K_INS,K_DEL,   0 ,    0 ,     0 ,  K_F11,
+	K_F12,   0 ,     0 ,     0 ,      0 ,    0 ,     0 ,     0 ,	// 5
+	0  ,     0 ,     0 ,     0 ,      0 ,    0 ,     0 ,     0 ,
+	0  ,     0 ,     0 ,     0 ,      0 ,    0 ,     0 ,     0 ,	// 6
+	0  ,     0 ,     0 ,     0 ,      0 ,    0 ,     0 ,     0 ,
+	0  ,     0 ,     0 ,     0 ,      0 ,    0 ,     0 ,     0	// 7
+};
 
 static void TrapKey(void)
 {
@@ -67,14 +64,6 @@ static void TrapKey(void)
 
 	keybuf_head = (keybuf_head + 1) & (KEYBUF_SIZE-1);
 }
-
-#define SC_UPARROW      0x48
-#define SC_DOWNARROW    0x50
-#define SC_LEFTARROW    0x4b
-#define SC_RIGHTARROW   0x4d
-#define SC_LEFTSHIFT    0x2a
-#define SC_RIGHTSHIFT   0x36
-#define SC_RIGHTARROW   0x4d
 
 #define STDOUT 1
 double	sys_msg_time;
@@ -110,14 +99,9 @@ static unsigned long virtualMemStart;
 */
 static void Sys_DetectLFN (void)
 {
-	unsigned int fd = _get_volume_info (NULL, 0, 0, NULL);
-
 	if(bSkipLFNCheck)
-	{
 		return;
-	}
-
-	if(!(fd & _FILESYS_LFN_SUPPORTED))
+	if(!(_get_volume_info(NULL, 0, 0, NULL) & _FILESYS_LFN_SUPPORTED))
 	{
 		printf("WARNING: Long file name support not detected!  Grab a copy of DOSLFN!\n");
 		sleep(2);
@@ -128,10 +112,7 @@ static void Sys_DetectLFN (void)
 static qboolean Sys_DetectWinNT (void) /* FS: Wisdom from Gisle Vanem */
 {
 	if(_get_dos_version(1) == 0x0532)
-	{
 		return true;
-	}
-
 	return false;
 }
 
@@ -167,12 +148,11 @@ static __dpmi_meminfo	info; /* FS: Sigh, moved this here because everyone wants 
 static int Sys_Get_Physical_Memory(void) /* FS: From DJGPP tutorial */
 {
 	_go32_dpmi_meminfo meminfo;
-	_go32_dpmi_get_free_memory_information(&meminfo);
 
+	_go32_dpmi_get_free_memory_information(&meminfo);
 	if (meminfo.available_physical_pages != -1)
-	{
 		return meminfo.available_physical_pages * 4096;
-	}
+
 	return meminfo.available_memory;
 }
 
@@ -254,9 +234,7 @@ void Sys_Error (char *error, ...)
 	va_list		argptr;
 
 	if (!dedicated || !dedicated->value)
-	{
 		dos_restoreintr(9); /* FS: Give back the keyboard */
-	}
 
 	Sys_SetTextMode();
 
@@ -283,9 +261,7 @@ void Sys_Error (char *error, ...)
 void Sys_Quit (void)
 {
 	if(!dedicated || !dedicated->value)
-	{
 		dos_restoreintr(9); /* FS: Give back the keyboard */
-	}
 
 	if (unlockmem)
 	{
@@ -294,7 +270,7 @@ void Sys_Quit (void)
 	}
 
 	Sys_SetTextMode();
-	
+
 	__dpmi_free_physical_address_mapping(&info);
 	__djgpp_nearptr_disable(); /* FS: Everyone else is a master DOS DPMI programmer.  Pretty sure CWSDPMI is already taking care of this... */
 
@@ -330,14 +306,10 @@ char *Sys_ConsoleInput (void)
 	char            ch;
 
 	if (!dedicated || !dedicated->value)
-	{
 		return NULL;
-	}
 
 	if (! kbhit())
-	{
 		return NULL;
-	}
 
 	ch = getche();
 
@@ -374,61 +346,64 @@ char *Sys_ConsoleInput (void)
 void	Sys_ConsoleOutput (char *string)
 {
 	if (!dedicated || !dedicated->value)
-	{
 		return;
-	}
-
 	printf("%s",string);
 }
 
-#define SC_RSHIFT       0x36 
-#define SC_LSHIFT       0x2a 
+#define	SC_UPARROW	0x48
+#define	SC_DOWNARROW	0x50
+#define	SC_LEFTARROW	0x4b
+#define	SC_RIGHTARROW	0x4d
+#define	SC_LEFTSHIFT	0x2a
+#define	SC_RIGHTSHIFT	0x36
+
 void Sys_SendKeyEvents (void)
 {
-	int k, next;
-	int outkey;
+	int	k, next;
+	int	outkey;
+
+// grab frame time
+	sys_msg_time = Sys_Milliseconds();
 
 // get key events
 
 	while (keybuf_head != keybuf_tail)
 	{
-		sys_msg_time = Sys_Milliseconds();
 		k = keybuf[keybuf_tail++];
-		keybuf_tail &= (KEYBUF_SIZE-1);
+		keybuf_tail &= (KEYBUF_SIZE - 1);
 
-		if (k==0xe0)
-			continue;               // special / pause keys
-		next = keybuf[(keybuf_tail-2)&(KEYBUF_SIZE-1)];
+		if (k == 0xe0)
+			continue;		// special / pause keys
+		next = keybuf[(keybuf_tail - 2) & (KEYBUF_SIZE - 1)];
+		// Pause generates e1 1d 45 e1 9d c5 when pressed, and
+		// nothing when released. e1 is generated only for the
+		// pause key.
 		if (next == 0xe1)
-			continue;                               // pause key bullshit
-		if (k==0xc5 && next == 0x9d) 
-		{ 
+			continue;		// pause key bullshit
+		if (k == 0xc5 && next == 0x9d)
+		{
 			Key_Event (K_PAUSE, true, sys_msg_time);
-			continue; 
-		} 
+			continue;
+		}
 
-		// extended keyboard shift key bullshit 
-		if ( (k&0x7f)==SC_LSHIFT || (k&0x7f)==SC_RSHIFT ) 
-		{ 
-			if ( keybuf[(keybuf_tail-2)&(KEYBUF_SIZE-1)]==0xe0 ) 
-				continue; 
-			k &= 0x80; 
-			k |= SC_RSHIFT; 
-		} 
+		// extended keyboard shift key bullshit
+		if ( (k & 0x7f) == SC_LEFTSHIFT || (k & 0x7f) == SC_RIGHTSHIFT )
+		{
+			if (keybuf[(keybuf_tail - 2) & (KEYBUF_SIZE - 1)] == 0xe0)
+				continue;
+			k &= 0x80;
+			k |= SC_RIGHTSHIFT;
+		}
 
-		if (k==0xc5 && keybuf[(keybuf_tail-2)&(KEYBUF_SIZE-1)] == 0x9d)
-			continue; // more pause bullshit
+		if (k == 0xc5 && keybuf[(keybuf_tail - 2) & (KEYBUF_SIZE - 1)] == 0x9d)
+			continue;	// more pause bullshit
 
 		outkey = scantokey[k & 0x7f];
 
 		if (k & 0x80)
-		{
 			Key_Event (outkey, false, sys_msg_time);
-		}
 		else
-		{
 			Key_Event (outkey, true, sys_msg_time);
-		}
 	}
 }
 
@@ -472,9 +447,9 @@ static void Sys_ParseEarlyArgs(int argc, char **argv) /* FS: Parse some very spe
 	int i;
 	for (i = 1; i < argc; i++)
 	{
-		if(strnicmp((char*)argv[i] + 1,"skipwincheck", 12) == 0)
+		if(strnicmp(argv[i],"-skipwincheck",12) == 0)
 			bSkipWinCheck = true;
-		if(strnicmp((char*)argv[i] + 1,"skiplfncheck", 12) == 0)
+		if(strnicmp(argv[i],"-skiplfncheck",12) == 0)
 			bSkipLFNCheck = true;
 	}
 }
