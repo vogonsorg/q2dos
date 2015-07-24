@@ -96,7 +96,6 @@ void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, 
 #endif
 
 
-
 void AngleVectors (vec3_t angles, vec3_t forward, vec3_t right, vec3_t up)
 {
 	float		angle;
@@ -187,7 +186,6 @@ void PerpendicularVector( vec3_t dst, const vec3_t src )
 	*/
 	VectorNormalize( dst );
 }
-
 
 
 /*
@@ -302,9 +300,6 @@ float	anglemod(float a)
 	a = (360.0/65536) * ((int)(a*(65536/360.0)) & 65535);
 	return a;
 }
-
-	int		i;
-	vec3_t	corners[2];
 
 
 // this is the slow, general version
@@ -688,10 +683,9 @@ int VectorCompare (vec3_t v1, vec3_t v2)
 {
 	if (v1[0] != v2[0] || v1[1] != v2[1] || v1[2] != v2[2])
 			return 0;
-			
+
 	return 1;
 }
-
 
 vec_t VectorNormalize (vec3_t v)
 {
@@ -707,9 +701,8 @@ vec_t VectorNormalize (vec3_t v)
 		v[1] *= ilength;
 		v[2] *= ilength;
 	}
-		
-	return length;
 
+	return length;
 }
 
 vec_t VectorNormalize2 (vec3_t v, vec3_t out)
@@ -726,9 +719,8 @@ vec_t VectorNormalize2 (vec3_t v, vec3_t out)
 		out[1] = v[1]*ilength;
 		out[2] = v[2]*ilength;
 	}
-		
-	return length;
 
+	return length;
 }
 
 void VectorMA (vec3_t veca, float scale, vec3_t vecb, vec3_t vecc)
@@ -737,7 +729,6 @@ void VectorMA (vec3_t veca, float scale, vec3_t vecb, vec3_t vecc)
 	vecc[1] = veca[1] + scale*vecb[1];
 	vecc[2] = veca[2] + scale*vecb[2];
 }
-
 
 vec_t _DotProduct (vec3_t v1, vec3_t v2)
 {
@@ -811,7 +802,6 @@ int Q_log2(int val)
 }
 
 
-
 //====================================================================================
 
 /*
@@ -822,7 +812,7 @@ COM_SkipPath
 char *COM_SkipPath (char *pathname)
 {
 	char	*last;
-	
+
 	last = pathname;
 	while (*pathname)
 	{
@@ -960,19 +950,19 @@ qboolean	bigendien;
 // mess up when qcommon is included in multiple places
 short	(*_BigShort) (short l);
 short	(*_LittleShort) (short l);
-int		(*_BigLong) (int l);
-int		(*_LittleLong) (int l);
+int	(*_BigLong) (int l);
+int	(*_LittleLong) (int l);
 float	(*_BigFloat) (float l);
 float	(*_LittleFloat) (float l);
 
 short	BigShort(short l){return _BigShort(l);}
 short	LittleShort(short l) {return _LittleShort(l);}
-int		BigLong (int l) {return _BigLong(l);}
-int		LittleLong (int l) {return _LittleLong(l);}
+int	BigLong (int l) {return _BigLong(l);}
+int	LittleLong (int l) {return _LittleLong(l);}
 float	BigFloat (float l) {return _BigFloat(l);}
 float	LittleFloat (float l) {return _LittleFloat(l);}
 
-short   ShortSwap (short l)
+short ShortSwap (short l)
 {
 	byte    b1,b2;
 
@@ -982,12 +972,12 @@ short   ShortSwap (short l)
 	return (b1<<8) + b2;
 }
 
-short	ShortNoSwap (short l)
+short ShortNoSwap (short l)
 {
 	return l;
 }
 
-int    LongSwap (int l)
+int LongSwap (int l)
 {
 	byte    b1,b2,b3,b4;
 
@@ -999,7 +989,7 @@ int    LongSwap (int l)
 	return ((int)b1<<24) + ((int)b2<<16) + ((int)b3<<8) + b4;
 }
 
-int	LongNoSwap (int l)
+int LongNoSwap (int l)
 {
 	return l;
 }
@@ -1011,7 +1001,7 @@ float FloatSwap (float f)
 		float	f;
 		byte	b[4];
 	} dat1, dat2;
-	
+
 	dat1.f = f;
 	dat2.b[0] = dat1.b[3];
 	dat2.b[1] = dat1.b[2];
@@ -1058,7 +1048,6 @@ void Swap_Init (void)
 }
 
 
-
 /*
 ============
 va
@@ -1100,13 +1089,13 @@ char *COM_Parse (char **data_p)
 	data = *data_p;
 	len = 0;
 	com_token[0] = 0;
-	
+
 	if (!data)
 	{
 		*data_p = NULL;
 		return "";
 	}
-		
+
 // skip whitespace
 skipwhite:
 	while ( (c = *data) <= ' ')
@@ -1118,7 +1107,7 @@ skipwhite:
 		}
 		data++;
 	}
-	
+
 // skip // comments
 	if (c=='/' && data[1] == '/')
 	{
@@ -1189,7 +1178,6 @@ void Com_PageInMemory (byte *buffer, int size)
 }
 
 
-
 /*
 ============================================================================
 
@@ -1207,7 +1195,6 @@ int Q_stricmp (char *s1, char *s2)
 	return strcasecmp (s1, s2);
 #endif
 }
-
 
 int Q_strncasecmp (char *s1, char *s2, int n)
 {
@@ -1231,7 +1218,7 @@ int Q_strncasecmp (char *s1, char *s2, int n)
 				return -1;		// strings not equal
 		}
 	} while (c1);
-	
+
 	return 0;		// strings are equal
 }
 
@@ -1239,7 +1226,6 @@ int Q_strcasecmp (char *s1, char *s2)
 {
 	return Q_strncasecmp (s1, s2, 99999);
 }
-
 
 
 void Com_sprintf (char *dest, int size, char *fmt, ...)
@@ -1354,7 +1340,7 @@ char *Info_ValueForKey (char *s, char *key)
 								// work without stomping on each other
 	static	int	valueindex;
 	char	*o;
-	
+
 	valueindex ^= 1;
 	if (*s == '\\')
 		s++;
@@ -1435,7 +1421,6 @@ void Info_RemoveKey (char *s, char *key)
 		if (!*s)
 			return;
 	}
-
 }
 
 
@@ -1581,7 +1566,6 @@ void Q_strncpyz (char *dst, const char *src, int dstSize)
 	dst[dstSize-1] = 0;
 }
 
-
 /*
 =================
 Q_strncatz
@@ -1629,7 +1613,6 @@ char *Q_strlwr (char *string)
 	return string;
 }
 
-
 char *Q_strupr (char *string)
 {
 	char	*s = string;
@@ -1641,6 +1624,7 @@ char *Q_strupr (char *string)
 	return string;
 }
 
+#if defined(__DJGPP__) || defined(_WIN32)
 char * /* from OpenBSD */
 strtok_r(char *s, const char *delim, char **last)
 {
@@ -1687,4 +1671,4 @@ cont:
 	}
 	/* NOTREACHED */
 }
-
+#endif
