@@ -36,11 +36,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <sys/stat.h>
 #include <string.h>
 #include <dpmi.h>
-#include <crt0.h> /* FS: Fake Mem Fix (QIP) */
+#include <crt0.h> /* FS: Fake Mem Fix for Win9x (QIP) */
 #include <sys/nearptr.h>
 #include <conio.h>
 
-int _crt0_startup_flags = _CRT0_FLAG_NONMOVE_SBRK; /* FS: Fake Mem Fix (QIP) */
+int _crt0_startup_flags = _CRT0_FLAG_UNIX_SBRK; /* FS: Fake Mem Fix for Win9x (QIP) */
 
 #include "dosisms.h"
 #include "../qcommon/qcommon.h"
@@ -507,6 +507,8 @@ int main (int argc, char **argv)
 	Sys_DetectLFN();
 	Sys_DetectWin95 ();
 	Sys_PageInProgram ();
+
+	_crt0_startup_flags &= _CRT0_FLAG_NONMOVE_SBRK; /* FS: We walked through all the data, now make it non-moving so Win9x doesn't barf. */
 
 	Sys_Init();
 
