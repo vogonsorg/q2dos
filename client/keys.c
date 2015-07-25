@@ -834,14 +834,20 @@ void Key_Event (int key, qboolean down, double time)
 	if (down)
 	{
 		key_repeats[key]++;
-		if (key != K_BACKSPACE 
-			&& key != K_PAUSE 
-			&& key != K_PGUP 
-			&& key != K_KP_PGUP 
-			&& key != K_PGDN
-			&& key != K_KP_PGDN
-			&& key_repeats[key] > 1)
-			return;	// ignore most autorepeats
+
+		if (!cl_autorepeat_allkeys->intValue) /* FS: Added */
+		{
+			if (key != K_BACKSPACE 
+				&& key != K_PAUSE 
+				&& key != K_PGUP 
+				&& key != K_KP_PGUP 
+				&& key != K_PGDN
+				&& key != K_KP_PGDN
+				&& key_repeats[key] > 1)
+			{
+				return;	// ignore most autorepeats
+			}
+		}
 			
 		if (key >= 200 && !keybindings[key])
 			Com_Printf ("%s is unbound, hit F4 to set.\n", Key_KeynumToString (key) );

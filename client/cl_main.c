@@ -110,6 +110,7 @@ cvar_t	*gender_auto;
 
 cvar_t	*cl_vwep;
 cvar_t	*console_old_complete; // FS: Old style command completing
+cvar_t	*cl_autorepeat_allkeys; /* FS: So I can autorepeat whatever I want, hoss. */
 
 #ifdef GAMESPY
 /* FS: Gamespy CVARs */
@@ -1743,8 +1744,10 @@ void CL_InitLocal (void)
 
 	cl_vwep = Cvar_Get ("cl_vwep", "1", CVAR_ARCHIVE);
 
-	// FS: New stuff
+	/* FS: New stuff */
 	console_old_complete = Cvar_Get("console_old_complete", "0", CVAR_ARCHIVE); // FS: Old style command completing
+	cl_autorepeat_allkeys = Cvar_Get("cl_autorepeat_allkeys", "0", CVAR_ARCHIVE); /* FS: Because I want to autorepeat whatever I want, hoss */
+	cl_autorepeat_allkeys->description = "Allow to autorepeat any key, not just Backspace, Pause, PgUp, and PgDn keys.";
 
 #ifdef GAMESPY
 	/* FS: For gamespy */

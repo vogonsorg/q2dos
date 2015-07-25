@@ -44,7 +44,7 @@ Tips and other misc info:
   you load Q2DOS load Ultramid -Q then Ultramid -Q -F.  If you don't have
   Ultramid for some reason, you can get the fix (with a batch included) at
   http://dk.toastednet.org/QDOS/GUSFIX.ZIP.
-  You also may need to set s_mixahead to 0.3 and use high IRQs.
+  You also may need to set s_mixahead to 0.3 and use high DMAs.
 * Make sure you are using the included CWSDPMI.EXE in your Q2 directory or you
   may get some issues with running out of memory.
 * To hear Ogg Vorbis or WAV tracks in game, rip the Q2 CD's audio tracks (2-11)
@@ -67,6 +67,8 @@ Tips and other misc info:
   You will notice the number will never rise, this is on purpose.
   Please read the DJGPP FAQ @ http://www.delorie.com/djgpp//v2faq/faq15_2.html
   for more information on how DJGPP and CWSDPMI work.
+* Logitch MouseWare drivers in Windows 9x may cause delayed/missing mouse input
+  when played in a Windows 9x DOS box.
 
 Follow neozeed @
 http://virtuallyfun.superglobalmegacorp.com/

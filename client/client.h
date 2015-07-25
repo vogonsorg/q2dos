@@ -393,6 +393,7 @@ extern	cvar_t	*cl_async;
 
 extern	cvar_t	*cl_vwep;
 
+extern	cvar_t	*cl_autorepeat_allkeys; /* FS: Added */
 /* FS: Gamespy stuff */
 extern	cvar_t	*s_gamespy_sounds;
 
