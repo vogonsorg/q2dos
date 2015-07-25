@@ -1,3 +1,23 @@
+/*
+Copyright (C) 1996-1997 Id Software, Inc.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+*/
+
 // sys_dos.c -- dos system driver, adapated from Quake 1
 
 #include <errno.h>
@@ -65,7 +85,6 @@ static void TrapKey(void)
 	keybuf_head = (keybuf_head + 1) & (KEYBUF_SIZE-1);
 }
 
-#define STDOUT 1
 double	sys_msg_time;
 double	sys_frame_time;
 int	sys_checksum;
@@ -74,16 +93,10 @@ void MaskExceptions (void);
 void Sys_PushFPCW_SetHigh (void);
 void Sys_PopFPCW (void);
 void Sys_SetFPCW (void);
-double Sys_FloatTime (void);
-
-#define LEAVE_FOR_CACHE   (512*1024)    /* FIXME: tune */
-#define LOCKED_FOR_MALLOC (128*1024)    /* FIXME: tune */
-
 
 int		end_of_memory;
 static qboolean	lockmem, lockunlockmem, unlockmem;
-static qboolean	bSkipWinCheck, bSkipLFNCheck;  /* FS */
-static int	win95;
+static qboolean	skipwincheck, skiplfncheck, win95;
 
 /* FS: Stuff for /memstats */
 static int physicalMemStart;
@@ -99,7 +112,7 @@ static unsigned long virtualMemStart;
 */
 static void Sys_DetectLFN (void)
 {
-	if(bSkipLFNCheck)
+	if(skiplfncheck)
 		return;
 	if(!(_get_volume_info(NULL, 0, 0, NULL) & _FILESYS_LFN_SUPPORTED))
 	{
@@ -123,7 +136,7 @@ static void Sys_DetectWin95 (void)
 	r.x.ax = 0x160a; /* Get Windows Version */
 	__dpmi_int(0x2f, &r);
 
-	if (/*bSkipWinCheck || */((r.x.ax || r.h.bh < 4) && !Sys_DetectWinNT())) /* Not windows or earlier than Win95 */
+	if (((r.x.ax || r.h.bh < 4) && !Sys_DetectWinNT())) /* Not windows or earlier than Win95 */
 	{
 		win95 = 0;
 		lockmem = true;
@@ -432,11 +445,6 @@ void	Sys_Init (void)
 	_go32_rmcb_stack_size = 4 * 1024;
 }
 
-double Sys_FloatTime (void)
-{
-	return (double) uclock() / (double) UCLOCKS_PER_SEC; /* FS: From Q1--Win9X/Fast PC Fix (QIP) */
-}
-
 void Sys_MakeCodeWriteable(void)
 {
 /* MS-DOS is always writeable */
@@ -450,9 +458,9 @@ static void Sys_ParseEarlyArgs(int argc, char **argv) /* FS: Parse some very spe
 	for (i = 1; i < argc; i++)
 	{
 		if(strnicmp(argv[i],"-skipwincheck",12) == 0)
-			bSkipWinCheck = true;
+			skipwincheck = true;
 		if(strnicmp(argv[i],"-skiplfncheck",12) == 0)
-			bSkipLFNCheck = true;
+			skiplfncheck = true;
 	}
 }
 
