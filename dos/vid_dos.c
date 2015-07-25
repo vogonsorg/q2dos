@@ -23,6 +23,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../client/qmenu.h"
 #include "vid_dos.h"
 
+#ifndef REF_HARD_LINKED
+#error vid_dos.c relies on static linkage.
+#endif
+
 #define NUM_VID_DRIVERS 1
 #define REF_SOFT	0
 
@@ -33,12 +37,12 @@ extern cvar_t *scr_viewsize;	// client/cl_scrn.c
 
 static cvar_t *sw_mode;
 static cvar_t *sw_stipplealpha;
-static cvar_t *sw_waterwarp; // FS
-static cvar_t *r_contentblend; // FS
+static cvar_t *sw_waterwarp; /* FS */
+static cvar_t *r_contentblend; /* FS */
 
 extern void M_ForceMenuOff (void);
-static void VID_ListModes_f (void); // FS: Added
-static void VID_Restart_f (void); // FS: Currently does nothing
+static void VID_ListModes_f (void);
+static void VID_Restart_f (void);
 
 #define SOFTWARE_MENU 0
 
@@ -50,8 +54,8 @@ static menulist_s		s_mode_list[NUM_VID_DRIVERS];
 static menuslider_s		s_screensize_slider[NUM_VID_DRIVERS];
 static menuslider_s		s_brightness_slider[NUM_VID_DRIVERS];
 static menulist_s		s_stipple_box;
-static menulist_s		s_contentblend_box; // FS
-static menulist_s		s_waterwarp_box; // FS
+static menulist_s		s_contentblend_box;	/* FS */
+static menulist_s		s_waterwarp_box;	/* FS */
 static menuaction_s		s_cancel_action[NUM_VID_DRIVERS];
 static menuaction_s		s_defaults_action[NUM_VID_DRIVERS];
 
@@ -114,13 +118,13 @@ static void VID_NewWindow (int width, int height)
 */
 static qboolean VID_GetModeInfo(int *width, int *height, int mode)
 {
-	if (mode < 0 || mode >= num_vid_resolutions) //VID_NUM_MODES
+	if (mode < 0 || mode >= num_vid_resolutions)
 		return false;
 
-	*width  = vid_resolutions[mode].width;//vid_modes[mode].width;
-	*height = vid_resolutions[mode].height;//vid_modes[mode].height;
+	*width  = vid_resolutions[mode].width;
+	*height = vid_resolutions[mode].height;
 
-	//Com_Printf("VID_GetModeInfo %dx%d mode %d\n",*width,*height,mode);
+//	Com_Printf("VID_GetModeInfo %dx%d mode %d\n",*width,*height,mode);
 	return true;
 }
 
@@ -315,10 +319,10 @@ void	VID_MenuInit (void)
 	if (!sw_stipplealpha)
 		sw_stipplealpha = Cvar_Get("sw_stipplealpha", "0", CVAR_ARCHIVE);
 
-	if (!r_contentblend) // FS
+	if (!r_contentblend) /* FS */
 		r_contentblend = Cvar_Get( "r_contentblend", "1", CVAR_ARCHIVE);
 
-	if (!sw_waterwarp) // FS
+	if (!sw_waterwarp) /* FS */
 		sw_waterwarp = Cvar_Get( "sw_waterwarp", "1", CVAR_ARCHIVE);
 
 	s_mode_list[SOFTWARE_MENU].curvalue = sw_mode->value;
@@ -338,7 +342,7 @@ void	VID_MenuInit (void)
 		s_mode_list[i].generic.type = MTYPE_SPINCONTROL;
 		s_mode_list[i].generic.name = "video resolution";
 		s_mode_list[i].generic.x = 0;
-		s_mode_list[i].generic.y = 10; // FS: Y position for where the spin control ends up
+		s_mode_list[i].generic.y = 10; /* FS: Y position for where the spin control ends up */
 		s_mode_list[i].generic.callback = NULL;
 		s_mode_list[i].itemnames = resolution_names;
 
@@ -379,7 +383,7 @@ void	VID_MenuInit (void)
 	s_stipple_box.curvalue = sw_stipplealpha->value;
 	s_stipple_box.itemnames = yesno_names;
 
-	// FS
+	/* FS */
 	s_contentblend_box.generic.type = MTYPE_SPINCONTROL;
 	s_contentblend_box.generic.x	= 0;
 	s_contentblend_box.generic.y	= 70;
@@ -387,7 +391,7 @@ void	VID_MenuInit (void)
 	s_contentblend_box.curvalue = r_contentblend->intValue;
 	s_contentblend_box.itemnames = yesno_names;
 
-	// FS
+	/* FS */
 	s_waterwarp_box.generic.type = MTYPE_SPINCONTROL;
 	s_waterwarp_box.generic.x	= 0;
 	s_waterwarp_box.generic.y	= 80;
@@ -395,7 +399,7 @@ void	VID_MenuInit (void)
 	s_waterwarp_box.curvalue = sw_waterwarp->intValue;
 	s_waterwarp_box.itemnames = yesno_names;
 
-	// FS: ATTN  AddItem order has to be the order you want to see it in or else the cursor gets wonky!
+	/* FS: ATTN  AddItem order has to be the order you want to see it in or else the cursor gets wonky! */
 	Menu_AddItem(&s_software_menu, (void *) &s_mode_list[SOFTWARE_MENU]);
 	Menu_AddItem(&s_software_menu, (void *) &s_screensize_slider[SOFTWARE_MENU]);
 	Menu_AddItem(&s_software_menu, (void *) &s_brightness_slider[SOFTWARE_MENU]);
@@ -477,7 +481,7 @@ static void VID_Restart_f (void)
 	return;
 }
 
-static void VID_ListModes_f (void) // FS: Added
+static void VID_ListModes_f (void)
 {
 	int i = 0;
 
