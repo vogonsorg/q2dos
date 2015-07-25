@@ -508,7 +508,7 @@ int main (int argc, char **argv)
 	Sys_DetectWin95 ();
 	Sys_PageInProgram ();
 
-	_crt0_startup_flags &= _CRT0_FLAG_NONMOVE_SBRK; /* FS: We walked through all the data, now make it non-moving so Win9x doesn't barf. */
+	_crt0_startup_flags &= ~_CRT0_FLAG_UNIX_SBRK; /* FS: We walked through all the data, now remove the sbrk flag so Win9x doesn't barf. */
 
 	Sys_Init();
 
