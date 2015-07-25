@@ -18,32 +18,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-//
-//
-// simple test of the Quake 1 VESA code
-//
-//
-// i586-pc-msdosdjgpp-gcc x.c dos/dos_v2.c -o /Users/jsteve/dos/x.exe
-// Known issues
-//2011-11-02 (SVN):
-//vid_ext.c: Fixed stack corruption in dos_getmemory()/seginfo due to the missing balancing dos_freememory() calls in VID_InitExtra() and VID_ExtraGetModeInfo() for failures and unwanted cases. The bug was discovered when h2dos.exe was compiled using gcc-4.5.4.
-//dos_v2.c: Add Sys_Error() calls to dos_getmemory() against reaching MAX_SEGINFO and dos_freememory() against uncached seginfo.
-//quakedef.h: updated beta date stamp to 2011-11-02.
-//
-//http://uhexen2.sourceforge.net/changes.html
-// 
+// extended video modes: VESA-specific DOS video stuff
 
 #include <stdio.h>
 #include <dpmi.h>
-#include <pc.h>
 
 #include "../client/client.h"
-#include "../client/qmenu.h"
 #include "vid_dos.h"
 #include "dosisms.h"
 
+static int	totalvidmem;
+
 vid_resolutions_t vid_resolutions[MAX_RESOLUTIONS];
-int num_vid_resolutions=0;	//we always have mode 13
+int num_vid_resolutions = 0;
 
 #define MODE_SUPPORTED_IN_HW		0x0001
 #define COLOR_MODE			0x0008
@@ -57,59 +44,57 @@ int num_vid_resolutions=0;	//we always have mode 13
 #define MAXVESAWIDTH		4000 /* FS: Was 1600 */
 #define MAXVESAHEIGHT		4000 /* FS: Was 1200 */
 
-static int	totalvidmem;
-
 int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes;
 byte	*VGA_pagebase;
 
-typedef struct vbeinfoblock_s {
-     byte			VbeSignature[4];
-     byte			VbeVersion[2];
-     byte			OemStringPtr[4];
-     byte			Capabilities[4];
-     byte			VideoModePtr[4];
-     byte			TotalMemory[2];
-     byte			OemSoftwareRev[2];
-     byte			OemVendorNamePtr[4];
-     byte			OemProductNamePtr[4];
-     byte			OemProductRevPtr[4];
-     byte			Reserved[222];
-     byte			OemData[256];
-} vbeinfoblock_t;
-
 typedef struct
 {
-	int modenum;
-	int mode_attributes;
+	int	modenum;
+	int	mode_attributes;
 	int	winasegment;
 	int	winbsegment;
 	int	bytes_per_scanline; // bytes per logical scanline (+16)
-	int win; // window number (A=0, B=1)
-	int win_size; // window size (+6)
-	int granularity; // how finely i can set the window in vid mem (+4)
-	int width, height; // displayed width and height (+18, +20)
-	int bits_per_pixel; // er, better be 8, 15, 16, 24, or 32 (+25)
-	int bytes_per_pixel; // er, better be 1, 2, or 4
-	int memory_model; // and better be 4 or 6, packed or direct color (+27)
-	int num_pages; // number of complete frame buffer pages (+29)
-	int red_width; // the # of bits in the red component (+31)
-	int red_pos; // the bit position of the red component (+32)
-	int green_width; // etc.. (+33)
-	int green_pos; // (+34)
-	int blue_width; // (+35)
-	int blue_pos; // (+36)
-	int pptr;
+	int	win;		// window number (A=0, B=1)
+	int	win_size;	// window size (+6)
+	int	granularity;	// how finely i can set the window in vid mem (+4)
+	int	width, height;	// displayed width and height (+18, +20)
+	int	bits_per_pixel;	// er, better be 8, 15, 16, 24, or 32 (+25)
+	int	bytes_per_pixel; // er, better be 1, 2, or 4
+	int	memory_model;	// and better be 4 or 6, packed or direct color (+27)
+	int	num_pages;	// number of complete frame buffer pages (+29)
+	int	red_width;	// the # of bits in the red component (+31)
+	int	red_pos;	// the bit position of the red component (+32)
+	int	green_width;	// etc.. (+33)
+	int	green_pos;	// (+34)
+	int	blue_width;	// (+35)
+	int	blue_pos;	// (+36)
+	int	pptr;
 	int	pagesize;
 	int	numpages;
 } modeinfo_t;
 
 static modeinfo_t modeinfo;
 
-qboolean VID_ExtraGetModeInfo(int modenum);
+// all bytes to avoid problems with compiler field packing
+typedef struct vbeinfoblock_s {
+	byte	VbeSignature[4];
+	byte	VbeVersion[2];
+	byte	OemStringPtr[4];
+	byte	Capabilities[4];
+	byte	VideoModePtr[4];
+	byte	TotalMemory[2];
+	byte	OemSoftwareRev[2];
+	byte	OemVendorNamePtr[4];
+	byte	OemProductNamePtr[4];
+	byte	OemProductRevPtr[4];
+	byte	Reserved[222];
+	byte	OemData[256];
+} vbeinfoblock_t;
 
+static qboolean VID_ExtraGetModeInfo(int modenum);
 /* FS: New stuff for planar/banked modes */
-void VID_AddPlanarModes(void);
-void VID_AddBankedModes(void);
+static void VID_AddPlanarModes(void);
+static void VID_AddBankedModes(void);
 
 /*
 ================
@@ -216,7 +201,7 @@ void VID_InitExtra (void)
 	VID_AddBankedModes(); /* FS: Add banked modes at the end of the video list. */
 }
 
-void VID_AddPlanarModes(void)
+static void VID_AddPlanarModes(void)
 {
 	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
 	vid_resolutions[num_vid_resolutions].vesa_mode=-1;
@@ -231,7 +216,7 @@ void VID_AddPlanarModes(void)
 	num_vid_resolutions++;
 }
 
-void VID_AddBankedModes(void)
+static void VID_AddBankedModes(void)
 {
 	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
 	vid_resolutions[num_vid_resolutions].vesa_mode=0x0101;
@@ -264,13 +249,12 @@ void VID_AddBankedModes(void)
 	num_vid_resolutions++;
 }
 
-
 /*
 ================
 VID_ExtraGetModeInfo
 ================
 */
-qboolean VID_ExtraGetModeInfo(int modenum)
+static qboolean VID_ExtraGetModeInfo(int modenum)
 {
 	char	*infobuf;
 	int		numimagepages;

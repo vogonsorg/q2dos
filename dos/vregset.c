@@ -22,22 +22,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 
 #include <dos.h>
-#include <conio.h>
 
 #include "../client/client.h"
-#include "vid_dos.h"
-#include "dosisms.h"
 #include "vregset.h"
-
-#if 0
-//#define outportb	loutportb
-
-void loutportb (int port, int val)
-{
-	printf ("port, val: %x %x\n", port, val);
-	getch ();
-}
-#endif
 
 /*
 ================
@@ -52,33 +39,33 @@ void VideoRegisterSet (const int *pregset)
 	{
 		switch (*pregset++)
 		{
-			case VRS_END:
-				return;
+		case VRS_END:
+			return;
 
-			case VRS_BYTE_OUT:
-				port = *pregset++;
-				outportb (port, *pregset++);
-				break;
+		case VRS_BYTE_OUT:
+			port = *pregset++;
+			outportb (port, *pregset++);
+			break;
 
-			case VRS_BYTE_RMW:
-				port = *pregset++;
-				temp0 = *pregset++;
-				temp1 = *pregset++;
-				temp2 = inportb (port);
-				temp2 &= temp0;
-				temp2 |= temp1;
-				outportb (port, temp2);
-				break;
+		case VRS_BYTE_RMW:
+			port = *pregset++;
+			temp0 = *pregset++;
+			temp1 = *pregset++;
+			temp2 = inportb (port);
+			temp2 &= temp0;
+			temp2 |= temp1;
+			outportb (port, temp2);
+			break;
 
-			case VRS_WORD_OUT:
-				port = *pregset++;
-				outportb (port, *pregset & 0xFF);
-				outportb (port+1, *pregset >> 8);
-				pregset++;
-				break;
+		case VRS_WORD_OUT:
+			port = *pregset++;
+			outportb (port, *pregset & 0xFF);
+			outportb (port+1, *pregset >> 8);
+			pregset++;
+			break;
 
-			default:
-				Sys_Error ("VideoRegisterSet: Invalid command\n");
+		default:
+			Sys_Error ("VideoRegisterSet: Invalid command\n");
 		}
 	}
 }
