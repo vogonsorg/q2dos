@@ -67,7 +67,6 @@ endif
 DOS = dos/dos_v2.o \
 	dos/cd_dos.o \
 	dos/vid_dos.o \
-	dos/vid_ext.o \
 	dos/snddma_dos.o \
 	dos/snd_gus.o \
 	dos/snd_sb.o \
@@ -76,7 +75,6 @@ DOS = dos/dos_v2.o \
 	dos/net_watt.o \
 	dos/q_shdos.o \
 	dos/vregset.o \
-	dos/swimp_dos.o \
 	dos/dxe.o \
 	dos/sys_dos.o
 
@@ -151,7 +149,9 @@ REFSOFT = ref_soft/r_alias.o \
 	ref_soft/r_bsp.o \
 	ref_soft/r_draw.o \
 	ref_soft/r_edge.o \
-	ref_soft/r_image.o
+	ref_soft/r_image.o \
+	dos/vid_ext.o \
+	dos/swimp_dos.o
 
 ifeq ($(USE_ASM),1)
 COMMONASM = gas/math.o
