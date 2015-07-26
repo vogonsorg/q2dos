@@ -189,7 +189,7 @@ rserr_t SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 {
 	__dpmi_regs r;
 
-	Com_Printf("SWimp_SetMode %d fullscreen %d\n",mode,fullscreen); 
+	ri.Con_Printf(PRINT_ALL, "SWimp_SetMode %d fullscreen %d\n",mode,fullscreen);
 
 	if ( !ri.Vid_GetModeInfo( pwidth, pheight, mode ) )
 	{

@@ -120,7 +120,7 @@ void VID_InitExtra (void)
 
 	pinfoblock = (vbeinfoblock_t *) dos_getmemory(sizeof(vbeinfoblock_t));
 	if (!pinfoblock) {
-		Com_DPrintf (DEVELOPER_MSG_GFX, "VID_InitExtra: Unable to allocate low memory.\n");
+		ri.Con_Printf(PRINT_ALL, "VID_InitExtra: Unable to allocate low memory.\n");
 		return;
 	}
 
@@ -172,12 +172,12 @@ void VID_InitExtra (void)
 		 (pinfoblock->OemStringPtr[1] <<  8) |
 		 (pinfoblock->OemStringPtr[2] << 16) |
 		 (pinfoblock->OemStringPtr[3] << 24));
-	Com_Printf ("VESA 2.0 compliant adapter:\n%s\n",
+	ri.Con_Printf(PRINT_ALL, "VESA 2.0 compliant adapter:\n%s\n",
 			(char *) VID_ExtraFarToLinear(addr));
 
 	totalvidmem  = ( (pinfoblock->TotalMemory[0]     ) |
 			 (pinfoblock->TotalMemory[1] << 8) ) << 16;
-//	Com_Printf ("%dk video memory\n", totalvidmem >> 10);
+//	ri.Con_Printf(PRINT_DEVELOPER, "%dk video memory\n", totalvidmem >> 10);
 
 	addr = ( (pinfoblock->VideoModePtr[0]      ) |
 		 (pinfoblock->VideoModePtr[1] <<  8) |
@@ -371,7 +371,7 @@ static qboolean VID_ExtraGetModeInfo(int modenum)
 		//8bit linear only
 		if((modeinfo.memory_model==0x4)&&(modeinfo.bits_per_pixel==8))
 		{
-			Com_Printf("VESA mode 0x%0x %dx%d supported\n",modeinfo.modenum,modeinfo.width,modeinfo.height);
+			ri.Con_Printf(PRINT_ALL, "VESA mode 0x%0x %dx%d supported\n",modeinfo.modenum,modeinfo.width,modeinfo.height);
 
 			if (num_vid_resolutions < MAX_RESOLUTIONS)
 			{
