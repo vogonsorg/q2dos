@@ -285,6 +285,7 @@ void Sys_Quit (void)
 	exit (0);
 }
 
+void Sys_InitDXE3 (void);
 #ifdef GAME_HARD_LINKED
 void *GetGameAPI (void *import);
 void	Sys_UnloadGame (void)
@@ -440,6 +441,8 @@ void	Sys_Init (void)
 {
 	_go32_interrupt_stack_size = 4 * 1024;
 	_go32_rmcb_stack_size = 4 * 1024;
+
+	Sys_InitDXE3 ();
 }
 
 void Sys_MakeCodeWriteable(void)

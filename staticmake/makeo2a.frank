@@ -72,6 +72,7 @@ DOS = dos/dos_v2.o \
 	dos/q_shdos.o \
 	dos/vregset.o \
 	dos/swimp_dos.o \
+	dos/no_dxe.o\
 	dos/sys_dos.o
 
 CLIENT = client/cl_input.o \
