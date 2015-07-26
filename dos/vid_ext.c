@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdio.h>
 #include <dpmi.h>
 
-#include "../client/client.h"
+#include "../ref_soft/r_local.h"
 #include "vid_dos.h"
 #include "dosisms.h"
 
