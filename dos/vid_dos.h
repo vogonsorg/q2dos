@@ -38,7 +38,6 @@ typedef struct vid_resolutions_s {
 
 extern int num_vid_resolutions;
 extern vid_resolutions_t vid_resolutions[MAX_RESOLUTIONS];
-extern int currentvideomode;
 
 extern int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes;
 extern byte		*VGA_pagebase;

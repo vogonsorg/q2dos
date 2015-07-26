@@ -139,6 +139,10 @@ void	SWimp_EndFrame (void)
 //Windows style hook
 int	SWimp_Init( void *hInstance, void *wndProc )
 {
+	currentvideomode = 0;
+
+	VID_InitExtra(); //probe VESA
+
 	return 0;
 }
 

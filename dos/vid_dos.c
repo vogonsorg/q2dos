@@ -31,8 +31,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define REF_SOFT	0
 
 cvar_t *vid_ref;
-extern cvar_t *vid_fullscreen;	// ref_soft/r_main.c
-extern cvar_t *vid_gamma;	// ref_soft/r_main.c
+static cvar_t *vid_fullscreen;
+static cvar_t *vid_gamma;
 extern cvar_t *scr_viewsize;	// client/cl_scrn.c
 
 static cvar_t *sw_mode;
@@ -65,8 +65,8 @@ static const char *		resolution_names[MAX_RESOLUTIONS + 1];
 viddef_t	viddef;				// global video state
 
 refexport_t	re;
-
 refexport_t GetRefAPI (refimport_t rimp);
+static qboolean reflib_active = false;
 
 
 /*
@@ -182,11 +182,21 @@ static void CancelChanges(void *unused)
 	M_PopMenu();
 }
 
-static void VID_LoadRefresh (void) // FS: Needed for dynamic changing game modes/vid_restart
+static void VID_FreeReflib (void)
+{
+	memset (&re, 0, sizeof(re));
+	reflib_active  = false;
+}
+
+static void VID_LoadRefresh (void)
 {
 	refimport_t	ri;
 
-	re.Shutdown();
+	if (reflib_active)
+	{
+		re.Shutdown();
+		VID_FreeReflib ();
+	}
 
 	ri.Cmd_AddCommand = Cmd_AddCommand;
 	ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
@@ -208,11 +218,17 @@ static void VID_LoadRefresh (void) // FS: Needed for dynamic changing game modes
 	re = GetRefAPI(ri);
 
 	if (re.api_version != API_VERSION)
+	{
+		VID_FreeReflib ();
 		Com_Error (ERR_FATAL, "Re has incompatible api_version");
+	}
 
 	// call the init function
 	if (re.Init (NULL, NULL) == -1)
 		Com_Error (ERR_FATAL, "Couldn't start refresh");
+
+	reflib_active = true;
+	vidref_val = VIDREF_SOFT;
 
 	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
 	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE);
@@ -221,15 +237,20 @@ static void VID_LoadRefresh (void) // FS: Needed for dynamic changing game modes
 
 void	VID_Init (void)
 {
-	refimport_t	ri;
 	int		i;
 
 	memset(vid_resolutions,0x0,sizeof(vid_resolutions));
-	VID_InitExtra(); //probe VESA
 
-	currentvideomode=0;
 	viddef.width = 320;
 	viddef.height = 240;
+
+	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
+	vid_ref->description = "Video renderer to use.  Locked to software in Q2DOS.";
+	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE);
+	vid_fullscreen->description = "Enable fullscreen video.  Locked to fullscreen in Q2DOS.";
+	vid_gamma = Cvar_Get("vid_gamma", "1", CVAR_ARCHIVE);
+
+	VID_CheckChanges ();
 
 	for (i = 0; i < MAX_RESOLUTIONS; ++i)
 	{
@@ -238,37 +259,6 @@ void	VID_Init (void)
 	}
 	resolution_names[MAX_RESOLUTIONS] = NULL;
 
-	ri.Cmd_AddCommand = Cmd_AddCommand;
-	ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
-	ri.Cmd_Argc = Cmd_Argc;
-	ri.Cmd_Argv = Cmd_Argv;
-	ri.Cmd_ExecuteText = Cbuf_ExecuteText;
-	ri.Con_Printf = VID_Printf;
-	ri.Sys_Error = VID_Error;
-	ri.FS_LoadFile = FS_LoadFile;
-	ri.FS_FreeFile = FS_FreeFile;
-	ri.FS_Gamedir = FS_Gamedir;
-	ri.Vid_NewWindow = VID_NewWindow;
-	ri.Cvar_Get = Cvar_Get;
-	ri.Cvar_Set = Cvar_Set;
-	ri.Cvar_SetValue = Cvar_SetValue;
-	ri.Vid_GetModeInfo = VID_GetModeInfo;
-
-	//JASON this is called from the video DLL
-	re = GetRefAPI(ri);
-
-	if (re.api_version != API_VERSION)
-		Com_Error (ERR_FATAL, "Re has incompatible api_version");
-
-	// call the init function
-	if (re.Init (NULL, NULL) == -1)
-		Com_Error (ERR_FATAL, "Couldn't start refresh");
-
-	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
-	vid_ref->description = "Video renderer to use.  Locked to software in Q2DOS.";
-	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE);
-	vid_fullscreen->description = "Enable fullscreen video.  Locked to fullscreen in Q2DOS.";
-	vid_gamma = Cvar_Get( "vid_gamma", "1", CVAR_ARCHIVE );
 	Cmd_AddCommand("vid_restart", VID_Restart_f);
 	Cmd_AddCommand("vid_listmodes", VID_ListModes_f); // FS: Added
 }
