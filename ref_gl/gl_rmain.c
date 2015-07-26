@@ -1075,7 +1075,7 @@ void R_Register ( void )
 	gl_particle_att_b = ri.Cvar_Get( "gl_particle_att_b", "0.0", CVAR_ARCHIVE );
 	gl_particle_att_c = ri.Cvar_Get( "gl_particle_att_c", "0.01", CVAR_ARCHIVE );
 
-	gl_modulate = ri.Cvar_Get ("gl_modulate", "1", CVAR_ARCHIVE );
+	gl_modulate = ri.Cvar_Get ("gl_modulate", "2", CVAR_ARCHIVE );
 	gl_log = ri.Cvar_Get( "gl_log", "0", 0 );
 	gl_bitdepth = ri.Cvar_Get( "gl_bitdepth", "0", 0 );
 	gl_mode = ri.Cvar_Get( "gl_mode", "3", CVAR_ARCHIVE );
@@ -1130,6 +1130,7 @@ void R_Register ( void )
 
 	vid_fullscreen = ri.Cvar_Get( "vid_fullscreen", "0", CVAR_ARCHIVE );
 	vid_gamma = ri.Cvar_Get( "vid_gamma", "1.0", CVAR_ARCHIVE );
+	vid_gamma->description = "Video gamma.  Use lower values for a brighter screen display.";
 	vid_ref = ri.Cvar_Get( "vid_ref", "soft", CVAR_ARCHIVE );
 
 	r_skydistance = ri.Cvar_Get("r_skydistance", "4600", 0); // Knightmare- variable sky range

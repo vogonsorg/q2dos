@@ -29,15 +29,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern cvar_t *vid_ref;
 extern cvar_t *vid_gamma;
 static cvar_t *gl_driver;
-//extern cvar_t *vid_fullscreen;
-//extern cvar_t *scr_viewsize;
-//static cvar_t *gl_mode;
-//static cvar_t *gl_picmip;
-//static cvar_t *gl_ext_palettedtexture;
-//static cvar_t *gl_swapinterval;
 
 static cvar_t *sw_mode;
 static cvar_t *sw_stipplealpha;
+static cvar_t *sw_waterwarp; /* FS */
+static cvar_t *r_contentblend; /* FS */
 
 extern void M_ForceMenuOff( void );
 const char *Default_MenuKey( menuframework_s *m, int key );
@@ -63,6 +59,8 @@ static menulist_s  		s_fs_box[2];
 static menuslider_s		s_screensize_slider[2];
 static menuslider_s		s_brightness_slider[2];
 static menulist_s  		s_stipple_box;
+static menulist_s		s_contentblend_box;	/* FS */
+static menulist_s		s_waterwarp_box;	/* FS */
 static menuslider_s		s_tq_slider;
 static menulist_s  		s_paletted_texture_box;
 static menulist_s  		s_npot_mipmap_box;	// Knightmare- non-power-of-2 texture option
@@ -70,7 +68,6 @@ static menulist_s		s_texfilter_box;
 static menulist_s		s_aniso_box;
 static menulist_s  		s_vsync_box;
 static menulist_s		s_refresh_box;	// Knightmare- refresh rate option
-//static menuaction_s	s_cancel_action[2];
 static menuaction_s		s_apply_action[2];
 static menuaction_s		s_defaults_action[2];
 
@@ -167,6 +164,8 @@ static void ApplyChanges( void *unused )
 
 	Cvar_SetValue ("vid_gamma", gamma);
 	Cvar_SetValue ("sw_stipplealpha", s_stipple_box.curvalue);
+	Cvar_SetValue ("r_contentblend", s_contentblend_box.curvalue); // FS
+	Cvar_SetValue ("sw_waterwarp", s_waterwarp_box.curvalue); // FS
 	Cvar_SetValue ("vid_fullscreen", s_fs_box[s_current_menu_index].curvalue);
 	Cvar_SetValue ("gl_picmip", 3 - s_tq_slider.curvalue);
 	Cvar_SetValue ("gl_ext_palettedtexture", s_paletted_texture_box.curvalue);
@@ -578,6 +577,22 @@ void VID_MenuInit( void )
 	s_stipple_box.itemnames		= yesno_names;
 	s_stipple_box.generic.statusbar	= "enables stipple drawing of trans surfaces";
 
+	/* FS */
+	s_contentblend_box.generic.type = MTYPE_SPINCONTROL;
+	s_contentblend_box.generic.x	= 0;
+	s_contentblend_box.generic.y	= 70;
+	s_contentblend_box.generic.name	= "content blending";
+	s_contentblend_box.curvalue = Cvar_VariableValue("r_contentblend");
+	s_contentblend_box.itemnames = yesno_names;
+
+	/* FS */
+	s_waterwarp_box.generic.type = MTYPE_SPINCONTROL;
+	s_waterwarp_box.generic.x	= 0;
+	s_waterwarp_box.generic.y	= 80;
+	s_waterwarp_box.generic.name	= "water warping";
+	s_waterwarp_box.curvalue = Cvar_VariableValue("sw_waterwarp");
+	s_waterwarp_box.itemnames = yesno_names;
+
 	s_tq_slider.generic.type			= MTYPE_SLIDER;
 	s_tq_slider.generic.x				= 0;
 	s_tq_slider.generic.y				= 60;
@@ -646,6 +661,8 @@ void VID_MenuInit( void )
 	Menu_AddItem( &s_software_menu, ( void * ) &s_screensize_slider[SOFTWARE_MENU] );
 	Menu_AddItem( &s_software_menu, ( void * ) &s_brightness_slider[SOFTWARE_MENU] );
 	Menu_AddItem( &s_software_menu, ( void * ) &s_stipple_box );
+	Menu_AddItem( &s_software_menu, ( void * ) &s_contentblend_box); // FS
+	Menu_AddItem( &s_software_menu, ( void * ) &s_waterwarp_box); // FS
 
 	Menu_AddItem( &s_opengl_menu, ( void * ) &s_ref_list[OPENGL_MENU] );
 	Menu_AddItem( &s_opengl_menu, ( void * ) &s_mode_list[OPENGL_MENU] );
@@ -664,11 +681,6 @@ void VID_MenuInit( void )
 	Menu_AddItem( &s_software_menu, ( void * ) &s_apply_action[SOFTWARE_MENU] );
 	Menu_AddItem( &s_opengl_menu, ( void * ) &s_defaults_action[OPENGL_MENU] );
 	Menu_AddItem( &s_opengl_menu, ( void * ) &s_apply_action[OPENGL_MENU] );
-
-//	Menu_Center( &s_software_menu );
-//	Menu_Center( &s_opengl_menu );
-//	s_opengl_menu.x -= 8;
-//	s_software_menu.x -= 8;
 }
 
 /*
