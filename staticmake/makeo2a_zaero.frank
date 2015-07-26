@@ -72,8 +72,7 @@ DOS = dos/dos_v2.o \
 	dos/q_shdos.o \
 	dos/vregset.o \
 	dos/swimp_dos.o \
-	dos/sys_dos.o \
-	gas/sys_dosa.o
+	dos/sys_dos.o
 
 CLIENT = client/cl_input.o \
 	client/cl_inv.o \
@@ -145,7 +144,9 @@ REFSOFT = ref_soft/r_alias.o \
 	ref_soft/r_image.o
 
 ifeq ($(USE_ASM),1)
-REFASM = gas/math.o \
+COMMONASM = gas/math.o
+CLIENTASM = gas/snd_mixa.o
+REFASM = gas/math_ref.o \
 	gas/d_copy.o \
 	gas/d_polysa.o \
 	gas/r_aclipa.o \
@@ -156,7 +157,7 @@ REFASM = gas/math.o \
 	gas/r_spr8.o \
 	gas/r_surf8.o \
 	gas/r_varsa.o \
-	gas/snd_mixa.o
+	gas/sys_dosa.o
 endif
 
 GAME = zaero/g_ai.o \
@@ -224,15 +225,15 @@ GAME = zaero/g_ai.o \
 	zaero/z_trigger.o \
 	zaero/z_weapon.o
 
-.PHONY: all test clean
-#
+OBJECTS = $(CLIENT) $(CLIENTASM) $(QCOMMON) $(COMMONASM) $(SERVER) $(GAME) $(GAMESPY) $(REFSOFT) $(REFASM) $(DOS)
 
-OBJECTS = $(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(GAMESPY) $(REFSOFT) $(REFASM) $(DOS)
+
+.PHONY: clean
 
 all: q2.exe
 
 q2.exe: $(OBJECTS)
-	$(CC) $(OBJECTS) -o q2.exe $(LDFLAGS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm
+	$(CC) $(OBJECTS) -o $@ $(LDFLAGS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm
 
 clean:
 	rm -f qcommon/*.o

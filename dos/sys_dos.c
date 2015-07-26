@@ -89,11 +89,6 @@ double	sys_msg_time;
 double	sys_frame_time;
 int	sys_checksum;
 
-void MaskExceptions (void);
-void Sys_PushFPCW_SetHigh (void);
-void Sys_PopFPCW (void);
-void Sys_SetFPCW (void);
-
 int		end_of_memory;
 static qboolean	lockmem, lockunlockmem, unlockmem;
 static qboolean	skipwincheck, skiplfncheck, win95;
@@ -437,10 +432,6 @@ char *Sys_GetClipboardData(void)
 
 void	Sys_Init (void)
 {
-	MaskExceptions ();
-
-	Sys_SetFPCW ();
-
 	_go32_interrupt_stack_size = 4 * 1024;
 	_go32_rmcb_stack_size = 4 * 1024;
 }

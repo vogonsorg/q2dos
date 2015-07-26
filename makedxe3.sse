@@ -77,13 +77,10 @@ DOS = dos/dos_v2.o \
 	dos/in_dos.o \
 	dos/net_watt.o \
 	dos/q_shdos.o \
-	game/m_flash.o \
-	game/q_shared.o \
 	dos/vregset.o \
 	dos/swimp_dos.o \
 	dos/dxe.o \
-	dos/sys_dos.o \
-	gas/sys_dosa.o
+	dos/sys_dos.o
 
 CLIENT = client/cl_input.o \
 	client/cl_inv.o \
@@ -127,7 +124,9 @@ QCOMMON = qcommon/cmd.o \
 	qcommon/files.o \
 	qcommon/md4.o \
 	qcommon/net_chan.o \
-	qcommon/pmove.o
+	qcommon/pmove.o \
+	game/m_flash.o \
+	game/q_shared.o
 
 SERVER = server/sv_ccmds.o \
 	server/sv_ents.o \
@@ -157,7 +156,9 @@ REFSOFT = ref_soft/r_alias.o \
 	ref_soft/r_image.o
 
 ifeq ($(USE_ASM),1)
-REFASM = gas/math.o \
+COMMONASM = gas/math.o
+CLIENTASM = gas/snd_mixa.o
+REFASM = gas/math_ref.o \
 	gas/d_copy.o \
 	gas/d_polysa.o \
 	gas/r_aclipa.o \
@@ -168,18 +169,18 @@ REFASM = gas/math.o \
 	gas/r_spr8.o \
 	gas/r_surf8.o \
 	gas/r_varsa.o \
-	gas/snd_mixa.o
+	gas/sys_dosa.o
 endif
 
-.PHONY: all test clean
-#
+OBJECTS = $(CLIENT) $(CLIENTASM) $(QCOMMON) $(COMMONASM) $(SERVER) $(GAMESPY) $(REFSOFT) $(REFASM) $(DOS)
 
-OBJECTS = $(CLIENT) $(QCOMMON) $(SERVER) $(GAMESPY) $(REFSOFT) $(REFASM) $(DOS)
+
+.PHONY: clean
 
 all: q2sse.exe
 
 q2sse.exe: $(OBJECTS)
-	$(CC) $(OBJECTS) -o q2sse.exe $(LDFLAGS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm
+	$(CC) $(OBJECTS) -o $@ $(LDFLAGS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm
 
 clean:
 	rm -f qcommon/*.o

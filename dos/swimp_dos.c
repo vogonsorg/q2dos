@@ -38,6 +38,11 @@ void VID_ExtraSwapBuffers(vrect_t *rects);
 extern vrect_t		scr_vrect;		// position of render window on screen
 
 #if	!id386
+void MaskExceptions (void) {
+}
+void Sys_SetFPCW (void) {
+}
+
 void VGA_UpdatePlanarScreen (void *srcbuffer)
 {
 /* based on vga_copytoplanar256() of SVGAlib */
