@@ -19,6 +19,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // vid_dos.c -- DOS video driver adapated from Q1
 
+#ifndef REF_HARD_LINKED
+#include <dlfcn.h>
+#endif
 #include "../client/client.h"
 #include "../client/qmenu.h"
 #include "vid_dos.h"
@@ -65,7 +68,11 @@ static const char *		resolution_names[MAX_RESOLUTIONS + 1];
 viddef_t	viddef;				// global video state
 
 refexport_t	re;
+#ifdef REF_HARD_LINKED
 refexport_t GetRefAPI (refimport_t rimp);
+#else
+static void *reflib_library; /* Handle to refresh DLL. */
+#endif
 static qboolean reflib_active = false;
 
 
@@ -184,19 +191,34 @@ static void CancelChanges(void *unused)
 
 static void VID_FreeReflib (void)
 {
+#ifndef REF_HARD_LINKED
+	if (reflib_library)
+		dlclose(reflib_library);
+	reflib_library = NULL;
+#endif
 	memset (&re, 0, sizeof(re));
 	reflib_active  = false;
 }
 
-static void VID_LoadRefresh (void)
+static void VID_LoadRefresh (const char *name)
 {
 	refimport_t	ri;
+#ifndef REF_HARD_LINKED
+	GetRefAPI_t	GetRefAPI;
+#endif
 
 	if (reflib_active)
 	{
 		re.Shutdown();
 		VID_FreeReflib ();
 	}
+
+#ifndef REF_HARD_LINKED
+	if ((reflib_library = dlopen(name, RTLD_LAZY|RTLD_GLOBAL)) == NULL)
+		Sys_Error("dlopen(\"%s\") failed\n",name);
+	if ((GetRefAPI = (void *) dlsym(reflib_library, "_GetRefAPI")) == NULL)
+		Sys_Error("dlsym() failed on %s",name);
+#endif
 
 	ri.Cmd_AddCommand = Cmd_AddCommand;
 	ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
@@ -271,6 +293,8 @@ void	VID_Shutdown (void)
 
 void	VID_CheckChanges (void)
 {
+	char name[100];
+
 	if ( vid_ref->modified)
 	{
 		cl.force_refdef = true;		// can't use a paused refdef
@@ -286,7 +310,8 @@ void	VID_CheckChanges (void)
 		cl.refresh_prepped = false;
 		cls.disable_screen = true;
 
-		VID_LoadRefresh();
+		Com_sprintf(name, sizeof(name), "ref_%s.dxe", vid_ref->string);
+		VID_LoadRefresh(name);
 
 		Cvar_Set("vid_ref", "soft");
 		cls.disable_screen = false;
