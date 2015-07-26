@@ -288,6 +288,138 @@ SOURCE=..\GAME\q_shared.c
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
+# Begin Source File
+
+SOURCE=..\game\tables\clientfields.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\tables\fields.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\g_local.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\game.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\tables\gamefunc_decs.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\tables\gamefunc_list.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\tables\gamemmove_decs.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\tables\gamemmove_list.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\tables\levelfields.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_actor.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_berserk.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_boss2.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_boss31.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_boss32.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_brain.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_chick.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_flipper.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_float.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_flyer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_gladiator.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_gunner.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_hover.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_infantry.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_insane.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_medic.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_mutant.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_parasite.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_player.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_rider.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_soldier.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_supertank.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\m_tank.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\q_shared.h
+# End Source File
 # End Group
 # Begin Group "Resource Files"
 

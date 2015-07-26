@@ -365,6 +365,17 @@ void Sys_ConsoleOutput (char *string)
 		WriteFile(houtput, console_text, console_textlen, &dummy, NULL);
 }
 
+/*
+================
+Sys_Sleep
+
+Knightmare- added this to fix CPU usage
+================
+*/
+void Sys_Sleep (int msec)
+{
+	Sleep (msec);
+}
 
 /*
 ================

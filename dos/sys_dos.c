@@ -358,6 +358,12 @@ void	Sys_ConsoleOutput (char *string)
 	printf("%s",string);
 }
 
+// Knightmare- added this to fix CPU usage
+void Sys_Sleep (int msec)
+{
+	usleep (msec*1000);
+}
+
 #define	SC_UPARROW	0x48
 #define	SC_DOWNARROW	0x50
 #define	SC_LEFTARROW	0x4b

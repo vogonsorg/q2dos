@@ -111,6 +111,7 @@ cvar_t	*gender_auto;
 cvar_t	*cl_vwep;
 cvar_t	*console_old_complete; // FS: Old style command completing
 cvar_t	*cl_autorepeat_allkeys; /* FS: So I can autorepeat whatever I want, hoss. */
+cvar_t	*cl_sleep; /* Knightmare: Added */
 
 #ifdef GAMESPY
 /* FS: Gamespy CVARs */
@@ -1749,6 +1750,10 @@ void CL_InitLocal (void)
 	cl_autorepeat_allkeys = Cvar_Get("cl_autorepeat_allkeys", "0", CVAR_ARCHIVE); /* FS: Because I want to autorepeat whatever I want, hoss */
 	cl_autorepeat_allkeys->description = "Allow to autorepeat any key, not just Backspace, Pause, PgUp, and PgDn keys.";
 
+	/* Knightmare: Added */
+	cl_sleep = Cvar_Get("cl_sleep", "0", CVAR_ARCHIVE);
+	cl_sleep->description = "Reduce CPU usage by issuing sleep commands between extra frames.";
+
 #ifdef GAMESPY
 	/* FS: For gamespy */
 	cl_master_server_ip = Cvar_Get("cl_master_server_ip", CL_MASTER_ADDR, CVAR_ARCHIVE);
@@ -2117,7 +2122,6 @@ void CL_Frame_Async (double msec)
 		
 		if (!packetFrame && !renderFrame && !cls.forcePacket && !userinfo_modified)
 		{
-#if 0 /* FS: Don't need this in DOS */
 			// Pooy's CPU usage fix
 			if (cl_sleep->value)
 			{
@@ -2127,7 +2131,6 @@ void CL_Frame_Async (double msec)
 					Sys_Sleep (1);
 				}
 			} // end CPU usage fix
-#endif
 			return;
 		}
 		
@@ -2340,7 +2343,6 @@ void CL_Frame (double msec)
 
 		if (extratime < 1000/fps)
 		{
-		#if 0
 			// Knightmare- added Pooy's CPU usage fix
 			if (cl_sleep->value)
 			{
@@ -2351,8 +2353,6 @@ void CL_Frame (double msec)
 					Sys_Sleep (1);
 				}
 			} // end CPU usage fix
-		#endif
-
 			return;			// framerate is too high
 		}
 	}

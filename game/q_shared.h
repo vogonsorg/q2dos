@@ -347,6 +347,7 @@ char	*Sys_FindFirst (char *path, unsigned musthave, unsigned canthave );
 char	*Sys_FindNext ( unsigned musthave, unsigned canthave );
 void	Sys_FindClose (void);
 
+void	Sys_Sleep (int msec);	// Knightmare added for CPU usage fix
 
 // this is only here so the functions in q_shared.c and q_shwin.c can link
 void Sys_Error (char *error, ...);
