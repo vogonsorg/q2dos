@@ -748,7 +748,6 @@ void VID_CheckChanges (void)
 				Con_ToggleConsole_f();
 			}
 		}
-				Cvar_Set( "vid_ref", "soft" );
 		cls.disable_screen = false;
 	}
 

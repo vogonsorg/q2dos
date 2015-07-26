@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define NUM_VID_DRIVERS 1
 #define REF_SOFT	0
+#define REF_OPENGL	1
 
 extern cvar_t *vid_ref;
 extern cvar_t *vid_fullscreen;
