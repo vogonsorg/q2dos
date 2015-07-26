@@ -59,21 +59,21 @@ CURL_CFLAGS = -Ilibcurl/include
 CURL_LIBS = -Llibcurl/lib -lcurl
 endif
 
-DOS = dos/cd_dos.o \
+DOS = dos/dos_v2.o \
+	dos/cd_dos.o \
 	dos/vid_dos.o \
 	dos/vid_ext.o \
 	dos/snddma_dos.o \
 	dos/snd_gus.o \
 	dos/snd_sb.o \
 	dos/snd_pci.o \
-	dos/sys_dos.o \
 	dos/in_dos.o \
 	dos/net_watt.o \
-	dos/dos_v2.o \
-	dos/sys_dosa.o \
 	dos/q_shdos.o \
 	dos/vregset.o \
-	dos/swimp_dos.o
+	dos/swimp_dos.o \
+	dos/sys_dos.o \
+	gas/sys_dosa.o
 
 CLIENT = client/cl_input.o \
 	client/cl_inv.o \
@@ -145,18 +145,18 @@ REFSOFT = ref_soft/r_alias.o \
 	ref_soft/r_image.o
 
 ifeq ($(USE_ASM),1)
-REFASM = linux/math.o \
-	linux/d_copy.o \
-	linux/d_polysa.o \
-	linux/r_aclipa.o \
-	linux/r_draw16.o \
-	linux/r_drawa.o \
-	linux/r_edgea.o \
-	linux/r_scana.o \
-	linux/r_spr8.o \
-	linux/r_surf8.o \
-	linux/r_varsa.o \
-	linux/snd_mixa.o
+REFASM = gas/math.o \
+	gas/d_copy.o \
+	gas/d_polysa.o \
+	gas/r_aclipa.o \
+	gas/r_draw16.o \
+	gas/r_drawa.o \
+	gas/r_edgea.o \
+	gas/r_scana.o \
+	gas/r_spr8.o \
+	gas/r_surf8.o \
+	gas/r_varsa.o \
+	gas/snd_mixa.o
 endif
 
 GAME = xsrc/g_ai.o \
