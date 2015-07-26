@@ -26,10 +26,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../client/qmenu.h"
 #include "vid_dos.h"
 
-#ifndef REF_HARD_LINKED
-#error vid_dos.c relies on static linkage.
-#endif
-
 #define NUM_VID_DRIVERS 1
 #define REF_SOFT	0
 
