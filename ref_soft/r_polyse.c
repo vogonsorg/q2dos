@@ -1453,9 +1453,9 @@ void R_PolysetDrawSpans8_Opaque (spanpackage_t *pspanpackage)
 
 			do
 			{
-				if(!lptex || !lpdest)
+				if(!lptex || !lpdest) /* FS */
 				{
-//					ri.Con_Printf(PRINT_ALL, "lptex FUCKED UP!\n");
+				//	ri.Con_Printf(PRINT_ALL, "lptex FUCKED UP!\n");
 					goto next;
 				}
 
@@ -1465,7 +1465,8 @@ void R_PolysetDrawSpans8_Opaque (spanpackage_t *pspanpackage)
 					if(r_newrefdef.rdflags & RDF_IRGOGGLES && currententity->flags & RF_IR_VISIBLE)
 						*lpdest = ((byte *)vid.colormap)[irtable[*lptex]];
 					else
-						*lpdest = ((byte *)vid.colormap)[*lptex + (llight & 0xFF00)]; /* FS: This line may be crashing in Whale's WOD!  Lptex has junk data in it */
+					/* FS: This line may be crashing in Whale's WOD!  Lptex has junk data in it */
+					*lpdest = ((byte *)vid.colormap)[*lptex + (llight & 0xFF00)];
 //PGM
 					*lpz = lzi >> 16;
 				}
@@ -1483,9 +1484,7 @@ void R_PolysetDrawSpans8_Opaque (spanpackage_t *pspanpackage)
 					lptex += r_affinetridesc.skinwidth;
 					ltfrac &= 0xFFFF;
 				}
-		next:
-				lcount = lcount; // FS: Shut up compiler
-
+		next: ;
 			} while (--lcount);
 		}
 
