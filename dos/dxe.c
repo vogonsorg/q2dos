@@ -139,7 +139,6 @@ DXE_EXPORT_TABLE (syms)
 DXE_EXPORT_END
 
 static void (*game_library)(void);
-static int	firsttime = 1;
 
 void Sys_UnloadGame (void)
 {
@@ -169,6 +168,14 @@ static void *dxe_res (const char *symname)
 	return func_ptr_cast.to;
 }
 
+void Sys_InitDXE3 (void)
+{
+	/* Set the error callback function */
+	_dlsymresolver = dxe_res;
+	/* Register the symbols exported into dynamic modules */
+	dlregsym (syms);
+}
+
 void *Sys_GetGameAPI (void *parms)
 {
 	void	*(*GetGameAPI) (void *);
@@ -180,15 +187,6 @@ void *Sys_GetGameAPI (void *parms)
 	getcwd(curpath, sizeof(curpath));
 
 	Com_Printf("------- Loading %s -------\n", gamename);
-
-	if (firsttime)
-	{
-		firsttime = 0;
-		/* Set the error callback function */
-		_dlsymresolver = dxe_res;
-		/* Register the symbols exported into dynamic modules */
-		dlregsym (syms);
-	}
 
 	/* now run through the search paths */
 	for (path = NULL; ; )
@@ -228,15 +226,6 @@ void *Sys_GetGameSpyAPI(void *parms)
 	getcwd(curpath, sizeof(curpath));
 
 	Com_Printf("------- Loading %s -------\n", dxename);
-
-	if (firsttime)
-	{
-		firsttime = 0;
-		/* Set the error callback function */
-		_dlsymresolver = dxe_res;
-		/* Register the symbols exported into dynamic modules */
-		dlregsym (syms);
-	}
 
 	Com_sprintf(name, sizeof(name), "%s/%s", curpath, dxename);
 	gamespy_library = dlopen (name, RTLD_LAZY);
