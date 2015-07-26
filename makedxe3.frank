@@ -16,11 +16,17 @@ USE_SNDPCI=1
 USE_CDAUDIO=1
 # abrash's asm optimizations:
 USE_ASM=1
+# dynamic refresh (video) modules:
+REF_DXE=0
 
 CC = gcc
 CFLAGS = -g -Wall -Werror -O2 -fno-strict-aliasing -fomit-frame-pointer
-CPPFLAGS = -DREF_HARD_LINKED -DCLIENT_SPLIT_NETFRAME
+CPPFLAGS = -DCLIENT_SPLIT_NETFRAME
 LDFLAGS =
+
+ifneq ($(REF_DXE),1)
+CPPFLAGS+= -DREF_HARD_LINKED
+endif
 
 # net -- watt-32 tcp/ip library :
 WATT32_CFLAGS = -Iwattcp/inc -DWATT32_NO_OLDIES
@@ -133,6 +139,7 @@ SERVER = server/sv_ccmds.o \
 	server/sv_user.o \
 	server/sv_world.o
 
+ifneq ($(REF_DXE),1)
 REFSOFT = ref_soft/r_alias.o \
 	ref_soft/r_main.o \
 	ref_soft/r_light.o \
@@ -152,10 +159,12 @@ REFSOFT = ref_soft/r_alias.o \
 	ref_soft/r_image.o \
 	dos/vid_ext.o \
 	dos/swimp_dos.o
+endif
 
 ifeq ($(USE_ASM),1)
 COMMONASM = gas/math.o
 CLIENTASM = gas/snd_mixa.o
+ifneq ($(REF_DXE),1)
 REFASM = gas/math_ref.o \
 	gas/d_copy.o \
 	gas/d_polysa.o \
@@ -168,6 +177,7 @@ REFASM = gas/math_ref.o \
 	gas/r_surf8.o \
 	gas/r_varsa.o \
 	gas/sys_dosa.o
+endif
 endif
 
 OBJECTS = $(CLIENT) $(CLIENTASM) $(QCOMMON) $(COMMONASM) $(SERVER) $(GAMESPY) $(REFSOFT) $(REFASM) $(DOS)
