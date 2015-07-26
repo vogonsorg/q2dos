@@ -438,14 +438,14 @@ C(R_PolysetCalcGradients):
 //	}
 
 	movl	C(d_pdrawspans),%eax
-	cmpl	$(C(R_PolysetDrawSpans8_Opaque)),%eax /* FS: FIXME.  I don't know how to compare to R_PolySetDrawSpans8_Opaque */
+	cmpl	$C(R_PolysetDrawSpans8_Opaque),%eax /* FS: FIXME.  I don't know how to compare to R_PolySetDrawSpans8_Opaque */
 	movl	C(r_sstepx),%eax
 	movl	C(r_tstepx),%edx
 	jnz	translucent
 
 	shll	$16,%eax
 	shll	$16,%edx
-	jne	done_with_steps
+	jmp	done_with_steps
 translucent:
 	andl	$65535, %eax
 	andl	$65535, %edx
@@ -850,16 +850,12 @@ LRightEdgeStepped:
 	jne	IRInsert
 
 	movl	spanpackage_t_ptex(%esi),%esi
-#ifdef _MSC_VER
-	jmp		aff8entryvec_table(,%eax,4)
-#else
-        jmp             *aff8entryvec_table(,%eax,4) // FS: Compiler Warning
-#endif
+	jmp		*aff8entryvec_table(,%eax,4) // fixed  Warning: indirect jmp without `*'
 
 IRInsert:
 	movl spanpackage_t_ptex(%esi), %esi
 	addl	$8, %eax
-        jmp             *aff8entryvec_table(,%eax,4) // FS: Compiler Warning
+	jmp		*aff8entryvec_table(,%eax,4)
 
 // %bx = count of full and partial loops
 // %ebx high word = sfrac
