@@ -241,7 +241,7 @@ clean:
 	rm -f server/*.o
 	rm -f ref_soft/*.o
 	rm -f dos/*.o
-	rm -f linux/*.o
+	rm -f gas/*.o
 	rm -f Goa/*.o
 	rm -f Goa/CEngine/*.o
 	rm -f zaero/*.o
