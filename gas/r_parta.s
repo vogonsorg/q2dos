@@ -6,7 +6,7 @@
 // FS: This is entirely unfinished, don't even try!
 
 #include "qasm.h"
-#include "../ref_soft/d_ifacea.h"
+#include "d_ifacea.h"
 
 #if id386
 
