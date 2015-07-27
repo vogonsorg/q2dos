@@ -17,6 +17,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
+
 // vid_dos.c -- DOS video driver adapated from Q1
 
 #ifndef REF_HARD_LINKED
@@ -66,9 +67,9 @@ static const vid_resolutions_t	*vid_modes;
 static int			vid_nummodes;
 
 static const char *		resolution_names[MAX_RESOLUTIONS + 1];
-				// namelist initialized by VID_Init()
+				/* namelist initialized by VID_Init() */
 
-viddef_t	viddef;				// global video state
+viddef_t	viddef; /* global video state */
 
 refexport_t	re;
 #ifdef REF_HARD_LINKED
@@ -120,7 +121,7 @@ static void VID_NewWindow (int width, int height)
 	viddef.width = width;
 	viddef.height = height;
 
-	cl.force_refdef = true;		// can't use a paused refdef
+	cl.force_refdef = true; /* can't use a paused refdef */
 }
 
 /*
@@ -307,7 +308,7 @@ void	VID_Init (void)
 	VID_CheckChanges ();
 
 	Cmd_AddCommand("vid_restart", VID_Restart_f);
-	Cmd_AddCommand("vid_listmodes", VID_ListModes_f); // FS: Added
+	Cmd_AddCommand("vid_listmodes", VID_ListModes_f); /* FS: Added */
 }
 
 void	VID_Shutdown (void)
@@ -325,7 +326,7 @@ void	VID_CheckChanges (void)
 
 	if ( vid_ref->modified)
 	{
-		cl.force_refdef = true;		// can't use a paused refdef
+		cl.force_refdef = true; /* can't use a paused refdef */
 		S_StopAllSounds();
 	}
 	while (vid_ref->modified)
@@ -458,8 +459,8 @@ void	VID_MenuInit (void)
 	Menu_AddItem(&s_software_menu, (void *) &s_screensize_slider[SOFTWARE_MENU]);
 	Menu_AddItem(&s_software_menu, (void *) &s_brightness_slider[SOFTWARE_MENU]);
 	Menu_AddItem(&s_software_menu, (void *) &s_stipple_box);
-	Menu_AddItem(&s_software_menu, (void *) &s_contentblend_box); // FS
-	Menu_AddItem(&s_software_menu, (void *) &s_waterwarp_box); // FS
+	Menu_AddItem(&s_software_menu, (void *) &s_contentblend_box); /* FS */
+	Menu_AddItem(&s_software_menu, (void *) &s_waterwarp_box); /* FS */
 
 	Menu_AddItem(&s_software_menu, (void *) &s_defaults_action[SOFTWARE_MENU]);
 	Menu_AddItem(&s_software_menu, (void *) &s_cancel_action[SOFTWARE_MENU]);
@@ -526,7 +527,7 @@ const char *VID_MenuKey (int k)
 		break;
 	}
 
-	return sound;//NULL
+	return sound;
 }
 
 static void VID_Restart_f (void)
