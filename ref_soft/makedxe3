@@ -34,6 +34,7 @@ REFSOFT = ../game/q_shared.o \
 
 ifeq ($(USE_ASM),1)
 REFASM = ../gas/math_ref.o \
+	../gas/math.o \
 	../gas/d_copy.o \
 	../gas/d_polysa.o \
 	../gas/r_aclipa.o \
@@ -60,6 +61,7 @@ ref_soft.dxe: $(OBJECTS)
 clean:
 	rm -f *.o
 	rm -f ../dos/*.o
+	rm -f ../game/*.o
 	rm -f ../gas/*.o
 
 DO_AS=$(CC) -x assembler-with-cpp
