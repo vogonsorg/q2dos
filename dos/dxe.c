@@ -23,10 +23,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <dlfcn.h>
 #include <sys/dxe.h>
 
+#include <sys/stat.h>
+#include <dir.h>
 #include <assert.h>
 #include <errno.h>
 #include <unistd.h>
 #include <ctype.h>
+
+#ifndef REF_HARD_LINKED
+#include <sys/movedata.h>
+#include "dosisms.h"
+#endif
 
 #if defined(GAMESPY) && !defined(GAMESPY_HARD_LINKED)
 #include <io.h>
@@ -60,6 +67,8 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (exit)
 	DXE_EXPORT (fclose)
 	DXE_EXPORT (feof)
+	DXE_EXPORT (findfirst)
+	DXE_EXPORT (findnext)
 	DXE_EXPORT (fgetc)
 	DXE_EXPORT (fgets)
 	DXE_EXPORT (floor)
@@ -81,6 +90,8 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (memcpy)
 	DXE_EXPORT (memset)
 	DXE_EXPORT (memmove)
+	DXE_EXPORT (mkdir)
+	DXE_EXPORT (pow)
 	DXE_EXPORT (printf)
 	DXE_EXPORT (putc)
 	DXE_EXPORT (puts)
@@ -116,9 +127,19 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (time)
 	DXE_EXPORT (gettimeofday)
 	DXE_EXPORT (tolower)
+	DXE_EXPORT (uclock)
 	DXE_EXPORT (usleep)
 	DXE_EXPORT (vsprintf)
 	DXE_EXPORT (vsnprintf)
+#ifndef REF_HARD_LINKED
+	DXE_EXPORT (__dpmi_int)
+	DXE_EXPORT (__dpmi_physical_address_mapping)
+	DXE_EXPORT (dosmemput)
+	DXE_EXPORT (dos_getmemory)
+	DXE_EXPORT (dos_freememory)
+	DXE_EXPORT (ptr2real)
+	DXE_EXPORT (real2ptr)
+#endif
 #if defined(GAMESPY) && !defined(GAMESPY_HARD_LINKED)
 	DXE_EXPORT(send)
 	DXE_EXPORT(sendto)
