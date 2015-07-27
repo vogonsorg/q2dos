@@ -146,8 +146,12 @@ int	SWimp_Init( void *vid_nummodes, void *vid_modes )
 {
 	currentvideomode = 0;
 
-	VID_InitExtra(); //probe VESA
+	VID_InitExtra(); /* probe VESA */
 
+	/* HACK HACK HACK: sending the video modes list to vid_dos.c
+	 * by exploiting our hInstance and wndProc parameters.  See:
+	 * vid_dos.c:VID_LoadRefresh()
+	 */
 	*(int *) vid_nummodes = num_vid_resolutions;
 	*(void **) vid_modes = vid_resolutions;
 

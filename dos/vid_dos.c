@@ -241,7 +241,6 @@ static void VID_LoadRefresh (const char *name)
 	ri.Cvar_SetValue = Cvar_SetValue;
 	ri.Vid_GetModeInfo = VID_GetModeInfo;
 
-	//JASON this is called from the video DLL
 	re = GetRefAPI(ri);
 
 	if (re.api_version != API_VERSION)
@@ -250,7 +249,10 @@ static void VID_LoadRefresh (const char *name)
 		Com_Error (ERR_FATAL, "Re has incompatible api_version");
 	}
 
-	// call the init function
+	/* HACK HACK HACK: retrieving the video modes list into here
+	 * using the hInstance and wndProc parameters of SWimp_Init().
+	 * See: swimp_dos.c:SWimp_Init()
+	 */
 	if (re.Init (&vid_nummodes, &vid_modes) == -1)
 		Com_Error (ERR_FATAL, "Couldn't start refresh");
 
