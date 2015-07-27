@@ -117,6 +117,7 @@ void VID_InitExtra (void)
 	short		*pmodenums;
 	vbeinfoblock_t	*pinfoblock;
 	unsigned long	addr;
+	__dpmi_regs	r;
 	cvar_t		*var;
 
 	pinfoblock = (vbeinfoblock_t *) dos_getmemory(sizeof(vbeinfoblock_t));
@@ -153,12 +154,12 @@ void VID_InitExtra (void)
 	}
 
 // see if VESA support is available
-	regs.x.ax = 0x4f00;
-	regs.x.es = ptr2real(pinfoblock) >> 4;
-	regs.x.di = ptr2real(pinfoblock) & 0xf;
-	dos_int86(0x10);
+	r.x.ax = 0x4f00;
+	r.x.es = ptr2real(pinfoblock) >> 4;
+	r.x.di = ptr2real(pinfoblock) & 0xf;
+	__dpmi_int(0x10, &r);
 
-	if (regs.x.ax != 0x4f)
+	if (r.x.ax != 0x4f)
 	{
 		dos_freememory(pinfoblock);
 		return;		// no VESA support
@@ -261,17 +262,18 @@ static qboolean VID_ExtraGetModeInfo(int modenum)
 	char	*infobuf;
 	int		numimagepages;
 	__dpmi_meminfo	phys_mem_info;
+	__dpmi_regs	r;
 	cvar_t		*var;
 
 	infobuf = dos_getmemory(256);
 
-	regs.x.ax = 0x4f01;
-	regs.x.cx = modenum;
-	regs.x.es = ptr2real(infobuf) >> 4;
-	regs.x.di = ptr2real(infobuf) & 0xf;
-	dos_int86(0x10);
+	r.x.ax = 0x4f01;
+	r.x.cx = modenum;
+	r.x.es = ptr2real(infobuf) >> 4;
+	r.x.di = ptr2real(infobuf) & 0xf;
+	__dpmi_int(0x10, &r);
 
-	if (regs.x.ax != 0x4f)
+	if (r.x.ax != 0x4f)
 	{
 		dos_freememory(infobuf);
 		return false;
