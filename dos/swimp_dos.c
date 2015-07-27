@@ -33,9 +33,8 @@ static int currentvideomode = 0;
 
 void VID_DrawBanked(void);
 void VGA_UpdatePlanarScreen (void *srcbuffer);
-void VGA_UpdateLinearScreen (void *srcptr, void *destptr, int width, int height, int srcrowbytes, int destrowbytes);
-void VID_ExtraSwapBuffers(vrect_t *rects);
-extern vrect_t		scr_vrect;		// position of render window on screen
+void VGA_UpdateLinearScreen (void *srcptr, void *destptr, int width, int height, int srcrowbytes, int destrowbytes); /* FS: Unused, may be unnecessary */
+extern vrect_t		scr_vrect; /* position of render window on screen */
 
 #if	!id386
 void MaskExceptions (void) {
@@ -114,15 +113,14 @@ void	SWimp_BeginFrame( float camera_separation )
 
 void	SWimp_EndFrame (void)
 {
-	//It's LFB only
 	if(!vid_resolutions[currentvideomode].isLFB)
 	{
-		if(!(vid_resolutions[currentvideomode].isBanked) && !(vid_resolutions[currentvideomode].isPlanar))	// VGA mode 13
+		if(!(vid_resolutions[currentvideomode].isBanked) && !(vid_resolutions[currentvideomode].isPlanar))
 		{
-			// FS: FIXME.  Someday get Abrash's VGA_UpdateLinearScreen working
+			/* JASON: VGA Mode 13 */
 			dosmemput(vid.buffer,vid_resolutions[currentvideomode].height*vid_resolutions[currentvideomode].width,0xA0000);
 		}
-		else // FS: Credit to ggorts
+		else /* FS: Credit to ggorts */
 		{
 			if(vid_resolutions[currentvideomode].isBanked)
 			{
@@ -130,18 +128,17 @@ void	SWimp_EndFrame (void)
 			}
 			else
 			{
-				VGA_UpdatePlanarScreen(vid.buffer); // FS: Abrash's code
+				VGA_UpdatePlanarScreen(vid.buffer); /* FS: Abrash's code */
 			}
 		}
 	}
 	else
 	{
-		// FS: FIXME.  Someday get Abrash's VGA_UpdateLinearScreen working
 		memcpy(vid_resolutions[currentvideomode].address, vid.buffer, (vid.height*vid.width));
 	}
 }
 
-//Windows style hook
+/* Windows style hook */
 int	SWimp_Init( void *vid_nummodes, void *vid_modes )
 {
 	currentvideomode = 0;
@@ -176,9 +173,9 @@ void	SWimp_SetPalette( const unsigned char *palette)
 	}
 
 	shiftcomponents=2;
-	outportb(0x3c8,0);	//this means we are going to set the pallette
+	outportb(0x3c8,0);	/* JASON: this means we are going to set the pallette */
 
-	for(i=0;i<1024;i++)	//we do it this way to skip a byte since it's padded
+	for(i=0;i<1024;i++)	/* JASON: we do it this way to skip a byte since it's padded */
 	{
 		outportb(0x3c9,palette[i]>>shiftcomponents);i++;
 		outportb(0x3c9,palette[i]>>shiftcomponents);i++;
@@ -188,7 +185,7 @@ void	SWimp_SetPalette( const unsigned char *palette)
 
 void	SWimp_Shutdown( void )
 {
-	//return to text mode
+	/* JASON: return to text mode */
 	__dpmi_regs r;
 	vid.buffer = 0;
 	vid.rowbytes = 0;
@@ -231,7 +228,7 @@ rserr_t SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 	if(!vid_resolutions[mode].isLFB)
 	{
 		if(!vid_resolutions[mode].isBanked && !vid_resolutions[mode].isPlanar)
-		{	//mode 13
+		{	/* JASON: VGA Mode 13 */
 			/* FS: Do nothing, let it fall through */
 //			r.x.ax = 0x13;
 		}
@@ -251,10 +248,10 @@ rserr_t SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 
 			if(vid_resolutions[mode].isPlanar)
 			{
-				// enable all planes for writing
+				/* enable all planes for writing */
 				outportb (SC_INDEX, MAP_MASK);
 				outportb (SC_DATA, 0x0F);
-				VideoRegisterSet(vrs320x240x256planar); // FS: 320x240x8 only.
+				VideoRegisterSet(vrs320x240x256planar); /* FS: 320x240x8 only. */
 				VGA_pagebase = vid_resolutions[mode].planarAddress;
 				VGA_rowbytes = vid_resolutions[mode].width / 4;
 				VGA_bufferrowbytes = vid.rowbytes;
@@ -268,7 +265,7 @@ rserr_t SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 	{
 	    //VESA LFB
 		r.x.ax = 0x4F02;
-		r.x.bx = vid_resolutions[mode].vesa_mode+0x4000; //0x4000 for Linear access
+		r.x.bx = vid_resolutions[mode].vesa_mode+0x4000; /* JASON: 0x4000 for Linear access */
 		__dpmi_int(0x10, &r);
 
 		if (r.h.ah)
@@ -323,20 +320,4 @@ void VID_DrawBanked(void)
 	r.x.bx = 0;
 	r.x.dx = 0;
 	__dpmi_int(0x10, &r);
-}
-
-void VID_ExtraSwapBuffers(vrect_t *rects) // FS: This bombs, investigate.
-{
-	while (rects)
-	{
-		VGA_UpdateLinearScreen (
-				vid.buffer + rects->x + (rects->y * vid.rowbytes),
-				vid_resolutions[currentvideomode].address + rects->x + (rects->y * vid.rowbytes),
-				rects->width,
-				rects->height,
-				vid.rowbytes,
-				vid.rowbytes);
-
-		rects = rects->pnext;
-	}
 }
