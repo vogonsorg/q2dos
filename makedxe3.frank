@@ -80,7 +80,6 @@ DOS = dos/dos_v2.o \
 	dos/in_dos.o \
 	dos/net_watt.o \
 	dos/q_shdos.o \
-	dos/vregset.o \
 	dos/dxe.o \
 	dos/sys_dos.o
 
@@ -158,6 +157,7 @@ REFSOFT = ref_soft/r_alias.o \
 	ref_soft/r_edge.o \
 	ref_soft/r_image.o \
 	dos/vid_ext.o \
+	dos/vregset.o \
 	dos/swimp_dos.o
 endif
 
