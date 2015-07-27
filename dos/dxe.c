@@ -20,8 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 /* dynamic module loading/unloading with DJGPP DXE3 */
 
-#ifndef GAME_HARD_LINKED
-
 #include <dlfcn.h>
 #include <sys/dxe.h>
 
@@ -138,15 +136,6 @@ DXE_EXPORT_TABLE (syms)
 #endif
 DXE_EXPORT_END
 
-static void (*game_library)(void);
-
-void Sys_UnloadGame (void)
-{
-	if (game_library)
-		dlclose (game_library);
-	game_library = NULL;
-}
-
 static int lastresort ()
 {
 	printf ("last resort function called!\n");
@@ -174,6 +163,16 @@ void Sys_InitDXE3 (void)
 	_dlsymresolver = dxe_res;
 	/* Register the symbols exported into dynamic modules */
 	dlregsym (syms);
+}
+
+#ifndef GAME_HARD_LINKED
+static void (*game_library)(void);
+
+void Sys_UnloadGame (void)
+{
+	if (game_library)
+		dlclose (game_library);
+	game_library = NULL;
 }
 
 void *Sys_GetGameAPI (void *parms)
@@ -212,6 +211,7 @@ void *Sys_GetGameAPI (void *parms)
 
 	return GetGameAPI (parms);
 }
+#endif /* GAME_HARD_LINKED */
 
 #if defined(GAMESPY) && !defined(GAMESPY_HARD_LINKED)
 static void (*gamespy_library)(void);
@@ -250,5 +250,3 @@ void Sys_UnloadGameSpy(void)
 	gamespy_library = NULL;
 }
 #endif /* GAMESPY ... */
-
-#endif /* GAME_HARD_LINKED */
