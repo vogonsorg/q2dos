@@ -62,6 +62,9 @@ static menulist_s		s_waterwarp_box;	/* FS */
 static menuaction_s		s_cancel_action[NUM_VID_DRIVERS];
 static menuaction_s		s_defaults_action[NUM_VID_DRIVERS];
 
+static const vid_resolutions_t	*vid_modes;
+static int			vid_nummodes;
+
 static const char *		resolution_names[MAX_RESOLUTIONS + 1];
 				// namelist initialized by VID_Init()
 
@@ -125,11 +128,11 @@ static void VID_NewWindow (int width, int height)
 */
 static qboolean VID_GetModeInfo(int *width, int *height, int mode)
 {
-	if (mode < 0 || mode >= num_vid_resolutions)
+	if (mode < 0 || mode >= vid_nummodes)
 		return false;
 
-	*width  = vid_resolutions[mode].width;
-	*height = vid_resolutions[mode].height;
+	*width  = vid_modes[mode].width;
+	*height = vid_modes[mode].height;
 
 //	Com_Printf("VID_GetModeInfo %dx%d mode %d\n",*width,*height,mode);
 	return true;
@@ -198,6 +201,8 @@ static void VID_FreeReflib (void)
 #endif
 	memset (&re, 0, sizeof(re));
 	reflib_active  = false;
+	vid_modes = NULL;
+	vid_nummodes = 0;
 }
 
 static void VID_LoadRefresh (const char *name)
@@ -246,7 +251,7 @@ static void VID_LoadRefresh (const char *name)
 	}
 
 	// call the init function
-	if (re.Init (NULL, NULL) == -1)
+	if (re.Init (&vid_nummodes, &vid_modes) == -1)
 		Com_Error (ERR_FATAL, "Couldn't start refresh");
 
 	reflib_active = true;
@@ -277,8 +282,8 @@ void	VID_Init (void)
 
 	for (i = 0; i < MAX_RESOLUTIONS; ++i)
 	{
-		resolution_names[i] = (i < num_vid_resolutions)?
-					vid_resolutions[i].menuname : NULL;
+		resolution_names[i] = (i < vid_nummodes)?
+					vid_modes[i].menuname : NULL;
 	}
 	resolution_names[MAX_RESOLUTIONS] = NULL;
 
@@ -501,12 +506,12 @@ static void VID_ListModes_f (void)
 {
 	int i = 0;
 
-	for(i = 0; i < num_vid_resolutions; i++)
+	for(i = 0; i < vid_nummodes; i++)
 	{
-		if(vid_resolutions[i].menuname[0] != 0)
+		if(vid_modes[i].menuname[0] != 0)
 		{
-			Com_Printf("[Mode %02d] %s\n", i, vid_resolutions[i].menuname);
+			Com_Printf("[Mode %02d] %s\n", i, vid_modes[i].menuname);
 		}
 	}
-	Com_Printf("Available modes: %d\n", num_vid_resolutions);
+	Com_Printf("Available modes: %d\n", vid_nummodes);
 }
