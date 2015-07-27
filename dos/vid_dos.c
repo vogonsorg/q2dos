@@ -34,6 +34,10 @@ static cvar_t *vid_fullscreen;
 static cvar_t *vid_gamma;
 extern cvar_t *scr_viewsize;	// client/cl_scrn.c
 
+/* cvars for vga/vesa code */
+static cvar_t *vid_bankedvga;
+static cvar_t *vid_vgaonly;
+
 static cvar_t *sw_mode;
 static cvar_t *sw_stipplealpha;
 static cvar_t *sw_waterwarp; /* FS */
@@ -267,6 +271,9 @@ void	VID_Init (void)
 	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE);
 	vid_fullscreen->description = "Enable fullscreen video.  Locked to fullscreen in Q2DOS.";
 	vid_gamma = Cvar_Get("vid_gamma", "1", CVAR_ARCHIVE);
+
+	vid_vgaonly = Cvar_Get("vid_vgaonly", (COM_CheckParm("-vgaonly"))? "1" : "0", 0);
+	vid_bankedvga = Cvar_Get("vid_vgaonly", (COM_CheckParm("-bankedvga"))? "1" : "0", 0);
 
 	VID_CheckChanges ();
 

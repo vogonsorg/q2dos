@@ -117,6 +117,7 @@ void VID_InitExtra (void)
 	short		*pmodenums;
 	vbeinfoblock_t	*pinfoblock;
 	unsigned long	addr;
+	cvar_t		*var;
 
 	pinfoblock = (vbeinfoblock_t *) dos_getmemory(sizeof(vbeinfoblock_t));
 	if (!pinfoblock) {
@@ -144,7 +145,8 @@ void VID_InitExtra (void)
 	Com_sprintf(vid_resolutions[num_vid_resolutions].menuname, sizeof(vid_resolutions[num_vid_resolutions].menuname), "[VGA 320x200]");
 	num_vid_resolutions++;
 
-	if(COM_CheckParm("-vgaonly"))
+	var = ri.Cvar_Get("vid_vgaonly", "0", 0);
+	if(var->intValue)
 	{
 		VID_AddBankedModes(); /* FS: Added */
 		return;	//test for VGA only
@@ -259,6 +261,7 @@ static qboolean VID_ExtraGetModeInfo(int modenum)
 	char	*infobuf;
 	int		numimagepages;
 	__dpmi_meminfo	phys_mem_info;
+	cvar_t		*var;
 
 	infobuf = dos_getmemory(256);
 
@@ -388,7 +391,8 @@ static qboolean VID_ExtraGetModeInfo(int modenum)
 
 				vid_resolutions[num_vid_resolutions].address = real2ptr (phys_mem_info.address);
 
-				if (!(COM_CheckParm("-bankedvga"))) /* FS: FIXME, just add all modes for banked */
+				var = ri.Cvar_Get("vid_bankedvga", "0", 0);
+				if(!var->intValue) /* FS: FIXME, just add all modes for banked */
 				{
 					vid_resolutions[num_vid_resolutions].isLFB=true;
 				}
