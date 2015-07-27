@@ -261,8 +261,6 @@ void	VID_Init (void)
 {
 	int		i;
 
-	memset(vid_resolutions,0x0,sizeof(vid_resolutions));
-
 	viddef.width = 320;
 	viddef.height = 240;
 

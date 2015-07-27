@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "vgamodes.h"
 #include "dosisms.h"
 
-int currentvideomode = 0;
+static int currentvideomode = 0;
 
 void VID_DrawBanked(void);
 void VGA_UpdatePlanarScreen (void *srcbuffer);
