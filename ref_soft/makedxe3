@@ -1,5 +1,7 @@
 # abrash's asm optimizations:
 USE_ASM=1
+#
+USE_SSE=0
 
 CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 CPPFLAGS = 
@@ -7,6 +9,10 @@ DXE3GEN = dxe3gen
 
 ifeq ($(USE_ASM),1)
 CPPFLAGS+= -Did386=1
+endif
+
+ifeq ($(USE_SSE),1)
+CFLAGS += -mtune=pentium3 -march=pentium3 -mfpmath=sse
 endif
 
 REFSOFT = ../game/q_shared.o \
