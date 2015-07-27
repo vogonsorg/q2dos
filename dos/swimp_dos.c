@@ -103,6 +103,11 @@ void VGA_UpdateLinearScreen (	void *srcptr, void *destptr,
 }
 #endif	/* !id386 */
 
+void Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length)
+{
+/* MS-DOS is always writeable */
+}
+
 void	SWimp_BeginFrame( float camera_separation )
 {
 }

@@ -445,11 +445,6 @@ void	Sys_Init (void)
 	Sys_InitDXE3 ();
 }
 
-void Sys_MakeCodeWriteable(void)
-{
-/* MS-DOS is always writeable */
-}
-
 //=============================================================================
 
 static void Sys_ParseEarlyArgs(int argc, char **argv) /* FS: Parse some very specific args before Qcommon_Init */
