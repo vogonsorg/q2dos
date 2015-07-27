@@ -17,7 +17,7 @@ USE_CDAUDIO=1
 # abrash's asm optimizations:
 USE_ASM=1
 # dynamic refresh (video) modules:
-REF_DXE=0
+REF_DXE=1
 
 CC = gcc
 CFLAGS = -g -Wall -Werror -O2 -fno-strict-aliasing -fomit-frame-pointer

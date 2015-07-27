@@ -17,7 +17,7 @@ USE_CDAUDIO=1
 # abrash's asm optimizations:
 USE_ASM=1
 # dynamic refresh (video) modules:
-REF_DXE=0
+REF_DXE=1
 
 # FS: approx 10-15% speed boost on my P3 550 when running timedemos.
 CC = gcc

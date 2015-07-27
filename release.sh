@@ -13,10 +13,9 @@ $TARGET-strip q2.exe || exit 1
 
 mkdir -p _build || exit 1
 cp -p q2.exe _build
+cp -p ref_soft/ref_soft.dxe _build
 cp -p CWSDPMI.EXE _build
 cp -p readme.txt _build
-# gamespy shit
-cp -p Goa/gamespy.dxe _build
 
 mkdir -p _build/baseq2
 cp -p game/gamex86.dxe _build/baseq2
@@ -39,6 +38,9 @@ mkdir -p _build/dday
 cp -p dday/gamex86.dxe _build/dday
 mkdir -p _build/zaero
 cp -p zaero/gamex86.dxe _build/zaero
+
+# gamespy shit
+cp -p Goa/gamespy.dxe _build
 
 cd _build || exit 1
 unzip ../doslfn.zip doslfn.com doslfn.txt
