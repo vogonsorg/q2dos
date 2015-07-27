@@ -26,13 +26,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../client/qmenu.h"
 #include "vid_dos.h"
 
-#define NUM_VID_DRIVERS 1
+#define NUM_VID_DRIVERS 1	/* only ref_soft for now */
 #define REF_SOFT	0
 
 cvar_t *vid_ref;
 static cvar_t *vid_fullscreen;
 static cvar_t *vid_gamma;
-extern cvar_t *scr_viewsize;	// client/cl_scrn.c
+extern cvar_t *scr_viewsize;	/* client/cl_scrn.c */
 
 /* cvars for vga/vesa code */
 static cvar_t *vid_bankedvga;
@@ -177,9 +177,10 @@ static void ApplyChanges(void *unused)
 	Cvar_SetValue("vid_gamma", gamma);
 	Cvar_SetValue("sw_stipplealpha", s_stipple_box.curvalue);
 	Cvar_SetValue("sw_mode", s_mode_list[SOFTWARE_MENU].curvalue);
-	Cvar_SetValue("r_contentblend", s_contentblend_box.curvalue); // FS
-	Cvar_SetValue("sw_waterwarp", s_waterwarp_box.curvalue); // FS
+	Cvar_SetValue("r_contentblend", s_contentblend_box.curvalue);	/* FS */
+	Cvar_SetValue("sw_waterwarp", s_waterwarp_box.curvalue);	/* FS */
 
+	/** only ref_soft for now!! **/
 	Cvar_Set("vid_ref", "soft");
 
 	M_ForceMenuOff();
@@ -205,8 +206,9 @@ static void VID_FreeReflib (void)
 	vid_nummodes = 0;
 }
 
-static void VID_LoadRefresh (const char *name)
+static qboolean VID_LoadRefresh (const char *name)
 {
+	int		i;
 	refimport_t	ri;
 #ifndef REF_HARD_LINKED
 	GetRefAPI_t	GetRefAPI;
@@ -219,6 +221,8 @@ static void VID_LoadRefresh (const char *name)
 	}
 
 #ifndef REF_HARD_LINKED
+	Com_Printf("------- Loading %s -------\n", name);
+
 	if ((reflib_library = dlopen(name, RTLD_LAZY|RTLD_GLOBAL)) == NULL)
 		Sys_Error("dlopen(\"%s\") failed\n",name);
 	if ((GetRefAPI = (void *) dlsym(reflib_library, "_GetRefAPI")) == NULL)
@@ -235,18 +239,19 @@ static void VID_LoadRefresh (const char *name)
 	ri.FS_LoadFile = FS_LoadFile;
 	ri.FS_FreeFile = FS_FreeFile;
 	ri.FS_Gamedir = FS_Gamedir;
-	ri.Vid_NewWindow = VID_NewWindow;
 	ri.Cvar_Get = Cvar_Get;
 	ri.Cvar_Set = Cvar_Set;
 	ri.Cvar_SetValue = Cvar_SetValue;
 	ri.Vid_GetModeInfo = VID_GetModeInfo;
+	ri.Vid_MenuInit = VID_MenuInit;
+	ri.Vid_NewWindow = VID_NewWindow;
 
 	re = GetRefAPI(ri);
 
 	if (re.api_version != API_VERSION)
 	{
 		VID_FreeReflib ();
-		Com_Error (ERR_FATAL, "Re has incompatible api_version");
+		Com_Error (ERR_FATAL, "%s has incompatible api_version", name);
 	}
 
 	/* HACK HACK HACK: retrieving the video modes list into here
@@ -254,20 +259,33 @@ static void VID_LoadRefresh (const char *name)
 	 * See: swimp_dos.c:SWimp_Init()
 	 */
 	if (re.Init (&vid_nummodes, &vid_modes) == -1)
-		Com_Error (ERR_FATAL, "Couldn't start refresh");
+	{
+		re.Shutdown();
+		VID_FreeReflib ();
+		return false;
+	}
 
 	reflib_active = true;
-	vidref_val = VIDREF_SOFT;
 
-	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
-	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE);
-	vid_gamma = Cvar_Get("vid_gamma", "1", CVAR_ARCHIVE);
+	vidref_val = VIDREF_OTHER;
+	if(vid_ref)
+	{
+		if(!strcmp(vid_ref->string, "soft"))
+			vidref_val = VIDREF_SOFT;
+	}
+
+	for (i = 0; i < MAX_RESOLUTIONS; ++i)
+	{
+		resolution_names[i] = (i < vid_nummodes)?
+					vid_modes[i].menuname : NULL;
+	}
+	resolution_names[MAX_RESOLUTIONS] = NULL;
+
+	return true;
 }
 
 void	VID_Init (void)
 {
-	int		i;
-
 	viddef.width = 320;
 	viddef.height = 240;
 
@@ -282,21 +300,17 @@ void	VID_Init (void)
 
 	VID_CheckChanges ();
 
-	for (i = 0; i < MAX_RESOLUTIONS; ++i)
-	{
-		resolution_names[i] = (i < vid_nummodes)?
-					vid_modes[i].menuname : NULL;
-	}
-	resolution_names[MAX_RESOLUTIONS] = NULL;
-
 	Cmd_AddCommand("vid_restart", VID_Restart_f);
 	Cmd_AddCommand("vid_listmodes", VID_ListModes_f); // FS: Added
 }
 
 void	VID_Shutdown (void)
 {
-	if (re.Shutdown)
+	if (reflib_active)
+	{
 		re.Shutdown ();
+		VID_FreeReflib ();
+	}
 }
 
 void	VID_CheckChanges (void)
@@ -319,9 +333,20 @@ void	VID_CheckChanges (void)
 		cls.disable_screen = true;
 
 		Com_sprintf(name, sizeof(name), "ref_%s.dxe", vid_ref->string);
-		VID_LoadRefresh(name);
+		if (!VID_LoadRefresh(name))
+		{
+			if (strcmp (vid_ref->string, "soft") == 0)
+				Com_Error (ERR_FATAL, "Couldn't fall back to software refresh!");
+			Cvar_Set("vid_ref", "soft");
 
-		Cvar_Set("vid_ref", "soft");
+			/*
+			** drop the console if we fail to load a refresh
+			*/
+			if (cls.key_dest != key_console)
+			{
+				Con_ToggleConsole_f();
+			}
+		}
 		cls.disable_screen = false;
 	}
 }
