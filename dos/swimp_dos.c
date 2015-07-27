@@ -169,13 +169,13 @@ void	SWimp_SetPalette( const unsigned char *palette)
 	}
 
 	shiftcomponents=2;
-	outp(0x3c8,0);	//this means we are going to set the pallette
+	outportb(0x3c8,0);	//this means we are going to set the pallette
 
 	for(i=0;i<1024;i++)	//we do it this way to skip a byte since it's padded
 	{
-		outp(0x3c9,palette[i]>>shiftcomponents);i++;
-		outp(0x3c9,palette[i]>>shiftcomponents);i++;
-		outp(0x3c9,palette[i]>>shiftcomponents);i++;
+		outportb(0x3c9,palette[i]>>shiftcomponents);i++;
+		outportb(0x3c9,palette[i]>>shiftcomponents);i++;
+		outportb(0x3c9,palette[i]>>shiftcomponents);i++;
 	}
 }
 
@@ -253,7 +253,6 @@ rserr_t SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 				VGA_bufferrowbytes = vid.rowbytes;
 				VGA_width = vid.width;
 				VGA_height = vid.height;
-				
 			}
 			__dpmi_int(0x10, &r);
 		}
