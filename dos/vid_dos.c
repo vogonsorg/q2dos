@@ -224,9 +224,15 @@ static qboolean VID_LoadRefresh (const char *name)
 	Com_Printf("------- Loading %s -------\n", name);
 
 	if ((reflib_library = dlopen(name, RTLD_LAZY|RTLD_GLOBAL)) == NULL)
-		Sys_Error("dlopen(\"%s\") failed\n",name);
+	{
+		Com_Printf("dlopen(\"%s\") failed\n", name);
+		return false;
+	}
 	if ((GetRefAPI = (void *) dlsym(reflib_library, "_GetRefAPI")) == NULL)
-		Sys_Error("dlsym() failed on %s",name);
+	{
+		Com_Error(ERR_FATAL, "dlsym() failed on %s", name);
+		return false;
+	}
 #endif
 
 	ri.Cmd_AddCommand = Cmd_AddCommand;
