@@ -3,6 +3,8 @@ taskkill /F /T /IM MSDEV.EXE
 taskkill /F /T /IM MSDEV.COM
 call F:\PROJ\Q2DOS\CLEAN.BAT
 msdev F:\proj\q2dos\msvc4-normal\quake2.dsw /MAKE "quake2 - Win32 Release" /BUILD
+msdev F:\proj\q2dos\msvc4-normal\quake2.dsw /MAKE "ref_soft - Win32 Release" /BUILD
+msdev F:\proj\q2dos\msvc4-normal\quake2.dsw /MAKE "ref_gl - Win32 Release" /BUILD
 msdev F:\proj\q2dos\msvc4-normal\quake2.dsw /MAKE "gamespysdk - Win32 Release" /BUILD
 msdev F:\proj\q2dos\msvc4-normal\quake2.dsw /MAKE "3zb2gamex86 - Win32 Release" /BUILD
 msdev F:\proj\q2dos\msvc4-normal\quake2.dsw /MAKE "acegamex86 - Win32 Release" /BUILD
