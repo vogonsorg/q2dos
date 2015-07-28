@@ -47,7 +47,12 @@ cvar_t		*vid_fullscreen;
 
 // Global variables used internally by this module
 viddef_t	viddef;				// global video state; used by other modules
+
+#ifdef REF_HARD_LINKED
+refexport_t GetRefAPI (refimport_t rimp);
+#else
 HINSTANCE	reflib_library;		// Handle to refresh DLL 
+#endif
 qboolean	reflib_active = 0;
 
 HWND        cl_hwnd;            // Main window handle for life of program
@@ -439,11 +444,12 @@ LONG WINAPI MainWndProc (
 		break;
 
 	case MM_MCINOTIFY:
+#if 0 /* turn off CD for now */
 		{
-			//turn off CD for now
-			//LONG CDAudio_MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-			//lRet = CDAudio_MessageHandler (hWnd, uMsg, wParam, lParam);
+			LONG CDAudio_MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+			lRet = CDAudio_MessageHandler (hWnd, uMsg, wParam, lParam);
 		}
+#endif
 		break;
 
 	default:	// pass all unhandled messages to DefWindowProc
@@ -555,9 +561,6 @@ void VID_FreeReflib (void)
 	reflib_active  = false;
 }
 
-#ifdef REF_HARD_LINKED
-refexport_t GetRefAPI (refimport_t rimp);
-#endif
 /*
 ==============
 VID_LoadRefresh
