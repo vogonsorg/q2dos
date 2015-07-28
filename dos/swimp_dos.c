@@ -34,7 +34,6 @@ static int currentvideomode = 0;
 void VID_DrawBanked(void);
 void VGA_UpdatePlanarScreen (void *srcbuffer);
 void VGA_UpdateLinearScreen (void *srcptr, void *destptr, int width, int height, int srcrowbytes, int destrowbytes); /* FS: Unused, may be unnecessary */
-extern vrect_t		scr_vrect; /* position of render window on screen */
 
 #if	!id386
 void MaskExceptions (void) {
