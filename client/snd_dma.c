@@ -864,12 +864,8 @@ void S_StopAllSounds(void)
 	// clear all the channels
 	memset(channels, 0, sizeof(channels));
 
-#ifdef OGG_SUPPORT
 	// Stop background track
 	S_StopBackgroundTrack (); // Knightmare added
-#endif
-
-	S_StopWAVBackgroundTrack();
 
 	S_ClearBuffer ();
 }

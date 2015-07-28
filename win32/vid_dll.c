@@ -555,6 +555,9 @@ void VID_FreeReflib (void)
 	reflib_active  = false;
 }
 
+#ifdef REF_HARD_LINKED
+refexport_t GetRefAPI (refimport_t rimp);
+#endif
 /*
 ==============
 VID_LoadRefresh
