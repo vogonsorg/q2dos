@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-// vid_dos.c -- DOS video driver adapated from Q1
+// vid_dos.c -- DOS video driver frontend
 
 #ifndef REF_HARD_LINKED
 #include <dlfcn.h>
@@ -63,10 +63,10 @@ static menulist_s		s_waterwarp_box;	/* FS */
 static menuaction_s		s_cancel_action[NUM_VID_DRIVERS];
 static menuaction_s		s_defaults_action[NUM_VID_DRIVERS];
 
-static const vid_resolutions_t	*vid_modes;
+static vmodeinfo_t		*vid_modes;
 static int			vid_nummodes;
 
-static const char *		resolution_names[MAX_RESOLUTIONS + 1];
+static const char *		resolution_names[MAX_VIDEOMODES + 1];
 				/* namelist initialized by VID_Init() */
 
 viddef_t	viddef; /* global video state */
@@ -203,8 +203,9 @@ static void VID_FreeReflib (void)
 #endif
 	memset (&re, 0, sizeof(re));
 	reflib_active  = false;
-	vid_modes = NULL;
 	vid_nummodes = 0;
+	free(vid_modes);
+	vid_modes = NULL;
 }
 
 static qboolean VID_LoadRefresh (const char *name)
@@ -262,9 +263,7 @@ static qboolean VID_LoadRefresh (const char *name)
 	}
 
 	/* HACK HACK HACK: retrieving the video modes list into here
-	 * using the hInstance and wndProc parameters of SWimp_Init().
-	 * See: swimp_dos.c:SWimp_Init()
-	 */
+	 * using the hInstance and wndProc parameters of re.Init(). */
 	if (re.Init (&vid_nummodes, &vid_modes) == -1)
 	{
 		re.Shutdown();
@@ -281,12 +280,12 @@ static qboolean VID_LoadRefresh (const char *name)
 			vidref_val = VIDREF_SOFT;
 	}
 
-	for (i = 0; i < MAX_RESOLUTIONS; ++i)
+	for (i = 0; i < MAX_VIDEOMODES; ++i)
 	{
 		resolution_names[i] = (i < vid_nummodes)?
 					vid_modes[i].menuname : NULL;
 	}
-	resolution_names[MAX_RESOLUTIONS] = NULL;
+	resolution_names[MAX_VIDEOMODES] = NULL;
 
 	return true;
 }
@@ -538,14 +537,12 @@ static void VID_Restart_f (void)
 
 static void VID_ListModes_f (void)
 {
-	int i = 0;
+	int i;
 
 	for(i = 0; i < vid_nummodes; i++)
 	{
 		if(vid_modes[i].menuname[0] != 0)
-		{
 			Com_Printf("[Mode %02d] %s\n", i, vid_modes[i].menuname);
-		}
 	}
 	Com_Printf("Available modes: %d\n", vid_nummodes);
 }

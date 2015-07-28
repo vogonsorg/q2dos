@@ -25,12 +25,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../ref_soft/r_local.h"
 #include "vid_dos.h"
+#include "swimp_dos.h"
 #include "dosisms.h"
 
 static int	totalvidmem;
 
-vid_resolutions_t vid_resolutions[MAX_RESOLUTIONS];
-int num_vid_resolutions = 0;
+vgamode_t vga_modes[MAX_VIDEOMODES];
+int vga_nummodes = 0;
 
 #define MODE_SUPPORTED_IN_HW		0x0001
 #define COLOR_MODE			0x0008
@@ -131,20 +132,20 @@ void VID_InitExtra (void)
 	pinfoblock->VbeSignature[2] = 'E';
 	pinfoblock->VbeSignature[3] = '2';
 
-	memset(vid_resolutions,0x0,sizeof(vid_resolutions));
+	memset(vga_modes,0x0,sizeof(vga_modes));
+	vga_nummodes = 0;
 
 	VID_AddPlanarModes(); /* FS: Add 320x240 Mode-X first */
 
 	/* We always have mode 13 VGA */
-	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
-	vid_resolutions[num_vid_resolutions].vesa_mode=-1;
-	vid_resolutions[num_vid_resolutions].height=200;
-	vid_resolutions[num_vid_resolutions].width=320;
-	vid_resolutions[num_vid_resolutions].isLFB=false;
-	vid_resolutions[num_vid_resolutions].isBanked=false;
+	vga_modes[vga_nummodes].mode=vga_nummodes;
+	vga_modes[vga_nummodes].vesa_mode=-1;
+	vga_modes[vga_nummodes].height=200;
+	vga_modes[vga_nummodes].width=320;
+	vga_modes[vga_nummodes].type = VGA_MODE13;
 
-	Com_sprintf(vid_resolutions[num_vid_resolutions].menuname, sizeof(vid_resolutions[num_vid_resolutions].menuname), "[VGA 320x200]");
-	num_vid_resolutions++;
+	Com_sprintf(vga_modes[vga_nummodes].menuname, sizeof(vga_modes[vga_nummodes].menuname), "[VGA 320x200]");
+	vga_nummodes++;
 
 	var = ri.Cvar_Get("vid_vgaonly", "0", 0);
 	if(var->intValue)
@@ -191,7 +192,7 @@ void VID_InitExtra (void)
 // find 8 bit modes until we either run out of space or run out of modes
 	nummodes = 0;
 
-	while ((*pmodenums != -1) && (nummodes < MAX_RESOLUTIONS))
+	while ((*pmodenums != -1) && (nummodes < MAX_VIDEOMODES))
 	{
 		if (VID_ExtraGetModeInfo (*pmodenums))
 		{
@@ -206,50 +207,45 @@ void VID_InitExtra (void)
 
 static void VID_AddPlanarModes(void)
 {
-	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
-	vid_resolutions[num_vid_resolutions].vesa_mode=-1;
-	vid_resolutions[num_vid_resolutions].height=240;
-	vid_resolutions[num_vid_resolutions].planarAddress = (void *)real2ptr(0xA0000);
-	vid_resolutions[num_vid_resolutions].width=320;
-	vid_resolutions[num_vid_resolutions].isLFB=false;
-	vid_resolutions[num_vid_resolutions].isBanked=false;
-	vid_resolutions[num_vid_resolutions].isPlanar=true;
+	vga_modes[vga_nummodes].mode=vga_nummodes;
+	vga_modes[vga_nummodes].vesa_mode=-1;
+	vga_modes[vga_nummodes].height=240;
+	vga_modes[vga_nummodes].width=320;
+	vga_modes[vga_nummodes].address = (void *)real2ptr(0xA0000);
+	vga_modes[vga_nummodes].type = VGA_PLANAR;
 
-	Com_sprintf(vid_resolutions[num_vid_resolutions].menuname, sizeof(vid_resolutions[num_vid_resolutions].menuname), "[VGA-X 320x240]");
-	num_vid_resolutions++;
+	Com_sprintf(vga_modes[vga_nummodes].menuname, sizeof(vga_modes[vga_nummodes].menuname), "[VGA-X 320x240]");
+	vga_nummodes++;
 }
 
 static void VID_AddBankedModes(void)
 {
-	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
-	vid_resolutions[num_vid_resolutions].vesa_mode=0x0101;
-	vid_resolutions[num_vid_resolutions].height=480;
-	vid_resolutions[num_vid_resolutions].width=640;
-	vid_resolutions[num_vid_resolutions].isLFB=false;
-	vid_resolutions[num_vid_resolutions].isBanked=true;
+	vga_modes[vga_nummodes].mode=vga_nummodes;
+	vga_modes[vga_nummodes].vesa_mode=0x0101;
+	vga_modes[vga_nummodes].height=480;
+	vga_modes[vga_nummodes].width=640;
+	vga_modes[vga_nummodes].type = VGA_BANKED;
 
-	Com_sprintf(vid_resolutions[num_vid_resolutions].menuname, sizeof(vid_resolutions[num_vid_resolutions].menuname), "[VGA-B 640x480]");
-	num_vid_resolutions++;
+	Com_sprintf(vga_modes[vga_nummodes].menuname, sizeof(vga_modes[vga_nummodes].menuname), "[VGA-B 640x480]");
+	vga_nummodes++;
 
-	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
-	vid_resolutions[num_vid_resolutions].vesa_mode=0x0103;
-	vid_resolutions[num_vid_resolutions].height=600;
-	vid_resolutions[num_vid_resolutions].width = 800;
-	vid_resolutions[num_vid_resolutions].isLFB=false;
-	vid_resolutions[num_vid_resolutions].isBanked=true;
+	vga_modes[vga_nummodes].mode=vga_nummodes;
+	vga_modes[vga_nummodes].vesa_mode=0x0103;
+	vga_modes[vga_nummodes].height=600;
+	vga_modes[vga_nummodes].width = 800;
+	vga_modes[vga_nummodes].type = VGA_BANKED;
 
-	Com_sprintf(vid_resolutions[num_vid_resolutions].menuname, sizeof(vid_resolutions[num_vid_resolutions].menuname), "[VGA-B 800x600]");
-	num_vid_resolutions++;
+	Com_sprintf(vga_modes[vga_nummodes].menuname, sizeof(vga_modes[vga_nummodes].menuname), "[VGA-B 800x600]");
+	vga_nummodes++;
 
-	vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
-	vid_resolutions[num_vid_resolutions].vesa_mode=0x0105;
-	vid_resolutions[num_vid_resolutions].height=768;
-	vid_resolutions[num_vid_resolutions].width = 1024;
-	vid_resolutions[num_vid_resolutions].isLFB=false;
-	vid_resolutions[num_vid_resolutions].isBanked=true;
+	vga_modes[vga_nummodes].mode=vga_nummodes;
+	vga_modes[vga_nummodes].vesa_mode=0x0105;
+	vga_modes[vga_nummodes].height=768;
+	vga_modes[vga_nummodes].width = 1024;
+	vga_modes[vga_nummodes].type = VGA_BANKED;
 
-	Com_sprintf(vid_resolutions[num_vid_resolutions].menuname, sizeof(vid_resolutions[num_vid_resolutions].menuname), "[VGA-B 1024x768]");
-	num_vid_resolutions++;
+	Com_sprintf(vga_modes[vga_nummodes].menuname, sizeof(vga_modes[vga_nummodes].menuname), "[VGA-B 1024x768]");
+	vga_nummodes++;
 }
 
 /*
@@ -378,12 +374,12 @@ static qboolean VID_ExtraGetModeInfo(int modenum)
 		{
 			ri.Con_Printf(PRINT_ALL, "VESA mode 0x%0x %dx%d supported\n",modeinfo.modenum,modeinfo.width,modeinfo.height);
 
-			if (num_vid_resolutions < MAX_RESOLUTIONS)
+			if (vga_nummodes < MAX_VIDEOMODES)
 			{
-				vid_resolutions[num_vid_resolutions].mode=num_vid_resolutions;
-				vid_resolutions[num_vid_resolutions].vesa_mode=modeinfo.modenum;
-				vid_resolutions[num_vid_resolutions].height=modeinfo.height;
-				vid_resolutions[num_vid_resolutions].width=modeinfo.width;
+				vga_modes[vga_nummodes].mode=vga_nummodes;
+				vga_modes[vga_nummodes].vesa_mode=modeinfo.modenum;
+				vga_modes[vga_nummodes].height=modeinfo.height;
+				vga_modes[vga_nummodes].width=modeinfo.width;
 
 				phys_mem_info.address = (int)modeinfo.pptr;
 				phys_mem_info.size = 0x400000;
@@ -391,20 +387,14 @@ static qboolean VID_ExtraGetModeInfo(int modenum)
 				if (__dpmi_physical_address_mapping(&phys_mem_info))
 					return false;
 
-				vid_resolutions[num_vid_resolutions].address = real2ptr (phys_mem_info.address);
+				vga_modes[vga_nummodes].address = real2ptr (phys_mem_info.address);
 
+				 /* FS: FIXME, just add all modes for banked */
 				var = ri.Cvar_Get("vid_bankedvga", "0", 0);
-				if(!var->intValue) /* FS: FIXME, just add all modes for banked */
-				{
-					vid_resolutions[num_vid_resolutions].isLFB=true;
-				}
-				else
-				{
-					vid_resolutions[num_vid_resolutions].isLFB=false;
-					vid_resolutions[num_vid_resolutions].isBanked=true;
-				}
-				Com_sprintf(vid_resolutions[num_vid_resolutions].menuname, sizeof(vid_resolutions[num_vid_resolutions].menuname), "[VESA %dx%d]",modeinfo.width,modeinfo.height);
-				num_vid_resolutions++;
+				vga_modes[vga_nummodes].type = (var->intValue)? VGA_BANKED : VGA_VESALFB;
+
+				Com_sprintf(vga_modes[vga_nummodes].menuname, sizeof(vga_modes[vga_nummodes].menuname), "[VESA %dx%d]",modeinfo.width,modeinfo.height);
+				vga_nummodes++;
 			}
 		}
 #ifdef VESA_DEBUG_OUTPUT

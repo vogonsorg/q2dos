@@ -17,14 +17,32 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-// vid_dos.h: DOS video driver frontend definitions
+// swimp_dos.h: header file for DOS-specific vga/vesa video stuff
 
-#define MAX_VIDEOMODES 20
+enum {
+	VGA_MODE13 = 0,
+	VGA_PLANAR,
+	VGA_BANKED,
+	VGA_VESALFB
+};
 
-/* this must remain unchanged with 32 bytes structure size */
-#define VIDNAME_LEN 24
-typedef struct vmodeinfo_s {
+typedef struct vgamode_s {
+	int mode;
+	int type;
 	int height;
 	int width;
+	int vesa_mode;
+	void *address;
 	char menuname[VIDNAME_LEN];
-} vmodeinfo_t;
+} vgamode_t;
+
+extern int vga_nummodes;
+extern vgamode_t vga_modes[MAX_VIDEOMODES];
+
+extern int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes;
+extern byte		*VGA_pagebase;
+
+void VID_InitExtra (void);
+void VGA_UpdatePlanarScreen (void *srcbuffer);
+void VGA_UpdateLinearScreen (void *srcptr, void *destptr, int width,
+	int height, int srcrowbytes, int destrowbytes);

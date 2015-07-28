@@ -106,6 +106,7 @@ LColumnLoop:
 	ret
 
 
+#if 0 // not used
 #define srcptr			4+16
 #define destptr			8+16
 #define width			12+16
@@ -144,4 +145,4 @@ LLRowLoop:
 	popl	%ebp				// restore the caller's stack frame
 
 	ret
-
+#endif
