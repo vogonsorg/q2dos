@@ -67,7 +67,7 @@ static vmodeinfo_t		*vid_modes;
 static int			vid_nummodes;
 
 static const char *		resolution_names[MAX_VIDEOMODES + 1];
-				/* namelist initialized by VID_Init() */
+				/* initialized by VID_LoadRefresh() */
 
 viddef_t	viddef; /* global video state */
 
