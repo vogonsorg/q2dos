@@ -173,11 +173,9 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 	sc->speed = info.rate * info.channels;	//CDawg changed
 	sc->width = info.width;
 	sc->stereo = info.channels;
-	// Knightmare added
-	sc->music = !strncmp (namebuffer, "music/", 6);
 
-	// force loopstart if it's a music file
-	if ( sc->music && (sc->loopstart == -1) )
+	// Knightmare: force loopstart if it's a music file
+	if (!strncmp(namebuffer, "music/", 6) && (sc->loopstart == -1))
 		sc->loopstart = 0;
 	// end Knightmare
 
