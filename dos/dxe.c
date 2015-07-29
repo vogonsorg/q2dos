@@ -167,6 +167,7 @@ static void *dxe_res (const char *sym)
 {
 	FILE *f = fopen ("dxe.log", "a");
 	fprintf (f, "%s: unresolved symbol in DXE.\n", sym);
+	fflush (f);
 	fclose (f);
 	return (void *)dxe_fail;
 }
