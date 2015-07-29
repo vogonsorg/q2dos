@@ -157,29 +157,23 @@ DXE_EXPORT_TABLE (syms)
 #endif
 DXE_EXPORT_END
 
-static int lastresort ()
+static int dxe_fail ()
 {
-	printf ("last resort function called!\n");
+	Sys_Error ("Unresolved symbol(s) in DXE. Can't continue. See DXE.LOG for details.");
 	return 0;
 }
 
-static void *dxe_res (const char *symname)
+static void *dxe_res (const char *sym)
 {
-	union
-	{
-		int (*from)(void);
-		void *to;
-	} func_ptr_cast;
-
-	printf ("%s: undefined symbol in dynamic module.  Please report this as a bug!\n", symname);
-	Com_Printf ("%s: undefined symbol in dynamic module.  Please report this as a bug!\n", symname);
-
-	func_ptr_cast.from = lastresort;
-	return func_ptr_cast.to;
+	FILE *f = fopen ("dxe.log", "a");
+	fprintf (f, "%s: unresolved symbol in DXE.\n", sym);
+	fclose (f);
+	return (void *)dxe_fail;
 }
 
 void Sys_InitDXE3 (void)
 {
+	remove ("dxe.log");
 	/* Set the error callback function */
 	_dlsymresolver = dxe_res;
 	/* Register the symbols exported into dynamic modules */
