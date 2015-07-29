@@ -13,13 +13,10 @@ To port a mod to Q2DOS the following changes must occur:
   This is so you can use the developer flags to filter game dll
   specific messages.
 
-* The DXE has to be built using dxe3gen with -U.  Start the game and see
-  if you see any complaints upon cinematic/demo/map load about missing
-  functions that should be reported as a bug.  It is also reported to
-  stdout so you can run q2.exe +set game <yourmod> >out.txt to capture
-  it
-
-  Added the exports to the family of DXE_EXPORTS in dos/dxe.c
-  Please report these to me.  The common ones mods use have been added.
+* The DXE has to be built using dxe3gen with -U, and must export
+  only _GetGameAPI(), i.e.:  dxe3gen -U -E _GetGameAPI ....
+  Run your mod (like "q2 +set game yourmod") and see if it errors
+  out with a message like "unresolved symbols in dxe": if it does,
+  see the generated DXE.LOG file for details, and report it to me.
 
 Good luck!
