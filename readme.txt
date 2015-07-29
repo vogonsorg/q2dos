@@ -16,7 +16,7 @@ What works?
 * CD-ROM music
 * OGG and WAV music
 * Networking (You need a packet driver)
-* Loading/unloading game DLLs in DXE3 format.
+* Loading/unloading video driver and game DLLs in DXE3 format.
 
 What works but needs more testing?
 * Playing in a Windows 9x DOS box.
@@ -88,8 +88,8 @@ Various code from
 * Mpxplay code importing by Ruslan Starodubov (http://sound-dos.ucoz.ru/)
 * Ogg Vorbis -- (https://www.xiph.org/)
 * R1CH -- R1Q2 (http://old.r1ch.net/stuff/r1q2/)
-* Sezero -- WATT32 and DJGPP 2.05 help.
-            HoT (http://uhexen2.sourceforge.net/)
+* Sezero -- WATT32, DJGPP 2.05, and other help.
+            uHexen2 (http://uhexen2.sourceforge.net/)
 * Yamagi -- Updated game code from YamagiQ2 (http://www.yamagi.org/quake2/)
 * Various DJGPP v2.05 upgrade help from RayeR (http://rayer.g6.cz/)
 * Berserk, CDawg, Pat Aftermoon, Anthony Jacques, David M. Pochron, Dopefish,
