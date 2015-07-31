@@ -848,6 +848,8 @@ void	Sys_Quit (void);
 char	*Sys_GetClipboardData( void );
 void	Sys_CopyProtect (void);
 
+void	Sys_Sleep (int msec);	// Knightmare added for CPU usage fix
+
 /*
 ==============================================================
 
