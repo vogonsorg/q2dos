@@ -107,8 +107,8 @@ int ArrayLength(const DArray array)
 
 void *ArrayNth(DArray array, int n)
 {
-	if( !(array >= 0) && !(n < array->count) )
-		gspyi.error("Array error in ArrayNth");
+	if (n < 0 || n >= array->count)
+		gspyi.error("ArrayNth: bad index");
 
 	return (char *)array->list + array->elemsize*n;
 }
@@ -123,8 +123,8 @@ void ArrayAppend(DArray array, const void *newElem)
 
 void ArrayInsertAt(DArray array, const void *newElem, int n)
 {
-	if( !(array >= 0) && !(n <= array->count) )
-		gspyi.error("Array error in ArrayInsertAt");
+	if (n < 0 || n > array->count)
+		gspyi.error("ArrayInsertAt: bad index");
 
 	if (array->count == array->capacity)
 		ArrayGrow(array);
@@ -137,8 +137,8 @@ void ArrayInsertAt(DArray array, const void *newElem, int n)
 
 void ArrayDeleteAt(DArray array, int n)
 {
-	if( !(array >= 0) && !(n < array->count) )
-		gspyi.error("Array error in ArrayDeleteAt");
+	if (n < 0 || n >= array->count)
+		gspyi.error("ArrayDeleteAt: bad index");
 
 	FreeElement(array,n);
 	if (n < array->count - 1) //if not last element
@@ -150,8 +150,8 @@ void ArrayDeleteAt(DArray array, int n)
 
 void ArrayReplaceAt(DArray array, const void *newElem, int n)
 {
-	if( !(array >= 0) && !(n < array->count) )
-		gspyi.error("Array error in ArrayReplaceAt");
+	if (n < 0 || n >= array->count)
+		gspyi.error("ArrayReplaceAt: bad index");
 
 	FreeElement(array, n);
 	SetElement(array, newElem,n);
