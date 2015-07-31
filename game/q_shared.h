@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #pragma warning(disable : 4305)		// truncation from const double to float
 #endif
 
-#include <assert.h>
+/*#include <assert.h>*/
 #include <math.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -38,12 +38,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdlib.h>
 #include <time.h>
 
-
-#if defined _M_ALPHA && !defined C_ONLY
-#define idaxp	1
-#else
-#define idaxp	0
-#endif
 
 typedef unsigned char 		byte;
 #if defined(__cplusplus)
@@ -432,7 +426,6 @@ COLLISION DETECTION
 #define	CONTENTS_LADDER			0x20000000
 
 
-
 #define	SURF_LIGHT		0x1		// value will hold the light strength
 
 #define	SURF_SLICK		0x2		// effects game physics
@@ -445,6 +438,7 @@ COLLISION DETECTION
 #define	SURF_NODRAW		0x80	// don't bother referencing the texture
 
 #define SURF_ALPHATEST	0x02000000	// Knightmare- alpha test flag
+
 
 // content masks
 #define	MASK_ALL				(-1)

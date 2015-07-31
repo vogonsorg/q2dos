@@ -336,6 +336,18 @@ int BoxOnPlaneSide2 (vec3_t emins, vec3_t emaxs, struct cplane_s *p)
 
 /*
 ==================
+BOPS_Error
+
+Split out like this for ASM to call.
+==================
+*/
+void BOPS_Error (void)
+{
+	Sys_Error ("BoxOnPlaneSide:  Bad signbits");
+}
+
+/*
+==================
 BoxOnPlaneSide
 
 Returns 1, 2, or 1 + 2
@@ -393,8 +405,8 @@ dist1 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
 dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
 		break;
 	default:
+		BOPS_Error ();
 		dist1 = dist2 = 0;		// shut up compiler
-		assert( 0 );
 		break;
 	}
 
@@ -404,7 +416,8 @@ dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
 	if (dist2 < p->dist)
 		sides |= 2;
 
-	assert( sides != 0 );
+	if (sides == 0)
+		BOPS_Error ();
 
 	return sides;
 }
@@ -644,18 +657,6 @@ Lerror:
 }
 #pragma warning( default: 4035 )
 #endif
-
-/*
-==================
-BOPS_Error
-
-Split out like this for ASM to call.
-==================
-*/
-void BOPS_Error (void)
-{
-	Sys_Error ("BoxOnPlaneSide:  Bad signbits");
-}
 
 void ClearBounds (vec3_t mins, vec3_t maxs)
 {

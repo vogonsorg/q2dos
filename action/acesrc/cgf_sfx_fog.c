@@ -406,9 +406,10 @@ vec_t    CGF_SFX_GetFogForDistance(vec_t dist)
 {
   int index;
   index = ((int) dist) / (int) kViewingDistanceStep;
-  assert( (index < (kMaxViewingDistance / kViewingDistanceStep))
-        );
-  return m_FogViewReduction[index];
+  if (index < (kMaxViewingDistance / kViewingDistanceStep))
+      return m_FogViewReduction[index];
+  gi.error ("CGF_SFX_GetFogForDistance: Assertion 'index < (kMaxViewingDistance / kViewingDistanceStep)' failed");
+  return 1;/* not reached */
 }
 
 

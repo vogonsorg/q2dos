@@ -4,7 +4,7 @@ PKG_NAME=q2dos_`date -u +%Y%m%d`.7z
 rm -f $PKG_NAME
 
 ./clean.sh
-./makeall.sh
+./makeall.sh $*
 
 . ./cross_defs.dj
 

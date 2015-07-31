@@ -10,7 +10,7 @@
 #pragma warning(disable : 4305)		// truncation from const double to float
 #endif
 
-#include <assert.h>
+/*#include <assert.h>*/
 #include <math.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -19,12 +19,6 @@
 #include <time.h>
 #include <stddef.h>
 
-
-#if defined _M_ALPHA && !defined C_ONLY
-#define idaxp	1
-#else
-#define idaxp	0
-#endif
 
 typedef unsigned char 		byte;
 #if defined(__cplusplus)
@@ -52,9 +46,9 @@ char *strtok_r(char *s, const char *delim, char **last);
 #define Q_vsnprintf  vsnprintf
 #endif
 
-#define CL_MASTER_ADDR	"maraakate.org"	/* FS: master.gamespy.com & co are dead */
+#define CL_MASTER_ADDR	"maraakate.org" /* FS: master.gamespy.com & co are dead */
 #define CL_MASTER_PORT	"28900"
-#define SV_MASTER_IP	"maraakate.org"	/* FS: master.gamespy.com & co are dead */
+#define SV_MASTER_IP	"maraakate.org" /* FS: master.gamespy.com & co are dead */
 #define SV_MASTER_PORT	"27900"
 
 // angle indexes
@@ -328,7 +322,6 @@ char	*Sys_FindFirst (char *path, unsigned musthave, unsigned canthave );
 char	*Sys_FindNext ( unsigned musthave, unsigned canthave );
 void	Sys_FindClose (void);
 
-
 // this is only here so the functions in q_shared.c and q_shwin.c can link
 void Sys_Error (char *error, ...);
 void Com_Printf (char *msg, ...);
@@ -412,7 +405,6 @@ COLLISION DETECTION
 #define	CONTENTS_LADDER			0x20000000
 
 
-
 #define	SURF_LIGHT		0x1		// value will hold the light strength
 
 #define	SURF_SLICK		0x2		// effects game physics
@@ -423,7 +415,6 @@ COLLISION DETECTION
 #define	SURF_TRANS66	0x20
 #define	SURF_FLOWING	0x40	// scroll towards angle
 #define	SURF_NODRAW		0x80	// don't bother referencing the texture
-
 
 
 // content masks
