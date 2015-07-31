@@ -39,10 +39,10 @@ HashTable TableNew(int elemSize, int nBuckets,
 		gspyi.error("TableNew: hashFn is NULL.");
 	if(!compFn)
 		gspyi.error("TableNew: compFn is NULL.");
-	if(!elemSize)
-		gspyi.error("TableNew: elemSize is NULL.");
-	if(!nBuckets)
-		gspyi.error("TableNew: nBuckets is NULL.");
+	if(elemSize <= 0)
+		gspyi.error("TableNew: bad elemSize.");
+	if(nBuckets <= 0)
+		gspyi.error("TableNew: bad nBuckets.");
 
 	table = (HashTable)malloc(sizeof(struct HashImplementation));
 	if(!table)

@@ -66,10 +66,10 @@ DArray ArrayNew(int elemSize, int numElemsToAllocate,
 	DArray array;
 
 	array = (DArray) malloc(sizeof(struct DArrayImplementation));
-	if(!array)
+	if (!array)
 		gspyi.error("ArrayNew: array is NULL.");
-	if(!elemSize)
-		gspyi.error("ArrayNew: elemSize is NULL.");
+	if (elemSize <= 0)
+		gspyi.error("ArrayNew: bad elemSize.");
 	if (numElemsToAllocate == 0)
 		numElemsToAllocate = DEF_GROWBY;
 	array->count = 0;
