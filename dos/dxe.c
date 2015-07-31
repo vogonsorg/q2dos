@@ -238,7 +238,7 @@ void *Sys_GetGameAPI (void *parms)
 		game_library = Sys_dlopen (name, RTLD_LAZY);
 		if (game_library)
 		{
-			Com_Printf ("LoadLibrary (%s)\n",name);
+			Com_Printf ("Loaded %s\n", name);
 			break;
 		}
 	}
@@ -247,7 +247,7 @@ void *Sys_GetGameAPI (void *parms)
 	if (!GetGameAPI)
 	{
 		Sys_UnloadGame ();
-		Com_Printf("dlsym() failed on %s", gamename);
+		Com_Printf("dlsym() failed on %s\n", gamename);
 		return NULL;
 	}
 
@@ -278,7 +278,7 @@ void *Sys_GetGameSpyAPI(void *parms)
 	if (!GetGameSpyAPI)
 	{
 		dlclose(gamespy_library);
-		Com_Printf("dlsym() failed on %s", dxename);
+		Com_Printf("dlsym() failed on %s\n", dxename);
 		gamespy_library = NULL;
 		return NULL;
 	}

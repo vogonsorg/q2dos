@@ -232,7 +232,7 @@ static qboolean VID_LoadRefresh (const char *name)
 	}
 	if ((GetRefAPI = (void *) Sys_dlsym(reflib_library, "_GetRefAPI")) == NULL)
 	{
-		Com_Error(ERR_FATAL, "dlsym() failed on %s", name);
+		Com_Error(ERR_FATAL, "dlsym() failed on %s\n", name);
 		return false;
 	}
 #endif

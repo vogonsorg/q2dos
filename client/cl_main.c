@@ -2833,20 +2833,19 @@ static void CL_LoadGameSpy (void)
 	gspye = (gspyexport_t *) Sys_GetGameSpyAPI (&import);
 	if (!gspye)
 	{
-		Com_Printf ("failed to load GameSpy DLL");
+		Com_Printf ("failed to load GameSpy DLL\n");
 		return;
 	}
-	else if (gspye->api_version != GAMESPY_API_VERSION)
+	if (gspye->api_version != GAMESPY_API_VERSION)
 	{
 		Com_Printf("Error: Unsupported GameSpy DLL version %i (need %i)\n", gspye->api_version, GAMESPY_API_VERSION);
 		Sys_UnloadGameSpy();
 		gspye = NULL;
 		return;
 	}
-	else /* all good */
-	{
-		gspye->Init ();
-	}
+
+	/* all good */
+	gspye->Init ();
 }
 #endif /* GAMESPY */
 
