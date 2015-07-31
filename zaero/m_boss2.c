@@ -110,7 +110,7 @@ boss2_firebullet_right(edict_t *self)
 	VectorSubtract(target, start, forward);
 	VectorNormalize(forward);
 
-	if(EMPNukeCheck(self, start)) // FS: Zaero specific
+	if(EMPNukeCheck(self, start)) /* FS: Zaero specific game dll changes */
 	{
 		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
 		return;
@@ -142,7 +142,7 @@ boss2_firebullet_left(edict_t *self)
 	VectorSubtract(target, start, forward);
 	VectorNormalize(forward);
 
-	if(EMPNukeCheck(self, start)) // FS: Zaero specific
+	if(EMPNukeCheck(self, start)) /* FS: Zaero specific game dll changes */
 	{
 		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
 		return;

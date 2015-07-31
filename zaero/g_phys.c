@@ -45,7 +45,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * solid_edge items only clip against bsp models.
  */
 
-void adjustRiders(edict_t *ent); // FS: Zaero specific
+void adjustRiders(edict_t *ent); /* FS: Zaero specific game dll changes */
 
 edict_t *
 SV_TestEntityPosition(edict_t *ent)
@@ -711,7 +711,7 @@ SV_Push(edict_t *pusher, vec3_t move, vec3_t amove)
 
 			{   /* pushed ok */
 				gi.linkentity(check);
-				adjustRiders(check); // FS: Zaero specific
+				adjustRiders(check); /* FS: Zaero specific game dll changes */
 				// impact?
 				continue;
 			}
@@ -897,7 +897,7 @@ SV_Physics_Toss(edict_t *ent)
 	qboolean wasinwater;
 	qboolean isinwater;
 	vec3_t old_origin;
-	float	speed = 0.0f; // FS: Zaero specific
+	float	speed = 0.0f; /* FS: Zaero specific game dll changes */
 
 	if (!ent)
 	{
@@ -941,7 +941,7 @@ SV_Physics_Toss(edict_t *ent)
 	/* add gravity */
 	if ((ent->movetype != MOVETYPE_FLY) &&
 		(ent->movetype != MOVETYPE_FLYMISSILE) &&
-		(ent->movetype != MOVETYPE_BOUNCEFLY)) // FS: Zaero specific
+		(ent->movetype != MOVETYPE_BOUNCEFLY)) /* FS: Zaero specific game dll changes */
 	{
 		SV_AddGravity (ent);
 	}
@@ -964,7 +964,7 @@ SV_Physics_Toss(edict_t *ent)
 		{
 			backoff = 1.5;
 		}
-		else if(ent->movetype == MOVETYPE_BOUNCEFLY) // FS: Zaero specific
+		else if(ent->movetype == MOVETYPE_BOUNCEFLY) /* FS: Zaero specific game dll changes */
 		{
 			backoff = 2;
 		}
@@ -973,14 +973,14 @@ SV_Physics_Toss(edict_t *ent)
 			backoff = 1;
 		}
 
-		if(ent->movetype == MOVETYPE_BOUNCEFLY) // FS: Zaero specific
+		if(ent->movetype == MOVETYPE_BOUNCEFLY) /* FS: Zaero specific game dll changes */
 		{
 			speed = VectorLength(ent->velocity);
 		}
 
 		ClipVelocity (ent->velocity, trace.plane.normal, ent->velocity, backoff);
 
-		if(ent->movetype == MOVETYPE_BOUNCEFLY) // FS: Zaero specific
+		if(ent->movetype == MOVETYPE_BOUNCEFLY) /* FS: Zaero specific game dll changes */
 		{
 			VectorNormalize (ent->velocity);
 			VectorScale (ent->velocity, speed, ent->velocity);
@@ -1243,7 +1243,7 @@ SV_Physics_Step(edict_t *ent)
 	SV_RunThink(ent);
 }
 
-void SV_Physics_FallFloat (edict_t *ent) // FS: Zaero specific
+void SV_Physics_FallFloat (edict_t *ent) /* FS: Zaero specific game dll changes */
 {
 	float gravVal = ent->gravity * sv_gravity->value * FRAMETIME;
 	qboolean wasonground = false;
@@ -1379,7 +1379,7 @@ void SV_Physics_FallFloat (edict_t *ent) // FS: Zaero specific
 	SV_RunThink (ent);
 }
 
-void adjustRiders(edict_t *ent) // FS: Zaero specific
+void adjustRiders(edict_t *ent) /* FS: Zaero specific game dll changes */
 {
 	int i = 0;
 
@@ -1391,7 +1391,7 @@ void adjustRiders(edict_t *ent) // FS: Zaero specific
 	}
 }
 
-void SV_Physics_Ride (edict_t *ent) // FS: Zaero specific
+void SV_Physics_Ride (edict_t *ent) /* FS: Zaero specific game dll changes */
 {
 	// base ourself on the step
 	SV_Physics_Step(ent);
@@ -1433,14 +1433,14 @@ G_RunEntity(edict_t *ent)
 	case MOVETYPE_TOSS:
 	case MOVETYPE_BOUNCE:
 	case MOVETYPE_FLY:
-	case MOVETYPE_BOUNCEFLY: // FS: Zaero specific
+	case MOVETYPE_BOUNCEFLY: /* FS: Zaero specific game dll changes */
 	case MOVETYPE_FLYMISSILE:
 		SV_Physics_Toss (ent);
 		break;
-	case MOVETYPE_FALLFLOAT: // FS: Zaero specific
+	case MOVETYPE_FALLFLOAT: /* FS: Zaero specific game dll changes */
 		SV_Physics_FallFloat(ent);
 		break;
-	case MOVETYPE_RIDE: // FS: Zaero specific
+	case MOVETYPE_RIDE: /* FS: Zaero specific game dll changes */
 		SV_Physics_Ride(ent);
 		break;
 	default:

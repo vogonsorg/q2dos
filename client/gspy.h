@@ -92,7 +92,7 @@ typedef struct
 
 /* FS: Binary stuff the DLL needs to access */
 extern void S_GamespySound (char *sound);
-extern char* NET_ErrorString(void);
+extern char *NET_ErrorString(void);
 extern void *Sys_GetGameSpyAPI(void *parms);
 extern void Sys_UnloadGameSpy(void);
 

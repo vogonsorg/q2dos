@@ -20,9 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "g_local.h"
 #include "m_player.h"
 
-extern void HelpComputer (edict_t *ent); // FS
-extern void InventoryMessage(edict_t *ent); // FS
-
 static char *
 ClientTeam(edict_t *ent, char* value)
 {

@@ -12,7 +12,7 @@ float		enemy_yaw;
 
 qboolean FindTarget(edict_t *self);
 qboolean ai_checkattack (edict_t *self, float dist);
-qboolean M_MoveAwayFromFlare(edict_t *self, float dist); // FS: Zaero specific
+qboolean M_MoveAwayFromFlare(edict_t *self, float dist); /* FS: Zaero specific game dll changes */
 
 /*
  * Called once each frame to set level.sight_client
@@ -332,7 +332,7 @@ visible(edict_t *self, edict_t *other)
 		return false;
 	}
 
-	if (self->monsterinfo.flashTime > 0) // FS: Zaero specific
+	if (self->monsterinfo.flashTime > 0) /* FS: Zaero specific game dll changes */
 	{
 		return false;
 	}
@@ -1175,7 +1175,7 @@ ai_run(edict_t *self, float dist)
 		return;
 	}
 
-	if (self->monsterinfo.flashTime > 0) // FS: Zaero specific
+	if (self->monsterinfo.flashTime > 0) /* FS: Zaero specific game dll changes */
 	{
 		M_MoveAwayFromFlare(self, dist);
 		return;
@@ -1208,7 +1208,7 @@ ai_run(edict_t *self, float dist)
 		}
 	}
 
-	if (self->monsterinfo.attack_state == AS_FLY_STRAFE) // FS: Zaero specific
+	if (self->monsterinfo.attack_state == AS_FLY_STRAFE) /* FS: Zaero specific game dll changes */
 	{
 		if (self->monsterinfo.flyStrafeTimeout < level.time)
 		{

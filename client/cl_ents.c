@@ -407,7 +407,7 @@ void CL_ParsePacketEntities (frame_t *oldframe, frame_t *newframe)
 {
 	int			newnum;
 	unsigned int			bits;
-	entity_state_t	*oldstate = NULL; // FS: Compiler warning
+	entity_state_t	*oldstate = NULL; /* FS: Compiler warning */
 	int			oldindex, oldnum;
 
 	newframe->parse_entities = cl.parse_entities;
@@ -462,7 +462,7 @@ void CL_ParsePacketEntities (frame_t *oldframe, frame_t *newframe)
 			if (cl_shownet->value == 3)
 				Com_Printf ("   remove: %i\n", newnum);
 			if (oldnum != newnum)
-				Com_DPrintf (DEVELOPER_MSG_NET, "U_REMOVE: oldnum != newnum\n"); // FS: Mods like WOD make this one happen fairly often
+				Com_DPrintf (DEVELOPER_MSG_NET, "U_REMOVE: oldnum != newnum\n"); /* FS: Mods like Whale's WOD make this one happen fairly often */
 
 			oldindex++;
 
@@ -690,7 +690,7 @@ void CL_ParseFrame (void)
 	CL_ClearProjectiles(); // clear projectiles for new frame
 #endif
 
-	cl.frame.serverframe = MSG_ReadLong (&net_message); // FS: Regular Q2 Protocol is going to send this is a long instead of float
+	cl.frame.serverframe = MSG_ReadLong (&net_message); /* FS: Regular Q2 Protocol is going to send this is a long instead of float */
 	cl.frame.deltaframe = MSG_ReadLong (&net_message);
 	cl.frame.servertime = cl.frame.serverframe*100.0f;
 
@@ -1428,10 +1428,6 @@ void CL_AddViewWeapon (player_state_t *ps, player_state_t *ops)
 	if (!cl_gun->value)
 		return;
 
-	// don't draw gun if in wide angle view
-//	if (ps->fov > 90) // FS
-//		return;
-
 	memset (&gun, 0, sizeof(gun));
 
 	if (gun_model)
@@ -1509,7 +1505,6 @@ void CL_CalcViewValues (void)
 {
 	int			i;
 	float		lerp, backlerp, ifov;
-//	centity_t	*ent; // FS: Unused
 	frame_t		*oldframe;
 	player_state_t	*ps, *ops;
 
@@ -1527,26 +1522,8 @@ void CL_CalcViewValues (void)
 		|| abs(ops->pmove.origin[2] - ps->pmove.origin[2]) > 256*8)
 		ops = ps;		// don't interpolate
 
-//	ent = &cl_entities[cl.playernum+1]; // FS: Unused
 	lerp = cl.lerpfrac;
 
-	// calculate the origin
-/*	if ((cl_predict->value) && !(cl.frame.playerstate.pmove.pm_flags & PMF_NO_PREDICTION))
-	{	// use predicted values
-		unsigned	delta;
-
-		backlerp = 1.0 - lerp;
-		for (i=0 ; i<3 ; i++)
-		{
-			cl.refdef.vieworg[i] = cl.predicted_origin[i] + ops->viewoffset[i] + cl.lerpfrac * (ps->viewoffset[i] - ops->viewoffset[i]) - backlerp * cl.prediction_error[i];
-		}
-
-		// smooth out stair climbing
-		delta = cls.realtime - cl.predicted_step_time;
-		if (delta < 100)
-			cl.refdef.vieworg[2] -= cl.predicted_step * (100 - delta) * 0.01;
-	}
-*/
 // calculate the origin
 	if ((cl_predict->value) && !(cl.frame.playerstate.pmove.pm_flags & PMF_NO_PREDICTION))
 	{	// use predicted values

@@ -94,7 +94,7 @@
  #define OS "Linux"
 #elif defined(_WIN32)
  #define OS "Windows"
-#elif defined(__DJGPP__) // FS: Added
+#elif defined(__DJGPP__) /* FS: Added */
  #define OS "MS-DOS"
 #else
  #define OS "Unknown"
@@ -229,7 +229,7 @@ InitGame(void)
 
 	// change anytime vars
 	dmflags = gi.cvar ("dmflags", "0", CVAR_SERVERINFO);
-	zdmflags = gi.cvar ("zdmflags", "0", CVAR_SERVERINFO); // FS: Zaero specific
+	zdmflags = gi.cvar ("zdmflags", "0", CVAR_SERVERINFO); /* FS: Zaero specific game dll changes */
 	fraglimit = gi.cvar ("fraglimit", "0", CVAR_SERVERINFO);
 	timelimit = gi.cvar ("timelimit", "0", CVAR_SERVERINFO);
 	password = gi.cvar ("password", "", CVAR_USERINFO);

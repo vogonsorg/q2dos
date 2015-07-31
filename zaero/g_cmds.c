@@ -20,9 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "g_local.h"
 #include "m_player.h"
 
-extern void HelpComputer (edict_t *ent); // FS
-extern void InventoryMessage(edict_t *ent); // FS
-extern void stopCamera(edict_t *self); // FS: Zaero specific
+extern void stopCamera(edict_t *self); /* FS: Zaero specific game dll changes */
 
 static char *
 ClientTeam(edict_t *ent, char* value)
@@ -117,7 +115,7 @@ SelectNextItem(edict_t *ent, int itflags)
 
 		it = &itemlist[index];
 
-		if (it->hideFlags & HIDE_FROM_INVENTORY) // don't show this // FS: Zaero specific
+		if (it->hideFlags & HIDE_FROM_INVENTORY) // don't show this /* FS: Zaero specific game dll changes */
 		{
 			continue;
 		}
@@ -171,7 +169,7 @@ SelectPrevItem(edict_t *ent, int itflags)
 
 		it = &itemlist[index];
 
-		if (it->hideFlags & HIDE_FROM_INVENTORY) // FS: Zaero specific
+		if (it->hideFlags & HIDE_FROM_INVENTORY) /* FS: Zaero specific game dll changes */
 		{
 			continue;
 		}
@@ -227,8 +225,8 @@ Cmd_Give_f(edict_t *ent)
 	int i;
 	qboolean give_all;
 	edict_t *it_ent;
-	int     numargs; // FS: Zaero specific
-	char tryname[256]; // FS: Zaero specific
+	int     numargs; /* FS: Zaero specific game dll changes */
+	char tryname[256]; /* FS: Zaero specific game dll changes */
 
 	if (!ent)
 	{
@@ -243,7 +241,7 @@ Cmd_Give_f(edict_t *ent)
 	}
 
 	name = gi.args();
-	numargs = gi.argc(); // FS: Zaero specific
+	numargs = gi.argc(); /* FS: Zaero specific game dll changes */
 
 	if (Q_stricmp(name, "all") == 0)
 	{
@@ -341,7 +339,7 @@ Cmd_Give_f(edict_t *ent)
 		}
 	}
 
-	if (give_all || Q_stricmp(name, "Visor") == 0) // FS: Zaero specific
+	if (give_all || Q_stricmp(name, "Visor") == 0) /* FS: Zaero specific game dll changes */
 	{
 		it = FindItem("Visor");
 		it_ent = G_Spawn();
@@ -404,7 +402,7 @@ Cmd_Give_f(edict_t *ent)
 	it = FindItem(name);
 	if (!it)
 	{
-	 // FS: Zaero specific, redone
+	 /* FS: Zaero specific game dll changes: redone */
 		tryname[0] = 0;
 		for(numargs = 1; numargs < gi.argc(); numargs++)
 		{
@@ -425,7 +423,7 @@ Cmd_Give_f(edict_t *ent)
 			return;
 		}
 
-		numargs++; // FS: Zaero specific
+		numargs++; /* FS: Zaero specific game dll changes */
 	}
 
 	if (!it->pickup)
@@ -438,7 +436,7 @@ Cmd_Give_f(edict_t *ent)
 
 	if (it->flags & IT_AMMO)
 	{
-		if (numargs < gi.argc()) // FS: Zaero specific
+		if (numargs < gi.argc()) /* FS: Zaero specific game dll changes */
 			ent->client->pers.inventory[index] = atoi(gi.argv(numargs));
 		else
 			ent->client->pers.inventory[index] += it->quantity;
@@ -557,7 +555,7 @@ Cmd_Noclip_f(edict_t *ent)
 	gi.cprintf(ent, PRINT_HIGH, msg);
 }
 
- // FS: Zaero specific
+ /* FS: Zaero specific game dll changes */
 #define MAX_ALT 2
 struct altsel_s
 {
@@ -578,7 +576,7 @@ struct altsel_s
 	{2,{"BFG10K", "Sonic Cannon"}}
 };
 
-qboolean tryUse(edict_t *ent, char *s) // FS: Zaero specific
+qboolean tryUse(edict_t *ent, char *s) /* FS: Zaero specific game dll changes */
 {
 	int index = 0;
 	gitem_t *it = FindItem(s);
@@ -602,7 +600,7 @@ qboolean tryUse(edict_t *ent, char *s) // FS: Zaero specific
 	return true;
 }
 
-void findNext(edict_t *ent, struct altsel_s *ptr, int offset) // FS: Zaero specific
+void findNext(edict_t *ent, struct altsel_s *ptr, int offset) /* FS: Zaero specific game dll changes */
 {
 	int start = offset;
 
@@ -621,7 +619,7 @@ void findNext(edict_t *ent, struct altsel_s *ptr, int offset) // FS: Zaero speci
 	}
 }
 
-void altSelect(edict_t *ent, int num) // FS: Zaero specific
+void altSelect(edict_t *ent, int num) /* FS: Zaero specific game dll changes */
 {
 	int offset = -1;
 	int i = 0;
@@ -825,7 +823,7 @@ Cmd_Inven_f(edict_t *ent)
 	gi.WriteByte (svc_inventory);
 	for (i=0; i < MAX_ITEMS ; i++)
 	{
-		gitem_t *it = &itemlist[i]; // FS: Zaero specific
+		gitem_t *it = &itemlist[i]; /* FS: Zaero specific game dll changes */
 		if (it->hideFlags & HIDE_FROM_INVENTORY)
 			gi.WriteShort(0);	// this is a hack and will work as long as
 								// the client continues to hide items that
@@ -891,7 +889,7 @@ Cmd_WeapPrev_f(edict_t *ent)
 	/* scan  for the next valid one */
 	for (i = 1; i <= MAX_ITEMS; i++)
 	{
-		index = (selected_weapon + MAX_ITEMS - i)%MAX_ITEMS; // FS: Zaero specific
+		index = (selected_weapon + MAX_ITEMS - i)%MAX_ITEMS; /* FS: Zaero specific game dll changes */
 //		index = (selected_weapon + i)%MAX_ITEMS;
 		if (!cl->pers.inventory[index])
 		{
@@ -900,7 +898,7 @@ Cmd_WeapPrev_f(edict_t *ent)
 
 		it = &itemlist[index];
 
-		if (it->hideFlags & HIDE_FROM_SELECTION) // FS: Zaero specific
+		if (it->hideFlags & HIDE_FROM_SELECTION) /* FS: Zaero specific game dll changes */
 		{
 			continue;
 		}
@@ -917,7 +915,7 @@ Cmd_WeapPrev_f(edict_t *ent)
 
 		it->use (ent, it);
 //		if (cl->pers.weapon == it)
-		if (cl->newweapon == it) // FS: Zaero specific
+		if (cl->newweapon == it) /* FS: Zaero specific game dll changes */
 		{
 			return;	// successful
 		}
@@ -953,7 +951,7 @@ void Cmd_WeapNext_f (edict_t *ent)
 	// scan  for the next valid one
 	for (i=1 ; i<=MAX_ITEMS ; i++)
 	{
-		index = (selected_weapon + i)%MAX_ITEMS; // FS: Zaero specific
+		index = (selected_weapon + i)%MAX_ITEMS; /* FS: Zaero specific game dll changes */
 //		index = (selected_weapon + MAX_ITEMS - i)%MAX_ITEMS;
 
 		if (!cl->pers.inventory[index])
@@ -963,7 +961,7 @@ void Cmd_WeapNext_f (edict_t *ent)
 
 		it = &itemlist[index];
 
-		if (it->hideFlags & HIDE_FROM_SELECTION) // FS: Zaero specific
+		if (it->hideFlags & HIDE_FROM_SELECTION) /* FS: Zaero specific game dll changes */
 		{
 			continue;
 		}
@@ -981,7 +979,7 @@ void Cmd_WeapNext_f (edict_t *ent)
 		it->use (ent, it);
 
 //		if (cl->pers.weapon == it)
-		if (cl->newweapon == it) // FS: Zaero specific
+		if (cl->newweapon == it) /* FS: Zaero specific game dll changes */
 		{
 			return;	// successful
 		}
@@ -1077,8 +1075,8 @@ Cmd_Kill_f(edict_t *ent)
 	meansOfDeath = MOD_SUICIDE;
 	player_die (ent, ent, ent, 100000, vec3_origin);
 	// don't even bother waiting for death frames
-	ent->deadflag = DEAD_DEAD; // FS: Zaero specific
-	respawn (ent); // FS: Zaero specific
+	ent->deadflag = DEAD_DEAD; /* FS: Zaero specific game dll changes */
+	respawn (ent); /* FS: Zaero specific game dll changes */
 }
 
 void
@@ -1093,7 +1091,7 @@ Cmd_PutAway_f(edict_t *ent)
 	ent->client->showhelp = false;
 	ent->client->showinventory = false;
 
-	if (ent->client->zCameraTrack) // FS: Zaero specific
+	if (ent->client->zCameraTrack) /* FS: Zaero specific game dll changes */
 		stopCamera(ent);
 }
 
@@ -1415,7 +1413,7 @@ ClientCommand(edict_t *ent)
 	cmd = gi.argv(0);
 
 	// if we're viewing thru the camera, only allow some things to happen
-	if (ent->client->zCameraTrack && !level.intermissiontime) // FS: Zaero specific
+	if (ent->client->zCameraTrack && !level.intermissiontime) /* FS: Zaero specific game dll changes */
 	{
 		if (Q_stricmp (cmd, "putaway") == 0)
 		{
@@ -1571,7 +1569,7 @@ ClientCommand(edict_t *ent)
 	{
 		Cmd_PlayerList_f(ent);
 	}
-	else if (Q_stricmp(cmd, "showorigin") == 0) // FS: Zaero specific
+	else if (Q_stricmp(cmd, "showorigin") == 0) /* FS: Zaero specific game dll changes */
 	{
 		ent->client->showOrigin = !ent->client->showOrigin;
 		if (ent->client->showOrigin)

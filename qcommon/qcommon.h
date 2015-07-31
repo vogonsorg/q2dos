@@ -527,7 +527,7 @@ char	*Cvar_Serverinfo (void);
 // returns an info string containing all the CVAR_SERVERINFO cvars
 
 void	Cvar_SetDescription (char *var_name, const char *description);
-// FS: Set descriptions for CVARs
+/* FS: Set descriptions for CVARs */
 
 extern	qboolean	userinfo_modified;
 // this is set each time a CVAR_USERINFO variable is changed
@@ -777,7 +777,7 @@ MISC
 void		Com_BeginRedirect (int target, char *buffer, int buffersize, void (*flush));
 void		Com_EndRedirect (void);
 void 		Com_Printf (char *fmt, ...);
-void 		Com_DPrintf (unsigned long developerFlags, char *fmt, ...); // FS: Added developer flags
+void 		Com_DPrintf (unsigned long developerFlags, char *fmt, ...); /* FS: Added developer flags */
 void 		Com_Error (int code, char *fmt, ...);
 void 		Com_Quit (void);
 
@@ -868,14 +868,16 @@ void SV_Shutdown (char *finalmsg, qboolean reconnect);
 void SV_Frame (double msec);
 
 
-qboolean IsValidChar (int c); // FS: From KMQ2
-// FS: DOS shit
+qboolean IsValidChar (int c); /* FS: From KMQ2 */
+
+/* FS: DOS shit */
 #define MAX_NUM_ARGVS	50
 
 extern	int		com_argc;
 extern	char	*com_argv[MAX_NUM_ARGVS+1];
-char Q_toupper(int c); // FS
-// FS: All this from Q1
+char Q_toupper(int c);
+
+/* FS: All this from Q1 */
 void Q_memset (void *dest, int fill, int count);
 void Q_memcpy (void *dest, void *src, int count);
 int Q_memcmp (void *m1, void *m2, int count);
@@ -888,6 +890,7 @@ int Q_strcmp (char *s1, char *s2);
 int Q_strncmp (char *s1, char *s2, int count);
 int Q_atoi (char *str);
 float Q_atof (char *str);
-const char *MakePrintable (const void *subject, size_t numchars); // FS: From R1Q2
+
+const char *MakePrintable (const void *subject, size_t numchars); /* FS: From R1Q2 */
 
 #endif // _QCOMMON_H

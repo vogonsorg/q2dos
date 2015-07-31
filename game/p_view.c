@@ -31,8 +31,6 @@ float xyspeed;
 float bobmove;
 int bobcycle; /* odd cycles are right foot going forward */
 float bobfracsin; /* sin(bobfrac*M_PI) */
-extern void HelpComputer (edict_t *ent); // FS
-extern void InventoryMessage(edict_t *ent); // FS
 
 float
 SV_CalcRoll(vec3_t angles, vec3_t velocity)

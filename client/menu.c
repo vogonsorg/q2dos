@@ -1107,10 +1107,10 @@ extern cvar_t *in_joystick;
 #endif
 
 static menuframework_s	s_options_menu;
-static menuframework_s	s_extended_options_menu; // FS
+static menuframework_s	s_extended_options_menu; /* FS: Added */
 static menuaction_s		s_options_defaults_action;
 static menuaction_s		s_options_customize_options_action;
-static menuaction_s		s_options_extended_options_action; // FS
+static menuaction_s		s_options_extended_options_action; /* FS: Added */
 static menuslider_s		s_options_sensitivity_slider;
 static menulist_s		s_options_freelook_box;
 
@@ -1130,9 +1130,9 @@ static menulist_s		s_options_joystick_box;
 #endif
 
 static menulist_s		s_options_cdvolume_box;
-static menuslider_s		s_options_musicvolume_slider; // FS
+static menuslider_s		s_options_musicvolume_slider; /* FS: Added */
 static menulist_s		s_options_quality_list;
-static menulist_s		s_options_loadas8bit_box; // FS
+static menulist_s		s_options_loadas8bit_box; /* FS: Added */
 
 #ifdef WIN32
 static menulist_s		s_options_compatibility_list;
@@ -1152,7 +1152,7 @@ static void JoystickFunc( void *unused )
 }
 #endif
 
-static void ExtendedOptionsFunc( void *unused ) // FS
+static void ExtendedOptionsFunc( void *unused ) /* FS: Added */
 {
 	M_Menu_Extended_Options_f();
 }
@@ -1193,7 +1193,7 @@ float ClampCvar( float min, float max, float value )
 }
 #endif	//duplicate from cl_main
 
-static int Get_S_KHZ_Quality (void) // FS
+static int Get_S_KHZ_Quality (void)  /* FS: Added */
 {
 	if(s_khz->intValue <= 19293)
 	{
@@ -1209,7 +1209,7 @@ static int Get_S_KHZ_Quality (void) // FS
 	}
 	else if(s_khz->intValue > 44100 && s_khz->intValue <= 48000 )
 	{
-		if(havegus == 1) // FS: Max of GUS Classic is 44100
+		if(havegus == 1) /* FS: Max of GUS Classic is 44100 */
 		{
 			return 2;
 		}
@@ -1221,11 +1221,11 @@ static int Get_S_KHZ_Quality (void) // FS
 		{
 			if(havegus == 1)
 			{
-				return 2; // FS: Max of GUS Classic is 44100
+				return 2; /* FS: Max of GUS Classic is 44100 */
 			}
 			else
 			{
-				return 3; // FS: Max of GUS MAX/PnP is 48000
+				return 3; /* FS: Max of GUS MAX/PnP is 48000 */
 			}
 		}
 
@@ -1239,10 +1239,10 @@ static void ControlsSetMenuItemValues( void )
 {
 	s_options_sfxvolume_slider.curvalue		= Cvar_VariableValue( "s_volume" ) * 10;
 	s_options_cdvolume_box.curvalue 		= !Cvar_VariableValue("cd_nocd");
-	s_options_quality_list.curvalue			= Get_S_KHZ_Quality(); // FS
+	s_options_quality_list.curvalue			= Get_S_KHZ_Quality();  /* FS: Added */
 	s_options_sensitivity_slider.curvalue	= ( sensitivity->value ) * 2;
 
-	// FS
+	 /* FS: Added */
 	s_options_loadas8bit_box.curvalue		= !Cvar_VariableValue("s_loadas8bit");
 
 	Cvar_SetValue( "cl_run", ClampCvar( 0, 1, cl_run->value ) );
@@ -1312,7 +1312,7 @@ static void UpdateCDVolumeFunc( void *unused )
 	Cvar_SetValue( "cd_nocd", !s_options_cdvolume_box.curvalue );
 }
 
-static void UpdateMusicVolumeFunc (void *unused) // FS: OGG Music Volume
+static void UpdateMusicVolumeFunc (void *unused) /* FS: WAV and OGG Music Volume */
 {
 	Cvar_SetValue ( "s_musicvolume", s_options_musicvolume_slider.curvalue / 10 );
 }
@@ -1379,7 +1379,7 @@ static void UpdateSoundQualityFunc( void *unused )
 	Cvar_SetValue( "s_primary", s_options_compatibility_list.curvalue );
 #endif
 
-	Cvar_SetValue( "s_loadas8bit", !s_options_loadas8bit_box.curvalue ); // FS
+	Cvar_SetValue( "s_loadas8bit", !s_options_loadas8bit_box.curvalue );  /* FS: Added */
 
 	M_DrawTextBox( 8, 120 - 48, 36, 3 );
 	M_Print( 16 + 16, 120 - 48 + 8,  "Restarting the sound system. This" );
@@ -1463,7 +1463,7 @@ void Options_MenuInit( void )
 	};
 #endif // WIN32
 
-	static const char *sloadas8bit_names[] = // FS
+	static const char *sloadas8bit_names[] =  /* FS: Added */
 	{
 		"8-bit",
 		"16-bit",
@@ -1532,9 +1532,9 @@ void Options_MenuInit( void )
 		s_options_quality_list.itemnames		= skhz_generic_dos_frequency;
 	}
 #endif // WIN32
-	s_options_quality_list.curvalue			= Get_S_KHZ_Quality(); // FS;
+	s_options_quality_list.curvalue			= Get_S_KHZ_Quality();  /* FS: Added */
 
-	// FS
+	 /* FS: Added */
 	s_options_loadas8bit_box.generic.type = MTYPE_SPINCONTROL;
 	s_options_loadas8bit_box.generic.x	= 0;
 	s_options_loadas8bit_box.generic.y	= 40;
@@ -1620,7 +1620,7 @@ void Options_MenuInit( void )
 	s_options_joystick_box.itemnames = yesno_names;
 #endif
 
-	// FS
+	 /* FS: Added */
 	s_options_extended_options_action.generic.type	= MTYPE_ACTION;
 	s_options_extended_options_action.generic.x		= 0;
 	s_options_extended_options_action.generic.y		= 150;
@@ -1651,12 +1651,12 @@ void Options_MenuInit( void )
 
 	ControlsSetMenuItemValues();
 
-// FS: If you add stuff you gotta be certain it's in order it appears!
+/* FS: If you add stuff you gotta be certain it's in order it appears! */
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_sfxvolume_slider );
-	Menu_AddItem( &s_options_menu, ( void * ) &s_options_musicvolume_slider); // FS
+	Menu_AddItem( &s_options_menu, ( void * ) &s_options_musicvolume_slider);  /* FS: Added */
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_cdvolume_box );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_quality_list );
-	Menu_AddItem( &s_options_menu, ( void * ) &s_options_loadas8bit_box ); // FS
+	Menu_AddItem( &s_options_menu, ( void * ) &s_options_loadas8bit_box );  /* FS: Added */
 
 #ifdef WIN32
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_compatibility_list );
@@ -1677,7 +1677,7 @@ void Options_MenuInit( void )
 #ifdef USE_JOYSTICK
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_joystick_box );
 #endif
-	Menu_AddItem( &s_options_menu, ( void * ) &s_options_extended_options_action ); // FS
+	Menu_AddItem( &s_options_menu, ( void * ) &s_options_extended_options_action );  /* FS: Added */
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_customize_options_action );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_defaults_action );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_console_action );
@@ -1708,7 +1708,7 @@ EXTENDED OPTIONS MENU
 
 =======================================================================
 */
-// FS: New stuff unique to Q2DOS
+/* FS: New stuff unique to Q2DOS */
 static menulist_s		s_extended_options_showfps_box;
 static menulist_s		s_extended_options_showtime_box;
 static menulist_s		s_extended_options_showuptime_box;
@@ -1728,7 +1728,7 @@ static void Extended_ControlsSetMenuItemValues(void)
 #if 0
 	s_options_sfxvolume_slider.curvalue		= Cvar_VariableValue( "s_volume" ) * 10;
 	s_options_cdvolume_box.curvalue 		= !Cvar_VariableValue("cd_nocd");
-	s_options_quality_list.curvalue			= Get_S_KHZ_Quality(); // FS
+	s_options_quality_list.curvalue			= Get_S_KHZ_Quality();  /* FS: Added */
 	s_options_sensitivity_slider.curvalue	= ( sensitivity->value ) * 2;
 #endif
 
@@ -1875,7 +1875,7 @@ void Extended_Options_MenuInit( void )
 
 	Extended_ControlsSetMenuItemValues();
 
-// FS: If you add stuff you gotta be certain it's in order it appears!
+/* FS: If you add stuff you gotta be certain it's in order it appears! */
 	Menu_AddItem(&s_extended_options_menu, (void *) &s_extended_options_showfps_box);
 	Menu_AddItem(&s_extended_options_menu, (void *) &s_extended_options_showtime_box);
 	Menu_AddItem(&s_extended_options_menu, (void *) &s_extended_options_showuptime_box);
@@ -2359,7 +2359,7 @@ void M_Menu_Credits_f( void )
 	int		isdeveloper = 0;
 
 	creditsBuffer = NULL;
-	count = FS_LoadFile ("credits", (void **)&creditsBuffer); // FS: Compiler warning
+	count = FS_LoadFile ("credits", (void **)&creditsBuffer); /* FS: Compiler warning */
 	if (count != -1)
 	{
 		p = creditsBuffer;
@@ -2383,7 +2383,7 @@ void M_Menu_Credits_f( void )
 				break;
 		}
 		creditsIndex[++n] = 0;
-		credits = (const char **)creditsIndex; // FS: Compiler warning
+		credits = (const char **)creditsIndex; /* FS: Compiler warning */
 	}
 	else
 	{

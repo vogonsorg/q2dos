@@ -1,4 +1,4 @@
-#if 0 // FS: Yamagi Removed
+#if 0 /* FS: Yamagi Removed */
 #ifndef __Z_DEBUG_H
 #define __Z_DEBUG_H
 

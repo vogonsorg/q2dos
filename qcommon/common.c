@@ -163,7 +163,7 @@ Com_DPrintf
 A Com_Printf that only shows up if the "developer" cvar is set
 ================
 */
-void Com_DPrintf (unsigned long developerFlags, char *fmt, ...) // FS: Added developer flags
+void Com_DPrintf (unsigned long developerFlags, char *fmt, ...) /* FS: Added developer flags */
 {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
@@ -174,7 +174,7 @@ void Com_DPrintf (unsigned long developerFlags, char *fmt, ...) // FS: Added dev
 
 	devValue = (unsigned long)developer->value;
 
-	if (developer->value == 1) // FS: Show all except extremely verbose shit
+	if (developer->value == 1) /* FS: Show all except extremely verbose shit */
 		devValue = 65534;
 
 	if (!(devValue & developerFlags))
@@ -1589,7 +1589,7 @@ void Qcommon_Frame (double msec)
 	}	
 }
 
-// FS: From Q1
+/* FS: From Q1 */
 int Q_atoi (char *str)
 {
 	int             val;
@@ -1648,14 +1648,14 @@ int Q_atoi (char *str)
 	return 0;
 }
 
-char Q_toupper (int c) // FS
+char Q_toupper (int c) /* FS: Added */
 {
 	if (c>='a' && c<='z')
 		c-=('a'-'A');
 	return(c);
 }
 
-// FS: All this from Q1
+/* FS: All this from Q1 */
 void Q_memset (void *dest, int fill, int count)
 {
 	int             i;

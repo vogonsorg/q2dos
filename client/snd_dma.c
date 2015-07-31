@@ -82,7 +82,7 @@ cvar_t		*s_musicvolume;
 
 int		s_rawend;
 portable_samplepair_t	s_rawsamples[MAX_RAW_SAMPLES];
-extern int	havegus; // FS
+extern int	havegus; /* FS: Added */
 
 
 // ====================================================================
@@ -147,7 +147,7 @@ void S_Init (void)
 
 		Cmd_AddCommand("wav_restart", S_WAV_Restart); /* FS: Added */
 
-		if (s_khz->value < 7000) // FS: Old config, fix it up
+		if (s_khz->value < 7000) /* FS: Old config, fix it up */
 			Cvar_SetValue("s_khz", 11025);
 
 		if (!SNDDMA_Init()) {
@@ -832,7 +832,7 @@ void S_ClearBuffer (void)
 	SNDDMA_Submit ();
 #ifdef __DJGPP__
 	if(havegus)
-		GUS_ClearDMA(); // FS
+		GUS_ClearDMA(); /* FS: Added */
 #endif
 }
 

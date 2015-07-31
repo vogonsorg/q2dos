@@ -765,7 +765,7 @@ hover_die(edict_t *self, edict_t *inflictor /* unused */,
 	self->monsterinfo.currentmove = &hover_move_death1;
 }
 
-void hover_dodge (edict_t *self, edict_t *attacker, float eta) // FS: Zaero specific
+void hover_dodge (edict_t *self, edict_t *attacker, float eta) /* FS: Zaero specific game dll changes */
 {
 	int delta = 0;
 	vec3_t forward, right;
@@ -857,7 +857,7 @@ SP_monster_hover(edict_t *self)
 	self->monsterinfo.stand = hover_stand;
 	self->monsterinfo.walk = hover_walk;
 	self->monsterinfo.run = hover_run;
-	self->monsterinfo.dodge = hover_dodge; // FS: Zaero specific
+	self->monsterinfo.dodge = hover_dodge; /* FS: Zaero specific game dll changes */
 	self->monsterinfo.attack = hover_start_attack;
 	self->monsterinfo.sight = hover_sight;
 	self->monsterinfo.search = hover_search;

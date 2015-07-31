@@ -32,7 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
   */
 
-#include <time.h> // FS: For cl_drawtime
+#include <time.h> /* FS: For cl_drawtime */
 #include "client.h"
 
 float		scr_con_current;	// aproaches scr_conlines at scr_conspeed
@@ -60,11 +60,12 @@ cvar_t		*scr_graphscale;
 cvar_t		*scr_graphshift;
 cvar_t		*scr_drawall;
 
-cvar_t		*cl_drawfps;	// Knightmare added FPS counter
-cvar_t		*cl_drawtime; // FS
-cvar_t		*cl_drawuptime; // FS
-cvar_t		*cl_drawaltcolours; // FS
-cvar_t		*cl_hide_gun_icon; // FS
+ /* FS: cl_draw* friends */
+cvar_t		*cl_drawfps;	// Knightmare
+cvar_t		*cl_drawtime;
+cvar_t		*cl_drawuptime;
+cvar_t		*cl_drawaltcolours;
+cvar_t		*cl_hide_gun_icon;
 
 typedef struct
 {
@@ -95,7 +96,7 @@ char		*sb_nums[2][11] =
 void SCR_TimeRefresh_f (void);
 void SCR_Loading_f (void);
 
-static void SCR_DrawUptime (void) // FS: Connection time
+static void SCR_DrawUptime (void) /* FS: Connection time */
 {
 	char	str[80];
 	int	minutes, seconds, tens, units;
@@ -109,7 +110,7 @@ static void SCR_DrawUptime (void) // FS: Connection time
 	SCR_DirtyScreen(); // repaint everything next frame
 
 	// time
-	if (cl_drawuptime->intValue == 1) // FS: Map time or total time playing quake time
+	if (cl_drawuptime->intValue == 1) /* FS: Map time or total time playing quake time */
 	{
 		minutes = (int)(cl.time/1000) / 60;
 	}
@@ -133,7 +134,7 @@ static void SCR_DrawUptime (void) // FS: Connection time
 	x = viddef.width - strlen(str) * 8;
 	y = viddef.height - 50;
 
-	if(cl_drawaltcolours->intValue) // FS: Personally, I like the green.  But other people might not like it.
+	if(cl_drawaltcolours->intValue) /* FS: Personally, I like the green.  But other people might not like it. */
 	{
 		DrawAltString(x, y, str);
 	}
@@ -143,7 +144,7 @@ static void SCR_DrawUptime (void) // FS: Connection time
 	}
 }
 
-static void SCR_DrawTime (void) // FS: show_time
+static void SCR_DrawTime (void) /* FS: Draw current time */
 {
 	int	x, y;
 	struct tm	*local = NULL;
@@ -183,8 +184,8 @@ static void SCR_DrawTime (void) // FS: show_time
 	strftime (st, sizeof (st), timefmt, local);
 
 	x = viddef.width - strlen(st) * 8;
-	y = viddef.height - 42; //52
-	if(cl_drawaltcolours->intValue) // FS: Personally, I like the green.  But other people might not like it.
+	y = viddef.height - 42;
+	if(cl_drawaltcolours->intValue) /* FS: Personally, I like the green.  But other people might not like it. */
 	{
 		DrawAltString(x, y, st);
 	}
@@ -248,7 +249,7 @@ static void SCR_ShowFPS (void)
 	x = (viddef.width - strlen(fpsText)*8);
 	y = (viddef.height - 33);
 
-	if(cl_drawaltcolours->intValue) // FS: Personally, I like the green.  But other people might not like it.
+	if(cl_drawaltcolours->intValue) /* FS: Personally, I like the green.  But other people might not like it. */
 	{
 		DrawAltString(x, y, fpsText);
 	}
@@ -605,11 +606,13 @@ void SCR_Init (void)
 	scr_graphscale = Cvar_Get ("graphscale", "1", 0);
 	scr_graphshift = Cvar_Get ("graphshift", "0", 0);
 	scr_drawall = Cvar_Get ("scr_drawall", "0", 0);
-	cl_drawfps = Cvar_Get ("cl_drawfps", "0", CVAR_ARCHIVE);	// Knightmare added
+
+	 /* FS: cl_draw* friends */
+	cl_drawfps = Cvar_Get ("cl_drawfps", "0", CVAR_ARCHIVE);	// Knightmare
 	cl_drawfps->description = "Draw FPS counter on the screen.";
-	cl_drawtime = Cvar_Get ("cl_drawtime", "0", CVAR_ARCHIVE); // FS
+	cl_drawtime = Cvar_Get ("cl_drawtime", "0", CVAR_ARCHIVE);
 	cl_drawtime->description = "Draw current time on the screen.  1 -  Military time.  2 - AM/PM.";
-	cl_drawuptime = Cvar_Get ("cl_drawuptime", "0", CVAR_ARCHIVE); // FS
+	cl_drawuptime = Cvar_Get ("cl_drawuptime", "0", CVAR_ARCHIVE);
 	cl_drawuptime->description = "Draw current uptime on the screen.  1 - Current level time.  2 - Total uptime of Quake 2.";
 	cl_drawaltcolours = Cvar_Get ("cl_drawaltcolours", "0", CVAR_ARCHIVE);
 	cl_drawaltcolours->description = "Draw green text instead of white for the cl_draw*** cvars.";
@@ -1158,14 +1161,14 @@ void SCR_ExecuteLayoutString (char *s)
 		}
 		if (!strcmp(token, "xv"))
 		{
-			token = COM_Parse (&s); // FS: x value
+			token = COM_Parse (&s); /* FS: x value */
 
-			if(cl_hide_gun_icon->intValue) // FS: Hide the gun/help computer icon.  I always find it to be kind of pointless.
+			if(cl_hide_gun_icon->intValue) /* FS: Hide the gun/help computer icon.  I always find it to be kind of pointless. */
 			{
 				if(!strcmp(token, "148"))
 				{
-					token = COM_Parse(&s); // FS: "pic"
-					token = COM_Parse(&s); // FS: pic number
+					token = COM_Parse(&s); /* FS: "pic" */
+					token = COM_Parse(&s); /* FS: pic number */
 					continue;
 				}
 			}
@@ -1587,9 +1590,10 @@ void SCR_UpdateScreen (void)
 
 			SCR_DrawConsole ();
 
-			SCR_DrawTime (); // FS
-			SCR_DrawUptime(); // FS
-			SCR_ShowFPS ();	// Knightmare- added FPS counter
+			 /* FS: cl_draw* friends */
+			SCR_DrawTime ();
+			SCR_DrawUptime();
+			SCR_ShowFPS ();	// Knightmare
 
 			M_Draw ();
 

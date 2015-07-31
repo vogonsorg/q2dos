@@ -697,7 +697,7 @@ supertankMachineGun(edict_t *self)
 		VectorNormalize(forward);
 	}
 
-	if(EMPNukeCheck(self, start)) // FS: Zaero specific
+	if(EMPNukeCheck(self, start)) /* FS: Zaero specific game dll changes */
 	{
 		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
 		return;

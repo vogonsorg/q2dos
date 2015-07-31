@@ -278,7 +278,7 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 		test[2] = trace.endpos[2] + ent->mins[2] + 1;
 		contents = gi.pointcontents(test);
 
-		if (contents & MASK_WATER && ent->movetype != MOVETYPE_FALLFLOAT) // FS: Zaero specific
+		if (contents & MASK_WATER && ent->movetype != MOVETYPE_FALLFLOAT) /* FS: Zaero specific game dll changes */
 		{
 			return false;
 		}
@@ -298,7 +298,7 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 			ent->groundentity = NULL;
 			return true;
 		}
-		else if (ent->movetype == MOVETYPE_FALLFLOAT) // FS: Zaero specific
+		else if (ent->movetype == MOVETYPE_FALLFLOAT) /* FS: Zaero specific game dll changes */
 		{
 			// can fall over the edge
 			VectorAdd (ent->s.origin, move, ent->s.origin);
@@ -322,7 +322,7 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 		if ( ent->flags & FL_PARTIALGROUND )
 		{	// entity had floor mostly pulled out from underneath it
 			// and is trying to correct
-			if (relink) // FS: Zaero specific
+			if (relink) /* FS: Zaero specific game dll changes */
 			{
 				gi.linkentity (ent);
 				G_TouchTriggers (ent);
@@ -694,13 +694,13 @@ M_walkmove(edict_t *ent, float yaw, float dist)
 
 	return SV_movestep(ent, move, true);
 }
-qboolean ai_checkattack (edict_t *self, float dist); // FS: Zaero specific
+qboolean ai_checkattack (edict_t *self, float dist); /* FS: Zaero specific game dll changes */
 /*
 ====================
 M_MoveAwayFromFlare
 ====================
 */
-qboolean M_MoveAwayFromFlare(edict_t *self, float dist) // FS: Zaero specific
+qboolean M_MoveAwayFromFlare(edict_t *self, float dist) /* FS: Zaero specific game dll changes */
 {
 	edict_t *e = NULL;
 	edict_t *goal = NULL;

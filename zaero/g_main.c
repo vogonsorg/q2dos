@@ -16,7 +16,7 @@ edict_t		*g_edicts;
 cvar_t	*deathmatch;
 cvar_t	*coop;
 cvar_t	*dmflags;
-cvar_t	*zdmflags; // FS: Zaero specific
+cvar_t	*zdmflags; /* FS: Zaero specific game dll changes */
 cvar_t	*skill;
 cvar_t	*fraglimit;
 cvar_t	*timelimit;
@@ -211,7 +211,7 @@ EndDMLevel
 The timelimit or fraglimit has been exceeded
 =================
 */
-void EndDMLevel (void) // FS: FIXME Zaero changes
+void EndDMLevel (void) /* FS: FIXME Zaero changes */
 {
 	edict_t		*ent;
 
@@ -221,14 +221,14 @@ void EndDMLevel (void) // FS: FIXME Zaero changes
 		ent = G_Spawn ();
 		ent->classname = "target_changelevel";
 		ent->map = level.mapname;
-		ent->spawnflags2 = 0; // FS: Zaero specific
+		ent->spawnflags2 = 0; /* FS: Zaero specific game dll changes */
 	}
 	else if (level.nextmap[0])
 	{	// go to a specific map
 		ent = G_Spawn ();
 		ent->classname = "target_changelevel";
 		ent->map = level.nextmap;
-		ent->spawnflags2 = 0; // FS: Zaero specific
+		ent->spawnflags2 = 0; /* FS: Zaero specific game dll changes */
 	}
 	else
 	{	// search for a changeleve
@@ -239,7 +239,7 @@ void EndDMLevel (void) // FS: FIXME Zaero changes
 			ent = G_Spawn ();
 			ent->classname = "target_changelevel";
 			ent->map = level.mapname;
-			ent->spawnflags2 = 0; // FS: Zaero specific
+			ent->spawnflags2 = 0; /* FS: Zaero specific game dll changes */
 		}
 	}
 
@@ -361,9 +361,9 @@ void ExitLevel (void)
 			ent->health = ent->client->pers.max_health;
 		}
 	}
-	level.fadeFrames = 0; // FS: Zaero specific
-	level.exitintermission = 0; // FS: Zaero specific, moved after changemap = NULL
-	level.intermissiontime = 0; // FS: Zaero specific, moved after changemap = NULL
+	level.fadeFrames = 0; /* FS: Zaero specific game dll changes */
+	level.exitintermission = 0; /* FS: Zaero specific game dll changes: moved after changemap = NULL */
+	level.intermissiontime = 0; /* FS: Zaero specific game dll changes: moved after changemap = NULL */
 }
 
 /*
@@ -386,7 +386,7 @@ void G_RunFrame (void)
 
 	// exit intermissions
 
-	if (level.fadeFrames > 1) // FS: Zaero specific
+	if (level.fadeFrames > 1) /* FS: Zaero specific game dll changes */
 	{
 		level.fadeFrames--;
 	}
@@ -410,7 +410,7 @@ void G_RunFrame (void)
 
 		level.current_entity = ent;
 
-	    if(!(ent->flags & FL_DONTSETOLDORIGIN)) // FS: Zaero specific
+	    if(!(ent->flags & FL_DONTSETOLDORIGIN)) /* FS: Zaero specific game dll changes */
 		{
 			VectorCopy (ent->s.origin, ent->s.old_origin);
 		}

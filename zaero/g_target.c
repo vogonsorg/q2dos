@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 #include "g_local.h"
 
-#define EMP_STYLE	1 // FS: Zaero specific
+#define EMP_STYLE	1 /* FS: Zaero specific game dll changes */
 
 /*
  * QUAKED target_temp_entity (1 0 0) (-8 -8 -8) (8 8 8)
@@ -342,7 +342,7 @@ Spawns an explosion temporary entity when used.
 "dmg"		how much radius damage should be done, defaults to 0
 */
 
-void target_explosion_explode_think(edict_t *self) // FS: Zaero specific
+void target_explosion_explode_think(edict_t *self) /* FS: Zaero specific game dll changes */
 {
 	if (!self)
 	{
@@ -372,7 +372,7 @@ target_explosion_explode (edict_t *self)
 		return;
 	}
 
-	if (self->spawnflags & EMP_STYLE) // FS: Zaero specific
+	if (self->spawnflags & EMP_STYLE) /* FS: Zaero specific game dll changes */
 	{
 		// play the sound
 		gi.positioned_sound(self->s.origin, self, CHAN_AUTO, gi.soundindex("weapons/a2k/ak_exp01.wav"), 1, ATTN_NORM, 0);
@@ -612,14 +612,14 @@ use_target_spawner(edict_t *self, edict_t *other /* unused */, edict_t *activato
 	VectorCopy(self->s.angles, ent->s.angles);
 	ED_CallSpawn(ent);
 	gi.unlinkentity(ent);
-	MonsterKillBox (ent); // FS: Zaero specific
+	MonsterKillBox (ent); /* FS: Zaero specific game dll changes */
 	gi.linkentity (ent);
 
 	if (self->speed)
 	{
 		VectorCopy (self->movedir, ent->velocity);
 	}
-	MonsterPlayerKillBox (ent); // FS: Zaero specific
+	MonsterPlayerKillBox (ent); /* FS: Zaero specific game dll changes */
 }
 
 void
@@ -670,7 +670,7 @@ use_target_blaster(edict_t *self, edict_t *other /* unused */, edict_t *activato
 		return;
 	}
 
-	if(EMPNukeCheck(self, self->s.origin)) // FS: Zaero specific
+	if(EMPNukeCheck(self, self->s.origin)) /* FS: Zaero specific game dll changes */
 	{
 		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
 		return;

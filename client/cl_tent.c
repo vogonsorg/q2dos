@@ -1383,7 +1383,7 @@ void CL_AddPlayerBeams (void)
 	float		yaw, pitch;
 	float		forward;
 	float		len, steps;
-	int			framenum = 0; // FS: Compiler warning
+	int			framenum = 0; /* FS: Compiler warning */
 	float		model_length;
 	
 	float		hand_multiplier;
@@ -1701,7 +1701,7 @@ void CL_AddExplosions (void)
 			ent->skinnum = 0;
 			ent->flags |= RF_TRANSLUCENT;
 			break;
-		case ex_free: // FS: Compiler warning
+		case ex_free: /* FS: Compiler warning */
 		case ex_explosion:
 			break;
 		}

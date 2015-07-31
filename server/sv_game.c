@@ -81,7 +81,7 @@ void PF_dprintf (unsigned long developerFlags, char *fmt, ...)
 
 	devValue = (unsigned long)developer->value;
 
-	if (developer->value == 1) // FS: Show all except extremely verbose shit
+	if (developer->value == 1) /* FS: Show all except extremely verbose shit */
 		devValue = 65534;
 
 	if (!(devValue & developerFlags))

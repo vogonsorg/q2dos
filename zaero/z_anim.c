@@ -1,4 +1,4 @@
-#if defined(_DEBUG) && defined(_Z_TESTMODE) // FS: Unused/unneeded
+#if defined(_DEBUG) && defined(_Z_TESTMODE) /* FS: Unused/unneeded */
 
 #include "g_local.h"
 

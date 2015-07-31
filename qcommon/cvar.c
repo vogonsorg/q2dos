@@ -151,8 +151,8 @@ cvar_t *Cvar_Get (char *var_name, char *var_value, int flags)
 		// Knightmare- change default value if this is called again
 		Z_Free(var->defaultValue);
 		var->defaultValue = CopyString(var_value);
-		var->defaultFlags |= flags; // FS: Ditto
-		
+		var->defaultFlags |= flags; /* FS: Ditto */
+
 		return var;
 	}
 
@@ -173,10 +173,10 @@ cvar_t *Cvar_Get (char *var_name, char *var_value, int flags)
 	var->string = CopyString (var_value);
 	var->modified = true;
 	var->value = atof (var->string);
-	var->intValue = atoi(var->string); // FS: So we don't need to cast shit all the time
-	var->defaultValue = CopyString(var_value); // FS: Find out what it was initially
-	var->defaultFlags = flags; // FS: Default flags for resetcvar
-	var->description = NULL; // FS: Init it first, d'oh
+	var->intValue = atoi(var->string); /* FS: So we don't need to cast shit all the time */
+	var->defaultValue = CopyString(var_value); /* FS: Find out what it was initially */
+	var->defaultFlags = flags; /* FS: Default flags for resetcvar */
+	var->description = NULL; /* FS: Init it first, d'oh */
 
 	// link the variable in
 	var->next = cvar_vars;
@@ -242,13 +242,13 @@ cvar_t *Cvar_Set2 (char *var_name, char *value, qboolean force)
 			{
 				var->string = CopyString(value);
 				var->value = atof (var->string);
-				var->intValue = atoi(var->string); // FS: So we don't need to cast shit all the time
+				var->intValue = atoi(var->string); /* FS: So we don't need to cast shit all the time */
 
 				if (!strcmp(var->name, "game"))
 				{
 					FS_SetGamedir (var->string);
 					FS_ExecAutoexec ();
-					Cbuf_AddText ("exec q2dos.cfg\n"); // FS: If we switch game modes dynamically load that dirs config
+					Cbuf_AddText ("exec q2dos.cfg\n"); /* FS: If we switch game modes dynamically load that dirs config */
 				}
 			}
 			return var;
@@ -275,7 +275,7 @@ cvar_t *Cvar_Set2 (char *var_name, char *value, qboolean force)
 
 	var->string = CopyString(value);
 	var->value = atof (var->string);
-	var->intValue = atoi(var->string); // FS: So we don't need to cast shit all the time
+	var->intValue = atoi(var->string); /* FS: So we don't need to cast shit all the time */
 
 	return var;
 }
@@ -324,7 +324,7 @@ cvar_t *Cvar_FullSet (char *var_name, char *value, int flags)
 
 	var->string = CopyString(value);
 	var->value = atof (var->string);
-	var->intValue = atoi(var->string); // FS: So we don't need to cast shit all the time
+	var->intValue = atoi(var->string); /* FS: So we don't need to cast shit all the time */
 	var->flags = flags;
 
 	return var;
@@ -366,7 +366,7 @@ void Cvar_GetLatchedVars (void)
 		var->string = var->latched_string;
 		var->latched_string = NULL;
 		var->value = atof(var->string);
-		var->intValue = atoi(var->string); // FS: So we don't need to cast shit all the time
+		var->intValue = atoi(var->string); /* FS: So we don't need to cast shit all the time */
 		if (!strcmp(var->name, "game"))
 		{
 			FS_SetGamedir (var->string);
@@ -392,7 +392,7 @@ qboolean Cvar_Command (void)
 	if (!v)
 		return false;
 
-	if (!strcmp(v->name, "developer") && con_show_dev_flags->intValue) // FS: Special case for showing enabled flags
+	if (!strcmp(v->name, "developer") && con_show_dev_flags->intValue) /* FS: Special case for showing enabled flags */
 	{
 		if(strlen(Cmd_Argv(1)) > 0)
 			Cvar_Set(developer->name, Cmd_Argv(1));
@@ -408,8 +408,8 @@ qboolean Cvar_Command (void)
 		else
 			Com_Printf ("\"%s\" is \"%s\", Default: \"%s\"\n", v->name, v->string, v->defaultValue);
 
-		// FS: cvar descriptions
-		// FS: Always show it for con_show_description so we know what it does
+		/* FS: cvar descriptions */
+		/* FS: Always show it for con_show_description so we know what it does */
 		if (v->description) {
 		    if (con_show_description->intValue || v == con_show_description)
 			Com_Printf("Description: %s\n", v->description);
@@ -495,15 +495,15 @@ Cvar_List_f
 void Cvar_List_f (void)
 {
 	cvar_t	*var;
-	qboolean endReached = false; // FS: For the filter
-	qboolean endIsAMatch = false; // FS: For the filter
+	qboolean endReached = false; /* FS: For the filter */
+	qboolean endIsAMatch = false; /* FS: For the filter */
 	int		i;
 
 	i = 0;
 
 	for (var = cvar_vars ; var ; var = var->next, i++)
 	{
-		// FS: Filter it
+		/* FS: Filter it */
 		if(Cmd_Argc() > 1)
 		{
 			if (i == 0)
@@ -516,7 +516,7 @@ void Cvar_List_f (void)
 
 			if(!var->next)
 			{
-				if(strstr(var->name, Cmd_Argv(1))) // FS: The last one in the search actually matches, so don't break out
+				if(strstr(var->name, Cmd_Argv(1))) /* FS: The last one in the search actually matches, so don't break out */
 				{
 					endIsAMatch = true;
 				}
@@ -525,7 +525,7 @@ void Cvar_List_f (void)
 			}
 		}
 
-		if(endReached && !endIsAMatch) // FS: We're at the end, and it's not a match to the filter so bust out.
+		if(endReached && !endIsAMatch) /* FS: We're at the end, and it's not a match to the filter so bust out. */
 		{
 			break;
 		}
@@ -553,13 +553,12 @@ void Cvar_List_f (void)
 		else
 			Com_Printf (" ");
 
-//		Com_Printf (" %s \"%s\"\n", var->name, var->string);
 		if ( (var->flags & CVAR_LATCH) && var->latched_string)
 			Com_Printf ("\"%s\" is \"%s\", Default: \"%s\", Latched to: \"%s\"\n", var->name, var->string, var->defaultValue, var->latched_string);
 		else
 			Com_Printf (" %s \"%s\", Default: \"%s\"\n", var->name, var->string, var->defaultValue);
 	}
-	Com_Printf("Legend: * Archive. U Userinfo. S Serverinfo. - Write Protected. L Latched. D Containts a Help Description.\n"); // FS: Added a legend
+	Com_Printf("Legend: * Archive. U Userinfo. S Serverinfo. - Write Protected. L Latched. D Containts a Help Description.\n"); /* FS: Added a legend */
 	Com_Printf ("%i cvars\n", i);
 }
 
@@ -615,7 +614,7 @@ void Cvar_Init (void)
 	Cmd_AddCommand ("resetcvar", Cvar_Reset_f); /* FS */
 }
 
-static cvar_t *Cvar_IsNoset (const char *var_name) // FS: Make sure this isn't a NOSET CVAR!
+static cvar_t *Cvar_IsNoset (const char *var_name) /* FS: Make sure this isn't a NOSET CVAR! */
 {
 	cvar_t	*var;
 	
@@ -635,14 +634,14 @@ static cvar_t *Cvar_IsNoset (const char *var_name) // FS: Make sure this isn't a
 	return NULL;
 }
 
-void Cvar_Toggle_f (void) // FS
+void Cvar_Toggle_f (void) /* FS: Added */
 {
 	if(Cmd_Argc() == 2 && Cmd_Argv(1))
 	{
 		char *cvar_name = Cmd_Argv(1);
 		float cur_value;
 
-		if (cvar_name == NULL || cvar_name[0] == '\0' || Cvar_FindVar(cvar_name) == NULL) // FS: Check for NULL sillies
+		if (cvar_name == NULL || cvar_name[0] == '\0' || Cvar_FindVar(cvar_name) == NULL) /* FS: Check for NULL sillies */
 		{
 			Com_Printf("%s not found!\n", Cmd_Argv(1));
 			return;
@@ -672,23 +671,21 @@ void Cvar_Toggle_f (void) // FS
 	}
 }
 
-void Cvar_Force_f (void) // FS
+void Cvar_Force_f (void) /* FS: Added */
 {
 	if(Cmd_Argc() == 3 && Cmd_Argv(1))
 	{
 		char *cvar_name = Cmd_Argv(1);
 		char *cvar_value;
 
-		if (cvar_name == NULL || cvar_name[0] == '\0' || Cvar_FindVar(cvar_name) == NULL) // FS: Check for NULL sillies
+		if (cvar_name == NULL || cvar_name[0] == '\0' || Cvar_FindVar(cvar_name) == NULL) /* FS: Check for NULL sillies */
 		{
 			Com_Printf("%s not found!\n", Cmd_Argv(1));
 			return;
 		}
 
 		// Knightmare 2/24/13- prevent dedicated from being changed!
-		// FS: sv_rcon_banned_commands too!
-		// FS: and version too.
-		// FS: Consolidated all of these into a special function because resetcvar bans them too
+		/* FS: Consolidated all of these into a special function because resetcvar bans them too */
 		if (Cvar_Never_Reset_Cmds(cvar_name))
 		{
 			Com_Printf("Error: %s cannot be changed from console!\n", cvar_name);

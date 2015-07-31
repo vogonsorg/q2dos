@@ -42,7 +42,7 @@ qboolean	menubound[256];	// if true, can't be rebound while in menu
 int		keyshift[256];		// key to map to if shift held down in console
 int		key_repeats[256];	// if > 1, it is autorepeating
 qboolean	keydown[256];
-extern char *Sort_Possible_Cmds (char *partial); // FS
+extern char *Sort_Possible_Cmds (char *partial); /* FS: Added */
 
 typedef struct
 {
@@ -165,12 +165,12 @@ keyname_t keynames[] =
 void CompleteCommand (void)
 {
 	char	*cmd, *s;
-	extern	cvar_t	*console_old_complete; // FS
+	extern	cvar_t	*console_old_complete; /* FS */
 
 	s = key_lines[edit_line]+1;
 	if (*s == '\\' || *s == '/')
 		s++;
-	if (console_old_complete->value)
+	if (console_old_complete->intValue)
 	{
 		cmd = Cmd_CompleteCommand (s);
 		if (!cmd)
@@ -178,7 +178,7 @@ void CompleteCommand (void)
 	}
 	else
 	{
-		cmd = Sort_Possible_Cmds(s); // FS: Show us all possible commands if it's a partial
+		cmd = Sort_Possible_Cmds(s); /* FS: Show us all possible commands if it's a partial */
 	}
 
 	if (cmd)
@@ -274,7 +274,7 @@ void Key_Console (int key)
 	}
 
 #ifdef GAMESPY
-	if( key == 'c' ) // FS: Added
+	if( key == 'c' ) /* FS: Added */
 	{
 		if ( keydown[K_CTRL] )
 		{
@@ -301,7 +301,7 @@ void Key_Console (int key)
 		}
 	}
 
-	if( key == 'r' ) // FS: Wanted this
+	if( key == 'r' ) /* FS: Added */
 	{
 		if ( keydown[K_CTRL] )
 		{
@@ -424,14 +424,14 @@ void Key_Console (int key)
 //============================================================================
 
 #define MAX_CHAT 32
-#define MAX_NETNAME_WITH_APPEND 29 // FS: What will be trimmed because after it's sent it could be "[MAX_NETNAMELENGTH] whispers: <your text>"
-#define MAX_CHAT_TEXT 149 // FS: Magic number from Physics.dll handling it
+#define MAX_NETNAME_WITH_APPEND 29 /* FS: What will be trimmed because after it's sent it could be "[MAX_NETNAMELENGTH] whispers: <your text>" */
+#define MAX_CHAT_TEXT 149 /* FS: Magic number from game DLL handling it */
 qboolean	chat_team;
 char		chat_buffer[MAX_CHAT_TEXT-MAX_NETNAME_WITH_APPEND];
 
-char		chat_buffer_array[MAX_CHAT][MAX_CHAT_TEXT-MAX_NETNAME_WITH_APPEND]; // FS: Chat history
-int			chat_head = 0, chat_tail = 0; // FS: Chat history
-int			chat_index = 0; // FS: Chat history
+char		chat_buffer_array[MAX_CHAT][MAX_CHAT_TEXT-MAX_NETNAME_WITH_APPEND]; /* FS: Chat history */
+int			chat_head = 0, chat_tail = 0; /* FS: Chat history */
+int			chat_index = 0; /* FS: Chat history */
 int			chat_bufferlen = 0;
 
 void Key_Message (int key)
@@ -461,7 +461,7 @@ void Key_Message (int key)
 		return;
 	}
 
-	if (key == K_UPARROW || key == K_RIGHTARROW) // FS: Press up to cycle up the index to the first chat msg
+	if (key == K_UPARROW || key == K_RIGHTARROW) /* FS: Press up to cycle up the index to the first chat msg */
 	{
 		cls.key_dest = key_message;
 
@@ -475,7 +475,7 @@ void Key_Message (int key)
 		return;
 	}
 
-	if (key == K_DOWNARROW || key == K_LEFTARROW) // FS: Press down to cycle down the index to the last chat msg
+	if (key == K_DOWNARROW || key == K_LEFTARROW) /* FS: Press down to cycle down the index to the last chat msg */
 	{
 		cls.key_dest = key_message;
 		
@@ -490,7 +490,7 @@ void Key_Message (int key)
 	if (key == K_ESCAPE)
 	{
 		cls.key_dest = key_game;
-		chat_index = chat_head; // FS: Reset to the beginning of the chat history
+		chat_index = chat_head; /* FS: Reset to the beginning of the chat history */
 		chat_bufferlen = 0;
 		chat_buffer[0] = 0;
 		return;
@@ -870,7 +870,7 @@ void Key_Event (int key, qboolean down, double time)
 	}
 
 
-	if (key == 'q') // FS: Instant quit
+	if (key == 'q') /* FS: Instant quit */
 	{
 		if (keydown[K_CTRL])
 		{
@@ -879,7 +879,7 @@ void Key_Event (int key, qboolean down, double time)
 		}
 	}
 
-	if (keydown [K_F4]) // FS: Instant quit
+	if (keydown [K_F4]) /* FS: Instant quit */
 	{
 		if (keydown[K_ALT])
 		{
@@ -947,7 +947,7 @@ void Key_Event (int key, qboolean down, double time)
 		kb = keybindings[key];
 		if (kb && kb[0] == '+')
 		{
-			Com_sprintf (cmd, sizeof(cmd), "-%s %i %f\n", kb+1, key, time); // FS: Precision error from double conversion.  Watch this
+			Com_sprintf (cmd, sizeof(cmd), "-%s %i %f\n", kb+1, key, time);
 			Cbuf_AddText (cmd);
 		}
 		if (keyshift[key] != key)
@@ -955,7 +955,7 @@ void Key_Event (int key, qboolean down, double time)
 			kb = keybindings[keyshift[key]];
 			if (kb && kb[0] == '+')
 			{
-				Com_sprintf (cmd, sizeof(cmd), "-%s %i %f\n", kb+1, key, time); // FS: Precision error from double conversion.  Watch this
+				Com_sprintf (cmd, sizeof(cmd), "-%s %i %f\n", kb+1, key, time);
 				Cbuf_AddText (cmd);
 			}
 		}
@@ -974,7 +974,7 @@ void Key_Event (int key, qboolean down, double time)
 		{
 			if (kb[0] == '+')
 			{	// button commands add keynum and time as a parm
-				Com_sprintf (cmd, sizeof(cmd), "%s %i %f\n", kb, key, time); // FS: Precision error from double conversion.  Watch this
+				Com_sprintf (cmd, sizeof(cmd), "%s %i %f\n", kb, key, time);
 				Cbuf_AddText (cmd);
 			}
 			else

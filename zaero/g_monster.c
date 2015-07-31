@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "g_local.h"
 
 void monster_start_go(edict_t *self);
-qboolean FindTarget (edict_t *self); // FS: Zaero specific
+qboolean FindTarget (edict_t *self); /* FS: Zaero specific game dll changes */
 
 /* Monster weapons */
 
@@ -33,7 +33,7 @@ monster_fire_bullet(edict_t *self, vec3_t start, vec3_t dir, int damage,
 		return;
 	}
 
-	ANIM_AIM(self, dir); // FS: Zaero specific
+	ANIM_AIM(self, dir); /* FS: Zaero specific game dll changes */
 	fire_bullet (self, start, dir, damage, kick, hspread, vspread, MOD_UNKNOWN);
 
 	gi.WriteByte (svc_muzzleflash2);
@@ -51,7 +51,7 @@ monster_fire_shotgun(edict_t *self, vec3_t start, vec3_t aimdir, int damage,
 		return;
 	}
 
-	ANIM_AIM(self, aimdir); // FS: Zaero specific
+	ANIM_AIM(self, aimdir); /* FS: Zaero specific game dll changes */
 	fire_shotgun (self, start, aimdir, damage, kick, hspread, vspread, count, MOD_UNKNOWN);
 
 	gi.WriteByte (svc_muzzleflash2);
@@ -69,13 +69,13 @@ monster_fire_blaster(edict_t *self, vec3_t start, vec3_t dir, int damage,
 		return;
 	}
 
-	if(EMPNukeCheck(self, start)) // FS: Zaero specific
+	if(EMPNukeCheck(self, start)) /* FS: Zaero specific game dll changes */
 	{
 		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
 		return;
 	}
 
-	ANIM_AIM(self, dir); // FS: Zaero specific
+	ANIM_AIM(self, dir); /* FS: Zaero specific game dll changes */
 	fire_blaster (self, start, dir, damage, speed, effect, false);
 
 	gi.WriteByte (svc_muzzleflash2);
@@ -93,7 +93,7 @@ monster_fire_grenade(edict_t *self, vec3_t start, vec3_t aimdir,
 		return;
 	}
 
-	ANIM_AIM(self, aimdir); // FS: Zaero specific
+	ANIM_AIM(self, aimdir); /* FS: Zaero specific game dll changes */
 	fire_grenade (self, start, aimdir, damage, speed, 2.5, damage+40);
 
 	gi.WriteByte (svc_muzzleflash2);
@@ -111,13 +111,13 @@ monster_fire_rocket(edict_t *self, vec3_t start, vec3_t dir,
 		return;
 	}
 
-	if(EMPNukeCheck(self, start)) // FS: Zaero specific
+	if(EMPNukeCheck(self, start)) /* FS: Zaero specific game dll changes */
 	{
 		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
 		return;
 	}
 
-	ANIM_AIM(self, dir); // FS: Zaero specific
+	ANIM_AIM(self, dir); /* FS: Zaero specific game dll changes */
 	fire_rocket (self, start, dir, damage, speed, damage+20, damage);
 
 	gi.WriteByte (svc_muzzleflash2);
@@ -135,13 +135,13 @@ monster_fire_railgun(edict_t *self, vec3_t start, vec3_t aimdir,
 		return;
 	}
 
-	if(EMPNukeCheck(self, start)) // FS: Zaero specific
+	if(EMPNukeCheck(self, start)) /* FS: Zaero specific game dll changes */
 	{
 		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
 		return;
 	}
 
-	ANIM_AIM(self, aimdir); // FS: Zaero specific
+	ANIM_AIM(self, aimdir); /* FS: Zaero specific game dll changes */
 	fire_rail (self, start, aimdir, damage, kick);
 
 	gi.WriteByte (svc_muzzleflash2);
@@ -160,13 +160,13 @@ monster_fire_bfg(edict_t *self, vec3_t start, vec3_t aimdir,
 		return;
 	}
 
-	if(EMPNukeCheck(self, start)) // FS: Zaero specific
+	if(EMPNukeCheck(self, start)) /* FS: Zaero specific game dll changes */
 	{
 		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
 		return;
 	}
 
-	ANIM_AIM(self, aimdir); // FS: Zaero specific
+	ANIM_AIM(self, aimdir); /* FS: Zaero specific game dll changes */
 	fire_bfg (self, start, aimdir, damage, speed, damage_radius);
 
 	gi.WriteByte (svc_muzzleflash2);
@@ -546,7 +546,7 @@ M_MoveFrame(edict_t *self)
 	self->nextthink = level.time + FRAMETIME;
 
 	// otherwise, move normally
-	move = self->monsterinfo.currentmove; // FS: Zaero specific, moved after nexthink
+	move = self->monsterinfo.currentmove; /* FS: Zaero specific game dll changes: moved after nexthink */
 	
 	if ((self->monsterinfo.nextframe) &&
 		(self->monsterinfo.nextframe >= move->firstframe) &&
@@ -636,7 +636,7 @@ monster_think(edict_t *self)
 	M_SetEffects(self);
 
 	// decrease blindness
-	if (self->monsterinfo.flashTime > 0) // FS: Zaero specific
+	if (self->monsterinfo.flashTime > 0) /* FS: Zaero specific game dll changes */
 	{
 		self->monsterinfo.flashTime--;
 	}
@@ -710,8 +710,8 @@ monster_triggered_spawn(edict_t *self)
 
 	// some sort of spawn effect
 	// TODO good enough?
-	self->s.event = EV_PLAYER_TELEPORT; // FS: Zaero specific
-	MonsterPlayerKillBox(self); // FS: Zaero specific
+	self->s.event = EV_PLAYER_TELEPORT; /* FS: Zaero specific game dll changes */
+	MonsterPlayerKillBox(self); /* FS: Zaero specific game dll changes */
 }
 
 void
@@ -808,7 +808,7 @@ monster_start(edict_t *self)
 
 	if (!(self->monsterinfo.aiflags & AI_GOOD_GUY))
 	{
-		if(!(self->spawnflags & 16)) // FS: Zaero specific
+		if(!(self->spawnflags & 16)) /* FS: Zaero specific game dll changes */
 		{
 			level.total_monsters++;
 		}

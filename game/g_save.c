@@ -94,7 +94,7 @@
  #define OS "Linux"
 #elif defined(_WIN32)
  #define OS "Windows"
-#elif defined(__DJGPP__) // FS: Added
+#elif defined(__DJGPP__) /* FS: Added */
  #define OS "MS-DOS"
 #else
  #define OS "Unknown"

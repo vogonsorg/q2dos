@@ -94,7 +94,7 @@ void Netchan_Init (void)
 
 	// pick a port value that should be nice and random
 #ifdef __DJGPP__
-	port = Sys_LinuxTime() & 0xffff; // FS: DOS counter doesn't work with this
+	port = Sys_LinuxTime() & 0xffff; /* FS: DOS counter doesn't work with this */
 #else
 	port = (int)Sys_Milliseconds() & 0xffff;
 #endif
@@ -314,7 +314,7 @@ qboolean Netchan_Process (netchan_t *chan, sizebuf_t *msg)
 //		qport = MSG_ReadShort (msg);
 
 	/* read the qport if we are a server */
-	if (chan->sock == NS_SERVER) // fS: From yamagi q2
+	if (chan->sock == NS_SERVER) /* FS: From yamagi q2 */
 	{
 		(void)MSG_ReadShort(msg);
 	}

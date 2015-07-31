@@ -27,7 +27,7 @@ cvar_t		*con_notifytime;
 
 
 #define		MAXCMDLINE	256
-#define		CONWIDTH_AT_640X480	78 // FS
+#define		CONWIDTH_AT_640X480	78 /* FS: Added */
 
 extern	char	key_lines[32][MAXCMDLINE];
 extern	int		edit_line;
@@ -459,7 +459,7 @@ The input line scrolls horizontally if typing goes beyond the right edge
 */
 void Con_DrawInput (void)
 {
-//	int		y; // FS: Unused
+	int		y;
 	int		i;
 	char	*text;
 	int		clsrealtime;
@@ -484,10 +484,10 @@ void Con_DrawInput (void)
 		text += 1 + key_linepos - con.linewidth;
 		
 // draw it
-//	y = con.vislines-16;
+	y = con.vislines-22;
 
 	for (i=0 ; i<con.linewidth ; i++)
-		re.DrawChar ( (i+1)<<3, con.vislines - 22, text[i]);
+		re.DrawChar ( (i+1)<<3, y, text[i]);
 
 // remove cursor
 	key_lines[edit_line][key_linepos] = 0;
@@ -741,7 +741,7 @@ void Con_DrawConsole (float frac)
 //ZOID
 
 #ifdef GAMESPY
-	if (cls.gamespyupdate) // FS: For gamespy server list
+	if (cls.gamespyupdate) /* FS: For gamespy server list */
 	{
 		text = "Gamespy";
 

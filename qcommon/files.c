@@ -215,22 +215,16 @@ void FS_FCloseFile (FILE *f)
 
 // RAFAEL
 /*
-	Developer_searchpath
+=================
+Developer_searchpath
+
+Reports if the current game is xatrix or rogue for some game specific hacks on the client-side
+=================
 */
 int	Developer_searchpath (int who)
 {
-	
-//	int		ch; // FS: Unused
-	// PMM - warning removal
-//	char	*start;
 	searchpath_t	*search;
 
-/*	
-	if (who == 1) // xatrix
-		ch = 'x';
-	else if (who == 2)
-		ch = 'r';
-*/
 	for (search = fs_searchpaths ; search ; search = search->next)
 	{
 		if (strstr (search->filename, "xatrix"))
@@ -238,15 +232,6 @@ int	Developer_searchpath (int who)
 
 		if (strstr (search->filename, "rogue"))
 			return 2;
-/*
-		start = strchr (search->filename, ch);
-
-		if (start == NULL)
-			continue;
-
-		if (strcmp (start ,"xatrix") == 0)
-			return (1);
-*/
 	}
 	return (0);
 
@@ -809,7 +794,7 @@ pack_t *FS_LoadPackFile (char *packfile)
 FS_LocalFileExists
 ================
 */
-// FS: From KMQ2
+/* FS: From KMQ2 */
 qboolean FS_LocalFileExists (char *path)
 {
 	char		realPath[MAX_OSPATH];
@@ -831,7 +816,7 @@ FS_AddPAKFile
 Adds a Pak file to the searchpath
 =================
 */
-// FS: From KMQ2
+/* FS: From KMQ2 */
 void FS_AddPAKFile (const char *packPath)
 {
 	searchpath_t	*search;

@@ -47,7 +47,7 @@ int	combat_armor_index;
 int	body_armor_index;
 int	power_screen_index;
 int	power_shield_index;
-// FS: Knightmare added indexes
+// Knightmare-- added indexes
 int	jacket_armor_index;
 int	combat_armor_index;
 int	body_armor_index;
@@ -62,22 +62,22 @@ int	tbombs_index;
 int	empnuke_index;
 int	plasmashield_index;
 int	a2k_index;
-// FS: Knightmare end
+// Knightmare-- end
 
 void Use_Quad (edict_t *ent, gitem_t *item);
 static int	quad_drop_timeout_hack;
 
 // *** Zaero prototypes ***
 
-void Weapon_FlareGun (edict_t *ent); // FS: Zaero specific
-void Weapon_SniperRifle(edict_t *ent); // FS: Zaero specific
-void Weapon_LaserTripBomb(edict_t *ent); // FS: Zaero specific
-void Weapon_SonicCannon (edict_t *ent); // FS: Zaero specific
-void Weapon_EMPNuke (edict_t *ent); // FS: Zaero specific
-void Weapon_A2k (edict_t *ent); // FS: Zaero specific
-void Use_Visor (edict_t *ent, gitem_t *item); // FS: Zaero specific
-void Action_Push(edict_t *ent); // FS: Zaero specific
-void Use_PlasmaShield (edict_t *ent, gitem_t *item); // FS: Zaero specific
+void Weapon_FlareGun (edict_t *ent); /* FS: Zaero specific game dll changes */
+void Weapon_SniperRifle(edict_t *ent); /* FS: Zaero specific game dll changes */
+void Weapon_LaserTripBomb(edict_t *ent); /* FS: Zaero specific game dll changes */
+void Weapon_SonicCannon (edict_t *ent); /* FS: Zaero specific game dll changes */
+void Weapon_EMPNuke (edict_t *ent); /* FS: Zaero specific game dll changes */
+void Weapon_A2k (edict_t *ent); /* FS: Zaero specific game dll changes */
+void Use_Visor (edict_t *ent, gitem_t *item); /* FS: Zaero specific game dll changes */
+void Action_Push(edict_t *ent); /* FS: Zaero specific game dll changes */
+void Use_PlasmaShield (edict_t *ent, gitem_t *item); /* FS: Zaero specific game dll changes */
 
 
 /* ====================================================================== */
@@ -152,7 +152,7 @@ FindItem(char *pickup_name)
 	return NULL;
 }
 
-void precacheAllItems() // FS: Zaero specific
+void precacheAllItems() /* FS: Zaero specific game dll changes */
 {
 	int		i;
 	gitem_t	*it;
@@ -436,22 +436,22 @@ Pickup_Pack(edict_t *ent, edict_t *other)
 		other->client->pers.max_slugs = 100;
 	}
 
-	if (other->client->pers.max_tbombs < 100) // FS: Zaero specific
+	if (other->client->pers.max_tbombs < 100) /* FS: Zaero specific game dll changes */
 	{
 		other->client->pers.max_tbombs = 100;
 	}
 
-	if (other->client->pers.max_a2k < 1) // FS: Zaero specific
+	if (other->client->pers.max_a2k < 1) /* FS: Zaero specific game dll changes */
 	{
 		other->client->pers.max_a2k = 1;
 	}
 
-	if (other->client->pers.max_empnuke < 100) // FS: Zaero specific
+	if (other->client->pers.max_empnuke < 100) /* FS: Zaero specific game dll changes */
 	{
 		other->client->pers.max_empnuke = 100;
 	}
 
-	if (other->client->pers.max_plasmashield < 40) // FS: Zaero specific
+	if (other->client->pers.max_plasmashield < 40) /* FS: Zaero specific game dll changes */
 	{
 		other->client->pers.max_plasmashield =40;
 	}
@@ -545,7 +545,7 @@ Pickup_Pack(edict_t *ent, edict_t *other)
 		}
 	}
 
-	item = FindItem("IRED"); // FS: Zaero specific
+	item = FindItem("IRED"); /* FS: Zaero specific game dll changes */
 	if (item)
 	{
 		index = ITEM_INDEX(item);
@@ -558,7 +558,7 @@ Pickup_Pack(edict_t *ent, edict_t *other)
 		}
 	}
 
-	item = FindItem("A2k"); // FS: Zaero specific
+	item = FindItem("A2k"); /* FS: Zaero specific game dll changes */
 	if (item)
 	{
 		index = ITEM_INDEX(item);
@@ -567,7 +567,7 @@ Pickup_Pack(edict_t *ent, edict_t *other)
 			other->client->pers.inventory[index] = other->client->pers.max_a2k;
 	}
 
-	item = FindItem("EMPNuke"); // FS: Zaero specific
+	item = FindItem("EMPNuke"); /* FS: Zaero specific game dll changes */
 	if (item)
 	{
 		index = ITEM_INDEX(item);
@@ -576,7 +576,7 @@ Pickup_Pack(edict_t *ent, edict_t *other)
 			other->client->pers.inventory[index] = other->client->pers.max_empnuke;
 	}
 
-	item = FindItem("Plasma Shield"); // FS: Zaero specific
+	item = FindItem("Plasma Shield"); /* FS: Zaero specific game dll changes */
 	if (item)
 	{
 		index = ITEM_INDEX(item);
@@ -800,23 +800,23 @@ Add_Ammo(edict_t *ent, gitem_t *item, int count)
 		max = ent->client->pers.max_slugs;
 	}
 // [evolve
-	else if (item->tag == AMMO_LASERTRIPBOMB) // FS: Zaero specific
+	else if (item->tag == AMMO_LASERTRIPBOMB) /* FS: Zaero specific game dll changes */
 	{
 		max = ent->client->pers.max_tbombs;
 	}
-	else if (item->tag == AMMO_FLARES) // FS: Zaero specific
+	else if (item->tag == AMMO_FLARES) /* FS: Zaero specific game dll changes */
 	{
 		max = ent->client->pers.max_flares;
 	}
-	else if (item->tag == AMMO_EMPNUKE) // FS: Zaero specific
+	else if (item->tag == AMMO_EMPNUKE) /* FS: Zaero specific game dll changes */
 	{
 		max = ent->client->pers.max_empnuke;
 	}
-	else if (item->tag == AMMO_A2K) // FS: Zaero specific
+	else if (item->tag == AMMO_A2K) /* FS: Zaero specific game dll changes */
 	{
 		max = ent->client->pers.max_a2k;
 	}
-	else if (item->tag == AMMO_PLASMASHIELD) // FS: Zaero specific
+	else if (item->tag == AMMO_PLASMASHIELD) /* FS: Zaero specific game dll changes */
 	{
 		max = ent->client->pers.max_plasmashield;
 	}
@@ -872,7 +872,7 @@ Pickup_Ammo(edict_t *ent, edict_t *other)
 
 	oldcount = other->client->pers.inventory[ITEM_INDEX(ent->item)];
   
-	if(ent->spawnflags & 0x08) // FS: Zaero specific
+	if(ent->spawnflags & 0x08) /* FS: Zaero specific game dll changes */
 	{
 		if(oldcount >= count)
 		{
@@ -902,7 +902,7 @@ Pickup_Ammo(edict_t *ent, edict_t *other)
 	{
 		SetRespawn (ent, 30);
 	}
-	else if(ent->spawnflags & 0x04) // FS: Zaero specific
+	else if(ent->spawnflags & 0x04) /* FS: Zaero specific game dll changes */
 	{
 		SetRespawn (ent, 15);
 	}
@@ -948,7 +948,7 @@ Drop_Ammo(edict_t *ent, gitem_t *item)
 }
 
 
-qboolean Pickup_A2k (edict_t *ent, edict_t *other) // FS: Zaero specific
+qboolean Pickup_A2k (edict_t *ent, edict_t *other) /* FS: Zaero specific game dll changes */
 {
 	// do we already have an a2k?
 	if (other->client->pers.inventory[ITEM_INDEX(ent->item)] == 1)
@@ -1291,7 +1291,7 @@ Drop_PowerArmor(edict_t *ent, gitem_t *item)
 
 //======================================================================
 
-qboolean Pickup_PlasmaShield(edict_t *ent, edict_t *other) // FS: Zaero specific
+qboolean Pickup_PlasmaShield(edict_t *ent, edict_t *other) /* FS: Zaero specific game dll changes */
 {
   if(other->client->pers.inventory[ITEM_INDEX(ent->item)])
   {
@@ -1310,7 +1310,7 @@ qboolean Pickup_PlasmaShield(edict_t *ent, edict_t *other) // FS: Zaero specific
 }
 
 
-qboolean Pickup_Visor(edict_t *ent, edict_t *other) // FS: Zaero specific
+qboolean Pickup_Visor(edict_t *ent, edict_t *other) /* FS: Zaero specific game dll changes */
 {
 	// do we already have a visor?
 	if (other->client->pers.inventory[ITEM_INDEX(ent->item)] == 1 &&
@@ -1335,7 +1335,7 @@ qboolean Pickup_Visor(edict_t *ent, edict_t *other) // FS: Zaero specific
 	return true;
 }
 
-void Drop_Visor(edict_t *ent, gitem_t *item) // FS: Zaero specific
+void Drop_Visor(edict_t *ent, gitem_t *item) /* FS: Zaero specific game dll changes */
 {
 	edict_t *visor = Drop_Item (ent, item);
 	ent->client->pers.inventory[ITEM_INDEX(item)] = 0;
@@ -1782,7 +1782,7 @@ SpawnItem(edict_t *ent, gitem_t *item)
 
 	if (ent->spawnflags)
 	{
-		if (!(item->flags & IT_KEY) && !(item->flags & IT_AMMO)) // FS: Zaero specific
+		if (!(item->flags & IT_KEY) && !(item->flags & IT_AMMO)) /* FS: Zaero specific game dll changes */
 		{
 			ent->spawnflags = 0;
 			gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s has invalid spawnflags set\n", ent->classname, vtos(ent->s.origin));
@@ -2015,7 +2015,7 @@ gitem_t	itemlist[] =
 /*QUAKED weapon_hand (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"weapon_push", // FS: Zaero specific
+		"weapon_push", /* FS: Zaero specific game dll changes */
 		NULL,
 		Use_Weapon,
 		NULL,
@@ -2039,7 +2039,7 @@ gitem_t	itemlist[] =
 /*QUAKED weapon_flaregun (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"weapon_flaregun", // FS: Zaero specific
+		"weapon_flaregun", /* FS: Zaero specific game dll changes */
 		Pickup_Weapon,
 		Use_Weapon,
 		Drop_Weapon,
@@ -2203,7 +2203,7 @@ always owned, never in the world
 /*QUAKED ammo_ired (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"ammo_ired", // FS: Zaero specific
+		"ammo_ired", /* FS: Zaero specific game dll changes */
 		Pickup_Ammo,
 		Use_Weapon,
 		Drop_Ammo,
@@ -2324,7 +2324,7 @@ always owned, never in the world
 /*QUAKED weapon_sniperrifle (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"weapon_sniperrifle",  // FS: Zaero specific
+		"weapon_sniperrifle",  /* FS: Zaero specific game dll changes */
 		Pickup_Weapon,
 		Use_Weapon,
 		Drop_Weapon,
@@ -2399,7 +2399,7 @@ always owned, never in the world
 /*QUAKED ammo_a2k (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"ammo_a2k", // FS: Zaero specific
+		"ammo_a2k", /* FS: Zaero specific game dll changes */
 		Pickup_A2k,
 		Use_Weapon,
 		Drop_Ammo,
@@ -2428,7 +2428,7 @@ always owned, never in the world
 /*QUAKED ammo_flares (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"ammo_flares", // FS: Zaero specific
+		"ammo_flares", /* FS: Zaero specific game dll changes */
 		Pickup_Ammo,
 		NULL,
 		Drop_Ammo,
@@ -2570,7 +2570,7 @@ always owned, never in the world
 /*QUAKED ammo_empnuke (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"ammo_empnuke", // FS: Zaero specific
+		"ammo_empnuke", /* FS: Zaero specific game dll changes */
 		Pickup_Ammo,
 		Use_Weapon,
 		Drop_Ammo,
@@ -2713,7 +2713,7 @@ always owned, never in the world
 /*QUAKED item_visor (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"item_visor", // FS: Zaero specific
+		"item_visor", /* FS: Zaero specific game dll changes */
 		Pickup_Visor,
 		Use_Visor,
 		Drop_Visor,
@@ -2737,7 +2737,7 @@ always owned, never in the world
 /*QUAKED ammo_plasmashield (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"ammo_plasmashield", // FS: Zaero specific
+		"ammo_plasmashield", /* FS: Zaero specific game dll changes */
 		Pickup_Ammo,
 		Use_PlasmaShield,
 		Drop_Ammo,
@@ -3076,7 +3076,7 @@ tank commander's head
 landing arena key - blue
 */
 	{
-		"key_landing_area", // FS: Zaero specific
+		"key_landing_area", /* FS: Zaero specific game dll changes */
 		Pickup_Key,
 		NULL,
 		Drop_General,
@@ -3100,7 +3100,7 @@ landing arena key - blue
 security pass for the laboratory
 */
 	{
-		"key_lab", // FS: Zaero specific
+		"key_lab", /* FS: Zaero specific game dll changes */
 		Pickup_Key,
 		NULL,
 		Drop_General,
@@ -3124,7 +3124,7 @@ security pass for the laboratory
 security pass for the security level
 */
 	{
-		"key_clearancepass", // FS: Zaero specific
+		"key_clearancepass", /* FS: Zaero specific game dll changes */
 		Pickup_Key,
 		NULL,
 		Drop_General,
@@ -3148,7 +3148,7 @@ security pass for the security level
 security pass for the security level
 */
 	{
-		"key_energy", // FS: Zaero specific
+		"key_energy", /* FS: Zaero specific game dll changes */
 		Pickup_Key,
 		NULL,
 		Drop_General,
@@ -3171,7 +3171,7 @@ security pass for the security level
 /*QUAKED key_lava (0 .5 .8) (-16 -16 -16) (16 16 16)
 */
 	{
-		"key_lava", // FS: Zaero specific
+		"key_lava", /* FS: Zaero specific game dll changes */
 		Pickup_Key,
 		NULL,
 		Drop_General,
@@ -3194,7 +3194,7 @@ security pass for the security level
 /*QUAKED key_slime (0 .5 .8) (-16 -16 -16) (16 16 16)
 */
 	{
-		"key_slime", // FS: Zaero specific
+		"key_slime", /* FS: Zaero specific game dll changes */
 		Pickup_Key,
 		NULL,
 		Drop_General,

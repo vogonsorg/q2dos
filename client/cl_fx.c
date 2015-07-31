@@ -1825,7 +1825,6 @@ void CL_FlyParticles (vec3_t origin, int count)
 	cparticle_t	*p;
 	float		angle;
 	float		sp, sy, cp, cy;
-//	float		sr, cr; // FS: Unused
 	vec3_t		forward;
 	float		dist = 64;
 	float		ltime;
@@ -1836,7 +1835,7 @@ void CL_FlyParticles (vec3_t origin, int count)
 
 	if (!avelocities[0][0])
 	{
-		for (i=0 ; i< NUMVERTEXNORMALS ; i++) // FS: GCC warning fix from yamagi q2
+		for (i=0 ; i< NUMVERTEXNORMALS ; i++) /* FS: GCC warning fix from yamagi q2 */
 		{
 			avelocities[i][0] = (rand()&255) * 0.01f;
 			avelocities[i][1] = (rand()&255) * 0.01f;
@@ -1855,8 +1854,6 @@ void CL_FlyParticles (vec3_t origin, int count)
 		sp = sin(angle);
 		cp = cos(angle);
 		angle = ltime * avelocities[i][2];
-//		sr = sin(angle);
-//		cr = cos(angle);
 	
 		forward[0] = cp*cy;
 		forward[1] = cp*sy;
@@ -1932,7 +1929,6 @@ void CL_BfgParticles (entity_t *ent)
 	cparticle_t	*p;
 	float		angle;
 	float		sp, sy, cp, cy;
-//	float		sr, cr; // FS: Unused
 	vec3_t		forward;
 	float		dist = 64;
 	vec3_t		v;
@@ -1940,7 +1936,7 @@ void CL_BfgParticles (entity_t *ent)
 	
 	if (!avelocities[0][0])
 	{
-		for (i=0 ; i< NUMVERTEXNORMALS ; i++) // FS: GCC warning fix from yamagi q2
+		for (i=0 ; i< NUMVERTEXNORMALS ; i++) /* FS: GCC warning fix from yamagi q2 */
 		{
 			avelocities[i][0] = (rand()&255) * 0.01f;
 			avelocities[i][1] = (rand()&255) * 0.01f;
@@ -1959,8 +1955,6 @@ void CL_BfgParticles (entity_t *ent)
 		sp = sin(angle);
 		cp = cos(angle);
 		angle = ltime * avelocities[i][2];
-//		sr = sin(angle);
-//		cr = cos(angle);
 	
 		forward[0] = cp*cy;
 		forward[1] = cp*sy;
@@ -2201,7 +2195,7 @@ void CL_AddParticles (void)
 	int				color;
 	cparticle_t		*active, *tail;
 
-	time = 0; // FS: Compiler warning
+	time = 0; /* FS: Compiler warning */
 	active = NULL;
 	tail = NULL;
 

@@ -1,4 +1,4 @@
-#if 0 // FS: Yamagi removed
+#if 0 /* FS: Yamagi removed */
 #include "g_local.h"
 
 void assertMsg(const char *msg, const char *file, int line)

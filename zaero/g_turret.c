@@ -128,7 +128,7 @@ turret_breach_fire(edict_t *self)
 	VectorMA(start, self->move_origin[1], r, start);
 	VectorMA(start, self->move_origin[2], u, start);
 
-  if(EMPNukeCheck(self, start)) // FS: Zaero specific
+  if(EMPNukeCheck(self, start)) /* FS: Zaero specific game dll changes */
   {
 		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
     return;
@@ -582,7 +582,7 @@ SP_turret_driver(edict_t *self)
 
 	self->flags |= FL_NO_KNOCKBACK;
 
-	if(!(self->spawnflags & 16)) // FS: Zaero specific
+	if(!(self->spawnflags & 16)) /* FS: Zaero specific game dll changes */
 	{
 		level.total_monsters++;
 	}

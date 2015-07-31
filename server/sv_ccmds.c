@@ -846,7 +846,7 @@ void SV_Status_f (void)
 			Com_Printf (" ");
 		}
 
-		Com_Printf ("%7i ", (int)(svs.realtime - cl->lastmessage) ); // FS: On purpose, don't need extreme precision for lastmsg reporting
+		Com_Printf ("%7i ", (int)(svs.realtime - cl->lastmessage) ); /* FS: On purpose, don't need extreme precision for lastmsg reporting */
 
 		s = NET_AdrToString ( cl->netchan.remote_address);
 		Com_Printf ("%s", s);
@@ -1174,7 +1174,7 @@ char *SV_MapName()
 	return sv.name;
 }
 
-// FS: Dump Entities
+/* FS: Dump Entities to *,ent file for server-side modding */
 void SV_DumpEntities_f (void)
 {
     FILE    *f;
@@ -1188,7 +1188,7 @@ void SV_DumpEntities_f (void)
 	}
 
     Com_sprintf (fileName, sizeof(fileName), "%s/maps/%s.ent", FS_Gamedir(), SV_MapName());
-	FS_CreatePath(fileName); // FS: Create the /maps dir if it's not there
+	FS_CreatePath(fileName); /* FS: Create the /maps dir if it's not there */
 
     f = fopen (fileName, "w");
 

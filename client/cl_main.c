@@ -109,7 +109,7 @@ cvar_t	*gender;
 cvar_t	*gender_auto;
 
 cvar_t	*cl_vwep;
-cvar_t	*console_old_complete; // FS: Old style command completing
+cvar_t	*console_old_complete; /* FS: Old style command completing */
 cvar_t	*cl_autorepeat_allkeys; /* FS: So I can autorepeat whatever I want, hoss. */
 cvar_t	*cl_sleep; /* Knightmare: Added */
 
@@ -154,7 +154,7 @@ static void CL_LoadGameSpy (void);
 #endif
 
 #ifdef __DJGPP__
-void Sys_Memory_Stats_f (void); // FS: Added
+void Sys_Memory_Stats_f (void); /* FS: Added */
 #endif
 
 /*
@@ -814,7 +814,7 @@ void CL_Changing_f (void)
 	Com_Printf ("\nChanging map...\n");
 
 #ifdef USE_CURL
-	if(cls.downloadServerRetry[0] != 0) // FS: Added because Whale's Weapons HTTP server rejects you after a lot of 404s.  Then you lose HTTP until a hard reconnect.
+	if(cls.downloadServerRetry[0] != 0) /* FS: Added because Whale's WOD HTTP server rejects you after a lot of 404s.  Then you lose HTTP until a hard reconnect. */
 	{
 		CL_SetHTTPServer(cls.downloadServerRetry);
 	}
@@ -1203,7 +1203,7 @@ new parameters and flush all sounds
 */
 void CL_Snd_Restart_f (void)
 {
-	S_StopAllSounds(); // FS: Clear GUS Buffer
+	S_StopAllSounds(); /* FS: Clear GUS Buffer */
 	S_Shutdown ();
 	S_Init ();
 	CL_RegisterSounds ();
@@ -1443,7 +1443,7 @@ void CL_RequestNextDownload (void)
 				i = (precache_check - CS_PLAYERSKINS)/PLAYER_MULT;
 				n = (precache_check - CS_PLAYERSKINS)%PLAYER_MULT;
 
-				if (i >= cl.maxclients) // FS: From R1Q2
+				if (i >= cl.maxclients) /* FS: From R1Q2 */
 				{
 					precache_check = ENV_CNT;
 					continue;
@@ -1746,7 +1746,7 @@ void CL_InitLocal (void)
 	cl_vwep = Cvar_Get ("cl_vwep", "1", CVAR_ARCHIVE);
 
 	/* FS: New stuff */
-	console_old_complete = Cvar_Get("console_old_complete", "0", CVAR_ARCHIVE); // FS: Old style command completing
+	console_old_complete = Cvar_Get("console_old_complete", "0", CVAR_ARCHIVE); /* FS: Old style command completing */
 	cl_autorepeat_allkeys = Cvar_Get("cl_autorepeat_allkeys", "0", CVAR_ARCHIVE); /* FS: Because I want to autorepeat whatever I want, hoss */
 	cl_autorepeat_allkeys->description = "Allow to autorepeat any key, not just Backspace, Pause, PgUp, and PgDn keys.";
 
@@ -2180,7 +2180,7 @@ void CL_Frame_Async (double msec)
 		{
 			miscDelta = 0;
 
-			if (cls.spamTime && (cls.spamTime < cls.realtime)) // FS: From R1Q2
+			if (cls.spamTime && (cls.spamTime < cls.realtime)) /* FS: From R1Q2 */
 			{
 				char versionStr[256];
 
@@ -2327,11 +2327,11 @@ void CL_Frame (double msec)
 
 	if (cl_maxfps->value)
 	{
-		fps = bound(5, cl_maxfps->value, 1000); // FS: Don't go under 5
+		fps = bound(5, cl_maxfps->value, 1000); /* FS: Don't go under 5 */
 	}
 	else
 	{
-		fps = bound(5, cl_maxfps->value, 72); // FS: Default to 72hz if nothing is set
+		fps = bound(5, cl_maxfps->value, 72); /* FS: Default to 72hz if nothing is set */
 	}
 
 	if (!cl_timedemo->value)
@@ -2367,7 +2367,7 @@ void CL_Frame (double msec)
 
 	extratime = 0;
 
-	if (cls.netFrameTime > (1.0 / 5)) // FS: 5 -- Minfps
+	if (cls.netFrameTime > (1.0 / 5)) /* FS: 5 -- Minfps */
 	{
 		cls.netFrameTime = (1.0 / 5);
 	}
@@ -2390,7 +2390,7 @@ void CL_Frame (double msec)
 	// send a new command message to the server
 	CL_SendCommand ();
 
-	if (cls.spamTime && (cls.spamTime < cls.realtime)) // FS: From R1Q2
+	if (cls.spamTime && (cls.spamTime < cls.realtime)) /* FS: From R1Q2 */
 	{
 		char versionStr[256];
 
@@ -2567,7 +2567,7 @@ static void GameSpy_Async_Think(void)
 
 	if(gspye->ServerListState(serverlist) == sl_idle && cls.gamespyupdate)
 	{
-		if (cls.key_dest != key_menu) // FS: Only print this from an slist2 command, not the server browser.
+		if (cls.key_dest != key_menu) /* FS: Only print this from an slist2 command, not the server browser. */
 		{
 			Com_Printf("Found %i active servers out of %i in %i seconds.\n", gspyCur, cls.gamespytotalservers, (((int)Sys_Milliseconds()-cls.gamespystarttime) / 1000) );
 		}
@@ -2579,7 +2579,7 @@ static void GameSpy_Async_Think(void)
 		cls.gamespypercent = 0;
 		gspye->ServerListClear(serverlist);
 		gspye->ServerListFree(serverlist);
-		serverlist = NULL; // FS: This is on purpose so future ctrl+c's won't try to close empty serverlists
+		serverlist = NULL; /* FS: This is on purpose so future ctrl+c's won't try to close empty serverlists */
 		if(cls.state == ca_disconnected)
 			NET_Config(false);
 	}
@@ -2592,7 +2592,7 @@ static void GameSpy_Async_Think(void)
 
 static void CL_Gspystop_f (void)
 {
-	if(serverlist != NULL && cls.gamespyupdate) // FS: Immediately abort gspy scans
+	if(serverlist != NULL && cls.gamespyupdate) /* FS: Immediately abort gspy scans */
 	{
 		Com_Printf("\x02Server scan aborted!\n");
 		S_GamespySound ("gamespy/abort.wav");

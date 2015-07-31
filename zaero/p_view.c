@@ -31,11 +31,10 @@ float	xyspeed;
 float	bobmove;
 int		bobcycle;		// odd cycles are right foot going forward
 float	bobfracsin;		// sin(bobfrac*M_PI)
-extern void HelpComputer (edict_t *ent); // FS
-extern void InventoryMessage(edict_t *ent); // FS
-void updateVisorHud(edict_t *ent); // FS: Zaero specific
-void startVisorStatic(edict_t *ent); // FS: Zaero specific
-void stopCamera(edict_t *self); // FS: Zaero specific
+
+void updateVisorHud(edict_t *ent); /* FS: Zaero specific game dll changes */
+void startVisorStatic(edict_t *ent); /* FS: Zaero specific game dll changes */
+void stopCamera(edict_t *self); /* FS: Zaero specific game dll changes */
 
 float
 SV_CalcRoll(vec3_t angles, vec3_t velocity)
@@ -372,7 +371,7 @@ SV_CalcViewOffset(edict_t *ent)
 	// absolutely bound offsets
 	// so the view can never be outside the player box
 
-	if(ent->client->zCameraTrack) // FS: Zaero specific
+	if(ent->client->zCameraTrack) /* FS: Zaero specific game dll changes */
 	{
 		int i;
 
@@ -464,7 +463,7 @@ SV_CalcGunOffset(edict_t *ent)
 
 // if we're using the sniper rifle, let's not do this
 	if (ent->client->pers.weapon &&
-		Q_stricmp(ent->client->pers.weapon->classname, "weapon_sniperrifle") != 0) // FS: Zaero specific
+		Q_stricmp(ent->client->pers.weapon->classname, "weapon_sniperrifle") != 0) /* FS: Zaero specific game dll changes */
 	{
 		// gun angles from bobbing
 		ent->client->ps.gunangles[ROLL] = xyspeed * bobfracsin * 0.005;
@@ -651,7 +650,7 @@ SV_CalcBlend(edict_t *ent)
 
 
 	// for blinding
-	if (ent->client->flashTime > 0)  // FS: Zaero specific
+	if (ent->client->flashTime > 0)  /* FS: Zaero specific game dll changes */
 	{
 		float alpha = (float)ent->client->flashTime / (float)ent->client->flashBase;
 		if (alpha > 1)
@@ -660,7 +659,7 @@ SV_CalcBlend(edict_t *ent)
 		ent->client->flashTime--;
 	}
 
-	if (ent->client->zCameraStaticFramenum > level.time) // FS: Zaero specific
+	if (ent->client->zCameraStaticFramenum > level.time) /* FS: Zaero specific game dll changes */
 	{
 		SV_AddBlend(1,1,1,1, ent->client->ps.blend);
 	}
@@ -1049,7 +1048,7 @@ G_SetClientEffects(edict_t *ent)
 		ent->s.renderfx |= (RF_SHELL_RED|RF_SHELL_GREEN|RF_SHELL_BLUE);
 	}
 
-	if(ent->client->zCameraLocalEntity) // FS: Zaero Specific
+	if(ent->client->zCameraLocalEntity) /* FS: Zaero specific game dll changes */
 	{
 		VectorCopy (ent->s.origin, ent->client->zCameraLocalEntity->s.origin);
 		VectorCopy (ent->s.angles, ent->client->zCameraLocalEntity->s.angles);
@@ -1131,7 +1130,7 @@ G_SetClientSound(edict_t *ent)
 	{
 		ent->s.sound = ent->client->weapon_sound;
 	}
-	else if (strcmp(weap, "weapon_soniccannon") == 0) // FS: Zaero specific
+	else if (strcmp(weap, "weapon_soniccannon") == 0) /* FS: Zaero specific game dll changes */
 	{
 		ent->s.sound = gi.soundindex("weapons/sonic/sc_idle.wav");
 	}
@@ -1313,7 +1312,7 @@ ClientEndServerFrame(edict_t *ent)
 		current_client->ps.fov = 90;
 		G_SetStats (ent);
 
-		if (level.fadeFrames > 0) // FS: Zaero specific
+		if (level.fadeFrames > 0) /* FS: Zaero specific game dll changes */
 		{
 			float ratio = (float)(50 - level.fadeFrames) / 50.0;
 			SV_AddBlend (1, 1, 1, ratio, current_client->ps.blend);
@@ -1429,7 +1428,7 @@ ClientEndServerFrame(edict_t *ent)
 		/* if the scoreboard is up, update it */
 		if (ent->client->showscores)
 		{
-			if (ent->client->zCameraTrack) // FS: Zaero specific
+			if (ent->client->zCameraTrack) /* FS: Zaero specific game dll changes */
 			{
 				updateVisorHud(ent);
 			}
@@ -1450,7 +1449,7 @@ ClientEndServerFrame(edict_t *ent)
 	}
 
 	// this we want to do regardless
-	if (ent->client->zCameraTrack)  // FS: Zaero specific
+	if (ent->client->zCameraTrack)  /* FS: Zaero specific game dll changes */
 	{
 		// decrease the visor frame time
 		ent->client->pers.visorFrames--;

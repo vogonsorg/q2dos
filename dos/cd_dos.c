@@ -280,7 +280,6 @@ static byte	cdvolume;
 static int	loopcounter;
 cvar_t *cd_loopcount;
 cvar_t *cd_looptrack;
-//cvar_t	*cd_volume;
 cvar_t *cd_nocd;
 
 static int RedBookToSector (int rb)
@@ -536,7 +535,7 @@ static void CDAudio_SetVolume (byte volume)
 void CDAudio_Play (int track, qboolean looping)
 {
 	int		volume;
-	int		previousTrack; // FS
+	int		previousTrack;
 
 	if (!initialized || !enabled)
 		return;
@@ -561,7 +560,7 @@ void CDAudio_Play (int track, qboolean looping)
 		return;
 	}
 
-	previousTrack = playTrack; // FS
+	previousTrack = playTrack;
 	playTrack = track;
 
 	if (cd.track[track].isData)
@@ -889,14 +888,13 @@ int CDAudio_Init (void)
 	if (dedicated && dedicated->value)
 		return -1;
 
-//	cd_volume = Cvar_Get ("cd_volume", "1.0", 0);
 	cd_nocd = Cvar_Get ("cd_nocd", "0", CVAR_ARCHIVE);
 	cd_loopcount = Cvar_Get ("cd_loopcount", "4", 0);
 	cd_looptrack = Cvar_Get ("cd_looptrack", "11", 0);
 
 	if (cd_nocd->value)
 		return -1;
-	if (COM_CheckParm("-nocdaudio") || COM_CheckParm("-nocd")) // FS
+	if (COM_CheckParm("-nocdaudio") || COM_CheckParm("-nocd")) /* FS: Added ability to skip cd init */
 		return -1;
 
 

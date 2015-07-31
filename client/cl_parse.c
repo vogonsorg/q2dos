@@ -72,9 +72,8 @@ qboolean	CL_CheckOrDownloadFile (char *filename)
 	FILE *fp;
 	char	name[MAX_OSPATH];
 	static char lastfilename[MAX_OSPATH] = {0};
-	int	length = 0; // FS: MSVC4 hates it elsewhere
-	char	*p = NULL; // FS: MSVC4 hates it elsewhere
-
+	int	length = 0; /* FS: MSVC4 hates it elsewhere */
+	char	*p = NULL; /* FS: MSVC4 hates it elsewhere */
 
 	strcpy (lastfilename, filename);
 
@@ -189,7 +188,7 @@ Request a download from the server
 */
 void	CL_Download_f (void)
 {
-	// FS: R1Q2 version
+	/* FS: R1Q2 version */
 	char	*filename;
 
 	if (Cmd_Argc() != 2) {
@@ -938,13 +937,13 @@ void CL_ParseServerMessage (void)
 
 				//r1: change !p_version to !version since p is for proxies
 				if ((strstr (s, "!r1q2_version") || strstr (s, "!version")) &&
-					(cls.lastSpamTime == 0.0f || cls.realtime > cls.lastSpamTime + 300000.0f)) // FS: 5 minutes
+					(cls.lastSpamTime == 0.0f || cls.realtime > cls.lastSpamTime + 300000.0f)) /* FS: 5 minutes */
 				{
-					cls.spamTime = cls.realtime + 1500.0f; // FS: 1.5 second delay
+					cls.spamTime = cls.realtime + 1500.0f; /* FS: 1.5 second delay */
 				}
 
 			}
-			Com_Printf("%s", s); // FS: !version reply
+			Com_Printf("%s", s); /* FS: !version reply */
 
 			con.ormask = 0;
 			break;

@@ -5,8 +5,8 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo);
 
 void SP_misc_teleporter_dest (edict_t *ent);
 void Touch_Item(edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf);
-void zCam_SetLocalCopy(struct edict_s *player, char *s);  // FS: Zaero specific
-void stopCamera(edict_t *ent); // FS: Zaero specific
+void zCam_SetLocalCopy(struct edict_s *player, char *s);  /* FS: Zaero specific game dll changes */
+void stopCamera(edict_t *ent); /* FS: Zaero specific game dll changes */
 
 /*
  * The ugly as hell coop spawnpoint fixup function.
@@ -385,7 +385,7 @@ player_pain(edict_t *self /* unused */, edict_t *other /* unused */,
 {
 	// player pain is handled at the end of the frame in P_DamageFeedback
 	// if we're in a camera, get out
-	if (self->client->zCameraTrack)  // FS: Zaero specific
+	if (self->client->zCameraTrack) /* FS: Zaero specific game dll changes */
 	{
 		stopCamera(self);
 	}
@@ -504,7 +504,7 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */,
 		meansOfDeath |= MOD_FRIENDLY_FIRE;
 	}
 
-	if (attacker != self && attacker->svflags & SVF_MONSTER)  // FS: Zaero specific?
+	if (attacker != self && attacker->svflags & SVF_MONSTER) /* FS: Zaero specific game dll changes */
 	{
 		struct monsterObit *ptr = obits;
 		while (ptr->classname != NULL)
@@ -562,7 +562,7 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */,
 		case MOD_BOMB:
 		case MOD_SPLASH:
 		case MOD_TRIGGER_HURT:
-		case MOD_AUTOCANNON:  // FS: Zaero specific
+		case MOD_AUTOCANNON:  /* FS: Zaero specific game dll changes */
 			message = "was in the wrong place";
 			break;
 		}
@@ -606,11 +606,11 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */,
 				message = "should have used a smaller gun";
 				break;
 
-			case MOD_A2K:  // FS: Zaero specific
+			case MOD_A2K:  /* FS: Zaero specific game dll changes */
 				message = "realized he was expendable";
 				break;
 
-			case MOD_SONICCANNON:  // FS: Zaero specific
+			case MOD_SONICCANNON:  /* FS: Zaero specific game dll changes */
 				message = "got carried away";
 				break;
 
@@ -716,28 +716,28 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */,
 				message = "tried to invade";
 				message2 = "'s personal space";
 				break;
-			case MOD_SNIPERRIFLE:  // FS: Zaero specific
+			case MOD_SNIPERRIFLE:  /* FS: Zaero specific game dll changes */
 				message = "was ventilated by";
 				message2 = "'s bullet";
 				break;
-			case MOD_TRIPBOMB:  // FS: Zaero specific
+			case MOD_TRIPBOMB:  /* FS: Zaero specific game dll changes */
 				message = "tripped over";
 				message2 = "'s trip bomb";
 				break;
-			case MOD_FLARE:  // FS: Zaero specific
+			case MOD_FLARE:  /* FS: Zaero specific game dll changes */
 				message = "didn't see";
 				message2 = "'s flare";
 				break;
-			case MOD_GL_POLYBLEND:  // FS: Zaero specific
+			case MOD_GL_POLYBLEND:  /* FS: Zaero specific game dll changes */
 				message = "turned off gl_polyblend and was damaged by";
 				message2 = "'s flare";
 				break;
-			case MOD_A2K:  // FS: Zaero specific
+			case MOD_A2K:  /* FS: Zaero specific game dll changes */
 				message = "got dissassembled by";
 				message2 = "";
 				break;
 
-			case MOD_SONICCANNON:  // FS: Zaero specific
+			case MOD_SONICCANNON:  /* FS: Zaero specific game dll changes */
 				message = "got microwaved by";
 				message2 = "";
 				break;
@@ -914,7 +914,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 	}
 
 	// if we're in a camera, get out
-	if (self->client->zCameraTrack) // FS: Zaero specific
+	if (self->client->zCameraTrack) /* FS: Zaero specific game dll changes */
 	{
 		stopCamera(self);
 	}
@@ -969,7 +969,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 	self->client->breather_framenum = 0;
 	self->client->enviro_framenum = 0;
 	self->flags &= ~FL_POWER_ARMOR;
-	self->client->a2kFramenum = 0; // FS: Zaero specific
+	self->client->a2kFramenum = 0; /* FS: Zaero specific game dll changes */
 
 	if (self->health < -40)
 	{
@@ -1052,7 +1052,7 @@ InitClientPersistant(gclient_t *client)
 
 	memset (&client->pers, 0, sizeof(client->pers));
 
-	item = FindItem("Push"); // FS: Zaero specific
+	item = FindItem("Push"); /* FS: Zaero specific game dll changes */
 	client->pers.inventory[ITEM_INDEX(item)] = 1;
 	
 	item = FindItem("Blaster");
@@ -1061,7 +1061,7 @@ InitClientPersistant(gclient_t *client)
 
 	client->pers.weapon = item;
 
-	if (!deathmatch->value) // FS: Zaero specific
+	if (!deathmatch->value) /* FS: Zaero specific game dll changes */
 	{
 		item = FindItem("Flare Gun");
 		client->pers.inventory[ITEM_INDEX(item)] = 1;
@@ -1079,11 +1079,11 @@ InitClientPersistant(gclient_t *client)
 	client->pers.max_grenades	    = 50;
 	client->pers.max_cells		    = 200;
 	client->pers.max_slugs		    = 50;
-	client->pers.max_tbombs		    = 30; // FS: Zaero specific
-	client->pers.max_flares       = 30; // FS: Zaero specific
-	client->pers.max_a2k          = 1; // FS: Zaero specific
-	client->pers.max_empnuke      = 50; // FS: Zaero specific
-	client->pers.max_plasmashield = 20; // FS: Zaero specific
+	client->pers.max_tbombs		    = 30; /* FS: Zaero specific game dll changes */
+	client->pers.max_flares       = 30; /* FS: Zaero specific game dll changes */
+	client->pers.max_a2k          = 1; /* FS: Zaero specific game dll changes */
+	client->pers.max_empnuke      = 50; /* FS: Zaero specific game dll changes */
+	client->pers.max_plasmashield = 20; /* FS: Zaero specific game dll changes */
 
 	client->pers.connected = true;
 }
@@ -1776,7 +1776,7 @@ PutClientInServer(edict_t *ent)
 	{
 		InitClientPersistant(client);
 	}
-	else if (Q_stricmp(level.mapname, "zboss") == 0) // FS: Zaero specific
+	else if (Q_stricmp(level.mapname, "zboss") == 0) /* FS: Zaero specific game dll changes */
 	{
 		char		userinfo[MAX_INFO_STRING];
 
@@ -2054,7 +2054,7 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 	/* set skin */
 	s = Info_ValueForKey(userinfo, "skin");
 
-	zCam_SetLocalCopy(ent, s); // FS: Zaero specific
+	zCam_SetLocalCopy(ent, s); /* FS: Zaero specific game dll changes */
 
 	playernum = ent-g_edicts-1;
 
@@ -2320,7 +2320,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		return;
 	}
 
-	if(ent->movetype == MOVETYPE_FREEZE)  // FS: Zaero specific?
+	if(ent->movetype == MOVETYPE_FREEZE)  /* FS: Zaero specific game dll changes */
 	{
 		client->ps.pmove.pm_type = PM_FREEZE;
 		return;

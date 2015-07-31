@@ -4,7 +4,7 @@
 
 int	gibsthisframe = 0;
 int lastgibframe = 0;
-qboolean SV_movestep (edict_t *ent, vec3_t move, qboolean relink); // FS: Zaero specific
+qboolean SV_movestep (edict_t *ent, vec3_t move, qboolean relink); /* FS: Zaero specific game dll changes */
 
 void
 Use_Areaportal(edict_t *ent, edict_t *other /* unused */, edict_t *activator /* unused */)
@@ -484,7 +484,7 @@ path_corner_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */,
 
 	if (self->wait)
 	{
-		if(other->goalentity) // FS: Zaero specific
+		if(other->goalentity) /* FS: Zaero specific game dll changes */
 		{
 			VectorSubtract (other->goalentity->s.origin, other->s.origin, v);
 			other->ideal_yaw = vectoyaw (v);
@@ -1185,22 +1185,22 @@ barrel_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */, csurfa
 {
 	float ratio;
 	vec3_t v;
-	vec3_t	move; // FS: Zaero specific
-	float yaw, dist; // FS: Zaero specific
+	vec3_t	move; /* FS: Zaero specific game dll changes */
+	float yaw, dist; /* FS: Zaero specific game dll changes */
 
 	if (!self || !other)
 	{
 		return;
 	}
 
-	if (other->groundentity == self || !other->client) // FS: Zaero specific
+	if (other->groundentity == self || !other->client) /* FS: Zaero specific game dll changes */
 	{
 		return;
 	}
 
 	ratio = (float)other->mass / (float)self->mass;
 	VectorSubtract (self->s.origin, other->s.origin, v);
-	// FS: Below all Zaero specific
+	/* FS: Zaero specific game dll changes */
 	yaw = vectoyaw(v);
 	dist = 20 * ratio * FRAMETIME;
 
@@ -1338,7 +1338,7 @@ SP_misc_explobox(edict_t *self)
 	gi.modelindex("models/objects/debris3/tris.md2");
 
 	self->solid = SOLID_BBOX;
-	self->movetype = MOVETYPE_FALLFLOAT; // FS: Zaero specific
+	self->movetype = MOVETYPE_FALLFLOAT; /* FS: Zaero specific game dll changes */
 
 	self->model = "models/objects/barrels/tris.md2";
 	self->s.modelindex = gi.modelindex(self->model);
@@ -1816,7 +1816,7 @@ SP_misc_viper(edict_t *ent)
 		return;
 	}
 
-	if (ent->spawnflags & 1) // FS: Zaero specific
+	if (ent->spawnflags & 1) /* FS: Zaero specific game dll changes */
 	{
 		ent->s.effects |= EF_ROCKET;
 		ent->spawnflags &= ~1; // turn this off so that it doesn't mess up the trains
@@ -1829,7 +1829,7 @@ SP_misc_viper(edict_t *ent)
 
 	ent->movetype = MOVETYPE_PUSH;
 
-	if (ent->spawnflags & 2) // FS: Zaero specific
+	if (ent->spawnflags & 2) /* FS: Zaero specific game dll changes */
 	{
 		ent->solid = SOLID_BBOX;
 	}
@@ -1838,7 +1838,7 @@ SP_misc_viper(edict_t *ent)
 		ent->solid = SOLID_NOT;
 	}
 
-	if(ent->model) // FS: Zaero specific
+	if(ent->model) /* FS: Zaero specific game dll changes */
 	{
 		ent->s.modelindex = gi.modelindex (ent->model);
 	}
@@ -1847,22 +1847,22 @@ SP_misc_viper(edict_t *ent)
 		ent->s.modelindex = gi.modelindex ("models/ships/viper/tris.md2");
 	}
 
-	if(ent->model2) // FS: Zaero specific
+	if(ent->model2) /* FS: Zaero specific game dll changes */
 	{
 		ent->s.modelindex2 = gi.modelindex (ent->model2);
 	}
 
-	if(ent->model3) // FS: Zaero specific
+	if(ent->model3) /* FS: Zaero specific game dll changes */
 	{
 		ent->s.modelindex3 = gi.modelindex (ent->model3);
 	}
 
-	if(ent->model4) // FS: Zaero specific
+	if(ent->model4) /* FS: Zaero specific game dll changes */
 	{
 		ent->s.modelindex4 = gi.modelindex (ent->model4);
 	}
 
-	if (!(ent->spawnflags & 4)) // FS: Zaero specific
+	if (!(ent->spawnflags & 4)) /* FS: Zaero specific game dll changes */
 	{
 		VectorSet (ent->mins, -16, -16, 0);
 		VectorSet (ent->maxs, 16, 16, 32);

@@ -20,8 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "g_local.h"
 
 #define PUSH_ONCE		1
-#define START_OFF		2 // FS: Zaero specific
-#define NO_SOUND		4 // FS: Zaero specific
+#define START_OFF		2 /* FS: Zaero specific game dll changes */
+#define NO_SOUND		4 /* FS: Zaero specific game dll changes */
 
 static int windsound;
 
@@ -552,7 +552,7 @@ trigger_push_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */,
 		return;
 	}
 
-	if (self->spawnflags & START_OFF) // FS: Zaero specific
+	if (self->spawnflags & START_OFF) /* FS: Zaero specific game dll changes */
 	{
 		if (self->message && self->touch_debounce_time < level.time)
 		{
@@ -579,7 +579,7 @@ trigger_push_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */,
 			if (other->fly_sound_debounce_time < level.time)
 			{
 				other->fly_sound_debounce_time = level.time + 1.5;
-				if (!(self->spawnflags & NO_SOUND)) // FS: Zaero specific
+				if (!(self->spawnflags & NO_SOUND)) /* FS: Zaero specific game dll changes */
 				{
 					gi.sound(other, CHAN_AUTO, windsound, 1, ATTN_NORM, 0);
 				}
@@ -593,7 +593,7 @@ trigger_push_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */,
 	}
 }
 
-void trigger_push_use(edict_t *self, edict_t *other, edict_t *activator) // FS: Zaero specific
+void trigger_push_use(edict_t *self, edict_t *other, edict_t *activator) /* FS: Zaero specific game dll changes */
 {
 	if(!self)
 	{
@@ -630,7 +630,7 @@ SP_trigger_push(edict_t *self)
 		self->speed = 1000;
 	}
 
-	if (self->targetname) // FS: Zaero specific
+	if (self->targetname) /* FS: Zaero specific game dll changes */
 	{
 		self->use = trigger_push_use;
 	}

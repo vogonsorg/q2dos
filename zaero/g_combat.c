@@ -167,7 +167,7 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 }
 
 void
-SpawnDamage (int type, vec3_t origin, vec3_t normal, int damage) // FS: FIXME remove damage
+SpawnDamage (int type, vec3_t origin, vec3_t normal, int damage) /* FS: FIXME remove damage */
 {
 	if (damage > 255)
 	{
@@ -233,7 +233,7 @@ CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 		return 0;
 	}
 
-	if(EMPNukeCheck(ent, point)) // FS: Zaero specific
+	if(EMPNukeCheck(ent, point)) /* FS: Zaero specific game dll changes */
 	{
 		return 0;
 	}
@@ -254,7 +254,7 @@ CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 		power = ent->monsterinfo.power_armor_power;
 		index = 0;
 	}
-	else if(strcmp(ent->classname, "PlasmaShield") == 0) // FS: Zaero specific
+	else if(strcmp(ent->classname, "PlasmaShield") == 0) /* FS: Zaero specific game dll changes */
 	{
 		power_armor_type = POWER_ARMOR_SHIELD;
 		power = ent->health;
@@ -294,7 +294,7 @@ CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 		damagePerCell = 1;
 		pa_te_type = TE_SCREEN_SPARKS;
 
-		if(!(dflags & DAMAGE_ARMORMOSTLY)) // FS: Zaero specific
+		if(!(dflags & DAMAGE_ARMORMOSTLY)) /* FS: Zaero specific game dll changes */
 		{
 			damage = damage / 3;
 		}
@@ -304,7 +304,7 @@ CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 		damagePerCell = 2;
 		pa_te_type = TE_SHIELD_SPARKS;
 
-		if(!(dflags & DAMAGE_ARMORMOSTLY)) // FS: Zaero specific
+		if(!(dflags & DAMAGE_ARMORMOSTLY)) /* FS: Zaero specific game dll changes */
 		{
  	 		damage = (2 * damage) / 3;
 		}
@@ -317,7 +317,7 @@ CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 		return 0;
 	}
 
-    if(!(dflags & DAMAGE_ARMORMOSTLY)) // FS: Zaero specific
+    if(!(dflags & DAMAGE_ARMORMOSTLY)) /* FS: Zaero specific game dll changes */
 	{
 		save *= 2;
 	}
@@ -336,7 +336,7 @@ CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 	{
 		client->pers.inventory[index] -= power_used;
 	}
-	else if (ent->svflags & SVF_MONSTER) // FS: Zaero specific
+	else if (ent->svflags & SVF_MONSTER) /* FS: Zaero specific game dll changes */
 	{
 		ent->monsterinfo.power_armor_power -= power_used;
 	}
@@ -405,7 +405,7 @@ CheckArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 
 	client->pers.inventory[index] -= save;
 
-	if(dflags & DAMAGE_ARMORMOSTLY) // FS: Zaero specific
+	if(dflags & DAMAGE_ARMORMOSTLY) /* FS: Zaero specific game dll changes */
 	{
 		save *= 2;
 	}
@@ -429,7 +429,7 @@ M_ReactToDamage(edict_t *targ, edict_t *attacker)
 	}
 
 	if (!(attacker->client) && !(attacker->svflags & SVF_MONSTER) &&
-		(strcmp (attacker->classname, "monster_autocannon") != 0)) // FS: Zaero specific
+		(strcmp (attacker->classname, "monster_autocannon") != 0)) /* FS: Zaero specific game dll changes */
 	{
 		return;
 	}
@@ -489,7 +489,7 @@ M_ReactToDamage(edict_t *targ, edict_t *attacker)
 		(strcmp(attacker->classname, "monster_supertank") != 0) &&
 		(strcmp(attacker->classname, "monster_makron") != 0) &&
 		(strcmp(attacker->classname, "monster_jorg") != 0) && 
-		(!(attacker->mteam && targ->mteam && strcmp(attacker->mteam, targ->mteam) == 0))) // FS: Zaero specific
+		(!(attacker->mteam && targ->mteam && strcmp(attacker->mteam, targ->mteam) == 0))) /* FS: Zaero specific game dll changes */
 	{
 		if (targ->enemy && targ->enemy->client)
 		{
@@ -520,7 +520,7 @@ M_ReactToDamage(edict_t *targ, edict_t *attacker)
 	}
 	/* otherwise get mad at whoever they are mad
 	   at (help our buddy) unless it is us! */
-	else if (attacker->enemy && (attacker->enemy != targ)) // FS: Zaero specific
+	else if (attacker->enemy && (attacker->enemy != targ)) /* FS: Zaero specific game dll changes */
 	{
 		if (targ->enemy && targ->enemy->client)
 		{
@@ -537,7 +537,7 @@ M_ReactToDamage(edict_t *targ, edict_t *attacker)
 }
 
 
-qboolean CheckTeamDamage (edict_t *targ, edict_t *attacker) // FS: FIXME remove this
+qboolean CheckTeamDamage (edict_t *targ, edict_t *attacker) /* FS: FIXME remove this */
 {
 		//FIXME make the next line real and uncomment this block
 		// if ((ability to damage a teammate == OFF) && (targ's team == attacker's team))
@@ -600,7 +600,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 	}
 
 	if ((targ->svflags & SVF_MONSTER) && ((targ->monsterinfo.aiflags & AI_REDUCEDDAMAGE) ||
-				((targ->monsterinfo.aiflags & AI_MONREDUCEDDAMAGE) && (inflictor->svflags & SVF_MONSTER)))) // FS: Zaero specific
+				((targ->monsterinfo.aiflags & AI_MONREDUCEDDAMAGE) && (inflictor->svflags & SVF_MONSTER)))) /* FS: Zaero specific game dll changes */
 	{
 		damage *= targ->monsterinfo.reducedDamageAmount;
 		if (!damage)
@@ -647,7 +647,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 	}
 
 	// check for a2k invincibility
-	if (client && client->a2kFramenum > level.framenum) // FS: Zaero specific
+	if (client && client->a2kFramenum > level.framenum) /* FS: Zaero specific game dll changes */
 	{
 		if (targ->pain_debounce_time < level.time)
 		{
@@ -683,7 +683,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 	asave += save;
 
 // figure momentum add
-	if (!(dflags & DAMAGE_NO_KNOCKBACK)) // FS: Zaero specific
+	if (!(dflags & DAMAGE_NO_KNOCKBACK)) /* FS: Zaero specific game dll changes */
 	{
 		if ((knockback) && (targ->movetype != MOVETYPE_NONE) && (targ->movetype != MOVETYPE_BOUNCE) && (targ->movetype != MOVETYPE_BOUNCEFLY) && (targ->movetype != MOVETYPE_PUSH) && (targ->movetype != MOVETYPE_STOP))
 		{
@@ -727,7 +727,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 			SpawnDamage (te_sparks, point, normal, take);
 		}
 
-		if (targ->takedamage != DAMAGE_IMMORTAL) // FS: Zaero specific
+		if (targ->takedamage != DAMAGE_IMMORTAL) /* FS: Zaero specific game dll changes */
 		{
 			targ->health = targ->health - take;
 		}
@@ -843,7 +843,7 @@ T_RadiusDamage (edict_t *inflictor, edict_t *attacker, float damage,
 T_RadiusDamagePosition
 ============
 */
-void T_RadiusDamagePosition (vec3_t origin, edict_t *inflictor, edict_t *attacker, float damage, edict_t *ignore, float radius, int mod) // FS: Zaero specific
+void T_RadiusDamagePosition (vec3_t origin, edict_t *inflictor, edict_t *attacker, float damage, edict_t *ignore, float radius, int mod) /* FS: Zaero specific game dll changes */
 {
 	float	points;
 	edict_t	*ent = NULL;

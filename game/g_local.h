@@ -782,6 +782,8 @@ void G_SetSpectatorStats (edict_t *ent);
 void G_CheckChaseStats (edict_t *ent);
 void ValidateSelectedItem (edict_t *ent);
 void DeathmatchScoreboardMessage (edict_t *client, edict_t *killer);
+void HelpComputer (edict_t *ent);
+void InventoryMessage(edict_t *ent);
 
 //
 // g_pweapon.c

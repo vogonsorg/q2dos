@@ -40,7 +40,7 @@ qboolean	cmd_wait;
 #define	ALIAS_LOOP_COUNT	16
 int		alias_count;		// for detecting runaway loops
 
-qboolean	Sort_Possible_Strtolower (char *partial, char *complete); // FS
+qboolean	Sort_Possible_Strtolower (char *partial, char *complete); /* FS: Added */
 
 //=============================================================================
 
@@ -907,8 +907,8 @@ Cmd_List_f
 void Cmd_List_f (void)
 {
 	cmd_function_t	*cmd;
-	qboolean endReached = false; // FS: For the filter
-	qboolean endIsAMatch = false; // FS: For the filter
+	qboolean endReached = false; /* FS: For the filter */
+	qboolean endIsAMatch = false; /* FS: For the filter */
 	int				i;
 
 	i = 0;
@@ -925,16 +925,16 @@ void Cmd_List_f (void)
 			}
 			if(!cmd->next)
 			{
-				if(strstr(cmd->name, Cmd_Argv(1))) // FS: The last one in the search actually matches, so don't break out
+				if(strstr(cmd->name, Cmd_Argv(1))) /* FS: The last one in the search actually matches, so don't break out */
 					endIsAMatch = true;
 				endReached = true;
 			}
 		}
-		if(endReached && !endIsAMatch) // FS: We're at the end, and it's not a match to the filter so bust out.
+		if(endReached && !endIsAMatch) /* FS: We're at the end, and it's not a match to the filter so bust out. */
 		{
 			break;
 		}
-		Com_Printf ("     %s\n", cmd->name); // FS: Make it look consistent with cvarlist
+		Com_Printf ("     %s\n", cmd->name); /* FS: Make it look consistent with cvarlist */
 	}
 	Com_Printf ("%i commands\n", i);
 }
@@ -961,17 +961,17 @@ void Cmd_Init (void)
 #define RETRY_ONCE		1
 #define RETRY_MULTIPLE	2
 
-// FS: Merged from Cmd_CompleteCommand and Cvar_CompleteVariable
-// FS: Inspired from KMQ2 with 100% in house code.
+/* FS: Merged from Cmd_CompleteCommand and Cvar_CompleteVariable */
+/* FS: Inspired from KMQ2 with 100% in house code. */
 char *Sort_Possible_Cmds (char *partial)
 {
 	cmd_function_t	*cmd;
-	cvar_t			*cvar; // FS
+	cvar_t			*cvar;
 	int				len;
 	cmdalias_t		*a;
-	int	foundExactCount = 0; // FS
-	int foundPartialCount = 0; // FS
-	int retryPartialFlag = RETRY_INITIAL; // FS
+	int	foundExactCount = 0;
+	int foundPartialCount = 0;
+	int retryPartialFlag = RETRY_INITIAL;
 
 	len = strlen(partial);
 
@@ -1068,7 +1068,7 @@ retryPartial:
 	return NULL;
 }
 
-// FS: This is needed because cmds, aliases, and cvars are case sensitive.
+/* FS: This is needed because cmds, aliases, and cvars are case sensitive. */
 qboolean	Sort_Possible_Strtolower (char *partial, char *complete)
 {
 	int partialLength = 0;

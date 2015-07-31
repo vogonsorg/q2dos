@@ -69,8 +69,8 @@ static int current_field_buffer=0;
 
 static struct section_buffer section_buffers[NUM_SECTION_BUFFERS];
 static struct field_buffer field_buffers[NUM_FIELD_BUFFERS];
-static byte	extVoices,extCodecVoices; // FS: GUS clicking sounds during map transitions and pauseing fix
-int	havegus; // FS
+static byte	extVoices,extCodecVoices; /* FS: GUS clicking sounds during map transitions and pauseing fix */
+int	havegus; /* FS: Is GUS our sound card? */
 
 //***************************************************************************
 // Internal routines
@@ -1083,8 +1083,8 @@ qboolean GUS_Init(void)
 	struct Gf1RateStruct *Gf1Rate;
 
 	if (COM_CheckParm("-nogus"))
-		return false;			  // FS: Disables GUS, useful if you want to use SB16 instead.  Thanks to Oz of HoT for oneliner.
-		  
+		return false; /* FS: Disables GUS, useful if you want to use SB16 instead.  Thanks to sezero for oneliner. */
+
 	// See what kind of UltraSound we have, if any
 	if (GUS_GetIWData()==false)
 		if (GUS_GetMAXData()==false)
@@ -1095,10 +1095,10 @@ qboolean GUS_Init(void)
 	{
 		// do 11khz sampling rate unless command line parameter wants different
 		dma.speed = 11025;
-		FSVal = extCodecVoices = 0x03; // FS: Added extCodecVoices
+		FSVal = extCodecVoices = 0x03; /* FS: Added extCodecVoices */
 		rc = COM_CheckParm("-sspeed");
 
-		if (s_khz->value > 11024) // FS: S_KHZ
+		if (s_khz->value > 11024)
 		{
 			dma.speed = s_khz->value;
 
@@ -1112,7 +1112,7 @@ qboolean GUS_Init(void)
 				if (dma.speed <= CodecRate->Rate)
 				{
 					dma.speed=CodecRate->Rate;
-					FSVal=extCodecVoices=CodecRate->FSVal; // FS: Added extCodecVoices
+					FSVal=extCodecVoices=CodecRate->FSVal; /* FS: Added extCodecVoices */
 					break;
 				}
 			}
@@ -1132,7 +1132,7 @@ qboolean GUS_Init(void)
 				if (dma.speed <= CodecRate->Rate)
 				{
 					dma.speed=CodecRate->Rate;
-					FSVal=extCodecVoices=CodecRate->FSVal; // FS: Added extCodecVoices
+					FSVal=extCodecVoices=CodecRate->FSVal; /* FS: Added extCodecVoices */
 					break;
 				}
 			}
@@ -1165,16 +1165,16 @@ qboolean GUS_Init(void)
 
 		GUS_StartDMA(DmaChannel,dma_buffer,SND_BUFFER_SIZE);
 		GUS_StartCODEC(SND_BUFFER_SIZE,FSVal);
-		havegus = 2; // FS: GUS MAX/IWPNP
+		havegus = 2; /* FS: GUS MAX/IWPNP */
 	}
 	else
 	{
 		// do 19khz sampling rate unless command line parameter wants different
 		dma.speed = 19293;
-		Voices=extVoices=32; // FS: Added extVoices
+		Voices=extVoices=32; /* FS: Added extVoices */
 		rc = COM_CheckParm("-sspeed");
 
-		if (s_khz->value > 19292) // FS: S_KHZ
+		if (s_khz->value > 19292)
 		{
 			dma.speed = s_khz->value;
 
@@ -1188,7 +1188,7 @@ qboolean GUS_Init(void)
 				if (dma.speed <= Gf1Rate->Rate)
 				{
 					dma.speed=Gf1Rate->Rate;
-					Voices=extVoices=Gf1Rate->Voices; // FS: Added extVoices
+					Voices=extVoices=Gf1Rate->Voices; /* FS: Added extVoices */
 					break;
 				}
 			}
@@ -1208,7 +1208,7 @@ qboolean GUS_Init(void)
 				if (dma.speed <= Gf1Rate->Rate)
 				{
 					dma.speed=Gf1Rate->Rate;
-					Voices=extVoices=Gf1Rate->Voices; // FS: Added extVoices
+					Voices=extVoices=Gf1Rate->Voices; /* FS: Added extVoices */
 					break;
 				}
 			}
@@ -1244,9 +1244,9 @@ qboolean GUS_Init(void)
 		else
 			SetGf18(DMA_CONTROL,0x45);
 		GUS_StartGf1(SND_BUFFER_SIZE,Voices);
-		havegus = 1; // FS: Classic GUS
+		havegus = 1; /* FS: Classic GUS */
 
-		if (s_mixahead->value <= 0.2) // FS: GUS Classic needs 0.3 to work properly.
+		if (s_mixahead->value <= 0.2) /* FS: GUS Classic needs 0.3 to work properly. */
 			Cvar_SetValue ("s_mixahead", 0.3);
 	}
 
@@ -1340,7 +1340,7 @@ void GUS_Shutdown (void)
 	dma_dosadr = NULL; // sezero
 }
 
-void GUS_ClearDMA (void) // FS: This stops the constant clicking sound during map loads and pause screens
+void GUS_ClearDMA (void) /* FS: This stops the constant clicking sound during map loads and pause screens */
 {
 	memset(dma_buffer, 0, SND_BUFFER_SIZE);
 	dma.samplepos = 0;
@@ -1348,12 +1348,12 @@ void GUS_ClearDMA (void) // FS: This stops the constant clicking sound during ma
 	dma.buffer = (unsigned char *) dma_buffer;
 	dma.samples = SND_BUFFER_SIZE/(dma.samplebits/8);
 
-	if (HaveCodec) // FS: GUS MAX, AMD InterWave/GUS PnP
+	if (HaveCodec) /* FS: GUS MAX, AMD InterWave/GUS PnP */
 	{
 		dos_outportb(CodecRegisterSelect,CODEC_INTERFACE_CONFIG);
 		dos_outportb(CodecData,0x01);
 	}
-	else // FS: GUS "Classic", ACE, or compatible OEM CLONE
+	else /* FS: GUS "Classic", ACE, or compatible OEM CLONE */
 	{
 		dos_outportb(Gf1PageRegister,0);
 		SetGf18(SET_CONTROL,0x03);
@@ -1370,11 +1370,11 @@ void GUS_ClearDMA (void) // FS: This stops the constant clicking sound during ma
 
 	GUS_StartDMA(DmaChannel,dma_buffer,SND_BUFFER_SIZE);
 
-	if (HaveCodec) // FS: GUS MAX, AMD InterWave/GUS PnP
+	if (HaveCodec) /* FS: GUS MAX, AMD InterWave/GUS PnP */
 	{
 		GUS_StartCODEC(SND_BUFFER_SIZE,extCodecVoices);
 	}
-	else // FS: GUS "Classic", ACE, or compatible OEM CLONE
+	else /* FS: GUS "Classic", ACE, or compatible OEM CLONE */
 	{
 		SetGf116(SET_DMA_ADDRESS,0x0000);
 		if (DmaChannel<=3)

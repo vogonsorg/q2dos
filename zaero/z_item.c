@@ -126,11 +126,11 @@ void SP_misc_securitycamera(edict_t *self)
 char *camera_statusbar =
 "xv 26 yb -75 string \"Tracking %s\" "
 // timer
-"if 22 " // FS: Must mirror STAT_CAMERA_ICON!
+"if 22 " /* FS: Must mirror STAT_CAMERA_ICON! */
 "	xv	246 "
-"	num	3	23 " // FS: Must mirror STAT_CAMERA_TIMER!
+"	num	3	23 " /* FS: Must mirror STAT_CAMERA_TIMER! */
 "	xv	296 "
-"	pic	22 " // FS: Must mirror STAT_CAMERA_ICON!
+"	pic	22 " /* FS: Must mirror STAT_CAMERA_ICON! */
 "endif "
 ;
 

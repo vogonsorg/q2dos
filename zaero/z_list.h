@@ -1,4 +1,4 @@
-#if 0 // FS: Yamagai Removed
+#if 0 /* FS: Yamagai q2 removed */
 #ifndef __Z_LIST_H
 #define __Z_LIST_H
 

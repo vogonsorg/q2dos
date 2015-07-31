@@ -111,7 +111,7 @@ int goa_init(int queryport, char *gamename, char *ip, void *userdata)
 
 	gspyi.print("Initializing GameSpy\n");
 
-	// FS: Now CVARs
+	/* FS: Now CVARs */
 	if (sv_master_server_ip->string[0] == '\0')
 	{
 		gspyi.print("Error: sv_master_server_ip is blank!  Setting to default: %s\n", SV_MASTER_ADDR);
@@ -560,7 +560,7 @@ void send_heartbeat(int statechanged)
 	if (!public_server->value)
 		return;		// a private dedicated game
 
-	gspyi.dprint(DEVELOPER_MSG_SERVER, "Sending a heartbeat to the GameSpy Master Server.\n"); // FS
+	gspyi.dprint(DEVELOPER_MSG_SERVER, "Sending a heartbeat to the GameSpy Master Server.\n"); /* FS: Added */
 	safe_sprintf(buf,sizeof(buf),"\\heartbeat\\%d\\gamename\\%s",qport, gname);
 	if (statechanged)
 	{

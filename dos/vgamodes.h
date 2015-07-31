@@ -478,7 +478,7 @@ int vrs360x480x256planar[] = {
 	VRS_END,
 };
 
-// FS: For now, I only care about 320x240 planar, everything else is worthless IMO
+/* FS: For now, I only care about 320x240 planar, everything else is worthless IMO */
 
 //
 // extra VGA-specific data for vgavidmodes

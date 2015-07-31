@@ -111,7 +111,7 @@ BeginIntermission(edict_t *targ)
 	level.intermissiontime = level.time;
 	level.changemap = targ->map;
 
-	if (Q_stricmp(level.mapname, "zboss") == 0 && !deathmatch->value) // FS: Zaero specific
+	if (Q_stricmp(level.mapname, "zboss") == 0 && !deathmatch->value) /* FS: Zaero specific game dll changes */
 		level.fadeFrames = 50;
 
 	if (strstr(level.changemap, "*"))
@@ -354,7 +354,7 @@ HelpComputer(edict_t *ent)
 
 	gi.WriteByte(svc_layout);
 	gi.WriteString(string);
-	gi.unicast (ent, true); // FS: Don't remove this DOS needs this!
+	gi.unicast (ent, true); /* FS: Don't remove this DOS needs this! */
 }
 
 void
@@ -457,7 +457,7 @@ G_SetStats(edict_t *ent)
 	//
 	// timers
 	//
-	if (ent->client->a2kFramenum > level.framenum)  // FS: Zaero specific
+	if (ent->client->a2kFramenum > level.framenum)  /* FS: Zaero specific game dll changes */
 	{
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("w_a2k");
 		ent->client->ps.stats[STAT_TIMER] = (ent->client->a2kFramenum - level.framenum)/10;
@@ -574,7 +574,7 @@ G_SetStats(edict_t *ent)
 	}
 
 	// origin
-	if (ent->client->showOrigin) // FS: Zaero specific, special debug command
+	if (ent->client->showOrigin) /* FS: Zaero specific game dll changes: special debug command */
 	{
 		ent->client->ps.stats[STAT_SHOW_ORIGIN] = 1;
 		ent->client->ps.stats[STAT_ORIGIN_X] = (int)ent->s.origin[0];
@@ -586,7 +586,7 @@ G_SetStats(edict_t *ent)
 		ent->client->ps.stats[STAT_SHOW_ORIGIN] = 0;
 	}
 
-	if (ent->client->zCameraTrack)  // FS: Zaero specific
+	if (ent->client->zCameraTrack)  /* FS: Zaero specific game dll changes */
 	{
 		ent->client->ps.stats[STAT_CAMERA_ICON] = gi.imageindex("i_visor");
 		ent->client->ps.stats[STAT_CAMERA_TIMER] = ent->client->pers.visorFrames/10;

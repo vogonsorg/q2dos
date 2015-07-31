@@ -350,7 +350,7 @@ InfantryMachineGun(edict_t *self)
 		AngleVectors(vec, forward, NULL, NULL);
 	}
 
-	if(EMPNukeCheck(self, start)) // FS: Zaero specific
+	if(EMPNukeCheck(self, start)) /* FS: Zaero specific game dll changes */
 	{
 		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
 		return;
@@ -817,7 +817,7 @@ SP_monster_infantry(edict_t *self)
 	walkmonster_start(self);
 }
 
-void handler_ConvertToInfantry(edict_t *self) // FS: Zaero specific
+void handler_ConvertToInfantry(edict_t *self) /* FS: Zaero specific game dll changes */
 {
 	if (!self)
 	{

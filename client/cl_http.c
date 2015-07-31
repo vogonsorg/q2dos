@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#include <ctype.h> // FS: For isalnum
+#include <ctype.h> /* FS: For isalnum */
 #include "client.h"
 
 #ifdef USE_CURL
@@ -425,7 +425,7 @@ void CL_SetHTTPServer (const char *URL)
 
 	strncpy (cls.downloadServer, URL, sizeof(cls.downloadServer)-1);
 
-	cls.downloadServerRetry[0] = 0; // FS: Added because Whale's Weapons HTTP server rejects you after a lot of 404s.  Then you lose HTTP until a hard reconnect.
+	cls.downloadServerRetry[0] = 0; /* FS: Added because Whale's WOD HTTP server rejects you after a lot of 404s.  Then you lose HTTP until a hard reconnect. */
 }
 /*
 ===============
@@ -1044,7 +1044,7 @@ static void CL_FinishHTTPDownload (void)
 		}
 		else if (abortDownloads == HTTPDL_ABORT_HARD)
 		{
-			Q_strncpyz(cls.downloadServerRetry, cls.downloadServer, sizeof(cls.downloadServerRetry)); // FS: Added because Whale's Weapons HTTP server rejects you after a lot of 404s.  Then you lose HTTP until a hard reconnect.
+			Q_strncpyz(cls.downloadServerRetry, cls.downloadServer, sizeof(cls.downloadServerRetry)); /* FS: Added because Whale's WOD HTTP server rejects you after a lot of 404s.  Then you lose HTTP until a hard reconnect. */
 			cls.downloadServer[0] = 0;
 		}
 	}

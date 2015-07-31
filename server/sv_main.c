@@ -108,7 +108,7 @@ Given an netadr_t, returns the matching client.
 */
 client_t *GetClientFromAdr (netadr_t address)
 {
-	client_t        *cl = NULL; // FS: Compiler warning
+	client_t        *cl = NULL; /* FS: Compiler warning */
 	int                     i;
 	qboolean        found = false;
 

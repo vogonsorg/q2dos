@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "g_local.h"
 
-void Z_SpawnDMItems(); // FS: Zaero specific
+void Z_SpawnDMItems(); /* FS: Zaero specific game dll changes */
 
 typedef struct
 {
@@ -145,25 +145,25 @@ void SP_turret_breach (edict_t *self);
 void SP_turret_base (edict_t *self);
 void SP_turret_driver (edict_t *self);
 
-void SP_sound_echo (edict_t *self); // FS: Zaero specific
+void SP_sound_echo (edict_t *self); /* FS: Zaero specific game dll changes */
 
-void SP_misc_lasertripbomb (edict_t *self); // FS: Zaero specific
-void SP_load_mirrorlevel (edict_t *self); // FS: Zaero specific
-void SP_trigger_laser(edict_t *self); // FS: Zaero specific
-void SP_monster_autocannon(edict_t *self); // FS: Zaero specific
-void SP_monster_autocannon_floor(edict_t *self); // FS: Zaero specific
-void SP_monster_sentien(edict_t *self); // FS: Zaero specific
-void SP_misc_securitycamera(edict_t *self); // FS: Zaero specific
-void SP_monster_hound (edict_t *self); // FS: Zaero specific
-void SP_monster_handler (edict_t *self); // FS: Zaero specific
-void SP_misc_commdish (edict_t *self); // FS: Zaero specific
-void SP_misc_crate(edict_t *self); // FS: Zaero specific
-void SP_misc_crate_medium(edict_t *self); // FS: Zaero specific
-void SP_misc_crate_small(edict_t *self); // FS: Zaero specific
-void SP_monster_zboss (edict_t *self); // FS: Zaero specific
-void SP_target_zboss_target(edict_t *self); // FS: Zaero specific
-void SP_func_barrier(edict_t *self); // FS: Zaero specific
-void SP_misc_seat(edict_t *self); // FS: Zaero specific
+void SP_misc_lasertripbomb (edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_load_mirrorlevel (edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_trigger_laser(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_monster_autocannon(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_monster_autocannon_floor(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_monster_sentien(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_misc_securitycamera(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_monster_hound (edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_monster_handler (edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_misc_commdish (edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_misc_crate(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_misc_crate_medium(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_misc_crate_small(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_monster_zboss (edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_target_zboss_target(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_func_barrier(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_misc_seat(edict_t *self); /* FS: Zaero specific game dll changes */
 
 
 
@@ -288,28 +288,28 @@ spawn_t	spawns[] = {
 	{"turret_driver", SP_turret_driver},
 
 // evolve map entities
-	{"sound_echo", SP_sound_echo}, // FS: Zaero specific
-	{"misc_ired", SP_misc_lasertripbomb}, // FS: Zaero specific
-	{"trigger_laser", SP_trigger_laser}, // FS: Zaero specific
-	{"monster_autocannon", SP_monster_autocannon}, // FS: Zaero specific
-	{"monster_autocannon_floor", SP_monster_autocannon_floor}, // FS: Zaero specific
-	{"monster_sentien", SP_monster_sentien}, // FS: Zaero specific
-	{"misc_securitycamera", SP_misc_securitycamera}, // FS: Zaero specific
-	{"monster_hound", SP_monster_hound}, // FS: Zaero specific
-	{"monster_handler", SP_monster_handler}, // FS: Zaero specific
-	{"misc_commdish", SP_misc_commdish}, // FS: Zaero specific
+	{"sound_echo", SP_sound_echo}, /* FS: Zaero specific game dll changes */
+	{"misc_ired", SP_misc_lasertripbomb}, /* FS: Zaero specific game dll changes */
+	{"trigger_laser", SP_trigger_laser}, /* FS: Zaero specific game dll changes */
+	{"monster_autocannon", SP_monster_autocannon}, /* FS: Zaero specific game dll changes */
+	{"monster_autocannon_floor", SP_monster_autocannon_floor}, /* FS: Zaero specific game dll changes */
+	{"monster_sentien", SP_monster_sentien}, /* FS: Zaero specific game dll changes */
+	{"misc_securitycamera", SP_misc_securitycamera}, /* FS: Zaero specific game dll changes */
+	{"monster_hound", SP_monster_hound}, /* FS: Zaero specific game dll changes */
+	{"monster_handler", SP_monster_handler}, /* FS: Zaero specific game dll changes */
+	{"misc_commdish", SP_misc_commdish}, /* FS: Zaero specific game dll changes */
 
 // mirror level's 
-	{"load_mirrorlevel", SP_load_mirrorlevel}, // FS: Zaero specific
+	{"load_mirrorlevel", SP_load_mirrorlevel}, /* FS: Zaero specific game dll changes */
 
-	{"misc_crate", SP_misc_crate}, // FS: Zaero specific
-	{"misc_crate_medium", SP_misc_crate_medium}, // FS: Zaero specific
-	{"misc_crate_small", SP_misc_crate_small}, // FS: Zaero specific
+	{"misc_crate", SP_misc_crate}, /* FS: Zaero specific game dll changes */
+	{"misc_crate_medium", SP_misc_crate_medium}, /* FS: Zaero specific game dll changes */
+	{"misc_crate_small", SP_misc_crate_small}, /* FS: Zaero specific game dll changes */
 
-	{"monster_zboss", SP_monster_zboss}, // FS: Zaero specific
-	{"func_barrier", SP_func_barrier}, // FS: Zaero specific
-	{"misc_seat", SP_misc_seat}, // FS: Zaero specific
-	{"target_zboss_target", SP_target_zboss_target}, // FS: Zaero specific
+	{"monster_zboss", SP_monster_zboss}, /* FS: Zaero specific game dll changes */
+	{"func_barrier", SP_func_barrier}, /* FS: Zaero specific game dll changes */
+	{"misc_seat", SP_misc_seat}, /* FS: Zaero specific game dll changes */
+	{"target_zboss_target", SP_target_zboss_target}, /* FS: Zaero specific game dll changes */
 	{NULL, NULL}
 };
 
@@ -621,7 +621,7 @@ void SpawnEntities (const char *mapname, char *entities, const char *spawnpoint)
 	const char	*com_token;
 	int			i;
 	float		skill_level;
-	int oldmaxent; // FS: Zaero specific
+	int oldmaxent; /* FS: Zaero specific game dll changes */
 
 	if (!mapname || !entities || !spawnpoint)
 	{
@@ -687,7 +687,7 @@ void SpawnEntities (const char *mapname, char *entities, const char *spawnpoint)
 		else
 		{
 			ent = G_Spawn ();
-			ent->spawnflags2 = 0; // FS: Zaero specific
+			ent->spawnflags2 = 0; /* FS: Zaero specific game dll changes */
 		}
 
 		entities = ED_ParseEdict (entities, ent);
@@ -741,7 +741,7 @@ void SpawnEntities (const char *mapname, char *entities, const char *spawnpoint)
 #endif // 0
 			else
 			{
-				if (((!coop->value) && (ent->spawnflags2 & SPAWNFLAG2_NOT_SINGLE)) || // FS: Zaero specific
+				if (((!coop->value) && (ent->spawnflags2 & SPAWNFLAG2_NOT_SINGLE)) || /* FS: Zaero specific game dll changes */
           ((coop->value) && (ent->spawnflags2 & SPAWNFLAG2_NOT_COOP)) ||
 					((skill->value == 0) && (ent->spawnflags & SPAWNFLAG_NOT_EASY)) ||
 					((skill->value == 1) && (ent->spawnflags & SPAWNFLAG_NOT_MEDIUM)) ||
@@ -760,7 +760,7 @@ void SpawnEntities (const char *mapname, char *entities, const char *spawnpoint)
 		ED_CallSpawn (ent);
 	}	
 
-	oldmaxent = globals.num_edicts; // FS: Zaero specific
+	oldmaxent = globals.num_edicts; /* FS: Zaero specific game dll changes */
 
 	gi.dprintf(DEVELOPER_MSG_GAME, "%i entities created\n", oldmaxent);
 	gi.dprintf(DEVELOPER_MSG_GAME, "%i entities inhibited\n", inhibit);
@@ -769,7 +769,7 @@ void SpawnEntities (const char *mapname, char *entities, const char *spawnpoint)
 
 	PlayerTrail_Init ();
 
-	Z_SpawnDMItems(); // FS: Zaero specific
+	Z_SpawnDMItems(); /* FS: Zaero specific game dll changes */
 }
 
 
@@ -832,15 +832,15 @@ char *single_statusbar =
 "	pic	11 "
 "endif "
 
-// player origin // FS: Zaero specific
-"if 18 " // FS: Must mirror STAT_SHOW_ORIGIN
+// player origin /* FS: Zaero specific game dll changes */
+"if 18 " /* FS: Must mirror STAT_SHOW_ORIGIN! */
 "	xl 0 "
 "	yb -120 "
-"	num 5 19 " // FS: Must mirror STAT_ORIGIN_X
+"	num 5 19 " /* FS: Must mirror STAT_ORIGIN_X! */
 "	yb -96 "
-"	num 5 20 " // FS: Must mirror STAT_ORIGIN_Y
+"	num 5 20 " /* FS: Must mirror STAT_ORIGIN_Y! */
 "	yb -72 "
-"	num 5 21 " // FS: Must mirror STAT_ORIGIN_Z
+"	num 5 21 " /* FS: Must mirror STAT_ORIGIN_Z! */
 "endif "
 ;
 
@@ -906,15 +906,15 @@ char *dm_statusbar =
 "yt 2 "
 "num 3 14 "
 
-// player origin // FS: Zaero specific
-"if 18 " // FS: Must mirror STAT_SHOW_ORIGIN
+// player origin /* FS: Zaero specific game dll changes */
+"if 18 " /* FS: Must mirror STAT_SHOW_ORIGIN! */
 "	xl 0 "
 "	yb -120 "
-"	num 5 19 " // FS: Must mirror STAT_ORIGIN_X
+"	num 5 19 " /* FS: Must mirror STAT_ORIGIN_X! */
 "	yb -96 "
-"	num 5 20 " // FS: Must mirror STAT_ORIGIN_Y
+"	num 5 20 " /* FS: Must mirror STAT_ORIGIN_Y! */
 "	yb -72 "
-"	num 5 21 " // FS: Must mirror STAT_ORIGIN_Z
+"	num 5 21 " /* FS: Must mirror STAT_ORIGIN_Z! */
 "endif "
 
 /* spectator */
@@ -956,7 +956,7 @@ SP_worldspawn(edict_t *ent)
 	ent->solid = SOLID_BSP;
 	ent->inuse = true; /* since the world doesn't use G_Spawn() */
 	ent->s.modelindex = 1; /* world model is always index 1 */
-	ent->spawnflags2 = 0; // FS: Zaero specific
+	ent->spawnflags2 = 0; /* FS: Zaero specific game dll changes */
 
 	/* --------------- */
 

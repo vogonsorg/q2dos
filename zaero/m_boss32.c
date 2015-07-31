@@ -525,7 +525,7 @@ makronBFG(edict_t *self)
 	G_ProjectSource(self->s.origin, monster_flash_offset[MZ2_MAKRON_BFG],
 			forward, right, start);
 
-  if(EMPNukeCheck(self, start)) // FS: Zaero specific
+  if(EMPNukeCheck(self, start)) /* FS: Zaero specific game dll changes */
   {
 		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
     return;
