@@ -7,10 +7,12 @@
  *
  *  See darray.h for function descriptions
  */
-#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../nonport.h"
 #include "darray.h"
+
+extern gspyimport_t		gspyi;
 
 #define DEF_GROWBY 8
 
@@ -46,7 +48,8 @@ static void ArrayGrow(DArray array)
 {
 	array->capacity +=  array->growby;
 	array->list = realloc(array->list, array->capacity * array->elemsize);
-	assert(array->list);
+	if(!array->list)
+		gspyi.error("ArrayGrow: array->list is NULL");
 }
 
 /* SetElement
@@ -63,8 +66,10 @@ DArray ArrayNew(int elemSize, int numElemsToAllocate,
 	DArray array;
 
 	array = (DArray) malloc(sizeof(struct DArrayImplementation));
-	assert(array);
-	assert(elemSize);
+	if(!array)
+		gspyi.error("ArrayNew: array is NULL.");
+	if(!elemSize)
+		gspyi.error("ArrayNew: elemSize is NULL.");
 	if (numElemsToAllocate == 0)
 		numElemsToAllocate = DEF_GROWBY;
 	array->count = 0;
@@ -73,7 +78,8 @@ DArray ArrayNew(int elemSize, int numElemsToAllocate,
 	array->growby = numElemsToAllocate;
 	array->elemfreefn = elemFreeFn;
 	array->list = malloc(array->capacity * array->elemsize);
-	assert(array->list);
+	if(!array->list)
+		gspyi.error("ArrayNew: array->list is NULL.");
 
 	return array;
 }
@@ -82,7 +88,9 @@ void ArrayFree(DArray array)
 {
 	int i;
 	
-	assert(array);
+	if(!array)
+		gspyi.error("ArrayFree: array is NULL.");
+
 	for (i = 0; i < array->count; i++)
 	{
 		FreeElement(array, i);
@@ -99,8 +107,9 @@ int ArrayLength(const DArray array)
 
 void *ArrayNth(DArray array, int n)
 {
-	assert( (n >= 0) && (n < array->count));
-	
+	if( !(array >= 0) && !(n < array->count) )
+		gspyi.error("Array error in ArrayNth");
+
 	return (char *)array->list + array->elemsize*n;
 }
 
@@ -114,7 +123,8 @@ void ArrayAppend(DArray array, const void *newElem)
 
 void ArrayInsertAt(DArray array, const void *newElem, int n)
 {
-	assert( (n >= 0) && (n <= array->count));
+	if( !(array >= 0) && !(n <= array->count) )
+		gspyi.error("Array error in ArrayInsertAt");
 
 	if (array->count == array->capacity)
 		ArrayGrow(array);
@@ -127,7 +137,8 @@ void ArrayInsertAt(DArray array, const void *newElem, int n)
 
 void ArrayDeleteAt(DArray array, int n)
 {
-	assert( (n >= 0) && (n < array->count));
+	if( !(array >= 0) && !(n < array->count) )
+		gspyi.error("Array error in ArrayDeleteAt");
 
 	FreeElement(array,n);
 	if (n < array->count - 1) //if not last element
@@ -139,7 +150,8 @@ void ArrayDeleteAt(DArray array, int n)
 
 void ArrayReplaceAt(DArray array, const void *newElem, int n)
 {
-	assert( (n >= 0) && (n < array->count));
+	if( !(array >= 0) && !(n < array->count) )
+		gspyi.error("Array error in ArrayReplaceAt");
 
 	FreeElement(array, n);
 	SetElement(array, newElem,n);
@@ -177,7 +189,8 @@ void ArrayMap(DArray array, ArrayMapFn fn, void *clientData)
 {
 	int i;
 
-	assert(fn);
+	if(!fn)
+		gspyi.error("ArrayMap: fn is NULL.");
 
 	for (i = 0; i < array->count; i++)
 		fn(ArrayNth(array,i), clientData);
