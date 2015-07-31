@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // vid_dos.c -- DOS video driver frontend
 
 #ifndef REF_HARD_LINKED
-#include <dlfcn.h>
+#include <dlfcn.h> /* RTLD_??? */
 #endif
 #include "../client/client.h"
 #include "../client/qmenu.h"
@@ -198,7 +198,7 @@ static void VID_FreeReflib (void)
 {
 #ifndef REF_HARD_LINKED
 	if (reflib_library)
-		dlclose(reflib_library);
+		Sys_dlclose(reflib_library);
 	reflib_library = NULL;
 #endif
 	memset (&re, 0, sizeof(re));
@@ -225,12 +225,12 @@ static qboolean VID_LoadRefresh (const char *name)
 #ifndef REF_HARD_LINKED
 	Com_Printf("------- Loading %s -------\n", name);
 
-	if ((reflib_library = dlopen(name, RTLD_LAZY|RTLD_GLOBAL)) == NULL)
+	if ((reflib_library = Sys_dlopen(name, RTLD_LAZY|RTLD_GLOBAL)) == NULL)
 	{
 		Com_Printf("dlopen(\"%s\") failed\n", name);
 		return false;
 	}
-	if ((GetRefAPI = (void *) dlsym(reflib_library, "_GetRefAPI")) == NULL)
+	if ((GetRefAPI = (void *) Sys_dlsym(reflib_library, "_GetRefAPI")) == NULL)
 	{
 		Com_Error(ERR_FATAL, "dlsym() failed on %s", name);
 		return false;

@@ -157,9 +157,10 @@ DXE_EXPORT_TABLE (syms)
 #endif
 DXE_EXPORT_END
 
+static int num_unres;
+
 static int dxe_fail ()
 {
-	Sys_Error ("Unresolved symbol(s) in DXE. Can't continue. See DXE.LOG for details.");
 	return 0;
 }
 
@@ -169,16 +170,40 @@ static void *dxe_res (const char *sym)
 	fprintf (f, "%s: unresolved symbol in DXE.\n", sym);
 	fflush (f);
 	fclose (f);
+	++num_unres;
 	return (void *)dxe_fail;
 }
 
 void Sys_InitDXE3 (void)
 {
 	remove ("dxe.log");
-	/* Set the error callback function */
-	_dlsymresolver = dxe_res;
+
 	/* Register the symbols exported into dynamic modules */
 	dlregsym (syms);
+}
+
+void *Sys_dlopen (const char *filename, int mode)
+{
+	void *lib;
+
+	_dlsymresolver = dxe_res;
+	num_unres = 0;
+	lib = dlopen (filename, mode);
+	_dlsymresolver = NULL;
+	if (num_unres)
+		Sys_Error ("Unresolved symbol(s) in %s. Can't continue. See DXE.LOG for details.", filename);
+
+	return lib;
+}
+
+void *Sys_dlsym (void *handle, const char *symbol)
+{
+	return dlsym (handle, symbol);
+}
+
+int Sys_dlclose (void *handle)
+{
+	return dlclose (handle);
 }
 
 #ifndef GAME_HARD_LINKED
@@ -210,7 +235,7 @@ void *Sys_GetGameAPI (void *parms)
 		if (!path) return NULL; /* couldn't find one anywhere */
 
 		Com_sprintf (name, sizeof(name), "%s/%s/%s", curpath, path, gamename);
-		game_library = dlopen (name, RTLD_LAZY);
+		game_library = Sys_dlopen (name, RTLD_LAZY);
 		if (game_library)
 		{
 			Com_Printf ("LoadLibrary (%s)\n",name);
@@ -222,6 +247,7 @@ void *Sys_GetGameAPI (void *parms)
 	if (!GetGameAPI)
 	{
 		Sys_UnloadGame ();
+		Com_Printf("dlsym() failed on %s", gamename);
 		return NULL;
 	}
 
@@ -244,7 +270,7 @@ void *Sys_GetGameSpyAPI(void *parms)
 	Com_Printf("------- Loading %s -------\n", dxename);
 
 	Com_sprintf(name, sizeof(name), "%s/%s", curpath, dxename);
-	gamespy_library = dlopen (name, RTLD_LAZY);
+	gamespy_library = Sys_dlopen (name, RTLD_LAZY);
 	if (!gamespy_library)
 		return NULL;
 
@@ -252,6 +278,7 @@ void *Sys_GetGameSpyAPI(void *parms)
 	if (!GetGameSpyAPI)
 	{
 		dlclose(gamespy_library);
+		Com_Printf("dlsym() failed on %s", dxename);
 		gamespy_library = NULL;
 		return NULL;
 	}

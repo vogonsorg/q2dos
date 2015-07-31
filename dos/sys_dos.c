@@ -285,7 +285,6 @@ void Sys_Quit (void)
 	exit (0);
 }
 
-void Sys_InitDXE3 (void);
 #ifdef GAME_HARD_LINKED
 void *GetGameAPI (void *import);
 void	Sys_UnloadGame (void)

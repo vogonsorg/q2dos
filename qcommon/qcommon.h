@@ -850,6 +850,15 @@ void	Sys_CopyProtect (void);
 
 void	Sys_Sleep (int msec);	// Knightmare added for CPU usage fix
 
+#ifdef __DJGPP__
+void Sys_InitDXE3 (void);
+/* Sys_dlopen() logs unresolved syms, and errors if any. */
+/* need to include dlfcn.h for the RTLD_??? mode macros. */
+void *Sys_dlopen (const char *filename, int mode);
+void *Sys_dlsym (void *handle, const char *symbol);
+int Sys_dlclose (void *handle);
+#endif
+
 /*
 ==============================================================
 
