@@ -10,11 +10,13 @@
  * array for the buckets, and a DArray for each individual bucket
  */
 
-#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../nonport.h"
 #include "darray.h"
 #include "hashtable.h"
+
+extern gspyimport_t		gspyi;
 
 struct HashImplementation
 {
@@ -33,16 +35,22 @@ HashTable TableNew(int elemSize, int nBuckets,
 	HashTable table;
 	int i;
 
-	assert(hashFn);
-	assert(compFn);
-	assert(elemSize);
-	assert(nBuckets);
+	if(!hashFn)
+		gspyi.error("TableNew: hashFn is NULL.");
+	if(!compFn)
+		gspyi.error("TableNew: compFn is NULL.");
+	if(!elemSize)
+		gspyi.error("TableNew: elemSize is NULL.");
+	if(!nBuckets)
+		gspyi.error("TableNew: nBuckets is NULL.");
 
 	table = (HashTable)malloc(sizeof(struct HashImplementation));
-	assert(table);
+	if(!table)
+		gspyi.error("TableNew: table is NULL.");
 
 	table->buckets = (DArray *)malloc(nBuckets * sizeof(DArray));
-	assert(table->buckets);
+	if(!table->buckets)
+		gspyi.error("TableNew: table->buckets is NULL.");
 	for (i = 0; i < nBuckets; i++) //ArrayNew will assert if allocation fails
 		table->buckets[i] = ArrayNew(elemSize, 0, freeFn);
 	table->nbuckets = nBuckets;
@@ -57,7 +65,8 @@ void TableFree(HashTable table)
 {
 	int i;
 
-	assert(table);
+	if(!table)
+		gspyi.error("TableFree: table is NULL.");
 
 	for (i = 0 ; i < table->nbuckets ; i++)
 	{
@@ -109,7 +118,8 @@ void TableMap(HashTable table, TableMapFn fn, void *clientData)
 {
 	int i;
 
-	assert(fn);
+	if(!fn)
+		gspyi.error("TableMap: fn is NULL.");
 
 	for (i = 0 ; i < table->nbuckets ; i++)
 		ArrayMap(table->buckets[i], fn, clientData);

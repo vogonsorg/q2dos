@@ -25,7 +25,6 @@ Fax(714)549-0757
 #include "../nonport.h"
 #include "../../client/client.h" /* FS: For the cl_gamespy CVARs */
 #include "gutil.h"
-#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -161,17 +160,20 @@ GServerList ServerListNew (char *gamename, char *enginename, char *seckey, int m
 	GServerList list;
 
 	list = (GServerList) malloc(sizeof(struct GServerListImplementation));
-	assert(list != NULL);
+	if(!list)
+		gspyi.error("ServerListNew: list is NULL.");
 	list->state = sl_idle;
 	list->servers = ArrayNew(sizeof(GServer), SERVER_GROWBY, ServerFree);
 	list->maxupdates = maxconcupdates;
 	list->updatelist = calloc(maxconcupdates, sizeof(UpdateInfo));
-	assert(list->updatelist != NULL);
+	if(!list->updatelist)
+		gspyi.error("ServerListNew: list->updatelist is NULL.");
 	strcpy(list->gamename, gamename);
 	strcpy(list->seckey, seckey);
 	strcpy(list->enginename, enginename);
 	list->CallBackFn = CallBackFn;
-	assert(CallBackFn != NULL);
+	if(!CallBackFn)
+		gspyi.error("ServerListNew: CallBackFn is NULL.");
 	list->instance = instance;
 	list->sortkey = "";
 	SocketStartUp();
@@ -446,7 +448,8 @@ GError ServerListLANUpdate(GServerList serverlist, gbool async, int startsearchp
 {
 	GError error;
 
-	assert(searchdelta > 0);
+	if(searchdelta < 0)
+		gspyi.error("ServerListLANUpdate: searchdetla < 0.");
 
 	if (serverlist->state != sl_idle)
 		return GE_BUSY;
