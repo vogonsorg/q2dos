@@ -1539,7 +1539,7 @@ int vsnprintf(char *str, size_t n, const char *fmt, va_list ap)
 }
 #endif
 
-// FS: From KMQ2
+/* FS: From KMQ2 */
 /*
 =================
 Q_strncpyz

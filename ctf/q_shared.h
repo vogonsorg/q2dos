@@ -142,13 +142,13 @@ typedef	int	fixed16_t;
 
 // Knightmare added
 #ifndef min
-#define min(a,b)        (((a) < (b)) ? (a) : (b))
+#define min(a,b)	(((a) < (b)) ? (a) : (b))
 #endif
 #ifndef max
-#define max(a,b)        (((a) > (b)) ? (a) : (b))
+#define max(a,b)	(((a) > (b)) ? (a) : (b))
 #endif
 
-// FS
+/* FS: Added */
 #ifndef bound
 #define bound(a,b,c) ((a) >= (c) ? (a) : \
 					(b) < (a) ? (a) : (b) > (c) ? (c) : (b))
@@ -318,7 +318,7 @@ SYSTEM SPECIFIC
 extern	double	curtime;		// time returned by last Sys_Milliseconds
 
 double		Sys_Milliseconds (void);
-int		Sys_LinuxTime(void); // FS: DOS needs this for the random qport
+int		Sys_LinuxTime(void); /* FS: DOS needs this for the random qport */
 void	Sys_Mkdir (char *path);
 
 // large block stack allocation routines
@@ -373,10 +373,10 @@ typedef struct cvar_s
 	int			flags;
 	qboolean	modified;	// set each time the cvar is changed
 	float		value;
-	int			intValue; // FS
-	char		*defaultValue; // FS
-	const char	*description; // FS
-	int			defaultFlags; // FS
+	int			intValue; /* FS: Added */
+	char		*defaultValue; /* FS: Added */
+	const char	*description; /* FS: Added */
+	int			defaultFlags; /* FS: Added */
 	struct cvar_s *next;
 } cvar_t;
 
@@ -434,6 +434,8 @@ COLLISION DETECTION
 #define	SURF_TRANS66	0x20
 #define	SURF_FLOWING	0x40	// scroll towards angle
 #define	SURF_NODRAW		0x80	// don't bother referencing the texture
+
+#define SURF_ALPHATEST	0x02000000	// Knightmare- alpha test flag
 
 
 // content masks
@@ -1256,8 +1258,8 @@ extern int vidref_val;
 // PGM
 // ==================
 
-// FS: Developer flags for developer cvar and DPrintf's
-// FS: No 0x00000001 because that would be developer->value 1 and we use that to show it all!
+/* FS: Developer flags for developer cvar and DPrintf's */
+/* FS: No 0x00000001 because that would be developer->value 1 and we use that to show it all! */
 #define DEVELOPER_MSG_STANDARD		0x00000002 // 2
 #define DEVELOPER_MSG_SOUND			0x00000004 // 4
 #define DEVELOPER_MSG_NET			0x00000008 // 8

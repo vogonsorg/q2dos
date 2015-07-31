@@ -122,10 +122,10 @@ typedef	int	fixed16_t;
 
 // Knightmare added
 #ifndef min
-#define min(a,b)        (((a) < (b)) ? (a) : (b))
+#define min(a,b)	(((a) < (b)) ? (a) : (b))
 #endif
 #ifndef max
-#define max(a,b)        (((a) > (b)) ? (a) : (b))
+#define max(a,b)	(((a) > (b)) ? (a) : (b))
 #endif
 
 /* FS: Added */
