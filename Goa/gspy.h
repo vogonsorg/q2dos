@@ -68,6 +68,7 @@ typedef struct
 {
 	void	(*print)(char *str, ...);
 	void	(*dprint)(unsigned long developerFlags, char *fmt, ...);
+	void	(*error)(char *error, ...);
 	cvar_t	*(*cvar)(char *name, char *value, int flags);
 	cvar_t	*(*cvar_set)(char *name, char *value);
 	cvar_t	*(*cvar_forceset)(char *name, char *value);

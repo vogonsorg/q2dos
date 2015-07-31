@@ -2821,6 +2821,7 @@ static void CL_LoadGameSpy (void)
 
 	import.print = Com_Printf;
 	import.dprint = Com_DPrintf;
+	import.error = Sys_Error;
 	import.cvar = Cvar_Get;
 	import.cvar_set = Cvar_Set;
 	import.cvar_forceset = Cvar_ForceSet;
