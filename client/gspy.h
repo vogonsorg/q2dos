@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 /* FS: IF THIS FILE IS CHANGED IT MUST BE CHANGED IN CLIENT/GSPY.H! */
 
-#define	GAMESPY_API_VERSION		1
+#define	GAMESPY_API_VERSION		2
 
 /* FS: Stuff we need to be able to link without goaceng.h */
 typedef struct GServerListImplementation *GServerList;
