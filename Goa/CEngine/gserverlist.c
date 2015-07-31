@@ -449,7 +449,7 @@ GError ServerListLANUpdate(GServerList serverlist, gbool async, int startsearchp
 	GError error;
 
 	if(searchdelta <= 0)
-		gspyi.error("ServerListLANUpdate: searchdetla < 0.");
+		gspyi.error("ServerListLANUpdate: searchdetla <= 0.");
 
 	if (serverlist->state != sl_idle)
 		return GE_BUSY;
