@@ -302,7 +302,7 @@ void	VID_Init (void)
 	vid_gamma = Cvar_Get("vid_gamma", "1", CVAR_ARCHIVE);
 
 	vid_vgaonly = Cvar_Get("vid_vgaonly", (COM_CheckParm("-vgaonly"))? "1" : "0", 0);
-	vid_bankedvga = Cvar_Get("vid_vgaonly", (COM_CheckParm("-bankedvga"))? "1" : "0", 0);
+	vid_bankedvga = Cvar_Get("vid_bankedvga", (COM_CheckParm("-bankedvga"))? "1" : "0", 0);
 
 	VID_CheckChanges ();
 
