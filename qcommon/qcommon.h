@@ -848,7 +848,7 @@ void	Sys_Quit (void);
 char	*Sys_GetClipboardData( void );
 void	Sys_CopyProtect (void);
 
-void	Sys_Sleep (int msec);	// Knightmare added for CPU usage fix
+void	Sys_Sleep (unsigned msec);	// Knightmare added
 
 #ifdef __DJGPP__
 void Sys_InitDXE3 (void);

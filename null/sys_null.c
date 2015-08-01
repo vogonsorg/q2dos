@@ -126,6 +126,10 @@ void	Sys_FindClose (void)
 {
 }
 
+void Sys_Sleep (unsigned msec)
+{
+}
+
 void	Sys_Init (void)
 {
 }

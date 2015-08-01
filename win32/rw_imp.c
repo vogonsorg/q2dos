@@ -120,7 +120,7 @@ int SWimp_Init( void *hInstance, void *wndProc )
 	sww_state.hInstance = ( HINSTANCE ) hInstance;
 	sww_state.wndproc = wndProc;
 
-	return true;
+	return 0;
 }
 
 /*

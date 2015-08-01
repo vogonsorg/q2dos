@@ -776,7 +776,7 @@ void R_NewMap (void);
 void R_Register (void);
 void R_UnRegister (void);
 void Draw_InitLocal (void);
-qboolean R_Init( void *hInstance, void *wndProc );
+int  R_Init(void *hInstance, void *wndProc);
 void R_Shutdown (void);
 void R_InitCaches (void);
 void D_FlushCaches (void);

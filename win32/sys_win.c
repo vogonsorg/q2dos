@@ -372,7 +372,7 @@ Sys_Sleep
 Knightmare- added this to fix CPU usage
 ================
 */
-void Sys_Sleep (int msec)
+void Sys_Sleep (unsigned msec)
 {
 	Sleep (msec);
 }
