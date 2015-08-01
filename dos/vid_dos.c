@@ -20,9 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // vid_dos.c -- DOS video driver frontend
 
-#ifndef REF_HARD_LINKED
-#include <dlfcn.h> /* RTLD_??? */
-#endif
 #include "../client/client.h"
 #include "../client/qmenu.h"
 #include "vid_dos.h"
@@ -225,7 +222,7 @@ static qboolean VID_LoadRefresh (const char *name)
 #ifndef REF_HARD_LINKED
 	Com_Printf("------- Loading %s -------\n", name);
 
-	if ((reflib_library = Sys_dlopen(name, RTLD_LAZY|RTLD_GLOBAL)) == NULL)
+	if ((reflib_library = Sys_dlopen(name, false)) == NULL)
 	{
 		Com_Printf("dlopen(\"%s\") failed\n", name);
 		return false;

@@ -167,7 +167,7 @@ static int dxe_fail ()
 static void *dxe_res (const char *sym)
 {
 	FILE *f = fopen ("dxe.log", "a");
-	fprintf (f, "%s: unresolved symbol in DXE.\n", sym);
+	fprintf (f, "%s: unresolved symbol.\n", sym);
 	fflush (f);
 	fclose (f);
 	++num_unres;
@@ -182,16 +182,16 @@ void Sys_InitDXE3 (void)
 	dlregsym (syms);
 }
 
-void *Sys_dlopen (const char *filename, int mode)
+void *Sys_dlopen (const char *filename, qboolean globalmode)
 {
 	void *lib;
 
 	_dlsymresolver = dxe_res;
 	num_unres = 0;
-	lib = dlopen (filename, mode);
+	lib = dlopen (filename, (globalmode)? RTLD_GLOBAL : 0);
 	_dlsymresolver = NULL;
 	if (num_unres)
-		Sys_Error ("Unresolved symbol(s) in %s. Can't continue. See DXE.LOG for details.", filename);
+		Sys_Error ("Unresolved symbol(s) in %s. See DXE.LOG for details.", filename);
 
 	return lib;
 }
@@ -235,7 +235,7 @@ void *Sys_GetGameAPI (void *parms)
 		if (!path) return NULL; /* couldn't find one anywhere */
 
 		Com_sprintf (name, sizeof(name), "%s/%s/%s", curpath, path, gamename);
-		game_library = Sys_dlopen (name, RTLD_LAZY);
+		game_library = Sys_dlopen (name, false);
 		if (game_library)
 		{
 			Com_Printf ("Loaded %s\n", name);
@@ -270,7 +270,7 @@ void *Sys_GetGameSpyAPI(void *parms)
 	Com_Printf("------- Loading %s -------\n", dxename);
 
 	Com_sprintf(name, sizeof(name), "%s/%s", curpath, dxename);
-	gamespy_library = Sys_dlopen (name, RTLD_LAZY);
+	gamespy_library = Sys_dlopen (name, false);
 	if (!gamespy_library)
 		return NULL;
 
