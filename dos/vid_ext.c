@@ -114,23 +114,11 @@ VID_InitExtra
 */
 void VID_InitExtra (void)
 {
-	int		nummodes;
 	short		*pmodenums;
 	vbeinfoblock_t	*pinfoblock;
 	unsigned long	addr;
 	__dpmi_regs	r;
 	cvar_t		*var;
-
-	pinfoblock = (vbeinfoblock_t *) dos_getmemory(sizeof(vbeinfoblock_t));
-	if (!pinfoblock) {
-		ri.Con_Printf(PRINT_ALL, "VID_InitExtra: Unable to allocate low memory.\n");
-		return;
-	}
-
-	pinfoblock->VbeSignature[0] = 'V';
-	pinfoblock->VbeSignature[1] = 'B';
-	pinfoblock->VbeSignature[2] = 'E';
-	pinfoblock->VbeSignature[3] = '2';
 
 	memset(vga_modes,0x0,sizeof(vga_modes));
 	vga_nummodes = 0;
@@ -143,16 +131,23 @@ void VID_InitExtra (void)
 	vga_modes[vga_nummodes].height=200;
 	vga_modes[vga_nummodes].width=320;
 	vga_modes[vga_nummodes].type = VGA_MODE13;
-
 	Com_sprintf(vga_modes[vga_nummodes].menuname, sizeof(vga_modes[vga_nummodes].menuname), "[VGA 320x200]");
 	vga_nummodes++;
 
 	var = ri.Cvar_Get("vid_vgaonly", "0", 0);
 	if(var->intValue)
-	{
-		VID_AddBankedModes(); /* FS: Added */
-		return;	//test for VGA only
+		return;
+
+	pinfoblock = (vbeinfoblock_t *) dos_getmemory(sizeof(vbeinfoblock_t));
+	if (!pinfoblock) {
+		ri.Con_Printf(PRINT_ALL, "VID_InitExtra: Unable to allocate low memory.\n");
+		return;
 	}
+
+	pinfoblock->VbeSignature[0] = 'V';
+	pinfoblock->VbeSignature[1] = 'B';
+	pinfoblock->VbeSignature[2] = 'E';
+	pinfoblock->VbeSignature[3] = '2';
 
 // see if VESA support is available
 	r.x.ax = 0x4f00;
@@ -190,19 +185,18 @@ void VID_InitExtra (void)
 	pmodenums = (short *) VID_ExtraFarToLinear(addr);
 
 // find 8 bit modes until we either run out of space or run out of modes
-	nummodes = 0;
-
-	while ((*pmodenums != -1) && (nummodes < MAX_VIDEOMODES))
+	while ((*pmodenums != -1) && (vga_nummodes < MAX_VIDEOMODES))
 	{
-		if (VID_ExtraGetModeInfo (*pmodenums))
-		{
-			nummodes++;
-		}
+		VID_ExtraGetModeInfo (*pmodenums);
 		pmodenums++;
 	}
 
 	dos_freememory(pinfoblock);
-	VID_AddBankedModes(); /* FS: Add banked modes at the end of the video list. */
+
+	/* FS: Add banked modes at the end of the video list. */
+	var = ri.Cvar_Get("vid_bankedvga", "0", 0);
+	if (! var->intValue)
+		VID_AddBankedModes();
 }
 
 static void VID_AddPlanarModes(void)
@@ -220,30 +214,33 @@ static void VID_AddPlanarModes(void)
 
 static void VID_AddBankedModes(void)
 {
+	if (vga_nummodes == MAX_VIDEOMODES)
+		return;
 	vga_modes[vga_nummodes].mode=vga_nummodes;
 	vga_modes[vga_nummodes].vesa_mode=0x0101;
 	vga_modes[vga_nummodes].height=480;
 	vga_modes[vga_nummodes].width=640;
 	vga_modes[vga_nummodes].type = VGA_BANKED;
-
 	Com_sprintf(vga_modes[vga_nummodes].menuname, sizeof(vga_modes[vga_nummodes].menuname), "[VGA-B 640x480]");
 	vga_nummodes++;
 
+	if (vga_nummodes == MAX_VIDEOMODES)
+		return;
 	vga_modes[vga_nummodes].mode=vga_nummodes;
 	vga_modes[vga_nummodes].vesa_mode=0x0103;
 	vga_modes[vga_nummodes].height=600;
 	vga_modes[vga_nummodes].width = 800;
 	vga_modes[vga_nummodes].type = VGA_BANKED;
-
 	Com_sprintf(vga_modes[vga_nummodes].menuname, sizeof(vga_modes[vga_nummodes].menuname), "[VGA-B 800x600]");
 	vga_nummodes++;
 
+	if (vga_nummodes == MAX_VIDEOMODES)
+		return;
 	vga_modes[vga_nummodes].mode=vga_nummodes;
 	vga_modes[vga_nummodes].vesa_mode=0x0105;
 	vga_modes[vga_nummodes].height=768;
 	vga_modes[vga_nummodes].width = 1024;
 	vga_modes[vga_nummodes].type = VGA_BANKED;
-
 	Com_sprintf(vga_modes[vga_nummodes].menuname, sizeof(vga_modes[vga_nummodes].menuname), "[VGA-B 1024x768]");
 	vga_nummodes++;
 }
@@ -373,29 +370,26 @@ static qboolean VID_ExtraGetModeInfo(int modenum)
 		if((modeinfo.memory_model==0x4)&&(modeinfo.bits_per_pixel==8))
 		{
 			ri.Con_Printf(PRINT_ALL, "VESA mode 0x%0x %dx%d supported\n",modeinfo.modenum,modeinfo.width,modeinfo.height);
+			/* vga_nummodes already checked by our caller. */
+			vga_modes[vga_nummodes].mode=vga_nummodes;
+			vga_modes[vga_nummodes].vesa_mode=modeinfo.modenum;
+			vga_modes[vga_nummodes].height=modeinfo.height;
+			vga_modes[vga_nummodes].width=modeinfo.width;
 
-			if (vga_nummodes < MAX_VIDEOMODES)
-			{
-				vga_modes[vga_nummodes].mode=vga_nummodes;
-				vga_modes[vga_nummodes].vesa_mode=modeinfo.modenum;
-				vga_modes[vga_nummodes].height=modeinfo.height;
-				vga_modes[vga_nummodes].width=modeinfo.width;
+			phys_mem_info.address = (int)modeinfo.pptr;
+			phys_mem_info.size = 0x400000;
 
-				phys_mem_info.address = (int)modeinfo.pptr;
-				phys_mem_info.size = 0x400000;
+			if (__dpmi_physical_address_mapping(&phys_mem_info))
+				return false;
 
-				if (__dpmi_physical_address_mapping(&phys_mem_info))
-					return false;
+			vga_modes[vga_nummodes].address = real2ptr (phys_mem_info.address);
 
-				vga_modes[vga_nummodes].address = real2ptr (phys_mem_info.address);
+			 /* FS: FIXME, just add all modes for banked */
+			var = ri.Cvar_Get("vid_bankedvga", "0", 0);
+			vga_modes[vga_nummodes].type = (var->intValue)? VGA_BANKED : VGA_VESALFB;
 
-				 /* FS: FIXME, just add all modes for banked */
-				var = ri.Cvar_Get("vid_bankedvga", "0", 0);
-				vga_modes[vga_nummodes].type = (var->intValue)? VGA_BANKED : VGA_VESALFB;
-
-				Com_sprintf(vga_modes[vga_nummodes].menuname, sizeof(vga_modes[vga_nummodes].menuname), "[VESA %dx%d]",modeinfo.width,modeinfo.height);
-				vga_nummodes++;
-			}
+			Com_sprintf(vga_modes[vga_nummodes].menuname, sizeof(vga_modes[vga_nummodes].menuname), "[VESA %dx%d]",modeinfo.width,modeinfo.height);
+			vga_nummodes++;
 		}
 #ifdef VESA_DEBUG_OUTPUT
 		printf("VID: (VESA) info for mode 0x%x\n", modeinfo.modenum);
