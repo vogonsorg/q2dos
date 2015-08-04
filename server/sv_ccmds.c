@@ -975,12 +975,17 @@ SV_StartMod
 */
 void SV_StartMod (char *mod)
 {
+	char cfgExecString[MAX_QPATH];
+
 	// killserver, start mod, unbind keys, exec configs, and start demos
 	Cbuf_AddText ("killserver\n");
 	Cbuf_AddText (va("game %s\n", mod));
 	Cbuf_AddText ("unbindall\n");
 	Cbuf_AddText ("exec default.cfg\n");
-	Cbuf_AddText ("exec q2dos.cfg\n");
+
+	Com_sprintf(cfgExecString, sizeof(cfgExecString), "exec %s\n", cfg_default->string);
+	Cbuf_AddText(cfgExecString);
+
 	Cbuf_AddText ("exec autoexec.cfg\n");
 	Cbuf_AddText ("d1\n");
 }

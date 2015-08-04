@@ -794,6 +794,7 @@ extern	cvar_t	*developer;
 extern	cvar_t	*dedicated;
 extern	cvar_t	*host_speeds;
 extern	cvar_t	*log_stats;
+extern	cvar_t	*cfg_default; /* FS: New default config stuff so we can keep some sanity between DOS and Win32 */
 
 // Knightmare added
 extern	cvar_t *fs_gamedirvar;

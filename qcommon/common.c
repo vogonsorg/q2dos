@@ -53,16 +53,17 @@ cvar_t	*fixedtime;
 cvar_t	*logfile_active;	// 1 = buffer log, 2 = flush after each print
 cvar_t	*showtrace;
 cvar_t	*dedicated;
+cvar_t	*cfg_default; /* FS: Added */
 
 FILE	*logfile;
 
-int			server_state;
+int		server_state;
 
 // host_speeds times
-double		time_before_game;
-double		time_after_game;
-double		time_before_ref;
-double		time_after_ref;
+double	time_before_game;
+double	time_after_game;
+double	time_before_ref;
+double	time_after_ref;
 
 /*
 ============================================================================
@@ -1364,7 +1365,6 @@ void Com_Error_f (void)
 	Com_Error (ERR_FATAL, "%s", Cmd_Argv(1));
 }
 
-
 /*
 =================
 Qcommon_Init
@@ -1373,6 +1373,8 @@ Qcommon_Init
 void Qcommon_Init (int argc, char **argv)
 {
 	char	*s;
+	char	cfgExecString[MAX_QPATH]; /* FS: New default config stuff so we can keep some sanity between DOS and Win32 */
+
 
 	if (setjmp (abortframe) )
 	{
@@ -1402,9 +1404,20 @@ void Qcommon_Init (int argc, char **argv)
 
 	FS_InitFilesystem ();
 
+	/* FS: New default config stuff so we can keep some sanity between DOS and Win32 */
+	cfg_default = Cvar_Get("cfg_default", "q2dos.cfg", CVAR_NOSET);
+	cfg_default->description = "Default cfg file to use for this gaming session.  Must be set at run time.";
 	Cbuf_AddText ("exec default.cfg\n");
-//	Cbuf_AddText ("exec config.cfg\n");
-	Cbuf_AddText ("exec q2dos.cfg\n"); /* FS: Use our own so other ports won't stomp over it */
+
+	/* FS: If it's NULL or not even at least "a.cfg" length then enforce default values */
+	if(!(cfg_default->string) || (cfg_default->string[0] == 0) || (strlen(cfg_default->string) < 5))
+	{
+		Com_Printf("Warning: invalid cfg_default string.  Setting to default: %s\n", cfg_default->defaultValue);
+		Cvar_ForceSet("cfg_default", cfg_default->defaultValue);
+	}
+
+	Com_sprintf(cfgExecString, sizeof(cfgExecString), "exec %s\n", cfg_default->string);
+	Cbuf_AddText (cfgExecString); /* FS: Use our own so other ports won't stomp over it */
 
 	Cbuf_AddEarlyCommands (true);
 	Cbuf_Execute ();

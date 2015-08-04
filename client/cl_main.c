@@ -1871,12 +1871,14 @@ void CL_WriteConfiguration (char *cfgName)
 	if (cls.state == ca_uninitialized)
 		return;
 
-//	Com_sprintf (path, sizeof(path),"%s/config.cfg", FS_Gamedir());
-	Com_sprintf (path, sizeof(path),"%s/%s.cfg", FS_Gamedir(), cfgName);
+	if(!(cfgName) || (cfgName[0] == 0)) /* FS: Sanity check */
+		Com_sprintf (path, sizeof(path),"%s/q2dos.cfg", FS_Gamedir());
+	else
+		Com_sprintf (path, sizeof(path),"%s/%s.cfg", FS_Gamedir(), cfgName);
+
 	f = fopen (path, "w");
 	if (!f)
 	{
-	//	Com_Printf ("Couldn't write config.cfg.\n");
 		Com_Printf ("Couldn't write %s.cfg.\n", cfgName);
 		return;
 	}
@@ -1900,11 +1902,11 @@ void CL_WriteConfig_f (void)
 {
 	char cfgName[MAX_QPATH];
 
-	if (Cmd_Argc() == 1 || Cmd_Argc() == 2)
+	if ((Cmd_Argc() == 1) || (Cmd_Argc() == 2))
 	{
 		if (Cmd_Argc() == 1)
-			Com_sprintf (cfgName, sizeof(cfgName), "q2dos"); /* FS: Use q2dos.cfg now */
-		else // if (Cmd_Argc() == 2)
+			COM_StripExtension(cfg_default->string, cfgName);
+		else
 			strncpy (cfgName, Cmd_Argv(1), sizeof(cfgName));
 
 		CL_WriteConfiguration (cfgName);
@@ -2522,6 +2524,7 @@ to run quit through here before the final handoff to the sys code.
 void CL_Shutdown(void)
 {
 	static qboolean isdown = false;
+	char	cfgName[MAX_QPATH];
 
 	if (isdown)
 	{
@@ -2535,7 +2538,8 @@ void CL_Shutdown(void)
 #endif
 
 	/* FS: Changed config to q2dos for WriteConfig */
-	CL_WriteConfiguration ("q2dos");	// Knightmare- changed to take config name as a parameter
+	COM_StripExtension(cfg_default->string, cfgName);
+	CL_WriteConfiguration (cfgName);	// Knightmare- changed to take config name as a parameter
 
 	CDAudio_Shutdown ();
 	S_Shutdown();

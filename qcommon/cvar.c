@@ -246,9 +246,13 @@ cvar_t *Cvar_Set2 (char *var_name, char *value, qboolean force)
 
 				if (!strcmp(var->name, "game"))
 				{
+					char cfgExecString[MAX_QPATH];
+
 					FS_SetGamedir (var->string);
 					FS_ExecAutoexec ();
-					Cbuf_AddText ("exec q2dos.cfg\n"); /* FS: If we switch game modes dynamically load that dirs config */
+
+					Com_sprintf(cfgExecString, sizeof(cfgExecString), "exec %s\n", cfg_default->string);
+					Cbuf_AddText (cfgExecString); /* FS: If we switch game modes dynamically load that dirs config */
 				}
 			}
 			return var;
@@ -715,7 +719,7 @@ qboolean Cvar_Never_Reset_Cmds(char *var_name) /* FS: Tired of copying CVARs eve
 		return true;
 	if(!strcmp(var_name, "version"))
 		return true;
-	if(!strcmp(var_name, "ref_soft"))
+	if(!strcmp(var_name, "cfg_default"))
 		return true;
 
 	return false;
