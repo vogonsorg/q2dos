@@ -708,26 +708,26 @@ void MSG_BeginReading (sizebuf_t *msg)
 int MSG_ReadChar (sizebuf_t *msg_read)
 {
 	int	c;
-	
+
 	if (msg_read->readcount+1 > msg_read->cursize)
 		c = -1;
 	else
 		c = (signed char)msg_read->data[msg_read->readcount];
 	msg_read->readcount++;
-	
+
 	return c;
 }
 
 int MSG_ReadByte (sizebuf_t *msg_read)
 {
 	int	c;
-	
+
 	if (msg_read->readcount+1 > msg_read->cursize)
 		c = -1;
 	else
 		c = (unsigned char)msg_read->data[msg_read->readcount];
 	msg_read->readcount++;
-	
+
 	return c;
 }
 
@@ -740,16 +740,16 @@ int MSG_ReadShort (sizebuf_t *msg_read)
 	else		
 		c = (short)(msg_read->data[msg_read->readcount]
 		+ (msg_read->data[msg_read->readcount+1]<<8));
-	
+
 	msg_read->readcount += 2;
-	
+
 	return c;
 }
 
 int MSG_ReadLong (sizebuf_t *msg_read)
 {
 	int	c;
-	
+
 	if (msg_read->readcount+4 > msg_read->cursize)
 		c = -1;
 	else
@@ -757,9 +757,9 @@ int MSG_ReadLong (sizebuf_t *msg_read)
 		+ (msg_read->data[msg_read->readcount+1]<<8)
 		+ (msg_read->data[msg_read->readcount+2]<<16)
 		+ (msg_read->data[msg_read->readcount+3]<<24);
-	
+
 	msg_read->readcount += 4;
-	
+
 	return c;
 }
 
@@ -771,7 +771,7 @@ float MSG_ReadFloat (sizebuf_t *msg_read)
 		float	f;
 		int	l;
 	} dat;
-	
+
 	if (msg_read->readcount+4 > msg_read->cursize)
 		dat.f = -1;
 	else
@@ -782,7 +782,7 @@ float MSG_ReadFloat (sizebuf_t *msg_read)
 		dat.b[3] =	msg_read->data[msg_read->readcount+3];
 	}
 	msg_read->readcount += 4;
-	
+
 	dat.l = LittleLong (dat.l);
 
 	return dat.f;	
@@ -792,19 +792,21 @@ char *MSG_ReadString (sizebuf_t *msg_read)
 {
 	static char	string[2048];
 	int		l,c;
-	
+
 	l = 0;
 	do
 	{
-		c = MSG_ReadChar (msg_read);
+		// sku - replaced MSG_ReadChar with MSG_ReadByte to avoid
+		// potentional vulnerability
+		c = MSG_ReadByte (msg_read);
 		if (c == -1 || c == 0)
 			break;
 		string[l] = c;
 		l++;
 	} while (l < sizeof(string)-1);
-	
+
 	string[l] = 0;
-	
+
 	return string;
 }
 
@@ -812,19 +814,21 @@ char *MSG_ReadStringLine (sizebuf_t *msg_read)
 {
 	static char	string[2048];
 	int		l,c;
-	
+
 	l = 0;
 	do
 	{
-		c = MSG_ReadChar (msg_read);
+		// sku - replaced MSG_ReadChar with MSG_ReadByte to avoid
+		// potentional vulnerability
+		c = MSG_ReadByte (msg_read);
 		if (c == -1 || c == 0 || c == '\n')
 			break;
 		string[l] = c;
 		l++;
 	} while (l < sizeof(string)-1);
-	
+
 	string[l] = 0;
-	
+
 	return string;
 }
 
