@@ -1,22 +1,18 @@
-#CC = gcc-4.2
-#CFLAGS = -arch i386 -g -O0
 CC = i586-pc-msdosdjgpp-gcc
-CFLAGS = -g -O0 -Wall -Did386=0 -I.
+CFLAGS = -g -O0 -Wall -I.
 
 .PHONY: clean
-#
 
 OBJECTS =  util/svga-dump.o util/dos_v2.o
 
-all: svd
+all: svd.exe
 
-svd:	$(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o svd -lm
+svd.exe: $(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o svd.exe
 
 clean:
 	rm -f util/*.o
 	rm -f svd.exe
-	rm -f svd
 
 util/%.o : util/%.c
 	$(CC) $(CFLAGS) -c $< -o $@

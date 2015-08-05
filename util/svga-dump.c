@@ -115,12 +115,21 @@ void VGA_BankedBeginDirectRect (viddef_t *lvid, struct vmode_s *pcurrentmode,
 	int x, int y, byte *pbitmap, int width, int height);
 void VGA_BankedEndDirectRect (viddef_t *lvid, struct vmode_s *pcurrentmode,
 	int x, int y, int width, int height);
-void *VID_ExtraFarToLinear (void *ptr);
 qboolean VID_ExtraGetModeInfo(int modenum);
 
 // to make standalone
 void Sys_Error (char *error, ...);
 
+
+/*
+================
+VID_ExtraFarToLinear
+================
+*/
+static void *VID_ExtraFarToLinear (unsigned long addr)
+{
+	return real2ptr(((addr & 0xFFFF0000) >> 12) + (addr & 0xFFFF));
+}
 
 /*
 ================
@@ -130,13 +139,20 @@ VID_InitExtra
 void VID_InitExtra (void)
 {
 	int				nummodes;
-	short			*pmodenums;
+	short		*pmodenums;
 	vbeinfoblock_t	*pinfoblock;
 	__dpmi_meminfo	phys_mem_info;
+	unsigned long	addr;
 
-	pinfoblock = dos_getmemory(sizeof(vbeinfoblock_t));
+	pinfoblock = (vbeinfoblock_t *) dos_getmemory(sizeof(vbeinfoblock_t));
+	if (!pinfoblock) {
+		Sys_Error("VID_InitExtra: Unable to allocate low memory.\n");
+	}
 
-	*(long *)pinfoblock->VbeSignature = 'V' + ('B'<<8) + ('E'<<16) + ('2'<<24);
+	pinfoblock->VbeSignature[0] = 'V';
+	pinfoblock->VbeSignature[1] = 'B';
+	pinfoblock->VbeSignature[2] = 'E';
+	pinfoblock->VbeSignature[3] = '2';
 
 // see if VESA support is available
 	regs.x.ax = 0x4f00;
@@ -145,19 +161,33 @@ void VID_InitExtra (void)
 	dos_int86(0x10);
 
 	if (regs.x.ax != 0x4f)
+	{
+		dos_freememory(pinfoblock);
 		return;		// no VESA support
+	}
 
 	if (pinfoblock->VbeVersion[1] < 0x02)
+	{
+		dos_freememory(pinfoblock);
 		return;		// not VESA 2.0 or greater
+	}
 
-	//Con_Printf ("VESA 2.0 compliant adapter:\n%s\n",
+	addr = ( (pinfoblock->OemStringPtr[0]      ) |
+		 (pinfoblock->OemStringPtr[1] <<  8) |
+		 (pinfoblock->OemStringPtr[2] << 16) |
+		 (pinfoblock->OemStringPtr[3] << 24));
 	printf ("VESA 2.0 compliant adapter:\n%s\n",
-				VID_ExtraFarToLinear (*(byte **)&pinfoblock->OemStringPtr[0]));
+			(char *) VID_ExtraFarToLinear(addr));
 
-	totalvidmem = *(unsigned short *)&pinfoblock->TotalMemory[0] << 16;
+	totalvidmem  = ( (pinfoblock->TotalMemory[0]     ) |
+			 (pinfoblock->TotalMemory[1] << 8) ) << 16;
+//	printf("%dk video memory\n", totalvidmem >> 10);
 
-	pmodenums = (short *)
-			VID_ExtraFarToLinear (*(byte **)&pinfoblock->VideoModePtr[0]);
+	addr = ( (pinfoblock->VideoModePtr[0]      ) |
+		 (pinfoblock->VideoModePtr[1] <<  8) |
+		 (pinfoblock->VideoModePtr[2] << 16) |
+		 (pinfoblock->VideoModePtr[3] << 24));
+	pmodenums = (short *) VID_ExtraFarToLinear(addr);
 
 // find 8 bit modes until we either run out of space or run out of modes
 	nummodes = 0;
@@ -240,8 +270,7 @@ void VID_InitExtra (void)
 				vesa_extra[nummodes].plinearmem =
 						real2ptr(modeinfo.winasegment<<4);
 
-				//vesa_modes[nummodes].begindirectrect =
-						VGA_BankedBeginDirectRect;
+				//vesa_modes[nummodes].begindirectrect = VGA_BankedBeginDirectRect;
 				//vesa_modes[nummodes].enddirectrect = VGA_BankedEndDirectRect;
 				vesa_extra[nummodes].pages[1] = modeinfo.pagesize;
 				vesa_extra[nummodes].pages[2] = modeinfo.pagesize * 2;
@@ -258,20 +287,6 @@ NextMode:
 	}
 
 	dos_freememory(pinfoblock);
-}
-
-
-/*
-================
-VID_ExtraFarToLinear
-================
-*/
-void *VID_ExtraFarToLinear (void *ptr)
-{
-	int		temp;
-
-	temp = (int)ptr;
-	return real2ptr(((temp & 0xFFFF0000) >> 12) + (temp & 0xFFFF));
 }
 
 
@@ -331,10 +346,10 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 		if (!(modeinfo.mode_attributes & LINEAR_FRAME_BUFFER))
 		{
 			if ((modeinfo.width != 320) || (modeinfo.height != 200))
-				{
+			{
 				dos_freememory(infobuf);
 				return false;
-				}
+			}
 		}
 
 		modeinfo.bytes_per_scanline = *(short*)(infobuf+16);
@@ -342,10 +357,10 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 		modeinfo.pagesize = modeinfo.bytes_per_scanline * modeinfo.height;
 
 		if (modeinfo.pagesize > totalvidmem)
-			{
+		{
 			dos_freememory(infobuf);
 			return false;
-			}
+		}
 
 	// force to one page if the adapter reports it doesn't support more pages
 	// than that, no matter how much memory it has--it may not have hardware
@@ -399,10 +414,8 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 		printf("  win b attrib = 0x%0x\n", *(unsigned char*)(infobuf+3));
 		printf("  win a seg 0x%0x\n", (int) modeinfo.winasegment);
 		printf("  win b seg 0x%0x\n", (int) modeinfo.winbsegment);
-		printf("  bytes per scanline = %d\n",
-				modeinfo.bytes_per_scanline);
-		printf("  width = %d, height = %d\n", modeinfo.width,
-				modeinfo.height);
+		printf("  bytes per scanline = %d\n", modeinfo.bytes_per_scanline);
+		printf("  width = %d, height = %d\n", modeinfo.width, modeinfo.height);
 		printf("  win = %c\n", 'A' + modeinfo.win);
 		printf("  win granularity = %d\n", modeinfo.granularity);
 		printf("  win size = %d\n", modeinfo.win_size);
@@ -427,14 +440,14 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 
 void Sys_Error (char *error, ...)
 {
-        va_list         argptr;
+	va_list		argptr;
 
-        printf ("Sys_Error: ");
-        va_start (argptr,error);
-        vprintf (error,argptr);
-        va_end (argptr);
-        printf ("\n");
-        exit (1);
+	printf ("Sys_Error: ");
+	va_start (argptr,error);
+	vprintf (error,argptr);
+	va_end (argptr);
+	printf ("\n");
+	exit (1);
 }
 
 int main(void)
