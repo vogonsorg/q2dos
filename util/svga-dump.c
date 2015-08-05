@@ -1,26 +1,14 @@
 //
-//
 // simple test of the Quake 1 VESA code
 //
-//
 // i586-pc-msdosdjgpp-gcc x.c dos/dos_v2.c -o /Users/jsteve/dos/x.exe
-// Known issues
-//2011-11-02 (SVN):
-//vid_ext.c: Fixed stack corruption in dos_getmemory()/seginfo due to the missing balancing dos_freememory() calls in VID_InitExtra() and VID_ExtraGetModeInfo() for failures and unwanted cases. The bug was discovered when h2dos.exe was compiled using gcc-4.5.4.
-//dos_v2.c: Add Sys_Error() calls to dos_getmemory() against reaching MAX_SEGINFO and dos_freememory() against uncached seginfo.
-//quakedef.h: updated beta date stamp to 2011-11-02.
 //
-//http://uhexen2.sourceforge.net/changes.html
-// 
-//This just dumps the first 30 SVGA modes 
+//This just dumps the first 30 SVGA modes
 
 #include <stdio.h>
 #include <dpmi.h>
-#include <pc.h>
 
-#include "client/client.h"
-#include "client/qmenu.h"
-#include "dos/vid_dos.h"
+#include "ref_soft/r_local.h"
 #include "dos/dosisms.h"
 
 #define MODE_SUPPORTED_IN_HW		0x0001
@@ -30,14 +18,30 @@
 #define LINEAR_FRAME_BUFFER		0x0080
 #define LINEAR_MODE			0x4000
 
-// !!! if this is changed, MAX_HEIGHT and MAX_WIDTH must be changed in d_ifacea.h too !!!
-// !!! if this is changed, MAX_HEIGHT and MAX_WIDTH must be changed in r_local.h too !!!
-#define MAXVESAWIDTH		1600
-#define MAXVESAHEIGHT		1200
+typedef struct vmode_s
+{
+	struct vmode_s	*pnext;
+	const char	*name;
+	const char	*header;
+	int		width;
+	int		height;
+	float		aspect;
+	int		rowbytes;
+	int		planar;
+	int		numpages;
+	void		*pextradata;
+	int		(*setmode)(viddef_t *lvid, struct vmode_s *pcurrentmode);
+	void		(*swapbuffers)(viddef_t *lvid, struct vmode_s *pcurrentmode, vrect_t *rects);
+	void		(*setpalette)(viddef_t *lvid, struct vmode_s *pcurrentmode, unsigned char *palette);
+	void		(*begindirectrect)(viddef_t *lvid, struct vmode_s *pcurrentmode,
+								   int x, int y, byte *pbitmap, int width,
+								   int height);
+	void		(*enddirectrect)(viddef_t *lvid, struct vmode_s *pcurrentmode,
+								 int x, int y, int width, int height);
+} vmode_t;
 
 vmode_t	*pvidmodes;
 static int	totalvidmem;
-static byte	*ppal;
 int		numvidmodes;
 
 
@@ -47,7 +51,6 @@ typedef struct {
 	void	*plinearmem;	// linear address of start of frame buffer
 	qboolean	vga_incompatible;
 } vesa_extra_t;
-
 
 #define MAX_VESA_MODES	30	// we'll just take the first 30 if there
 				//  are more
@@ -59,49 +62,49 @@ static char			names[MAX_VESA_MODES][10];
 static vesa_extra_t	vesa_extra[MAX_VESA_MODES];
 
 
-
-typedef struct vbeinfoblock_s {
-     byte			VbeSignature[4];
-     byte			VbeVersion[2];
-     byte			OemStringPtr[4];
-     byte			Capabilities[4];
-     byte			VideoModePtr[4];
-     byte			TotalMemory[2];
-     byte			OemSoftwareRev[2];
-     byte			OemVendorNamePtr[4];
-     byte			OemProductNamePtr[4];
-     byte			OemProductRevPtr[4];
-     byte			Reserved[222];
-     byte			OemData[256];
-} vbeinfoblock_t;
-
 typedef struct
 {
-	int modenum;
-	int mode_attributes;
+	int	modenum;
+	int	mode_attributes;
 	int	winasegment;
 	int	winbsegment;
 	int	bytes_per_scanline; // bytes per logical scanline (+16)
-	int win; // window number (A=0, B=1)
-	int win_size; // window size (+6)
-	int granularity; // how finely i can set the window in vid mem (+4)
-	int width, height; // displayed width and height (+18, +20)
-	int bits_per_pixel; // er, better be 8, 15, 16, 24, or 32 (+25)
-	int bytes_per_pixel; // er, better be 1, 2, or 4
-	int memory_model; // and better be 4 or 6, packed or direct color (+27)
-	int num_pages; // number of complete frame buffer pages (+29)
-	int red_width; // the # of bits in the red component (+31)
-	int red_pos; // the bit position of the red component (+32)
-	int green_width; // etc.. (+33)
-	int green_pos; // (+34)
-	int blue_width; // (+35)
-	int blue_pos; // (+36)
-	int pptr;
+	int	win;		// window number (A=0, B=1)
+	int	win_size;	// window size (+6)
+	int	granularity;	// how finely i can set the window in vid mem (+4)
+	int	width, height;	// displayed width and height (+18, +20)
+	int	bits_per_pixel;	// er, better be 8, 15, 16, 24, or 32 (+25)
+	int	bytes_per_pixel; // er, better be 1, 2, or 4
+	int	memory_model;	// and better be 4 or 6, packed or direct color (+27)
+	int	num_pages;	// number of complete frame buffer pages (+29)
+	int	red_width;	// the # of bits in the red component (+31)
+	int	red_pos;	// the bit position of the red component (+32)
+	int	green_width;	// etc.. (+33)
+	int	green_pos;	// (+34)
+	int	blue_width;	// (+35)
+	int	blue_pos;	// (+36)
+	int	pptr;
 	int	pagesize;
 	int	numpages;
 } modeinfo_t;
 
 static modeinfo_t modeinfo;
+
+// all bytes to avoid problems with compiler field packing
+typedef struct vbeinfoblock_s {
+	byte	VbeSignature[4];
+	byte	VbeVersion[2];
+	byte	OemStringPtr[4];
+	byte	Capabilities[4];
+	byte	VideoModePtr[4];
+	byte	TotalMemory[2];
+	byte	OemSoftwareRev[2];
+	byte	OemVendorNamePtr[4];
+	byte	OemProductNamePtr[4];
+	byte	OemProductRevPtr[4];
+	byte	Reserved[222];
+	byte	OemData[256];
+} vbeinfoblock_t;
 
 int VID_ExtraInitMode (viddef_t *vid, vmode_t *pcurrentmode);
 void VID_ExtraSwapBuffers (viddef_t *vid, vmode_t *pcurrentmode,
@@ -114,13 +117,9 @@ void VGA_BankedEndDirectRect (viddef_t *lvid, struct vmode_s *pcurrentmode,
 	int x, int y, int width, int height);
 void *VID_ExtraFarToLinear (void *ptr);
 qboolean VID_ExtraGetModeInfo(int modenum);
-//to make standalone
-void Sys_Error (char *error, ...);
 
-void main(void)
-{
-VID_InitExtra();
-}
+// to make standalone
+void Sys_Error (char *error, ...);
 
 
 /*
@@ -258,15 +257,6 @@ NextMode:
 		pmodenums++;
 	}
 
-// add the VESA modes at the start of the mode list (if there are any)
-	if (nummodes)
-	{
-		vesa_modes[nummodes-1].pnext = pvidmodes;
-		pvidmodes = &vesa_modes[0];
-		numvidmodes += nummodes;
-		ppal = dos_getmemory(256*4);
-	}
-
 	dos_freememory(pinfoblock);
 }
 
@@ -283,7 +273,6 @@ void *VID_ExtraFarToLinear (void *ptr)
 	temp = (int)ptr;
 	return real2ptr(((temp & 0xFFFF0000) >> 12) + (temp & 0xFFFF));
 }
-
 
 
 /*
@@ -319,8 +308,8 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 	// we do only 8-bpp in software
 		if ((modeinfo.bits_per_pixel != 8) ||
 			(modeinfo.bytes_per_pixel != 1) ||
-			(modeinfo.width > MAXVESAWIDTH) ||
-			(modeinfo.height > MAXVESAHEIGHT))
+			(modeinfo.width > MAXWIDTH) ||
+			(modeinfo.height > MAXHEIGHT))
 		{
 			dos_freememory(infobuf);
 			return false;
@@ -445,13 +434,11 @@ void Sys_Error (char *error, ...)
         vprintf (error,argptr);
         va_end (argptr);
         printf ("\n");
-#if 0
-{       //we crash here so we can get a backtrace.  Yes it is ugly, and no this should never be in production!
-        int j,k;
-fflush(stdout);
-        j=0;
-        k=5/j;  //divide by zero!
-}
-#endif
         exit (1);
+}
+
+int main(void)
+{
+	VID_InitExtra();
+	return 0;
 }

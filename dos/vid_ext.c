@@ -40,11 +40,6 @@ int vga_nummodes = 0;
 #define LINEAR_FRAME_BUFFER		0x0080
 #define LINEAR_MODE			0x4000
 
-// !!! if this is changed, MAX_HEIGHT and MAX_WIDTH must be changed in d_ifacea.h too !!!
-// !!! if this is changed, MAX_HEIGHT and MAX_WIDTH must be changed in r_local.h too !!!
-#define MAXVESAWIDTH		4000 /* FS: Was 1600 */
-#define MAXVESAHEIGHT		4000 /* FS: Was 1200 */
-
 int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes;
 byte	*VGA_pagebase;
 
@@ -282,8 +277,8 @@ static qboolean VID_ExtraGetModeInfo(int modenum)
 	// we do only 8-bpp in software
 		if ((modeinfo.bits_per_pixel != 8) ||
 			(modeinfo.bytes_per_pixel != 1) ||
-			(modeinfo.width > MAXVESAWIDTH) ||
-			(modeinfo.height > MAXVESAHEIGHT))
+			(modeinfo.width > MAXWIDTH) ||
+			(modeinfo.height > MAXHEIGHT))
 		{
 			dos_freememory(infobuf);
 			return false;
@@ -366,8 +361,8 @@ static qboolean VID_ExtraGetModeInfo(int modenum)
 
 		modeinfo.pptr = *(long *)(infobuf+40);
 
-		//8bit linear only
-		if((modeinfo.memory_model==0x4)&&(modeinfo.bits_per_pixel==8))
+		/* 8 bit linear only */
+		if (modeinfo.memory_model == 0x4 && modeinfo.bits_per_pixel == 8)
 		{
 			ri.Con_Printf(PRINT_ALL, "VESA mode 0x%0x %dx%d supported\n",modeinfo.modenum,modeinfo.width,modeinfo.height);
 			/* vga_nummodes already checked by our caller. */
