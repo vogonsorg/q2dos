@@ -217,23 +217,21 @@ void Cbuf_Execute (void)
 			if (text[i] == '\n')
 				break;
 		}
-			
-				
+
 		// R1ch's fix for overflow vulnerability
-		if (i >= sizeof(line) - 1) {
+		if (i > sizeof(line) - 1) {
 			Com_Printf ("Cbuf_Execute: overflow of %d truncated\n", i);
 			memcpy (line, text, sizeof(line)-1);
 			line[sizeof(line)-1] = 0;
 		}
 		else {
-		memcpy (line, text, i);
-		line[i] = 0;
+			memcpy (line, text, i);
+			line[i] = 0;
 		}
-		
+
 // delete the text from the command buffer and move remaining commands down
 // this is necessary because commands (exec, alias) can insert data at the
 // beginning of the text buffer
-
 		if (i == cmd_text.cursize)
 			cmd_text.cursize = 0;
 		else
@@ -679,10 +677,7 @@ void Cmd_TokenizeString (char *text, qboolean macroExpand)
 		{
 			int		l;
 
-			// [SkulleR]'s fix for overflow vulnerability
-			//strncpy (cmd_args, text);
 			Q_strncpyz (cmd_args, text, sizeof(cmd_args));
-			cmd_args[sizeof(cmd_args)-1] = 0; 
 
 			// strip off any trailing whitespace
 			l = strlen(cmd_args) - 1;
@@ -692,7 +687,7 @@ void Cmd_TokenizeString (char *text, qboolean macroExpand)
 				else
 					break;
 		}
-			
+
 		com_token = COM_Parse (&text);
 		if (!text)
 			return;
