@@ -822,13 +822,13 @@ void FS_AddPAKFile (const char *packPath)
 	searchpath_t	*search;
 	pack_t		*pack;
 
-    pack = FS_LoadPackFile ((char *)packPath);
-    if (!pack)
-        return;
-    search = Z_Malloc (sizeof(searchpath_t));
-    search->pack = pack;
-    search->next = fs_searchpaths;
-    fs_searchpaths = search;
+	pack = FS_LoadPackFile ((char *)packPath);
+	if (!pack)
+		return;
+	search = Z_Malloc (sizeof(searchpath_t));
+	search->pack = pack;
+	search->next = fs_searchpaths;
+	fs_searchpaths = search;
 }
 
 /*
@@ -846,13 +846,15 @@ void FS_AddGameDirectory (char *dir)
 	pack_t			*pak;
 	char			pakfile[MAX_OSPATH];
 
-	strcpy (fs_gamedir, dir);
+	strncpy (fs_gamedir, dir, sizeof(fs_gamedir)-1);
+	fs_gamedir[sizeof(fs_gamedir)-1] = 0;
 
 	//
 	// add the directory to the search path
 	//
 	search = Z_Malloc (sizeof(searchpath_t));
-	strcpy (search->filename, dir);
+	strncpy (search->filename, dir, sizeof(search->filename)-1);
+	search->filename[sizeof(search->filename)-1] = 0;
 	search->next = fs_searchpaths;
 	fs_searchpaths = search;
 
@@ -868,10 +870,8 @@ void FS_AddGameDirectory (char *dir)
 		search = Z_Malloc (sizeof(searchpath_t));
 		search->pack = pak;
 		search->next = fs_searchpaths;
-		fs_searchpaths = search;		
+		fs_searchpaths = search;
 	}
-
-
 }
 
 /*
