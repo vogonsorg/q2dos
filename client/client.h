@@ -139,8 +139,7 @@ typedef struct dlhandle_s
 	char		URL[576];
 	char		*tempBuffer;
 } dlhandle_t;
-
-#endif	// USE_CURL
+#endif	/* USE_CURL */
 
 //
 // the client_state_t structure is wiped completely at every
@@ -202,7 +201,7 @@ typedef struct
 	FILE		*cinematic_file;
 	double			cinematictime;		// cls.realtime for first cinematic frame
 	int			cinematicframe;
-	char		cinematicpalette[768];
+	unsigned char	cinematicpalette[768];
 	qboolean	cinematicpalette_active;
 
 	//
@@ -313,7 +312,6 @@ typedef struct
 
 #ifdef USE_CURL /* HTTP downloading from R1Q2 */
 	dlqueue_t		downloadQueue;			//queue of paths we need
-	
 	dlhandle_t		HTTPHandles[MAX_HTTP_HANDLES];			//actual download handles
 	//don't raise this!
 	//i use a hardcoded maximum of 4 simultaneous connections to avoid
@@ -594,8 +592,8 @@ typedef struct
 } kbutton_t;
 
 extern	kbutton_t	in_mlook, in_klook;
-extern 	kbutton_t 	in_strafe;
-extern 	kbutton_t 	in_speed;
+extern	kbutton_t	in_strafe;
+extern	kbutton_t	in_speed;
 
 void CL_InitInput (void);
 void CL_SendCmd (void);
