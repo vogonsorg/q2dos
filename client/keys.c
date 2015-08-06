@@ -382,13 +382,13 @@ void Key_Console (int key)
 		return;
 	}
 
-	if (key == K_PGUP || key == K_KP_PGUP )
+	if ( (key == K_PGUP) || (key == K_KP_PGUP) || (key == K_MWHEELUP) )
 	{
 		con.display -= 2;
 		return;
 	}
 
-	if (key == K_PGDN || key == K_KP_PGDN ) 
+	if ( (key == K_PGDN) || (key == K_KP_PGDN) || (key == K_MWHEELDOWN) ) 
 	{
 		con.display += 2;
 		if (con.display > con.current)
@@ -396,13 +396,13 @@ void Key_Console (int key)
 		return;
 	}
 
-	if (key == K_HOME || key == K_KP_HOME )
+	if ( (key == K_HOME) || (key == K_KP_HOME) )
 	{
 		con.display = con.current - con.totallines + 10;
 		return;
 	}
 
-	if (key == K_END || key == K_KP_END )
+	if ( (key == K_END) || (key == K_KP_END) )
 	{
 		con.display = con.current;
 		return;
@@ -765,6 +765,8 @@ void Key_Init (void)
 	consolekeys[K_KP_PLUS] = true;
 	consolekeys[K_KP_MINUS] = true;
 	consolekeys[K_KP_5] = true;
+	consolekeys[K_MWHEELUP] = true;
+	consolekeys[K_MWHEELDOWN] = true;
 
 	consolekeys['`'] = false;
 	consolekeys['~'] = false;
