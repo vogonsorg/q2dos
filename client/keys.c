@@ -249,8 +249,8 @@ void Key_Console (int key)
 		break;
 	}
 
-	if ( ( Q_toupper( key ) == 'V' && keydown[K_CTRL] ) ||
-		 ( ( ( key == K_INS ) || ( key == K_KP_INS ) ) && keydown[K_SHIFT] ) )
+	if ( ((key == 'v' || key == 'V') && keydown[K_CTRL]) ||
+		 ((key == K_INS || key == K_KP_INS) && keydown[K_SHIFT]) )
 	{
 		static const char *seperators = "\n\r\b";
 		char *cbd, *cbdPtr;
@@ -273,30 +273,18 @@ void Key_Console (int key)
 		return;
 	}
 
-#ifdef GAMESPY
 	if( key == 'c' ) /* FS: Added */
 	{
 		if ( keydown[K_CTRL] )
 		{
+#ifdef GAMESPY
 			if(cls.gamespyupdate)
 			{
 				Cbuf_AddText("gspystop\n");
+				return;
 			}
-			else
-			{
-				Cbuf_AddText ("disconnect\n");
-			}
-			return;
-		}
-	}
 #endif
-
-	if ( key == 'l' ) 
-	{
-
-		if ( keydown[K_CTRL] )
-		{
-			Cbuf_AddText ("clear\n");
+			Cbuf_AddText ("disconnect\n");
 			return;
 		}
 	}
@@ -309,6 +297,17 @@ void Key_Console (int key)
 			return;
 		}
 	}
+
+	if ( key == 'l' ) 
+	{
+
+		if ( keydown[K_CTRL] )
+		{
+			Cbuf_AddText ("clear\n");
+			return;
+		}
+	}
+
 	if ( key == K_ENTER || key == K_KP_ENTER )
 	{	// backslash text are commands, else chat
 		if (key_lines[edit_line][1] == '\\' || key_lines[edit_line][1] == '/')
@@ -337,7 +336,7 @@ void Key_Console (int key)
 		CompleteCommand ();
 		return;
 	}
-	
+
 	if ( ( key == K_BACKSPACE ) || ( key == K_LEFTARROW ) || ( key == K_KP_LEFTARROW ) || ( ( key == 'h' ) && ( keydown[K_CTRL] ) ) )
 	{
 		if (key_linepos > 1)
