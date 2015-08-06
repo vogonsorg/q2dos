@@ -885,7 +885,8 @@ qboolean IsValidChar (int c); /* FS: From KMQ2 */
 
 extern	int		com_argc;
 extern	char	*com_argv[MAX_NUM_ARGVS+1];
-char Q_toupper(int c);
+int Q_tolower(int c);
+int Q_toupper(int c);
 
 /* FS: All this from Q1 */
 void Q_memset (void *dest, int fill, int count);

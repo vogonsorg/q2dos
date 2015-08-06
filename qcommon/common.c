@@ -1665,10 +1665,17 @@ int Q_atoi (char *str)
 	return 0;
 }
 
-char Q_toupper (int c) /* FS: Added */
+int Q_toupper (int c) /* FS: Added */
 {
 	if (c>='a' && c<='z')
 		c-=('a'-'A');
+	return(c);
+}
+
+int Q_tolower (int c) /* FS: Added */
+{
+	if (c>='A' && c<='Z')
+		c+=('a'-'A');
 	return(c);
 }
 

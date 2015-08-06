@@ -75,12 +75,6 @@ int	havegus; /* FS: Is GUS our sound card? */
 //***************************************************************************
 // Internal routines
 //***************************************************************************
-static char my_toupper(char c)
-{
-	if (c>='a' && c<='z')
-		c-=('a'-'A');
-	return(c);
-}
 
 static void reset_buffer(FILE *f)
 {
@@ -116,7 +110,7 @@ static int is_section(char *s,const char *name)
 	while (s[0]!=']' && s[0]!=13 && s[0]!=10 && s[0]!=0 && name[0]!=0)
 	{
 		if (!wild)
-			if (my_toupper(s[0])!=my_toupper(name[0]))
+			if (Q_toupper(s[0])!=Q_toupper(name[0]))
 				return(0);
 		s++;
 		if (!wild)
@@ -153,7 +147,7 @@ static int is_field(char *s,const char *name)
 	while (s[0]!='=' && s[0]!=13 && s[0]!=10 && s[0]!=0 && name[0]!=0)
 	{
 		if (!wild)
-			if (my_toupper(s[0])!=my_toupper(name[0]))
+			if (Q_toupper(s[0])!=Q_toupper(name[0]))
 				return(0);
 		s++;
 		if (!wild)

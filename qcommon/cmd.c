@@ -20,7 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // cmd.c -- Quake script command processing module
 
 #include "qcommon.h"
-#include <ctype.h> // tolower()
 
 void Cmd_ForwardToServer (void);
 
@@ -1073,7 +1072,7 @@ qboolean	Sort_Possible_Strtolower (char *partial, char *complete)
 
 	while(x < partialLength)
 	{
-		if(tolower(partial[x]) != tolower(complete[x]))
+		if(Q_tolower(partial[x]) != Q_tolower(complete[x]))
 		{
 			return false;
 		}
