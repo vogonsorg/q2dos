@@ -194,8 +194,8 @@ qboolean Field_Key( menufield_s *f, int key )
 	/*
 	** support pasting from the clipboard
 	*/
-	if ( ( Q_toupper( key ) == 'V' && keydown[K_CTRL] ) ||
-		 ( ( ( key == K_INS ) || ( key == K_KP_INS ) ) && keydown[K_SHIFT] ) )
+	if ( ((key == 'V' || key == 'v') && keydown[K_CTRL]) ||
+		 ((key == K_INS || key == K_KP_INS) && keydown[K_SHIFT]) )
 	{
 		static const char *seperators = "\n\r\b";
 		char *cbd, *cbdPtr;
