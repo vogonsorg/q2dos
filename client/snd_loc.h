@@ -155,7 +155,7 @@ void GUS_ClearDMA (void); /* FS: This stops the constant clicking sound during m
 
 //====================================================================
 
-#define SND_BUFFER_SIZE 32768 /* FS: DMA BUFFER SIZE. NOTE: Q1 uses 4096. */
+#define SND_BUFFER_SIZE 16384 /* FS: DMA BUFFER SIZE. NOTE: Q1 uses 4096. */
 #define	PAINTBUFFER_SIZE	2048 /* FS: NOTE: Q1 uses 512 */
 #define	MAX_CHANNELS			32
 extern	channel_t   channels[MAX_CHANNELS];
