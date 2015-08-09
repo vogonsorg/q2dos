@@ -147,15 +147,13 @@ static void SCR_DrawUptime (void) /* FS: Connection time */
 static void SCR_DrawTime (void) /* FS: Draw current time */
 {
 	int	x, y;
-	struct tm	*local = NULL;
-	time_t	utc = 0;
-	const char *timefmt = NULL;
+	struct tm	*local;
+	time_t	utc;
+	const char *timefmt;
 	char	st[80];
 
-	if ((cls.state != ca_active) || !(cl_drawtime->intValue))
-	{
+	if (cls.state != ca_active || cl_drawtime->intValue <= 0)
 		return;
-	}
 
 	SCR_DirtyScreen(); // repaint everything next frame
 
@@ -164,22 +162,12 @@ static void SCR_DrawTime (void) /* FS: Draw current time */
 
 #ifdef _MSC_VER
 	if (cl_drawtime->intValue == 1)
-	{
 		timefmt = "%H:%M:%S %p";
-	}
-	else if (cl_drawtime->intValue > 1)
-	{
-		timefmt = "%I:%M:%S %p";
-	}
+	else	timefmt = "%I:%M:%S %p";
 #else
 	if (cl_drawtime->intValue == 1)
-	{
 		timefmt = "%k:%M:%S %p";
-	}
-	else if (cl_drawtime->intValue > 1)
-	{
-		timefmt = "%l:%M:%S %p";
-	}
+	else	timefmt = "%l:%M:%S %p";
 #endif
 	strftime (st, sizeof (st), timefmt, local);
 
