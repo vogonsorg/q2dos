@@ -1,5 +1,6 @@
 CC = i586-pc-msdosdjgpp-gcc
 CFLAGS = -g -O0 -Wall -I.
+LDFLAGS=
 
 .PHONY: clean
 
@@ -8,7 +9,7 @@ OBJECTS =  util/svga-dump.o util/dos_v2.o
 all: svd.exe
 
 svd.exe: $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o svd.exe
+	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
 
 clean:
 	rm -f util/*.o

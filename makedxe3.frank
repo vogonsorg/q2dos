@@ -188,7 +188,7 @@ OBJECTS = $(CLIENT) $(CLIENTASM) $(QCOMMON) $(COMMONASM) $(SERVER) $(GAMESPY) $(
 all: q2.exe
 
 q2.exe: $(OBJECTS)
-	$(CC) $(OBJECTS) -o $@ $(LDFLAGS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm
+	$(CC) $(OBJECTS) $(LDFLAGS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm -o $@
 
 clean:
 	rm -f qcommon/*.o

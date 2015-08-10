@@ -1,6 +1,7 @@
 CC = gcc
 CFLAGS = -g -O0 -Uid386 -Wall
 CPPFLAGS = -DREF_HARD_LINKED -DGAME_HARD_LINKED
+LDFLAGS= -lm
 
 NULL = 	null/cd_null.o \
 	null/vid_null.o \
@@ -126,7 +127,7 @@ OBJECTS =  $(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(REFSOFT) $(NULL)
 all: q2_null
 
 q2_null:	$(CLIENT) $(QCOMMON) $(SERVER) $(GAME) $(REFSOFT) $(NULL) 
-	$(CC) $(CFLAGS) $(OBJECTS) -o q2_null -lm
+	$(CC) $(OBJECTS) $(LDFLAGS) -o q2_null
 
 clean:
 	find ./ -name '*.o' -exec rm {} \;
