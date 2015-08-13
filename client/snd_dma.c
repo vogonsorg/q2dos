@@ -992,102 +992,88 @@ void S_AddLoopSounds (void)
 S_RawSamples
 
 Cinematic streaming and voice over network
+Streaming music support. Byte swapping
+of data must be handled by the codec.
+Expects data in signed 16 bit, or unsigned
+8 bit format.
 ============
 */
 void S_RawSamples (int samples, int rate, int width, int channels, byte *data, qboolean music)
 {
-	int		i;
-	int		src, dst;
-	float	scale;
-	int		snd_vol;	// Knightmare added
+	int i;
+	int src, dst;
+	float scale;
+	int intVolume;
 
 	if (!sound_started)
 		return;
 
-// Knightmare added
-	if (music)
-		snd_vol = (int)(s_musicvolume->value * 256);
-	else
-		snd_vol = (int)(s_volume->value * 256);
-// end Knightmare
-
 	if (s_rawend < paintedtime)
 		s_rawend = paintedtime;
-	scale = (float)rate / dma.speed;
 
-//Com_Printf ("%i < %i < %i\n", soundtime, paintedtime, s_rawend);
+	scale = (float) rate / dma.speed;
+	if (music)
+		intVolume = (int) (s_musicvolume->value * 256);
+	else	intVolume = (int) (s_volume->value * 256);
+
 	if (channels == 2 && width == 2)
 	{
-		if (scale == 1.0)
-		{	// optimized case
-			for (i=0 ; i<samples ; i++)
-			{
-				dst = s_rawend&(MAX_RAW_SAMPLES-1);
-				s_rawend++;
-				s_rawsamples[dst].left =
-				    LittleShort(((short *)data)[i*2]) * snd_vol;	// << 8; // Knightmare- changed to uses snd_vol
-				s_rawsamples[dst].right =
-				    LittleShort(((short *)data)[i*2+1]) * snd_vol;	// << 8; // Knightmare- changed to uses snd_vol
-			}
-		}
-		else
+		for (i = 0; ; i++)
 		{
-			for (i=0 ; ; i++)
-			{
-				src = i*scale;
-				if (src >= samples)
-					break;
-				dst = s_rawend&(MAX_RAW_SAMPLES-1);
-				s_rawend++;
-				s_rawsamples[dst].left =
-				    LittleShort(((short *)data)[src*2]) * snd_vol;	// << 8; // Knightmare- changed to use snd_vol
-				s_rawsamples[dst].right =
-				    LittleShort(((short *)data)[src*2+1]) * snd_vol;	// << 8; // Knightmare- changed to use snd_vol
-			}
+			src = i * scale;
+			if (src >= samples)
+				break;
+			dst = s_rawend & (MAX_RAW_SAMPLES - 1);
+			s_rawend++;
+			s_rawsamples [dst].left = ((short *) data)[src * 2] * intVolume;
+			s_rawsamples [dst].right = ((short *) data)[src * 2 + 1] * intVolume;
 		}
 	}
 	else if (channels == 1 && width == 2)
 	{
-		for (i=0 ; ; i++)
+		for (i = 0; ; i++)
 		{
-			src = i*scale;
+			src = i * scale;
 			if (src >= samples)
 				break;
-			dst = s_rawend&(MAX_RAW_SAMPLES-1);
+			dst = s_rawend & (MAX_RAW_SAMPLES - 1);
 			s_rawend++;
-			s_rawsamples[dst].left =
-			    LittleShort(((short *)data)[src]) * snd_vol;	// << 8; // Knightmare- changed to use snd_vol
-			s_rawsamples[dst].right =
-			    LittleShort(((short *)data)[src]) * snd_vol;	// << 8; // Knightmare- changed to use snd_vol
+			s_rawsamples [dst].left = ((short *) data)[src] * intVolume;
+			s_rawsamples [dst].right = ((short *) data)[src] * intVolume;
 		}
 	}
 	else if (channels == 2 && width == 1)
 	{
-		for (i=0 ; ; i++)
+		intVolume *= 256;
+
+		for (i = 0; ; i++)
 		{
-			src = i*scale;
+			src = i * scale;
 			if (src >= samples)
 				break;
-			dst = s_rawend&(MAX_RAW_SAMPLES-1);
+			dst = s_rawend & (MAX_RAW_SAMPLES - 1);
 			s_rawend++;
-			s_rawsamples[dst].left =
-			    ( ((char *)data)[src*2] << 8 ) * snd_vol;	// << 16; // Knightmare- changed to use snd_vol
-			s_rawsamples[dst].right =
-			    ( ((char *)data)[src*2+1] << 8 ) * snd_vol;	// << 16; // Knightmare- changed to use snd_vol
+		//	s_rawsamples [dst].left = ((signed char *) data)[src * 2] * intVolume;
+		//	s_rawsamples [dst].right = ((signed char *) data)[src * 2 + 1] * intVolume;
+			s_rawsamples [dst].left = (((byte *) data)[src * 2] - 128) * intVolume;
+			s_rawsamples [dst].right = (((byte *) data)[src * 2 + 1] - 128) * intVolume;
 		}
 	}
 	else if (channels == 1 && width == 1)
 	{
-		for (i=0 ; ; i++)
+		intVolume *= 256;
+
+		for (i = 0; ; i++)
 		{
-			src = i*scale;
+			src = i * scale;
 			if (src >= samples)
 				break;
-			dst = s_rawend&(MAX_RAW_SAMPLES-1);
+			dst = s_rawend & (MAX_RAW_SAMPLES - 1);
 			s_rawend++;
-			s_rawsamples[dst].left =
-				( (((byte *)data)[src]-128) << 8 ) * snd_vol;	// << 16; // Knightmare- changed to use snd_vol
-			s_rawsamples[dst].right = ( (((byte *)data)[src]-128) << 8 ) * snd_vol;	// << 16; // Knightmare- changed to use snd_vol
+		//	s_rawsamples [dst].left = ((signed char *) data)[src] * intVolume;
+		//	s_rawsamples [dst].right = ((signed char *) data)[src] * intVolume;
+			s_rawsamples [dst].left = (((byte *) data)[src] - 128) * intVolume;
+			s_rawsamples [dst].right = (((byte *) data)[src] - 128) * intVolume;
 		}
 	}
 }

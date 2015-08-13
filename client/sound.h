@@ -31,8 +31,8 @@ void S_StartLocalSound (char *s);
 void S_GamespySound (char *s); /* FS: Play the complete.wav and abort.wav from gamespy3d if it's in sounds/gamespy */
 #endif
 
-//void S_RawSamples (int samples, int rate, int width, int channels, byte *data);
-void S_RawSamples (int samples, int rate, int width, int channels, byte *data, qboolean music);	// Knightmare changed
+void S_RawSamples (int samples, int rate, int width, int channels, byte *data, qboolean music);
+				/* Expects data in signed 16 bit, or unsigned 8 bit format. */
 
 void S_StopAllSounds(void);
 void S_Update (vec3_t origin, vec3_t v_forward, vec3_t v_right, vec3_t v_up);
