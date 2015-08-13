@@ -114,7 +114,6 @@ typedef struct
 	int			master_vol;		// 0-255 master volume
 	qboolean	fixed_origin;	// use origin instead of fetching entnum's origin
 	qboolean	autosound;		// from an entity->sound, cleared each frame
-	qboolean	streaming; // Knightmare added
 } channel_t;
 
 #define WAV_FORMAT_PCM	1

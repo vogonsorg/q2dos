@@ -36,8 +36,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 static bgTrack_t	s_bgTrack;
 
-static channel_t	*s_streamingChannel;
-
 static qboolean	ogg_first_init = true;	// First initialization flag
 static qboolean	ogg_started = false;	// Initialization flag
 static bgm_status_t	trk_status;		// Status indicator
@@ -190,9 +188,6 @@ void S_StreamBackgroundTrack (void)
 	if (!s_bgTrack.file || !s_musicvolume->value || !cl_ogg_music->intValue)
 		return;
 
-	if (!s_streamingChannel)
-		return;
-
 	if (s_rawend < paintedtime)
 		s_rawend = paintedtime;
 
@@ -301,8 +296,6 @@ void S_StartOGGBackgroundTrack (const char *introTrack, const char *loopTrack)
 	// set a loop counter so that this track will change to the ambient track later
 	ogg_loopcounter = 0;
 
-	S_StartStreaming();
-
 	// Open the intro track
 	if (!S_OpenBackgroundTrack(s_bgTrack.introName, &s_bgTrack))
 	{
@@ -320,58 +313,17 @@ void S_StartOGGBackgroundTrack (const char *introTrack, const char *loopTrack)
 S_StopOGGBackgroundTrack
 =================
 */
-
-/* FS: Called from S_StopBackgroundTrack in snd_dma.c so OGG and WAV won't clash over Channel 0 */
+/* FS: Called from S_StopBackgroundTrack in snd_dma.c */
 void S_StopOGGBackgroundTrack (void)
 {
 	if (!ogg_started)
 		return;
-
-	S_StopStreaming ();
 
 	S_CloseBackgroundTrack(&s_bgTrack);
 
 	trk_status = BGM_STOP;
 
 	memset(&s_bgTrack, 0, sizeof(bgTrack_t));
-}
-
-/*
-=================
-S_StartStreaming
-=================
-*/
-void S_StartStreaming (void)
-{
-	if (!ogg_started)
-		return;
-
-	if (s_streamingChannel)
-		return;		// Already started
-
-	s_streamingChannel = S_PickChannel(0, 0);
-	if (!s_streamingChannel)
-		return;
-
-	s_streamingChannel->streaming = true;
-}
-
-/*
-=================
-S_StopStreaming
-=================
-*/
-void S_StopStreaming (void)
-{
-	if (!ogg_started)
-		return;
-
-	if (!s_streamingChannel)
-		return;		// Already stopped
-
-	s_streamingChannel->streaming = false;
-
-	s_streamingChannel = NULL;
 }
 
 // =====================================================================

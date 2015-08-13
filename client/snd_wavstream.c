@@ -26,8 +26,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 static wavinfo_t	musicWavInfo;
 static bgTrack_t	s_bgTrack;
 
-static channel_t	*s_streamingChannel;
-
 static qboolean		wav_first_init = true;	// First initialization flag
 static qboolean		wav_started = false;	// Initialization flag
 static bgm_status_t	trk_status;		// Status indicator
@@ -240,9 +238,6 @@ void S_StreamWAVBackgroundTrack(void)
 	if (!s_bgTrack.file || !s_musicvolume->value || !cl_wav_music->intValue)
 		return;
 
-	if (!s_streamingChannel)
-		return;
-
 	if (s_rawend < paintedtime)
 		s_rawend = paintedtime;
 
@@ -337,8 +332,6 @@ void S_StartWAVBackgroundTrack (const char *introTrack, const char *loopTrack)
 	// set a loop counter so that this track will change to the ambient track later
 	wav_loopcounter = 0;
 
-	S_StartWAVStreaming();
-
 	// Open the intro track
 	if (!S_OpenWAVBackgroundTrack(s_bgTrack.introName, &s_bgTrack))
 	{
@@ -351,13 +344,11 @@ void S_StartWAVBackgroundTrack (const char *introTrack, const char *loopTrack)
 	S_StreamWAVBackgroundTrack();
 }
 
-/* FS: Called from S_StopBackgroundTrack in snd_dma.c so OGG and WAV won't clash over Channel 0 */
+/* FS: Called from S_StopBackgroundTrack in snd_dma.c */
 void S_StopWAVBackgroundTrack (void)
 {
 	if (!wav_started)
 		return;
-
-	S_StopWAVStreaming ();
 
 	S_CloseWAVBackgroundTrack();
 
@@ -365,34 +356,6 @@ void S_StopWAVBackgroundTrack (void)
 
 	memset(&musicWavInfo, 0, sizeof(wavinfo_t));
 	memset(&s_bgTrack, 0, sizeof(bgTrack_t));
-}
-
-void S_StartWAVStreaming (void)
-{
-	if (!wav_started)
-		return;
-
-	if (s_streamingChannel)
-		return;		// Already started
-
-	s_streamingChannel = S_PickChannel(0, 0);
-	if (!s_streamingChannel)
-		return;
-
-	s_streamingChannel->streaming = true;
-}
-
-void S_StopWAVStreaming (void)
-{
-	if (!wav_started)
-		return;
-
-	if (!s_streamingChannel)
-		return;		// Already stopped
-
-	s_streamingChannel->streaming = false;
-
-	s_streamingChannel = NULL;
 }
 
 void S_WAV_Init (void)
