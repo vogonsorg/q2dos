@@ -34,6 +34,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <vorbis/vorbisfile.h>
 #endif
 
+/* Vorbis codec can return the samples in a number of different
+ * formats, we use the standard signed short format. */
+#define VORBIS_SAMPLEBITS 16
+#define VORBIS_SAMPLEWIDTH 2
+#define VORBIS_SIGNED_DATA 1
+
 static bgTrack_t	s_bgTrack;
 
 static qboolean	ogg_first_init = true;	// First initialization flag
@@ -215,7 +221,9 @@ void S_StreamBackgroundTrack (void)
 			 */
 			read = ov_read(s_bgTrack.vorbisFile, (char *)(data + total), maxRead - total,
 #if !defined(VORBIS_USE_TREMOR)
-											0, 2, 1,
+											bigendien,
+											VORBIS_SAMPLEWIDTH,
+											VORBIS_SIGNED_DATA,
 #endif /* ! VORBIS_USE_TREMOR */
 											&dummy);
 			if (!read)
