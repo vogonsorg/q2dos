@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <float.h>
 
-#include "..\ref_soft\r_local.h"
+#include "../ref_soft/r_local.h"
 #define INITGUID
 #include "rw_win.h"
 
@@ -50,7 +50,7 @@ qboolean DDRAW_Init( unsigned char **ppbuffer, int *ppitch )
 
 	HRESULT (WINAPI *QDirectDrawCreate)( GUID FAR *lpGUID, LPDIRECTDRAW FAR * lplpDDRAW, IUnknown FAR * pUnkOuter );
 
-ri.Con_Printf( PRINT_ALL, "Initializing DirectDraw\n");
+	ri.Con_Printf( PRINT_ALL, "Initializing DirectDraw\n");
 
 
 	for ( i = 0; i < 256; i++ )
@@ -130,7 +130,7 @@ ri.Con_Printf( PRINT_ALL, "Initializing DirectDraw\n");
 															 sww_state.hWnd,
 															 DDSCL_NORMAL );
 
-		/*															 
+		/*
 		** set exclusive mode
 		*/
 		if ( ( ddrval = sww_state.lpDirectDraw->lpVtbl->SetCooperativeLevel( sww_state.lpDirectDraw, 
@@ -245,14 +245,14 @@ ri.Con_Printf( PRINT_ALL, "Initializing DirectDraw\n");
 	*/
 	memset( &ddsd, 0, sizeof( ddsd ) );
 	ddsd.dwSize = sizeof( ddsd );
-	
-ri.Con_Printf( PRINT_ALL, "...locking backbuffer: " );
+
+	ri.Con_Printf( PRINT_ALL, "...locking backbuffer: " );
 	if ( ( ddrval = sww_state.lpddsOffScreenBuffer->lpVtbl->Lock( sww_state.lpddsOffScreenBuffer, NULL, &ddsd, DDLOCK_WAIT, NULL ) ) != DD_OK )
 	{
 		ri.Con_Printf( PRINT_ALL, "failed - %s\n", DDrawError( ddrval ) );
 		goto fail;
 	}
-ri.Con_Printf( PRINT_ALL, "ok\n" );
+	ri.Con_Printf( PRINT_ALL, "ok\n" );
 
 	*ppbuffer = ddsd.lpSurface;
 	*ppitch   = ddsd.lPitch;
@@ -350,7 +350,7 @@ void DDRAW_Shutdown( void )
 		ri.Con_Printf( PRINT_ALL, "...restoring display mode\n");
 		sww_state.lpDirectDraw->lpVtbl->RestoreDisplayMode( sww_state.lpDirectDraw );
 		ri.Con_Printf( PRINT_ALL, "...restoring normal coop mode\n");
-	    sww_state.lpDirectDraw->lpVtbl->SetCooperativeLevel( sww_state.lpDirectDraw, sww_state.hWnd, DDSCL_NORMAL );
+		sww_state.lpDirectDraw->lpVtbl->SetCooperativeLevel( sww_state.lpDirectDraw, sww_state.hWnd, DDSCL_NORMAL );
 		ri.Con_Printf( PRINT_ALL, "...releasing lpDirectDraw\n");
 		sww_state.lpDirectDraw->lpVtbl->Release( sww_state.lpDirectDraw );
 		sww_state.lpDirectDraw = NULL;

@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <assert.h>
 #include <float.h>
 
-#include "..\client\client.h"
+#include "../client/client.h"
 #include "winquake.h"
 //#include "zmouse.h"
 
@@ -59,7 +59,7 @@ HWND        cl_hwnd;            // Main window handle for life of program
 
 #define VID_NUM_MODES ( sizeof( vid_modes ) / sizeof( vid_modes[0] ) )
 
-LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
+LRESULT WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 static qboolean s_alttab_disabled;
 
@@ -69,6 +69,10 @@ extern	double	sys_msg_time;
 ** WIN32 helper functions
 */
 extern qboolean s_win95;
+
+#ifndef SPI_SCREENSAVERRUNNING
+#define SPI_SCREENSAVERRUNNING 0x0061
+#endif
 
 static void WIN_DisableAltTab( void )
 {
@@ -122,7 +126,6 @@ void VID_Printf (int print_level, char *fmt, ...)
 {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
-	static qboolean	inupdate;
 
 	va_start (argptr,fmt);
 	_vsnprintf (msg,sizeof(msg),fmt,argptr);
@@ -148,7 +151,6 @@ void VID_Error (int err_level, char *fmt, ...)
 {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
-	static qboolean	inupdate;
 
 	va_start (argptr,fmt);
 	_vsnprintf (msg,sizeof(msg),fmt,argptr);
@@ -289,14 +291,12 @@ MainWndProc
 main window procedure
 ====================
 */
-LONG WINAPI MainWndProc (
+LRESULT WINAPI MainWndProc (
     HWND    hWnd,
     UINT    uMsg,
     WPARAM  wParam,
     LPARAM  lParam)
 {
-	LONG			lRet = 0;
-
 	if ( uMsg == MSH_MOUSEWHEEL )
 	{
 		if ( ( ( int ) wParam ) > 0 )
@@ -446,8 +446,8 @@ LONG WINAPI MainWndProc (
 	case MM_MCINOTIFY:
 #if 0 /* turn off CD for now */
 		{
-			LONG CDAudio_MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-			lRet = CDAudio_MessageHandler (hWnd, uMsg, wParam, lParam);
+			LRESULT CDAudio_MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+			return CDAudio_MessageHandler (hWnd, uMsg, wParam, lParam);
 		}
 #endif
 		break;

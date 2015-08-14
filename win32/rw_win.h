@@ -32,7 +32,7 @@ typedef struct
 
 	HDC				hdcDIBSection;		// DC compatible with DIB section
 	HBITMAP			hDIBSection;		// DIB section
-	unsigned char	*pDIBBase;			// DIB base pointer, NOT used directly for rendering!
+	void		*pDIBBase;			// DIB base pointer, NOT used directly for rendering!
 
 	HPALETTE		hPal;				// palette we're using
 	HPALETTE		hpalOld;			// original system palette

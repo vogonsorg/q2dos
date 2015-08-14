@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ** This handles DIB section management under Windows.
 **
 */
-#include "..\ref_soft\r_local.h"
+#include "../ref_soft/r_local.h"
 #include "rw_win.h"
 
 #ifndef _WIN32
@@ -34,7 +34,7 @@ static qboolean s_systemcolors_saved;
 
 static HGDIOBJ previously_selected_GDI_obj;
 
-static int s_syspalindices[] = 
+static INT s_syspalindices[] = 
 {
   COLOR_ACTIVEBORDER,
   COLOR_ACTIVECAPTION,
@@ -60,7 +60,7 @@ static int s_syspalindices[] =
 
 #define NUM_SYS_COLORS ( sizeof( s_syspalindices ) / sizeof( int ) )
 
-static int s_oldsyscolors[NUM_SYS_COLORS];
+static COLORREF s_oldsyscolors[NUM_SYS_COLORS];
 
 typedef struct dibinfo
 {
@@ -105,7 +105,7 @@ qboolean DIB_Init( unsigned char **ppbuffer, int *ppitch )
 	/*
 	** figure out if we're running in an 8-bit display mode
 	*/
- 	if ( GetDeviceCaps( sww_state.hDC, RASTERCAPS ) & RC_PALETTE )
+	if ( GetDeviceCaps( sww_state.hDC, RASTERCAPS ) & RC_PALETTE )
 	{
 		sww_state.palettized = true;
 
@@ -150,7 +150,7 @@ qboolean DIB_Init( unsigned char **ppbuffer, int *ppitch )
 	** create the DIB section
 	*/
 	sww_state.hDIBSection = CreateDIBSection( sww_state.hDC,
-		                                     pbmiDIB,
+											 pbmiDIB,
 											 DIB_RGB_COLORS,
 											 &sww_state.pDIBBase,
 											 NULL,
@@ -163,17 +163,17 @@ qboolean DIB_Init( unsigned char **ppbuffer, int *ppitch )
 	}
 
 	if ( pbmiDIB->bmiHeader.biHeight > 0 )
-    {
+	{
 		// bottom up
 		*ppbuffer	= sww_state.pDIBBase + ( vid.height - 1 ) * vid.width;
 		*ppitch		= -vid.width;
-    }
-    else
-    {
+	}
+	else
+	{
 		// top down
 		*ppbuffer	= sww_state.pDIBBase;
 		*ppitch		= vid.width;
-    }
+	}
 
 	/*
 	** clear the DIB memory buffer
@@ -196,7 +196,6 @@ qboolean DIB_Init( unsigned char **ppbuffer, int *ppitch )
 fail:
 	DIB_Shutdown();
 	return false;
-	
 }
 
 /*
@@ -215,7 +214,7 @@ fail:
 void DIB_SetPalette( const unsigned char *_pal )
 {
 	const unsigned char *pal = _pal;
-  	LOGPALETTE		*pLogPal = ( LOGPALETTE * ) &s_ipal;
+	LOGPALETTE		*pLogPal = ( LOGPALETTE * ) &s_ipal;
 	RGBQUAD			colors[256];
 	int				i;
 	int				ret;

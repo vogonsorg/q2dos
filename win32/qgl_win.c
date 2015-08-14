@@ -3017,7 +3017,9 @@ void QGL_Shutdown( void )
 	qwglSetDeviceGammaRampEXT = NULL;
 }
 
+#ifdef _MSC_VER
 #	pragma warning (disable : 4113 4133 4047 )
+#endif
 #	define GPA( a ) GetProcAddress( glw_state.hinstOpenGL, a )
 
 /*
@@ -4135,7 +4137,8 @@ void GLimp_LogNewFrame( void )
 	fprintf( glw_state.log_fp, "*** R_BeginFrame ***\n" );
 }
 
+#ifdef _MSC_VER
 #pragma warning (default : 4113 4133 4047 )
-
+#endif
 
 

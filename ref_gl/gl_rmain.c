@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // r_main.c
 #include "gl_local.h"
+#include <ctype.h>
 
 void R_Clear (void);
 
@@ -259,7 +260,7 @@ void R_DrawSpriteModel (entity_t *e)
 
 	qglColor4f( 1, 1, 1, alpha );
 
-    GL_Bind(currentmodel->skins[e->frame]->texnum);
+	GL_Bind(currentmodel->skins[e->frame]->texnum);
 
 	GL_TexEnv( GL_MODULATE );
 
@@ -445,7 +446,7 @@ void GL_DrawParticles( int num_particles, const particle_t particles[], const un
 	float			scale;
 	byte			color[4];
 
-    GL_Bind(r_particletexture->texnum);
+	GL_Bind(r_particletexture->texnum);
 	qglDepthMask( GL_FALSE );		// no z buffering
 	qglEnable( GL_BLEND );
 	GL_TexEnv( GL_MODULATE );
@@ -457,9 +458,9 @@ void GL_DrawParticles( int num_particles, const particle_t particles[], const un
 	for ( p = particles, i=0 ; i < num_particles ; i++,p++)
 	{
 		// hack a scale up to keep particles from disapearing
-		scale = ( p->origin[0] - r_origin[0] ) * vpn[0] + 
-			    ( p->origin[1] - r_origin[1] ) * vpn[1] +
-			    ( p->origin[2] - r_origin[2] ) * vpn[2];
+		scale = ( p->origin[0] - r_origin[0] ) * vpn[0] +
+			( p->origin[1] - r_origin[1] ) * vpn[1] +
+			( p->origin[2] - r_origin[2] ) * vpn[2];
 
 		if (scale < 20)
 			scale = 1;
@@ -552,11 +553,11 @@ void R_PolyBlend (void)
 	qglDisable (GL_DEPTH_TEST);
 	qglDisable (GL_TEXTURE_2D);
 
-    qglLoadIdentity ();
+	qglLoadIdentity ();
 
 	// FIXME: get rid of these
-    qglRotatef (-90,  1, 0, 0);	    // put Z going up
-    qglRotatef (90,  0, 0, 1);	    // put Z going up
+	qglRotatef (-90, 1, 0, 0);	// put Z going up
+	qglRotatef (90,  0, 0, 1);	// put Z going up
 
 	qglColor4fv (v_blend);
 
@@ -787,8 +788,8 @@ void R_SetupGL (void)
 	qglMatrixMode(GL_MODELVIEW);
     qglLoadIdentity ();
 
-    qglRotatef (-90,  1, 0, 0);	    // put Z going up
-    qglRotatef (90,  0, 0, 1);	    // put Z going up
+    qglRotatef (-90, 1, 0, 0);	// put Z going up
+    qglRotatef (90,  0, 0, 1);	// put Z going up
     qglRotatef (-r_newrefdef.viewangles[2],  1, 0, 0);
     qglRotatef (-r_newrefdef.viewangles[0],  0, 1, 0);
     qglRotatef (-r_newrefdef.viewangles[1],  0, 0, 1);
@@ -819,7 +820,7 @@ R_Clear
 */
 void R_Clear (void)
 {
-	GLbitfield	clearbits;	// Knightmare added
+	GLbitfield clearbits = 0;	// Knightmare added
 
 	if (gl_ztrick->value)
 	{
@@ -1248,7 +1249,7 @@ R_Init
 ===============
 */
 int R_Init ( void *hinstance, void *hWnd )
-{	
+{
 	char renderer_buffer[1000];
 	char vendor_buffer[1000];
 	int		err;
@@ -1270,7 +1271,7 @@ int R_Init ( void *hinstance, void *hWnd )
 	if ( !QGL_Init( gl_driver->string ) )
 	{
 		QGL_Shutdown();
-        ri.Con_Printf (PRINT_ALL, "ref_gl::R_Init() - could not load \"%s\"\n", gl_driver->string );
+		ri.Con_Printf (PRINT_ALL, "ref_gl::R_Init() - could not load \"%s\"\n", gl_driver->string );
 		return -1;
 	}
 
@@ -1640,7 +1641,7 @@ int R_Init ( void *hinstance, void *hWnd )
 		gl_config.anisotropic = false;
 		gl_config.max_anisotropy = 0.0;
 		ri.Cvar_SetValue ("gl_anisotropic_avail", 0.0);
-	} 
+	}
 
 	GL_SetDefaultState();
 
@@ -1659,6 +1660,8 @@ int R_Init ( void *hinstance, void *hWnd )
 	err = qglGetError();
 	if ( err != GL_NO_ERROR )
 		ri.Con_Printf (PRINT_ALL, "glGetError() = 0x%x\n", err);
+
+	return 0;
 }
 
 /*
@@ -1710,7 +1713,6 @@ R_BeginFrame
 void UpdateGammaRamp (void); // Knightmare- hardware gamma
 void R_BeginFrame( float camera_separation )
 {
-
 	gl_state.camera_separation = camera_separation;
 
 	/*

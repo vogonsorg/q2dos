@@ -174,7 +174,6 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 		qglEnable (GL_ALPHA_TEST);
 }
 
-
 /*
 =============
 Draw_Pic

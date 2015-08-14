@@ -30,10 +30,10 @@ extern cvar_t *vid_ref;
 extern cvar_t *vid_gamma;
 static cvar_t *gl_driver;
 
-static cvar_t *sw_mode;
-static cvar_t *sw_stipplealpha;
-static cvar_t *sw_waterwarp; /* FS */
-static cvar_t *r_contentblend; /* FS */
+//static cvar_t *sw_mode;
+//static cvar_t *sw_stipplealpha;
+//static cvar_t *sw_waterwarp; /* FS */
+//static cvar_t *r_contentblend; /* FS */
 
 extern void M_ForceMenuOff( void );
 const char *Default_MenuKey( menuframework_s *m, int key );

@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // GL_RSURF.C: surface-related refresh code
 #include <assert.h>
-
+#include <ctype.h>
 #include "gl_local.h"
 
 static vec3_t	modelorg;		// relative to viewpoint
@@ -985,11 +985,11 @@ static void R_RenderLightmappedPoly (msurface_t *surf)
 	int			i, nv = surf->polys->numverts;
 	float		*v, scroll;
 	image_t		*image = R_TextureAnimation( surf ); // was surf->texinfo
-	qboolean	is_dynamic = false;
 	unsigned	lmtex = surf->lightmaptexturenum;
 	glpoly_t	*p;
-#ifndef BATCH_LM_UPDATES	// Knighmare- removed for batch lightmap updates
+#ifndef BATCH_LM_UPDATES	/* Knighmare- removed for batch lightmap updates */
 	int			map;
+	qboolean	is_dynamic = false;
 
 	for ( map = 0; map < MAXLIGHTMAPS && surf->styles[map] != 255; map++ )
 	{

@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // conproc.c -- support for qhost
 #include <stdio.h>
 #include <process.h>
+#include <ctype.h>
 #include <windows.h>
 #include "conproc.h"
 
@@ -84,9 +85,9 @@ int CCheckParm (char *parm)
 void InitConProc (int argc, char **argv)
 {
 	unsigned	threadAddr;
-	HANDLE		hFile;
-	HANDLE		heventParent;
-	HANDLE		heventChild;
+	HANDLE		hFile = NULL;
+	HANDLE		heventParent = NULL;
+	HANDLE		heventChild = NULL;
 	int			t;
 
 	ccom_argc = argc;
@@ -95,19 +96,19 @@ void InitConProc (int argc, char **argv)
 // give QHOST a chance to hook into the console
 	if ((t = CCheckParm ("-HFILE")) > 0)
 	{
-		if (t < argc)
+		if (t < argc - 1)
 			hFile = (HANDLE)atoi (ccom_argv[t+1]);
 	}
 		
 	if ((t = CCheckParm ("-HPARENT")) > 0)
 	{
-		if (t < argc)
+		if (t < argc - 1)
 			heventParent = (HANDLE)atoi (ccom_argv[t+1]);
 	}
 		
 	if ((t = CCheckParm ("-HCHILD")) > 0)
 	{
-		if (t < argc)
+		if (t < argc - 1)
 			heventChild = (HANDLE)atoi (ccom_argv[t+1]);
 	}
 

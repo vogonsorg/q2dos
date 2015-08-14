@@ -82,7 +82,7 @@ cvar_t	*joy_upsensitivity;
 qboolean	joy_avail, joy_advancedinit, joy_haspov;
 DWORD		joy_oldbuttonstate, joy_oldpovstate;
 
-int			joy_id;
+UINT			joy_id;
 DWORD		joy_flags;
 DWORD		joy_numbuttons;
 
@@ -110,8 +110,8 @@ qboolean	mlooking;
 
 void IN_MLookDown (void) { mlooking = true; }
 void IN_MLookUp (void) {
-mlooking = false;
-if (!freelook->value && lookspring->value)
+	mlooking = false;
+	if (!freelook->value && lookspring->value)
 		IN_CenterView ();
 }
 
@@ -224,8 +224,8 @@ void IN_StartupMouse (void)
 	cvar_t		*cv;
 
 	cv = Cvar_Get ("in_initmouse", "1", CVAR_NOSET);
-	if ( !cv->value ) 
-		return; 
+	if ( !cv->value )
+		return;
 
 	mouseinitialized = true;
 	mouseparmsvalid = SystemParametersInfo (SPI_GETMOUSE, 0, originalmouseparms, 0);
@@ -258,8 +258,8 @@ void IN_MouseEvent (int mstate)
 		{
 				Key_Event (K_MOUSE1 + i, false, sys_msg_time);
 		}
-	}	
-		
+	}
+
 	mouse_oldbuttonstate = mstate;
 }
 
@@ -347,7 +347,7 @@ void IN_Init (void)
 {
 	// mouse variables
 	m_filter				= Cvar_Get ("m_filter",					"0",		0);
-    in_mouse				= Cvar_Get ("in_mouse",					"1",		CVAR_ARCHIVE);
+	in_mouse				= Cvar_Get ("in_mouse",					"1",		CVAR_ARCHIVE);
 
 	// joystick variables
 	in_joystick				= Cvar_Get ("in_joystick",				"0",		CVAR_ARCHIVE);
@@ -478,26 +478,26 @@ JOYSTICK
 =========================================================================
 */
 
-/* 
-=============== 
-IN_StartupJoystick 
-=============== 
-*/  
+/*
+===============
+IN_StartupJoystick
+===============
+*/
 void IN_StartupJoystick (void) 
-{ 
-	int			numdevs;
+{
+	UINT			numdevs;
 	JOYCAPS		jc;
-	MMRESULT	mmr;
+	MMRESULT	mmr = ~JOYERR_NOERROR;
 	cvar_t		*cv;
 
- 	// assume no joystick
-	joy_avail = false; 
+	// assume no joystick
+	joy_avail = false;
 
 	// abort startup if user requests no joystick
 	cv = Cvar_Get ("in_initjoy", "1", CVAR_NOSET);
-	if ( !cv->value ) 
-		return; 
- 
+	if ( !cv->value )
+		return;
+
 	// verify joystick driver is present
 	if ((numdevs = joyGetNumDevs ()) == 0)
 	{
@@ -514,7 +514,7 @@ void IN_StartupJoystick (void)
 
 		if ((mmr = joyGetPosEx (joy_id, &ji)) == JOYERR_NOERROR)
 			break;
-	} 
+	}
 
 	// abort startup if we didn't find a valid joystick
 	if (mmr != JOYERR_NOERROR)
@@ -542,7 +542,7 @@ void IN_StartupJoystick (void)
 	// mark the joystick as available and advanced initialization not completed
 	// this is needed as cvars are not available during initialization
 
-	joy_avail = true; 
+	joy_avail = true;
 	joy_advancedinit = false;
 
 	Com_Printf ("\njoystick detected\n\n"); 
@@ -583,7 +583,6 @@ Joy_AdvancedUpdate_f
 */
 void Joy_AdvancedUpdate_f (void)
 {
-
 	// called once by IN_ReadJoystick and by user whenever an update is needed
 	// cvars are now available
 	int	i;
@@ -663,7 +662,6 @@ void IN_Commands (void)
 		return;
 	}
 
-	
 	// loop through the joystick buttons
 	// key a joystick event or auxillary event for higher number buttons for each state change
 	buttonstate = ji.dwButtons;
@@ -718,14 +716,13 @@ void IN_Commands (void)
 }
 
 
-/* 
-=============== 
+/*
+===============
 IN_ReadJoystick
-=============== 
-*/  
+===============
+*/
 qboolean IN_ReadJoystick (void)
 {
-
 	memset (&ji, 0, sizeof(ji));
 	ji.dwSize = sizeof(ji);
 	ji.dwFlags = joy_flags;
@@ -737,7 +734,7 @@ qboolean IN_ReadJoystick (void)
 	else
 	{
 		// read error occurred
-		// turning off the joystick seems too harsh for 1 read error,\
+		// turning off the joystick seems too harsh for 1 read error,
 		// but what should be done?
 		// Com_Printf ("IN_ReadJoystick: no response\n");
 		// joy_avail = false;

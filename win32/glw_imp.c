@@ -36,7 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "glw_win.h"
 #include "winquake.h"
 
-static qboolean GLimp_SwitchFullscreen( int width, int height );
+/*static qboolean GLimp_SwitchFullscreen( int width, int height );*/
 qboolean GLimp_InitGL (void);
 
 glwstate_t glw_state;
@@ -406,7 +406,7 @@ void GLimp_Shutdown( void )
 ** of OpenGL.  Under Win32 this means dealing with the pixelformats and
 ** doing the wgl interface stuff.
 */
-qboolean GLimp_Init( void *hinstance, void *wndproc )
+int GLimp_Init( void *hinstance, void *wndproc )
 {
 #define OSR2_BUILD_NUMBER 1111
 
