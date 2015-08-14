@@ -451,9 +451,9 @@ static void Sys_ParseEarlyArgs(int argc, char **argv) /* FS: Parse some very spe
 	int i;
 	for (i = 1; i < argc; i++)
 	{
-		if(strnicmp(argv[i],"-skipwincheck",13) == 0)
+		if(stricmp(argv[i],"-skipwincheck") == 0)
 			skipwincheck = true;
-		if(strnicmp(argv[i],"-skiplfncheck",13) == 0)
+		if(stricmp(argv[i],"-skiplfncheck") == 0)
 			skiplfncheck = true;
 	}
 }
