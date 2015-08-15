@@ -165,13 +165,13 @@ qboolean DIB_Init( unsigned char **ppbuffer, int *ppitch )
 	if ( pbmiDIB->bmiHeader.biHeight > 0 )
 	{
 		// bottom up
-		*ppbuffer	= sww_state.pDIBBase + ( vid.height - 1 ) * vid.width;
+		*ppbuffer	= (unsigned char *)sww_state.pDIBBase + ( vid.height - 1 ) * vid.width;
 		*ppitch		= -vid.width;
 	}
 	else
 	{
 		// top down
-		*ppbuffer	= sww_state.pDIBBase;
+		*ppbuffer	= (unsigned char *)sww_state.pDIBBase;
 		*ppitch		= vid.width;
 	}
 
