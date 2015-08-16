@@ -26,6 +26,9 @@ typedef int			qboolean;
 typedef enum {false, true}	qboolean;
 #endif
 
+#ifndef id386
+#define id386 0
+#endif
 
 #ifndef NULL
 #define NULL ((void *)0)
