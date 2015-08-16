@@ -207,8 +207,8 @@ DO_AS=$(CC) -x assembler-with-cpp
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(WATT32_CFLAGS) $(VORBIS_CFLAGS) $(CURL_CFLAGS) -c $< -o $@
 
 %.o: %.S
-	$(DO_AS) $(CFLAGS) -c $< -o $@
+	$(DO_AS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 %.o: %.s
-	$(DO_AS) $(CFLAGS) -c $< -o $@
+	$(DO_AS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
