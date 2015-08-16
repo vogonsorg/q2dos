@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "r_local.h"
 
-#ifndef id386
+#if !id386
 void R_SurfacePatch (void)
 {
 }
@@ -82,7 +82,6 @@ int			ubasestep, errorterm, erroradjustup, erroradjustdown;
 // FIXME: should go away
 extern void			R_RotateBmodel (void);
 extern void			R_TransformFrustum (void);
-
 
 
 void R_GenerateSpans (void);
