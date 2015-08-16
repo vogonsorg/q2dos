@@ -43,7 +43,6 @@ cp -p zaero/gamex86.dxe _build/zaero
 cp -p Goa/gamespy.dxe _build
 
 cd _build || exit 1
-unzip ../doslfn.zip doslfn.com doslfn.txt
 unix2dos -k readme.txt
 find * -type d|xargs chmod 755
 find * -type f|xargs chmod 644
