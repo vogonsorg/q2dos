@@ -1072,7 +1072,7 @@ qboolean GUS_Init(void)
 	int rc;
 	int RealAddr;
 
-		  BYTE FSVal,Voices;
+	BYTE FSVal,Voices;
 	struct CodecRateStruct *CodecRate;
 	struct Gf1RateStruct *Gf1Rate;
 
@@ -1085,7 +1085,7 @@ qboolean GUS_Init(void)
 			if (GUS_GetGUSData()==false)
 				return(false);
 
-	if (HaveCodec)
+	if (HaveCodec) /* FS: Mythical Gravis UltraSound MAX with Crystal CS4231 CODEC chip or an AMD Interwave/Gravis UltraSound PnP */
 	{
 		// do 11khz sampling rate unless command line parameter wants different
 		dma.speed = 11025;
@@ -1100,7 +1100,7 @@ qboolean GUS_Init(void)
 			if (dma.speed>48000)
 				dma.speed=48000;
 
-			// Adjust speed to match one of the possible GF1 rates
+			// Adjust speed to match one of the possible CODEC rates
 			for (CodecRate=CodecRates;CodecRate->Rate!=0;CodecRate++)
 			{
 				if (dma.speed <= CodecRate->Rate)
@@ -1161,10 +1161,10 @@ qboolean GUS_Init(void)
 		GUS_StartCODEC(SND_BUFFER_SIZE,FSVal);
 		havegus = 2; /* FS: GUS MAX/IWPNP */
 	}
-	else
+	else /* FS: No CODEC?  You must have a Gravis UltraSound "Classic", ACE/SoundBuddy or compatible OEM CLONE! */
 	{
 		// do 19khz sampling rate unless command line parameter wants different
-		dma.speed = 19293;
+		dma.speed = 19293; /* FS: Maximum kHZ at 32 Voices.  14 voices gets you 44kHZ. */
 		Voices=extVoices=32; /* FS: Added extVoices */
 		rc = COM_CheckParm("-sspeed");
 
