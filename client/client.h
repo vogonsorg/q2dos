@@ -279,7 +279,7 @@ typedef struct
 									// > cls.disable_servercount, clear disable_screen
 
 // connection information
-	char		servername[MAX_OSPATH];	// name of server from original connect
+	char		servername[256];	// name of server from original connect
 	double		connect_time;		// for connection retransmits
 
 	int			quakePort;			// a 16 bit value that allows quake servers
