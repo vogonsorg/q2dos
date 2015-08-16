@@ -230,7 +230,7 @@ void R_LightPoint (vec3_t p, vec3_t color)
 //	float		light; // FS: Unused
 	vec3_t		dist;
 	float		add;
-	
+
 	if (!r_worldmodel->lightdata)
 	{
 		color[0] = color[1] = color[2] = 1.0;

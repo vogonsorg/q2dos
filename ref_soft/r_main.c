@@ -475,7 +475,7 @@ void R_MarkLeaves (void)
 
 	if (r_oldviewcluster == r_viewcluster && !r_novis->value && r_viewcluster != -1)
 		return;
-	
+
 	// development aid to let you run around and see exactly where
 	// the pvs ends
 	if (sw_lockpvs->value)
@@ -671,7 +671,7 @@ int R_BmodelCheckBBox (float *minmaxs)
 		rejectpt[0] = minmaxs[pindex[0]];
 		rejectpt[1] = minmaxs[pindex[1]];
 		rejectpt[2] = minmaxs[pindex[2]];
-		
+
 		d = DotProduct (rejectpt, view_clipplanes[i].normal);
 		d -= view_clipplanes[i].dist;
 
@@ -712,7 +712,7 @@ mnode_t *R_FindTopnode (vec3_t mins, vec3_t maxs)
 	{
 		if (node->visframe != r_visframecount)
 			return NULL;		// not visible at all
-		
+
 		if (node->contents != CONTENTS_NODE)
 		{
 			if (node->contents != CONTENTS_SOLID)
@@ -720,13 +720,13 @@ mnode_t *R_FindTopnode (vec3_t mins, vec3_t maxs)
 							//  visible and not BSP clipped
 			return NULL;	// in solid, so not visible
 		}
-		
+
 		splitplane = node->plane;
 		sides = BOX_ON_PLANE_SIDE(mins, maxs, (cplane_t *)splitplane);
-		
+
 		if (sides == 3)
 			return node;	// this is the splitter
-		
+
 	// not split yet; recurse down the contacted side
 		if (sides & 1)
 			node = node->children[0];

@@ -336,8 +336,7 @@ quotient must fit in 32 bits.
 FIXME: GET RID OF THIS! (FloorDivMod)
 ====================
 */
-void FloorDivMod (float numer, float denom, int *quotient,
-		int *rem)
+void FloorDivMod (float numer, float denom, int *quotient, int *rem)
 {
 	int		q, r;
 	float	x;

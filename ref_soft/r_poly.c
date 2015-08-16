@@ -133,10 +133,10 @@ void R_DrawSpanletTurbulentStipple33( void )
 			izi               += s_spanletvars.izistep_times_2;
 			s_spanletvars.s   += s_spanletvars.sstep;
 			s_spanletvars.t   += s_spanletvars.tstep;
-			
+
 			pdest += 2;
 			pz    += 2;
-			
+
 			s_spanletvars.spancount -= 2;
 		}
 	}
@@ -152,7 +152,7 @@ void R_DrawSpanletTurbulentStipple66( void )
 	byte    *pdest = s_spanletvars.pdest;
 	short   *pz    = s_spanletvars.pz;
 	int      izi   = s_spanletvars.izi;
-	
+
 	if ( !( s_spanletvars.v & 1 ) )
 	{
 		s_spanletvars.pdest += s_spanletvars.spancount;
@@ -193,7 +193,7 @@ void R_DrawSpanletTurbulentStipple66( void )
 			
 			pdest += 2;
 			pz    += 2;
-			
+
 			s_spanletvars.spancount -= 2;
 		}
 	}
@@ -211,9 +211,9 @@ void R_DrawSpanletTurbulentStipple66( void )
 		{
 			sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
 			tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
-			
+
 			btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
-			
+
 			if ( *pz <= ( izi >> 16 ) )
 				*pdest = btemp;
 			
@@ -456,7 +456,7 @@ void R_DrawSpanlet66Stipple( void )
 		{
 			unsigned s = s_spanletvars.s >> 16;
 			unsigned t = s_spanletvars.t >> 16;
-			
+
 			btemp = *( s_spanletvars.pbase + ( s ) + ( t * cachewidth ) );
 
 			if ( btemp != 255 )
@@ -481,22 +481,22 @@ void R_DrawSpanlet66Stipple( void )
 		{
 			unsigned s = s_spanletvars.s >> 16;
 			unsigned t = s_spanletvars.t >> 16;
-			
+
 			btemp = *( s_spanletvars.pbase + ( s ) + ( t * cachewidth ) );
-			
+
 			if ( btemp != 255 )
 			{
 				if ( *pz <= ( izi >> 16 ) )
 					*pdest = btemp;
 			}
-			
+
 			izi             += s_spanletvars.izistep;
 			s_spanletvars.s += s_spanletvars.sstep;
 			s_spanletvars.t += s_spanletvars.tstep;
-			
+
 			pdest++;
 			pz++;
-			
+
 			s_spanletvars.spancount--;
 		}
 	}
@@ -517,7 +517,7 @@ int R_ClipPolyFace (int nump, clipplane_t *pclipplane)
 
 	clipdist = pclipplane->dist;
 	pclipnormal = pclipplane->normal;
-	
+
 // calc dists
 	if (clip_current)
 	{
@@ -531,13 +531,13 @@ int R_ClipPolyFace (int nump, clipplane_t *pclipplane)
 		outstep = r_clip_verts[1][0];
 		clip_current = 1;
 	}
-	
+
 	instep = in;
 	for (i=0 ; i<nump ; i++, instep += sizeof (vec5_t) / sizeof (float))
 	{
 		dists[i] = DotProduct (instep, pclipnormal) - clipdist;
 	}
-	
+
 // handle wraparound case
 	dists[nump] = dists[0];
 	memcpy (instep, in, sizeof (vec5_t));
@@ -561,12 +561,12 @@ int R_ClipPolyFace (int nump, clipplane_t *pclipplane)
 
 		if ( (dists[i] > 0) == (dists[i+1] > 0) )
 			continue;
-			
+
 	// split it into a new vertex
 		frac = dists[i] / (dists[i] - dists[i+1]);
-			
+
 		vert2 = instep + sizeof (vec5_t) / sizeof (float);
-		
+
 		outstep[0] = instep[0] + frac*(vert2[0] - instep[0]);
 		outstep[1] = instep[1] + frac*(vert2[1] - instep[1]);
 		outstep[2] = instep[2] + frac*(vert2[2] - instep[2]);
@@ -576,7 +576,7 @@ int R_ClipPolyFace (int nump, clipplane_t *pclipplane)
 		outstep += sizeof (vec5_t) / sizeof (float);
 		outcount++;
 	}	
-	
+
 	return outcount;
 }
 
@@ -992,7 +992,7 @@ void R_ClipAndDrawPoly ( float alpha, int isturbulent, qboolean textured )
 
 		pout->s = pv[3];
 		pout->t = pv[4];
-		
+
 		scale = xscale * pout->zi;
 		pout->u = (xcenter + scale * transformed[0]);
 
@@ -1230,7 +1230,7 @@ void R_DrawAlphaSurfaces( void )
 
 		s = s->nextalphasurface;
 	}
-	
+
 	r_alpha_surfaces = NULL;
 }
 
