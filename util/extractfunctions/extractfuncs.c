@@ -734,7 +734,7 @@ void main (int argc, char *argv[])
 		}
 	}
 
-	if (argc < 1 || (firstParmSet && firstParm < 1))
+	if (argc < 2 || (firstParmSet && firstParm < 1))
 		Usage ();
 	// end Knightmare
 
@@ -820,7 +820,7 @@ int main (int argc, char *argv[])
 		}
 	}
 
-	if (argc < 1 || (firstParmSet && firstParm < 1))
+	if (argc < 2 || (firstParmSet && firstParm < 1))
 		Usage ();
 	// end Knightmare
 
