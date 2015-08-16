@@ -721,13 +721,13 @@ int PS_ReadNumber( script_t *script, token_t *token ) {
 	{
 		c = *script->script_p;
 		//check for a LONG number
-		if ( c == 'l' || c == 'L' &&
+		if ( (c == 'l' || c == 'L') &&
 			 !( token->subtype & TT_LONG ) ) {
 			script->script_p++;
 			token->subtype |= TT_LONG;
 		} //end if
-		  //check for an UNSIGNED number
-		else if ( c == 'u' || c == 'U' &&
+		//check for an UNSIGNED number
+		else if ( (c == 'u' || c == 'U') &&
 				  !( token->subtype & ( TT_UNSIGNED | TT_FLOAT ) ) ) {
 			script->script_p++;
 			token->subtype |= TT_UNSIGNED;
@@ -736,7 +736,7 @@ int PS_ReadNumber( script_t *script, token_t *token ) {
 	token->string[len] = '\0';
 #ifdef NUMBERVALUE
 	NumberValue( token->string, token->subtype, &token->intvalue, &token->floatvalue );
-#endif //NUMBERVALUE
+#endif /* NUMBERVALUE */
 	if ( !( token->subtype & TT_FLOAT ) ) {
 		token->subtype |= TT_INTEGER;
 	}

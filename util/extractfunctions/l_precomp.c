@@ -49,6 +49,7 @@ you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, R
 #include <stdarg.h>
 #include <time.h>
 #include <math.h>
+#include <ctype.h>
 #include "l_memory.h"
 #include "l_script.h"
 #include "l_precomp.h"
@@ -789,12 +790,12 @@ void PC_AddBuiltinDefines( source_t *source ) {
 		char *string;
 		int builtin;
 	} builtin[] = {
-		"__LINE__",  BUILTIN_LINE,
-		"__FILE__",  BUILTIN_FILE,
-		"__DATE__",  BUILTIN_DATE,
-		"__TIME__",  BUILTIN_TIME,
-//		"__STDC__", BUILTIN_STDC,
-		NULL, 0
+		{ "__LINE__",  BUILTIN_LINE },
+		{ "__FILE__",  BUILTIN_FILE },
+		{ "__DATE__",  BUILTIN_DATE },
+		{ "__TIME__",  BUILTIN_TIME },
+//		{ "__STDC__", BUILTIN_STDC },
+		{ NULL, 0 }
 	};
 
 	for ( i = 0; builtin[i].string; i++ )
@@ -811,7 +812,7 @@ void PC_AddBuiltinDefines( source_t *source ) {
 #else
 		define->next = source->defines;
 		source->defines = define;
-#endif //DEFINEHASHING
+#endif /* DEFINEHASHING */
 	} //end for
 } //end of the function PC_AddBuiltinDefines
 //============================================================================
@@ -823,7 +824,7 @@ void PC_AddBuiltinDefines( source_t *source ) {
 int PC_ExpandBuiltinDefine( source_t *source, define_t *define,
 							token_t **firsttoken, token_t **lasttoken ) {
 	token_t token;
-	unsigned long t;    //	time_t t; //to prevent LCC warning
+	time_t t;
 	char *curtime;
 
 	memcpy( &token, &source->token, sizeof( token_t ) );
