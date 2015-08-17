@@ -1053,7 +1053,7 @@ void R_PolygonScanRightEdge (void)
 void R_ClipAndDrawPoly ( float alpha, int isturbulent, qboolean textured )
 {
 	emitpoint_t	outverts[MAXWORKINGVERTS+3], *pout;
-	float		*pv;
+	vec_t		*pv;
 	int			i, nump;
 	float		scale;
 	vec3_t		transformed, local;
@@ -1149,7 +1149,7 @@ void R_ClipAndDrawPoly ( float alpha, int isturbulent, qboolean textured )
 		scale = yscale * pout->zi;
 		pout->v = (ycenter - scale * transformed[1]);
 
-		pv += sizeof (vec5_t) / sizeof (pv);
+		pv += sizeof (vec5_t) / sizeof (*pv);
 	}
 
 // draw it
