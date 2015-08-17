@@ -732,7 +732,8 @@ void R_DrawSurfaceBlock8RGBX_mip0()
 	psource = pbasesource;
 	prowdest = prowdestbase;
 
-#pragma loop(hint_parallel(8)) //qb: try this
+/* FS: FIXME: Unknown pragma.  Must be for VS2012 */
+//#pragma loop(hint_parallel(8)) //qb: try this
 	for (v=0 ; v<r_numvblocks ; v++)
 	{
 		lightlefta[0] = r_lightptr[0];
@@ -790,7 +791,8 @@ void R_DrawSurfaceBlock8RGBX_mip1()
 	
 	prowdest = prowdestbase;
 
-#pragma loop(hint_parallel(8)) //qb: try this
+/* FS: FIXME: Unknown pragma.  Must be for VS2012 */
+//#pragma loop(hint_parallel(8)) //qb: try this
 	for (v=0 ; v<r_numvblocks ; v++)
 	{
 		lightlefta[0] = r_lightptr[0];
@@ -847,7 +849,8 @@ void R_DrawSurfaceBlock8RGBX_mip2()
 	
 	prowdest = prowdestbase;
 
-#pragma loop(hint_parallel(8)) //qb: try this
+/* FS: FIXME: Unknown pragma.  Must be for VS2012 */
+//#pragma loop(hint_parallel(8)) //qb: try this
 	for (v=0 ; v<r_numvblocks ; v++)
 	{
 		lightlefta[0] = r_lightptr[0];
@@ -903,7 +906,8 @@ void R_DrawSurfaceBlock8RGBX_mip3()
 	
 	prowdest = prowdestbase;
 
-#pragma loop(hint_parallel(8)) //qb: try this
+/* FS: FIXME: Unknown pragma.  Must be for VS2012 */
+//#pragma loop(hint_parallel(8)) //qb: try this
 	for (v=0 ; v<r_numvblocks ; v++)
 	{
 		lightlefta[0] = r_lightptr[0];

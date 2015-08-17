@@ -129,7 +129,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "ref_gl"="..\ref_gl\ref_gl.dsp" - Package Owner=<4>
+Project: "ref_gl"=".\ref_gl.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -142,6 +142,18 @@ Package=<4>
 ###############################################################################
 
 Project: "ref_soft"=".\ref_soft.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "ref_sqb"=".\ref_sqb.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{

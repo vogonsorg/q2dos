@@ -31,7 +31,6 @@ static fixed16_t    s, t, snext, tnext, sstep, tstep;
 static float        sdivz, tdivz, zi, z, du, dv, spancountminus1;
 static float        sdivzstepu, tdivzstepu, zistepu;
 static int		    izi, izistep; // mankrip
-static short		*pz; // mankrip
 
 static byte	*r_turb_pbase, *r_turb_pdest;
 static fixed16_t		r_turb_s, r_turb_t, r_turb_sstep, r_turb_tstep;

@@ -60,7 +60,6 @@ void	Draw_8to24(byte *palette)
 	unsigned v;
 	unsigned short i;
 	byte	*table;
-	float gamma = 0;
 
 	//
 	// 8 8 8 encoding
