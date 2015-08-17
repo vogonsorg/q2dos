@@ -1316,6 +1316,9 @@ LScanLoop:
 //		d_pedgespanpackage->pz = d_pz;
 //		d_pedgespanpackage->count = d_aspancount;
 //		d_pedgespanpackage->light = d_light;
+//		d_pedgespanpackage->lightr = d_lightr;
+//		d_pedgespanpackage->lightg = d_lightg;
+//		d_pedgespanpackage->lightb = d_lightb;
 //		d_pedgespanpackage->zi = d_zi;
 //		d_pedgespanpackage->sfrac = d_sfrac << 16;
 //		d_pedgespanpackage->tfrac = d_tfrac << 16;
@@ -1327,6 +1330,15 @@ LScanLoop:
 	movl	C(d_aspancount),%eax
 	movl	%eax,spanpackage_t_count(%esi)
 	movl	%edi,spanpackage_t_light(%esi)
+#ifdef COLMODEL
+// FS: For qbism soft ref
+	movl	C(d_lightr), %edi
+	movl	%edi,spanpackage_t_lightr(%esi)
+	movl	C(d_lightg), %edi
+	movl	%edi,spanpackage_t_lightg(%esi)
+	movl	C(d_lightb), %edi
+	movl	%edi,spanpackage_t_lightb(%esi)
+endif
 	movl	%ebp,spanpackage_t_zi(%esi)
 	movl	%ecx,spanpackage_t_sfrac(%esi)
 	movl	%edx,spanpackage_t_tfrac(%esi)
@@ -1387,9 +1399,21 @@ LSkip1:
 
 //			d_light += d_lightextrastep;
 //			d_zi += d_ziextrastep;
+	movl	C(d_light), %edi
 	addl	C(d_lightextrastep),%edi
 	addl	C(d_ziextrastep),%ebp
 
+//			d_lightr += d_lightextrastepr;
+//			d_lightg += d_lightextrastepg;
+//			d_lightb += d_lightextrastepb;
+#ifdef COLMODEL
+	movl	C(d_lightr), %edi
+	addl	%edi,C(d_lightextrastepr)
+	movl	C(d_lightg), %edi
+	addl	%edi,C(d_lightextrastepg)
+	movl	C(d_lightb), %edi
+	addl	%edi,C(d_lightextrastepb)
+endif
 //		}
 	movl	C(d_pedgespanpackage),%esi
 	decl	%ecx
@@ -1445,7 +1469,16 @@ LSkip2:
 
 //			d_light += d_lightbasestep;
 //			d_zi += d_zibasestep;
+	movl	C(d_light), %edi
 	addl	C(d_lightbasestep),%edi
+#ifdef COLMODEL
+	movl	C(d_lightr), %edi
+	addl	%edi,C(d_lightbasestepr)
+	movl	C(d_lightg), %edi
+	addl	%edi,C(d_lightbasestepg)
+	movl	C(d_lightb), %edi
+	addl	%edi,C(d_lightbasestepb)
+endif
 	addl	C(d_zibasestep),%ebp
 
 //		}

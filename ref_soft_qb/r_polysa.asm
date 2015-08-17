@@ -59,8 +59,8 @@ pspans	equ		4+8
 _D_PolysetAff8Start:	
 
 ;qb: only works for mono (non-colored) light
-public _R_PolysetDrawSpans8_Opaque_Monolight 
-_R_PolysetDrawSpans8_Opaque_Monolight :
+public _R_PolysetDrawSpans8_Opaque 
+_R_PolysetDrawSpans8_Opaque :
 
  push esi	; preserve register variables
  push ebx	
@@ -821,11 +821,11 @@ LSkip2:
  add edi,ds:dword ptr[_d_lightbasestep]
 ifdef COLMODEL
  mov ds:dword ptr[_d_lightr],edi
- add edi,ds:dword ptr[_d_lightextrastepr]
+ add edi,ds:dword ptr[_d_lightbasestepr]
  mov ds:dword ptr[_d_lightg],edi
- add edi,ds:dword ptr[_d_lightextrastepg]
+ add edi,ds:dword ptr[_d_lightbasestepg]
  mov ds:dword ptr[_d_lightb],edi
- add edi,ds:dword ptr[_d_lightextrastepb]
+ add edi,ds:dword ptr[_d_lightbasestepb]
 endif
  add ebp,ds:dword ptr[_d_zibasestep]
 

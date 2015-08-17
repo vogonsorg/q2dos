@@ -605,7 +605,6 @@ extern cvar_t   *sw_reportedgeout;
 extern cvar_t   *sw_stipplealpha;
 extern cvar_t   *sw_surfcacheoverride;
 extern cvar_t   *sw_waterwarp;
-extern cvar_t   *sw_transmooth; // texture dither on transparencies
 
 extern cvar_t   *r_fullbright;
 extern cvar_t	*r_lefthand;

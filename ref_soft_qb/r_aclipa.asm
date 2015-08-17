@@ -64,6 +64,15 @@ LDo3Forward:
  fild ds:dword ptr[fv_v+4+edi]	; fv1v1 | fv0v1 | fv1v0 | fv0v0 | scale
  fild ds:dword ptr[fv_v+8+esi]	; fv0v2 | fv1v1 | fv0v1 | fv1v0 | fv0v0 | scale
  fild ds:dword ptr[fv_v+8+edi]	; fv1v2 | fv0v2 | fv1v1 | fv0v1 | fv1v0 | fv0v0 |
+
+; FS: Start
+ fild ds:dword ptr[fv_v+12+esi]	; lr
+ fild ds:dword ptr[fv_v+12+edi]	
+ fild ds:dword ptr[fv_v+16+esi]	; lg
+ fild ds:dword ptr[fv_v+16+edi]	
+ fild ds:dword ptr[fv_v+18+esi]	; lb
+ fild ds:dword ptr[fv_v+18+edi]	
+
 ;  scale
  fxch st(5)	; fv0v0 | fv0v2 | fv1v1 | fv0v1 | fv1v0 | fv1v2 |
 ;  scale

@@ -19,7 +19,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 #include <assert.h>
 #include "r_local.h"
-#include "r_dither.h"
 
 #define AFFINE_SPANLET_SIZE      16
 #define AFFINE_SPANLET_SIZE_BITS 4
@@ -38,7 +37,6 @@ typedef struct
 spanletvars_t s_spanletvars;
 
 static int r_polyblendcolor;
-static unsigned btemp; //qb: faster.  probably.
 
 static espan_t	*s_polygon_spans;
 
@@ -60,25 +58,14 @@ static void R_DrawPoly( int iswater );
 */
 void R_DrawSpanletOpaque( void )
 {
+	unsigned btemp;
+
 	do
 	{
 		unsigned ts, tt;
 
-		if (sw_transmooth->value)
-		{
-			ts = s_spanletvars.s;
-			tt = s_spanletvars.t;
-
-			DitherKernel2(ts, tt, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
-
-			ts = (ts >> 16);
-			tt = (tt >> 16);
-		}
-		else
-		{
-			ts = s_spanletvars.s >> 16;
-			tt = s_spanletvars.t >> 16;
-		}
+		ts = s_spanletvars.s >> 16;
+		tt = s_spanletvars.t >> 16;
 
 		btemp = *(s_spanletvars.pbase + (ts) + (tt) * cachewidth);
 		if (btemp != 255)
@@ -103,6 +90,7 @@ void R_DrawSpanletOpaque( void )
 */
 void R_DrawSpanletTurbulentStipple33( void )
 {
+	unsigned btemp;
 	int	     sturb, tturb;
 	byte    *pdest = s_spanletvars.pdest;
 	short   *pz    = s_spanletvars.pz;
@@ -134,28 +122,14 @@ void R_DrawSpanletTurbulentStipple33( void )
 
 		while ( s_spanletvars.spancount > 0 )
 		{
-			if (sw_transmooth->value)
-			{
-				sturb = s_spanletvars.s + r_turb_turb[(s_spanletvars.t >> 16)&(CYCLE - 1)];
-				tturb = s_spanletvars.t + r_turb_turb[(s_spanletvars.s >> 16)&(CYCLE - 1)];
+			sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
+			tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
 
-				DitherKernel2(sturb, tturb, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
-
-				tturb = (tturb >> 16) & 63;
-				sturb = (sturb >> 16) & 63;
-			}
-			else
-			{
-				sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t >> 16)&(CYCLE - 1)]) >> 16) & 63;
-				tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s >> 16)&(CYCLE - 1)]) >> 16) & 63;
-			}
-
-			btemp = *(s_spanletvars.pbase + (sturb)+(tturb << 6));
-			if (btemp != 255)
-			{
-				if (*pz <= (izi >> 16))
-					*pdest = btemp;
-			}
+			btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
+			
+			if ( *pz <= ( izi >> 16 ) )
+				*pdest = btemp;
+			
 			izi               += s_spanletvars.izistep_times_2;
 			s_spanletvars.s   += s_spanletvars.sstep;
 			s_spanletvars.t   += s_spanletvars.tstep;
@@ -173,6 +147,7 @@ void R_DrawSpanletTurbulentStipple33( void )
 */
 void R_DrawSpanletTurbulentStipple66( void )
 {
+	unsigned btemp;
 	int	     sturb, tturb;
 	byte    *pdest = s_spanletvars.pdest;
 	short   *pz    = s_spanletvars.pz;
@@ -204,28 +179,14 @@ void R_DrawSpanletTurbulentStipple66( void )
 
 		while ( s_spanletvars.spancount > 0 )
 		{
-			if (sw_transmooth->value)
-			{
-				sturb = s_spanletvars.s + r_turb_turb[(s_spanletvars.t >> 16)&(CYCLE - 1)];
-				tturb = s_spanletvars.t + r_turb_turb[(s_spanletvars.s >> 16)&(CYCLE - 1)];
-
-				DitherKernel2(sturb, tturb, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
-
-				tturb = (tturb >> 16) & 63;
-				sturb = (sturb >> 16) & 63;
-			}
-			else
-			{
-				sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t >> 16)&(CYCLE - 1)]) >> 16) & 63;
-				tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s >> 16)&(CYCLE - 1)]) >> 16) & 63;
-			}
-
-			btemp = *(s_spanletvars.pbase + (sturb)+(tturb << 6));
-			if (btemp != 255)
-			{
-				if (*pz <= (izi >> 16))
-					*pdest = btemp;
-			}
+			sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
+			tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
+			
+			btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
+			
+			if ( *pz <= ( izi >> 16 ) )
+				*pdest = btemp;
+			
 			izi               += s_spanletvars.izistep_times_2;
 			s_spanletvars.s   += s_spanletvars.sstep;
 			s_spanletvars.t   += s_spanletvars.tstep;
@@ -248,36 +209,21 @@ void R_DrawSpanletTurbulentStipple66( void )
 		
 		while ( s_spanletvars.spancount > 0 )
 		{
-			if (sw_transmooth->value)
-			{
-				sturb = s_spanletvars.s + r_turb_turb[(s_spanletvars.t >> 16)&(CYCLE - 1)];
-				tturb = s_spanletvars.t + r_turb_turb[(s_spanletvars.s >> 16)&(CYCLE - 1)];
-
-				DitherKernel2(sturb, tturb, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
-
-				tturb = (tturb >> 16) & 63;
-				sturb = (sturb >> 16) & 63;
-			}
-			else
-			{
-				sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t >> 16)&(CYCLE - 1)]) >> 16) & 63;
-				tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s >> 16)&(CYCLE - 1)]) >> 16) & 63;
-			}
+			sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
+			tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
 
 			btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
 
-			if (btemp != 255)  //qb: add alphatest to drawspanturbulent funcs.  Easy-peasy!
-			{
-				if (*pz <= (izi >> 16))
-					*pdest = btemp;
-			}
-			izi += s_spanletvars.izistep;
-			s_spanletvars.s += s_spanletvars.sstep;
-			s_spanletvars.t += s_spanletvars.tstep;
+			if ( *pz <= ( izi >> 16 ) )
+				*pdest = btemp;
+			
+			izi               += s_spanletvars.izistep;
+			s_spanletvars.s   += s_spanletvars.sstep;
+			s_spanletvars.t   += s_spanletvars.tstep;
 
 			pdest++;
 			pz++;
-
+			
 			s_spanletvars.spancount--;
 		}
 	}
@@ -286,35 +232,20 @@ void R_DrawSpanletTurbulentStipple66( void )
 /*
 ** R_DrawSpanletTurbulentBlended
 */
-void R_DrawSpanletTurbulentBlended66(void)
+void R_DrawSpanletTurbulentBlended66( void )
 {
+	unsigned btemp;
 	int	     sturb, tturb;
 
 	do
 	{
-		if (sw_transmooth->value)
-		{
-			sturb = s_spanletvars.s + r_turb_turb[(s_spanletvars.t >> 16)&(CYCLE - 1)];
-			tturb = s_spanletvars.t + r_turb_turb[(s_spanletvars.s >> 16)&(CYCLE - 1)];
+		sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
+		tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
 
-			DitherKernel2(sturb, tturb, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
+		btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
 
-			tturb = (tturb >> 16) & 63;
-			sturb = (sturb >> 16) & 63;
-		}
-		else
-		{
-			sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t >> 16)&(CYCLE - 1)]) >> 16) & 63;
-			tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s >> 16)&(CYCLE - 1)]) >> 16) & 63;
-		}
-
-		btemp = *(s_spanletvars.pbase + (sturb)+(tturb << 6));
-
-		if (btemp != 255)
-		{
-			if (*s_spanletvars.pz <= (s_spanletvars.izi >> 16))
-				*s_spanletvars.pdest = vid.alphamap[btemp * 256 + *s_spanletvars.pdest];
-		}
+		if ( *s_spanletvars.pz <= ( s_spanletvars.izi >> 16 ) )
+			*s_spanletvars.pdest = vid.alphamap[btemp*256+*s_spanletvars.pdest];
 
 		s_spanletvars.izi += s_spanletvars.izistep;
 		s_spanletvars.pdest++;
@@ -322,37 +253,24 @@ void R_DrawSpanletTurbulentBlended66(void)
 		s_spanletvars.s += s_spanletvars.sstep;
 		s_spanletvars.t += s_spanletvars.tstep;
 
-	} while (--s_spanletvars.spancount > 0);
+	} while ( --s_spanletvars.spancount > 0 );
 }
 
-void R_DrawSpanletTurbulentBlended33(void)
+void R_DrawSpanletTurbulentBlended33( void )
 {
+	unsigned btemp;
 	int	     sturb, tturb;
 
 	do
 	{
-		if (sw_transmooth->value)
-		{
-			sturb = s_spanletvars.s + r_turb_turb[(s_spanletvars.t >> 16)&(CYCLE - 1)];
-			tturb = s_spanletvars.t + r_turb_turb[(s_spanletvars.s >> 16)&(CYCLE - 1)];
-
-			DitherKernel2(sturb, tturb, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
-
-			tturb = (tturb >> 16) & 63;
-			sturb = (sturb >> 16) & 63;
-		}
-		else
-		{
-			sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t >> 16)&(CYCLE - 1)]) >> 16) & 63;
-			tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s >> 16)&(CYCLE - 1)]) >> 16) & 63;
-		}
+		sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
+		tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
 
 		btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
-		if (btemp != 255)
-		{
-			if (*s_spanletvars.pz <= (s_spanletvars.izi >> 16))
-				*s_spanletvars.pdest = vid.alphamap[btemp + *s_spanletvars.pdest * 256];
-		}
+
+		if ( *s_spanletvars.pz <= ( s_spanletvars.izi >> 16 ) )
+			*s_spanletvars.pdest = vid.alphamap[btemp+*s_spanletvars.pdest*256];
+
 		s_spanletvars.izi += s_spanletvars.izistep;
 		s_spanletvars.pdest++;
 		s_spanletvars.pz++;
@@ -367,28 +285,14 @@ void R_DrawSpanletTurbulentBlended33(void)
 */
 void R_DrawSpanlet33( void )
 {
+	unsigned btemp;
+
 	do
 	{
 		unsigned ts, tt;
 
-		if (sw_transmooth->value)
-		{
-			ts = s_spanletvars.s;
-			tt = s_spanletvars.t;
-
-			DitherKernel2(ts, tt, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
-
-			ts = (ts >> 16);
-			//ts = ts ? ts - 1 : ts;
-
-			tt = (tt >> 16);
-			//tt = tt ? tt - 1 : tt;
-		}
-		else
-		{
-			ts = s_spanletvars.s >> 16;
-			tt = s_spanletvars.t >> 16;
-		}
+		ts = s_spanletvars.s >> 16;
+		tt = s_spanletvars.t >> 16;
 
 		btemp = *(s_spanletvars.pbase + (ts) + (tt) * cachewidth);
 
@@ -428,28 +332,16 @@ void R_DrawSpanletConstant33( void )
 */
 void R_DrawSpanlet66( void )
 {
+	unsigned btemp;
 
 	do
 	{
 		unsigned ts, tt;
 
-		if (sw_transmooth->value)
-		{
-			ts = s_spanletvars.s;
-			tt = s_spanletvars.t;
+		ts = s_spanletvars.s >> 16;
+		tt = s_spanletvars.t >> 16;
 
-			DitherKernel2(ts, tt, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
-
-			ts = (ts >> 16);
-			tt = (tt >> 16);
-		}
-		else
-		{
-			ts = s_spanletvars.s >> 16;
-			tt = s_spanletvars.t >> 16;
-		}
-
-		btemp = *(s_spanletvars.pbase + (ts)+(tt)* cachewidth);
+		btemp = *(s_spanletvars.pbase + (ts) + (tt) * cachewidth);
 
 		if ( btemp != 255 )
 		{
@@ -472,6 +364,7 @@ void R_DrawSpanlet66( void )
 */
 void R_DrawSpanlet33Stipple( void )
 {
+	unsigned btemp;
 	byte    *pdest = s_spanletvars.pdest;
 	short   *pz    = s_spanletvars.pz;
 	int      izi   = s_spanletvars.izi;
@@ -502,25 +395,8 @@ void R_DrawSpanlet33Stipple( void )
 
 		while ( s_spanletvars.spancount > 0 )
 		{
-			unsigned s, t;
-			if (sw_transmooth->value)
-			{
-				s = s_spanletvars.s;
-				t = s_spanletvars.t;
-
-				DitherKernel2(s, t, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
-
-				s = (s >> 16);
-				t = (t >> 16);
-				/*s = s ? s - 1 : s;
-				t = t ? t - 1 : t;*/
-
-			}
-			else
-			{
-				s = s_spanletvars.s >> 16;
-				t = s_spanletvars.t >> 16;
-			}
+			unsigned s = s_spanletvars.s >> 16;
+			unsigned t = s_spanletvars.t >> 16;
 
 			btemp = *( s_spanletvars.pbase + ( s ) + ( t * cachewidth ) );
 			
@@ -547,10 +423,10 @@ void R_DrawSpanlet33Stipple( void )
 */
 void R_DrawSpanlet66Stipple( void )
 {
+	unsigned btemp;
 	byte    *pdest = s_spanletvars.pdest;
 	short   *pz    = s_spanletvars.pz;
 	int      izi   = s_spanletvars.izi;
-	unsigned s, t;
 
 	s_spanletvars.pdest += s_spanletvars.spancount;
 	s_spanletvars.pz    += s_spanletvars.spancount;
@@ -578,21 +454,8 @@ void R_DrawSpanlet66Stipple( void )
 
 		while ( s_spanletvars.spancount > 0 )
 		{
-			if (sw_transmooth->value)
-			{
-				s = s_spanletvars.s;
-				t = s_spanletvars.t;
-
-				DitherKernel2(s, t, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
-
-				s = (s >> 16);
-				t = (t >> 16);
-			}
-			else
-			{
-				s = s_spanletvars.s >> 16;
-				t = s_spanletvars.t >> 16;
-			}
+			unsigned s = s_spanletvars.s >> 16;
+			unsigned t = s_spanletvars.t >> 16;
 
 			btemp = *( s_spanletvars.pbase + ( s ) + ( t * cachewidth ) );
 
@@ -616,21 +479,8 @@ void R_DrawSpanlet66Stipple( void )
 	{
 		while ( s_spanletvars.spancount > 0 )
 		{
-			if (sw_transmooth->value)
-			{
-				s = s_spanletvars.s;
-				t = s_spanletvars.t;
-
-				DitherKernel2(s, t, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
-
-				s = (s >> 16);
-				t = (t >> 16);
-			}
-			else
-			{
-				s = s_spanletvars.s >> 16;
-				t = s_spanletvars.t >> 16;
-			}
+			unsigned s = s_spanletvars.s >> 16;
+			unsigned t = s_spanletvars.t >> 16;
 
 			btemp = *( s_spanletvars.pbase + ( s ) + ( t * cachewidth ) );
 

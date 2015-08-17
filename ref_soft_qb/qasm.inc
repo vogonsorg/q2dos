@@ -247,6 +247,7 @@ ifndef GLQUAKE
 	externdef spr8entryvec_table:dword
 	externdef d_8to24table:dword
 	externdef palmap2:dword
+	externdef coloredlights:dword
 endif
 
 	externdef _fpu_ceil_cw:dword

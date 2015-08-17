@@ -27,7 +27,7 @@ int	rand1k[] = {
 };
 
 #define MASK_1K	0x3FF
-#define	id386ALIAS	0 /* FS: TODO FIXME: R_PolysetDrawSpans8_Opaque_Coloured needs the ASM updated first DO NOT ENABLE */
+#define	id386ALIAS	1 /* FS: TODO FIXME: R_PolysetDrawSpans8_Opaque_Coloured needs the ASM updated first DO NOT ENABLE */
 
 int		rand1k_index = 0;
 
@@ -130,7 +130,7 @@ void	(*d_pdrawspans)(spanpackage_t *pspanpackage);
 void R_PolysetDrawSpans8_33 (spanpackage_t *pspanpackage);
 void R_PolysetDrawSpans8_66 (spanpackage_t *pspanpackage);
 void R_PolysetDrawSpans8_Opaque (spanpackage_t *pspanpackage);
-void R_PolysetDrawSpans8_Opaque_Coloured(spanpackage_t *pspanpackage);
+void R_PolysetDrawSpans8_Opaque_Coloured (spanpackage_t *pspanpackage);
 
 void R_PolysetDrawThreshSpans8 (spanpackage_t *pspanpackage);
 void R_PolysetCalcGradients (int skinwidth);
@@ -816,6 +816,11 @@ void R_PolysetCalcGradients( int skinwidth )
  	__asm mov ebx, r_tstepx
 	__asm jne translucent
 #if id386ALIAS
+
+	__asm mov ecx, coloredlights
+	__asm cmp ecx, 2
+	__asm jne translucent
+
 	__asm shl eax, 16
 	__asm shl ebx, 16
 	__asm jmp done_with_steps
@@ -904,10 +909,13 @@ void R_PolysetCalcGradients (int skinwidth)
 
 //#if	id386ALIAS
 #if id386ALIAS
-	if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
+	if (coloredlights == 2)
 	{
-		a_sstepxfrac = r_sstepx << 16;
-		a_tstepxfrac = r_tstepx << 16;
+		if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
+		{
+			a_sstepxfrac = r_sstepx << 16;
+			a_tstepxfrac = r_tstepx << 16;
+		}
 	}
 	else
 #endif
@@ -924,7 +932,6 @@ void R_PolysetCalcGradients (int skinwidth)
 
 
 //qb: staticized
-/* FS: TODO FIXME: Undo all of this because we need it in ASM */
 static int		lcount;
 static int		lsfrac, ltfrac;
 static byte	*lpdest;
@@ -1206,6 +1213,11 @@ void R_PolysetDrawSpansConstant8_66( spanpackage_t *pspanpackage)
 
 void R_PolysetDrawSpans8_Opaque_Coloured(spanpackage_t *pspanpackage)
 {
+	if(coloredlights == 2)
+	{
+		R_PolysetDrawSpans8_Opaque(pspanpackage);
+		return;
+	}
 
 	do
 	{
@@ -1367,7 +1379,7 @@ void R_RasterizeAliasPolySmooth (void)
 			(plefttop[3] >> 16) * r_affinetridesc.skinwidth;
 //#if	id386ALIAS
 #if id386ALIAS
-	if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
+	if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
 	{
 		d_sfrac = (plefttop[2] & 0xFFFF) << 16;
 		d_tfrac = (plefttop[3] & 0xFFFF) << 16;
@@ -1419,7 +1431,7 @@ void R_RasterizeAliasPolySmooth (void)
 
 //#if	id386ALIAS
 #if id386ALIAS
-		if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
+		if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
 		{
 			d_pzbasestep = (d_zwidth + ubasestep) << 1;
 			d_pzextrastep = d_pzbasestep + 2;
@@ -1464,7 +1476,7 @@ void R_RasterizeAliasPolySmooth (void)
 				r_affinetridesc.skinwidth;
 //#if	id386ALIAS
 #if id386ALIAS
-		if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
+		if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
 		{
 			d_sfracbasestep = (r_sstepy + r_sstepx * ubasestep) << 16;
 			d_tfracbasestep = (r_tstepy + r_tstepx * ubasestep) << 16;
@@ -1491,7 +1503,7 @@ void R_RasterizeAliasPolySmooth (void)
 				r_affinetridesc.skinwidth;
 //#if	id386ALIAS
 #if id386ALIAS
-		if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
+		if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
 		{
 			d_sfracextrastep = (r_sstepy + r_sstepx*d_countextrastep) << 16;
 			d_tfracextrastep = (r_tstepy + r_tstepx*d_countextrastep) << 16;
@@ -1512,7 +1524,7 @@ void R_RasterizeAliasPolySmooth (void)
 		d_lightextrastepb = d_lightbasestepb + working_lbstepx;
 
 #if id386ALIAS
-		if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
+		if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
 		{
 			R_PolysetScanLeftEdge (initialleftheight);
 		}
@@ -1584,7 +1596,7 @@ void R_RasterizeAliasPolySmooth (void)
 
 //#if	id386ALIAS
 #if id386ALIAS
-			if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
+			if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
 			{
 				d_pzbasestep = (d_zwidth + ubasestep) << 1;
 				d_pzextrastep = d_pzbasestep + 2;
@@ -1618,7 +1630,7 @@ void R_RasterizeAliasPolySmooth (void)
 					r_affinetridesc.skinwidth;
 //#if	id386ALIAS
 #if id386ALIAS
-			if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
+			if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
 			{
 				d_sfracbasestep = (r_sstepy + r_sstepx * ubasestep) << 16;
 				d_tfracbasestep = (r_tstepy + r_tstepx * ubasestep) << 16;
@@ -1645,7 +1657,7 @@ void R_RasterizeAliasPolySmooth (void)
 					r_affinetridesc.skinwidth;
 //#if	id386ALIAS
 #if id386ALIAS
-			if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
+			if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
 			{
 				d_sfracextrastep = ((r_sstepy+r_sstepx*d_countextrastep) & 0xFFFF)<<16;
 				d_tfracextrastep = ((r_tstepy+r_tstepx*d_countextrastep) & 0xFFFF)<<16;
@@ -1666,7 +1678,7 @@ void R_RasterizeAliasPolySmooth (void)
 			d_lightextrastepb = d_lightbasestepb + working_lbstepx;
 
 #if id386ALIAS
-			if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
+			if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
 			{
 				R_PolysetScanLeftEdge (height);
 			}

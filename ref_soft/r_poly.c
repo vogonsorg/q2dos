@@ -124,7 +124,7 @@ void R_DrawSpanletTurbulentStipple33( void )
 		{
 			sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
 			tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
-			
+
 			btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
 			
 			if ( *pz <= ( izi >> 16 ) )
@@ -220,7 +220,7 @@ void R_DrawSpanletTurbulentStipple66( void )
 			izi               += s_spanletvars.izistep;
 			s_spanletvars.s   += s_spanletvars.sstep;
 			s_spanletvars.t   += s_spanletvars.tstep;
-			
+
 			pdest++;
 			pz++;
 			
