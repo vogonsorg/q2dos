@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir "."
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /G5 /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D id386=1 /YX /c
+# ADD CPP /nologo /G5 /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D id386=1 /D "COLMODEL" /YX /c
 # ADD BASE MTL /nologo /D "NDEBUG" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -69,7 +69,7 @@ LINK32=link.exe
 # PROP Intermediate_Dir ".\Debug"
 # PROP Target_Dir "."
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /G5 /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D id386=1 /FR /YX /FD /c
+# ADD CPP /nologo /G5 /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D id386=1 /D "COLMODEL" /FR /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -214,6 +214,27 @@ InputName=r_polysa
 	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
 
 # End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\ref_soft_qb\r_scana.asm
+
+!IF  "$(CFG)" == "ref_sqb - Win32 Release"
+
+# Begin Custom Build
+OutDir=.\Release
+InputPath=..\ref_soft_qb\r_scana.asm
+InputName=r_scana
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "ref_sqb - Win32 Debug"
 
 !ENDIF 
 
@@ -561,7 +582,6 @@ DEP_CPP_R_POL=\
 	"..\game\q_shared.h"\
 	"..\qcommon\qcommon.h"\
 	"..\qcommon\qfiles.h"\
-	"..\ref_soft_qb\r_dither.h"\
 	"..\ref_soft_qb\r_local.h"\
 	"..\ref_soft_qb\r_model.h"\
 	
@@ -621,7 +641,6 @@ DEP_CPP_R_SCA=\
 	"..\game\q_shared.h"\
 	"..\qcommon\qcommon.h"\
 	"..\qcommon\qfiles.h"\
-	"..\ref_soft_qb\r_dither.h"\
 	"..\ref_soft_qb\r_local.h"\
 	"..\ref_soft_qb\r_model.h"\
 	
@@ -751,6 +770,10 @@ SOURCE=..\ref_soft_qb\anorms.h
 # Begin Source File
 
 SOURCE=..\ref_soft_qb\asm_draw.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\ref_soft_qb\qasm.inc
 # End Source File
 # Begin Source File
 

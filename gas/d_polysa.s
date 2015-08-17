@@ -1338,7 +1338,7 @@ LScanLoop:
 	movl	%edi,spanpackage_t_lightg(%esi)
 	movl	C(d_lightb), %edi
 	movl	%edi,spanpackage_t_lightb(%esi)
-endif
+#endif
 	movl	%ebp,spanpackage_t_zi(%esi)
 	movl	%ecx,spanpackage_t_sfrac(%esi)
 	movl	%edx,spanpackage_t_tfrac(%esi)
@@ -1413,7 +1413,7 @@ LSkip1:
 	addl	%edi,C(d_lightextrastepg)
 	movl	C(d_lightb), %edi
 	addl	%edi,C(d_lightextrastepb)
-endif
+#endif
 //		}
 	movl	C(d_pedgespanpackage),%esi
 	decl	%ecx
@@ -1478,7 +1478,7 @@ LSkip2:
 	addl	%edi,C(d_lightbasestepg)
 	movl	C(d_lightb), %edi
 	addl	%edi,C(d_lightbasestepb)
-endif
+#endif
 	addl	C(d_zibasestep),%ebp
 
 //		}

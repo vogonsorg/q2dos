@@ -204,6 +204,18 @@
 	.extern C(irtable)
 	.extern C(iractive)
 
+#ifdef COLMODEL
+	.extern C(d_lightr)
+	.extern C(d_lightg)
+	.extern C(d_lightb)
+	.extern C(d_lightextrastepr)
+	.extern C(d_lightextrastepg)
+	.extern C(d_lightextrastepb)
+	.extern C(d_lightbasestepr)
+	.extern C(d_lightbasestepg)
+	.extern C(d_lightbasestepb)
+#endif
+
 	.extern float_point5
 	.extern Float2ToThe31nd
 	.extern izistep
@@ -370,7 +382,14 @@
 #define spanpackage_t_tfrac				20
 #define spanpackage_t_light				24
 #define spanpackage_t_zi				28
-#define spanpackage_t_size				32 
+#ifndef COLMODEL
+#define spanpackage_t_size				32
+#else
+#define spanpackage_t_lightr			32
+#define spanpackage_t_lightg			36
+#define spanpackage_t_lightb			40
+#define spanpackage_t_size				44 
+#endif // COLMODEL
 
 // edge_t structure
 // !!! if this is changed, it must be changed in r_shared.h too !!!
