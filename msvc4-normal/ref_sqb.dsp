@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir "."
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /G5 /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
+# ADD CPP /nologo /G5 /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D id386=1 /YX /c
 # ADD BASE MTL /nologo /D "NDEBUG" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -69,7 +69,7 @@ LINK32=link.exe
 # PROP Intermediate_Dir ".\Debug"
 # PROP Target_Dir "."
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /G5 /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /FR /YX /FD /c
+# ADD CPP /nologo /G5 /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D id386=1 /FR /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -91,6 +91,227 @@ LINK32=link.exe
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90"
+# Begin Group "ASM"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\ref_soft_qb\r_draw16.asm
+
+!IF  "$(CFG)" == "ref_sqb - Win32 Release"
+
+# Begin Custom Build
+OutDir=.\Release
+InputPath=..\ref_soft_qb\r_draw16.asm
+InputName=r_draw16
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "ref_sqb - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft_qb\r_draw16.asm
+InputName=r_draw16
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\ref_soft_qb\r_drawa.asm
+
+!IF  "$(CFG)" == "ref_sqb - Win32 Release"
+
+# Begin Custom Build
+OutDir=.\Release
+InputPath=..\ref_soft_qb\r_drawa.asm
+InputName=r_drawa
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "ref_sqb - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft_qb\r_drawa.asm
+InputName=r_drawa
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\ref_soft_qb\r_edgea.asm
+
+!IF  "$(CFG)" == "ref_sqb - Win32 Release"
+
+# Begin Custom Build
+OutDir=.\Release
+InputPath=..\ref_soft_qb\r_edgea.asm
+InputName=r_edgea
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "ref_sqb - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft_qb\r_edgea.asm
+InputName=r_edgea
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\ref_soft_qb\r_polysa.asm
+
+!IF  "$(CFG)" == "ref_sqb - Win32 Release"
+
+# Begin Custom Build
+OutDir=.\Release
+InputPath=..\ref_soft_qb\r_polysa.asm
+InputName=r_polysa
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "ref_sqb - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft_qb\r_polysa.asm
+InputName=r_polysa
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\ref_soft_qb\r_spr8.asm
+
+!IF  "$(CFG)" == "ref_sqb - Win32 Release"
+
+# Begin Custom Build
+OutDir=.\Release
+InputPath=..\ref_soft_qb\r_spr8.asm
+InputName=r_spr8
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "ref_sqb - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft_qb\r_spr8.asm
+InputName=r_spr8
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\ref_soft_qb\r_surf8.asm
+
+!IF  "$(CFG)" == "ref_sqb - Win32 Release"
+
+# Begin Custom Build
+OutDir=.\Release
+InputPath=..\ref_soft_qb\r_surf8.asm
+InputName=r_surf8
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "ref_sqb - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft_qb\r_surf8.asm
+InputName=r_surf8
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\ref_soft_qb\r_varsa.asm
+
+!IF  "$(CFG)" == "ref_sqb - Win32 Release"
+
+# Begin Custom Build
+OutDir=.\Release
+InputPath=..\ref_soft_qb\r_varsa.asm
+InputName=r_varsa
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "ref_sqb - Win32 Debug"
+
+# Begin Custom Build
+OutDir=.\Debug
+InputPath=..\ref_soft_qb\r_varsa.asm
+InputName=r_varsa
+
+"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=..\game\q_shared.c

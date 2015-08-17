@@ -74,8 +74,8 @@ LClampHigh5:
 pspans	equ		4+16
 
  align 4	
- public _D_DrawSpans16	
-_D_DrawSpans16:	
+ public _D_DrawSpans_16	
+_D_DrawSpans_16:	
  push ebp	; preserve caller's stack frame
  push edi	
  push esi	; preserve register variables

@@ -338,8 +338,8 @@ void R_Register (void)
 	r_customheight = ri.Cvar_Get("r_customheight", "768", CVAR_ARCHIVE);
 	// leilei - colored lights
 
-	r_coloredlights = ri.Cvar_Get("r_coloredlights", "2", CVAR_ARCHIVE);
-	r_lightsaturation = ri.Cvar_Get("r_lightsaturation", "1", CVAR_ARCHIVE);
+	r_coloredlights = ri.Cvar_Get("r_coloredlights", "1", CVAR_ARCHIVE);
+	r_lightsaturation = ri.Cvar_Get("r_lightsaturation", "0.75", CVAR_ARCHIVE);
 
 	// o^_^o
 }

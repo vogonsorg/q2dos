@@ -102,7 +102,7 @@ void D_WarpScreen (void)
 }
 
 
-#if	!id386
+#if	1 // !id386
 
 /*
 =============
@@ -403,7 +403,7 @@ void NonTurbulent8 (espan_t *pspan)
 //====================
 
 
-#if	!id386
+#if	1 // !id386
 
 /*
 =============
