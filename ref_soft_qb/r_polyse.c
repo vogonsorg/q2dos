@@ -34,7 +34,6 @@ int		rand1k_index = 0;
 // !!! if this is changed, it must be changed in d_polysa.s too !!!
 #define DPS_MAXSPANS			MAXHEIGHT+1	
 									// 1 extra for spanpackage that marks end
-
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct {
 	void			*pdest;
@@ -452,7 +451,7 @@ void R_PolysetSetUpForLineScan(fixed8_t startvertu, fixed8_t startvertv,
 R_PolysetCalcGradients
 ================
 */
-#if 0 //qb: doesn't work for colored light ATM. was: id386 && !defined __linux__ && !defined __FreeBSD__
+#if id386 && !defined __linux__ && !defined __FreeBSD__
 void R_PolysetCalcGradients( int skinwidth )
 {
 	static float xstepdenominv, ystepdenominv, t0, t1;
@@ -549,6 +548,138 @@ void R_PolysetCalcGradients( int skinwidth )
 	__asm fxch  st(1)               ; r_lstepx | r_lstepy
 	__asm fistp dword ptr [r_lstepx]
 	__asm fistp dword ptr [r_lstepy]
+
+/* FS: Start */
+/*
+	t0 = r_p0[6] - r_p2[6];
+	t1 = r_p1[6] - r_p2[6];
+	r_lrstepx = (int)ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	r_lrstepy = (int)ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+*/
+	__asm fild  dword ptr d_xdenom    ; d_xdenom
+	__asm fdivr one                   ; 1 / d_xdenom
+	__asm fst   xstepdenominv         ; 
+	__asm fmul  negative_one          ; -( 1 / d_xdenom )
+
+	__asm mov   eax, dword ptr [r_p0+24] // 6
+	__asm mov   ebx, dword ptr [r_p1+24]
+	__asm sub   eax, dword ptr [r_p2+24]
+	__asm sub   ebx, dword ptr [r_p2+24]
+
+	__asm fstp  ystepdenominv       ; (empty)
+
+	__asm mov   t0_int, eax
+	__asm mov   t1_int, ebx
+	__asm fild  t0_int              ; t0
+	__asm fild  t1_int              ; t1 | t0
+	__asm fxch  st(1)               ; t0 | t1
+	__asm fstp  t0                  ; t1
+	__asm fst   t1                  ; t1
+	__asm fmul  p01_minus_p21       ; t1 * p01_minus_p21
+	__asm fld   t0                  ; t0 | t1 * p01_minus_p21
+	__asm fmul  p11_minus_p21       ; t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fld   t1                  ; t1 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fmul  p00_minus_p20       ; t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fld   t0                  ; t0 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fmul  p10_minus_p20       ; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fxch  st(2)               ; t0 * p11_minus_p21 | t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21
+	__asm fsubp st(3), st           ; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	__asm fsubrp st(1), st          ; t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	__asm fxch  st(1)               ; t1 * p01_minus_p21 - t0 * p11_minus_p21 | t1 * p00_minus_p20 - t0 * p10_minus_p20
+	__asm fmul  xstepdenominv       ; r_lstepx | t1 * p00_minus_p20 - t0 * p10_minus_p20
+	__asm fxch  st(1)
+	__asm fmul  ystepdenominv       ; r_lstepy | r_lstepx
+	__asm fxch  st(1)               ; r_lstepx | r_lstepy
+	__asm fistp dword ptr [r_lrstepx]
+	__asm fistp dword ptr [r_lrstepy]
+
+/* FS: Start */
+/*
+	t0 = r_p0[7] - r_p2[7];
+	t1 = r_p1[7] - r_p2[7];
+	r_lgstepx = (int)ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	r_lgstepy = (int)ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+*/
+	__asm fild  dword ptr d_xdenom    ; d_xdenom
+	__asm fdivr one                   ; 1 / d_xdenom
+	__asm fst   xstepdenominv         ; 
+	__asm fmul  negative_one          ; -( 1 / d_xdenom )
+
+	__asm mov   eax, dword ptr [r_p0+28] // 7
+	__asm mov   ebx, dword ptr [r_p1+28]
+	__asm sub   eax, dword ptr [r_p2+28]
+	__asm sub   ebx, dword ptr [r_p2+28]
+
+	__asm fstp  ystepdenominv       ; (empty)
+
+	__asm mov   t0_int, eax
+	__asm mov   t1_int, ebx
+	__asm fild  t0_int              ; t0
+	__asm fild  t1_int              ; t1 | t0
+	__asm fxch  st(1)               ; t0 | t1
+	__asm fstp  t0                  ; t1
+	__asm fst   t1                  ; t1
+	__asm fmul  p01_minus_p21       ; t1 * p01_minus_p21
+	__asm fld   t0                  ; t0 | t1 * p01_minus_p21
+	__asm fmul  p11_minus_p21       ; t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fld   t1                  ; t1 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fmul  p00_minus_p20       ; t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fld   t0                  ; t0 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fmul  p10_minus_p20       ; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fxch  st(2)               ; t0 * p11_minus_p21 | t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21
+	__asm fsubp st(3), st           ; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	__asm fsubrp st(1), st          ; t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	__asm fxch  st(1)               ; t1 * p01_minus_p21 - t0 * p11_minus_p21 | t1 * p00_minus_p20 - t0 * p10_minus_p20
+	__asm fmul  xstepdenominv       ; r_lstepx | t1 * p00_minus_p20 - t0 * p10_minus_p20
+	__asm fxch  st(1)
+	__asm fmul  ystepdenominv       ; r_lstepy | r_lstepx
+	__asm fxch  st(1)               ; r_lstepx | r_lstepy
+	__asm fistp dword ptr [r_lgstepx]
+	__asm fistp dword ptr [r_lgstepy]
+
+/* FS: Start */
+/*
+	t0 = r_p0[8] - r_p2[8];
+	t1 = r_p1[8] - r_p2[8];
+	r_lbstepy = (int)ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	r_lbstepy = (int)ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+*/
+	__asm fild  dword ptr d_xdenom    ; d_xdenom
+	__asm fdivr one                   ; 1 / d_xdenom
+	__asm fst   xstepdenominv         ; 
+	__asm fmul  negative_one          ; -( 1 / d_xdenom )
+
+	__asm mov   eax, dword ptr [r_p0+32] // 8
+	__asm mov   ebx, dword ptr [r_p1+32]
+	__asm sub   eax, dword ptr [r_p2+32]
+	__asm sub   ebx, dword ptr [r_p2+32]
+
+	__asm fstp  ystepdenominv       ; (empty)
+
+	__asm mov   t0_int, eax
+	__asm mov   t1_int, ebx
+	__asm fild  t0_int              ; t0
+	__asm fild  t1_int              ; t1 | t0
+	__asm fxch  st(1)               ; t0 | t1
+	__asm fstp  t0                  ; t1
+	__asm fst   t1                  ; t1
+	__asm fmul  p01_minus_p21       ; t1 * p01_minus_p21
+	__asm fld   t0                  ; t0 | t1 * p01_minus_p21
+	__asm fmul  p11_minus_p21       ; t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fld   t1                  ; t1 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fmul  p00_minus_p20       ; t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fld   t0                  ; t0 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fmul  p10_minus_p20       ; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fxch  st(2)               ; t0 * p11_minus_p21 | t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21
+	__asm fsubp st(3), st           ; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	__asm fsubrp st(1), st          ; t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	__asm fxch  st(1)               ; t1 * p01_minus_p21 - t0 * p11_minus_p21 | t1 * p00_minus_p20 - t0 * p10_minus_p20
+	__asm fmul  xstepdenominv       ; r_lstepx | t1 * p00_minus_p20 - t0 * p10_minus_p20
+	__asm fxch  st(1)
+	__asm fmul  ystepdenominv       ; r_lstepy | r_lstepx
+	__asm fxch  st(1)               ; r_lstepx | r_lstepy
+	__asm fistp dword ptr [r_lbstepx]
+	__asm fistp dword ptr [r_lbstepy]
 
 	/*
 	** put FPU back into extended precision chop mode
@@ -681,19 +812,19 @@ void R_PolysetCalcGradients( int skinwidth )
 #endif
 	*/
 	__asm mov eax, d_pdrawspans
-	__asm cmp eax, offset R_PolysetDrawSpans8_Opaque
-	__asm mov eax, r_sstepx
-	__asm mov ebx, r_tstepx
+	__asm cmp eax, offset R_PolysetDrawSpans8_Opaque_Coloured
+ 	__asm mov eax, r_sstepx
+ 	__asm mov ebx, r_tstepx
 	__asm jne translucent
-//#if id386ALIAS
+#if id386ALIAS
 	__asm shl eax, 16
 	__asm shl ebx, 16
 	__asm jmp done_with_steps
-//#else
+#else
 translucent:
 	__asm and eax, 0ffffh
 	__asm and ebx, 0ffffh
-//#endif
+#endif
 done_with_steps:
 	__asm mov a_sstepxfrac, eax
 	__asm mov a_tstepxfrac, ebx
