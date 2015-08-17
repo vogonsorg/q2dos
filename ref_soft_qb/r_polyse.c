@@ -132,6 +132,7 @@ void	(*d_pdrawspans)(spanpackage_t *pspanpackage);
 void R_PolysetDrawSpans8_33 (spanpackage_t *pspanpackage);
 void R_PolysetDrawSpans8_66 (spanpackage_t *pspanpackage);
 void R_PolysetDrawSpans8_Opaque (spanpackage_t *pspanpackage);
+void R_PolysetDrawSpans8_Opaque_Coloured(spanpackage_t *pspanpackage);
 
 void R_PolysetDrawThreshSpans8 (spanpackage_t *pspanpackage);
 void R_PolysetCalcGradients (int skinwidth);
@@ -769,7 +770,7 @@ void R_PolysetCalcGradients (int skinwidth)
 
 //#if	id386ALIAS
 #if id386ALIAS
-	if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
+	if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
 	{
 		a_sstepxfrac = r_sstepx << 16;
 		a_tstepxfrac = r_tstepx << 16;
@@ -1068,7 +1069,7 @@ void R_PolysetDrawSpansConstant8_66( spanpackage_t *pspanpackage)
 #if 1 //qb: no asm colored light support was- !id386
 // leilei - colored lighting
 
-void R_PolysetDrawSpans8_Opaque(spanpackage_t *pspanpackage)
+void R_PolysetDrawSpans8_Opaque_Coloured(spanpackage_t *pspanpackage)
 {
 
 	do
@@ -1230,7 +1231,7 @@ void R_RasterizeAliasPolySmooth (void)
 			(plefttop[3] >> 16) * r_affinetridesc.skinwidth;
 //#if	id386ALIAS
 #if id386ALIAS
-	if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
+	if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
 	{
 		d_sfrac = (plefttop[2] & 0xFFFF) << 16;
 		d_tfrac = (plefttop[3] & 0xFFFF) << 16;
@@ -1282,7 +1283,7 @@ void R_RasterizeAliasPolySmooth (void)
 
 //#if	id386ALIAS
 #if id386ALIAS
-		if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
+		if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
 		{
 			d_pzbasestep = (d_zwidth + ubasestep) << 1;
 			d_pzextrastep = d_pzbasestep + 2;
@@ -1327,7 +1328,7 @@ void R_RasterizeAliasPolySmooth (void)
 				r_affinetridesc.skinwidth;
 //#if	id386ALIAS
 #if id386ALIAS
-		if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
+		if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
 		{
 			d_sfracbasestep = (r_sstepy + r_sstepx * ubasestep) << 16;
 			d_tfracbasestep = (r_tstepy + r_tstepx * ubasestep) << 16;
@@ -1354,7 +1355,7 @@ void R_RasterizeAliasPolySmooth (void)
 				r_affinetridesc.skinwidth;
 //#if	id386ALIAS
 #if id386ALIAS
-		if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
+		if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
 		{
 			d_sfracextrastep = (r_sstepy + r_sstepx*d_countextrastep) << 16;
 			d_tfracextrastep = (r_tstepy + r_tstepx*d_countextrastep) << 16;
@@ -1375,7 +1376,7 @@ void R_RasterizeAliasPolySmooth (void)
 		d_lightextrastepb = d_lightbasestepb + working_lbstepx;
 
 #if id386ALIAS
-		if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
+		if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
 		{
 			R_PolysetScanLeftEdge (initialleftheight);
 		}
@@ -1447,7 +1448,7 @@ void R_RasterizeAliasPolySmooth (void)
 
 //#if	id386ALIAS
 #if id386ALIAS
-			if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
+			if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
 			{
 				d_pzbasestep = (d_zwidth + ubasestep) << 1;
 				d_pzextrastep = d_pzbasestep + 2;
@@ -1481,7 +1482,7 @@ void R_RasterizeAliasPolySmooth (void)
 					r_affinetridesc.skinwidth;
 //#if	id386ALIAS
 #if id386ALIAS
-			if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
+			if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
 			{
 				d_sfracbasestep = (r_sstepy + r_sstepx * ubasestep) << 16;
 				d_tfracbasestep = (r_tstepy + r_tstepx * ubasestep) << 16;
@@ -1508,7 +1509,7 @@ void R_RasterizeAliasPolySmooth (void)
 					r_affinetridesc.skinwidth;
 //#if	id386ALIAS
 #if id386ALIAS
-			if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
+			if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
 			{
 				d_sfracextrastep = ((r_sstepy+r_sstepx*d_countextrastep) & 0xFFFF)<<16;
 				d_tfracextrastep = ((r_tstepy+r_tstepx*d_countextrastep) & 0xFFFF)<<16;
@@ -1529,7 +1530,7 @@ void R_RasterizeAliasPolySmooth (void)
 			d_lightextrastepb = d_lightbasestepb + working_lbstepx;
 
 #if id386ALIAS
-			if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
+			if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque_Coloured )
 			{
 				R_PolysetScanLeftEdge (height);
 			}

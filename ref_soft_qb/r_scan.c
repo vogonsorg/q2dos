@@ -30,7 +30,9 @@ static byte         *pbase, *pdest;
 static fixed16_t    s, t, snext, tnext, sstep, tstep;
 static float        sdivz, tdivz, zi, z, du, dv, spancountminus1;
 static float        sdivzstepu, tdivzstepu, zistepu;
+#if !id386
 static int		    izi, izistep; // mankrip
+#endif
 
 static byte	*r_turb_pbase, *r_turb_pdest;
 static fixed16_t		r_turb_s, r_turb_t, r_turb_sstep, r_turb_tstep;
@@ -424,7 +426,7 @@ FIXME: actually make this subdivide by 16 instead of 8!!!  qb:  OK!!!!
 //qbism: pointer to pbase and macroize idea from mankrip
 #define WRITEPDEST(i)   { pdest[i] = *(pbase + (s >> 16) + (t >> 16) * cachewidth); s+=sstep; t+=tstep;}
 
-void D_DrawSpans16(espan_t *pspan) //qb: up it from 8 to 16.  This + unroll = big speed gain!
+void D_DrawSpans16_Coloured(espan_t *pspan) //qb: up it from 8 to 16.  This + unroll = big speed gain!
 {
 	sstep = 0;   // keep compiler happy
 	tstep = 0;   // ditto

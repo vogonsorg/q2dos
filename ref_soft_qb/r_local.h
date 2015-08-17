@@ -24,6 +24,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <math.h>
 #include <stdarg.h>
 
+#include "../client/ref.h"
+
 #ifdef __DJGPP__ // FS: 2.05 finally has stdint.h!
 	#include <stdint.h>
 #else
@@ -32,10 +34,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 	#endif // intptr_t
 #endif // __DJGPP__
 
-#include "../client/ref.h"
-
 #define	COLMODEL //qb: tnq2
-#define REF_VERSION     "SOFT 0.01"
+#define REF_VERSION     "QBISM SOFT 0.01"
 
 // up / down
 #define PITCH   0
@@ -527,6 +527,7 @@ extern  fixed16_t       bbextents, bbextentt;
 
 
 void D_DrawSpans16 (espan_t *pspans);
+void D_DrawSpans16_Coloured (espan_t *pspans);
 void D_DrawZSpans (espan_t *pspans);
 void Turbulent8 (espan_t *pspan);
 void NonTurbulent8 (espan_t *pspan);	//PGM
