@@ -663,20 +663,31 @@ LScanLoop:
 ;		d_pedgespanpackage->pz = d_pz;
 ;		d_pedgespanpackage->count = d_aspancount;
 ;		d_pedgespanpackage->light = d_light;
+;		d_pedgespanpackage->lightr = d_lightr;
+;		d_pedgespanpackage->lightg = d_lightg;
+;		d_pedgespanpackage->lightb = d_lightb;
 ;		d_pedgespanpackage->zi = d_zi;
 ;		d_pedgespanpackage->sfrac = d_sfrac << 16;
 ;		d_pedgespanpackage->tfrac = d_tfrac << 16;
- mov ds:dword ptr[spanpackage_t_ptex+esi],ebx	
- mov eax,ds:dword ptr[_d_pdest]	
- mov ds:dword ptr[spanpackage_t_pdest+esi],eax	
- mov eax,ds:dword ptr[_d_pz]	
- mov ds:dword ptr[spanpackage_t_pz+esi],eax	
- mov eax,ds:dword ptr[_d_aspancount]	
- mov ds:dword ptr[spanpackage_t_count+esi],eax	
- mov ds:dword ptr[spanpackage_t_light+esi],edi	
- mov ds:dword ptr[spanpackage_t_zi+esi],ebp	
- mov ds:dword ptr[spanpackage_t_sfrac+esi],ecx	
- mov ds:dword ptr[spanpackage_t_tfrac+esi],edx	
+ mov ds:dword ptr[spanpackage_t_ptex+esi],ebx
+ mov eax,ds:dword ptr[_d_pdest]
+ mov ds:dword ptr[spanpackage_t_pdest+esi],eax
+ mov eax,ds:dword ptr[_d_pz]
+ mov ds:dword ptr[spanpackage_t_pz+esi],eax
+ mov eax,ds:dword ptr[_d_aspancount]
+ mov ds:dword ptr[spanpackage_t_count+esi],eax
+ mov ds:dword ptr[spanpackage_t_light+esi],edi
+ifdef COLMODEL
+ mov edi,ds:dword ptr[d_lightr]
+ mov ds:dword ptr[spanpackage_t_lightr+esi],edi
+ mov edi,ds:dword ptr[d_lightg]
+ mov ds:dword ptr[spanpackage_t_lightg+esi],edi
+ mov edi,ds:dword ptr[d_lightb]
+ mov ds:dword ptr[spanpackage_t_lightb+esi],edi
+endif
+ mov ds:dword ptr[spanpackage_t_zi+esi],ebp
+ mov ds:dword ptr[spanpackage_t_sfrac+esi],ecx
+ mov ds:dword ptr[spanpackage_t_tfrac+esi],edx
 
 ; pretouch the next cache line
  mov al,ds:byte ptr[spanpackage_t_size+esi]	
@@ -687,8 +698,8 @@ LScanLoop:
  mov ds:dword ptr[_d_pedgespanpackage],esi	
 
 ;		errorterm += erroradjustup;
- mov esi,ds:dword ptr[_errorterm]	
- add esi,eax	
+ mov esi,ds:dword ptr[_errorterm]
+ add esi,eax
  mov eax,ds:dword ptr[_d_pdest]	
 
 ;		if (errorterm >= 0)
@@ -701,7 +712,6 @@ LScanLoop:
  add eax,ds:dword ptr[_d_pdestextrastep]	
  mov ds:dword ptr[_errorterm],esi	
  mov ds:dword ptr[_d_pdest],eax	
-
 ;			d_pz += d_pzextrastep;
 ;			d_aspancount += d_countextrastep;
 ;			d_ptex += d_ptexextrastep;
@@ -734,8 +744,20 @@ LSkip1:
 
 ;			d_light += d_lightextrastep;
 ;			d_zi += d_ziextrastep;
+ mov ds:dword ptr[_d_light],edi
  add edi,ds:dword ptr[_d_lightextrastep]	
  add ebp,ds:dword ptr[_d_ziextrastep]	
+;			d_lightr += d_lightextrastepr;
+;			d_lightg += d_lightextrastepg;
+;			d_lightb += d_lightextrastepb;
+ifdef COLMODEL
+ mov ds:dword ptr[_d_lightr],edi
+ add edi,ds:dword ptr[_d_lightextrastepr]
+ mov ds:dword ptr[_d_lightg],edi
+ add edi,ds:dword ptr[_d_lightextrastepg]
+ mov ds:dword ptr[_d_lightb],edi
+ add edi,ds:dword ptr[_d_lightextrastepb]
+endif
 
 ;		}
  mov esi,ds:dword ptr[_d_pedgespanpackage]	
@@ -791,9 +813,21 @@ LNoLeftEdgeTurnover:
 LSkip2:	
 
 ;			d_light += d_lightbasestep;
+;			d_lightr += d_lightbasestepr;
+;			d_lightg += d_lightbasestepg;
+;			d_lightb += d_lightbasestepb;
 ;			d_zi += d_zibasestep;
- add edi,ds:dword ptr[_d_lightbasestep]	
- add ebp,ds:dword ptr[_d_zibasestep]	
+ mov ds:dword ptr[_d_light],edi
+ add edi,ds:dword ptr[_d_lightbasestep]
+ifdef COLMODEL
+ mov ds:dword ptr[_d_lightr],edi
+ add edi,ds:dword ptr[_d_lightextrastepr]
+ mov ds:dword ptr[_d_lightg],edi
+ add edi,ds:dword ptr[_d_lightextrastepg]
+ mov ds:dword ptr[_d_lightb],edi
+ add edi,ds:dword ptr[_d_lightextrastepb]
+endif
+ add ebp,ds:dword ptr[_d_zibasestep]
 
 ;		}
 ;	} while (--height);

@@ -139,6 +139,9 @@ ifndef GLQUAKE
 	externdef _d_pedgespanpackage:dword
 	externdef _d_tfrac:dword
 	externdef _d_light:dword
+	externdef _d_lightr:dword
+	externdef _d_lightg:dword
+	externdef _d_lightb:dword
 	externdef _d_zi:dword
 	externdef _d_pdest:dword
 	externdef _d_pz:dword
@@ -171,6 +174,9 @@ ifndef GLQUAKE
 	externdef _d_countextrastep:dword
 	externdef _d_tfracextrastep:dword
 	externdef _d_lightextrastep:dword
+	externdef _d_lightextrastepr:dword
+	externdef _d_lightextrastepg:dword
+	externdef _d_lightextrastepb:dword
 	externdef _d_ziextrastep:dword
 	externdef _d_pdestbasestep:dword
 	externdef _d_pzbasestep:dword
@@ -179,6 +185,9 @@ ifndef GLQUAKE
 	externdef _ubasestep:dword
 	externdef _d_tfracbasestep:dword
 	externdef _d_lightbasestep:dword
+	externdef _d_lightbasestepr:dword
+	externdef _d_lightbasestepg:dword
+	externdef _d_lightbasestepb:dword
 	externdef _d_zibasestep:dword
 	externdef _zspantable:dword
 	externdef _r_lstepy:dword
@@ -236,6 +245,8 @@ ifndef GLQUAKE
 	externdef fp_64kx64k:dword
 	externdef pz:dword
 	externdef spr8entryvec_table:dword
+	externdef d_8to24table:dword
+	externdef palmap2:dword
 endif
 
 	externdef _fpu_ceil_cw:dword
@@ -343,7 +354,10 @@ spanpackage_t_sfrac				equ		16
 spanpackage_t_tfrac				equ		20
 spanpackage_t_light				equ		24
 spanpackage_t_zi				equ		28
-spanpackage_t_size				equ		32 
+spanpackage_t_lightr			equ		32
+spanpackage_t_lightg			equ		36
+spanpackage_t_lightb			equ		40
+spanpackage_t_size				equ		44 
 
 ; edge_t structure
 ; !!! if this is changed, it must be changed in r_shared.h too !!!

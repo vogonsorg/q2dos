@@ -27,6 +27,7 @@ int	rand1k[] = {
 };
 
 #define MASK_1K	0x3FF
+#define	id386ALIAS	0 /* FS: TODO FIXME: R_PolysetDrawSpans8_Opaque_Coloured needs the ASM updated first DO NOT ENABLE */
 
 int		rand1k_index = 0;
 
@@ -41,9 +42,7 @@ typedef struct {
 	int				count;
 	byte			*ptex;
 	int				sfrac, tfrac, light, zi;
-#ifdef COLMODEL
 	int				lightr, lightg, lightb; // leilei - colored lighting
-#endif
 } spanpackage_t;
 
 typedef struct {
@@ -820,10 +819,14 @@ void R_PolysetCalcGradients( int skinwidth )
 	__asm shl eax, 16
 	__asm shl ebx, 16
 	__asm jmp done_with_steps
+translucent:
+	__asm and eax, 0ffffh
+	__asm and ebx, 0ffffh
 #else
 translucent:
 	__asm and eax, 0ffffh
 	__asm and ebx, 0ffffh
+	__asm jmp done_with_steps
 #endif
 done_with_steps:
 	__asm mov a_sstepxfrac, eax
@@ -921,6 +924,7 @@ void R_PolysetCalcGradients (int skinwidth)
 
 
 //qb: staticized
+/* FS: TODO FIXME: Undo all of this because we need it in ASM */
 static int		lcount;
 static int		lsfrac, ltfrac;
 static byte	*lpdest;
@@ -1246,6 +1250,7 @@ void R_PolysetDrawSpans8_Opaque_Coloured(spanpackage_t *pspanpackage)
 						int lptemp = *lptex;
 						pix24 = (unsigned char *)&d_8to24table[lptemp];
 						//qb: works now...
+						/* FS: For my sanity... Bit shift pix24 over 15, 0 is low, 63 is max */
 						trans[0] = CLAMP((int)(pix24[0] * (pspanpackage->lightr * shadelight[0])) >> 15, 0, 63);
 						trans[1] = CLAMP((int)(pix24[1] * (pspanpackage->lightg * shadelight[1])) >> 15, 0, 63);
 						trans[2] = CLAMP((int)(pix24[2] * (pspanpackage->lightb * shadelight[2])) >> 15, 0, 63);
