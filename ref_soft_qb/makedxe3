@@ -53,6 +53,9 @@ REFASM = ../gas/math_ref.o \
 	../gas/r_surf8.o \
 	../gas/r_varsa.o \
 	../gas/sys_dosa.o
+# FIXME...
+#	../gas/r_aclipa.o
+#	../gas/r_scana.o
 endif
 
 .PHONY: all test clean

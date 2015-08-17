@@ -34,7 +34,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 	#endif // intptr_t
 #endif // __DJGPP__
 
+/* if you change this, change qasm.inc too !!! */
 #define	COLMODEL //qb: tnq2
+
 #define REF_VERSION     "QBISM SOFT 0.01"
 
 // up / down

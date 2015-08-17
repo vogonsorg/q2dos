@@ -42,7 +42,9 @@ typedef struct {
 	int				count;
 	byte			*ptex;
 	int				sfrac, tfrac, light, zi;
+#ifdef COLMODEL
 	int				lightr, lightg, lightb; // leilei - colored lighting
+#endif
 } spanpackage_t;
 
 typedef struct {

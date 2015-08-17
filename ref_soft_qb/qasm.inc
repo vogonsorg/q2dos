@@ -12,6 +12,11 @@
 ; set to 0 to skip all asm code
 id386	equ		1
 
+; set to 0 to skip colored light code.
+; if set to 1, it must be #defined in r_local.h
+; if set to 0, must NOT be defined in r_local.h
+COLMODEL	equ	1
+
 ; !!! must be kept the same as in d_iface.h !!!
 TRANSPARENT_COLOR	equ		255
 
@@ -354,10 +359,14 @@ spanpackage_t_sfrac				equ		16
 spanpackage_t_tfrac				equ		20
 spanpackage_t_light				equ		24
 spanpackage_t_zi				equ		28
+if COLMODEL
+spanpackage_t_size				equ		32.
+else
 spanpackage_t_lightr			equ		32
 spanpackage_t_lightg			equ		36
 spanpackage_t_lightb			equ		40
 spanpackage_t_size				equ		44 
+endif ; COLMODEL
 
 ; edge_t structure
 ; !!! if this is changed, it must be changed in r_shared.h too !!!
