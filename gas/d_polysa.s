@@ -1399,7 +1399,9 @@ LSkip1:
 
 //			d_light += d_lightextrastep;
 //			d_zi += d_ziextrastep;
+#ifdef COLMODEL
 	movl	C(d_light), %edi
+#endif
 	addl	C(d_lightextrastep),%edi
 	addl	C(d_ziextrastep),%ebp
 
@@ -1469,7 +1471,9 @@ LSkip2:
 
 //			d_light += d_lightbasestep;
 //			d_zi += d_zibasestep;
+#ifdef COLMODEL
 	movl	C(d_light), %edi
+#endif
 	addl	C(d_lightbasestep),%edi
 #ifdef COLMODEL
 	movl	C(d_lightr), %edi
