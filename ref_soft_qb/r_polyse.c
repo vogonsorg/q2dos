@@ -27,7 +27,7 @@ int	rand1k[] = {
 };
 
 #define MASK_1K	0x3FF
-#define	id386ALIAS	1 /* FS: TODO FIXME: R_PolysetDrawSpans8_Opaque_Coloured needs the ASM updated first DO NOT ENABLE */
+#define	id386ALIAS	1 /* FS: Use the ASM path for no lights or if we want a hacky speed at the cost of no coloured lights on models */
 
 int		rand1k_index = 0;
 
@@ -450,7 +450,7 @@ void R_PolysetSetUpForLineScan(fixed8_t startvertu, fixed8_t startvertv,
 R_PolysetCalcGradients
 ================
 */
-#if (id386) && defined(_MSC_VER)
+#if 0 //#if (id386) && defined(_MSC_VER)
 void R_PolysetCalcGradients( int skinwidth )
 {
 	static float xstepdenominv, ystepdenominv, t0, t1;
@@ -810,29 +810,24 @@ void R_PolysetCalcGradients( int skinwidth )
 	a_tstepxfrac = r_tstepx & 0xFFFF;
 #endif
 	*/
+	/* FS: If we're not using the coloured lights ASM speed hack then don't try to load the ASM version of draw spans! */
+	__asm mov eax, coloredlights
+	__asm cmp eax, 1
+	__asm je skipPolysetAsm
 	__asm mov eax, d_pdrawspans
-	__asm cmp eax, offset R_PolysetDrawSpans8_Opaque_Coloured
+	__asm cmp eax, offset R_PolysetDrawSpans8_Opaque
  	__asm mov eax, r_sstepx
  	__asm mov ebx, r_tstepx
 	__asm jne translucent
-#if id386ALIAS
-
-	__asm mov ecx, coloredlights
-	__asm cmp ecx, 2
-	__asm jne translucent
-
 	__asm shl eax, 16
 	__asm shl ebx, 16
 	__asm jmp done_with_steps
+skipPolysetAsm:
+ 	__asm mov eax, r_sstepx
+ 	__asm mov ebx, r_tstepx
 translucent:
 	__asm and eax, 0ffffh
 	__asm and ebx, 0ffffh
-#else
-translucent:
-	__asm and eax, 0ffffh
-	__asm and ebx, 0ffffh
-	__asm jmp done_with_steps
-#endif
 done_with_steps:
 	__asm mov a_sstepxfrac, eax
 	__asm mov a_tstepxfrac, ebx
@@ -909,13 +904,11 @@ void R_PolysetCalcGradients (int skinwidth)
 
 //#if	id386ALIAS
 #if id386ALIAS
-	if (coloredlights == 2)
+	/* FS: r_coloredlights set to 2 and a vid_restart will use the ASM path.  You lose the coloured dlights on entities and view model, but the world retains it and it's a good speed bost.  The difference between 114 and 150 in a timedemo. */
+	if ((coloredlights != 1) && (d_pdrawspans == R_PolysetDrawSpans8_Opaque)) /* FS: Use the ASM path for no lights or if we want a hacky speed at the cost of no coloured lights on models */
 	{
-		if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
-		{
-			a_sstepxfrac = r_sstepx << 16;
-			a_tstepxfrac = r_tstepx << 16;
-		}
+		a_sstepxfrac = r_sstepx << 16;
+		a_tstepxfrac = r_tstepx << 16;
 	}
 	else
 #endif
@@ -1213,11 +1206,13 @@ void R_PolysetDrawSpansConstant8_66( spanpackage_t *pspanpackage)
 
 void R_PolysetDrawSpans8_Opaque_Coloured(spanpackage_t *pspanpackage)
 {
+#if id386ALIAS
 	if(coloredlights == 2)
 	{
 		R_PolysetDrawSpans8_Opaque(pspanpackage);
 		return;
 	}
+#endif
 
 	do
 	{

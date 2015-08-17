@@ -1081,6 +1081,7 @@ R_AliasDrawModel
 void R_AliasDrawModel (void)
 {
 	extern void	(*d_pdrawspans)(void *);
+	extern void R_PolysetDrawSpans8_Opaque( void * );
 	extern void R_PolysetDrawSpans8_Opaque_Coloured( void * );
 	extern void R_PolysetDrawSpans8_33( void * );
 	extern void R_PolysetDrawSpans8_66( void * );
@@ -1195,7 +1196,12 @@ void R_AliasDrawModel (void)
 	else if ( currententity->flags & RF_TRANSLUCENT )
 	{
 		if ( currententity->alpha > 0.66 )
-			d_pdrawspans = R_PolysetDrawSpans8_Opaque_Coloured;
+		{
+			if(coloredlights != 1) /* FS: Use the ASM path for no lights or if we want a hacky speed at the cost of no coloured lights on models */
+				d_pdrawspans = R_PolysetDrawSpans8_Opaque;
+			else
+				d_pdrawspans = R_PolysetDrawSpans8_Opaque_Coloured;
+		}
 		else if ( currententity->alpha > 0.33 )
 			d_pdrawspans = R_PolysetDrawSpans8_66;
 		else
@@ -1203,7 +1209,10 @@ void R_AliasDrawModel (void)
 	}
 	else
 	{
-		d_pdrawspans = R_PolysetDrawSpans8_Opaque_Coloured;
+		if(coloredlights != 1) /* FS: Use the ASM path for no lights or if we want a hacky speed at the cost of no coloured lights on models */
+			d_pdrawspans = R_PolysetDrawSpans8_Opaque;
+		else
+			d_pdrawspans = R_PolysetDrawSpans8_Opaque_Coloured;
 	}
 
 	/*

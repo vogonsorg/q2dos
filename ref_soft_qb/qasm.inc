@@ -12,6 +12,11 @@
 ; set to 0 to skip all asm code
 id386	equ		1
 
+; set to 0 to skip all colour asm code
+; FS: Don't use yet, R_PolysetDrawSpans8_Opaque_Coloured is not finished
+;     Will result in bad clipping with lights on models
+colasm	equ		0
+
 ; !!! must be kept the same as in d_iface.h !!!
 TRANSPARENT_COLOR	equ		255
 

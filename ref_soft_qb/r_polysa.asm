@@ -677,12 +677,12 @@ LScanLoop:
  mov eax,ds:dword ptr[_d_aspancount]
  mov ds:dword ptr[spanpackage_t_count+esi],eax
  mov ds:dword ptr[spanpackage_t_light+esi],edi
-ifdef COLMODEL
- mov edi,ds:dword ptr[d_lightr]
+if colasm
+ mov edi,ds:dword ptr[_d_lightr]
  mov ds:dword ptr[spanpackage_t_lightr+esi],edi
- mov edi,ds:dword ptr[d_lightg]
+ mov edi,ds:dword ptr[_d_lightg]
  mov ds:dword ptr[spanpackage_t_lightg+esi],edi
- mov edi,ds:dword ptr[d_lightb]
+ mov edi,ds:dword ptr[_d_lightb]
  mov ds:dword ptr[spanpackage_t_lightb+esi],edi
 endif
  mov ds:dword ptr[spanpackage_t_zi+esi],ebp
@@ -744,13 +744,15 @@ LSkip1:
 
 ;			d_light += d_lightextrastep;
 ;			d_zi += d_ziextrastep;
+if colasm
  mov ds:dword ptr[_d_light],edi
+endif
  add edi,ds:dword ptr[_d_lightextrastep]	
  add ebp,ds:dword ptr[_d_ziextrastep]	
 ;			d_lightr += d_lightextrastepr;
 ;			d_lightg += d_lightextrastepg;
 ;			d_lightb += d_lightextrastepb;
-ifdef COLMODEL
+if colasm
  mov ds:dword ptr[_d_lightr],edi
  add edi,ds:dword ptr[_d_lightextrastepr]
  mov ds:dword ptr[_d_lightg],edi
@@ -817,9 +819,11 @@ LSkip2:
 ;			d_lightg += d_lightbasestepg;
 ;			d_lightb += d_lightbasestepb;
 ;			d_zi += d_zibasestep;
+if colasm
  mov ds:dword ptr[_d_light],edi
+endif
  add edi,ds:dword ptr[_d_lightbasestep]
-ifdef COLMODEL
+if colasm
  mov ds:dword ptr[_d_lightr],edi
  add edi,ds:dword ptr[_d_lightbasestepr]
  mov ds:dword ptr[_d_lightg],edi

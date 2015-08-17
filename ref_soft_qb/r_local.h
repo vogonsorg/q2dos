@@ -35,7 +35,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif // __DJGPP__
 
 /* FS: Define this as compile time to keep compatibility with GASM */
-//#define	COLMODEL //qb: tnq2
+#define	COLMODEL //qb: tnq2
 #define REF_VERSION     "QBISM SOFT 0.01"
 
 // up / down
