@@ -733,40 +733,40 @@ void R_PolysetCalcGradients (int skinwidth)
 // very visible, overflow is very unlikely, because of ambient lighting
 	t0 = r_p0[4] - r_p2[4];
 	t1 = r_p1[4] - r_p2[4];
-	r_lstepx = ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
-	r_lstepy = ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+	r_lstepx = (int)ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	r_lstepy = (int)ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
 
 	//qb: use ceil
 	t0 = r_p0[6] - r_p2[6];
 	t1 = r_p1[6] - r_p2[6];
-	r_lrstepx = ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
-	r_lrstepy = ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+	r_lrstepx = (int)ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	r_lrstepy = (int)ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
 
 	t0 = r_p0[7] - r_p2[7];
 	t1 = r_p1[7] - r_p2[7];
-	r_lgstepx = ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
-	r_lgstepy = ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+	r_lgstepx = (int)ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	r_lgstepy = (int)ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
 
 	t0 = r_p0[8] - r_p2[8];
 	t1 = r_p1[8] - r_p2[8];
-	r_lbstepx = ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
-	r_lbstepy = ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+	r_lbstepx = (int)ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	r_lbstepy = (int)ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
 
 
 	t0 = r_p0[2] - r_p2[2];
 	t1 = r_p1[2] - r_p2[2];
-	r_sstepx = ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
-	r_sstepy = ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+	r_sstepx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	r_sstepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
 
 	t0 = r_p0[3] - r_p2[3];
 	t1 = r_p1[3] - r_p2[3];
-	r_tstepx = ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
-	r_tstepy = ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+	r_tstepx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	r_tstepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
 
 	t0 = r_p0[5] - r_p2[5];
 	t1 = r_p1[5] - r_p2[5];
-	r_zistepx = ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
-	r_zistepy = ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+	r_zistepx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	r_zistepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
 
 //#if	id386ALIAS
 #if id386ALIAS
