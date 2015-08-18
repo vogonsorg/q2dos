@@ -21,7 +21,7 @@ REF_DXE=0
 
 CC = gcc
 CFLAGS = -O2 -fno-strict-aliasing -fomit-frame-pointer
-CPPFLAGS = -Iref_3dfx/include -Iref_3dfx/include/glide3 -DCLIENT_SPLIT_NETFRAME
+CPPFLAGS = -Iref_3dfx/include -Iref_3dfx/include/glide3 -DCLIENT_SPLIT_NETFRAME -DUSE_3DFX
 LDFLAGS =
 
 ifneq ($(REF_DXE),1)
@@ -72,7 +72,7 @@ endif
 
 DOS = dos/dos_v2.o \
 	dos/cd_dos.o \
-	dos/vid_dos.o \
+	dos/vid_3dfx_dos.o \
 	dos/snddma_dos.o \
 	dos/snd_gus.o \
 	dos/snd_sb.o \
