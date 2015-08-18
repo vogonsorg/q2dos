@@ -129,6 +129,9 @@ cvar_t	*gl_lockpvs;
 
 cvar_t	*gl_3dlabs_broken;
 
+cvar_t	*r_customheight;
+cvar_t	*r_customwidth;
+
 cvar_t	*vid_fullscreen;
 cvar_t	*vid_gamma;
 cvar_t	*vid_ref;
@@ -1032,6 +1035,9 @@ void R_Register( void )
 
 	gl_3dlabs_broken = ri.Cvar_Get( "gl_3dlabs_broken", "1", CVAR_ARCHIVE );
 
+	r_customwidth = ri.Cvar_Get("r_customwidth", "640", CVAR_ARCHIVE);
+	r_customheight = ri.Cvar_Get("r_customheight", "480", CVAR_ARCHIVE);
+
 	vid_fullscreen = ri.Cvar_Get( "vid_fullscreen", "0", CVAR_ARCHIVE );
 	vid_gamma = ri.Cvar_Get( "vid_gamma", "1.0", CVAR_ARCHIVE );
 	vid_ref = ri.Cvar_Get( "vid_ref", "gl", CVAR_ARCHIVE );
@@ -1093,10 +1099,10 @@ qboolean R_SetMode (void)
 		}
 	}
 
-	/*gl_mode->modified = false;
+	gl_mode->modified = false;
 	vid_fullscreen->modified = false;
 	fullscreen = true;
-	GLimp_SetMode( &vid.width, &vid.height, gl_mode->value, fullscreen );*/
+	GLimp_SetMode( &vid.width, &vid.height, gl_mode->value, fullscreen );
 	return true;
 }
 
