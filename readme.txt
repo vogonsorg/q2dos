@@ -19,6 +19,7 @@ What works?
 * Loading/unloading video driver and game DLLs in DXE3 format.
 
 What works but needs more testing?
+* 3DFX OpenGL with Voodoo 1, 2, 4, and 5.  (3 not yet supported).
 * Playing in a Windows 9x DOS box.
 * Modern sound cards like AC'97 or HDA
 * Mouse wheel support. (see info below.)
@@ -69,6 +70,9 @@ Tips and other misc info:
   for more information on how DJGPP and CWSDPMI work.
 * Logitch MouseWare drivers in Windows 9x may cause delayed/missing mouse input
   when played in a Windows 9x DOS box.
+* Useful 3DFX environment variables:
+  - SST_SCREENREFRESH.  Sets the screen refresh rate.
+  - FX_GLIDE_SWAPINTERVAL. Set to 0 to disable V-Sync.
 
 Follow neozeed @
 http://virtuallyfun.superglobalmegacorp.com/
