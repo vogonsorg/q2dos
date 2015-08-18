@@ -1708,8 +1708,9 @@ void Sys_Error (char *error, ...)
 	char		text[1024];
 
 	va_start (argptr, error);
-	vsprintf (text, error, argptr);
+	Q_vsnprintf (text, sizeof(text), error, argptr);
 	va_end (argptr);
+	text[sizeof(text)-1] = 0;
 
 	ri.Sys_Error (ERR_FATAL, "%s", text);
 }
@@ -1720,8 +1721,9 @@ void Com_Printf (char *fmt, ...)
 	char		text[1024];
 
 	va_start (argptr, fmt);
-	vsprintf (text, fmt, argptr);
+	Q_vsnprintf (text, sizeof(text), fmt, argptr);
 	va_end (argptr);
+	text[sizeof(text)-1] = 0;
 
 	ri.Con_Printf (PRINT_ALL, "%s", text);
 }
