@@ -85,7 +85,7 @@ Various code from
 * DJGPP community -- (http://www.delorie.com/djgpp/)
 * Gamespy SDK -- Released publically in 2014.
 * ggorts -- Ported 3ZB2, Action, Chaos, and DDay to Q2DOS.  Banked VGA code and
-            Planar mode help.
+            Planar mode help.  3DFX/MesaFX help.
 * Knightmare -- Ref_soft help.
                 KMQuake II (http://www.markshan.com/knightmare/)
 * Leillol and Qbism -- Ref_sqb renderer (https://qbism.com/)
