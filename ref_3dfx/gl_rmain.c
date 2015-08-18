@@ -1113,7 +1113,7 @@ int R_Init( void *hinstance, void *hWnd )
 	int		j;
 	extern float r_turbsin[256];
 
-	printf("R_Init starting\n");
+	printf("3DFX driver starting...\n");
 
 	for ( j = 0; j < 256; j++ )
 	{
@@ -1196,7 +1196,7 @@ int R_Init( void *hinstance, void *hWnd )
 	else
 		gl_config.renderer = GL_RENDERER_OTHER;
 
-	gl_config.renderer = GL_RENDERER_VOODOO;
+	gl_config.renderer = GL_RENDERER_VOODOO; /* FS: Enforce the voodoo renderer hacks/specific code */
 
 	if ( toupper( gl_monolightmap->string[1] ) != 'F' )
 	{

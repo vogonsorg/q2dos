@@ -25,7 +25,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "vid_dos.h"
 
 #define NUM_VID_DRIVERS 2	/* only ref_soft for now */
-// #define REF_SOFT	0
+#define REF_SOFT	0
+#define REF_SQB		1 /* FS: Qbism's coloured dlight renderer */
 
 cvar_t *vid_ref;
 static cvar_t *vid_fullscreen;
@@ -51,6 +52,7 @@ static menuframework_s  s_software_menu;
 static menuframework_s *s_current_menu;
 static int		s_current_menu_index;
 
+static menulist_s		s_ref_list[NUM_VID_DRIVERS];
 static menulist_s		s_mode_list[NUM_VID_DRIVERS];
 static menuslider_s		s_screensize_slider[NUM_VID_DRIVERS];
 static menuslider_s		s_brightness_slider[NUM_VID_DRIVERS];
@@ -136,6 +138,23 @@ static qboolean VID_GetModeInfo(int *width, int *height, int mode)
 	return true;
 }
 
+static void RefreshCallback( void *unused )
+{
+	s_ref_list[!s_current_menu_index].curvalue = s_ref_list[s_current_menu_index].curvalue;
+
+//	if ( s_ref_list[s_current_menu_index].curvalue == SOFTWARE_MENU )
+	{
+		s_current_menu = &s_software_menu;
+		s_current_menu_index = 0;
+	}
+/*	else
+	{
+		s_current_menu = &s_opengl_menu;
+		s_current_menu_index = 1;
+	}
+*/
+}
+
 static void ScreenSizeCallback(void *s)
 {
 	menuslider_s *slider = (menuslider_s *) s;
@@ -146,7 +165,7 @@ static void BrightnessCallback(void *s)
 {
 	menuslider_s *slider = (menuslider_s *) s;
 
-	if (stricmp(vid_ref->string,"soft") == 0)
+	if ((stricmp(vid_ref->string,"soft") == 0) || (stricmp(vid_ref->string, "sqb") == 0))
 	{
 		float gamma = (0.8 - (slider->curvalue/10.0 - 0.5)) + 0.5;
 		Cvar_SetValue( "vid_gamma", gamma );
@@ -178,8 +197,15 @@ static void ApplyChanges(void *unused)
 	Cvar_SetValue("r_contentblend", s_contentblend_box.curvalue);	/* FS */
 	Cvar_SetValue("sw_waterwarp", s_waterwarp_box.curvalue);	/* FS */
 
-	/** only ref_soft for now!! **/
-	Cvar_Set("vid_ref", "gl");
+	switch ( s_ref_list[s_current_menu_index].curvalue )
+	{
+	case REF_SOFT:
+		Cvar_Set( "vid_ref", "soft" );
+		break;
+	case REF_SQB:
+		Cvar_Set( "vid_ref", "sqb" );
+		break;
+	}
 
 	M_ForceMenuOff();
 }
@@ -259,41 +285,41 @@ static qboolean VID_LoadRefresh (const char *name)
 		Com_Error (ERR_FATAL, "%s has incompatible api_version", name);
 	}
 
+	/* HACK HACK HACK: retrieving the video modes list into here
+	 * using the hInstance and wndProc parameters of re.Init(). */
 	if (re.Init (&vid_nummodes, &vid_modes) == -1)
 	{
-		/* re.Shutdown();
+		re.Shutdown();
 		VID_FreeReflib ();
-		return false; */
-		printf("re.Init failed in LoadRefresh\n");
-
+		return false;
 	}
 
 	reflib_active = true;
 
 	vidref_val = VIDREF_OTHER;
-/*	if(vid_ref)
+	if(vid_ref)
 	{
-		if(!strcmp(vid_ref->string, "soft"))
+		if(!strcmp(vid_ref->string, "soft") || !strcmp(vid_ref->string, "sqb"))
 			vidref_val = VIDREF_SOFT;
-	}	*/
+	}
 
 	for (i = 0; i < MAX_VIDEOMODES; ++i)
 	{
 		resolution_names[i] = (i < vid_nummodes)?
 					vid_modes[i].menuname : NULL;
 	}
-	// resolution_names[MAX_VIDEOMODES] = NULL;
+	resolution_names[MAX_VIDEOMODES] = NULL;
 
 	return true;
 }
 
 void	VID_Init (void)
 {
-	viddef.width = 512;
-	viddef.height = 284;
+	viddef.width = 320;
+	viddef.height = 240;
 
-	vid_ref = Cvar_Get ("vid_ref", "gl", CVAR_ARCHIVE);
-	vid_ref->description = "Video renderer to use.  Locked to gl in Q2DOS.";
+	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
+	vid_ref->description = "Video renderer to use.  Locked to software in Q2DOS.";
 	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE);
 	vid_fullscreen->description = "Enable fullscreen video.  Locked to fullscreen in Q2DOS.";
 	vid_gamma = Cvar_Get("vid_gamma", "1", CVAR_ARCHIVE);
@@ -301,10 +327,10 @@ void	VID_Init (void)
 	vid_vgaonly = Cvar_Get("vid_vgaonly", (COM_CheckParm("-vgaonly"))? "1" : "0", 0);
 	vid_bankedvga = Cvar_Get("vid_bankedvga", (COM_CheckParm("-bankedvga"))? "1" : "0", 0);
 
-	// VID_CheckChanges ();
+	VID_CheckChanges ();
 
 	Cmd_AddCommand("vid_restart", VID_Restart_f);
-	// Cmd_AddCommand("vid_listmodes", VID_ListModes_f); /* FS: Added */
+	Cmd_AddCommand("vid_listmodes", VID_ListModes_f); /* FS: Added */
 }
 
 void	VID_Shutdown (void)
@@ -338,11 +364,9 @@ void	VID_CheckChanges (void)
 		Com_sprintf(name, sizeof(name), "ref_%s.dxe", vid_ref->string);
 		if (!VID_LoadRefresh(name))
 		{
-			printf("LoadRefresh failed\n");
-			
-			/* if (strcmp (vid_ref->string, "soft") == 0)
+			if (strcmp (vid_ref->string, "soft") == 0)
 				Com_Error (ERR_FATAL, "Couldn't fall back to software refresh!");
-			Cvar_Set("vid_ref", "soft"); */
+			Cvar_Set("vid_ref", "soft");
 
 			/*
 			** drop the console if we fail to load a refresh
@@ -362,6 +386,14 @@ void	VID_MenuInit (void)
 		"no",
 		"yes",
 		NULL
+	};
+
+	static const char *refs[] =
+	{
+		"[software      ]",
+		"[software qbism]",
+//		"[3Dfx OpenGL   ]",
+		0
 	};
 
 	int i;
@@ -385,13 +417,31 @@ void	VID_MenuInit (void)
 
 	s_screensize_slider[SOFTWARE_MENU].curvalue = scr_viewsize->value/10;
 
-	s_current_menu_index = SOFTWARE_MENU;
+	if ( strcmp( Cvar_VariableString("vid_ref"), "soft" ) == 0 )
+	{
+		s_current_menu_index = SOFTWARE_MENU;
+		s_ref_list[0].curvalue = s_ref_list[1].curvalue = REF_SOFT;
+	}
+
+	if ( strcmp( Cvar_VariableString("vid_ref"), "sqb" ) == 0 )
+	{
+		s_current_menu_index = SOFTWARE_MENU;
+		s_ref_list[0].curvalue = s_ref_list[1].curvalue = REF_SQB;
+	}
 
 	s_software_menu.x = viddef.width * 0.50;
 	s_software_menu.nitems = 0;
 
 	for (i = 0; i < NUM_VID_DRIVERS; i++)
 	{
+		s_ref_list[i].generic.type		= MTYPE_SPINCONTROL;
+		s_ref_list[i].generic.name		= "graphics renderer";
+		s_ref_list[i].generic.x			= 0;
+		s_ref_list[i].generic.y			= 0;
+		s_ref_list[i].generic.callback	= RefreshCallback;
+		s_ref_list[i].itemnames			= refs;
+		s_ref_list[i].generic.statusbar	= "changes video refresh";
+
 		s_mode_list[i].generic.type = MTYPE_SPINCONTROL;
 		s_mode_list[i].generic.name = "video resolution";
 		s_mode_list[i].generic.x = 0;
@@ -453,6 +503,7 @@ void	VID_MenuInit (void)
 	s_waterwarp_box.itemnames = yesno_names;
 
 	/* FS: ATTN  AddItem order has to be the order you want to see it in or else the cursor gets wonky! */
+	Menu_AddItem(&s_software_menu, (void *) &s_ref_list[SOFTWARE_MENU]);
 	Menu_AddItem(&s_software_menu, (void *) &s_mode_list[SOFTWARE_MENU]);
 	Menu_AddItem(&s_software_menu, (void *) &s_screensize_slider[SOFTWARE_MENU]);
 	Menu_AddItem(&s_software_menu, (void *) &s_brightness_slider[SOFTWARE_MENU]);

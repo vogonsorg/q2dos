@@ -15,14 +15,12 @@
 #include <termios.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
-// #include <sys/vt.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <signal.h>
 
 #include "gl_local.h"
 #include "../client/keys.h"
-// #include "../linux/rw_linux.h"
 
 #include <GL/fxmesa.h>
 
@@ -44,6 +42,7 @@ static resolutions[NUM_RESOLUTIONS][3]={
   { 640, 480, GR_RESOLUTION_640x480 }
 };
 
+/* FS: FIXME */
 static int findres(int *width, int *height)
 {
 	int i;
@@ -65,9 +64,10 @@ static void signal_handler(int sig)
 {
 	printf("Received signal %d, exiting...\n", sig);
 	GLimp_Shutdown();
-	_exit(0);
+	exit(0);
 }
 
+/* FS: FIXME: Is this needed in DOS? */
 static void InitSig(void)
 {
 	signal(SIGHUP, signal_handler);
@@ -84,7 +84,7 @@ static void InitSig(void)
 /*
 ** GLimp_SetMode
 */
-int GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
+rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
 {
 	int width, height;
 	GLint attribs[32];
@@ -118,7 +118,7 @@ int GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
 	attribs[4] = 1;
 	attribs[5] = FXMESA_NONE;
 
-	fc = fxMesaCreateContext(0, findres(640, 480), GR_REFRESH_60Hz, 
+	fc = fxMesaCreateContext(0, findres(&width, &height), GR_REFRESH_60Hz, 
 		attribs);
 	if (!fc)
 		return rserr_invalid_mode;
