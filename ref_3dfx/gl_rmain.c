@@ -1102,11 +1102,6 @@ qboolean R_SetMode (void)
 			return false;
 		}
 	}
-
-	gl_mode->modified = false;
-	vid_fullscreen->modified = false;
-	fullscreen = true;
-	GLimp_SetMode( &vid.width, &vid.height, gl_mode->value, fullscreen );
 	return true;
 }
 
@@ -1122,8 +1117,6 @@ int R_Init( void *hinstance, void *hWnd )
 	int		err;
 	int		j;
 	extern float r_turbsin[256];
-
-	printf("3DFX driver starting...\n");
 
 	for ( j = 0; j < 256; j++ )
 	{
@@ -1205,8 +1198,6 @@ int R_Init( void *hinstance, void *hWnd )
 		gl_config.renderer = GL_RENDERER_RENDITION;
 	else
 		gl_config.renderer = GL_RENDERER_OTHER;
-
-	gl_config.renderer = GL_RENDERER_VOODOO; /* FS: Enforce the voodoo renderer hacks/specific code */
 
 	if ( toupper( gl_monolightmap->string[1] ) != 'F' )
 	{
