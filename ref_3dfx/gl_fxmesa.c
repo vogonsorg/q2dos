@@ -34,29 +34,40 @@ extern cvar_t *vid_ref;
 
 static fxMesaContext fc = NULL;
 
-#define NUM_RESOLUTIONS 3
+#define NUM_RESOLUTIONS 16
 
 static resolutions[NUM_RESOLUTIONS][3]={ 
-  { 512, 384, GR_RESOLUTION_512x384 },
-  { 640, 400, GR_RESOLUTION_640x400 },
-  { 640, 480, GR_RESOLUTION_640x480 }
+	{ 320,200,  GR_RESOLUTION_320x200 },
+	{ 320,240,  GR_RESOLUTION_320x240 },
+	{ 400,256,  GR_RESOLUTION_400x256 },
+	{ 400,300,  GR_RESOLUTION_400x300 },
+	{ 512,384,  GR_RESOLUTION_512x384 },
+	{ 640,200,  GR_RESOLUTION_640x200 },
+	{ 640,350,  GR_RESOLUTION_640x350 },
+	{ 640,400,  GR_RESOLUTION_640x400 },
+	{ 640,480,  GR_RESOLUTION_640x480 },
+	{ 800,600,  GR_RESOLUTION_800x600 },
+	{ 960,720,  GR_RESOLUTION_960x720 },
+	{ 856,480,  GR_RESOLUTION_856x480 },
+	{ 512,256,  GR_RESOLUTION_512x256 },
+	{ 1024,768, GR_RESOLUTION_1024x768 },
+	{ 1280,1024,GR_RESOLUTION_1280x1024 },
+	{ 1600,1200,GR_RESOLUTION_1600x1200 }
 };
 
-/* FS: FIXME */
 static int findres(int *width, int *height)
 {
 	int i;
 
-/*	for(i=0;i<NUM_RESOLUTIONS;i++)
+	for(i=0;i<NUM_RESOLUTIONS;i++)
 		if((*width<=resolutions[i][0]) && (*height<=resolutions[i][1])) {
 			*width = resolutions[i][0];
 			*height = resolutions[i][1];
 			return resolutions[i][2];
 		}
-*/
         
-	//*width = 640;
-	//*height = 480;
+	*width = 640;
+	*height = 480;
 	return GR_RESOLUTION_640x480;
 }
 
@@ -105,6 +116,7 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 
 	ri.Con_Printf (PRINT_ALL, "...setting mode %d:", mode );
 
+	/* FS: FIXME */
 	/*if ( !ri.Vid_GetModeInfo( &width, &height, mode ) )
 	{
 		ri.Con_Printf( PRINT_ALL, " invalid mode\n" );
