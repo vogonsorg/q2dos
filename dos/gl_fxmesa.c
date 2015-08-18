@@ -20,6 +20,7 @@
 
 #include "../ref_3dfx/gl_local.h"
 #include "../client/keys.h"
+#include "vid_dos.h"
 
 #include <GL/fxmesa.h>
 
@@ -32,42 +33,18 @@ extern cvar_t *vid_ref;
 
 static fxMesaContext fc = NULL;
 
-#define NUM_RESOLUTIONS 16
+#define NUM_GL_RESOLUTIONS 8
 
-static int resolutions[NUM_RESOLUTIONS][3]={ 
-	{ 320,200,  GR_RESOLUTION_320x200 },
-	{ 320,240,  GR_RESOLUTION_320x240 },
-	{ 400,256,  GR_RESOLUTION_400x256 },
-	{ 400,300,  GR_RESOLUTION_400x300 },
-	{ 512,384,  GR_RESOLUTION_512x384 },
-	{ 640,200,  GR_RESOLUTION_640x200 },
-	{ 640,350,  GR_RESOLUTION_640x350 },
-	{ 640,400,  GR_RESOLUTION_640x400 },
-	{ 640,480,  GR_RESOLUTION_640x480 },
-	{ 800,600,  GR_RESOLUTION_800x600 },
-	{ 960,720,  GR_RESOLUTION_960x720 },
-	{ 856,480,  GR_RESOLUTION_856x480 },
-	{ 512,256,  GR_RESOLUTION_512x256 },
-	{ 1024,768, GR_RESOLUTION_1024x768 },
-	{ 1280,1024,GR_RESOLUTION_1280x1024 },
-	{ 1600,1200,GR_RESOLUTION_1600x1200 }
+vmodeinfo_t resolutions[NUM_GL_RESOLUTIONS]={ 
+	{ 240,320,  "[320x240]" },
+	{ 300,400,  "[400x300]" },
+	{ 384,512,  "[512x384]" },
+	{ 480,640,  "[640x480]" },
+	{ 600,800,  "[800x600]" },
+	{ 768,1024,  "[1024x768]" },
+	{ 1024,1280,  "[1280x1024]" },
+	{ 1200,1600,  "[1600x1200]" }
 };
-
-static int findres(int *width, int *height)
-{
-	int i;
-
-	for(i=0;i<NUM_RESOLUTIONS;i++)
-		if((*width<=resolutions[i][0]) && (*height<=resolutions[i][1])) {
-			*width = resolutions[i][0];
-			*height = resolutions[i][1];
-			return resolutions[i][2];
-		}
-        
-	*width = 640;
-	*height = 480;
-	return GR_RESOLUTION_640x480;
-}
 
 /*
 ** GLimp_SetMode
@@ -82,25 +59,16 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 		width = r_customwidth->intValue;
 		height = r_customheight->intValue;
 	}
-	else
-	{
-		width=640;
-		height=480;
-	}
-	mode=false;
 
 	ri.Con_Printf( PRINT_ALL, "Initializing OpenGL display\n");
 
 	ri.Con_Printf (PRINT_ALL, "...setting mode %d:", mode );
 
-	/* FS: FIXME */
-	/*if ( !ri.Vid_GetModeInfo( &width, &height, mode ) )
+	if ( !ri.Vid_GetModeInfo( &width, &height, mode ) )
 	{
 		ri.Con_Printf( PRINT_ALL, " invalid mode\n" );
 		return rserr_invalid_mode;
-	}*/
-
-	ri.Vid_GetModeInfo( &width, &height, mode );
+	}
 
 	ri.Con_Printf( PRINT_ALL, " %d %d\n", width, height );
 
@@ -155,8 +123,23 @@ void GLimp_Shutdown( void )
 ** of OpenGL.  
 */
 
-int GLimp_Init( void *hinstance, void *wndproc )
+int GLimp_Init( void *nummodes, void *modeinfos )
 {
+	vmodeinfo_t *vi;
+	int	i;
+
+	/* HACK HACK HACK: sending the video mode infos to vid_dos.c
+	 * by exploiting our params. See: vid_dos.c:VID_LoadRefresh() */
+	vi = malloc(sizeof(resolutions) * sizeof(vmodeinfo_t));
+	for (i = 0; i < NUM_GL_RESOLUTIONS; ++i)
+	{
+		vi[i].height = resolutions[i].height;
+		vi[i].width = resolutions[i].width;
+		strcpy(vi[i].menuname, resolutions[i].menuname);
+	}
+	*(int *) nummodes = NUM_GL_RESOLUTIONS;
+	*(vmodeinfo_t **) modeinfos = vi;
+
 	return true;
 }
 
