@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
-CPPFLAGS = -Did386=1
+CFLAGS = -fno-strict-aliasing -fomit-frame-pointer
+CPPFLAGS = -Did386=0
 DXE3GEN = dxe3gen
 
 GAME = m_tank.o \

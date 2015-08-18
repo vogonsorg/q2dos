@@ -42,6 +42,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 int _crt0_startup_flags = _CRT0_FLAG_UNIX_SBRK; /* FS: Fake Mem Fix for Win9x (QIP) */
 
+unsigned _stklen = 1048576;
+
 #include "dosisms.h"
 #include "../qcommon/qcommon.h"
 #include "../client/keys.h"

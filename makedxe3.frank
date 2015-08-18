@@ -1,27 +1,27 @@
 # features selection :
 #
 # gamespy/server browser:
-USE_GAMESPY=1
+USE_GAMESPY=0
 # dynamically linked gamespy:
 GAMESPY_DXE=1
 # libcurl/http downloads:
-USE_CURL=1
+USE_CURL=0
 # ogg/vorbis music:
-USE_OGG=1
+USE_OGG=0
 # use tremor library for ogg/vorbis:
-USE_TREMOR=1
+USE_TREMOR=0
 # pci sound card support:
-USE_SNDPCI=1
+USE_SNDPCI=0
 # cd audio support:
 USE_CDAUDIO=1
 # abrash's asm optimizations:
 USE_ASM=1
 # dynamic refresh (video) modules:
-REF_DXE=1
+REF_DXE=0
 
 CC = gcc
-CFLAGS = -g -Wall -Werror -O2 -fno-strict-aliasing -fomit-frame-pointer
-CPPFLAGS = -DCLIENT_SPLIT_NETFRAME
+CFLAGS = -O2 -fno-strict-aliasing -fomit-frame-pointer
+CPPFLAGS = -Iref_3dfx/include -Iref_3dfx/include/glide3 -DCLIENT_SPLIT_NETFRAME
 LDFLAGS =
 
 ifneq ($(REF_DXE),1)
@@ -139,44 +139,23 @@ SERVER = server/sv_ccmds.o \
 	server/sv_world.o
 
 ifneq ($(REF_DXE),1)
-REFSOFT = ref_soft/r_alias.o \
-	ref_soft/r_main.o \
-	ref_soft/r_light.o \
-	ref_soft/r_misc.o \
-	ref_soft/r_model.o \
-	ref_soft/r_part.o \
-	ref_soft/r_poly.o \
-	ref_soft/r_polyse.o \
-	ref_soft/r_rast.o \
-	ref_soft/r_scan.o \
-	ref_soft/r_sprite.o \
-	ref_soft/r_surf.o \
-	ref_soft/r_aclip.o \
-	ref_soft/r_bsp.o \
-	ref_soft/r_draw.o \
-	ref_soft/r_edge.o \
-	ref_soft/r_image.o \
-	dos/vid_ext.o \
-	dos/vregset.o \
-	dos/swimp_dos.o
+REFSOFT = ref_3dfx/gl_draw.o \
+	ref_3dfx/gl_image.o \
+	ref_3dfx/gl_light.o \
+	ref_3dfx/gl_mesh.o \
+	ref_3dfx/gl_model.o \
+	ref_3dfx/gl_rmain.o \
+	ref_3dfx/gl_rmisc.o \
+	ref_3dfx/gl_rsurf.o \
+	ref_3dfx/gl_warp.o \
+	ref_3dfx/qgl_linux.o \
+	ref_3dfx/gl_fxmesa.o
 endif
 
 ifeq ($(USE_ASM),1)
-COMMONASM = gas/math.o
 CLIENTASM = gas/snd_mixa.o
 ifneq ($(REF_DXE),1)
-REFASM = gas/math_ref.o \
-	gas/d_copy.o \
-	gas/d_polysa.o \
-	gas/r_aclipa.o \
-	gas/r_draw16.o \
-	gas/r_drawa.o \
-	gas/r_edgea.o \
-	gas/r_scana.o \
-	gas/r_spr8.o \
-	gas/r_surf8.o \
-	gas/r_varsa.o \
-	gas/sys_dosa.o
+REFASM = gas/sys_dosa.o
 endif
 endif
 
@@ -188,13 +167,13 @@ OBJECTS = $(CLIENT) $(CLIENTASM) $(QCOMMON) $(COMMONASM) $(SERVER) $(GAMESPY) $(
 all: q2.exe
 
 q2.exe: $(OBJECTS)
-	$(CC) $(OBJECTS) $(LDFLAGS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm -o $@
+	$(CC) $(OBJECTS) $(LDFLAGS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -Lref_3dfx/lib -lgl -lglu -lglid3 -lm -o $@
 
 clean:
 	rm -f qcommon/*.o
 	rm -f client/*.o
 	rm -f server/*.o
-	rm -f ref_soft/*.o
+	rm -f ref_3dfx/*.o
 	rm -f dos/*.o
 	rm -f gas/*.o
 	rm -f Goa/*.o

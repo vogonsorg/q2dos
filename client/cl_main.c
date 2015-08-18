@@ -2486,9 +2486,16 @@ void CL_Init (void)
 
 	Con_Init ();
 	VID_Init ();
+
+	printf("VID_Init complete\n");
+
 	S_Init ();	// sound must be initialized after window is created
 
+	printf("Sound_Init complete\n");
+
 	V_Init ();
+
+	printf("V_Init complete\n");
 
 	net_message.data = net_message_buffer;
 	net_message.maxsize = sizeof(net_message_buffer);
@@ -2496,6 +2503,9 @@ void CL_Init (void)
 	M_Init ();
 	
 	SCR_Init ();
+
+	printf("SCR_Init complete\n");
+
 	cls.disable_screen = true;	// don't draw yet
 
 	CDAudio_Init ();
