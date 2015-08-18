@@ -18,7 +18,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "gl_local.h"
+#include "../ref_3dfx/gl_local.h"
 #include "../client/keys.h"
 
 #include <GL/fxmesa.h>

@@ -21,7 +21,7 @@ REF_DXE=1
 
 CC = gcc
 CFLAGS = -O2 -fno-strict-aliasing -fomit-frame-pointer
-CPPFLAGS = -Iref_3dfx/include -Iref_3dfx/include/glide3 -DCLIENT_SPLIT_NETFRAME -DUSE_3DFX
+CPPFLAGS = -Idos/3rdparty/include -Idos/3rdparty/include/glide3 -DCLIENT_SPLIT_NETFRAME -DUSE_3DFX
 LDFLAGS =
 
 ifneq ($(REF_DXE),1)
@@ -148,8 +148,8 @@ REFSOFT = ref_3dfx/gl_draw.o \
 	ref_3dfx/gl_rmisc.o \
 	ref_3dfx/gl_rsurf.o \
 	ref_3dfx/gl_warp.o \
-	ref_3dfx/qgl_linux.o \
-	ref_3dfx/gl_fxmesa.o
+	dos/qgl_dos.o \
+	dos/gl_fxmesa.o
 endif
 
 ifeq ($(USE_ASM),1)
