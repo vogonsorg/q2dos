@@ -144,9 +144,6 @@ ifndef GLQUAKE
 	externdef _d_pedgespanpackage:dword
 	externdef _d_tfrac:dword
 	externdef _d_light:dword
-	externdef _d_lightr:dword
-	externdef _d_lightg:dword
-	externdef _d_lightb:dword
 	externdef _d_zi:dword
 	externdef _d_pdest:dword
 	externdef _d_pz:dword
@@ -179,9 +176,6 @@ ifndef GLQUAKE
 	externdef _d_countextrastep:dword
 	externdef _d_tfracextrastep:dword
 	externdef _d_lightextrastep:dword
-	externdef _d_lightextrastepr:dword
-	externdef _d_lightextrastepg:dword
-	externdef _d_lightextrastepb:dword
 	externdef _d_ziextrastep:dword
 	externdef _d_pdestbasestep:dword
 	externdef _d_pzbasestep:dword
@@ -190,9 +184,6 @@ ifndef GLQUAKE
 	externdef _ubasestep:dword
 	externdef _d_tfracbasestep:dword
 	externdef _d_lightbasestep:dword
-	externdef _d_lightbasestepr:dword
-	externdef _d_lightbasestepg:dword
-	externdef _d_lightbasestepb:dword
 	externdef _d_zibasestep:dword
 	externdef _zspantable:dword
 	externdef _r_lstepy:dword
@@ -250,9 +241,21 @@ ifndef GLQUAKE
 	externdef fp_64kx64k:dword
 	externdef pz:dword
 	externdef spr8entryvec_table:dword
+
+	/* FS: Coloured light specific stuff */
+	externdef _d_lightr:dword
+	externdef _d_lightg:dword
+	externdef _d_lightb:dword
+	externdef _d_lightextrastepr:dword
+	externdef _d_lightextrastepg:dword
+	externdef _d_lightextrastepb:dword
+	externdef _d_lightbasestepr:dword
+	externdef _d_lightbasestepg:dword
+	externdef _d_lightbasestepb:dword
 	externdef d_8to24table:dword
 	externdef palmap2:dword
 	externdef coloredlights:dword
+
 endif
 
 	externdef _fpu_ceil_cw:dword

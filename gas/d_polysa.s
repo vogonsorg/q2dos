@@ -1330,7 +1330,7 @@ LScanLoop:
 	movl	C(d_aspancount),%eax
 	movl	%eax,spanpackage_t_count(%esi)
 	movl	%edi,spanpackage_t_light(%esi)
-#ifdef COLMODEL
+#if colasm
 // FS: For qbism soft ref
 	movl	C(d_lightr), %edi
 	movl	%edi,spanpackage_t_lightr(%esi)
@@ -1399,7 +1399,7 @@ LSkip1:
 
 //			d_light += d_lightextrastep;
 //			d_zi += d_ziextrastep;
-#ifdef COLMODEL
+#if colasm
 	movl	C(d_light), %edi
 #endif
 	addl	C(d_lightextrastep),%edi
@@ -1408,7 +1408,7 @@ LSkip1:
 //			d_lightr += d_lightextrastepr;
 //			d_lightg += d_lightextrastepg;
 //			d_lightb += d_lightextrastepb;
-#ifdef COLMODEL
+#if colasm
 	movl	C(d_lightr), %edi
 	addl	%edi,C(d_lightextrastepr)
 	movl	C(d_lightg), %edi
@@ -1471,11 +1471,11 @@ LSkip2:
 
 //			d_light += d_lightbasestep;
 //			d_zi += d_zibasestep;
-#ifdef COLMODEL
+#if colasm
 	movl	C(d_light), %edi
 #endif
 	addl	C(d_lightbasestep),%edi
-#ifdef COLMODEL
+#if colasm
 	movl	C(d_lightr), %edi
 	addl	%edi,C(d_lightbasestepr)
 	movl	C(d_lightg), %edi

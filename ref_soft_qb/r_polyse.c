@@ -27,7 +27,10 @@ int	rand1k[] = {
 };
 
 #define MASK_1K	0x3FF
+
+#if id386
 #define	id386ALIAS	1 /* FS: Use the ASM path for no lights or if we want a hacky speed at the cost of no coloured lights on models */
+#endif
 
 int		rand1k_index = 0;
 

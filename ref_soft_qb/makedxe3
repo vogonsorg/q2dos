@@ -6,7 +6,7 @@ USE_SSE=0
 
 # -funroll-loops to possibly help a small bit with the C only code...
 # about a 2fps boost in timedemos...
-CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer -funroll-loops -DCOLMODEL
+CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer -funroll-loops -Dcolasmdef=1
 CPPFLAGS = 
 DXE3GEN = dxe3gen
 

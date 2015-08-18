@@ -24,6 +24,8 @@
 #define id386	0
 #endif
 
+#define colasm 0 /* FS: Don't enable yet, but for ref_sqb we do need the definitions for the span struct sizes so use /Dcolasmdef=1 */
+
 // !!! must be kept the same as in d_iface.h !!!
 #define TRANSPARENT_COLOR	255
 
@@ -204,7 +206,7 @@
 	.extern C(irtable)
 	.extern C(iractive)
 
-#ifdef COLMODEL
+#if colasmdef
 	.extern C(d_lightr)
 	.extern C(d_lightg)
 	.extern C(d_lightb)
@@ -382,14 +384,14 @@
 #define spanpackage_t_tfrac				20
 #define spanpackage_t_light				24
 #define spanpackage_t_zi				28
-#ifndef COLMODEL
-#define spanpackage_t_size				32
-#else
+#if colasmdef
 #define spanpackage_t_lightr			32
 #define spanpackage_t_lightg			36
 #define spanpackage_t_lightb			40
 #define spanpackage_t_size				44 
-#endif // COLMODEL
+#else
+#define spanpackage_t_size				32 
+#endif
 
 // edge_t structure
 // !!! if this is changed, it must be changed in r_shared.h too !!!
