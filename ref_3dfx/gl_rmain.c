@@ -1678,7 +1678,7 @@ refexport_t GetRefAPI (refimport_t rimp )
 }
 
 
-#if 0
+#ifndef REF_HARD_LINKED
 // this is only here so the functions in q_shared.c and q_shwin.c can link
 void Sys_Error (char *error, ...)
 {
