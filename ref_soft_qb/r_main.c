@@ -149,9 +149,6 @@ cvar_t	*sw_load_tga_sky; // FS
 cvar_t	*sw_lockpvs;
 //PGM
 
-cvar_t  *r_customwidth;
-cvar_t  *r_customheight;
-
 cvar_t	*r_coloredlights; // leilei
 cvar_t	*r_lightsaturation; //qb: colored light saturation
 int		coloredlights;	  // leilei
@@ -329,8 +326,6 @@ void R_Register (void)
 	sw_lockpvs->description = "Development aid to let you run around and see exactly where the Potentially Visble Set ends.";
 //PGM
 
-	r_customwidth = ri.Cvar_Get("r_customwidth", "1024", CVAR_ARCHIVE);
-	r_customheight = ri.Cvar_Get("r_customheight", "768", CVAR_ARCHIVE);
 	// leilei - colored lights
 
 	r_coloredlights = ri.Cvar_Get("r_coloredlights", "1", CVAR_ARCHIVE);
@@ -381,7 +376,13 @@ int R_Init( void *hInstance, void *wndProc )
 
 	R_Register ();
 	Draw_GetPalette ();
-	Draw_InitRGBMap ();		// leilei - colored lights	
+
+	if(r_coloredlights->intValue) /* FS: Don't build this stuff if we have it set to 0 */
+	{
+		/* FS: TODO: It would be nice to print a message here about building the RGB maps because it does cause like a 5-10 second delay in DOS, but there is no safe printf like Q1
+		 *           and the frame hasn't started yet */
+		Draw_InitRGBMap ();		// leilei - colored lights
+	}
 
 	if (SWimp_Init(hInstance, wndProc) != 0)
 		return -1;
@@ -1176,11 +1177,6 @@ void R_BeginFrame( float camera_separation )
 	{
 		rserr_t err;
 
-		/* a bit hackish approach to enable custom resolutions:
-		* SWimp_SetMode needs these values set for mode -1 */
-		vid.width = r_customwidth->value;
-		vid.height = r_customheight->value;
-
 		/*
 		** if this returns rserr_invalid_fullscreen then it set the mode but not as a
 		** fullscreen mode, e.g. 320x200 on a system that doesn't support that res
@@ -1189,15 +1185,7 @@ void R_BeginFrame( float camera_separation )
 		{
 			R_InitGraphics( vid.width, vid.height );
 
-			if (sw_mode->value == -1)
-			{
-				sw_state.prev_mode = 4; /* safe default for custom mode */
-			}
-			else
-			{
-				sw_state.prev_mode = sw_mode->value;
-			}
-
+			sw_state.prev_mode = sw_mode->value;
 			vid_fullscreen->modified = false;
 			sw_mode->modified = false;
 		}
@@ -1414,6 +1402,7 @@ void Draw_GetPalette (void)
 	if (!vid.colormap)
 		ri.Sys_Error (ERR_FATAL, "Couldn't load pics/colormap.pcx");
 	vid.alphamap = vid.colormap + 64*256;
+
 	out = (byte *)d_8to24table;
 	for (i=0 ; i<256 ; i++, out+=4)
 	{

@@ -34,7 +34,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 	#endif // intptr_t
 #endif // __DJGPP__
 
-/* FS: Define this as compile time to keep compatibility with GASM */
 #define	COLMODEL //qb: tnq2
 #define REF_VERSION     "QBISM SOFT 0.01"
 
@@ -626,11 +625,8 @@ extern	cvar_t	*sw_particle_size; // FS
 extern	cvar_t	*sw_particle_size_min; // FS
 extern	cvar_t	*sw_particle_size_max; // FS
 
-extern cvar_t  *r_customwidth;
-extern cvar_t  *r_customheight;
 extern cvar_t   *r_coloredlights; // leilei
 extern cvar_t   *r_lightsaturation;
-//extern cvar_t   *sw_transquality; // leilei
 
 extern  clipplane_t     view_clipplanes[4];
 extern int              *pfrustum_indexes[4];

@@ -182,7 +182,6 @@ void Draw_InitRGBMap(void)
 
 	// Make the 18-bit lookup table here
 	// This is a HUGE 256kb table, the biggest there is here
-	// TODO: Option to enable this 
 
 	{
 		Draw_8to24((byte *)d_8to24table);

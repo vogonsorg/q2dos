@@ -242,7 +242,7 @@ ifndef GLQUAKE
 	externdef pz:dword
 	externdef spr8entryvec_table:dword
 
-	/* FS: Coloured light specific stuff */
+; FS: Coloured light specific stuff
 	externdef _d_lightr:dword
 	externdef _d_lightg:dword
 	externdef _d_lightb:dword
