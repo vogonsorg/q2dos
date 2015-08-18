@@ -132,6 +132,7 @@ cvar_t	*gl_3dlabs_broken;
 
 cvar_t	*r_customheight;
 cvar_t	*r_customwidth;
+cvar_t	*r_refreshrate;
 
 cvar_t	*vid_fullscreen;
 cvar_t	*vid_gamma;
@@ -1039,8 +1040,9 @@ void R_Register( void )
 
 	r_customwidth = ri.Cvar_Get("r_customwidth", "640", CVAR_ARCHIVE);
 	r_customheight = ri.Cvar_Get("r_customheight", "480", CVAR_ARCHIVE);
+	r_refreshrate = ri.Cvar_Get("r_refreshrate", "75", CVAR_ARCHIVE);
 
-	vid_fullscreen = ri.Cvar_Get( "vid_fullscreen", "0", CVAR_ARCHIVE );
+	vid_fullscreen = ri.Cvar_Get( "vid_fullscreen", "1", CVAR_ARCHIVE );
 	vid_gamma = ri.Cvar_Get( "vid_gamma", "1.0", CVAR_ARCHIVE );
 	vid_ref = ri.Cvar_Get( "vid_ref", "gl", CVAR_ARCHIVE );
 
@@ -1440,6 +1442,19 @@ void R_BeginFrame( float camera_separation )
 			Com_sprintf( envbuffer, sizeof(envbuffer), "SSTV2_GAMMA=%f", g );
 			putenv( envbuffer );
 			Com_sprintf( envbuffer, sizeof(envbuffer), "SST_GAMMA=%f", g );
+			putenv( envbuffer );
+		}
+	}
+	
+	if ( r_refreshrate->modified) /* FS: Refresh rate control */
+	{
+		r_refreshrate->modified = false;
+		
+		if ( gl_config.renderer & ( GL_RENDERER_VOODOO ) )
+		{
+			char envbuffer[1024];
+		
+			Com_sprintf( envbuffer, sizeof(envbuffer), "SST_SCREENREFRESH=%i", r_refreshrate->intValue );
 			putenv( envbuffer );
 		}
 	}

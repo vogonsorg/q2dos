@@ -241,8 +241,9 @@ extern  cvar_t  *gl_lockpvs;
 extern	cvar_t	*vid_fullscreen;
 extern	cvar_t	*vid_gamma;
 
-extern cvar_t  *r_customwidth;
-extern cvar_t  *r_customheight;
+extern	cvar_t  *r_customwidth;
+extern	cvar_t  *r_customheight;
+extern	cvar_t	*r_refreshrate;
 
 extern	cvar_t		*intensity;
 
