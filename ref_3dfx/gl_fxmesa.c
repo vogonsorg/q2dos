@@ -118,8 +118,8 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 	attribs[4] = 1;
 	attribs[5] = FXMESA_NONE;
 
-	fc = fxMesaCreateContext(0, findres(&width, &height), GR_REFRESH_60Hz, 
-		attribs);
+//	fc = fxMesaCreateContext(0, findres(&width, &height), GR_REFRESH_60Hz, attribs);
+	fc = fxMesaCreateBestContext(0, (GLint)width, (GLint)height, attribs); /* FS: This will allow us to use SST_SCREENREFRESH to set the refresh rate */
 	if (!fc)
 		return rserr_invalid_mode;
 
