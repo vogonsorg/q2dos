@@ -1,0 +1,29 @@
+#!/bin/sh
+
+# Make a shared lib for SunOS 5.x library file
+
+#--common--------------------------------------------------------------
+
+LIBRARY=$1
+shift 1
+
+MAJOR=$1
+shift 1
+
+MINOR=$1
+shift 1
+
+TINY=$1
+shift 1
+
+OBJECTS=$*
+
+#--platform-------------------------------------------------------------
+
+echo "Linking $LIBRARY..."
+if [ $LIBRARY = "libGLU.so" ]; then
+#  CC -G -o $LIBRARY $OBJECTS -Bdynamic -lCrun
+  c++ -G -o $LIBRARY $OBJECTS
+else
+  ld -G -o $LIBRARY $OBJECTS
+fi
