@@ -17,7 +17,6 @@
 #include <sys/stat.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <signal.h>
 
 #include "gl_local.h"
 #include "../client/keys.h"
@@ -26,7 +25,6 @@
 
 /*****************************************************************************/
 
-static qboolean GLimp_SwitchFullscreen( int width, int height );
 qboolean GLimp_InitGL (void);
 
 extern cvar_t *vid_fullscreen;
@@ -36,7 +34,7 @@ static fxMesaContext fc = NULL;
 
 #define NUM_RESOLUTIONS 16
 
-static resolutions[NUM_RESOLUTIONS][3]={ 
+static int resolutions[NUM_RESOLUTIONS][3]={ 
 	{ 320,200,  GR_RESOLUTION_320x200 },
 	{ 320,240,  GR_RESOLUTION_320x240 },
 	{ 400,256,  GR_RESOLUTION_400x256 },
@@ -69,27 +67,6 @@ static int findres(int *width, int *height)
 	*width = 640;
 	*height = 480;
 	return GR_RESOLUTION_640x480;
-}
-
-static void signal_handler(int sig)
-{
-	printf("Received signal %d, exiting...\n", sig);
-	GLimp_Shutdown();
-	exit(0);
-}
-
-/* FS: FIXME: Is this needed in DOS? */
-static void InitSig(void)
-{
-	signal(SIGHUP, signal_handler);
-	signal(SIGQUIT, signal_handler);
-	signal(SIGILL, signal_handler);
-	signal(SIGTRAP, signal_handler);
-	//signal(SIGIOT, signal_handler);
-	//signal(SIGBUS, signal_handler);
-	signal(SIGFPE, signal_handler);
-	signal(SIGSEGV, signal_handler);
-	signal(SIGTERM, signal_handler);
 }
 
 /*
@@ -180,8 +157,6 @@ void GLimp_Shutdown( void )
 
 int GLimp_Init( void *hinstance, void *wndproc )
 {
-	//InitSig();
-
 	return true;
 }
 

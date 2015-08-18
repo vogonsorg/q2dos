@@ -301,7 +301,6 @@ void R_LightPoint (vec3_t p, vec3_t color)
 	float		r;
 	int			lnum;
 	dlight_t	*dl;
-	float		light;
 	vec3_t		dist;
 	float		add;
 	
@@ -329,7 +328,6 @@ void R_LightPoint (vec3_t p, vec3_t color)
 	//
 	// add dynamic lights
 	//
-	light = 0;
 	dl = r_newrefdef.dlights;
 	for (lnum=0 ; lnum<r_newrefdef.num_dlights ; lnum++, dl++)
 	{

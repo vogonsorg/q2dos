@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // r_main.c
+#include <ctype.h>
 #include "gl_local.h"
 
 void R_Clear (void);
@@ -878,6 +879,7 @@ void	R_SetGL2D (void)
 	qglColor4f (1,1,1,1);
 }
 
+#ifdef USE_3DGLASSES
 static void GL_DrawColoredStereoLinePair( float r, float g, float b, float y )
 {
 	qglColor3f( r, g, b );
@@ -918,7 +920,7 @@ static void GL_DrawStereoPattern( void )
 		GLimp_EndFrame();
 	}
 }
-
+#endif
 
 /*
 ====================
@@ -1163,13 +1165,13 @@ int R_Init( void *hinstance, void *hWnd )
 	/*
 	** get our various GL strings
 	*/
-	gl_config.vendor_string = qglGetString (GL_VENDOR);
+	gl_config.vendor_string = (const char *)qglGetString (GL_VENDOR);
 	ri.Con_Printf (PRINT_ALL, "GL_VENDOR: %s\n", gl_config.vendor_string );
-	gl_config.renderer_string = qglGetString (GL_RENDERER);
+	gl_config.renderer_string = (const char *)qglGetString (GL_RENDERER);
 	ri.Con_Printf (PRINT_ALL, "GL_RENDERER: %s\n", gl_config.renderer_string );
-	gl_config.version_string = qglGetString (GL_VERSION);
+	gl_config.version_string = (const char *)qglGetString (GL_VERSION);
 	ri.Con_Printf (PRINT_ALL, "GL_VERSION: %s\n", gl_config.version_string );
-	gl_config.extensions_string = qglGetString (GL_EXTENSIONS);
+	gl_config.extensions_string = (const char *)qglGetString (GL_EXTENSIONS);
 	ri.Con_Printf (PRINT_ALL, "GL_EXTENSIONS: %s\n", gl_config.extensions_string );
 
 	strcpy( renderer_buffer, gl_config.renderer_string );
@@ -1341,7 +1343,7 @@ int R_Init( void *hinstance, void *hWnd )
 	/*
 	** draw our stereo patterns
 	*/
-#if 0 // commented out until H3D pays us the money they owe us
+#ifdef USE_3DGLASSES // commented out until H3D pays us the money they owe us
 	GL_DrawStereoPattern();
 #endif
 
@@ -1352,7 +1354,12 @@ int R_Init( void *hinstance, void *hWnd )
 
 	err = qglGetError();
 	if ( err != GL_NO_ERROR )
+	{
+		/* FS: Should we stop here if we do get an error? */
 		ri.Con_Printf (PRINT_ALL, "glGetError() = 0x%x\n", err);
+	}
+
+	return 0;
 }
 
 /*

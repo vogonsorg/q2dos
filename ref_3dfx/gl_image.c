@@ -1511,15 +1511,18 @@ void	GL_InitImages (void)
 
 	if ( qglColorTableEXT )
 	{
-		ri.FS_LoadFile( "pics/16to8.dat", &gl_state.d_16to8table );
+		ri.FS_LoadFile( "pics/16to8.dat", (void **)&gl_state.d_16to8table );
 		if ( !gl_state.d_16to8table )
 			ri.Sys_Error( ERR_FATAL, "Couldn't load pics/16to8.pcx");
 	}
 
+	/* FS: MesaFX will set gamma properly, no need to hard lock any more */
+	/*
 	if ( gl_config.renderer & ( GL_RENDERER_VOODOO | GL_RENDERER_VOODOO2 ) )
 	{
 		g = 1.0F;
 	}
+	*/
 
 	for ( i = 0; i < 256; i++ )
 	{

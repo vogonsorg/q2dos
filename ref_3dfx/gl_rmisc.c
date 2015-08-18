@@ -240,6 +240,14 @@ void GL_UpdateSwapInterval( void )
 #ifdef _WIN32
 			if ( qwglSwapIntervalEXT )
 				qwglSwapIntervalEXT( gl_swapinterval->value );
+#else
+			if ( gl_config.renderer & ( GL_RENDERER_VOODOO ) ) /* FS: Adjust V-Sync without a restart */
+			{
+				char envbuffer[1024];
+
+				Com_sprintf( envbuffer, sizeof(envbuffer), "FX_GLIDE_SWAPINTERVAL=%i", gl_swapinterval->intValue );
+				putenv( envbuffer );
+			}
 #endif
 		}
 	}

@@ -305,18 +305,12 @@ extern	vec3_t			lightspot;
 
 void GL_DrawAliasShadow (dmdl_t *paliashdr, int posenum)
 {
-	dtrivertx_t	*verts;
 	int		*order;
 	vec3_t	point;
 	float	height, lheight;
 	int		count;
-	daliasframe_t	*frame;
 
 	lheight = currententity->origin[2] - lightspot[2];
-
-	frame = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames 
-		+ currententity->frame * paliashdr->framesize);
-	verts = frame->verts;
 
 	height = 0;
 
@@ -341,24 +335,14 @@ void GL_DrawAliasShadow (dmdl_t *paliashdr, int posenum)
 		do
 		{
 			// normals and vertexes come from the frame list
-/*
-			point[0] = verts[order[2]].v[0] * frame->scale[0] + frame->translate[0];
-			point[1] = verts[order[2]].v[1] * frame->scale[1] + frame->translate[1];
-			point[2] = verts[order[2]].v[2] * frame->scale[2] + frame->translate[2];
-*/
-
 			memcpy( point, s_lerped[order[2]], sizeof( point )  );
 
 			point[0] -= shadevector[0]*(point[2]+lheight);
 			point[1] -= shadevector[1]*(point[2]+lheight);
 			point[2] = height;
-//			height -= 0.001;
 			qglVertex3fv (point);
 
 			order += 3;
-
-//			verts++;
-
 		} while (--count);
 
 		qglEnd ();
