@@ -153,9 +153,11 @@ REFSOFT = ref_3dfx/gl_draw.o \
 endif
 
 ifeq ($(USE_ASM),1)
+COMMONASM = gas/math.o
 CLIENTASM = gas/snd_mixa.o
 ifneq ($(REF_DXE),1)
-REFASM = gas/sys_dosa.o
+REFASM = gas/math_ref.o \
+	gas/sys_dosa.o
 endif
 endif
 
