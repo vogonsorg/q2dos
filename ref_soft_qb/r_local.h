@@ -177,6 +177,7 @@ extern oldrefdef_t      r_refdef;
 /* be careful if you ever want to change MAXWIDTH: 12.20 fixed
  * point math used in R_ScanEdges() overflows at width 2048 !! */
 #define MAXWIDTH		2040
+#define MAXDIMENSION	((MAXHEIGHT > MAXWIDTH) ? MAXHEIGHT : MAXWIDTH)
 
 #define INFINITE_DISTANCE       0x10000         // distance that's always guaranteed to
 										//  be farther away than anything in
@@ -557,11 +558,12 @@ extern int              r_screenwidth;
 
 extern int              r_drawnpolycount;
 
-#define TABLESIZE 1280*2 // FS: Fix going underwater with 1280x960 or higher modes
+#define TABLESIZE (MAXDIMENSION+CYCLE)
 
-extern int      sintable[TABLESIZE]; // FS: Changed from 1280
-extern int      intsintable[TABLESIZE]; // FS: Changed from 1280
-extern int		blanktable[TABLESIZE]; // FS: Changed from 1280	// PGM
+// FS: these three changed from [1280] to [TABLESIZE].
+extern int      sintable[TABLESIZE];
+extern int      intsintable[TABLESIZE];
+extern int		blanktable[TABLESIZE];	// PGM
 
 extern  vec3_t  vup, base_vup;
 extern  vec3_t  vpn, base_vpn;
