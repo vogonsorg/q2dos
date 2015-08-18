@@ -164,10 +164,10 @@ OBJECTS = $(CLIENT) $(CLIENTASM) $(QCOMMON) $(COMMONASM) $(SERVER) $(GAMESPY) $(
 
 .PHONY: clean
 
-all: q2fx_v5.exe
+all: q2fx_v1.exe
 
-q2fx_v5.exe: $(OBJECTS)
-	$(CC) $(OBJECTS) $(LDFLAGS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -Lref_3dfx/lib -lgl -lglu -lglid3 -lm -o $@
+q2fx_v1.exe: $(OBJECTS)
+	$(CC) $(OBJECTS) $(LDFLAGS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -Lref_3dfx/lib -lgl -lglu -lglid3_v1 -lm -o $@
 
 clean:
 	rm -f qcommon/*.o
