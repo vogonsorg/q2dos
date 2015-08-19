@@ -11,9 +11,4 @@ del /s /q *.idb
 del /s /q *.pdb
 del /s /q gam*.dxe
 del /s /q ref*.dxe
-del /q q2.exe
-del /q q2ace.exe
-del /q q2rogue.exe
-del /q q2xatrix.exe
-del /q q2zaero.exe
-del /q q2dxe.exe
+del /q q2*.exe
