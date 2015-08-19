@@ -61,7 +61,7 @@ export FX_GLIDE_HW ?= sst1
 #export FX_GLIDE_HW ?= cvg
 #export FX_GLIDE_HW ?= h3
 #export FX_GLIDE_HW ?= h5
-export USE_X86 ?= 1
+#export USE_X86 ?= 1
 
 ifeq ($(FX_GLIDE_HW),sst96)
 G3_DIR = sst1/glide3/src
