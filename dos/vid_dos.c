@@ -407,6 +407,9 @@ void	VID_Init (void)
 	vid_vgaonly = Cvar_Get("vid_vgaonly", (COM_CheckParm("-vgaonly"))? "1" : "0", 0);
 	vid_bankedvga = Cvar_Get("vid_bankedvga", (COM_CheckParm("-bankedvga"))? "1" : "0", 0);
 
+	/* don't let fxMesa cheat multitexturing */
+	putenv("FX_DONT_FAKE_MULTITEX=1");
+
 	VID_CheckChanges ();
 
 	Cmd_AddCommand("vid_restart", VID_Restart_f);

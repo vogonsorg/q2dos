@@ -755,7 +755,9 @@ void VID_Init (void)
 
 	/* Disable the 3Dfx splash screen */
 	putenv("FX_GLIDE_NO_SPLASH=0");
-		
+	/* don't let fxMesa cheat multitexturing */
+	putenv("FX_DONT_FAKE_MULTITEX=1");
+
 	/* Start the graphics mode and load refresh DLL */
 	VID_CheckChanges();
 }
