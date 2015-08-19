@@ -63,13 +63,7 @@ CC = gcc
 AS = nasm
 AR = ar
 
-HAVEDXE3 = $(wildcard $(DJDIR)/bin/dxe3gen.exe)
-
-ifeq ($(wildcard $(addsuffix /rm.exe,$(subst ;, ,$(PATH)))),)
-UNLINK = del $(subst /,\,$(1))
-else
-UNLINK = $(RM) $(1)
-endif
+UNLINK = rm -f $(1)
 
 ###############################################################################
 #	defines
@@ -239,11 +233,7 @@ $(GLIDE_LIBDIR)/$(GLIDE_LIB): $(GLIDE_OBJECTS)
 	$(AR) $(ARFLAGS) $@ $^
 
 $(GLIDE_LIBDIR)/$(GLIDE_DXE) $(GLIDE_LIBDIR)/$(GLIDE_IMP): $(GLIDE_OBJECTS)
-ifeq ($(HAVEDXE3),)
-	$(warning Missing DXE3 package... Skipping $(GLIDE_DXE))
-else
 	-dxe3gen -o $(GLIDE_LIBDIR)/$(GLIDE_DXE) -Y $(GLIDE_LIBDIR)/$(GLIDE_IMP) -D "Glide3(h3) DJGPP" -E _gr -E _gu -E _tx -U $^
-endif
 
 $(TEXUS_EXEDIR)/$(TEXUS_EXE): $(FX_GLIDE_SW)/texus2/cmd/cmd.c $(GLIDE_LIBDIR)/$(GLIDE_LIB)
 ifeq ($(TEXUS2),1)
