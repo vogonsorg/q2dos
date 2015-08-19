@@ -9,7 +9,7 @@
 ** QGL_Shutdown() - unloads libraries, NULLs function pointers
 */
 #define QGL
-#include "../ref_3dfx/gl_local.h"
+#include "../ref_gl/gl_local.h"
 #include <GL/dmesa.h>
 
 static FILE *log_fp = NULL;

@@ -18,7 +18,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "../ref_3dfx/gl_local.h"
+#include "../ref_gl/gl_local.h"
 #include "../client/keys.h"
 #include "vid_dos.h"
 
