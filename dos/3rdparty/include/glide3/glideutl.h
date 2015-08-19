@@ -17,19 +17,25 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot-fuse/glide/glide3x/sst1/glide3/src/Attic/glideutl.h,v 1.1.2.2 2004/10/04 09:36:00 dborca Exp $
-** $Log: glideutl.h,v $
-** Revision 1.1.2.2  2004/10/04 09:36:00  dborca
-** second cut at Glide3x for Voodoo1/Rush (massive update):
-** delayed validation, vertex snapping, clip coordinates, strip/fan_continue, bugfixes.
-** and probably a bunch of other crap that I forgot
-**
-** Revision 1.1.2.1  2004/03/02 07:55:30  dborca
-** Bastardised Glide3x for SST1
-**
-** Revision 1.1.1.1  1999/12/07 21:48:52  joseph
-** Initial checkin into SourceForge.
-**
+** $Header: /cvsroot/glide/glide3x/h5/glide3/src/glideutl.h,v 1.3.4.2 2003/06/05 08:23:53 koolsmoky Exp $
+** $Log: 
+**  3    3dfx      1.0.1.0.1.0 10/11/00 Brent           Forced check in to enforce
+**       branching.
+**  2    3dfx      1.0.1.0     06/20/00 Joseph Kain     Changes to support the
+**       Napalm Glide open source release.  Changes include cleaned up offensive
+**       comments and new legal headers.
+**  1    3dfx      1.0         09/11/99 StarTeam VTS Administrator 
+** $
+** 
+** 4     7/24/98 1:41p Hohn
+** 
+** 3     1/30/98 4:27p Atai
+** gufog* prototype
+** 
+** 1     1/29/98 4:00p Atai
+ * 
+ * 1     1/16/98 4:29p Atai
+ * create glide 3 src
  * 
  * 11    1/07/98 11:18a Atai
  * remove GrMipMapInfo and GrGC.mm_table in glide3

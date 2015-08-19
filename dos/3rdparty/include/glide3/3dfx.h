@@ -17,8 +17,8 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Revision: 1.3.4.2 $
-** $Date: 2003/05/05 06:50:41 $
+** $Revision: 1.3.4.5 $
+** $Date: 2005/08/13 21:07:03 $
 */
 #ifndef __3DFX_H__
 #define __3DFX_H__
@@ -30,12 +30,12 @@ typedef unsigned char   FxU8;
 typedef signed   char   FxI8;
 typedef unsigned short  FxU16;
 typedef signed   short  FxI16;
-#if defined(__alpha__) || defined (__LP64__)
-typedef signed   int    FxI32;
-typedef unsigned int    FxU32;
-#else
+#ifdef __DJGPP__
 typedef signed   long   FxI32;
 typedef unsigned long   FxU32;
+#else
+typedef signed   int    FxI32;
+typedef unsigned int    FxU32;
 #endif
 typedef unsigned long   AnyPtr;
 typedef int             FxBool;
@@ -58,7 +58,7 @@ typedef struct { float r, g, b, a; } FxColor4;
 ** helper macros
 */
 #define FXUNUSED( a ) ((void)(a))
-#define FXBIT( i )    ( 1L << (i) )
+#define FXBIT( i )    ( 1 << (i) )
 
 /*
 ** export macros
@@ -69,7 +69,7 @@ typedef struct { float r, g, b, a; } FxColor4;
 #    define FX_ENTRY 
 #    define FX_CALL
 #  else
-#    define FX_ENTRY extern
+#    define FX_ENTRY __declspec( dllimport )
 #    define FX_CALL  __stdcall
 #  endif
 #elif defined(__WATCOMC__)
