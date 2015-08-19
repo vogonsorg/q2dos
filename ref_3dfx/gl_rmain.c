@@ -1319,7 +1319,6 @@ int R_Init( void *hinstance, void *hWnd )
 	{
 		ri.Con_Printf( PRINT_ALL, "...3DFX_set_global_palette not found\n" );
 	}
-#endif
 
 	if ( !qglColorTableEXT &&
 		strstr( gl_config.extensions_string, "GL_EXT_paletted_texture" ) && 
@@ -1339,6 +1338,7 @@ int R_Init( void *hinstance, void *hWnd )
 	{
 		ri.Con_Printf( PRINT_ALL, "...GL_EXT_shared_texture_palette not found\n" );
 	}
+#endif
 
 	if ( strstr( gl_config.extensions_string, "GL_ARB_multitexture" ) )
 	{
