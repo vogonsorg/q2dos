@@ -170,40 +170,7 @@ void GLimp_AppActivate( qboolean active )
 {
 }
 
-void Fake_glColorTableEXT( GLenum target, GLenum internalformat,
-                             GLsizei width, GLenum format, GLenum type,
-                             const GLvoid *table )
-{
-	byte temptable[256][4];
-	byte *intbl;
-	int i;
-
-	for (intbl = (byte *)table, i = 0; i < 256; i++) {
-		temptable[i][2] = *intbl++;
-		temptable[i][1] = *intbl++;
-		temptable[i][0] = *intbl++;
-		temptable[i][3] = 255;
-	}
-	qglEnable( GL_SHARED_TEXTURE_PALETTE_EXT );
-	qgl3DfxSetPaletteEXT((GLuint *)temptable);
-}
-
-/* FS: TODO FIXME: These are just stubs so Knightmare's ref_gl can link until GetProcAddress is working for extensions */
+/* FS: This is so Knightmare's ref_gl can link.  Maybe a windows only thing, not sure */
 void UpdateGammaRamp (void)
-{
-}
-
-void qglClientActiveTextureARB (GLenum foo)
-{
-}
-void qwglGetProcAddress (char * foo)
-{
-}
-
-void qglActiveTextureARB (GLenum foo)
-{
-}
-
-void qglMultiTexCoord2f (GLenum foo, GLfloat x, GLfloat y)
 {
 }

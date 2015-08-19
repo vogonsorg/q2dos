@@ -433,9 +433,9 @@ extern BOOL ( WINAPI * qwglSetDeviceGammaRampEXT ) ( const unsigned char *pRed, 
 // local function in dll
 extern void *qwglGetProcAddress(char *symbol);
 
-extern void (*qgl3DfxSetPaletteEXT)(GLuint *);
-
 #ifdef __linux__
+
+extern void (*qgl3DfxSetPaletteEXT)(GLuint *);
 
 /*
 //FX Mesa Functions
@@ -455,12 +455,12 @@ extern Bool (*qglXMakeCurrent)( Display *dpy, GLXDrawable drawable, GLXContext c
 extern void (*qglXCopyContext)( Display *dpy, GLXContext src, GLXContext dst, GLuint mask );
 extern void (*qglXSwapBuffers)( Display *dpy, GLXDrawable drawable );
 
-#endif // linux
-
 // 3dfxSetPaletteEXT shunt
 void Fake_glColorTableEXT( GLenum target, GLenum internalformat,
                              GLsizei width, GLenum format, GLenum type,
                              const GLvoid *table );
+
+#endif // linux
 
 /*
 ** extension constants
