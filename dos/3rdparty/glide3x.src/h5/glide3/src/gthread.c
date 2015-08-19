@@ -19,8 +19,8 @@
 **
 **
 **
-** $Revision: 1.3.4.5 $ 
-** $Date: 2003/08/04 12:45:47 $ 
+** $Revision: 1.3.4.8 $ 
+** $Date: 2005/05/25 08:56:26 $ 
 **
 */
 
@@ -56,53 +56,44 @@ initThreadStorage( void )
   if ( !threadInit ) {
     threadInit = 1;
     _GlideRoot.tlsIndex = TlsAlloc();
-  }
 
-  if ((_GlideRoot.OS == OS_WIN32_95) ||
-      (_GlideRoot.OS == OS_WIN32_98) ||
-	  (_GlideRoot.OS == OS_WIN32_ME)) {
-    _GlideRoot.tlsOffset = W95_TLS_INDEX_TO_OFFSET(_GlideRoot.tlsIndex);
-  } else {
-    _GlideRoot.tlsOffset = WNT_TLS_INDEX_TO_OFFSET(_GlideRoot.tlsIndex);
+    if (_GlideRoot.tlsIndex == TLS_OUT_OF_INDEXES)
+      GrErrorCallback( "initThreadStorage:  Failed to allocate TLS index.", FXTRUE );
+
+    /* pray the index is lower than 64 */
+    if ((_GlideRoot.tlsIndex < 0) ||
+        (_GlideRoot.tlsIndex > 63)) /* TLS_MINIMUM_AVAILABLE = 64 */
+      GrErrorCallback( "initThreadStorage:  TLS index higher than 64.", FXTRUE );
+#if !USE_STANDARD_TLS_FUNC
+    if ((_GlideRoot.OS == OS_WIN32_95) ||
+        (_GlideRoot.OS == OS_WIN32_98) ||
+        (_GlideRoot.OS == OS_WIN32_ME)) {
+      _GlideRoot.tlsOffset = W95_TLS_INDEX_TO_OFFSET(_GlideRoot.tlsIndex);
+    } else {
+      _GlideRoot.tlsOffset = WNT_TLS_INDEX_TO_OFFSET(_GlideRoot.tlsIndex);
+    }
+#endif
   }
 } /* initThreadStorage */
 
-void setThreadValue( FxU32 value ) {
+void setThreadValue( unsigned long value ) {
     GR_CHECK_F( "setThreadValue", !threadInit, "Thread storage not initialized\n" );
     TlsSetValue( _GlideRoot.tlsIndex, (void*)value );
 }
 
-#ifdef __GNUC__
-
-FxU32 getThreadValueSLOW (void)
+unsigned long getThreadValueSLOW(void)
 {
- GR_CHECK_F( "getThreadValue", !threadInit, "Thread storage not initialized\n" );
+  GR_CHECK_F( "getThreadValue", !threadInit, "Thread storage not initialized\n" );
 
- return getThreadValueFast();
+  return getThreadValueFast();
 }
 
-#else
-
-#pragma warning (4:4035)        /* No return value */
-FxU32 getThreadValueSLOW( void ) {
-    GR_CHECK_F( "getThreadValue", !threadInit, "Thread storage not initialized\n" );
-
-#if 0
-    return (FxU32)TlsGetValue( _GlideRoot.tlsIndex );
-#elif 1
-    __GR_GET_TLSC_VALUE();
-#else
-
-  __asm {
-    mov esi, DWORD PTR fs:[WNT_TEB_PTR]
-    add esi, DWORD PTR _GlideRoot.tlsOffset
-    mov eax, DWORD PTR [esi]
-  }
-
-#endif
-
+#if USE_STANDARD_TLS_FUNC
+/* used in gdraw.c (grDrawTriangle) and xos.inc */
+FxU32 getThreadValue(void)
+{
+  return (FxU32)TlsGetValue(_GlideRoot.tlsIndex);
 }
-
 #endif
 
 void freeThreadStorage( void )
@@ -118,6 +109,13 @@ void initCriticalSection( void ) {
         criticalSectionInit = 1;
         InitializeCriticalSection( &criticalSectionObject );
     }
+}
+
+void deleteCriticalSection( void ) {
+  if ( criticalSectionInit ) {
+    DeleteCriticalSection( &criticalSectionObject );
+    criticalSectionInit = 0;
+  }
 }
 
 void beginCriticalSection( void ) {
@@ -138,7 +136,7 @@ void initThreadStorage(void)
 {
 }
 
-void setThreadValue( FxU32 value )
+void setThreadValue( unsigned long value )
 {
 	_threadValueMacOS = value;
 }
@@ -156,6 +154,10 @@ void initCriticalSection(void)
 {
 }
 
+void deleteCriticalSection( void )
+{
+}
+
 void beginCriticalSection(void)
 {
 }
@@ -166,7 +168,7 @@ void endCriticalSection(void)
 
 #elif (GLIDE_PLATFORM & GLIDE_OS_UNIX)
 
-FxU32 threadValueLinux;
+unsigned long threadValueLinux;
 
 void initThreadStorage(void)
 {
@@ -174,17 +176,21 @@ void initThreadStorage(void)
 
 
 
-void setThreadValue( FxU32 value )
+void setThreadValue( unsigned long value )
 {
 	threadValueLinux = value;
 }
 
-FxU32 getThreadValueSLOW( void )
+unsigned long getThreadValueSLOW( void )
 {
 	return threadValueLinux;
 }
 
 void initCriticalSection(void)
+{
+}
+
+void deleteCriticalSection( void )
 {
 }
 
@@ -196,9 +202,9 @@ void endCriticalSection(void)
 {
 }
 
-#elif defined(__DJGPP__)
+#elif (GLIDE_PLATFORM & GLIDE_OS_DOS32)
 
-FxU32 threadValueDJGPP;
+FxU32 GR_CDECL threadValueDJGPP;
 
 void initThreadStorage(void)
 {
@@ -218,6 +224,10 @@ void initCriticalSection(void)
 {
 }
 
+void deleteCriticalSection( void )
+{
+}
+
 void beginCriticalSection(void)
 {
 }
@@ -226,6 +236,6 @@ void endCriticalSection(void)
 {
 }
 
-#else	/* defined(__DJGPP__) */
+#else
 #  error "No thread synchronization/storage functions defined for this OS"
 #endif

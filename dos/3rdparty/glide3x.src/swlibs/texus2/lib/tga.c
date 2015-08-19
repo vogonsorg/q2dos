@@ -14,8 +14,8 @@
 ** successor clauses in the FAR, DOD or NASA FAR Supplement. Unpublished  -
 ** rights reserved under the Copyright Laws of the United States.
 **
-** $Revision: 1.1.1.1 $
-** $Date: 2000/08/03 00:27:21 $
+** $Revision: 1.1.1.1.6.1 $
+** $Date: 2005/08/13 21:07:04 $
 */
 
 #include <stdio.h>
@@ -335,7 +335,7 @@ _txReadTGAData( FILE *stream, TxMip *info)
     int		i, stride;
     int 	bpp;			// bytesPerPixel
     FxU8*	data;
-    long	BigEndian = 0xff000000;
+    int		BigEndian = 0xff000000;
 
     // printf("TxREAD TGA DATA\n");
     tgaRLEcount = 0;

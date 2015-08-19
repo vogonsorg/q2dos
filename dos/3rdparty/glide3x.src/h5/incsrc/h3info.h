@@ -20,15 +20,15 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Revision: 1.3.4.1 $
-** $Date: 2003/04/06 18:23:10 $
+** $Revision: 1.3.4.3 $
+** $Date: 2005/06/09 18:32:34 $
 */
 
 #if defined(__unix__) && ! defined(__H3REGS_H__)
 // basic data types
 #define FxU8  unsigned char
 #define FxU16 unsigned short
-#define FxU32 unsigned long
+#define FxU32 unsigned int
 #define FxBool int
 // defn of registers not reqd, treat (SstRegs *) as (void *)
 typedef void SstRegs;

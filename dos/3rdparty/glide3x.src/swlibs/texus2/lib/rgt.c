@@ -15,8 +15,8 @@
 ** successor clauses in the FAR, DOD or NASA FAR Supplement. Unpublished  -
 ** rights reserved under the Copyright Laws of the United States.
 **
-** $Revision: 1.1.1.1 $
-** $Date: 2000/08/03 00:27:20 $
+** $Revision: 1.1.1.1.6.2 $
+** $Date: 2005/08/13 21:07:04 $
 **
 */
 
@@ -49,7 +49,7 @@ typedef struct _rgtHeader{
 
 
 
-static void swapShorts(unsigned short *array, long length)
+static void swapShorts(unsigned short *array, int length)
 {
     unsigned short s;
     while (length--) {
@@ -58,7 +58,8 @@ static void swapShorts(unsigned short *array, long length)
     }
 }
 
-static void swapLongs(unsigned int *array, long length)
+#if 0 /* not used */
+static void swapLongs(unsigned int *array, int length)
 {
     unsigned int s;
     while (length--) {
@@ -67,9 +68,10 @@ static void swapLongs(unsigned int *array, long length)
                         ((s&0xFF00) << 8) | (s>>24);
     }
 }
+#endif
 
 // just swap RGB into BGR (leave MSB undefined)
-static void swapRGB(unsigned int *array, long length)
+static void swapRGB(unsigned int *array, int length)
 {
     unsigned int s;
     while (length--) {
@@ -161,7 +163,7 @@ _txReadRGTData( FILE *stream, TxMip *info)
 
 #if 1
         if (swap) {
-            swapRGB((unsigned int *)data32, (long)info->width);
+            swapRGB((unsigned int *)data32, (int)info->width);
         }
 #endif
 

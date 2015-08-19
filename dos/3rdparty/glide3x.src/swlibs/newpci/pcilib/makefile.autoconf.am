@@ -17,19 +17,15 @@
 ##
 ## COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 ##
-## $Revision: 1.1.8.1 $
-## $Date: 2003/07/29 10:05:04 $
+## $Revision: 1.1.8.2 $
+## $Date: 2004/01/25 11:02:51 $
 ##
-if GLIDE_DEBUG
-GLIDE_DEBUG_DEFS = -DGDBG_INFO_ON
-endif
 
 if DRI_BUILD
 DRI_BUILD_VDEFS = -DDRI_BUILD
 endif
 
 VDEFS            = $(DRI_BUILD_VDEFS)
-LDEFS            = $(GLIDE_DEBUG_DEFS)
 
 noinst_HEADERS         = fxpci.h sst1_pci.h pcilib.h
 noinst_LTLIBRARIES     = libfxpci.la

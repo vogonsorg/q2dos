@@ -17,7 +17,7 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  *
- ** $Header: /cvsroot/glide/glide3x/h5/glide3/src/fifo.c,v 1.4.4.5 2003/07/25 07:14:58 dborca Exp $
+ ** $Header: /cvsroot/glide/glide3x/h5/glide3/src/fifo.c,v 1.4.4.12 2005/08/13 21:07:03 jwrdegoede Exp $
  ** $Log:
  **  14   3dfx      1.8.1.2.1.1 10/11/00 Brent           Forced check in to enforce
  **       branching.
@@ -502,7 +502,7 @@ static const char * h3SstIORegNames[] = {
 } ;
 
 
-#define GEN_INDEX(a) ((((FxU32) a) - ((FxU32) gc->reg_ptr)) >> 2)
+#define GEN_INDEX(a) ((((unsigned long) a) - ((unsigned long) gc->reg_ptr)) >> 2)
 #endif /* GDBG_INFO_ON || _FIFODUMP */
 
 #if GDBG_INFO_ON
@@ -621,8 +621,6 @@ _grErrorCallback(const char* const procName,
                  const char* const format,
                  va_list           args)
 {
-  GR_DCL_GC;
-  
   static FxBool inProcP = FXFALSE;
 
   if (!inProcP) {
@@ -633,7 +631,7 @@ _grErrorCallback(const char* const procName,
       extern void (*GrErrorCallback)( const char *string, FxBool fatal );
 
       vsprintf(errMsgBuf, format, args);
-      (*GrErrorCallback)(errMsgBuf, (GETENV("FX_ERROR_FAIL", gc->bInfo->RegPath) != NULL));
+      (*GrErrorCallback)(errMsgBuf, (GETENV("FX_ERROR_FAIL") != NULL));
     }
     inProcP = FXFALSE;
   }
@@ -791,13 +789,11 @@ void
 _FifoFlush( void ) 
 {
 #define FN_NAME "_FifoFlush"
-  GR_DCL_GC;
-  
   _grCommandTransportMakeRoom(0, __FILE__, __LINE__);
 #undef FN_NAME
 } /* _FifoFlush */
 
-FxU32 _grHwFifoPtrSlave(FxU32 slave, FxBool ignored);
+unsigned long _grHwFifoPtrSlave(FxU32 slave, FxBool ignored);
 
 void FX_CALL
 _grCommandTransportMakeRoom(const FxI32 blockSize, const char* fName, const int fLine)
@@ -807,7 +803,7 @@ _grCommandTransportMakeRoom(const FxI32 blockSize, const char* fName, const int 
   GR_BEGIN_NOFIFOCHECK(FN_NAME"()\n", 400);
 
   if ( gc->windowed ) {
-#if defined(GLIDE_INIT_HWC) && !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !defined(__DJGPP__)
+#if defined(GLIDE_INIT_HWC) && !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !(GLIDE_PLATFORM & GLIDE_OS_DOS32)
     struct cmdTransportInfo*
       gcFifo = &gc->cmdTransportInfo;
     HwcWinFifo 
@@ -933,20 +929,22 @@ _grCommandTransportMakeRoom(const FxI32 blockSize, const char* fName, const int 
     }
     
     GR_SET_FIFO_PTR( 0, 0 );
-#endif /* defined(GLIDE_INIT_HWC) && !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !defined(__DJGPP__) */
+#endif /* defined(GLIDE_INIT_HWC) && !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !defined(GLIDE_PLATFORM & GLIDE_OS_DOS32) */
   } else {
     /* Check here to see if we have a valid context since the last time
      * we checked. This is to protect us from loosing our context before
      * we wrap check the current hw fifo pointer which is going to be the
      * 2d driver's fifo if we lost our context.
      */
-#if defined(GLIDE_INIT_HWC) && !(GLIDE_PLATFORM & GLIDE_OS_UNIX)
+#if defined(GLIDE_INIT_HWC) && GLIDE_CHECK_CONTEXT
     gc->contextP = !(*gc->lostContext) ;
-#else /* defined(GLIDE_INIT_HWC) && !(GLIDE_PLATFORM & GLIDE_OS_UNIX) */
+#else  /* defined(GLIDE_INIT_HWC) && GLIDE_CHECK_CONTEXT */
     gc->contextP = 1; /* always has context in CSIM */
-#endif /* defined(GLIDE_INIT_HWC) && !(GLIDE_PLATFORM & GLIDE_OS_UNIX) */
+#endif /* defined(GLIDE_INIT_HWC) && GLIDE_CHECK_CONTEXT */
     if (gc->contextP) {
+#if 0
       FxU32 wrapAddr = 0x00UL;
+#endif
       FxU32 checks;
 
 #if TACO_MEMORY_FIFO_HACK
@@ -1011,11 +1009,11 @@ _grCommandTransportMakeRoom(const FxI32 blockSize, const char* fName, const int 
   again:
       /* do we need to stall? */
       {
-        FxU32 lastHwRead = gc->cmdTransportInfo.fifoRead;
+        unsigned long lastHwRead = gc->cmdTransportInfo.fifoRead;
         FxI32 roomToReadPtr = gc->cmdTransportInfo.roomToReadPtr;
         
         while (roomToReadPtr < blockSize) {
-          FxU32 curReadPtr = HW_FIFO_PTR(FXTRUE);
+          unsigned long curReadPtr = HW_FIFO_PTR(FXTRUE);
           FxU32 curReadDist = curReadPtr - lastHwRead;
 
           /* Handle slave chips.  This code lifted from cvg and modified
@@ -1023,13 +1021,13 @@ _grCommandTransportMakeRoom(const FxI32 blockSize, const char* fName, const int 
           if(gc->chipCount > 1) {
             FxU32 slave;
             for(slave = 1; slave < gc->chipCount; slave++) {              
-              const FxU32 slaveReadPtr = _grHwFifoPtrSlave(slave, 0);
+              const unsigned long slaveReadPtr = _grHwFifoPtrSlave(slave, 0);
               const FxU32 slaveReadDist = (slaveReadPtr - lastHwRead);
               FxI32 distSlave = (FxI32)slaveReadDist;
               FxI32 distMaster = (FxI32)curReadDist;
 
-              GR_ASSERT((slaveReadPtr >= (FxU32)gc->cmdTransportInfo.fifoStart) &&
-                        (slaveReadPtr < (FxU32)gc->cmdTransportInfo.fifoEnd));
+              GR_ASSERT((slaveReadPtr >= (unsigned long)gc->cmdTransportInfo.fifoStart) &&
+                        (slaveReadPtr < (unsigned long)gc->cmdTransportInfo.fifoEnd));
           
               /* Get the actual absolute distance to the respective fifo ptrs */
               if (distSlave < 0) distSlave += (FxI32)gc->cmdTransportInfo.fifoSize - FIFO_END_ADJUST;
@@ -1105,8 +1103,8 @@ _grCommandTransportMakeRoom(const FxI32 blockSize, const char* fName, const int 
             checks = 0;
           }
 #endif /* GLIDE_DEBUG */
-          GR_ASSERT((curReadPtr >= (FxU32)gc->cmdTransportInfo.fifoStart) &&
-                    (curReadPtr < (FxU32)gc->cmdTransportInfo.fifoEnd));
+          GR_ASSERT((curReadPtr >= (unsigned long)gc->cmdTransportInfo.fifoStart) &&
+                    (curReadPtr < (unsigned long)gc->cmdTransportInfo.fifoEnd));
               
           roomToReadPtr += curReadDist;
               
@@ -1165,8 +1163,10 @@ _grCommandTransportMakeRoom(const FxI32 blockSize, const char* fName, const int 
         }
           
         P6FENCE;
-    
+
+#if 0
         wrapAddr = (FxU32)gc->cmdTransportInfo.fifoPtr;
+#endif
           
         /* Update roomXXX fields for the actual wrap */
         gc->cmdTransportInfo.roomToReadPtr -= gc->cmdTransportInfo.roomToEnd;
@@ -1244,10 +1244,10 @@ _grH3FifoDump_Linear(const FxU32* const linearPacketAddr)
 }
 
 
-FxU32
+unsigned long
 _grHwFifoPtr(FxBool ignored)
 {
-  FxU32 rVal = 0;
+  unsigned long rVal = 0;
 
   FxU32 status, readPtrL1, readPtrL2;
   FxU32 chip ; /* AJB SLI MAYHEM */
@@ -1306,7 +1306,7 @@ _grHwFifoPtr(FxBool ignored)
         readPtrL2 = GET(gc->cRegs->cmdFifo0.readPtrL);
       } while (readPtrL1 != readPtrL2);
     }
-    rVal = (((FxU32)gc->cmdTransportInfo.fifoStart) + 
+    rVal = (((unsigned long)gc->cmdTransportInfo.fifoStart) + 
             readPtrL2 - 
             (FxU32)gc->cmdTransportInfo.fifoOffset);
   }
@@ -1314,11 +1314,9 @@ _grHwFifoPtr(FxBool ignored)
 } /* _grHwFifoPtr */
 
 
-FxU32
+unsigned long
 _grHwFifoPtrSlave(FxU32 slave, FxBool ignored)
 {
-  FxU32 rVal = 0;
-
   FxU32 status, readPtrL1, readPtrL2;
   GR_DCL_GC;
 
@@ -1332,11 +1330,8 @@ _grHwFifoPtrSlave(FxU32 slave, FxBool ignored)
     readPtrL2 = GET(gc->slaveCRegs[slave-1]->cmdFifo0.readPtrL);
   } while (readPtrL1 != readPtrL2);
 
-  rVal = (((FxU32)gc->cmdTransportInfo.fifoStart) + 
-          readPtrL2 - 
-          (FxU32)gc->cmdTransportInfo.fifoOffset);
-  
-  return rVal;
+  return (((unsigned long)gc->cmdTransportInfo.fifoStart) + 
+    readPtrL2 - gc->cmdTransportInfo.fifoOffset);
 } /* _grHwFifoPtr */
 
 
@@ -1349,17 +1344,22 @@ _fifoAssertFull( void )
   
   if ( !gc->windowed ) {
     if ((gFifoCheckCount++ & kFifoCheckMask) == 0) {
+#if GLIDE_INIT_HAL
       const FxU32 cmdFifoDepth = GR_GET(((SstRegs*)(gc->reg_ptr))->cmdFifoDepth);
+#else
+      /* [dBorca] gc->reg_ptr == NULL if not GLIDE_INIT_HAL */
+      const FxU32 cmdFifoDepth = GR_GET(((SstRegs*)(gc->sstRegs))->cmdFifoDepth);
+#endif
       const FxU32 maxFifoDepth = ((gc->cmdTransportInfo.fifoSize - FIFO_END_ADJUST) >> 2);
-      if(cmdFifoDepth > maxFifoDepth) { 
+      if(cmdFifoDepth > maxFifoDepth) {
         GDBG_PRINTF("cmdFifoDepth > size: 0x%X : 0x%Xn", 
                     cmdFifoDepth, maxFifoDepth); 
-        ASSERT_FAULT_IMMED(cmdFifoDepth <= maxFifoDepth); 
-      } else if (cmdFifoDepth + (gc->cmdTransportInfo.fifoRoom >> 2) > maxFifoDepth) { 
+        ASSERT_FAULT_IMMED(cmdFifoDepth <= maxFifoDepth);
+      } else if (cmdFifoDepth + (gc->cmdTransportInfo.fifoRoom >> 2) > maxFifoDepth) {
         GDBG_PRINTF("cmdFifoDepth + fifoRoom > size: (0x%X : 0x%X) : 0x%Xn", 
                     cmdFifoDepth, (gc->cmdTransportInfo.fifoRoom >> 2), maxFifoDepth); 
-        ASSERT_FAULT_IMMED(cmdFifoDepth + (gc->cmdTransportInfo.fifoRoom >> 2) <= maxFifoDepth); 
-      } 
+        ASSERT_FAULT_IMMED(cmdFifoDepth + (gc->cmdTransportInfo.fifoRoom >> 2) <= maxFifoDepth);
+      }
     } 
     ASSERT_FAULT_IMMED(HW_FIFO_PTR(FXTRUE) >= (FxU32)gc->cmdTransportInfo.fifoStart); 
     ASSERT_FAULT_IMMED(HW_FIFO_PTR(FXTRUE) < (FxU32)gc->cmdTransportInfo.fifoEnd); 
@@ -1443,7 +1443,7 @@ _grImportFifo(int fifoPtr, int fifoRead) {
   GR_DCL_GC;
 
 #if 1
-  int dummy, d;
+  FxU32 dummy, d;
 
   do {
     dummy=GET(gc->cRegs->cmdFifo0.depth);
@@ -1456,13 +1456,13 @@ _grImportFifo(int fifoPtr, int fifoRead) {
   gcFifo=&gc->cmdTransportInfo;
   readPos=readPos-gcFifo->fifoOffset;
   gcFifo->fifoPtr = gcFifo->fifoStart + (readPos>>2);
-  gcFifo->fifoRead = (FxU32)gcFifo->fifoPtr;
+  gcFifo->fifoRead = (unsigned long)gcFifo->fifoPtr;
 #else
   gcFifo=&gc->cmdTransportInfo;
   gcFifo->fifoPtr = gc->rawLfb+(fifoPtr>>2);
   gcFifo->fifoRead = ((int)gc->rawLfb)+fifoRead;
 #endif
-  gcFifo->roomToReadPtr = gcFifo->fifoRead-((int)gcFifo->fifoPtr)-FIFO_END_ADJUST-sizeof(FxU32);
+  gcFifo->roomToReadPtr = gcFifo->fifoRead-((long)gcFifo->fifoPtr)-FIFO_END_ADJUST-sizeof(FxU32);
   if (gcFifo->roomToReadPtr<0) gcFifo->roomToReadPtr+=gcFifo->fifoSize;
   gcFifo->roomToEnd = gcFifo->fifoSize - 
     ((gcFifo->fifoPtr-gcFifo->fifoStart)<<2) -
@@ -1480,7 +1480,7 @@ _grExportFifo(int *fifoPtr, int *fifoRead) {
   GR_DCL_GC;
   gcFifo=&gc->cmdTransportInfo;
   *fifoPtr=(gcFifo->fifoPtr-gc->rawLfb)<<2;
-  *fifoRead=(gcFifo->fifoRead-(int)gc->rawLfb);
+  *fifoRead=(gcFifo->fifoRead-(long)gc->rawLfb);
 }
 
 int

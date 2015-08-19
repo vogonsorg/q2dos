@@ -17,8 +17,8 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Revision: 1.2 $
-** $Date: 2000/06/15 00:11:40 $
+** $Revision: 1.2.6.2 $
+** $Date: 2005/06/09 18:32:40 $
 */
 
 #ifndef __TEXUS_H__
@@ -38,8 +38,8 @@ extern "C" {
 typedef unsigned char   FxU8;
 typedef unsigned short  FxU16;
 typedef short           FxI16;
-typedef unsigned long   FxU32;
-typedef long            FxI32;
+typedef unsigned int    FxU32;
+typedef int             FxI32;
 typedef int             FxBool;
 
 /*

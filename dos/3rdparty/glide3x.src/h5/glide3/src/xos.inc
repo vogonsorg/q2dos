@@ -1,10 +1,11 @@
 ;
-; compulsory header for h5/glide3/xdraw* assembly specializations (NASM)
+; compulsory header for glide3/xdraw* assembly specializations (NASM)
 ;
-; $Header: /cvsroot/glide/glide3x/h5/glide3/src/Attic/xos.inc,v 1.1.2.2 2003/06/13 07:22:59 dborca Exp $
+; $Header: /cvsroot/glide/glide3x/h5/glide3/src/Attic/xos.inc,v 1.1.2.6 2004/10/05 14:50:54 dborca Exp $
 ; $Log: xos.inc,v $
-; Revision 1.1.2.2  2003/06/13 07:22:59  dborca
-; more fixes to NASM sources
+; Revision 1.1.2.6  2004/10/05 14:50:54  dborca
+; removed misplaced else
+;
 ;
 ; Revision 1.1.2.1  2003/06/07 09:53:25  dborca
 ; initial checkin for NASM sources
@@ -16,8 +17,10 @@
 %define XOS_DJGPP 1
 %define XOS_LINUX 2
 %define XOS_WIN32 4
+%define XOS_WATCD 8
 
 %define STDCALL   0
+%define ELFTYPE   0
 
 ;---------------------------------------
 ; pick up the right OS
@@ -26,8 +29,13 @@
 %define XOS XOS_DJGPP
 %elifdef __linux__
 %define XOS XOS_LINUX
+%define ELFTYPE 1
 %elifdef __WIN32__
 %define XOS XOS_WIN32
+%define STDCALL 1
+%define USE_STANDARD_TLS_FUNC 0
+%elifdef __WATCOMD__
+%define XOS XOS_WATCD
 %define STDCALL 1
 %else
 %error Unknown OS
@@ -37,14 +45,14 @@
 ; general purpose macros
 ;---------------------------------------
 %macro	extrn	1-2 0
-	%if (XOS == XOS_WIN32) && STDCALL && (%2 > 0)
+	%if STDCALL && (%2 > 0)
 		%define %1 %1@%2
 	%endif
 		extern	%1
 %endmacro
 
 %macro	globl	1-2 0
-	%if (XOS == XOS_WIN32) && STDCALL && (%2 > 0)
+	%if STDCALL && (%2 > 0)
 		%define %1 %1@%2
 	%endif
 		global	%1
@@ -57,7 +65,11 @@
 	%else
 		%define	%$ret	RET
 	%endif
-	globl	%1, %2
+	%if ELFTYPE
+		globl	%1:function, %2
+	%else
+		globl	%1, %2
+	%endif
 %1:
 %endmacro
 
@@ -98,6 +110,23 @@
 %define DATA  .data   align=32
 %define CONST .rdata  align=32
 
+%if USE_STANDARD_TLS_FUNC == 1
+
+extrn getThreadValue
+
+%macro SET_TLSBASE 1
+%endmacro
+
+%macro SET_TLSOFFSET 1
+%endmacro
+
+%macro GET_GC 2
+	call	getThreadValue
+	mov	gc, eax
+%endmacro
+
+%else
+
 %macro SET_TLSBASE 1
 	mov	%1, dword [fs:18h] ; get thread local storage base pointer
 %endmacro
@@ -109,6 +138,8 @@
 %macro GET_GC 2
 	mov	gc, [%1 + %2]
 %endmacro
+
+%endif
 
 %endif
 
@@ -154,6 +185,29 @@ extrn threadValueLinux
 
 %macro GET_GC 2
 	mov	gc, [threadValueLinux]
+%endmacro
+
+%endif
+
+;---------------------------------------
+; WATCOM/DOS
+;---------------------------------------
+%if XOS == XOS_WATCD
+
+%define TEXT  _TEXT	align=1 public use32 class=CODE FLAT
+%define DATA  _DATA	align=4 public use32 class=DATA FLAT
+%define CONST CONST2	align=4 public use32 class=DATA FLAT
+
+extrn threadValueDJGPP
+
+%macro SET_TLSBASE 1
+%endmacro
+
+%macro SET_TLSOFFSET 1
+%endmacro
+
+%macro GET_GC 2
+	mov	gc, [threadValueDJGPP]
 %endmacro
 
 %endif

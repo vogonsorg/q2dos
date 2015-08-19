@@ -20,8 +20,8 @@
 **
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
 **
-** $Revision: 1.3.4.5 $
-** $Date: 2003/07/24 03:53:02 $
+** $Revision: 1.3.4.7 $
+** $Date: 2005/06/09 18:32:34 $
 **
 **
 ** $Log: 
@@ -71,7 +71,7 @@ static char gdbg_debuglevel[GDBG_MAX_LEVELS];   // array of debuglevel controls
 
 static long gdbg_errors = 0;
 
-#if defined(HWC_EXT_INIT) || defined(__DJGPP__) || (GLIDE_PLATFORM & GLIDE_OS_UNIX)
+#if defined(HWC_EXT_INIT) || (GLIDE_PLATFORM & GLIDE_OS_DOS32) || (GLIDE_PLATFORM & GLIDE_OS_UNIX)
 char *hwcGetenv (const char *a);
 /*#ifdef GETENV
 #undef GETENV
@@ -141,22 +141,28 @@ FILE *gdbg_msgfile = INITIAL_STATIC_GDBG_MSGFILE;     // GDBG info/error file
 //----------------------------------------------------------------------
 static const char *setRange(const char *buf, int val)
 {
-    int r0,r1,pos;
+    int r0,r1,pos=0;
 
-    sscanf(buf,"%i%n",&r0,&pos);                // parse the first integer
-    if (buf[pos]=='-' || buf[pos]==':') {       // if there's a second
-        buf += pos+1;
-        sscanf(buf,"%i%n",&r1,&pos);            // then parse it
+    if (sscanf(buf,"%i%n",&r0,&pos) >= 1)       // parse the first integer
+    {
+      if (buf[pos]=='-' || buf[pos]==':') {     // if there's a second
+          buf += pos+1;
+          if (sscanf(buf,"%i%n",&r1,&pos) < 1)  // then parse it
+          {
+             r1 = r0;
+             pos = 0;
+          }
+      }
+      else
+          r1 = r0;
+
+      if (r0 < 0) r0 = 0;                         // sanity checks
+      if (r1 >= GDBG_MAX_LEVELS) r1 = GDBG_MAX_LEVELS-1;
+      if (r1 < r0) r1 = r0;
+
+      while (r0 <= r1)                            // now set the debuglevel levels
+          gdbg_debuglevel[r0++] = val;
     }
-    else
-        r1 = r0;
-
-    if (r0 < 0) r0 = 0;                         // sanity checks
-    if (r1 >= GDBG_MAX_LEVELS) r1 = GDBG_MAX_LEVELS-1;
-    if (r1 < r0) r1 = r0;
-
-    while (r0 <= r1)                            // now set the debuglevel levels
-        gdbg_debuglevel[r0++] = val;
 
     return buf + pos;                           // and return rest of string
 }

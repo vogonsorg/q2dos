@@ -15,8 +15,8 @@
 ** successor clauses in the FAR, DOD or NASA FAR Supplement. Unpublished  -
 ** rights reserved under the Copyright Laws of the United States.
 **
-** $Revision: 1.2 $
-** $Date: 2000/08/07 15:24:44 $
+** $Revision: 1.2.6.1 $
+** $Date: 2005/08/13 21:07:04 $
 */
 
 #include <stdio.h>
@@ -156,14 +156,14 @@ txGCD(int a, int b)
 }
 
 void
-txYABtoPal256(long *palette, const long* yabTable)
+txYABtoPal256(int *palette, const int* yabTable)
 {
         // Convert YAB table to a 256 color palette 
         // Assume yabTable[] has first 16Y's, 12 A's, 12 B's
 
-        const   long    *Y = yabTable;
-        const   long    *A = yabTable + 16;
-        const   long    *B = yabTable + 16 + 12;
+        const   int    *Y = yabTable;
+        const   int    *A = yabTable + 16;
+        const   int    *B = yabTable + 16 + 12;
         int             i;
 
         for (i=0; i<256; i++) {
@@ -288,7 +288,7 @@ int     _explode3[255+256] = {
 int  *explode3 = &_explode3[255];
 
 int
-txNearestColor(long ir, long ig, long ib, const FxU32 *pal, int ncolors)
+txNearestColor(int ir, int ig, int ib, const FxU32 *pal, int ncolors)
 {
         int             i, d; 
         int             mindist, minpos;                // closest distance to input

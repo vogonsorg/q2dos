@@ -18,7 +18,7 @@
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
 **
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gerror.c,v 1.3.4.5 2003/07/25 07:13:41 dborca Exp $
+** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gerror.c,v 1.3.4.7 2005/05/25 08:56:26 jwrdegoede Exp $
 ** $Log: 
 **  6    3dfx      1.1.1.2.1.0 10/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -209,38 +209,28 @@ GR_DIENTRY(grErrorSetCallback, void,
   GrErrorCallback = function;
 }
 
-#ifdef __WIN32__
 void
 _grErrorDefaultCallback( const char *s, FxBool fatal )
 {
   if ( fatal ) {
     GDBG_ERROR("glide", s);
     grGlideShutdown();
+
+#ifdef __WIN32__
     MessageBox(NULL, s, NULL, MB_OK);
     exit(1);
-  }
-}
-#else
-void
-_grErrorDefaultCallback( const char *s, FxBool fatal )
-{
-  if ( fatal ) {
-    GDBG_ERROR("glide",s);
-    grGlideShutdown();
+#elif (GLIDE_PLATFORM & GLIDE_OS_MACOS)
+    {
+       //Str255 errBuf;
 
-#if (GLIDE_PLATFORM & GLIDE_OS_MACOS)
-                {
-                        //Str255 errBuf;
-                        
-                        //errBuf[0] = sprintf((char*)(errBuf + 1), "%s", s);
-                        //DebugStr(errBuf);
-                        ErrorMacCallback(s);
-                        ExitToShell();
-                }
+       //errBuf[0] = sprintf((char*)(errBuf + 1), "%s", s);
+       //DebugStr(errBuf);
+       ErrorMacCallback(s);
+       ExitToShell();
+    }
 #endif /* (GLIDE_PLATFORM * GLIDE_OS_MACOS) */
   }
 }
-#endif
 
 void
 _grAssert(char *exp, char *fileName, int lineNo)
@@ -273,7 +263,7 @@ _grAssert(char *exp, char *fileName, int lineNo)
     
     GDBG_PRINTF("Command Fifo:\n");
     GDBG_PRINTF("\tSoftware:\n");
-    GDBG_PRINTF("\t\tfifoPtr:           0x%X\n", (FxU32)gc->cmdTransportInfo.fifoPtr - (FxU32) gc->rawLfb);
+    GDBG_PRINTF("\t\tfifoPtr:           0x%lX\n", (unsigned long)gc->cmdTransportInfo.fifoPtr - (unsigned long)gc->rawLfb);
     GDBG_PRINTF("\t\tfifoOffset:        0x%X\n", gc->cmdTransportInfo.fifoOffset); 
     GDBG_PRINTF("\t\tfifoEnd:           0x%X\n", gc->cmdTransportInfo.fifoEnd - gc->rawLfb);
     GDBG_PRINTF("\t\tfifoSize:          0x%X\n", gc->cmdTransportInfo.fifoSize); 
@@ -283,7 +273,7 @@ _grAssert(char *exp, char *fileName, int lineNo)
 
     if ( !gc->windowed ) {
       GDBG_PRINTF("\tHardware:\n");
-      GDBG_PRINTF("\t\treadPtrL:          0x%X\n", HW_FIFO_PTR(FXTRUE) - (FxU32)gc->rawLfb);
+      GDBG_PRINTF("\t\treadPtrL:          0x%lX\n", HW_FIFO_PTR(FXTRUE) - (unsigned long)gc->rawLfb);
       GDBG_PRINTF("\t\tdepth:             0x%X\n", GR_CAGP_GET(depth));
       GDBG_PRINTF("\t\tholeCount:         0x%X\n", GR_CAGP_GET(holeCount));
       GDBG_PRINTF("\t\tbaseAddrL:         0x%X\n", GR_CAGP_GET(baseAddrL));

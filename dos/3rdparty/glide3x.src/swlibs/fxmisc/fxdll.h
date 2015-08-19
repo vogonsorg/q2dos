@@ -17,8 +17,8 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Revision: 1.2.8.2 $
-** $Date: 2003/08/04 12:43:27 $
+** $Revision: 1.2.8.3 $
+** $Date: 2004/07/12 17:41:24 $
 */
 /* preprocessor defines for libraries to support DLL creation */
 
@@ -90,8 +90,13 @@
   #endif /* FX_DLL_ENABLE */
 
 #else /* FX_DLL_DEFINITION */
-  #define FX_ENTRY extern
-  #define FX_CALL __stdcall
+  #if defined(__MSC__)
+    #define FX_ENTRY __declspec( dllimport )
+    #define FX_CALL __stdcall
+  #else
+    #define FX_ENTRY extern
+    #define FX_CALL __stdcall
+  #endif
 #endif /* FX_DLL_DEFINITION */
 
 /*

@@ -18,15 +18,18 @@ dnl Process this file with autoconf to produce a configure script.
 #
 # COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 #
-# $Revision: 1.8.4.4 $
-# $Date: 2003/08/22 05:29:58 $
+# $Revision: 1.8.4.7 $
+# $Date: 2005/04/23 21:53:52 $
 #
-AC_INIT(h5/glide3/src/glfb.c)
-AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE(glide, 3.0)
-AM_CONFIG_HEADER(swlibs/include/config.h)
+AC_INIT([glide], [3.0])
+AC_PREREQ(2.53)
+AC_CONFIG_SRCDIR([h5/glide3/src/glfb.c])
 AC_PREFIX_DEFAULT([/usr])
+AC_CANONICAL_TARGET([])
 includedir='${prefix}/include/glide3'
+AM_INIT_AUTOMAKE([foreign 1.7])
+AM_MAINTAINER_MODE
+AM_CONFIG_HEADER([swlibs/include/config.h])
 #
 # Variables local to the build.
 #
@@ -56,7 +59,7 @@ AC_SUBST(FX_GLIDE_HW)
 #
 AC_ARG_ENABLE([fx-dri-build],
               [dnl
-  --enable-fx-build-dri       Build for DRI. [default=yes]],
+  --enable-fx-dri-build       Build for DRI. [default=yes]],
               [case ${enableval} in
                true|yes)
                    DRI_BUILD=true
@@ -65,7 +68,7 @@ AC_ARG_ENABLE([fx-dri-build],
                    DRI_BUILD=false
                    ;;
                *)
-                   AC_MSG_ERROR([Illegal value (${enableval}) for --enable-fx-build-dri])
+                   AC_MSG_ERROR([Illegal value (${enableval}) for --enable-fx-dri-build])
                    ;;
                esac],[DRI_BUILD=true])
 AM_CONDITIONAL(DRI_BUILD,test x$DRI_BUILD = xtrue)
@@ -198,7 +201,7 @@ AC_ARG_ENABLE([build-architecture],
               [dnl
   --enable-build-architecture Enable AMD 3DNow instructions [default=current]],
               [case ${enableval} in
-               i[3456]86|alpha)
+               i[[3456]]86|alpha)
                    FX_GLIDE_BUILD_ARCHITECTURE=${enableval}
                    ;;
                *)
@@ -277,7 +280,7 @@ AM_CONDITIONAL(DRI_BUILD,dnl
 dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_CPP
-AC_CHECK_TOOL(AS, as, false)
+AM_PROG_AS
 AC_CHECK_TOOL(OBJDUMP, objdump, false)
 AC_CHECK_TOOL(DLLTOOL, dlltool, false)
 AC_CHECK_TOOL(CP, cp, false)
@@ -316,7 +319,7 @@ dnl     o $makefile.in
 dnl     o swlibs/include/make/makefile.autoconf.bottom
 dnl where $makefile is the makefile name.
 dnl
-AC_OUTPUT(build.3dfx
+AC_CONFIG_FILES([build.3dfx
           makefile.autoconf:makefile.autoconf.in:swlibs/include/make/makefile.autoconf.bottom
           cvg/makefile.autoconf:cvg/makefile.autoconf.in:swlibs/include/make/makefile.autoconf.bottom
           cvg/incsrc/makefile.autoconf:cvg/incsrc/makefile.autoconf.in:swlibs/include/make/makefile.autoconf.bottom
@@ -341,6 +344,7 @@ AC_OUTPUT(build.3dfx
           swlibs/texus/lib/makefile.autoconf:swlibs/texus/lib/makefile.autoconf.in:swlibs/include/make/makefile.autoconf.bottom
           swlibs/texus2/makefile.autoconf:swlibs/texus2/makefile.autoconf.in:swlibs/include/make/makefile.autoconf.bottom
           swlibs/texus2/lib/makefile.autoconf:swlibs/texus2/lib/makefile.autoconf.in:swlibs/include/make/makefile.autoconf.bottom
-          swlibs/texus2/cmd/makefile.autoconf:swlibs/texus2/cmd/makefile.autoconf.in:swlibs/include/make/makefile.autoconf.bottom,
-	  [chmod +x build.3dfx]
-          )
+          swlibs/texus2/cmd/makefile.autoconf:swlibs/texus2/cmd/makefile.autoconf.in:swlibs/include/make/makefile.autoconf.bottom
+          ], [chmod +x build.3dfx])
+AC_OUTPUT
+

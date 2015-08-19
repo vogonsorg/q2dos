@@ -57,7 +57,7 @@ typedef FxU8  GrAlpha_t;
 typedef FxU32 GrMipMapId_t;
 typedef FxU32 GrStipplePattern_t;
 typedef FxU8  GrFog_t;
-typedef FxU32 GrContext_t;
+typedef unsigned long GrContext_t;
 typedef int (FX_CALL *GrProc)();
 
 /*
@@ -529,7 +529,7 @@ typedef struct {
 
 typedef GrResolution GlideResolution;
 
-#define GR_QUERY_ANY  ((FxU32)(~0))
+#define GR_QUERY_ANY -1
 
 typedef FxU32 GrLfbSrcFmt_t;
 #define GR_LFB_SRC_FMT_565          0x00

@@ -17,7 +17,7 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/xtexdl_def.c,v 1.3.4.2 2003/06/05 08:23:57 koolsmoky Exp $
+** $Header: /cvsroot/glide/glide3x/h5/glide3/src/xtexdl_def.c,v 1.3.4.7 2005/06/09 18:32:33 jwrdegoede Exp $
 ** $Log: 
 **  7    3dfx      1.4.1.0.1.0 10/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -90,48 +90,26 @@ _grTexDownload_Default_4_4(struct GrGC_s* gc, const FxU32 tmuBaseAddr,
                            const FxI32 maxS, const FxI32 minT,
                            const FxI32 maxT, void* texData)
 {
-/* for DXT1 8*4 mipmaps */
+/* for DXT1 4*4 mipmaps */
 #define FN_NAME "_grTexDownload_Default_4_4"
-#if 0
-  const FxU16
-    *src16  = (const FxU16*)texData;
-  FxI32 
-    t = minT;
-
-  src16++;
-  for (; t <= maxT; t+=4) {
-    FxU32 tex_address = tmuBaseAddr + (t << 2UL), s;
-    LINEAR_WRITE_BEGIN(2, PACKET5_MODE, (FxU32)tex_address, 0x00UL, 0x00UL);
-    for (s = 0; s < 2; s++)  {
-      LINEAR_WRITE_SET(tex_address, (FxU32)(*src16));
-      tex_address++;
-      src16+=4;
-    }
-    LINEAR_WRITE_END();
-  }
-#else
   const FxU32
     *src32  = (const FxU32*)texData;
   FxI32 
     t = minT;
 
-  /* Ok, what we do is write 8 bytes at a time (4 'half' lines) */
-  /* Anyone attempting to do partial DXT1 uploads is a moron */
   for (; t <= maxT; t+=4) {
     FxU32 tex_address = tmuBaseAddr + (t << 2UL);
-    int s;
-
+    FxI32 s;
+    
     LINEAR_WRITE_BEGIN(2, PACKET5_MODE, (FxU32)tex_address, 0x00UL, 0x00UL);
-	for (s=0;s<2;s++)
-	{
-	    const FxU32 t0 = *src32;
-		LINEAR_WRITE_SET(tex_address, t0);
-		tex_address++;
-	    src32++;
-	}
-	LINEAR_WRITE_END();
+    for (s = 0; s < 2; s++) {
+      const FxU32 t0 = *src32;
+      LINEAR_WRITE_SET(tex_address, t0);
+      tex_address++;
+      src32++;
+    }
+    LINEAR_WRITE_END();
   }
-#endif
 #undef FN_NAME
 }
 
@@ -223,8 +201,8 @@ _grTexDownload_Default_8_1(struct GrGC_s* gc, const FxU32 tmuBaseAddr,
     FxI32
       shiftTexel = 0;
     FxU32
-      shiftData,
-      shiftMask;
+      shiftData = 0,
+      shiftMask = 0;
       
     for(; t <= maxT; t++) {
       texData |= (*src8++ << (texShift << 3UL));

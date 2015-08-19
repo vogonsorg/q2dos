@@ -17,7 +17,7 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/distrip.c,v 1.3.4.2 2003/06/05 08:23:51 koolsmoky Exp $
+** $Header: /cvsroot/glide/glide3x/h5/glide3/src/distrip.c,v 1.3.4.5 2005/05/25 08:56:25 jwrdegoede Exp $
 ** $Log: 
 **  3    3dfx      1.0.1.0.1.0 10/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -552,10 +552,12 @@ GR_DIENTRY(grDrawVertexArrayContiguous, void , (FxU32 mode, FxU32 Count, void *p
     else {
       void *b_ptr, *c_ptr;
       while ((int)Count >= 3) {
-        b_ptr = (void *)((FxU32)pointers + stride);
-        c_ptr = (void *)((FxU32)pointers + stride*2);
-        TRISETUP(pointers, b_ptr, c_ptr);
-        pointers = (void *)((FxU32)c_ptr + stride);
+        b_ptr = (void *)((unsigned long)pointers + stride);
+        c_ptr = (void *)((unsigned long)b_ptr + stride);
+        /*TRISETUP(pointers, b_ptr, c_ptr);*/
+        /* Do extra context checking. Fixes GLExcess (Spaceship chase) crash with Mesa. */
+        grDrawTriangle(pointers, b_ptr, c_ptr);
+        pointers = (void *)((unsigned long)c_ptr + stride);
         Count -= 3;
       }
     }

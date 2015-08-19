@@ -14,8 +14,8 @@
 ** successor clauses in the FAR, DOD or NASA FAR Supplement. Unpublished  -
 ** rights reserved under the Copyright Laws of the United States.
 **
-** $Revision: 1.3 $
-** $Date: 2000/08/25 17:33:26 $
+** $Revision: 1.3.6.2 $
+** $Date: 2005/08/13 21:07:04 $
 */
 
 #ifndef __TEXUS_H__
@@ -28,6 +28,8 @@ extern "C" {
 #include <stdlib.h>
 #include <stdio.h>
 #include <3dfx.h>
+#define FX_DLL_DEFINITION
+#include <fxdll.h> 
 
 #ifndef __3DFX_H__
 /*
@@ -36,8 +38,8 @@ extern "C" {
 typedef unsigned char   FxU8;
 typedef unsigned short  FxU16;
 typedef short           FxI16;
-typedef unsigned long   FxU32;
-typedef long            FxI32;
+typedef unsigned int    FxU32;
+typedef int             FxI32;
 typedef int             FxBool;
 
 /*
@@ -274,7 +276,7 @@ FxBool txWrite( Gu3dfInfo *info, FILE *fp, FxU32 flags );
 /*
  * Conversion of a single mip level
  */
-extern void txImgQuantize( char *dst, char *src, 
+FX_ENTRY void FX_CALL txImgQuantize( char *dst, char *src, 
                            int w, int h, 
                            FxU32 format, FxU32 dither);
 

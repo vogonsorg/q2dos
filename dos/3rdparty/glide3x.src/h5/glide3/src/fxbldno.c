@@ -17,7 +17,7 @@
  * 
  * COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  *
- * $Header: /cvsroot/glide/glide3x/h5/glide3/src/fxbldno.c,v 1.3.4.4 2003/08/21 08:49:11 dborca Exp $
+ * $Header: /cvsroot/glide/glide3x/h5/glide3/src/fxbldno.c,v 1.3.4.5 2005/06/09 18:32:31 jwrdegoede Exp $
  * $Log: 
  *  3    3dfx      1.0.1.0.1.0 10/11/00 Brent           Forced check in to enforce
  *       branching.
@@ -39,7 +39,7 @@
 #include <stdio.h>
 #include <time.h>
 
-int main (int argc, char **argv)
+int main (void)
 {
     struct tm	locTime;
     time_t	sysTime;

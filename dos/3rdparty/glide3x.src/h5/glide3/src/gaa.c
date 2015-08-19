@@ -17,7 +17,7 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gaa.c,v 1.3.4.2 2003/06/05 08:23:52 koolsmoky Exp $
+** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gaa.c,v 1.3.4.9 2005/08/13 21:07:03 jwrdegoede Exp $
 ** $Log: 
 **  5    3dfx      1.2.1.0.1.0 10/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -387,9 +387,14 @@ aaVpDrawArrayEdgeSense(float *a, float *b, float *c, float oowa, float oowb)
     v1a = v2a = 0.f;
   }
   else {
+    union { float f; FxU32 u; } va;
     ia = gc->state.vData.pargbInfo.offset;
-    *((FxU32 *)&v1a)=*((FxU32 *)((int)a + ia))&0x00ffffff;
-    *((FxU32 *)&v2a)=*((FxU32 *)((int)b + ia))&0x00ffffff;
+    va.f = *(float *)((unsigned char *)a + ia);
+    va.u &= 0x00ffffff;
+    v1a = va.f;
+    va.f = *(float *)((unsigned char *)b + ia);
+    va.u &= 0x00ffffff;
+    v2a = va.f;
   }
 
   {
@@ -435,7 +440,7 @@ GR_ENTRY(grAADrawTriangle,
   GR_BEGIN_NOFIFOCHECK(FN_NAME, 96);
   GDBG_INFO_MORE(gc->myLevel,"(0x%x,0x%x,0x%x,%d,%d,%d)\n",
                  a,b,c,ab_antialias,bc_antialias,ca_antialias);
-  
+
   GR_FLUSH_STATE();
 
   fbzModeOld = gc->state.shadow.fbzMode;
@@ -445,17 +450,17 @@ GR_ENTRY(grAADrawTriangle,
     ** culling
     */
     float dxAB, dxBC, dyAB, dyBC;
-    FxI32 j;
+    union { float f; FxI32 i; } j;
     dxAB = FARRAY(a, 0) - FARRAY(b, 0);
     dxBC = FARRAY(b, 0) - FARRAY(c, 0);
     
     dyAB = FARRAY(a, 4) - FARRAY(b, 4);
     dyBC = FARRAY(b, 4) - FARRAY(c, 4);
     
-    *(float *)&j = dxAB * dyBC - dxBC * dyAB;
-    if ((j & 0x7FFFFFFF) == 0) 
+    j.f = dxAB * dyBC - dxBC * dyAB;
+    if ((j.i & 0x7FFFFFFF) == 0) 
       return;
-    if ((gc->state.cull_mode != GR_CULL_DISABLE) && (((FxI32)(j ^ (gc->state.cull_mode << 31UL))) >= 0))
+    if ((gc->state.cull_mode != GR_CULL_DISABLE) && (((FxI32)(j.i ^ (gc->state.cull_mode << 31UL))) >= 0))
       return;
   }
 #if __POWERPC__
@@ -466,8 +471,10 @@ GR_ENTRY(grAADrawTriangle,
                 verts[2] = c;
                 (*gc->archDispatchProcs.drawTrianglesProc)(GR_VTX_PTR_ARRAY, 3, verts);
         }
-#else
+#elif defined(__MSC__)
   grDrawTriangle(a, b, c);
+#else
+  (*gc->archDispatchProcs.drawTrianglesProc)(GR_VTX_PTR_ARRAY, 3, (void*)&a);
 #endif
   /* Disable depth buffer writes for edge triangles */
   fbzMode = fbzModeOld;
@@ -490,7 +497,7 @@ GR_ENTRY(grAADrawTriangle,
       aaDrawArrayEdgeSense((float *)c, (float *)a, (float *)b);
   }
   else {
-    float oowa, oowb, oowc;
+    float oowa = 0.0, oowb = 0.0, oowc = 0.0;
     if (ab_antialias) {
       oowa = 1.0f / FARRAY(a, gc->state.vData.wInfo.offset);        
       oowb = 1.0f / FARRAY(b, gc->state.vData.wInfo.offset);        
@@ -586,10 +593,9 @@ _grAADrawPoints(FxI32 mode, FxI32 count, void *pointers)
 #if GLIDE_HW_TRI_SETUP && GLIDE_PACKET3_TRI_SETUP
   GR_DCL_GC;
   float *e, ptX, ptY;
-  FxU32 ia;
-  FxU32 i;
+  FxI32 i, ia;
   FxU32 vsize;
-  FxI32 stride = mode;
+  FxI32 stride;
   FxU32 tmp_cullStripHdr;
 
   GDBG_INFO(94,"_grAADrawPoints(0x%x, %d, 0x%x)\n", mode, count, pointers);
@@ -597,8 +603,10 @@ _grAADrawPoints(FxI32 mode, FxI32 count, void *pointers)
   GDBG_INFO_MORE(gc->myLevel, "(count = %d, pointers = 0x%x)\n",
                  count, pointers);
 
-  if (stride == 0)
+  if (mode == 0)
     stride = gc->state.vData.vStride;
+  else
+    stride = sizeof(float *) / sizeof (float);
 
   GR_FLUSH_STATE();
 
@@ -649,7 +657,7 @@ _grAADrawPoints(FxI32 mode, FxI32 count, void *pointers)
        * the new points.
        */
       {
-        int v;
+        unsigned int v;
         static const float xAdjust[] = {  1.0f, -1.0f, -1.0f, 1.0f,  1.0f };
         static const float yAdjust[] = { -1.0f, -1.0f,  1.0f, 1.0f, -1.0f };
       
@@ -687,11 +695,11 @@ _grAADrawPoints(FxI32 mode, FxI32 count, void *pointers)
             i = gc->tsuDataList[dataElem];
             
             while (i != GR_DLIST_END) {
-              FxU32 argb;
-              
               if (i == ia) {
-                argb = *((FxU32 *)((int)e + i)) & 0x00ffffff;
-                TRI_SETF(*((float *)&argb));
+                union { float f; FxU32 u; } argb;
+                argb.f = *(float *)((unsigned char *)e + i);
+                argb.u &= 0x00ffffff;
+                TRI_SETF(argb.f);
               }
               else {
                 TRI_SETF(FARRAY(e, i));
@@ -715,8 +723,6 @@ _grAADrawPoints(FxI32 mode, FxI32 count, void *pointers)
     float oow;
 
     while (count--) {
-      FxU32 dataElem = 0;
-
       /* We draw this as a 4 triangle fan centered around E. */
       GR_SET_EXPECTED_SIZE(vsize, 1);
       TRI_STRIP_BEGIN(kSetupFan, 
@@ -746,7 +752,7 @@ _grAADrawPoints(FxI32 mode, FxI32 count, void *pointers)
        * the new points.
        */
       {
-        int v;
+        unsigned int v;
         static const float xAdjust[] = {  1.0f, -1.0f, -1.0f, 1.0f,  1.0f };
         static const float yAdjust[] = { -1.0f, -1.0f,  1.0f, 1.0f, -1.0f };
       
@@ -809,30 +815,29 @@ _grAADrawLineStrip(FxI32 mode, FxI32 ltype, FxI32 count, void *pointers)
    */
   GR_DCL_GC;
   float           adx, ady;         /* |dX| and |dY| */
-  float **lPtrs = (float **) pointers;
   float *v1, *v2;
-  float v1a, v2a;
-  FxU32 ia, vNum = 0;
+  float v1a = 0.0f, v2a = 0.0f;
+  FxU32 ia;
   FxU32 vsize;
   FxU32 sCount;
-  FxI32 stride = mode;
+  FxI32 stride;
   FxU32 tmp_cullStripHdr;
 
   GDBG_INFO(95,"_grAADrawLineStrip(count = %d, pointers = 0x%x)\n",
             count, pointers);
 
-  if (gc->state.vData.colorType == GR_FLOAT) {
+  if (gc->state.vData.colorType == GR_FLOAT)
     ia = gc->state.vData.aInfo.offset;
-    v1a = 0.0f;
-    v2a = 0.0f;
-  }
   else
     ia = gc->state.vData.pargbInfo.offset;
 
   GR_FLUSH_STATE();
 
-  if (stride == 0)
+  if (mode == 0)
     stride = gc->state.vData.vStride;
+  else
+    stride = sizeof(float *) / sizeof (float);
+
   if (ltype == GR_LINES)
     sCount = count >> 1; /* line list */
   else
@@ -869,8 +874,13 @@ _grAADrawLineStrip(FxI32 mode, FxI32 ltype, FxI32 count, void *pointers)
         ady = -ady;
       
       if (gc->state.vData.colorType != GR_FLOAT) {
-        *((FxU32 *)&v1a)=*((FxU32 *)((int)v1 + ia))&0x00ffffff;
-        *((FxU32 *)&v2a)=*((FxU32 *)((int)v2 + ia))&0x00ffffff;
+        union { float f; FxU32 u; } va;
+        va.f = *(float *)((unsigned char *)v1 + ia);
+        va.u &= 0x00ffffff;
+        v1a = va.f;
+        va.f = *(float *)((unsigned char *)v2 + ia);
+        va.u &= 0x00ffffff;
+        v2a = va.f;
       }
       
       if (adx >= ady) {           /* X major line */
@@ -1015,7 +1025,7 @@ _grAADrawLineStrip(FxI32 mode, FxI32 ltype, FxI32 count, void *pointers)
     }
   }
   else {
-    float oowa, oowb, owa, owb, tmp1, tmp2, fax, fay, fbx, fby;
+    float oowa, oowb = 0.0f, owa, owb, tmp1, tmp2, fax, fay, fbx, fby;
 
     if (ltype == GR_LINE_STRIP) {
       v1 = (float *)pointers;
@@ -1025,30 +1035,20 @@ _grAADrawLineStrip(FxI32 mode, FxI32 ltype, FxI32 count, void *pointers)
       oowb = 1.0f / FARRAY(v1, gc->state.vData.wInfo.offset);        
     }
     while (sCount--) {
+      v1 = (float *)pointers;
+      v2 = (float *)pointers + stride;
+      if (mode) {
+        v1 = *(float **)v1;
+        v2 = *(float **)v2;
+      }
+      pointers = (float *)pointers + stride;
       if (ltype == GR_LINES) {
-        v1 = (float *)pointers;
-        v2 = (float *)pointers + stride;
-        if (mode) {
-          v1 = *(float **)v1;
-          v2 = *(float **)v2;
-        }
         pointers = (float *)pointers + stride;
-        if (ltype == GR_LINES)
-          pointers = (float *)pointers + stride;
         owa = oowa = 1.0f / FARRAY(v1, gc->state.vData.wInfo.offset);
-        owb = oowb = 1.0f / FARRAY(v2, gc->state.vData.wInfo.offset);
       }
-      else {
+      else
         owa = oowa = oowb;
-        v1 = (float *)pointers;
-        v2 = (float *)pointers + stride;
-        if (mode) {
-          v1 = *(float **)v1;
-          v2 = *(float **)v2;
-        }
-        pointers = (float *)pointers + stride;
-        owb = oowb = 1.0f / FARRAY(v2, gc->state.vData.wInfo.offset);
-      }
+      owb = oowb = 1.0f / FARRAY(v2, gc->state.vData.wInfo.offset);
       
       fay = tmp1 = FARRAY(v1, gc->state.vData.vertexInfo.offset+4)
         *oowa*gc->state.Viewport.hheight+gc->state.Viewport.oy;
@@ -1269,9 +1269,14 @@ aaDrawArrayEdgeSense(float *a, float *b, float *c)
     v1a = v2a = 0.f;
   }
   else {
+    union { float f; FxU32 u; } va;
     ia = gc->state.vData.pargbInfo.offset;
-    *((FxU32 *)&v1a)=*((FxU32 *)((int)a + ia))&0x00ffffff;
-    *((FxU32 *)&v2a)=*((FxU32 *)((int)b + ia))&0x00ffffff;
+    va.f = *(float *)((unsigned char *)a + ia);
+    va.u &= 0x00ffffff;
+    v1a = va.f;
+    va.f = *(float *)((unsigned char *)b + ia);
+    va.u &= 0x00ffffff;
+    v2a = va.f;
   }
 
   {
@@ -1350,7 +1355,7 @@ _grAADrawTriangles(FxI32 mode, FxI32 ttype, FxI32 count, void *pointers)
   float **lPtr = (float **)pointers;
   FxI32 tCount = 3;
   FxU32 fbzModeOld;                 /* Squirrel away current fbzMode */
-  FxI32 stride = mode;
+  FxI32 stride;
   FxI32 xindex = (gc->state.vData.vertexInfo.offset >> 2);
   FxI32 yindex = xindex + 1;
 
@@ -1367,8 +1372,10 @@ _grAADrawTriangles(FxI32 mode, FxI32 ttype, FxI32 count, void *pointers)
   /* gc->state.invalid |= fbzModeBIT; */
   GR_FLUSH_STATE();
 
-  if (stride == 0)
+  if (mode == 0)
     stride = gc->state.vData.vStride;
+  else
+    stride = sizeof(float *) / sizeof (float);
 
   /* backfaced or zero area */
   while (tCount <= count) {
@@ -1523,7 +1530,7 @@ _grAAVpDrawTriangles(FxI32 mode, FxI32 ttype, FxI32 count, void *pointers)
   float **lPtr = (float **)pointers;
   FxI32 tCount = 3;
   FxU32 fbzModeOld;                 /* Squirrel away current fbzMode */
-  FxI32 stride = mode;
+  FxI32 stride;
   FxI32 xindex = (gc->state.vData.vertexInfo.offset >> 2);
   FxI32 yindex = xindex + 1;
 
@@ -1540,8 +1547,10 @@ _grAAVpDrawTriangles(FxI32 mode, FxI32 ttype, FxI32 count, void *pointers)
   /* gc->state.invalid |= fbzModeBIT; */
   GR_FLUSH_STATE();
 
-  if (stride == 0)
+  if (mode == 0)
     stride = gc->state.vData.vStride;
+  else
+    stride = sizeof(float *) / sizeof (float);
 
   /* backfaced or zero area */
   while (tCount <= count) {
@@ -1581,18 +1590,22 @@ _grAAVpDrawTriangles(FxI32 mode, FxI32 ttype, FxI32 count, void *pointers)
         float fay = a[yindex]*oowa*gc->state.Viewport.hheight*gc->state.Viewport.oy;
         float fby = b[yindex]*oowb*gc->state.Viewport.hheight*gc->state.Viewport.oy;
         float fcy = c[yindex]*oowc*gc->state.Viewport.hheight*gc->state.Viewport.oy;
-        int ay = *(int *)&fay;
-        int by = *(int *)&fby;
-        int cy = *(int *)&fcy;
+        union { float f; int i; } ay;
+        union { float f; int i; } by;
+        union { float f; int i; } cy;
         int culltest = gc->state.cull_mode;
         
-        if (ay < 0) ay ^= 0x7FFFFFFF;
-        if (by < 0) by ^= 0x7FFFFFFF;
-        if (cy < 0) cy ^= 0x7FFFFFFF;
+        ay.f = fay;
+        by.f = fby;
+        cy.f = fcy;
         
-        if (ay < by) {
-          if (by > cy) {    /* acb */
-            if (ay < cy) {
+        if (ay.i < 0) ay.i ^= 0x7FFFFFFF;
+        if (by.i < 0) by.i ^= 0x7FFFFFFF;
+        if (cy.i < 0) cy.i ^= 0x7FFFFFFF;
+        
+        if (ay.i < by.i) {
+          if (by.i > cy.i) {    /* acb */
+            if (ay.i < cy.i) {
               fa = a;
               fb = c;
               fc = b;
@@ -1606,8 +1619,8 @@ _grAAVpDrawTriangles(FxI32 mode, FxI32 ttype, FxI32 count, void *pointers)
             /* else it's already sorted */
           }
         } else {
-          if (by < cy) {    /* bac */
-            if (ay < cy) {
+          if (by.i < cy.i) {    /* bac */
+            if (ay.i < cy.i) {
               fa = b;
               fb = a;
               fc = c;
@@ -1705,7 +1718,7 @@ _grAADrawVertexList(FxU32 type, FxI32 mode, FxI32 count, void *pointers)
   float *v[3];
   FxBool flip = FXFALSE;
   FxU32 fbzModeOld;                 /* Squirrel away current fbzMode */
-  FxI32 stride = mode;
+  FxI32 stride;
 
   if (sCount <= 2) return;
 
@@ -1716,8 +1729,10 @@ _grAADrawVertexList(FxU32 type, FxI32 mode, FxI32 count, void *pointers)
   gc->state.shadow.fbzMode &= ~(SST_ZAWRMASK);
   /* gc->state.invalid |= fbzModeBIT; */
   GR_FLUSH_STATE();
-  if (stride == 0)
+  if (mode == 0)
     stride = gc->state.vData.vStride;
+  else
+    stride = sizeof(float *) / sizeof (float);
 
   sCount-=2;
   if (type == kSetupFan) {

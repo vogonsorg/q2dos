@@ -18,7 +18,7 @@
 **
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gsst.c,v 1.5.4.16 2003/08/21 08:49:55 dborca Exp $
+** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gsst.c,v 1.5.4.30 2005/06/09 18:32:32 jwrdegoede Exp $
 ** $Log:
 **  69   3dfx      1.52.1.3.1.1111/08/00 Drew McMinn     Create initialise read and
 **       use useAppGamma flag, to allow us to disable applications changing gamma
@@ -843,6 +843,8 @@ static FxU32 lostcontext_csim;
 #define kPageBoundaryMask (kPageBoundarySlop - 1)
 
 /* Some forward declarations */
+void _grImportFifo (int, int);
+GR_ENTRY(grDRIBufferSwap, void, (FxU32 swapInterval));
 #ifdef FX_GLIDE_NAPALM
 static void _grSstSetColumnsOfNWidth(FxU32 width);
 #endif /* FX_GLIDE_NAPALM */
@@ -1058,7 +1060,7 @@ clearBuffers( GrGC *gc )
     grRenderBuffer( GR_BUFFER_FRONTBUFFER );
   }
 } /* clearBuffers */
-#else	/* defined(DRI_BUILD) */
+#elif 0	/* defined(DRI_BUILD) */ /* not used in DRI build */
 static void 
 clearBuffers( GrGC *gc ) 
 {
@@ -1210,8 +1212,8 @@ initGC ( GrGC *gc )
     gc->bufferSwaps[t] = 0xffffffff;
   }
   
-  gc->bufferSwaps[0] = ((FxU32) gc->cmdTransportInfo.fifoPtr -
-                        (FxU32) gc->cmdTransportInfo.fifoStart);
+  gc->bufferSwaps[0] = ((unsigned long) gc->cmdTransportInfo.fifoPtr -
+                        (unsigned long) gc->cmdTransportInfo.fifoStart);
   
   gc->swapsPending = 1;
   
@@ -1390,106 +1392,8 @@ GR_ENTRY(grSstWinOpen, GrContext_t, ( FxU32                   hWnd,
                                       int                     nAuxBuffers) )
 {
 #define FN_NAME "grSstWinOpen"
-#define TILE_WIDTH_PXLS   64
-#define TILE_HEIGHT_PXLS  32
-#define BYTES_PER_PIXEL   2
-#define MIN_TEXTURE_STORE 0x200000
-#define MIN_FIFO_SIZE     0x10000
-#if defined( GLIDE_INIT_HWC )
-  hwcBoardInfo  *bInfo   = 0;
-  hwcVidInfo    *vInfo   = 0;
-  hwcBufferInfo *bufInfo = 0;
-  hwcFifoInfo   *fInfo   = 0;
-#elif defined( GLIDE_INIT_HAL )
-  FxDeviceInfo   devInfo;
-  hwcBoardInfo  *bInfo   = 0;
-  hwcVidInfo    *vInfo   = 0;
-  hwcBufferInfo *bufInfo = 0;
-  hwcFifoInfo   *fInfo   = 0;
-#endif /* defined ( GLIDE_INIT_HAL ) */
-  
-  struct cmdTransportInfo *gcFifo = 0;
-  GrContext_t retVal = 0;
 
-#if !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !defined(__DJGPP__)
-  if (!hWnd) hWnd = (FxU32) GetActiveWindow();
-  if (!hWnd)
-    GrErrorCallback("grSstWinOpen: need to use a valid window handle",
-                    FXTRUE);
-/*
-  GDBG_INFO(80, "Setting hwnd to foreground.\n");
-  SetForegroundWindow((HWND)hWnd);
-*/
-#endif	/* (GLIDE_PLATFORM & GLIDE_OS_UNIX) || defined(__DJGPP__) */
-
-  /* NB: TLS must be setup before the 'declaration' which grabs the
-   * current gc. This gc is valid for all threads in the fullscreen
-   * context.
-   */
-  setThreadValue( (FxU32)&_GlideRoot.GCs[_GlideRoot.current_sst] );
-  
-  {
-    /* Partial Argument Validation */
-    GR_BEGIN_NOFIFOCHECK_NORET("grSstWinOpen",80);
-    GDBG_INFO_MORE(gc->myLevel,
-                   "(rez=%d,ref=%d,cformat=%d,origin=%s,#bufs=%d, #abufs=%d)\n",
-                   resolution,refresh,format,
-                   origin ? "LL" : "UL",
-                   nColBuffers, nAuxBuffers);
-    GR_CHECK_F(FN_NAME, !gc, "no SST selected as current (gc==NULL)");
-  
-#ifdef FX_GLIDE_NAPALM
-    if (IS_NAPALM(gc->bInfo->pciInfo.deviceID)) {
-      GrPixelFormat_t  thePixelFormat = GR_PIXFMT_RGB_565 ; 
-#if 0
-
-      /**/
-      /* All this stuff lets Joe bag-o-donuts force old apps */
-      /* to render with 32bpp and AA modes. */
-      /* */
-      if (_GlideRoot.environment.outputBpp == 32)
-      {
-        /* Force rendering to 32bpp */
-        if ((_GlideRoot.environment.aaSample == 8) &&	/* 8xaa */
-            	(gc->chipCount > 2))
-          		thePixelFormat = GR_PIXFMT_AA_8_ARGB_8888 ;
-        else if ((_GlideRoot.environment.aaSample == 4) &&
-            	(gc->chipCount > 1))
-          		thePixelFormat = GR_PIXFMT_AA_4_ARGB_8888 ;
-        else if (_GlideRoot.environment.aaSample == 2)
-            	thePixelFormat = GR_PIXFMT_AA_2_ARGB_8888 ;
-        else
-            	thePixelFormat = GR_PIXFMT_ARGB_8888 ;
-      }
-       else
-      {
-        /* default rendering to 16bpp */
-        if ((_GlideRoot.environment.aaSample == 8) &&	/* 8xaa */
-            (gc->chipCount > 2))
-          	thePixelFormat = GR_PIXFMT_AA_8_RGB_565 ;
-		else if ((_GlideRoot.environment.aaSample == 4) &&
-            (gc->chipCount > 1))
-          	thePixelFormat = GR_PIXFMT_AA_4_RGB_565 ;
-        else if (_GlideRoot.environment.aaSample == 2)
-            thePixelFormat = GR_PIXFMT_AA_2_RGB_565 ;
-        else
-            thePixelFormat = GR_PIXFMT_RGB_565 ;
-      }
-      
-#endif
-
-      return ( grSstWinOpenExt(hWnd,
-                               resolution, 
-                               refresh, 
-                               format, 
-                               origin, 
-                               thePixelFormat,
-                               nColBuffers,
-                               nAuxBuffers) );
-    }
-#endif
-
-    return ( grSstWinOpenExt(hWnd,
+  return ( grSstWinOpenExt(hWnd,
                            resolution, 
                            refresh, 
                            format, 
@@ -1497,9 +1401,8 @@ GR_ENTRY(grSstWinOpen, GrContext_t, ( FxU32                   hWnd,
                            GR_PIXFMT_RGB_565,
                            nColBuffers,
                            nAuxBuffers) );
-  }
 
-  #undef FN_NAME
+#undef FN_NAME
 } /* grSstWinOpen */
 
 #ifdef FX_GLIDE_NAPALM
@@ -1574,7 +1477,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
   GrContext_t retVal = 0;
   FxU32 tramShift, tmu1Offset;
 
-#if !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !defined(__DJGPP__)
+#if !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !(GLIDE_PLATFORM & GLIDE_OS_DOS32)
   if (!hWnd) hWnd = (FxU32) GetActiveWindow();
   if (!hWnd)
     GrErrorCallback("grSstWinOpen: need to use a valid window handle",
@@ -1587,21 +1490,21 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
   /* Want Windowed Mode */
   if (resolution == GR_RESOLUTION_NONE)
   {
-	 extern GrContext_t _grCreateWindowSurface(FxU32 hWnd,
-										GrColorFormat_t		format, 
-										GrOriginLocation_t	origin, 
-										GrPixelFormat_t		pixelformat,
-										int					nAuxBuffer);
-
-	 return _grCreateWindowSurface(hWnd, format, origin, pixelformat, nAuxBuffers);
+    GrContext_t _grCreateWindowSurface(FxU32 hWnd,
+                                       GrColorFormat_t    format,
+                                       GrOriginLocation_t origin,
+                                       GrPixelFormat_t    pixelformat,
+                                       int                nAuxBuffer);
+    
+    return _grCreateWindowSurface(hWnd, format, origin, pixelformat, nAuxBuffers);
   }
-#endif	/* (GLIDE_PLATFORM & GLIDE_OS_UNIX) || defined(__DJGPP__) */
+#endif	/* (GLIDE_PLATFORM & GLIDE_OS_UNIX) || (GLIDE_PLATFORM & GLIDE_OS_DOS32) */
   
   /* NB: TLS must be setup before the 'declaration' which grabs the
    * current gc. This gc is valid for all threads in the fullscreen
    * context.
    */
-  setThreadValue( (FxU32)&_GlideRoot.GCs[_GlideRoot.current_sst] );
+  setThreadValue( (unsigned long)&_GlideRoot.GCs[_GlideRoot.current_sst] );
   
   {
     /* Partial Argument Validation */
@@ -1995,11 +1898,11 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
       }
     } else {
       gc->sampleOffsetIndex = gc->grPixelSample-1 + ((gc->grSamplesPerChip == 1) ? 1 : 0);
-      if (!GETENV("FX_GLIDE_AA_SAMPLE", gc->bInfo->RegPath) && gc->sampleOffsetIndex)
+      if (!GETENV("FX_GLIDE_AA_SAMPLE") && gc->sampleOffsetIndex)
         gc->sampleOffsetIndex+=3;
     }
 #else
-    if (!GETENV("FX_GLIDE_AA_SAMPLE", gc->bInfo->RegPath) && gc->sampleOffsetIndex)
+    if (!GETENV("FX_GLIDE_AA_SAMPLE") && gc->sampleOffsetIndex)
         gc->sampleOffsetIndex+=3;
 #endif
 
@@ -2010,6 +1913,142 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
       GDBG_INFO( gc->myLevel, "Number of pixel sample = %d\n", gc->grPixelSample);
       GrErrorCallback( "grSstWinOpen: unsupported pixel format", FXFALSE );
       return 0;
+    }
+
+    // test
+    if (gc->chipCount == 4 && gc->grPixelSample == 2) {
+      _GlideRoot.environment.aaXOffset[13][0] =
+      _GlideRoot.environment.aaXOffset[13][4] = _GlideRoot.environment.aaXOffset[6][0];
+      _GlideRoot.environment.aaXOffset[13][2] =
+      _GlideRoot.environment.aaXOffset[13][6] = _GlideRoot.environment.aaXOffset[6][2];
+      _GlideRoot.environment.aaYOffset[13][0] =
+      _GlideRoot.environment.aaYOffset[13][4] = _GlideRoot.environment.aaYOffset[6][0];
+      _GlideRoot.environment.aaYOffset[13][2] =
+      _GlideRoot.environment.aaYOffset[13][6] = _GlideRoot.environment.aaYOffset[6][2];
+      
+      _GlideRoot.environment.aaXOffset[14][0] =
+      _GlideRoot.environment.aaXOffset[14][4] = _GlideRoot.environment.aaXOffset[6][1];
+      _GlideRoot.environment.aaXOffset[14][2] =
+      _GlideRoot.environment.aaXOffset[14][6] = _GlideRoot.environment.aaXOffset[6][3];
+      _GlideRoot.environment.aaYOffset[14][0] =
+      _GlideRoot.environment.aaYOffset[14][4] = _GlideRoot.environment.aaYOffset[6][1];
+      _GlideRoot.environment.aaYOffset[14][2] =
+      _GlideRoot.environment.aaYOffset[14][6] = _GlideRoot.environment.aaYOffset[6][3];
+    }
+    else if (gc->chipCount == 4 && gc->grPixelSample == 4) {
+      _GlideRoot.environment.aaXOffset[13][0] = _GlideRoot.environment.aaXOffset[12][0];
+      _GlideRoot.environment.aaXOffset[13][2] = _GlideRoot.environment.aaXOffset[12][2];
+      _GlideRoot.environment.aaXOffset[13][4] = _GlideRoot.environment.aaXOffset[12][4];
+      _GlideRoot.environment.aaXOffset[13][6] = _GlideRoot.environment.aaXOffset[12][6];
+      _GlideRoot.environment.aaYOffset[13][0] = _GlideRoot.environment.aaYOffset[12][0];
+      _GlideRoot.environment.aaYOffset[13][2] = _GlideRoot.environment.aaYOffset[12][2];
+      _GlideRoot.environment.aaYOffset[13][4] = _GlideRoot.environment.aaYOffset[12][4];
+      _GlideRoot.environment.aaYOffset[13][6] = _GlideRoot.environment.aaYOffset[12][6];
+      
+      _GlideRoot.environment.aaXOffset[14][0] = _GlideRoot.environment.aaXOffset[12][1];
+      _GlideRoot.environment.aaXOffset[14][2] = _GlideRoot.environment.aaXOffset[12][3];
+      _GlideRoot.environment.aaXOffset[14][4] = _GlideRoot.environment.aaXOffset[12][5];
+      _GlideRoot.environment.aaXOffset[14][6] = _GlideRoot.environment.aaXOffset[12][7];
+      _GlideRoot.environment.aaYOffset[14][0] = _GlideRoot.environment.aaYOffset[12][1];
+      _GlideRoot.environment.aaYOffset[14][2] = _GlideRoot.environment.aaYOffset[12][3];
+      _GlideRoot.environment.aaYOffset[14][4] = _GlideRoot.environment.aaYOffset[12][5];
+      _GlideRoot.environment.aaYOffset[14][6] = _GlideRoot.environment.aaYOffset[12][7];
+    }
+    else if (gc->chipCount == 4 && gc->grPixelSample == 8) {
+      /* TODO: temporalAA over 4-chip 8xFSAA
+       * probably too slow and probably not needed anyway
+       */
+      /* use 8xFSAA jitter values for now */
+      _GlideRoot.environment.aaXOffset[13][0] =
+      _GlideRoot.environment.aaXOffset[14][0] = _GlideRoot.environment.aaXOffset[12][0];
+      _GlideRoot.environment.aaXOffset[13][1] =
+      _GlideRoot.environment.aaXOffset[14][1] = _GlideRoot.environment.aaXOffset[12][1];
+      _GlideRoot.environment.aaXOffset[13][2] =
+      _GlideRoot.environment.aaXOffset[14][2] = _GlideRoot.environment.aaXOffset[12][2];
+      _GlideRoot.environment.aaXOffset[13][3] =
+      _GlideRoot.environment.aaXOffset[14][3] = _GlideRoot.environment.aaXOffset[12][3];
+      _GlideRoot.environment.aaXOffset[13][4] =
+      _GlideRoot.environment.aaXOffset[14][4] = _GlideRoot.environment.aaXOffset[12][4];
+      _GlideRoot.environment.aaXOffset[13][5] =
+      _GlideRoot.environment.aaXOffset[14][5] = _GlideRoot.environment.aaXOffset[12][5];
+      _GlideRoot.environment.aaXOffset[13][6] =
+      _GlideRoot.environment.aaXOffset[14][6] = _GlideRoot.environment.aaXOffset[12][6];
+      _GlideRoot.environment.aaXOffset[13][7] =
+      _GlideRoot.environment.aaXOffset[14][7] = _GlideRoot.environment.aaXOffset[12][7];
+      
+      _GlideRoot.environment.aaYOffset[13][0] =
+      _GlideRoot.environment.aaYOffset[14][0] = _GlideRoot.environment.aaYOffset[12][0];
+      _GlideRoot.environment.aaYOffset[13][1] =
+      _GlideRoot.environment.aaYOffset[14][1] = _GlideRoot.environment.aaYOffset[12][1];
+      _GlideRoot.environment.aaYOffset[13][2] =
+      _GlideRoot.environment.aaYOffset[14][2] = _GlideRoot.environment.aaYOffset[12][2];
+      _GlideRoot.environment.aaYOffset[13][3] =
+      _GlideRoot.environment.aaYOffset[14][3] = _GlideRoot.environment.aaYOffset[12][3];
+      _GlideRoot.environment.aaYOffset[13][4] =
+      _GlideRoot.environment.aaYOffset[14][4] = _GlideRoot.environment.aaYOffset[12][4];
+      _GlideRoot.environment.aaYOffset[13][5] =
+      _GlideRoot.environment.aaYOffset[14][5] = _GlideRoot.environment.aaYOffset[12][5];
+      _GlideRoot.environment.aaYOffset[13][6] =
+      _GlideRoot.environment.aaYOffset[14][6] = _GlideRoot.environment.aaYOffset[12][6];
+      _GlideRoot.environment.aaYOffset[13][7] =
+      _GlideRoot.environment.aaYOffset[14][7] = _GlideRoot.environment.aaYOffset[12][7];
+    }
+    else if (gc->chipCount == 2 && gc->grPixelSample == 2) {
+      _GlideRoot.environment.aaXOffset[13][0] = _GlideRoot.environment.aaXOffset[6][0];
+      _GlideRoot.environment.aaXOffset[13][2] = _GlideRoot.environment.aaXOffset[6][2];
+      _GlideRoot.environment.aaYOffset[13][0] = _GlideRoot.environment.aaYOffset[6][0];
+      _GlideRoot.environment.aaYOffset[13][2] = _GlideRoot.environment.aaYOffset[6][2];
+      
+      _GlideRoot.environment.aaXOffset[14][0] = _GlideRoot.environment.aaXOffset[6][1];
+      _GlideRoot.environment.aaXOffset[14][2] = _GlideRoot.environment.aaXOffset[6][3];
+      _GlideRoot.environment.aaYOffset[14][0] = _GlideRoot.environment.aaYOffset[6][1];
+      _GlideRoot.environment.aaYOffset[14][2] = _GlideRoot.environment.aaYOffset[6][3];
+    }
+    else if (gc->chipCount == 2 && gc->grPixelSample == 4) {
+      _GlideRoot.environment.aaXOffset[13][0] = _GlideRoot.environment.aaXOffset[12][0];
+      _GlideRoot.environment.aaXOffset[13][1] = _GlideRoot.environment.aaXOffset[12][2];
+      _GlideRoot.environment.aaXOffset[13][2] = _GlideRoot.environment.aaXOffset[12][4];
+      _GlideRoot.environment.aaXOffset[13][3] = _GlideRoot.environment.aaXOffset[12][6];
+      _GlideRoot.environment.aaYOffset[13][0] = _GlideRoot.environment.aaYOffset[12][0];
+      _GlideRoot.environment.aaYOffset[13][1] = _GlideRoot.environment.aaYOffset[12][2];
+      _GlideRoot.environment.aaYOffset[13][2] = _GlideRoot.environment.aaYOffset[12][4];
+      _GlideRoot.environment.aaYOffset[13][3] = _GlideRoot.environment.aaYOffset[12][6];
+      
+      _GlideRoot.environment.aaXOffset[14][0] = _GlideRoot.environment.aaXOffset[12][1];
+      _GlideRoot.environment.aaXOffset[14][1] = _GlideRoot.environment.aaXOffset[12][3];
+      _GlideRoot.environment.aaXOffset[14][2] = _GlideRoot.environment.aaXOffset[12][5];
+      _GlideRoot.environment.aaXOffset[14][3] = _GlideRoot.environment.aaXOffset[12][7];
+      _GlideRoot.environment.aaYOffset[14][0] = _GlideRoot.environment.aaYOffset[12][1];
+      _GlideRoot.environment.aaYOffset[14][1] = _GlideRoot.environment.aaYOffset[12][3];
+      _GlideRoot.environment.aaYOffset[14][2] = _GlideRoot.environment.aaYOffset[12][5];
+      _GlideRoot.environment.aaYOffset[14][3] = _GlideRoot.environment.aaYOffset[12][7];
+    }
+    else if (gc->chipCount == 1 && gc->grPixelSample == 2) {
+      /* TODO: temporalAA over 1-chip 2xFSAA
+       * probably too slow
+       */
+      _GlideRoot.environment.aaXOffset[13][0] = _GlideRoot.environment.aaXOffset[6][0];
+      _GlideRoot.environment.aaXOffset[13][1] = _GlideRoot.environment.aaXOffset[6][2];
+      _GlideRoot.environment.aaYOffset[13][0] = _GlideRoot.environment.aaYOffset[6][0];
+      _GlideRoot.environment.aaYOffset[13][1] = _GlideRoot.environment.aaYOffset[6][2];
+      
+      _GlideRoot.environment.aaXOffset[14][0] = _GlideRoot.environment.aaXOffset[6][1];
+      _GlideRoot.environment.aaXOffset[14][1] = _GlideRoot.environment.aaXOffset[6][3];
+      _GlideRoot.environment.aaYOffset[14][0] = _GlideRoot.environment.aaYOffset[6][1];
+      _GlideRoot.environment.aaYOffset[14][1] = _GlideRoot.environment.aaYOffset[6][3];
+    }
+    if (gc->grPixelSample < 2) {
+      int i;
+      /* default perturbation values */
+      for (i = 0; i < 8; i++) {
+        _GlideRoot.environment.aaXOffset[13][i] = _GlideRoot.environment.aaXOffset[0][i];
+        _GlideRoot.environment.aaYOffset[13][i] = _GlideRoot.environment.aaYOffset[0][i];
+      }
+      /* jittered values */
+      for (i = 0; i < 8; i++) {
+        _GlideRoot.environment.aaXOffset[14][i] = _GlideRoot.environment.aaXOffset[13][i] + 0x6;
+        _GlideRoot.environment.aaYOffset[14][i] = _GlideRoot.environment.aaXOffset[13][i] + 0x6;
+      }
     }
 
     /*
@@ -2032,7 +2071,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
       {
         switch (gc->grSstRez) 
         {
-		case GR_RESOLUTION_1600x1200:
+        case GR_RESOLUTION_1600x1200:
         case GR_RESOLUTION_1600x1024:
         case GR_RESOLUTION_1280x1024:
         case GR_RESOLUTION_1280x960:
@@ -2299,7 +2338,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
     for (buffer = 0; buffer < nColBuffers; buffer++) {
       gc->buffers0[buffer] = bufInfo->colBuffStart0[buffer];
       GDBG_INFO(80, "Buffer %d:  Start: 0x%x\n", buffer, gc->buffers0[buffer]);
-      gc->lfbBuffers[buffer] = (FxU32)gc->rawLfb + bufInfo->lfbBuffAddr0[buffer];
+      gc->lfbBuffers[buffer] = (unsigned long)gc->rawLfb + bufInfo->lfbBuffAddr0[buffer];
       if (bInfo->buffInfo.enable2ndbuffer) {
         gc->buffers1[buffer] = bufInfo->colBuffStart1[buffer];
         GDBG_INFO(80, "Buffer %d:  Start: 0x%x\n", buffer, gc->buffers1[buffer]);
@@ -2308,7 +2347,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
     if (nAuxBuffers != 0) {
       gc->buffers0[buffer] = bufInfo->auxBuffStart0;
       GDBG_INFO(80, "Aux Buffer:  Start: 0x%x\n", gc->buffers0[buffer]);
-      gc->lfbBuffers[buffer] = (FxU32)gc->rawLfb + bufInfo->lfbBuffAddr0[buffer];
+      gc->lfbBuffers[buffer] = (unsigned long)gc->rawLfb + bufInfo->lfbBuffAddr0[buffer];
       if (bInfo->buffInfo.enable2ndbuffer) {
         gc->buffers1[buffer] = bufInfo->auxBuffStart1;
         GDBG_INFO(80, "Aux Buffer:  Start: 0x%x\n", gc->buffers1[buffer]);
@@ -2347,7 +2386,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
     /* This actually gets taken in hwcInitVideo */
     gc->contextP = FXTRUE;
 
-#if !(GLIDE_PLATFORM & GLIDE_OS_UNIX)
+#if GLIDE_CHECK_CONTEXT
     /* CSR - Set up flag for display driver to tell us that context was lost */
     if ( !gc->open )  /* If we already have a context open, then lets not
                          re-initialize the pointers                          */                                             
@@ -2359,7 +2398,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
     /* This actually gets taken in hwcInitVideo */
     gc->contextP = FXTRUE;
     *gc->lostContext = FXFALSE;
-#endif	/* !(GLIDE_PLATFORM & GLIDE_OS_UNIX) */
+#endif /* GLIDE_CHECK_CONTEXT */
 
     if (_GlideRoot.environment.gammaR != 1.3f &&
         _GlideRoot.environment.gammaG != 1.3f &&
@@ -2389,7 +2428,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
     ** if we only have one TMU or we are using UMA, do similar things
     */
     if (
-      (gc->num_tmu < 1) ||
+      (gc->num_tmu < 2) ||
       (gc->state.grEnableArgs.texture_uma_mode == GR_MODE_ENABLE)
       ) {
       tramShift = 0;
@@ -2428,7 +2467,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
     GDBG_INFO(1, "autoBump: 0x%x\n", _GlideRoot.environment.autoBump);
     /* The logic for this is hosed for PowerPC, where we disable auto-bump even
        on PCI. */
-    if (gc->cmdTransportInfo.autoBump = _GlideRoot.environment.autoBump) {
+    if ((gc->cmdTransportInfo.autoBump = _GlideRoot.environment.autoBump)) {
       if (!hwcInitFifo( bInfo, gc->cmdTransportInfo.autoBump)) {
         hwcRestoreVideo(bInfo);
         GrErrorCallback(hwcGetErrorString(), FXFALSE);
@@ -2440,7 +2479,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
 #if __POWERPC__
       if (!hwcInitAGPFifo(bInfo, FXFALSE)) {
 #else
-      if (!hwcInitAGPFifo(bInfo, _GlideRoot.environment.forceAutoBump/*FXTRUE*/)) {
+      if (!hwcInitAGPFifo(bInfo, _GlideRoot.environment.autoBump/*FXTRUE*/)) {
 #endif      
         hwcRestoreVideo(bInfo);
         GrErrorCallback(hwcGetErrorString(), FXFALSE);
@@ -2469,7 +2508,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
     gc->tmu_state[0].total_mem = gc->tramSize;
 #else
     /* gc->fbOffset               = (FxU32)fxHalFbiGetMemory((SstRegs*)gc->reg_ptr); */
-    gc->fbOffset                  = (FxU32)gc->rawLfb;
+    gc->fbOffset                  = (unsigned long)gc->rawLfb;
     gc->fbOffset                  = 0;
     gc->tmuMemInfo[0].tramOffset  = 
       (pixelformat == GR_PIXFMT_ARGB_8888) ? 0x400000 : 0x200000;
@@ -2625,7 +2664,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
                                   gc->buffers0[gc->curBuffer], /* board address of beginning of OS  */
                                   gc->strideInTiles );        /* distance between scanlines of the OS, in*/
 
-#if !(GLIDE_PLATFORM & GLIDE_OS_UNIX)
+#if GLIDE_CHECK_CONTEXT
     /*
     ** initialize context checking
     */
@@ -2634,7 +2673,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
       *gc->lostContext = FXFALSE;
       gc->contextP = 1;
     }
-#endif	/* !(GLIDE_PLATFORM & GLIDE_OS_UNIX) */
+#endif /* GLIDE_CHECK_CONTEXT */
 
 #endif /*  defined( GLIDE_INIT_HAL )  */
 #else  /* !defined( USE_PACKET_FIFO ) */
@@ -2746,7 +2785,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
                                   gc->buffers0[gc->curBuffer], /* board address of beginning of OS  */
                                   gc->strideInTiles );        /* distance between scanlines of the OS, in*/
     _grReCacheFifo(0);
-#if !(GLIDE_PLATFORM & GLIDE_OS_UNIX)
+#if GLIDE_CHECK_CONTEXT
     /*
     ** initialize context checking
     */
@@ -2755,7 +2794,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
       *gc->lostContext = FXFALSE;
       gc->contextP = 1;
     }
-#endif /* !(GLIDE_PLATFORM & GLIDE_OS_UNIX) */
+#endif /* GLIDE_CHECK_CONTEXT */
 
 #endif /* !defined( USE_PACKET_FIFO ) */
   
@@ -2791,7 +2830,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
     gcFifo->fifoRead = HW_FIFO_PTR( FXTRUE );
 #endif /* USE_PACKET_FIFO */
     
-#if !(GLIDE_PLATFORM & GLIDE_OS_UNIX)
+#if !DRI_BUILD
     if ( (void*)gcFifo->fifoPtr != (void*)gcFifo->fifoRead ) {
 #ifdef GLIDE_INIT_HWC
       hwcRestoreVideo( bInfo );
@@ -2799,7 +2838,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
       GDBG_INFO( gc->myLevel, "Initial fifo state is incorrect\n" );
       return 0;
     }
-#endif	/* GLIDE_PLATFORM & GLIDE_OS_UNIX */
+#endif	/* DRI_BUILD */
     
 #if __POWERPC__ && PCI_BUMP_N_GRIND
     enableCopyBackCache((FxU32)gcFifo->fifoStart,gcFifo->fifoSize);
@@ -2842,7 +2881,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
               gcFifo->fifoPtr ); 
     
 #ifdef DRI_BUILD
-    _grImportFifo(*driInfo.fifoPtr, *driInfo.fifoRead);
+    _grImportFifo(*(int *)driInfo.fifoPtr, *(int *)driInfo.fifoRead);
 #endif
 
     /* The hw is now in a usable state from the fifo macros.
@@ -2900,7 +2939,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
     {
       REG_GROUP_SET(hw, colBufferAddr, gc->state.shadow.colBufferAddr);
 #ifdef DRI_BUILD
-      REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? driInfo.stride : 
+      REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? (FxU32)driInfo.stride : 
 		    gc->state.shadow.colBufferStride );
 #else
       REG_GROUP_SET(hw, colBufferStride, gc->state.shadow.colBufferStride );
@@ -2916,7 +2955,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
         {
             REG_GROUP_SET(hw, colBufferAddr, gc->buffers1[gc->curBuffer] | SST_BUFFER_BASE_SELECT);
 #ifdef DRI_BUILD
-	    REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? driInfo.stride : 
+	    REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? (FxU32)driInfo.stride : 
 			  gc->state.shadow.colBufferStride );
 #else
 	    REG_GROUP_SET(hw, colBufferStride, gc->state.shadow.colBufferStride );
@@ -3114,13 +3153,14 @@ GR_ENTRY(grSstWinClose, FxBool, (GrContext_t context))
   if (!gc)
     return 0;
 
-#if !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !defined(__DJGPP__)
+#if !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !(GLIDE_PLATFORM & GLIDE_OS_DOS32)
   /* We are in Windowed Mode */
   if (gc->windowed)
   {
-	 extern void _grReleaseWindowSurface(GrContext_t ctx);
-	 _grReleaseWindowSurface(context);
-	 return FXTRUE;
+    void _grReleaseWindowSurface(GrContext_t ctx);
+    _grReleaseWindowSurface(context);
+    gc->windowed = FXFALSE; /* init the windowed flag */
+    return FXTRUE;
   }
 #endif
 
@@ -3136,7 +3176,7 @@ GR_ENTRY(grSstWinClose, FxBool, (GrContext_t context))
   }
 #endif
 
-#if !(GLIDE_PLATFORM & GLIDE_OS_UNIX)
+#if GLIDE_CHECK_CONTEXT
   if (gc->lostContext) {
     if (*gc->lostContext) {
 #if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
@@ -3149,7 +3189,7 @@ GR_ENTRY(grSstWinClose, FxBool, (GrContext_t context))
       return 0;
     }
   }
-#endif	/* !(GLIDE_PLATFORM & GLIDE_OS_UNIX) */
+#endif /* GLIDE_CHECK_CONTEXT */
 
   /* NB: The gc that is being closed is the passed gc not the
    * currently selected gc. This must be setup before the
@@ -3160,7 +3200,7 @@ GR_ENTRY(grSstWinClose, FxBool, (GrContext_t context))
    * the tls gc explicitly otherwise other whacky-ness (read 'random
    * crashes' will ensue). 
    */
-  setThreadValue((FxU32)gc);
+  setThreadValue((unsigned long)gc);
   if ((gc != NULL) && gc->open) grFlush();
 
   /* Make sure that the user specified gc is not whacked */
@@ -3203,8 +3243,11 @@ GR_ENTRY(grSstWinClose, FxBool, (GrContext_t context))
        * safe everywhere.
        */
       GDBG_INFO(gc->myLevel, "  Restore Video\n");
-#if !(GLIDE_PLATFORM & GLIDE_OS_UNIX)
-      if (!*gc->lostContext) {
+#if GLIDE_CHECK_CONTEXT
+      if (!*gc->lostContext)
+#endif /* GLIDE_CHECK_CONTEXT */
+#if !DRI_BUILD
+      {
       /* disable SLI and AA */
 #ifdef FX_GLIDE_NAPALM
         if (IS_NAPALM(gc->bInfo->pciInfo.deviceID)) {
@@ -3224,7 +3267,7 @@ GR_ENTRY(grSstWinClose, FxBool, (GrContext_t context))
 #endif            
         hwcRestoreVideo(gc->bInfo);
       }
-#endif	/* !(GLIDE_PLATFORM & GLIDE_OS_UNIX) */
+#endif	/* !DRI_BUILD */
 #endif /* !GLIDE_INIT_HAL */
 
       /*--------------------------
@@ -3248,17 +3291,18 @@ GR_ENTRY(grSstWinClose, FxBool, (GrContext_t context))
     gc->grSstRez = GR_RESOLUTION_NONE;
     gc->grSstRefresh = GR_REFRESH_NONE;
   }
+
   _GlideRoot.windowsInit--;
-    
+  
 #if (GLIDE_OS & GLIDE_OS_WIN32)
   if (_GlideRoot.environment.is_opengl != FXTRUE) {
     if ((_GlideRoot.OS == OS_WIN32_95) ||
-	    (_GlideRoot.OS == OS_WIN32_98) ||
-		(_GlideRoot.OS == OS_WIN32_ME)) {
-        hwcUnmapMemory9x ( gc->bInfo );
-	} else {
-		hwcUnmapMemory();
-	}
+        (_GlideRoot.OS == OS_WIN32_98) ||
+        (_GlideRoot.OS == OS_WIN32_ME)) {
+      hwcUnmapMemory9x ( gc->bInfo );
+    } else {
+      hwcUnmapMemory();
+    }
   }
 #endif
 
@@ -3346,12 +3390,7 @@ GR_DIENTRY(grSelectContext, FxBool , (GrContext_t context) )
         GR_ASSERT((gc >= _GlideRoot.GCs) &&
                   (gc <= _GlideRoot.GCs + MAX_NUM_SST));
 
-// Need context checking in XP. Should this effect windowed contexts as well??
-#if WINXP_ALT_TAB_FIX
-        hwcQueryContextXP(gc->bInfo); 
-#endif
-
-#ifdef GLIDE_INIT_HWC
+#if defined(GLIDE_INIT_HWC) && GLIDE_CHECK_CONTEXT 
         gc->contextP = !(*gc->lostContext) ;
 #else
         gc->contextP = 1;
@@ -3519,14 +3558,14 @@ GR_ENTRY(grFinish, void, (void))
 
   grFlush();
   if ( gc->windowed ) {
-#if defined(GLIDE_INIT_HWC) && !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !defined(__DJGPP__)
+#if defined(GLIDE_INIT_HWC) && !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !(GLIDE_PLATFORM & GLIDE_OS_DOS32)
     struct cmdTransportInfo*
       gcFifo = &gc->cmdTransportInfo;
     
     hwcIdleWinFifo(gc->bInfo,
                    &gcFifo->hwcFifoInfo,
                    gcFifo->issuedSerialNumber);
-#endif	/* defined(GLIDE_INIT_HWC) && !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !defined(__DJGPP__) */
+#endif	/* defined(GLIDE_INIT_HWC) && !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !(GLIDE_PLATFORM & GLIDE_OS_DOS32) */
   } else {
     /*while((_grSstStatus() & SST_BUSY) != 0) */
       /* Do Nothing */; 
@@ -3621,7 +3660,9 @@ GR_ENTRY(guGammaCorrectionRGB, void, (float r, float g, float b))
     	  hwcGammaRGB(gc->bInfo, r, g, b);
   }
   else
+  {
 	GDBG_INFO(69,"guGammaCorrectionRGB::hwcGammaRGB (%3.3f, %3.3f, %3.3f)  call ignored\n", r,g,b);
+  }
 
 #endif /* !GLIDE_INIT_HAL */
 
@@ -3653,7 +3694,9 @@ GR_DIENTRY(grLoadGammaTable, void, (FxU32 nentries, FxU32 *red, FxU32 *green, Fx
   if (_GlideRoot.environment.useAppGamma)
    	hwcGammaTable(gc->bInfo, nentries, red, green, blue);  
   else
+  {
 	GDBG_INFO(69, "grLoadGammaTable::hwcGammaRGB call ignored\n");
+  }
 #endif
 
   GR_END();
@@ -3957,9 +4000,11 @@ _grEnableSliCtrl(void)
   if( gc-> chipCount == 2 )
   	sliChipCountDivisor = (gc->grPixelSample == 4) ? 2 : 1;
 
-  if( gc-> chipCount == 4 )
+  else if( gc-> chipCount == 4 )
 	sliChipCountDivisor = (gc->grPixelSample == 2) ? 2 : 1;
 
+  else
+	sliChipCountDivisor = 0; /* should never happen will cause div by 0 */
 
   renderMask = (gc->chipCount / sliChipCountDivisor - 1) << gc->sliBandHeight;
   scanMask = (1 << gc->sliBandHeight) - 1;

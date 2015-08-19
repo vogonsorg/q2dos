@@ -21,8 +21,8 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Revision: 1.3.4.5 $
-** $Date: 2003/08/04 12:45:47 $
+** $Revision: 1.3.4.6 $
+** $Date: 2005/05/25 08:56:27 $
 */
 
 #include <stdarg.h>
@@ -72,9 +72,9 @@
 #endif /* defined(__WATCOMC__) || defined(__WATCOM_CPLUSPLUS__) */
 
 #ifdef __GNUC__ /* variadic macros */
-#define GDBG_INFO(level, format, ...)      do {} while (0)
-#define GDBG_INFO_MORE(level, format, ...) do {} while (0)
-#define GDBG_PRINTF(format, ...)           do {} while (0)
+#define GDBG_INFO(level, format, ...)
+#define GDBG_INFO_MORE(level, format, ...)
+#define GDBG_PRINTF(format, ...)
 #else
 #define GDBG_INFO      0 && (unsigned long)
 #define GDBG_INFO_MORE 0 && (unsigned long)

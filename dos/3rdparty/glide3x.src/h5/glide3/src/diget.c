@@ -17,7 +17,7 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/diget.c,v 1.4.4.2 2003/06/05 08:23:50 koolsmoky Exp $
+** $Header: /cvsroot/glide/glide3x/h5/glide3/src/diget.c,v 1.4.4.7 2005/06/09 18:32:31 jwrdegoede Exp $
 ** $Log: 
 **  22   3dfx      1.17.1.0.1.210/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -810,11 +810,12 @@ GR_DIENTRY(grGet, FxU32, (FxU32 pname, FxU32 plength, FxI32 *params))
     break;
 
   case GR_SURFACE_TEXTURE:
-    if (plength == 4) {
+    if (plength == sizeof(unsigned long)) {
+      unsigned long *p = (unsigned long *)params;
       GR_DCL_GC;
 
 #ifdef GLIDE_INIT_HWC
-      *params = (FxU32) &gc->tBuffer;
+      *p = (unsigned long) &gc->tBuffer;
       retVal = plength;
 #endif
     }
@@ -1067,6 +1068,12 @@ typedef struct {
     GrProc      proc;
 } GrExtensionTuple;
 
+#if HAVE_TEXUS2
+FX_ENTRY void FX_CALL txImgQuantize (char *dst, char *src, int w, int h, FxU32 format, FxU32 dither);
+FX_ENTRY void FX_CALL txMipQuantize (void *pxMip, void *txMip, int fmt, FxU32 d, FxU32 comp);
+FX_ENTRY void FX_CALL txPalToNcc (GuNccTable *ncc_table, const FxU32 *pal);
+#endif
+
 static GrExtensionTuple _extensionTable[] = {
     { "grGetRegistryOrEnvironmentStringExt",    (GrProc)grGetRegistryOrEnvironmentString },
     { "grGetGammaTableExt",    (GrProc)grGetGammaTable },
@@ -1118,11 +1125,17 @@ static GrExtensionTuple _extensionTable[] = {
     { "grSstQueryHardware", (GrProc)grSstQueryHardware },
 #endif
     /* POINTCAST */
-#if GLIDE_POINTCAST_PALETTE
     { "grTexDownloadTableExt", (GrProc)grTexDownloadTableExt },
+#if GLIDE_POINTCAST_PALETTE
     { "grTexDownloadTablePartialExt", (GrProc)grTexDownloadTablePartialExt },
     { "grTexNCCTableExt", (GrProc)grTexNCCTableExt },
 #endif
+#if HAVE_TEXUS2
+    { "txMipQuantize", (GrProc)txMipQuantize },
+    { "txImgQuantize", (GrProc)txImgQuantize },
+    { "txPalToNcc", (GrProc)txPalToNcc },
+#endif
+    { "grSetNumPendingBuffers", (GrProc)grSetNumPendingBuffers},
     { 0, 0 }
 };
 
@@ -1181,6 +1194,7 @@ GR_DIENTRY(grQueryResolutions, FxI32, (const GlideResolution *resTemplate, Glide
     /* 0x10000 is the minimum interesting FIFO size */
     fbmem = (gc->bInfo->h3Mem << 20) - gc->bInfo->min_tramSize - 0x10000;
 
+#if GDBG_INFO_ON
   static char *resNames[] = {
     "GR_RESOLUTION_320x200", 
     "GR_RESOLUTION_320x240", 
@@ -1207,6 +1221,7 @@ GR_DIENTRY(grQueryResolutions, FxI32, (const GlideResolution *resTemplate, Glide
     "GR_RESOLUTION_2048x1536", 
     "GR_RESOLUTION_2048x2048"   
   };
+#endif
 
   GDBG_INFO(80, FN_NAME"(0x%x, 0x%x)\n", resTemplate, output);
   

@@ -18,7 +18,7 @@
  ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  **
  **
- ** $Header: /cvsroot/glide/glide3x/h5/glide3/src/distate.c,v 1.4.4.7 2003/08/26 15:41:34 koolsmoky Exp $
+ ** $Header: /cvsroot/glide/glide3x/h5/glide3/src/distate.c,v 1.4.4.13 2005/06/09 18:32:31 jwrdegoede Exp $
  ** $Log:
  **  33   3dfx      1.25.1.2.1.311/14/00 Jonny Cochrane  Implement multisample LOD
  **       Dithering for 2x and 4x FSAA modes 
@@ -1573,7 +1573,7 @@ _grValidateTMUState()
         tmu > 0 ? gc->state.tcc_requires_prev_texture[tmu - 1] : gc->state.ac_requires_texture);
 #endif
        
-    if(tmuRequiredByDownstreamUnit && !doTMU0Passthrough || palletizedTexture) {
+    if((tmuRequiredByDownstreamUnit && !doTMU0Passthrough) || palletizedTexture) {
 #if DEBUG_2PPC
       GDBG_PRINTF("Setup TMU%d\n",tmu);
 #endif
@@ -1893,7 +1893,7 @@ _grValidateTMUState()
   it calls this routine.  grValidateState then goes through valid
   markers and flushes all invalid state.
   -------------------------------------------------------------------*/
-void
+void GR_CDECL
 _grValidateState()
 {
 #define FN_NAME "_grValidateState"
@@ -2040,22 +2040,14 @@ _grValidateState()
   /* Check for alpha test optimization */
   if (NOTVALID(alphaMode) || NOTVALID(fbzMode) || NOTVALID(stencilMode)) {
     updateAlphaMode = FXTRUE;
-	// KoolSmoky - need to recheck this.
-    /*if((LOADARG(grAlphaBlendFunction, rgb_sf) == GR_BLEND_SRC_ALPHA) &&
+    if((LOADARG(grAlphaBlendFunction, rgb_sf) == GR_BLEND_SRC_ALPHA) &&
        (LOADARG(grAlphaBlendFunction, rgb_df) == GR_BLEND_ONE_MINUS_SRC_ALPHA) &&
        (LOADARG(grAlphaBlendFunction, rgb_op) == GR_BLEND_OP_ADD) &&
        (LOADARG(grDepthMask, enable) == FXFALSE) &&
        ((LOADARG(grStencilMask, value) == 0x00) ||
-        (gc->state.grEnableArgs.stencil_mode == FXFALSE))) {*/
-    if(LOADARG(grDepthMask, enable) == FXFALSE) {
-      if((LOADARG(grAlphaBlendFunction, rgb_df) == GR_BLEND_ONE_MINUS_SRC_ALPHA) &&
-         (LOADARG(grAlphaBlendFunction, rgb_op) == GR_BLEND_OP_ADD) &&
-         (LOADARG(grDepthMask, enable) == FXFALSE) &&
-         ((LOADARG(grStencilMask, value) == 0x00) ||
-          (gc->state.grEnableArgs.stencil_mode == FXFALSE))) {
-        //GDBG_PRINTF("Alpha test optimization enabled.\n");
-        alphaTestOptimization = FXTRUE;
-      }
+        (gc->state.grEnableArgs.stencil_mode == FXFALSE))) {
+      //GDBG_PRINTF("Alpha test optimization enabled.\n");
+      alphaTestOptimization = FXTRUE;
     } else {
       //GDBG_PRINTF("Alpha test optimization disabled.\n");
     }  
@@ -2698,9 +2690,8 @@ GR_DIENTRY(grEnable, void , (GrEnableMode_t mode) )
       /* EnableOpenGL - Win_Mode.c 
       ** Allow minihwc to know about OpenGL 
       */
-      /* KoolSmoky - the registry path should already be enumerated by now. */
-      void EnableOpenGL ( char *regpath );
-      EnableOpenGL( gc->bInfo->RegPath );
+      /*void EnableOpenGL ();
+      EnableOpenGL();*/
      /* setup env to determine whether we are an OGL app */
      _GlideRoot.environment.is_opengl=FXTRUE;
 #endif
@@ -2764,7 +2755,7 @@ GR_DIENTRY(grDisable, void , (GrEnableMode_t mode) )
       gc->tmuMemInfo[1].tramOffset = gc->tmuMemInfo[0].tramOffset + gc->tmuMemInfo[0].tramSize;
       gc->tmuMemInfo[1].tramSize   = (gc->bInfo->tramSize >> 1);
       gc->tmu_state[1].total_mem   = gc->tmuMemInfo[1].tramSize;
-  }
+    }
     break;
   case GR_COMBINEEXT_MODE:
     gc->state.grEnableArgs.combine_ext_mode = GR_MODE_DISABLE;

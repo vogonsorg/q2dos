@@ -17,7 +17,7 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gbanner.c,v 1.3.4.6 2003/07/29 10:04:32 dborca Exp $
+** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gbanner.c,v 1.3.4.8 2005/06/09 18:32:31 jwrdegoede Exp $
 ** $Log: 
 **  3    3dfx      1.0.1.0.1.0 10/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -113,7 +113,8 @@ _grShamelessPlug(void)
 
   if (gc->pluginInfo.plugProc != NULL) {
     FxU32
-      plugWidth, plugHeight,
+      plugWidth, plugHeight;
+    FxI32
       plugStride;
     GrLfbWriteMode_t
       plugFormat;
@@ -188,7 +189,7 @@ static FxU16 *fxPlugData;
 
 
 
-void fxSplashShutdown (void)
+void FX_CALL fxSplashShutdown (void)
 {
 #if GLIDE_PLUG
  if (fxPlugData != NULL) {
@@ -200,10 +201,10 @@ void fxSplashShutdown (void)
 
 
 
-FxBool fxSplashInit (FxU32 hWnd,
-                     FxU32 screenWidth, FxU32 screenHeight,
-                     FxU32 numColBuf, FxU32 numAuxBuf,
-                     GrColorFormat_t colorFormat)
+FxBool FX_CALL fxSplashInit (FxU32 hWnd,
+                             FxU32 screenWidth, FxU32 screenHeight,
+                             FxU32 numColBuf, FxU32 numAuxBuf,
+                             GrColorFormat_t colorFormat)
 {
 #if GLIDE_PLUG
  if (fxPlugData == NULL) {
@@ -214,7 +215,7 @@ FxBool fxSplashInit (FxU32 hWnd,
     FILE *f;
     if ((f = fopen("3dfxplug.tga", "rb")) != NULL) {
        int bpp, skip;
-       int i, j, decoded;
+       unsigned int i, j, decoded;
        unsigned char header[18], b1[4], b0;
 
        /* read TGA header */
@@ -355,7 +356,7 @@ FxBool fxSplashInit (FxU32 hWnd,
      * embedded image is always 16bit RLE and does not need to be flipped
      */
     int k = 0;
-    int i, j, decoded;
+    unsigned int i, j, decoded;
     unsigned char b0;
 
     /* allocate datablock */
@@ -397,9 +398,9 @@ FxBool fxSplashInit (FxU32 hWnd,
 
 
 
-const void *fxSplashPlug (FxU32* w, FxU32* h,
-                          FxI32* strideInBytes,
-                          GrLfbWriteMode_t* format)
+const void * FX_CALL fxSplashPlug (FxU32* w, FxU32* h,
+                                   FxI32* strideInBytes,
+                                   GrLfbWriteMode_t* format)
 {
 #if GLIDE_PLUG
  *w = fxPlugWidth;
@@ -414,7 +415,7 @@ const void *fxSplashPlug (FxU32* w, FxU32* h,
 
 
 
-void fxSplash (float x, float y, float w, float h, FxU32 frameNumber)
+void FX_CALL fxSplash (float x, float y, float w, float h, FxU32 frameNumber)
 {
 }
 

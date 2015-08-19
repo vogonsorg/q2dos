@@ -14,7 +14,7 @@
 ** successor clauses in the FAR, DOD or NASA FAR Supplement. Unpublished -
 ** rights reserved under the Copyright Laws of the United States.
 **
-** $Id: texuslib.c,v 1.1.1.1.8.1 2003/07/23 06:29:33 anholt Exp $
+** $Id: texuslib.c,v 1.1.1.1.8.3 2005/08/13 21:07:04 jwrdegoede Exp $
 */
 #include <stdlib.h>
 #include <string.h>
@@ -187,7 +187,7 @@ void txNccToPal( FxU32 *pal, const GuNccTable *ncc_table )
     }
 }
 
-void txPalToNcc( GuNccTable *ncc_table, const FxU32 *pal ) {
+void FX_CSTYLE txPalToNcc( GuNccTable *ncc_table, const FxU32 *pal ) {
   int i, j;
 
   for( i = 0; i < 16; i++ )
@@ -254,7 +254,7 @@ size_t txInit3dfInfoFromFile( FILE *file,
                               int *destWidth, int *destHeight,
                               int mipLevels, FxU32 flags )
 {
-  long file_start_position;
+  int file_start_position;
   size_t size_retval;
   int input_format;
   TxMip txMip;
@@ -403,7 +403,7 @@ size_t txInit3dfInfo( Gu3dfInfo *info, GrTextureFormat_t destFormat,
 FxBool txConvertFromFile( FILE *file, Gu3dfInfo *info, 
                           FxU32 flags, const void *palNcc )
 {
-  long file_start_position;
+  int file_start_position;
   FxBool retval;
   TxMip txMip;
   

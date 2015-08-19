@@ -18,8 +18,8 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Revision: 1.2 $
-** $Date: 2000/06/15 00:11:40 $
+** $Revision: 1.2.6.1 $
+** $Date: 2005/05/25 08:56:37 $
 */
 
 #include <stdio.h>
@@ -35,7 +35,7 @@
 #define B3(x)   ((x>>0)&0xFF)
 
 static void
-_txImgHalve(long *outdata, int width, int height, long *indata)
+_txImgHalve(int *outdata, int width, int height, int *indata)
 {
     unsigned int i,j,k;
     unsigned int w,h, *p,sum,*q;

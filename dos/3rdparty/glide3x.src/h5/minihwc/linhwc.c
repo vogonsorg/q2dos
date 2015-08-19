@@ -67,7 +67,13 @@ hwcCheckMemSize(hwcBoardInfo *bInfo, FxU32 xres, FxU32 yres, FxU32 nColBuffers,
 #include "lindri.h"
 
 static FxU32 fenceVar;
-#define P6FENCE asm("xchg %%eax, %0" : : "m" (fenceVar) : "eax");
+#ifdef __ia64__
+# define P6FENCE asm volatile("mf.a" ::: "memory");
+#elif defined (__alpha__)
+# define P6FENCE asm volatile("mb" ::: "memory");
+#else
+# define P6FENCE asm("xchg %%eax, %0" : : "m" (fenceVar) : "eax");
+#endif
 
 #define MAXFIFOSIZE     0x40000
 #define FIFOPAD         0x0000
@@ -97,7 +103,7 @@ typedef struct envitem_t {
 static envitem *first=0;
 static int envinit=0;
 
-DRIDef driInfo={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+DRIDef driInfo={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 void grDRIOpen(char *pFB, char *pRegs, int deviceID, int width, int height, 
 	       int mem, int cpp, int stride, int fifoOffset, int fifoSize, 
@@ -171,6 +177,7 @@ static void loadEnvFile() {
   }
 }
 
+#if 0 /* not used */
 static void deleteEnvData() {
   envitem *ptr, *next;
 
@@ -185,6 +192,7 @@ static void deleteEnvData() {
   first=0;
   envinit=0;
 }
+#endif
 
 char *
 hwcGetErrorString()
@@ -201,7 +209,7 @@ hwcInit(FxU32 vID, FxU32 dID) {
   errorString[0] = '\0';
 
   if (!driInfo.pFB) return 0;
-  if (dID!=driInfo.deviceID) return 0;
+  if (dID!=(FxU32)driInfo.deviceID) return 0;
   hInfo.boardInfo[0].pciInfo.initialized = FXFALSE;
   hInfo.nBoards++;
   hInfo.boardInfo[0].boardNum = 0;
@@ -237,8 +245,8 @@ hwcMapBoard(hwcBoardInfo *bInfo, FxU32 bAddrMask) {
   bInfo->linearInfo.initialized = FXTRUE;
   /*bInfo->osNT = FXFALSE;*/
   bInfo->procHandle = getpid();
-  bInfo->linearInfo.linearAddress[0]=(FxU32)driInfo.pRegs;
-  bInfo->linearInfo.linearAddress[1]=(FxU32)driInfo.pFB;
+  bInfo->linearInfo.linearAddress[0]=(unsigned long)driInfo.pRegs;
+  bInfo->linearInfo.linearAddress[1]=(unsigned long)driInfo.pFB;
   return FXTRUE;
 }
 
@@ -379,9 +387,9 @@ static FxU32
 calculateLfbStride(FxU32 screenWidth)
 {
 #if	1
-    int TileAperturePitch;
+    unsigned int TileAperturePitch;
     for (TileAperturePitch = 1024;
-         (TileAperturePitch < (16 << 10)) && (TileAperturePitch < screenWidth);
+         (TileAperturePitch < (16u << 10)) && (TileAperturePitch < screenWidth);
          TileAperturePitch <<= 1);
     return(TileAperturePitch);
 #else
@@ -897,6 +905,10 @@ hwcResolutionSupported(hwcBoardInfo *bInfo, GrScreenResolution_t res,
 #undef FN_NAME
 } /* hwcResolutionSupported */
 
+extern void _grImportFifo (int, int);
+extern void _grInvalidateAll (void);
+extern void _grExportFifo (int *, int *);
+
 /* This two routines hwcSLIRead{Enable,Disable} are currently NOPs XXX */
 
 void hwcSLIReadEnable(hwcBoardInfo *bInfo)
@@ -985,6 +997,5 @@ void grDRIInvalidateAll() {
 
 void grDRIResetSAREA()
 {
-  _grExportFifo(driInfo.fifoPtr, driInfo.fifoRead);
+  _grExportFifo((int *)driInfo.fifoPtr, (int *)driInfo.fifoRead);
 }
-

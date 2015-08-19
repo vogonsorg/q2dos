@@ -17,8 +17,35 @@
 **
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/glfb.c,v 1.7.4.16 2003/08/21 08:49:55 dborca Exp $
+** $Header: /cvsroot/glide/glide3x/h5/glide3/src/glfb.c,v 1.7.4.24 2005/08/13 21:07:03 jwrdegoede Exp $
 ** $Log: glfb.c,v $
+** Revision 1.7.4.24  2005/08/13 21:07:03  jwrdegoede
+** Last needed 64 bit fixes for h5/h3, complete 64 bit support for cvg
+**
+** Revision 1.7.4.23  2005/06/09 18:32:32  jwrdegoede
+** Fixed all warnings with gcc4 -Wall -W -Wno-unused-parameter, except for a couple I believe to be a gcc bug. This has been reported to gcc.
+**
+** Revision 1.7.4.22  2005/05/25 08:56:26  jwrdegoede
+** Make h5 and h3 tree 64 bit clean. This is ported over from the non-devel branch so this might be incomplete
+**
+** Revision 1.7.4.21  2005/05/25 08:51:50  jwrdegoede
+** Add #ifdef GL_X86 around x86 specific code
+**
+** Revision 1.7.4.20  2005/05/07 08:40:30  jwrdegoede
+** lvalue cast fixes for gcc4
+**
+** Revision 1.7.4.19  2004/10/05 14:54:43  dborca
+** DOS/OpenWatcom woes
+**
+** Revision 1.7.4.18  2004/04/28 17:40:51  koolsmoky
+** Removed registry path from GETENV.
+** Removed FX_GLIDE_AA_PIXELCENTER, FX_GLIDE_AA_JITTERDISP, FX_GLIDE_AA_GRIDROTATION, and FX_GLIDE_FORCE_SST0.
+** Removed FX_GL_LFBLOCK_HACK and FX_GLIDE_USE_HWC_AA_FOR_LFB_READ.
+** Moved _grSstDetectResources into _GlideInitEnvironment so that it will not be called everytime _grGlideInit is called.
+**
+** Revision 1.7.4.17  2003/10/14 15:04:07  dborca
+** fixed minihwc; conditioned context checking; added Texus2 to Glide3
+**
 ** Revision 1.7.4.16  2003/08/21 08:49:55  dborca
 ** Texture fixes by Koolsmoky
 **
@@ -468,8 +495,8 @@
 		movl	%%eax, (%%edi)	\n\
 		.p2align 3,,7		\n\
 	5:"::"g"(src), "g"(dst), "g"(width):"%eax", "%ecx", "%esi", "%edi")
-        
-#else
+
+#elif defined(__MSC__)
 
 #define MMX_RESET() __asm { emms }
 
@@ -643,6 +670,162 @@
 		__asm align	8		\
 	__asm finish_mmx_dstline4:		\
 	}
+        
+#elif defined(__WATCOMC__)
+
+#define MMX_RESET() __asm { emms }
+
+/* Desc: copy one row of pixels
+ *
+ * In  : length = number of bytes (pixels*bytesperpixel). Must be even (which
+ *                holds true, because we don't support 8bit. Also the existing
+ *                code assumes this, so this won't be a problem.
+ *       src    = source buffer
+ *       dst    = destination buffer
+ *
+ * Note: Aligns src (LFB) before copying. Clobbers eax, ecx, esi, edi
+ */
+extern void MMX_SRCLINE(FxU32 *src, FxU32 *dst, FxI32 length);
+#pragma aux MMX_SRCLINE = \
+		"cmp	ecx, 8"		\
+		"jb	small_move"	\
+		"test	esi, 2"		\
+		"jz	check4"		\
+		"mov	ax, [esi]"	\
+		"add	esi, 2"		\
+		"mov	[edi], ax"	\
+		"add	edi, 2"		\
+		"sub	ecx, 2"		\
+	"check4:"			\
+		"test	esi, 4"		\
+		"jz	aligned8"	\
+		"mov	eax, [esi]"	\
+		"add	esi, 4"		\
+		"mov	[edi], eax"	\
+		"add	edi, 4"		\
+		"sub	ecx, 4"		\
+	"aligned8:"			\
+		"mov	eax, ecx"	\
+		"and	ecx, 7"		\
+		"shr	eax, 3"		\
+		"jz	small_move"	\
+	"big_move:"			\
+		"movq	mm0, [esi]"	\
+		"add	esi, 8"		\
+		"movq	[edi], mm0"	\
+		"add	edi, 8"		\
+		"dec	eax"		\
+		"jnz	big_move"	\
+	"small_move:"			\
+		"test	ecx, 4"		\
+		"jz	check2"		\
+		"mov	eax, [esi]"	\
+		"add	esi, 4"		\
+		"mov	[edi], eax"	\
+		"add	edi, 4"		\
+	"check2:"			\
+		"test	ecx, 2"		\
+		"jz	finish"		\
+		"mov	ax, [esi]"	\
+		"mov	[edi], ax"	\
+	"finish:"			\
+        parm [esi] [edi] [ecx]		\
+        modify [eax ecx esi edi];
+
+/* Desc: copy one row of 16bit pixels
+ *
+ * In  : width = number of pixels
+ *       src   = source buffer
+ *       dst   = destination buffer
+ *
+ * Note: Aligns dst (LFB) before copying. Clobbers eax, ecx, esi, edi
+ */
+extern void MMX_DSTLINE2(FxU32 *src, FxU32 *dst, FxU32 width);
+#pragma aux MMX_DSTLINE2 = \
+		"cmp	ecx, 4"		\
+		"jb	small_move_mmx_dstline2"\
+		"test	edi, 2"		\
+		"jz	check4_mmx_dstline2"\
+		"mov	ax, [esi]"	\
+		"add	esi, 2"		\
+		"mov	[edi], ax"	\
+		"add	edi, 2"		\
+		"dec	ecx"		\
+	"check4_mmx_dstline2:"		\
+		"test	edi, 4"		\
+		"jz	aligned8_mmx_dstline2"\
+		"mov	eax, [esi]"	\
+		"add	esi, 4"		\
+		"mov	[edi], eax"	\
+		"add	edi, 4"		\
+		"sub	ecx, 2"		\
+	"aligned8_mmx_dstline2:"	\
+		"mov	eax, ecx"	\
+		"and	ecx, 3"		\
+		"shr	eax, 2"		\
+		"jz	small_move_mmx_dstline2"\
+	"big_move_mmx_dstline2:"	\
+		"movq	mm0, [esi]"	\
+		"add	esi, 8"		\
+		"movq	[edi], mm0"	\
+		"add	edi, 8"		\
+		"dec	eax"		\
+		"jnz	big_move_mmx_dstline2"\
+	"small_move_mmx_dstline2:"	\
+		"test	ecx, 2"		\
+		"jz	check2_mmx_dstline2"\
+		"mov	eax, [esi]"	\
+		"add	esi, 4"		\
+		"mov	[edi], eax"	\
+		"add	edi, 4"		\
+	"check2_mmx_dstline2:"		\
+		"test	ecx, 1"		\
+		"jz	finish_mmx_dstline2"\
+		"mov	ax, [esi]"	\
+		"mov	[edi], ax"	\
+	"finish_mmx_dstline2:"		\
+        parm [esi] [edi] [ecx]		\
+        modify [eax ecx esi edi];
+
+/* Desc: copy one row of 32bit pixels
+ *
+ * In  : width = number of pixels
+ *       src   = source buffer
+ *       dst   = destination buffer
+ *
+ * Note: Aligns dst (LFB) before copying. Clobbers eax, ecx, esi, edi
+ */
+extern void MMX_DSTLINE4(FxU32 *src, FxU32 *dst, FxU32 width);
+#pragma aux MMX_DSTLINE4 = \
+		"cmp	ecx, 2"		\
+		"jb	small_move_mmx_dstline4"\
+		"test	edi, 4"		\
+		"jz	aligned8_mmx_dstline4"\
+		"mov	eax, [esi]"	\
+		"add	esi, 4"		\
+		"mov	[edi], eax"	\
+		"add	edi, 4"		\
+		"dec	ecx"		\
+	"aligned8_mmx_dstline4:"	\
+		"mov	eax, ecx"	\
+		"and	ecx, 1"		\
+		"shr	eax, 1"		\
+		"jz	small_move_mmx_dstline4"\
+	"big_move_mmx_dstline4:"	\
+		"movq	mm0, [esi]"	\
+		"add	esi, 8"		\
+		"movq	[edi], mm0"	\
+		"add	edi, 8"		\
+		"dec	eax"		\
+		"jnz	big_move_mmx_dstline4"	\
+	"small_move_mmx_dstline4:"	\
+		"test	ecx, 1"		\
+		"jz	finish_mmx_dstline4"\
+		"mov	eax, [esi]"	\
+		"mov	[edi], eax"	\
+	"finish_mmx_dstline4:"		\
+        parm [esi] [edi] [ecx]		\
+        modify [eax ecx esi edi];
 
 #endif
 
@@ -793,7 +976,7 @@
 		.p2align 3,,7		\n\
 	5:"::"g"(src), "g"(dst), "g"(width):"%eax", "%ecx", "%esi", "%edi")
 
-#else
+#elif defined(__MSC__)
 
 #define FPU_SRCLINE(src, dst, length) __asm {\
 		__asm mov	ecx, length	\
@@ -939,6 +1122,134 @@
 		__asm align	8		\
 	__asm finish_fpu_dstline4:		\
 	}
+
+#elif defined(__WATCOMC__)
+
+extern void FPU_SRCLINE(FxU32 *src, FxU32 *dst, FxI32 length);
+#pragma aux FPU_SRCLINE = \
+		"cmp	ecx, 8"		\
+		"jb	small_move_fpu_srcline"\
+		"test	esi, 2"		\
+		"jz	check4_fpu_srcline"\
+		"mov	ax, [esi]"	\
+		"add	esi, 2"		\
+		"mov	[edi], ax"	\
+		"add	edi, 2"		\
+		"sub	ecx, 2"		\
+	"check4_fpu_srcline:"		\
+		"test	esi, 4"		\
+		"jz	aligned8_fpu_srcline"\
+		"mov	eax, [esi]"	\
+		"add	esi, 4"		\
+		"mov	[edi], eax"	\
+		"add	edi, 4"		\
+		"sub	ecx, 4"		\
+	"aligned8_fpu_srcline:"		\
+		"mov	eax, ecx"	\
+		"and	ecx, 7"		\
+		"shr	eax, 3"		\
+		"jz	small_move_fpu_srcline"\
+	"big_move_fpu_srcline:"		\
+		"fild	qword ptr [esi]"\
+		"add	esi, 8"		\
+		"fistp	qword ptr [edi]"\
+		"add	edi, 8"		\
+		"dec	eax"		\
+		"jnz	big_move_fpu_srcline"\
+	"small_move_fpu_srcline:"	\
+		"test	ecx, 4"		\
+		"jz	check2_fpu_srcline"\
+		"mov	eax, [esi]"	\
+		"add	esi, 4"		\
+		"mov	[edi], eax"	\
+		"add	edi, 4"		\
+	"check2_fpu_srcline:"		\
+		"test	ecx, 2"		\
+		"jz	finish_fpu_srcline"\
+		"mov	ax, [esi]"	\
+		"mov	[edi], ax"	\
+	"finish_fpu_srcline:"		\
+        parm [esi] [edi] [ecx]		\
+        modify [eax ecx esi edi];
+
+extern void FPU_DSTLINE2(FxU32 *src, FxU32 *dst, FxI32 length);
+#pragma aux FPU_DSTLINE2 = \
+		"cmp	ecx, 4"		\
+		"jb	small_move_fpu_dstline2"\
+		"test	edi, 2"		\
+		"jz	check4_fpu_dstline2"	\
+		"mov	ax, [esi]"	\
+		"add	esi, 2"		\
+		"mov	[edi], ax"	\
+		"add	edi, 2"		\
+		"dec	ecx"		\
+	"check4_fpu_dstline2:"		\
+		"test	edi, 4"		\
+		"jz	aligned8_fpu_dstline2"\
+		"mov	eax, [esi]"	\
+		"add	esi, 4"		\
+		"mov	[edi], eax"	\
+		"add	edi, 4"		\
+		"sub	ecx, 2"		\
+	"aligned8_fpu_dstline2:"	\
+		"mov	eax, ecx"	\
+		"and	ecx, 3"		\
+		"shr	eax, 2"		\
+		"jz	small_move_fpu_dstline2"\
+	"big_move_fpu_dstline2:"	\
+		"fild	qword ptr [esi]"\
+		"add	esi, 8"		\
+		"fistp	qword ptr [edi]"\
+		"add	edi, 8"		\
+		"dec	eax"		\
+		"jnz	big_move_fpu_dstline2"\
+	"small_move_fpu_dstline2:"	\
+		"test	ecx, 2"		\
+		"jz	check2_fpu_dstline2"\
+		"mov	eax, [esi]"	\
+		"add	esi, 4"		\
+		"mov	[edi], eax"	\
+		"add	edi, 4"		\
+	"check2_fpu_dstline2:"		\
+		"test	ecx, 1"		\
+		"jz	finish_fpu_dstline2"\
+		"mov	ax, [esi]"	\
+		"mov	[edi], ax"	\
+	"finish_fpu_dstline2:"		\
+        parm [esi] [edi] [ecx]		\
+        modify [eax ecx esi edi];
+
+extern void FPU_DSTLINE4(FxU32 *src, FxU32 *dst, FxI32 length);
+#pragma aux FPU_DSTLINE4 = \
+		"cmp	ecx, 2"		\
+		"jb	small_move_fpu_dstline4"\
+		"test	edi, 4"		\
+		"jz	aligned8_fpu_dstline4"\
+		"mov	eax, [esi]"	\
+		"add	esi, 4"		\
+		"mov	[edi], eax"	\
+		"add	edi, 4"		\
+		"dec	ecx"		\
+	"aligned8_fpu_dstline4:"	\
+		"mov	eax, ecx"	\
+		"and	ecx, 1"		\
+		"shr	eax, 1"		\
+		"jz	small_move_fpu_dstline4"\
+	"big_move_fpu_dstline4:"	\
+		"fild	qword ptr [esi]"\
+		"add	esi, 8"		\
+		"fistp	qword ptr [edi]"\
+		"add	edi, 8"		\
+		"dec	eax"		\
+		"jnz	big_move_fpu_dstline4"\
+	"small_move_fpu_dstline4:"	\
+		"test	ecx, 1"		\
+		"jz	finish_fpu_dstline4"\
+		"mov	eax, [esi]"	\
+		"mov	[edi], eax"	\
+	"finish_fpu_dstline4:"		\
+        parm [esi] [edi] [ecx]          \
+        modify [eax ecx esi edi];
 
 #endif
 
@@ -1335,7 +1646,7 @@ static FxBool _grLfbLock (GrLock_t type, GrBuffer_t buffer,
         if(gc->textureBuffer.on && 
            (buffer == GR_BUFFER_TEXTUREBUFFER_EXT || buffer == GR_BUFFER_TEXTUREAUXBUFFER_EXT)) {
           if(type == GR_LFB_READ_ONLY) {
-            info->lfbPtr         = (void *)((FxU32)gc->rawLfb + gc->textureBuffer.addr);
+            info->lfbPtr         = (void *)((unsigned long)gc->rawLfb + gc->textureBuffer.addr);
             info->strideInBytes  = gc->textureBuffer.stride;
 #if __POWERPC__
             if(IS_NAPALM(gc->bInfo->pciInfo.deviceID)) {
@@ -1357,7 +1668,7 @@ static FxBool _grLfbLock (GrLock_t type, GrBuffer_t buffer,
                   (!pixelPipeline) &&
                   /* Origin must be upper left since we will return raw lfb */
                   (origin != GR_ORIGIN_LOWER_LEFT)) {
-            info->lfbPtr        = (void *)((FxU32)gc->rawLfb + gc->textureBuffer.addr);
+            info->lfbPtr        = (void *)((unsigned long)gc->rawLfb + gc->textureBuffer.addr);
             info->strideInBytes = gc->textureBuffer.stride;
           }
 #endif
@@ -1551,8 +1862,6 @@ GR_ENTRY(grLfbLock, FxBool,(GrLock_t _type, GrBuffer_t buffer,
 {
 #define FN_NAME "grLfbLock"
   FxBool rv = FXTRUE;
-  FxBool wantHwc = FXFALSE;
-  FxBool forbidden = FXFALSE;
   
   GrLock_t type;
   
@@ -1571,26 +1880,16 @@ GR_ENTRY(grLfbLock, FxBool,(GrLock_t _type, GrBuffer_t buffer,
     GR_RETURN(FXFALSE);
   }
   
-#if !(GLIDE_PLATFORM & GLIDE_OS_UNIX) /* fix me! */
-  /* Read using HWC if we want dithering and using FSAA or 16 bpp mode */
-  wantHwc = ((_GlideRoot.environment.useHwcAAforLfbRead & 2) &&                  /* using HWC and */
-             _GlideRoot.environment.ditherHwcAA &&                               /* want dithering and */
-             ((gc->bInfo->h3pixelSample > 1) || (gc->bInfo->h3pixelSize == 2))); /* using FSAA or 16 bit mode */
-#endif
-  
   /* If we are using forced 32 bpp mode, the app is expecting 16 bit data */
   /* Or we want to be using HwcAA for the Lfb read lock */
   /* We need to use a hack for reading in OpenGL since they do 2 locks. Why, oh why, oh why...*/
-  if ((gc->state.forced32BPP || wantHwc) &&                                           /* using forced 32 bpp mode or using HWC and */
-      (!_GlideRoot.environment.is_opengl || _GlideRoot.environment.oglLfbLockHack) && /* not OpenGL or using OpenGL lock hacks and */
-      (buffer ==  GR_BUFFER_FRONTBUFFER || buffer == GR_BUFFER_BACKBUFFER))           /* is front or back buffer */
-     {
+  if (gc->state.forced32BPP &&                                                   /* using forced 32 bpp mode or using HWC and */
+      (buffer ==  GR_BUFFER_FRONTBUFFER || buffer == GR_BUFFER_BACKBUFFER))      /* is front or back buffer */
+    {
       if (_GlideRoot.environment.is_opengl && type == GR_LFB_WRITE_ONLY && (gc->lockPtrs[GR_LFB_READ_ONLY] == (FxU32)buffer))
-        {
-          const FxU32 lockCount = gc->cmdTransportInfo.lfbLockCount;
-          
+        { 
           GDBG_INFO_MORE(82,"OpenGL Locking forced 32bit->16bit hack(%d, %d)\n", _type, buffer);
-
+          
           /* check if the buffer exists */
           if(!forced_32bpp_lock_buffer) GR_RETURN(FXFALSE);
           
@@ -1602,9 +1901,9 @@ GR_ENTRY(grLfbLock, FxBool,(GrLock_t _type, GrBuffer_t buffer,
           info->writeMode = GR_LFBWRITEMODE_565;
           info->strideInBytes = gc->state.screen_width * 2;
           info->origin = origin;
-
-          gc->cmdTransportInfo.lfbLockCount = lockCount + 1;
-
+          
+          gc->cmdTransportInfo.lfbLockCount++;
+          
           GDBG_INFO_MORE(82,"OpenGL Locked forced hack (%d, %d)\n", _type, buffer);
           GR_RETURN(FXFALSE);
           
@@ -1615,20 +1914,10 @@ GR_ENTRY(grLfbLock, FxBool,(GrLock_t _type, GrBuffer_t buffer,
           
           /* Force origin */
           /* origin = GR_ORIGIN_UPPER_LEFT; */
-          
-          /* Just play with the useHwcAAforLfbRead setting to tell the ReadRegion */
-          /* function what we want to do */
-          FxU32 old_useHwcAAforLfbRead = _GlideRoot.environment.useHwcAAforLfbRead;
-          if (wantHwc) _GlideRoot.environment.useHwcAAforLfbRead |= 1;
-          else _GlideRoot.environment.useHwcAAforLfbRead = 0;
-          
           GDBG_INFO_MORE(82,"Locking forced (%d, %d)\n", _type, buffer);
           
           forced_32bpp_lock_buffer = malloc (gc->state.screen_width * gc->state.screen_height * 2);
           rv = grLfbReadRegionOrigin(buffer, origin, 0, 0, gc->state.screen_width, gc->state.screen_height, gc->state.screen_width*2, forced_32bpp_lock_buffer);
-          
-          /* Reset the useHwcAAforLfbRead setting */
-          _GlideRoot.environment.useHwcAAforLfbRead = old_useHwcAAforLfbRead;
           
           /* Failed to read */
           if (!rv)
@@ -1646,7 +1935,7 @@ GR_ENTRY(grLfbLock, FxBool,(GrLock_t _type, GrBuffer_t buffer,
           info->writeMode = GR_LFBWRITEMODE_565;
           info->strideInBytes = gc->state.screen_width * 2;
           info->origin = origin;
-
+          
           gc->cmdTransportInfo.lfbLockCount = lockCount + 1;
           
           GDBG_INFO_MORE(82,"Locked forced (%d, %d)\n", _type, buffer);
@@ -1787,8 +2076,6 @@ static FxBool _grLfbUnlock (GrLock_t type, GrBuffer_t buffer)
 GR_ENTRY(grLfbUnlock, FxBool, (GrLock_t _type, GrBuffer_t buffer))
 {
 #define FN_NAME "grLfbUnlock"
-  FxBool rval = FXFALSE;
-  FxBool wantHwc = FXFALSE;
   GrLock_t type;
   
   GR_BEGIN_NOFIFOCHECK_RET("grLfbUnLock", 83);
@@ -1810,18 +2097,10 @@ GR_ENTRY(grLfbUnlock, FxBool, (GrLock_t _type, GrBuffer_t buffer))
                          buffer != GR_BUFFER_AUXBUFFER,
                          "Bad buffer");
   
-#if !(GLIDE_PLATFORM & GLIDE_OS_UNIX) /* fix me! */
-  /* Read using HWC if we want dithering and using FSAA or 16 bpp mode */
-  wantHwc = ((_GlideRoot.environment.useHwcAAforLfbRead & 2) &&                  /* using HWC and */
-             _GlideRoot.environment.ditherHwcAA &&                               /* want dithering and */
-             ((gc->bInfo->h3pixelSample > 1) || (gc->bInfo->h3pixelSize == 2))); /* using FSAA or 16 bit mode */
-#endif
-  
   /* If we are using forced 32 bpp mode, the app is expecting 16 bit data */
   /* Or we want to be using HwcAA for the Lfb read lock */
   /* We need to use a hack for reading in OpenGL since they do 2 locks. Why, oh why, oh why...*/
-  if ((gc->state.forced32BPP || wantHwc) && 
-      (!_GlideRoot.environment.is_opengl || _GlideRoot.environment.oglLfbLockHack) &&  
+  if (gc->state.forced32BPP && 
       (buffer ==  GR_BUFFER_FRONTBUFFER || buffer == GR_BUFFER_BACKBUFFER))
     {
       if (_GlideRoot.environment.is_opengl && type == GR_LFB_WRITE_ONLY && (gc->lockPtrs[GR_LFB_READ_ONLY] == (FxU32)buffer))
@@ -1967,7 +2246,7 @@ _grLfbWriteRegion(FxBool pixPipelineP,
 
   info.size = sizeof(info);
   
-#define SET_LFB_STRAIGHT (!HAL_CSIM && !SET_SWIZZLEHACK && !SET_BSWAP) /* Hack alert: more tests? */
+#define SET_LFB_STRAIGHT (!HAL_CSIM && !SET_SWIZZLEHACK && !SET_BSWAP && GL_X86) /* Hack alert: more tests? */
   if (_grLfbLock(GR_LFB_WRITE_ONLY_EXPLICIT_EXT, 
                  dst_buffer, 
                  writeMode,
@@ -2001,23 +2280,25 @@ _grLfbWriteRegion(FxBool pixPipelineP,
          do {
              MMX_DSTLINE2(srcData, dstData, src_width);
              /* adjust for next line */
-             srcData = ((FxU8 *)srcData) + src_stride;
-             dstData = ((FxU8 *)dstData) + info.strideInBytes;
+             srcData = (FxU32 *)((FxU8 *)srcData + src_stride);
+             dstData = (FxU32 *)((FxU8 *)dstData + info.strideInBytes);
          } while (--scanline);
          MMX_RESET();
          break;
-	  } else {
+      }
+      else
+      {
          do {
              FPU_DSTLINE2(srcData, dstData, src_width);
              /* adjust for next line */
-             srcData = ((FxU8 *)srcData) + src_stride;
-             dstData = ((FxU8 *)dstData) + info.strideInBytes;
+             srcData = (FxU32 *)((FxU8 *)srcData + src_stride);
+             dstData = (FxU32 *)((FxU8 *)dstData + info.strideInBytes);
          } while (--scanline);
          break;
 	  }
 #else
       length  = src_width * 2;
-      aligned = !((int)dstData&0x2);
+      aligned = !((long)dstData&0x2);
       srcJump = src_stride - length;
       dstJump = info.strideInBytes - length;
       if (aligned) {
@@ -2081,17 +2362,19 @@ _grLfbWriteRegion(FxBool pixPipelineP,
          do {
              MMX_DSTLINE4(srcData, dstData, src_width);
              /* adjust for next line */
-             srcData = ((FxU8 *)srcData) + src_stride;
-             dstData = ((FxU8 *)dstData) + info.strideInBytes;
+             srcData = (FxU32 *)((FxU8 *)srcData + src_stride);
+             dstData = (FxU32 *)((FxU8 *)dstData + info.strideInBytes);
          } while (--scanline);
          MMX_RESET();
          break;
-	  } else {
+      }
+      else
+      {
 		 do {
              FPU_DSTLINE4(srcData, dstData, src_width);
              /* adjust for next line */
-             srcData = ((FxU8 *)srcData) + src_stride;
-             dstData = ((FxU8 *)dstData) + info.strideInBytes;
+             srcData = (FxU32 *)((FxU8 *)srcData + src_stride);
+             dstData = (FxU32 *)((FxU8 *)dstData + info.strideInBytes);
          } while (--scanline);
          break;
       }
@@ -2216,7 +2499,6 @@ static FxBool grLfbReadRegionOrigin (GrBuffer_t src_buffer, GrOriginLocation_t o
 #define FN_NAME "grLfbReadRegion"
    FxU32 bpp;
    FxBool rv;
-   FxBool wantHwc = FXFALSE;
    GrLfbInfo_t info;
 
    GR_BEGIN_NOFIFOCHECK_RET("grLfbReadRegion",82);
@@ -2235,103 +2517,43 @@ static FxBool grLfbReadRegionOrigin (GrBuffer_t src_buffer, GrOriginLocation_t o
    info.size = sizeof(info);
    rv=FXFALSE;
 
-#if !(GLIDE_PLATFORM & GLIDE_OS_UNIX) /* [dBorca] fixme :D */
-   /* Read using HWC if we want dithering and using FSAA or 16 bpp mode */
-   wantHwc = ((_GlideRoot.environment.useHwcAAforLfbRead & 2) &&                  /* using HWC and */
-              _GlideRoot.environment.ditherHwcAA &&                               /* want dithering and */
-              ((gc->bInfo->h3pixelSample > 1) || (gc->bInfo->h3pixelSize == 2))); /* using FSAA or 16 bit mode */
-
-   /* We want to use the 'advanced' and slow capture method */
-   if(wantHwc) {
-     FxU32 colBufferIndex = 0;
-     FxU32 bpp = 0;
-
-     if(gc->state.forced32BPP) {
-       bpp = gc->state.forced32BPP;
-     } else {
-       switch(gc->grPixelFormat) {
-       case GR_PIXFMT_ARGB_1555:
-       case GR_PIXFMT_AA_2_ARGB_1555:
-       case GR_PIXFMT_AA_4_ARGB_1555:
-       case GR_PIXFMT_AA_8_ARGB_1555: 	/* 8xaa */
-         bpp = 15;
-         break;
-       case GR_PIXFMT_ARGB_8888:
-       case GR_PIXFMT_AA_2_ARGB_8888:
-       case GR_PIXFMT_AA_4_ARGB_8888:
-       case GR_PIXFMT_AA_8_ARGB_8888:	/* 8xaa */
-         bpp = 32;
-         break;
-       case GR_PIXFMT_RGB_565:
-       case GR_PIXFMT_AA_2_RGB_565:
-       case GR_PIXFMT_AA_4_RGB_565:
-       case GR_PIXFMT_AA_8_RGB_565: 	/* 8xaa */
-       default:
-         bpp = 16;
-         break;
-       }
-
-       switch(src_buffer) {
-       case GR_BUFFER_FRONTBUFFER:
-         colBufferIndex = gc->frontBuffer;
-         break;
-
-       case GR_BUFFER_BACKBUFFER:
-         colBufferIndex = gc->backBuffer;
-         break;
-       }
-     }
-
-     hwcAAReadRegion(gc->bInfo, colBufferIndex,  src_x, src_y,
-                     src_width, src_height,  dst_stride, dst_data,
-                     bpp, _GlideRoot.environment.ditherHwcAA);
-     rv=FXTRUE;
-     goto done;
-   }
-#endif
-
    if (_grLfbLock(GR_LFB_READ_ONLY,
                   src_buffer,
                   GR_LFBWRITEMODE_ANY,
                   GR_ORIGIN_UPPER_LEFT,
                   FXFALSE,
                   &info)) {
-     FxU32 *src;
-     FxI32 len;
-#if 0
-     FxU32 *dst;
-     FxU32 src_adjust,dst_adjust,tmp;
-#endif
-
-     src=(FxU32 *) (((char*)info.lfbPtr)+
+     FxU32 *src=(FxU32 *) (((char*)info.lfbPtr)+
                     (src_y*info.strideInBytes) + (src_x * bpp));
-     len = src_width * bpp;
+     FxI32 len = src_width * bpp;
 
+#if GL_X86
      if(!gc->state.forced32BPP) {
        if(_GlideRoot.CPUType.os_support & _CPU_FEATURE_MMX) {
          do {
            MMX_SRCLINE(src, dst_data, len);
            /* adjust for next line */
-         src = ((FxU8 *)src) + info.strideInBytes;
-         dst_data = ((FxU8 *)dst_data) + dst_stride;
+           src = (FxU32 *)((FxU8 *)src + info.strideInBytes);
+           dst_data = (FxU32 *)((FxU8 *)dst_data + dst_stride);
          } while (--src_height);
          MMX_RESET();
-       } else {
+       }
+       else
+       {
          do {
            FPU_SRCLINE(src, dst_data, len);
            /* adjust for next line */
-         src = ((FxU8 *)src) + info.strideInBytes;
-         dst_data = ((FxU8 *)dst_data) + dst_stride;
+           src = (FxU32 *)((FxU8 *)src + info.strideInBytes);
+           dst_data = (FxU32 *)((FxU8 *)dst_data + dst_stride);
          } while (--src_height);
        }
-       goto okay;
      }
-
-#if 0
-     dst=dst_data;
+#else
+     FxU32 *dst=dst_data;
+     FxU32 src_adjust,dst_adjust,tmp;
 
      /* set length - alignment fix*/
-     tmp=(((FxU32)src)&2);
+     tmp=((unsigned long)src)&2;
      len -= tmp;
      src_adjust=info.strideInBytes - tmp;
      dst_adjust=dst_stride - tmp;
@@ -2342,8 +2564,12 @@ static FxBool grLfbReadRegionOrigin (GrBuffer_t src_buffer, GrOriginLocation_t o
      if(!gc->state.forced32BPP) {
        while(src_height--) {
          /* adjust starting alignment */
-         if (((FxU32)src)&3) {
-           *((FxU16 *)dst)++=*((FxU16 *)src)++;
+         if (((unsigned long)src)&3) {
+           /* Old code: *((FxU16 *)dst)++ = *((FxU16 *)src)++; */
+           FxU16 *p = (FxU16 *)dst;
+           *p = *((FxU16 *)src);
+           dst = (FxU32 *)((FxU16 *)dst + 1);
+           src = (FxU32 *)((FxU16 *)src + 1);
          }
 
          /* read in dwords of pixels */
@@ -2353,17 +2579,17 @@ static FxBool grLfbReadRegionOrigin (GrBuffer_t src_buffer, GrOriginLocation_t o
 
            /* copies aligned dwords */
            do {
-             *((FxU32 *)(((FxU32)dst) + byte_index))=*((FxU32 *)(((FxU32)src) + byte_index));
+             *((FxU32 *)(((unsigned long)dst) + byte_index))=*((FxU32 *)(((unsigned long)src) + byte_index));
            } while((byte_index+=4)<aligned);
 
            /* handle backend misalignment */
            if(byte_index!=(FxU32)len) {
-               *((FxU16 *)(((FxU32)dst) + byte_index))=*((FxU16 *)(((FxU32)src) + byte_index));
+               *((FxU16 *)(((unsigned long)dst) + byte_index))=*((FxU16 *)(((unsigned long)src) + byte_index));
            }
          }
          /* adjust for next line */
-         ((FxU8 *)src)+=src_adjust;
-         ((FxU8 *)dst)+=dst_adjust;
+         src = (FxU32 *)((FxU8 *)src + src_adjust);
+         dst = (FxU32 *)((FxU8 *)dst + dst_adjust);
        }
      }
 #endif
@@ -2378,18 +2604,18 @@ static FxBool grLfbReadRegionOrigin (GrBuffer_t src_buffer, GrOriginLocation_t o
 
            /* copies aligned dwords */
            do {
-             FxU32 s =*((FxU32 *)(((FxU32)src) + byte_index));
+             FxU32 s =*((FxU32 *)(((unsigned long)src) + byte_index));
              FxU16 d = (FxU16) (s & 0xF8) >> 3;
              d |= (s & 0xFC00) >> 5;
              d |= (s & 0xF80000) >> 8;
-             *((FxU16 *)(((FxU32)dst_data) + (byte_index2))) = d;
+             *((FxU16 *)(((unsigned long)dst_data) + (byte_index2))) = d;
              byte_index +=4;
            } while((byte_index2+=2)<(src_width*2));
          }
          
          /* adjust for next line */
-         src = ((FxU8 *)src) + info.strideInBytes;
-         dst_data = ((FxU8 *)dst_data) + dst_stride;
+         src = (FxU32 *)((FxU8 *)src + info.strideInBytes);
+         dst_data = (FxU32 *)((FxU8 *)dst_data + dst_stride);
        }
      } else if (gc->state.forced32BPP == 15) {
        while(src_height--) {
@@ -2400,22 +2626,20 @@ static FxBool grLfbReadRegionOrigin (GrBuffer_t src_buffer, GrOriginLocation_t o
 
            /* copies aligned dwords */
            do {
-             FxU32 s =*((FxU32 *)(((FxU32)src) + byte_index));
+             FxU32 s =*((FxU32 *)(((unsigned long)src) + byte_index));
              FxU16 d = (FxU16) (s & 0xF8) >> 3;
              d |= (s & 0xF800) >> 6;
              d |= (s & 0xF80000) >> 9;
-             *((FxU16 *)(((FxU32)dst_data) + (byte_index2))) = d;
+             *((FxU16 *)(((unsigned long)dst_data) + (byte_index2))) = d;
              byte_index +=4;
            } while((byte_index2+=2)<(src_width*2));
          }
          
          /* adjust for next line */
-         src = ((FxU8 *)src) + info.strideInBytes;
-         dst_data = ((FxU8 *)dst_data) + dst_stride;
+         src = (FxU32 *)((FxU8 *)src + info.strideInBytes);
+         dst_data = (FxU32 *)((FxU8 *)dst_data + dst_stride);
        }
      }
-
-okay:
      rv=FXTRUE;
      /* unlock buffer */
      _grLfbUnlock(GR_LFB_READ_ONLY,src_buffer);
@@ -2476,7 +2700,7 @@ GR_ENTRY(grLfbReadRegion, FxBool, (GrBuffer_t src_buffer,
     length   = src_width * 2;
     dstJump  = dst_stride - length;
     srcJump  = info.strideInBytes - length;
-    aligned  = !((int)srcData&0x2);
+    aligned  = !((long)srcData&0x2);
     odd      = (src_y+src_height) & 0x1;
     
 #if __POWERPC__
@@ -2571,4 +2795,16 @@ GR_ENTRY(grLfbReadRegion, FxBool, (GrBuffer_t src_buffer,
   GR_RETURN(rv);
 #undef FN_NAME
 }/* grLfbReadRegion */
+
+/* grLfbReadRegionOrigin, just call grLfbReadRegion, ignoring the origin
+   argument, since it is ignored by the X86 version too. */
+static FxBool grLfbReadRegionOrigin (GrBuffer_t src_buffer, GrOriginLocation_t origin, 
+                                     FxU32 src_x, FxU32 src_y, 
+                                     FxU32 src_width, FxU32 src_height, 
+                                     FxU32 dst_stride, void *dst_data)
+{
+  return grLfbReadRegion(src_buffer, src_x, src_y, src_width, src_height,
+    dst_stride, dst_data);
+}
+
 #endif /* if __POWERPC__ */

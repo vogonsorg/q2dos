@@ -318,14 +318,14 @@ typedef struct hwcPCIInfo_s {
 typedef struct hwcLinearInfo_s {
   FxBool
     initialized;
-  FxU32
+  unsigned long
     linearAddress[HWC_NUM_BASE_ADDR];
 } hwcLinearInfo;
 
 typedef struct hwcRegInfo_s {
   FxBool
     initialized;
-  volatile FxU32
+  volatile unsigned long
     ioMemBase,                  /* mem base for I/O aliases */
     cmdAGPBase,                 /* CMD/AGP register base */
     waxBase,                    /* 2D register base */
@@ -349,8 +349,9 @@ typedef struct hwcFifoInfo_s {
   FxBool
     agpFifo,
     initialized;
+  unsigned long
+    agpVirtAddr;
   FxU32
-    agpVirtAddr,
     agpPhysAddr,
     agpSize,
     fifoStart,                  /* Beg of fifo (offset from base) */
@@ -506,7 +507,7 @@ typedef struct hwcBoardInfo_s {
     contextHandle;  
   FxI32 hwcProtocol;
   FxU32 devNode ;   /* AJB- DevNode from display driver for minivdd ioctls */
-  FxI16/*FxI32*/ hwcEscape ; /* AJB- sucky: H5 TOT uses a diff't escape code than H3 */ /* KoolSmoky - new escape code for winxp *//* revert back to previous for now */
+  FxI16/*FxI32*/ hwcEscape ; /* AJB- sucky: H5 TOT uses a diff't escape code than H3 */
   char RegPath[256];    /* KoolSmoky - Device registry path */
   char DeviceName[32];  /* KoolSmoky - Device Name */
 } hwcBoardInfo;
@@ -617,16 +618,6 @@ hwcCheckMemSize(hwcBoardInfo *bInfo, FxU32 xres, FxU32 yres, FxU32 nColBuffers,
                 FxU32 nAuxBuffers, FxBool tiled);
 
 #ifdef __WIN32__
-
-#define OS_WIN32_95  0
-#define OS_WIN32_98  1
-#define OS_WIN32_ME  2
-#define OS_WIN32_NT4 3
-#define OS_WIN32_2K  4
-#define OS_WIN32_XP  5
-FxI32
-hwcGetOS();
-
 FxU32
 hwcAllocWinContext(hwcBoardInfo* bInfo);
 
@@ -717,11 +708,6 @@ hwcGetenvEx(const char *a, char *b);
 FxU32
 hwcQueryContext(hwcBoardInfo *bInfo);
 
-#if WINXP_ALT_TAB_FIX
-FxU32 __fastcall 
-hwcQueryContextXP(hwcBoardInfo *bInfo);
-#endif
-
 FxU32
 hwcShareContextData(hwcBoardInfo *bInfo, FxU32 **data);
 
@@ -770,6 +756,20 @@ extern void hwcAAReadRegion(hwcBoardInfo *bInfo, FxU32 colBufNum,
 
 void hwcCalcSipValue(hwcBoardInfo *bInfo, FxU32 chipNum, FxU32 *nandChain, FxU32 *norChain);
 
-void hwcSetCPUInfo (_p_info *CPUInfo_);
+#if GL_X86
+void hwcSetCPUInfo (_p_info *cpuInfo);
+#endif
+
+#if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
+/* values must be in sync with fxglide.h */
+#define OS_UNKNOWN   0
+#define OS_WIN32_95  1
+#define OS_WIN32_98  2
+#define OS_WIN32_ME  3
+#define OS_WIN32_NT4 4
+#define OS_WIN32_2K  5
+#define OS_WIN32_XP  6
+void hwcSetOSInfo(FxI32 *osInfo);
+#endif
 
 #endif                          /* MINIHWC_H not defined */

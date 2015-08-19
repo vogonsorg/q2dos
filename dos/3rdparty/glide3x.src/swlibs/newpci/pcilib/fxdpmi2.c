@@ -31,12 +31,13 @@
 
 #include <fxdpmi.h>
 
-/* [dBorca] */
 #ifdef __DJGPP__
 #include <crt0.h>
 #include <dpmi.h>
 #include <sys/nearptr.h>
 static FxBool dirty;
+#elif defined(__WATCOMC__)
+#include <i86.h>
 #else
 #include <fxmemmap.h>
 #endif
@@ -105,7 +106,6 @@ pciPlatformInit(void)
 static FxBool
 pciInitializeDPMI(void)
 {
-/* [dBorca] */
 #ifdef __DJGPP__
  /* enable nearptr access */
  if (_crt0_startup_flags & _CRT0_FLAG_NEARPTR) {
@@ -123,7 +123,6 @@ pciInitializeDPMI(void)
 static FxBool
 pciShutdownDPMI(void)
 {
-/* [dBorca] */
 #ifdef __DJGPP__
  if (dirty) {
     __djgpp_nearptr_disable();
@@ -145,7 +144,6 @@ static FxBool
 pciMapLinearDPMI(FxU32 busNumber, FxU32 physical_addr,
                FxU32 *linear_addr, FxU32 *length)
 {
-/* [dBorca] */
 #ifdef __DJGPP__
  __dpmi_meminfo meminfo;
 
@@ -160,6 +158,36 @@ pciMapLinearDPMI(FxU32 busNumber, FxU32 physical_addr,
        return FXFALSE;
 
     *linear_addr = meminfo.address - __djgpp_base_address;
+ } else {
+    /* exploit 1 -> 1 physical to linear mapping in low megabyte */
+    *linear_addr = physical_addr;
+ }
+#elif defined(__WATCOMC__)
+ if (physical_addr >= 0x100000) {
+    union REGS r;
+    /* Hack alert:
+     * because of the TILE shit, we must enhance the mapped area
+     */
+    FxU32 len = *length * 3 / 2;
+
+    /* function 0x800 (Physical Address Mapping) */
+    r.w.ax = 0x800;
+
+    /*
+    ** BX:CX = physical address
+    ** SI:DI = length
+    */
+    r.w.bx = ( FxU16 ) ( physical_addr >> 16 );
+    r.w.cx = ( FxU16 ) ( physical_addr & 0x0000FFFF );
+    r.w.si = ( FxU16 ) ( len >> 16 );
+    r.w.di = ( FxU16 ) ( len & 0x0000FFFF );
+    int386( 0x31, &r, &r );
+
+    /* if cflag set then an error occured */
+    if ( r.w.cflag ) {
+      return FXFALSE;
+    }
+    *linear_addr = (r.w.bx << 16) | r.w.cx;
  } else {
     /* exploit 1 -> 1 physical to linear mapping in low megabyte */
     *linear_addr = physical_addr;
@@ -208,7 +236,6 @@ pciMapLinearDPMI(FxU32 busNumber, FxU32 physical_addr,
 static FxBool
 pciUnmapLinearDPMI( FxU32 linear_addr, FxU32 length ) 
 {
-/* [dBorca] */
 #ifdef __DJGPP__
  __dpmi_meminfo meminfo;
 
@@ -220,6 +247,18 @@ pciUnmapLinearDPMI( FxU32 linear_addr, FxU32 length )
  }
 
  return FXFALSE;
+#elif defined(__WATCOMC__)
+ union REGS r;
+
+ /* function 0x801 (Free Physical Address Mapping) */
+ r.w.ax = 0x801;
+
+ /* BX:CX = physical address */
+ r.w.bx = ( FxU16 ) ( linear_addr >> 16 );
+ r.w.cx = ( FxU16 ) ( linear_addr & 0x0000FFFF );
+ int386( 0x31, &r, &r );
+
+ return (r.w.cflag == 0);
 #else
   DpmiUnmapMemory(linear_addr, length);
 #endif
@@ -247,7 +286,6 @@ pciPortInLongDPMI(FxU16 port)
 static FxBool
 pciPortOutByteDPMI(FxU16 port, FxU8 data)
 {
-  /* [dBorca] */
   outp(port, data);
   return FXTRUE;
 }
@@ -255,7 +293,6 @@ pciPortOutByteDPMI(FxU16 port, FxU8 data)
 static FxBool
 pciPortOutWordDPMI(FxU16 port, FxU16 data)
 {
-  /* [dBorca] */
   outpw(port, data);
   return FXTRUE;
 }
@@ -263,7 +300,6 @@ pciPortOutWordDPMI(FxU16 port, FxU16 data)
 static FxBool
 pciPortOutLongDPMI(FxU16 port, FxU32 data)
 {
-  /* [dBorca] */
   outpd(port, data);
   return FXTRUE;
 }
@@ -271,8 +307,7 @@ pciPortOutLongDPMI(FxU16 port, FxU32 data)
 static FxBool 
 pciMsrGetDPMI(MSRInfo* in, MSRInfo* out)
 {
-/* [dBorca] */
-#ifdef __DJGPP__
+#if defined(__DJGPP__) || defined(__WATCOMC__)
   return FXTRUE;
 #else
   return DpmiGetMSR((FxU32)in, (FxU32)out);
@@ -282,8 +317,7 @@ pciMsrGetDPMI(MSRInfo* in, MSRInfo* out)
 static FxBool 
 pciMsrSetDPMI(MSRInfo* in, MSRInfo* out)
 {
-/* [dBorca] */
-#ifdef __DJGPP__
+#if defined(__DJGPP__) || defined(__WATCOMC__)
   return FXTRUE;
 #else
   return DpmiSetMSR((FxU32)in, (FxU32)out);
@@ -294,8 +328,7 @@ pciMsrSetDPMI(MSRInfo* in, MSRInfo* out)
 static FxBool
 pciOutputStringDPMI(const char* msg)
 {
-/* [dBorca] */
-#ifdef __DJGPP__
+#if defined(__DJGPP__) || defined(__WATCOMC__)
  printf("%s", msg);
  return FXTRUE;
 #else
@@ -307,8 +340,7 @@ static FxBool
 pciSetPermissionDPMI(const FxU32 addrBase, const FxU32 addrLen,
                    const FxBool writePermP)
 {
-/* [dBorca] */
-#ifdef __DJGPP__
+#if defined(__DJGPP__) || defined(__WATCOMC__)
   return FXTRUE;
 #else
   return DpmiLinearRangeSetPermission(addrBase, addrLen, writePermP);
@@ -318,8 +350,7 @@ pciSetPermissionDPMI(const FxU32 addrBase, const FxU32 addrLen,
 static FxBool
 pciSetPassThroughBaseDPMI(FxU32* baseAddr, FxU32 baseAddrLen)
 {
-/* [dBorca] */
-#ifdef __DJGPP__
+#if defined(__DJGPP__) || defined(__WATCOMC__)
   return FXTRUE;
 #else
   return DpmiSetPassThroughBase(baseAddr, baseAddrLen);

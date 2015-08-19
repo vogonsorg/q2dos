@@ -17,7 +17,7 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/disst.c,v 1.3.4.4 2003/07/07 23:29:04 koolsmoky Exp $
+** $Header: /cvsroot/glide/glide3x/h5/glide3/src/disst.c,v 1.3.4.8 2005/05/25 08:56:25 jwrdegoede Exp $
 ** $Log:
 **  3    3dfx      1.0.1.0.1.0 10/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -180,16 +180,40 @@ GR_DIENTRY(grSstSelect, void, ( int which ))
    */
   GDBG_INFO(80, "grSstSelect(0x%X)\n", which);
 
-  if ( which >= _GlideRoot.hwConfig.num_sst )
+  if (!_GlideRoot.initialized)
+    GrErrorCallback( "grSstSelect:  grGlideInit must be called first.", FXTRUE );
+
+  if ((which < 0) ||
+      (which >= _GlideRoot.hwConfig.num_sst))
     GrErrorCallback( "grSstSelect:  non-existent SST", FXTRUE );
 
+#if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
+  /* [koolsmoky] We are using GR_DCL_GC to determine whether we
+   * have already attached a windowed context to the TLS slot.
+   *
+   * XXX: Note that the glide dll does not attach a gc to a newly
+   * created thread's TLS slot when in windowed mode (see DllMain).
+   * The application must call grSelectContext from its new thread
+   * to attach one.
+   */
+  {
+    GR_DCL_GC;
+    if (gc) {
+      if (gc->windowed) {
+        _GlideRoot.current_sst = which; // ZZZ
+        return;
+      }
+    }
+  }
+#endif
+  
+  /* Attach a full screen context to the TLS slot */
   _GlideRoot.current_sst = which;
-  setThreadValue( (FxU32)&_GlideRoot.GCs[_GlideRoot.current_sst] );
-
+  setThreadValue( (unsigned long)&_GlideRoot.GCs[_GlideRoot.current_sst] );
+  
 #ifdef GLIDE_MULTIPLATFORM
   _GlideRoot.curGCFuncs = _GlideRoot.curGC->gcFuncs;
 #endif
-
 } /* grSstSelect */
 
 /*---------------------------------------------------------------------------

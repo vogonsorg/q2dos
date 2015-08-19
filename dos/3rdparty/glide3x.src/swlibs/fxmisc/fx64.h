@@ -17,8 +17,8 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Revision: 1.2.8.1 $
-** $Date: 2003/04/06 18:30:23 $
+** $Revision: 1.2.8.2 $
+** $Date: 2004/10/04 09:41:24 $
 */
 #ifndef __FX64_H__
 #define __FX64_H__
@@ -116,7 +116,7 @@ extern FxI64 i64_zero;
 #define FX_MUL64( a, b )  ( __FX_MUL64( (a), (b) ) )
 #define FX_NEG64( a )     ( __FX_NEG64( (a).hi, (a).lo ) )
 #define FX_OR64( a, b )   ( __FX_OR64( a, b ) )
-#define FX_SET64( a, b, c ) {(a).hi = b; (a).lo = c;}
+#define FX_SET64( a, b, c ) do {(a).hi = b; (a).lo = c;} while(0)
 #define FX_SHL64( a, n )  ( __FX_SHL64( (a).hi, (a).lo, n ) )
 #define FX_SHR64( a, n )  ( __FX_SHR64( (a).hi, (a).lo, n ) )
 #define FX_SUB64( a, b )  ( __FX_SUB64( (a).hi, (a).lo, (b).hi, (b).lo ) )

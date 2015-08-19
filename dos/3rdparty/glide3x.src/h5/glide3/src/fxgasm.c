@@ -17,8 +17,8 @@
 **
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
 **
-** $Revision: 1.3.4.6 $
-** $Date: 2003/07/24 03:51:08 $
+** $Revision: 1.3.4.11 $
+** $Date: 2005/06/16 18:58:32 $
 ** 
 ** $Log:
 */
@@ -39,7 +39,6 @@
  * macros for creating assembler offset files
  *----------------------------------------------------------------------*/
 
-#if 1	/* defined(NASM) - default */
 #define NEWLINE printf("\n")
 #define COMMENT printf(";----------------------------------------------------------------------\n")
 
@@ -56,54 +55,9 @@
     else printf("%s\tequ %10d\n",pname,((int)&o)-(int)&p)
 
 #define SIZEOF(p,pname) if (hex) \
-        printf("SIZEOF_%s\tequ %08lxh\n",pname,sizeof(p)); \
-    else printf("SIZEOF_%s\tequ %10ld\n",pname,sizeof(p))
+        printf("SIZEOF_%s\tequ %08lxh\n",pname,(unsigned long)sizeof(p)); \
+    else printf("SIZEOF_%s\tequ %10lu\n",pname,(unsigned long)sizeof(p))
 
-#else	/* !NASM */
-
-#if !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !defined(__DJGPP__)
-#define NEWLINE printf("\n")
-#define COMMENT printf(";----------------------------------------------------------------------\n")
-
-#define HEADER(str)     NEWLINE; COMMENT; \
-                        printf("; Assembler offsets for %s struct\n",str);\
-                        COMMENT; NEWLINE
-
-#define OFFSET(p,o,pname) if (hex) \
-        printf("%s\t= %08xh\n",pname,((int)&p.o)-(int)&p); \
-    else printf("%s\t= %10d\n",pname,((int)&p.o)-(int)&p)
-
-#define OFFSET2(p,o,pname) if (hex) \
-        printf("%s\t= %08xh\n",pname,((int)&o)-(int)&p); \
-    else printf("%s\t= %10d\n",pname,((int)&o)-(int)&p)
-
-#define SIZEOF(p,pname) if (hex) \
-        printf("SIZEOF_%s\t= %08xh\n",pname,sizeof(p)); \
-    else printf("SIZEOF_%s\t= %10d\n",pname,sizeof(p))
-
-#else	/* (GLIDE_PLATFORM & GLIDE_OS_UNIX) || defined (__DJGPP__) */
-
-#define NEWLINE printf("\n");
-#define COMMENT printf("/*----------------------------------------------------------------------*/\n")
- 
-#define HEADER(str)     NEWLINE; COMMENT; \
-                        printf("/* Assembler offsets for %s struct */\n",str);\
-                        COMMENT; NEWLINE
-
-#define OFFSET(p,o,pname) if (hex) \
-        printf("#define %s 0x%08x\n",pname,((int)&p.o)-(int)&p); \
-    else printf("#define %s %10d\n",pname,((int)&p.o)-(int)&p)
-
-#define OFFSET2(p,o,pname) if (hex) \
-        printf("#define %s 0x%08x\n",pname,((int)&o)-(int)&p); \
-    else printf("#define %s %10d\n",pname,((int)&o)-(int)&p)
-
-#define SIZEOF(p,pname) if (hex) \
-        printf("#define SIZEOF_%s 0x%08x\n",pname,sizeof(p)); \
-    else printf("#define SIZEOF_%s %10d\n",pname,sizeof(p))
-#endif	/* (GLIDE_PLATFORM & GLIDE_OS_UNIX) || defined (__DJGPP__) */
-
-#endif  /* defined(NASM)*/
 
 int
 main (int argc, char **argv)
@@ -119,24 +73,24 @@ main (int argc, char **argv)
 
     if (argc > 1) {
       if (strcmp("-inline", argv[1]) == 0) {
-        SstRegs dummyRegs = { 0x00UL };
+        SstRegs dummyRegs;
 
         printf("#ifndef __FX_INLINE_H__\n");
         printf("#define __FX_INLINE_H__\n");
         printf("\n");
 
         printf("#define kTriProcOffset 0x%lXUL\n",
-               offsetof(struct GrGC_s, triSetupProc));
+               (unsigned long)offsetof(struct GrGC_s, triSetupProc));
         
         printf("/* The # of 2-byte entries in the hw fog table */\n");
-        printf("#define kInternalFogTableEntryCount 0x%lXUL\n",
-               sizeof(dummyRegs.fogTable) >> 1);
+        printf("#define kInternalFogTableEntryCount 0x%X\n",
+               (unsigned int)sizeof(dummyRegs.fogTable) >> 1);
 
         printf("#define kTLSOffset 0x%lXUL\n",
-               offsetof(struct _GlideRoot_s, tlsOffset));
+               (unsigned long)offsetof(struct _GlideRoot_s, tlsOffset));
 
         printf("#define kLostContextOffset 0x%lxUL\n",
-               offsetof(GrGC, lostContext));
+               (unsigned long)offsetof(GrGC, lostContext));
 
         printf("\n");
         printf("#endif /* __FX_INLINE_H__ */\n");
@@ -237,10 +191,14 @@ main (int argc, char **argv)
 #endif
 
     HEADER ("GlideRoot");
+#if defined(__WATCOMC__) || defined(__MSC__) || (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
     OFFSET (gr,p6Fencer,"p6Fencer\t");
+#endif
     OFFSET (gr,current_sst,"current_sst\t");
+#if GL_X86
     OFFSET (gr,CPUType,"CPUType\t\t");
-    OFFSET (gr,tlsOffset,"tlsOffset\t\t");    
+#endif
+    OFFSET (gr,tlsOffset,"tlsOffset\t\t");
     OFFSET (gr, pool.f255,"pool_f255");
     OFFSET (gr, pool.f1,"pool_f1");
     SIZEOF (gr.GCs[0].state,"GrState\t");

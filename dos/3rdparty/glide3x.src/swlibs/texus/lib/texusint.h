@@ -17,8 +17,8 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Revision: 1.2 $
-** $Date: 2000/06/15 00:11:40 $
+** $Revision: 1.2.6.1 $
+** $Date: 2005/05/25 08:56:37 $
 */
 
 #ifndef __TEXUSINT_H__
@@ -67,7 +67,7 @@ int     txGCD(int a, int b);
 int             txAspectRatio(int w, int h);
 void    txPanic(char *);
 void    txError(char *);
-void    txYABtoPal256(long *palette, const long* yabTable);
+void    txYABtoPal256(int *palette, const int* yabTable);
 void    txRectCopy(FxU8 *dst, int dstStride, const FxU8 *src, int srcStride,
                         int width, int height);
 FxBool  txMipAlloc(TxMip *txMip);
@@ -90,7 +90,7 @@ extern  int *explode3;
 
 void    txDiffuseIndex(TxMip *pxMip, TxMip *txMip, int pixsize, 
                 const FxU32 *palette, int       ncolors);
-int             txNearestColor(long ir, long ig, long ib, const FxU32 *pal, int npal);
+int             txNearestColor(int ir, int ig, int ib, const FxU32 *pal, int npal);
 
 FxBool _txReadTGAHeader( FILE *stream, FxU32 cookie, TxMip *info);
 FxBool _txReadTGAData( FILE *stream, TxMip *info);

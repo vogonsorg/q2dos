@@ -18,8 +18,8 @@
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
 **
-** $Revision: 1.1.8.1 $ 
-** $Date: 2003/05/06 12:55:17 $ 
+** $Revision: 1.1.8.3 $ 
+** $Date: 2004/10/05 14:39:57 $ 
 **
 */
 
@@ -48,7 +48,6 @@ unsigned long hWndMain;
 #endif
 
 #ifdef __DJGPP__
-/* [dBorca] */
 #include <conio.h>
 #include <pc.h>
 #include <crt0.h>
@@ -1532,6 +1531,7 @@ int _tlLoadTXS( const char   *filename,
 #if NAPALM_TEXTURES
       /* 4 bit, but treat as 8 bit for now */
     case GR_TEXFMT_ARGB_CMP_FXT1:
+    case GR_TEXFMT_ARGB_CMP_DXT1:
 #endif
 
     case GR_TEXFMT_RGB_332:
@@ -2183,7 +2183,7 @@ tlScreenDump
   return FXTRUE;
 }
 
-#if defined(__unix__) && !defined(__DJGPP__) /* [dBorca] */
+#if defined(__unix__) && !defined(__DJGPP__)
 
 /*-------------------------------------------------------------------
   Function: tlKbHit
@@ -2297,8 +2297,7 @@ tlErrorMessage( char *err)
 } /* tlErrorMessage */
 
 FxU32 tlGethWnd( void ) {
-/* [dBorca] */
-#ifdef __DJGPP__
+#ifdef __DOS32__
         return 1;
 #else
         return (FxU32)FrontWindow();

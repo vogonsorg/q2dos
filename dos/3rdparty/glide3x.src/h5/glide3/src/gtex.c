@@ -17,7 +17,7 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gtex.c,v 1.3.4.6 2003/08/21 08:49:55 dborca Exp $
+** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gtex.c,v 1.3.4.8 2005/06/09 18:32:33 jwrdegoede Exp $
 ** $Log:
 **  39   3dfx      1.34.1.0.1.211/14/00 Jonny Cochrane  Implement multisample LOD
 **       Dithering for 2x and 4x FSAA modes 
@@ -1205,7 +1205,6 @@ GR_ENTRY(grTexCombine, void,
     FxU32 combineMode = gc->state.tmuShadow[tmu].combineMode;
     FxU32 isCombineExt = (combineMode & SST_CM_USE_COMBINE_MODE);
     if (isCombineExt) {
-      SstRegs* tmuHw = SST_TMU(hw, tmu);
       /* It appears that some of the combineMode bits still take effect */
       /* even if SST_CM_USE_COMBINE_MODE is cleared.  Thus, to make sure */
       /* that things work right with old style combine modes, we clear   */
@@ -2785,8 +2784,7 @@ GR_ENTRY(grTexSource, void,
                                                     info->aspectRatioLog2,
                                                     info->format,
                                                     evenOdd,
-                                                    FXTRUE,
-                                                    FXFALSE)
+                                                    FXTRUE)
                            > gc->tmu_state[tmu].total_mem)),
                          "insufficient texture ram at startAddress");
   GR_CHECK_F(FN_NAME, evenOdd > 0x3 || evenOdd == 0, "evenOdd mask invalid");
@@ -3145,16 +3143,20 @@ GR_ENTRY(grTexMultibaseAddress, void,
           FxU32 evenOdd, GrTexInfo *info))
 {
 #define FN_NAME "grTexMultibaseAddress"
+#if GLIDE_DEBUG
   GrTexBaseRange_t
     maxPossibleLodRange = GR_TEXBASE_256; /* But see below for Napalm */
+#endif
 
   GR_BEGIN_NOFIFOCHECK("grTexMultibaseAddress", 88);
   GDBG_INFO_MORE(gc->myLevel,"(%d, 0x%X, 0x%X)\n", tmu, range, startAddress);
 
   GR_CHECK_TMU(FN_NAME, tmu);
+#if 0 /* GLIDE_DEBUG  FIXME: this is NOT handled in the case below */
   if (IS_NAPALM(gc->bInfo->pciInfo.deviceID)) {
     maxPossibleLodRange = GR_TEXBASE_2048;
-  }
+  } 
+#endif
   GR_CHECK_F(FN_NAME, range > maxPossibleLodRange, "invalid range");
   GR_CHECK_F(FN_NAME, startAddress >= gc->tmu_state[tmu].total_mem,
              "invalid startAddress");
@@ -3196,6 +3198,7 @@ GR_ENTRY(grTexMultibaseAddress, void,
       break;
       
     case GR_TEXBASE_32_TO_1:
+    default: /* should never happen because of range check above */
       largeLevelLod = GR_LOD_LOG2_32;
       baseAddrRegIndex = (offsetof(SstRegs, texBaseAddr38) >> 2UL);
       addrRegShadow = &gc->state.tmuShadow[tmu].texBaseAddr_3_8;
@@ -3398,7 +3401,6 @@ _grTexForceLod(GrChipID_t tmu, int value)
 {
 #define FN_NAME "_grTexForceLod"
   GR_DCL_GC;
-  GR_DCL_HW;
   FxU32 tLod = gc->state.tmuShadow[tmu].tLOD;
   FxBool tBig = FXFALSE;
 
@@ -3464,10 +3466,10 @@ GR_DIENTRY(grTextureBuffer, void,
   /*
    * AJB- Last I checked we couldn't render to an FXT1 surface...
    *
-  if (format == GR_TEXFMT_ARGB_CMP_FXT1 || format == GR_TEXFMT_ARGB_CMP_DXT1) {
+  if (format == GR_TEXFMT_ARGB_CMP_FXT1) {
     width = _grMipMapHostWHCmp4Bit[G3_ASPECT_TRANSLATE(aspectRatio)][thisLOD][0];
     height = _grMipMapHostWHCmp4Bit[G3_ASPECT_TRANSLATE(aspectRatio)][thisLOD][1];
-  } else if (format >= GR_TEXFMT_ARGB_CMP_DXT2 && format <= GR_TEXFMT_ARGB_CMP_DXT5) {
+  } else if (format >= GR_TEXFMT_ARGB_CMP_DXT1 && format <= GR_TEXFMT_ARGB_CMP_DXT5) {
     width = _grMipMapHostWHDXT[G3_ASPECT_TRANSLATE(aspectRatio)][thisLOD][0];
     height = _grMipMapHostWHDXT[G3_ASPECT_TRANSLATE(aspectRatio)][thisLOD][1];
   } else {
@@ -3496,8 +3498,7 @@ GR_DIENTRY(grTextureBuffer, void,
   else
     offset = _grTexTextureMemRequired( thisLOD+1, largeLOD, 
                                        aspectRatio, format,
-                                       odd_even_mask, FXTRUE,
-                                       FXFALSE );
+                                       odd_even_mask, FXTRUE );
 
   /* How do we deal with UMA?
   The tmu only makes sense when the UMA is not turned on.
@@ -3573,10 +3574,10 @@ GR_DIENTRY(grTextureAuxBuffer, void,
   /*
    * AJB- Using FXT1 for an aux buffer looks like it would be a mistake to me as well.
    *
-  if (format == GR_TEXFMT_ARGB_CMP_FXT1 || format == GR_TEXFMT_ARGB_CMP_DXT1) {
+  if (format == GR_TEXFMT_ARGB_CMP_FXT1) {
     width = _grMipMapHostWHCmp4Bit[G3_ASPECT_TRANSLATE(aspectRatio)][thisLOD][0];
     height = _grMipMapHostWHCmp4Bit[G3_ASPECT_TRANSLATE(aspectRatio)][thisLOD][1];
-  } else if (format >= GR_TEXFMT_ARGB_CMP_DXT2 && format <= GR_TEXFMT_ARGB_CMP_DXT5) {
+  } else if (format >= GR_TEXFMT_ARGB_CMP_DXT1 && format <= GR_TEXFMT_ARGB_CMP_DXT5) {
     width = _grMipMapHostWHDXT[G3_ASPECT_TRANSLATE(aspectRatio)][thisLOD][0];
     height = _grMipMapHostWHDXT[G3_ASPECT_TRANSLATE(aspectRatio)][thisLOD][1];
   } else {
@@ -3596,8 +3597,7 @@ GR_DIENTRY(grTextureAuxBuffer, void,
   else
     offset = _grTexTextureMemRequired( thisLOD+1, largeLOD, 
                                        aspectRatio, format,
-                                       odd_even_mask, FXTRUE,
-                                       FXFALSE );
+                                       odd_even_mask, FXTRUE );
 
   /* How do we deal with UMA?
   The tmu only makes sense when the UMA is not turned on.

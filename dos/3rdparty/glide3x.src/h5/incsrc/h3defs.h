@@ -20,8 +20,8 @@
 **
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Revision: 1.4.4.2 $
-** $Date: 2003/06/21 12:43:04 $
+** $Revision: 1.4.4.4 $
+** $Date: 2005/05/25 08:56:27 $
 */
 
 #ifndef WINSIM
@@ -61,11 +61,21 @@
 
 // this crazy macro tests the sign bit of a float by loading it into
 // an integer register and then testing the sign bit of the integer
-#define FLOAT_ISNEG(f) ((*(int *)(&(f))) < 0)
+#ifdef __ia64__
+  /* On IA-64, it's faster to do this the obvious way... --davidm 00/08/09 */
+# define FLOAT_ISNEG(f)	((f) < 0.0)
+#else
+# define FLOAT_ISNEG(f) ((*(int *)(&(f))) < 0)
+#endif
 
 // these crazy macros returns the sign of a number (1 if >= 0; -1 if < 0)
-#define ISIGN(x) (((x) | 0x40000000L) >> 30)
-#define FSIGN(f) ISIGN(*(long *)&f)
+#ifdef __ia64__
+# define ISIGN(x) ((x) >= 0 ? 1 : -1)
+# define FSIGN(f) ((f) >= 0.0 ? 1 : -1)
+#else
+# define ISIGN(x) (((x) | 0x40000000L) >> 30)
+# define FSIGN(f) ISIGN(*(long *)&f)
+#endif
 
 #define BIT(n)  (1UL<<(n))
 #define SST_MASK(n) (0xFFFFFFFFL >> (32-(n)))
@@ -579,8 +589,8 @@
         #define PRIBUFVTXOFFX_4SMPL_CHP0_CORRECT_DEF      "-0.125"
         #define PRIBUFVTXOFFX_4SMPL_CHP1_CORRECT_DEF      "-0.375"
         #define PRIBUFVTXOFFX_8SMPL_CHP0_CORRECT_DEF      "-0.125"
-        #define PRIBUFVTXOFFX_8SMPL_CHP1_CORRECT_DEF      "0.375"
-        #define PRIBUFVTXOFFX_8SMPL_CHP2_CORRECT_DEF      "-0.375"
+        #define PRIBUFVTXOFFX_8SMPL_CHP1_CORRECT_DEF      "-0.375"
+        #define PRIBUFVTXOFFX_8SMPL_CHP2_CORRECT_DEF      "0.375"
         #define PRIBUFVTXOFFX_8SMPL_CHP3_CORRECT_DEF      "0.125"
 // Note: Glide uses the binary values, and these are still the *original* values that ar
 //       centered around the pixel center, rather than offset by -0.5
@@ -605,8 +615,8 @@
         #define PRIBUFVTXOFFY_4SMPL_CHP0_CORRECT_DEF      "-0.375"
         #define PRIBUFVTXOFFY_4SMPL_CHP1_CORRECT_DEF      "0.125"
         #define PRIBUFVTXOFFY_8SMPL_CHP0_CORRECT_DEF      "-0.375"
-        #define PRIBUFVTXOFFY_8SMPL_CHP1_CORRECT_DEF      "-0.125"
-        #define PRIBUFVTXOFFY_8SMPL_CHP2_CORRECT_DEF      "0.125"
+        #define PRIBUFVTXOFFY_8SMPL_CHP1_CORRECT_DEF      "0.125"
+        #define PRIBUFVTXOFFY_8SMPL_CHP2_CORRECT_DEF      "-0.125"
         #define PRIBUFVTXOFFY_8SMPL_CHP3_CORRECT_DEF      "0.375"
 // Note: Glide uses the binary values, and these are still the *original* values that ar
 //       centered around the pixel center, rather than offset by -0.5
@@ -631,9 +641,9 @@
         #define SECBUFVTXOFFX_4SMPL_CHP0_CORRECT_DEF      "0.375"
         #define SECBUFVTXOFFX_4SMPL_CHP1_CORRECT_DEF      "0.125"
         #define SECBUFVTXOFFX_8SMPL_CHP0_CORRECT_DEF      "-0.25"
-        #define SECBUFVTXOFFX_8SMPL_CHP1_CORRECT_DEF      "0.125"
-        #define SECBUFVTXOFFX_8SMPL_CHP2_CORRECT_DEF      "0.25"
-        #define SECBUFVTXOFFX_8SMPL_CHP3_CORRECT_DEF      "-0.125"
+        #define SECBUFVTXOFFX_8SMPL_CHP1_CORRECT_DEF      "-0.125"
+        #define SECBUFVTXOFFX_8SMPL_CHP2_CORRECT_DEF      "0.125"
+        #define SECBUFVTXOFFX_8SMPL_CHP3_CORRECT_DEF      "0.25"
 // Note: Glide uses the binary values, and these are still the *original* values that ar
 //       centered around the pixel center, rather than offset by -0.5
         #define SECBUFVTXOFFX_2SMPL_DEF_VAL               0x04
@@ -657,9 +667,9 @@
         #define SECBUFVTXOFFY_4SMPL_CHP0_CORRECT_DEF      "-0.125"
         #define SECBUFVTXOFFY_4SMPL_CHP1_CORRECT_DEF      "0.375"
         #define SECBUFVTXOFFY_8SMPL_CHP0_CORRECT_DEF      "-0.125"
-        #define SECBUFVTXOFFY_8SMPL_CHP1_CORRECT_DEF      "-0.25"
-        #define SECBUFVTXOFFY_8SMPL_CHP2_CORRECT_DEF      "0.125"
-        #define SECBUFVTXOFFY_8SMPL_CHP3_CORRECT_DEF      "0.25"
+        #define SECBUFVTXOFFY_8SMPL_CHP1_CORRECT_DEF      "0.25"
+        #define SECBUFVTXOFFY_8SMPL_CHP2_CORRECT_DEF      "-0.25"
+        #define SECBUFVTXOFFY_8SMPL_CHP3_CORRECT_DEF      "0.125"
 // Note: Glide uses the binary values, and these are still the *original* values that ar
 //       centered around the pixel center, rather than offset by -0.5
         #define SECBUFVTXOFFY_2SMPL_DEF_VAL               0x04
@@ -2080,9 +2090,9 @@
 
 //----------------- useful addressing macros -----------------------
 // return pointer to SST at specified WRAP, CHIP, or TREX
-#define SST_WRAP(sst,n) ((SstRegs *)((n)*0x4000+(FxI32)(sst)))
-#define SST_CHIP(sst,n) ((SstRegs *)((n)*0x400+(FxI32)(sst)))
-#define SST_TMU(sst,n)  ((SstRegs *)((0x800<<(n))+(FxI32)(sst)))
+#define SST_WRAP(sst,n) ((SstRegs *)((n)*0x4000+(long)(sst)))
+#define SST_CHIP(sst,n) ((SstRegs *)((n)*0x400+(long)(sst)))
+#define SST_TMU(sst,n)  ((SstRegs *)((0x800<<(n))+(long)(sst)))
 #define SST_TREX(sst,n) SST_TMU(sst,n)
 
 // offsets from the base of memBaseAddr0
@@ -2129,7 +2139,7 @@
 
 #define SST_IS_REGISTER_ADDR(a)  ( (a) >= SST_IO_OFFSET         && (a) < SST_TEX_OFFSET )
 
-#define SST_BASE_ADDRESS(sst)   ((FxI32)(sst)-SST_3D_OFFSET)
+#define SST_BASE_ADDRESS(sst)   ((long)(sst)-SST_3D_OFFSET)
 #define SST_IO_ADDRESS(sst)     (SST_IO_OFFSET+SST_BASE_ADDRESS(sst))
 #define SST_CMDAGP_ADDRESS(sst) (SST_CMDAGP_OFFSET+SST_BASE_ADDRESS(sst))
 #define SST_GUI_ADDRESS(sst)    (SST_2D_OFFSET+SST_BASE_ADDRESS(sst))

@@ -17,7 +17,7 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/diglide.c,v 1.3.4.6 2003/07/24 03:51:07 anholt Exp $
+** $Header: /cvsroot/glide/glide3x/h5/glide3/src/diglide.c,v 1.3.4.10 2005/05/25 08:51:50 jwrdegoede Exp $
 ** $Log:
 **  3    3dfx      1.0.1.0.1.0 10/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -320,9 +320,11 @@ GR_DIENTRY(grHints, void, (GrHint_t hintType, FxU32 hints))
     gc->state.checkFifo = hints;
     break;
 
+#if GL_X86
   case GR_HINT_FPUPRECISION:
     hints ? double_precision_asm() : single_precision_asm();
     break;
+#endif
 
   case GR_HINT_ALLOW_MIPMAP_DITHER:
     /* Regardless of the game hint, force the user selection */
@@ -343,31 +345,9 @@ GR_DIENTRY(grHints, void, (GrHint_t hintType, FxU32 hints))
 GR_DIENTRY(grGlideInit, void, (void))
 {
   GDBG_INIT();
-  
+
   GDBG_INFO(80,"grGlideInit()\n");
-
-  /* dBorca - play safe */
-  grErrorSetCallback(_grErrorDefaultCallback);
-  
-  /* KoolSmoky - let's detect glide devices *before* GETENV is called
-  ** need to know where the devices are first if we want multimonitor
-  ** capabilities.
-  */
-  if ( !_grSstDetectResources() ) {
-  /* Hack alert:
-   * dBorca - Linux/DRI failed the above call, so bypass the next one
-   */
-#ifndef DRI_BUILD
-#ifdef GLIDE_INIT_HWC
-    GrErrorCallback( hwcGetErrorString(), FXTRUE );
-#endif
-#endif
-  }
-
-  /* KoolSmoky - if we have multiple sst devices, they will all use the 
-   * same environment values. Win32 will use device 0's registry.
-   */
-  _GlideInitEnvironment(0); /* the main init code */
+  _GlideInitEnvironment(); /* the main init code */
   FXUNUSED(*glideIdent);
 
 #if GDBG_INFO_ON
@@ -375,6 +355,11 @@ GR_DIENTRY(grGlideInit, void, (void))
 #endif
 
   if (_GlideRoot.initialized) {
+    /* allocate the TLS index */
+    /* [koolsmoky] According to Microsoft, the TLS index must be allocated
+     * only once when the DLL entry point is called with a DLL_PROCESS_ATTACH.
+     * However, doing so provoke problems so it is done here instead.
+     */
     initThreadStorage();
     initCriticalSection();
     

@@ -526,7 +526,17 @@
 #include <cpuid.h>
 
 /* local */
+#ifdef __WATCOMC__
+/* [dBorca]
+ * gross hack to prevent Watcom appending @0 to names;
+ * this is dangerous if those functions have parameters
+ * and are called from inside the asm specializations...
+ * You have been warned!
+ */
+#define GR_CDECL __cdecl
+#else
 #define GR_CDECL
+#endif
 #include "g3ext.h"
 #include "fxcmd.h"
 #include "gsfc.h"
@@ -547,15 +557,15 @@
 #define WIN32_LEANER_AND_MEANER
 #include <windows.h>
 #else
-FxBool fxSplashInit (FxU32 hWnd,
-                     FxU32 screenWidth, FxU32 screenHeight,
-                     FxU32 numColBuf, FxU32 numAuxBuf,
-                     GrColorFormat_t colorFormat);
-void fxSplashShutdown (void);
-void fxSplash (float x, float y, float w, float h, FxU32 frameNumber);
-const void *fxSplashPlug (FxU32* w, FxU32* h,
-                          FxI32* strideInBytes,
-                          GrLfbWriteMode_t* format);
+FxBool FX_CALL fxSplashInit (FxU32 hWnd,
+                             FxU32 screenWidth, FxU32 screenHeight,
+                             FxU32 numColBuf, FxU32 numAuxBuf,
+                             GrColorFormat_t colorFormat);
+void FX_CALL fxSplashShutdown (void);
+void FX_CALL fxSplash (float x, float y, float w, float h, FxU32 frameNumber);
+const void * FX_CALL fxSplashPlug (FxU32* w, FxU32* h,
+                                   FxI32* strideInBytes,
+                                   GrLfbWriteMode_t* format);
 #endif /* (GLIDE_PLATFORM & GLIDE_OS_WIN32) */
 
 /* -----------------------------------------------------------------------
@@ -600,11 +610,7 @@ const void *fxSplashPlug (FxU32* w, FxU32* h,
    Code Macros
    ----------------------------------------------------------------------- */
 #undef  GETENV
-#if (GLIDE_PLATFORM & GLIDE_OS_UNIX) || defined(__DJGPP__)
-#define GETENV(a, b) hwcGetenv(a)
-#else
-#define GETENV(a, b) hwcGetenvEx(a, b)
-#endif
+#define GETENV(a) hwcGetenv(a)
 
 /* -----------------------------------------------------------------------
    Internal Enumerated Types
@@ -1378,7 +1384,7 @@ void FX_CSTYLE _grDrawVertexList_SSE_Clip(FxU32 pktype, FxU32 type, FxI32 mode, 
 /* Define this structure otherwise it assumes the structure only exists
    within the function */
 struct GrGC_s;
-#endif	/* (GLIDE_PLATFORM & GLIDE_OS_UNIX) || defined(__DJGPP__) */
+#endif	/* __GNUC__ */
 
 /* _GlideRoot.curTexProcs is an array of (possibly specialized)
  * function pointers indexed by texture format size (8/16 bits for
@@ -1632,7 +1638,7 @@ typedef struct GrGC_s
           SET_FIFO(*curFifoPtr++, *curPktData++); \
         } \
         GR_INC_SIZE((__writeCount) * sizeof(FxU32)); \
-        gc->cmdTransportInfo.fifoRoom -= ((FxU32)curFifoPtr - (FxU32)gc->cmdTransportInfo.fifoPtr); \
+        gc->cmdTransportInfo.fifoRoom -= ((unsigned long)curFifoPtr - (unsigned long)gc->cmdTransportInfo.fifoPtr); \
         gc->cmdTransportInfo.fifoPtr = curFifoPtr; \
       } \
       GR_CHECK_SIZE(); \
@@ -1762,7 +1768,7 @@ typedef struct GrGC_s
                           */
     
     FxU32* fifoPtr;      /* Current write pointer into fifo */
-    FxU32  fifoRead;     /* Last known hw read ptr. 
+    unsigned long   fifoRead;     /* Last known hw read ptr. 
                           * If on an sli enabled system this will be
                           * the 'closest' hw read ptr of the sli
                           * master and slave.
@@ -1856,11 +1862,11 @@ typedef struct GrGC_s
     frontBuffer,
     backBuffer,
     buffers0[4],
-    buffers1[4],
-    lfbBuffers[4];              /* Tile relative addresses of the color/aux
+    buffers1[4];
+    unsigned long lfbBuffers[4];              /* Tile relative addresses of the color/aux
                                  * buffers for lfbReads.
                                  */  
-  FxU32 lockPtrs[2];        /* pointers to locked buffers */
+  unsigned long lockPtrs[2];        /* pointers to locked buffers */
   FxU32 fbStride;
 
   FxBool colTiled,            // AJB - grBufferClear needs to know when target surfaces
@@ -2019,14 +2025,18 @@ typedef struct GrGC_s
 **  stuff near the top is accessed a lot
 */
 struct _GlideRoot_s {
+#if defined(__WATCOMC__) || defined(__MSC__) || (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
   int   p6Fencer;           /* xchg to here to keep this in cache!!! */
+#endif
   FxU32 tlsIndex;
   FxU32 tlsOffset;
 
   int   current_sst;
   FxI32 windowsInit;        /* Is the fullscreen part of glide initialized? */
 
+#if GL_X86
   _p_info CPUType;          /* CPUID */
+#endif
 
 #if !GLIDE_HW_TRI_SETUP || !GLIDE_PACKET3_TRI_SETUP
   FxU32 paramCount;
@@ -2089,7 +2099,7 @@ struct _GlideRoot_s {
     FxI32  forceOldAA;          /* Force AA to use SLI when possible */
     FxI32  waxon ;              /* Enable use of WAX */
     FxU32  aaToggleKey;         /* Raw Key code for AA toggle */
-    FxU32  aaScreenshotKey;         /* Raw Key code for AA toggle */
+    FxU32  aaScreenshotKey;     /* Raw Key code for AA toggle */
     FxI32  analogSli ;          /* force digital or analog sli */
     FxI32  lodBias;             /* User-adjustable lod bias value (signed) */
     FxU32  sliBandHeightForce;  /* Force user-specified band height */
@@ -2109,17 +2119,13 @@ struct _GlideRoot_s {
     FxU32  columnWidth;         /* 'n' in columns of n */
 
     /* Anti-aliasing default perturbation values */
-    FxU32  aaXOffset[13][8];	/* increase arrays for 8xaa */
-    FxU32  aaYOffset[13][8];
+    FxU32  aaXOffset[15][8];	/* increase arrays for 8xaa */
+    FxU32  aaYOffset[15][8];
     /* Limit number of writes between fences */
     FxI32  fenceLimit;
     FxBool texSubLodDither;     /* always do subsample mipmap dithering */
     FxBool aaClip;              /* clean out AA garbage */
-    float  aaPixelOffset;       /* AA jitter pixel offset */
-    float  aaJitterDisp;        /* AA jitter dispersity */
-    double aaGridRotation;      /* AA grid rotation */
 
-    FxBool forceAutoBump;       /* force Auto bump? */
 #if CHECK_SLAVE_SWAPCMD
     FxU32 checkSlaveSwapCMD;    /* check swap commands across all chips */
 #endif
@@ -2127,9 +2133,9 @@ struct _GlideRoot_s {
     FxBool memFIFOHack;         /* flush FIFO as much as possible */
 #endif
 
-    FxU32  oglLfbLockHack;	    /* Enables disable hack to get around forced 32bit problems in OpenGL */
-    FxU32  useHwcAAforLfbRead;  /* Specifies whether to use HwcAAReadRegion for read Locks and LfbReadRegion calls */
-    FxU32  ditherHwcAA;		    /* Specifies whether to use HwcAAReadRegion should dither */
+    FxU32  ditherHwcAA;		/* Specifies whether to use HwcAAReadRegion should dither */
+    FxU32  taaToggleKey;        /* Raw key code for TemporalAA toggle */
+    FxBool taaEnabled;          /* TemporalAA enabled */
   } environment;
 
   GrHwConfiguration     hwConfig;
@@ -2154,12 +2160,13 @@ struct _GlideRoot_s {
   } deviceArchProcs;
 
 #if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
-#define OS_WIN32_95  0
-#define OS_WIN32_98  1
-#define OS_WIN32_ME  2
-#define OS_WIN32_NT4 3
-#define OS_WIN32_2K  4
-#define OS_WIN32_XP  5
+#define OS_UNKNOWN   0
+#define OS_WIN32_95  1
+#define OS_WIN32_98  2
+#define OS_WIN32_ME  3
+#define OS_WIN32_NT4 4
+#define OS_WIN32_2K  5
+#define OS_WIN32_XP  6
   FxI32 OS;
 #endif
 
@@ -2189,11 +2196,22 @@ extern GrGCFuncs _curGCFuncs;
 #  pragma warning(default : 4035)
 #elif defined(macintosh) && defined(__POWERPC__) && defined(__MWERKS__)
 #  define P6FENCE __sync()
-#elif defined(__GNUC__) && defined(__i386__)
+#elif defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
 /*
  * This is the __linux__ code.
  */
 #define P6FENCE asm("xchg %%eax, %0" : : "m" (_GlideRoot.p6Fencer) : "eax");
+#elif defined(__GNUC__) && defined(__ia64__)
+# define P6FENCE asm volatile ("mf.a" ::: "memory");
+#elif defined(__GNUC__) && defined(__alpha__)
+# define P6FENCE asm volatile("mb" ::: "memory");
+#elif defined(__WATCOMC__)
+void 
+p6Fence(void);
+#pragma aux p6Fence = \
+  "xchg eax, dword ptr _GlideRoot" \
+  modify [eax];
+#define P6FENCE p6Fence()
 #else  /* !defined ( P6FENCE ) */
 #  error "P6 Fencing code needs to be added for this compiler"
 #endif /* !defined ( P6FENCE ) */
@@ -2329,7 +2347,7 @@ _trisetup_noclip_valid(const void *va, const void *vb, const void *vc );
   (*gc->triSetupProc)
 #else  // _MSC_VER
 // TRISETUP Macro for msvc 6 or later 
-#ifdef GLIDE_DEBUG
+#if defined(GLIDE_DEBUG) || GLIDE_USE_C_TRISETUP
 // MSVC6 Debug does funny stuff, so push our parms inline
 #define TRISETUP(_a, _b, _c) \
   __asm { \
@@ -2356,11 +2374,23 @@ _trisetup_noclip_valid(const void *va, const void *vb, const void *vc );
 #define TRISETUP \
   __asm(""::"d"(gc)); \
   (*gc->triSetupProc)
-#else /* (GLIDE_PLATFORM & GLIDE_OS_UNIX) */
+#elif defined(__WATCOMC__)
+extern void wat_trisetup (void *gc, const void *a, const void *b, const void *c);
+#pragma aux wat_trisetup = \
+	"push ecx" \
+	"push ebx" \
+	"push eax" \
+	parm [edx] [eax] [ebx] [ecx];
+#define TRISETUP(_a, _b, _c) \
+        do { \
+           wat_trisetup(gc, _a, _b, _c); \
+           ((FxI32 (*)(void))*gc->triSetupProc)(); \
+        } while (0)
+#else
 #define TRISETUP \
   (*gc->triSetupProc)
 #endif
-void
+void GR_CDECL
 _grValidateState();
 
 void FX_CSTYLE
@@ -2428,9 +2458,9 @@ grStencilFunc(GrCmpFnc_t fnc, GrStencil_t ref, GrStencil_t mask);
 void FX_CALL 
 grStencilMask(GrStencil_t write_mask);
 
-void FX_CALL
+/*void FX_CALL
 grStipplePattern(
-            GrStipplePattern_t stipple);
+            GrStipplePattern_t stipple);*/
 
 void FX_CALL 
 grStencilOp(
@@ -2680,6 +2710,64 @@ _grSstVRetraceOn(void);
 */
 
 #if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
+/* [koolsmoky] According to MSJ, in WinNT, the pointer to the TLS slots for
+ * the thread contains a null pointer until the first time a TLS slot is used
+ * in the thread, then the system allocates memory for the TLS slots out of
+ * the default process heap. In Win95, it points to the TLS slots that are
+ * always kept as part of the Ring 3 thread database.
+ *
+ * The value of TLS index X can be read as follows on all Win32 systems;
+ * get pointer to the TLS slots for the thread, add (X * sizeof(DWORD)) to it,
+ * and read from that address.
+ *
+ * NOTE: This is valid for TLS slots 0 through 63 (64 slots).
+ *
+ * Win2k/XP
+ * From Win2k/XP DDK's ntddk.h;
+ * FS:[0x3C]  - contains a pointer to the TLS slots for the thread.
+ *
+ * Win9x/Me/NT4
+ * FS:[0x2C] - contains a pointer to the TLS slots for the thread.
+ *
+ *
+ * According to MSDN, the TLS slots are always kept as part of the Ring 3
+ * thread database on all Win32 systems; they are kept at the following
+ * offsets of the Thread Environment Block (TEB) structure.
+ *
+ * Win95
+ * offsets 0x88 - 0x188 (64 slots)
+ *
+ * WinNT4
+ * offsets 0xE10 - 0xF0F (64 slots)
+ *
+ * Win98/Me
+ * offsets 0x88 - 0x188, 0x???? - 0x???? (80 slots)
+ *
+ * Win2k/XP
+ * offsets 0xE10 - 0xF0F, 0x268C - 0x368C (1088 slots)
+ *
+ * FS:[0x18] contains the base address of the TEB structure.
+ *
+ * NOTE: The minimum slots is guaranteed to be at least 64 on all systems.
+ *       TLS_MINIMUM_AVAILABLE = 64
+ */
+
+#define USE_STANDARD_TLS_FUNC 0
+
+#if USE_STANDARD_TLS_FUNC
+
+__inline FxU32
+getThreadValueFast() {
+  /* According to Microsoft, TlsGetValue is implemented with speed as the
+   * primary goal. The function performs minimal parameter validation and
+   * error checking. This function succeeds only when the TLS index is in
+   * the range 0 through (TLS_MINIMUM_AVAILABLE - 1).
+   */
+  return (FxU32)TlsGetValue(_GlideRoot.tlsIndex);
+}
+
+#else
+
 #define W95_TEB_PTR                     0x18
 #define W95_TEB_TLS_OFFSET              0x88
 #define W95_TLS_INDEX_TO_OFFSET(i)      ((i)*sizeof(DWORD)+W95_TEB_TLS_OFFSET)
@@ -2703,13 +2791,6 @@ extern __inline FxU32 getThreadValueFast (void)
 
 #else  /* __GNUC__ */
 
-#define __GR_GET_TLSC_VALUE() \
-__asm { \
-   __asm mov eax, DWORD PTR fs:[WNT_TEB_PTR] \
-   __asm add eax, DWORD PTR _GlideRoot.tlsOffset \
-   __asm mov eax, DWORD PTR [eax] \
-}
-
 #pragma warning (4:4035)        /* No return value */
 __inline FxU32
 getThreadValueFast() {
@@ -2719,9 +2800,10 @@ getThreadValueFast() {
     __asm mov eax, DWORD PTR [eax] 
   }
 }
-#pragma warning (3:4035)
 
 #endif /* __GNUC__ */
+#endif
+
 #endif
 
 #if (GLIDE_PLATFORM & GLIDE_OS_MACOS)
@@ -2733,14 +2815,14 @@ getThreadValueFast() {
 #endif
 
 #if (GLIDE_PLATFORM & GLIDE_OS_UNIX)
-extern FxU32 threadValueLinux;
+extern unsigned long threadValueLinux;
 #define getThreadValueFast() threadValueLinux
 #endif /* defined(GLIDE_PLATFORM & GLIDE_OS_UNIX) */
 
-#ifdef __DJGPP__
-extern FxU32 threadValueDJGPP;
+#if (GLIDE_PLATFORM & GLIDE_OS_DOS32)
+extern FxU32 GR_CDECL threadValueDJGPP;
 #define getThreadValueFast() threadValueDJGPP
-#endif /* defined(__DJGPP__) */
+#endif /* DOS32 */
 
 #define CUR_TRI_PROC(__checkValidP, __cullP) \
   (*gc->archDispatchProcs.coorModeTriVector)[__checkValidP][__cullP]
@@ -2761,13 +2843,16 @@ void
 freeThreadStorage( void );
 
 void 
-setThreadValue( FxU32 value );
+setThreadValue( unsigned long value );
 
-FxU32
+unsigned long
 getThreadValueSLOW( void );
 
 void 
 initCriticalSection( void );
+
+void
+deleteCriticalSection( void );
 
 void 
 beginCriticalSection( void );
@@ -2795,7 +2880,7 @@ void
 _grDisplayStats(void);
 
 void
-_GlideInitEnvironment(int which);
+_GlideInitEnvironment(void);
 
 void FX_CSTYLE
 _grColorCombineDelta0Mode(FxBool delta0Mode);
@@ -2941,8 +3026,7 @@ FxU32
 _grTexTextureMemRequired(GrLOD_t small_lod, GrLOD_t large_lod, 
                          GrAspectRatio_t aspect, GrTextureFormat_t format,
                          FxU32 evenOdd,
-                         FxBool roundP,
-                         FxBool systemMem);
+                         FxBool roundP);
 void FX_CSTYLE
 _grUpdateParamIndex(void);
 
@@ -3035,14 +3119,6 @@ assertDefaultState( void );
 
 #include <assert.h>
 
-#if WINXP_ALT_TAB_FIX
-#define HWCQUERYCONTEXTXP() if (!(gc->windowed || hwcQueryContextXP(gc->bInfo))) return;
-#define HWCQUERYCONTEXTXP_RET() if (!(gc->windowed || hwcQueryContextXP(gc->bInfo))) return 0;
-#else /* WINXP_ALT_TAB_FIX */
-#define HWCQUERYCONTEXTXP()
-#define HWCQUERYCONTEXTXP_RET()
-#endif/* WINXP_ALT_TAB_FIX */
-
 #ifdef GLIDE_ALT_TAB
 #define GR_BEGIN_NOFIFOCHECK(name,level) \
                 GR_DCL_GC;      \
@@ -3051,11 +3127,12 @@ assertDefaultState( void );
                 FXUNUSED(hw); \
                 if (!gc) \
                   return; \
-                if (gc->lostContext) { \
-                  if (*gc->lostContext) { \
-                    return;\
+                if (!(gc->windowed)) { \
+                  if (gc->lostContext) { \
+                    if (*gc->lostContext) { \
+                      return;\
+                    }\
                   }\
-                  HWCQUERYCONTEXTXP(); \
                 }
 #define GR_BEGIN_NOFIFOCHECK_RET(name,level) \
                 GR_DCL_GC;      \
@@ -3064,11 +3141,12 @@ assertDefaultState( void );
                 FXUNUSED(hw); \
                 if (!gc) \
                   return 0; \
-                if (gc->lostContext) {\
-                  if (*gc->lostContext) { \
-                      return 0;\
+                if (!(gc->windowed)) { \
+                  if (gc->lostContext) {\
+                    if (*gc->lostContext) { \
+                        return 0;\
+                    }\
                   }\
-                  HWCQUERYCONTEXTXP_RET(); \
                 }
 #define GR_BEGIN_NOFIFOCHECK_NORET(name,level) \
                 GR_DCL_GC;      \
@@ -3113,7 +3191,11 @@ assertDefaultState( void );
 #if defined(GLIDE_SANITY_ASSERT)
 #define GR_ASSERT(exp) ((void)((!(exp)) ? (_grAssert(#exp,  __FILE__, __LINE__),0) : 0xFFFFFFFF))
 #else
-#define GR_ASSERT(exp) ((void)(0 && ((FxU32)(exp))))
+# ifdef __GNUC__
+#  define GR_ASSERT(exp)	((void) 0)
+# else
+#  define GR_ASSERT(exp) ((void)(0 && ((FxU32)(exp))))
+# endif
 #endif
 
 #define INTERNAL_CHECK(__name, __cond, __msg, __fatalP) \
@@ -3185,7 +3267,7 @@ extern FxU32 SST_TEXTURE_ALIGN;
 #define HW_TEX_PTR(__b)        ((FxU32*)(((FxU32)(__b)) + HW_TEXTURE_OFFSET))   
 
 /* access a floating point array with a byte index */
-#define FARRAY(p,i)    (*(float *)((i)+(int)(p)))
+#define FARRAY(p,i)    (*(float *)((i)+(long)(p)))
 #define ArraySize(__a) (sizeof(__a) / sizeof((__a)[0]))
 
 #if GDBG_INFO_ON
@@ -3265,5 +3347,9 @@ static GrLOD_t g3LodXlat_base[2] = { GR_LOD_LOG2_256, GR_LOD_LOG2_2048 };
 #define _g3LodXlat(someLOD, tBig) \
   (g3LodXlat_base[tBig] - someLOD)
 #endif
+
+GR_EXT_ENTRY(grTexDownloadTableExt,
+         void,
+         (GrChipID_t tmu, GrTexTable_t type,  void *data));
 
 #endif /* __FXGLIDE_H__ */

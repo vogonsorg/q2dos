@@ -14,8 +14,8 @@
 ** successor clauses in the FAR, DOD or NASA FAR Supplement. Unpublished  -
 ** rights reserved under the Copyright Laws of the United States.
 **
-** $Revision: 1.1.1.1.6.1 $
-** $Date: 2003/06/29 18:23:28 $
+** $Revision: 1.1.1.1.6.9 $
+** $Date: 2005/08/13 21:07:04 $
 */
 
 #include <assert.h>
@@ -67,7 +67,7 @@ _txDuplicateData(const FxU32 *src, int *wp, int *hp, int lbw, int lbh)
 }
 
 static int
-_txPixQuantize_RGB332( unsigned long argb, int x, int y, int w)
+_txPixQuantize_RGB332( unsigned int argb, int x, int y, int w)
 {
     return (
             (((argb>>16) & 0xE0) |
@@ -76,7 +76,7 @@ _txPixQuantize_RGB332( unsigned long argb, int x, int y, int w)
 }
 
 static int
-_txPixQuantize_RGB332_D4x4( unsigned long argb, int x, int y, int w)
+_txPixQuantize_RGB332_D4x4( unsigned int argb, int x, int y, int w)
 {
     int d = dithmat[y&3][x&3];
     int n, t;
@@ -91,7 +91,7 @@ _txPixQuantize_RGB332_D4x4( unsigned long argb, int x, int y, int w)
 }
 
 static int
-_txPixQuantize_RGB332_DErr( unsigned long argb, int x, int y, int w)
+_txPixQuantize_RGB332_DErr( unsigned int argb, int x, int y, int w)
 {
     static unsigned char a3[] = {0x00,0x24,0x49,0x6d,0x92,0xb6,0xdb,0xff};
     static unsigned char a2[] = {0x00,0x55,0xaa,0xff};
@@ -148,13 +148,13 @@ _txPixQuantize_RGB332_DErr( unsigned long argb, int x, int y, int w)
 /* YIQ422 done elsewhere */
 
 static int
-_txPixQuantize_A8( unsigned long argb, int x, int y, int w)
+_txPixQuantize_A8( unsigned int argb, int x, int y, int w)
 {
     return (argb >> 24);
 }
 
 static int
-_txPixQuantize_I8( unsigned long argb, int x, int y, int w)
+_txPixQuantize_I8( unsigned int argb, int x, int y, int w)
 {
     return (
     ((int) (((argb >>16) & 0xFF) * .30F +
@@ -163,7 +163,7 @@ _txPixQuantize_I8( unsigned long argb, int x, int y, int w)
 }
 
 static int
-_txPixQuantize_AI44( unsigned long argb, int x, int y, int w)
+_txPixQuantize_AI44( unsigned int argb, int x, int y, int w)
 {
     return(
         (int)   ((      ((argb>>16) & 0xFF) * .30F +
@@ -173,7 +173,7 @@ _txPixQuantize_AI44( unsigned long argb, int x, int y, int w)
 }
 
 static int
-_txPixQuantize_AI44_D4x4( unsigned long argb, int x, int y, int w)
+_txPixQuantize_AI44_D4x4( unsigned int argb, int x, int y, int w)
 {
     int d = dithmat[y&3][x&3];
     int n, t;
@@ -191,7 +191,7 @@ _txPixQuantize_AI44_D4x4( unsigned long argb, int x, int y, int w)
 }
 
 static int
-_txPixQuantize_AI44_DErr( unsigned long argb, int x, int y, int w)
+_txPixQuantize_AI44_DErr( unsigned int argb, int x, int y, int w)
 {
     int ii, t;
     static      int     qi;
@@ -226,7 +226,7 @@ _txPixQuantize_AI44_DErr( unsigned long argb, int x, int y, int w)
 
 
 static int
-_txPixQuantize_ARGB8332 ( unsigned long argb, int x, int y, int w)
+_txPixQuantize_ARGB8332 ( unsigned int argb, int x, int y, int w)
 {
     return (
                          ((argb>>16) & 0xE0) |
@@ -237,7 +237,7 @@ _txPixQuantize_ARGB8332 ( unsigned long argb, int x, int y, int w)
 
 
 static int
-_txPixQuantize_ARGB8332_D4x4( unsigned long argb, int x, int y, int w)
+_txPixQuantize_ARGB8332_D4x4( unsigned int argb, int x, int y, int w)
 {
     int d = dithmat[y&3][x&3];
     int n, t;
@@ -253,7 +253,7 @@ _txPixQuantize_ARGB8332_D4x4( unsigned long argb, int x, int y, int w)
 }
 
 static int
-_txPixQuantize_ARGB8332_DErr( unsigned long argb, int x, int y, int w)
+_txPixQuantize_ARGB8332_DErr( unsigned int argb, int x, int y, int w)
 {
     int t;
 
@@ -265,7 +265,7 @@ _txPixQuantize_ARGB8332_DErr( unsigned long argb, int x, int y, int w)
 /* AYIQ8422 done elsewhere */
 
 static int
-_txPixQuantize_RGB565( unsigned long argb, int x, int y, int w)
+_txPixQuantize_RGB565( unsigned int argb, int x, int y, int w)
 {
     return (
                     ((argb >> 8) & 0xF800) |
@@ -274,7 +274,7 @@ _txPixQuantize_RGB565( unsigned long argb, int x, int y, int w)
 }
 
 static int
-_txPixQuantize_RGB565_D4x4 ( unsigned long argb, int x, int y, int w)
+_txPixQuantize_RGB565_D4x4 ( unsigned int argb, int x, int y, int w)
 {
     int d = dithmat[y&3][x&3];
     int n, t;
@@ -290,7 +290,7 @@ _txPixQuantize_RGB565_D4x4 ( unsigned long argb, int x, int y, int w)
 
 
 static int
-_txPixQuantize_RGB565_DErr ( unsigned long argb, int x, int y, int w)
+_txPixQuantize_RGB565_DErr ( unsigned int argb, int x, int y, int w)
 {
     static int          qr, qg, qb;             // quantized incoming values.
     int                         ir, ig, ib;             // incoming values.
@@ -346,7 +346,7 @@ _txPixQuantize_RGB565_DErr ( unsigned long argb, int x, int y, int w)
 }
 
 static int
-_txPixQuantize_ARGB1555( unsigned long argb, int x, int y, int w)
+_txPixQuantize_ARGB1555( unsigned int argb, int x, int y, int w)
 {
     return (
                     ((argb >> 9) & 0x7C00) |
@@ -356,7 +356,7 @@ _txPixQuantize_ARGB1555( unsigned long argb, int x, int y, int w)
 }
 
 static int
-_txPixQuantize_ARGB1555_D4x4 ( unsigned long argb, int x, int y, int w)
+_txPixQuantize_ARGB1555_D4x4 ( unsigned int argb, int x, int y, int w)
 {
     int d = dithmat[y&3][x&3];
     int n, t;
@@ -372,7 +372,7 @@ _txPixQuantize_ARGB1555_D4x4 ( unsigned long argb, int x, int y, int w)
 }
 
 static int
-_txPixQuantize_ARGB1555_DErr ( unsigned long argb, int x, int y, int w)
+_txPixQuantize_ARGB1555_DErr ( unsigned int argb, int x, int y, int w)
 {
     static int          qr, qg, qb;             // quantized incoming values.
     int                 ir, ig, ib;             // incoming values.
@@ -429,7 +429,7 @@ _txPixQuantize_ARGB1555_DErr ( unsigned long argb, int x, int y, int w)
 }
 
 static int
-_txPixQuantize_ARGB4444 (unsigned long argb, int x, int y, int w)
+_txPixQuantize_ARGB4444 (unsigned int argb, int x, int y, int w)
 {
     return (
                     ((argb >> 12) & 0x0F00) |
@@ -439,7 +439,7 @@ _txPixQuantize_ARGB4444 (unsigned long argb, int x, int y, int w)
 }
 
 static int
-_txPixQuantize_ARGB4444_D4x4 (unsigned long argb, int x, int y, int w)
+_txPixQuantize_ARGB4444_D4x4 (unsigned int argb, int x, int y, int w)
 {
     int d = dithmat[y&3][x&3];
     int n, t;
@@ -455,7 +455,7 @@ _txPixQuantize_ARGB4444_D4x4 (unsigned long argb, int x, int y, int w)
 }
 
 static int
-_txPixQuantize_ARGB4444_DErr (unsigned long argb, int x, int y, int w)
+_txPixQuantize_ARGB4444_DErr (unsigned int argb, int x, int y, int w)
 {
     static int          qr, qg, qb;             // quantized incoming values.
     int                         ir, ig, ib;             // incoming values.
@@ -512,7 +512,7 @@ _txPixQuantize_ARGB4444_DErr (unsigned long argb, int x, int y, int w)
 }
 
 static int
-_txPixQuantize_AI88( unsigned long argb, int x, int y, int w)
+_txPixQuantize_AI88( unsigned int argb, int x, int y, int w)
 {
     return (
     (((int) (((argb >>16) & 0xFF) * .30F +
@@ -523,7 +523,7 @@ _txPixQuantize_AI88( unsigned long argb, int x, int y, int w)
 }
 
 static void 
-_txCalcYUVFromRGB(FxU32 argb, long *y, long *u, long *v)
+_txCalcYUVFromRGB(FxU32 argb, int *y, int *u, int *v)
 {
         float red, green, blue;
 
@@ -535,22 +535,22 @@ _txCalcYUVFromRGB(FxU32 argb, long *y, long *u, long *v)
 
         // ImageMagick method
         /*
-        *y = (long)( 0.29900 * red + 0.58700 * green + 0.11400 * blue );
-        *u = (long)(-0.14740 * red - 0.28950 * green + 0.43690 * blue + 128.5);
-        *v = (long)( 0.61500 * red - 0.51500 * green - 0.10000 * blue + 128.5);
+        *y = (int)( 0.29900 * red + 0.58700 * green + 0.11400 * blue );
+        *u = (int)(-0.14740 * red - 0.28950 * green + 0.43690 * blue + 128.5);
+        *v = (int)( 0.61500 * red - 0.51500 * green - 0.10000 * blue + 128.5);
         */
 
         // MWP method
         /*
-        *y = (long)((77.0 / 256.0) * red + (150.0 / 256.0) * green + (29.0 / 256.0) * blue + 0.5);
-        *u = (long)(128 - (44.0 / 256.0) * red - (87.0 / 256.0) * green + (131.0 / 256.0) * blue + 0.5);        
-        *v = (long)(128 + (131.0 / 256.0) * red - (110.0 / 256.0) * green - (21.0 / 256.0) * blue + 0.5);
+        *y = (int)((77.0 / 256.0) * red + (150.0 / 256.0) * green + (29.0 / 256.0) * blue + 0.5);
+        *u = (int)(128 - (44.0 / 256.0) * red - (87.0 / 256.0) * green + (131.0 / 256.0) * blue + 0.5);        
+        *v = (int)(128 + (131.0 / 256.0) * red - (110.0 / 256.0) * green - (21.0 / 256.0) * blue + 0.5);
         */
 
         // Method from solving dequantizer equations
-        *y = (long)( .25695 * red + .50442 * green + .09773 * blue + 16.5);
-        *u = (long)(-.14821 * red - .29095 * green + .43917 * blue + 128.5);
-        *v = (long)( .43917 * red - .36788 * green - .07128 * blue + 128.5);
+        *y = (int)( .25695 * red + .50442 * green + .09773 * blue + 16.5);
+        *u = (int)(-.14821 * red - .29095 * green + .43917 * blue + 128.5);
+        *v = (int)( .43917 * red - .36788 * green - .07128 * blue + 128.5);
 
         // Clamp YUV
 
@@ -587,9 +587,9 @@ _txImgQuantizeYUV(FxU16 *dst, const FxU32 *src, int w, int h, FxU32 format)
 {
         int k = w * h;
     int i, j;
-        unsigned long Y[2], U[2], V[2];
-        unsigned long avgU, avgV;
-        long tmpY, tmpU, tmpV;
+        unsigned int Y[2], U[2], V[2];
+        unsigned int avgU, avgV;
+        int tmpY, tmpU, tmpV;
     const FxU32 *localSrc = NULL;
 
     /* surface size must be a multiple of the 2x1 block size */
@@ -607,13 +607,13 @@ _txImgQuantizeYUV(FxU16 *dst, const FxU32 *src, int w, int h, FxU32 format)
 
             src++;
 
-                        Y[j] = (unsigned long) tmpY;
-                        U[j] = (unsigned long) tmpU;
-                        V[j] = (unsigned long) tmpV;
+                        Y[j] = (unsigned int) tmpY;
+                        U[j] = (unsigned int) tmpU;
+                        V[j] = (unsigned int) tmpV;
                 }
 
-                avgU = (unsigned long) ((U[0] + U[1] + 1) / 2.0);  // add 1 to round
-                avgV = (unsigned long) ((V[0] + V[1] + 1) / 2.0);  // add 1 to round
+                avgU = (unsigned int) ((U[0] + U[1] + 1) / 2.0);  // add 1 to round
+                avgV = (unsigned int) ((V[0] + V[1] + 1) / 2.0);  // add 1 to round
 
                 if ( format == GR_TEXFMT_YUYV_422 )
                 {
@@ -647,7 +647,7 @@ void
 _txImgQuantizeAYUV(FxU32 *dst, FxU32 *src, int w, int h)
 {
     int i, k;
-        long y, u, v;
+        int y, u, v;
 
         k = w * h;
 
@@ -707,6 +707,7 @@ _txColorBlend(const FxU32 c0, const FxU32 c1,
           ((FxU32)blendB << (0 + 0)));
 }
 
+#if 0 /* not used */
 static void
 _txImgEncodeBlock(FxU16* dst, 
                   const FxU32* src, int srcW, int srcH,
@@ -820,7 +821,206 @@ _txImgEncodeBlock(FxU16* dst,
     dst[3] = texelData[1];
   }
 }
+#endif
 
+/* 4-color encoding (opaque) */
+static void
+_txImgEncodeBlock4Color(FxU16* dst, 
+                        const FxU32* src, int srcW, int srcH,
+                        int blockS, int blockT)
+{
+  FxU32
+    texelBlock[4][4];
+  FxU16 
+    texelData[2] = { 0, 0 };
+  int 
+    i, j;
+  FxU32
+    minTexel = 0xFFFFFFFFUL,
+    maxTexel = 0x00000000UL;
+  
+  /* Find the min and max color for this interpolation */
+  for(i = 0; i < 4; i++) {
+    for(j = 0; j < 4; j++) {
+      const FxU32 
+        rawColor = *(src + ((blockT + i) * srcW) + (blockS + j));
+      const FxU16
+        convertedColor = (FxU16)(rawColor & 0xFFFFUL);
+      
+      texelBlock[i][j] = convertedColor;
+      
+      /* find the block local min and max. */
+      if (convertedColor < minTexel) minTexel = convertedColor;
+      if (convertedColor > maxTexel) maxTexel = convertedColor;
+    }
+  }
+  
+  {
+    const FxU32
+      c2TestVal   = _txColorBlend(maxTexel, minTexel, 5, 6, 5, 1.0f / 4.0f),
+      midColorVal = _txColorBlend(maxTexel, minTexel, 5, 6, 5, 0.5f),
+      c3TestVal   = _txColorBlend(maxTexel, minTexel, 5, 6, 5, 3.0f / 4.0f);
+    
+    for(i = 0; i < 4; i++) {
+      for(j = 0; j < 4; j++) {
+        const FxU32
+          testTexel = texelBlock[i][j];
+        FxU32
+          bitVal;
+        
+        if (testTexel > c2TestVal)        bitVal = 0x00UL; /* encoded to bitcode 00 */
+        else if (testTexel > midColorVal) bitVal = 0x02UL; /* encoded to bitcode 10 */
+        else if (testTexel > c3TestVal)   bitVal = 0x03UL; /* encoded to bitcode 11 */
+        else                              bitVal = 0x01UL; /* encoded to bitcode 01 */
+        /* the *decoded* result will be
+         * 0x00UL (bitcode 00) -> color0 = maxTexel
+         * 0x01UL (bitcode 01) -> color1 = minTexel
+         * 0x02UL (bitcode 10) -> 2/3 color0 + 1/3 color1
+         * 0x03UL (bitcode 11) -> 1/3 color0 + 2/3 color1
+         */
+        
+        texelData[i >> 1] |= (bitVal << (((i & 0x01UL) << 0x03UL) + (j << 0x01UL)));
+      }
+    }
+  }
+  
+  dst[0] = (FxU16)maxTexel;
+  dst[1] = (FxU16)minTexel;
+  dst[2] = texelData[0];
+  dst[3] = texelData[1];
+}
+
+/* 3-color encoding (1bit alpha) */
+static void
+_txImgEncodeBlock3Color(FxU16* dst, 
+                        const FxU32* src, int srcW, int srcH,
+                        int blockS, int blockT,
+                        FxU32 alphaThresh)
+{
+  FxU32
+    texelBlock[4][4],
+    alphaBlock[4][4];
+  FxU16 
+    texelData[2] = { 0, 0 };
+  int 
+    i, j;
+  FxU32
+    minTexel = 0xFFFFFFFFUL,
+    maxTexel = 0x00000000UL;
+  
+  /* Find the min and max color for this interpolation */
+  for(i = 0; i < 4; i++) {
+    for(j = 0; j < 4; j++) {
+      const FxU32 
+        rawColor = *(src + ((blockT + i) * srcW) + (blockS + j));
+      const FxU16
+        convertedColor = (FxU16)(rawColor & 0xFFFFUL);
+
+      alphaBlock[i][j] = (rawColor >> 24UL);
+      texelBlock[i][j] = convertedColor;
+      
+      /* find the block local min and max. */
+      if (convertedColor < minTexel) minTexel = convertedColor;
+      if (convertedColor > maxTexel) maxTexel = convertedColor;
+    }
+  }
+  
+  {
+    const FxU32
+      c2TestVal   = _txColorBlend(minTexel, maxTexel, 5, 6, 5, 1.0f / 3.0f),
+      c3TestVal   = _txColorBlend(minTexel, maxTexel, 5, 6, 5, 2.0f / 3.0f);
+    
+    for(i = 0; i < 4; i++) {
+      for(j = 0; j < 4; j++) {
+        const FxU32
+          testTexel = texelBlock[i][j],
+          testAlpha = alphaBlock[i][j];
+        FxU32
+          bitVal;
+        
+        if (testAlpha < alphaThresh)    bitVal = 0x03UL; /* encoded to bitcode 11 */
+        else if (testTexel > c3TestVal) bitVal = 0x01UL; /* encoded to bitcode 01 */
+        else if (testTexel > c2TestVal) bitVal = 0x02UL; /* encoded to bitcode 10 */
+        else                            bitVal = 0x00UL; /* encoded to bitcode 00 */
+        /* the *decoded* result will be
+         * 0x00UL (bitcode 00) -> color0 = minTexel
+         * 0x01UL (bitcode 01) -> color1 = maxTexel
+         * 0x02UL (bitcode 10) -> 1/2 color0 + 1/2 color1
+         * 0x03UL (bitcode 11) -> Transparent
+         */
+        
+        texelData[i >> 1] |= (bitVal << (((i & 0x01UL) << 0x03UL) + (j << 0x01UL)));
+      }
+    }
+  }
+
+  dst[0] = (FxU16)minTexel;
+  dst[1] = (FxU16)maxTexel;
+  dst[2] = texelData[0];
+  dst[3] = texelData[1];
+}
+
+/* do ARGB8888 to RGB565 error diffusion conversion and save the
+ * result with the raw alpha value. At the same time, analyze if
+ * the texture has varying alpha in dxt1 mode, or if the texture
+ * has both 0 and 255 alpha values in dxt4/5 mode.
+ * converted pixel aaaaaaaa00000000rrrrrggggggbbbbb (32bit)
+ */
+static FxU32
+_txImgConvert_ARGB565DErr(FxU32* dst, const FxU32* src, FxU32 format, int srcW, int srcH)
+{
+  int
+    s, t;
+  FxU32
+    blockAlphaSum = 0x00000000UL,
+    maxAlpha = 0x100UL,
+    minAlpha = 0x000UL;
+
+  /* Clear error diffusion accumulators. */
+  for (s = 0; s < srcW; s++) errR[s] = errG[s] = errB[s] = 0;
+
+  for (t = 0; t < srcH; t++) {
+    for (s = 0; s < srcW; s++) {
+      FxU32
+        rawColor = *(src + t * srcW + s),
+        rawAlpha = (rawColor >> 24UL);
+
+      /* If we're in dxt2 or dxt4 mode then we multiply
+       * the color by the alpha value.
+       */
+      if ((format == GR_TEXFMT_ARGB_CMP_DXT4) ||
+          (format == GR_TEXFMT_ARGB_CMP_DXT2)) {
+        rawColor = _txColorBlend(0x00UL, rawColor,
+                                 8, 8, 8,
+                                 (rawAlpha / 255.0f));
+      }
+
+      /* convert to rgb565 and save result with raw alpha */
+      *dst++ = (rawAlpha << 24UL)|_txPixQuantize_RGB565_DErr(rawColor, s, 0, 0);
+
+      /* scan for the min and max values */
+      if (rawAlpha < minAlpha) minAlpha = rawAlpha;
+      if (rawAlpha > maxAlpha) maxAlpha = rawAlpha;
+
+      /* sum of the alpha's */
+      blockAlphaSum += rawAlpha;
+    }
+  }
+
+  if ((format == GR_TEXFMT_ARGB_CMP_DXT4) ||
+      (format == GR_TEXFMT_ARGB_CMP_DXT5)) {
+    if ((minAlpha == 0x00UL) &&
+        (maxAlpha == 0xFFUL)) {
+      return 0xFFUL; /* signal 6-alpha block encoding for dxt4,5 */
+    } else {
+      return 0x00UL; /* signal 8-alpha block encoding for dxt4,5 */
+    }
+  }
+  
+  return (blockAlphaSum / (srcW * srcH)); /* return average alpha for dxt1 */
+}
+
+/* dxt1 */
 static void
 _txImgQuantizeDXT1(FxU16* dst, const FxU32* src,
                    FxU32 format, 
@@ -828,31 +1028,73 @@ _txImgQuantizeDXT1(FxU16* dst, const FxU32* src,
 {
   int s, t;
   const FxU32 *localSrc = NULL;
-
+  FxU32 avgAlpha = 0xFFUL;
+  FxU32 *ditheredSrc;
+  
   /* surface size must be a multiple of the 4x4 block size */
   if (((w & 0x03UL) != 0) || ((h & 0x03UL) != 0)) {
     src = localSrc = _txDuplicateData(src, &w, &h, 2, 2);
   }
 
-  for(t = 0; t < h; t += 4) {
-    for(s = 0; s < w; s += 4) {
-      _txImgEncodeBlock(dst, 
-                        src, w, h,
-                        s, t);
-      // convert the data so that its in little endian format
-#ifdef ENDB
-      HWC_SWAP16(dst);
-      HWC_SWAP16(dst+2);
-#endif
+  /* ARGB8888 to RGB565 conversion */
+  ditheredSrc = (FxU32 *)malloc(w * h * sizeof(FxU32));
+  avgAlpha = _txImgConvert_ARGB565DErr(ditheredSrc, src, format, w, h);
+  src = ditheredSrc;
 
-      dst += 4;
+  /* finnished using localSrc */
+  if ( localSrc )
+    free((void *)localSrc);
+
+  /* Do we have varying alpha? Do the whacked 3-color encoding (1bit alpha),
+   * otherwise go on to do the 4-color encoding (opaque).
+   */
+  if (avgAlpha != 0xFFUL) /* we have varying alpha. do the 3-color encoding. */
+  {
+    /* set the threshold */
+    /* According to OpenGL spec, a texel with an alpha component
+     * smaller than 0x7FUL will end up with 0x00UL alpha (black) and
+     * one with an alpha component equal to or larger than 0x7FUL will
+     * end up with 0xFFUL alpha.
+     */
+    const FxU32 alphaThresh = 0x7FUL;
+    
+    for(t = 0; t < h; t += 4) {
+      for(s = 0; s < w; s += 4) {
+        _txImgEncodeBlock3Color(dst, 
+                                src, w, h,
+                                s, t,
+                                alphaThresh);
+        /* convert the data so that its in little endian format */
+#ifdef ENDB
+        HWC_SWAP16(dst);
+        HWC_SWAP16(dst+2);
+#endif
+        
+        dst += 4;
+      }
+    }
+  } else { /* do the 4-color encoding */
+    for(t = 0; t < h; t += 4) {
+      for(s = 0; s < w; s += 4) {
+        _txImgEncodeBlock4Color(dst, 
+                                src, w, h,
+                                s, t);
+        /* convert the data so that it's in little endian format */
+#ifdef ENDB
+        HWC_SWAP16(dst);
+        HWC_SWAP16(dst+2);
+#endif
+        
+        dst += 4;
+      }
     }
   }
 
-  if ( localSrc )
-    free((void *)localSrc);
+  /* don't forget to clean up */
+  free(ditheredSrc);
 }
 
+/* dxt4, dxt5 */
 static void
 _txImgQuantizeDXAlpha3(FxU16* dst, const FxU32* src,
                        FxU32 format, 
@@ -860,11 +1102,22 @@ _txImgQuantizeDXAlpha3(FxU16* dst, const FxU32* src,
 {
   int s, t;
   const FxU32 *localSrc = NULL;
+  FxU32 *ditheredSrc;
+  FxU32 alphaEncMode = 0x00UL;
 
   /* surface size must be a multiple of the 4x4 block size */
   if (((w & 0x03UL) != 0) || ((h & 0x03UL) != 0)) {
     src = localSrc = _txDuplicateData(src, &w, &h, 2, 2);
   }
+
+  /* ARGB8888 to RGB565 conversion */
+  ditheredSrc = (FxU32 *)malloc(w * h * sizeof(FxU32));
+  alphaEncMode = _txImgConvert_ARGB565DErr(ditheredSrc, src, format, w, h);
+  src = ditheredSrc;
+
+  /* finnished using localSrc */
+  if ( localSrc )
+    free((void *)localSrc);
 
   for(t = 0; t < h; t += 4) {
     for(s = 0; s < w; s += 4) {
@@ -892,24 +1145,28 @@ _txImgQuantizeDXAlpha3(FxU16* dst, const FxU32* src,
         }
       }
 
-      /* Encode the alpha block. If we have both 0 and 255 values then
-       * we use the 6-alpha block encoding otherwise we use the
-       * 8-alpha block encoding.  
+      /* XXX: Apparently we can't switch between encoding modes within the
+       *      same texture. Is this a Nalapm bug?
+       */
+      /* Encode the alpha block. If we have both 0 and 255 alpha values then
+       * we use the 6-alpha bock encoding otherwise we use the 8-alpha block
+       * encoding.
        */
       {
-        FxU64
+        FxI64
           alphaData;
 
-        if (minRangeP && maxRangeP) {
+        if (alphaEncMode == 0xFFUL/*minRangeP && maxRangeP*/) { /* do the 6-alpha block encoding */
+
           const FxU32
             testA0 = _txColorBlend(minAlpha, maxAlpha, 0, 0, 8, 1.0f / 6.0f),
             testA2 = _txColorBlend(minAlpha, maxAlpha, 0, 0, 8, 2.0f / 6.0f),
             testA3 = _txColorBlend(minAlpha, maxAlpha, 0, 0, 8, 3.0f / 6.0f),
             testA4 = _txColorBlend(minAlpha, maxAlpha, 0, 0, 8, 4.0f / 6.0f),
             testA5 = _txColorBlend(minAlpha, maxAlpha, 0, 0, 8, 5.0f / 6.0f);
-            
-          FX_SET64(alphaData, 0x00UL, (maxAlpha << 0x08UL) | minAlpha);
-            
+          
+          FX_SET64(alphaData, 0x00UL, (maxAlpha << 8UL) | minAlpha); /* alpha0 < alpha1 */
+          
           for(i = 0; i < 4; i++) {
             for(j = 0; j < 4; j++) {
               FxU32
@@ -917,34 +1174,33 @@ _txImgQuantizeDXAlpha3(FxU16* dst, const FxU32* src,
                 rawAlpha = (rawColor >> 24UL);
               FxU64
                 bitVal;
-                
-              if (rawAlpha == 0x00)        FX_SET64(bitVal, 0x00UL, 0x06UL);
-              else if (rawAlpha == 0xFFUL) FX_SET64(bitVal, 0x00UL, 0x07UL);
-              else if (rawAlpha < testA0)  FX_SET64(bitVal, 0x00UL, 0x00UL);
-              else if (rawAlpha < testA2)  FX_SET64(bitVal, 0x00UL, 0x02UL);
-              else if (rawAlpha < testA3)  FX_SET64(bitVal, 0x00UL, 0x03UL);
-              else if (rawAlpha < testA4)  FX_SET64(bitVal, 0x00UL, 0x04UL);
-              else if (rawAlpha < testA5)  FX_SET64(bitVal, 0x00UL, 0x05UL);
-              else                         FX_SET64(bitVal, 0x00UL, 0x01UL);
 
-              alphaData = FX_OR64(alphaData, FX_SHL64(bitVal, (((i << 0x02UL) + j) << 0x01UL) + 16UL));
-              
-              /* If we're in dxt4 mode then we multiply the color by the alpha
-               * value otherwise we just pass the original color value. 
+              if (rawAlpha == 0x00UL)      FX_SET64(bitVal, 0x00UL, 0x06UL); /* encoded to bitcode 110 */
+              else if (rawAlpha == 0xFFUL) FX_SET64(bitVal, 0x00UL, 0x07UL); /* encoded to bitcode 111 */
+              else if (rawAlpha < testA0)  FX_SET64(bitVal, 0x00UL, 0x00UL); /* encoded to bitcode 000 */
+              else if (rawAlpha < testA2)  FX_SET64(bitVal, 0x00UL, 0x02UL); /* encoded to bitcode 010 */
+              else if (rawAlpha < testA3)  FX_SET64(bitVal, 0x00UL, 0x03UL); /* encoded to bitcode 011 */
+              else if (rawAlpha < testA4)  FX_SET64(bitVal, 0x00UL, 0x04UL); /* encoded to bitcode 100 */
+              else if (rawAlpha < testA5)  FX_SET64(bitVal, 0x00UL, 0x05UL); /* encoded to bitcode 101 */
+              else                         FX_SET64(bitVal, 0x00UL, 0x01UL); /* encoded to bitcode 001 */
+              /* the *decoded* result will be
+               * 0x00UL (bitcode 000) -> alpha0 = minAlpha (the next smallest value to 0)
+               * 0x01UL (bitcode 001) -> alpha1 = maxAlpha (the next largest value to 255)
+               * 0x02UL (bitcode 010) -> alpha2 = 4/5 alpha0 + 1/5 alpha1
+               * 0x03UL (bitcode 011) -> alpha3 = 3/5 alpha0 + 2/5 alpha1
+               * 0x04UL (bitcode 100) -> alpha4 = 2/5 alpha0 + 3/5 alpha1
+               * 0x05UL (bitcode 101) -> alpha5 = 1/5 alpha0 + 4/5 alpha1
+               * 0x06UL (bitcode 110) -> 0x00UL (0)
+               * 0x07UL (bitcode 111) -> 0xFFUL (255)
                */
-              if (format == GR_TEXFMT_ARGB_CMP_DXT4) {
-                rawColor = _txColorBlend(0x00UL, rawColor,
-                                         8, 8, 8,
-                                         (rawAlpha / 255.0f));
-              }
-              
-              /* We also set the alpha value for the encoding to be full
-               * so that it does not do the alpha transparency thing.  
-               */
-              srcColors[(i << 2UL) + j] = (0xFF000000UL | rawColor);
+
+              alphaData = FX_OR64(alphaData, FX_SHL64(bitVal, (((i << 2UL) + j) * 3UL) + 16UL));
+
+              srcColors[(i << 2UL) + j] = rawColor;
             }
           }
-        } else {
+        } else { /* do the 8-alpha block encoding */
+          
           /* Merge the boolean-ness since we don't have both */
           if (minRangeP) minAlpha = 0x00UL;
           if (maxRangeP) maxAlpha = 0xFFUL;
@@ -958,9 +1214,9 @@ _txImgQuantizeDXAlpha3(FxU16* dst, const FxU32* src,
               testA5 = _txColorBlend(maxAlpha, minAlpha, 0, 0, 8, 5.0f / 8.0f),
               testA6 = _txColorBlend(maxAlpha, minAlpha, 0, 0, 8, 6.0f / 8.0f),
               testA7 = _txColorBlend(maxAlpha, minAlpha, 0, 0, 8, 7.0f / 8.0f);
-
-            FX_SET64(alphaData, 0x00UL, (minAlpha << 0x08UL) | maxAlpha);
-
+            
+            FX_SET64(alphaData, 0x00UL, (minAlpha << 8UL) | maxAlpha); /* alpha0 > alpha1 */
+            
             for(i = 0; i < 4; i++) {
               for(j = 0; j < 4; j++) {
                 FxU32
@@ -968,36 +1224,35 @@ _txImgQuantizeDXAlpha3(FxU16* dst, const FxU32* src,
                   rawAlpha = (rawColor >> 24UL);
                 FxU64
                   bitVal;
-              
-                if (rawAlpha > testA0)      FX_SET64(bitVal, 0x00UL, 0x00UL);
-                else if (rawAlpha > testA2) FX_SET64(bitVal, 0x00UL, 0x02UL);
-                else if (rawAlpha > testA3) FX_SET64(bitVal, 0x00UL, 0x03UL);
-                else if (rawAlpha > testA4) FX_SET64(bitVal, 0x00UL, 0x04UL);
-                else if (rawAlpha > testA5) FX_SET64(bitVal, 0x00UL, 0x05UL);
-                else if (rawAlpha > testA6) FX_SET64(bitVal, 0x00UL, 0x06UL);
-                else if (rawAlpha > testA7) FX_SET64(bitVal, 0x00UL, 0x07UL);
-                else                        FX_SET64(bitVal, 0x00UL, 0x01UL);
 
-                alphaData = FX_OR64(alphaData, FX_SHL64(bitVal, (((i << 0x02UL) + j) << 0x01UL) + 16UL));
-              
-                /* If we're in dxt4 mode then we multiply the color by the alpha
-                 * value otherwise we just pass the original color value. 
+                if (rawAlpha > testA0)      FX_SET64(bitVal, 0x00UL, 0x00UL); /* encoded to bitcode 000 */
+                else if (rawAlpha > testA2) FX_SET64(bitVal, 0x00UL, 0x02UL); /* encoded to bitcode 010 */
+                else if (rawAlpha > testA3) FX_SET64(bitVal, 0x00UL, 0x03UL); /* encoded to bitcode 011 */
+                else if (rawAlpha > testA4) FX_SET64(bitVal, 0x00UL, 0x04UL); /* encoded to bitcode 100 */
+                else if (rawAlpha > testA5) FX_SET64(bitVal, 0x00UL, 0x05UL); /* encoded to bitcode 101 */
+                else if (rawAlpha > testA6) FX_SET64(bitVal, 0x00UL, 0x06UL); /* encoded to bitcode 110 */
+                else if (rawAlpha > testA7) FX_SET64(bitVal, 0x00UL, 0x07UL); /* encoded to bitcode 111 */
+                else                        FX_SET64(bitVal, 0x00UL, 0x01UL); /* encoded to bitcode 001 */
+                /* the *decoded* result will be
+                 * 0x00UL (bitcode 000) -> alpha0 = maxAlpha
+                 * 0x01UL (bitcode 001) -> alpha1 = minAlpha
+                 * 0x02UL (bitcode 010) -> alpha2 = 6/7 alpha0 + 1/7 alpha1
+                 * 0x03UL (bitcode 011) -> alpha3 = 5/7 alpha0 + 2/7 alpha1
+                 * 0x04UL (bitcode 100) -> alpha4 = 4/7 alpha0 + 3/7 alpha1
+                 * 0x05UL (bitcode 101) -> alpha5 = 3/7 alpha0 + 4/7 alpha1
+                 * 0x06UL (bitcode 110) -> alpha6 = 2/7 alpha0 + 5/7 alpha1
+                 * 0x07UL (bitcode 111) -> alpha7 = 1/7 alpha0 + 6/7 alpha1
                  */
-                if (format == GR_TEXFMT_ARGB_CMP_DXT4) {
-                  rawColor = _txColorBlend(0x00UL, rawColor,
-                                           8, 8, 8,
-                                           (rawAlpha / 255.0f));
-                }
-              
-                /* We also set the alpha value for the encoding to be full
-                 * so that it does not do the alpha transparency thing.  
-                 */
-                srcColors[(i << 2UL) + j] = (0xFF000000UL | rawColor);
+
+                alphaData = FX_OR64(alphaData, FX_SHL64(bitVal, (((i << 2UL) + j) * 3UL) + 16UL));
+
+                srcColors[(i << 2UL) + j] = rawColor;
               }
             }
           }
         }
 
+        /* save the encoded alpha block */
         {
           const FxU8*
             alphaSrc = (const FxU8*)&alphaData;
@@ -1007,7 +1262,7 @@ _txImgQuantizeDXAlpha3(FxU16* dst, const FxU32* src,
           for(i = 0; i < 8; i++) *alphaDst++ = *alphaSrc++;
         }
       }
-      // convert the data so that its in little endian format
+      /* convert the data so that it's in little endian format */
 #ifdef ENDB
       HWC_SWAP8(dst);
       HWC_SWAP8(dst+2);
@@ -1015,10 +1270,11 @@ _txImgQuantizeDXAlpha3(FxU16* dst, const FxU32* src,
 
       dst += 4;
 
-      /* Encode the color block w/o the transparency option */
-      _txImgEncodeBlock(dst, 
-                        srcColors, 4, 4,
-                        0, 0);
+      /* 4-color encoding */
+      _txImgEncodeBlock4Color(dst, 
+                              srcColors, 4, 4,
+                              0, 0);
+      
 #ifdef ENDB
       HWC_SWAP16(dst);
       HWC_SWAP16(dst+2);
@@ -1028,10 +1284,11 @@ _txImgQuantizeDXAlpha3(FxU16* dst, const FxU32* src,
     }
   }
 
-  if ( localSrc )
-    free((void *)localSrc);
+  /* don't forget to clean up */
+  free(ditheredSrc);
 }
 
+/* dxt2, dxt3 */
 static void
 _txImgQuantizeDXAlpha4(FxU16* dst, const FxU32* src,
                        FxU32 format, 
@@ -1039,11 +1296,21 @@ _txImgQuantizeDXAlpha4(FxU16* dst, const FxU32* src,
 {
   int s, t;
   const FxU32 *localSrc = NULL;
+  FxU32 *ditheredSrc;
 
   /* surface size must be a multiple of the 4x4 block size */
   if (((w & 0x03UL) != 0) || ((h & 0x03UL) != 0)) {
     src = localSrc = _txDuplicateData(src, &w, &h, 2, 2);
   }
+
+  /* ARGB8888 to RGB565 conversion */
+  ditheredSrc = (FxU32 *)malloc(w * h * sizeof(FxU32));
+  _txImgConvert_ARGB565DErr(ditheredSrc, src, format, w, h);
+  src = ditheredSrc;
+
+  /* finnished using localSrc */
+  if ( localSrc )
+    free((void *)localSrc);
 
   for(t = 0; t < h; t += 4) {
     for(s = 0; s < w; s += 4) {
@@ -1063,28 +1330,16 @@ _txImgQuantizeDXAlpha4(FxU16* dst, const FxU32* src,
             rawAlpha = (rawColor >> 24UL);
 
           /* We're just going to take the top 4 bits of the whole
-           * alpha value as the encoding.  
+           * alpha value as the encoding. Allowed by the spec.
            */
           alphaVal |= ((rawAlpha >> 0x04UL) << (j << 0x02UL));
 
-          /* If we're in dxt2 mode then we multiply the color by the alpha
-           * value otherwise we just pass the original color value. 
-           */
-          if (format == GR_TEXFMT_ARGB_CMP_DXT2) {
-            rawColor = _txColorBlend(0x00UL, rawColor,
-                                     8, 8, 8,
-                                     (rawAlpha / 255.0f));
-          }
-
-          /* We also set the alpha value for the encoding to be full
-           * so that it does not do the alpha transparency thing.  
-           */
-          srcColors[(i << 2UL) + j] = (0xFF000000UL | rawColor);
+          srcColors[(i << 2UL) + j] = rawColor;
         }
 
         dst[i] = alphaVal;
       }
-      // convert the data so that its in little endian format
+      /* convert the data so that it's in little endian format */
 #ifdef ENDB
       HWC_SWAP16(dst);
       HWC_SWAP16(dst+2);
@@ -1092,10 +1347,11 @@ _txImgQuantizeDXAlpha4(FxU16* dst, const FxU32* src,
 
       dst += 4;
 
-      /* Encode the color block w/o the transparency option */
-      _txImgEncodeBlock(dst, 
-                        srcColors, 4, 4,
-                        0, 0);
+      /* 4-color encoding */
+      _txImgEncodeBlock4Color(dst, 
+                              srcColors, 4, 4,
+                              0, 0);
+      
 #ifdef ENDB
       HWC_SWAP16(dst);
       HWC_SWAP16(dst+2);
@@ -1105,16 +1361,16 @@ _txImgQuantizeDXAlpha4(FxU16* dst, const FxU32* src,
     }
   }
 
-  if ( localSrc )
-    free((void *)localSrc);
+  /* don't forget to clean up */
+  free(ditheredSrc);
 }
 
-void
+void FX_CSTYLE
 txImgQuantize(char *dst, char *src, 
                int w, int h, 
                FxU32 format, FxU32 dither)
 {
-    int (*quantizer)(unsigned long argb, int x, int y, int w);
+    int (*quantizer)(unsigned int argb, int x, int y, int w) = NULL;
     int         x, y;
 
     dither &= TX_DITHER_MASK;
@@ -1170,7 +1426,6 @@ txImgQuantize(char *dst, char *src,
                                                                 break;
 
         default: txPanic("Unable to dither this format\n");                         
-                                                                break;
         }
     } else {            // No dithering.
 
@@ -1203,11 +1458,10 @@ txImgQuantize(char *dst, char *src,
         case GR_TEXFMT_YUYV_422:
         case GR_TEXFMT_UYVY_422:
         case GR_TEXFMT_AYUV_444:        
-        case GR_TEXFMT_RGB_888:                 quantizer = NULL;
+        case GR_TEXFMT_RGB_888:
           break;
 
         default: txPanic("Bad texture format in txQuantize()\n");                 
-          break;
         }
     }
 
@@ -1220,7 +1474,7 @@ txImgQuantize(char *dst, char *src,
     case GR_TEXFMT_ALPHA_INTENSITY_44:
       for (y=0; y<h; y++) {
         for (x=0; x<w; x++) {
-          *dst++ = (*quantizer)(*(unsigned long *)src, x, y, w);
+          *dst++ = (*quantizer)(*(unsigned int *)src, x, y, w);
           src += 4;
         }
       }
@@ -1240,7 +1494,7 @@ txImgQuantize(char *dst, char *src,
         
         for (y=0; y<h; y++) {
           for (x=0; x<w; x++) {
-            *dst16++ = (*quantizer)(*(unsigned long *)src, x, y, w);
+            *dst16++ = (*quantizer)(*(unsigned int *)src, x, y, w);
             src += 4;
           }
         }
@@ -1286,7 +1540,7 @@ txImgQuantize(char *dst, char *src,
  * For the special cases of YIQ image, you also get the choice of 2 different
  * quality levels in each of the compression cases.
  */
-void    
+void FX_CSTYLE
 txMipQuantize(TxMip *pxMip, TxMip *txMip, int format, FxU32 dither, FxU32 compression)
 {
     int         i, w, h;

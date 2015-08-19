@@ -14,8 +14,8 @@
 ** successor clauses in the FAR, DOD or NASA FAR Supplement. Unpublished  -
 ** rights reserved under the Copyright Laws of the United States.
 **
-** $Revision: 1.1.1.1 $
-** $Date: 2000/08/03 00:27:22 $
+** $Revision: 1.1.1.1.8.1 $
+** $Date: 2004/02/02 07:47:13 $
 */
 
 #include <stdio.h>
@@ -448,13 +448,7 @@ _txParseCmdline(int argc, char **argv, TxOpts *txOptions)
 
 }
 
-#if	defined(__linux__)
-#define MAIN_RETURN_TYPE int
-#else	/* defined(__linux__) */
-#define	MAIN_RETURN_TYPE void
-#endif	/* defined(__linux__) */
-
-MAIN_RETURN_TYPE
+int
 main(int argc, char **argv)
 {
   char    *progname;
@@ -477,7 +471,7 @@ main(int argc, char **argv)
       txOptions.output_base[0]) {
 
     fprintf(stderr, "Texus: many input files, but only one output file specified!\n");
-    exit(2);
+    return 2;
   }
 
 
@@ -760,5 +754,5 @@ main(int argc, char **argv)
       printf("No output file generated\n");
     }
   }
-  exit(0);
+  return 0;
 }

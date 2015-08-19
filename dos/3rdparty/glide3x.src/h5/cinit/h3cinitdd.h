@@ -17,18 +17,18 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Revision: 1.1.2.1 $
-** $Date: 2003/08/21 08:32:12 $
+** $Revision: 1.1.2.3 $
+** $Date: 2004/10/05 14:39:56 $
 */
-#include <conio.h>
 #include <stddef.h>
 
-/* [dBorca] */
 #ifdef __DJGPP__
 #include <fxdpmi.h>
 #endif
 
 #if defined(__WATCOMC__)
+#include <conio.h>
+
 #define _inp inp
 #define _outp outp
 
@@ -38,6 +38,15 @@
 #define _inpd inpd
 #define _outpd outpd
 
+#endif
+
+#ifdef __linux__
+#define _inp pioInByte
+#define _outp pioOutByte
+#define _inpw pioInWord
+#define _outpw pioOutWord
+#define _inpd pioInLong
+#define _outpd pioOutLong
 #endif
 
 

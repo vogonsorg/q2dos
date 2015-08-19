@@ -1,8 +1,14 @@
 /*
  * CPU detection code
  *
- * $Header: /cvsroot/glide/glide3x/h5/glide3/src/Attic/cpuid.c,v 1.1.2.9 2003/08/04 12:45:47 dborca Exp $
+ * $Header: /cvsroot/glide/glide3x/h5/glide3/src/Attic/cpuid.c,v 1.1.2.11 2005/05/07 08:26:35 jwrdegoede Exp $
  * $Log: cpuid.c,v $
+ * Revision 1.1.2.11  2005/05/07 08:26:35  jwrdegoede
+ * gcc4 cpuid fix
+ *
+ * Revision 1.1.2.10  2004/10/05 14:54:29  dborca
+ * DOS/OpenWatcom woes
+ *
  * Revision 1.1.2.9  2003/08/04 12:45:47  dborca
  * Preparing for MinGW 2.0
  *
@@ -58,7 +64,7 @@ typedef unsigned long word32;
  * TEST_MMXPLUS   = emms | pminsw mm0, mm0 | emms
  */
 #ifdef __GNUC__
-#define TEST_CPUID(f)    __asm __volatile ("cpuid"::"a"(f):"%ebx", "%ecx", "%edx")
+#define TEST_CPUID(f)    __asm __volatile ("pushl %%ebx; cpuid; popl %%ebx"::"a"(f):"%ecx", "%edx")
 #define TEST_SSE()       __asm __volatile (".byte 0x0f, 0x57, 0xc0")
 #define TEST_SSE2()      __asm __volatile (".byte 0x66, 0x0f, 0x57, 0xc0")
 #define TEST_3DNOW()     __asm __volatile (".byte 0x0f, 0x0e")
@@ -197,31 +203,38 @@ int _cpuid (_p_info *pinfo)
 
 #ifdef __GNUC__
  __asm("\n\
-	pushl	%%ebx			\n\
 	/* get the vendor string */	\n\
+	pushl	%%ebx			\n\
 	xorl	%%eax, %%eax		\n\
 	cpuid				\n\
-	movl	%%ebx, %3		\n\
+	movl	%%ebx, %%eax		\n\
+	popl	%%ebx			\n\
+	movl	%%eax, %3		\n\
 	movl	%%edx, %4		\n\
 	movl	%%ecx, %5		\n\
 	/* get the Standard bits */	\n\
+	pushl	%%ebx			\n\
 	movl	$1, %%eax		\n\
 	cpuid				\n\
+	popl	%%ebx			\n\
 	movl	%%eax, %1		\n\
 	movl	%%edx, %2		\n\
 	/* get AMD-specials */		\n\
+	pushl	%%ebx			\n\
 	movl	$0x80000000, %%eax	\n\
 	cpuid				\n\
+	popl	%%ebx			\n\
 	cmpl	$0x80000000, %%eax	\n\
 	jc	0f			\n\
+	pushl	%%ebx			\n\
 	movl	$0x80000001, %%eax	\n\
 	cpuid				\n\
+	popl	%%ebx			\n\
 	movl	%%edx, %0		\n\
  0:					\n\
-	popl	%%ebx			\n\
  ":"=g"(dwExt), "=g"(dwId), "=g"(dwFeature),
    "=g"(((long *)Ident)[0]), "=g"(((long *)Ident)[1]), "=g"(((long *)Ident)[2])
- ::"%eax", "%ebx", "%ecx", "%edx");
+ ::"%eax", "%ecx", "%edx");
 #else
     _asm
     {
@@ -258,6 +271,8 @@ notamd:
     }
 #endif
 
+#ifndef __WATCOMC__
+ /* stupid watcom does not sigill... */
  if (dwFeature & _MMX_FEATURE_BIT) {
     feature |= _CPU_FEATURE_MMX;
     os_support |= has_feature(_CPU_FEATURE_MMX);
@@ -282,6 +297,7 @@ notamd:
     feature |= _CPU_FEATURE_SSE2;
     os_support |= has_feature(_CPU_FEATURE_SSE2);
  }
+#endif
 
  if (pinfo) {
     memset(pinfo, 0, sizeof(_p_info));

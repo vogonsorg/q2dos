@@ -15,8 +15,8 @@
 ** successor clauses in the FAR, DOD or NASA FAR Supplement. Unpublished  -
 ** rights reserved under the Copyright Laws of the United States.
 **
-** $Revision: 1.1.1.1 $
-** $Date: 2000/08/03 00:27:18 $
+** $Revision: 1.1.1.1.6.1 $
+** $Date: 2005/08/13 21:07:04 $
 */
 
 #include <stdio.h>
@@ -32,7 +32,7 @@
 #define B3(x)   ((x>>0)&0xFF)
 
 static void
-_txImgHalve(long *outdata, int width, int height, long *indata)
+_txImgHalve(int *outdata, int width, int height, int *indata)
 {
     unsigned int i,j,k;
     unsigned int w,h, *p,sum,*q;

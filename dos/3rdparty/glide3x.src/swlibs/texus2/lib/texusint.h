@@ -14,8 +14,8 @@
 ** successor clauses in the FAR, DOD or NASA FAR Supplement. Unpublished  -
 ** rights reserved under the Copyright Laws of the United States.
 **
-** $Revision: 1.2 $
-** $Date: 2000/08/25 17:33:26 $
+** $Revision: 1.2.6.2 $
+** $Date: 2005/08/13 21:07:04 $
 */
  
 #ifndef __TEXUSINT_H__
@@ -56,7 +56,7 @@ void    txMipResample(TxMip *destMip, TxMip *srcMip);
 void    txMipClamp( TxMip *dstMip, TxMip *srcMip );
 void    txMipMipmap(TxMip *txMip);
 
-void    txMipQuantize(TxMip *pxMip, TxMip *txMip, int fmt, FxU32 d, FxU32 comp);
+FX_ENTRY void FX_CALL txMipQuantize(TxMip *pxMip, TxMip *txMip, int fmt, FxU32 d, FxU32 comp);
 void    txMipNcc(TxMip *pxMip, TxMip *txMip, int fmt, FxU32 dither, FxU32 comp);
 void    txMipNccNNet(TxMip *pxMip, TxMip *txMip, int fmt, FxU32 dither, FxU32 comp);
 int     txMipPal256(TxMip *pxMip, TxMip *txMip, int fmt, FxU32 dither, FxU32 comp);
@@ -73,7 +73,7 @@ int     txGCD(int a, int b);
 int             txAspectRatio(int w, int h);
 void    txPanic(char *);
 void    txError(char *);
-void    txYABtoPal256(long *palette, const long* yabTable);
+void    txYABtoPal256(int *palette, const int* yabTable);
 void    txRectCopy(FxU8 *dst, int dstStride, const FxU8 *src, int srcStride,
                         int width, int height);
 FxBool  txMipAlloc(TxMip *txMip);
@@ -96,7 +96,7 @@ extern  int *explode3;
 
 void    txDiffuseIndex(TxMip *pxMip, TxMip *txMip, int pixsize, 
                 const FxU32 *palette, int       ncolors);
-int             txNearestColor(long ir, long ig, long ib, const FxU32 *pal, int npal);
+int             txNearestColor(int ir, int ig, int ib, const FxU32 *pal, int npal);
 
 FxBool _txReadTGAHeader( FILE *stream, FxU32 cookie, TxMip *info);
 FxBool _txReadTGAData( FILE *stream, TxMip *info);
@@ -115,7 +115,7 @@ FxBool _txRead3DFData( FILE *stream, TxMip *info);
 
 int _txReadHeader( FILE *stream, TxMip *info );
 
-void txPalToNcc( GuNccTable *ncc_table, const FxU32 *pal );
+FX_ENTRY void FX_CALL txPalToNcc( GuNccTable *ncc_table, const FxU32 *pal );
 void txNccToPal( FxU32 *pal, const GuNccTable *ncc_table );
 
 #define MAX_TEXWIDTH    2048

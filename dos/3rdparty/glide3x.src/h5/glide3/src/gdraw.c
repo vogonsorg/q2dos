@@ -17,7 +17,7 @@
  ** 
  ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
  **
- ** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gdraw.c,v 1.3.4.6 2003/08/04 12:45:47 dborca Exp $
+ ** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gdraw.c,v 1.3.4.15 2005/08/13 21:07:03 jwrdegoede Exp $
  ** $Log:
  **  11   3dfx      1.5.1.2.1.1 10/11/00 Brent           Forced check in to enforce
  **       branching.
@@ -223,7 +223,7 @@
 #define OUTBOUNDS(a) (OUTBOUNDSX(a) || OUTBOUNDSY(a))
 
 /* access an array of four-byte opaque datums with a byte index */
-#define ARRAY(p,i)    (*(int *)((i)+(int)(p)))
+#define ARRAY(p,i)    (*(int *)((i)+(long)(p)))
 
 /*---------------------------------------------------------------------------
 ** grDrawPoint
@@ -275,34 +275,17 @@ GR_ENTRY(grDrawPoint, void, (const void *p))
 
 GR_ENTRY(grDrawLine, void, (const void *a, const void *b))
 {
+  const void *verts[2];
 #define FN_NAME "grDrawLine"
   GR_BEGIN_NOFIFOCHECK(FN_NAME, 91);
   GDBG_INFO_MORE(gc->myLevel, "(a = 0x%x, b = 0x%x)\n", a, b);
 
-#if __POWERPC__
-  {
-        const void *verts[2];
         verts[0] = a; verts[1] = b;
         
           if (gc->state.grEnableArgs.primitive_smooth_mode & GR_AA_ORDERED_LINES_MASK)
             _grAADrawLineStrip(GR_VTX_PTR_ARRAY, GR_LINES, 2, verts);
           else
             _grDrawLineStrip(GR_VTX_PTR_ARRAY, GR_LINES, 2, verts);
-  }
-#else
-#ifdef __GNUC__
-  if (gc->state.grEnableArgs.primitive_smooth_mode & GR_AA_ORDERED_LINES_MASK)
-    _grAADrawLineStrip(GR_VTX_PTR_ARRAY, GR_LINES, 2, (void *)&a);
-  else
-    _grDrawLineStrip(GR_VTX_PTR_ARRAY, GR_LINES, 2, (void *)&a);
-#else	/* (GLIDE_PLATFORM & GLIDE_OS_UNIX) || defined(__DJGPP__) */
-  if (gc->state.grEnableArgs.primitive_smooth_mode & GR_AA_ORDERED_LINES_MASK)
-    _grAADrawLineStrip(GR_VTX_PTR_ARRAY, GR_LINES, 2, &(void *)a);
-  else
-    _grDrawLineStrip(GR_VTX_PTR_ARRAY, GR_LINES, 2, &(void *)a);
-#endif	/* (GLIDE_PLATFORM & GLIDE_OS_UNIX) || defined(__DJGPP__) */
-#endif
-    
 #undef FN_NAME
 } /* grDrawLine */
 
@@ -311,11 +294,11 @@ GR_ENTRY(grDrawLine, void, (const void *a, const void *b))
  */
 
 #if !defined(__POWERPC__) || GLIDE_USE_C_TRISETUP
-#if !defined(GLIDE_DEBUG) && !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !defined(__DJGPP__)
+#if !defined(GLIDE_DEBUG) && !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !(GLIDE_PLATFORM & GLIDE_OS_DOS32)
 #if !(GLIDE_USE_C_TRISETUP)
 __declspec( naked )
 #endif
-#endif	/* !defined(GLIDE_DEBUG) && !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !defined(__DJGPP__) */
+#endif	/* !defined(GLIDE_DEBUG) && !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !(GLIDE_PLATFORM & GLIDE_OS_DOS32) */
 GR_ENTRY(grDrawTriangle, void, (const void *a, const void *b, const void *c))
 {
 #define FN_NAME "grDrawTriangle"
@@ -347,14 +330,15 @@ GR_ENTRY(grDrawTriangle, void, (const void *a, const void *b, const void *c))
   }
 #elif defined(__MSC__)
   {
+#if USE_STANDARD_TLS_FUNC
+    extern FxU32 getThreadValue(void);
     __asm {
-      mov eax, DWORD PTR fs:[WNT_TEB_PTR] ;
-      add eax, DWORD PTR _GlideRoot.tlsOffset;
-      mov edx, [eax];
+      call getThreadValue;
+      mov edx, eax;
       test edx, edx;
       je   lostContext;
       mov eax, [edx + kLostContextOffset];
-      test eax, eax
+      test eax, eax;
       je   lostContext;
       mov eax, [eax];
       test eax, 1;
@@ -362,16 +346,33 @@ GR_ENTRY(grDrawTriangle, void, (const void *a, const void *b, const void *c))
       mov eax, [edx + kTriProcOffset];
       jmp eax;
     }
+#else
+    __asm {
+      mov eax, DWORD PTR fs:[WNT_TEB_PTR];
+      add eax, DWORD PTR _GlideRoot.tlsOffset;
+      mov edx, [eax];
+      test edx, edx;
+      je   lostContext;
+      mov eax, [edx + kLostContextOffset];
+      test eax, eax;
+      je   lostContext;
+      mov eax, [eax];
+      test eax, 1;
+      jnz  lostContext;
+      mov eax, [edx + kTriProcOffset];
+      jmp eax;
+    }
+#endif
     lostContext: ; /* <-- my, that's odd, but MSVC was insistent  */
   }
-#elif (GLIDE_PLATFORM & GLIDE_OS_UNIX) || defined(__DJGPP__)
+#elif (GLIDE_PLATFORM & GLIDE_OS_UNIX) || (GLIDE_PLATFORM & GLIDE_OS_DOS32)
   {
     GR_BEGIN_NOFIFOCHECK("grDrawTriangle",92);
     TRISETUP(a, b, c);
     GR_END();
   }
   
-#else /* (GLIDE_PLATFORM & GLIDE_OS_UNIX) || defined(__DJGPP__) */
+#else /* (GLIDE_PLATFORM & GLIDE_OS_UNIX) || (GLIDE_PLATFORM & GLIDE_OS_DOS32) */
 #error "Write triangle proc dispatch for this compiler"
 #endif /* Triangle proc dispatch routine */
 #undef FN_NAME
@@ -400,7 +401,7 @@ GR_ENTRY(grDrawTriangle, void, (const void *a, const void *b, const void *c))
   GR_INC_SIZE(sizeof(FxU32))
 
 #define DA_END \
-  gc->cmdTransportInfo.fifoRoom -= ((FxU32)packetPtr - (FxU32)gc->cmdTransportInfo.fifoPtr); \
+  gc->cmdTransportInfo.fifoRoom -= ((unsigned long)packetPtr - (unsigned long)gc->cmdTransportInfo.fifoPtr); \
   gc->cmdTransportInfo.fifoPtr = packetPtr; \
   FIFO_ASSERT(); \
 }
@@ -426,7 +427,7 @@ _grDrawPoints(FxI32 mode, FxI32 count, void *pointers)
    * except the data set up is from the pointer array and 
    * its data layout
    */
-  FxI32 stride = mode;
+  FxI32 stride;
 
   /* we snap to an integer by adding a large enough number that it
    * shoves all fraction bits off the right side of the mantissa.
@@ -443,7 +444,6 @@ _grDrawPoints(FxI32 mode, FxI32 count, void *pointers)
    * to compute a logical 1 value to fill an entire pixel.  
    */
 #define kNumMantissaBits 12UL
-  const float bias = (const float)(3UL << kNumMantissaBits);
   
 
   GR_BEGIN_NOFIFOCHECK(FN_NAME, 90);
@@ -461,8 +461,10 @@ _grDrawPoints(FxI32 mode, FxI32 count, void *pointers)
    */
 #define POINTS_BUFFER  100
 
-  if (stride == 0)
+  if (mode == 0)
     stride = gc->state.vData.vStride;
+  else
+    stride = sizeof(float *) / sizeof (float);
 
   if (gc->state.grCoordinateSpaceArgs.coordinate_space_mode == GR_WINDOW_COORDS) {
 #ifndef FX_GLIDE_H5_CSIM
@@ -479,7 +481,7 @@ _grDrawPoints(FxI32 mode, FxI32 count, void *pointers)
         vPtr = pointers;
         if (mode) vPtr = *(float **)vPtr;
         
-        pointers = (float *)pointers + stride;
+        (float *)pointers += stride;
         
         GDBG_INFO_MORE(gc->myLevel, "(%f %f)\n",  
                        FARRAY(vPtr,gc->state.vData.vertexInfo.offset), 
@@ -488,6 +490,7 @@ _grDrawPoints(FxI32 mode, FxI32 count, void *pointers)
         {
           FxU32 x, y;
           FxU32 dataElem;
+          const float bias = (const float)(3UL << kNumMantissaBits);
           
           DA_CONT(kSetupStrip | kSetupCullDisable, 0x00,
                   0x02, sizeof(FxU32) << 1, SSTCP_PKT3_BDDDDD);
@@ -770,7 +773,7 @@ _grDrawLineStrip(FxI32 mode, FxI32 ltype, FxI32 count, void *pointers)
   int j;
   FxI32 sCount;
   FxU32 vertexParamOffset;
-  FxI32 stride = mode;
+  FxI32 stride;
 
 #define  DX gc->pool.ftemp1
 #define ADY gc->pool.ftemp2
@@ -786,8 +789,11 @@ _grDrawLineStrip(FxI32 mode, FxI32 ltype, FxI32 count, void *pointers)
 
 #define LINES_BUFFER  100
 
-  if (stride == 0)
+  if (mode == 0)
     stride = gc->state.vData.vStride;
+  else
+    stride = sizeof(float *) / sizeof (float);
+
   if (ltype == GR_LINES)
     sCount = count >> 1; /* line list */
   else
@@ -815,16 +821,16 @@ _grDrawLineStrip(FxI32 mode, FxI32 ltype, FxI32 count, void *pointers)
         ** compute absolute deltas and draw from low Y to high Y
         */
         ADY = FARRAY(b, gc->state.vData.vertexInfo.offset+4) - FARRAY(a, gc->state.vData.vertexInfo.offset+4);
-        i = *(long *)&ADY;
+        i = *(int *)&ADY;
         if (i < 0) {
           float *tv;
           tv = a; a = b; b = tv;
           i ^= 0x80000000;            /* ady = -ady; */
-          (*(long *)&ADY) = i;
+          (*(int *)&ADY) = i;
         }
         
         DX = FARRAY(b, gc->state.vData.vertexInfo.offset) - FARRAY(a, gc->state.vData.vertexInfo.offset);
-        j = *(long *)&DX;
+        j = *(int *)&DX;
         if (j < 0) {
           j ^= 0x80000000;            /* adx = -adx; */
         }
@@ -946,7 +952,7 @@ _grDrawLineStrip(FxI32 mode, FxI32 ltype, FxI32 count, void *pointers)
   }
   else {
 
-    float oowa, oowb, owa, owb, tmp1, tmp2, fax, fay, fbx, fby;
+    float oowa, oowb = 0.0f, owa, owb, tmp1, tmp2, fax, fay, fbx, fby;
 
     while (sCount > 0) {
       FxI32 k, i;
@@ -962,29 +968,21 @@ _grDrawLineStrip(FxI32 mode, FxI32 ltype, FxI32 count, void *pointers)
         oowb = 1.0f / FARRAY(a, gc->state.vData.wInfo.offset);        
       }
       for (k = 0; k < vcount; k++) {
+        a = (float *)pointers;
+        b = (float *)pointers + stride;
+        if (mode) {
+          a = *(float **)a;
+          b = *(float **)b;
+        }
+        pointers = (float *)pointers + stride;
         if (ltype == GR_LINES) {
-          a = (float *)pointers;
-          b = (float *)pointers + stride;
-          if (mode) {
-            a = *(float **)a;
-            b = *(float **)b;
-          }
-          pointers = (float *)pointers + stride;
           owa = oowa = 1.0f / FARRAY(a, gc->state.vData.wInfo.offset);        
-          owb = oowb = 1.0f / FARRAY(b, gc->state.vData.wInfo.offset);        
           pointers = (float *)pointers + stride;
         }
-        else {
+        else
           owa = oowa = oowb;
-          a = (float *)pointers;
-          b = (float *)pointers + stride;
-          if (mode) {
-            a = *(float **)a;
-            b = *(float **)b;
-          }
-          pointers = (float *)pointers + stride;
-          owb = oowb = 1.0f / FARRAY(b, gc->state.vData.wInfo.offset);
-        }
+        owb = oowb = 1.0f / FARRAY(b, gc->state.vData.wInfo.offset);
+
         fay = tmp1 = FARRAY(a, gc->state.vData.vertexInfo.offset+4)
           *oowa*gc->state.Viewport.hheight+gc->state.Viewport.oy;
         fby = tmp2 = FARRAY(b, gc->state.vData.vertexInfo.offset+4)
@@ -994,7 +992,7 @@ _grDrawLineStrip(FxI32 mode, FxI32 ltype, FxI32 count, void *pointers)
         ** compute absolute deltas and draw from low Y to high Y
         */
         ADY = tmp2 - tmp1;
-        i = *(long *)&ADY;
+        i = *(int *)&ADY;
         if (i < 0) {
           float *tv;          
           owa = oowb; owb = oowa;
@@ -1002,7 +1000,7 @@ _grDrawLineStrip(FxI32 mode, FxI32 ltype, FxI32 count, void *pointers)
           fby = tmp1;
           tv = a; a = b; b = tv;
           i ^= 0x80000000;            /* ady = -ady; */
-          (*(long *)&ADY) = i;
+          (*(int *)&ADY) = i;
         }
         fax = FARRAY(a, gc->state.vData.vertexInfo.offset)
           *owa*gc->state.Viewport.hwidth+gc->state.Viewport.ox;
@@ -1010,7 +1008,7 @@ _grDrawLineStrip(FxI32 mode, FxI32 ltype, FxI32 count, void *pointers)
           *owb*gc->state.Viewport.hwidth+gc->state.Viewport.ox;
         
         DX = fbx - fax;
-        j = *(long *)&DX;
+        j = *(int *)&DX;
         if (j < 0) {
           j ^= 0x80000000;            /* adx = -adx; */
         }
@@ -1096,7 +1094,7 @@ _grDrawTriangles_Default(FxI32 mode, FxI32 count, void *pointers)
 #if GLIDE_HW_TRI_SETUP && GLIDE_PACKET3_TRI_SETUP
   FxI32
     k;
-  FxI32 stride = mode;
+  FxI32 stride;
   float *vPtr;
 
   GR_BEGIN_NOFIFOCHECK(FN_NAME, 90);
@@ -1110,9 +1108,10 @@ _grDrawTriangles_Default(FxI32 mode, FxI32 count, void *pointers)
   GDBG_INFO(110, "%s:  paramMask = 0x%x\n", FN_NAME, gc->cmdTransportInfo.paramMask);
 #endif
 
-  if (stride == 0)
+  if (mode == 0)
     stride = gc->state.vData.vStride;
-
+  else
+    stride = sizeof(float *) / sizeof (float);
 
   gc->stats.trisProcessed+=(count/3);
 

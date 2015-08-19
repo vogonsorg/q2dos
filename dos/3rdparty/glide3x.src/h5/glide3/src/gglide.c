@@ -18,7 +18,7 @@
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
 **
 ** 
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gglide.c,v 1.7.4.11 2003/08/26 18:03:41 koolsmoky Exp $
+** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gglide.c,v 1.7.4.18 2005/06/09 18:32:32 jwrdegoede Exp $
 ** $Log:
 **  51   3dfx      1.41.1.6.1.110/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -1141,7 +1141,7 @@ _grBufferClear2D(/*const*/ FxU32 buffOffset,
 #define REFERENCE_TRI_FILL 0
 #ifdef FX_GLIDE_NAPALM
 /* KoolSmoky - testing 2-tri fill with napalm */
-#define TWO_TRI_FILL       1
+#define TWO_TRI_FILL       0
 #else
 #define TWO_TRI_FILL       0
 #endif
@@ -1336,7 +1336,7 @@ _grTriFill(GrColor_t color, FxU32 depth, GrStencil_t stencil)
       {
         REG_GROUP_SET(hw, stencilMode, (GR_CMP_ALWAYS << SST_STENCIL_FUNC_SHIFT) |
                                        (stencil       << SST_STENCIL_REF_SHIFT)  |
-                                        stencilMode & (SST_STENCIL_WMASK | SST_STENCIL_MASK) |
+                                       (stencilMode & (SST_STENCIL_WMASK | SST_STENCIL_MASK)) |
                                         SST_STENCIL_ENABLE) ;
         REG_GROUP_SET(hw, stencilOp, (GR_STENCILOP_REPLACE << SST_STENCIL_SFAIL_OP_SHIFT) |
                                      (GR_STENCILOP_REPLACE << SST_STENCIL_ZFAIL_OP_SHIFT) |
@@ -1883,7 +1883,7 @@ GR_ENTRY(grBufferClear, void, (GrColor_t color, GrAlpha_t alpha, FxU32 depth))
             REG_GROUP_BEGIN(BROADCAST_ID, colBufferAddr, 2, 0x3);
             REG_GROUP_SET(hw, colBufferAddr, gc->state.shadow.auxBufferAddr );
 #ifdef DRI_BUILD
-            REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer)? driInfo.stride :
+            REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer)? (FxU32)driInfo.stride :
                           gc->state.shadow.auxBufferStride);
 #else	/* defined(DRI_BUILD) */
             REG_GROUP_SET(hw, colBufferStride, gc->state.shadow.auxBufferStride );
@@ -1934,7 +1934,7 @@ GR_ENTRY(grBufferClear, void, (GrColor_t color, GrAlpha_t alpha, FxU32 depth))
             REG_GROUP_BEGIN(BROADCAST_ID, colBufferAddr, 2, 0x3);
             REG_GROUP_SET(hw, colBufferAddr, gc->buffers0[gc->windowed ? 0 : gc->curBuffer]);
 #ifdef DRI_BUILD
-            REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? driInfo.stride : 
+            REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? (FxU32)driInfo.stride : 
                           gc->state.shadow.colBufferStride );
 #else
             REG_GROUP_SET(hw, colBufferStride, gc->state.shadow.colBufferStride );
@@ -2430,7 +2430,7 @@ GR_EXT_ENTRY(grBufferClearExt, void, (GrColor_t color, GrAlpha_t alpha, FxU32 de
             REG_GROUP_BEGIN(BROADCAST_ID, colBufferAddr, 2, 0x3) ;
             REG_GROUP_SET(hw, colBufferAddr, gc->state.shadow.auxBufferAddr) ;
 #ifdef DRI_BUILD
-	    REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? driInfo.stride : 
+	    REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? (FxU32)driInfo.stride : 
 			  gc->state.shadow.auxBufferStride );
 #else
 	    REG_GROUP_SET(hw, colBufferStride, gc->state.shadow.auxBufferStride );
@@ -2480,7 +2480,7 @@ GR_EXT_ENTRY(grBufferClearExt, void, (GrColor_t color, GrAlpha_t alpha, FxU32 de
             REG_GROUP_BEGIN(BROADCAST_ID, colBufferAddr, 2, 0x3) ;
             REG_GROUP_SET(hw, colBufferAddr, gc->buffers0[gc->windowed ? 0 : gc->curBuffer]) ;
 #ifdef DRI_BUILD
-	    REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? driInfo.stride : 
+	    REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? (FxU32)driInfo.stride : 
 			  gc->state.shadow.colBufferStride );
 #else
 	    REG_GROUP_SET(hw, colBufferStride, gc->state.shadow.colBufferStride );
@@ -2644,6 +2644,16 @@ GR_ENTRY(grBufferClear, void, (GrColor_t color, GrAlpha_t alpha, FxU32 depth))
 } /* grBufferClear */
 #endif
 
+#if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
+#define KBHIT(key) ((GetAsyncKeyState(key) & 0x8001) == 0x8001)
+#elif (GLIDE_PLATFORM & GLIDE_OS_UNIX)
+#define KBHIT(key) (0)
+#elif (GLIDE_PLATFORM & GLIDE_OS_DOS32)
+#define KBHIT(key) (0)
+#else
+#define KBHIT(key) (0)
+#endif
+
 #ifndef DRI_BUILD
 /*---------------------------------------------------------------------------
 ** grBufferSwap
@@ -2656,11 +2666,13 @@ GR_ENTRY(grBufferClear, void, (GrColor_t color, GrAlpha_t alpha, FxU32 depth))
 GR_ENTRY(grBufferSwap, void, (FxU32 swapInterval))
 {
 #define FN_NAME "grBufferSwap"
+  static FxU32 aaEnabled = 1;
+  
   GR_BEGIN_NOFIFOCHECK(FN_NAME,86);
   GDBG_INFO_MORE(gc->myLevel,"(%d)\n",swapInterval);
 
 #ifdef FX_GLIDE_NAPALM
-#if !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !defined(__DJGPP__)
+#if !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !(GLIDE_PLATFORM & GLIDE_OS_DOS32)
   /* Window hacky stuff */
   if (gc->windowed)
   {
@@ -2672,19 +2684,32 @@ GR_ENTRY(grBufferSwap, void, (FxU32 swapInterval))
   }
 #endif
 
-  // 4x FSAA or greater FSAA
-  if (0 && gc->grPixelSample >= 4) {
-    int sample = gc->stats.bufferSwaps%4;
-    
-    // We want to accumulate swaps so don't swap now
-    if (sample) {
-      _grChipMask(0x1 << sample);
-      gc->chipmask = sample;
-      gc->stats.bufferSwaps++;
-      return;
+  // test
+  if (aaEnabled) {
+    /* aaEnabled doesn't mean we have AA.
+     * It only means the user didn't forbid any kind of AA
+     * at run-time with _GlideRoot.environment.aaToggleKey
+     */
+    static FxU32 taaFrame = 1;
+    if (KBHIT(_GlideRoot.environment.taaToggleKey)) {
+      _GlideRoot.environment.taaEnabled ^= 1;
+      if (!_GlideRoot.environment.taaEnabled) {
+        int jOffset = 0; /* reset the offsets to default */
+        if (gc->grPixelSample > 1) {
+          /* reset the offsets to whatever our AA defaults */
+          jOffset = gc->sampleOffsetIndex;
+        }
+        _grAAOffsetValue(_GlideRoot.environment.aaXOffset[jOffset],
+                         _GlideRoot.environment.aaYOffset[jOffset],
+                         0, gc->chipCount - 1, FXTRUE, gc->enableSecondaryBuffer);
+      }
     }
-    //grTBufferWriteMaskExt(0xF);
-    
+    if (_GlideRoot.environment.taaEnabled) {
+      _grAAOffsetValue(_GlideRoot.environment.aaXOffset[13 + taaFrame],
+                       _GlideRoot.environment.aaYOffset[13 + taaFrame],
+                       0, gc->chipCount - 1, FXTRUE, gc->enableSecondaryBuffer);
+      taaFrame ^= 1;
+    }
   }
   
   if (IS_NAPALM(gc->bInfo->pciInfo.deviceID)) {
@@ -2698,9 +2723,8 @@ GR_ENTRY(grBufferSwap, void, (FxU32 swapInterval))
 #if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
   if (_GlideRoot.environment.aaToggleKey) {
     if(gc->grPixelSample > 1) {
-      FxU16 keyState = GetAsyncKeyState(_GlideRoot.environment.aaToggleKey);
-      if((keyState & 0x8001) == 0x8001) {
-        static FxU32 aaEnabled = 1;
+      if (KBHIT(_GlideRoot.environment.aaToggleKey)) {
+        //static FxU32 aaEnabled = 1;
         
         aaEnabled ^= 1;
         if(aaEnabled) {
@@ -2712,8 +2736,7 @@ GR_ENTRY(grBufferSwap, void, (FxU32 swapInterval))
     }  
   }  
   if(_GlideRoot.environment.aaScreenshotKey) {
-    FxU16 keyState = GetAsyncKeyState(_GlideRoot.environment.aaScreenshotKey);
-    if((keyState & 0x8001) == 0x8001) {
+    if (KBHIT(_GlideRoot.environment.aaScreenshotKey)) {
       grFinish();
       hwcAAScreenShot(gc->bInfo, gc->curBuffer, _GlideRoot.environment.ditherHwcAA);
     }
@@ -2918,13 +2941,6 @@ GR_ENTRY(grBufferSwap, void, (FxU32 swapInterval))
   if (!gc->cmdTransportInfo.autoBump)
     GR_BUMP_N_GRIND;
 
-  // 4x FSAA or greater FSAA
-  if (0 && gc->grPixelSample >= 4) {
-    _grChipMask(1);
-    gc->chipmask = 1;
-    //   grTBufferWriteMaskExt(0x11);
-  }
-
   GR_END();
 #undef FN_NAME  
 } /* grBufferSwap */
@@ -2947,6 +2963,34 @@ GR_ENTRY(grDRIBufferSwap, void, (FxU32 swapInterval))
   GDBG_INFO_MORE(gc->myLevel,"(%d)\n",swapInterval);
 
 #ifdef FX_GLIDE_NAPALM
+  // test
+  if (1/*aaEnabled*/) {
+    /* aaEnabled doesn't mean we have AA.
+     * It only means the user didn't forbid any kind of AA
+     * at run-time with _GlideRoot.environment.aaToggleKey
+     */
+    static FxU32 taaFrame = 1;
+    if (KBHIT(_GlideRoot.environment.taaToggleKey)) {
+      _GlideRoot.environment.taaEnabled ^= 1;
+      if (!_GlideRoot.environment.taaEnabled) {
+        int jOffset = 0; /* reset the offsets to default */
+        if (gc->grPixelSample > 1) {
+          /* reset the offsets to whatever our AA defaults */
+          jOffset = gc->sampleOffsetIndex;
+        }
+        _grAAOffsetValue(_GlideRoot.environment.aaXOffset[jOffset],
+                         _GlideRoot.environment.aaYOffset[jOffset],
+                         0, gc->chipCount - 1, FXTRUE, gc->enableSecondaryBuffer);
+      }
+    }
+    if (_GlideRoot.environment.taaEnabled) {
+      _grAAOffsetValue(_GlideRoot.environment.aaXOffset[13 + taaFrame],
+                       _GlideRoot.environment.aaYOffset[13 + taaFrame],
+                       0, gc->chipCount - 1, FXTRUE, gc->enableSecondaryBuffer);
+      taaFrame ^= 1;
+    }
+  }
+
   if (IS_NAPALM(gc->bInfo->pciInfo.deviceID)) {
     _grChipMask( SST_CHIP_MASK_ALL_CHIPS );
   }
@@ -2973,8 +3017,8 @@ GR_ENTRY(grDRIBufferSwap, void, (FxU32 swapInterval))
     for ( i = 0; i < MAX_BUFF_PENDING && j == -1; i++) {
       if (gc->bufferSwaps[i] == 0xffffffff) {
         gc->bufferSwaps[i] =
-          (FxU32) gc->cmdTransportInfo.fifoPtr -
-          (FxU32) gc->cmdTransportInfo.fifoStart; 
+          (unsigned long) gc->cmdTransportInfo.fifoPtr -
+          (unsigned long) gc->cmdTransportInfo.fifoStart; 
         j = i;
       }
     }
@@ -3017,7 +3061,7 @@ GR_ENTRY(grDRIBufferSwap, void, (FxU32 swapInterval))
       REG_GROUP_SET_WAX(hw, srcXY, x | ((driInfo.y+(y-driInfo.y))<<16));
       REG_GROUP_SET_WAX(hw, dstSize, (w&0x1FFF)|((h&0x1FFF)<<16));
       REG_GROUP_SET_WAX(hw, dstXY, (x&0x1FFF) | ((y&0x1FFF)<<16));
-      REG_GROUP_SET_WAX(hw, command, (0xCC<<24) | 0x1 | BIT(8));
+      REG_GROUP_SET_WAX(hw, command, (0xCCu<<24) | 0x1 | BIT(8));
       REG_GROUP_END();
     } while (cnt);
 
@@ -3070,6 +3114,11 @@ GR_ENTRY(grDRIBufferSwap, void, (FxU32 swapInterval))
   GR_END();
 #undef FN_NAME  
 } /* grBufferSwap */
+
+void grBufferSwap(FxU32 i) {
+  grDRIBufferSwap(i);
+}
+
 #endif	/* defined(DRI_BUILD) */
 
 /*---------------------------------------------------------------------------
@@ -3868,7 +3917,12 @@ GR_STATE_ENTRY(grDitherMode, void, (GrDitherMode_t mode))
         fbzMode &= ~(SST_ENDITHERSUBTRACT);  
     break;
   }
-   
+  
+  /* disable dithering when in 32bpp */
+  if (gc->bInfo->h3pixelSize == 4) {
+    fbzMode &= ~SST_ENDITHER;
+  }
+  
   gc->state.shadow.fbzMode = fbzMode;
 
 #if !GLIDE3
@@ -4099,7 +4153,7 @@ GR_ENTRY(grGlideShutdown, void, (void))
            * continuing so that any internal glide calls have a valid
            * gc from tls via GR_DCL_GC. F*ck this up at your own peril.
            */
-          setThreadValue((FxU32)gc);
+          setThreadValue((unsigned long)gc);
 #if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
           /* Flush any remaining commands and cleanup any per gc state */
           grSurfaceReleaseContext((GrContext_t)gc);
@@ -4368,7 +4422,7 @@ GR_STATE_ENTRY(grRenderBuffer, void, (GrBuffer_t buffer))
                      : gc->backBuffer);
     REG_GROUP_BEGIN(BROADCAST_ID, colBufferAddr, 2, 0x3); 
     REG_GROUP_SET(hw, colBufferAddr, gc->buffers0[gc->curBuffer]);
-    REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? driInfo.stride :
+    REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? (FxU32)driInfo.stride :
 		    gc->state.shadow.colBufferStride);
     REG_GROUP_END();
     gc->state.shadow.colBufferAddr = gc->buffers0[gc->curBuffer];
@@ -5540,7 +5594,7 @@ GR_EXT_ENTRY(grTBufferWriteMaskExt, void , (FxU32 tmask) )
       {
         REG_GROUP_SET(hw, colBufferAddr, gc->state.shadow.colBufferAddr);
 #ifdef DRI_BUILD
-	REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? driInfo.stride :
+	REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? (FxU32)driInfo.stride :
                       gc->state.shadow.colBufferStride );
 #else
         REG_GROUP_SET(hw, colBufferStride, gc->state.shadow.colBufferStride );
@@ -5563,7 +5617,7 @@ GR_EXT_ENTRY(grTBufferWriteMaskExt, void , (FxU32 tmask) )
         REG_GROUP_SET(hw, colBufferAddr, gc->state.shadow.colBufferAddr);
         REG_GROUP_SET(hw, colBufferStride, gc->state.shadow.colBufferStride );
 #ifdef DRI_BUILD
-	REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? driInfo.stride :
+	REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? (FxU32)driInfo.stride :
                       gc->state.shadow.colBufferStride );
 #else
         REG_GROUP_SET(hw, auxBufferAddr, gc->state.shadow.auxBufferAddr);
@@ -5583,7 +5637,7 @@ GR_EXT_ENTRY(grTBufferWriteMaskExt, void , (FxU32 tmask) )
       {
         REG_GROUP_SET(hw, colBufferAddr, gc->state.shadow.colBufferAddr);
 #ifdef DRI_BUILD
-	REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? driInfo.stride :
+	REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? (FxU32)driInfo.stride :
                       gc->state.shadow.colBufferStride );
 #else
         REG_GROUP_SET(hw, colBufferStride, gc->state.shadow.colBufferStride );
@@ -5596,7 +5650,7 @@ GR_EXT_ENTRY(grTBufferWriteMaskExt, void , (FxU32 tmask) )
       {
         REG_GROUP_SET(hw, colBufferAddr, gc->buffers1[gc->curBuffer] | SST_BUFFER_BASE_SELECT);
 #ifdef DRI_BUILD
-	REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? driInfo.stride :
+	REG_GROUP_SET(hw, colBufferStride, (!gc->curBuffer) ? (FxU32)driInfo.stride :
                       gc->state.shadow.colBufferStride );
 #else
         REG_GROUP_SET(hw, colBufferStride, gc->state.shadow.colBufferStride );

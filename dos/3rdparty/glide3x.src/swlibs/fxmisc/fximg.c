@@ -17,8 +17,8 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Revision: 1.3 $
-** $Date: 2000/10/03 18:31:53 $
+** $Revision: 1.3.4.1 $
+** $Date: 2005/05/25 08:56:28 $
 **
 */
 
@@ -1948,7 +1948,7 @@ FxBool imgReadFile(const char *filename, ImgInfo *info)
 	if (prefix) {					// if there's a path prefix
 	    char buf[1024], *p;
 	    strcpy(buf,prefix);			// copy and replace semicolon
-	    if ((p = strchr(buf,';'))) *p = '\0';
+	    if ((p = strchr(buf,';')) != NULL) *p = '\0';
 	    fprintf(stderr,buf);
 	    fprintf(stderr,"/");
 	}

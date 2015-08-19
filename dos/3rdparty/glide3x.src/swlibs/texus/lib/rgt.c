@@ -18,8 +18,8 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Revision: 1.2 $
-** $Date: 2000/06/15 00:11:40 $
+** $Revision: 1.2.6.1 $
+** $Date: 2005/05/25 08:56:37 $
 **
 */
 
@@ -52,7 +52,7 @@ typedef struct _rgtHeader{
 
 
 
-static void swapShorts(unsigned short *array, long length)
+static void swapShorts(unsigned short *array, int length)
 {
     unsigned short s;
     while (length--) {
@@ -61,7 +61,7 @@ static void swapShorts(unsigned short *array, long length)
     }
 }
 
-static void swapLongs(unsigned int *array, long length)
+static void swapLongs(unsigned int *array, int length)
 {
     unsigned int s;
     while (length--) {
@@ -72,7 +72,7 @@ static void swapLongs(unsigned int *array, long length)
 }
 
 // just swap RGB into BGR (leave MSB undefined)
-static void swapRGB(unsigned int *array, long length)
+static void swapRGB(unsigned int *array, int length)
 {
     unsigned int s;
     while (length--) {
@@ -164,7 +164,7 @@ _txReadRGTData( FILE *stream, TxMip *info)
 
 #if 1
         if (swap) {
-            swapRGB((unsigned int *)data32, (long)info->width);
+            swapRGB((unsigned int *)data32, (int)info->width);
         }
 #endif
 

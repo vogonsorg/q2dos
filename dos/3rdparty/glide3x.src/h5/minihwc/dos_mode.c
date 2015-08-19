@@ -17,7 +17,7 @@
 **
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
 **
-** $Header: /cvsroot/glide/glide3x/h5/minihwc/dos_mode.c,v 1.3.4.6 2003/08/01 10:06:41 dborca Exp $
+** $Header: /cvsroot/glide/glide3x/h5/minihwc/dos_mode.c,v 1.3.4.12 2004/10/05 14:54:44 dborca Exp $
 ** $Log: 
 **  9    3dfx      1.4.1.2.1.0 10/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -68,6 +68,7 @@
 #include <h3regs.h>
 #include <minihwc.h>
 #include "hwcio.h"
+#include "setmode.h"
 
 #if 1
 #define LOG(x)
@@ -76,7 +77,6 @@
  do { \
    FILE *dbg = fopen("debug.txt","a"); \
    fprintf x ; \
-   fflush(dbg); \
    fclose(dbg); \
  } while(0);
 #endif
@@ -109,14 +109,18 @@ static unsigned long _tableSize = sizeof( _table ) / sizeof( ResTableEntry );
 #include "glide.h"
 #include "fxglide.h"
 
-FxBool 
-setVideoMode( unsigned long dummy, int xres, int yres, int pixelSize, int refresh, void *hmon ) 
+FxBool
+setVideoMode( void *hwnd,
+              int  xres,
+              int  yres,
+              int  pixelSize,
+              int  refresh,
+              void *hmon,
+              char *devicename)
 {
   union REGS r, rOut;
   int i;
   int mode;
-
-  dummy = dummy;
 
   r.w.ax = 0x4f03;
   int386(0x10, &r, &rOut);
@@ -173,42 +177,28 @@ resetVideo( void )
 } /* resetVideo */
 
 
-#include <conio.h>
+FxBool checkResolutions (FxBool *supportedByResolution, FxU32 stride, void *hmon)
+{
+  /* [dBorca] this should be tied to cinit code (or at least VESA)
+   * FxU16 *h3InitFindVideoMode (FxU32 xRes, FxU32 yRes, FxU32 refresh)
+   */
+  int res, ref;
 
-/* Snarfed from h3cinitdd.h */
-#if defined(__WATCOMC__)
-#define _inp inp
-#define _outp outp
+  for (res = GR_MIN_RESOLUTION; res <= GR_MAX_RESOLUTION; res++) {
+    for (ref = GR_MIN_REFRESH; ref <= GR_MAX_REFRESH; ref++) {
+      supportedByResolution[res * stride + ref] = FXTRUE;
+    }
+  }
 
-#define _inpw inpw
-#define _outpw outpw
+  return FXTRUE;
+}
 
-#define _inpd inpd
-#define _outpd outpd
 
+#ifdef __WATCOMC__
+#include "h3cini~1.h"
+#else
+#include "h3cinitdd.h"
 #endif
-
-
-#define SSTIOADDR(regName)      ((FxU16)offsetof(SstIORegs, regName))
-
-#define ISET32(addr, value)     _outpd((FxU16) ((FxU16) regBase + (FxU16) (SSTIOADDR(addr))), value)
-#define IGET32(addr)            _inpd((FxU16) ((FxU16) regBase + (FxU16) (SSTIOADDR(addr))))
-
-
-#define ISET8PHYS(a,b) {\
-FxU16 port = (FxU16) (regBase) + (FxU16) (a);\
-GDBG_INFO(120, "OUT8:  Port 0x%x Value 0x%x\n", port, b);\
-_outp(port, (FxU8) (b));}
-
-#define ISET16PHYS(a,b) {\
-FxU16 port = (FxU16)(regBase) + (FxU16)(a);\
-GDBG_INFO(120, "OUT16:  Port 0x%x Value 0x%x\n", port, b);\
-_outpw(port, (FxU16) (b));}
-
-#define IGET8PHYS(a) _inp((FxU16) ((FxU16) (regBase) + (FxU16) (a)))
-#define IGET16PHYS(a) _inpw((FxU16) ((FxU16) (regBase) + (FxU16)(a)))
-
-#define CHECKFORROOM while (! (_inp((FxU16) regBase) & (FxU16)(0x3f)))
 
 #define CFG_READ(_chip, _offset) \
   hwcReadConfigRegister(bInfo, _chip, offsetof(SstPCIConfigRegs, _offset))
@@ -627,6 +617,12 @@ void hwcSetSLIAAMode(hwcBoardInfo *bInfo,
 
   /* Enable AA and/or SLI */
   if(sliEnable || aaEnable) {
+
+    /* v56k has an external clock! */
+    if (bInfo->pciInfo.realNumChips == 4) {
+       extern unsigned long gpio_6k_clock(hwcBoardInfo *bInfo);
+       gpio_6k_clock(bInfo);
+    }
     
     /* First, init all chips */
     for(chipNum = 1; chipNum < numChips; chipNum++) {
@@ -1145,7 +1141,7 @@ void hwcSetSLIAAMode(hwcBoardInfo *bInfo,
                          0x01 << sliBandHeightLog2);
           CFG_VIDEOCTRL2(0x00, 0xff);
         }    
-      } else if(numChips == 4 && sliEnable && aaEnable && aaSampleHigh == 1 && analogSLI) {
+      } else if(numChips == 4 && !sliEnable && aaEnable && aaSampleHigh == 1 && analogSLI) {
         /* Four chip, 4-sample AA. 1 subsample per chip analog SLI'ed */
         if(chipNum == 0) {
           /* First chip */

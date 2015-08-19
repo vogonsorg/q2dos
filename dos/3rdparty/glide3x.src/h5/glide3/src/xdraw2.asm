@@ -16,9 +16,19 @@
 ;; 
 ;; COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 ;;
-;; $Header: /cvsroot/glide/glide3x/h5/glide3/src/xdraw2.asm,v 1.1.8.7 2003/07/07 23:29:06 koolsmoky Exp $
-;; $Revision: 1.1.8.7 $
+;; $Header: /cvsroot/glide/glide3x/h5/glide3/src/xdraw2.asm,v 1.1.8.10 2004/05/04 17:04:31 koolsmoky Exp $
+;; $Revision: 1.1.8.10 $
 ;; $Log: xdraw2.asm,v $
+;; Revision 1.1.8.10  2004/05/04 17:04:31  koolsmoky
+;; clean up
+;;
+;; Revision 1.1.8.9  2003/11/07 13:38:39  dborca
+;; unite the clans
+;;
+;; Revision 1.1.8.8  2003/09/12 05:11:45  koolsmoky
+;; preparing for graphic context checks
+;; fixed jmp errors
+;;
 ;; Revision 1.1.8.7  2003/07/07 23:29:06  koolsmoky
 ;; cleaned logs
 ;;
@@ -86,11 +96,11 @@
 ; B4 Chip field fix.
 ;;
 
-%include "h5\glide3\src\xos.inc"
+%include "xos.inc"
 
 
 ;;; Definitions of cvg regs and glide root structures.
-%INCLUDE "h5\glide3\src\fxgasm.h"
+%INCLUDE "fxgasm.h"
 
 extrn _GlideRoot
 extrn _grCommandTransportMakeRoom, 12
@@ -223,7 +233,7 @@ Y       equ 4
 %ENDM
 
 ;; enables/disables trisProcessed and trisDrawn counters
-STATS equ 1
+%define STATS 1
 
     ;; NB:  All of the base triangle procs expect to have the gc
     ;;      passed from the caller in edx so that we can avoid
@@ -245,7 +255,7 @@ PROC_TYPE clip_nocull_invalid
 %define GLIDE_PACK_RGB       0
 %define GLIDE_PACK_ALPHA     0
 %define GLIDE_GENERIC_SETUP  0
-%INCLUDE "h5\glide3\src\xdraw2.inc"
+%INCLUDE "xdraw2.inc"
 %undef GLIDE_GENERIC_SETUP
 %undef GLIDE_PACK_ALPHA
 %undef GLIDE_PACK_RGB           
@@ -264,7 +274,7 @@ PROC_TYPE clip_cull_invalid
 %define GLIDE_PACK_RGB       0
 %define GLIDE_PACK_ALPHA     0
 %define GLIDE_GENERIC_SETUP  0
-%INCLUDE "h5\glide3\src\xdraw2.inc"
+%INCLUDE "xdraw2.inc"
 %undef GLIDE_GENERIC_SETUP      
 %undef GLIDE_PACK_ALPHA
 %undef GLIDE_PACK_RGB           
@@ -273,7 +283,7 @@ PROC_TYPE clip_cull_invalid
 %undef GLIDE_VALIDATE_STATE
 
 endp
-        
+
             ALIGN    32
 PROC_TYPE clip_cull_valid
 
@@ -283,7 +293,7 @@ PROC_TYPE clip_cull_valid
 %define GLIDE_PACK_RGB       0
 %define GLIDE_PACK_ALPHA     0
 %define GLIDE_GENERIC_SETUP  0
-%INCLUDE "h5\glide3\src\xdraw2.inc"
+%INCLUDE "xdraw2.inc"
 %undef GLIDE_GENERIC_SETUP      
 %undef GLIDE_PACK_ALPHA
 %undef GLIDE_PACK_RGB           
@@ -292,7 +302,7 @@ PROC_TYPE clip_cull_valid
 %undef GLIDE_VALIDATE_STATE
 
 endp
-    
+
             ALIGN    32
 PROC_TYPE clip_nocull_valid
 
@@ -302,7 +312,7 @@ PROC_TYPE clip_nocull_valid
 %define GLIDE_PACK_RGB       0
 %define GLIDE_PACK_ALPHA     0
 %define GLIDE_GENERIC_SETUP  0
-%INCLUDE "h5\glide3\src\xdraw2.inc"
+%INCLUDE "xdraw2.inc"
 %undef GLIDE_GENERIC_SETUP      
 %undef GLIDE_PACK_ALPHA
 %undef GLIDE_PACK_RGB           
@@ -321,7 +331,7 @@ PROC_TYPE win_nocull_invalid
 %define GLIDE_PACK_RGB       0
 %define GLIDE_PACK_ALPHA     0
 %define GLIDE_GENERIC_SETUP  0
-%INCLUDE "h5\glide3\src\xdraw2.inc"
+%INCLUDE "xdraw2.inc"
 %undef GLIDE_GENERIC_SETUP      
 %undef GLIDE_PACK_ALPHA
 %undef GLIDE_PACK_RGB           
@@ -340,7 +350,7 @@ PROC_TYPE win_cull_invalid
 %define GLIDE_PACK_RGB       0
 %define GLIDE_PACK_ALPHA     0
 %define GLIDE_GENERIC_SETUP  0
-%INCLUDE "h5\glide3\src\xdraw2.inc"
+%INCLUDE "xdraw2.inc"
 %undef GLIDE_GENERIC_SETUP
 %undef GLIDE_PACK_ALPHA
 %undef GLIDE_PACK_RGB           
@@ -359,7 +369,7 @@ PROC_TYPE win_cull_valid
 %define GLIDE_PACK_RGB       0
 %define GLIDE_PACK_ALPHA     0
 %define GLIDE_GENERIC_SETUP  0
-%INCLUDE "h5\glide3\src\xdraw2.inc"
+%INCLUDE "xdraw2.inc"
 %undef GLIDE_GENERIC_SETUP      
 %undef GLIDE_PACK_ALPHA
 %undef GLIDE_PACK_RGB           
@@ -378,7 +388,7 @@ PROC_TYPE win_nocull_valid
 %define GLIDE_PACK_RGB       0
 %define GLIDE_PACK_ALPHA     0
 %define GLIDE_GENERIC_SETUP  0
-%INCLUDE "h5\glide3\src\xdraw2.inc"
+%INCLUDE "xdraw2.inc"
 %undef GLIDE_GENERIC_SETUP
 %undef GLIDE_PACK_ALPHA
 %undef GLIDE_PACK_RGB           
@@ -388,13 +398,32 @@ PROC_TYPE win_nocull_valid
 
 endp
 
-%IFDEF       GL_AMD3D
-            ALIGN   32
-proc _trisetup_clip_coor_thunk, 12
+%IFDEF GL_AMD3D GL_SSE
+
+  ALIGN   32
+
+%ifdef GL_AMD3D
+  proc _trisetup_clip_coor_thunk, 12
+%else ; GL_SSE
+  proc _trisetup_SSE_clip_coor_thunk, 12
+%endif
 
 %define procPtr eax
 %define vPtr    ecx
 %define gc      edx           ; Current graphics context passed implicitly through edx
+
+%IFDEF GLIDE_ALT_TAB
+    test gc, gc
+    je   .__contextLost
+;    mov  eax, [gc + windowed]
+;    test eax, 1
+;    jnz  .pastContextTest
+    mov  eax, DWORD [gc+lostContext]
+    mov  ecx, [eax]
+    test ecx, 1
+    jnz  .__contextLost
+;.pastContextTest:
+%ENDIF
     
     ;; Call through to the gc->curArchProcs.drawTrianglesProc w/o
     ;; adding extra stuff to the stack. I wish we could actually
@@ -413,37 +442,10 @@ __clipSpace:
 
     invoke  procPtr, 1, 3, vPtr ; (*gc->curArchProcs.drawTrianglesProc)(grDrawVertexArray, 3, vPtr)
 
+%IFDEF GLIDE_ALT_TAB
+.__contextLost:
+%ENDIF
     ret                         ; pop 3 dwords (vertex addrs) and return
 endp
 
-%ENDIF ; GL_AMD3D
-
-%IFDEF GL_SSE
-            ALIGN   32
-proc _trisetup_SSE_clip_coor_thunk, 12
-
-%define procPtr eax
-%define vPtr    ecx
-%define gc      edx           ; Current graphics context passed implicitly through edx
-    
-    ;; Call through to the gc->curArchProcs.drawTrianglesProc w/o
-    ;; adding extra stuff to the stack. I wish we could actually
-    ;; do a direct return here w/o too much work.
-    lea     vPtr, [esp + _va$ - STKOFF]         ; Get vertex pointer address
-    mov     procPtr, [gc + drawTrianglesProc]   ; Prefetch drawTriangles proc addr
-
-    ;; If debugging make sure that we're in clip coordinates
-%IFDEF GLIDE_DEBUG
-    test    dword [gc + CoordinateSpace], 1
-    jnz     __clipSpace
-    xor     eax, eax
-    mov     [eax], eax
-__clipSpace:    
-%ENDIF ; GLIDE_DEBUG
-
-    invoke  procPtr, 1, 3, vPtr ; (*gc->curArchProcs.drawTrianglesProc)(grDrawVertexArray, 3, vPtr)
-
-    ret                         ; pop 3 dwords (vertex addrs) and return
-endp
-
-%ENDIF ; GL_SSE
+%ENDIF ; GL_AMD3D GL_SSE
