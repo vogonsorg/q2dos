@@ -189,4 +189,22 @@ void Fake_glColorTableEXT( GLenum target, GLenum internalformat,
 	gl3DfxSetPaletteEXT((GLuint *)temptable);
 }
 
+/* FS: TODO FIXME: These are just stubs so Knightmare's ref_gl can link until GetProcAddress is working for extensions */
+void UpdateGammaRamp (void)
+{
+}
 
+void qglClientActiveTextureARB (GLenum foo)
+{
+}
+void qwglGetProcAddress (char * foo)
+{
+}
+
+void qglActiveTextureARB (GLenum foo)
+{
+}
+
+void qglMultiTexCoord2f (GLenum foo, GLfloat x, GLfloat y)
+{
+}

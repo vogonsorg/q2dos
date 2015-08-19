@@ -1436,7 +1436,7 @@ void R_BeginFrame( float camera_separation )
 			putenv( envbuffer );
 		}
 	}
-	
+
 	if ( r_refreshrate->modified) /* FS: Refresh rate control */
 	{
 		r_refreshrate->modified = false;

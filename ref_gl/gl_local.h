@@ -25,8 +25,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdio.h>
 
 #include <GL/gl.h>
-#include <GL/glu.h>
+#ifndef __DJGPP__ /* FS: Don't overrides Mesas which is capable */
 #include "glext.h" // Knightmare- include new extension header
+#endif
 #include <math.h>
 
 #ifndef __linux__
@@ -303,6 +304,11 @@ extern	cvar_t	*vid_gamma;
 extern	cvar_t	*intensity;
 
 extern	cvar_t	*r_skydistance; // Knightmare- variable sky range
+
+/* FS: New stuff */
+extern	cvar_t	*r_customheight;
+extern	cvar_t	*r_customwidth;
+extern	cvar_t	*r_refreshrate;
 
 extern	int		gl_lightmap_format;
 extern	int		gl_solid_format;

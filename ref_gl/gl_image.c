@@ -1873,11 +1873,13 @@ void	GL_InitImages (void)
 	}
 
 //	if ( gl_config.renderer & ( GL_RENDERER_VOODOO | GL_RENDERER_VOODOO2 ) )
-	if ( gl_config.renderer == GL_RENDERER_VOODOO )
+
+	/* FS: MesaFX will set gamma properly, no need to hard lock any more */
+/*	if ( gl_config.renderer == GL_RENDERER_VOODOO )
 	{
 		g = 1.0F;
 	}
-
+*/
 	for ( i = 0; i < 256; i++ )
 	{
 		if ( g == 1 )

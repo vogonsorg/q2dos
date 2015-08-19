@@ -148,6 +148,10 @@ cvar_t	*gl_lockpvs;
 
 cvar_t	*gl_3dlabs_broken;
 
+cvar_t	*r_customheight;
+cvar_t	*r_customwidth;
+cvar_t	*r_refreshrate;
+
 cvar_t	*vid_fullscreen;
 cvar_t	*vid_gamma;
 cvar_t	*vid_ref;
@@ -1129,9 +1133,13 @@ void R_Register ( void )
 
 	gl_3dlabs_broken = ri.Cvar_Get( "gl_3dlabs_broken", "1", CVAR_ARCHIVE );
 
-	vid_fullscreen = ri.Cvar_Get( "vid_fullscreen", "0", CVAR_ARCHIVE );
+	r_customwidth = ri.Cvar_Get("r_customwidth", "640", CVAR_ARCHIVE);
+	r_customheight = ri.Cvar_Get("r_customheight", "480", CVAR_ARCHIVE);
+	r_refreshrate = ri.Cvar_Get("r_refreshrate", "75", CVAR_ARCHIVE);
+
+	vid_fullscreen = ri.Cvar_Get( "vid_fullscreen", "1", CVAR_ARCHIVE );
 	vid_gamma = ri.Cvar_Get( "vid_gamma", "1.0", CVAR_ARCHIVE );
-	vid_ref = ri.Cvar_Get( "vid_ref", "soft", CVAR_ARCHIVE );
+	vid_ref = ri.Cvar_Get( "vid_ref", "gl", CVAR_ARCHIVE );
 
 	r_skydistance = ri.Cvar_Get("r_skydistance", "4600", 0); // Knightmare- variable sky range
 	r_entity_fliproll = ri.Cvar_Get( "r_entity_fliproll", "0", 0);	// Knightmare- allow disabling of backwards alias model roll
@@ -1465,6 +1473,7 @@ int R_Init ( void *hinstance, void *hWnd )
 	/*
 	** grab extensions
 	*/
+#ifndef __DJGPP__ /* FS: Not ready for primetime */
 	// GL_EXT_compiled_vertex_array
 	if ( StringContainsToken( gl_config.extensions_string, "GL_EXT_compiled_vertex_array" ) || 
 		 StringContainsToken( gl_config.extensions_string, "GL_SGI_compiled_vertex_array" ) )
@@ -1641,6 +1650,7 @@ int R_Init ( void *hinstance, void *hWnd )
 		gl_config.max_anisotropy = 0.0;
 		ri.Cvar_SetValue ("gl_anisotropic_avail", 0.0);
 	}
+#endif
 
 	GL_SetDefaultState();
 
@@ -1756,6 +1766,19 @@ void R_BeginFrame( float camera_separation )
 			putenv( envbuffer );
 		}
 		UpdateGammaRamp (); // Knightmare- hardware gamma
+	}
+
+	if ( r_refreshrate->modified) /* FS: Refresh rate control */
+	{
+		r_refreshrate->modified = false;
+		
+		if ( gl_config.renderer & ( GL_RENDERER_VOODOO ) )
+		{
+			char envbuffer[1024];
+		
+			Com_sprintf( envbuffer, sizeof(envbuffer), "SST_SCREENREFRESH=%i", r_refreshrate->intValue );
+			putenv( envbuffer );
+		}
 	}
 
 	GLimp_BeginFrame( camera_separation );
@@ -2013,9 +2036,9 @@ void Sys_Error (char *error, ...)
 	char		text[1024];
 
 	va_start (argptr, error);
-//	vsprintf (text, error, argptr);
 	Q_vsnprintf (text, sizeof(text), error, argptr);
 	va_end (argptr);
+	text[sizeof(text)-1] = 0;
 
 	ri.Sys_Error (ERR_FATAL, "%s", text);
 }
@@ -2026,9 +2049,9 @@ void Com_Printf (char *fmt, ...)
 	char		text[1024];
 
 	va_start (argptr, fmt);
-//	vsprintf (text, fmt, argptr);
 	Q_vsnprintf (text, sizeof(text), fmt, argptr);
 	va_end (argptr);
+	text[sizeof(text)-1] = 0;
 
 	ri.Con_Printf (PRINT_ALL, "%s", text);
 }
