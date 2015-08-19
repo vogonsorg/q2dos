@@ -295,7 +295,6 @@ void R_Register (void)
 
 	vid_fullscreen = ri.Cvar_Get( "vid_fullscreen", "0", CVAR_ARCHIVE );
 	vid_gamma = ri.Cvar_Get( "vid_gamma", "1.0", CVAR_ARCHIVE );
-	vid_gamma->description = "Video gamma.  Use lower values for a brighter screen display.";
 
 	sw_particle_size_override = ri.Cvar_Get ("sw_particle_size_override", "0", CVAR_ARCHIVE);
 	sw_particle_size_override->description = "Enable this to override particle size scaling with sw_particle_size, sw_particle_size_min, and sw_particle_size_max.";

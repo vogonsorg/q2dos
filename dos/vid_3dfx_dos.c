@@ -398,10 +398,11 @@ void	VID_Init (void)
 	viddef.height = 240;
 
 	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
-	vid_ref->description = "Video renderer to use.  Locked to software in Q2DOS.";
+	vid_ref->description = "Video renderer to use.";
 	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE);
 	vid_fullscreen->description = "Enable fullscreen video.  Locked to fullscreen in Q2DOS.";
 	vid_gamma = Cvar_Get("vid_gamma", "1", CVAR_ARCHIVE);
+	vid_gamma->description = "Video gamma.  Use lower values for a brighter screen display.";
 
 	vid_vgaonly = Cvar_Get("vid_vgaonly", (COM_CheckParm("-vgaonly"))? "1" : "0", 0);
 	vid_bankedvga = Cvar_Get("vid_bankedvga", (COM_CheckParm("-bankedvga"))? "1" : "0", 0);
