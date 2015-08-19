@@ -72,7 +72,7 @@ endif
 
 DOS = dos/dos_v2.o \
 	dos/cd_dos.o \
-	dos/vid_3dfx_dos.o \
+	dos/vid_dos.o \
 	dos/snddma_dos.o \
 	dos/snd_gus.o \
 	dos/snd_sb.o \
