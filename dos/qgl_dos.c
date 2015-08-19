@@ -10,6 +10,7 @@
 */
 #define QGL
 #include "../ref_3dfx/gl_local.h"
+#include <GL/dmesa.h>
 
 static FILE *log_fp = NULL;
 
@@ -2927,6 +2928,11 @@ void QGL_Shutdown( void )
 	qglVertex4sv                 = NULL;
 	qglVertexPointer             = NULL;
 	qglViewport                  = NULL;
+}
+
+void *qwglGetProcAddress(char *symbol)
+{
+	return DMesaGetProcAddress(symbol);
 }
 
 /*

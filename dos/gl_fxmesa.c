@@ -170,8 +170,6 @@ void GLimp_AppActivate( qboolean active )
 {
 }
 
-extern void gl3DfxSetPaletteEXT(GLuint *pal);
-
 void Fake_glColorTableEXT( GLenum target, GLenum internalformat,
                              GLsizei width, GLenum format, GLenum type,
                              const GLvoid *table )
@@ -186,7 +184,8 @@ void Fake_glColorTableEXT( GLenum target, GLenum internalformat,
 		temptable[i][0] = *intbl++;
 		temptable[i][3] = 255;
 	}
-	gl3DfxSetPaletteEXT((GLuint *)temptable);
+	qglEnable( GL_SHARED_TEXTURE_PALETTE_EXT );
+	qgl3DfxSetPaletteEXT((GLuint *)temptable);
 }
 
 /* FS: TODO FIXME: These are just stubs so Knightmare's ref_gl can link until GetProcAddress is working for extensions */
