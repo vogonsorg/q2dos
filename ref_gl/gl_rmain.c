@@ -958,6 +958,7 @@ void	R_SetGL2D (void)
 	qglColor4f (1,1,1,1);
 }
 
+#ifdef USE_3DGLASSES
 static void GL_DrawColoredStereoLinePair( float r, float g, float b, float y )
 {
 	qglColor3f( r, g, b );
@@ -999,7 +1000,7 @@ static void GL_DrawStereoPattern( void )
 		GLimp_EndFrame();
 	}
 }
-
+#endif
 
 /*
 ====================
@@ -1305,11 +1306,11 @@ int R_Init ( void *hinstance, void *hWnd )
 	/*
 	** get our various GL strings
 	*/
-	gl_config.vendor_string = qglGetString (GL_VENDOR);
+	gl_config.vendor_string = (const char *)qglGetString (GL_VENDOR);
 	ri.Con_Printf (PRINT_ALL, "GL_VENDOR: %s\n", gl_config.vendor_string );
-	gl_config.renderer_string = qglGetString (GL_RENDERER);
+	gl_config.renderer_string = (const char *)qglGetString (GL_RENDERER);
 	ri.Con_Printf (PRINT_ALL, "GL_RENDERER: %s\n", gl_config.renderer_string );
-	gl_config.version_string = qglGetString (GL_VERSION);
+	gl_config.version_string = (const char *)qglGetString (GL_VERSION);
 	sscanf(gl_config.version_string, "%d.%d.%d", &gl_config.version_major, &gl_config.version_minor, &gl_config.version_release);
 	ri.Con_Printf (PRINT_ALL, "GL_VERSION: %s\n", gl_config.version_string );
 
@@ -1320,7 +1321,7 @@ int R_Init ( void *hinstance, void *hWnd )
 		gl_config.max_texsize = 256;
 	// end Knightmare
 
-	gl_config.extensions_string = qglGetString (GL_EXTENSIONS);
+	gl_config.extensions_string = (const char *)qglGetString (GL_EXTENSIONS);
 //	ri.Con_Printf (PRINT_DEVELOPER, "GL_EXTENSIONS: %s\n", gl_config.extensions_string ); // Knightmare- changed to PRINT_DEVELOPER
 	if (developer->value > 0)	// Knightmare- print extensions 2 to a line
 	{
@@ -1657,7 +1658,7 @@ int R_Init ( void *hinstance, void *hWnd )
 	/*
 	** draw our stereo patterns
 	*/
-#if 0 // commented out until H3D pays us the money they owe us
+#ifdef USE_3DGLASSES // commented out until H3D pays us the money they owe us
 	GL_DrawStereoPattern();
 #endif
 

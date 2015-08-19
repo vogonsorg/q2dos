@@ -541,7 +541,6 @@ typedef struct _TargaHeader {
 	unsigned char	pixel_size, attributes;
 } TargaHeader;
 
-
 /*
 =============
 LoadTGA

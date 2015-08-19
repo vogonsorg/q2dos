@@ -227,7 +227,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 	//
 	// load the file
 	//
-	modfilelen = ri.FS_LoadFile (mod->name, &buf);
+	modfilelen = ri.FS_LoadFile (mod->name, (void **)&buf);
 	if (!buf)
 	{
 		if (crash)
@@ -470,9 +470,11 @@ void Mod_LoadTexinfo (lump_t *l)
 
 	for ( i=0 ; i<count ; i++, in++, out++)
 	{
-		for (j=0 ; j<8 ; j++)
+		for (j=0 ; j<4 ; j++)
+		{
 			out->vecs[0][j] = LittleFloat (in->vecs[0][j]);
-
+			out->vecs[1][j] = LittleFloat (in->vecs[1][j]);
+		}
 		out->flags = LittleLong (in->flags);
 		next = LittleLong (in->nexttexinfo);
 		if (next > 0) {
@@ -923,7 +925,6 @@ void Mod_LoadBrushModel (model_t *mod, void *buffer)
 	Mod_LoadNodes (&header->lumps[LUMP_NODES]);
 	Mod_LoadSubmodels (&header->lumps[LUMP_MODELS]);
 	mod->numframes = 2;		// regular and alternate animation
-
 	
 //
 // set up the submodels
