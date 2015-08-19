@@ -22,7 +22,7 @@ REF_DXE=1
 CC = gcc
 CFLAGS = -O2 -fno-strict-aliasing -fomit-frame-pointer
 CPPFLAGS = -Idos/3rdparty/include -Idos/3rdparty/include/glide3 -DCLIENT_SPLIT_NETFRAME -DUSE_3DFX
-LDFLAGS =
+LDFLAGS = -Ldos/3rdparty/lib -lgl -lglu -lglid3_v3
 
 ifneq ($(REF_DXE),1)
 CPPFLAGS+= -DREF_HARD_LINKED
@@ -166,10 +166,10 @@ OBJECTS = $(CLIENT) $(CLIENTASM) $(QCOMMON) $(COMMONASM) $(SERVER) $(GAMESPY) $(
 
 .PHONY: clean
 
-all: q2fx_v1.exe
+all: q2fx_dxe.exe
 
-q2fx_v1.exe: $(OBJECTS)
-	$(CC) $(OBJECTS) $(LDFLAGS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -Lref_3dfx/lib -lgl -lglu -lm -o $@
+q2fx_dxe.exe: $(OBJECTS)
+	$(CC) $(OBJECTS) $(LDFLAGS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm -o $@
 
 clean:
 	rm -f qcommon/*.o
