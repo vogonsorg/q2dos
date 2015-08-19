@@ -21,7 +21,7 @@ REF_DXE=1
 
 CC = gcc
 CFLAGS = -O2 -fno-strict-aliasing -fomit-frame-pointer
-CPPFLAGS = -DCLIENT_SPLIT_NETFRAME -DUSE_3DFX
+CPPFLAGS = -DCLIENT_SPLIT_NETFRAME
 LDFLAGS =
 
 ifneq ($(REF_DXE),1)
@@ -166,15 +166,16 @@ OBJECTS = $(CLIENT) $(CLIENTASM) $(QCOMMON) $(COMMONASM) $(SERVER) $(GAMESPY) $(
 
 .PHONY: clean
 
-all: q2fx_dxe.exe
+all: q2fx.exe
 
-q2fx_dxe.exe: $(OBJECTS)
+q2fx.exe: $(OBJECTS)
 	$(CC) $(OBJECTS) $(LDFLAGS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm -o $@
 
 clean:
 	rm -f qcommon/*.o
 	rm -f client/*.o
 	rm -f server/*.o
+	rm -f ref_soft/*.o
 	rm -f ref_3dfx/*.o
 	rm -f dos/*.o
 	rm -f gas/*.o

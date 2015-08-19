@@ -22,17 +22,16 @@ SET DAY=%ERR10%%ERR1%
 
 F:
 cd "F:\PROJ\Q2DOS"
-del Q2DOS_EXE_%MONTH%%DAY%%YEAR%.7Z
-del Q2DOS_EXE_LATEST.7Z
+del Q2DOS_3DFX_%MONTH%%DAY%%YEAR%.7Z
+del Q2DOS_3DFX_LATEST.7Z
 rd /s /q release
 
 md release
 
-copy q2fx_v1.exe release
-copy q2fx_v2.exe release
-copy q2fx_v3.exe release
-copy q2fx_v5.exe release
+copy q2fx.exe release
+copy ref_3dfx\ref_gl.dxe release
 copy readme.txt release
+xcopy glide_dxes release /E
 
 C:
 cd\

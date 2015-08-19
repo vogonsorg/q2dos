@@ -195,6 +195,7 @@ clean:
 	rm -f client/*.o
 	rm -f server/*.o
 	rm -f ref_soft/*.o
+	rm -f ref_3dfx/*.o
 	rm -f dos/*.o
 	rm -f gas/*.o
 	rm -f Goa/*.o

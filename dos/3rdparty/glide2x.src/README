@@ -1,0 +1,32 @@
+Look at the INSTALL file for more information on installing Glide3.
+
+Here are a few notes about building Glide3x from CVS.
+
+1.) Top Level Source Organization
+    The Glide source trees are branched by platform.  The platform
+    names are internal names used at 3dfx.  Since these names may not
+    make sense to others here is a quick list.
+
+        sst1:  Voodoo Graphics
+        sst96: Voodoo Rush
+        cvg:   Voodoo 2
+        h3:    Voodoo Banshee/Voodoo 3
+        h5:    The VSA-100 chip set used in the Voodoo4 and Voodoo5
+               line of products.
+
+2.) The New Way of getting Glide from CVS.
+    There is now a CVS module to get glide3 named Glide3.  If you get
+    this, you will get everything you need.  All of the relevant
+    projects, cvs, h3 and h5, are included, as well as swlibs.
+
+3.) The Old Way of getting Glide from CVS.
+    The top level module needed are glide3x and swlibs.  The glide3x
+    module has only the glide code, without swlibs.
+
+    All glide source trees use a common set of libraries kept in the
+    swlibs branch.  In order to build any glide library the swlibs
+    branch must be moved inside the glide3x directory.  The swlibs
+    branch is not stored here within the glide3x cvs tree because it
+    is also shared with the glide2x branch.  N.B.: If you use the CVS
+    module Glide3, swlibs will be in the right place, and does not
+    need to be moved.
