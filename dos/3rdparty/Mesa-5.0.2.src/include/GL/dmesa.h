@@ -130,6 +130,9 @@ GLboolean DMesaResizeBuffer (GLint width, GLint height);
  */
 void DMesaSetCI (int ndx, GLfloat red, GLfloat green, GLfloat blue);
 
+/* from MesaLib-6.2.x */
+void *DMesaGetProcAddress (const char *name);
+
 /*
  * DMesa state retrieval.
  */

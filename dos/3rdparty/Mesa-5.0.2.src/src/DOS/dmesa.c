@@ -1640,6 +1640,21 @@ DMesaContext DMesaGetCurrentContext (void)
 
 
 
+/* from MesaLib-6.2.x */
+void *DMesaGetProcAddress (const char *name)
+{
+ void *p = (void *)_glapi_get_proc_address(name);
+
+/* TODO: handle DMesa* namespace
+ if (p == NULL) {
+ }
+*/
+
+ return p;
+}
+
+
+
 int DMesaGetIntegerv (GLenum pname, GLint *params)
 {
 #ifndef FX
