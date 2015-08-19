@@ -643,6 +643,7 @@ void	VID_MenuInit (void)
 	s_waterwarp_box.curvalue = sw_waterwarp->intValue;
 	s_waterwarp_box.itemnames = yesno_names;
 
+	/* FS: OpenGL stuff */
 	s_tq_slider.generic.type			= MTYPE_SLIDER;
 	s_tq_slider.generic.x				= 0;
 	s_tq_slider.generic.y				= 60;
@@ -662,7 +663,7 @@ void	VID_MenuInit (void)
 
 	s_texfilter_box.generic.type		= MTYPE_SPINCONTROL;
 	s_texfilter_box.generic.x			= 0;
-	s_texfilter_box.generic.y			= 90;
+	s_texfilter_box.generic.y			= 80;
 	s_texfilter_box.generic.name		= "texture filter";
 	s_texfilter_box.curvalue			= texfilter_box_setval();
 	s_texfilter_box.itemnames			= filter_names;
@@ -671,7 +672,7 @@ void	VID_MenuInit (void)
 
 	s_vsync_box.generic.type		= MTYPE_SPINCONTROL;
 	s_vsync_box.generic.x			= 0;
-	s_vsync_box.generic.y			= 110;
+	s_vsync_box.generic.y			= 90;
 	s_vsync_box.generic.name		= "video sync";
 	s_vsync_box.curvalue			= Cvar_VariableValue("gl_swapinterval");
 	s_vsync_box.itemnames			= yesno_names;
@@ -681,7 +682,7 @@ void	VID_MenuInit (void)
 	// Knightmare- refresh rate option
 	s_refresh_box.generic.type			= MTYPE_SPINCONTROL;
 	s_refresh_box.generic.x				= 0;
-	s_refresh_box.generic.y				= 120;
+	s_refresh_box.generic.y				= 100;
 	s_refresh_box.generic.name			= "refresh rate";
 	s_refresh_box.curvalue				= refresh_box_setval();
 	s_refresh_box.itemnames				= refreshrate_names;

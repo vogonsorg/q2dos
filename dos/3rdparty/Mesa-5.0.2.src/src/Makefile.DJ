@@ -317,7 +317,7 @@ ifeq ($(HAVEDXE3),)
 	$(warning Missing DXE3 package... Skipping $(GL_DXE))
 else
 ifeq ($(FX),1)
-	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -I $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa -P glid3.dxe -U $(OBJECTS)
+	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -I $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa -E _fxMesa -P glide3x.dxe -U $(OBJECTS)
 else
 	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -I $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa -U $(OBJECTS)
 endif

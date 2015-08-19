@@ -4,7 +4,7 @@ USE_ASM=1
 USE_SSE=0
 
 CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
-CPPFLAGS = -Iinclude -Iinclude/glide3
+CPPFLAGS = -I../dos/3rdparty/include -I../dos/3rdparty/include/glide3
 DXE3GEN = dxe3gen
 
 ifeq ($(USE_ASM),1)
@@ -26,8 +26,8 @@ REFSOFT = ../game/q_shared.o \
 	gl_rmisc.o \
 	gl_rsurf.o \
 	gl_warp.o \
-	qgl_linux.o \
-	gl_fxmesa.o
+	../dos/qgl_dos.o \
+	../dos/gl_fxmesa.o
 
 ifeq ($(USE_ASM),1)
 REFASM = ../gas/math_ref.o \
@@ -40,10 +40,10 @@ endif
 
 OBJECTS = $(REFSOFT) $(REFASM)
 
-all: ref_3dfx.dxe
+all: ref_gl.dxe
 
-ref_3dfx.dxe: $(OBJECTS)
-	$(DXE3GEN) -U -E _GetRefAPI $(OBJECTS) -o ref_3dfx.dxe
+ref_gl.dxe: $(OBJECTS)
+	$(DXE3GEN) -U -E _GetRefAPI -P gl.dxe $(OBJECTS) -o ref_gl.dxe
 
 clean:
 	rm -f *.o

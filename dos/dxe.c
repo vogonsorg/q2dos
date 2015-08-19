@@ -33,6 +33,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef REF_HARD_LINKED
 #include <sys/movedata.h>
 #include "dosisms.h"
+
+/* FS: 3dfx */
+#include <sys/nearptr.h>
+#include <setjmp.h>
+#include <crt0.h>
 #endif
 
 #if defined(GAMESPY) && !defined(GAMESPY_HARD_LINKED)
@@ -139,6 +144,31 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (dos_freememory)
 	DXE_EXPORT (ptr2real)
 	DXE_EXPORT (real2ptr)
+
+	/* FS: 3dfx */
+	DXE_EXPORT(longjmp)
+	DXE_EXPORT(int86)
+	DXE_EXPORT(fflush)
+	DXE_EXPORT(__djgpp_base_address)
+	DXE_EXPORT (__djgpp_nearptr_enable)
+	DXE_EXPORT (__djgpp_nearptr_disable)
+	DXE_EXPORT(__dj_stdout)
+	DXE_EXPORT(getenv)
+	DXE_EXPORT(signal)
+	DXE_EXPORT(__dpmi_free_physical_address_mapping)
+	DXE_EXPORT(strtoul)
+	DXE_EXPORT(atol)
+	DXE_EXPORT(_crt0_startup_flags)
+	DXE_EXPORT(setjmp)
+	DXE_EXPORT(vfprintf)
+	DXE_EXPORT(strncat)
+	DXE_EXPORT(frexp)
+	DXE_EXPORT(getenv)
+	DXE_EXPORT(abort)
+	DXE_EXPORT(vfprintf)
+	DXE_EXPORT(putenv)
+	DXE_EXPORT(strlwr)
+	DXE_EXPORT(asctime)
 #endif
 #if defined(GAMESPY) && !defined(GAMESPY_HARD_LINKED)
 	DXE_EXPORT(send)
@@ -157,6 +187,7 @@ DXE_EXPORT_TABLE (syms)
 #endif
 DXE_EXPORT_END
 
+
 static int num_unres;
 
 static int dxe_fail ()
@@ -167,7 +198,7 @@ static int dxe_fail ()
 static void *dxe_res (const char *sym)
 {
 	FILE *f = fopen ("dxe.log", "a");
-	fprintf (f, "%s: unresolved symbol.\n", sym);
+	fprintf (f, "%s)\n", sym);
 	fflush (f);
 	fclose (f);
 	++num_unres;

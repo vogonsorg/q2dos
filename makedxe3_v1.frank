@@ -22,7 +22,7 @@ REF_DXE=0
 CC = gcc
 CFLAGS = -O2 -fno-strict-aliasing -fomit-frame-pointer
 CPPFLAGS = -Idos/3rdparty/include -Idos/3rdparty/include/glide3 -DCLIENT_SPLIT_NETFRAME -DUSE_3DFX
-LDFLAGS = -Ldos/3rdparty/lib -lgl -lglid3_v3
+LDFLAGS = -Ldos/3rdparty/lib -lgl -lglid3_v1
 
 ifneq ($(REF_DXE),1)
 CPPFLAGS+= -DREF_HARD_LINKED
