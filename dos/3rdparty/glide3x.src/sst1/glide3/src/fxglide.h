@@ -923,7 +923,9 @@ struct _GlideRoot_s {
     float f1;
     float f255;
     float f256;
-    float ftemp1, ftemp2;       /* temps to convert floats to ints */
+    /* temps to convert floats to ints */
+    union { float f; FxI32 i; FxU32 u; } temp1;
+    union { float f; FxI32 i; FxU32 u; } temp2;
   } pool;
 
   struct {                      /* environment data             */
