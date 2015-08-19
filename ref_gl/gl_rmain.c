@@ -1474,7 +1474,6 @@ int R_Init ( void *hinstance, void *hWnd )
 	/*
 	** grab extensions
 	*/
-#ifndef __DJGPP__ /* FS: Not ready for primetime */
 	// GL_EXT_compiled_vertex_array
 	if ( StringContainsToken( gl_config.extensions_string, "GL_EXT_compiled_vertex_array" ) || 
 		 StringContainsToken( gl_config.extensions_string, "GL_SGI_compiled_vertex_array" ) )
@@ -1541,6 +1540,7 @@ int R_Init ( void *hinstance, void *hWnd )
 	}
 #endif
 
+#ifndef __DJGPP__ /* FS: Causes odd missing things on real hadrware && locks */
 	// GL_EXT_paletted_texture / GL_EXT_shared_texture_palette
 	if ( !qglColorTableEXT &&
 		StringContainsToken( gl_config.extensions_string, "GL_EXT_paletted_texture" ) && 
@@ -1560,6 +1560,7 @@ int R_Init ( void *hinstance, void *hWnd )
 	{
 		ri.Con_Printf( PRINT_ALL, "...GL_EXT_shared_texture_palette not found\n" );
 	}
+#endif
 
 	// GL_ARB_multitexture
 	gl_config.multitexture = false;
@@ -1651,7 +1652,6 @@ int R_Init ( void *hinstance, void *hWnd )
 		gl_config.max_anisotropy = 0.0;
 		ri.Cvar_SetValue ("gl_anisotropic_avail", 0.0);
 	}
-#endif
 
 	GL_SetDefaultState();
 
