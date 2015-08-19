@@ -139,15 +139,15 @@ SERVER = server/sv_ccmds.o \
 	server/sv_world.o
 
 ifneq ($(REF_DXE),1)
-REFSOFT = ref_3dfx/gl_draw.o \
-	ref_3dfx/gl_image.o \
-	ref_3dfx/gl_light.o \
-	ref_3dfx/gl_mesh.o \
-	ref_3dfx/gl_model.o \
-	ref_3dfx/gl_rmain.o \
-	ref_3dfx/gl_rmisc.o \
-	ref_3dfx/gl_rsurf.o \
-	ref_3dfx/gl_warp.o \
+REFGL = ref_gl/gl_draw.o \
+	ref_gl/gl_image.o \
+	ref_gl/gl_light.o \
+	ref_gl/gl_mesh.o \
+	ref_gl/gl_model.o \
+	ref_gl/gl_rmain.o \
+	ref_gl/gl_rmisc.o \
+	ref_gl/gl_rsurf.o \
+	ref_gl/gl_warp.o \
 	dos/qgl_dos.o \
 	dos/gl_fxmesa.o
 endif
@@ -161,7 +161,7 @@ REFASM = gas/math_ref.o \
 endif
 endif
 
-OBJECTS = $(CLIENT) $(CLIENTASM) $(QCOMMON) $(COMMONASM) $(SERVER) $(GAMESPY) $(REFSOFT) $(REFASM) $(DOS)
+OBJECTS = $(CLIENT) $(CLIENTASM) $(QCOMMON) $(COMMONASM) $(SERVER) $(GAMESPY) $(REFGL) $(REFASM) $(DOS)
 
 
 .PHONY: clean
@@ -175,7 +175,7 @@ clean:
 	rm -f qcommon/*.o
 	rm -f client/*.o
 	rm -f server/*.o
-	rm -f ref_3dfx/*.o
+	rm -f ref_gl/*.o
 	rm -f dos/*.o
 	rm -f gas/*.o
 	rm -f Goa/*.o

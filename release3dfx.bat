@@ -29,7 +29,7 @@ rd /s /q release
 md release
 
 copy q2fx.exe release
-copy ref_3dfx\ref_gl.dxe release
+copy ref_gl\ref_gl.dxe release
 copy readme.txt release
 xcopy dos\3rdparty\lib_dxe release /E
 

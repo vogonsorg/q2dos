@@ -3,6 +3,6 @@ make -f makedxe3_3dfx.frank
 strip q2fx.exe
 upx -9 q2fx.exe
 
-cd ref_3dfx
+cd ref_gl
 make -f makedxe3 clean
 make -f makedxe3
