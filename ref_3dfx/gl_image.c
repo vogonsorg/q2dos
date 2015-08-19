@@ -660,8 +660,11 @@ void LoadTGA (char *name, byte **pic, int *width, int *height)
 								red = *buf_p++;
 								alphabyte = *buf_p++;
 								break;
+						default: /* silence compiler */
+								blue = red = green = alphabyte = 0;
+								break;
 					}
-	
+
 					for(j=0;j<packetSize;j++) {
 						*pixbuf++=red;
 						*pixbuf++=green;
@@ -1189,6 +1192,7 @@ qboolean GL_Upload8 (byte *data, int width, int height,  qboolean mipmap, qboole
 
 		qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_filter_max);
 		qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gl_filter_max);
+		return false;
 	}
 	else
 	{

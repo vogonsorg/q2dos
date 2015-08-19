@@ -17,6 +17,8 @@ endif
 
 REFSOFT = ../game/q_shared.o \
 	../dos/q_shdos.o \
+	../dos/qgl_dos.o \
+	../dos/gl_fxmesa.o \
 	gl_draw.o \
 	gl_image.o \
 	gl_light.o \
@@ -25,9 +27,7 @@ REFSOFT = ../game/q_shared.o \
 	gl_rmain.o \
 	gl_rmisc.o \
 	gl_rsurf.o \
-	gl_warp.o \
-	../dos/qgl_dos.o \
-	../dos/gl_fxmesa.o
+	gl_warp.o
 
 ifeq ($(USE_ASM),1)
 REFASM = ../gas/math_ref.o \
