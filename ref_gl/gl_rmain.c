@@ -1116,7 +1116,11 @@ void R_Register ( void )
 
 	gl_ext_swapinterval = ri.Cvar_Get( "gl_ext_swapinterval", "1", CVAR_ARCHIVE );
 	gl_ext_palettedtexture = ri.Cvar_Get( "gl_ext_palettedtexture", "1", CVAR_ARCHIVE );
+#ifdef __DJGPP__
+	gl_ext_multitexture = ri.Cvar_Get( "gl_ext_multitexture", "0", CVAR_ARCHIVE ); /* FS: About a ~10fps loss on average with this on.  So let's set it to be off by default */
+#else
 	gl_ext_multitexture = ri.Cvar_Get( "gl_ext_multitexture", "1", CVAR_ARCHIVE );
+#endif
 	// Knightmare- intel disable mulittexture option
 //	gl_intel_allow_multitexture = ri.Cvar_Get( "gl_intel_allow_multitexture", "0", CVAR_ARCHIVE );
 	gl_ext_pointparameters = ri.Cvar_Get( "gl_ext_pointparameters", "1", CVAR_ARCHIVE );

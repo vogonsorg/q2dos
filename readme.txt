@@ -71,6 +71,13 @@ Tips and other misc info:
 * Logitch MouseWare drivers in Windows 9x may cause delayed/missing mouse input
   when played in a Windows 9x DOS box.
 
+3DFX Notes:
+* gl_ext_multitexture is supported by the driver but appears to have an
+  approximately 10fps loss on average on everything I tested it on.  It
+  defaults to 0 by default.  If you would like to try it anyways set it to 1
+  and do a vid_restart.
+
+
 Follow neozeed @
 http://virtuallyfun.superglobalmegacorp.com/
 
