@@ -199,7 +199,7 @@ static int dxe_fail ()
 static void *dxe_res (const char *sym)
 {
 	FILE *f = fopen ("dxe.log", "a");
-	fprintf (f, "%s)\n", sym);
+	fprintf (f, "%s: unresolved symbol.\n", sym);
 	fflush (f);
 	fclose (f);
 	++num_unres;
