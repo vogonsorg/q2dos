@@ -144,7 +144,8 @@ _tnl_DestroyContext( GLcontext *ctx )
    _tnl_array_destroy( ctx );
    _tnl_imm_destroy( ctx );
    _tnl_destroy_pipeline( ctx );
-   _tnl_free_immediate( ctx, tnl->freed_immediate );
+   if (tnl->freed_immediate) 
+     _tnl_free_immediate( ctx, tnl->freed_immediate );
 
    FREE(tnl);
    ctx->swtnl_context = 0;

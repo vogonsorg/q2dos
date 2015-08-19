@@ -37,6 +37,10 @@
 #include "m_debug.h"
 #include "m_debug_util.h"
 
+#ifdef __UNIXOS2__
+static char dummy;
+#endif
+
 #ifdef DEBUG  /* This code only used for debugging */
 
 static clip_func *clip_tab[2] = {

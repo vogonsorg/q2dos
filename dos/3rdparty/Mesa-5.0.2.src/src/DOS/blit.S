@@ -72,12 +72,12 @@ _vesa_swbank:	.long	_vesa_swbankBIOS
 		.global	_vesa_b_dump_virtual
 _vesa_b_dump_virtual:
 		cld
-		pushl	%esp
+		pushl	%es
 		pushl	%ebx
 		pushl	%esi
 		pushl	%edi
 		pushl	%ebp
-		movl	_vl_video_selector, %esp
+		movl	_vl_video_selector, %es
 		movl	_vl_current_draw_buffer, %esi
 		movl	_vl_current_offset, %edi
 		movl	_vesa_gran_shift, %ecx
@@ -120,7 +120,7 @@ _vesa_b_dump_virtual:
 		popl	%edi
 		popl	%esi
 		popl	%ebx
-		popl	%esp
+		popl	%es
 		ret
 
 /* Desc: void vesa_l_dump_virtual (void);
@@ -134,10 +134,10 @@ _vesa_b_dump_virtual:
 		.global	_vesa_l_dump_virtual
 _vesa_l_dump_virtual:
 		cld
-		pushl	%esp
+		pushl	%es
 		pushl	%esi
 		pushl	%edi
-		movl	_vl_video_selector, %esp
+		movl	_vl_video_selector, %es
 		movl	_vl_current_draw_buffer, %esi
 		movl	_vl_current_offset, %edi
 		movl	_vl_current_stride, %ecx
@@ -154,7 +154,7 @@ _vesa_l_dump_virtual:
 		jnz	0b
 		popl	%edi
 		popl	%esi
-		popl	%esp
+		popl	%es
 		ret
 
 /* Desc: void vesa_l_dump_virtual_mmx (void);

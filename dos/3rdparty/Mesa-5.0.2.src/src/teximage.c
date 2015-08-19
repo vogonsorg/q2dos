@@ -1650,7 +1650,6 @@ _mesa_TexImage1D( GLenum target, GLint level, GLint internalFormat,
       else if (texImage->Data && !texImage->IsClientData) {
          /* free the old texture data */
          MESA_PBUFFER_FREE(texImage->Data);
-//			FREE(texImage->Data); /* FS: Ggorts patch for lock ups */
       }
       texImage->Data = NULL;
       clear_teximage_fields(texImage); /* not really needed, but helpful */

@@ -1,5 +1,5 @@
 /* DO NOT EDIT - This file generated automatically with glsparcasm.py script */
-#include "glapioffsets.h"
+#include "../glapioffsets.h"
 
 /* The _glapi_Dispatch symbol addresses get relocated into the
  * sethi/or instruction sequences below at library init time.

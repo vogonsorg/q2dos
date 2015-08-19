@@ -204,7 +204,7 @@ do {						\
 
 
 #if defined(__i386__) || defined(__sparc__) || defined(__s390x__) || \
-    defined(__powerpc__) || \
+    defined(__powerpc__) || defined(__AMD64__) || \
     ( defined(__alpha__) && ( defined(__IEEE_FLOAT) || !defined(VMS) ) )
 #define USE_IEEE
 #endif

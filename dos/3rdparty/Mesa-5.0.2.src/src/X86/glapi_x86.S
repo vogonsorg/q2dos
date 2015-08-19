@@ -1,6 +1,6 @@
 /* DO NOT EDIT - This file generated automatically with glx86asm.py script */
 #include "assyntax.h"
-#include "glapioffsets.h"
+#include "../glapioffsets.h"
 
 #ifndef __WIN32__
 

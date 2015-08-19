@@ -29,7 +29,7 @@
  *
  * Written by Holger Waechtler <holger@akaflieg.extern.tu-berlin.de>
  * Changed by Andre Werthmann <wertmann@cs.uni-potsdam.de> for using the
- * new Katmai functions.
+ * new SSE functions.
  */
 
 #include <stdlib.h>

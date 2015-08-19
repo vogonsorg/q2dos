@@ -56,7 +56,7 @@ CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 
-DEFS = $(DEFS) -DGGIMESACONFFILE=\"$(ggimesaconfdatadir)/ggimesa.conf\"
+DEFS = @DEFS@ -DGGIMESACONFFILE=\"$(ggimesaconfdatadir)/ggimesa.conf\"
 DEPDIR = @DEPDIR@
 ECHO = @ECHO@
 ECHO_C = @ECHO_C@
@@ -199,7 +199,7 @@ SUBDIRS = default display include
 ggimesaconfdatadir = ${sysconfdir}/ggi
 ggimesaconfdata_DATA = ggimesa.conf
 
-INCLUDES = $(INCLUDES) -I$(top_srcdir)/include -I$(top_srcdir)/src/GGI/include \
+INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/src/GGI/include \
 	-I$(top_srcdir)/src $(GGI_CFLAGS)
 
 

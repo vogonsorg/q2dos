@@ -53,7 +53,7 @@ CCDEPMODE = @CCDEPMODE@
 
 # Choose one of STANDALONE, LIBRARYBUILD, and GLBUILD. They are debugging
 # switches. grep LIBRARYBUILD `find .. -name '*.h'` for details.
-CFLAGS = $(CFLAGS) -DLIBRARYBUILD -DNDEBUG
+CFLAGS = @CFLAGS@ -DLIBRARYBUILD -DNDEBUG
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@

@@ -112,10 +112,10 @@ GLNAME( _mesa_identify_x86_cpu_features ):
 	CPUID
 	MOV_L	( EDX, EAX )
 
-	/* Mask out highest bit, which is used by AMD for 3dnow
-         * Newer Intel have this bit set, but do not support 3dnow 
- 	 */
-        AND_L   ( CONST(0X7FFFFFFF), EAX)
+	/* Mask out highest bit, which is used by AMD for 3dnow.
+	 * Newer Intel have this bit set, but do not support 3dnow.
+	 */
+	AND_L	( CONST(0X7FFFFFFF), EAX)
 	JMP	( LLBL(cpuid_done) )
 
 LLBL(cpuid_amd):

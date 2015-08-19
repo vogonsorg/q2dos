@@ -1,10 +1,10 @@
 #!/bin/sh
 
-# Make a Linux ELF shared library, including 3Dfx Glide libs
+# Make a shared library on AIX with GCC
 
 #--identification------------------------------------------------------
 
-# $Id: mklib.glide,v 1.7 2001/11/15 19:49:36 brianp Exp $
+# $Id: mklib.linux,v 1.9 2002/11/10 15:45:28 brianp Exp $
 
 #--common--------------------------------------------------------------
 
@@ -24,24 +24,41 @@ OBJECTS=$*
 
 #--platform------------------------------------------------------------
 
-if [ $LIBRARY = "libGL.so" ] ; then
-    GLIDELIBS="-L/usr/local/glide/lib -lglide2x -lm"
-fi
-
-
 # the following provided by Thomas Hiller (Hiller@tu-harburg.d400.de)
 
-VERSION="${MAJOR}.${MINOR}"
+VERSION="${MAJOR}.${MINOR}.${TINY}"
 
 LIBNAME=`basename $LIBRARY`
 ARNAME=`basename $LIBNAME .so`.a
 DIRNAME=`dirname $LIBRARY`
 
+# When making shared libraries, also link with any libraries we're
+# depenedant on.
+if [ $LIBRARY = "libGL.so" ] ; then
+    EXTRA_LIBS=${GL_LIB_DEPS}
+elif [ $LIBRARY = "libGLU.so" ] ; then
+    EXTRA_LIBS=${GLU_LIB_DEPS}
+elif [ $LIBRARY = "libglut.so" ] ; then
+    EXTRA_LIBS=${GLUT_LIB_DEPS}
+fi
+
+# NOTE: -Xlinker -Bsymbolic passes the -Bsymbolic option to the ld linker.
+# This forces symbol references inside libGL to be resolved by symbols
+# within libGL, rather by symbols in other libs or the application itself.
+# This fixes a nasty bug found with Chromium.  Added in Mesa 4.0.1
 if [ $LIBRARY = "libGL.so" ] ; then
     EXTRA_FLAGS="-Xlinker -Bsymbolic"
 fi
 
-gcc ${EXTRA_FLAGS} -shared -Wl,-soname,${LIBNAME}.${MAJOR} -o ${LIBRARY}.${VERSION} ${OBJECTS} ${GLIDELIBS}
+# Use g++ for libGLU since it's in C++ and we need the C++ runtime library.
+if [ $LIBRARY = "libGLU.so" ] ; then
+    LINKER="g++"
+else
+    LINKER="gcc"
+fi
+
+${LINKER} ${EXTRA_FLAGS} -shared -Wl,-soname,${LIBNAME}.${MAJOR} -o ${LIBRARY}.${VERSION} ${OBJECTS} ${EXTRA_LIBS} 
+
 (cd $DIRNAME; ln -s ${LIBNAME}.${VERSION} ${LIBNAME}.${MAJOR})
 
 ln -s ${LIBNAME}.${MAJOR} ${LIBRARY}

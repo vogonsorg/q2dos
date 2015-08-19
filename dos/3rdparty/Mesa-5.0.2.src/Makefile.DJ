@@ -70,12 +70,12 @@
 
 .PHONY : all libgl libglu libglut clean realclean
 
-CPU ?= pentium
+CPU ?= k6
 
 GLU ?= src
 
-CFLAGS = -Wall -W -fno-strict-aliasing
-CFLAGS += -O2 -ffast-math -mtune=$(CPU)
+CFLAGS = -Wall -W -pedantic
+CFLAGS += -O2 -ffast-math -mcpu=$(CPU)
 
 export CFLAGS
 

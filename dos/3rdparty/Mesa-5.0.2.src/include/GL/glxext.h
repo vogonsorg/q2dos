@@ -579,6 +579,16 @@ extern GLuint glXGetAGPOffsetMESA (const GLvoid *);
 typedef GLuint ( * PFNGLXGETAGPOFFSETMESAPROC) (const GLvoid *);
 #endif
 
+#ifndef GLX_MESA_swap_control
+#define GLX_MESA_swap_control 1
+#ifdef GLX_GLXEXT_PROTOTYPES
+extern GLint glXSwapIntervalMESA(unsigned interval);
+extern GLint glXGetSwapIntervalMESA( void );
+#endif /* GLX_GLXEXT_PROTOTYPES */
+typedef GLint ( * PFNGLXSWAPINTERVALMESAPROC) (unsigned interval);
+typedef GLint ( * PFNGLXGETSWAPINTERVALMESAPROC) ( void );
+#endif
+
 #ifndef GLX_SGIX_visual_select_group
 #define GLX_SGIX_visual_select_group 1
 #endif
@@ -587,8 +597,8 @@ typedef GLuint ( * PFNGLXGETAGPOFFSETMESAPROC) (const GLvoid *);
 #define GLX_OML_swap_method 1
 #endif
 
-#if defined(__STDC_VERSION__)
-#if __STDC_VERSION__ >= 199901L
+#if (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)) || \
+	defined(_STDINT_H) || defined(_SYS_INTTYPES_H_) || defined(_INTTYPES_H_)
 /* Include ISO C99 integer types for OML_sync_control; need a better test */
 #include <inttypes.h>
 
@@ -608,8 +618,21 @@ typedef Bool ( * PFNGLXWAITFORMSCOMLPROC) (Display *dpy, GLXDrawable drawable, i
 typedef Bool ( * PFNGLXWAITFORSBCOMLPROC) (Display *dpy, GLXDrawable drawable, int64_t target_sbc, int64_t *ust, int64_t *msc, int64_t *sbc);
 #endif
 
+#ifndef GLX_MESA_swap_frame_usage
+#define GLX_MESA_swap_frame_usage 1
+#ifdef GLX_GLXEXT_PROTOTYPES
+extern GLint glXBeginFrameTrackingMESA(Display *dpy, GLXDrawable drawable);
+extern GLint glXEndFrameTrackingMESA(Display *dpy, GLXDrawable drawable);
+extern GLint glXGetFrameUsageMESA(Display *dpy, GLXDrawable drawable, GLfloat *usage);
+extern GLint glXQueryFrameTrackingMESA(Display *dpy, GLXDrawable drawable, int64_t *sbc, int64_t *missedFrames, GLfloat *lastMissedUsage);
+#endif /* GLX_GLXEXT_PROTOTYPES */
+typedef GLint ( * PFNGLXBEGINFRAMETRACKINGMESAPROC) (Display *dpy, GLXDrawable drawable);
+typedef GLint ( * PFNGLXENDFRAMETRACKINGMESAPROC) (Display *dpy, GLXDrawable drawable);
+typedef GLint ( * PFNGLXGETFRAMEUSAGEMESAPROC) (Display *dpy, GLXDrawable drawable, GLfloat *usage);
+typedef GLint ( * PFNGLXQUERYFRAMETRACKINGMESAPROC) (Display *dpy, GLXDrawable drawable, int64_t *sbc, int64_t *missedFrames, GLfloat *lastMissedUsage);
+#endif
+
 #endif /* C99 version test */
-#endif /* STDC test */
 
 #ifdef __cplusplus
 }

@@ -89,8 +89,9 @@ dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CXX
+AM_PROG_AS
 AC_LANG_C
-AM_PROG_LIBTOOL
+AC_PROG_LIBTOOL
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 
@@ -387,6 +388,8 @@ dnl ------------------------------------------
 dnl GGI driver
 GGI_CFLAGS=
 GGI_LIBS=
+build_ggi_fbdev_target=no
+build_ggi_genkgi_driver=no
 AC_ARG_WITH(ggi,
   [  --with-ggi=DIR          GGI is installed in DIR],
   [if test x$with_ggi != xno && test x$with_ggi != yes; then
@@ -458,8 +461,6 @@ if test "x$with_ggi" = xyes; then
     AC_MSG_RESULT(yes)
   fi
     
-  AM_CONDITIONAL(HAVE_GGI_FBDEV, test $build_ggi_fbdev_target = yes)
-  AM_CONDITIONAL(HAVE_GGI_GENKGI, test $build_ggi_genkgi_driver = yes)
 fi
 ggi_confdir=$prefix/etc
 ggi_libdir=$prefix/lib
@@ -631,6 +632,8 @@ esac
 AC_SUBST(MESA_MD_FLAG)
 
 dnl ------------------------------------------
+AM_CONDITIONAL(HAVE_GGI_FBDEV, test $build_ggi_fbdev_target = yes)
+AM_CONDITIONAL(HAVE_GGI_GENKGI, test $build_ggi_genkgi_driver = yes)
 AM_CONDITIONAL(OVERRIDE_BUILD_RULES, test $override_build_rules = yes)
 AM_CONDITIONAL(HAVE_3DNOW, test $have_3dnow = yes)
 AM_CONDITIONAL(HAVE_SSE, test $have_sse = yes)
