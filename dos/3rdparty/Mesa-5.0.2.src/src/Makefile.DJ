@@ -89,13 +89,7 @@ endif
 AR = ar
 ARFLAGS = rus
 
-HAVEDXE3 = $(wildcard $(DJDIR)/bin/dxe3gen.exe)
-
-ifeq ($(wildcard $(addsuffix /rm.exe,$(subst ;, ,$(PATH)))),)
-UNLINK = del $(subst /,\,$(1))
-else
-UNLINK = $(RM) $(1)
-endif
+UNLINK = rm -f $(1)
 
 CORE_SOURCES = \
 	api_arrayelt.c \
@@ -313,14 +307,10 @@ $(LIBDIR)/$(GL_LIB): $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/$(GL_LIB) $(OBJECTS)
 
 $(LIBDIR)/$(GL_DXE) $(LIBDIR)/$(GL_IMP): $(OBJECTS)
-ifeq ($(HAVEDXE3),)
-	$(warning Missing DXE3 package... Skipping $(GL_DXE))
-else
 ifeq ($(FX),1)
-	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -I $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa -P glid3.dxe -U $(OBJECTS)
+	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -I $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa  -E _fxMesa -P glide3x.dxe -U $(OBJECTS)
 else
 	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -I $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa -U $(OBJECTS)
-endif
 endif
 
 $(X86_OBJECTS): X86/matypes.h

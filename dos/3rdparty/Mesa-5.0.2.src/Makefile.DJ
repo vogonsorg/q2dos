@@ -70,29 +70,23 @@
 
 .PHONY : all libgl libglu libglut clean realclean
 
-CPU ?= k6
+CPU ?= pentium
 
 GLU ?= src
 
-CFLAGS = -Wall -W -pedantic
-CFLAGS += -O2 -ffast-math -mcpu=$(CPU)
+CFLAGS = -Wall -fno-strict-aliasing
+CFLAGS += -O2 -ffast-math -mtune=$(CPU)
 
 export CFLAGS
 
-ifeq ($(wildcard $(addsuffix /rm.exe,$(subst ;, ,$(PATH)))),)
-UNLINK = del $(subst /,\,$(1))
-else
-UNLINK = $(RM) $(1)
-endif
+UNLINK = rm -f $(1)
 
-all: libgl libglu libglut
+all: libgl libglu
 
 libgl: lib
 	$(MAKE) -f Makefile.DJ -C src
 libglu: lib
 	$(MAKE) -f Makefile.DJ -C $(GLU)-glu
-libglut: lib
-	$(MAKE) -f Makefile.DJ -C src-glut.dos
 
 lib:
 	mkdir lib
@@ -100,7 +94,6 @@ lib:
 clean:
 	$(MAKE) -f Makefile.DJ clean -C src
 	$(MAKE) -f Makefile.DJ clean -C $(GLU)-glu
-	$(MAKE) -f Makefile.DJ clean -C src-glut.dos
 
 realclean: clean
 	-$(call UNLINK,lib/*.a)
