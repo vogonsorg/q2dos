@@ -1,6 +1,7 @@
 #!/bin/sh
 
 find . -name "*.o"|xargs rm -f
-find . -name "*.dxe"|xargs rm -f
-rm -f q2.exe
+find . -name "game*.dxe"|xargs rm -f
+find . -name "ref_*.dxe"|xargs rm -f
+rm -f q2*.exe
 rm -rf _build
