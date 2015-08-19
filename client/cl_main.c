@@ -2186,7 +2186,10 @@ void CL_Frame_Async (double msec)
 			{
 				char versionStr[256];
 
-				Com_sprintf(versionStr, sizeof(versionStr), "say Q2DOS %4.2f %s %s %s\n", VERSION, CPUSTRING, __DATE__, BUILDSTRING);
+				if(vidref_val == VIDREF_GL)
+					Com_sprintf(versionStr, sizeof(versionStr), "say Q2DOS with 3DFX Voodoo %4.2f %s %s %s\n", VERSION, CPUSTRING, __DATE__, BUILDSTRING);
+				else
+					Com_sprintf(versionStr, sizeof(versionStr), "say Q2DOS %4.2f %s %s %s\n", VERSION, CPUSTRING, __DATE__, BUILDSTRING);
 				Cbuf_AddText(versionStr);
 				cls.lastSpamTime = cls.realtime;
 				cls.spamTime = 0.0f;
@@ -2396,7 +2399,10 @@ void CL_Frame (double msec)
 	{
 		char versionStr[256];
 
-		Com_sprintf(versionStr, sizeof(versionStr), "say Q2DOS %4.2f %s %s %s\n", VERSION, CPUSTRING, __DATE__, BUILDSTRING);
+		if(vidref_val == VIDREF_GL)
+			Com_sprintf(versionStr, sizeof(versionStr), "say Q2DOS with 3DFX Voodoo %4.2f %s %s %s\n", VERSION, CPUSTRING, __DATE__, BUILDSTRING);
+		else
+			Com_sprintf(versionStr, sizeof(versionStr), "say Q2DOS %4.2f %s %s %s\n", VERSION, CPUSTRING, __DATE__, BUILDSTRING);
 		Cbuf_AddText(versionStr);
 		cls.lastSpamTime = cls.realtime;
 		cls.spamTime = 0.0f;
