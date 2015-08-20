@@ -27,12 +27,12 @@ CC = gcc
 CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 CPPFLAGS = -DCLIENT_SPLIT_NETFRAME
 LDFLAGS =
-FILENAME = q2.exe
+EXE = q2.exe
 
 ifeq ($(USE_SSE),1)
 # FS: approx 10-15% speed boost on my P3 550 when running timedemos, but could be dangerous.
 CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer -mtune=pentium3 -march=pentium3 -mfpmath=sse
-FILENAME = q2sse.exe
+EXE = q2sse.exe
 endif
 
 ifneq ($(REF_DXE),1)
@@ -82,9 +82,8 @@ CURL_LIBS = -Llibcurl/lib -lcurl
 endif
 
 ifeq ($(REF_STATIC_GL),1)
-# NOTE: if using REF_STATIC_GL you must define your libglid3_vX.a with
-# VOODOOFLAGS!
-FILENAME = q2fx.exe
+# NOTE: if using REF_STATIC_GL you must define glide library like "GLIDE_LIBS=-lglid3_v5"
+EXE = q2fx.exe
 CFLAGS += -Idos/3rdparty/include -Idos/3rdparty/include/glide3
 LDFLAGS += -Ldos/3rdparty/lib -lgl
 REF_STATIC_SOFT=0
@@ -228,7 +227,7 @@ OBJECTS = $(CLIENT) $(CLIENTASM) $(QCOMMON) $(COMMONASM) $(COMMONREFASM) $(SERVE
 all: q2dos
 
 q2dos: $(OBJECTS)
-	$(CC) $(OBJECTS) $(LDFLAGS) $(VOODOOFLAGS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm -o $(FILENAME)
+	$(CC) $(OBJECTS) $(LDFLAGS) $(GLIDE_LIBS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm -o $(EXE)
 
 clean:
 	rm -f qcommon/*.o
