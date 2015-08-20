@@ -1,7 +1,6 @@
 @echo off
 move /Y Debug\quake2.exe F:\quake2
 move /Y Debug\ref_soft.dll F:\quake2
-move /Y Debug\ref_sqb.dll F:\quake2
 move /Y Debug\ref_gl.dll F:\quake2
 move /Y Debug\gamespy.dll F:\quake2
 move /Y Debug\gamex86.dll F:\quake2\baseq2

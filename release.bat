@@ -52,7 +52,6 @@ cd ..
 
 copy q2.exe release
 copy ref_soft\ref_soft.dxe release
-copy ref_soft_qb\ref_sqb.dxe release
 copy cwsdpmi.exe release
 copy readme.txt release
 copy Goa\gamespy.dxe release

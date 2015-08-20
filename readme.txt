@@ -92,7 +92,6 @@ Various code from
             Planar mode help.  3DFX/MesaFX help.
 * Knightmare -- Ref_soft help.
                 KMQuake II (http://www.markshan.com/knightmare/)
-* Leillol and Qbism -- Ref_sqb renderer (https://qbism.com/)
 * Mpxplay -- (http://mpxplay.sourceforge.net/)
 * Mpxplay code importing by Ruslan Starodubov (http://sound-dos.ucoz.ru/)
 * Ogg Vorbis -- (https://www.xiph.org/)
