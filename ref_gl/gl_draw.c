@@ -369,7 +369,6 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 		unsigned *dest;
 
 		image32 = malloc((width * height) * 4);
-		memset(image32, 0, sizeof(image32));
 
 		for (i=0; i<trows; i++)
 		{
@@ -395,7 +394,6 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 		unsigned char *dest;
 
 		image8 = malloc(width * height);
-		memset(image8, 0, sizeof(image8));
 
 		for (i=0; i<trows; i++)
 		{
