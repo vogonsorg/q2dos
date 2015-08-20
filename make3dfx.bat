@@ -1,5 +1,5 @@
-make -f makedxe3_3dfx.frank clean
-make -f makedxe3_3dfx.frank
+make -f makedxe3.frank clean
+make -f makedxe3.frank FILENAME=q2fx.exe
 strip q2fx.exe
 upx -9 q2fx.exe
 

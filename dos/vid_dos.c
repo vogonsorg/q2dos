@@ -37,12 +37,12 @@ extern cvar_t *scr_viewsize;	/* client/cl_scrn.c */
 static cvar_t *vid_bankedvga;
 static cvar_t *vid_vgaonly;
 
-static cvar_t *sw_mode;
 static cvar_t *sw_stipplealpha;
 static cvar_t *sw_waterwarp; /* FS */
 static cvar_t *r_contentblend; /* FS */
 
 extern void M_ForceMenuOff (void);
+extern const char *Default_MenuKey( menuframework_s *m, int key );
 static void VID_ListModes_f (void);
 static void VID_Restart_f (void);
 
@@ -282,13 +282,6 @@ static void ApplyChanges( void *unused )
 	}
 
 	M_ForceMenuOff();
-}
-
-static void CancelChanges(void *unused)
-{
-	extern void M_PopMenu(void);
-
-	M_PopMenu();
 }
 
 static void VID_FreeReflib (void)

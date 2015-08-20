@@ -18,11 +18,22 @@ USE_CDAUDIO=1
 USE_ASM=1
 # dynamic refresh (video) modules:
 REF_DXE=1
+# compile software renderer if REF_DXE=0
+REF_STATIC_SOFT=1
+# compile gl renderer if REF_DXE=0
+REF_STATIC_GL=0
 
 CC = gcc
-CFLAGS = -O2 -fno-strict-aliasing -fomit-frame-pointer
+CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 CPPFLAGS = -DCLIENT_SPLIT_NETFRAME
 LDFLAGS =
+FILENAME = q2.exe
+
+ifeq ($(USE_SSE),1)
+# FS: approx 10-15% speed boost on my P3 550 when running timedemos, but could be dangerous.
+CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer -mtune=pentium3 -march=pentium3 -mfpmath=sse
+FILENAME = q2sse.exe
+endif
 
 ifneq ($(REF_DXE),1)
 CPPFLAGS+= -DREF_HARD_LINKED
@@ -68,6 +79,15 @@ ifeq ($(USE_CURL),1)
 CPPFLAGS+= -DUSE_CURL -DCURL_NO_OLDIES
 CURL_CFLAGS = -Ilibcurl/include
 CURL_LIBS = -Llibcurl/lib -lcurl
+endif
+
+ifeq ($(REF_STATIC_GL),1)
+# NOTE: if using REF_STATIC_GL you must define your libglid3_vX.a with
+# VOODOOFLAGS!
+FILENAME = q2fx.exe
+CFLAGS += -Idos/3rdparty/include -Idos/3rdparty/include/glide3
+LDFLAGS += -Ldos/3rdparty/lib -lgl
+REF_STATIC_SOFT=0
 endif
 
 DOS = dos/dos_v2.o \
@@ -139,6 +159,7 @@ SERVER = server/sv_ccmds.o \
 	server/sv_world.o
 
 ifneq ($(REF_DXE),1)
+ifeq ($(REF_STATIC_SOFT),1)
 REFSOFT = ref_soft/r_alias.o \
 	ref_soft/r_main.o \
 	ref_soft/r_light.o \
@@ -160,13 +181,32 @@ REFSOFT = ref_soft/r_alias.o \
 	dos/vregset.o \
 	dos/swimp_dos.o
 endif
+endif
+
+ifneq ($(REF_DXE),1)
+ifeq ($(REF_STATIC_GL),1)
+REFGL = ref_gl/gl_draw.o \
+	ref_gl/gl_image.o \
+	ref_gl/gl_light.o \
+	ref_gl/gl_mesh.o \
+	ref_gl/gl_model.o \
+	ref_gl/gl_rmain.o \
+	ref_gl/gl_rmisc.o \
+	ref_gl/gl_rsurf.o \
+	ref_gl/gl_warp.o \
+	dos/qgl_dos.o \
+	dos/gl_fxmesa.o
+endif
+endif
 
 ifeq ($(USE_ASM),1)
 COMMONASM = gas/math.o
 CLIENTASM = gas/snd_mixa.o
 ifneq ($(REF_DXE),1)
-REFASM = gas/math_ref.o \
-	gas/d_copy.o \
+COMMONREFASM = gas/math_ref.o \
+	gas/sys_dosa.o
+ifeq ($(REF_STATIC_SOFT),1)
+REFASM = gas/d_copy.o \
 	gas/d_polysa.o \
 	gas/r_aclipa.o \
 	gas/r_draw16.o \
@@ -175,27 +215,27 @@ REFASM = gas/math_ref.o \
 	gas/r_scana.o \
 	gas/r_spr8.o \
 	gas/r_surf8.o \
-	gas/r_varsa.o \
-	gas/sys_dosa.o
+	gas/r_varsa.o
+endif
 endif
 endif
 
-OBJECTS = $(CLIENT) $(CLIENTASM) $(QCOMMON) $(COMMONASM) $(SERVER) $(GAMESPY) $(REFSOFT) $(REFASM) $(DOS)
+OBJECTS = $(CLIENT) $(CLIENTASM) $(QCOMMON) $(COMMONASM) $(COMMONREFASM) $(SERVER) $(GAMESPY) $(REFSOFT) $(REFGL) $(REFASM) $(DOS)
 
 
 .PHONY: clean
 
-all: q2.exe
+all: q2dos
 
-q2.exe: $(OBJECTS)
-	$(CC) $(OBJECTS) $(LDFLAGS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm -o $@
+q2dos: $(OBJECTS)
+	$(CC) $(OBJECTS) $(LDFLAGS) $(VOODOOFLAGS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm -o $(FILENAME)
 
 clean:
 	rm -f qcommon/*.o
 	rm -f client/*.o
 	rm -f server/*.o
 	rm -f ref_soft/*.o
-	rm -f ref_3dfx/*.o
+	rm -f ref_gl/*.o
 	rm -f dos/*.o
 	rm -f gas/*.o
 	rm -f Goa/*.o
