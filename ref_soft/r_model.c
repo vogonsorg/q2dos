@@ -395,6 +395,10 @@ void Mod_LoadVertexes (lump_t *l)
 		out->position[1] = LittleFloat (in->point[1]);
 		out->position[2] = LittleFloat (in->point[2]);
 	}
+	for ( i=0 ; i<8 ; i++, out++)
+	{
+		VectorClear(out->position);
+	}
 }
 
 /*
@@ -522,12 +526,11 @@ void Mod_LoadTexinfo (lump_t *l)
 		if (next > 0)
 		{
 			if (next >= count)	// Knightmare added
-			{
 				ri.Sys_Error (ERR_DROP, "Mod_LoadTexinfo: bad anim chain");
-			}
-
 			out->next = loadmodel->texinfo + next;
 		}
+		else
+		    out->next = NULL;
 
 		Com_sprintf (name, sizeof(name), "textures/%s.wal", in->texture);
 		// FS: I don't quite understand what's the deal with the bottom one, but OK..
