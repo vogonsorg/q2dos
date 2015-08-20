@@ -101,7 +101,7 @@ Various code from
 * Mpxplay code importing by Ruslan Starodubov (http://sound-dos.ucoz.ru/)
 * Ogg Vorbis -- (https://www.xiph.org/)
 * R1CH -- R1Q2 (http://old.r1ch.net/stuff/r1q2/)
-* Sezero -- WATT32, DJGPP 2.05, and other help.
+* Sezero -- WATT32, DJGPP 2.05, 3DFX/Mesa, and several other help.
             uHexen2 (http://uhexen2.sourceforge.net/)
 * Yamagi -- Updated game code from YamagiQ2 (http://www.yamagi.org/quake2/)
 * Various DJGPP v2.05 upgrade help from RayeR (http://rayer.g6.cz/)
