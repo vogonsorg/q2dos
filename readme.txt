@@ -76,6 +76,11 @@ Tips and other misc info:
   approximately 10fps loss on average on everything I tested it on.  It
   defaults to 0 by default.  If you would like to try it anyways set it to 1
   and do a vid_restart.
+* gl_ext_pointparameters can lock some machines when particles are drawn.
+  If you start a map and try to fire your gun and the game locks up,
+  this is why.  It is disabled by default in Q2DOS.  But if you are using
+  a custom config file imported from another OS it may secretly have this
+  enabled.
 
 
 Follow neozeed @
