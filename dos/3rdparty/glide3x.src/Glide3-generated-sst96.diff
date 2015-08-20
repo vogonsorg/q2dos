@@ -1,0 +1,36 @@
+diff -urNp Glide3/sst1/glide3/src/fxgasm.h.sst1 Glide3/sst1/glide3/src/fxgasm.h.sst96
+--- Glide3/sst1/glide3/src/fxgasm.h.sst1
++++ Glide3/sst1/glide3/src/fxgasm.h
+@@ -4,16 +4,9 @@
+ ; Assembler offsets for SSTREGS struct
+ ;----------------------------------------------------------------------
+ 
+-FVAX			equ 00000088h
+-FVAY			equ 0000008ch
+-FVBX			equ 00000090h
+-FVBY			equ 00000094h
+-FVCX			equ 00000098h
+-FVCY			equ 0000009ch
+-FTRIANGLECMD		equ 00000100h
+ 
+-FDPDX_OFFSET		equ 00000020h
+-FDPDY_OFFSET		equ 00000040h
++FDPDX_OFFSET		equ 00000004h
++FDPDY_OFFSET		equ 00000008h
+ 
+ ;----------------------------------------------------------------------
+ ; Assembler offsets for GC struct
+@@ -27,7 +20,12 @@
+ invalid		equ 0000055ch
+ coord_space		equ 0000060ch
+ color_type		equ 00000558h
+-fifoFree		equ 000003c8h
++writesSinceFence	equ 000006b8h
++paramMask		equ 000006c0h
++gwCommand		equ 000006c4h
++gwHeaders		equ 000006c8h
++fifoPtr			equ 000006ach
++fifoSize		equ 000006b0h
+ SIZEOF_GrState		equ 0000024ch
+ SIZEOF_GrHwConfiguration	equ 00000094h
+ SIZEOF_GC		equ 00000754h
