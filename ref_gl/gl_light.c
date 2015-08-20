@@ -121,7 +121,6 @@ void R_MarkLights (dlight_t *light, int bit, mnode_t *node)
 	float		dist;
 	msurface_t	*surf;
 	int			i;
-//	int			sidebit; // Knightmare added
 	
 	if (node->contents != -1)
 		return;
@@ -349,7 +348,7 @@ void R_LightPoint (vec3_t p, vec3_t color)
 
 //===================================================================
 
-static float s_blocklights[128*128*4]; // Knightmare-  was [34*34*3], supports max chop size of 2048?
+static float s_blocklights[128*128*4]; /* Knightmare-  was [34*34*3], supports max chop size of 2048? */
 /*
 ===============
 R_AddDynamicLights
@@ -368,7 +367,7 @@ void R_AddDynamicLights (msurface_t *surf)
 	dlight_t	*dl;
 	float		*pfBL;
 	float		fsacc, ftacc;
-	// Knightmare added
+	/* Knightmare added */
 	qboolean	rotated = false;
 	vec3_t		dlorigin, temp, entOrigin, entAngles, forward, right, up;
 
@@ -376,7 +375,7 @@ void R_AddDynamicLights (msurface_t *surf)
 	tmax = (surf->extents[1]>>4)+1;
 	tex = surf->texinfo;
 
-	// Knightmare- factor in entity movement
+	/* Knightmare- factor in entity movement */
 	// currententity is not valid for trans surfaces
 	if (tex->flags & (SURF_TRANS33|SURF_TRANS66)) {
 		if (surf->entity) {
@@ -398,7 +397,7 @@ void R_AddDynamicLights (msurface_t *surf)
 		rotated = true;
 		AngleVectors (entAngles, forward, right, up);
 	}
-	// end Knightmare
+	/* end Knigthmare */
 
 	for (lnum=0 ; lnum<r_newrefdef.num_dlights ; lnum++)
 	{
@@ -409,7 +408,7 @@ void R_AddDynamicLights (msurface_t *surf)
 
 		frad = dl->intensity;
 
-		// Knightmare- factor in entity movement
+		/* Knightmare- factor in entity movement */
 		VectorCopy (dl->origin, dlorigin);
 		VectorSubtract (dlorigin, entOrigin, dlorigin);
 		if (rotated)
@@ -421,7 +420,7 @@ void R_AddDynamicLights (msurface_t *surf)
 		}
 	//	fdist = DotProduct (dl->origin, surf->plane->normal) -	surf->plane->dist;
 		fdist = DotProduct (dlorigin, surf->plane->normal) - surf->plane->dist;
-		// end Knightmare
+		/* end Knigthmare */
 
 		frad -= fabs(fdist);
 		// rad is now the highest intensity on the plane
@@ -432,7 +431,7 @@ void R_AddDynamicLights (msurface_t *surf)
 		fminlight = frad - fminlight;
 
 		for (i=0 ; i<3 ; i++)
-		{	// Knightmare- use adjusted light origin
+		{	/* Knightmare- use adjusted light origin */
 		//	impact[i] = dl->origin[i] - surf->plane->normal[i]*fdist;
 			impact[i] = dlorigin[i] - surf->plane->normal[i]*fdist;
 		}
@@ -483,7 +482,7 @@ void R_SetCacheState( msurface_t *surf )
 	{
 		surf->cached_light[maps] = r_newrefdef.lightstyles[surf->styles[maps]].white;
 	}
-// Knightmare- added for lightmap update batching
+/* Knightmare- added for lightmap update batching */
 #ifdef BATCH_LM_UPDATES
 	// mark if dynamicly lit
 	surf->cached_dlight = (surf->dlightframe == r_framecount);
@@ -667,9 +666,9 @@ store:
 					b = b*t;
 					a = a*t;
 				}
-				a = 255; // Knightmare- fix for alpha test
+				a = 255; /* Knightmare- fix for alpha test */
 
-				// Knightmare- changed to BGRA
+				/* Knightmare- changed to BGRA */
 				if (gl_lms.external_format == GL_BGRA)
 				{
 					dest[0] = b;
@@ -750,7 +749,7 @@ store:
 				case 'I':
 					r = a;
 					g = b = 0;
-					a = 255; // Knightmare- fix for alpha test
+					a = 255; /* Knightmare- fix for alpha test */
 					break;
 				case 'C':
 					// try faking colored lighting
@@ -758,7 +757,7 @@ store:
 					r *= a/255.0;
 					g *= a/255.0;
 					b *= a/255.0;
-					a = 255; // Knightmare- fix for alpha test
+					a = 255; /* Knightmare- fix for alpha test */
 					break;
 				case 'A':
 				//	r = g = b = 0;
@@ -767,10 +766,10 @@ store:
 					break;
 				default:
 					r = g = b = a;
-					a = 255; // Knightmare- fix for alpha test
+					a = 255; /* Knightmare- fix for alpha test */
 					break;
 				}
-				// Knightmare- changed to BGRA
+				/* Knightmare- changed to BGRA */
 				if (gl_lms.external_format == GL_BGRA)
 				{
 					dest[0] = b;

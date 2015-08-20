@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <GL/gl.h>
 #ifndef __DJGPP__ /* FS: Don't overrides Mesas which is capable */
-#include "glext.h" // Knightmare- include new extension header
+#include "glext.h" /* Knightmare- include new extension header */
 #endif
 #include <math.h>
 
@@ -40,7 +40,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "qgl.h"
 
-#define	REF_VERSION	"GL 0.02" // Knightmare changed, was 0.01
+#define	REF_VERSION	"GL 0.02" /* Knightmare changed, was 0.01 */
 
 // up / down
 #define	PITCH	0
@@ -88,7 +88,7 @@ typedef enum
 typedef struct image_s
 {
 	char	name[MAX_QPATH];			// game path, including extension
-	long		hash;					// Knightmare- added to speed up searching
+	long		hash;					/* Knightmare- added to speed up searching */
 	imagetype_t	type;
 	int		width, height;				// source image
 	int		upload_width, upload_height;	// after power of two and picmip
@@ -102,13 +102,13 @@ typedef struct image_s
 	qboolean paletted;
 } image_t;
 
-#define	MAX_LIGHTMAPS	128		// Knightmare- moved this here for use by macros
+#define	MAX_LIGHTMAPS	128		/* Knightmare- moved this here for use by macros */
 
 #define	TEXNUM_LIGHTMAPS	1024
-#define	TEXNUM_SCRAPS		TEXNUM_LIGHTMAPS + MAX_LIGHTMAPS	// Knightmare- changed to use macro, was 1152
-#define	TEXNUM_IMAGES		TEXNUM_SCRAPS + 1	// Knightmare- changed to use macro, was 1153
+#define	TEXNUM_SCRAPS		TEXNUM_LIGHTMAPS + MAX_LIGHTMAPS	/* Knightmare- changed to use macro, was 1152 */
+#define	TEXNUM_IMAGES		TEXNUM_SCRAPS + 1	/* Knightmare- changed to use macro, was 1153 */
 
-#define		MAX_GLTEXTURES	2048	// Knightmare increased, was 1024
+#define		MAX_GLTEXTURES	2048	/* Knightmare increased, was 1024 */
 
 //===================================================================
 
@@ -129,7 +129,7 @@ void GL_EndRendering (void);
 
 void GL_SetDefaultState( void );
 void GL_UpdateSwapInterval( void );
-void GL_PrintError (int errorCode, char *funcName);	// Knightmare added
+void GL_PrintError (int errorCode, char *funcName);	/* Knightmare added */
 
 extern	float	gldepthmin, gldepthmax;
 
@@ -146,7 +146,7 @@ typedef struct
 #define BACKFACE_EPSILON	0.01
 
 //====================================================
-// Knightmare- moved these here from gl_rsurf.c
+/* Knightmare- moved these here from gl_rsurf.c */
 
 #define LIGHTMAP_BYTES 4
 
@@ -169,8 +169,8 @@ typedef struct
 typedef struct
 {
 	int			internal_format;
-	int			external_format;	// Knightmare added
-	int			type;				// Knightmare added
+	int			external_format;	/* Knightmare added */
+	int			type;				/* Knightmare added */
 	int			current_lightmap_texture;
 
 	msurface_t	*lightmap_surfaces[MAX_LIGHTMAPS];
@@ -198,7 +198,7 @@ extern	int			numgltextures;
 extern	image_t		*r_notexture;
 extern	image_t		*r_particletexture;
 extern	entity_t	*currententity;
-extern	int			r_worldframe;	// Knightmare- added for trans animations
+extern	int			r_worldframe;	/* Knightmare- added for trans animations */
 extern	model_t		*currentmodel;
 extern	int			r_visframecount;
 extern	int			r_framecount;
@@ -231,10 +231,10 @@ extern	cvar_t	*r_fullbright;
 extern	cvar_t	*r_novis;
 extern	cvar_t	*r_nocull;
 extern	cvar_t	*r_lerpmodels;
-extern	cvar_t	*r_ignorehwgamma; // Knightmare- hardware gamma
-extern	cvar_t	*r_displayrefresh; // Knightmare- refresh rate control
+extern	cvar_t	*r_ignorehwgamma; /* Knightmare- hardware gamma */
+extern	cvar_t	*r_displayrefresh; /* Knightmare- refresh rate control */
 
-extern	cvar_t	*r_dlights_normal; // Knightmare- lerped dlights on models
+extern	cvar_t	*r_dlights_normal; /* Knightmare- lerped dlights on models */
 
 extern	cvar_t	*r_lightlevel;	// FIXME: This is a HACK to get the client's light level
 
@@ -245,10 +245,10 @@ extern cvar_t	*gl_ext_palettedtexture;
 extern cvar_t	*gl_ext_multitexture;
 extern cvar_t	*gl_ext_pointparameters;
 extern cvar_t	*gl_ext_compiled_vertex_array;
-extern cvar_t	*gl_arb_texturenonpoweroftwo;	// Knightmare- non-power-of-two texture support
-extern cvar_t	*gl_nonpoweroftwo_mipmaps;		// Knightmare- non-power-of-two texture support
+extern cvar_t	*gl_arb_texturenonpoweroftwo;	/* Knightmare- non-power-of-two texture support */
+extern cvar_t	*gl_nonpoweroftwo_mipmaps;		/* Knightmare- non-power-of-two texture support */
 
-extern cvar_t	*gl_newtextureformat;			// Knightmare- whether to use RGBA textures / BGRA lightmaps
+extern cvar_t	*gl_newtextureformat;			/* Knightmare- whether to use RGBA textures / BGRA lightmaps */
 
 extern cvar_t	*gl_particle_min_size;
 extern cvar_t	*gl_particle_max_size;
@@ -257,7 +257,7 @@ extern cvar_t	*gl_particle_att_a;
 extern cvar_t	*gl_particle_att_b;
 extern cvar_t	*gl_particle_att_c;
 
-extern	cvar_t	*r_entity_fliproll;		// Knightmare- allow disabling of backwards alias model roll
+extern	cvar_t	*r_entity_fliproll;		/* Knightmare- allow disabling of backwards alias model roll */
 extern	cvar_t	*r_lightcutoff;	//** DMP - allow dynamic light cutoff to be user-settable
 
 extern	cvar_t	*gl_nosubimage;
@@ -266,7 +266,7 @@ extern	cvar_t	*gl_mode;
 extern	cvar_t	*gl_log;
 extern	cvar_t	*gl_lightmap;
 extern	cvar_t	*gl_shadows;
-extern	cvar_t	*gl_shadowalpha; // Knightmare- added shadow alpha
+extern	cvar_t	*gl_shadowalpha; /* Knightmare- added shadow alpha */
 extern	cvar_t	*gl_dynamic;
 extern  cvar_t  *gl_monolightmap;
 extern	cvar_t	*gl_nobind;
@@ -274,7 +274,7 @@ extern	cvar_t	*gl_round_down;
 extern	cvar_t	*gl_picmip;
 extern	cvar_t	*gl_skymip;
 extern	cvar_t	*gl_showtris;
-extern	cvar_t	*gl_showbbox;	// Knightmare- show model bounding box
+extern	cvar_t	*gl_showbbox;	/* Knightmare- show model bounding box */
 extern	cvar_t	*gl_finish;
 extern	cvar_t	*gl_ztrick;
 extern	cvar_t	*gl_clear;
@@ -290,8 +290,8 @@ extern	cvar_t	*gl_drawbuffer;
 extern	cvar_t	*gl_3dlabs_broken;
 extern  cvar_t  *gl_driver;
 extern	cvar_t	*gl_swapinterval;
-extern	cvar_t	*gl_anisotropic;		// Knightmare- added anisotropic filtering
-extern	cvar_t	*gl_anisotropic_avail;	// Knightmare- added anisotropic filtering
+extern	cvar_t	*gl_anisotropic;		/* Knightmare- added anisotropic filtering */
+extern	cvar_t	*gl_anisotropic_avail;	/* Knightmare- added anisotropic filtering */
 extern	cvar_t	*gl_texturemode;
 extern	cvar_t	*gl_texturealphamode;
 extern	cvar_t	*gl_texturesolidmode;
@@ -303,7 +303,7 @@ extern	cvar_t	*vid_gamma;
 
 extern	cvar_t	*intensity;
 
-extern	cvar_t	*r_skydistance; // Knightmare- variable sky range
+extern	cvar_t	*r_skydistance; /* Knightmare- variable sky range */
 
 /* FS: New stuff */
 extern	cvar_t	*r_refreshrate;
@@ -404,7 +404,7 @@ struct image_s *R_RegisterSkin (char *name);
 void LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *height);
 image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t type, int bits);
 image_t	*GL_FindImage (char *name, imagetype_t type);
-void	GL_UpdateAnisoMode (void);	// Knightmare- added anisotropic filter update
+void	GL_UpdateAnisoMode (void);	/* Knightmare- added anisotropic filter update */
 void	GL_TextureMode( char *string );
 void	GL_ImageList_f (void);
 int nearest_power_of_2 (int size);
@@ -427,7 +427,7 @@ void GL_DrawParticles( int n, const particle_t particles[], const unsigned color
 /*
 ** GL config stuff
 */
-// Knightmare- new vendor list
+/* Knightmare- new vendor list */
 enum {
 	GL_RENDERER_DEFAULT		= 1 << 0,
 
@@ -462,14 +462,14 @@ typedef struct
 	const char *vendor_string;
 	const char *version_string;
 	const char *extensions_string;
-	// Knightmare- for parsing newer OpenGL versions
+	/* Knightmare- for parsing newer OpenGL versions */
 	int			version_major;
 	int			version_minor;
 	int			version_release;
 
 	qboolean	allow_cds;
 
-	// Knightmare added
+	/* Knightmare added */
 	qboolean	multitexture;				// multitexture is enabled
 	int			max_texsize;				// max texture size
 	int			max_texunits;				// texunits available
@@ -502,7 +502,7 @@ typedef struct
 	qboolean	stereo_enabled;
 
 	qboolean	gammaRamp;
-	qboolean	multitextureEnabled;	// Knightmare added
+	qboolean	multitextureEnabled;	/* Knightmare added */
 
 	unsigned char originalRedGammaTable[256];
 	unsigned char originalGreenGammaTable[256];

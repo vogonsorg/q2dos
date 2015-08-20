@@ -76,14 +76,14 @@ void GL_EnableMultitexture( qboolean enable )
 		GL_SelectTexture( GL_TEXTURE1 );
 		qglEnable( GL_TEXTURE_2D );
 		GL_TexEnv( GL_REPLACE );
-		gl_state.multitextureEnabled = true;	// Knightmare added
+		gl_state.multitextureEnabled = true;	/* Knightmare added */
 	}
 	else
 	{
 		GL_SelectTexture( GL_TEXTURE1 );
 		qglDisable( GL_TEXTURE_2D );
 		GL_TexEnv( GL_REPLACE );
-		gl_state.multitextureEnabled = false;	// Knightmare added
+		gl_state.multitextureEnabled = false;	/* Knightmare added */
 	}
 	GL_SelectTexture( gl_texture0 );
 	GL_TexEnv( GL_REPLACE );
@@ -179,7 +179,7 @@ glmode_t modes[] = {
 
 #define NUM_GL_MODES (sizeof(modes) / sizeof (glmode_t))
 
-//#if 0	// Knightmare- removed this, all textures are now GL_RGBA
+//#if 0	/* Knightmare- removed this, all textures are now GL_RGBA */
 typedef struct
 {
 	char *name;
@@ -258,10 +258,10 @@ void GL_TextureSolidMode (char *string)
 
 	gl_tex_solid_format = gl_solid_modes[i].mode;
 }
-//#endif	// end Knightmare
+//#endif	/* end Knightmare */
 
 
-// Knightmare- added anisotropic filter update
+/* Knightmare- added anisotropic filter update */
 /*
 ===============
 GL_UpdateAnisoMode
@@ -1591,7 +1591,7 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 	if (strlen(name) >= sizeof(image->name))
 		ri.Sys_Error (ERR_DROP, "Draw_LoadPic: \"%s\" is too long", name);
 	strcpy (image->name, name);
-	image->hash = Com_HashFileName(name, 0, false);	// Knightmare added
+	image->hash = Com_HashFileName(name, 0, false);	/* Knightmare added */
 	image->registration_sequence = registration_sequence;
 
 	image->width = width;
@@ -1692,7 +1692,7 @@ image_t	*GL_FindImage (char *name, imagetype_t type)
 	int		i, len;
 	byte	*pic, *palette;
 	int		width, height;
-	// Knightmare added
+	/* Knightmare added */
 	char	*tmp;
 	long	hash;
 
@@ -1702,7 +1702,7 @@ image_t	*GL_FindImage (char *name, imagetype_t type)
 	if (len < 5)
 		return NULL;	//	ri.Sys_Error (ERR_DROP, "GL_FindImage: bad name: %s", name);
 
-	// Knightmare- fix up bad image paths
+	/* Knightmare- fix up bad image paths */
     tmp = name;
     while ( *tmp != 0 )
     {
@@ -1712,10 +1712,10 @@ image_t	*GL_FindImage (char *name, imagetype_t type)
     }
 
 	// look for it
-	hash = Com_HashFileName(name, 0, false);	// Knightmare added
+	hash = Com_HashFileName(name, 0, false);	/* Knightmare added */
 	for (i=0, image=gltextures ; i<numgltextures ; i++,image++)
 	{
-		if (hash == image->hash) {	// Knightmare- compare hash first
+		if (hash == image->hash) {	/* Knightmare- compare hash first */
 			if (!strcmp(name, image->name))
 			{
 				image->registration_sequence = registration_sequence;

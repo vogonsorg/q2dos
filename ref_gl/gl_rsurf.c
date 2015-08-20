@@ -43,7 +43,7 @@ static void R_RenderLightmappedPoly (msurface_t *surf);
 extern void R_SetCacheState( msurface_t *surf );
 extern void R_BuildLightMap (msurface_t *surf, byte *dest, int stride);
 
-// Knightmare- added for lightmap update batching
+/* Knightmare- added for lightmap update batching */
 #ifdef BATCH_LM_UPDATES
 void R_UpdateSurfaceLightmap (msurface_t *surf);
 void R_RebuildLightmaps (void);
@@ -65,7 +65,7 @@ Returns the proper texture for a given time and base texture
 ===============
 */
 #if 1
-// Knightmare- redid this to support trans surfaces
+/* Knightmare- redid this to support trans surfaces */
 image_t *R_TextureAnimation (msurface_t *surf)
 {
 	int			c, frame;
@@ -720,7 +720,7 @@ void R_DrawAlphaSurfaces (void)
 {
 	msurface_t	*s;
 	float		intens;
-	image_t		*image; // Knightmare added
+	image_t		*image; /* Knightmare added */
 
 	// the textures are prescaled up for a better lighting range,
 	// so scale it back down
@@ -735,21 +735,21 @@ void R_DrawAlphaSurfaces (void)
 		// go back to the world matrix
 		qglLoadMatrixf (r_world_matrix);
 
-		// Knightmare- disable depth testing for all bmodel surfs (which are not BSP-sorted) except solid alphas
+		/* Knightmare- disable depth testing for all bmodel surfs (which are not BSP-sorted) except solid alphas */
 		if ( s->entity && !((s->flags & SURF_TRANS33) && (s->flags & SURF_TRANS66)) )
 			qglDepthMask (false);
 		else
 			qglDepthMask (true);
 
-		// Knightmare- moving trans brushes
+		/* Knightmare- moving trans brushes */
 		if (s->entity)
 			R_RotateForEntity (s->entity, true);
 
-		// Knightmare- use animated texture
+		/* Knightmare- use animated texture */
 	//	GL_Bind(s->texinfo->image->texnum);
 		image = R_TextureAnimation (s);
 		GL_Bind(image->texnum);
-		// end Knightmare
+		/* end Knightmare */
 		c_brush_polys++;
 		if (s->texinfo->flags & SURF_TRANS33)
 			qglColor4f (intens,intens,intens,0.33);
@@ -764,11 +764,11 @@ void R_DrawAlphaSurfaces (void)
 		else
 			DrawGLPoly (s);
 
-		// Knightmare- GuyP's gl_showtris fix
+		/* Knightmare- GuyP's gl_showtris fix */
 		R_DrawTriangleOutlines (s, false, true);
 	}
 
-	// Knightmare- go back to the world matrix after shifting trans faces
+	/* Knightmare- go back to the world matrix after shifting trans faces */
 	qglLoadMatrixf (r_world_matrix);
 
 	qglBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -811,7 +811,7 @@ void R_DrawTextureChains (void)
 		}
 	}
 	else
-	{	// Knightmare- draw lightmapped surfs here
+	{	/* Knightmare- draw lightmapped surfs here */
 		GL_EnableMultitexture (true);
 
 		GL_SelectTexture( gl_texture0);
@@ -822,7 +822,7 @@ void R_DrawTextureChains (void)
 		else 
 			GL_TexEnv (GL_MODULATE);
 
-// Knightmare- added for lightmap update batching
+/* Knightmare- added for lightmap update batching */
 #ifdef BATCH_LM_UPDATES
 		R_RebuildLightmaps ();
 #endif
@@ -843,7 +843,7 @@ void R_DrawTextureChains (void)
 			}
 		}
 		GL_EnableMultitexture (false);
-		// end Knightmare
+		/* end Knightmare */
 
 		for (i=0, image=gltextures; i<numgltextures; i++, image++)
 		{
@@ -865,7 +865,7 @@ void R_DrawTextureChains (void)
 	GL_TexEnv( GL_REPLACE );
 }
 
-// Knightmare added
+/* Knightmare added */
 #ifdef BATCH_LM_UPDATES
 /*
 =============
@@ -978,7 +978,7 @@ void R_RebuildLightmaps (void)
 		qglPixelStorei (GL_UNPACK_ROW_LENGTH, 0);
 }
 #endif // BATCH_LM_UPDATES
-// end Knightmare
+/* end Knightmare */
 
 static void R_RenderLightmappedPoly (msurface_t *surf)
 {
@@ -1012,7 +1012,7 @@ dynamic:
 
 	if ( is_dynamic )
 	{
-		unsigned	temp[LM_BLOCK_WIDTH*LM_BLOCK_HEIGHT];	// Knightmare- changed to use LM_BLOCK macros
+		unsigned	temp[LM_BLOCK_WIDTH*LM_BLOCK_HEIGHT];	/* Knightmare- changed to use LM_BLOCK macros */
 		int			smax, tmax;
 
 		smax = (surf->extents[0]>>4)+1;
@@ -1072,7 +1072,7 @@ dynamic:
 		qglEnd ();
 	}
 
-	qglDisable (GL_ALPHA_TEST); // Knightmare- Alpha test flag
+	qglDisable (GL_ALPHA_TEST); /* Knightmare- Alpha test flag */
 }
 
 
@@ -1122,7 +1122,7 @@ void R_DrawInlineBModel (void)
 		}
 	}
 
-#if 0	// Knightmare- removed this
+#if 0	/* Knightmare- removed this */
 	psurf = &currentmodel->surfaces[currentmodel->firstmodelsurface];
 
 	if ( currententity->flags & RF_TRANSLUCENT )
@@ -1149,14 +1149,14 @@ void R_DrawInlineBModel (void)
 			(!(psurf->flags & SURF_PLANEBACK) && (dot > BACKFACE_EPSILON)))
 		{
 
-// Knightmare- added for lightmap update batching
+/* Knightmare- added for lightmap update batching */
 #ifdef BATCH_LM_UPDATES
 			if ( gl_config.multitexture && ( r_fullbright->value == 0 ) 
 				&& !(psurf->texinfo->flags & (SURF_SKY|SURF_TRANS33|SURF_TRANS66|SURF_WARP)) )
 				R_UpdateSurfaceLightmap (psurf);
 #endif
 
-			psurf->entity = NULL; // Knightmare- entity pointer
+			psurf->entity = NULL; /* Knightmare- entity pointer */
 			if (psurf->texinfo->flags & (SURF_TRANS33|SURF_TRANS66) )
 			{	// add to the translucent chain
 				// if bmodel is used by multiple entities, adding surface
@@ -1171,10 +1171,10 @@ void R_DrawInlineBModel (void)
 				{
 					psurf->texturechain = r_alpha_surfaces;
 					r_alpha_surfaces = psurf;
-					psurf->entity = currententity; // Knightmare- entity pointer to support movement
+					psurf->entity = currententity; /* Knightmare- entity pointer to support movement */
 				}
 			}
-#if 0	// Knightmare- removed this
+#if 0	/* Knightmare- removed this */
 			else if ( gl_config.multitexture && !( psurf->flags & SURF_DRAWTURB ) )
 			{
 				R_RenderLightmappedPoly( psurf );
@@ -1186,11 +1186,11 @@ void R_DrawInlineBModel (void)
 				GL_EnableMultitexture (true);
 			}
 
-			// Knightmare- GuyP's gl_showtris fix
+			/* Knightmare- GuyP's gl_showtris fix */
 			if ( !(psurf->texinfo->flags & (SURF_TRANS33|SURF_TRANS66)) )
 				R_DrawTriangleOutlines (psurf, gl_config.multitexture, false);
 #endif
-			else	// Knightmare- add to texturechain
+			else	/* Knightmare- add to texturechain */
 			{
 				image = R_TextureAnimation (psurf); // was surf->texinfo
 				psurf->texturechain = image->texturechain;
@@ -1199,7 +1199,7 @@ void R_DrawInlineBModel (void)
 		}
 	}
 
-	// Knightmare- draw using texturechains
+	/* Knightmare- draw using texturechains */
 	if (currententity->flags & RF_TRANSLUCENT)
 	{
 		qglEnable (GL_BLEND);
@@ -1208,7 +1208,7 @@ void R_DrawInlineBModel (void)
 	}
 
 	R_DrawTextureChains ();
-	// end Knightmare
+	/* end Knightmare */
 
 	if ( !(currententity->flags & RF_TRANSLUCENT) )
 	{
@@ -1282,12 +1282,12 @@ void R_DrawBrushModel (entity_t *e)
 	e->angles[0] = -e->angles[0];	// stupid quake bug
 	e->angles[2] = -e->angles[2];	// stupid quake bug
 
-#if 0	// Knightmare- removed this
+#if 0	/* Knightmare- removed this */
 	GL_EnableMultitexture (true);
 	GL_SelectTexture (gl_texture0);
 	GL_TexEnv (GL_REPLACE);
 	GL_SelectTexture (gl_texture1);
-	if (gl_lightmap->value)	// Knightmare- show lightmaps on bmodels, too
+	if (gl_lightmap->value)	/* Knightmare- show lightmaps on bmodels, too */
 		GL_TexEnv (GL_REPLACE);
 	else 
 		GL_TexEnv (GL_MODULATE);
@@ -1295,7 +1295,7 @@ void R_DrawBrushModel (entity_t *e)
 
 	R_DrawInlineBModel ();
 
-#if 0	// Knightmare- removed this
+#if 0	/* Knightmare- removed this */
 	GL_EnableMultitexture (false);
 #endif
 
@@ -1403,9 +1403,9 @@ void R_RecursiveWorldNode (mnode_t *node)
 		if ( (surf->flags & SURF_PLANEBACK) != sidebit )
 			continue;		// wrong side
 
-		surf->entity = NULL; // Knightmare- entity pointer
+		surf->entity = NULL; /* Knightmare- entity pointer */
 
-// Knightmare- added for lightmap update batching
+/* Knightmare- added for lightmap update batching */
 #ifdef BATCH_LM_UPDATES
 		if ( gl_config.multitexture && ( r_fullbright->value == 0 ) && 
 			!(surf->texinfo->flags & (SURF_SKY|SURF_TRANS33|SURF_TRANS66|SURF_WARP)) )
@@ -1423,7 +1423,7 @@ void R_RecursiveWorldNode (mnode_t *node)
 		}
 		else
 		{
-			// Knightmare- removed this, draw these surfaces AFTER traversing BSP tree!
+			/* Knightmare- removed this, draw these surfaces AFTER traversing BSP tree! */
 		/*	if ( gl_config.multitexture && !( surf->flags & SURF_DRAWTURB ) )
 			{
 				R_RenderLightmappedPoly (surf);
@@ -1438,7 +1438,7 @@ void R_RecursiveWorldNode (mnode_t *node)
 				image->texturechain = surf;
 			}
 
-			// Knightmare- GuyP's gl_showtris fix
+			/* Knightmare- GuyP's gl_showtris fix */
 		//	if (gl_config.multitexture)
 		//		R_DrawTriangleOutlines (surf, true, false);
 		}
@@ -1470,7 +1470,7 @@ void R_DrawWorld (void)
 
 	// auto cycle the world frame for texture animation
 	memset (&ent, 0, sizeof(ent));
-	// Knightmare- added r_worldframe for trans animations
+	/* Knightmare- added r_worldframe for trans animations */
 	ent.frame = r_worldframe = (int)(r_newrefdef.time*2);
 	currententity = &ent;
 
@@ -1480,7 +1480,7 @@ void R_DrawWorld (void)
 	memset (gl_lms.lightmap_surfaces, 0, sizeof(gl_lms.lightmap_surfaces));
 	R_ClearSkyBox ();
 
-#if 0	// Knightmare removed
+#if 0	/* Knightmare removed */
 	if (gl_config.multitexture)
 	{
 		GL_EnableMultitexture( true );
@@ -1505,13 +1505,13 @@ void R_DrawWorld (void)
 	** theoretically nothing should happen in the next two functions
 	** if multitexture is enabled
 	*/
-	// Knightmare- R_DrawTextureChains is now used in multitexture mode
+	/* Knightmare- R_DrawTextureChains is now used in multitexture mode */
 	R_DrawTextureChains ();
 	R_BlendLightmaps ();
 	
 	R_DrawSkyBox ();
 
-	// Knightmare- GuyP's gl_showtris fix
+	/* Knightmare- GuyP's gl_showtris fix */
 	if (!gl_config.multitexture)
 		R_DrawTriangleOutlines (NULL, false, false);
 }
@@ -1618,7 +1618,7 @@ static void LM_InitBlock( void )
 {
 	memset( gl_lms.allocated, 0, sizeof( gl_lms.allocated ) );
 
-// Knightmare- added for lightmap update batching
+/* Knightmare- added for lightmap update batching */
 #ifdef BATCH_LM_UPDATES
 	// alloc lightmap update buffer if needed
 	if (!gl_lms.lightmap_update[gl_lms.current_lightmap_texture]) {
@@ -1678,7 +1678,7 @@ static void LM_UploadBlock( qboolean dynamic )
 					   gl_lms.type,
 		//			   GL_LIGHTMAP_FORMAT, 
 		//			   GL_LIGHTMAP_TYPE, 
-// Knightmare- added for lightmap update batching
+/* Knightmare- added for lightmap update batching */
 #ifdef BATCH_LM_UPDATES
 					   gl_lms.lightmap_update[gl_lms.current_lightmap_texture] );
 #else
@@ -1827,7 +1827,7 @@ void GL_CreateSurfaceLightmap (msurface_t *surf)
 	}
 	surf->lightmaptexturenum = gl_lms.current_lightmap_texture;
 
-// Knightmare- added for lightmap update batching
+/* Knightmare- added for lightmap update batching */
 #ifdef BATCH_LM_UPDATES
 	base = gl_lms.lightmap_update[surf->lightmaptexturenum];
 #else
@@ -1855,7 +1855,7 @@ void GL_BeginBuildingLightmaps (model_t *m)
 
 	memset( gl_lms.allocated, 0, sizeof(gl_lms.allocated) );
 
-// Knightmare- added for lightmap update batching
+/* Knightmare- added for lightmap update batching */
 #ifdef BATCH_LM_UPDATES
 	// free lightmap update buffers
 	for (i=0; i<MAX_LIGHTMAPS; i++)
@@ -1871,7 +1871,7 @@ void GL_BeginBuildingLightmaps (model_t *m)
 		gl_lms.lightrect[i].bottom = 0;
 	}
 #endif	// BATCH_LM_UPDATES
-// end Knightmare
+/* end Knightmare */
 
 	r_framecount = 1;		// no dlightcache
 
@@ -1900,7 +1900,7 @@ void GL_BeginBuildingLightmaps (model_t *m)
 
 	gl_lms.current_lightmap_texture = 1;
 
-// Knightmare- added for lightmap update batching
+/* Knightmare- added for lightmap update batching */
 #ifdef BATCH_LM_UPDATES
 	// alloc lightmap update buffer if needed
 	if (!gl_lms.lightmap_update[gl_lms.current_lightmap_texture]) {
@@ -1924,7 +1924,7 @@ void GL_BeginBuildingLightmaps (model_t *m)
 	** format then we should change this code to use real alpha maps.
 	*/
 
-	// Knightmare- old internal formats for compatibility with older GPUs/drivers
+	/* Knightmare- old internal formats for compatibility with older GPUs/drivers */
 	if ( !gl_config.newTexFormat )
 	{
 		if ( toupper( gl_monolightmap->string[0] ) == 'A' )
@@ -1964,7 +1964,7 @@ void GL_BeginBuildingLightmaps (model_t *m)
 		gl_lms.external_format = GL_BGRA;
 		gl_lms.type = GL_UNSIGNED_INT_8_8_8_8_REV;
 	}
-	// end Knightmare	
+	/* end Knightmare */
 
 	/*
 	** initialize the dynamic lightmap texture

@@ -315,11 +315,11 @@ void GL_DrawAliasShadow (entity_t *e, dmdl_t *paliashdr, int posenum)
 	order = (int *)((byte *)paliashdr + paliashdr->ofs_glcmds);
 	height = -lheight + 0.1f; // was 1.0f, lowered shadows to ground more - MrG
 
-	// Knightmare- don't draw shadow above entity
+	/* Knightmare- don't draw shadow above entity */
 	if ((currententity->origin[2]+height) > currententity->origin[2])
 		return;
 
-	// Knightmare- don't draw shadows above view origin
+	/* Knightmare- don't draw shadows above view origin */
 	if (r_newrefdef.vieworg[2] < (currententity->origin[2] + height))
 		return;
 
@@ -329,7 +329,7 @@ void GL_DrawAliasShadow (entity_t *e, dmdl_t *paliashdr, int posenum)
 	qglEnable (GL_BLEND);
 	qglColor4f (0, 0, 0, gl_shadowalpha->value); // was 0.5
 
-	// Knightmare- Stencil shadows by MrG
+	/* Knightmare- Stencil shadows by MrG */
 	if (gl_config.have_stencil)
 	{
 		qglEnable(GL_STENCIL_TEST);
@@ -378,7 +378,7 @@ void GL_DrawAliasShadow (entity_t *e, dmdl_t *paliashdr, int posenum)
 		qglEnd ();
 	}
 
-	// Knightmare- disable Stencil shadows
+	/* Knightmare- disable Stencil shadows */
 	if (gl_config.have_stencil)
 		qglDisable(GL_STENCIL_TEST);
 	
@@ -458,7 +458,7 @@ static qboolean R_CullAliasModel( vec3_t bbox[8], entity_t *e )
 		}
 	}
 
-#if 1	// Knightmare- jitspore's fix for correct bbox rotation
+#if 1	/* Knightmare- jitspore's fix for correct bbox rotation */
 	//
 	// compute bounding box and rotate
 	//
@@ -794,10 +794,10 @@ void R_DrawAliasModel (entity_t *e)
 
     qglPushMatrix ();
 	e->angles[PITCH] = -e->angles[PITCH];				// sigh.
-	e->angles[ROLL] = e->angles[ROLL] * R_RollMult();	// Knightmare- roll is backwards
+	e->angles[ROLL] = e->angles[ROLL] * R_RollMult();	/* Knightmare- roll is backwards */
 	R_RotateForEntity (e, true);
 	e->angles[PITCH] = -e->angles[PITCH];				// sigh.
-	e->angles[ROLL] = e->angles[ROLL] * R_RollMult();	// Knightmare- roll is backwards
+	e->angles[ROLL] = e->angles[ROLL] * R_RollMult();	/* Knightmare- roll is backwards */
 
 	// select skin
 	if (currententity->skin)
@@ -856,7 +856,7 @@ void R_DrawAliasModel (entity_t *e)
 	qglPopMatrix ();
 
 //#if 1
-	if (gl_showbbox->value)	// Knightmare- show bbox option
+	if (gl_showbbox->value)	/* Knightmare- show bbox option */
 	{
 		qglColor4f (1.0f, 1.0f, 1.0f, 1.0f);
 		qglDisable( GL_CULL_FACE );

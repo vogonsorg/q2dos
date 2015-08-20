@@ -113,7 +113,7 @@ void GL_ScreenShot_TGA (qboolean silent)
 // find a file name to save it to 
 // 
 
-	// Knightmare- changed screenshot filenames, up to 100 screenies
+	/* Knightmare- changed screenshot filenames, up to 100 screenies */
 //	strcpy(picname,"quake00.tga");
 
 	for (i=0; i<=999; i++) 
@@ -126,7 +126,7 @@ void GL_ScreenShot_TGA (qboolean silent)
 		tens = (i - hundreds*100)*0.1;
 		ones = i - hundreds*100 - tens*10;
 		Com_sprintf (picname, sizeof(picname), "quake2_%i%i%i.tga", hundreds, tens, ones);
-		// end Knightmare
+		/* end Knigthmare */
 		Com_sprintf (checkname, sizeof(checkname), "%s/scrnshot/%s", ri.FS_Gamedir(), picname);
 		f = fopen (checkname, "rb");
 		if (!f)
@@ -205,7 +205,7 @@ void GL_Strings_f( void )
 	ri.Con_Printf (PRINT_ALL, "GL_VERSION: %s\n", gl_config.version_string );
 	ri.Con_Printf (PRINT_ALL, "GL_MAX_TEXTURE_SIZE: %i\n", gl_config.max_texsize );
 //	ri.Con_Printf (PRINT_ALL, "GL_EXTENSIONS: %s\n", gl_config.extensions_string );
-	// Knightmare- print extensions 2 to a line
+	/* Knightmare- print extensions 2 to a line */
 	ri.Con_Printf (PRINT_ALL, "GL_EXTENSIONS: " );
 	extString = (char *)gl_config.extensions_string;
 	while (1)
@@ -221,7 +221,7 @@ void GL_Strings_f( void )
 	}
 	if ((line % 2) != 0)
 		ri.Con_Printf (PRINT_ALL, "\n" );
-	// end Knightmare
+	/* end Knigthmare */
 }
 
 /*
@@ -285,15 +285,15 @@ void GL_SetDefaultState (void)
 
 void GL_UpdateSwapInterval( void )
 {
-	static qboolean registering;	// Knightmare added
+	static qboolean registering;	/* Knightmare added */
 
-	// Knightmare- don't swap interval if loading a map
+	/* Knightmare- don't swap interval if loading a map */
 	if (registering != registration_active)
 		gl_swapinterval->modified = true;
 
 	if ( gl_swapinterval->modified )
 	{
-		gl_swapinterval->modified = false;	// Knightmare added
+		gl_swapinterval->modified = false;	/* Knightmare added */
 
 		registering = registration_active;
 
@@ -301,7 +301,7 @@ void GL_UpdateSwapInterval( void )
 		{
 #ifdef _WIN32
 			if ( qwglSwapIntervalEXT )
-				qwglSwapIntervalEXT( (registration_active) ? 0 : gl_swapinterval->value );	// Knightmare changed
+				qwglSwapIntervalEXT( (registration_active) ? 0 : gl_swapinterval->value );	/* Knightmare changed */
 			//	qwglSwapIntervalEXT( gl_swapinterval->value );
 #else
 			if ( gl_config.renderer & ( GL_RENDERER_VOODOO ) ) /* FS: Adjust V-Sync without a restart */
@@ -316,7 +316,7 @@ void GL_UpdateSwapInterval( void )
 	}
 }
 
-// Knightmare added
+/* Knightmare added */
 /*
 =================
 GL_PrintError
@@ -357,4 +357,4 @@ void GL_PrintError (int errorCode, char *funcName)
 		break;
 	}
 }
-// end Knightmare
+/* end Knigthmare */
