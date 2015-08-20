@@ -54,12 +54,6 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 	int width, height;
 	GLint attribs[32];
 
-	if(gl_mode->value < 0.0f)
-	{
-		width = r_customwidth->intValue;
-		height = r_customheight->intValue;
-	}
-
 	ri.Con_Printf( PRINT_ALL, "Initializing OpenGL display\n");
 
 	ri.Con_Printf (PRINT_ALL, "...setting mode %d:", mode );

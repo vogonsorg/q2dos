@@ -151,9 +151,6 @@ cvar_t	*sw_load_tga_sky; // FS
 cvar_t	*sw_lockpvs;
 //PGM
 
-cvar_t  *r_customwidth;
-cvar_t  *r_customheight;
-
 cvar_t	*r_coloredlights; // leilei
 cvar_t	*r_lightsaturation; //qb: colored light saturation
 int		coloredlights;	  // leilei
@@ -333,8 +330,6 @@ void R_Register (void)
 	sw_lockpvs->description = "Development aid to let you run around and see exactly where the Potentially Visble Set ends.";
 //PGM
 
-	r_customwidth = ri.Cvar_Get("r_customwidth", "1024", CVAR_ARCHIVE);
-	r_customheight = ri.Cvar_Get("r_customheight", "768", CVAR_ARCHIVE);
 	// leilei - colored lights
 
 	r_coloredlights = ri.Cvar_Get("r_coloredlights", "1", CVAR_ARCHIVE);
@@ -1179,11 +1174,6 @@ void R_BeginFrame( float camera_separation )
 	while ( sw_mode->modified || vid_fullscreen->modified )
 	{
 		rserr_t err;
-
-		/* a bit hackish approach to enable custom resolutions:
-		* SWimp_SetMode needs these values set for mode -1 */
-		vid.width = r_customwidth->value;
-		vid.height = r_customheight->value;
 
 		/*
 		** if this returns rserr_invalid_fullscreen then it set the mode but not as a

@@ -148,8 +148,6 @@ cvar_t	*gl_lockpvs;
 
 cvar_t	*gl_3dlabs_broken;
 
-cvar_t	*r_customheight;
-cvar_t	*r_customwidth;
 cvar_t	*r_refreshrate;
 
 cvar_t	*vid_fullscreen;
@@ -1138,8 +1136,6 @@ void R_Register ( void )
 
 	gl_3dlabs_broken = ri.Cvar_Get( "gl_3dlabs_broken", "1", CVAR_ARCHIVE );
 
-	r_customwidth = ri.Cvar_Get("r_customwidth", "640", CVAR_ARCHIVE);
-	r_customheight = ri.Cvar_Get("r_customheight", "480", CVAR_ARCHIVE);
 	r_refreshrate = ri.Cvar_Get("r_refreshrate", "75", CVAR_ARCHIVE);
 
 	vid_fullscreen = ri.Cvar_Get( "vid_fullscreen", "1", CVAR_ARCHIVE );

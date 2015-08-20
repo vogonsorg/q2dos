@@ -136,9 +136,6 @@ static void VID_NewWindow (int width, int height)
 */
 static qboolean VID_GetModeInfo(int *width, int *height, int mode)
 {
-	if (mode == -1) /* FS: r_custom modes */
-		return true;
-
 	if (mode < 0 || mode >= vid_nummodes)
 		return false;
 

@@ -630,8 +630,6 @@ extern	cvar_t	*sw_particle_size; // FS
 extern	cvar_t	*sw_particle_size_min; // FS
 extern	cvar_t	*sw_particle_size_max; // FS
 
-extern cvar_t  *r_customwidth;
-extern cvar_t  *r_customheight;
 extern cvar_t   *r_coloredlights; // leilei
 extern cvar_t   *r_lightsaturation;
 //extern cvar_t   *sw_transquality; // leilei
