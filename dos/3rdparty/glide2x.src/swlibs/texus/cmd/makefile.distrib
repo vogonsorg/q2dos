@@ -1,6 +1,0 @@
-#
-
-CFLAGS = -g -I/usr/include/glide -I../lib
-
-texus : waco.o
-	$(CC) -o $@ $+ -L../lib -ltexus
