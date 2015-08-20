@@ -1121,7 +1121,11 @@ void R_Register ( void )
 #endif
 	// Knightmare- intel disable mulittexture option
 //	gl_intel_allow_multitexture = ri.Cvar_Get( "gl_intel_allow_multitexture", "0", CVAR_ARCHIVE );
+#ifdef __DJGPP__
+	gl_ext_pointparameters = ri.Cvar_Get( "gl_ext_pointparameters", "0", CVAR_ARCHIVE ); /* FS: Hardlocks when it's time to draw a particle */
+#else
 	gl_ext_pointparameters = ri.Cvar_Get( "gl_ext_pointparameters", "1", CVAR_ARCHIVE );
+#endif
 	gl_ext_compiled_vertex_array = ri.Cvar_Get( "gl_ext_compiled_vertex_array", "1", CVAR_ARCHIVE );
 	// Knightmare- non-power-of-two texture support
 	gl_arb_texturenonpoweroftwo = ri.Cvar_Get( "gl_arb_texturenonpoweroftwo", "1", CVAR_ARCHIVE );
@@ -1350,31 +1354,7 @@ int R_Init ( void *hinstance, void *hWnd )
 
 	strcpy( vendor_buffer, gl_config.vendor_string );
 	strlwr( vendor_buffer );
-/*
-	if ( strstr( renderer_buffer, "voodoo" ) )
-	{
-		if ( !strstr( renderer_buffer, "rush" ) )
-			gl_config.renderer = GL_RENDERER_VOODOO;
-		else
-			gl_config.renderer = GL_RENDERER_VOODOO_RUSH;
-	}
-	else if ( strstr( vendor_buffer, "sgi" ) )
-		gl_config.renderer = GL_RENDERER_SGI;
-	else if ( strstr( renderer_buffer, "permedia" ) )
-		gl_config.renderer = GL_RENDERER_PERMEDIA2;
-	else if ( strstr( renderer_buffer, "glint" ) )
-		gl_config.renderer = GL_RENDERER_GLINT_MX;
-	else if ( strstr( renderer_buffer, "glzicd" ) )
-		gl_config.renderer = GL_RENDERER_REALIZM;
-	else if ( strstr( renderer_buffer, "gdi" ) )
-		gl_config.renderer = GL_RENDERER_MCD;
-	else if ( strstr( renderer_buffer, "pcx2" ) )
-		gl_config.renderer = GL_RENDERER_PCX2;
-	else if ( strstr( renderer_buffer, "verite" ) )
-		gl_config.renderer = GL_RENDERER_RENDITION;
-	else
-		gl_config.renderer = GL_RENDERER_OTHER;
-*/
+
 	// Knightmare- replaced the vendor detection 
 	if (strstr(vendor_buffer, "nvidia")) {
 		gl_config.renderer = GL_RENDERER_NVIDIA;
@@ -1559,6 +1539,27 @@ int R_Init ( void *hinstance, void *hWnd )
 	else
 	{
 		ri.Con_Printf( PRINT_ALL, "...GL_EXT_shared_texture_palette not found\n" );
+	}
+#else
+	/* FS: GL_EXT_paletted texture is the "8-bit textures" option.
+	 *     Used for reducing texture size by mostly forcing to load the awful PCX images instead and clamping textures max sizes.
+	 *     Mostly for Voodoo 1/2 users.  But, speed performances are gained on later cards at the expensive of awful dithering on images.
+	 *     So let's announce it's enabled.
+	 */
+	if (StringContainsToken( gl_config.extensions_string, "GL_EXT_paletted_texture" ))
+	{
+		if ( gl_ext_palettedtexture->value )
+		{
+			ri.Con_Printf( PRINT_ALL, "...using GL_EXT_paletted_texture\n" );
+		}
+		else
+		{
+			ri.Con_Printf( PRINT_ALL, "...ignoring GL_EXT_paletted_texture\n" );
+		}
+	}
+	else
+	{
+		ri.Con_Printf( PRINT_ALL, "...GL_EXT_paletted_texture not found\n" );
 	}
 #endif
 
