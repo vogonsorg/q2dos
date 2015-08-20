@@ -1,6 +1,6 @@
 diff -urNp /dev/null Glide3/cvg/glide3/src/fxgasm.h
---- /dev/null	1970-01-01 02:00:00.000000000 +0200
-+++ Glide3/cvg/glide3/src/fxgasm.h	2015-08-19 10:45:16.000000000 +0300
+--- /dev/null
++++ Glide3/cvg/glide3/src/fxgasm.h
 @@ -0,0 +1,83 @@
 +
 +;----------------------------------------------------------------------
@@ -86,8 +86,8 @@ diff -urNp /dev/null Glide3/cvg/glide3/src/fxgasm.h
 +SIZEOF_GlideRoot	equ 0000124ch
 +
 diff -urNp /dev/null Glide3/cvg/glide3/src/fxinline.h
---- /dev/null	1970-01-01 02:00:00.000000000 +0200
-+++ Glide3/cvg/glide3/src/fxinline.h	2015-08-19 10:45:16.000000000 +0300
+--- /dev/null
++++ Glide3/cvg/glide3/src/fxinline.h
 @@ -0,0 +1,10 @@
 +#ifndef __FX_INLINE_H__
 +#define __FX_INLINE_H__
@@ -100,8 +100,8 @@ diff -urNp /dev/null Glide3/cvg/glide3/src/fxinline.h
 +
 +#endif /* __FX_INLINE_H__ */
 diff -urNp /dev/null Glide3/h3/glide3/src/fxgasm.h
---- /dev/null	1970-01-01 02:00:00.000000000 +0200
-+++ Glide3/h3/glide3/src/fxgasm.h	2015-08-19 10:45:03.000000000 +0300
+--- /dev/null
++++ Glide3/h3/glide3/src/fxgasm.h
 @@ -0,0 +1,80 @@
 +
 +;----------------------------------------------------------------------
@@ -184,8 +184,8 @@ diff -urNp /dev/null Glide3/h3/glide3/src/fxgasm.h
 +SIZEOF_GlideRoot	equ 000b74fch
 +
 diff -urNp /dev/null Glide3/h3/glide3/src/fxinline.h
---- /dev/null	1970-01-01 02:00:00.000000000 +0200
-+++ Glide3/h3/glide3/src/fxinline.h	2015-08-19 10:45:03.000000000 +0300
+--- /dev/null
++++ Glide3/h3/glide3/src/fxinline.h
 @@ -0,0 +1,10 @@
 +#ifndef __FX_INLINE_H__
 +#define __FX_INLINE_H__
@@ -198,14 +198,14 @@ diff -urNp /dev/null Glide3/h3/glide3/src/fxinline.h
 +
 +#endif /* __FX_INLINE_H__ */
 diff -urNp /dev/null Glide3/h5/glide3/src/fxbldno.h
---- /dev/null	1970-01-01 02:00:00.000000000 +0200
-+++ Glide3/h5/glide3/src/fxbldno.h	2015-08-19 10:39:52.000000000 +0300
+--- /dev/null
++++ Glide3/h5/glide3/src/fxbldno.h
 @@ -0,0 +1,2 @@
 +#define BUILD_NUMBER		40404
 +#define BUILD_NUMBER_STR	"40404"
 diff -urNp /dev/null Glide3/h5/glide3/src/fxgasm.h
---- /dev/null	1970-01-01 02:00:00.000000000 +0200
-+++ Glide3/h5/glide3/src/fxgasm.h	2015-08-19 10:39:52.000000000 +0300
+--- /dev/null
++++ Glide3/h5/glide3/src/fxgasm.h
 @@ -0,0 +1,82 @@
 +
 +;----------------------------------------------------------------------
@@ -290,8 +290,8 @@ diff -urNp /dev/null Glide3/h5/glide3/src/fxgasm.h
 +SIZEOF_GlideRoot	equ 000bd60ch
 +
 diff -urNp /dev/null Glide3/h5/glide3/src/fxinline.h
---- /dev/null	1970-01-01 02:00:00.000000000 +0200
-+++ Glide3/h5/glide3/src/fxinline.h	2015-08-19 10:39:52.000000000 +0300
+--- /dev/null
++++ Glide3/h5/glide3/src/fxinline.h
 @@ -0,0 +1,10 @@
 +#ifndef __FX_INLINE_H__
 +#define __FX_INLINE_H__
@@ -304,16 +304,16 @@ diff -urNp /dev/null Glide3/h5/glide3/src/fxinline.h
 +
 +#endif /* __FX_INLINE_H__ */
 diff -urNp /dev/null Glide3/h5/incsrc/gendate.h
---- /dev/null	1970-01-01 02:00:00.000000000 +0200
-+++ Glide3/h5/incsrc/gendate.h	2015-08-19 10:39:52.000000000 +0300
+--- /dev/null
++++ Glide3/h5/incsrc/gendate.h
 @@ -0,0 +1,4 @@
 +#ifndef GENDATE_H
 +#define GENDATE_H
-+#define BUILD_DATE "Wed Aug 19 10:39:52 2015 (from incsrc/gendate.h)"
++#define BUILD_DATE "Thu Aug 20 10:50:10 2015 (from incsrc/gendate.h)"
 +#endif
 diff -urNp /dev/null Glide3/sst1/glide3/src/fxgasm.h
---- /dev/null	1970-01-01 02:00:00.000000000 +0200
-+++ Glide3/sst1/glide3/src/fxgasm.h	2015-08-19 10:45:27.000000000 +0300
+--- /dev/null
++++ Glide3/sst1/glide3/src/fxgasm.h
 @@ -0,0 +1,58 @@
 +SST_CHIP_MASK equ 03c00h
 +
@@ -374,8 +374,8 @@ diff -urNp /dev/null Glide3/sst1/glide3/src/fxgasm.h
 +SIZEOF_dataList		equ 00000014h
 +
 diff -urNp /dev/null Glide3/sst1/glide3/src/fxinline.h
---- /dev/null	1970-01-01 02:00:00.000000000 +0200
-+++ Glide3/sst1/glide3/src/fxinline.h	2015-08-19 10:45:27.000000000 +0300
+--- /dev/null
++++ Glide3/sst1/glide3/src/fxinline.h
 @@ -0,0 +1,7 @@
 +#ifndef __FX_INLINE_H__
 +#define __FX_INLINE_H__
