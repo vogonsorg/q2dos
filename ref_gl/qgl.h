@@ -431,8 +431,10 @@ extern BOOL ( WINAPI * qwglSetDeviceGammaRampEXT ) ( const unsigned char *pRed, 
 
 #endif
 
+#ifndef _WIN32
 // local function in dll
 extern void *qwglGetProcAddress(char *symbol);
+#endif
 
 #ifdef __linux__
 
