@@ -1735,14 +1735,15 @@ void R_BeginFrame( float camera_separation )
 
 		if ( gl_config.renderer & ( GL_RENDERER_VOODOO ) )
 		{
-			char envbuffer[1024];
+			static char v1buf[64];
+			static char v2buf[64];
 			float g;
 
 			g = 2.00 * ( 0.8 - ( vid_gamma->value - 0.5 ) ) + 1.0F;
-			Com_sprintf( envbuffer, sizeof(envbuffer), "SSTV2_GAMMA=%f", g );
-			putenv( envbuffer );
-			Com_sprintf( envbuffer, sizeof(envbuffer), "SST_GAMMA=%f", g );
-			putenv( envbuffer );
+			Com_sprintf( v2buf, sizeof(v2buf), "SSTV2_GAMMA=%f", g );
+			putenv( v2buf );
+			Com_sprintf( v1buf, sizeof(v1buf), "SST_GAMMA=%f", g );
+			putenv( v1buf );
 		}
 		UpdateGammaRamp (); /* Knightmare- hardware gamma */
 	}
@@ -1753,8 +1754,7 @@ void R_BeginFrame( float camera_separation )
 		
 		if ( gl_config.renderer & ( GL_RENDERER_VOODOO ) )
 		{
-			char envbuffer[1024];
-		
+			static char envbuffer[64];
 			Com_sprintf( envbuffer, sizeof(envbuffer), "SST_SCREENREFRESH=%i", r_refreshrate->intValue );
 			putenv( envbuffer );
 		}

@@ -386,6 +386,8 @@ static qboolean VID_LoadRefresh (const char *name)
 
 void	VID_Init (void)
 {
+	/* putenv() from DJGPP libc will copy, so
+	 * it is OK to use an automatic var here. */
 	char	envString[64];
 
 	viddef.width = 320;
@@ -612,6 +614,7 @@ void	VID_MenuInit (void)
 		s_brightness_slider[i].generic.callback = BrightnessCallback;
 		s_brightness_slider[i].minvalue = 5;
 		s_brightness_slider[i].maxvalue = 13;
+//		s_brightness_slider[i].curvalue = ( 1.3 - vid_gamma->value + 0.5 ) * 10;
 		s_brightness_slider[i].curvalue = ( 1.3 - vid_gamma->value ) * 20;
 		s_brightness_slider[i].generic.statusbar	= "changes display brightness";
 

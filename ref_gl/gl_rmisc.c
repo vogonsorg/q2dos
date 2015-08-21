@@ -306,7 +306,7 @@ void GL_UpdateSwapInterval( void )
 #else
 			if ( gl_config.renderer & ( GL_RENDERER_VOODOO ) ) /* FS: Adjust V-Sync without a restart */
 			{
-				char envbuffer[1024];
+				static char envbuffer[64];
 
 				Com_sprintf( envbuffer, sizeof(envbuffer), "FX_GLIDE_SWAPINTERVAL=%i", gl_swapinterval->intValue );
 				putenv( envbuffer );
