@@ -40,6 +40,8 @@ static cvar_t *vid_vgaonly;
 static cvar_t *sw_stipplealpha;
 static cvar_t *sw_waterwarp; /* FS */
 static cvar_t *r_contentblend; /* FS */
+static cvar_t *r_refreshrate; /* FS: For 3DFX */
+static cvar_t *gl_swapinterval; /* FS: For 3DFX */
 
 extern void M_ForceMenuOff (void);
 extern const char *Default_MenuKey( menuframework_s *m, int key );
@@ -384,6 +386,8 @@ static qboolean VID_LoadRefresh (const char *name)
 
 void	VID_Init (void)
 {
+	char	envString[64];
+
 	viddef.width = 320;
 	viddef.height = 240;
 
@@ -396,6 +400,18 @@ void	VID_Init (void)
 
 	vid_vgaonly = Cvar_Get("vid_vgaonly", (COM_CheckParm("-vgaonly"))? "1" : "0", 0);
 	vid_bankedvga = Cvar_Get("vid_bankedvga", (COM_CheckParm("-bankedvga"))? "1" : "0", 0);
+
+	/* FS: 3DFX - Enforce the refresh rate at startup */
+	r_refreshrate = Cvar_Get("r_refreshrate", "75", CVAR_ARCHIVE);
+	r_refreshrate->description = "Refresh rate control for 3DFX OpenGL driver.";
+	Com_sprintf(envString, sizeof(envString), "SST_SCREENREFRESH=%i", r_refreshrate->intValue);
+	putenv(envString);
+
+	/* FS: 3DFX - Enforce the swap interval at startup */
+	gl_swapinterval = Cvar_Get("gl_swapinterval", "1", CVAR_ARCHIVE);
+	gl_swapinterval->description = "V-Sync control for 3DFX OpenGL driver.";
+	Com_sprintf(envString, sizeof(envString), "FX_GLIDE_SWAPINTERVAL=%i", gl_swapinterval->intValue);
+	putenv(envString);
 
 	/* don't let fxMesa cheat multitexturing */
 	putenv("FX_DONT_FAKE_MULTITEX=1");
