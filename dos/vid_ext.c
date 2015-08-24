@@ -118,9 +118,7 @@ void VID_InitExtra (void)
 	memset(vga_modes,0x0,sizeof(vga_modes));
 	vga_nummodes = 0;
 
-	VID_AddPlanarModes(); /* FS: Add 320x240 Mode-X first */
-
-	/* We always have mode 13 VGA */
+	/* mode 13 VGA first */
 	vga_modes[vga_nummodes].mode=vga_nummodes;
 	vga_modes[vga_nummodes].vesa_mode=-1;
 	vga_modes[vga_nummodes].height=200;
@@ -128,6 +126,8 @@ void VID_InitExtra (void)
 	vga_modes[vga_nummodes].type = VGA_MODE13;
 	Com_sprintf(vga_modes[vga_nummodes].menuname, sizeof(vga_modes[vga_nummodes].menuname), "[VGA 320x200]");
 	vga_nummodes++;
+
+	VID_AddPlanarModes();
 
 	var = ri.Cvar_Get("vid_vgaonly", "0", 0);
 	if(var->intValue)
@@ -196,6 +196,7 @@ void VID_InitExtra (void)
 
 static void VID_AddPlanarModes(void)
 {
+	/* add only Mode-X 320x240 */
 	vga_modes[vga_nummodes].mode=vga_nummodes;
 	vga_modes[vga_nummodes].vesa_mode=-1;
 	vga_modes[vga_nummodes].height=240;
