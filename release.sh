@@ -12,8 +12,11 @@ echo $TARGET-strip q2.exe
 $TARGET-strip q2.exe || exit 1
 
 mkdir -p _build || exit 1
+
 cp -p q2.exe _build
 cp -p ref_soft/ref_soft.dxe _build
+cp -p ref_gl/ref_gl.dxe _build
+cp -pr dos/3rdparty/lib_dxe/* _build
 cp -p CWSDPMI.EXE _build
 cp -p readme.txt _build
 

@@ -24,14 +24,14 @@ REF_STATIC_SOFT=1
 REF_STATIC_GL=0
 
 CC = gcc
-CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
+CFLAGS = -Wall -Werror -O2 -fno-strict-aliasing -fomit-frame-pointer
 CPPFLAGS = -DCLIENT_SPLIT_NETFRAME
 LDFLAGS =
 EXE = q2.exe
 
 ifeq ($(USE_SSE),1)
 # FS: approx 10-15% speed boost on my P3 550 when running timedemos, but could be dangerous.
-CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer -mtune=pentium3 -march=pentium3 -mfpmath=sse
+CFLAGS+= -mtune=pentium3 -march=pentium3 -mfpmath=sse
 EXE = q2sse.exe
 endif
 

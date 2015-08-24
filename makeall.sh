@@ -3,8 +3,12 @@
 . ./cross_defs.dj
 
 make CC=$TARGET-gcc -f makedxe3.frank $*     || exit 1
+# refresh drivers
 rm -f game/*.o
 make CC=$TARGET-gcc -C ref_soft -f makedxe3 $* || exit 1
+rm -f game/*.o
+make CC=$TARGET-gcc -C ref_gl -f makedxe3 $* || exit 1
+# game code
 rm -f game/*.o
 make CC=$TARGET-gcc -C game -f makedxe3 $*   || exit 1
 make CC=$TARGET-gcc -C ctf -f makedxe3 $*    || exit 1
