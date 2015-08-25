@@ -1202,16 +1202,10 @@ void SP_worldspawn (edict_t *ent)
         if (teamplay->value)
         {
                 if (team1_skin_index[0] == 0)
-                {
-                        gi.dprintf(DEVELOPER_MSG_GAME, "No skin was specified for team 1 in config file.  Exiting.\n");
-                        exit(1);
-                }
+                        gi.error("No skin was specified for team 1 in config file.");
                 gi.imageindex(team1_skin_index);
                 if (team2_skin_index[0] == 0)
-                {
-                        gi.dprintf(DEVELOPER_MSG_GAME, "No skin was specified for team 2 in config file.  Exiting.\n");
-                        exit(1);
-                }
+                        gi.error("No skin was specified for team 2 in config file.");
                 gi.imageindex(team2_skin_index);
         }
         PrecacheRadioSounds();

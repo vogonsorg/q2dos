@@ -75,10 +75,7 @@ void AddToTransparentList(edict_t *ent)
 
         n = (transparent_list_t *)gi.TagMalloc(sizeof(transparent_list_t), TAG_GAME);
         if (n == NULL)
-        {
-                gi.dprintf(DEVELOPER_MSG_GAME, "Out of memory\n");
-                exit(1);
-        }
+                gi.error("Out of memory");
         n->ent = ent;
         n->next = NULL;
 
