@@ -137,16 +137,6 @@ void S_Init (void)
 		s_musicvolume = Cvar_Get ("s_musicvolume", "1.0", CVAR_ARCHIVE); // Knightmare added
 		s_musicvolume->description = "Volume for music played from WAV and OGG files.";
 
-		Cmd_AddCommand("play", S_Play);
-		Cmd_AddCommand("stopsound", S_StopAllSounds);
-		Cmd_AddCommand("soundlist", S_SoundList);
-		Cmd_AddCommand("soundinfo", S_SoundInfo_f);
-	#ifdef OGG_SUPPORT
-		Cmd_AddCommand("ogg_restart", S_OGG_Restart); // Knightmare added
-	#endif
-
-		Cmd_AddCommand("wav_restart", S_WAV_Restart); /* FS: Added */
-
 		if (s_khz->value < 7000) /* FS: Old config, fix it up */
 			Cvar_SetValue("s_khz", 11025);
 
@@ -154,6 +144,15 @@ void S_Init (void)
 			dma.buffer = NULL;/* just in case */
 			return;
 		}
+
+		Cmd_AddCommand("play", S_Play);
+		Cmd_AddCommand("stopsound", S_StopAllSounds);
+		Cmd_AddCommand("soundlist", S_SoundList);
+		Cmd_AddCommand("soundinfo", S_SoundInfo_f);
+#ifdef OGG_SUPPORT
+		Cmd_AddCommand("ogg_restart", S_OGG_Restart); /* Knightmare added */
+#endif
+		Cmd_AddCommand("wav_restart", S_WAV_Restart); /* FS: Added */
 
 		S_InitScaletable ();
 
@@ -170,9 +169,8 @@ void S_Init (void)
 
 #ifdef OGG_SUPPORT
 	if(!COM_CheckParm("-noogg"))
-		S_OGG_Init(); // Knightmare added
+		S_OGG_Init(); /* Knightmare added */
 #endif
-
 	if(!COM_CheckParm("-nowavstream"))
 		S_WAV_Init(); /* FS: Added */
 
@@ -193,9 +191,8 @@ void S_Shutdown(void)
 		return;
 
 #ifdef OGG_SUPPORT
-	S_OGG_Shutdown(); // Knightmare added
+	S_OGG_Shutdown(); /* Knightmare added */
 #endif
-
 	S_WAV_Shutdown(); /* FS: Added */
 
 	SNDDMA_Shutdown();
