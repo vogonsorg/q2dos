@@ -174,7 +174,7 @@ PF_error
 Abort the server with a game error
 ===============
 */
-void __attribute__((__format__(__printf__,1,2)))
+void __attribute__((__noreturn__, __format__(__printf__,1,2)))
 PF_error (char *fmt, ...)
 {
 	char		msg[1024];

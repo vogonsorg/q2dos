@@ -114,7 +114,7 @@ VID_Printf (int print_level, char *fmt, ...)
 		Com_DPrintf(DEVELOPER_MSG_GFX, "%s", msg);
 }
 
-static void __attribute__((__format__(__printf__,2,3)))
+static void __attribute__((__noreturn__, __format__(__printf__,2,3)))
 VID_Error (int err_level, char *fmt, ...)
 {
 	va_list		argptr;

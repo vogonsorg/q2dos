@@ -357,7 +357,7 @@ char	*Sys_FindNext ( unsigned musthave, unsigned canthave );
 void	Sys_FindClose (void);
 
 // this is only here so the functions in q_shared.c and q_shwin.c can link
-void Sys_Error (char *error, ...) __attribute__((__format__(__printf__,1,2)));
+void Sys_Error (char *error, ...) __attribute__((__noreturn__, __format__(__printf__,1,2)));
 void Com_Printf (char *msg, ...) __attribute__((__format__(__printf__,1,2)));
 
 

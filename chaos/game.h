@@ -96,7 +96,7 @@ typedef struct
 	// they connect, and changes are sent to all connected clients.
 	void	(*configstring) (int num, char *string);
 
-	void	(*error) (char *fmt, ...) __fp_attribute__((__format__(__printf__,1,2)));
+	void	(*error) (char *fmt, ...) __fp_attribute__((__noreturn__, __format__(__printf__,1,2)));
 
 	// the *index functions create configstrings and some internal server state
 	int		(*modelindex) (char *name);

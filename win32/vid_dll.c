@@ -148,7 +148,7 @@ VID_Printf (int print_level, char *fmt, ...)
 	}
 }
 
-void __attribute__((__format__(__printf__,2,3)))
+void __attribute__((__noreturn__, __format__(__printf__,2,3)))
 VID_Error (int err_level, char *fmt, ...)
 {
 	va_list		argptr;

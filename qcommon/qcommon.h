@@ -778,7 +778,7 @@ void		Com_BeginRedirect (int target, char *buffer, int buffersize, void (*flush)
 void		Com_EndRedirect (void);
 void 		Com_Printf (char *fmt, ...) __attribute__((__format__(__printf__,1,2)));
 void 		Com_DPrintf (unsigned long developerFlags, char *fmt, ...) __attribute__((__format__(__printf__,2,3))); /* FS: Added developer flags */
-void 		Com_Error (int code, char *fmt, ...) __attribute__((__format__(__printf__,2,3)));
+void 		Com_Error (int code, char *fmt, ...) __attribute__((__noreturn__, __format__(__printf__,2,3)));
 void 		Com_Quit (void);
 
 int			Com_ServerState (void);		// this should have just been a cvar...
@@ -844,7 +844,7 @@ void	*Sys_GetGameAPI (void *parms);
 char	*Sys_ConsoleInput (void);
 void	Sys_ConsoleOutput (char *string);
 void	Sys_SendKeyEvents (void);
-void	Sys_Error (char *error, ...) __attribute__((__format__(__printf__,1,2)));
+void	Sys_Error (char *error, ...) __attribute__((__noreturn__, __format__(__printf__,1,2)));
 void	Sys_Quit (void);
 char	*Sys_GetClipboardData( void );
 void	Sys_CopyProtect (void);

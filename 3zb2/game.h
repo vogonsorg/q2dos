@@ -95,7 +95,7 @@ typedef struct
 	// they connect, and changes are sent to all connected clients.
 	void	(*configstring) (int num, char *string);
 
-	void	(*error) (char *fmt, ...) __fp_attribute__((__format__(__printf__,1,2)));
+	void	(*error) (char *fmt, ...) __fp_attribute__((__noreturn__, __format__(__printf__,1,2)));
 
 	// new names can only be added during spawning
 	// existing names can be looked up at any time
