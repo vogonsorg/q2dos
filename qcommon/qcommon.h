@@ -779,7 +779,7 @@ void		Com_EndRedirect (void);
 void 		Com_Printf (char *fmt, ...) __attribute__((__format__(__printf__,1,2)));
 void 		Com_DPrintf (unsigned long developerFlags, char *fmt, ...) __attribute__((__format__(__printf__,2,3))); /* FS: Added developer flags */
 void 		Com_Error (int code, char *fmt, ...) __attribute__((__noreturn__, __format__(__printf__,2,3)));
-void 		Com_Quit (void);
+void 		Com_Quit (void) __attribute__((__noreturn__));
 
 int			Com_ServerState (void);		// this should have just been a cvar...
 void		Com_SetServerState (int state);
@@ -845,7 +845,7 @@ char	*Sys_ConsoleInput (void);
 void	Sys_ConsoleOutput (char *string);
 void	Sys_SendKeyEvents (void);
 void	Sys_Error (char *error, ...) __attribute__((__noreturn__, __format__(__printf__,1,2)));
-void	Sys_Quit (void);
+void	Sys_Quit (void) __attribute__((__noreturn__));
 char	*Sys_GetClipboardData( void );
 void	Sys_CopyProtect (void);
 
