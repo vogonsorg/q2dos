@@ -75,13 +75,13 @@ void R_InitParticleTexture (void)
 }
 
 
-/* 
-============================================================================== 
- 
-						SCREEN SHOTS 
- 
-============================================================================== 
-*/ 
+/*
+==============================================================================
+
+						SCREEN SHOTS
+
+==============================================================================
+*/
 
 typedef struct _TargaHeader {
 	unsigned char 	id_length, colormap_type, image_type;
@@ -92,15 +92,15 @@ typedef struct _TargaHeader {
 } TargaHeader;
 
 
-/* 
-================== 
+/*
+==================
 GL_ScreenShot_TGA
-================== 
-*/  
-void GL_ScreenShot_TGA (qboolean silent) 
+==================
+*/
+void GL_ScreenShot_TGA (qboolean silent)
 {
 	byte		*buffer;
-	char		picname[80]; 
+	char		picname[80];
 	char		checkname[MAX_OSPATH];
 	int			i, c, temp;
 	FILE		*f;
@@ -109,17 +109,17 @@ void GL_ScreenShot_TGA (qboolean silent)
 	Com_sprintf (checkname, sizeof(checkname), "%s/scrnshot", ri.FS_Gamedir());
 	Sys_Mkdir (checkname);
 
-// 
-// find a file name to save it to 
-// 
+//
+// find a file name to save it to
+//
 
 	/* Knightmare- changed screenshot filenames, up to 100 screenies */
 //	strcpy(picname,"quake00.tga");
 
-	for (i=0; i<=999; i++) 
-	{ 
-	//	picname[5] = i/10 + '0'; 
-	//	picname[6] = i%10 + '0'; 
+	for (i=0; i<=999; i++)
+	{
+	//	picname[5] = i/10 + '0';
+	//	picname[6] = i%10 + '0';
 		int ones, tens, hundreds;
 
 		hundreds = i*0.01;
@@ -132,12 +132,12 @@ void GL_ScreenShot_TGA (qboolean silent)
 		if (!f)
 			break;	// file doesn't exist
 		fclose (f);
-	} 
-	if (i==1000) 
+	}
+	if (i==1000)
 	{
 		ri.Con_Printf (PRINT_ALL, "GL_ScreenShot_f: Couldn't create a file\n"); 
 		return;
- 	}
+	}
 
 
 	buffer = malloc(vid.width*vid.height*3 + 18);
@@ -167,26 +167,26 @@ void GL_ScreenShot_TGA (qboolean silent)
 	free (buffer);
 	if (!silent)
 		ri.Con_Printf (PRINT_ALL, "Wrote %s\n", picname);
-} 
+}
 
 
-/* 
-================== 
+/*
+==================
 GL_ScreenShot_f
-================== 
-*/  
-void GL_ScreenShot_f (void) 
+==================
+*/
+void GL_ScreenShot_f (void)
 {
 	GL_ScreenShot_TGA (false);
 }
 
 
-/* 
-================== 
+/*
+==================
 GL_ScreenShot_Silent_f
-================== 
-*/  
-void GL_ScreenShot_Silent_f (void) 
+==================
+*/
+void GL_ScreenShot_Silent_f (void)
 {
 	GL_ScreenShot_TGA (true);
 }
@@ -349,7 +349,7 @@ void GL_PrintError (int errorCode, char *funcName)
 		break;
 #ifdef GL_INVALID_FRAMEBUFFER_OPERATION_EXT
 	case GL_INVALID_FRAMEBUFFER_OPERATION_EXT:
-		VID_Printf (PRINT_DEVELOPER, "GL_INVALID_FRAMEBUFFER_OPERATION_EXT\n", funcName);
+		ri.Con_Printf (PRINT_DEVELOPER, "%s: GL_INVALID_FRAMEBUFFER_OPERATION_EXT\n", funcName);
 		break;
 #endif
 	default:

@@ -122,7 +122,8 @@ DLL GLUE
 */
 
 #define	MAXPRINTMSG	4096
-void VID_Printf (int print_level, char *fmt, ...)
+void __attribute__((__format__(__printf__,2,3)))
+VID_Printf (int print_level, char *fmt, ...)
 {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
@@ -147,7 +148,8 @@ void VID_Printf (int print_level, char *fmt, ...)
 	}
 }
 
-void VID_Error (int err_level, char *fmt, ...)
+void __attribute__((__format__(__printf__,2,3)))
+VID_Error (int err_level, char *fmt, ...)
 {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
