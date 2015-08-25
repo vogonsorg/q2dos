@@ -693,7 +693,7 @@ void CL_TrapParticles (entity_t *ent);
 /* FS: Gamespy browser */
 typedef struct
 {
-	char ip[15];
+	char ip[16];
 	int port;
 	int ping;
 	char hostname[32];
