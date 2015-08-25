@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../qcommon/qcommon.h"
 #include "CEngine/goaceng.h"
 
-/* FS: IF THIS FILE IS CHANGED IT MUST BE CHANGED IN CLIENT/GSPY.H! */
+/* FS: IF THIS FILE IS CHANGED IT MUST BE CHANGED IN CLIENT/GSPY.H ! */
 
 #define	GAMESPY_API_VERSION		2
 
@@ -66,9 +66,9 @@ typedef struct
  */
 typedef struct
 {
-	void	(*print)(char *str, ...);
-	void	(*dprint)(unsigned long developerFlags, char *fmt, ...);
-	void	(*error)(char *error, ...);
+	void	(*print)(char *str, ...) __fp_attribute__((__format__(__printf__,1,2)));
+	void	(*dprint)(unsigned long developerFlags, char *fmt, ...) __fp_attribute__((__format__(__printf__,2,3)));
+	void	(*error)(char *error, ...) __fp_attribute__((__format__(__printf__,1,2)));
 	cvar_t	*(*cvar)(char *name, char *value, int flags);
 	cvar_t	*(*cvar_set)(char *name, char *value);
 	cvar_t	*(*cvar_forceset)(char *name, char *value);

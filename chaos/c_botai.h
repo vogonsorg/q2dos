@@ -72,7 +72,7 @@ void Bot_Create(int level, int team, char *name, char *skin);
 void Bot_Spawn(edict_t *ent);
 void Bot_Respawn(edict_t *ent);
 void Bot_Wave (edict_t *ent, int i, float time);
-void Bot_Say (edict_t *ent, qboolean team, char *fmt, ...);
+void Bot_Say (edict_t *ent, qboolean team, char *fmt, ...) __attribute__((__format__(__printf__,3,4)));
 void bot_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point);
 void Bot_Think(edict_t *ent);
 void Bot_Aim(edict_t *ent, vec3_t target, vec3_t angles);

@@ -161,7 +161,7 @@ void		AITools_Frame(void);
 void		AITools_DropNodes(edict_t *ent);
 
 // safe **cough** prints
-void		debug_printf(char *fmt, ...);
-void		safe_cprintf (edict_t *ent, int printlevel, char *fmt, ...);
-void		safe_centerprintf (edict_t *ent, char *fmt, ...);
-void		safe_bprintf (int printlevel, char *fmt, ...);
+void		debug_printf(char *fmt, ...) __attribute__((__format__(__printf__,1,2)));
+void		safe_cprintf (edict_t *ent, int printlevel, char *fmt, ...) __attribute__((__format__(__printf__,3,4)));
+void		safe_centerprintf (edict_t *ent, char *fmt, ...) __attribute__((__format__(__printf__,2,3)));
+void		safe_bprintf (int printlevel, char *fmt, ...) __attribute__((__format__(__printf__,2,3)));

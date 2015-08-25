@@ -930,7 +930,7 @@ void vectoangles (vec3_t vec, vec3_t angles);
 qboolean WeighPlayer(edict_t *ent);
 void reinforcement_think(edict_t *ent);
 
-void centerprintall (char *mesg, ...);
+void centerprintall (char *mesg, ...) __attribute__((__format__(__printf__,1,2)));
 
 qboolean IsValidPlayer(edict_t *ent);
 

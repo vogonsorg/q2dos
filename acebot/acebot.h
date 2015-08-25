@@ -262,9 +262,9 @@ void     ACESP_SetName(edict_t *bot, char *name, char *skin, char *team);
 void     ACESP_SpawnBot (char *team, char *name, char *skin, char *userinfo);
 void     ACESP_ReAddBots();
 void     ACESP_RemoveBot(char *name);
-void	 safe_cprintf (edict_t *ent, int printlevel, char *fmt, ...);
-void     safe_centerprintf (edict_t *ent, char *fmt, ...);
-void     safe_bprintf (int printlevel, char *fmt, ...);
-void     debug_printf (char *fmt, ...);
+void	 safe_cprintf (edict_t *ent, int printlevel, char *fmt, ...) __attribute__((__format__(__printf__,3,4)));
+void     safe_centerprintf (edict_t *ent, char *fmt, ...) __attribute__((__format__(__printf__,2,3)));
+void     safe_bprintf (int printlevel, char *fmt, ...) __attribute__((__format__(__printf__,2,3)));
+void     debug_printf (char *fmt, ...) __attribute__((__format__(__printf__,1,2)));
 
 #endif

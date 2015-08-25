@@ -1109,9 +1109,9 @@ struct edict_s
 };
 
 //MATTHIAS
-void	bprintf2 (int printlevel, char *fmt, ...);
-void	cprintf2 (edict_t *ent, int printlevel, char *fmt, ...);
-void	nprintf (int printlevel, char *fmt, ...);
+void	bprintf2 (int printlevel, char *fmt, ...) __attribute__((__format__(__printf__,2,3)));
+void	cprintf2 (edict_t *ent, int printlevel, char *fmt, ...) __attribute__((__format__(__printf__,3,4)));
+void	nprintf (int printlevel, char *fmt, ...) __attribute__((__format__(__printf__,2,3)));
 void	stuffcmd(edict_t *ent, char *s);
 qboolean visible2 (vec3_t spot1, vec3_t spot2);
 void	EndDMLevel (void);

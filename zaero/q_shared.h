@@ -10,7 +10,6 @@
 #pragma warning(disable : 4305)		// truncation from const double to float
 #endif
 
-/*#include <assert.h>*/
 #include <math.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -34,8 +33,21 @@ typedef enum {false, true}	qboolean;
 #define NULL ((void *)0)
 #endif
 
+#if !defined(__GNUC__)
+#define	__attribute__(x)
+#endif
+
+/* argument format attributes for function
+ * pointers are supported for gcc >= 3.1
+ */
+#if defined(__GNUC__) && (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ > 0))
+#define	__fp_attribute__	__attribute__
+#else
+#define	__fp_attribute__(x)
+#endif
+
 #ifdef __DJGPP__
-int vsnprintf(char *str, size_t n, const char *fmt, va_list ap);
+int vsnprintf(char *str, size_t n, const char *fmt, va_list ap) __attribute__((__format__(__printf__,3,0)));
 #endif
 #if defined(__DJGPP__) || defined(_WIN32)
 char *strtok_r(char *s, const char *delim, char **last);
@@ -234,7 +246,7 @@ void COM_DefaultExtension (char *path, char *extension);
 char *COM_Parse (char **data_p);
 // data is an in/out parm, returns a parsed out token
 
-void Com_sprintf (char *dest, int size, char *fmt, ...);
+void Com_sprintf (char *dest, int size, char *fmt, ...) __attribute__((__format__(__printf__,3,4)));
 // Knightmare added
 void Com_strcpy (char *dest, int destSize, const char *src);
 void Com_strcat (char *dest, int destSize, const char *src);
@@ -264,7 +276,7 @@ float	BigFloat (float l);
 float	LittleFloat (float l);
 
 void	Swap_Init (void);
-char	*va(char *format, ...);
+char	*va(char *format, ...) __attribute__((__format__(__printf__,1,2)));
 
 //=============================================
 
@@ -325,8 +337,8 @@ char	*Sys_FindNext ( unsigned musthave, unsigned canthave );
 void	Sys_FindClose (void);
 
 // this is only here so the functions in q_shared.c and q_shwin.c can link
-void Sys_Error (char *error, ...);
-void Com_Printf (char *msg, ...);
+void Sys_Error (char *error, ...) __attribute__((__format__(__printf__,1,2)));
+void Com_Printf (char *msg, ...) __attribute__((__format__(__printf__,1,2)));
 
 
 /*
