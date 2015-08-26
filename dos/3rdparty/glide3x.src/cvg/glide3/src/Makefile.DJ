@@ -15,7 +15,7 @@
 #	FX_GLIDE_HW	build for the given ASIC (cvg).
 #			default = cvg
 #	OPTFLAGS	pass given optimization flags to compiler
-#			default = -O2 -ffast-math
+#			default = -O2 -ffastmath (+ -mcpu=pentium if USE_X86=1)
 #	DEBUG=1		enable debugging checks and messages
 #			default = no
 #	USE_X86=1	use assembler triangle specializations; req by CVG
@@ -41,7 +41,7 @@
 
 
 .PHONY: all glide3x clean realclean
-.INTERMEDIATE: fxgasm.exe fxbldno.exe
+.INTERMEDIATE: fxgasm.exe
 
 ###############################################################################
 #	general defines (user settable?)
@@ -65,13 +65,7 @@ CC = gcc
 AS = nasm
 AR = ar
 
-HAVEDXE3 = $(wildcard $(DJDIR)/bin/dxe3gen.exe)
-
-ifeq ($(wildcard $(addsuffix /rm.exe,$(subst ;, ,$(PATH)))),)
-UNLINK = del $(subst /,\,$(1))
-else
-UNLINK = $(RM) $(1)
-endif
+UNLINK = rm -f $(1)
 
 ###############################################################################
 #	defines
@@ -112,7 +106,7 @@ ASFLAGS = -O6 -fcoff -D__DJGPP__ --prefix _
 ASFLAGS += $(CDEFS)
 
 # compiler
-CFLAGS = -Wall -W -fno-strict-aliasing
+CFLAGS = -Wall -W
 CFLAGS += -I. -I../../incsrc -I../../init
 CFLAGS += -I$(FX_GLIDE_SW)/fxmisc -I$(FX_GLIDE_SW)/newpci/pcilib -I$(FX_GLIDE_SW)/fxmemmap
 CFLAGS += -I$(FX_GLIDE_SW)/texus2/lib
@@ -130,7 +124,7 @@ endif
 
 ifeq ($(USE_X86),1)
 CFLAGS += -DGL_X86
-OPTFLAGS ?= -O2 -ffast-math
+OPTFLAGS ?= -O2 -ffast-math -mcpu=pentium
 else
 CFLAGS += -DGLIDE_USE_C_TRISETUP
 OPTFLAGS ?= -O2 -ffast-math
@@ -252,11 +246,7 @@ $(GLIDE_LIBDIR)/$(GLIDE_LIB): $(GLIDE_OBJECTS)
 	$(AR) $(ARFLAGS) $@ $^
 
 $(GLIDE_LIBDIR)/$(GLIDE_DXE) $(GLIDE_LIBDIR)/$(GLIDE_IMP): $(GLIDE_OBJECTS)
-ifeq ($(HAVEDXE3),)
-	$(warning Missing DXE3 package... Skipping $(GLIDE_DXE))
-else
 	-dxe3gen -o $(GLIDE_LIBDIR)/$(GLIDE_DXE) -Y $(GLIDE_LIBDIR)/$(GLIDE_IMP) -D "Glide3(cvg) DJGPP" -E _gr -E _gu -E _tx -U $^
-endif
 
 $(TEXUS_EXEDIR)/$(TEXUS_EXE): $(FX_GLIDE_SW)/texus2/cmd/cmd.c $(GLIDE_LIBDIR)/$(GLIDE_LIB)
 ifeq ($(TEXUS2),1)
@@ -286,7 +276,7 @@ xdraw3_3dnow.o: xdraw3.asm
 xtexdl_3dnow.o: xtexdl.asm
 	$(AS) -o $@ $(ASFLAGS) -DGL_AMD3D=1 $<
 
-$(GLIDE_OBJECTS): fxinline.h fxgasm.h fxbldno.h
+$(GLIDE_OBJECTS): fxinline.h fxgasm.h
 
 fxinline.h: fxgasm.exe
 	$< -inline > $@
@@ -295,13 +285,6 @@ fxgasm.h: fxgasm.exe
 	$< -hex > $@
 
 fxgasm.exe: fxgasm.c
-	$(CC) -o $@ $(CFLAGS) $<
-
-
-fxbldno.h: fxbldno.exe
-	$< > $@
-
-fxbldno.exe: fxbldno.c
 	$(CC) -o $@ $(CFLAGS) $<
 
 ###############################################################################
@@ -314,7 +297,6 @@ clean:
 	-$(call UNLINK,$(FX_GLIDE_SW)/newpci/pcilib/*.o)
 	-$(call UNLINK,fxinline.h)
 	-$(call UNLINK,fxgasm.h)
-	-$(call UNLINK,fxbldno.h)
 	-$(call UNLINK,$(FX_GLIDE_SW)/texus2/lib/*.o)
 
 realclean: clean
