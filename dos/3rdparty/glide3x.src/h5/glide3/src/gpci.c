@@ -17,7 +17,7 @@
 **
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gpci.c,v 1.4.2.29 2005/06/09 18:32:32 jwrdegoede Exp $
+** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gpci.c,v 1.4.2.31 2007/06/23 09:22:41 koolsmoky Exp $
 ** $Log:
 **  44   3dfx      1.34.1.2.1.511/08/00 Drew McMinn     Create initialise read and
 **       use useAppGamma flag, to allow us to disable applications changing gamma
@@ -1202,13 +1202,9 @@ _grSstDetectResources(void)
 
       /* KoolSmoky - UMA for the TMUs */
       GC.state.grEnableArgs.texture_uma_mode = GR_MODE_DISABLE;
-      if( GETENV("FX_GLIDE_TEXTURE_UMA") ) {
-        if( atoi(GETENV("FX_GLIDE_TEXTURE_UMA")) == 1 ) {
+      if( GETENV("FX_GLIDE_TEXTURE_UMA") )
+        if( atoi(GETENV("FX_GLIDE_TEXTURE_UMA")) == 1 )
           GC.state.grEnableArgs.texture_uma_mode = GR_MODE_ENABLE;
-        } else {
-          GC.state.grEnableArgs.texture_uma_mode = GR_MODE_DISABLE;
-        }
-      }
 
       SST.sstBoard.SST96Config.fbRam    = GC.fbuf_size;
       SST.sstBoard.SST96Config.nTexelfx = GC.num_tmu;
@@ -1302,70 +1298,6 @@ _GlideInitEnvironment(void)
 
   /* dBorca - play safe */
   grErrorSetCallback(_grErrorDefaultCallback);
-
-#if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
-  /* Detect Windows OS before we detect glide devices */
-  {
-    OSVERSIONINFO ovi;
-    
-    ovi.dwOSVersionInfoSize = sizeof ( ovi );
-    GetVersionEx ( &ovi );
-    
-    /*XXX: [koolsmoky] I'm too lazy, set default as winxp */
-    _GlideRoot.OS = OS_WIN32_XP/*OS_UNKNOWN*/;
-    
-    if (ovi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) {
-      if(ovi.dwMajorVersion == 4) {
-        if (ovi.dwMinorVersion >= 90) {
-          _GlideRoot.OS = OS_WIN32_ME;
-        } else if (ovi.dwMinorVersion >= 10) {
-          _GlideRoot.OS = OS_WIN32_98;
-        } else {
-          _GlideRoot.OS = OS_WIN32_95;
-        }
-      }
-    } else if (ovi.dwPlatformId == VER_PLATFORM_WIN32_NT) {
-      if(ovi.dwMajorVersion == 4) {
-        _GlideRoot.OS = OS_WIN32_NT4;
-      } else if(ovi.dwMajorVersion == 5) {
-        if (ovi.dwMinorVersion >= 1) {
-          _GlideRoot.OS = OS_WIN32_XP;
-        } else {
-          _GlideRoot.OS = OS_WIN32_2K;
-        }
-      } else {
-        _GlideRoot.OS = OS_WIN32_XP;
-      }
-    }
-    
-    switch(_GlideRoot.OS) {
-    case OS_WIN32_95:
-      GDBG_INFO(80, "Detected Windows 95\n");
-      break;
-    case OS_WIN32_98:
-      GDBG_INFO(80, "Detected Windows 98\n");
-      break;
-    case OS_WIN32_ME:
-      GDBG_INFO(80, "Detected Windows Me\n");
-      break;
-    case OS_WIN32_NT4:
-      GDBG_INFO(80, "Detected Windows NT 4.0\n");
-      break;
-    case OS_WIN32_2K:
-      GDBG_INFO(80, "Detected Windows 2000\n");
-      break;
-    case OS_WIN32_XP:
-      GDBG_INFO(80, "Detected Windows XP\n");
-      break;
-    default:
-      GDBG_INFO(80, "Unknown Windows\n");
-      break;
-    }
-    
-    /* Pass retrieved OS info into minihwc */
-    hwcSetOSInfo(&_GlideRoot.OS);
-  }
-#endif
 
 #if GL_X86
   /* Get CPU Info before we detect glide devices */
@@ -1499,8 +1431,8 @@ _GlideInitEnvironment(void)
   GDBG_INFO(80,"     shamelessPlug: %d\n",_GlideRoot.environment.shamelessPlug);
   _GlideRoot.environment.ignoreReopen      = GETENV("FX_GLIDE_IGNORE_REOPEN") != NULL;
   GDBG_INFO(80,"      ignoreReopen: %d\n",_GlideRoot.environment.ignoreReopen);
-  _GlideRoot.environment.disableDitherSub  = GETENV("FX_GLIDE_NO_DITHER_SUB") != NULL; 
-  GDBG_INFO(80,"  disableDitherSub: %d\n",_GlideRoot.environment.disableDitherSub);
+  /*_GlideRoot.environment.disableDitherSub  = GETENV("FX_GLIDE_NO_DITHER_SUB") != NULL; 
+  GDBG_INFO(80,"  disableDitherSub: %d\n",_GlideRoot.environment.disableDitherSub);*/
   _GlideRoot.environment.fifoSize          = GETENV("FX_GLIDE_FIFO_SIZE") != NULL;
   GDBG_INFO(80,"          fifoSize: %d\n",_GlideRoot.environment.fifoSize);
   _GlideRoot.environment.noHW              = GETENV("FX_GLIDE_NO_HW") != NULL;
@@ -1949,15 +1881,16 @@ _GlideInitEnvironment(void)
   GDBG_INFO(80," sliBandHeightForce : %d\n",_GlideRoot.environment.sliBandHeightForce);
   
   _GlideRoot.environment.swapPendingCount  = GLIDE_GETENV("FX_GLIDE_SWAPPENDINGCOUNT", 3L);
-  if (_GlideRoot.environment.swapPendingCount > 3)
-    _GlideRoot.environment.swapPendingCount = 3;
+  /* The hardware counter is 3 bits. Anything above this will cause a hang. */
+  if (_GlideRoot.environment.swapPendingCount > 6)
+    _GlideRoot.environment.swapPendingCount = 6;
   if (_GlideRoot.environment.swapPendingCount < 0)
     _GlideRoot.environment.swapPendingCount = 0;
   GDBG_INFO(80," swapPendingCount : %d\n",_GlideRoot.environment.swapPendingCount);
   
-  _GlideRoot.environment.gammaR = GLIDE_FGETENV("SSTH3_RGAMMA", 1.3f);
-  _GlideRoot.environment.gammaG = GLIDE_FGETENV("SSTH3_GGAMMA", 1.3f);
-  _GlideRoot.environment.gammaB = GLIDE_FGETENV("SSTH3_BGAMMA", 1.3f);
+  _GlideRoot.environment.gammaR = GLIDE_FGETENV("SSTH3_RGAMMA", 1.0f);
+  _GlideRoot.environment.gammaG = GLIDE_FGETENV("SSTH3_GGAMMA", 1.0f);
+  _GlideRoot.environment.gammaB = GLIDE_FGETENV("SSTH3_BGAMMA", 1.0f);
   
   _GlideRoot.environment.useAppGamma  = GLIDE_GETENV("FX_GLIDE_USE_APP_GAMMA", 1L);
   
@@ -2050,7 +1983,7 @@ DllMain(HANDLE hInst, ULONG  ul_reason_for_call, LPVOID lpReserved)
      */
     /* attach a fullscreen gc to the TLS slot if in fullscreen mode. */
     if(_GlideRoot.initialized &&       /* scanned for hw? */
-        (_GlideRoot.windowsInit > 0)) { /* outstanding fullscreen contexts? */
+        (_GlideRoot.windowsInit[_GlideRoot.current_sst] > 0)) { /* outstanding fullscreen contexts? */
       GR_DCL_GC;
 
       /* If there is no current gc in tls then set the current context. */

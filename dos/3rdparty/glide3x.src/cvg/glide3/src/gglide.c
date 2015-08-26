@@ -17,8 +17,14 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/gglide.c,v 1.1.1.1.8.5 2005/06/09 18:32:08 jwrdegoede Exp $
+** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/gglide.c,v 1.1.1.1.8.7 2007/09/29 13:59:34 koolsmoky Exp $
 ** $Log: gglide.c,v $
+** Revision 1.1.1.1.8.7  2007/09/29 13:59:34  koolsmoky
+** completed grStippleMode and grStipplePattern
+**
+** Revision 1.1.1.1.8.6  2007/05/19 10:58:19  koolsmoky
+** force 4x4 dither with alpha dither subtraction
+**
 ** Revision 1.1.1.1.8.5  2005/06/09 18:32:08  jwrdegoede
 ** Fixed all warnings with gcc4 -Wall -W -Wno-unused-parameter, except for a couple I believe to be a gcc bug. This has been reported to gcc.
 **
@@ -1738,6 +1744,44 @@ GR_ENTRY(grDisableAllEffects, void, (void))
 } /* grDisableAllEffects */
 
 /*---------------------------------------------------------------------------
+** grStippleMode
+*/
+
+GR_STATE_ENTRY(grStippleMode, void, (GrStippleMode_t mode))
+{
+#define FN_NAME "_grStippleMode"
+  FxU32 fbzMode;
+  GR_BEGIN_NOFIFOCHECK("_grStippleMode", 85);
+  GDBG_INFO_MORE(gc->myLevel, "(%d)\n", mode);
+
+  fbzMode = gc->state.fbi_config.fbzMode;
+
+  fbzMode &= ~(SST_ENSTIPPLE | SST_ENSTIPPLEPATTERN);
+
+  switch (mode) {
+  case GR_STIPPLE_DISABLE:
+    break;
+
+  case GR_STIPPLE_PATTERN:
+    fbzMode |= (SST_ENSTIPPLE | SST_ENSTIPPLEPATTERN);
+    break;
+
+  case GR_STIPPLE_ROTATE:
+    fbzMode |= SST_ENSTIPPLE;
+    break;
+  }
+
+  gc->state.fbi_config.fbzMode = fbzMode;
+
+#if !GLIDE3
+  GR_SET_EXPECTED_SIZE(sizeof(FxU32), 1);
+  GR_SET(BROADCAST_ID, hw, fbzMode,  fbzMode);
+  GR_CHECK_SIZE();
+#endif /* !GLIDE3 */
+#undef FN_NAME
+} /* grStippleMode */
+
+/*---------------------------------------------------------------------------
 ** grDitherMode
 */
 
@@ -1758,12 +1802,15 @@ GR_STATE_ENTRY(grDitherMode, void, (GrDitherMode_t mode))
 
   case GR_DITHER_2x2:
   case GR_DITHER_4x4:
-    /* always force 2x2 dither because it looks better */
-    fbzMode |= (SST_ENDITHER | SST_DITHER2x2 | SST_ENDITHERSUBTRACT);
+    /* force 4x4 dither with alpha dither subtraction */
+    fbzMode |= (SST_ENDITHER | SST_ENDITHERSUBTRACT);
 
     /* disable alpha blending dither subtraction according to user request */
-    if (_GlideRoot.environment.disableDitherSub == FXTRUE)
+    if (_GlideRoot.environment.disableDitherSub == FXTRUE) {
+      /* without alpha dither subtraction, 2x2 dither looks better */
+      fbzMode |= SST_DITHER2x2;
       fbzMode &= ~(SST_ENDITHERSUBTRACT);
+    }
     break;
   }
 

@@ -16,9 +16,12 @@
 ;; 
 ;; COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 ;;
-;; $Header: /cvsroot/glide/glide3x/cvg/glide3/src/xtexdl.asm,v 1.1.1.1.8.3 2005/06/09 18:32:08 jwrdegoede Exp $
-;; $Revision: 1.1.1.1.8.3 $
+;; $Header: /cvsroot/glide/glide3x/cvg/glide3/src/xtexdl.asm,v 1.1.1.1.8.4 2007/06/23 08:50:57 koolsmoky Exp $
+;; $Revision: 1.1.1.1.8.4 $
 ;; $Log: xtexdl.asm,v $
+;; Revision 1.1.1.1.8.4  2007/06/23 08:50:57  koolsmoky
+;; removed unneeded emms calls
+;;
 ;; Revision 1.1.1.1.8.3  2005/06/09 18:32:08  jwrdegoede
 ;; Fixed all warnings with gcc4 -Wall -W -Wno-unused-parameter, except for a couple I believe to be a gcc bug. This has been reported to gcc.
 ;;
@@ -169,7 +172,7 @@ proc _grTexDownload_MMX, 24
     femms                               ; we'll use MMX/3DNow!, make sure FPU register cleared
 %ENDIF
 %IFDEF GL_MMX
-    emms                                ; we'll use MMX
+;    emms                                ; we'll use MMX
 %ENDIF
 
     mov       edx, curS                 ; curS = maxS = scanline width in DWORDs

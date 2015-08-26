@@ -17,7 +17,7 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gtex.c,v 1.3.4.8 2005/06/09 18:32:33 jwrdegoede Exp $
+** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gtex.c,v 1.3.4.11 2007/09/29 14:19:23 koolsmoky Exp $
 ** $Log:
 **  39   3dfx      1.34.1.0.1.211/14/00 Jonny Cochrane  Implement multisample LOD
 **       Dithering for 2x and 4x FSAA modes 
@@ -884,8 +884,8 @@ _grTexCheckTriLinear(GrChipID_t tmu)
      *
      * Case 1 - TMU set for lod blending and has both even/odd levels
      */
-    if ((curTmu->textureMode & SST_TRILINEAR) &&
-        (curTmu->evenOdd == 3)) {
+    if (((curTmu->textureMode & SST_TRILINEAR) == SST_TRILINEAR) &&
+        (curTmu->evenOdd == GR_MIPMAPLEVELMASK_BOTH)) {
       
       /* Check the 'other' tmu to see if it is active, if not then we
        * are doing two pass trilinear so check that we have the
@@ -924,7 +924,7 @@ _grTexCheckTriLinear(GrChipID_t tmu)
             FxU32 i;
             
             for(i = 0; i < GLIDE_NUM_TMU; i++) {
-              evenOdd[i] = gc->state.shadow[i].tLOD & SST_LOD_ODD;
+              evenOdd[i] = gc->state.shadow.tmuState[i].tLOD & SST_LOD_ODD;
             }
           }
 
@@ -2458,7 +2458,7 @@ GR_ENTRY(grTexLodBiasValue, void,
   else if(lodBias < -0x20) lodBias = -0x20;
   /* Mask it back off. */
   lodBias &= 0x3f;
-  tLod |= lodBias << SST_LODBIAS_SHIFT;
+  tLod |= (lodBias << SST_LODBIAS_SHIFT);
   
   gc->state.tmuShadow[tmu].tLOD = tLod;
   
@@ -2540,7 +2540,15 @@ GR_ENTRY(grTexMipMapMode, void,
     --------------------------------------------------------------*/
   tLod    &= ~(SST_LODMIN | SST_LODMAX | SST_LOD_ODD);
   texMode &= ~(SST_TLODDITHER | SST_TRILINEAR);
-  
+  gc->state.per_tmu[tmu].texSubLodDither = FXFALSE;
+
+  /* Force LOD dithering if the user asked for it.
+   *
+   * NB: There is a performance hit for this, but it does
+   * look better.
+   */
+  texMode |= _GlideRoot.environment.texLodDither;
+
   /*--------------------------------------------------------------
     Encode Mipmap Mode Bits
     --------------------------------------------------------------*/
@@ -2565,8 +2573,15 @@ GR_ENTRY(grTexMipMapMode, void,
       ----------------------------------------------------------*/
     tLod |= SST_TLOD_MINMAX_INT(gc->state.per_tmu[tmu].largeLod,
                                 gc->state.per_tmu[tmu].smallLod);
-    if(_GlideRoot.environment.texSubLodDither && !lodBlend)
+#ifdef FX_GLIDE_NAPALM
+    if(!(gc->sliCount == gc->chipCount && gc->grSamplesPerChip == 1) &&
+       _GlideRoot.environment.texSubLodDither) {
       gc->state.per_tmu[tmu].texSubLodDither = FXTRUE;
+      /* disable lod dithering if we are doing performance trilinear */
+      texMode &= ~SST_TLODDITHER;
+      mmMode = GR_MIPMAP_NEAREST;
+    }
+#endif
     break;
 
   default:
@@ -2574,13 +2589,6 @@ GR_ENTRY(grTexMipMapMode, void,
     break;
   }
   gc->state.per_tmu[tmu].mmMode = mmMode;
-
-  /* Force LOD dithering if the user asked for it.
-   *
-   * NB: There is a performance hit for this, but it does
-   * look better.
-   */
-  texMode |= _GlideRoot.environment.texLodDither;
 
   /*--------------------------------------------------------------
     Fix trilinear and evenOdd bits -
@@ -2731,6 +2739,57 @@ GR_ENTRY(grTexNCCTable, void,
   GR_END();
 #undef FN_NAME
 } /* grTexNCCTable */
+
+#if GLIDE_POINTCAST_PALETTE
+GR_EXT_ENTRY(grTexNCCTableExt, void, (GrChipID_t tmu, GrNCCTable_t table))
+{
+#define FN_NAME "grTexNCCTableExt"
+  FxU32 texMode;
+  
+  GR_BEGIN("grTexNCCTable",88,4*GLIDE_NUM_TMU, GLIDE_NUM_TMU);
+  GDBG_INFO_MORE(gc->myLevel,"\n");
+  GR_CHECK_F(myName, table > GR_TEXTABLE_PALETTE, "invalid ncc table specified");
+
+  /* Disable 2PPC mode */
+#ifdef FX_GLIDE_NAPALM
+  if (IS_NAPALM(gc->bInfo->pciInfo.deviceID)) {
+    _grTex2ppc(FXFALSE);
+  }
+#endif
+  
+  /* Update local state */
+  gc->state.per_tmu[tmu].nccTable = table;
+  
+  /* Grab shadow texMode, update TexMode, update shadow/real register */
+  texMode  = gc->state.tmuShadow[tmu].textureMode;
+  texMode &= ~(SST_TNCCSELECT);
+  if (table == GR_TEXTABLE_NCC1)
+    texMode |= SST_TNCCSELECT;
+  else 
+    texMode &= ~(SST_TNCCSELECT);
+
+  gc->state.tmuShadow[tmu].textureMode = texMode;
+
+  /* Update real shadows and update hardware immediately if we can. */
+  {
+    SstRegs* tmuHw = SST_TMU(hw, tmu);
+    
+    gc->state.shadow.tmuState[tmu].textureMode = texMode;
+      
+    _grChipMask( SST_CHIP_MASK_ALL_CHIPS );
+    REG_GROUP_BEGIN((0x02 << tmu), textureMode, 1, 0x1);
+    {
+      REG_GROUP_SET(tmuHw, textureMode, gc->state.shadow.tmuState[tmu].textureMode);
+    }
+    REG_GROUP_END();
+    _grChipMask( gc->chipmask );
+  }   
+
+    
+  GR_END();
+#undef FN_NAME
+} /* grTexNCCTableExt */
+#endif
 
 /*-------------------------------------------------------------------
   Function: grTexSource
@@ -3727,13 +3786,24 @@ _g3LodXlat(const GrLOD_t someLOD, const FxBool tBig)
 void g3LodBiasPerChip(GrChipID_t tmu, FxU32 tLod)
 {
 #define FN_NAME "g3LodBiasPerChip"
-  FxU32 newtLod ;
-  FxI32 oldLodBias, newLodBias;
-  unsigned int i;
-  unsigned int idx, iTexLodDither;
+  GR_BEGIN_NOFIFOCHECK("g3LodBiasPerChip", 88);
 
-  static FxI32 chipLodBias[2][2][4] =
+  if( /*(_GlideRoot.environment.texSubLodDither != 1) ||*//* we won't get here if 0 */
+      /*((gc->sliCount == gc->chipCount) && (gc->grSamplesPerChip == 1)) ||*//* check done in grTexMipMapMode */
+      /*(gc->windowed) ||*/
+      (gc->state.per_tmu[tmu].evenOdd != 3) ||
+      (gc->state.tmuShadow[tmu].textureMode & SST_TRILINEAR) )
+    goto FORGET_IT;
+
+  {
+    unsigned int i;
+    FxU32 newtLod;
+    FxI32 newLodBias;
+    /* sign extend it. do not remove the FxI32 cast. */
+    const FxI32 oldLodBias = ((((FxI32)tLod & SST_LODBIAS) << (32-6-SST_LODBIAS_SHIFT)) >> (32-6-SST_LODBIAS_SHIFT));
+    const unsigned int idx = ((gc->chipCount - gc->sliCount) > 2);
     /* 4.2 format for tLod register
+     * 1chip x2fsaa - no sli, 2 samples per chip
      * 2chip x2fsaa - no sli, 1 sample per chip
      * 2chip x4fsaa - no sli, 2 samples per chip
      * 4chip x2fsaa - 2 way sli, 1 sample per sli unit
@@ -3743,62 +3813,46 @@ void g3LodBiasPerChip(GrChipID_t tmu, FxU32 tLod)
      * 4chip x8fsaa - no sli, 2 samples per chip
      * 0.00, 0.25, 0.50, 0.75 - 4 chip
      * {0x00, 0x01, 0x02, 0x03}
-     * if mipmap dithering is enabled
-     * we will use different tLod registers.
      */
-  {
+    static const FxI32 chipLodBias[2][4] =
     {
       {0x00<<SST_LODBIAS_SHIFT, 0x02<<SST_LODBIAS_SHIFT, 0x00<<SST_LODBIAS_SHIFT, 0x02<<SST_LODBIAS_SHIFT},
       {0x00<<SST_LODBIAS_SHIFT, 0x01<<SST_LODBIAS_SHIFT, 0x02<<SST_LODBIAS_SHIFT, 0x03<<SST_LODBIAS_SHIFT}
-    },
+    };
+
+    /* unmask lodbias */
+    tLod &= ~(SST_LODBIAS);
+
+    for (i = 0; i < gc->chipCount; i++)
     {
-      {-0x01<<SST_LODBIAS_SHIFT, 0x02<<SST_LODBIAS_SHIFT, -0x01<<SST_LODBIAS_SHIFT, 0x02<<SST_LODBIAS_SHIFT},
-      {-0x01<<SST_LODBIAS_SHIFT, 0x00<<SST_LODBIAS_SHIFT,  0x01<<SST_LODBIAS_SHIFT, 0x02<<SST_LODBIAS_SHIFT}
-    }
-  };
-  
-  GR_BEGIN_NOFIFOCHECK("g3LodBiasPerChip", 88);
+      /* don't need to modify lodbias if 0 */
+      if(chipLodBias[idx][i] != 0) {
+        newLodBias = oldLodBias + chipLodBias[idx][i];
 
-  if( /*(_GlideRoot.environment.texSubLodDither != 1) ||*//* we won't get here if 0 */
-      (gc->sliCount == gc->chipCount) ||
-      (gc->windowed) )
-    return;
-  
-  /* sign extend it. */
-  oldLodBias = (((tLod & SST_LODBIAS) << (32-6-SST_LODBIAS_SHIFT)) >> (32-6-SST_LODBIAS_SHIFT));
+        if (newLodBias > (0x1f<<SST_LODBIAS_SHIFT))
+          newLodBias = (0x1f<<SST_LODBIAS_SHIFT);
+        /*else if (newLodBias < (-0x20<<SST_LODBIAS_SHIFT))
+          newLodBias = (-0x20<<SST_LODBIAS_SHIFT);*/
 
-  /* unmask lodbias */
-  tLod &= ~(SST_LODBIAS);
+        newtLod = (tLod | (newLodBias & SST_LODBIAS));
 
-  idx = ((gc->chipCount - gc->sliCount) > 2);
-  iTexLodDither = (_GlideRoot.environment.texLodDither == 1);
-
-  for (i = 0; i < gc->chipCount; i++)
-  {
-    /* don't need to modify lodbias if 0 */
-    if(chipLodBias[iTexLodDither][idx][i] != 0) {
-      newLodBias = oldLodBias + chipLodBias[iTexLodDither][idx][i];
-      
-      if(newLodBias > (0x1f<<SST_LODBIAS_SHIFT)) newLodBias = (0x1f<<SST_LODBIAS_SHIFT);
-      else if(newLodBias < (-0x20<<SST_LODBIAS_SHIFT)) newLodBias = (-0x20<<SST_LODBIAS_SHIFT);
-      newLodBias &= SST_LODBIAS;
-      newtLod = tLod | newLodBias;
-      
-      {
-        SstRegs* tmuHw = SST_TMU(hw, tmu);
-        _grChipMask( 0x01 << i );
-        REG_GROUP_BEGIN((0x02 << tmu), tLOD, 1, 0x1);
         {
-          REG_GROUP_SET(tmuHw, tLOD, tLod);
+          SstRegs* tmuHw = SST_TMU(hw, tmu);
+          _grChipMask( 0x01 << i );
+          REG_GROUP_BEGIN((0x02 << tmu), tLOD, 1, 0x1);
+          {
+            REG_GROUP_SET(tmuHw, tLOD, newtLod);
+          }
+          REG_GROUP_END();
         }
-        REG_GROUP_END();
       }
     }
-  }
-  
-  /* Restore chip mask */
-  _grChipMask( gc->chipmask );
 
+    /* Restore chip mask */
+    _grChipMask( gc->chipmask );
+  }
+
+FORGET_IT:
   GR_END();
 #undef FN_NAME
 }

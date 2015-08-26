@@ -17,8 +17,11 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/splshdat.c,v 1.1.1.1.8.1 2005/06/09 18:32:08 jwrdegoede Exp $
+** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/splshdat.c,v 1.1.1.1.8.2 2007/05/19 11:06:47 koolsmoky Exp $
 ** $Log: splshdat.c,v $
+** Revision 1.1.1.1.8.2  2007/05/19 11:06:47  koolsmoky
+** win32 build workaround
+**
 ** Revision 1.1.1.1.8.1  2005/06/09 18:32:08  jwrdegoede
 ** Fixed all warnings with gcc4 -Wall -W -Wno-unused-parameter, except for a couple I believe to be a gcc bug. This has been reported to gcc.
 **
@@ -10680,7 +10683,7 @@ static Gu3dfInfo hilite_3dfinfo = {
 #endif
     GR_TEXFMT_INTENSITY_8 /* format */
   },
-  { },                    /* table */
+  { 0x00000000 },                    /* table */
   NULL,                   /* data */
   0x00000ab0              /* mem_required */
 };
@@ -12071,7 +12074,7 @@ static Gu3dfInfo shadow_3dfinfo = {
 #endif
     GR_TEXFMT_INTENSITY_8 /* format */
   },
-  { },         /* table */
+  { 0x0000000 },         /* table */
   NULL,                   /* data */
   0x00000ab0              /* mem_required */
 };

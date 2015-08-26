@@ -22,8 +22,8 @@
 #define __SST_H__
 
 /*
-** $Revision: 1.1.2.1 $
-** $Date: 2004/03/02 07:56:00 $
+** $Revision: 1.1.2.2 $
+** $Date: 2006/01/16 21:22:46 $
 */
 
 #include <ncc.h>

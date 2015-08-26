@@ -17,7 +17,7 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/diget.c,v 1.4.4.7 2005/06/09 18:32:31 jwrdegoede Exp $
+** $Header: /cvsroot/glide/glide3x/h5/glide3/src/diget.c,v 1.4.4.9 2007/06/23 09:22:41 koolsmoky Exp $
 ** $Log: 
 **  22   3dfx      1.17.1.0.1.210/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -864,6 +864,11 @@ GR_DIENTRY(grGet, FxU32, (FxU32 pname, FxU32 plength, FxI32 *params))
 #else
 #define QUERY_EXT_STR ""
 #endif
+#ifdef MULTIRENDERING
+#define MULTIRENDERING_STR "MULTIRENDERING "
+#else
+#define MULTIRENDERING_STR ""
+#endif
 
 #define BASE_EXT_STR	"CHROMARANGE TEXCHROMA TEXMIRROR TEXUMA PALETTE6666 FOGCOORD SURFACE COMMAND_TRANSPORT TEXTUREBUFFER GETGAMMA GETREGISTRY ALPHAFOG "
 #define NAPALM_EXT_STR	"PIXEXT COMBINE TEXFMT "
@@ -885,7 +890,7 @@ GR_DIENTRY(grGetString, const char *, (FxU32 pname))
       if (!IS_NAPALM(gc->bInfo->pciInfo.deviceID))
         rv = " " BASE_EXT_STR QUERY_EXT_STR POINTCAST_EXT_STR;
       else
-        rv = " " BASE_EXT_STR NAPALM_EXT_STR QUERY_EXT_STR POINTCAST_EXT_STR;
+        rv = " " BASE_EXT_STR NAPALM_EXT_STR QUERY_EXT_STR POINTCAST_EXT_STR MULTIRENDERING_STR;
     }
     break;
   case GR_HARDWARE:
@@ -1125,8 +1130,8 @@ static GrExtensionTuple _extensionTable[] = {
     { "grSstQueryHardware", (GrProc)grSstQueryHardware },
 #endif
     /* POINTCAST */
-    { "grTexDownloadTableExt", (GrProc)grTexDownloadTableExt },
 #if GLIDE_POINTCAST_PALETTE
+    { "grTexDownloadTableExt", (GrProc)grTexDownloadTableExt },
     { "grTexDownloadTablePartialExt", (GrProc)grTexDownloadTablePartialExt },
     { "grTexNCCTableExt", (GrProc)grTexNCCTableExt },
 #endif
@@ -1135,7 +1140,8 @@ static GrExtensionTuple _extensionTable[] = {
     { "txImgQuantize", (GrProc)txImgQuantize },
     { "txPalToNcc", (GrProc)txPalToNcc },
 #endif
-    { "grSetNumPendingBuffers", (GrProc)grSetNumPendingBuffers},
+    { "grTexDownloadMipMapLevelPartialRowExt", (GrProc)grTexDownloadMipMapLevelPartialRowExt },
+    { "grSetNumPendingBuffers", (GrProc)grSetNumPendingBuffers },
     { 0, 0 }
 };
 
@@ -1263,7 +1269,9 @@ GR_DIENTRY(grQueryResolutions, FxI32, (const GlideResolution *resTemplate, Glide
   }
 
   for (i = min_res; i <= max_res; i++) {
+#if GDBG_INFO_ON
     GDBG_INFO(80, FN_NAME "Resolution = %s\n", resNames[i]);
+#endif
     for (j = min_ref; j <= max_ref; j++) {
       FxBool resSuported;
       GDBG_INFO(80, FN_NAME ":  _grResolutionRefresh passed\n");

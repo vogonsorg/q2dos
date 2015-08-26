@@ -17,8 +17,11 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/gglide.c,v 1.1.2.5 2005/05/25 08:51:52 jwrdegoede Exp $
+** $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/gglide.c,v 1.1.2.6 2006/01/16 21:22:45 jwrdegoede Exp $
 ** $Log: gglide.c,v $
+** Revision 1.1.2.6  2006/01/16 21:22:45  jwrdegoede
+** Fix gcc 4.1 new type-punned ptr breaks antialias. warnings
+**
 ** Revision 1.1.2.5  2005/05/25 08:51:52  jwrdegoede
 ** Add #ifdef GL_X86 around x86 specific code
 **

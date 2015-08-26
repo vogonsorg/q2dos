@@ -17,8 +17,11 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h3/glide3/src/gaa.c,v 1.1.1.1.6.6 2005/08/13 21:07:02 jwrdegoede Exp $
+** $Header: /cvsroot/glide/glide3x/h3/glide3/src/gaa.c,v 1.1.1.1.6.7 2006/01/16 21:22:42 jwrdegoede Exp $
 ** $Log: gaa.c,v $
+** Revision 1.1.1.1.6.7  2006/01/16 21:22:42  jwrdegoede
+** Fix gcc 4.1 new type-punned ptr breaks antialias. warnings
+**
 ** Revision 1.1.1.1.6.6  2005/08/13 21:07:02  jwrdegoede
 ** Last needed 64 bit fixes for h5/h3, complete 64 bit support for cvg
 **

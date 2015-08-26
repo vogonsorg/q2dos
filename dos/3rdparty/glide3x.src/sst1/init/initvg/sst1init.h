@@ -18,8 +18,8 @@
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
 **
-** $Revision: 1.1.2.2 $ 
-** $Date: 2005/05/25 08:53:23 $ 
+** $Revision: 1.1.2.3 $ 
+** $Date: 2006/01/16 21:22:46 $ 
 **
 */
 
@@ -675,7 +675,7 @@ extern "C" {
 #endif
 
 #ifdef SST1INIT_ALLOCATE
-  static char headersIdent[] = "@#%InitHeaders $Revision: 1.1.2.2 $";
+  static char headersIdent[] = "@#%InitHeaders $Revision: 1.1.2.3 $";
   FxBool sst1InitUseVoodooFile = FXFALSE;
   sst1InitEnvVarStruct *envVarsBase = (sst1InitEnvVarStruct *) NULL;
   sst1InitDacStruct *dacStructBase = (sst1InitDacStruct *) NULL;

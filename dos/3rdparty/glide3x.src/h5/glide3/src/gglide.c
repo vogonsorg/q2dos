@@ -18,7 +18,7 @@
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
 **
 ** 
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gglide.c,v 1.7.4.18 2005/06/09 18:32:32 jwrdegoede Exp $
+** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gglide.c,v 1.7.4.21 2007/06/23 09:22:41 koolsmoky Exp $
 ** $Log:
 **  51   3dfx      1.41.1.6.1.110/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -1139,12 +1139,7 @@ _grBufferClear2D(/*const*/ FxU32 buffOffset,
 /* C = (width+1, height*2) */
 /* */
 #define REFERENCE_TRI_FILL 0
-#ifdef FX_GLIDE_NAPALM
-/* KoolSmoky - testing 2-tri fill with napalm */
 #define TWO_TRI_FILL       0
-#else
-#define TWO_TRI_FILL       0
-#endif
 
 void
 _grTriFill(GrColor_t color, FxU32 depth, GrStencil_t stencil)
@@ -1155,16 +1150,14 @@ _grTriFill(GrColor_t color, FxU32 depth, GrStencil_t stencil)
   GrDepthBufferMode_t bufferMode ;
 #endif
 
+  struct 
+  {
+    float x, y, depth ;
+  }
 #if TWO_TRI_FILL
-  struct 
-  {
-    float x, y, depth ;
-  } vertex[6] ;
+  vertex[4] ;
 #else
-  struct 
-  {
-    float x, y, depth ;
-  } vertex[3] ;
+  vertex[3] ;
 #endif
 
   GR_BEGIN_NOFIFOCHECK("_grTriFill", 86);
@@ -1229,19 +1222,12 @@ _grTriFill(GrColor_t color, FxU32 depth, GrStencil_t stencil)
   vertex[2].x =  gc->state.clipwindowf_xmax ;
   vertex[2].y =  gc->state.clipwindowf_ymax ;
   vertex[2].depth = (float)depth ;
-
   vertex[3].x =  gc->state.clipwindowf_xmin ;
-  vertex[3].y =  gc->state.clipwindowf_ymin ;
+  vertex[3].y =  gc->state.clipwindowf_ymax ;
   vertex[3].depth = (float)depth ;
-  vertex[4].x =  gc->state.clipwindowf_xmax ;
-  vertex[4].y =  gc->state.clipwindowf_ymax ;
-  vertex[4].depth = (float)depth;
-  vertex[5].x =  gc->state.clipwindowf_xmin ;
-  vertex[5].y =  gc->state.clipwindowf_ymax ;
-  vertex[5].depth = (float)depth ;
 
   grDrawTriangle(&vertex[0],&vertex[1],&vertex[2]) ; 
-  grDrawTriangle(&vertex[3],&vertex[4],&vertex[5]) ; 
+  grDrawTriangle(&vertex[0],&vertex[2],&vertex[3]) ; 
 #else
   vertex[0].x = 0.0f -(float)gc->state.screen_width ;
   vertex[0].y = 0.0f;
@@ -1381,13 +1367,8 @@ _grTriFill(GrColor_t color, FxU32 depth, GrStencil_t stencil)
     vertex[1].y =  (float)gc->state.clipwindowf_ymin ;
     vertex[2].x =  (float)gc->state.clipwindowf_xmax ;
     vertex[2].y =  (float)gc->state.clipwindowf_ymax ;
-    
     vertex[3].x =  (float)gc->state.clipwindowf_xmin ;
-    vertex[3].y =  (float)gc->state.clipwindowf_ymin ;
-    vertex[4].x =  (float)gc->state.clipwindowf_xmax ;
-    vertex[4].y =  (float)gc->state.clipwindowf_ymax ;
-    vertex[5].x =  (float)gc->state.clipwindowf_xmin ;
-    vertex[5].y =  (float)gc->state.clipwindowf_ymax ;
+    vertex[3].y =  (float)gc->state.clipwindowf_ymax ;
 #else
     vertex[0].x = 0.0f -(float)gc->state.screen_width ;
     vertex[0].y = 0.0f ;
@@ -1401,14 +1382,12 @@ _grTriFill(GrColor_t color, FxU32 depth, GrStencil_t stencil)
     /* depth buffering and odd when z buffering. */
     if (bufferMode)
     {
-	  vertex[0].depth = (float)depth ;
+      vertex[0].depth = (float)depth ;
 #if TWO_TRI_FILL
-      vertex[3].depth = (float)depth ;
-
-      GR_SET_EXPECTED_SIZE(sizeof(float) * 3 * 3 * 2, 1) ;
-      TRI_PACKET_BEGIN(kSetupStrip,
+      GR_SET_EXPECTED_SIZE(sizeof(float) * 3 * 4, 1) ;
+      TRI_PACKET_BEGIN(kSetupFan,
                       SST_SETUP_Z << SSTCP_PKT3_PMASK_SHIFT, 
-                      6, sizeof(float) * 3, SSTCP_PKT3_BDDBDD);
+                      4, sizeof(float) * 3, SSTCP_PKT3_BDDDDD);
 #else
       GR_SET_EXPECTED_SIZE(sizeof(float) * 3 * 3, 1) ;
       TRI_PACKET_BEGIN(kSetupStrip,
@@ -1429,17 +1408,9 @@ _grTriFill(GrColor_t color, FxU32 depth, GrStencil_t stencil)
         TRI_SETF(vertex[0].depth);
 
 #if TWO_TRI_FILL
-		TRI_SETF(vertex[3].x);
+        TRI_SETF(vertex[3].x);
         TRI_SETF(vertex[3].y);
-        TRI_SETF(vertex[3].depth);
-
-        TRI_SETF(vertex[4].x);
-        TRI_SETF(vertex[4].y);
-        TRI_SETF(vertex[3].depth);
-
-        TRI_SETF(vertex[5].x);
-        TRI_SETF(vertex[5].y);
-        TRI_SETF(vertex[3].depth);
+        TRI_SETF(vertex[0].depth);
 #endif
       }
       TRI_END ;
@@ -1450,10 +1421,10 @@ _grTriFill(GrColor_t color, FxU32 depth, GrStencil_t stencil)
     {
       /* When depth buffering is disabled, don't send a depth component */
 #if TWO_TRI_FILL
-      GR_SET_EXPECTED_SIZE(sizeof(float) * 2 * 3 * 2, 1) ;
-      TRI_PACKET_BEGIN(kSetupStrip,
+      GR_SET_EXPECTED_SIZE(sizeof(float) * 2 * 4, 1) ;
+      TRI_PACKET_BEGIN(kSetupFan,
                       0, 
-                      6, sizeof(float) * 2, SSTCP_PKT3_BDDBDD) ;
+                      4, sizeof(float) * 2, SSTCP_PKT3_BDDDDD) ;
 #else
       GR_SET_EXPECTED_SIZE(sizeof(float) * 2 * 3, 1) ;
       TRI_PACKET_BEGIN(kSetupStrip,
@@ -1473,12 +1444,6 @@ _grTriFill(GrColor_t color, FxU32 depth, GrStencil_t stencil)
 #if TWO_TRI_FILL
         TRI_SETF(vertex[3].x);
         TRI_SETF(vertex[3].y);
-
-        TRI_SETF(vertex[4].x);
-        TRI_SETF(vertex[4].y);
-
-        TRI_SETF(vertex[5].x);
-        TRI_SETF(vertex[5].y);
 #endif
       }
       TRI_END ;
@@ -2263,8 +2228,6 @@ GR_EXT_ENTRY(grBufferClearExt, void, (GrColor_t color, GrAlpha_t alpha, FxU32 de
       }
         REG_GROUP_END() ;
 #endif
-        /* KoolSmoky - there is nothing else to do so return */
-        return;
       }
        else
       {        
@@ -2517,9 +2480,6 @@ GR_EXT_ENTRY(grBufferClearExt, void, (GrColor_t color, GrAlpha_t alpha, FxU32 de
            * so we have to use the triangle engine to do TBuffer clears.  UGH! */
           _grTriFill(color, depth, stencil) ;            
         }
-
-        /* KoolSmoky - there is nothing else to do so return */
-        return;
         
       } /* end of windowed or sdram clear */
 #else /* !GLIDE_INIT_HWC */
@@ -3320,7 +3280,7 @@ _grClipNormalizeAndGenerateRegValues(FxU32 minx, FxU32 miny, FxU32 maxx,
   }
 
   if(_GlideRoot.environment.aaClip == FXTRUE) {
-    if((gc->grPixelSample > 1) && (_GlideRoot.windowsInit == 1)) {
+    if((gc->grPixelSample > 1) && (_GlideRoot.windowsInit[_GlideRoot.current_sst] == 1)) {
       if(minx == 0) minx = 1;
       if(miny == 0) miny = 1;
     }
@@ -3353,7 +3313,7 @@ _grClipNormalizeAndGenerateRegValues(FxU32 minx, FxU32 miny, FxU32 maxx,
     if (maxx > gc->state.screen_width) maxx = gc->state.screen_width;
     if (maxy > gc->state.screen_height) maxy = gc->state.screen_height;
   }
-  
+
   GDBG_INFO(85, 
             "%s: normalized  minx = %d, maxx = %d, miny = %d, maxy = %d\n",
             FN_NAME, minx, maxx, miny, maxy);
@@ -3920,7 +3880,7 @@ GR_STATE_ENTRY(grDitherMode, void, (GrDitherMode_t mode))
   
   /* disable dithering when in 32bpp */
   if (gc->bInfo->h3pixelSize == 4) {
-    fbzMode &= ~SST_ENDITHER;
+    fbzMode &= ~(SST_ENDITHER | SST_DITHER2x2 | SST_ENDITHERSUBTRACT);
   }
   
   gc->state.shadow.fbzMode = fbzMode;
@@ -4138,10 +4098,10 @@ GR_ENTRY(grGlideShutdown, void, (void))
         grSstSelect(i);
         grSstWinClose((GrContext_t)gc);
       }
+
+      /* Force all fullscreen contexts to be closed */
+      _GlideRoot.windowsInit[i] = 0;
     }
-    
-    /* Force all fullscreen contexts to be closed */
-    _GlideRoot.windowsInit = 0;
     
     /* If there are any surface contexts close them up now too */
     {

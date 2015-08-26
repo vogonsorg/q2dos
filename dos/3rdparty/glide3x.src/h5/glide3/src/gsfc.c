@@ -17,7 +17,7 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gsfc.c,v 1.3.4.6 2004/11/25 19:39:54 koolsmoky Exp $
+** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gsfc.c,v 1.3.4.7 2007/05/13 09:11:11 koolsmoky Exp $
 ** $Log: 
 **  20   3dfx      1.17.1.0.1.010/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -418,10 +418,8 @@ GR_EXT_ENTRY(grSurfaceReleaseContext, void , (GrContext_t ctx) )
        * context by yanking out the hardware mapping!  %%KCD
        */
 #if (GLIDE_OS & GLIDE_OS_WIN32)
-	  if ((_GlideRoot.OS == OS_WIN32_95) ||
-              (_GlideRoot.OS == OS_WIN32_98) ||
-              (_GlideRoot.OS == OS_WIN32_ME))
-		  hwcUnmapMemory9x ( gc->bInfo );
+      if ( hwcIsOSWin9x() )
+        hwcUnmapMemory9x ( gc->bInfo );
 #endif
 
       /* Free any windowed fifo associated w/ the context */

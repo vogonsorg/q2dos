@@ -18,7 +18,7 @@
  ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  **
  **
- ** $Header: /cvsroot/glide/glide3x/h5/glide3/src/distate.c,v 1.4.4.13 2005/06/09 18:32:31 jwrdegoede Exp $
+ ** $Header: /cvsroot/glide/glide3x/h5/glide3/src/distate.c,v 1.4.4.14 2007/06/23 09:22:41 koolsmoky Exp $
  ** $Log:
  **  33   3dfx      1.25.1.2.1.311/14/00 Jonny Cochrane  Implement multisample LOD
  **       Dithering for 2x and 4x FSAA modes 
@@ -2697,6 +2697,19 @@ GR_DIENTRY(grEnable, void , (GrEnableMode_t mode) )
 #endif
       /* Set up some stuff that's affected by OpenGL's behaviour. */
       _GlideRoot.environment.sliBandHeightForce = FXTRUE;
+    }
+    break;
+#endif
+#ifdef MULTIRENDERING
+  case GR_MULTIRENDERING_EXT:
+    {
+      /* EnableMultiRendering - Win_Mode.c
+      ** Allow minihwc to know about MultiRendering mode
+      */
+      void EnableMultiRendering();
+      EnableMultiRendering();
+      /* disable splash screen */
+      _GlideRoot.environment.noSplash = FXTRUE;
     }
     break;
 #endif

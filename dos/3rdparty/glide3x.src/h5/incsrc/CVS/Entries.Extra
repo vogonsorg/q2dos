@@ -1,0 +1,17 @@
+/.cvsignore////*////
+/cmddefs.h////*////
+/cpuid.h////*////
+/fxhal.h////*////
+/fxvid.h////*////
+/gdebug.h////*////
+/gendate.c////*////
+/h3.h////*////
+/h3cinit.h////*////
+/h3defs.h////*////
+/h3gdefs.h////*////
+/h3hwc.h////*////
+/h3info.h////*////
+/h3regs.h////*////
+/sst1vid.h////*////
+/vector.h////*////
+/vxd.h////*////

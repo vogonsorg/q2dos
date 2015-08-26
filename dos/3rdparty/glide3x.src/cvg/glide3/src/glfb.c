@@ -17,8 +17,11 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/glfb.c,v 1.1.1.1.8.2 2005/08/13 21:06:57 jwrdegoede Exp $
+** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/glfb.c,v 1.1.1.1.8.3 2007/05/19 11:06:28 koolsmoky Exp $
 ** $Log: glfb.c,v $
+** Revision 1.1.1.1.8.3  2007/05/19 11:06:28  koolsmoky
+** win32 build workaround
+**
 ** Revision 1.1.1.1.8.2  2005/08/13 21:06:57  jwrdegoede
 ** Last needed 64 bit fixes for h5/h3, complete 64 bit support for cvg
 **
@@ -1062,8 +1065,10 @@ GR_ENTRY(grLfbReadRegion, FxBool, (GrBuffer_t src_buffer,
 
           /* Leading slop up to the start of a logical 0 tile */
           if (((unsigned long)srcData & kPageMask) != 0) {
-            unsigned long tileSlopMask = -1UL;
+            unsigned long tileSlopMask = 0UL; // XXX was -1UL. 
             FxU32 tileSlopAdjust = kTileSize;
+
+            tileSlopMask = ~tileSlopMask; // XXX
 
             /* Do we have a partial 0 tile? */
             if (((unsigned long)srcData & kTileSize) == 0) {

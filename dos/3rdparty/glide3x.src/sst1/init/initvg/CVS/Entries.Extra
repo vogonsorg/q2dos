@@ -1,0 +1,17 @@
+/MAKEFILE.new////*////
+/dac.c////*////
+/gamma.c////*////
+/gdebug.c////*////
+/gdebug.h////*////
+/info.c////*////
+/init.rc////*////
+/makefile.linux////*////
+/makefile.unix////*////
+/parse.c////*////
+/print.c////*////
+/rcver.h////*////
+/sli.c////*////
+/sst1init.c////*////
+/sst1init.h////*////
+/util.c////*////
+/video.c////*////

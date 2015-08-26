@@ -19,8 +19,8 @@
 **
 **
 **
-** $Revision: 1.3.4.8 $ 
-** $Date: 2005/05/25 08:56:26 $ 
+** $Revision: 1.3.4.9 $ 
+** $Date: 2007/05/13 09:16:10 $ 
 **
 */
 
@@ -65,9 +65,7 @@ initThreadStorage( void )
         (_GlideRoot.tlsIndex > 63)) /* TLS_MINIMUM_AVAILABLE = 64 */
       GrErrorCallback( "initThreadStorage:  TLS index higher than 64.", FXTRUE );
 #if !USE_STANDARD_TLS_FUNC
-    if ((_GlideRoot.OS == OS_WIN32_95) ||
-        (_GlideRoot.OS == OS_WIN32_98) ||
-        (_GlideRoot.OS == OS_WIN32_ME)) {
+    if ( hwcIsOSWin9x() ) {
       _GlideRoot.tlsOffset = W95_TLS_INDEX_TO_OFFSET(_GlideRoot.tlsIndex);
     } else {
       _GlideRoot.tlsOffset = WNT_TLS_INDEX_TO_OFFSET(_GlideRoot.tlsIndex);

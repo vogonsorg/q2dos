@@ -19,8 +19,8 @@
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
 **
-** $Revision: 1.2.8.3 $ 
-** $Date: 2005/06/17 14:53:33 $ 
+** $Revision: 1.2.8.4 $ 
+** $Date: 2007/05/19 19:27:45 $ 
 **
 ** Initialization code for initializing SST-1 video unit
 **
@@ -131,7 +131,9 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitVideoBuffers(FxU32 *sstbase,
     FxU32 ft_clkdel, memSizeInPages;
     FxU32 nCol, nAux, miscCtrl;
     int memFifoEntries;
+#ifndef DIRECTX
     float vidClkFreq;
+#endif
 
     if(!sst)
         return(FXFALSE);

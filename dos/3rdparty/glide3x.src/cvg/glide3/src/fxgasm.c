@@ -17,8 +17,8 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Revision: 1.1.1.1.8.6 $
-** $Date: 2005/06/16 18:58:31 $
+** $Revision: 1.1.1.1.8.8 $
+** $Date: 2007/09/29 13:59:34 $
 */
 
 #include <stddef.h>
@@ -71,7 +71,7 @@ main (int argc, char **argv)
 
     if (argc > 1) {
       if (strcmp("-inline", argv[1]) == 0) {
-        SstRegs dummyRegs;
+        SstRegs dummyRegs = { 0x00UL };
 
         printf("#ifndef __FX_INLINE_H__\n");
         printf("#define __FX_INLINE_H__\n");

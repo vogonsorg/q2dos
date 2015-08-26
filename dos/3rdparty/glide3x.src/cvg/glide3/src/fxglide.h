@@ -17,8 +17,14 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/fxglide.h,v 1.1.1.1.8.13 2005/08/13 21:06:56 jwrdegoede Exp $
+** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/fxglide.h,v 1.1.1.1.8.15 2007/09/29 13:59:34 koolsmoky Exp $
 ** $Log: fxglide.h,v $
+** Revision 1.1.1.1.8.15  2007/09/29 13:59:34  koolsmoky
+** completed grStippleMode and grStipplePattern
+**
+** Revision 1.1.1.1.8.14  2006/01/16 21:22:41  jwrdegoede
+** Fix gcc 4.1 new type-punned ptr breaks antialias. warnings
+**
 ** Revision 1.1.1.1.8.13  2005/08/13 21:06:56  jwrdegoede
 ** Last needed 64 bit fixes for h5/h3, complete 64 bit support for cvg
 **
@@ -684,6 +690,7 @@ typedef struct  {
 #define lfbModeBIT              FXBIT(8)
 #define c0c1BIT                 FXBIT(9)
 #define chromaRangeBIT          FXBIT(10)
+#define stippleBIT              FXBIT(11)
 /*
 ** lazy evaluate vertexlayout.
 ** it is not part of the registers so we add the bit in MSB
@@ -943,6 +950,12 @@ typedef struct
     struct {
       GrDitherMode_t mode;
     } grDitherModeArgs;
+    struct {
+      GrStippleMode_t mode;
+    } grStippleModeArgs;
+    struct {
+      GrStipplePattern_t stipple;
+    } grStipplePatternArgs;
     struct {
       GrBuffer_t buffer;
     } grRenderBufferArgs;
@@ -1598,6 +1611,8 @@ _grColorCombine(
 /*
 ** Glide 3 extension APIs
 */
+void FX_CALL
+grStipplePattern(GrStipplePattern_t stipple);
 
 void FX_CALL 
 grChromaRangeMode(GrChromaRangeMode_t mode);
@@ -1650,6 +1665,9 @@ _grDepthBufferMode( GrDepthBufferMode_t mode );
 
 void
 _grDitherMode( GrDitherMode_t mode );
+
+void
+_grStippleMode( GrStippleMode_t mode );
 
 void
 _grRenderBuffer( GrBuffer_t buffer );

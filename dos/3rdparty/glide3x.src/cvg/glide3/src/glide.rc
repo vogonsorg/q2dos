@@ -17,8 +17,11 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/glide.rc,v 1.1.1.1 1999/12/07 21:42:32 joseph Exp $
+** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/glide.rc,v 1.1.1.1.8.1 2007/09/29 14:02:31 koolsmoky Exp $
 ** $Log: glide.rc,v $
+** Revision 1.1.1.1.8.1  2007/09/29 14:02:31  koolsmoky
+** added glide sf advertisement
+**
 ** Revision 1.1.1.1  1999/12/07 21:42:32  joseph
 ** Initial checkin into SourceForge.
 **
@@ -63,6 +66,7 @@ BEGIN
             VALUE "ProductName", PRODNAME
             VALUE "ProductVersion", VERSIONSTR
             VALUE "Graphics Subsystem", HWSTR
+            VALUE "Contact", "The Glide Open Source Project http://glide.sourceforge.net/"
         END
     END
     BLOCK "VarFileInfo"

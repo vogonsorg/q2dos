@@ -18,7 +18,7 @@
 **
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gsst.c,v 1.5.4.30 2005/06/09 18:32:32 jwrdegoede Exp $
+** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gsst.c,v 1.5.4.33 2007/06/23 09:22:41 koolsmoky Exp $
 ** $Log:
 **  69   3dfx      1.52.1.3.1.1111/08/00 Drew McMinn     Create initialise read and
 **       use useAppGamma flag, to allow us to disable applications changing gamma
@@ -1087,96 +1087,95 @@ doSplash( void )
 {
   GR_DCL_GC;
 
+  FxBool didLoad;
+
   /* The splash screen wants a swapped Y origin, which doesn't
    * work in all SLI configs. */
   if(_GlideRoot.environment.sliBandHeightForce)
     return;
 
-  if (_GlideRoot.environment.noSplash == 0)
-  {
-
 #if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
-  {
-    FxBool
-      didLoad;
-
-    if (gc->pluginInfo.moduleHandle == NULL) gc->pluginInfo.moduleHandle = LoadLibrary("3dfxspl3.dll");
-    didLoad = (gc->pluginInfo.moduleHandle != NULL);
+  if (gc->pluginInfo.moduleHandle == NULL)
+    gc->pluginInfo.moduleHandle = LoadLibrary("3dfxspl3.dll");
+  
+  didLoad = (gc->pluginInfo.moduleHandle != NULL);
+  if (didLoad) {
+    gc->pluginInfo.initProc     = (GrSplashInitProc)    GetProcAddress(gc->pluginInfo.moduleHandle, 
+                                                                       "_fxSplashInit@24");
+    gc->pluginInfo.shutdownProc = (GrSplashShutdownProc)GetProcAddress(gc->pluginInfo.moduleHandle, 
+                                                                       "_fxSplashShutdown@0");
+    gc->pluginInfo.splashProc   = (GrSplashProc)        GetProcAddress(gc->pluginInfo.moduleHandle, 
+                                                                       "_fxSplash@20");
+    gc->pluginInfo.plugProc     = (GrSplashPlugProc)    GetProcAddress(gc->pluginInfo.moduleHandle, 
+                                                                       "_fxSplashPlug@16");
+    
+    didLoad = (!_GlideRoot.environment.noSplash &&
+               (gc->pluginInfo.initProc != NULL) &&
+               (gc->pluginInfo.splashProc != NULL) &&
+               (gc->pluginInfo.plugProc != NULL) &&
+               (gc->pluginInfo.shutdownProc != NULL));
     if (didLoad) {
-      gc->pluginInfo.initProc = (GrSplashInitProc)GetProcAddress(gc->pluginInfo.moduleHandle, 
-                                                                 "_fxSplashInit@24");
-      gc->pluginInfo.shutdownProc = (GrSplashShutdownProc)GetProcAddress(gc->pluginInfo.moduleHandle, 
-                                                                         "_fxSplashShutdown@0");
-      gc->pluginInfo.splashProc = (GrSplashProc)GetProcAddress(gc->pluginInfo.moduleHandle, 
-                                                               "_fxSplash@20");
-      gc->pluginInfo.plugProc = (GrSplashPlugProc)GetProcAddress(gc->pluginInfo.moduleHandle, 
-                                                                 "_fxSplashPlug@16");
-
-      didLoad = ((gc->pluginInfo.initProc != NULL) &&
-                 (gc->pluginInfo.splashProc != NULL) &&
-                 (gc->pluginInfo.plugProc != NULL) &&
-                 (gc->pluginInfo.shutdownProc != NULL));
-      if (didLoad) {
-        GrState glideState;
-
-        /* Protect ourselves from the splash screen */
-        grGlideGetState(&glideState);
-        {
-          didLoad = (*gc->pluginInfo.initProc)(gc->grHwnd,
-                                               gc->state.screen_width, gc->state.screen_height,
-                                               gc->grColBuf, gc->grAuxBuf,
-                                               gc->state.color_format);
-          if (!didLoad) (*gc->pluginInfo.shutdownProc)();
-        }
-        grGlideSetState((const void*)&glideState);
-      }
+      GrState glideState;
       
-      if (!didLoad) FreeLibrary(gc->pluginInfo.moduleHandle);
+      /* Protect ourselves from the splash screen */
+      grGlideGetState(&glideState);
+      didLoad = (*gc->pluginInfo.initProc)(gc->grHwnd,
+                                           gc->state.screen_width, gc->state.screen_height,
+                                           gc->grColBuf, gc->grAuxBuf,
+                                           gc->state.color_format);
+      if (didLoad) {
+        (*gc->pluginInfo.splashProc)(0.0f, 0.0f, 
+                                     (float)gc->state.screen_width,
+                                     (float)gc->state.screen_height,
+                                     0);
+        (*gc->pluginInfo.shutdownProc)();
+      }
+      grGlideSetState((const void*)&glideState);
     }
-
-    /* Clear all the info if we could not load for some reason */
-    if (!didLoad) memset(&gc->pluginInfo, 0, sizeof(gc->pluginInfo));
+  }
+  
+  /* Clear all the info if we could not load for some reason */
+  if (!didLoad) {
+    if (gc->pluginInfo.moduleHandle)
+      FreeLibrary(gc->pluginInfo.moduleHandle);
+    memset(&gc->pluginInfo, 0, sizeof(gc->pluginInfo));
   }
 #else
-  {
-    FxBool
-      didLoad;
-
-      gc->pluginInfo.initProc = fxSplashInit;
-      gc->pluginInfo.shutdownProc = fxSplashShutdown;
-      gc->pluginInfo.splashProc = fxSplash;
-      gc->pluginInfo.plugProc = fxSplashPlug;
-
-      didLoad = ((gc->pluginInfo.initProc != NULL) &&
-                 (gc->pluginInfo.splashProc != NULL) &&
-                 (gc->pluginInfo.plugProc != NULL) &&
-                 (gc->pluginInfo.shutdownProc != NULL));
-      if (didLoad) {
-        GrState glideState;
-
-        /* Protect ourselves from the splash screen */
-        grGlideGetState(&glideState);
-        {
-          didLoad = (*gc->pluginInfo.initProc)(gc->grHwnd,
-                                               gc->state.screen_width, gc->state.screen_height,
-                                               gc->grColBuf, gc->grAuxBuf,
-                                               gc->state.color_format);
-          if (!didLoad) (*gc->pluginInfo.shutdownProc)();
-        }
-        grGlideSetState((const void*)&glideState);
-      }
-
-    /* Clear all the info if we could not load for some reason */
-    if (!didLoad) memset(&gc->pluginInfo, 0, sizeof(gc->pluginInfo));
+  gc->pluginInfo.initProc = fxSplashInit;
+  gc->pluginInfo.shutdownProc = fxSplashShutdown;
+  gc->pluginInfo.splashProc = fxSplash;
+  gc->pluginInfo.plugProc = fxSplashPlug;
+  
+  didLoad = (!_GlideRoot.environment.noSplash &&
+             (gc->pluginInfo.initProc != NULL) &&
+             (gc->pluginInfo.splashProc != NULL) &&
+             (gc->pluginInfo.plugProc != NULL) &&
+             (gc->pluginInfo.shutdownProc != NULL));
+  if (didLoad) {
+    GrState glideState;
+    
+    /* Protect ourselves from the splash screen */
+    grGlideGetState(&glideState);
+    didLoad = (*gc->pluginInfo.initProc)(gc->grHwnd,
+                                         gc->state.screen_width, gc->state.screen_height,
+                                         gc->grColBuf, gc->grAuxBuf,
+                                         gc->state.color_format);
+    if (didLoad) {
+      (*gc->pluginInfo.splashProc)(0.0f, 0.0f, 
+                                   (float)gc->state.screen_width,
+                                   (float)gc->state.screen_height,
+                                   0);
+      (*gc->pluginInfo.shutdownProc)();
+    }
+    grGlideSetState((const void*)&glideState);
   }
+
+  /* Clear all the info if we could not load for some reason */
+  if (!didLoad) memset(&gc->pluginInfo, 0, sizeof(gc->pluginInfo));
 #endif /* (GLIDE_PLATFORM & GLIDE_OS_WIN32) */
 
-    grSplash(0.0f, 0.0f, 
-             (float)gc->state.screen_width,
-             (float)gc->state.screen_height,
-             0);
-  }
   _GlideRoot.environment.noSplash = 1;
+
 } /* doSplash */
 
 
@@ -2066,83 +2065,66 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
     {
       gc->do2ppc = FXFALSE;
       gc->bInfo->h3analogSli = 0 ;
-
+      
       if (gc->grPixelSize <= 2) 
       {
         switch (gc->grSstRez) 
         {
-        case GR_RESOLUTION_1600x1200:
-        case GR_RESOLUTION_1600x1024:
-        case GR_RESOLUTION_1280x1024:
-        case GR_RESOLUTION_1280x960:
-        case GR_RESOLUTION_1152x864:
-        case GR_RESOLUTION_1024x768:
-        case GR_RESOLUTION_960x720:
-        case GR_RESOLUTION_800x600:
-        case GR_RESOLUTION_856x480:
-        case GR_RESOLUTION_640x480:
-        case GR_RESOLUTION_640x400:
-        case GR_RESOLUTION_640x350:
-          gc->do2ppc = FXTRUE;
-          break;
-        case GR_RESOLUTION_640x200:
-        case GR_RESOLUTION_512x384:
-        case GR_RESOLUTION_512x256:
-        case GR_RESOLUTION_400x300:
-        case GR_RESOLUTION_400x256:
-        case GR_RESOLUTION_320x240:
-        case GR_RESOLUTION_320x200:
-          gc->sliCount = 1 ;
-          gc->chipCount = 1 ;
-          gc->grPixelSample = 1 ;
-          break;
-        case GR_RESOLUTION_2048x2048:
-        case GR_RESOLUTION_2048x1536:
-        case GR_RESOLUTION_1920x1440:
-        case GR_RESOLUTION_1856x1392:
-        case GR_RESOLUTION_1792x1344:
-        default:
-          gc->bInfo->h3analogSli = 1 ;
-          break;
+          case GR_RESOLUTION_1600x1024:
+             gc->do2ppc = FXTRUE;
+             break;
+          case GR_RESOLUTION_1600x1200:
+             break;
+          case GR_RESOLUTION_1792x1344:
+          case GR_RESOLUTION_1856x1392:
+          case GR_RESOLUTION_1920x1440:
+          case GR_RESOLUTION_2048x1536:
+          case GR_RESOLUTION_2048x2048:
+            gc->bInfo->h3analogSli = 1 ;
+            break;          
+          case GR_RESOLUTION_400x300:
+          case GR_RESOLUTION_320x200:
+          case GR_RESOLUTION_320x240:
+          case GR_RESOLUTION_400x256:
+          case GR_RESOLUTION_512x256:
+          case GR_RESOLUTION_512x384:
+          case GR_RESOLUTION_640x200:
+            gc->sliCount = 1 ;
+            gc->chipCount = 1 ;
+            gc->grPixelSample = 1 ;
+          default:
+            gc->do2ppc = FXTRUE;
+            break;
         }
       }
       else if (gc->grPixelSize == 4) 
       {
         switch (gc->grSstRez) 
         {
-        case GR_RESOLUTION_1280x1024:
-        case GR_RESOLUTION_1280x960:
-        case GR_RESOLUTION_1152x864:
-        case GR_RESOLUTION_1024x768:
-        case GR_RESOLUTION_960x720:
-        case GR_RESOLUTION_800x600:
-        case GR_RESOLUTION_856x480:
-        case GR_RESOLUTION_640x480:
-        case GR_RESOLUTION_640x400:
-        case GR_RESOLUTION_640x350:
-          gc->do2ppc = FXTRUE;
-          break;
-        case GR_RESOLUTION_640x200:
-        case GR_RESOLUTION_512x384:
-        case GR_RESOLUTION_512x256:
-        case GR_RESOLUTION_400x300:
-        case GR_RESOLUTION_400x256:
-        case GR_RESOLUTION_320x240:
-        case GR_RESOLUTION_320x200:
-          gc->sliCount = 1 ;
-          gc->chipCount = 1 ;
-          gc->grPixelSample = 1 ;
-		  break;
-        case GR_RESOLUTION_2048x2048:
-        case GR_RESOLUTION_2048x1536:
-        case GR_RESOLUTION_1920x1440:
-        case GR_RESOLUTION_1856x1392:
-        case GR_RESOLUTION_1792x1344:
-        case GR_RESOLUTION_1600x1200:
-        case GR_RESOLUTION_1600x1024:
-        default:
-          gc->bInfo->h3analogSli = 1 ;
-          break;
+          case GR_RESOLUTION_1600x1024:
+            gc->bInfo->h3analogSli = 1 ;
+            gc->do2ppc = FXTRUE;
+            break;
+          case GR_RESOLUTION_1600x1200:
+          case GR_RESOLUTION_1792x1344:
+          case GR_RESOLUTION_1856x1392:
+          case GR_RESOLUTION_1920x1440:
+          case GR_RESOLUTION_2048x1536:
+          case GR_RESOLUTION_2048x2048:
+            gc->bInfo->h3analogSli = 1 ;
+            break;          
+          case GR_RESOLUTION_400x300:
+          case GR_RESOLUTION_320x200:
+          case GR_RESOLUTION_320x240:
+          case GR_RESOLUTION_400x256:
+          case GR_RESOLUTION_512x256:
+          case GR_RESOLUTION_512x384:
+          case GR_RESOLUTION_640x200:
+            gc->sliCount = 1 ;
+            gc->chipCount = 1 ;
+            gc->grPixelSample = 1 ;
+          default:
+            break;
         }
       }
 
@@ -2400,16 +2382,10 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
     *gc->lostContext = FXFALSE;
 #endif /* GLIDE_CHECK_CONTEXT */
 
-    if (_GlideRoot.environment.gammaR != 1.3f &&
-        _GlideRoot.environment.gammaG != 1.3f &&
-        _GlideRoot.environment.gammaB != 1.3f) {
-      hwcGammaRGB(gc->bInfo, 
-                  _GlideRoot.environment.gammaR, 
-                  _GlideRoot.environment.gammaG,
-                  _GlideRoot.environment.gammaB);
-    } else {
-      hwcGammaRGB(gc->bInfo, 1.3f, 1.3f, 1.3f);
-    }
+    hwcGammaRGB(gc->bInfo,
+                _GlideRoot.environment.gammaR,
+                _GlideRoot.environment.gammaG,
+                _GlideRoot.environment.gammaB);
 
     /* Setup memory configuration */
     gc->fbOffset = bInfo->fbOffset;
@@ -2479,7 +2455,7 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
 #if __POWERPC__
       if (!hwcInitAGPFifo(bInfo, FXFALSE)) {
 #else
-      if (!hwcInitAGPFifo(bInfo, _GlideRoot.environment.autoBump/*FXTRUE*/)) {
+      if (!hwcInitAGPFifo(bInfo, FXTRUE)) {
 #endif      
         hwcRestoreVideo(bInfo);
         GrErrorCallback(hwcGetErrorString(), FXFALSE);
@@ -3095,12 +3071,12 @@ GR_EXT_ENTRY(grSstWinOpenExt, GrContext_t, ( FxU32                   hWnd,
     doSplash();
 
     gc->windowed = FXFALSE;
-    _GlideRoot.windowsInit++; /* to avoid race with grSstControl() */
+    _GlideRoot.windowsInit[_GlideRoot.current_sst]++; /* to avoid race with grSstControl() */
 
     retVal = (GrContext_t)gc;
 
     if(_GlideRoot.environment.aaClip == FXTRUE) {
-      if((gc->grPixelSample > 1) && (_GlideRoot.windowsInit == 1)) {
+      if((gc->grPixelSample > 1) && (_GlideRoot.windowsInit[_GlideRoot.current_sst] == 1)) {
         grClipWindow(0, 0, gc->state.screen_width, gc->state.screen_height);
       }
     }
@@ -3151,7 +3127,26 @@ GR_ENTRY(grSstWinClose, FxBool, (GrContext_t context))
   GDBG_INFO(80, FN_NAME"(0x%X)\n", context);
 
   if (!gc)
-    return 0;
+    return FXFALSE;
+
+  /* NB: The gc that is being closed is the passed gc not the
+   * currently selected gc. This must be setup before the
+   * 'declaration' which grabs the current gc in grFlush.  In
+   * addition, it is possible for us to have 'missed' a thread attach
+   * if the current thread came into existance before glide was
+   * explicitly loaded by an application. In this case we have to set
+   * the tls gc explicitly otherwise other whacky-ness (read 'random
+   * crashes' will ensue). 
+   */
+  setThreadValue((unsigned long)gc);
+
+#if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
+  /* free splashscreen DLL */
+  if (gc->pluginInfo.moduleHandle) {
+    FreeLibrary(gc->pluginInfo.moduleHandle);
+    memset(&gc->pluginInfo, 0, sizeof(gc->pluginInfo));
+  }
+#endif
 
 #if !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !(GLIDE_PLATFORM & GLIDE_OS_DOS32)
   /* We are in Windowed Mode */
@@ -3176,79 +3171,47 @@ GR_ENTRY(grSstWinClose, FxBool, (GrContext_t context))
   }
 #endif
 
-#if GLIDE_CHECK_CONTEXT
-  if (gc->lostContext) {
-    if (*gc->lostContext) {
-#if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
-      /* KoolSmoky - splashscreen DLL needs to be freed */
-      if (gc->pluginInfo.moduleHandle) {
-        FreeLibrary(gc->pluginInfo.moduleHandle);
-        gc->pluginInfo.moduleHandle = 0L;
-      }
-#endif
-      return 0;
-    }
-  }
-#endif /* GLIDE_CHECK_CONTEXT */
-
-  /* NB: The gc that is being closed is the passed gc not the
-   * currently selected gc. This must be setup before the
-   * 'declaration' which grabs the current gc in grFlush.  In
-   * addition, it is possible for us to have 'missed' a thread attach
-   * if the current thread came into existance before glide was
-   * explicitly loaded by an application. In this case we have to set
-   * the tls gc explicitly otherwise other whacky-ness (read 'random
-   * crashes' will ensue). 
-   */
-  setThreadValue((unsigned long)gc);
-  if ((gc != NULL) && gc->open) grFlush();
-
   /* Make sure that the user specified gc is not whacked */
   if ((gc != NULL) &&
       (gc >= _GlideRoot.GCs) &&
       (gc <= _GlideRoot.GCs + MAX_NUM_SST)) {
     if (gc->open) {
-#if GLIDE_INIT_HAL
-      /* dpc - 22 may 1997 - FixMe!
-       * We need the equivilant stuff in the hal layer too.
-       */
-#else /* !GLIDE_INIT_HAL */
-#if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
-      /* KoolSmoky - splashscreen DLL needs to be freed */
-      if (gc->pluginInfo.moduleHandle) {
-        FreeLibrary(gc->pluginInfo.moduleHandle);
-        gc->pluginInfo.moduleHandle = 0L;
-      }
-#endif
-      /*--------------------------
-        3D Idle
-        --------------------------*/
-      GDBG_INFO(gc->myLevel, "  3D Idle\n");
-
-      /*--------------------------
-        Command Transport Disable
-        --------------------------*/
-      GDBG_INFO(gc->myLevel, "  Command Transport Disable\n");
-    
-#if __POWERPC__ && PCI_BUMP_N_GRIND
-      restoreCacheSettings();
-#endif
-
-      /* Video Restore 
-       *
-       * NB: The hwcRestoreVideo in addition to restoring the video also
-       * turns off the command fifo and then releases the hw context
-       * which can unmap the board at the driver level.  The next time
-       * we use grSstWinOpen we need to re-map the board etc just to be
-       * safe everywhere.
-       */
-      GDBG_INFO(gc->myLevel, "  Restore Video\n");
 #if GLIDE_CHECK_CONTEXT
-      if (!*gc->lostContext)
-#endif /* GLIDE_CHECK_CONTEXT */
-#if !DRI_BUILD
+      if (gc->lostContext && !*gc->lostContext)
+#endif
       {
-      /* disable SLI and AA */
+        grFlush();
+
+#if GLIDE_INIT_HAL
+        /* dpc - 22 may 1997 - FixMe!
+         * We need the equivilant stuff in the hal layer too.
+         */
+#else /* !GLIDE_INIT_HAL */
+        /*--------------------------
+          3D Idle
+          --------------------------*/
+        GDBG_INFO(gc->myLevel, "  3D Idle\n");
+
+        /*--------------------------
+          Command Transport Disable
+          --------------------------*/
+        GDBG_INFO(gc->myLevel, "  Command Transport Disable\n");
+
+#if __POWERPC__ && PCI_BUMP_N_GRIND
+        restoreCacheSettings();
+#endif
+
+        /* Video Restore 
+         *
+         * NB: The hwcRestoreVideo in addition to restoring the video also
+         * turns off the command fifo and then releases the hw context
+         * which can unmap the board at the driver level.  The next time
+         * we use grSstWinOpen we need to re-map the board etc just to be
+         * safe everywhere.
+         */
+        GDBG_INFO(gc->myLevel, "  Restore Video\n");
+#if !DRI_BUILD
+        /* disable SLI and AA */
 #ifdef FX_GLIDE_NAPALM
         if (IS_NAPALM(gc->bInfo->pciInfo.deviceID)) {
           _grChipMask( SST_CHIP_MASK_ALL_CHIPS );
@@ -3260,15 +3223,20 @@ GR_ENTRY(grSstWinClose, FxBool, (GrContext_t context))
           }
           if (gc->sliCount > 1)
             _grDisableSliCtrl();
-          
+
           /* Idle the 3D pipe. */
           grFinish();
         }
-#endif            
+#endif
         hwcRestoreVideo(gc->bInfo);
-      }
 #endif	/* !DRI_BUILD */
 #endif /* !GLIDE_INIT_HAL */
+      }
+#if (GLIDE_OS & GLIDE_OS_WIN32)
+      else {
+        hwcResetVideo(gc->bInfo);
+      }
+#endif
 
       /*--------------------------
         GC Reset
@@ -3292,17 +3260,18 @@ GR_ENTRY(grSstWinClose, FxBool, (GrContext_t context))
     gc->grSstRefresh = GR_REFRESH_NONE;
   }
 
-  _GlideRoot.windowsInit--;
-  
+  _GlideRoot.windowsInit[_GlideRoot.current_sst]--;
+
 #if (GLIDE_OS & GLIDE_OS_WIN32)
   if (_GlideRoot.environment.is_opengl != FXTRUE) {
-    if ((_GlideRoot.OS == OS_WIN32_95) ||
-        (_GlideRoot.OS == OS_WIN32_98) ||
-        (_GlideRoot.OS == OS_WIN32_ME)) {
-      hwcUnmapMemory9x ( gc->bInfo );
-    } else {
+    /* we are using hwcUnmapMemory9x for both win9x and winNT
+    ** to unmap the selected board
+    */
+    /*if ( hwcIsOSWin9x() ) {*/
+      hwcUnmapMemory9x( gc->bInfo );
+    /*} else {
       hwcUnmapMemory();
-    }
+    }*/
   }
 #endif
 
@@ -3327,6 +3296,12 @@ GR_ENTRY(grSstWinClose, FxBool, (GrContext_t context))
 GR_DIENTRY(grSetNumPendingBuffers, void, (FxI32 NumPendingBuffers))
 {
   _GlideRoot.environment.swapPendingCount = NumPendingBuffers;
+
+  /* Play safe. The hardware counter is 3 bits. */
+  if (_GlideRoot.environment.swapPendingCount > 6)
+    _GlideRoot.environment.swapPendingCount = 6;
+  else if (_GlideRoot.environment.swapPendingCount < 0)
+    _GlideRoot.environment.swapPendingCount = 0;
 }
 
 /*-------------------------------------------------------------------

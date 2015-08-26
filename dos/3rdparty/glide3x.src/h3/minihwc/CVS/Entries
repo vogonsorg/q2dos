@@ -1,0 +1,21 @@
+/.cvsignore/1.1/Mon Aug  7 15:24:43 2000//Tglide-devel-branch
+/dos_mode.c/1.1.1.1.8.6/Tue Oct  5 14:43:19 2004//Tglide-devel-branch
+/dxdrvr.c/1.1.1.1/Wed Nov 24 21:45:03 1999//Tglide-devel-branch
+/fxhwc.h/1.1.1.1.8.1/Sun Jun 29 18:43:28 2003//Tglide-devel-branch
+/gdebug.c/1.1.1.1.8.1/Thu Jun  9 18:32:30 2005//Tglide-devel-branch
+/hwcext.h/1.1.1.1.6.2/Wed May 25 08:56:24 2005//Tglide-devel-branch
+/hwcio.c/1.1.1.1/Wed Nov 24 21:45:04 1999//Tglide-devel-branch
+/hwcio.h/1.1.1.1/Wed Nov 24 21:45:04 1999//Tglide-devel-branch
+/initvga.h/1.1.1.1/Wed Nov 24 21:45:04 1999//Tglide-devel-branch
+/lin_mode.c/1.1.2.2/Tue Mar  2 07:30:57 2004//Tglide-devel-branch
+/lindri.h/1.1.1.1/Wed Nov 24 21:45:04 1999//Tglide-devel-branch
+/linhwc.c/1.1.2.7/Thu Jun 23 20:03:38 2005//Tglide-devel-branch
+/makefile/1.1.1.1/Wed Nov 24 21:45:05 1999//Tglide-devel-branch
+/makefile.linux/1.2/Wed Jul 12 21:33:32 2000//Tglide-devel-branch
+/minihwc.c/1.1.1.1.6.10/Wed May 25 08:56:24 2005//Tglide-devel-branch
+/minihwc.h/1.1.1.1.6.2/Wed May 25 08:56:24 2005//Tglide-devel-branch
+/qmodes.h/1.1.1.1/Wed Nov 24 21:45:07 1999//Tglide-devel-branch
+/setmode.h/1.1.1.1/Wed Nov 24 21:45:07 1999//Tglide-devel-branch
+/tv.h/1.1.1.1/Wed Nov 24 21:45:08 1999//Tglide-devel-branch
+/win_mode.c/1.1.1.1.8.2/Thu Oct  7 07:19:50 2004//Tglide-devel-branch
+D

@@ -17,8 +17,11 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/gpci.c,v 1.1.1.1.8.8 2005/08/13 21:06:57 jwrdegoede Exp $
+** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/gpci.c,v 1.1.1.1.8.9 2007/09/29 14:01:24 koolsmoky Exp $
 ** $Log: gpci.c,v $
+** Revision 1.1.1.1.8.9  2007/09/29 14:01:24  koolsmoky
+** removed false swapInterval envar checks
+**
 ** Revision 1.1.1.1.8.8  2005/08/13 21:06:57  jwrdegoede
 ** Last needed 64 bit fixes for h5/h3, complete 64 bit support for cvg
 **
@@ -742,9 +745,6 @@ _GlideInitEnvironment(void)
     _GlideRoot.environment.swFifoLWM         = GLIDE_GETENV("FX_GLIDE_LWM", -1L);
 
     _GlideRoot.environment.swapInterval      = GLIDE_GETENV("FX_GLIDE_SWAPINTERVAL", -1L);
-    if ((envStr != NULL) && (_GlideRoot.environment.swapInterval < 0)) {
-      _GlideRoot.environment.swapInterval = 0;
-    }
 
     /* wait until there's 6 or fewer buffer swaps pending */
     /* the hardware counter is only 3 bits so we don't want it to overflow */

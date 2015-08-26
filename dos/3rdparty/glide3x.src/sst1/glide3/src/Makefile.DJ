@@ -4,7 +4,7 @@
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
-# $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/Makefile.DJ,v 1.1.2.8 2005/06/16 18:58:32 jwrdegoede Exp $
+# $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/Makefile.DJ,v 1.1.2.9 2005/11/29 22:05:55 dborca Exp $
 #
 
 
@@ -114,7 +114,7 @@ CFLAGS += $(CDEFS)
 
 ifeq ($(USE_X86),1)
 CFLAGS += -DGL_X86
-OPTFLAGS ?= -O1 -ffast-math -mcpu=pentium
+OPTFLAGS ?= -O1 -ffast-math -mtune=pentium
 else
 CFLAGS += -DGLIDE_USE_C_TRISETUP
 OPTFLAGS ?= -O1 -ffast-math
