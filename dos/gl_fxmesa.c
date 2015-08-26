@@ -22,6 +22,7 @@
 #include "../client/keys.h"
 #include "vid_dos.h"
 
+#include <GL/dmesa.h>
 #include <GL/fxmesa.h>
 
 /*****************************************************************************/
@@ -31,7 +32,10 @@ qboolean GLimp_InitGL (void);
 extern cvar_t *vid_fullscreen;
 extern cvar_t *vid_ref;
 
-static fxMesaContext fc = NULL;
+//static fxMesaContext fc = NULL;
+static DMesaVisual dv;
+static DMesaContext dc;
+static DMesaBuffer db;
 
 #define NUM_GL_RESOLUTIONS 8
 
@@ -52,7 +56,6 @@ vmodeinfo_t resolutions[NUM_GL_RESOLUTIONS]={
 rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
 {
 	int width, height;
-	GLint attribs[32];
 
 	ri.Con_Printf( PRINT_ALL, "Initializing OpenGL display\n");
 
@@ -69,17 +72,15 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 	// destroy the existing window
 	GLimp_Shutdown ();
 
-	// set fx attribs
-	attribs[0] = FXMESA_DOUBLEBUFFER;
-	attribs[1] = FXMESA_ALPHA_SIZE;
-	attribs[2] = 1;
-	attribs[3] = FXMESA_DEPTH_SIZE;
-	attribs[4] = 1;
-	attribs[5] = FXMESA_NONE;
-
-//	fc = fxMesaCreateContext(0, findres(&width, &height), GR_REFRESH_60Hz, attribs);
-	fc = fxMesaCreateBestContext(0, (GLint)width, (GLint)height, attribs); /* FS: This will allow us to use SST_SCREENREFRESH to set the refresh rate */
-	if (!fc)
+	dv = DMesaCreateVisual((GLint)width, (GLint)height, 16, 0, true, true, 2, 16, 0, 0);
+	if (!dv)
+		return rserr_invalid_mode;
+	
+	dc = DMesaCreateContext(dv, NULL);
+	if (!dc)
+		return rserr_invalid_mode;
+	db = DMesaCreateBuffer(dv, 0,0,(GLint)width,(GLint)height);
+	if (!db)
 		return rserr_invalid_mode;
 
 	*pwidth = width;
@@ -88,7 +89,7 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 	// let the sound and input subsystems know about the new window
 	ri.Vid_NewWindow (width, height);
 
-	fxMesaMakeCurrent(fc);
+	DMesaMakeCurrent(dc, db);
 
 	return rserr_ok;
 }
@@ -104,9 +105,20 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 */
 void GLimp_Shutdown( void )
 {
-	if (fc) {
-		fxMesaDestroyContext(fc);
-		fc = NULL;
+	if (db)
+	{
+		DMesaDestroyBuffer(db);
+		db = NULL;
+	}
+	if (dc)
+	{
+		DMesaDestroyContext(dc);
+		dc = NULL;
+	}
+	if (dv)
+	{
+		DMesaDestroyVisual(dv);
+		dv = NULL;
 	}
 }
 
@@ -154,7 +166,7 @@ void GLimp_BeginFrame( float camera_seperation )
 void GLimp_EndFrame (void)
 {
 	glFlush();
-	fxMesaSwapBuffers();
+	DMesaSwapBuffers(db);
 }
 
 /*

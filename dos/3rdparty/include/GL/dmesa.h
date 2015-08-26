@@ -125,13 +125,13 @@ GLboolean DMesaMakeCurrent (DMesaContext c, DMesaBuffer b);
 GLboolean DMesaMoveBuffer (GLint xpos, GLint ypos);
 GLboolean DMesaResizeBuffer (GLint width, GLint height);
 
-/* from MesaLib-6.2.x */
-void *DMesaGetProcAddress (const char *name);
-
 /*
  * Set palette index, using normalized values.
  */
 void DMesaSetCI (int ndx, GLfloat red, GLfloat green, GLfloat blue);
+
+/* from MesaLib-6.2.x */
+void *DMesaGetProcAddress (const char *name);
 
 /*
  * DMesa state retrieval.
