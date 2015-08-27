@@ -2506,25 +2506,13 @@ void HeadShotGib (edict_t *ent, vec3_t head_pos, vec3_t forward, vec3_t right, v
 
 qboolean strcmpwld (char *give, char *check)
 {
-	int i, j, givenlength, checklength;
+	char tmp[64]; /* csurface_t->name is [16] */
 
-	givenlength = strlen(give);
-	checklength = strlen(check);
+	strcpy (tmp, give);
+	Q_strlwr (tmp); // pbowens: use tolower() for editors like worldcraft
 
-	for (i = 0; i < givenlength; i++)
-	{
-		char checked[100];
-		checked[0] = 0;
-
-		for (j=i; j<checklength+i; j++)
-		{
-			// pbowens: use tolower() for editors like worldcraft
-			// SZO: WTF???
-			Com_sprintf (checked, sizeof(checked), "%s%c", &checked, tolower(give[j]));
-		}
-		if (!strcmp(check, (char *)(&checked)))
-			return true;
-	}
+	if (strstr(tmp, check))
+		return true;
 
 	return false;
 }
