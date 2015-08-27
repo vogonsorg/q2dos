@@ -60,6 +60,7 @@ TEXUS_EXEDIR = $(FX_GLIDE_SW)/bin
 ###############################################################################
 
 CC = gcc
+HOST_CC = gcc
 AS = nasm
 AR = ar
 
@@ -261,14 +262,21 @@ xtexdl_3dnow.o: xtexdl.asm
 
 $(GLIDE_OBJECTS): fxinline.h fxgasm.h
 
+# cross-compile workaround:
+ifneq ($(COMSPEC),)
+RUN_FXGASM=fxgasm.exe
+else
+RUN_FXGASM=./fxgasm.exe
+endif
+
 fxinline.h: fxgasm.exe
-	$< -inline > $@
+	$(RUN_FXGASM) -inline > $@
 
 fxgasm.h: fxgasm.exe
-	$< -hex > $@
+	$(RUN_FXGASM) -hex > $@
 
 fxgasm.exe: fxgasm.c
-	$(CC) -o $@ $(CFLAGS) $<
+	$(HOST_CC) -o $@ $(CFLAGS) $<
 
 ###############################################################################
 #	clean, realclean
