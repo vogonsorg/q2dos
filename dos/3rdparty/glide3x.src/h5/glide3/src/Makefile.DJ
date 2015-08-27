@@ -17,7 +17,8 @@
 #	H4=1		High speed Avenger/Napalm.
 #			default = no
 #	OPTFLAGS	pass given optimization flags to compiler
-#			default = -O2 -ffast-math
+#			default = -O1 -ffast-math
+#			-O2 has problems in SLI configurations and GCC3
 #	DEBUG=1		enable debugging checks and messages
 #			default = no
 #	USE_X86=1	use assembler triangle specializations!
@@ -138,10 +139,10 @@ endif
 
 ifeq ($(USE_X86),1)
 CFLAGS += -DGL_X86
-OPTFLAGS ?= -O2 -ffast-math
+OPTFLAGS ?= -O1 -ffast-math
 else
 CFLAGS += -DGLIDE_USE_C_TRISETUP
-OPTFLAGS ?= -O2 -ffast-math
+OPTFLAGS ?= -O1 -ffast-math
 endif
 
 # optflags
