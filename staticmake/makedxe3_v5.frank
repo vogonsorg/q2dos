@@ -149,7 +149,7 @@ REFGL = ref_gl/gl_draw.o \
 	ref_gl/gl_rsurf.o \
 	ref_gl/gl_warp.o \
 	dos/qgl_dos.o \
-	dos/gl_fxmesa.o
+	dos/gl_dmesa.o
 endif
 
 ifeq ($(USE_ASM),1)
