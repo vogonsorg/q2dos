@@ -107,7 +107,7 @@ CLOCK_TABLE ClockTableAT3D[] =
   { 90, 0x31, 0x1, 0x2, 0x1 },
   { 95, 0x34, 0x1, 0x2, 0x1 },
   { 100, 0x1b, 0x1, 0x1, 0x6},
-  { 0 } /* used for end of table mark */
+  { 0,  0,    0,   0,   0 } /* used for end of table mark */
 };
 
 typedef struct _REGVALS {
@@ -137,6 +137,8 @@ static Init96HALData at3dHALData = {
   NULL,
   initAT3DUseTiles,
   initAT3DGetInfo,
+  NULL, /* SwapTiles */
+  NULL
 };
 
 /* Random Kruft */
