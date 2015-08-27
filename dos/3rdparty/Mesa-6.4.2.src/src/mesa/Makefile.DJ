@@ -63,6 +63,8 @@ GL_IMP = libigl.a
 export LD_LIBRARY_PATH := $(LD_LIBRARY_PATH);$(LIBDIR);$(GLIDE)/lib
 
 CC = gcc
+# HOST_CC is for generating X86/gen_matypes.exe when cross-compiling.
+HOST_CC = gcc
 CFLAGS += $(INCLUDE_DIRS)
 CFLAGS += -DUSE_EXTERNAL_DXTN_LIB=1
 ifeq ($(FX),1)
@@ -76,13 +78,7 @@ endif
 AR = ar
 ARFLAGS = crus
 
-HAVEDXE3 = $(wildcard $(DJDIR)/bin/dxe3gen.exe)
-
-ifeq ($(wildcard $(addsuffix /rm.exe,$(subst ;, ,$(PATH)))),)
-UNLINK = del $(subst /,\,$(1))
-else
-UNLINK = $(RM) $(1)
-endif
+UNLINK = rm -f $(1)
 
 include sources
 
@@ -133,14 +129,10 @@ $(LIBDIR)/$(GL_LIB): $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $^
 
 $(LIBDIR)/$(GL_DXE) $(LIBDIR)/$(GL_IMP): $(OBJECTS)
-ifeq ($(HAVEDXE3),)
-	$(warning Missing DXE3 package... Skipping $(GL_DXE))
-else
 ifeq ($(FX),1)
 	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -Y $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa -P glide3x.dxe -U $^
 else
 	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -Y $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa -U $^
-endif
 endif
 
 $(X86_OBJECTS): x86/matypes.h
@@ -149,7 +141,7 @@ x86/matypes.h: x86/gen_matypes.exe
 	$< > $@
 
 x86/gen_matypes.exe: x86/gen_matypes.c
-	$(CC) -o $@ $(CFLAGS) -s $<
+	$(HOST_CC) -o $@ $(CFLAGS) -s $<
 
 clean:
 	-$(call UNLINK,array_cache/*.o)
