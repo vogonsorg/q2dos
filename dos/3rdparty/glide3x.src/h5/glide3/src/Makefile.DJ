@@ -148,6 +148,7 @@ endif
 
 # optflags
 CFLAGS += $(OPTFLAGS)
+HOST_CFLAGS=$(filter-out -mcpu=% -mtune=% -march=%,$(CFLAGS))
 
 ###############################################################################
 #	objects
@@ -316,7 +317,7 @@ fxgasm.h: fxgasm.exe
 	$(RUN_FXGASM) -hex > $@
 
 fxgasm.exe: fxgasm.c ../../incsrc/gendate.h
-	$(HOST_CC) -o $@ $(CFLAGS) $<
+	$(HOST_CC) -o $@ $(HOST_CFLAGS) $<
 
 ../../incsrc/gendate.h: gendate.exe
 	$(RUN_GENDATE) > $@
@@ -325,10 +326,10 @@ fxbldno.h: fxbldno.exe
 	$(RUN_FXBLDNO) > $@
 
 gendate.exe: ../../incsrc/gendate.c
-	$(HOST_CC) -o $@ $(CFLAGS) $<
+	$(HOST_CC) -o $@ $(HOST_CFLAGS) $<
 
 fxbldno.exe: fxbldno.c
-	$(HOST_CC) -o $@ $(CFLAGS) $<
+	$(HOST_CC) -o $@ $(HOST_CFLAGS) $<
 
 ###############################################################################
 #	clean, realclean

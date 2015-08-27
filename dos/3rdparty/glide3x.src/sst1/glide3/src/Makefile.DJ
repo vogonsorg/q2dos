@@ -123,6 +123,7 @@ endif
 
 # optflags
 CFLAGS += $(OPTFLAGS)
+HOST_CFLAGS=$(filter-out -mcpu=% -mtune=% -march=%,$(CFLAGS))
 
 ###############################################################################
 #	objects
@@ -298,7 +299,7 @@ fxgasm.h: fxgasm.exe
 	$(RUN_FXGASM) -hex > $@
 
 fxgasm.exe: fxgasm.c
-	$(HOST_CC) -o $@ $(CFLAGS) $<
+	$(HOST_CC) -o $@ $(HOST_CFLAGS) $<
 
 ###############################################################################
 #	clean, realclean
