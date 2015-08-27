@@ -23,7 +23,6 @@
 #include "vid_dos.h"
 
 #include <GL/dmesa.h>
-#include <GL/fxmesa.h>
 
 /*****************************************************************************/
 
@@ -32,7 +31,6 @@ qboolean GLimp_InitGL (void);
 extern cvar_t *vid_fullscreen;
 extern cvar_t *vid_ref;
 
-//static fxMesaContext fc = NULL;
 static DMesaVisual dv;
 static DMesaContext dc;
 static DMesaBuffer db;
