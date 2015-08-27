@@ -120,10 +120,10 @@ endif
 
 ifeq ($(USE_X86),1)
 CFLAGS += -DGL_X86
-OPTFLAGS ?= -O2 -ffast-math
+OPTFLAGS ?= -O1 -ffast-math
 else
 CFLAGS += -DGLIDE_USE_C_TRISETUP
-OPTFLAGS ?= -O2 -ffast-math
+OPTFLAGS ?= -O1 -ffast-math
 endif
 
 # optflags
