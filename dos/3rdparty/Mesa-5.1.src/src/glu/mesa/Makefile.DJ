@@ -56,13 +56,7 @@ CFLAGS += -I$(TOP)/include
 AR = ar
 ARFLAGS = rus
 
-HAVEDXE3 = $(wildcard $(DJDIR)/bin/dxe3gen.exe)
-
-ifeq ($(wildcard $(addsuffix /rm.exe,$(subst ;, ,$(PATH)))),)
-UNLINK = del $(subst /,\,$(1))
-else
-UNLINK = $(RM) $(1)
-endif
+UNLINK = rm -f $(1)
 
 CORE_SOURCES = \
 	glu.c \
@@ -90,11 +84,7 @@ $(LIBDIR)/$(GLU_LIB): $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $^
 
 $(LIBDIR)/$(GLU_DXE) $(LIBDIR)/$(GLU_IMP): $(OBJECTS)
-ifeq ($(HAVEDXE3),)
-	$(warning Missing DXE3 package... Skipping $(GLU_DXE))
-else
 	-dxe3gen -o $(LIBDIR)/$(GLU_DXE) -Y $(LIBDIR)/$(GLU_IMP) -D "MesaGLU DJGPP" -E _glu -P gl.dxe -U $^
-endif
 
 clean:
 	-$(call UNLINK,*.o)
