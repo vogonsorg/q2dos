@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  5.1
+ * Version:  6.3
  *
- * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -38,8 +38,6 @@
  */
 #if !defined(__SCITECH_SNAP__)
 
-#include <stddef.h>     /* to get ptrdiff_t, used below */
-
 #if defined(__BEOS__)
 #include <stdlib.h>     /* to get some BeOS-isms */
 #endif
@@ -53,19 +51,21 @@
 #endif
 
 #if !defined(OPENSTEP) && (defined(__WIN32__) && !defined(__CYGWIN__))
-#  if defined(_MSC_VER) && defined(BUILD_GL32) /* tag specify we're building mesa as a DLL */
+#  if (defined(_MSC_VER) || defined(__MINGW32__)) && defined(BUILD_GL32) /* tag specify we're building mesa as a DLL */
 #    define GLAPI __declspec(dllexport)
-#  elif defined(_MSC_VER) && defined(_DLL) /* tag specifying we're building for DLL runtime support */
+#  elif (defined(_MSC_VER) || defined(__MINGW32__)) && defined(_DLL) /* tag specifying we're building for DLL runtime support */
 #    define GLAPI __declspec(dllimport)
 #  else /* for use with static link lib build of Win32 edition only */
 #    define GLAPI extern
 #  endif /* _STATIC_MESA support */
 #  define GLAPIENTRY __stdcall
-#else
-/* non-Windows compilation */
+#elif defined(__CYGWIN__) && defined(USE_OPENGL32) /* use native windows opengl32 */
 #  define GLAPI extern
+#  define GLAPIENTRY __stdcall
+#elif defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__) >= 303
+#  define GLAPI __attribute__((visibility("default")))
 #  define GLAPIENTRY
-#endif /* WIN32 / CYGWIN bracket */
+#endif /* WIN32 && !CYGWIN */
 
 #if (defined(__BEOS__) && defined(__POWERPC__)) || defined(__QUICKDRAW__)
 #  define PRAGMA_EXPORT_SUPPORTED		1
@@ -92,10 +92,22 @@
 #pragma import on
 #endif
 
+#ifndef GLAPI
+#define GLAPI extern
+#endif
+
+#ifndef GLAPIENTRY
+#define GLAPIENTRY
+#endif
+
 #ifndef APIENTRY
 #define APIENTRY GLAPIENTRY
 #endif
+
+/* "P" suffix to be used for a pointer to a function */
+#ifndef APIENTRYP
 #define APIENTRYP APIENTRY *
+#endif
 
 #ifndef GLAPIENTRYP
 #define GLAPIENTRYP GLAPIENTRY *
@@ -165,10 +177,10 @@ typedef double		GLclampd;	/* double precision float in [0,1] */
 #define GL_INT					0x1404
 #define GL_UNSIGNED_INT				0x1405
 #define GL_FLOAT				0x1406
-#define GL_DOUBLE				0x140A
 #define GL_2_BYTES				0x1407
 #define GL_3_BYTES				0x1408
 #define GL_4_BYTES				0x1409
+#define GL_DOUBLE				0x140A
 
 /* Primitives */
 #define GL_POINTS				0x0000
@@ -841,7 +853,7 @@ GLAPI GLint GLAPIENTRY glRenderMode( GLenum mode );
 
 GLAPI GLenum GLAPIENTRY glGetError( void );
 
-GLAPI const GLubyte* GLAPIENTRY glGetString( GLenum name );
+GLAPI const GLubyte * GLAPIENTRY glGetString( GLenum name );
 
 GLAPI void GLAPIENTRY glFinish( void );
 
@@ -2187,96 +2199,6 @@ GLAPI void GLAPIENTRY glTracePointerRangeMESA( const GLvoid* first, const GLvoid
 #endif /* GL_MESA_packed_depth_stencil */
 
 
-#ifndef GL_MESA_ycbcr_texture
-#define GL_MESA_ycbcr_texture 1
-
-#define GL_YCBCR_MESA				0x8757
-#define GL_UNSIGNED_SHORT_8_8_MESA		0x85BA /* same as Apple */
-#define GL_UNSIGNED_SHORT_8_8_REV_MESA		0x85BB /* same as Apple */
-
-#endif /* GL_MESA_texture_ycbcr */
-
-
-
-#ifndef GL_MESA_pack_invert
-#define GL_MESA_pack_invert 1
-
-#define GL_PACK_INVERT_MESA                     0x8758
-
-#endif /* GL_MESA_pack_invert */
-
-
-
-/* XXX temporary until glext.h is updated! */
-#ifndef GL_EXT_depth_bounds_test
-#define GL_EXT_depth_bounds_test 1
-
-#define GL_DEPTH_BOUNDS_TEST_EXT                       0x8890
-#define GL_DEPTH_BOUNDS_EXT                            0x8891
-
-GLAPI void GLAPIENTRY glDepthBoundsEXT(GLclampd zmin, GLclampd zmax);
-
-typedef void (APIENTRYP PFNGLDEPTHBOUNDSEXTPROC)(GLclampd zmin, GLclampd zmax);
-
-#endif /* GL_EXT_depth_bounds_test */
-
-
-
-/* XXX temporary until glext.h is updated! */
-#ifndef GL_EXT_texture_mirror_clamp
-#define GL_EXT_texture_mirror_clamp 1
-
-#define GL_MIRROR_CLAMP_EXT                            0x8742
-#define GL_MIRROR_CLAMP_TO_EDGE_EXT                    0x8743
-#define GL_MIRROR_CLAMP_TO_BORDER_EXT                  0x8912
-
-#endif /* GL_EXT_texture_mirror_clamp */
-
-
-
-/* XXX temporary until glext.h is updated! */
-#ifndef GL_ARB_occlusion_query
-#define GL_ARB_occlusion_query 1
-
-#define GL_SAMPLES_PASSED_ARB         0x8914
-#define GL_QUERY_COUNTER_BITS_ARB     0x8864
-#define GL_CURRENT_QUERY_ARB          0x8865
-#define GL_QUERY_RESULT_ARB           0x8866
-#define GL_QUERY_RESULT_AVAILABLE_ARB 0x8867
-
-#ifdef GL_GLEXT_PROTOTYPES
-GLAPI void GLAPIENTRY glGenQueriesARB(GLsizei n, GLuint *ids);
-GLAPI void GLAPIENTRY glDeleteQueriesARB(GLsizei n, const GLuint *ids);
-GLAPI GLboolean GLAPIENTRY glIsQueryARB(GLuint id);
-GLAPI void GLAPIENTRY glBeginQueryARB(GLenum target, GLuint id);
-GLAPI void GLAPIENTRY glEndQueryARB(GLenum target);
-GLAPI void GLAPIENTRY glGetQueryivARB(GLenum target, GLenum pname, GLint *params);
-GLAPI void GLAPIENTRY glGetQueryObjectivARB(GLuint id, GLenum pname, GLint *params);
-GLAPI void GLAPIENTRY glGetQueryObjectuivARB(GLuint id, GLenum pname, GLuint *params);
-#endif
-
-typedef void (APIENTRYP PFNGLGENQUERIESARBPROC)(GLsizei n, GLuint *ids);
-typedef void (APIENTRYP PFNGLDELETEQUERIESARBPROC)(GLsizei n, const GLuint *ids);
-typedef GLboolean (APIENTRYP PFNGLISQUERYARBPROC)(GLuint id);
-typedef void (APIENTRYP PFNGLBEGINQUERYARBPROC)(GLenum target, GLuint id);
-typedef void (APIENTRYP PFNGLENDQUERYARBPROC)(GLenum target);
-typedef void (APIENTRYP PFNGLGETQUERYIVARBPROC)(GLenum target, GLenum pname, GLint *params);
-typedef void (APIENTRYP PFNGLGETQUERYOBJECTIVARBPROC)(GLuint id, GLenum pname, GLint *params);
-typedef void (APIENTRYP PFNGLGETQUERYOBJECTUIVARBPROC)(GLuint id, GLenum pname, GLuint *params);
-
-#endif /* GL_ARB_occlusion_query */
-
-
-/* XXX temporary until glext.h is updated! */
-#ifndef GL_ARB_point_sprite
-#define GL_ARB_point_sprite 1
-
-#define GL_POINT_SPRITE_ARB                0x8861
-#define GL_COORD_REPLACE_ARB               0x8862
-
-#endif /* GL_ARB_point_sprite */
-
-
 #ifndef GL_MESA_program_debug
 #define GL_MESA_program_debug 1
 
@@ -2291,126 +2213,29 @@ typedef void (APIENTRYP PFNGLGETQUERYOBJECTUIVARBPROC)(GLuint id, GLenum pname, 
 
 typedef void (*GLprogramcallbackMESA)(GLenum target, GLvoid *data);
 
-extern void
-glProgramCallbackMESA(GLenum target, GLprogramcallbackMESA callback,
-                      GLvoid *data);
+GLAPI void GLAPIENTRY glProgramCallbackMESA(GLenum target, GLprogramcallbackMESA callback, GLvoid *data);
 
-extern void
-glGetProgramRegisterfvMESA(GLenum target, GLsizei len, const GLubyte *name,
-                           GLfloat *v);
+GLAPI void GLAPIENTRY glGetProgramRegisterfvMESA(GLenum target, GLsizei len, const GLubyte *name, GLfloat *v);
 
 #endif /* GL_MESA_program_debug */
 
 
+#ifndef GL_ATI_blend_equation_separate
+#define GL_ATI_blend_equation_separate 1
 
-/*
- * XXX temporary - these new 1.5 tokens should be defined in glext.h
- */
-#ifndef GL_VERSION_1_5
-#define GL_VERSION_1_5 1
+#define GL_ALPHA_BLEND_EQUATION_ATI	        0x883D
 
-/* New and improved token names */
-#define GL_FOG_COORD_SRC		GL_FOG_COORDINATE_SOURCE
-#define GL_FOG_COORD			GL_FOG_COORDINATE
-#define GL_CURRENT_FOG_COORD		GL_CURRENT_FOG_COORDINATE
-#define GL_FOG_COORD_ARRAY_TYPE		GL_FOG_COORDINATE_ARRAY_TYPE
-#define GL_FOG_COORD_ARRAY_STRIDE	GL_FOG_COORDINATE_ARRAY_STRIDE
-#define GL_FOG_COORD_ARRAY_POINTER	GL_FOG_COORDINATE_ARRAY_POINTER
-#define GL_FOG_COORD_ARRAY		GL_FOG_COORDINATE_ARRAY
-#define GL_SRC0_RGB			GL_SOURCE0_RGB
-#define GL_SRC1_RGB			GL_SOURCE1_RGB
-#define GL_SRC2_RGB			GL_SOURCE2_RGB
-#define GL_SRC0_ALPHA			GL_SOURCE0_ALPHA
-#define GL_SRC1_ALPHA			GL_SOURCE1_ALPHA
-#define GL_SRC2_ALPHA			GL_SOURCE2_ALPHA
+GLAPI void GLAPIENTRY glBlendEquationSeparateATI( GLenum modeRGB, GLenum modeA );
+typedef void (APIENTRYP PFNGLBLENDEQUATIONSEPARATEATIPROC) (GLenum modeRGB, GLenum modeA);
 
-/* Buffer object tokens */
-#define GL_BUFFER_SIZE				0x8764
-#define GL_BUFFER_USAGE				0x8765
-#define GL_ARRAY_BUFFER				0x8892
-#define GL_ELEMENT_ARRAY_BUFFER			0x8893
-#define GL_ARRAY_BUFFER_BINDING			0x8894
-#define GL_ELEMENT_ARRAY_BUFFER_BINDING		0x8895
-#define GL_VERTEX_ARRAY_BUFFER_BINDING		0x8896
-#define GL_NORMAL_ARRAY_BUFFER_BINDING		0x8897
-#define GL_COLOR_ARRAY_BUFFER_BINDING		0x8898
-#define GL_INDEX_ARRAY_BUFFER_BINDING		0x8899
-#define GL_TEXTURE_COORD_ARRAY_BUFFER_BINDING	0x889A
-#define GL_EDGE_FLAG_ARRAY_BUFFER_BINDING	0x889B
-#define GL_SECONDARY_COLOR_ARRAY_BUFFER_BINDING	0x889C
-#define GL_FOG_COORDINATE_ARRAY_BUFFER_BINDING	0x889D
-#define GL_WEIGHT_ARRAY_BUFFER_BINDING		0x889E
-#define GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING	0x889F
-#define GL_READ_ONLY				0x88B8
-#define GL_WRITE_ONLY				0x88B9
-#define GL_READ_WRITE				0x88BA
-#define GL_BUFFER_ACCESS	 		0x88BB
-#define GL_BUFFER_MAPPED	 		0x88BC
-#define GL_BUFFER_MAP_POINTER			0x88BD
-#define GL_STREAM_DRAW				0x88E0
-#define GL_STREAM_READ				0x88E1
-#define GL_STREAM_COPY				0x88E2
-#define GL_STATIC_DRAW				0x88E4
-#define GL_STATIC_READ				0x88E5
-#define GL_STATIC_COPY				0x88E6
-#define GL_DYNAMIC_DRAW				0x88E8
-#define GL_DYNAMIC_READ				0x88E9
-#define GL_DYNAMIC_COPY				0x88EA
+#endif /* GL_ATI_blend_equation_separate */
 
-/* Occlusion query tokens */
-#define GL_SAMPLES_PASSED			0x8914
-#define GL_QUERY_COUNTER_BITS			0x8864
-#define GL_CURRENT_QUERY			0x8865
-#define GL_QUERY_RESULT				0x8866
-#define GL_QUERY_RESULT_AVAILABLE		0x8867
 
-typedef ptrdiff_t GLintptr;
-typedef ptrdiff_t GLsizeiptr;
-
-#ifdef GL_GLEXT_PROTOTYPES
-GLAPI void GLAPIENTRY glGenQueries(GLsizei n, GLuint *ids);
-GLAPI void GLAPIENTRY glDeleteQueries(GLsizei n, const GLuint *ids);
-GLAPI GLboolean GLAPIENTRY glIsQuery(GLuint id);
-GLAPI void GLAPIENTRY glBeginQuery(GLenum target, GLuint id);
-GLAPI void GLAPIENTRY glEndQuery(GLenum target);
-GLAPI void GLAPIENTRY glGetQueryiv(GLenum target, GLenum pname, GLint *params);
-GLAPI void GLAPIENTRY glGetQueryObjectiv(GLuint id, GLenum pname, GLint *params);
-GLAPI void GLAPIENTRY glGetQueryObjectuiv(GLuint id, GLenum pname, GLuint *params);
-GLAPI void GLAPIENTRY glBindBuffer(GLenum, GLuint);
-GLAPI void GLAPIENTRY glDeleteBuffers(GLsizei, const GLuint *);
-GLAPI void GLAPIENTRY glGenBuffers(GLsizei, GLuint *);
-GLAPI GLboolean GLAPIENTRY glIsBuffer(GLuint);
-GLAPI void GLAPIENTRY glBufferData(GLenum, GLsizeiptr, const GLvoid *, GLenum);
-GLAPI void GLAPIENTRY glBufferSubData(GLenum, GLintptr, GLsizeiptr, const GLvoid *);
-GLAPI void GLAPIENTRY glGetBufferSubData(GLenum, GLintptr, GLsizeiptr, GLvoid *);
-GLAPI GLvoid* GLAPIENTRY glMapBuffer(GLenum, GLenum);
-GLAPI GLboolean GLAPIENTRY glUnmapBuffer(GLenum);
-GLAPI void GLAPIENTRY glGetBufferParameteriv(GLenum, GLenum, GLint *);
-GLAPI void GLAPIENTRY glGetBufferPointerv(GLenum, GLenum, GLvoid* *);
-#endif
-
-typedef void (APIENTRYP PFNGLGENQUERIESPROC)(GLsizei n, GLuint *ids);
-typedef void (APIENTRYP PFNGLDELETEQUERIESPROC)(GLsizei n, const GLuint *ids);
-typedef GLboolean (APIENTRYP PFNGLISQUERYPROC)(GLuint id);
-typedef void (APIENTRYP PFNGLBEGINQUERYPROC)(GLenum target, GLuint id);
-typedef void (APIENTRYP PFNGLENDQUERYPROC)(GLenum target);
-typedef void (APIENTRYP PFNGLGETQUERYIVPROC)(GLenum target, GLenum pname, GLint *params);
-typedef void (APIENTRYP PFNGLGETQUERYOBJECTIVPROC)(GLuint id, GLenum pname, GLint *params);
-typedef void (APIENTRYP PFNGLGETQUERYOBJECTUIVPROC)(GLuint id, GLenum pname, GLuint *params);
-
-typedef void (APIENTRYP PFNGLBINDBUFFERPROC)(GLenum target, GLuint buffer);
-typedef void (APIENTRYP PFNGLDELETEBUFFERSPROC)(GLsizei n, const GLuint *buffers);
-typedef void (APIENTRYP PFNGLGENBUFFERSPROC)(GLsizei n, GLuint *buffers);
-typedef GLboolean (APIENTRYP PFNGLISBUFFERPROC)(GLuint buffer);
-typedef void (APIENTRYP PFNGLBUFFERDATAPROC)(GLenum target, GLsizeiptr size, const GLvoid *data, GLenum usage);
-typedef void (APIENTRYP PFNGLBUFFERSUBDATAPROC)(GLenum target, GLintptr offset, GLsizeiptr size, const GLvoid *data);
-typedef void (APIENTRYP PFNGLGETBUFFERSUBDATAPROC)(GLenum target, GLintptr offset, GLsizeiptr size, GLvoid *data);
-typedef GLvoid* (APIENTRYP PFNGLMAPBUFFERPROC)(GLenum target, GLenum access);
-typedef GLboolean (APIENTRYP PFNGLUNMAPBUFFERPROC)(GLenum target);
-typedef void (APIENTRYP PFNGLGETBUFFERPARAMETERIVPROC)(GLenum target, GLenum pname, GLint *params);
-typedef void (APIENTRYP PFNGLGETBUFFERPOINTERVPROC)(GLenum target, GLenum pname, GLvoid* *params);
-
-#endif /* GL_VERSION_1_5 */
+/**
+ ** NOTE!!!!!  If you add new functions to this file, or update
+ ** glext.h be sure to regenerate the gl_mangle.h file.  See comments
+ ** in that file for details.
+ **/
 
 
 
