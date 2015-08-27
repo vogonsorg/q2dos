@@ -19,28 +19,28 @@ diff -urNp /dev/null Glide3/cvg/glide3/src/fxgasm.h
 +tex_ptr			equ 00000008h
 +cull_mode		equ 000000d0h
 +tsuDataList		equ 00000014h
-+triPacketHdr	equ 00000350h
-+cullStripHdr	equ 00000354h
-+paramMask	equ 00000358h
-+triSetupProc	equ 0000033ch
-+drawTrianglesProc	equ 00000340h
-+drawVertexList	equ 00000344h
-+fifoStart	equ 0000035ch
-+fifoEnd	equ 00000360h
-+fifoOffset	equ 00000364h
-+fifoSize	equ 00000368h
-+fifoJmpHdr	equ 0000036ch
-+fifoPtr	equ 00000370h
-+fifoRead	equ 00000374h
-+fifoRoom	equ 00000378h
-+roomToReadPtr	equ 0000037ch
-+roomToEnd	equ 00000380h
-+fifoLfbP	equ 00000384h
-+lfbLockCount	equ 00000388h
++triPacketHdr	equ 00000358h
++cullStripHdr	equ 0000035ch
++paramMask	equ 00000360h
++triSetupProc	equ 00000344h
++drawTrianglesProc	equ 00000348h
++drawVertexList	equ 0000034ch
++fifoStart	equ 00000364h
++fifoEnd	equ 00000368h
++fifoOffset	equ 0000036ch
++fifoSize	equ 00000370h
++fifoJmpHdr	equ 00000374h
++fifoPtr	equ 00000378h
++fifoRead	equ 0000037ch
++fifoRoom	equ 00000380h
++roomToReadPtr	equ 00000384h
++roomToEnd	equ 00000388h
++fifoLfbP	equ 0000038ch
++lfbLockCount	equ 00000390h
 +vertexSize	equ 00000278h
 +vertexStride	equ 00000274h
 +invalid	equ 00000280h
-+CoordinateSpace	equ 00000334h
++CoordinateSpace	equ 0000033ch
 +paramIndex	equ 000000d4h
 +vp_hwidth	equ 00000208h
 +vp_hheight	equ 0000020ch
@@ -60,8 +60,8 @@ diff -urNp /dev/null Glide3/cvg/glide3/src/fxgasm.h
 +tmu0_t_scale	equ 00000148h
 +tmu1_s_scale	equ 00000184h
 +tmu1_t_scale	equ 00000188h
-+SIZEOF_GrState		equ 0000026ch
-+SIZEOF_GC		equ 00000430h
++SIZEOF_GrState		equ 00000274h
++SIZEOF_GC		equ 00000438h
 +
 +
 +;----------------------------------------------------------------------
@@ -83,7 +83,7 @@ diff -urNp /dev/null Glide3/cvg/glide3/src/fxgasm.h
 +pool_f255	equ 00000050h
 +pool_fTemp1	equ 00000054h
 +pool_fTemp2	equ 00000058h
-+SIZEOF_GlideRoot	equ 0000124ch
++SIZEOF_GlideRoot	equ 0000126ch
 +
 diff -urNp /dev/null Glide3/cvg/glide3/src/fxinline.h
 --- /dev/null
@@ -93,7 +93,7 @@ diff -urNp /dev/null Glide3/cvg/glide3/src/fxinline.h
 +#define __FX_INLINE_H__
 +
 +#define kCurGCOffset   0x2CUL
-+#define kTriProcOffset 0x33CUL
++#define kTriProcOffset 0x344UL
 +#define kGCStateInvalid 0x280UL
 +/* The # of 2-byte entries in the hw fog table */
 +#define kInternalFogTableEntryCount 0x40
@@ -280,14 +280,14 @@ diff -urNp /dev/null Glide3/h5/glide3/src/fxgasm.h
 +
 +p6Fencer		equ 00000000h
 +current_sst		equ 0000000ch
-+CPUType			equ 00000014h
++CPUType			equ 00000020h
 +tlsOffset			equ 00000008h
-+pool_f255	equ 00000048h
-+pool_f1	equ 00000044h
++pool_f255	equ 00000054h
++pool_f1	equ 00000050h
 +SIZEOF_GrState		equ 00000be4h
 +SIZEOF_GC		equ 00009738h
 +
-+SIZEOF_GlideRoot	equ 000bd60ch
++SIZEOF_GlideRoot	equ 000bd618h
 +
 diff -urNp /dev/null Glide3/h5/glide3/src/fxinline.h
 --- /dev/null
