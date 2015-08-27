@@ -580,6 +580,7 @@ fxSetupDDSpanPointers(GLcontext * ctx)
 
    swdd->SetBuffer = fxDDSetBuffer;
 
+#if 0 /* these members removed in 6.4 */
    switch (fxMesa->colDepth) {
           case 15:
                swdd->WriteRGBASpan = tdfxWriteRGBASpan_ARGB1555;
@@ -631,6 +632,7 @@ fxSetupDDSpanPointers(GLcontext * ctx)
       swdd->WriteStencilPixels = fxWriteStencilPixels;
       swdd->ReadStencilPixels = fxReadStencilPixels;
    }
+#endif
 #if 0
    swdd->WriteCI8Span		= NULL;
    swdd->WriteCI32Span		= NULL;
