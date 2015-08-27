@@ -83,13 +83,13 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 	if (!db)
 		return rserr_invalid_mode;
 
+	DMesaMakeCurrent(dc, db);
+
 	*pwidth = width;
 	*pheight = height;
 
 	// let the sound and input subsystems know about the new window
 	ri.Vid_NewWindow (width, height);
-
-	DMesaMakeCurrent(dc, db);
 
 	return rserr_ok;
 }
