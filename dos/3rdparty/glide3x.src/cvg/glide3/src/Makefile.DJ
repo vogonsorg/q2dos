@@ -168,7 +168,7 @@ GLIDE_OBJECTS += \
 	xdraw3_def.o
 ifeq ($(USE_MMX),1)
 GLIDE_OBJECTS += \
-	xtexdl_mmx.obj
+	xtexdl_mmx.o
 endif
 ifeq ($(USE_3DNOW),1)
 GLIDE_OBJECTS += \
@@ -267,7 +267,7 @@ xdraw3_def.o: xdraw3.asm
 	$(AS) -o $@ $(ASFLAGS) $<
 xtexdl_def.o: xtexdl.c
 	$(CC) -o $@ $(CFLAGS) -c $<
-xtexdl_mmx.obj: xtexdl.asm
+xtexdl_mmx.o: xtexdl.asm
 	$(AS) -o $@ $(ASFLAGS) -DGL_MMX=1 $<
 xdraw2_3dnow.o: xdraw2.asm
 	$(AS) -o $@ $(ASFLAGS) -DGL_AMD3D=1 $<
@@ -293,7 +293,6 @@ fxgasm.exe: fxgasm.c
 
 clean:
 	-$(call UNLINK,*.o)
-	-$(call UNLINK,*.obj)
 	-$(call UNLINK,../../init/*.o)
 	-$(call UNLINK,$(FX_GLIDE_SW)/newpci/pcilib/*.o)
 	-$(call UNLINK,fxinline.h)
