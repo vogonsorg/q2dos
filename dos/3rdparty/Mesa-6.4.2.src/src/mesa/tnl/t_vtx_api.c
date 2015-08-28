@@ -194,7 +194,7 @@ static void _tnl_copy_from_current( GLcontext *ctx )
    tnl->vtx.CurrentFloatEdgeFlag = 
       (GLfloat)ctx->Current.EdgeFlag;
    
-   for (i = _TNL_ATTRIB_POS+1 ; i <= _TNL_ATTRIB_MAX ; i++) 
+   for (i = _TNL_ATTRIB_POS+1 ; i < _TNL_ATTRIB_MAX ; i++) 
       switch (tnl->vtx.attrsz[i]) {
       case 4: tnl->vtx.attrptr[i][3] = tnl->vtx.current[i][3];
       case 3: tnl->vtx.attrptr[i][2] = tnl->vtx.current[i][2];
@@ -645,7 +645,7 @@ static void GLAPIENTRY _tnl_EvalCoord1f( GLfloat u )
       if (tnl->vtx.eval.new_state) 
 	 _tnl_update_eval( ctx );
 
-      for (i = 0 ; i <= _TNL_ATTRIB_INDEX ; i++) {
+      for (i = 0; i < _TNL_NUM_EVAL; i++) {
 	 if (tnl->vtx.eval.map1[i].map) 
 	    if (tnl->vtx.attrsz[i] != tnl->vtx.eval.map1[i].sz)
 	       _tnl_fixup_vertex( ctx, i, tnl->vtx.eval.map1[i].sz );
@@ -673,7 +673,7 @@ static void GLAPIENTRY _tnl_EvalCoord2f( GLfloat u, GLfloat v )
       if (tnl->vtx.eval.new_state) 
 	 _tnl_update_eval( ctx );
 
-      for (i = 0 ; i <= _TNL_ATTRIB_INDEX ; i++) {
+      for (i = 0; i < _TNL_NUM_EVAL; i++) {
 	 if (tnl->vtx.eval.map2[i].map) 
 	    if (tnl->vtx.attrsz[i] != tnl->vtx.eval.map2[i].sz)
 	       _tnl_fixup_vertex( ctx, i, tnl->vtx.eval.map2[i].sz );
@@ -734,6 +734,11 @@ static void GLAPIENTRY _tnl_EvalPoint2( GLint i, GLint j )
 static void GLAPIENTRY _tnl_Begin( GLenum mode )
 {
    GET_CURRENT_CONTEXT( ctx ); 
+
+   if (mode > GL_POLYGON) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "glBegin(mode)");
+      return;
+   }
 
    if (ctx->Driver.CurrentExecPrimitive == GL_POLYGON+1) {
       TNLcontext *tnl = TNL_CONTEXT(ctx); 

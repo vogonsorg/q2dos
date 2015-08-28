@@ -181,10 +181,11 @@ static GLuint translate_tex_src_bit( GLuint bit )
    }
 }
 
-static struct state_key *make_state_key( GLcontext *ctx )
+static void make_state_key( GLcontext *ctx,  struct state_key *key )
 {
-   struct state_key *key = CALLOC_STRUCT(state_key);
    GLuint i, j;
+
+   memset(key, 0, sizeof(*key));
 	
    for (i=0;i<MAX_TEXTURE_UNITS;i++) {
       struct gl_texture_unit *texUnit = &ctx->Texture.Unit[i];
@@ -207,7 +208,7 @@ static struct state_key *make_state_key( GLcontext *ctx )
 	 translate_mode(texUnit->_CurrentCombine->ModeA);
 		
       key->unit[i].ScaleShiftRGB = texUnit->_CurrentCombine->ScaleShiftRGB;
-      key->unit[i].ScaleShiftA = texUnit->_CurrentCombine->ScaleShiftRGB;
+      key->unit[i].ScaleShiftA = texUnit->_CurrentCombine->ScaleShiftA;
 
       for (j=0;j<3;j++) {
          key->unit[i].OptRGB[j].Operand =
@@ -228,8 +229,6 @@ static struct state_key *make_state_key( GLcontext *ctx )
       key->fog_enabled = 1;
       key->fog_mode = translate_fog_mode(ctx->Fog.Mode);
    }
-	
-   return key;
 }
 
 /* Use uregs to represent registers internally, translate to Mesa's
@@ -593,14 +592,14 @@ static struct ureg get_one( struct texenv_fragment_program *p )
 static struct ureg get_half( struct texenv_fragment_program *p )
 {
    if (is_undef(p->half)) 
-      p->one = register_scalar_const(p, 0.5);
+      p->half = register_scalar_const(p, 0.5);
    return p->half;
 }
 
 static struct ureg get_zero( struct texenv_fragment_program *p )
 {
    if (is_undef(p->zero)) 
-      p->one = register_scalar_const(p, 0.0);
+      p->zero = register_scalar_const(p, 0.0);
    return p->zero;
 }
 
@@ -760,6 +759,7 @@ static struct ureg emit_combine( struct texenv_fragment_program *p,
        * result = tmp - .5
        */
       half = get_half(p);
+      tmp = get_temp(p);
       emit_arith( p, FP_OPCODE_ADD, tmp, mask, 0, src[0], src[1], undef );
       emit_arith( p, FP_OPCODE_SUB, dest, mask, saturate, tmp, half, undef );
       return dest;
@@ -924,9 +924,12 @@ static void load_texture( struct texenv_fragment_program *p, GLuint unit )
 			  
       /* TODO: Use D0_MASK_XY where possible.
        */
-      p->src_texture[unit] = emit_texld( p, FP_OPCODE_TXP,
-					 tmp, WRITEMASK_XYZW, 
-					 unit, dim, texcoord );
+      if (p->state->unit[unit].enabled) 
+	 p->src_texture[unit] = emit_texld( p, FP_OPCODE_TXP,
+					    tmp, WRITEMASK_XYZW, 
+					    unit, dim, texcoord );
+      else
+	 p->src_texture[unit] = get_zero(p);
    }
 }
 
@@ -946,8 +949,6 @@ static GLboolean load_texenv_source( struct texenv_fragment_program *p,
    case SRC_TEXTURE5:
    case SRC_TEXTURE6:
    case SRC_TEXTURE7:       
-      if (!p->state->unit[src - SRC_TEXTURE0].enabled) 
-	 return GL_FALSE;
       load_texture(p, src - SRC_TEXTURE0);
       break;
       
@@ -961,12 +962,16 @@ static GLboolean load_texenv_source( struct texenv_fragment_program *p,
 static GLboolean load_texunit_sources( struct texenv_fragment_program *p, int unit )
 {
    struct state_key *key = p->state;
-   int i, nr = key->unit[unit].NumArgsRGB;
-   for (i = 0; i < nr; i++) {
-      if (!load_texenv_source( p, key->unit[unit].OptRGB[i].Source, unit) ||
-	  !load_texenv_source( p, key->unit[unit].OptA[i].Source, unit ))
-	 return GL_FALSE;
+   GLuint i;
+
+   for (i = 0; i < key->unit[unit].NumArgsRGB; i++) {
+      load_texenv_source( p, key->unit[unit].OptRGB[i].Source, unit);
    }
+
+   for (i = 0; i < key->unit[unit].NumArgsA; i++) {
+      load_texenv_source( p, key->unit[unit].OptA[i].Source, unit );
+   }
+
    return GL_TRUE;
 }
 
@@ -1002,6 +1007,10 @@ static void create_new_program(struct state_key *key, GLcontext *ctx,
       p.src_texture[unit] = undef;
 
    p.src_previous = undef;
+   p.half = undef;
+   p.zero = undef;
+   p.one = undef;
+
    p.last_tex_stage = 0;
    release_temps(&p);
 
@@ -1012,8 +1021,8 @@ static void create_new_program(struct state_key *key, GLcontext *ctx,
        */
       for (unit = 0 ; unit < ctx->Const.MaxTextureUnits ; unit++)
 	 if (key->unit[unit].enabled) {
-	    if (load_texunit_sources( &p, unit ))
-	       p.last_tex_stage = unit;
+	    load_texunit_sources( &p, unit );
+	    p.last_tex_stage = unit;
 	 }
 
       /* Second pass - emit combine instructions to build final color:
@@ -1033,6 +1042,7 @@ static void create_new_program(struct state_key *key, GLcontext *ctx,
        */
       struct ureg s = register_input(&p, FRAG_ATTRIB_COL1);
       emit_arith( &p, FP_OPCODE_ADD, out, WRITEMASK_XYZ, 0, cf, s, undef );
+      emit_arith( &p, FP_OPCODE_MOV, out, WRITEMASK_W, 0, cf, undef, undef );
    }
    else if (memcmp(&cf, &out, sizeof(cf)) != 0) {
       /* Will wind up in here if no texture enabled or a couple of
@@ -1085,9 +1095,9 @@ static void *search_cache( struct texenvprog_cache *cache,
 			   const void *key,
 			   GLuint keysize)
 {
-   struct texenvprog_cache *c;
+   struct texenvprog_cache_item *c;
 
-   for (c = cache; c; c = c->next) {
+   for (c = cache->items[hash % cache->size]; c; c = c->next) {
       if (c->hash == hash && memcmp(c->key, key, keysize) == 0)
 	 return c->data;
    }
@@ -1095,17 +1105,71 @@ static void *search_cache( struct texenvprog_cache *cache,
    return NULL;
 }
 
-static void cache_item( struct texenvprog_cache **cache,
+static void rehash( struct texenvprog_cache *cache )
+{
+   struct texenvprog_cache_item **items;
+   struct texenvprog_cache_item *c, *next;
+   GLuint size, i;
+
+   size = cache->size * 3;
+   items = (struct texenvprog_cache_item**) _mesa_malloc(size * sizeof(*items));
+   _mesa_memset(items, 0, size * sizeof(*items));
+
+   for (i = 0; i < cache->size; i++)
+      for (c = cache->items[i]; c; c = next) {
+	 next = c->next;
+	 c->next = items[c->hash % size];
+	 items[c->hash % size] = c;
+      }
+
+   FREE(cache->items);
+   cache->items = items;
+   cache->size = size;
+}
+
+static void clear_cache( struct texenvprog_cache *cache )
+{
+   struct texenvprog_cache_item *c, *next;
+   GLuint i;
+
+   for (i = 0; i < cache->size; i++) {
+      for (c = cache->items[i]; c; c = next) {
+	 next = c->next;
+	 FREE(c->key);
+	 cache->ctx->Driver.DeleteProgram(cache->ctx, (struct program *)c->data);
+	 FREE(c);
+      }
+      cache->items[i] = NULL;
+   }
+
+
+   cache->n_items = 0;
+}
+
+
+static void cache_item( struct texenvprog_cache *cache,
 			GLuint hash,
-			void *key,
+			const struct state_key *key,
 			void *data )
 {
-   struct texenvprog_cache *c = MALLOC(sizeof(*c));
+   struct texenvprog_cache_item *c = MALLOC(sizeof(*c));
    c->hash = hash;
-   c->key = key;
+
+   c->key = _mesa_malloc(sizeof(*key));
+   memcpy(c->key, key, sizeof(*key));
+
    c->data = data;
-   c->next = *cache;
-   *cache = c;
+
+   if (cache->n_items > cache->size * 1.5) {
+      if (cache->size < 1000)
+	 rehash(cache);
+      else 
+	 clear_cache(cache);
+   }
+
+   cache->n_items++;
+   c->next = cache->items[hash % cache->size];
+   cache->items[hash % cache->size] = c;
 }
 
 static GLuint hash_key( struct state_key *key )
@@ -1113,28 +1177,32 @@ static GLuint hash_key( struct state_key *key )
    GLuint *ikey = (GLuint *)key;
    GLuint hash = 0, i;
 
-   /* I'm sure this can be improved on, but speed is important:
+   /* Make a slightly better attempt at a hash function:
     */
-   for (i = 0; i < sizeof(*key)/sizeof(GLuint); i++)
-      hash ^= ikey[i];
+   for (i = 0; i < sizeof(*key)/sizeof(*ikey); i++)
+   {
+      hash += ikey[i];
+      hash += (hash << 10);
+      hash ^= (hash >> 6);
+   }
 
    return hash;
 }
 
 void _mesa_UpdateTexEnvProgram( GLcontext *ctx )
 {
-   struct state_key *key;
+   struct state_key key;
    GLuint hash;
 	
    if (ctx->FragmentProgram._Enabled)
       return;
 	
-   key = make_state_key(ctx);
-   hash = hash_key(key);
+   make_state_key(ctx, &key);
+   hash = hash_key(&key);
 
    ctx->FragmentProgram._Current = ctx->_TexEnvProgram =
       (struct fragment_program *)
-      search_cache(ctx->Texture.env_fp_cache, hash, key, sizeof(*key));
+      search_cache(&ctx->Texture.env_fp_cache, hash, &key, sizeof(key));
 	
    if (!ctx->_TexEnvProgram) {
       if (0) _mesa_printf("Building new texenv proggy for key %x\n", hash);
@@ -1143,25 +1211,27 @@ void _mesa_UpdateTexEnvProgram( GLcontext *ctx )
 	 (struct fragment_program *) 
 	 ctx->Driver.NewProgram(ctx, GL_FRAGMENT_PROGRAM_ARB, 0);
 		
-      create_new_program(key, ctx, ctx->_TexEnvProgram);
+      create_new_program(&key, ctx, ctx->_TexEnvProgram);
 
-      cache_item(&ctx->Texture.env_fp_cache, hash, key, ctx->_TexEnvProgram);
+      cache_item(&ctx->Texture.env_fp_cache, hash, &key, ctx->_TexEnvProgram);
    } else {
-      FREE(key);
       if (0) _mesa_printf("Found existing texenv program for key %x\n", hash);
    }
-	
+}
+
+void _mesa_TexEnvProgramCacheInit( GLcontext *ctx )
+{
+   ctx->Texture.env_fp_cache.ctx = ctx;
+   ctx->Texture.env_fp_cache.size = 17;
+   ctx->Texture.env_fp_cache.n_items = 0;
+   ctx->Texture.env_fp_cache.items = (struct texenvprog_cache_item **)
+      _mesa_calloc(ctx->Texture.env_fp_cache.size * 
+		   sizeof(struct texenvprog_cache_item));
 }
 
 void _mesa_TexEnvProgramCacheDestroy( GLcontext *ctx )
 {
-   struct texenvprog_cache *a, *tmp;
-
-   for (a = ctx->Texture.env_fp_cache; a; a = tmp) {
-      tmp = a->next;
-      FREE(a->key);
-      FREE(a->data);
-      FREE(a);
-   }
+   clear_cache(&ctx->Texture.env_fp_cache);
+   FREE(ctx->Texture.env_fp_cache.items);
 }
 

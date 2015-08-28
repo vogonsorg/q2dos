@@ -211,19 +211,20 @@ enum
 #define VERT_RESULT_HPOS 0
 #define VERT_RESULT_COL0 1
 #define VERT_RESULT_COL1 2
-#define VERT_RESULT_BFC0 3
-#define VERT_RESULT_BFC1 4
-#define VERT_RESULT_FOGC 5
-#define VERT_RESULT_PSIZ 6
-#define VERT_RESULT_TEX0 7
-#define VERT_RESULT_TEX1 8
-#define VERT_RESULT_TEX2 9
-#define VERT_RESULT_TEX3 10
-#define VERT_RESULT_TEX4 11
-#define VERT_RESULT_TEX5 12
-#define VERT_RESULT_TEX6 13
-#define VERT_RESULT_TEX7 14
-#define VERT_RESULT_MAX  15
+#define VERT_RESULT_FOGC 3
+#define VERT_RESULT_TEX0 4
+#define VERT_RESULT_TEX1 5
+#define VERT_RESULT_TEX2 6
+#define VERT_RESULT_TEX3 7
+#define VERT_RESULT_TEX4 8
+#define VERT_RESULT_TEX5 9
+#define VERT_RESULT_TEX6 10
+#define VERT_RESULT_TEX7 11
+#define VERT_RESULT_PSIZ 12
+#define VERT_RESULT_BFC0 13
+#define VERT_RESULT_BFC1 14
+#define VERT_RESULT_EDGE 15
+#define VERT_RESULT_MAX  16
 
 
 /**
@@ -242,7 +243,8 @@ enum
    FRAG_ATTRIB_TEX4 = 8,
    FRAG_ATTRIB_TEX5 = 9,
    FRAG_ATTRIB_TEX6 = 10,
-   FRAG_ATTRIB_TEX7 = 11
+   FRAG_ATTRIB_TEX7 = 11,
+   FRAG_ATTRIB_MAX = 12
 };
 
 /*
@@ -1433,11 +1435,17 @@ struct gl_texture_unit
    GLboolean ColorTableEnabled;
 };
 
-struct texenvprog_cache {
+struct texenvprog_cache_item {
    GLuint hash;
    void *key;
-   void *data;
-   struct texenvprog_cache *next;
+   struct fragment_program *data;
+   struct texenvprog_cache_item *next;
+};
+
+struct texenvprog_cache {
+   struct texenvprog_cache_item **items;
+   GLuint size, n_items;
+   GLcontext *ctx;
 };
 
 /**
@@ -1470,7 +1478,7 @@ struct gl_texture_attrib
    struct gl_color_table Palette;
    
    /** Cached texenv fragment programs */
-   struct texenvprog_cache *env_fp_cache;
+   struct texenvprog_cache env_fp_cache;
 };
 
 
@@ -1800,6 +1808,7 @@ struct fragment_program
    GLuint NumTexIndirections;
    GLenum FogOption;
    struct program_parameter_list *Parameters; /**< array [NumParameters] */
+   GLboolean UsesKill;
 
 #ifdef USE_TCC
    char c_str[4096];		/* experimental... */
