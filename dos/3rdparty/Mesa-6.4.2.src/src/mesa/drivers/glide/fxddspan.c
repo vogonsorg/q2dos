@@ -50,6 +50,10 @@
 /*****                    Span functions                            *****/
 /************************************************************************/
 
+#if 0 /* not used anymore */
+/* (were used for software rasterizer whose corresponding
+ * function pointer members were removed in MesaLib-6.4) */
+
 #define DBG 0
 
 
@@ -539,6 +543,7 @@ fxReadStencilPixels (GLcontext *ctx, struct gl_renderbuffer *rb, GLuint n,
   * XXX todo
   */
 }
+#endif /* #if 0 */
 
 
 
@@ -576,7 +581,9 @@ void
 fxSetupDDSpanPointers(GLcontext * ctx)
 {
    struct swrast_device_driver *swdd = _swrast_GetDeviceDriverReference( ctx );
+#if 0 /* not used anymore (see below) */
    fxMesaContext fxMesa = FX_CONTEXT(ctx);
+#endif
 
    swdd->SetBuffer = fxDDSetBuffer;
 
