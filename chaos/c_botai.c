@@ -545,7 +545,7 @@ void Bot_Think(edict_t *ent)
 		n = ent->client->b_currentnode;
 
 		//duck if needed
-		if (nodes[ent->client->b_path[n]].duckflag)
+		if (n >= 0 && nodes[ent->client->b_path[n]].duckflag)
 		{
 			ent->client->b_duck = 1;
 		}
