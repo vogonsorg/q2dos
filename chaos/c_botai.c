@@ -1974,7 +1974,7 @@ void Bot_Wave (edict_t *ent, int i, float time)
 	if (ent->client->ps.pmove.pm_flags & PMF_DUCKED)
 		return;
 
-	if (ent->client->anim_priority == (ANIM_DEATH || ANIM_PAIN))
+	if (ent->client->anim_priority == ANIM_DEATH || ent->client->anim_priority == ANIM_PAIN)
 		return;
 
 	ent->client->anim_priority = ANIM_WAVE;
