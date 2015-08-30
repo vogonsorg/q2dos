@@ -314,7 +314,7 @@ qboolean PBM_FireResistant (edict_t *ent, vec3_t point)
 //            That field cannot be NULL, or Q2 may crash.
 //------------------------------------------------------------------------*/
 void PBM_BurnDamage
-(edict_t *victim, edict_t *fire, vec3_t point, vec3_t damage, int dflags, int mod)
+	(edict_t *victim, edict_t *fire, vec3_t point, vec3_t damage, int dflags, int mod)
 {
 	int   points;
 	int   die = (int)damage[0];
@@ -334,7 +334,7 @@ void PBM_BurnDamage
 
 /* Check if entity will catch on fire. */
 //	if ((rand() % 100) < chance)
-		if (fire->master != fire);
+		if (fire->master != fire)
 			PBM_Ignite (victim, fire->master, point);
 
 /* Inflict some burn damage. */
