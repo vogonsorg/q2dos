@@ -557,7 +557,7 @@ void Bot_Think(edict_t *ent)
 				ent->client->b_nodetime	= 0;
 				ent->client->b_goalitem->avoidtime = level.time + 15;
 				ent->client->b_goalitem = NULL;
-				ent->client->b_currentnode =- 1;
+				ent->client->b_currentnode = -1;
 				
 			}
 			else if (!visible(ent, ent->client->b_goalitem))
@@ -565,7 +565,7 @@ void Bot_Think(edict_t *ent)
 				ent->client->b_nodetime	= 0;
 				ent->client->b_goalitem->avoidtime = level.time + 15;
 				ent->client->b_goalitem = NULL;
-				ent->client->b_currentnode =- 1;
+				ent->client->b_currentnode = -1;
 			}
 			else
 			{
@@ -608,7 +608,7 @@ void Bot_Think(edict_t *ent)
 				{
 					ent->client->b_nodetime	= 0;
 					ent->client->b_goalitem = NULL;
-					ent->client->b_currentnode =- 1;
+					ent->client->b_currentnode = -1;
 				}
 			}
 		}
@@ -652,7 +652,7 @@ void Bot_Think(edict_t *ent)
 					ent->client->b_nodetime	= 0;
 					ent->client->b_goalitem->avoidtime = level.time + 10;
 					ent->client->b_goalitem = NULL;
-					ent->client->b_currentnode =- 1;
+					ent->client->b_currentnode = -1;
 
 				}
 				else if (!visible_node(nodes[ent->client->b_path[n]].origin, ent->s.origin))
@@ -660,7 +660,7 @@ void Bot_Think(edict_t *ent)
 					nprintf(PRINT_HIGH,"visible_node == 0!\n");
 					ent->client->b_goalitem->avoidtime = level.time + 10;
 					ent->client->b_goalitem = NULL;
-					ent->client->b_currentnode =- 1;
+					ent->client->b_currentnode = -1;
 				}
 				else if ((nodes[ent->client->b_path[n]].flag == PLAT_NODE)
 					&& dist < 100
@@ -674,7 +674,7 @@ void Bot_Think(edict_t *ent)
 						ent->client->b_nodetime	= 0;
 						ent->client->b_goalitem->avoidtime = level.time + 10;
 						ent->client->b_goalitem = NULL;
-						ent->client->b_currentnode =- 1;
+						ent->client->b_currentnode = -1;
 					}
 					else
 					{
