@@ -38,7 +38,6 @@ void Assign_Bot_Class (edict_t *self)
 	int j;
 	edict_t *cl_ent;
 
-
 	randnum = rand()%8;
 	 if (randnum == 0)
 		self->client->resp.mos = SPECIAL;
@@ -61,9 +60,8 @@ void Assign_Bot_Class (edict_t *self)
 		self->client->resp.mos = ENGINEER;
 	else if (randnum == 7 && rand()%2 == 1)
 		self->client->resp.mos = MEDIC;
-	else 
+	else
 		self->client->resp.mos = INFANTRY;
-		
 
 	for (j=0 ; j < game.maxclients ; j++)
 	{
@@ -127,21 +125,17 @@ void Assign_Bot_Class (edict_t *self)
 	{
 		available = mapclasslimits[self->client->resp.team_on->index][self->client->resp.mos].limit;
 	}
-    
+
 	//gi.dprintf(DEVELOPER_MSG_GAME, "%i  %i\n", self->client->resp.mos, available);
 	if (available <= 0 )
 		self->client->resp.mos = INFANTRY;
-
-
-
 }
+
 //===============================================================
 //
 //				BOT SPAWN
 //
 //===============================================================
-
-
 
 ///////////////////////////////////////////////////////////////////////
 // Respawn the bot
@@ -158,7 +152,7 @@ void BOT_Respawn (edict_t *self)
 	// add a teleportation effect
 	self->s.event = EV_PLAYER_TELEPORT;
 
-		// hold in place briefly
+	// hold in place briefly
 	self->client->ps.pmove.pm_flags = PMF_TIME_TELEPORT;
 	self->client->ps.pmove.pm_time = 14;
 
@@ -169,12 +163,7 @@ void BOT_Respawn (edict_t *self)
 
 	change_stance(self, STANCE_STAND);
 
-
-
 	Assign_Bot_Class (self);
-
-
-
 
 	//join game
 	self->movetype = MOVETYPE_WALK;
@@ -203,7 +192,7 @@ void BOT_Respawn (edict_t *self)
 	self->deadflag = DEAD_NO;
 	self->air_finished = level.time + 12;
 	self->clipmask = MASK_PLAYERSOLID;
-    self->svflags &= ~SVF_NOCLIENT; 
+	self->svflags &= ~SVF_NOCLIENT;
 	self->wound_location=0;
 	Give_Class_Weapon(self);
 	Give_Class_Ammo(self);
@@ -239,13 +228,9 @@ void BOT_Respawn (edict_t *self)
 		Spawn_Chute(self);
 	}
 
-
-
 	self->solid = SOLID_TRIGGER;
 
 	Set_VIP_Defense_Bot(self);
-
-
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -259,11 +244,11 @@ edict_t *BOT_FindFreeClient (void)
 	int max_count=0;
 
 	bot = NULL;
-//faf: hack to stop crash	
+//faf: hack to stop crash
 
-//	for( i = 0, ent = g_edicts + 1; i < game.maxclients; i++, ent++ ) 
-	for( i = game.maxclients, ent = g_edicts + game.maxclients; i >= 0; i--, ent-- ) 
-//	for( i = 16, ent = g_edicts + 17; i < game.maxclients; i++, ent++ ) 
+//	for( i = 0, ent = g_edicts + 1; i < game.maxclients; i++, ent++ )
+	for( i = game.maxclients, ent = g_edicts + game.maxclients; i >= 0; i--, ent-- )
+//	for( i = 16, ent = g_edicts + 17; i < game.maxclients; i++, ent++ )
 	{
 		if( !ent->inuse && bot == NULL )
 			bot = ent;
@@ -295,7 +280,6 @@ void BOT_SetName(edict_t *bot, char *name, char *skin, int team)
 	edict_t *e;
 	qboolean gotname = false;
 
-
 	char * usanames [14] = {"SaBOTeur", "BOTched", "loBOTomy", "Dipsymama", "saBOTage", "G.I. Joe", "Audie", "Winters", "Speirs", "Blithe", "Jim", "Bob", "Patton", "Eisenhower"};
 	char * grmnames [14] = {"VerBOTen", "PolkaBOT", "BOTskrieg", "BOTwurst", "VolksBOT", "Adolf", "Lars", "Franz", "Frederick", "Niels", "Erik", "Goebbels", "Goering", "Rommel"};
 	char * rusnames [14] = {"Stalin", "Zhukov", "Molotov", "Igor", "Vladimir", "Boris", "Viktor", "Dmitri", "KalashniBOT", "ShishkaBOT", "CosmoBOT", "Rostislav", "KGBot", "BOTshevik"}; 
@@ -307,23 +291,22 @@ void BOT_SetName(edict_t *bot, char *name, char *skin, int team)
 
 	for (j=0; j<50 && gotname == false; j++)
 	{
-
 		randname = (int)rand()%14;
 
-	if (!strcmp (team_list[team]->teamid, "grm"))
-		sprintf(bot_name,"%s",grmnames[randname]);
-	else if (!strcmp (team_list[team]->teamid, "rus"))
-		sprintf(bot_name,"%s",rusnames[randname]);
-	else if (!strcmp (team_list[team]->teamid, "gbr"))
-		sprintf(bot_name,"%s",gbrnames[randname]);
-	else if (!strcmp (team_list[team]->teamid, "pol"))
-		sprintf(bot_name,"%s",polnames[randname]);
-	else if (!strcmp (team_list[team]->teamid, "ita"))
-		sprintf(bot_name,"%s",itanames[randname]);
-	else if (!strcmp (team_list[team]->teamid, "jpn"))
-		sprintf(bot_name,"%s",jpnnames[randname]);
-	else 
-		sprintf(bot_name,"%s",usanames[randname]);
+		if (!strcmp (team_list[team]->teamid, "grm"))
+			sprintf(bot_name,"%s",grmnames[randname]);
+		else if (!strcmp (team_list[team]->teamid, "rus"))
+			sprintf(bot_name,"%s",rusnames[randname]);
+		else if (!strcmp (team_list[team]->teamid, "gbr"))
+			sprintf(bot_name,"%s",gbrnames[randname]);
+		else if (!strcmp (team_list[team]->teamid, "pol"))
+			sprintf(bot_name,"%s",polnames[randname]);
+		else if (!strcmp (team_list[team]->teamid, "ita"))
+			sprintf(bot_name,"%s",itanames[randname]);
+		else if (!strcmp (team_list[team]->teamid, "jpn"))
+			sprintf(bot_name,"%s",jpnnames[randname]);
+		else
+			sprintf(bot_name,"%s",usanames[randname]);
 
 		gotname = true;
 
@@ -335,16 +318,11 @@ void BOT_SetName(edict_t *bot, char *name, char *skin, int team)
 
 			if (!strcmp (bot_name, e->client->pers.netname))
 				gotname = false;
-
 		}
-	}	
-
+	}
 
 	if ((int)rand()%35 == 1)
 		sprintf(bot_name,"%s",ddaynames[randname]);
-
-
-
 
 	// Set the name for the bot.
 	// name
@@ -355,13 +333,13 @@ void BOT_SetName(edict_t *bot, char *name, char *skin, int team)
 	else
 		strcpy(bot_name,name);
 */
-/*	
+/*
 	// skin
 	if(strlen(skin) == 0)
 	{
 		// randomly choose skin 
 		rnd = random();
-	if(rnd  < 0.05)
+		if(rnd  < 0.05)
 			sprintf(bot_skin,"female/athena");
 		else if(rnd < 0.1)
 			sprintf(bot_skin,"female/brianna");
@@ -399,14 +377,14 @@ void BOT_SetName(edict_t *bot, char *name, char *skin, int team)
 			sprintf(bot_skin,"male/psycho");
 		else if(rnd < 0.95)
 			sprintf(bot_skin,"male/razor");
-		else 
+		else
 			sprintf(bot_skin,"male/sniper");
 	}
 	else
 		strcpy(bot_skin,skin);
 */
 
-			sprintf(bot_skin,"grm/class_infantry");
+	sprintf(bot_skin,"grm/class_infantry");
 
 	// initialise userinfo
 	memset (userinfo, 0, sizeof(userinfo));
@@ -415,7 +393,6 @@ void BOT_SetName(edict_t *bot, char *name, char *skin, int team)
 	Info_SetValueForKey (userinfo, "name", bot_name);
 	Info_SetValueForKey (userinfo, "skin", bot_skin);
 	Info_SetValueForKey (userinfo, "hand", "0"); // bot is center handed for now!
-
 
 	ClientConnect (bot, userinfo);
 }
@@ -436,7 +413,7 @@ int	BOT_NextCTFTeam()
 //==========================================
 qboolean BOT_JoinCTFTeam (edict_t *ent, char *team_name)
 {
-return false;
+	return false;
 /*	char	*s;
 	int		team;
 //	edict_t	*event;
@@ -489,12 +466,9 @@ void Set_VIP_Defense_Bot (edict_t *ent)
 	axis_vip = false;
 	numdefenders = 0;
 
-
-
-
 	ent->ai->defend_bot = false;
 
-    for (i=0 ; i<globals.num_edicts ; i++)
+	for (i=0 ; i<globals.num_edicts ; i++)
 	{
 		e = &g_edicts[i];
 
@@ -514,7 +488,6 @@ void Set_VIP_Defense_Bot (edict_t *ent)
 			axis_vip = true;
 	}
 
-
 	if (allied_vip == true && axis_vip == true)
 	{
 		for(i=0;i<maxclients->value;i++)
@@ -529,7 +502,6 @@ void Set_VIP_Defense_Bot (edict_t *ent)
 				continue;
 			if (bot->ai->defend_bot == true)
 				numdefenders++;
-		
 		}
 
 		teamcount = PlayerCountForTeam(ent->client->resp.team_on->index, true);
@@ -556,15 +528,14 @@ void Set_VIP_Defense_Bot (edict_t *ent)
 		}
 		//gi.dprintf(DEVELOPER_MSG_GAME, "myteam:%i tcount:%i numdef %i defendbot? %i\n", ent->client->resp.team_on->index, teamcount, numdefenders, ent->ai->defend_bot);
 	}
-
 }
+
 //==========================================
 // BOT_DMClass_JoinGame
 // put the bot into the game.
 //==========================================
 void BOT_DMClass_JoinGame (edict_t *ent, char *team_name)
 {
-
 	vec3_t	spawn_origin, spawn_angles;
 //	int randnum = rand()%5;
 
@@ -577,9 +548,7 @@ void BOT_DMClass_JoinGame (edict_t *ent, char *team_name)
 
 //	ent->client->resp.team_on=team_list[1];
 
-
 	Assign_Bot_Class (ent);
-
 
 	//join game
 	ent->movetype = MOVETYPE_WALK;
@@ -610,7 +579,7 @@ void BOT_DMClass_JoinGame (edict_t *ent, char *team_name)
 	ent->deadflag = DEAD_NO;
 	ent->air_finished = level.time + 12;
 	ent->clipmask = MASK_PLAYERSOLID;
-    ent->svflags &= ~SVF_NOCLIENT; 
+	ent->svflags &= ~SVF_NOCLIENT;
 	ent->wound_location=0;
 	Give_Class_Weapon(ent);
 	Give_Class_Ammo(ent);
@@ -653,10 +622,7 @@ void BOT_DMClass_JoinGame (edict_t *ent, char *team_name)
 
 	change_stance(ent, STANCE_STAND);
 
-	
 	Set_VIP_Defense_Bot(ent);
-
-
 }
 
 //==========================================
@@ -682,10 +648,12 @@ void BOT_JoinBlue (edict_t *ent)
 {
 	BOT_DMClass_JoinGame( ent, "blue" );
 }
+
 void BOT_JoinRed (edict_t *ent)
 {
 	BOT_DMClass_JoinGame( ent, "red" );
 }
+
 void BOT_JoinGame (edict_t *ent)
 {
 	BOT_DMClass_JoinGame( ent, NULL );
@@ -698,8 +666,6 @@ qboolean nobotwarn = false;
 void BOT_SpawnBot (int team, char *name, char *skin, char *userinfo)
 {
 	edict_t	*bot;
-
-
 
 	//if (!nobotwarn && !nav.loaded)
 	if (!nobotwarn && (nav.loaded == -1))
@@ -714,37 +680,28 @@ void BOT_SpawnBot (int team, char *name, char *skin, char *userinfo)
 		Com_Printf("No .cmp file for this map, can't load bots!\n");
 		return;
 	}
-	
+
 	//	if( !nav.loaded ) {
 	if (nav.loaded == -1 || total_camp_spots == 0){
 		Com_Printf("Can't spawn bots without a valid navigation file\n");
 		return;
 	}
-	
-
 
 	if (level.intermissiontime)
 		return;
-		
 
 	bot = BOT_FindFreeClient ();
-	
 	if (!bot)
 	{
 //		safe_bprintf (PRINT_MEDIUM, "Server is full, increase Maxclients.\n");
 		return;
 	}
 
-	
 	qbots = true;
-
-
 
 	//init the bot
 	bot->inuse = true;
 	bot->yaw_speed = 100;
-
-
 
 	// To allow bots to respawn
 	if(userinfo == NULL)
@@ -753,8 +710,6 @@ void BOT_SpawnBot (int team, char *name, char *skin, char *userinfo)
 	{
 		ClientConnect (bot, userinfo);
 	}
-
-
 
 	G_InitEdict (bot);
 	G_SpawnAI(bot); //jabot092(2)
@@ -776,17 +731,14 @@ void BOT_SpawnBot (int team, char *name, char *skin, char *userinfo)
 	AI_ResetWeights(bot);
 	AI_ResetNavigation(bot);
 
-
 	bot->client->resp.team_on = team_list[team];
 
 	bot->think = BOT_JoinGame;
-
 
 	if (level.time >= level_wait->value + bot->client->resp.team_on->delay)
 		bot->nextthink = level.time + (random()*2.0);
 	else
 		bot->nextthink = level_wait->value + bot->client->resp.team_on->delay + (random()*2.0);
-
 
 /*	if( ctf->value && team != NULL )
 	{
@@ -795,7 +747,7 @@ void BOT_SpawnBot (int team, char *name, char *skin, char *userinfo)
 		else if( !Q_stricmp( team, "red" ) )
 			bot->think = BOT_JoinRed;
 	}
-*/	
+*/
 	AI_EnemyAdded (bot); // let the ai know we added another
 	bot->solid = SOLID_TRIGGER;
 }

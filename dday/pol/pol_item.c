@@ -564,15 +564,5 @@ gitem_t politems[MAX_TEAM_ITEMS]=
 	0
 	},
 
-{
-	NULL
-},
+	{ NULL }
 };
-
-
-
-
-
-
-
-

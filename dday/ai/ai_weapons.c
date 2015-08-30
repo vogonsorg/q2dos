@@ -36,10 +36,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //WEAP_BFG
 //WEAP_GRAPPLE
 
-
 //==========================================
 // AI_InitAIWeapons
-// 
+//
 // AIWeapons are the way the AI uses to analize
 // weapon types, for choosing and fire them
 //==========================================
@@ -65,7 +64,6 @@ void AI_InitAIWeapons (void)
 	AIWeapons[WEAP_SHOTGUN].RangeWeight[AIWEAP_MELEE_RANGE] = 0.3;
 	AIWeapons[WEAP_SHOTGUN].weaponItem = NULL;//FindItemByClassname("weapon_shotgun");
 	AIWeapons[WEAP_SHOTGUN].ammoItem = NULL;//FindItemByClassname("ammo_shells");
-	
 
 	//MACHINEGUN
 	AIWeapons[WEAP_MACHINEGUN].aimType = AI_AIMSTYLE_INSTANTHIT;
@@ -94,7 +92,6 @@ void AI_InitAIWeapons (void)
 	AIWeapons[WEAP_GRENADES].weaponItem = NULL;//FindItemByClassname("ammo_grenades");
 	AIWeapons[WEAP_GRENADES].ammoItem = NULL;//FindItemByClassname("ammo_grenades");
 
-
 	//ROCKETLAUNCHER
 	AIWeapons[WEAP_ROCKETLAUNCHER].aimType = AI_AIMSTYLE_PREDICTION_EXPLOSIVE;
 	AIWeapons[WEAP_ROCKETLAUNCHER].RangeWeight[AIWEAP_LONG_RANGE] = 0.2;	//machinegun is better
@@ -103,7 +100,6 @@ void AI_InitAIWeapons (void)
 	AIWeapons[WEAP_ROCKETLAUNCHER].RangeWeight[AIWEAP_MELEE_RANGE] = 0.6;
 	AIWeapons[WEAP_ROCKETLAUNCHER].weaponItem = NULL;//FindItemByClassname("weapon_rocketlauncher");
 	AIWeapons[WEAP_ROCKETLAUNCHER].ammoItem = NULL;//FindItemByClassname("ammo_rockets");
-
 
 	//WEAP_MAUSER
 	AIWeapons[WEAP_RIFLE].aimType = AI_AIMSTYLE_INSTANTHIT;
@@ -131,14 +127,4 @@ void AI_InitAIWeapons (void)
 	AIWeapons[WEAP_MELEE].RangeWeight[AIWEAP_MELEE_RANGE] = 0.9;
 	AIWeapons[WEAP_MELEE].weaponItem = NULL;//FindItemByClassname("weapon_railgun");
 	AIWeapons[WEAP_MELEE].ammoItem = NULL;//FindItemByClassname("ammo_slugs");
-
 }
-
-
-
-
-
-
-
-
-

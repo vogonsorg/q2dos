@@ -517,16 +517,7 @@ gitem_t rusitems[MAX_TEAM_ITEMS]=
 		"rus",
 		0,
 		0
-	   
+	},
 
-		},
-{
-	NULL
-},
+	{ NULL }
 };
-
-
-
-
-
-

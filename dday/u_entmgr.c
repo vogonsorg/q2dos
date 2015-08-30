@@ -24,8 +24,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
- 
- /*
+
+/*
   u_entmgr.c
 
   vjj
@@ -40,15 +40,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define EMPTY_NAME   "*none*"
 
-
 //these are the Entity functions
 //These functions allow the user to insert and remove types of entities from 
 //the spawns[].
 //we need to be able to access the spawns[]
 
 extern spawn_t spawns[];
-
-
 
 
 //add an item to the itemlist array. Note that once you request a spot, it
@@ -66,52 +63,44 @@ gitem_t *InsertItem(gitem_t *it, spawn_t *spawnInfo)
 
     inc_items = 0;
     spot = NULL;
-      //first, we want to find a place for the item.
+    //first, we want to find a place for the item.
     for(i=1;i<game.num_items && !spot;i++)
         if(itemlist[i].classname && !Q_stricmp(itemlist[i].classname,EMPTY_NAME))
             spot = &itemlist[i];
 
-
-      //if we didn't find an empty slot, see if we can create one
+    //if we didn't find an empty slot, see if we can create one
     if(!spot && i < MAX_ITEMS)
-        {
+    {
         spot = &itemlist[i];
-
-                inc_items = 1;
-
-        }
+        inc_items = 1;
+    }
 
     if(spot)
     {
-          //found a place in the item list, need to see if we can insert
-          //the spawn function befrore we can insert item
+        //found a place in the item list, need to see if we can insert
+        //the spawn function befrore we can insert item
         spspot = NULL;
 
         for(s=spawns, i=0; i<MAX_EDICTS && s->name;i++,s++)
             if(s->name && !Q_stricmp(s->name,EMPTY_NAME))
                 spspot = s;
 
-          //if we didn't find an empty slot, see if we can create one
+        //if we didn't find an empty slot, see if we can create one
         if(!spspot && !s->name && i < (MAX_EDICTS - 1)) //want to leave {NULL,NULL}
             spspot = s;
 
-
-      //OK, fill spot in with the stuff the user sent in
+        //OK, fill spot in with the stuff the user sent in
         if(spspot)
         {
             *spspot = *spawnInfo;
-
             *spot = *it;            //OK, fill spot in with the stuff the user sent in
-                        if (inc_items) game.num_items++;
+            if (inc_items) game.num_items++;
         }
     }
-    
-	//gi.dprintf(DEVELOPER_MSG_GAME, "InsertItem: %s -> %s\n", it->classname, it->pickup_name);
 
-	PrecacheItem (it); //pbowens: precache team items
+    //gi.dprintf(DEVELOPER_MSG_GAME, "InsertItem: %s -> %s\n", it->classname, it->pickup_name);
+
+    PrecacheItem (it); //pbowens: precache team items
     return spot;
 }
-
-
-
 

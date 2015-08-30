@@ -582,15 +582,5 @@ gitem_t itaitems[MAX_TEAM_ITEMS]=
 		0
 	},
 
-{
-	NULL
-},
+	{ NULL }
 };
-
-
-
-
-
-
-
-

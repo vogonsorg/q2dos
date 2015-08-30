@@ -592,14 +592,5 @@ gitem_t jpnitems[MAX_TEAM_ITEMS]=
 		0
 	},
 
-{
-	NULL
-},
+	{ NULL }
 };
-
-
-
-
-
-
-

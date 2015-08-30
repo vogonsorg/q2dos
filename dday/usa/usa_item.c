@@ -520,16 +520,5 @@ gitem_t usaitems[MAX_TEAM_ITEMS]=
 		0
 	},
 
-	
-
-
-{
-	NULL
-},
+	{ NULL }
 };
-
-
-
-
-
-

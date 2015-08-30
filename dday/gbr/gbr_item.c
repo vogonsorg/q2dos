@@ -525,19 +525,8 @@ gitem_t gbritems[]=
 		0
 	},
 
-	
-
-	
-
-
-{
-	NULL
-},
+	{ NULL },/**/
+	{ NULL },/**/
+	{ NULL },/**/
+	{ NULL }
 };
-
-
-
-
-
-
-

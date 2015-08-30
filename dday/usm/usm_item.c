@@ -582,13 +582,5 @@ gitem_t usmitems[MAX_TEAM_ITEMS]=
 		0
 	},
 
-
-{
-	NULL
-},
+	{ NULL }
 };
-
-
-
-
-

@@ -492,16 +492,9 @@ gitem_t grmitems[]=
 		0
 	},
 
-
-{
-	NULL
-},
+	{ NULL },/**/
+	{ NULL },/**/
+	{ NULL },/**/
+	{ NULL },/**/
+	{ NULL }
 };
-
-
-
-
-
-
-
-
