@@ -39,10 +39,10 @@ void Svcmd_addbots_f()	// adds "num" bots.
 		// set the model
 		if (Q_stricmp(gi.argv(6), "") == 0)
 		{
-			sprintf(model, Get_RandomBotSkin());
+			strcpy(model, Get_RandomBotSkin());
 		}
 		else
-			sprintf(model, gi.argv(6));
+			strcpy(model, gi.argv(6));
 
 		// set the name
 		if(Q_stricmp(name,"") == 0
@@ -66,10 +66,10 @@ void Svcmd_addbots_f()	// adds "num" bots.
 			// set the model
 			if (Q_stricmp(gi.argv(6), "") == 0)
 			{
-				sprintf(model, Get_RandomBotSkin());
+				strcpy(model, Get_RandomBotSkin());
 			}
 			else
-				sprintf(model, gi.argv(6));
+				strcpy(model, gi.argv(6));
 
 			// set the name
 			strcpy(name,(strchr(model, '/')+1));

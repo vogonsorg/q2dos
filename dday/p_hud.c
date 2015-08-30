@@ -664,7 +664,7 @@ void A_ScoreboardMessage (edict_t *ent)//, edict_t *killer)
 		strcat(scoretoprightpic, team_list[1]->teamid);
 		strcat(scoretoprightpic, "_score_top  ");
 
-		sprintf(string, scoretopleftpic); //team 0
+		strcpy(string, scoretopleftpic); //team 0
 		strcat(string, scoretoprightpic); // team 1
 		strcat(string, scoreleftpic); //background left list pic
 		strcat(string, scorerightpic); // background right list pic
@@ -964,7 +964,7 @@ void A_ScoreboardMessage2 (edict_t *ent)//, edict_t *killer)
 		strcat(scoretoprightpic, team_list[1]->teamid);
 		strcat(scoretoprightpic, "_score_top  ");
 
-		sprintf(string, scoretopleftpic); //team 0
+		strcpy(string, scoretopleftpic); //team 0
 		strcat(string, scoretoprightpic); // team 1
 		strcat(string, scoreleftpic); //background left list pic
 		strcat(string, scorerightpic); // background right list pic

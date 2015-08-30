@@ -1596,9 +1596,9 @@ void ClientCommand2 (edict_t *ent)
 			{
 				char name[MAX_INFO_KEY], skin[MAX_INFO_KEY], hand[MAX_INFO_KEY];
 
-				sprintf(name,Info_ValueForKey (ent->client->pers.userinfo, "name"));
-				sprintf(skin,Info_ValueForKey (ent->client->pers.userinfo, "skin"));
-				sprintf(hand,Info_ValueForKey (ent->client->pers.userinfo, "hand"));
+				strcpy(name,Info_ValueForKey (ent->client->pers.userinfo, "name"));
+				strcpy(skin,Info_ValueForKey (ent->client->pers.userinfo, "skin"));
+				strcpy(hand,Info_ValueForKey (ent->client->pers.userinfo, "hand"));
 				
 				ClientDisconnect (ent);
 				ClientConnect (ent, ent->client->pers.userinfo);
