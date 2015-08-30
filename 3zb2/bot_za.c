@@ -2279,7 +2279,8 @@ void Bots_Move_NORM (edict_t *ent)
 	gitem_t		*item;
 
 	float		x,yaw,iyaw,f1,f2,f3,bottom;
-	qboolean	tempflag;//,buttonuse;
+//	qboolean	tempflag;//,buttonuse;
+	int		tempflag;
 	vec3_t		temppos;
 
 	trace_t		rs_trace;
