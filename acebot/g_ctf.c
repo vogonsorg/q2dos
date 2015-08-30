@@ -340,7 +340,7 @@ void CTFAssignTeam(gclient_t *who)
 			team2count++;
 		}
 	}
-	if (team1count < team1count)
+	if (team1count < team2count)
 		who->resp.ctf_team = CTF_TEAM1;
 	else if (team2count < team1count)
 		who->resp.ctf_team = CTF_TEAM2;
