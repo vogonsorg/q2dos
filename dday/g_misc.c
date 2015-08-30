@@ -2504,7 +2504,7 @@ void HeadShotGib (edict_t *ent, vec3_t head_pos, vec3_t forward, vec3_t right, v
 
 // pbowens: surface types (based on psychospaz)
 
-qboolean strcmpwld (char *give, char *check)
+static qboolean strcmpwld (char *give, char *check)
 {
 	char tmp[64]; /* csurface_t->name is [16] */
 

@@ -37,7 +37,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //bcass end
 
 void SV_AddBlend (float r, float g, float b, float a, float *v_blend);
-qboolean strcmpwld (char *give, char *check);
 qboolean Cmd_Reload(edict_t *ent);
 void Cmd_Objectives (edict_t *ent);
 
