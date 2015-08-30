@@ -1191,7 +1191,7 @@ void SpawnItem (edict_t *ent, gitem_t *item)
 		}
 		if ( (int)dmflags->value & DF_INFINITE_AMMO )
 		{
-			if ( (item->flags == IT_AMMO) /*|| (strcmp(ent->classname, "weapon_flamethrower") == 0) */)
+			if (item->flags == IT_AMMO /*|| (strcmp(ent->classname, "weapon_flamethrower") == 0) */)
 			{
 				G_FreeEdict (ent);
 				return;

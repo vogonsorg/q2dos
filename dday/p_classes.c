@@ -64,11 +64,11 @@ void Load_Weapon (edict_t *ent, gitem_t	*item)
                         ent->client->mags[1].hmg_rnd = ammo_item->quantity;
                 else if (item->position == LOC_ROCKET)
                         ent->client->mags[1].antitank_rnd = ammo_item->quantity;
-                else if ((item->position == LOC_RIFLE))
+                else if (item->position == LOC_RIFLE)
                         ent->client->mags[1].rifle_rnd = ammo_item->quantity;
-                else if ((item->position == LOC_SNIPER))
+                else if (item->position == LOC_SNIPER)
                         ent->client->mags[1].sniper_rnd = ammo_item->quantity;
-                else if ((item->position == LOC_SHOTGUN))
+                else if (item->position == LOC_SHOTGUN)
                         ent->client->mags[1].shotgun_rnd = ammo_item->quantity;
                  else if (item->position == LOC_SUBMACHINEGUN2)
                         ent->client->mags[1].submg2_rnd = ammo_item->quantity;
