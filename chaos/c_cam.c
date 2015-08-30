@@ -608,7 +608,7 @@ void CameraThink(edict_t *ent, usercmd_t *ucmd)
 					ent->last_move_time = 0;
 				}
 			}
-			else if ((ent->client->pTarget = BestViewPlayer(ent)) != NULL)
+			else if ((ent->client->pTarget = BestViewPlayer()) != NULL)
 			{
 				RepositionAtPlayer(ent);
 				PointCamAtPlayer(ent);
@@ -630,7 +630,7 @@ void CameraThink(edict_t *ent, usercmd_t *ucmd)
 
 		if (ent->client->pTarget == NULL)
 		{
-			ent->client->pTarget = BestViewPlayer(ent);
+			ent->client->pTarget = BestViewPlayer();
 		}
 	}
 	else if (ent->client->cammode == 2)	//Chase Cam mode
@@ -670,11 +670,11 @@ void CameraThink(edict_t *ent, usercmd_t *ucmd)
 					PointCamAtPlayer(ent);
 				}
 				else	// go to next valid player
-					ent->client->pTarget = GetRandomValidPlayer(ent->client->pTarget);
+					ent->client->pTarget = GetRandomValidPlayer();
 			}
 
 		}
 		else
-			ent->client->pTarget = GetFirstValidPlayer (ent);
+			ent->client->pTarget = GetFirstValidPlayer ();
 	}
 }
