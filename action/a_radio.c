@@ -338,13 +338,13 @@ void RadioBroadcast(edict_t *ent, int partner, char *msg)
                 radio_msgs = female_radio_msgs;
                 base_path = "radio/female/";
         }
-                else
+        else
         {
                 radio_msgs = male_radio_msgs;
                 base_path = "radio/male/";
         }
 
-        i = found = 0;
+        i = found = msg_len = 0;
         while (strcmp(radio_msgs[i].msg, "END"))
         {
                 if (!Q_stricmp(radio_msgs[i].msg, msg))
