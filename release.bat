@@ -52,6 +52,7 @@ cd ..
 
 copy q2.exe release
 copy ref_soft\ref_soft.dxe release
+copy ref_gl\ref_gl.dxe release
 copy cwsdpmi.exe release
 copy readme.txt release
 copy Goa\gamespy.dxe release
@@ -66,6 +67,7 @@ copy dday\gamex86.dxe release\dday
 copy rsrc\gamex86.dxe release\rogue
 copy xsrc\gamex86.dxe release\xatrix
 copy zaero\gamex86.dxe release\zaero
+xcopy dos\3rdparty\lib_dxe release /E
 
 C:
 cd\

@@ -12,6 +12,11 @@ make -f makedxe3 clean
 make -f makedxe3
 cd..
 
+cd ref_gl
+make -f makedxe3 clean
+make -f makedxe3
+cd..
+
 cd Goa
 make -f makedxe3 clean
 make -f makedxe3
