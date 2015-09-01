@@ -525,7 +525,7 @@ void SP_info_team_start(edict_t *ent)
 		{
 			switch (r)
 			{
-				r = (int)(random() *4);
+			//	r = (int)(random() *4); //unreachable!!!
 				case 0: team = "rus"; break;
 				case 1: team = "gbr"; break;
 				case 2: team = "pol"; break;
@@ -537,7 +537,7 @@ void SP_info_team_start(edict_t *ent)
 		{
 			switch (r)
 			{
-				r = (int)(random() *2);
+			//	r = (int)(random() *2); //unreachable!!!
 				case 0: team = "grm"; break;
 				case 1: team = "ita"; break;
 				default: team = "jpn"; break;
