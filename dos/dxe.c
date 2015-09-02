@@ -27,13 +27,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <dir.h>
 #include <assert.h>
 #include <errno.h>
+#include <io.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <time.h>
+#include <signal.h>
 
 #ifndef REF_HARD_LINKED
+#include <dos.h>
+#include <dpmi.h>
 #include <sys/movedata.h>
-#include "dosisms.h"
-
+#include "dosisms.h" /* ref_soft */
 /* FS: 3dfx */
 #include <sys/nearptr.h>
 #include <setjmp.h>
@@ -41,8 +45,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 
 #if defined(GAMESPY) && !defined(GAMESPY_HARD_LINKED)
-#include <io.h>
-#include <signal.h>
 #include <tcp.h>
 #include <netdb.h>
 #include <arpa/inet.h>
@@ -67,7 +69,6 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (atoi)
 	DXE_EXPORT (ceil)
 	DXE_EXPORT (cos)
-	DXE_EXPORT (crand)
 	DXE_EXPORT (errno)
 	DXE_EXPORT (exit)
 	DXE_EXPORT (fclose)
@@ -173,7 +174,7 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (strtoul)
 	DXE_EXPORT (vfprintf)
 
-	/* FS: Mesa 6.2.4 friends */
+	/* FS: Mesa 6.4.x */
 	DXE_EXPORT (dlclose)
 	DXE_EXPORT (dlopen)
 	DXE_EXPORT (dlsym)
