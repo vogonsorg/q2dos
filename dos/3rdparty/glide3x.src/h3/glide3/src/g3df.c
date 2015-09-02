@@ -87,7 +87,6 @@
 */
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>
 #include <3dfx.h>
 
 #define FX_DLL_DEFINITION
@@ -415,7 +414,8 @@ GR_DIENTRY(gu3dfGetInfo, FxBool,
   {
     char *tempStr = (char*)color_format;
     while (*tempStr != '\0') {
-          *tempStr = toupper(*tempStr);
+          if (*tempStr >= 'a' && *tempStr <= 'z')
+              *tempStr -= ('a'-'A');
           tempStr++;
     }
   }

@@ -31,7 +31,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
 #if __WIN32__
 #include <windows.h>
@@ -503,7 +502,9 @@ static int sst1InitFgetc(FILE *stream)
                     continue;
                 validChars++;
                 column++;
-                charReadL = (islower(charRead)) ? toupper(charRead) : charRead;
+                charReadL = charRead;
+                if (charReadL >= 'a' && charReadL <= 'z')
+                    charReadL -= ('a'-'A');
                 return(charReadL);
             }
         }
@@ -1016,7 +1017,8 @@ static void sst1InitToLower(char *string)
     char *ptr = string;
 
     while(*ptr) {
-        *ptr = (isupper(*ptr)) ? tolower(*ptr) : *ptr;
+        if (*ptr >= 'A' && *ptr <= 'Z')
+            *ptr += ('a'-'A');
         ptr++;
     }
 }
