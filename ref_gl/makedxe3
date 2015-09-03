@@ -1,3 +1,5 @@
+# enable evil 3dfx glide hacks for native hardware gamma:
+USE_3DFXGAMMA=1
 # abrash's asm optimizations:
 USE_ASM=1
 #
@@ -6,6 +8,12 @@ USE_SSE=0
 CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 CPPFLAGS = -I../dos/3rdparty/include -I../dos/3rdparty/include/glide3
 DXE3GEN = dxe3gen
+
+ifeq ($(USE_3DFXGAMMA),1)
+FX_GAMMA:=../dos/fx_gamma.o
+else
+FX_GAMMA:=
+endif
 
 ifeq ($(USE_ASM),1)
 CPPFLAGS+= -Did386=1
@@ -19,6 +27,7 @@ REFSOFT = ../game/q_shared.o \
 	../dos/q_shdos.o \
 	../dos/qgl_dos.o \
 	../dos/gl_dmesa.o \
+	$(FX_GAMMA) \
 	gl_draw.o \
 	gl_image.o \
 	gl_light.o \

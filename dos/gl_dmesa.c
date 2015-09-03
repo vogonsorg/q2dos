@@ -26,6 +26,86 @@
 
 /*****************************************************************************/
 
+// Gamma stuff
+#define	USE_GAMMA_RAMPS			0
+
+/* 3dfx gamma hacks: stuff are in fx_gamma.c
+ * Note: gamma ramps crashes voodoo graphics */
+#define	USE_3DFX_RAMPS			0
+#if defined(USE_3DFXGAMMA)
+#include "fx_gamma.h"
+#endif
+
+#if (USE_GAMMA_RAMPS) || (defined(USE_3DFXGAMMA) && (USE_3DFX_RAMPS))
+static unsigned short	orig_ramps[3][256];
+#endif
+
+static qboolean	fx_gamma   = false;	// 3dfx-specific gamma control
+static qboolean	gammaworks = false;	// whether hw-gamma works
+
+#if !defined(USE_3DFXGAMMA)
+static inline int Init_3dfxGammaCtrl (void)		{ return 0; }
+static inline void Shutdown_3dfxGamma (void)		{ }
+static inline int do3dfxGammaCtrl (float value)			{ return 0; }
+static inline int glGetDeviceGammaRamp3DFX (void *arrays)	{ return 0; }
+static inline int glSetDeviceGammaRamp3DFX (void *arrays)	{ return 0; }
+static inline qboolean VID_Check3dfxGamma (void)	{ return false; }
+#else
+static qboolean VID_Check3dfxGamma (void)
+{
+	int		ret;
+
+#if USE_3DFX_RAMPS /* not recommended for Voodoo1, currently crashes */
+	ret = glGetDeviceGammaRamp3DFX(orig_ramps);
+	if (ret != 0)
+	{
+		ri.Con_Printf(PRINT_ALL, "Using 3dfx glide3 specific gamma ramps\n");
+		return true;
+	}
+#else
+	ret = Init_3dfxGammaCtrl();
+	if (ret > 0)
+	{
+		ri.Con_Printf(PRINT_ALL, "Using 3dfx glide%d gamma controls\n", ret);
+		return true;
+	}
+#endif
+	return false;
+}
+#endif	/* USE_3DFXGAMMA */
+
+static void VID_InitGamma (void)
+{
+	const char *gl_renderer = (const char *)qglGetString (GL_RENDERER);
+
+	gammaworks = fx_gamma = false;
+	/* we don't have WGL_3DFX_gamma_control or an equivalent in dos. */
+	/* Here is an evil hack abusing the exposed Glide symbols: */
+	if (gl_renderer &&
+		(!strnicmp(gl_renderer, "3dfx", 4)	  ||
+		 !strnicmp(gl_renderer, "SAGE Glide", 10) ||
+		 !strnicmp(gl_renderer, "Glide ", 6)	  || /* possible with Mesa 3.x/4.x/5.0.x */
+		 !strnicmp(gl_renderer, "Mesa Glide", 10)))
+	{
+		fx_gamma = VID_Check3dfxGamma();
+	}
+
+	if (!gammaworks && !fx_gamma)
+		ri.Con_Printf(PRINT_ALL, "gamma adjustment not available\n");
+}
+
+static void VID_ShutdownGamma (void)
+{
+#if USE_3DFX_RAMPS
+	if (fx_gamma) glSetDeviceGammaRamp3DFX(orig_ramps);
+#else
+/*	if (fx_gamma) do3dfxGammaCtrl(1);*/
+#endif
+	Shutdown_3dfxGamma();
+}
+
+/*****************************************************************************/
+
 qboolean GLimp_InitGL (void);
 
 extern cvar_t *vid_fullscreen;
@@ -37,7 +117,7 @@ static DMesaBuffer db;
 
 #define NUM_GL_RESOLUTIONS 8
 
-vmodeinfo_t resolutions[NUM_GL_RESOLUTIONS]={ 
+static vmodeinfo_t resolutions[NUM_GL_RESOLUTIONS] = {
 	{ 240,320,  "[320x240]" },
 	{ 300,400,  "[400x300]" },
 	{ 384,512,  "[512x384]" },
@@ -103,6 +183,7 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 */
 void GLimp_Shutdown( void )
 {
+	VID_ShutdownGamma();
 	if (db)
 	{
 		DMesaDestroyBuffer(db);
@@ -131,6 +212,8 @@ int GLimp_Init( void *nummodes, void *modeinfos )
 {
 	vmodeinfo_t *vi;
 	int	i;
+
+	VID_InitGamma();
 
 	/* HACK HACK HACK: sending the video mode infos to vid_dos.c
 	 * by exploiting our params. See: vid_dos.c:VID_LoadRefresh() */
@@ -174,7 +257,16 @@ void GLimp_AppActivate( qboolean active )
 {
 }
 
-/* FS: This is so Knightmare's ref_gl can link.  Maybe a windows only thing, not sure */
+#define GAMMA_MAX	3.0
 void UpdateGammaRamp (void)
 {
+#if (!USE_GAMMA_RAMPS) || (!USE_3DFX_RAMPS)
+	float	value = (vid_gamma->value > (1.0 / GAMMA_MAX)) ?
+			(1.0 / vid_gamma->value) : GAMMA_MAX;
+#endif
+#if USE_3DFX_RAMPS
+	if (fx_gamma) glSetDeviceGammaRamp3DFX(ramps);
+#else
+	if (fx_gamma) do3dfxGammaCtrl(value);
+#endif
 }

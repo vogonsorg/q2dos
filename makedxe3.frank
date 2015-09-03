@@ -22,6 +22,8 @@ REF_DXE=1
 REF_STATIC_SOFT=1
 # compile gl renderer if REF_DXE=0
 REF_STATIC_GL=0
+# enable evil 3dfx glide hacks for native hardware gamma (if REF_DXE=0)
+USE_3DFXGAMMA=1
 
 CC = gcc
 CFLAGS = -Wall -Werror -O2 -fno-strict-aliasing -fomit-frame-pointer
@@ -195,6 +197,9 @@ REFGL = ref_gl/gl_draw.o \
 	ref_gl/gl_warp.o \
 	dos/qgl_dos.o \
 	dos/gl_dmesa.o
+ifeq ($(USE_3DFXGAMMA),1)
+REFGL+= dos/fx_gamma.o
+endif
 endif
 endif
 

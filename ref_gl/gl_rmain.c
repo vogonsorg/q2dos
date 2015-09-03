@@ -1725,26 +1725,9 @@ void R_BeginFrame( float camera_separation )
 		GLimp_LogNewFrame();
 	}
 
-	/*
-	** update 3Dfx gamma -- it is expected that a user will do a vid_restart
-	** after tweaking this value
-	*/
 	if ( vid_gamma->modified )
 	{
 		vid_gamma->modified = false;
-
-		if ( gl_config.renderer & ( GL_RENDERER_VOODOO ) )
-		{
-			static char v1buf[64];
-			static char v2buf[64];
-			float g;
-
-			g = 2.00 * ( 0.8 - ( vid_gamma->value - 0.5 ) ) + 1.0F;
-			Com_sprintf( v2buf, sizeof(v2buf), "SSTV2_GAMMA=%f", g );
-			putenv( v2buf );
-			Com_sprintf( v1buf, sizeof(v1buf), "SST_GAMMA=%f", g );
-			putenv( v1buf );
-		}
 		UpdateGammaRamp (); /* Knightmare- hardware gamma */
 	}
 
