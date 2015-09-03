@@ -92,6 +92,7 @@ static void VID_InitGamma (void)
 
 	if (!gammaworks && !fx_gamma)
 		ri.Con_Printf(PRINT_ALL, "gamma adjustment not available\n");
+	else	vid_gamma->modified = true;/* let refresh loop update gamma */
 }
 
 static void VID_ShutdownGamma (void)
@@ -163,6 +164,8 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 
 	DMesaMakeCurrent(dc, db);
 
+	VID_InitGamma();
+
 	*pwidth = width;
 	*pheight = height;
 
@@ -212,8 +215,6 @@ int GLimp_Init( void *nummodes, void *modeinfos )
 {
 	vmodeinfo_t *vi;
 	int	i;
-
-	VID_InitGamma();
 
 	/* HACK HACK HACK: sending the video mode infos to vid_dos.c
 	 * by exploiting our params. See: vid_dos.c:VID_LoadRefresh() */
