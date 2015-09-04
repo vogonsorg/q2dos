@@ -11,6 +11,7 @@ DXE3GEN = dxe3gen
 
 ifeq ($(USE_3DFXGAMMA),1)
 FX_GAMMA:=../dos/fx_gamma.o
+CFLAGS += -DUSE_3DFXGAMMA
 else
 FX_GAMMA:=
 endif
