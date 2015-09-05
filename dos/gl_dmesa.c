@@ -135,6 +135,7 @@ static vmodeinfo_t resolutions[NUM_GL_RESOLUTIONS] = {
 rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
 {
 	int width, height;
+	static char fxglide_env_nosplash[32] = "FX_GLIDE_NO_SPLASH=0";
 
 	ri.Con_Printf( PRINT_ALL, "Initializing OpenGL display\n");
 
@@ -151,7 +152,7 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 	// destroy the existing window
 	GLimp_Shutdown ();
 
-	dv = DMesaCreateVisual((GLint)width, (GLint)height, 16, 0, true, true, 2, 16, 0, 0);
+	dv = DMesaCreateVisual((GLint)width, (GLint)height, 16, 0, true, true, 2, 16, 0, 0); /* FS: TODO: Add something like ri.COM_CheckParm so we can control bpp to be 15 or 32 on Voodoo 5 */
 	if (!dv)
 		return rserr_invalid_mode;
 	
@@ -165,6 +166,9 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 	DMesaMakeCurrent(dc, db);
 
 	VID_InitGamma();
+
+	/* avoid the 3dfx splash screen on resolution changes */
+	putenv (fxglide_env_nosplash);
 
 	*pwidth = width;
 	*pheight = height;
