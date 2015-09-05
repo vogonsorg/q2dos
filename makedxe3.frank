@@ -199,6 +199,7 @@ REFGL = ref_gl/gl_draw.o \
 	dos/gl_dmesa.o
 ifeq ($(USE_3DFXGAMMA),1)
 REFGL+= dos/fx_gamma.o
+CPPFLAGS+= -DUSE_3DFXGAMMA
 endif
 endif
 endif
