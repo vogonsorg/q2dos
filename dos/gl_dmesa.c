@@ -134,7 +134,7 @@ static vmodeinfo_t resolutions[NUM_GL_RESOLUTIONS] = {
 */
 rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
 {
-	int width, height;
+	int width, height, bpp;
 
 	ri.Con_Printf( PRINT_ALL, "Initializing OpenGL display\n");
 
@@ -146,12 +146,13 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 		return rserr_invalid_mode;
 	}
 
-	ri.Con_Printf( PRINT_ALL, " %d %d\n", width, height );
+	bpp = (Cvar_Get("vid_glbpp", "16", 0))->intValue;
+	ri.Con_Printf( PRINT_ALL, " %dx%dx%d\n", width, height, bpp );
 
 	// destroy the existing window
 	GLimp_Shutdown ();
 
-	dv = DMesaCreateVisual((GLint)width, (GLint)height, 16, 0, true, true, 2, 16, 0, 0); /* FS: TODO: Add something like ri.COM_CheckParm so we can control bpp to be 15 or 32 on Voodoo 5 */
+	dv = DMesaCreateVisual(width, height, 16, 0, true, true, 2, bpp, 0, 0);
 	if (!dv)
 		return rserr_invalid_mode;
 	

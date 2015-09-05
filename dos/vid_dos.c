@@ -36,6 +36,8 @@ extern cvar_t *scr_viewsize;	/* client/cl_scrn.c */
 /* cvars for vga/vesa code */
 static cvar_t *vid_bankedvga;
 static cvar_t *vid_vgaonly;
+/* cvars for opengl code */
+static cvar_t *vid_glbpp;
 
 static cvar_t *sw_stipplealpha;
 static cvar_t *sw_waterwarp; /* FS */
@@ -391,6 +393,7 @@ void	VID_Init (void)
 	/* putenv() from DJGPP libc will copy, so
 	 * it is OK to use an automatic var here. */
 	char	envString[64];
+	int	i, bpp;
 
 	viddef.width = 320;
 	viddef.height = 240;
@@ -404,6 +407,16 @@ void	VID_Init (void)
 
 	vid_vgaonly = Cvar_Get("vid_vgaonly", (COM_CheckParm("-vgaonly"))? "1" : "0", 0);
 	vid_bankedvga = Cvar_Get("vid_bankedvga", (COM_CheckParm("-bankedvga"))? "1" : "0", 0);
+	vid_glbpp = Cvar_Get("vid_glbpp", "16", 0);
+	i = COM_CheckParm("-bpp");
+	if (i && i < com_argc-1) {
+		bpp = atoi(com_argv[i+1]);
+		switch (bpp) {
+		case 15: case 16: case 32:
+			Cvar_SetValue("vid_glbpp", bpp);
+			break;
+		}
+	}
 
 	/* FS: 3DFX - Enforce the refresh rate at startup */
 	r_refreshrate = Cvar_Get("r_refreshrate", "75", CVAR_ARCHIVE);
