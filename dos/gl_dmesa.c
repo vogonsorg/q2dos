@@ -146,7 +146,7 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 		return rserr_invalid_mode;
 	}
 
-	bpp = (Cvar_Get("vid_glbpp", "16", 0))->intValue;
+	bpp = (ri.Cvar_Get("vid_glbpp", "16", 0))->intValue;
 	ri.Con_Printf( PRINT_ALL, " %dx%dx%d\n", width, height, bpp );
 
 	// destroy the existing window
