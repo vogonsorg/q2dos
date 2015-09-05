@@ -152,7 +152,7 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 	// destroy the existing window
 	GLimp_Shutdown ();
 
-	dv = DMesaCreateVisual(width, height, 16, 0, true, true, 2, bpp, 0, 0);
+	dv = DMesaCreateVisual(width, height, bpp, 0, true, true, 2, 16, 0, 0);
 	if (!dv)
 		return rserr_invalid_mode;
 	
