@@ -33,12 +33,6 @@ static cvar_t *vid_fullscreen;
 static cvar_t *vid_gamma;
 extern cvar_t *scr_viewsize;	/* client/cl_scrn.c */
 
-/* cvars for vga/vesa code */
-static cvar_t *vid_bankedvga;
-static cvar_t *vid_vgaonly;
-/* cvars for opengl code */
-static cvar_t *vid_glbpp;
-
 static cvar_t *sw_stipplealpha;
 static cvar_t *sw_waterwarp; /* FS */
 static cvar_t *r_contentblend; /* FS */
@@ -405,9 +399,11 @@ void	VID_Init (void)
 	vid_gamma = Cvar_Get("vid_gamma", "1", CVAR_ARCHIVE);
 	vid_gamma->description = "Video gamma.  Use lower values for a brighter screen display.";
 
-	vid_vgaonly = Cvar_Get("vid_vgaonly", (COM_CheckParm("-vgaonly"))? "1" : "0", 0);
-	vid_bankedvga = Cvar_Get("vid_bankedvga", (COM_CheckParm("-bankedvga"))? "1" : "0", 0);
-	vid_glbpp = Cvar_Get("vid_glbpp", "16", 0);
+	/* cvars for vga/vesa code */
+	Cvar_Get("vid_vgaonly", (COM_CheckParm("-vgaonly"))? "1" : "0", 0);
+	Cvar_Get("vid_bankedvga", (COM_CheckParm("-bankedvga"))? "1" : "0", 0);
+	/* cvars for opengl code */
+	Cvar_Get("vid_glbpp", "16", 0);
 	i = COM_CheckParm("-bpp");
 	if (i && i < com_argc-1) {
 		bpp = atoi(com_argv[i+1]);
