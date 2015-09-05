@@ -424,6 +424,9 @@ void	VID_Init (void)
 
 	Cmd_AddCommand("vid_restart", VID_Restart_f);
 	Cmd_AddCommand("vid_listmodes", VID_ListModes_f); /* FS: Added */
+
+	/* avoid 3dfx splash screen on resolution changes */
+	putenv("FX_GLIDE_NO_SPLASH=0");
 }
 
 void	VID_Shutdown (void)

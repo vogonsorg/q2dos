@@ -135,7 +135,6 @@ static vmodeinfo_t resolutions[NUM_GL_RESOLUTIONS] = {
 rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
 {
 	int width, height;
-	static char fxglide_env_nosplash[32] = "FX_GLIDE_NO_SPLASH=0";
 
 	ri.Con_Printf( PRINT_ALL, "Initializing OpenGL display\n");
 
@@ -166,9 +165,6 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 	DMesaMakeCurrent(dc, db);
 
 	VID_InitGamma();
-
-	/* avoid the 3dfx splash screen on resolution changes */
-	putenv (fxglide_env_nosplash);
 
 	*pwidth = width;
 	*pheight = height;
