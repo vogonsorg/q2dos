@@ -55,6 +55,7 @@ copy ref_soft\ref_soft.dxe release
 copy ref_gl\ref_gl.dxe release
 copy cwsdpmi.exe release
 copy readme.txt release
+copy readme.fx release
 copy Goa\gamespy.dxe release
 copy game\gamex86.dxe release\baseq2
 copy ctf\gamex86.dxe release\ctf

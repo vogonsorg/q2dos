@@ -19,6 +19,7 @@ cp -p ref_gl/ref_gl.dxe _build
 cp -pr dos/3rdparty/lib_dxe/* _build
 cp -p CWSDPMI.EXE _build
 cp -p readme.txt _build
+cp -p readme.fx _build
 
 mkdir -p _build/baseq2
 cp -p game/gamex86.dxe _build/baseq2
@@ -47,6 +48,7 @@ cp -p Goa/gamespy.dxe _build
 
 cd _build || exit 1
 unix2dos -k readme.txt
+unix2dos -k readme.fx
 find * -type d|xargs chmod 755
 find * -type f|xargs chmod 644
 7z a ../$PKG_NAME *

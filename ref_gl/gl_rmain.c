@@ -1093,7 +1093,11 @@ void R_Register ( void )
 	gl_skymip = ri.Cvar_Get ("gl_skymip", "0", 0);
 	gl_showtris = ri.Cvar_Get ("gl_showtris", "0", 0);
 	gl_showbbox = ri.Cvar_Get ("gl_showbbox", "0", 0); /* Knightmare- show model bounding box */
+#ifdef __DJGPP__ /* FS: 32-bit bpp issues with Voodoo 5 in SLI mode if this is off.  Also, has no decrease in performance or graphics issues if it's on for 3DFX */
+	gl_ztrick = ri.Cvar_Get ("gl_ztrick", "1", 0);
+#else
 	gl_ztrick = ri.Cvar_Get ("gl_ztrick", "0", 0);
+#endif
 	gl_finish = ri.Cvar_Get ("gl_finish", "0", CVAR_ARCHIVE);
 	gl_clear = ri.Cvar_Get ("gl_clear", "0", 0);
 	gl_cull = ri.Cvar_Get ("gl_cull", "1", 0);
