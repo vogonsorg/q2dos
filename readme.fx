@@ -10,6 +10,10 @@ Setup:
   * cvg   -> Voodoo2
 
   * h5    -> Banshee, Voodoo3, Voodoo4 and Voodoo5
+* It's recommended to use RayeR's MTRRLFBE.EXE utility
+  (http://rayer.g6.cz/programm/mtrrlfbe.exe) to setup a
+  Write-combining MTRR for the LFB.  This will dramatically increase
+  performance on Voodoo Rush and higher cards.
 
 Recommended System Specs:
 * Pentium 2 400mhz.  Pentium 3 550mhz or higher for the best experience.
