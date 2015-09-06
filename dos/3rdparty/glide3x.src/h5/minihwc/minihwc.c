@@ -4201,8 +4201,6 @@ hwcInitVideo(hwcBoardInfo *bInfo, FxBool tiled, FxVideoTimingInfo *vidTiming,
                         refresh,
                         bInfo->hMon,
                         (char *)bInfo->devName) )
-//                      (void *)bInfo->lpDD1,
-//                    (void *)bInfo->lpDD) )
       {
         GDBG_INFO(80, "%s:  setVideoMode() failed!\n", FN_NAME);
         return FXFALSE;
