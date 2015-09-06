@@ -2834,9 +2834,10 @@ void
 freeThreadStorage( void );
 
 void 
-setThreadValue( FxU32 value );
+setThreadValue( unsigned long value );
 
-FxU32 getThreadValueSLOW( void );
+unsigned long
+getThreadValueSLOW( void );
 
 void 
 initCriticalSection( void );
