@@ -5,7 +5,7 @@
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
-# $Header: /cvsroot/glide/glide3x/Attic/Makefile.wat,v 1.1.2.2 2005/05/25 08:49:21 jwrdegoede Exp $
+# $Header: /cvsroot/glide/glide3x/Attic/Makefile.wat,v 1.1.2.3 2005/11/29 22:02:36 dborca Exp $
 #
 
 
@@ -20,7 +20,7 @@
 #			default = no
 #	OPTFLAGS	pass given optimization flags to compiler
 #			target  = sst1, sst96, cvg, h3, h5
-#			default = -O2 -ffastmath (+ -mcpu=pentium if USE_X86=1)
+#			default = -ox -5s (Pentium, stack)
 #	DEBUG=1		enable debugging checks and messages
 #			target  = sst1, sst96, cvg, h3, h5
 #			default = no

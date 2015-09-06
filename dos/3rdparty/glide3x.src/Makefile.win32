@@ -5,7 +5,7 @@
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
-# $Header: /cvsroot/glide/glide3x/Attic/Makefile.win32,v 1.1.2.23 2005/05/25 08:49:21 jwrdegoede Exp $
+# $Header: /cvsroot/glide/glide3x/Attic/Makefile.win32,v 1.1.2.24 2005/11/29 22:02:37 dborca Exp $
 #
 
 
@@ -20,7 +20,7 @@
 #			default = no
 #	OPTFLAGS	pass given optimization flags to compiler
 #			target  = sst1, sst96, cvg, h3, h5
-#			default = -O2 -ffastmath (+ -mcpu=pentium if USE_X86=1)
+#			default = -G6 -O2 (or -Od if DEBUG=1)
 #	DEBUG=1		enable debugging checks and messages
 #			target  = sst1, sst96, cvg, h3, h5
 #			default = no

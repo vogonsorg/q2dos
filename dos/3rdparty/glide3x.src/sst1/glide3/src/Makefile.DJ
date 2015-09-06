@@ -15,7 +15,7 @@
 #	FX_GLIDE_HW	build for the given ASIC (sst1, sst96).
 #			default = sst1
 #	OPTFLAGS	pass given optimization flags to compiler
-#			default = -O1 -ffastmath (+ -mtune=pentium if USE_X86=1)
+#			default = -O1 -ffast-math (+ -mtune=pentium if USE_X86=1)
 #	DEBUG=1		enable debugging checks and messages
 #			default = no
 #	USE_X86=1	use assembler triangle specializations!
