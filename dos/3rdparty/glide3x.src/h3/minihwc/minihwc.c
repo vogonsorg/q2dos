@@ -1147,7 +1147,7 @@ hwcMapBoard(hwcBoardInfo *bInfo, FxU32 bAddrMask)
     /* memory mapped register spaces */
     for (bAddr = 0; bAddr < 2; bAddr++) {
       if ((bAddrMask & (0x01UL << bAddr)) != 0x00UL) {
-        bInfo->linearInfo.linearAddress[bAddr] = 
+        bInfo->linearInfo.linearAddress[bAddr] = (unsigned long)
           pciMapCardMulti(bInfo->pciInfo.vendorID, bInfo->pciInfo.deviceID,
                                  0x1000000, &bInfo->deviceNum, bInfo->boardNum, bAddr);
       }
@@ -1156,13 +1156,13 @@ hwcMapBoard(hwcBoardInfo *bInfo, FxU32 bAddrMask)
     /* FixMe: This gets used to set the pll's so I guess we need it here
      * unconditionally
      */
-    bInfo->linearInfo.linearAddress[2] = 
+    bInfo->linearInfo.linearAddress[2] = (unsigned long)
       pciMapCardMulti(bInfo->pciInfo.vendorID, bInfo->pciInfo.deviceID,
                              0x1000000, &bInfo->deviceNum, bInfo->boardNum, 2);
 
     /* Does the caller want the rom bios? */
     if ((bAddrMask & 0x08UL) != 0x00UL) {
-      bInfo->linearInfo.linearAddress[3] = 
+      bInfo->linearInfo.linearAddress[3] = (unsigned long)
         pciMapCardMulti(bInfo->pciInfo.vendorID, bInfo->pciInfo.deviceID,
                                0x1000000, &bInfo->deviceNum, bInfo->boardNum, 3);
     }
