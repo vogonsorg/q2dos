@@ -989,7 +989,7 @@ static _p_info *CPUInfo = NULL;
 
 #define MAX_ERROR_SIZE 1024
 static char errorString[MAX_ERROR_SIZE];
-FxU32 fenceVar;
+static volatile FxU32 fenceVar;
 
 FxU32 hwc_errncpy(char *dst,const char *src);
 
@@ -1059,8 +1059,10 @@ static LRESULT CALLBACK _XPAltTabProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
 static hwcSwapType swapType;
 #endif
 
+#ifdef _WIN32
 static FxU32
 pow2Round(FxU32 val, FxU32 roundVal);
+#endif
 
 static FxU32
 hwcBufferLfbAddr(const hwcBoardInfo *bInfo, FxU32 physAddress);
@@ -5989,6 +5991,7 @@ hwcBufferLfbAddr(const hwcBoardInfo *bInfo, FxU32 physAddress)
   return retVal;
 }
 
+#ifdef _WIN32
 static FxU32
 pow2Round(FxU32 val, FxU32 pow2Const)
 {
@@ -5996,6 +5999,7 @@ pow2Round(FxU32 val, FxU32 pow2Const)
 
   return ((val + pow2Mask) & ~pow2Mask);
 }
+#endif
 
 FxU32 
 hwcInitAGPFifo(hwcBoardInfo *bInfo, FxBool enableHoleCounting) 
@@ -7875,7 +7879,7 @@ static void hwcCopyBuffer565Dithered(hwcBoardInfo *bInfo, FxU16 *src, int w, int
   FxI32 er = 0;
   FxI32 eg = 0;
   FxI32 eb = 0;
-  FxI32 ea = 0;
+/*FxI32 ea = 0;*/
   
   rbmask = 0xF8 << aaShift;
   gmask = 0xFC << aaShift;
@@ -8013,7 +8017,7 @@ static void hwcCopyBuffer1555Dithered(hwcBoardInfo *bInfo, FxU16 *src, int w, in
   FxI32 er = 0;
   FxI32 eg = 0;
   FxI32 eb = 0;
-  FxI32 ea = 0;
+/*FxI32 ea = 0;*/
   
   mask = 0xF8 << aaShift;
   bgshift = 3 + aaShift;
@@ -8775,8 +8779,6 @@ hwcQueryContext(hwcBoardInfo *bInfo)
 #define FN_NAME "hwcQueryContext"
   FxU32
     retVal = FXTRUE;
-  FxU32
-    retExtVal = FXTRUE;
 
   GDBG_INFO(80, FN_NAME ":  Called!\n");
 
@@ -8786,6 +8788,7 @@ hwcQueryContext(hwcBoardInfo *bInfo)
     {
       hwcExtRequest_t ctxReq;
       hwcExtResult_t ctxRes;
+      FxU32 retExtVal;
       GDBG_INFO(80, FN_NAME ":  ExtEscape:HWCEXT_QUERYCONTEXT\n");
       ctxReq.which = HWCEXT_QUERYCONTEXT;
       retExtVal = ExtEscape((HDC)bInfo->hdc, HWCEXT_ESCAPE(bInfo->boardNum), /**/

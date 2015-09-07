@@ -539,6 +539,7 @@
 #include <math.h>
 
 #include <3dfx.h>
+#include <glidesys.h>
 
 #ifdef HWC_EXT_INIT
 #include "hwcext.h"
@@ -586,9 +587,9 @@
 
 static hwcInfo hInfo;
 static char errorString[1024];
-static FxU32 fenceVar;
+static volatile FxU32 fenceVar;
 
-static FxU32 ProcessID;
+/*static FxU32 ProcessID;*/
 
 #if defined(__WATCOMC__)
 /*
@@ -633,11 +634,13 @@ modify [eax];
 static FxU32
 dummyContextDWORD;
 
-static void
-lostContext(void);
+/*static void
+lostContext(void);*/
 
+#ifdef _WIN32
 static FxU32
 pow2Round(FxU32 val, FxU32 roundVal);
+#endif
 
 static FxU32
 hwcBufferLfbAddr(FxU32 bufNum, 
@@ -661,9 +664,8 @@ static FxBool resolutionSupported[HWC_MAX_BOARDS][0xF];
 /*
 **  Function Prototypes
 */
-static hwcBoardInfo *curBI;
-
 #ifdef HWC_EXT_INIT
+static hwcBoardInfo *curBI;
 
 typedef void *HMONITOR;
 typedef BOOL (CALLBACK* MONITORENUMPROC)(HMONITOR, HDC, LPRECT, LPARAM);
@@ -3753,6 +3755,7 @@ hwcBufferLfbAddr(FxU32 bufNum,
   return retVal;
 }
 
+#ifdef _WIN32
 static FxU32
 pow2Round(FxU32 val, FxU32 pow2Const)
 {
@@ -3760,6 +3763,7 @@ pow2Round(FxU32 val, FxU32 pow2Const)
 
   return ((val + pow2Mask) & ~pow2Mask);
 }
+#endif
 
 FxU32 
 hwcInitAGPFifo(hwcBoardInfo *bInfo, FxBool enableHoleCounting) 
