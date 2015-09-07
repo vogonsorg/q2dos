@@ -10683,7 +10683,7 @@ static Gu3dfInfo hilite_3dfinfo = {
 #endif
     GR_TEXFMT_INTENSITY_8 /* format */
   },
-  { 0x00000000 },                    /* table */
+  { { { 0x00 } } },             /* table */
   NULL,                   /* data */
   0x00000ab0              /* mem_required */
 };
@@ -12074,7 +12074,7 @@ static Gu3dfInfo shadow_3dfinfo = {
 #endif
     GR_TEXFMT_INTENSITY_8 /* format */
   },
-  { 0x0000000 },         /* table */
+  { { { 0x00 } } },             /* table */
   NULL,                   /* data */
   0x00000ab0              /* mem_required */
 };
