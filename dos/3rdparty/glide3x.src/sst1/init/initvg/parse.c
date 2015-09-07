@@ -660,6 +660,7 @@ static int sst1InitParseDacRdWr(char *string, sst1InitDacRdWrStruct *dacRdWrPtr)
     return(1);
 }
 
+#if TEST
 static void sst1InitPrintDacRdWr(sst1InitDacRdWrStruct *dacRdWrBase,
   char *prefix)
 {
@@ -684,6 +685,7 @@ static void sst1InitPrintDacRdWr(sst1InitDacRdWrStruct *dacRdWrBase,
         dacRdWrPtr = dacRdWrPtr->nextRdWr;
     }
 }
+#endif /* TEST */
 
 static int sst1InitParseSetVideoString(char *string, sst1InitDacStruct *dacBase)
 {
