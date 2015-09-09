@@ -2,4 +2,4 @@
 
 . ../cross_defs.dj
 
-exec make CC=$TARGET-gcc -f makedxe3 $*
+exec make CC=$TARGET-gcc -f Makefile.dj $*
