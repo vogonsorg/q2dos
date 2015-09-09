@@ -70,6 +70,12 @@ Tips and other misc info:
   for more information on how DJGPP and CWSDPMI work.
 * Logitch MouseWare drivers in Windows 9x may cause delayed/missing mouse input
   when played in a Windows 9x DOS box.
+* Demos recorded from multiplayer can be run with timedemo 1 but to keep the
+  code simple it must be used with the demomap command instead of map.  Demomap
+  will set the attractloop mode on which can be used as a hint from the client
+  that a demo is currently playing without having to hack between the server
+  and client.  Starting a demo with demomap is easy, i.e.  demomap demo1.dm2.
+  The extension must be incldued.
 
 3DFX Notes:
 * Please refer to readme.fx for more details.

@@ -28,10 +28,11 @@ Interesting parameters:
   Anti-aliasing on these cards.
 
 Known Issues:
-* Mesa is slower than MiniGL drivers such as the official 3dfxgl.dll or
-  WickedGL.  These DLLs rely on special Quake engine hacks to speed up
-  rendering.  They are closed source so we do not know what tricks were
-  used.
+* Mesa is slower than MiniGL drivers such as the WickedGL driver or the
+  OpenGL ICD from 3dfx.  These DLLs rely on special Quake engine hacks
+  to speed up rendering.  They are closed source so we do not know what
+  tricks were used.  However, Mesa in DOS is comparable in speeds to 
+  Mesa DLLs for Windows.
 * Outdoor scenes are slower compared to Windows OpenGL ICD.  This issue
   also exists in Mesa.  You can verify by downloading the Windows Mesa DLLs
   from http://falconfly.de.
