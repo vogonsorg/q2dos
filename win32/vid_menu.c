@@ -114,9 +114,9 @@ static void BrightnessCallback( void *s )
 static void TexFilterCallback( void *s )
 {
 	if (s_texfilter_box.curvalue == 1)
-		Cvar_Set ("r_texturemode", "GL_LINEAR_MIPMAP_LINEAR");
+		Cvar_Set ("gl_texturemode", "GL_LINEAR_MIPMAP_LINEAR");
 	else // (s_texfilter_box.curvalue == 0)
-		Cvar_Set ("r_texturemode", "GL_LINEAR_MIPMAP_NEAREST");
+		Cvar_Set ("gl_texturemode", "GL_LINEAR_MIPMAP_NEAREST");
 }
 
 // Knightmare- anisotropic filtering
@@ -216,9 +216,9 @@ static void ApplyChanges( void *unused )
 
 	// Knightmare- texture filter mode
 	if (s_texfilter_box.curvalue == 1)
-		Cvar_Set ("r_texturemode", "GL_LINEAR_MIPMAP_LINEAR");
+		Cvar_Set ("gl_texturemode", "GL_LINEAR_MIPMAP_LINEAR");
 	else // (s_texfilter_box.curvalue == 0)
-		Cvar_Set ("r_texturemode", "GL_LINEAR_MIPMAP_NEAREST");
+		Cvar_Set ("gl_texturemode", "GL_LINEAR_MIPMAP_NEAREST");
 
 	// Knightmare- anisotropic filtering
 	switch ((int)s_aniso_box.curvalue)
@@ -290,7 +290,7 @@ static void ApplyChanges( void *unused )
 // Knightmare- texture filter mode
 int texfilter_box_setval (void)
 {
-	char *texmode = Cvar_VariableString ("r_texturemode");
+	char *texmode = Cvar_VariableString ("gl_texturemode");
 	if (!Q_strcasecmp(texmode, "GL_LINEAR_MIPMAP_NEAREST"))
 		return 0;
 	else
