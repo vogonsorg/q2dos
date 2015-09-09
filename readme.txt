@@ -35,7 +35,7 @@ What doesn't work:
 Tips and other misc info:
 * Run /slist2 to get a gamespy list of active servers, or use the new browser
   menu.  Run /srelist to print the previous list.  Use CTRL+C to abort.
-* Don't use EMM386.  If you get weird virtual alloc failed errors, 
+* Don't use EMM386.  If you get weird virtual alloc failed errors,
   it's probably related to this.
 * Use FastVid for some faster linear frame buffering if you a P1 or P2-era PC.
   Download it at http://dk.toastednet.org/QDOS/FASTV110.ZIP.
@@ -51,8 +51,8 @@ Tips and other misc info:
 * To hear Ogg Vorbis or WAV tracks in game, rip the Q2 CD's audio tracks (2-11)
   to track02-track11.* and put them in baseq2/music.  For the mission pack 
   audio tracks, rip the Ground Zero CD's audio tracks (2-11) to 
-  track12-track21.*.  Don't bother ripping the tracks from the Reckoning CD, 
-  as they're a mix of the tracks on the Q2 and Ground Zero CDs.  Everything 
+  track12-track21.*.  Don't bother ripping the tracks from the Reckoning CD,
+  as they're a mix of the tracks on the Q2 and Ground Zero CDs.  Everything
   else will be taken care of internally.
 * Mouse wheel:  The code is from HoT.  If you use the latest beta version of
   cutemouse, which  is 2.1b3 (ctmouse21b3.zip), the wheel should work nicely.
@@ -104,5 +104,5 @@ Various code from
 * Yamagi -- Updated game code from YamagiQ2 (http://www.yamagi.org/quake2/)
 * Various DJGPP v2.05 upgrade help from RayeR (http://rayer.g6.cz/)
 * Berserk, CDawg, Pat Aftermoon, Anthony Jacques, David M. Pochron, Dopefish,
-  GuyP, Jitspoe, MH, MrG, NeVo, Skuller, Riot, R1ch, Psychospaz, Pooy, Sul, 
+  GuyP, Jitspoe, MH, MrG, NeVo, Skuller, Riot, R1ch, Psychospaz, Pooy, Sul,
   and others.
