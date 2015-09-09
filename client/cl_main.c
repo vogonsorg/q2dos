@@ -1955,7 +1955,7 @@ void CL_FixCvarCheats (void)
 	cheatvar_t	*var;
 
 	if ( !strcmp(cl.configstrings[CS_MAXCLIENTS], "1") 
-		|| !cl.configstrings[CS_MAXCLIENTS][0] )
+		|| !cl.configstrings[CS_MAXCLIENTS][0] || cl.attractloop) /* FS: Allow timedemo from deathmatch demos to work */
 		return;		// single player can cheat
 
 	// find all the cvars if we haven't done it yet
