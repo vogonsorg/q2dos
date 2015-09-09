@@ -2,17 +2,13 @@ Setup:
 * Pick the correct glide driver (glide3x.dxe) for your 3dfx card from
   one of the directories listed below and put it in the same place as
   q2.exe and gl.dxe:
-
   * sst1  -> Voodoo Graphics
-
   * sst96 -> Voodoo Rush
-
   * cvg   -> Voodoo2
-
   * h5    -> Banshee, Voodoo3, Voodoo4 and Voodoo5
-* It's recommended to use RayeR's MTRRLFBE.EXE utility
+* It is recommended to use RayeR's MTRRLFBE.EXE utility
   (http://rayer.g6.cz/programm/mtrrlfbe.exe) to setup a
-  Write-combining MTRR for the LFB.  This will dramatically increase
+  write-combining MTRR for the LFB.  This will dramatically increase
   performance on Voodoo Rush and higher cards.
 
 Recommended System Specs:

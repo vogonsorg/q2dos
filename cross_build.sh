@@ -8,4 +8,4 @@ if test "$1" = "strip"; then
 	exit 0
 fi
 
-exec make CC=$TARGET-gcc -f makedxe3.frank $*
+exec make CC=$TARGET-gcc -f Makefile.dj $*

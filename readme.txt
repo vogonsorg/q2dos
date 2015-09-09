@@ -51,8 +51,8 @@ Tips and other misc info:
 * To hear Ogg Vorbis or WAV tracks in game, rip the Q2 CD's audio tracks (2-11)
   to track02-track11.* and put them in baseq2/music.  For the mission pack 
   audio tracks, rip the Ground Zero CD's audio tracks (2-11) to 
-  track12-track21.*.  Don't bother ripping the tracks from the Reckoning CD, 
-  as they're a mix of the tracks on the Q2 and Ground Zero CDs.  Everything 
+  track12-track21.*.  Don't bother ripping the tracks from the Reckoning CD,
+  as they're a mix of the tracks on the Q2 and Ground Zero CDs.  Everything
   else will be taken care of internally.
 * Mouse wheel:  The code is from HoT.  If you use the latest beta version of
   cutemouse, which  is 2.1b3 (ctmouse21b3.zip), the wheel should work nicely.

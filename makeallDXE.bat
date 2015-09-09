@@ -2,71 +2,71 @@
 call clean.bat
 call setenv.bat
 
-make -f makedxe3.frank clean
-make -f makedxe3.frank
+make -f Makefile.dj clean
+make -f Makefile.dj
 strip q2.exe
 upx -9 q2.exe
 
 cd ref_soft
-make -f makedxe3 clean
-make -f makedxe3
-cd..
+make -f Makefile.dj clean
+make -f Makefile.dj
+cd ..
 
 cd ref_gl
-make -f makedxe3 clean
-make -f makedxe3
-cd..
+make -f Makefile.dj clean
+make -f Makefile.dj
+cd ..
 
 cd Goa
-make -f makedxe3 clean
-make -f makedxe3
-cd..
+make -f Makefile.dj clean
+make -f Makefile.dj
+cd ..
 
 cd game
-make -f makedxe3 clean
-make -f makedxe3
-cd..
+make -f Makefile.dj clean
+make -f Makefile.dj
+cd ..
 
 cd ctf
-make -f makedxe3 clean
-make -f makedxe3
-cd..
+make -f Makefile.dj clean
+make -f Makefile.dj
+cd ..
 
 cd 3zb2
-make -f makedxe3 clean
-make -f makedxe3
-cd..
+make -f Makefile.dj clean
+make -f Makefile.dj
+cd ..
 
 cd acebot
-make -f makedxe3 clean
-make -f makedxe3
+make -f Makefile.dj clean
+make -f Makefile.dj
 cd ..
 
 cd action
-make -f makedxe3 clean
-make -f makedxe3
+make -f Makefile.dj clean
+make -f Makefile.dj
 cd ..
 
 cd chaos
-make -f makedxe3 clean
-make -f makedxe3
+make -f Makefile.dj clean
+make -f Makefile.dj
 cd ..
 
 cd dday
-make -f makedxe3 clean
-make -f makedxe3
+make -f Makefile.dj clean
+make -f Makefile.dj
 cd ..
 
 cd rsrc
-make -f makedxe3 clean
-make -f makedxe3
+make -f Makefile.dj clean
+make -f Makefile.dj
 cd ..
 
 cd xsrc
-make -f makedxe3 clean
-make -f makedxe3
+make -f Makefile.dj clean
+make -f Makefile.dj
 cd ..
 
 cd zaero
-make -f makedxe3 clean
-make -f makedxe3
+make -f Makefile.dj clean
+make -f Makefile.dj
