@@ -599,17 +599,15 @@ qboolean GLimp_InitGL (void)
 	InitGammaRamp ();
 
 	// Knightmare- stencil buffer
-	{
-		if (strstr(qglGetString(GL_RENDERER), "Voodoo3")) {
-			ri.Con_Printf( PRINT_ALL, "... Voodoo3 has no stencil buffer\n" );
-		} else {
-			if (pfd.cStencilBits) {
-				ri.Con_Printf( PRINT_ALL, "... Using stencil buffer\n" );
-				gl_config.have_stencil = true; // Stencil shadows - MrG
-			}
-			else
-				ri.Con_Printf( PRINT_ALL, "... Stencil buffer not found\n" );
+	if (strstr(qglGetString(GL_RENDERER), "Voodoo3")) {
+		ri.Con_Printf( PRINT_ALL, "... Voodoo3 has no stencil buffer\n" );
+	} else {
+		if (pfd.cStencilBits) {
+			ri.Con_Printf( PRINT_ALL, "... Using stencil buffer\n" );
+			gl_config.have_stencil = true;
 		}
+		else
+			ri.Con_Printf( PRINT_ALL, "... Stencil buffer not found\n" );
 	}
 	// if (pfd.cStencilBits)
 	//	gl_config.have_stencil = true;
