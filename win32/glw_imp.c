@@ -600,12 +600,7 @@ qboolean GLimp_InitGL (void)
 
 	// Knightmare- stencil buffer
 	{
-		char buffer[1024];
-
-		gl_config.have_stencil = false;
-		strcpy( buffer, qglGetString( GL_RENDERER ) );
-		strlwr( buffer );
-		if (strstr(buffer, "Voodoo3")) {
+		if (strstr(qglGetString(GL_RENDERER), "Voodoo3")) {
 			ri.Con_Printf( PRINT_ALL, "... Voodoo3 has no stencil buffer\n" );
 		} else {
 			if (pfd.cStencilBits) {
