@@ -48,7 +48,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <dlfcn.h>
-#if 0
+#if defined(__DJGPP__) && defined(REF_HARD_LINKED)/*#if 0*/
 #include <glide.h>
 #else
 #define FX_CALL		/*__stdcall*/
@@ -78,7 +78,14 @@ static void (FX_CALL *grLoadGammaTable_fp)(FxU32, FxU32*, FxU32*, FxU32*) = NULL
  * Init_3dfxGammaCtrl
  * Sends 0 for failure, 2 for glide2 or 3 for glide3 api.
  */
-#ifdef __DJGPP__
+#if defined(__DJGPP__) && defined(REF_HARD_LINKED)
+int Init_3dfxGammaCtrl (void)
+{
+	/* this relies on static linking to glide3x. */
+	guGammaCorrectionRGB_fp = guGammaCorrectionRGB;
+	return 3;
+}
+#elif defined(__DJGPP__)
 int Init_3dfxGammaCtrl (void)
 {
 	if (grGammaCorrectionValue_fp != NULL)
@@ -148,7 +155,15 @@ int do3dfxGammaCtrl (float value)
 
 /**********************************************************************/
 
-#ifdef __DJGPP__
+#if defined(__DJGPP__) && defined(REF_HARD_LINKED)
+static int Check_3DfxGammaRamp (void)
+{
+	/* this relies on static linking to glide3x. */
+	grGet_fp = grGet;
+	grLoadGammaTable_fp = grLoadGammaTable;
+	return 1;
+}
+#elif defined(__DJGPP__)
 static int Check_3DfxGammaRamp (void)
 {
 	if (grLoadGammaTable_fp != NULL && grGet_fp != NULL)
