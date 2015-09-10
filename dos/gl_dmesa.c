@@ -272,3 +272,12 @@ void UpdateGammaRamp (void)
 	if (fx_gamma) do3dfxGammaCtrl(value);
 #endif
 }
+
+/* FS: If we don't let Voodoo cards lock to 1.0f in GL_InitImages then on next startup HW gamma will be way too bright */
+qboolean GLimp_Get3dfxHwGamma (void)
+{
+	if(fx_gamma)
+		return true;
+
+	return false;
+}

@@ -1142,6 +1142,9 @@ static GrExtensionTuple _extensionTable[] = {
 #endif
     { "grTexDownloadMipMapLevelPartialRowExt", (GrProc)grTexDownloadMipMapLevelPartialRowExt },
     { "grSetNumPendingBuffers", (GrProc)grSetNumPendingBuffers },
+    { "guGammaCorrectionRGB", (GrProc)guGammaCorrectionRGB },
+    { "grLoadGammaTable", (GrProc)grLoadGammaTable },
+    { "grGet", (GrProc)grGet },
     { 0, 0 }
 };
 

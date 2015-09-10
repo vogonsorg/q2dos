@@ -1871,13 +1871,14 @@ void	GL_InitImages (void)
 			ri.Sys_Error( ERR_FATAL, "Couldn't load pics/16to8.pcx");
 	}
 
-	/* FS: MesaFX will set gamma properly, no need to hard lock any more */
-	/*
-	if ( gl_config.renderer & ( GL_RENDERER_VOODOO | GL_RENDERER_VOODOO2 ) )
+#ifdef __DJGPP__
+	/* FS: MesaFX will set gamma properly with Software (not HW) gamma, no need to hard lock for some situations */
+	if ( gl_config.renderer & GL_RENDERER_VOODOO )
 	{
-		g = 1.0F;
+		if(GLimp_Get3dfxHwGamma() == true)
+			g = 1.0F;
 	}
-	*/
+#endif
 
 	for ( i = 0; i < 256; i++ )
 	{

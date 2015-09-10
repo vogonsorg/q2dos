@@ -304,7 +304,7 @@ void GL_UpdateSwapInterval( void )
 				qwglSwapIntervalEXT( (registration_active) ? 0 : gl_swapinterval->value );	/* Knightmare changed */
 			//	qwglSwapIntervalEXT( gl_swapinterval->value );
 #else
-			if ( gl_config.renderer & ( GL_RENDERER_VOODOO ) ) /* FS: Adjust V-Sync without a restart */
+			if ( gl_config.renderer & ( GL_RENDERER_VOODOO ) ) /* FS: Adjust V-Sync without a program restart */
 			{
 				static char envbuffer[64];
 

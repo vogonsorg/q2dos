@@ -20,6 +20,12 @@ Interesting parameters:
 * -bpp for setting 15, 16, or 32bpp on Voodoo 4 or 5 cards.
 * FX_GLIDE_NO_SPLASH=1 to disable the splash logo on Voodoo 1 and 2 cards
   on startup.
+* FX_GLIDE_SWAPPENDINGCOUNT to set the number of frames to buffer.  Default
+  value is 2, but can go as high as 6.  Traditionally, in Windows, higher
+  values can be a slight speed advantage but can introduce input lag.  On
+  the hardware I tested it on I was able to gain a few extra frames in
+  timedemos (about 3-4) with 6 with no input lag and I am even able to
+  use m_filter in combination with this.
 * SSTH3_SLI_AA_CONFIGURATION to control SLI on Voodoo 5 5500 as well as
   Anti-aliasing on these cards.
 
