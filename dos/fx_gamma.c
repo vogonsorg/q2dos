@@ -56,7 +56,6 @@
 typedef signed int	FxI32;
 typedef unsigned int	FxU32;
 typedef float		FxFloat;
-typedef int (FX_CALL *GrProc)();
 #endif
 #include "fx_gamma.h"
 
@@ -73,9 +72,6 @@ static void (FX_CALL *guGammaCorrectionRGB_fp)(FxFloat, FxFloat, FxFloat) = NULL
 static FxU32 (FX_CALL *grGet_fp)(FxU32, FxU32, FxI32*) = NULL;
 static void (FX_CALL *grLoadGammaTable_fp)(FxU32, FxU32*, FxU32*, FxU32*) = NULL;
 
-/* Modified grGetProcAddress for DJGPP so this can work without static linked builds */
-extern GrProc FX_CALL grGetProcAddress( char *procName );
-
 /**********************************************************************/
 
 /*
@@ -90,9 +86,9 @@ int Init_3dfxGammaCtrl (void)
 	if (guGammaCorrectionRGB_fp != NULL)
 		return 3;	/* already have glide3x proc address */
 
-	if ((grGammaCorrectionValue_fp = (void (*) (FxFloat)) grGetProcAddress("grGammaCorrectionValue")) != NULL)
+	if ((grGammaCorrectionValue_fp = (void (*) (FxFloat)) dlsym(RTLD_DEFAULT, "_grGammaCorrectionValue")) != NULL)
 		return 2;/* glide2x */
-	else if ((guGammaCorrectionRGB_fp = (void (*) (FxFloat, FxFloat, FxFloat)) grGetProcAddress("guGammaCorrectionRGB")) != NULL)
+	else if ((guGammaCorrectionRGB_fp = (void (*) (FxFloat, FxFloat, FxFloat)) dlsym(RTLD_DEFAULT, "_guGammaCorrectionRGB")) != NULL)
 		return 3;/* glide3x */
 	else	return 0;
 }
@@ -158,8 +154,8 @@ static int Check_3DfxGammaRamp (void)
 	if (grLoadGammaTable_fp != NULL && grGet_fp != NULL)
 		return 1;
 
-	grGet_fp = (FxU32 (*) (FxU32, FxU32, FxI32 *)) grGetProcAddress("grGet");
-	grLoadGammaTable_fp = (void (*) (FxU32, FxU32 *, FxU32 *, FxU32 *)) grGetProcAddress("grLoadGammaTable");
+	grGet_fp = (FxU32 (*) (FxU32, FxU32, FxI32 *)) dlsym(RTLD_DEFAULT, "_grGet");
+	grLoadGammaTable_fp = (void (*) (FxU32, FxU32 *, FxU32 *, FxU32 *)) dlsym(RTLD_DEFAULT, "_grLoadGammaTable");
 	if (grLoadGammaTable_fp != NULL && grGet_fp != NULL)
 		return 1;
 

@@ -915,9 +915,6 @@ static GrExtensionTuple _extensionTable[] = {
     { "txPalToNcc", (GrProc)txPalToNcc },
 #endif
     { "grSetNumPendingBuffers", (GrProc)grSetNumPendingBuffers},
-    { "guGammaCorrectionRGB", (GrProc)guGammaCorrectionRGB },
-    { "grLoadGammaTable", (GrProc)grLoadGammaTable },
-    { "grGet", (GrProc)grGet },
     { 0, 0 }
 };
 
