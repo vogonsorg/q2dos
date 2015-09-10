@@ -280,9 +280,6 @@ void SV_WriteFrameToClient (client_t *client, sizebuf_t *msg);
 void SV_RecordDemoMessage (void);
 void SV_BuildClientFrame (client_t *client);
 
-
-void SV_Error (char *error, ...) __attribute__((__format__(__printf__,1,2)));
-
 //
 // sv_game.c
 //
