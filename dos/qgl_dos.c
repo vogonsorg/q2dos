@@ -358,7 +358,7 @@ void ( APIENTRY * qglPointParameterfEXT)( GLenum param, GLfloat value );
 void ( APIENTRY * qglPointParameterfvEXT)( GLenum param, const GLfloat *value );
 void ( APIENTRY * qglColorTableEXT)( int, int, int, int, int, const void * );
 void ( APIENTRY * qglSelectTextureSGIS)( GLenum );
-void ( APIENTRY * qglMTexCoord2fSGIS)( GLenum, GLfloat, GLfloat );
+//void ( APIENTRY * qglMTexCoord2fSGIS)( GLenum, GLfloat, GLfloat );
 void ( APIENTRY * qglActiveTextureARB) ( GLenum );
 void ( APIENTRY * qglClientActiveTextureARB) ( GLenum );
 void ( APIENTRY * qglMultiTexCoord2f)( GLenum, GLfloat, GLfloat );
@@ -2933,9 +2933,9 @@ void QGL_Shutdown( void )
 	qglViewport                  = NULL;
 }
 
-void *qwglGetProcAddress(char *symbol)
+void *qwglGetProcAddress(const char *sym)
 {
-	return DMesaGetProcAddress(symbol);
+	return DMesaGetProcAddress(sym);
 }
 
 /*
@@ -3293,7 +3293,7 @@ qboolean QGL_Init( const char *dllname )
 	qglPointParameterfvEXT = 0;
 	qglColorTableEXT = 0;
 	qglSelectTextureSGIS = 0;
-	qglMTexCoord2fSGIS = 0;
+//	qglMTexCoord2fSGIS = 0;
 	qglActiveTextureARB = 0;
 	qglClientActiveTextureARB = 0;
 	qglMultiTexCoord2f = 0;
@@ -3316,8 +3316,8 @@ void GLimp_EnableLogging( qboolean enable )
 
 			asctime( newtime );
 
-			sprintf( buffer, "%s/gl.log", ri.FS_Gamedir() ); 
-			log_fp = fopen( buffer, "wt");
+			Com_sprintf( buffer, sizeof(buffer), "%s/gl.log", ri.FS_Gamedir() );
+			log_fp = fopen( buffer, "wt" );
 
 			fprintf( log_fp, "%s\n", asctime( newtime ) );
 		}
@@ -4003,7 +4003,6 @@ void GLimp_EnableLogging( qboolean enable )
 
 void GLimp_LogNewFrame( void )
 {
-	fprintf( log_fp, "*** R_BeginFrame ***\n");
+	fprintf( log_fp, "*** R_BeginFrame ***\n" );
 }
-
 
