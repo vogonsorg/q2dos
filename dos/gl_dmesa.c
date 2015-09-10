@@ -80,18 +80,15 @@ static void VID_InitGamma (void)
 
 	gammaworks = fx_gamma = false;
 
-	if(!r_ignorehwgamma->value) /* FS: Fail this check if the ignore CVAR is set */
+	/* we don't have WGL_3DFX_gamma_control or an equivalent in dos. */
+	/* Here is an evil hack abusing the exposed Glide symbols: */
+	if (!r_ignorehwgamma->value &&
+		(!strnicmp(gl_renderer, "3dfx", 4)	  ||
+		 !strnicmp(gl_renderer, "SAGE Glide", 10) ||
+		 !strnicmp(gl_renderer, "Glide ", 6)	  || /* possible with Mesa 3.x/4.x/5.0.x */
+		 !strnicmp(gl_renderer, "Mesa Glide", 10)))
 	{
-		/* we don't have WGL_3DFX_gamma_control or an equivalent in dos. */
-		/* Here is an evil hack abusing the exposed Glide symbols: */
-		if (gl_renderer &&
-			(!strnicmp(gl_renderer, "3dfx", 4)	  ||
-			 !strnicmp(gl_renderer, "SAGE Glide", 10) ||
-			 !strnicmp(gl_renderer, "Glide ", 6)	  || /* possible with Mesa 3.x/4.x/5.0.x */
-			 !strnicmp(gl_renderer, "Mesa Glide", 10)))
-		{
-			fx_gamma = VID_Check3dfxGamma();
-		}
+		fx_gamma = VID_Check3dfxGamma();
 	}
 
 	if (!gammaworks && !fx_gamma)
