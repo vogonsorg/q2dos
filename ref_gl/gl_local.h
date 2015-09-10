@@ -538,6 +538,3 @@ void		GLimp_AppActivate( qboolean active );
 void		GLimp_EnableLogging( qboolean enable );
 void		GLimp_LogNewFrame( void );
 
-#ifdef __DJGPP__
-qboolean	GLimp_Get3dfxHwGamma (void);
-#endif

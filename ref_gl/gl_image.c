@@ -1871,18 +1871,9 @@ void	GL_InitImages (void)
 			ri.Sys_Error( ERR_FATAL, "Couldn't load pics/16to8.pcx");
 	}
 
-#ifdef __DJGPP__
-	/* FS: MesaFX will set gamma properly with Software (not HW) gamma, no need to hard lock for some situations */
-	if ( gl_config.renderer & GL_RENDERER_VOODOO )
-	{
-		if(GLimp_Get3dfxHwGamma() == true)
-			g = 1.0F;
-	}
-#endif
-
 	for ( i = 0; i < 256; i++ )
 	{
-		if ( g == 1 )
+		if ( g == 1  || gl_state.gammaRamp )
 		{
 			gammatable[i] = i;
 		}

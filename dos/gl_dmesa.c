@@ -41,7 +41,6 @@ static unsigned short	orig_ramps[3][256];
 #endif
 
 static qboolean	fx_gamma   = false;	// 3dfx-specific gamma control
-static qboolean	gammaworks = false;	// whether hw-gamma works
 
 #if !defined(USE_3DFXGAMMA)
 static inline int Init_3dfxGammaCtrl (void)		{ return 0; }
@@ -76,22 +75,27 @@ static qboolean VID_Check3dfxGamma (void)
 
 static void VID_InitGamma (void)
 {
-	const char *gl_renderer = (const char *)qglGetString (GL_RENDERER);
+	const char *gl_renderer;
 
-	gammaworks = fx_gamma = false;
+	gl_state.gammaRamp = fx_gamma = false;
+	if (r_ignorehwgamma->value) {
+		ri.Con_Printf(PRINT_ALL, "ignoring hardware gamma\n");
+		return;
+	}
 
 	/* we don't have WGL_3DFX_gamma_control or an equivalent in dos. */
 	/* Here is an evil hack abusing the exposed Glide symbols: */
-	if (!r_ignorehwgamma->value &&
-		(!strnicmp(gl_renderer, "3dfx", 4)	  ||
-		 !strnicmp(gl_renderer, "SAGE Glide", 10) ||
-		 !strnicmp(gl_renderer, "Glide ", 6)	  || /* possible with Mesa 3.x/4.x/5.0.x */
-		 !strnicmp(gl_renderer, "Mesa Glide", 10)))
+	gl_renderer = (const char *)qglGetString (GL_RENDERER);
+	if (!strnicmp(gl_renderer, "3dfx", 4)	  ||
+	    !strnicmp(gl_renderer, "SAGE Glide", 10) ||
+	    !strnicmp(gl_renderer, "Glide ", 6)	  || /* possible with Mesa 3.x/4.x/5.0.x */
+	    !strnicmp(gl_renderer, "Mesa Glide", 10))
 	{
 		fx_gamma = VID_Check3dfxGamma();
+		gl_state.gammaRamp = fx_gamma;
 	}
 
-	if (!gammaworks && !fx_gamma)
+	if (!gl_state.gammaRamp)
 		ri.Con_Printf(PRINT_ALL, "gamma adjustment not available\n");
 	else	vid_gamma->modified = true;/* let refresh loop update gamma */
 }
@@ -104,6 +108,7 @@ static void VID_ShutdownGamma (void)
 /*	if (fx_gamma) do3dfxGammaCtrl(1);*/
 #endif
 	Shutdown_3dfxGamma();
+	gl_state.gammaRamp = fx_gamma = false;
 }
 
 /*****************************************************************************/
@@ -272,13 +277,4 @@ void UpdateGammaRamp (void)
 #else
 	if (fx_gamma) do3dfxGammaCtrl(value);
 #endif
-}
-
-/* FS: If we don't let Voodoo cards lock to 1.0f in GL_InitImages then on next startup HW gamma will be way too bright */
-qboolean GLimp_Get3dfxHwGamma (void)
-{
-	if(fx_gamma)
-		return true;
-
-	return false;
 }
