@@ -84,8 +84,6 @@ cvar_t	*r_ignorehwgamma; /* Knightmare- hardware gamma */
 cvar_t	*r_displayrefresh; /* Knightmare- refresh rate control */
 cvar_t	*r_lefthand;
 
-cvar_t	*r_dlights_normal; /* Knightmare- lerped dlights on models */
-
 cvar_t	*r_lightlevel;	// FIXME: This is a HACK to get the client's light level
 
 cvar_t	*gl_nosubimage;
@@ -1063,9 +1061,6 @@ void R_Register ( void )
 	r_ignorehwgamma = ri.Cvar_Get ("r_ignorehwgamma", "0", CVAR_ARCHIVE);	/* Knightmare- hardware gamma */
 	r_displayrefresh = ri.Cvar_Get ("r_displayrefresh", "0", CVAR_ARCHIVE); /* Knightmare- refresh rate control */
 	r_speeds = ri.Cvar_Get ("r_speeds", "0", 0);
-
-	// lerped dlights on models
-	r_dlights_normal = ri.Cvar_Get ("r_dlights_normal", "1", CVAR_ARCHIVE);
 
 	r_lightlevel = ri.Cvar_Get ("r_lightlevel", "0", 0);
 

@@ -234,8 +234,6 @@ extern	cvar_t	*r_lerpmodels;
 extern	cvar_t	*r_ignorehwgamma; /* Knightmare- hardware gamma */
 extern	cvar_t	*r_displayrefresh; /* Knightmare- refresh rate control */
 
-extern	cvar_t	*r_dlights_normal; /* Knightmare- lerped dlights on models */
-
 extern	cvar_t	*r_lightlevel;	// FIXME: This is a HACK to get the client's light level
 
 extern cvar_t	*gl_vertex_arrays;
