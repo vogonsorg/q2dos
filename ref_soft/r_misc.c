@@ -321,7 +321,7 @@ Guaranteed to be called before the first refresh
 void R_ViewChanged (vrect_t *vr, float aspect)
 {
 	int		i;
-	float	screenAspect, pixelAspect; /* FS: From Q1 */
+	float	screenAspect, pixelAspect;
 
 	r_refdef.vrect = *vr;
 
@@ -352,23 +352,6 @@ void R_ViewChanged (vrect_t *vr, float aspect)
 	xOrigin = r_refdef.xOrigin;
 	yOrigin = r_refdef.yOrigin;
 
-#if 0
-	/* Knightmare- catch 5:4 modes pushing top and bottom clips beyond screen buffer */
-	if ( (r_refdef.vrect.width != r_newrefdef.width || r_refdef.vrect.height != r_newrefdef.height)
-		&& (((float)r_newrefdef.width / (float)r_newrefdef.height) < (640.0f/480.0f)) )
-	{
-		float	x;
-		x = r_refdef.vrect.width/tan(r_newrefdef.fov_x/360*M_PI);
-		verticalFieldOfView = 2*(r_refdef.vrect.height/x);
-	}
-	else
-		verticalFieldOfView = 2*tan((float)r_newrefdef.fov_y/360*M_PI);
-	/* end Knightmare */
-	/* leilei - Aspect stuff nicked from Q1 */
-	pixelAspect = 1.000 + (1.3333 - ((float)vid.width / (float)vid.height));
-	screenAspect = r_refdef.vrect.width*pixelAspect / r_refdef.vrect.height;
-	verticalFieldOfView = r_refdef.horizontalFieldOfView / screenAspect; /* FS: FIXME Knightmare's code is already modifying the vert FOV so whatdo? */
-#else
 	// 320*200 1.0 pixelAspect = 1.6 screenAspect
 	// 320*240 1.0 pixelAspect = 1.3333 screenAspect
 	// proper 320*200 pixelAspect = 0.8333333
@@ -383,7 +366,6 @@ void R_ViewChanged (vrect_t *vr, float aspect)
 		screenAspect = r_refdef.vrect.width*pixelAspect / r_refdef.vrect.height;
 		verticalFieldOfView = r_refdef.horizontalFieldOfView / screenAspect;
 	}
-#endif
 
 /* values for perspective projection
    if math were exact, the values would range from 0.5 to to range+0.5
@@ -403,15 +385,13 @@ void R_ViewChanged (vrect_t *vr, float aspect)
 	aliasxscale = xscale * r_aliasuvscale;
 	xscaleinv = 1.0 / xscale;
 
-//	yscale = xscale;
-	yscale = (r_newrefdef.rdflags & RDF_FOVADAPT)? /* fov_adapt ?? */
+	yscale = (r_newrefdef.rdflags & RDF_FOVADAPT)?
 			  r_refdef.vrect.height / verticalFieldOfView :
 			  xscale * pixelAspect;
 	aliasyscale = yscale * r_aliasuvscale;
 	yscaleinv = 1.0 / yscale;
 	xscaleshrink = (r_refdef.vrect.width-6)/r_refdef.horizontalFieldOfView;
-//	yscaleshrink = xscaleshrink;
-	yscaleshrink = xscaleshrink*pixelAspect; /* FS: From Q1 */
+	yscaleshrink = xscaleshrink*pixelAspect;
 
 // left side clip
 	screenedge[0].normal[0] = -1.0 / (xOrigin*r_refdef.horizontalFieldOfView);
@@ -489,7 +469,7 @@ void R_SetupFrame (void)
 	{	// warp into off screen buffer
 		if (r_newrefdef.width <= WARP_WIDTH && r_newrefdef.height <= WARP_HEIGHT)
 		{
-			// shortcut for 320x240 and lower -- from Q1
+			/* shortcut for 320x240 and lower -- from Q1 */
 			vrect.x = 0;
 			vrect.y = 0;
 			vrect.width = r_newrefdef.width;
@@ -497,25 +477,7 @@ void R_SetupFrame (void)
 		}
 		else
 		{
-#if 0
-			int adj_warp_height; // Knightmare added
-			vrect.x = 0;
-			vrect.y = 0;
-			vrect.width = r_newrefdef.width < WARP_WIDTH ? r_newrefdef.width : WARP_WIDTH;
-		//	vrect.height = r_newrefdef.height < WARP_HEIGHT ? r_newrefdef.height : WARP_HEIGHT;
-			// Knightmare- adjust warp height for widescreen aspect ratio
-			if ( ((float)r_newrefdef.width / (float)r_newrefdef.height) > (640.0f/480.0f) )
-			{
-				adj_warp_height = (int)( ((float)r_newrefdef.height / (float)r_newrefdef.width) * (float)WARP_WIDTH );
-			}
-			else
-			{
-				adj_warp_height = WARP_HEIGHT;
-			}
-			vrect.height = r_newrefdef.height < adj_warp_height ? r_newrefdef.height : adj_warp_height;
-			// end Knightmare
-#endif
-			// the following adapted from Q1
+			/* the following adapted from Q1 */
 			float w = r_newrefdef.width;
 			float h = r_newrefdef.height;
 
