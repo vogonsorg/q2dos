@@ -64,3 +64,12 @@ Known Issues:
   this is why.  It is disabled by default in Q2DOS.  But if you are using
   a custom config file imported from another OS it may secretly have this
   enabled.
+* Trilinear filtering is disabled by default on Voodoo 4/5 unless you use
+  MESA_FX_IGNORE_CMBEXT.
+
+Other tidbits:
+* 3DFX's reference hardware for benchmarking with the VSA-100 chipset
+  (Voodoo 4 and 5) was a Pentium 3 866mhz.  A setup in this range provides
+  the smoothest framerates and is recommended to play the game comfortably.
+  See http://www.falconfly.de/downloads/3dfx-v5-PC-Reviewers-Guide.zip for
+  more details.
