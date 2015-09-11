@@ -2,22 +2,22 @@ Setup:
 * Pick the correct glide driver (glide3x.dxe) for your 3dfx card from
   one of the directories listed below and put it in the same place as
   q2.exe and gl.dxe:
-  * sst1  -> Voodoo Graphics
-  * sst96 -> Voodoo Rush
-  * cvg   -> Voodoo2
-  * h5    -> Banshee, Voodoo3, Voodoo4 and Voodoo5
+  - sst1  -> Voodoo Graphics
+  - sst96 -> Voodoo Rush
+  - cvg   -> Voodoo2
+  - h5    -> Banshee and Voodoo 3/4/5
 * It is recommended to use RayeR's MTRRLFBE.EXE utility
   (http://rayer.g6.cz/programm/mtrrlfbe.exe) to setup a
-  Write-combining MTRR for the LFB.  This will dramatically increase
+  write-combining MTRR for the LFB.  This will dramatically increase
   performance on Voodoo Rush and higher cards.
 
 Recommended System Specs:
 * Pentium 2 400mhz.  Pentium 3 550mhz or higher for the best experience.
-* Voodoo 3.  Older generations will work, but unknown how well they perform
-  in faster computers.
+* Voodoo 3.  Older cards will work, but unknown how well they perform in
+  faster computers.
 
 Interesting parameters:
-* -bpp for setting 15, 16, or 32bpp on Voodoo 4/5 cards.
+* -bpp for setting 15, 16, or 32 bpp on Voodoo 4/5 cards.
 * FX_GLIDE_NO_SPLASH=1 to disable the splash logo on Voodoo 1 and 2 cards
   on startup.
 * FX_GLIDE_SWAPPENDINGCOUNT to set the number of frames to buffer.  Default
@@ -27,15 +27,15 @@ Interesting parameters:
   timedemos (about 3-4) with 6 with no input lag and I am even able to
   use m_filter in combination with this.
 * SSTH3_SLI_AA_CONFIGURATION to control SLI on Voodoo 5 5500 as well as
-  Anti-aliasing on these cards.
+  anti-aliasing on these cards.
   - For Voodoo 4 and 5:
     0 - SLI Disabled, AA Disabled.
     1 - SLI Disabled, AA 2x Enabled.
   - For Voodoo 5 5500:
-    2 - SLI Enabled, AA Disabled (Default setting).
+    2 - SLI Enabled, AA Disabled (default setting).
     3 - SLI Enabled, AA 2x Enabled.
     4 - SLI Disabled, AA 4x Enabled.
-  Options 5-8 are for Voodoo 5 6000 users.  If you're out there, send me
+  Options 5-8 are for Voodoo 5 6000 users: if you're out there, send me
   an email!
 * MESA_FX_IGNORE_CMBEXT to allow Voodoo 4/5 to perform single-pass
   trilinear.  This also provides a small speed boost of 4-5 fps on average
