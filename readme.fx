@@ -53,9 +53,10 @@ Known Issues:
   also exists in Mesa.  You can verify by downloading the Windows Mesa DLLs
   from http://falconfly.de/ .
 * gl_ext_multitexture is supported by the driver but appears to have an
-  approximately 10fps loss on average on everything I tested it on.  It
-  defaults to 0 by default.  If you would like to try it anyways set it to 1
-  and do a vid_restart.
+  approximately 10fps loss on average (more in complex scenes) on everything
+  I tested it on EXCEPT in modes 1280x1024 and 1600x1200 where it really
+  helps.  It defaults to 0 by default.  If you would like to try it anyways
+  set it to 1 and do a vid_restart.
 * gl_ext_pointparameters can lock some machines when particles are drawn,
   i.g. if you start a map and try to fire your gun and the game locks up.
   This is why it is disabled by default in Q2DOS.  But if you are using
