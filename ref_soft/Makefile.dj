@@ -12,7 +12,7 @@ CPPFLAGS+= -Did386=1
 endif
 
 ifeq ($(USE_SSE),1)
-CFLAGS += -mtune=pentium3 -march=pentium3 -mfpmath=sse
+CFLAGS += -mtune=pentium3 -march=pentium3
 endif
 
 REFSOFT = ../game/q_shared.o \

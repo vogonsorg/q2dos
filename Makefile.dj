@@ -33,7 +33,7 @@ EXE = q2.exe
 
 ifeq ($(USE_SSE),1)
 # FS: approx 10-15% speed boost on my P3 550 when running timedemos, but could be dangerous.
-CFLAGS+= -mtune=pentium3 -march=pentium3 -mfpmath=sse
+CFLAGS+= -mtune=pentium3 -march=pentium3
 EXE = q2sse.exe
 endif
 
