@@ -28,16 +28,13 @@ Interesting parameters:
   use m_filter in combination with this.
 * SSTH3_SLI_AA_CONFIGURATION to control SLI on Voodoo 5 5500 as well as
   Anti-aliasing on these cards.
-
-  For Voodoo 4 and 5:
-  0 - SLI Disabled, AA Disabled.
-  1 - SLI Disabled, AA 2x Enabled.
-
-  For Voodoo 5 5500:
-  2 - SLI Enabled, AA Disabled (Default setting).
-  3 - SLI Enabled, AA 2x Enabled.
-  4 - SLI Disabled, AA 4x Enabled.
-
+  - For Voodoo 4 and 5:
+    0 - SLI Disabled, AA Disabled.
+    1 - SLI Disabled, AA 2x Enabled.
+  - For Voodoo 5 5500:
+    2 - SLI Enabled, AA Disabled (Default setting).
+    3 - SLI Enabled, AA 2x Enabled.
+    4 - SLI Disabled, AA 4x Enabled.
   Options 5-8 are for Voodoo 5 6000 users.  If you're out there, send me
   an email!
 * MESA_FX_IGNORE_CMBEXT to allow Voodoo 4/5 to perform single-pass
@@ -59,9 +56,9 @@ Known Issues:
   approximately 10fps loss on average on everything I tested it on.  It
   defaults to 0 by default.  If you would like to try it anyways set it to 1
   and do a vid_restart.
-* gl_ext_pointparameters can lock some machines when particles are drawn.
-  If you start a map and try to fire your gun and the game locks up,
-  this is why.  It is disabled by default in Q2DOS.  But if you are using
+* gl_ext_pointparameters can lock some machines when particles are drawn,
+  i.g. if you start a map and try to fire your gun and the game locks up.
+  This is why it is disabled by default in Q2DOS.  But if you are using
   a custom config file imported from another OS it may secretly have this
   enabled.
 * Trilinear filtering is disabled by default on Voodoo 4/5 unless you use
