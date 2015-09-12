@@ -64,6 +64,14 @@ Known Issues:
   enabled.
 * Trilinear filtering is disabled by default on Voodoo 4/5 unless you use
   MESA_FX_IGNORE_CMBEXT.
+* Warehouse maps with power cubes.  Grabbing/adding a power cube to/from a
+  generator uses a dynamic lighting effect to dim or turn on the lights.
+  This effect drastically slows the renderer down briefly for a few seconds
+  until the effect is finished.  The issue persists on Mesa 6.1 and higher
+  due to the tnl code being completely overhauled.  The offending gl functions
+  are in DrawGLPolyChain in gl_rsurf.c.  You can use Mesa 6.0.1 if it truly
+  bothers you, but DMesaGetProcAddress will have to be re-added to the code
+  (trivial to do so, do a grep for it in current Mesa code).
 
 Other tidbits:
 * 3DFX's reference hardware for benchmarking with the VSA-100 chipset
