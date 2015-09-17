@@ -21,9 +21,10 @@ Interesting parameters:
 * FX_GLIDE_2PPC controls the 2 Pixels Per Clock mode.  Valid only for
   Voodoo 4/5 cards.  Disabled in multi-texturing mode.  Valid values are
   -1 to disable, 0 driver decides, 1 forced on.  Default is 1.
-* FX_GLIDE_LOD_BIAS sets the level detail.  This one was kind of tricky to
-  figure out, but basically if you want say +0.5 you would set the value to
-  5, for +1.2 you'd set it to 12 and so on.  Valid ranges are -32 to 32.
+* FX_GLIDE_LOD_BIAS sets the level detail.  Valid only for Voodoo 3/4/5 cards.
+  This one was kind of tricky to figure out, but basically if you want say
+  +0.5 you would set the value to 5, for +1.2 you'd set it to 12 and so on.
+  Valid ranges are -32 to 32.
 * FX_GLIDE_NO_SPLASH=1 to disable the splash logo on Voodoo 1 and 2 cards
   on startup.
 * FX_GLIDE_SWAPPENDINGCOUNT to set the number of frames to buffer.  Default
