@@ -413,6 +413,10 @@ void	VID_Init (void)
 			break;
 		}
 	}
+	Cvar_Get ("r_ignorehwgamma", "0", CVAR_ARCHIVE);
+	/* we only have 3dfx hw accel in dos: */
+	if (COM_CheckParm("-no3dfxgamma"))
+		Cvar_Set("r_ignorehwgamma", "1");
 
 	/* FS: 3DFX - Enforce the refresh rate at startup */
 	r_refreshrate = Cvar_Get("r_refreshrate", "75", CVAR_ARCHIVE);
