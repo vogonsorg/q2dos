@@ -1,6 +1,6 @@
 /*
  * fx_gamma.c
- * $Id: fx_gamma.c 5215 2013-07-25 11:00:27Z sezero $
+ * $Id: fx_gamma.c 5433 2015-09-18 08:20:11Z sezero $
  *
  * Small library providing gamma control functions for 3Dfx Voodoo1/2
  * cards by abusing the exposed glide symbols when using fxMesa.
@@ -12,7 +12,7 @@
  * See the accompanying COPYING file for more details.
  *
  * Compiling as a shared library:
- * gcc fx_gamma.c -O2 -fPIC -Wall -W -o lib3dfxgamma.so -shared
+ * gcc -O2 -fPIC -Wall -W fx_gamma.c -o lib3dfxgamma.so -shared
  *
  * How to use:
  * If you are linking to the opengl library at compile time (-lGL),
@@ -43,8 +43,15 @@
  *			Also renamed FX_Get to FX_GetInteger to be more
  *			explicit.
  * v0.0.5, 2013-07-24:	Several cleanups/tidy-ups.
+ * v0.1.0, 2015-09-18:	Use dlsym(RTLD_DEFAULT,symname) instead of using
+ *			the handle returned by dlopen(NULL,mode).
+ *			Handle dlsym() implementations needing a leading
+ *			underscore to function names, e.g. DJGPP.
  */
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE 1
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <dlfcn.h>
@@ -58,6 +65,16 @@ typedef unsigned int	FxU32;
 typedef float		FxFloat;
 #endif
 #include "fx_gamma.h"
+
+#ifdef __DJGPP__
+#define DLSYM_NEEDS_UNDERSCORE
+#endif
+
+#ifdef DLSYM_NEEDS_UNDERSCORE
+#define DLSYM_NAME(symname) "_"#symname
+#else
+#define DLSYM_NAME(symname)    #symname
+#endif
 
 /**********************************************************************/
 
@@ -79,51 +96,26 @@ static void (FX_CALL *grLoadGammaTable_fp)(FxU32, FxU32*, FxU32*, FxU32*) = NULL
  * Sends 0 for failure, 2 for glide2 or 3 for glide3 api.
  */
 #if defined(__DJGPP__) && defined(REF_HARD_LINKED)
+/* djgpp dlsym() doesn't work on syms from statically linked libs. the
+ * following is for cases where we are statically linked to glide3x. */
 int Init_3dfxGammaCtrl (void)
 {
-	/* this relies on static linking to glide3x. */
 	guGammaCorrectionRGB_fp = guGammaCorrectionRGB;
 	return 3;
-}
-#elif defined(__DJGPP__)
-int Init_3dfxGammaCtrl (void)
-{
-	if (grGammaCorrectionValue_fp != NULL)
-		return 2;	/* already have glide2x proc address */
-	if (guGammaCorrectionRGB_fp != NULL)
-		return 3;	/* already have glide3x proc address */
-
-	if ((grGammaCorrectionValue_fp = (void (*) (FxFloat)) dlsym(RTLD_DEFAULT, "_grGammaCorrectionValue")) != NULL)
-		return 2;/* glide2x */
-	else if ((guGammaCorrectionRGB_fp = (void (*) (FxFloat, FxFloat, FxFloat)) dlsym(RTLD_DEFAULT, "_guGammaCorrectionRGB")) != NULL)
-		return 3;/* glide3x */
-	else	return 0;
 }
 #else
 int Init_3dfxGammaCtrl (void)
 {
-	void	*symslist;
-	int	ret;
-
 	if (grGammaCorrectionValue_fp != NULL)
 		return 2;	/* already have glide2x proc address */
 	if (guGammaCorrectionRGB_fp != NULL)
 		return 3;	/* already have glide3x proc address */
 
-	symslist = (void *) dlopen(NULL, RTLD_LAZY);
-	if (symslist != NULL)
-	{
-		if ((grGammaCorrectionValue_fp = (void (*) (FxFloat)) dlsym(symslist, "grGammaCorrectionValue")) != NULL)
-			ret = 2;/* glide2x */
-		else if ((guGammaCorrectionRGB_fp = (void (*) (FxFloat, FxFloat, FxFloat)) dlsym(symslist, "guGammaCorrectionRGB")) != NULL)
-			ret = 3;/* glide3x */
-		else	ret = 0;
-
-		dlclose(symslist);
-		return ret;
-	}
-
-	return 0;	/* shouldn't reach here */
+	if ((grGammaCorrectionValue_fp = (void (*) (FxFloat)) dlsym(RTLD_DEFAULT, DLSYM_NAME(grGammaCorrectionValue))) != NULL)
+		return 2;/* glide2x */
+	else if ((guGammaCorrectionRGB_fp = (void (*) (FxFloat, FxFloat, FxFloat)) dlsym(RTLD_DEFAULT, DLSYM_NAME(guGammaCorrectionRGB))) != NULL)
+		return 3;/* glide3x */
+	else	return 0;
 }
 #endif
 
@@ -156,43 +148,24 @@ int do3dfxGammaCtrl (float value)
 /**********************************************************************/
 
 #if defined(__DJGPP__) && defined(REF_HARD_LINKED)
+/* djgpp dlsym() doesn't work on syms from statically linked libs. the
+ * following is for cases where we are statically linked to glide3x. */
 static int Check_3DfxGammaRamp (void)
 {
-	/* this relies on static linking to glide3x. */
 	grGet_fp = grGet;
 	grLoadGammaTable_fp = grLoadGammaTable;
 	return 1;
 }
-#elif defined(__DJGPP__)
-static int Check_3DfxGammaRamp (void)
-{
-	if (grLoadGammaTable_fp != NULL && grGet_fp != NULL)
-		return 1;
-
-	grGet_fp = (FxU32 (*) (FxU32, FxU32, FxI32 *)) dlsym(RTLD_DEFAULT, "_grGet");
-	grLoadGammaTable_fp = (void (*) (FxU32, FxU32 *, FxU32 *, FxU32 *)) dlsym(RTLD_DEFAULT, "_grLoadGammaTable");
-	if (grLoadGammaTable_fp != NULL && grGet_fp != NULL)
-		return 1;
-
-	return 0;
-}
 #else
 static int Check_3DfxGammaRamp (void)
 {
-	void	*symslist;
-
 	if (grLoadGammaTable_fp != NULL && grGet_fp != NULL)
 		return 1;
 
-	symslist = (void *) dlopen(NULL, RTLD_LAZY);
-	if (symslist != NULL)
-	{
-		grGet_fp = (FxU32 (*) (FxU32, FxU32, FxI32 *)) dlsym(symslist, "grGet");
-		grLoadGammaTable_fp = (void (*) (FxU32, FxU32 *, FxU32 *, FxU32 *)) dlsym(symslist, "grLoadGammaTable");
-		dlclose(symslist);
-		if (grLoadGammaTable_fp != NULL && grGet_fp != NULL)
-			return 1;
-	}
+	grGet_fp = (FxU32 (*) (FxU32, FxU32, FxI32 *)) dlsym(RTLD_DEFAULT, DLSYM_NAME(grGet));
+	grLoadGammaTable_fp = (void (*) (FxU32, FxU32 *, FxU32 *, FxU32 *)) dlsym(RTLD_DEFAULT, DLSYM_NAME(grLoadGammaTable));
+	if (grLoadGammaTable_fp != NULL && grGet_fp != NULL)
+		return 1;
 
 	return 0;
 }
