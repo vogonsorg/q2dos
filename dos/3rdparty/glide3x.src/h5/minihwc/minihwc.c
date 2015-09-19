@@ -987,9 +987,17 @@ static hwcInfo hInfo;
 static _p_info *CPUInfo = NULL;
 #endif
 
+#if defined(__GNUC__) && ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 3)))
+# define __attribute_used __attribute__((__used__))
+#elif defined(__GNUC__) && (__GNUC__ >= 2)
+# define __attribute_used __attribute__((__unused__))
+#else
+# define __attribute_used
+#endif
+
 #define MAX_ERROR_SIZE 1024
 static char errorString[MAX_ERROR_SIZE];
-static volatile FxU32 fenceVar;
+static FxU32 __attribute_used fenceVar;
 
 FxU32 hwc_errncpy(char *dst,const char *src);
 

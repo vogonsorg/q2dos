@@ -585,9 +585,17 @@
 #define MAXFIFOSIZE_16MB   MAXFIFOSIZE
 #endif
 
+#if defined(__GNUC__) && ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 3)))
+# define __attribute_used __attribute__((__used__))
+#elif defined(__GNUC__) && (__GNUC__ >= 2)
+# define __attribute_used __attribute__((__unused__))
+#else
+# define __attribute_used
+#endif
+
 static hwcInfo hInfo;
 static char errorString[1024];
-static volatile FxU32 fenceVar;
+static FxU32 __attribute_used fenceVar;
 
 /*static FxU32 ProcessID;*/
 
