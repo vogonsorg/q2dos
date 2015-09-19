@@ -179,6 +179,15 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (dlopen)
 	DXE_EXPORT (dlsym)
 	DXE_EXPORT (ldexp)
+
+	/* FS: SAGE */
+	DXE_EXPORT (powf)
+	DXE_EXPORT (strcspn)
+	DXE_EXPORT (expf)
+	DXE_EXPORT (sqrtf)
+	DXE_EXPORT (cosf)
+	DXE_EXPORT (atexit)
+	DXE_EXPORT (sinf)
 #endif
 #if defined(GAMESPY) && !defined(GAMESPY_HARD_LINKED)
 	DXE_EXPORT(send)
