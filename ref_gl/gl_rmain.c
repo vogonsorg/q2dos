@@ -1462,9 +1462,15 @@ int R_Init ( void *hinstance, void *hWnd )
 	if ( StringContainsToken( gl_config.extensions_string, "GL_EXT_compiled_vertex_array" ) || 
 		 StringContainsToken( gl_config.extensions_string, "GL_SGI_compiled_vertex_array" ) )
 	{
-		ri.Con_Printf( PRINT_ALL, "...enabling GL_EXT_compiled_vertex_array\n" );
 		qglLockArraysEXT = ( void * ) qwglGetProcAddress( "glLockArraysEXT" );
 		qglUnlockArraysEXT = ( void * ) qwglGetProcAddress( "glUnlockArraysEXT" );
+		if (qglUnlockArraysEXT && qglLockArraysEXT)
+			ri.Con_Printf( PRINT_ALL, "...enabling GL_EXT_compiled_vertex_array\n" );
+		else {
+			qglUnlockArraysEXT = NULL;
+			qglLockArraysEXT = NULL;
+			ri.Con_Printf( PRINT_ALL, "...failed loading GL_EXT_compiled_vertex_array\n" );
+		}
 	}
 	else
 	{
@@ -1474,8 +1480,9 @@ int R_Init ( void *hinstance, void *hWnd )
 #ifdef _WIN32
 	// WGL_EXT_swap_control
 	if ( StringContainsToken( gl_config.extensions_string, "WGL_EXT_swap_control" ) )
-	{
 		qwglSwapIntervalEXT = ( BOOL (WINAPI *)(int)) qwglGetProcAddress( "wglSwapIntervalEXT" );
+	if ( qwglSwapIntervalEXT )
+	{
 		ri.Con_Printf( PRINT_ALL, "...enabling WGL_EXT_swap_control\n" );
 	}
 	else
@@ -1491,7 +1498,13 @@ int R_Init ( void *hinstance, void *hWnd )
 		{
 			qglPointParameterfEXT = ( void (APIENTRY *)( GLenum, GLfloat ) ) qwglGetProcAddress( "glPointParameterfEXT" );
 			qglPointParameterfvEXT = ( void (APIENTRY *)( GLenum, const GLfloat * ) ) qwglGetProcAddress( "glPointParameterfvEXT" );
-			ri.Con_Printf( PRINT_ALL, "...using GL_EXT_point_parameters\n" );
+			if (qglPointParameterfEXT && qglPointParameterfvEXT)
+				ri.Con_Printf( PRINT_ALL, "...using GL_EXT_point_parameters\n" );
+			else {
+				qglPointParameterfEXT = NULL;
+				qglPointParameterfvEXT = NULL;
+				ri.Con_Printf( PRINT_ALL, "...failed loading GL_EXT_point_parameters\n" );
+			}
 		}
 		else
 		{
@@ -1509,9 +1522,14 @@ int R_Init ( void *hinstance, void *hWnd )
 	{
 		if ( gl_ext_palettedtexture->value )
 		{
-			ri.Con_Printf( PRINT_ALL, "...using 3DFX_set_global_palette\n" );
 			qgl3DfxSetPaletteEXT = ( void ( APIENTRY * ) (GLuint *) )qwglGetProcAddress( "gl3DfxSetPaletteEXT" );
-			qglColorTableEXT = Fake_glColorTableEXT;
+			if (qgl3DfxSetPaletteEXT) {
+				ri.Con_Printf( PRINT_ALL, "...using 3DFX_set_global_palette\n" );
+				qglColorTableEXT = Fake_glColorTableEXT;
+			}
+			else {
+				ri.Con_Printf( PRINT_ALL, "...failed loading 3DFX_set_global_palette\n" );
+			}
 		}
 		else
 		{
@@ -1532,8 +1550,10 @@ int R_Init ( void *hinstance, void *hWnd )
 	{
 		if ( gl_ext_palettedtexture->value )
 		{
-			ri.Con_Printf( PRINT_ALL, "...using GL_EXT_shared_texture_palette\n" );
 			qglColorTableEXT = ( void ( APIENTRY * ) ( int, int, int, int, int, const void * ) ) qwglGetProcAddress( "glColorTableEXT" );
+			if (qglColorTableEXT)
+				ri.Con_Printf( PRINT_ALL, "...using GL_EXT_shared_texture_palette\n" );
+			else	ri.Con_Printf( PRINT_ALL, "...failed loading GL_EXT_shared_texture_palette\n" );
 		}
 		else
 		{
@@ -1559,13 +1579,28 @@ int R_Init ( void *hinstance, void *hWnd )
 			qglMultiTexCoord2f = ( void * ) qwglGetProcAddress( "glMultiTexCoord2fARB" );
 			qglActiveTextureARB = ( void * ) qwglGetProcAddress( "glActiveTextureARB" );
 			qglClientActiveTextureARB = ( void * ) qwglGetProcAddress( "glClientActiveTextureARB" );
-			gl_texture0 = GL_TEXTURE0_ARB;
-			gl_texture1 = GL_TEXTURE1_ARB;
-			gl_config.multitexture = true;
-			gl_state.multitextureEnabled = false;	/* Knightmare added */
-			ri.Con_Printf( PRINT_ALL, "...using GL_ARB_multitexture\n" );
-			qglGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &gl_config.max_texunits);
-			ri.Con_Printf (PRINT_ALL, "...GL_MAX_TEXTURE_UNITS_ARB: %i\n", gl_config.max_texunits);
+			if (qglMultiTexCoord2f && qglActiveTextureARB && qglClientActiveTextureARB) {
+				qglGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &gl_config.max_texunits);
+				if (gl_config.max_texunits > 1) {
+					gl_texture0 = GL_TEXTURE0_ARB;
+					gl_texture1 = GL_TEXTURE1_ARB;
+					gl_config.multitexture = true;
+					gl_state.multitextureEnabled = false;	/* Knightmare added */
+					ri.Con_Printf( PRINT_ALL, "...using GL_ARB_multitexture, %i TMUs\n", gl_config.max_texunits );
+				}
+				else {
+					qglMultiTexCoord2f = NULL;
+					qglActiveTextureARB = NULL;
+					qglClientActiveTextureARB = NULL;
+					ri.Con_Printf( PRINT_ALL, "...not using GL_ARB_multitexture, < 2 TMUs\n" );
+				}
+			}
+			else {
+				qglMultiTexCoord2f = NULL;
+				qglActiveTextureARB = NULL;
+				qglClientActiveTextureARB = NULL;
+				ri.Con_Printf( PRINT_ALL, "...failed loading GL_ARB_multitexture\n" );
+			}
 		}
 		else
 		{
@@ -1588,11 +1623,18 @@ int R_Init ( void *hinstance, void *hWnd )
 		{
 			qglMultiTexCoord2f = ( void * ) qwglGetProcAddress( "glMTexCoord2fSGIS" );
 			qglSelectTextureSGIS = ( void * ) qwglGetProcAddress( "glSelectTextureSGIS" );
-			gl_texture0 = GL_TEXTURE0_SGIS;
-			gl_texture1 = GL_TEXTURE1_SGIS;
-			gl_config.multitexture = true;
-			gl_config.max_texunits = 2;
-			ri.Con_Printf( PRINT_ALL, "...using GL_SGIS_multitexture\n" );
+			if (qglMultiTexCoord2f && qglSelectTextureSGIS) {
+				gl_texture0 = GL_TEXTURE0_SGIS;
+				gl_texture1 = GL_TEXTURE1_SGIS;
+				gl_config.multitexture = true;
+				gl_config.max_texunits = 2;
+				ri.Con_Printf( PRINT_ALL, "...using GL_SGIS_multitexture\n" );
+			}
+			else {
+				qglMultiTexCoord2f = NULL;
+				qglSelectTextureSGIS = NULL;
+				ri.Con_Printf( PRINT_ALL, "...failed loading GL_SGIS_multitexture\n" );
+			}
 		}
 		else
 		{
