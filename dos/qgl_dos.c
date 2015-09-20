@@ -1,5 +1,5 @@
 /*
-** QGL_WIN.C
+** QGL_DOS.C
 **
 ** This file implements the operating system binding of GL to QGL function
 ** pointers.  When doing a port of Quake2 you must implement the following
@@ -8,7 +8,6 @@
 ** QGL_Init() - loads libraries, assigns function pointers, etc.
 ** QGL_Shutdown() - unloads libraries, NULLs function pointers
 */
-#define QGL
 #include "../ref_gl/gl_local.h"
 #include <GL/dmesa.h>
 
