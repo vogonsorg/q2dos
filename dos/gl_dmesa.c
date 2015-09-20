@@ -15,6 +15,14 @@
 #include "../ref_gl/gl_local.h"
 #include "glimp_dos.h"
 
+#if defined(REF_HARD_LINKED) && !defined(REFGL_MESA)
+int DMESA_ScanIFace (void)
+{
+	return -1;
+}
+
+#else
+
 #include <GL/dmesa.h>
 
 #ifndef REF_HARD_LINKED
@@ -127,3 +135,5 @@ int DMESA_ScanIFace (void)
 
 	return 0;
 }
+
+#endif

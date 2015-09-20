@@ -15,6 +15,14 @@
 #include "../ref_gl/gl_local.h"
 #include "glimp_dos.h"
 
+#if defined(REF_HARD_LINKED) && !defined(REFGL_SAGE)
+int DSAGE_ScanIFace (void)
+{
+	return -1;
+}
+
+#else
+
 #include <GL/sage.h>
 
 #ifndef REF_HARD_LINKED
@@ -130,3 +138,5 @@ int SAGE_ScanIFace (void)
 
 	return 0;
 }
+
+#endif

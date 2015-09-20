@@ -18,11 +18,15 @@ USE_CDAUDIO=1
 USE_ASM=1
 # dynamic refresh (video) modules:
 REF_DXE=1
-# compile software renderer if REF_DXE=0
+# compile which renderer if REF_DXE=0 : enable ONLY ONE!
 REF_STATIC_SOFT=1
-# compile gl renderer if REF_DXE=0
 REF_STATIC_GL=0
-# enable evil 3dfx glide hacks for native hardware gamma (if REF_DXE=0)
+# compile which gl driver if REF_DXE=0 and REF_STATIC_GL=1
+# enable ONLY ONE!
+USE_MESA=0
+USE_SAGE=1
+# enable evil 3dfx glide hacks for native hardware gamma
+# (if REF_DXE=0 and REF_STATIC_GL=1)
 USE_3DFXGAMMA=1
 
 CC = gcc
@@ -83,12 +87,21 @@ CURL_CFLAGS = -Ilibcurl/include
 CURL_LIBS = -Llibcurl/lib -lcurl
 endif
 
+ifneq ($(REF_DXE),1)
 ifeq ($(REF_STATIC_GL),1)
 # NOTE: if using REF_STATIC_GL you must define glide library like "GLIDE_LIBS=-lglid3_v5"
 EXE = q2fx.exe
 CFLAGS += -Idos/3rdparty/include -Idos/3rdparty/include/glide3
 LDFLAGS += -Ldos/3rdparty/lib -lgl
 REF_STATIC_SOFT=0
+ifeq ($(USE_MESA),1)
+USE_SAGE=0
+CPPFLAGS+= -DREFGL_MESA
+endif
+ifeq ($(USE_SAGE),1)
+CPPFLAGS+= -DREFGL_SAGE
+endif
+endif
 endif
 
 DOS = dos/dos_v2.o \
@@ -196,7 +209,9 @@ REFGL = ref_gl/gl_draw.o \
 	ref_gl/gl_rsurf.o \
 	ref_gl/gl_warp.o \
 	dos/qgl_dos.o \
-	dos/gl_dmesa.o
+	dos/gl_dmesa.o \
+	dos/gl_sage.o \
+	dos/glimp_dos.o
 ifeq ($(USE_3DFXGAMMA),1)
 REFGL+= dos/fx_gamma.o
 CPPFLAGS+= -DUSE_3DFXGAMMA
