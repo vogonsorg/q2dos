@@ -92,7 +92,9 @@ static void DMESA_EndFrame (void)
 
 static void *DMESA_GetProcAddress (const char *sym)
 {
+#ifndef REF_HARD_LINKED
 	if (DMesaGetProcAddress_fp)
+#endif
 		return DMesaGetProcAddress_fp (sym);
 	return NULL;
 }

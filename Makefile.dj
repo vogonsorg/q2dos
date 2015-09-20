@@ -22,9 +22,12 @@ REF_DXE=1
 REF_STATIC_SOFT=1
 REF_STATIC_GL=0
 # compile which gl driver if REF_DXE=0 and REF_STATIC_GL=1
-# enable ONLY ONE!
-USE_MESA=0
-USE_SAGE=1
+# valid values: mesa or sage
+REFGL_DRIVER=sage
+# compile which glide driver,if REF_DXE=0 and REF_STATIC_GL=1
+# sst1=Voodoo Graphics, sst96=Voodoo Rush
+# cvg=Voodoo2, h5=Banshee and Voodoo3/4/5
+FX_GLIDE_HW=h5
 # enable evil 3dfx glide hacks for native hardware gamma
 # (if REF_DXE=0 and REF_STATIC_GL=1)
 USE_3DFXGAMMA=1
@@ -89,16 +92,14 @@ endif
 
 ifneq ($(REF_DXE),1)
 ifeq ($(REF_STATIC_GL),1)
-# NOTE: if using REF_STATIC_GL you must define glide library like "GLIDE_LIBS=-lglid3_v5"
 EXE = q2fx.exe
 CFLAGS += -Idos/3rdparty/include -Idos/3rdparty/include/glide3
-LDFLAGS += -Ldos/3rdparty/lib -lgl
+LDFLAGS += -Ldos/3rdparty/lib/$(REFGL_DRIVER) -lgl -Ldos/3rdparty/lib/$(FX_GLIDE_HW) -lglide3x
 REF_STATIC_SOFT=0
-ifeq ($(USE_MESA),1)
-USE_SAGE=0
+ifeq ($(REFGL_DRIVER),mesa)
 CPPFLAGS+= -DREFGL_MESA
 endif
-ifeq ($(USE_SAGE),1)
+ifeq ($(REFGL_DRIVER),sage)
 CPPFLAGS+= -DREFGL_SAGE
 endif
 endif

@@ -16,7 +16,7 @@
 #include "glimp_dos.h"
 
 #if defined(REF_HARD_LINKED) && !defined(REFGL_SAGE)
-int DSAGE_ScanIFace (void)
+int SAGE_ScanIFace (void)
 {
 	return -1;
 }
@@ -98,7 +98,9 @@ static void SAGE_EndFrame (void)
 
 static void *SAGE_GetProcAddress (const char *sym)
 {
+#ifndef REF_HARD_LINKED
 	if (sage_GetProcAddress_fp)
+#endif
 		return sage_GetProcAddress_fp (sym);
 	return NULL;
 }
