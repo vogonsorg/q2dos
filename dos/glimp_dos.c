@@ -25,6 +25,13 @@
 
 /*****************************************************************************/
 
+/* DOSGL interface */
+int  (*DOSGL_InitCtx ) (int *width, int *height, int *bpp);
+void (*DOSGL_Shutdown) (void);
+void (*DOSGL_EndFrame) (void);
+void * (*DOSGL_GetProcAddress) (const char *);
+const char * (*DOSGL_IFaceName) (void);
+
 // Gamma stuff
 #define	USE_GAMMA_RAMPS			0
 
@@ -117,10 +124,6 @@ qboolean GLimp_InitGL (void);
 extern cvar_t *vid_fullscreen;
 extern cvar_t *vid_ref;
 
-static DMesaVisual dv;
-static DMesaContext dc;
-static DMesaBuffer db;
-
 #define NUM_GL_RESOLUTIONS 8
 
 static vmodeinfo_t resolutions[NUM_GL_RESOLUTIONS] = {
@@ -157,18 +160,8 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 	// destroy the existing window
 	GLimp_Shutdown ();
 
-	dv = DMesaCreateVisual(width, height, bpp, 0, true, true, 2, 16, 0, 0);
-	if (!dv)
+	if (DOSGL_InitCtx(&width, &height, &bpp) < 0)
 		return rserr_invalid_mode;
-	
-	dc = DMesaCreateContext(dv, NULL);
-	if (!dc)
-		return rserr_invalid_mode;
-	db = DMesaCreateBuffer(dv, 0,0,(GLint)width,(GLint)height);
-	if (!db)
-		return rserr_invalid_mode;
-
-	DMesaMakeCurrent(dc, db);
 
 	VID_InitGamma();
 
@@ -193,21 +186,7 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 void GLimp_Shutdown( void )
 {
 	VID_ShutdownGamma();
-	if (db)
-	{
-		DMesaDestroyBuffer(db);
-		db = NULL;
-	}
-	if (dc)
-	{
-		DMesaDestroyContext(dc);
-		dc = NULL;
-	}
-	if (dv)
-	{
-		DMesaDestroyVisual(dv);
-		dv = NULL;
-	}
+	DOSGL_Shutdown();
 }
 
 /*
@@ -253,8 +232,7 @@ void GLimp_BeginFrame( float camera_seperation )
 */
 void GLimp_EndFrame (void)
 {
-	glFlush();
-	DMesaSwapBuffers(db);
+	DOSGL_EndFrame ();
 }
 
 /*

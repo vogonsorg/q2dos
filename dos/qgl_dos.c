@@ -2934,7 +2934,7 @@ void QGL_Shutdown( void )
 
 void *qwglGetProcAddress(const char *sym)
 {
-	return DMesaGetProcAddress(sym);
+	return DOSGL_GetProcAddress (sym);
 }
 
 /*
@@ -2949,6 +2949,22 @@ void *qwglGetProcAddress(const char *sym)
 */
 qboolean QGL_Init( const char *dllname )
 {
+	int rc = -1;
+
+	if (rc < 0)
+		rc = DMESA_ScanIFace ();
+	if (rc < 0)
+		rc = SAGE_ScanIFace ();
+#if 0
+	if (rc < 0)
+		rc = FXMESA_ScanIFace ();
+#endif
+	if (rc < 0) {
+		ri.Con_Printf (PRINT_ALL, "QGL_Init() - no supported interfaces found.\n");
+		return false;
+	}
+	ri.Con_Printf(PRINT_ALL, "QGL: driver using %s interface.\n", DOSGL_IFaceName());
+
 	qglAccum                     = dllAccum = glAccum;
 	qglAlphaFunc                 = dllAlphaFunc = glAlphaFunc;
 	qglAreTexturesResident       = dllAreTexturesResident = glAreTexturesResident;
