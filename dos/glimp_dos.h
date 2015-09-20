@@ -27,6 +27,4 @@ extern const char * (*DOSGL_IFaceName) (void);
 
 int DMESA_ScanIFace (void);
 int SAGE_ScanIFace (void);
-#if 0
 int FXMESA_ScanIFace (void);
-#endif

@@ -22,7 +22,7 @@ REF_DXE=1
 REF_STATIC_SOFT=1
 REF_STATIC_GL=0
 # compile which gl driver if REF_DXE=0 and REF_STATIC_GL=1
-# valid values: mesa or sage
+# valid values: mesa, sage, or fxmesa
 REFGL_DRIVER=sage
 # compile which glide driver,if REF_DXE=0 and REF_STATIC_GL=1
 # sst1=Voodoo Graphics, sst96=Voodoo Rush
@@ -94,8 +94,14 @@ ifneq ($(REF_DXE),1)
 ifeq ($(REF_STATIC_GL),1)
 EXE = q2fx.exe
 CFLAGS += -Idos/3rdparty/include -Idos/3rdparty/include/glide3
-LDFLAGS += -Ldos/3rdparty/lib/$(REFGL_DRIVER) -lgl -Ldos/3rdparty/lib/$(FX_GLIDE_HW) -lglide3x
+LDFLAGS += -Ldos/3rdparty/lib/$(GLDIR) -lgl -Ldos/3rdparty/lib/$(FX_GLIDE_HW) -lglide3x
 REF_STATIC_SOFT=0
+ifeq ($(REFGL_DRIVER),fxmesa)
+GLDIR=mesa
+CPPFLAGS+= -DREFGL_FXMESA
+else
+GLDIR=$(REFGL_DRIVER)
+endif
 ifeq ($(REFGL_DRIVER),mesa)
 CPPFLAGS+= -DREFGL_MESA
 endif
@@ -210,6 +216,7 @@ REFGL = ref_gl/gl_draw.o \
 	ref_gl/gl_rsurf.o \
 	ref_gl/gl_warp.o \
 	dos/qgl_dos.o \
+	dos/gl_fxmesa.o \
 	dos/gl_dmesa.o \
 	dos/gl_sage.o \
 	dos/glimp_dos.o

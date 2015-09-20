@@ -2951,14 +2951,9 @@ qboolean QGL_Init( const char *dllname )
 {
 	int rc = -1;
 
-	if (rc < 0)
-		rc = DMESA_ScanIFace ();
-	if (rc < 0)
-		rc = SAGE_ScanIFace ();
-#if 0
-	if (rc < 0)
-		rc = FXMESA_ScanIFace ();
-#endif
+	if (rc < 0) rc = DMESA_ScanIFace ();
+	if (rc < 0) rc = SAGE_ScanIFace ();
+	if (rc < 0) rc = FXMESA_ScanIFace ();
 	if (rc < 0) {
 		ri.Con_Printf (PRINT_ALL, "QGL_Init() - no supported interfaces found.\n");
 		return false;
