@@ -51,7 +51,7 @@
 
 
 .PHONY: all clean
-.INTERMEDIATE: x86/gen_matypes.exe
+.INTERMEDIATE: x86/gen_matypes.exe glide3x.dxe
 
 TOP = ../..
 GLIDE ?= $(TOP)/glide3
@@ -59,8 +59,6 @@ LIBDIR = $(TOP)/lib
 GL_LIB = libgl.a
 GL_DXE = gl.dxe
 GL_IMP = libigl.a
-
-export LD_LIBRARY_PATH := $(LD_LIBRARY_PATH);$(LIBDIR);$(GLIDE)/lib
 
 CC = gcc
 # HOST_CC is for generating X86/gen_matypes.exe when cross-compiling.
@@ -130,7 +128,8 @@ $(LIBDIR)/$(GL_LIB): $(OBJECTS)
 
 $(LIBDIR)/$(GL_DXE) $(LIBDIR)/$(GL_IMP): $(OBJECTS)
 ifeq ($(FX),1)
-	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -Y $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa -P glide3x.dxe -U $^
+$(LIBDIR)/$(GL_DXE) $(LIBDIR)/$(GL_IMP): glide3x.dxe
+	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -Y $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa -P glide3x.dxe -U $(OBJECTS)
 else
 	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -Y $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa -U $^
 endif
@@ -142,6 +141,14 @@ x86/matypes.h: x86/gen_matypes.exe
 
 x86/gen_matypes.exe: x86/gen_matypes.c
 	$(HOST_CC) -o $@ $(CFLAGS) -s $<
+
+# dxe3gen needs glide3x.dxe when generating the import lib libigl.a.
+# so we generate a dummy glide3x.dxe to cover common glide3x exports
+# and all possible libc dependencies:
+drivers/glide/glide3x_dxe.o: drivers/glide/glide3x_dxe.c
+	$(CC) -O0 -Wall -o $@ -c $<
+glide3x.dxe: drivers/glide/glide3x_dxe.o
+	-dxe3gen -o glide3x.dxe -E _gr -E _gu -U $<
 
 clean:
 	-$(call UNLINK,array_cache/*.o)
