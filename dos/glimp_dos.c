@@ -21,8 +21,7 @@
 #include "../ref_gl/gl_local.h"
 #include "../client/keys.h"
 #include "vid_dos.h"
-
-#include <GL/dmesa.h>
+#include "glimp_dos.h"
 
 /*****************************************************************************/
 

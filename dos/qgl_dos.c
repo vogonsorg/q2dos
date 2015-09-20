@@ -9,7 +9,7 @@
 ** QGL_Shutdown() - unloads libraries, NULLs function pointers
 */
 #include "../ref_gl/gl_local.h"
-#include <GL/dmesa.h>
+#include "glimp_dos.h"
 
 static FILE *log_fp = NULL;
 
