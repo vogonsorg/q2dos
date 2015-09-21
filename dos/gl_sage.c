@@ -45,6 +45,8 @@ static SageProc (*sage_GetProcAddress_fp) (const char *);
 #endif
 
 static sageContext *ctx;
+static qboolean firstRunHack = true;
+static void SAGE_Shutdown (void);
 
 static int SAGE_InitCtx (int *width, int *height, int *bpp)
 {
@@ -75,6 +77,14 @@ static int SAGE_InitCtx (int *width, int *height, int *bpp)
 		sage_fini_fp ();
 		ctx = NULL;
 		return -1;
+	}
+
+	if (firstRunHack) /* FS: For some reason SAGE has bad performance unless it's loaded twice.  SLI or not. :( */
+	{
+		firstRunHack = false;
+		ri.Con_Printf(PRINT_DEVELOPER, "Running SAGE performance hack\n");
+		SAGE_Shutdown();
+		SAGE_InitCtx(width, height, bpp);
 	}
 
 	return 0;
