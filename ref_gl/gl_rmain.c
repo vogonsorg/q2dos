@@ -1137,7 +1137,7 @@ void R_Register ( void )
 
 	gl_3dlabs_broken = ri.Cvar_Get( "gl_3dlabs_broken", "1", CVAR_ARCHIVE );
 
-	r_refreshrate = ri.Cvar_Get("r_refreshrate", "75", CVAR_ARCHIVE);
+	r_refreshrate = ri.Cvar_Get("r_refreshrate", "60", CVAR_ARCHIVE);
 
 	vid_fullscreen = ri.Cvar_Get( "vid_fullscreen", "1", CVAR_ARCHIVE );
 	vid_gamma = ri.Cvar_Get( "vid_gamma", "1.0", CVAR_ARCHIVE );
