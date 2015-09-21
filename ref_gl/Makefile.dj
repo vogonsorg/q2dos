@@ -27,6 +27,7 @@ endif
 REFSOFT = ../game/q_shared.o \
 	../dos/q_shdos.o \
 	../dos/qgl_dos.o \
+	../dos/gl_fxmesa.o \
 	../dos/gl_dmesa.o \
 	../dos/gl_sage.o \
 	../dos/glimp_dos.o \
