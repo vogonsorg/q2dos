@@ -1,23 +1,72 @@
-Setup:
+     .,o'       `o,.
+   ,o8'           `8o.
+  o8'               `8o
+ o8:                 ;8o
+.88                   88.
+:88.                 ,88:
+`888                 888'
+ 888o   `888 888'   o888
+ `888o,. `88 88' .,o888'
+  `8888888888888888888'
+    `888888888888888'
+       `::88;88;:'
+          88 88
+          88 88
+          `8 8'
+           ` '
+
++----------------------------------+
+|        Table of Contents         |
+|                                  |
+|  1 - Setup                       |
+|  2 - Recommend System Specs      |
+|  3 - Mesa vs. Sage               |
+|  4 - Interesting Paramaters      |
+|  5 - Interesting Mesa Parameters |
+|  6 - Interesting Sage Parameters |
+|  7 - Known General Issues        |
+|  8 - Known Mesa Issues           |
+|  9 - Known Sage Issues           |
+| 10 - Other tidbits               |
++----------------------------------+
+
+1 - Setup
+---------------------------------------------------------
 * Pick the correct glide driver (glide3x.dxe) for your 3dfx card from
   one of the directories listed below and put it in the same place as
-  q2.exe and gl.dxe:
+  q2.exe:
   - sst1  -> Voodoo Graphics
   - sst96 -> Voodoo Rush
   - cvg   -> Voodoo2
   - h5    -> Banshee and Voodoo 3/4/5
+* Pick a renderer (gl.dxe) from one of the directories listed below
+  and put it in the same place as q2.exe:
+  - mesa -> Mesa v6.4.3
+  - sage -> Sage (be sure to copy sage.ini as well)
 * It is recommended to use RayeR's MTRRLFBE.EXE utility
   (http://rayer.g6.cz/programm/mtrrlfbe.exe) to setup a
   write-combining MTRR for the LFB.  This will dramatically increase
   performance on Voodoo Rush and higher cards.
 
-Recommended System Specs:
+2 - Recommended System Specs
+---------------------------------------------------------
 * Pentium 2 400mhz.  Pentium 3 550mhz or higher for the best experience.
 * Voodoo 3.  Older cards will work, but unknown how well they perform in
   faster computers.
 
-Interesting parameters:
+3 - Mesa vs. Sage
+---------------------------------------------------------
+* Sage is much faster than Mesa, very close to or in some cases exceeding
+  Windows performance compared to the OpenGL ICD by AmigaMerlin v2.9.
+  It is not totally perfect, it has it's own share of issues read below
+  for more information.
+* Mesa has been more thoroughly tested but also has it's own share of issues.
+  Read below for more information.
+
+4 - Interesting parameters
+---------------------------------------------------------
 * -bpp for setting 15, 16, or 32 bpp on Voodoo 4/5 cards.
+  "set vid_glbpp" can also control the bpp in-game.  Requires a vid_restart.
 * FX_GLIDE_2PPC controls the 2 Pixels Per Clock mode.  Valid only for
   Voodoo 4/5 cards.  Disabled in multi-texturing mode.  Valid values are
   -1 to disable, 0 driver decides, 1 forced on.  Default is 1.
@@ -47,13 +96,34 @@ Interesting parameters:
     4 - SLI Disabled, AA 4x Enabled.
   Options 5-8 are for Voodoo 5 6000 users: if you're out there, send me
   an email!
+
+5 - Interesting Mesa parameters
+---------------------------------------------------------
 * MESA_FX_IGNORE_CMBEXT to allow Voodoo 4/5 to perform single-pass
   trilinear.  This also provides a small speed boost of 4-5 fps on average
   in my timedemo tests with bilinear.  Mesa warns some advanced (multi)texturing
   modes won't work (GL_EXT_texture_env_combine), but multitexturing is slower
   in Mesa and is recommended to be disabled (see below).
+* MESA_FX_IGNORE_TEXFMT set to any value (including 0) to disable the
+  32bpp-like quality on 16bpp modes.  This causes a slightly performance hit.
+  This is enabled by default, and only affects Voodoo 4 and 5.
+* MESA_CODEGEN enables code generation for TnL code.  May help performance,
+  but I have personally seen no benefits.
 
-Known Issues:
+6 - Interesting Sage parameters
+---------------------------------------------------------
+* See sage.ini for more information.
+
+7 - Known General Issues
+---------------------------------------------------------
+* gl_ext_multitexture is supported by the driver but appears to have an
+  approximately 10fps loss on average (more in complex scenes) on everything
+  I tested it on EXCEPT in modes 1280x1024 and 1600x1200 where it really
+  helps.  It defaults to 0 by default.  If you would like to try it anyways
+  set it to 1 and do a vid_restart.
+
+8 - Known Mesa Issues
+---------------------------------------------------------
 * Mesa is slower than MiniGL drivers such as the WickedGL driver or the
   OpenGL ICD from 3dfx.  These DLLs rely on special Quake engine hacks
   to speed up rendering.  They are closed source so we do not know what
@@ -62,11 +132,6 @@ Known Issues:
 * Outdoor scenes are slower compared to Windows OpenGL ICD.  This issue
   also exists in Mesa.  You can verify by downloading the Windows Mesa DLLs
   from http://falconfly.de/ .
-* gl_ext_multitexture is supported by the driver but appears to have an
-  approximately 10fps loss on average (more in complex scenes) on everything
-  I tested it on EXCEPT in modes 1280x1024 and 1600x1200 where it really
-  helps.  It defaults to 0 by default.  If you would like to try it anyways
-  set it to 1 and do a vid_restart.
 * gl_ext_pointparameters can lock some machines when particles are drawn,
   i.g. if you start a map and try to fire your gun and the game locks up.
   This is why it is disabled by default in Q2DOS.  But if you are using
@@ -77,13 +142,27 @@ Known Issues:
 * Warehouse maps with power cubes.  Grabbing/adding a power cube to/from a
   generator uses a dynamic lighting effect to dim or turn on the lights.
   This effect drastically slows the renderer down briefly for a few seconds
-  until the effect is finished.  The issue persists on Mesa 6.1 and higher
+  until the effect is finished.  The issue persists on Mesa v6.1 and higher
   due to the tnl code being completely overhauled.  The offending gl functions
-  are in DrawGLPolyChain in gl_rsurf.c.  You can use Mesa 6.0.1 if it truly
-  bothers you, but DMesaGetProcAddress will have to be re-added to the code
-  (trivial to do so, do a grep for it in current Mesa code).
+  are in DrawGLPolyChain in gl_rsurf.c.  You can use Mesa v6.0.1 or Sage
+  if it truly bothers you. DMesaGetProcAddress will have to be re-added to the
+  Mesa v6.0.1 code (trivial to do so, do a grep for it in current Mesa code).
 
-Other tidbits:
+9 - Known Sage Issues
+---------------------------------------------------------
+* Trilinear filtering does not work on Voodoo 4 and 5.
+* Static builds have issues with multiple vid_restarts and mode changes.
+  You seem to be allowed about 2 or 3 per session until a malloc error
+  bombs it out.  This is only going to affect users building custom builds
+  from source.  Distribution packages are unaffacted.
+* Black screens with segfaults from the LFN check.  Consequently, the LFN
+  check is now disabled.  It is up to you to be diligent on being sure an
+  LFN driver is loaded.
+* Requires initialization twice for proper performance.  There is a hack in
+  place until this issue can be resolved.
+
+10 - Other tidbits
+---------------------------------------------------------
 * 3DFX's reference hardware for benchmarking with the VSA-100 chipset
   (Voodoo 4 and 5) was a Pentium 3 866mhz.  A setup in this range provides
   the smoothest framerates and is recommended to play the game comfortably.

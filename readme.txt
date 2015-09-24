@@ -1,13 +1,45 @@
+     .,o'       `o,.
+   ,o8'           `8o.
+  o8'               `8o
+ o8:                 ;8o
+.88                   88.
+:88.                 ,88:
+`888                 888'
+ 888o   `888 888'   o888
+ `888o,. `88 88' .,o888'
+  `8888888888888888888'
+    `888888888888888'
+       `::88;88;:'
+          88 88
+          88 88
+          `8 8'
+           ` '
+
 Welcome to the Quake II for MS-DOS port.
 By Neozeed, [HCI]Mara'akate, and sezero.
 
++-----------------------------------------+
+|            Table of Contents            |
+|                                         |
+|  1 - What's Required?                   |
+|  2 - What works?                        |
+|  3 - What works but needs more testing? |
+|  4 - What doesn't work                  |
+|  5 - Interesting Mesa Parameters        |
+|  6 - Interesting Sage Parameters        |
+|  7 - Tips and other misc. info          |
+|  8 - 3DFX Notes                         |
+|  9 - Links and Credits                  |
++-----------------------------------------+
 
-What's required?
+1 - What's required?
+---------------------------------------------------------
 * Pentium 1.  At least a 200MHz to play it at ~20-30fps.
 * At least 48 MB RAM.  More for larger mods.
 * LFN TSR.  Use the included DOSLFN.ZIP (can be loaded high with LH DOSLFN.COM)
 
-What works?
+2 - What works?
+---------------------------------------------------------
 * VGA (320x200 and 320x240)
 * SVGA (Banked and LFB)
 * Mouse
@@ -18,21 +50,24 @@ What works?
 * Networking (You need a packet driver)
 * Loading/unloading video driver and game DLLs in DXE3 format.
 
-What works but needs more testing?
+3 - What works but needs more testing?
+---------------------------------------------------------
 * 3DFX OpenGL rendering.
 * Playing in a Windows 9x DOS box.
 * Modern sound cards like AC'97 or HDA
 * Mouse wheel support. (see info below.)
 * Hor+ FOV scaling. (see info below.)
 
-What doesn't work:
+4 - What doesn't work
+---------------------------------------------------------
 * Playing in a Windows NT NTVDM DOS box.  If you must, +set sw_mode 1.
 * TGA files from maps that were only optimized for OpenGL.
 * Some models from Whale's WODX server can crash the software renderer.  I'm
   assuming they're custom player models as I tried replaying the same maps
   later and got no crashes.  Until I can spot it, be on the lookout.
 
-Tips and other misc info:
+5 - Tips and other misc. info
+---------------------------------------------------------
 * Run /slist2 to get a gamespy list of active servers, or use the new browser
   menu.  Run /srelist to print the previous list.  Use CTRL+C to abort.
 * Don't use EMM386.  If you get weird virtual alloc failed errors,
@@ -77,10 +112,12 @@ Tips and other misc info:
   and client.  Starting a demo with demomap is easy, i.e.  demomap demo1.dm2.
   The extension must be incldued.
 
-3DFX Notes:
+6 - 3DFX Notes
+---------------------------------------------------------
 * Please refer to readme.fx for more details.
 
-
+7 - Links and Credits
+---------------------------------------------------------
 Follow neozeed @
 http://virtuallyfun.superglobalmegacorp.com/
 
