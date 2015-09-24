@@ -35,14 +35,14 @@
 * Pick the correct glide driver (glide3x.dxe) for your 3dfx card from
   one of the directories listed below and put it in the same place as
   q2.exe:
-  - sst1  -> Voodoo Graphics
-  - sst96 -> Voodoo Rush
-  - cvg   -> Voodoo2
-  - h5    -> Banshee and Voodoo 3/4/5
+  - voodoo/sst1  -> Voodoo Graphics
+  - voodoo/sst96 -> Voodoo Rush
+  - voodoo/cvg   -> Voodoo2
+  - voodoo/h5    -> Banshee and Voodoo 3/4/5
 * Pick a renderer (gl.dxe) from one of the directories listed below
   and put it in the same place as q2.exe:
-  - mesa -> Mesa v6.4.3
-  - sage -> Sage (be sure to copy sage.ini as well)
+  - opengl/mesa -> Mesa v6.4.3
+  - opengl/sage -> Sage (be sure to copy sage.ini as well)
 * It is recommended to use RayeR's MTRRLFBE.EXE utility
   (http://rayer.g6.cz/programm/mtrrlfbe.exe) to setup a
   write-combining MTRR for the LFB.  This will dramatically increase
