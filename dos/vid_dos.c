@@ -588,7 +588,7 @@ void	VID_MenuInit (void)
 	else if ( strcmp( Cvar_VariableString("vid_ref"), "gl" ) == 0 )
 	{
 		s_current_menu_index = OPENGL_MENU;
-			s_ref_list[s_current_menu_index].curvalue = REF_OPENGL;
+		s_ref_list[s_current_menu_index].curvalue = REF_OPENGL;
 	}
 
 	s_software_menu.x = viddef.width * 0.50;
