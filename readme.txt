@@ -61,7 +61,7 @@ By Neozeed, [HCI]Mara'akate, and sezero.
 4 - What doesn't work
 ---------------------------------------------------------
 * Playing in a Windows NT NTVDM DOS box.  If you must, +set sw_mode 1.
-* TGA files from maps that were only optimized for OpenGL.
+* Software Renderer: TGA files from maps that were only optimized for OpenGL.
 * Some models from Whale's WODX server can crash the software renderer.  I'm
   assuming they're custom player models as I tried replaying the same maps
   later and got no crashes.  Until I can spot it, be on the lookout.
