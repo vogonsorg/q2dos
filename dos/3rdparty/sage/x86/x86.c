@@ -88,6 +88,8 @@ k3d_init (void)
 int
 x86_init (void)
 {
+	extern int allow_sse;
+
     x86_cpu_bits = cpusoft(x86_cpu_name);
 
     tnl_clipmask_tab[0] = x86_clipmask;
@@ -95,7 +97,7 @@ x86_init (void)
     ctx_imm_table.TexCoord2fv = x86_TexCoord2fv;
     ctx_imm_table.MultiTexCoord2fv = x86_MultiTexCoord2fv;
 
-    if (x86_cpu_bits & _CPU_FEATURE_SSE) {
+    if ((x86_cpu_bits & _CPU_FEATURE_SSE) && (allow_sse)) { /* FS: SSE is buggy, so require it explicitly */
 	sse_init();
     }
     if (x86_cpu_bits & _CPU_FEATURE_3DNOW) {

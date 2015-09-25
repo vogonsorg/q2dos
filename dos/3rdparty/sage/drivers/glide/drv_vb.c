@@ -452,7 +452,7 @@ vb_init (void)
     init_q0q1fs();
 
 #ifdef X86
-    if (x86_cpu_bits & _CPU_FEATURE_SSE) {
+    if ((x86_cpu_bits & _CPU_FEATURE_SSE) && (allow_sse)) { /* FS: SSE is buggy, so require it explictly */
 	extern void sse_emitvertices_g (int n);
 	extern void sse_emitvertices_t0 (int n);
 	extern void sse_emitvertices_q0 (int n);

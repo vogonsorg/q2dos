@@ -152,7 +152,7 @@ extern int allow_combine;
 extern int allow_blendsquare;
 extern int allow_compressed;
 extern int allow_multitex;
-
+extern int allow_sse; /* FS: SSE is buggy, so require it explicitly */
 
 typedef char * (FX_CALL *gfGetRegistryOrEnvironmentStringExt_f) (char *theEntry);
 typedef GrContext_t (FX_CALL *gfSstWinOpenExt_f) (FxU32 hWnd, GrScreenResolution_t resolution, GrScreenRefresh_t refresh, GrColorFormat_t format, GrOriginLocation_t origin, GrPixelFormat_t pixelformat, int nColBuffers, int nAuxBuffers);
