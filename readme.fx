@@ -159,7 +159,7 @@
   Due to an issue with the SSE specific code in Sage, you may or may not
   be able to start the game.  As a consequence, it must be explicitly enabled
   via the sage.ini as x86.enable.sse = y.  If you build from source you can
-  force GCC SSE optimizations with -march=pentium3 and 3dfx.enable.sse = n and
+  force GCC SSE optimizations with -march=pentium3 and x86.enable.sse = n and
   get similar performance without the crashes.  Distributing SSE-only builds
   of DXEs and binaries is impractical; you must build it yourself.
 * Requires initialization twice for proper performance.  There is a hack in
