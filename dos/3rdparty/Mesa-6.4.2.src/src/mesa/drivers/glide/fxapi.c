@@ -270,36 +270,13 @@ fxMesaContext GLAPIENTRY
 fxMesaCreateBestContext(GLuint win, GLint width, GLint height,
 			const GLint attribList[])
 {
-	GrScreenRefresh_t refresh = GR_REFRESH_75Hz;
-	int res = fxBestResolution(width, height);
+ int res = fxBestResolution(width, height);
 
-	if (res == -1) {
-		return NULL;
-	}
+ if (res == -1) {
+    return NULL;
+ }
 
-	/* FS: Added this back in */
-	if (getenv("SST_SCREENREFRESH")) {
-		if (!strcmp(getenv("SST_SCREENREFRESH"), "60"))
-			refresh = GR_REFRESH_60Hz;
-		if (!strcmp(getenv("SST_SCREENREFRESH"), "70"))
-			refresh = GR_REFRESH_70Hz;
-		if (!strcmp(getenv("SST_SCREENREFRESH"), "72"))
-			refresh = GR_REFRESH_72Hz;
-		if (!strcmp(getenv("SST_SCREENREFRESH"), "75"))
-			refresh = GR_REFRESH_75Hz;
-		if (!strcmp(getenv("SST_SCREENREFRESH"), "80"))
-			refresh = GR_REFRESH_80Hz;
-		if (!strcmp(getenv("SST_SCREENREFRESH"), "85"))
-			refresh = GR_REFRESH_85Hz;
-		if (!strcmp(getenv("SST_SCREENREFRESH"), "90"))
-			refresh = GR_REFRESH_90Hz;
-		if (!strcmp(getenv("SST_SCREENREFRESH"), "100"))
-			refresh = GR_REFRESH_100Hz;
-		if (!strcmp(getenv("SST_SCREENREFRESH"), "120"))
-			refresh = GR_REFRESH_120Hz;
-	}
-
-	return fxMesaCreateContext(win, res, refresh, attribList);
+ return fxMesaCreateContext(win, res, GR_REFRESH_60Hz, attribList);
 }
 
 
