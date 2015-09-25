@@ -602,33 +602,6 @@ sage_open (int db_flag,
     return NULL;
 }
 
-/* FS: Use SST_SCREENREFRESH for refresh rate control */
-static GrScreenRefresh_t
-get_refreshrate (void)
-{
-	const char *refresh_env = getenv("SST_SCREENREFRESH");
-	if (!refresh_env)
-		return GR_REFRESH_60Hz;
-	if (!strcmp(refresh_env, "60"))
-		return GR_REFRESH_60Hz;
-	if (!strcmp(refresh_env, "70"))
-		return GR_REFRESH_70Hz;
-	if (!strcmp(refresh_env, "72"))
-		return GR_REFRESH_72Hz;
-	if (!strcmp(refresh_env, "75"))
-		return GR_REFRESH_75Hz;
-	if (!strcmp(refresh_env, "80"))
-		return GR_REFRESH_80Hz;
-	if (!strcmp(refresh_env, "85"))
-		return GR_REFRESH_85Hz;
-	if (!strcmp(refresh_env, "90"))
-		return GR_REFRESH_90Hz;
-	if (!strcmp(refresh_env, "100"))
-		return GR_REFRESH_100Hz;
-	if (!strcmp(refresh_env, "120"))
-		return GR_REFRESH_120Hz;
-	return GR_REFRESH_60Hz;
-}
 
 int
 sage_bind (sageContext *ctx, void *win, int width, int height)
@@ -664,14 +637,14 @@ sage_bind (sageContext *ctx, void *win, int width, int height)
     if (hwext_pixext) {
 	ctx->gr_ctx = gfSstWinOpenExt((int)win,
 				findBestRes(width, height),
-				get_refreshrate(),
+				GR_REFRESH_60Hz,
 				GR_COLORFORMAT_ABGR,
 				GR_ORIGIN_LOWER_LEFT,
 				ctx->fmt, 2, 1);
     } else if (ctx->fmt == GR_PIXFMT_RGB_565) {
 	ctx->gr_ctx = grSstWinOpen((int)win,
 				findBestRes(width, height),
-				get_refreshrate(),
+				GR_REFRESH_60Hz,
 				GR_COLORFORMAT_ABGR,
 				GR_ORIGIN_LOWER_LEFT, 2, 1);
     }
