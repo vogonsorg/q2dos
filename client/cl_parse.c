@@ -860,6 +860,33 @@ void SHOWNET(char *s)
 		Com_Printf ("%3i:%s\n", net_message.readcount-1, s);
 }
 
+/* FS: One time, I was playing on a xatrix server and that a player who has been
+       MIA for months moved on to another xatrix server.  The admin started sending
+	   down malicious stufftexts for me to connect elsewhere.  Let's stop that and other
+	   potentially scary shit */
+qboolean CL_MaliciousStuffText(char *s)
+{
+	if(!cl_skip_stufftext_check->value)
+		return false;
+
+	if(!s || s[0] == 0)
+		return false;
+
+	if((cl_skip_stufftext_check->intValue > 1) && (strstr(s, "connect "))) /* FS: Special case, because you might want to use WallFly to jump from server-to-server, but ignore malicious admin from Friends of Xatrix server. */
+	{
+		Com_DPrintf (DEVELOPER_MSG_NET, "Ignoring malicious stufftext: %s\n", s);
+		return true;
+	}
+
+	if( (strstr(s, "fov ")) || (strstr(s, "s_mixahead ")) || (strstr(s, "rate ")) || (strstr(s, "cl_maxfps ")) || (strstr(s, "r_maxfps ")) )
+	{
+		Com_DPrintf (DEVELOPER_MSG_NET, "Ignoring malicious stufftext: %s\n", s);
+		return true;
+	}
+
+	return false;
+}
+
 /*
 =====================
 CL_ParseServerMessage
@@ -962,7 +989,9 @@ void CL_ParseServerMessage (void)
 		case svc_stufftext:
 			s = MSG_ReadString (&net_message);
 			Com_DPrintf(DEVELOPER_MSG_NET, "stufftext: %s\n", s);
-			Cbuf_AddText (s);
+
+			if(!CL_MaliciousStuffText(s)) /* FS: See function for more info */
+				Cbuf_AddText (s);
 			break;
 			
 		case svc_serverdata:

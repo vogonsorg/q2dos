@@ -402,6 +402,7 @@ extern	cvar_t	*cl_http_proxy;
 extern	cvar_t	*cl_http_max_connections;
 #endif	/* USE_CURL */
 
+extern	cvar_t	*cl_skip_stufftext_check; /* FS: Added */
 extern	cvar_t	*fov_adapt; /* sezero */
 
 typedef struct

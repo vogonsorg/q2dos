@@ -112,6 +112,7 @@ cvar_t	*cl_vwep;
 cvar_t	*console_old_complete; /* FS: Old style command completing */
 cvar_t	*cl_autorepeat_allkeys; /* FS: So I can autorepeat whatever I want, hoss. */
 cvar_t	*cl_sleep; /* Knightmare: Added */
+cvar_t	*cl_skip_stufftext_check; /* FS: Added */
 
 #ifdef GAMESPY
 /* FS: Gamespy CVARs */
@@ -1749,6 +1750,8 @@ void CL_InitLocal (void)
 	console_old_complete = Cvar_Get("console_old_complete", "0", CVAR_ARCHIVE); /* FS: Old style command completing */
 	cl_autorepeat_allkeys = Cvar_Get("cl_autorepeat_allkeys", "0", CVAR_ARCHIVE); /* FS: Because I want to autorepeat whatever I want, hoss */
 	cl_autorepeat_allkeys->description = "Allow to autorepeat any key, not just Backspace, Pause, PgUp, and PgDn keys.";
+	cl_skip_stufftext_check = Cvar_Get ("cl_skip_stufftext_check", "0", 0);
+	cl_skip_stufftext_check->description = "Check malicious stufftexts from servers and their admins.  Must explicitly be enabled and will not be saved.  Values higher than 1 will ignore connect stufftexts from WallFly, etc.";
 
 	/* Knightmare: Added */
 	cl_sleep = Cvar_Get("cl_sleep", "0", CVAR_ARCHIVE);
