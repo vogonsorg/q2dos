@@ -56,7 +56,6 @@ int allow_combine;		/**< Enable or emulate texture env combine */
 int allow_blendsquare;		/**< Allow blend square (GL_NV_blend_square) */
 int allow_compressed;		/**< Allow compressed textures */
 int allow_multitex;		/**< Allow multitexture if available */
-int allow_sse;			 /* FS: SSE is buggy, so require it explicitly */
 
 int (*drv_multipass) (int pass);
 void (*drv_emitvertices) (int n);
@@ -505,7 +504,6 @@ sage_open (int db_flag,
     allow_blendsquare = (hardware >= GR_SSTTYPE_Voodoo4) && !YES("3dfx.disable.blendsquare");
     allow_combine     = GL_TRUE && !YES("3dfx.disable.combine");
     allow_multitex    = (getInteger(GR_NUM_TMU) > 1) && !YES("3dfx.disable.multitex");
-    allow_sse         = YES("3dfx.enable.sse"); /* FS: SSE is buggy, so require it explicitly */
 
     allow_compressed = atoi(cfg_get("3dfx.texture.compression", "3"));
     if (hardware < GR_SSTTYPE_Voodoo4) {

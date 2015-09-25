@@ -156,9 +156,9 @@
   bombs it out.  This is only going to affect users building custom builds
   from source.  Distribution packages are unaffacted.
 * Black screens with segfaults on SSE processors (i.e. P3 and higher).
-  Due to an issue with the SSE specific code in Sage you may or may not
+  Due to an issue with the SSE specific code in Sage, you may or may not
   be able to start the game.  As a consequence, it must be explicitly enabled
-  via the sage.ini as 3dfx.enable.sse = y.  If you build from source you can
+  via the sage.ini as x86.enable.sse = y.  If you build from source you can
   force GCC SSE optimizations with -march=pentium3 and 3dfx.enable.sse = n and
   get similar performance without the crashes.  Distributing SSE-only builds
   of DXEs and binaries is impractical; you must build it yourself.
