@@ -109,7 +109,6 @@ static unsigned long virtualMemStart;
 */
 static void Sys_DetectLFN (void)
 {
-#if 0 /* FS: FIXME: for some reason this breaks dynamic Sage builds */
 	if(skiplfncheck)
 		return;
 	if(!(_get_volume_info(NULL, 0, 0, NULL) & _FILESYS_LFN_SUPPORTED))
@@ -118,7 +117,6 @@ static void Sys_DetectLFN (void)
 		sleep(2);
 		printf("Continuing to load Quake II. . .\n");
 	}
-#endif
 }
 
 static qboolean Sys_DetectWinNT (void) /* FS: Wisdom from Gisle Vanem */

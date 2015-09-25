@@ -155,9 +155,8 @@
   You seem to be allowed about 2 or 3 per session until a malloc error
   bombs it out.  This is only going to affect users building custom builds
   from source.  Distribution packages are unaffacted.
-* Black screens with segfaults from the LFN check.  Consequently, the LFN
-  check is now disabled.  It is up to you to be diligent on being sure an
-  LFN driver is loaded.
+* Black screens with segfaults on Pentium 3s.  Due to an issue with the SSE
+  specific code in Sage you may or may not be able to start the game.
 * Requires initialization twice for proper performance.  There is a hack in
   place until this issue can be resolved.
 
