@@ -866,13 +866,13 @@ void SHOWNET(char *s)
 	   potentially scary shit */
 qboolean CL_MaliciousStuffText(char *s)
 {
-	if(!cl_skip_stufftext_check->value)
+	if(!cl_stufftext_check->value)
 		return false;
 
 	if(!s || s[0] == 0)
 		return false;
 
-	if((cl_skip_stufftext_check->intValue > 1) && (strstr(s, "connect "))) /* FS: Special case, because you might want to use WallFly to jump from server-to-server, but ignore malicious admin from Friends of Xatrix server. */
+	if((cl_stufftext_check->intValue > 1) && (strstr(s, "connect "))) /* FS: Special case, because you might want to use WallFly to jump from server-to-server, but ignore malicious admin from Friends of Xatrix server. */
 	{
 		Com_DPrintf (DEVELOPER_MSG_NET, "Ignoring malicious stufftext: %s\n", s);
 		return true;
