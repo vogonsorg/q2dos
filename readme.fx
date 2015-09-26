@@ -66,7 +66,7 @@
 4 - Interesting parameters
 ---------------------------------------------------------
 * -bpp for setting 15, 16, or 32 bpp on Voodoo 4/5 cards.
-  "set vid_glbpp" can also control the bpp in-game.  Requires a vid_restart.
+  "set vid_glbpp" will control the bpp in-game.  Requires a vid_restart.
 * FX_GLIDE_2PPC controls the 2 Pixels Per Clock mode.  Valid only for
   Voodoo 4/5 cards.  Disabled in multi-texturing mode.  Valid values are
   -1 to disable, 0 driver decides, 1 forced on.  Default is 1.
@@ -76,12 +76,15 @@
   Valid ranges are -32 to 32.
 * FX_GLIDE_NO_SPLASH=1 to disable the splash logo on Voodoo 1 and 2 cards
   on startup.
+* FX_GLIDE_REFRESH for refresh rate control on Banshee, Voodoo 3, 4, and 5.
+* FX_GLIDE_SWAPINTERVAL to control V-Sync.
 * FX_GLIDE_SWAPPENDINGCOUNT to set the number of frames to buffer.  Default
   value is 2, but can go as high as 6.  Traditionally, in Windows, higher
   values can be a slight speed advantage but can introduce input lag.  On
   the hardware I tested it on I was able to gain a few extra frames in
   timedemos (about 3-4) with 6 with no input lag and I am even able to
   use m_filter in combination with this.
+* SST_SCREENREFRESH for refresh rate control on Voodoo 1, Rush.
 * SSTH3_ALPHADITHERMODE set to 3 for the "Smoother" option that is equivalent
   in the Windows control panel for Alpha Blending Quality.  Values 0-2 all
   use the same code path.  Defaults to 1.
@@ -96,6 +99,7 @@
     4 - SLI Disabled, AA 4x Enabled.
   Options 5-8 are for Voodoo 5 6000 users: if you're out there, send me
   an email!
+* SSTV2_SCREENREFRESH for refresh rate control on Voodoo 2.
 
 5 - Interesting Mesa parameters
 ---------------------------------------------------------

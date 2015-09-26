@@ -304,6 +304,7 @@ void GL_UpdateSwapInterval( void )
 				qwglSwapIntervalEXT( (registration_active) ? 0 : gl_swapinterval->value );	/* Knightmare changed */
 			//	qwglSwapIntervalEXT( gl_swapinterval->value );
 #else
+#if 0 /* FS: Disabled until we decide if we want to keep this */
 			if ( gl_config.renderer & ( GL_RENDERER_VOODOO ) ) /* FS: Adjust V-Sync without a program restart */
 			{
 				static char envbuffer[64];
@@ -311,6 +312,7 @@ void GL_UpdateSwapInterval( void )
 				Com_sprintf( envbuffer, sizeof(envbuffer), "FX_GLIDE_SWAPINTERVAL=%i", gl_swapinterval->intValue );
 				putenv( envbuffer );
 			}
+#endif
 #endif
 		}
 	}

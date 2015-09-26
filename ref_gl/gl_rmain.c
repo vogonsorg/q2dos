@@ -1779,6 +1779,7 @@ void R_BeginFrame( float camera_separation )
 		UpdateGammaRamp (); /* Knightmare- hardware gamma */
 	}
 
+#if 0 /* FS: Disabled until we decide if we want to keep this */
 	if ( r_refreshrate->modified) /* FS: Refresh rate control */
 	{
 		r_refreshrate->modified = false;
@@ -1790,6 +1791,7 @@ void R_BeginFrame( float camera_separation )
 			putenv( envbuffer );
 		}
 	}
+#endif
 
 	GLimp_BeginFrame( camera_separation );
 
