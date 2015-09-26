@@ -42,7 +42,6 @@ static void (*fxMesaSwapBuffers_fp) (void);
 
 static fxMesaContext fc = NULL;
 
-#if 0
 static int findres (int *width, int *height)
 {
 	static int fx_resolutions[][3] = {
@@ -79,7 +78,6 @@ static int findres (int *width, int *height)
 	*height = 480;
 	return GR_RESOLUTION_640x480;
 }
-#endif
 
 static int FXMESA_InitCtx (int *width, int *height, int *bpp)
 {
@@ -92,8 +90,8 @@ static int FXMESA_InitCtx (int *width, int *height, int *bpp)
 	attribs[4] = 1;
 	attribs[5] = FXMESA_NONE;
 
-//	fc = fxMesaCreateContext_fp(0, findres(width, height), GR_REFRESH_60Hz, attribs);
-	fc = fxMesaCreateBestContext_fp(0, *width, *height, attribs); /* FS: allows us to use SST_SCREENREFRESH to set the refresh rate */
+//	fc = fxMesaCreateBestContext_fp(0, *width, *height, attribs);
+	fc = fxMesaCreateContext_fp(0, findres(width, height), GR_REFRESH_60Hz, attribs);
 	if (!fc)
 		return -1;
 
