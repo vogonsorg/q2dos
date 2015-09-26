@@ -27,15 +27,24 @@ int DMESA_ScanIFace (void)
 
 #ifndef REF_HARD_LINKED
 #include <dlfcn.h>
-static DMesaVisual (*DMesaCreateVisual_fp) (GLint, GLint, GLint, GLint, GLboolean, GLboolean, GLint, GLint, GLint, GLint);
-static void (*DMesaDestroyVisual_fp) (DMesaVisual);
-static DMesaContext (*DMesaCreateContext_fp) (DMesaVisual, DMesaContext);
-static void (*DMesaDestroyContext_fp) (DMesaContext);
-static DMesaBuffer (*DMesaCreateBuffer_fp) (DMesaVisual, GLint, GLint, GLint, GLint);
-static void (*DMesaDestroyBuffer_fp) (DMesaBuffer b);
-static void (*DMesaSwapBuffers_fp) (DMesaBuffer);
-static GLboolean (*DMesaMakeCurrent_fp) (DMesaContext, DMesaBuffer);
-static DMesaProc (*DMesaGetProcAddress_fp) (const char *);
+typedef DMesaVisual (*DMesaCreateVisual_f) (GLint, GLint, GLint, GLint, GLboolean, GLboolean, GLint, GLint, GLint, GLint);
+typedef void (*DMesaDestroyVisual_f) (DMesaVisual);
+typedef DMesaContext (*DMesaCreateContext_f) (DMesaVisual, DMesaContext);
+typedef void (*DMesaDestroyContext_f) (DMesaContext);
+typedef DMesaBuffer (*DMesaCreateBuffer_f) (DMesaVisual, GLint, GLint, GLint, GLint);
+typedef void (*DMesaDestroyBuffer_f) (DMesaBuffer b);
+typedef void (*DMesaSwapBuffers_f) (DMesaBuffer);
+typedef GLboolean (*DMesaMakeCurrent_f) (DMesaContext, DMesaBuffer);
+typedef DMesaProc (*DMesaGetProcAddress_f) (const char *);
+static DMesaCreateVisual_f DMesaCreateVisual_fp;
+static DMesaDestroyVisual_f DMesaDestroyVisual_fp;
+static DMesaCreateContext_f DMesaCreateContext_fp;
+static DMesaDestroyContext_f DMesaDestroyContext_fp;
+static DMesaCreateBuffer_f DMesaCreateBuffer_fp;
+static DMesaDestroyBuffer_f DMesaDestroyBuffer_fp;
+static DMesaSwapBuffers_f DMesaSwapBuffers_fp;
+static DMesaMakeCurrent_f DMesaMakeCurrent_fp;
+static DMesaGetProcAddress_f DMesaGetProcAddress_fp;
 #else
 #define DMesaCreateVisual_fp DMesaCreateVisual
 #define DMesaDestroyVisual_fp DMesaDestroyVisual
@@ -90,14 +99,18 @@ static void DMESA_EndFrame (void)
 	DMesaSwapBuffers_fp(db);
 }
 
+#ifndef REF_HARD_LINKED
 static void *DMESA_GetProcAddress (const char *sym)
 {
-#ifndef REF_HARD_LINKED
 	if (DMesaGetProcAddress_fp)
-#endif
 		return DMesaGetProcAddress_fp (sym);
 	return NULL;
 }
+#else /* assume the function is present */
+static void *DMESA_GetProcAddress (const char *sym) {
+	return DMesaGetProcAddress (sym);
+}
+#endif
 
 static const char *DMESA_IFaceName (void)
 {
@@ -112,15 +125,15 @@ int DMESA_ScanIFace (void)
 	DOSGL_EndFrame = NULL;
 	DOSGL_GetProcAddress = NULL;
 	DOSGL_IFaceName = NULL;
-	DMesaCreateVisual_fp = dlsym(RTLD_DEFAULT,"_DMesaCreateVisual");
-	DMesaDestroyVisual_fp = dlsym(RTLD_DEFAULT,"_DMesaDestroyVisual");
-	DMesaCreateContext_fp = dlsym(RTLD_DEFAULT,"_DMesaCreateContext");
-	DMesaDestroyContext_fp = dlsym(RTLD_DEFAULT,"_DMesaDestroyContext");
-	DMesaCreateBuffer_fp = dlsym(RTLD_DEFAULT,"_DMesaCreateBuffer");
-	DMesaDestroyBuffer_fp = dlsym(RTLD_DEFAULT,"_DMesaDestroyBuffer");
-	DMesaSwapBuffers_fp = dlsym(RTLD_DEFAULT,"_DMesaSwapBuffers");
-	DMesaMakeCurrent_fp = dlsym(RTLD_DEFAULT,"_DMesaMakeCurrent");
-	DMesaGetProcAddress_fp = dlsym(RTLD_DEFAULT,"_DMesaGetProcAddress");
+	DMesaCreateVisual_fp = (DMesaCreateVisual_f) dlsym(RTLD_DEFAULT,"_DMesaCreateVisual");
+	DMesaDestroyVisual_fp = (DMesaDestroyVisual_f) dlsym(RTLD_DEFAULT,"_DMesaDestroyVisual");
+	DMesaCreateContext_fp = (DMesaCreateContext_f) dlsym(RTLD_DEFAULT,"_DMesaCreateContext");
+	DMesaDestroyContext_fp = (DMesaDestroyContext_f) dlsym(RTLD_DEFAULT,"_DMesaDestroyContext");
+	DMesaCreateBuffer_fp = (DMesaCreateBuffer_f) dlsym(RTLD_DEFAULT,"_DMesaCreateBuffer");
+	DMesaDestroyBuffer_fp = (DMesaDestroyBuffer_f) dlsym(RTLD_DEFAULT,"_DMesaDestroyBuffer");
+	DMesaSwapBuffers_fp = (DMesaSwapBuffers_f) dlsym(RTLD_DEFAULT,"_DMesaSwapBuffers");
+	DMesaMakeCurrent_fp = (DMesaMakeCurrent_f) dlsym(RTLD_DEFAULT,"_DMesaMakeCurrent");
+	DMesaGetProcAddress_fp = (DMesaGetProcAddress_f) dlsym(RTLD_DEFAULT,"_DMesaGetProcAddress");
 	if (!DMesaCreateVisual_fp || !DMesaDestroyVisual_fp ||
 	    !DMesaCreateContext_fp || !DMesaDestroyContext_fp ||
 	    !DMesaCreateBuffer_fp || !DMesaDestroyBuffer_fp ||

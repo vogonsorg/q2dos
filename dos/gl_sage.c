@@ -27,13 +27,20 @@ int SAGE_ScanIFace (void)
 
 #ifndef REF_HARD_LINKED
 #include <dlfcn.h>
-static int (*sage_init_fp) (void);
-static sageContext* (*sage_open_fp) (int, int, int, int, int, int, int);
-static int (*sage_bind_fp) (sageContext *, void *, int, int);
-static void (*sage_shut_fp) (sageContext *);
-static void (*sage_fini_fp) (void);
-static void (*sage_swap_fp) (int);
-static SageProc (*sage_GetProcAddress_fp) (const char *);
+typedef int (*sage_init_f) (void);
+typedef sageContext* (*sage_open_f) (int, int, int, int, int, int, int);
+typedef int (*sage_bind_f) (sageContext *, void *, int, int);
+typedef void (*sage_shut_f) (sageContext *);
+typedef void (*sage_fini_f) (void);
+typedef void (*sage_swap_f) (int);
+typedef SageProc (*sage_GetProcAddress_f) (const char *);
+static sage_init_f sage_init_fp;
+static sage_open_f sage_open_fp;
+static sage_bind_f sage_bind_fp;
+static sage_shut_f sage_shut_fp;
+static sage_fini_f sage_fini_fp;
+static sage_swap_f sage_swap_fp;
+static sage_GetProcAddress_f sage_GetProcAddress_fp;
 #else
 #define sage_init_fp sage_init
 #define sage_open_fp sage_open
@@ -107,14 +114,18 @@ static void SAGE_EndFrame (void)
 	sage_swap_fp (1);
 }
 
+#ifndef REF_HARD_LINKED
 static void *SAGE_GetProcAddress (const char *sym)
 {
-#ifndef REF_HARD_LINKED
 	if (sage_GetProcAddress_fp)
-#endif
 		return sage_GetProcAddress_fp (sym);
 	return NULL;
 }
+#else /* assume the function is present */
+static void *SAGE_GetProcAddress (const char *sym) {
+	return sage_GetProcAddress (sym);
+}
+#endif
 
 static const char *SAGE_IFaceName (void)
 {
@@ -129,13 +140,13 @@ int SAGE_ScanIFace (void)
 	DOSGL_EndFrame = NULL;
 	DOSGL_GetProcAddress = NULL;
 	DOSGL_IFaceName = NULL;
-	sage_init_fp = dlsym(RTLD_DEFAULT,"_sage_init");
-	sage_open_fp = dlsym(RTLD_DEFAULT,"_sage_open");
-	sage_bind_fp = dlsym(RTLD_DEFAULT,"_sage_bind");
-	sage_shut_fp = dlsym(RTLD_DEFAULT,"_sage_shut");
-	sage_fini_fp = dlsym(RTLD_DEFAULT,"_sage_fini");
-	sage_swap_fp = dlsym(RTLD_DEFAULT,"_sage_swap");
-	sage_GetProcAddress_fp = dlsym(RTLD_DEFAULT,"_sage_GetProcAddress");
+	sage_init_fp = (sage_init_f) dlsym(RTLD_DEFAULT,"_sage_init");
+	sage_open_fp = (sage_open_f) dlsym(RTLD_DEFAULT,"_sage_open");
+	sage_bind_fp = (sage_bind_f) dlsym(RTLD_DEFAULT,"_sage_bind");
+	sage_shut_fp = (sage_shut_f) dlsym(RTLD_DEFAULT,"_sage_shut");
+	sage_fini_fp = (sage_fini_f) dlsym(RTLD_DEFAULT,"_sage_fini");
+	sage_swap_fp = (sage_swap_f) dlsym(RTLD_DEFAULT,"_sage_swap");
+	sage_GetProcAddress_fp = (sage_GetProcAddress_f) dlsym(RTLD_DEFAULT,"_sage_GetProcAddress");
 	if (!sage_init_fp || !sage_open_fp ||
 	    !sage_bind_fp || !sage_shut_fp ||
 	    !sage_fini_fp || !sage_swap_fp) {

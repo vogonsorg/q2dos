@@ -27,11 +27,16 @@ int FXMESA_ScanIFace (void)
 
 #ifndef REF_HARD_LINKED
 #include <dlfcn.h>
-static fxMesaContext (*fxMesaCreateContext_fp) (GLuint, GrScreenResolution_t, GrScreenRefresh_t, const GLint attribList[]);
-static fxMesaContext (*fxMesaCreateBestContext_fp) (GLuint, GLint, GLint, const GLint attribList[]);
-static void (*fxMesaMakeCurrent_fp) (fxMesaContext);
-static void (*fxMesaDestroyContext_fp) (fxMesaContext);
-static void (*fxMesaSwapBuffers_fp) (void);
+typedef fxMesaContext (*fxMesaCreateContext_f) (GLuint, GrScreenResolution_t, GrScreenRefresh_t, const GLint attribList[]);
+typedef fxMesaContext (*fxMesaCreateBestContext_f) (GLuint, GLint, GLint, const GLint attribList[]);
+typedef void (*fxMesaMakeCurrent_f) (fxMesaContext);
+typedef void (*fxMesaDestroyContext_f) (fxMesaContext);
+typedef void (*fxMesaSwapBuffers_f) (void);
+static fxMesaCreateContext_f fxMesaCreateContext_fp;
+static fxMesaCreateBestContext_f fxMesaCreateBestContext_fp;
+static fxMesaMakeCurrent_f fxMesaMakeCurrent_fp;
+static fxMesaDestroyContext_f fxMesaDestroyContext_fp;
+static fxMesaSwapBuffers_f fxMesaSwapBuffers_fp;
 #else
 #define fxMesaCreateContext_fp fxMesaCreateContext
 #define fxMesaCreateBestContext_fp fxMesaCreateBestContext
@@ -116,7 +121,7 @@ static void FXMESA_EndFrame (void)
 
 static void *FXMESA_GetProcAddress (const char *sym)
 {
-	return NULL; /* hmph.. */
+	return NULL; /* no can do.. */
 }
 
 static const char *FXMESA_IFaceName (void)
@@ -132,11 +137,11 @@ int FXMESA_ScanIFace (void)
 	DOSGL_EndFrame = NULL;
 	DOSGL_GetProcAddress = NULL;
 	DOSGL_IFaceName = NULL;
-	fxMesaCreateContext_fp = dlsym(RTLD_DEFAULT,"_fxMesaCreateContext");
-	fxMesaCreateBestContext_fp = dlsym(RTLD_DEFAULT,"_fxMesaCreateBestContext");
-	fxMesaMakeCurrent_fp = dlsym(RTLD_DEFAULT,"_fxMesaMakeCurrent");
-	fxMesaDestroyContext_fp = dlsym(RTLD_DEFAULT,"_fxMesaDestroyContext");
-	fxMesaSwapBuffers_fp = dlsym(RTLD_DEFAULT,"_fxMesaSwapBuffers");
+	fxMesaCreateContext_fp = (fxMesaCreateContext_f) dlsym(RTLD_DEFAULT,"_fxMesaCreateContext");
+	fxMesaCreateBestContext_fp = (fxMesaCreateBestContext_f) dlsym(RTLD_DEFAULT,"_fxMesaCreateBestContext");
+	fxMesaMakeCurrent_fp = (fxMesaMakeCurrent_f) dlsym(RTLD_DEFAULT,"_fxMesaMakeCurrent");
+	fxMesaDestroyContext_fp = (fxMesaDestroyContext_f) dlsym(RTLD_DEFAULT,"_fxMesaDestroyContext");
+	fxMesaSwapBuffers_fp = (fxMesaSwapBuffers_f) dlsym(RTLD_DEFAULT,"_fxMesaSwapBuffers");
 	if (!fxMesaCreateContext_fp || !fxMesaCreateBestContext_fp ||
 	    !fxMesaMakeCurrent_fp || !fxMesaDestroyContext_fp ||
 	    !fxMesaSwapBuffers_fp) {
