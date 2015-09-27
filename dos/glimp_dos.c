@@ -188,7 +188,8 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 void GLimp_Shutdown( void )
 {
 	VID_ShutdownGamma();
-	DOSGL_Shutdown();
+	if (DOSGL_Shutdown)
+		DOSGL_Shutdown();
 }
 
 /*
