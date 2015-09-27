@@ -2621,6 +2621,11 @@ void QGL_Shutdown( void )
 		dlclose (opengl_dxe);
 		opengl_dxe = NULL;
 	}
+	DOSGL_InitCtx  = NULL;
+	DOSGL_Shutdown = NULL;
+	DOSGL_EndFrame = NULL;
+	DOSGL_GetProcAddress = NULL;
+	DOSGL_APIName  = NULL;
 #endif
 
 	qglAccum                     = NULL;
