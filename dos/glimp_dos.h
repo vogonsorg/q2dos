@@ -19,12 +19,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // glimp_dos.h: header file for DOS-specific OpenGL video stuff
 
+#ifndef REF_HARD_LINKED
+#define GL_DLSYM
+#endif
+
+extern void *opengl_dxe;
+
 extern int  (*DOSGL_InitCtx ) (int *width, int *height, int *bpp);
 extern void (*DOSGL_Shutdown) (void);
 extern void (*DOSGL_EndFrame) (void);
 extern void * (*DOSGL_GetProcAddress) (const char *);
-extern const char * (*DOSGL_IFaceName) (void);
+extern const char * (*DOSGL_APIName) (void);
 
-int DMESA_ScanIFace (void);
-int SAGE_ScanIFace (void);
-int FXMESA_ScanIFace (void);
+int DMESA_LoadAPI (void *handle);
+int SAGE_LoadAPI (void *handle);
+int FXMESA_LoadAPI (void *handle);

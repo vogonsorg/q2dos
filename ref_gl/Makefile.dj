@@ -56,7 +56,7 @@ OBJECTS = $(REFSOFT) $(REFASM)
 all: ref_gl.dxe
 
 ref_gl.dxe: $(OBJECTS)
-	$(DXE3GEN) -U -E _GetRefAPI -P gl.dxe $(OBJECTS) -o ref_gl.dxe
+	$(DXE3GEN) -U -E _GetRefAPI $(OBJECTS) -o ref_gl.dxe
 
 clean:
 	rm -f *.o

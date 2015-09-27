@@ -8,7 +8,6 @@
 ** GLimp_EndFrame
 ** GLimp_Init
 ** GLimp_Shutdown
-** GLimp_SwitchFullscreen
 **
 */
 
@@ -25,12 +24,14 @@
 
 /*****************************************************************************/
 
+void *opengl_dxe = NULL;
+
 /* DOSGL interface */
 int  (*DOSGL_InitCtx ) (int *width, int *height, int *bpp);
 void (*DOSGL_Shutdown) (void);
 void (*DOSGL_EndFrame) (void);
 void * (*DOSGL_GetProcAddress) (const char *);
-const char * (*DOSGL_IFaceName) (void);
+const char * (*DOSGL_APIName) (void);
 
 // Gamma stuff
 #define	USE_GAMMA_RAMPS			0
@@ -124,18 +125,19 @@ qboolean GLimp_InitGL (void);
 extern cvar_t *vid_fullscreen;
 extern cvar_t *vid_ref;
 
-#define NUM_GL_RESOLUTIONS 8
-
-static vmodeinfo_t resolutions[NUM_GL_RESOLUTIONS] = {
+static vmodeinfo_t resolutions[] = {
 	{ 240,320,  "[320x240]" },
 	{ 300,400,  "[400x300]" },
 	{ 384,512,  "[512x384]" },
 	{ 480,640,  "[640x480]" },
 	{ 600,800,  "[800x600]" },
+	{ 480,856,  "[856x480]" },
+	{ 720,960,  "[960x720]" },
 	{ 768,1024,  "[1024x768]" },
 	{ 1024,1280,  "[1280x1024]" },
 	{ 1200,1600,  "[1600x1200]" }
 };
+static const int NUM_GL_RESOLUTIONS = (int) (sizeof(resolutions) / sizeof(resolutions[0]));
 
 /*
 ** GLimp_SetMode

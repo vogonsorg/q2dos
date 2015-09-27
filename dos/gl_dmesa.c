@@ -1,22 +1,29 @@
-/*
-** GL_DMESA.C
-**
-** This file contains DOS specific stuff having to do with the
-** OpenGL refresh using DMesa interface.  The following functions
-** must be implemented:
-**
-** DOSGL_InitCtx
-** DOSGL_Shutdown
-** DOSGL_EndFrame
-** DOSGL_GetProcAddress
-** DOSGL_IFaceName
-*/
+/* gl_dmesa.c -- DOS OpenGL refresh using DMesa api.
+ * for use with Mesa library version 5.x or 6.x possibly built
+ * against 3dfx glide.
+ * Copyright (C) 2015 O.Sezer <sezero@users.sourceforge.net>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or (at
+ * your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 
 #include "../ref_gl/gl_local.h"
 #include "glimp_dos.h"
 
-#if defined(REF_HARD_LINKED) && !defined(REFGL_MESA)
-int DMESA_ScanIFace (void)
+#if !defined(GL_DLSYM) && !defined(REFGL_MESA)
+int DMESA_LoadAPI (void *handle)
 {
 	return -1;
 }
@@ -25,7 +32,7 @@ int DMESA_ScanIFace (void)
 
 #include <GL/dmesa.h>
 
-#ifndef REF_HARD_LINKED
+#if defined(GL_DLSYM)
 #include <dlfcn.h>
 typedef DMesaVisual (*DMesaCreateVisual_f) (GLint, GLint, GLint, GLint, GLboolean, GLboolean, GLint, GLint, GLint, GLint);
 typedef void (*DMesaDestroyVisual_f) (DMesaVisual);
@@ -99,41 +106,41 @@ static void DMESA_EndFrame (void)
 	DMesaSwapBuffers_fp(db);
 }
 
-#ifndef REF_HARD_LINKED
+#ifdef GL_DLSYM
 static void *DMESA_GetProcAddress (const char *sym)
 {
 	if (DMesaGetProcAddress_fp)
-		return DMesaGetProcAddress_fp (sym);
+		return (void *) DMesaGetProcAddress_fp (sym);
 	return NULL;
 }
 #else /* assume the function is present */
 static void *DMESA_GetProcAddress (const char *sym) {
-	return DMesaGetProcAddress (sym);
+	return (void *) DMesaGetProcAddress (sym);
 }
 #endif
 
-static const char *DMESA_IFaceName (void)
+static const char *DMESA_APIName (void)
 {
 	return "DMesa";
 }
 
-int DMESA_ScanIFace (void)
+int DMESA_LoadAPI (void *handle)
 {
-#ifndef REF_HARD_LINKED
+#ifdef GL_DLSYM
 	DOSGL_InitCtx  = NULL;
 	DOSGL_Shutdown = NULL;
 	DOSGL_EndFrame = NULL;
 	DOSGL_GetProcAddress = NULL;
-	DOSGL_IFaceName = NULL;
-	DMesaCreateVisual_fp = (DMesaCreateVisual_f) dlsym(RTLD_DEFAULT,"_DMesaCreateVisual");
-	DMesaDestroyVisual_fp = (DMesaDestroyVisual_f) dlsym(RTLD_DEFAULT,"_DMesaDestroyVisual");
-	DMesaCreateContext_fp = (DMesaCreateContext_f) dlsym(RTLD_DEFAULT,"_DMesaCreateContext");
-	DMesaDestroyContext_fp = (DMesaDestroyContext_f) dlsym(RTLD_DEFAULT,"_DMesaDestroyContext");
-	DMesaCreateBuffer_fp = (DMesaCreateBuffer_f) dlsym(RTLD_DEFAULT,"_DMesaCreateBuffer");
-	DMesaDestroyBuffer_fp = (DMesaDestroyBuffer_f) dlsym(RTLD_DEFAULT,"_DMesaDestroyBuffer");
-	DMesaSwapBuffers_fp = (DMesaSwapBuffers_f) dlsym(RTLD_DEFAULT,"_DMesaSwapBuffers");
-	DMesaMakeCurrent_fp = (DMesaMakeCurrent_f) dlsym(RTLD_DEFAULT,"_DMesaMakeCurrent");
-	DMesaGetProcAddress_fp = (DMesaGetProcAddress_f) dlsym(RTLD_DEFAULT,"_DMesaGetProcAddress");
+	DOSGL_APIName = NULL;
+	DMesaCreateVisual_fp = (DMesaCreateVisual_f) dlsym(handle,"_DMesaCreateVisual");
+	DMesaDestroyVisual_fp = (DMesaDestroyVisual_f) dlsym(handle,"_DMesaDestroyVisual");
+	DMesaCreateContext_fp = (DMesaCreateContext_f) dlsym(handle,"_DMesaCreateContext");
+	DMesaDestroyContext_fp = (DMesaDestroyContext_f) dlsym(handle,"_DMesaDestroyContext");
+	DMesaCreateBuffer_fp = (DMesaCreateBuffer_f) dlsym(handle,"_DMesaCreateBuffer");
+	DMesaDestroyBuffer_fp = (DMesaDestroyBuffer_f) dlsym(handle,"_DMesaDestroyBuffer");
+	DMesaSwapBuffers_fp = (DMesaSwapBuffers_f) dlsym(handle,"_DMesaSwapBuffers");
+	DMesaMakeCurrent_fp = (DMesaMakeCurrent_f) dlsym(handle,"_DMesaMakeCurrent");
+	DMesaGetProcAddress_fp = (DMesaGetProcAddress_f) dlsym(handle,"_DMesaGetProcAddress");
 	if (!DMesaCreateVisual_fp || !DMesaDestroyVisual_fp ||
 	    !DMesaCreateContext_fp || !DMesaDestroyContext_fp ||
 	    !DMesaCreateBuffer_fp || !DMesaDestroyBuffer_fp ||
@@ -146,7 +153,7 @@ int DMESA_ScanIFace (void)
 	DOSGL_Shutdown = DMESA_Shutdown;
 	DOSGL_EndFrame = DMESA_EndFrame;
 	DOSGL_GetProcAddress = DMESA_GetProcAddress;
-	DOSGL_IFaceName = DMESA_IFaceName;
+	DOSGL_APIName = DMESA_APIName;
 
 	return 0;
 }

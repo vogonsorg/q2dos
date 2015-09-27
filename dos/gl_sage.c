@@ -1,22 +1,30 @@
-/*
-** GL_SAGE.C
-**
-** This file contains DOS specific stuff having to do with the
-** OpenGL refresh using sage interface.  The following functions
-** must be implemented:
-**
-** DOSGL_InitCtx
-** DOSGL_Shutdown
-** DOSGL_EndFrame
-** DOSGL_GetProcAddress
-** DOSGL_IFaceName
-*/
+/* gl_sage.c -- DOS OpenGL refresh using sage api :
+ * for use with SAGE library of Daniel Borca.
+ * http://www.geocities.ws/dborca/opengl/sage.html
+ * https://github.com/sezero/sage
+ * Copyright (C) 2015 O.Sezer <sezero@users.sourceforge.net>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or (at
+ * your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 
 #include "../ref_gl/gl_local.h"
 #include "glimp_dos.h"
 
-#if defined(REF_HARD_LINKED) && !defined(REFGL_SAGE)
-int SAGE_ScanIFace (void)
+#if !defined(GL_DLSYM) && !defined(REFGL_SAGE)
+int SAGE_LoadAPI (void *handle)
 {
 	return -1;
 }
@@ -25,7 +33,7 @@ int SAGE_ScanIFace (void)
 
 #include <GL/sage.h>
 
-#ifndef REF_HARD_LINKED
+#if defined(GL_DLSYM)
 #include <dlfcn.h>
 typedef int (*sage_init_f) (void);
 typedef sageContext* (*sage_open_f) (int, int, int, int, int, int, int);
@@ -114,39 +122,39 @@ static void SAGE_EndFrame (void)
 	sage_swap_fp (1);
 }
 
-#ifndef REF_HARD_LINKED
+#ifdef GL_DLSYM
 static void *SAGE_GetProcAddress (const char *sym)
 {
 	if (sage_GetProcAddress_fp)
-		return sage_GetProcAddress_fp (sym);
+		return (void *) sage_GetProcAddress_fp (sym);
 	return NULL;
 }
 #else /* assume the function is present */
 static void *SAGE_GetProcAddress (const char *sym) {
-	return sage_GetProcAddress (sym);
+	return (void *) sage_GetProcAddress (sym);
 }
 #endif
 
-static const char *SAGE_IFaceName (void)
+static const char *SAGE_APIName (void)
 {
 	return "sage";
 }
 
-int SAGE_ScanIFace (void)
+int SAGE_LoadAPI (void *handle)
 {
-#ifndef REF_HARD_LINKED
+#ifdef GL_DLSYM
 	DOSGL_InitCtx  = NULL;
 	DOSGL_Shutdown = NULL;
 	DOSGL_EndFrame = NULL;
 	DOSGL_GetProcAddress = NULL;
-	DOSGL_IFaceName = NULL;
-	sage_init_fp = (sage_init_f) dlsym(RTLD_DEFAULT,"_sage_init");
-	sage_open_fp = (sage_open_f) dlsym(RTLD_DEFAULT,"_sage_open");
-	sage_bind_fp = (sage_bind_f) dlsym(RTLD_DEFAULT,"_sage_bind");
-	sage_shut_fp = (sage_shut_f) dlsym(RTLD_DEFAULT,"_sage_shut");
-	sage_fini_fp = (sage_fini_f) dlsym(RTLD_DEFAULT,"_sage_fini");
-	sage_swap_fp = (sage_swap_f) dlsym(RTLD_DEFAULT,"_sage_swap");
-	sage_GetProcAddress_fp = (sage_GetProcAddress_f) dlsym(RTLD_DEFAULT,"_sage_GetProcAddress");
+	DOSGL_APIName = NULL;
+	sage_init_fp = (sage_init_f) dlsym(handle,"_sage_init");
+	sage_open_fp = (sage_open_f) dlsym(handle,"_sage_open");
+	sage_bind_fp = (sage_bind_f) dlsym(handle,"_sage_bind");
+	sage_shut_fp = (sage_shut_f) dlsym(handle,"_sage_shut");
+	sage_fini_fp = (sage_fini_f) dlsym(handle,"_sage_fini");
+	sage_swap_fp = (sage_swap_f) dlsym(handle,"_sage_swap");
+	sage_GetProcAddress_fp = (sage_GetProcAddress_f) dlsym(handle,"_sage_GetProcAddress");
 	if (!sage_init_fp || !sage_open_fp ||
 	    !sage_bind_fp || !sage_shut_fp ||
 	    !sage_fini_fp || !sage_swap_fp) {
@@ -158,7 +166,7 @@ int SAGE_ScanIFace (void)
 	DOSGL_Shutdown = SAGE_Shutdown;
 	DOSGL_EndFrame = SAGE_EndFrame;
 	DOSGL_GetProcAddress = SAGE_GetProcAddress;
-	DOSGL_IFaceName = SAGE_IFaceName;
+	DOSGL_APIName = SAGE_APIName;
 
 	return 0;
 }

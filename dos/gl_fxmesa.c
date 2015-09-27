@@ -1,22 +1,29 @@
-/*
-** GL_FXMESA.C
-**
-** This file contains DOS specific stuff having to do with the
-** OpenGL refresh using fxMesa interface.  The following functions
-** must be implemented:
-**
-** DOSGL_InitCtx
-** DOSGL_Shutdown
-** DOSGL_EndFrame
-** DOSGL_GetProcAddress
-** DOSGL_IFaceName
-*/
+/* gl_fxmesa.c -- DOS OpenGL refresh using fxMesa api:
+ * for use with Mesa library built against 3dfx glide.
+ * Copyright (C) 1997-2001 Id Software, Inc.
+ * Copyright (C) 2015 O.Sezer <sezero@users.sourceforge.net>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or (at
+ * your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 
 #include "../ref_gl/gl_local.h"
 #include "glimp_dos.h"
 
-#if defined(REF_HARD_LINKED) && !defined(REFGL_FXMESA)
-int FXMESA_ScanIFace (void)
+#if !defined(GL_DLSYM) && !defined(REFGL_FXMESA)
+int FXMESA_LoadAPI (void *handle)
 {
 	return -1;
 }
@@ -25,7 +32,7 @@ int FXMESA_ScanIFace (void)
 
 #include <GL/fxmesa.h>
 
-#ifndef REF_HARD_LINKED
+#if defined(GL_DLSYM)
 #include <dlfcn.h>
 typedef fxMesaContext (*fxMesaCreateContext_f) (GLuint, GrScreenResolution_t, GrScreenRefresh_t, const GLint attribList[]);
 typedef fxMesaContext (*fxMesaCreateBestContext_f) (GLuint, GLint, GLint, const GLint attribList[]);
@@ -47,35 +54,40 @@ static fxMesaSwapBuffers_f fxMesaSwapBuffers_fp;
 
 static fxMesaContext fc = NULL;
 
-static int findres (int *width, int *height)
-{
-	static int fx_resolutions[][3] = {
-		{ 320,200,  GR_RESOLUTION_320x200 },
-		{ 320,240,  GR_RESOLUTION_320x240 },
-		{ 400,256,  GR_RESOLUTION_400x256 },
-		{ 400,300,  GR_RESOLUTION_400x300 },
-		{ 512,384,  GR_RESOLUTION_512x384 },
-		{ 640,200,  GR_RESOLUTION_640x200 },
-		{ 640,350,  GR_RESOLUTION_640x350 },
-		{ 640,400,  GR_RESOLUTION_640x400 },
-		{ 640,480,  GR_RESOLUTION_640x480 },
-		{ 800,600,  GR_RESOLUTION_800x600 },
-		{ 960,720,  GR_RESOLUTION_960x720 },
-		{ 856,480,  GR_RESOLUTION_856x480 },
-		{ 512,256,  GR_RESOLUTION_512x256 },
-		{ 1024,768, GR_RESOLUTION_1024x768 },
-		{ 1280,1024,GR_RESOLUTION_1280x1024 },
-		{ 1600,1200,GR_RESOLUTION_1600x1200 },
-		{ 0, 0, 0 }
-	};
+typedef struct {
+	int width, height;
+	GrScreenResolution_t fxmode;
+} fxmode_t;
 
+static fxmode_t fx_modes[] = {
+	{ 320,200,  GR_RESOLUTION_320x200 },
+	{ 320,240,  GR_RESOLUTION_320x240 },
+	{ 400,256,  GR_RESOLUTION_400x256 },
+	{ 400,300,  GR_RESOLUTION_400x300 },
+	{ 512,384,  GR_RESOLUTION_512x384 },
+	{ 640,200,  GR_RESOLUTION_640x200 },
+	{ 640,350,  GR_RESOLUTION_640x350 },
+	{ 640,400,  GR_RESOLUTION_640x400 },
+	{ 640,480,  GR_RESOLUTION_640x480 },
+	{ 800,600,  GR_RESOLUTION_800x600 },
+	{ 960,720,  GR_RESOLUTION_960x720 },
+	{ 856,480,  GR_RESOLUTION_856x480 },
+	{ 512,256,  GR_RESOLUTION_512x256 },
+	{ 1024,768, GR_RESOLUTION_1024x768 },
+	{ 1280,1024,GR_RESOLUTION_1280x1024 },
+	{ 1600,1200,GR_RESOLUTION_1600x1200 },
+};
+#define MAX_FXMODES (int)(sizeof(fx_modes) / sizeof(fx_modes[0]))
+
+static GrScreenResolution_t findres (int *width, int *height)
+{
 	int i;
 
-	for (i = 0; fx_resolutions[i][0]; i++) {
-		if (*width <= fx_resolutions[i][0] && *height <= fx_resolutions[i][1]) {
-			*width = fx_resolutions[i][0];
-			*height = fx_resolutions[i][1];
-			return fx_resolutions[i][2];
+	for (i = 0; i < MAX_FXMODES; i++) {
+		if (*width <= fx_modes[i].width && *height <= fx_modes[i].height) {
+			*width = fx_modes[i].width;
+			*height = fx_modes[i].height;
+			return fx_modes[i].fxmode;
 		}
 	}
 
@@ -124,24 +136,24 @@ static void *FXMESA_GetProcAddress (const char *sym)
 	return NULL; /* no can do.. */
 }
 
-static const char *FXMESA_IFaceName (void)
+static const char *FXMESA_APIName (void)
 {
 	return "fxMesa";
 }
 
-int FXMESA_ScanIFace (void)
+int FXMESA_LoadAPI (void *handle)
 {
-#ifndef REF_HARD_LINKED
+#ifdef GL_DLSYM
 	DOSGL_InitCtx  = NULL;
 	DOSGL_Shutdown = NULL;
 	DOSGL_EndFrame = NULL;
 	DOSGL_GetProcAddress = NULL;
-	DOSGL_IFaceName = NULL;
-	fxMesaCreateContext_fp = (fxMesaCreateContext_f) dlsym(RTLD_DEFAULT,"_fxMesaCreateContext");
-	fxMesaCreateBestContext_fp = (fxMesaCreateBestContext_f) dlsym(RTLD_DEFAULT,"_fxMesaCreateBestContext");
-	fxMesaMakeCurrent_fp = (fxMesaMakeCurrent_f) dlsym(RTLD_DEFAULT,"_fxMesaMakeCurrent");
-	fxMesaDestroyContext_fp = (fxMesaDestroyContext_f) dlsym(RTLD_DEFAULT,"_fxMesaDestroyContext");
-	fxMesaSwapBuffers_fp = (fxMesaSwapBuffers_f) dlsym(RTLD_DEFAULT,"_fxMesaSwapBuffers");
+	DOSGL_APIName = NULL;
+	fxMesaCreateContext_fp = (fxMesaCreateContext_f) dlsym(handle,"_fxMesaCreateContext");
+	fxMesaCreateBestContext_fp = (fxMesaCreateBestContext_f) dlsym(handle,"_fxMesaCreateBestContext");
+	fxMesaMakeCurrent_fp = (fxMesaMakeCurrent_f) dlsym(handle,"_fxMesaMakeCurrent");
+	fxMesaDestroyContext_fp = (fxMesaDestroyContext_f) dlsym(handle,"_fxMesaDestroyContext");
+	fxMesaSwapBuffers_fp = (fxMesaSwapBuffers_f) dlsym(handle,"_fxMesaSwapBuffers");
 	if (!fxMesaCreateContext_fp || !fxMesaCreateBestContext_fp ||
 	    !fxMesaMakeCurrent_fp || !fxMesaDestroyContext_fp ||
 	    !fxMesaSwapBuffers_fp) {
@@ -153,7 +165,7 @@ int FXMESA_ScanIFace (void)
 	DOSGL_Shutdown = FXMESA_Shutdown;
 	DOSGL_EndFrame = FXMESA_EndFrame;
 	DOSGL_GetProcAddress = FXMESA_GetProcAddress;
-	DOSGL_IFaceName = FXMESA_IFaceName;
+	DOSGL_APIName = FXMESA_APIName;
 
 	return 0;
 }
