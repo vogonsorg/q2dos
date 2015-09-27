@@ -33,6 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef GL_DLSYM
 #include <dlfcn.h>
 #endif
+#undef GL_DLSYM /* until the issues are resolved.. */
 
 static FILE *log_fp = NULL;
 
