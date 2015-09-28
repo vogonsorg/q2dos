@@ -32,8 +32,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "glimp_dos.h"
 #ifdef GL_DLSYM
 #include <dlfcn.h>
-#undef GL_DLSYM /* until the issues are resolved.. */
-#define opengl_dxe RTLD_DEFAULT /* until we fix things.. */
 #endif
 
 static FILE *log_fp = NULL;
