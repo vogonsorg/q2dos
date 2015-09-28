@@ -505,7 +505,7 @@ void NET_Init (void)
 
 	if (err != 0)
 	{
-		Com_Printf("WATTCP initialization failed (%s)", sock_init_err(err));
+		Com_Printf("WATTCP initialization failed (%s)\n", sock_init_err(err));
 	}
 	else
 	{
