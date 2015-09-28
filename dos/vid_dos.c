@@ -430,7 +430,7 @@ void	VID_Init (void)
 	if (COM_CheckParm("-no3dfxgamma"))
 		Cvar_Set("r_ignorehwgamma", "1");
 
-#if USE_3DFX_REFRESH_CONTROL /* FS: Commented out until we decide if we want to keep this */
+#if 0 /* FS: Commented out until we decide if we want to keep this */
 	/* FS: 3DFX - Enforce the refresh rate at startup */
 	r_refreshrate = Cvar_Get("r_refreshrate", "60", CVAR_ARCHIVE);
 	r_refreshrate->description = "Refresh rate control for 3DFX OpenGL driver.";
@@ -444,13 +444,15 @@ void	VID_Init (void)
 	putenv(envString);
 #endif
 
+	/* Add some console commands that we want to handle */
+	Cmd_AddCommand("vid_restart", VID_Restart_f);
+	Cmd_AddCommand("vid_listmodes", VID_ListModes_f);
+
 	/* don't let fxMesa cheat multitexturing */
 	putenv("FX_DONT_FAKE_MULTITEX=1");
 
+	/* Start the graphics mode and load refresh DLL */
 	VID_CheckChanges ();
-
-	Cmd_AddCommand("vid_restart", VID_Restart_f);
-	Cmd_AddCommand("vid_listmodes", VID_ListModes_f); /* FS: Added */
 
 	/* avoid 3dfx splash screen on resolution changes */
 	putenv("FX_GLIDE_NO_SPLASH=0");
@@ -799,7 +801,6 @@ const char *VID_MenuKey (int k)
 static void VID_Restart_f (void)
 {
 	vid_ref->modified = true;
-	return;
 }
 
 static void VID_ListModes_f (void)
