@@ -52,7 +52,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../qcommon/qcommon.h"
 
-/* FS: The following is gross, but I just figured this out. */
 DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (__dj_assert)
 	DXE_EXPORT (__dj_ctype_tolower)
@@ -140,11 +139,18 @@ DXE_EXPORT_TABLE (syms)
 #ifndef REF_HARD_LINKED
 	DXE_EXPORT (__dpmi_int)
 	DXE_EXPORT (__dpmi_physical_address_mapping)
+
+	/* functions from dos_v2.c used by ref_soft: */
 	DXE_EXPORT (dosmemput)
 	DXE_EXPORT (dos_getmemory)
 	DXE_EXPORT (dos_freememory)
 	DXE_EXPORT (ptr2real)
 	DXE_EXPORT (real2ptr)
+
+	/* FS: ref_gl */
+	DXE_EXPORT (dlclose)
+	DXE_EXPORT (dlopen)
+	DXE_EXPORT (dlsym)
 
 	/* FS: 3dfx */
 	DXE_EXPORT (__dj_ctype_flags)
@@ -175,14 +181,10 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (vfprintf)
 
 	/* FS: Mesa 6.4.x */
-	DXE_EXPORT (dlclose)
-	DXE_EXPORT (dlopen)
-	DXE_EXPORT (dlsym)
 	DXE_EXPORT (ldexp)
 
 	/* FS: SAGE */
 	DXE_EXPORT (strcspn)
-	DXE_EXPORT (atexit)
 #endif
 #if defined(GAMESPY) && !defined(GAMESPY_HARD_LINKED)
 	DXE_EXPORT(send)
