@@ -1,5 +1,7 @@
 # features selection :
 #
+# use WatTCP (WATT-32) for DOS UDP networking
+USE_WAT32=1
 # gamespy/server browser:
 USE_GAMESPY=1
 # dynamically linked gamespy:
@@ -52,9 +54,13 @@ ifneq ($(REF_DXE),1)
 CPPFLAGS+= -DREF_HARD_LINKED
 endif
 
-# net -- watt-32 tcp/ip library :
+ifneq ($(USE_WATT32),1)
+NET_OBJ = dos/net_null.o
+else
+NET_OBJ = dos/net_watt.o
 WATT32_CFLAGS = -Iwattcp/inc -DWATT32_NO_OLDIES
 WATT32_LIBS = -Lwattcp/lib -lwatt
+endif
 
 ifeq ($(USE_ASM),1)
 CPPFLAGS+= -Did386=1
@@ -123,7 +129,7 @@ DOS = dos/dos_v2.o \
 	dos/snd_sb.o \
 	dos/snd_pci.o \
 	dos/in_dos.o \
-	dos/net_watt.o \
+	$(NET_OBJ) \
 	dos/q_shdos.o \
 	dos/dxe.o \
 	dos/sys_dos.o
@@ -284,4 +290,7 @@ DO_AS=$(CC) -x assembler-with-cpp
 
 %.o: %.s
 	$(DO_AS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+dos/net_null.o : null/net_null.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(WATT32_CFLAGS) $(VORBIS_CFLAGS) $(CURL_CFLAGS) -c $< -o $@
 
