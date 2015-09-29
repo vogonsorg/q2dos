@@ -1,7 +1,7 @@
 # features selection :
 #
 # use WatTCP (WATT-32) for DOS UDP networking
-USE_WAT32=1
+USE_WATT32=1
 # gamespy/server browser:
 USE_GAMESPY=1
 # dynamically linked gamespy:
