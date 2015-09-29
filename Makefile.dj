@@ -33,7 +33,11 @@ FX_GLIDE_HW=h5
 USE_3DFXGAMMA=1
 
 CC = gcc
+ifeq ($(DEBUG),1)
+CFLAGS = -g -Wall -Werror -O0 -fno-strict-aliasing
+else
 CFLAGS = -Wall -Werror -O2 -fno-strict-aliasing -fomit-frame-pointer
+endif
 CPPFLAGS = -DCLIENT_SPLIT_NETFRAME
 LDFLAGS =
 EXE = q2.exe
