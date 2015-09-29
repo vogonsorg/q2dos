@@ -10,8 +10,12 @@ all: lib/libGL.a lib/gl.dxe
 CC = gcc
 HOST_CC = gcc
 CFLAGS = -Wall -W -pedantic
+ifeq ($(DEBUG), 1)
+CFLAGS += -g
+CFLAGS += -O0
+else
 CFLAGS += -O2
-# CFLAGS += -g
+endif
 # CFLAGS += -ffast-math -DFAST_MATH
 CFLAGS += -I. -Iinclude -Idrivers
 CFLAGS += -Wno-unused
@@ -20,7 +24,11 @@ LD = $(CC)
 LDFLAGS =
 LDLIBS = -lm
 AS = nasm
+ifeq ($(DEBUG),1)
+ASFLAGS = -O0 -fcoff -D__DJGPP__ -Ix86/ -Imain/ --prefix _
+else
 ASFLAGS = -O6 -fcoff -D__DJGPP__ -Ix86/ -Imain/ --prefix _
+endif
 AR = ar
 ARFLAGS = crus
 DXE3GEN = dxe3gen
