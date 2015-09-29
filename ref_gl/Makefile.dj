@@ -4,6 +4,10 @@ USE_3DFXGAMMA=1
 USE_ASM=1
 #
 USE_SSE=0
+# Require gl.dxe dependency to load (normally resolved internally by us.
+# This is strictly to make testing certain issues easier instead of
+# manually updating the Makefile all the time
+USE_GLDEP=0
 
 CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 CPPFLAGS = -I../dos/3rdparty/include -I../dos/3rdparty/include/glide3
@@ -22,6 +26,10 @@ endif
 
 ifeq ($(USE_SSE),1)
 CFLAGS += -march=pentium3
+endif
+
+ifeq ($(USE_GLDEP),1)
+DXEFLAGS = -P gl.dxe
 endif
 
 REFSOFT = ../game/q_shared.o \
@@ -56,7 +64,7 @@ OBJECTS = $(REFSOFT) $(REFASM)
 all: ref_gl.dxe
 
 ref_gl.dxe: $(OBJECTS)
-	$(DXE3GEN) -U -E _GetRefAPI -P gl.dxe $(OBJECTS) -o ref_gl.dxe
+	$(DXE3GEN) -U -E _GetRefAPI $(DXEFLAGS) $(OBJECTS) -o ref_gl.dxe
 
 clean:
 	rm -f *.o
