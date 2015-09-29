@@ -1125,8 +1125,10 @@ int nearest_power_of_2 (int size)
 {
 	int i = 2;
 
+	/* FS: FIXME: Should we Sys_Error out if size < 1 ? */
+
 	// NeVo - infinite loop bug-fix
-	if (size == 1)
+	if (size == 1 || size == 2) /* FS: Size can be 2 (i.e. a dummy texture), which is a nearest power of two */
 		return size; 
 
 	while (1) 
@@ -1153,7 +1155,7 @@ Knightmare: rewrite for higher-res
 and non-power-of-two texture support
 ===============
 */
-#if 0 /* FS: FIXME: Breaking chaos mod flashlight! */
+#if 1 /* FS: FIXME: Breaking chaos mod flashlight! */
 qboolean GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap)
 {
 	unsigned	*scaled;
