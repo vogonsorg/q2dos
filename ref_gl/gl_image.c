@@ -1125,11 +1125,12 @@ int nearest_power_of_2 (int size)
 {
 	int i = 2;
 
-	/* FS: FIXME: Should we Sys_Error out if size < 1 ? */
-
 	// NeVo - infinite loop bug-fix
-	if (size == 1 || size == 2) /* FS: Size can be 2 (i.e. a dummy texture), which is a nearest power of two */
+	if (size < 2)
 		return size; 
+	// already a power of two?
+	if (!(size & (size - 1)))
+		return size;
 
 	while (1) 
 	{
@@ -1159,13 +1160,16 @@ and non-power-of-two texture support
 qboolean GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap)
 {
 	unsigned	*scaled;
-	unsigned char *paletted_texture; //paletted_texture[256*256];
+	unsigned char *paletted_texture;
 	int			scaled_width, scaled_height;
 	int			i, c, comp;
 	int			samples;
 	byte		*scan;
 	qboolean	hasAlpha;
 	qboolean	isPaletted;
+
+	if (width < 1 || height < 1)
+		ri.Sys_Error (ERR_DROP, "GL_Upload32: bad dimensions %d x %d", width, height);
 
 	uploaded_paletted = false;
 
@@ -1485,23 +1489,6 @@ GL_Upload8
 Returns has_alpha
 ===============
 */
-/*
-static qboolean IsPowerOf2( int value )
-{
-	int i = 1;
-
-
-	while ( 1 )
-	{
-		if ( value == i )
-			return true;
-		if ( i > value )
-			return false;
-		i <<= 1;
-	}
-}
-*/
-
 qboolean GL_Upload8 (byte *data, int width, int height,  qboolean mipmap, qboolean is_sky )
 {
 	unsigned	trans[512*256];
