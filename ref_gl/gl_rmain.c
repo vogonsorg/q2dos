@@ -101,7 +101,6 @@ cvar_t	*gl_particle_att_c;
 cvar_t	*gl_ext_swapinterval;
 cvar_t	*gl_ext_palettedtexture;
 cvar_t	*gl_ext_multitexture;
-//cvar_t	*gl_intel_allow_multitexture;
 cvar_t	*gl_ext_pointparameters;
 cvar_t	*gl_ext_compiled_vertex_array;
 cvar_t	*gl_arb_texturenonpoweroftwo;	/* Knightmare- non-power-of-two texture support */
@@ -1721,8 +1720,11 @@ void R_Shutdown (void)
 	for (i=0; i<MAX_LIGHTMAPS; i++)
 	{
 		if (gl_lms.lightmap_update[i])
+		{
 		//	Z_Free(gl_lms.lightmap_update[i]);
 			free(gl_lms.lightmap_update[i]);
+			gl_lms.lightmap_update[i]=NULL; /* FS: Hunk_Alloc crashes in static builds without this */
+		}
 	}
 	/* end Knigthmare */
 

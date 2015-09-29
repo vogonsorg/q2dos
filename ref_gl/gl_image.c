@@ -1153,7 +1153,7 @@ Knightmare: rewrite for higher-res
 and non-power-of-two texture support
 ===============
 */
-#if 1
+#if 0 /* FS: FIXME: Breaking chaos mod flashlight! */
 qboolean GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap)
 {
 	unsigned	*scaled;
