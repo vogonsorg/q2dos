@@ -287,6 +287,7 @@ extern	cvar_t	*gl_playermip;
 extern	cvar_t	*gl_drawbuffer;
 extern	cvar_t	*gl_3dlabs_broken;
 extern  cvar_t  *gl_driver;
+extern	cvar_t	*gl_dosdriver; /* FS: Don't clash with win32's usage of opengl32 and mini drivers */
 extern	cvar_t	*gl_swapinterval;
 extern	cvar_t	*gl_anisotropic;		/* Knightmare- added anisotropic filtering */
 extern	cvar_t	*gl_anisotropic_avail;	/* Knightmare- added anisotropic filtering */
