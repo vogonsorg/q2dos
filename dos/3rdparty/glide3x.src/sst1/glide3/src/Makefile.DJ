@@ -73,7 +73,6 @@ CDEFS += -DGLIDE3 -DGLIDE3_ALPHA -DGLIDE_HARDWARE
 # subsystem
 ifeq ($(FX_GLIDE_HW),sst1)
 CDEFS += -DSST1
-GLIDE_LIBDIR = ../../lib/sst1
 else
 ifeq ($(FX_GLIDE_HW),sst96)
 CDEFS += -DSST96
