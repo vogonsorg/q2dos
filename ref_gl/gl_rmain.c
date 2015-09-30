@@ -647,12 +647,12 @@ void R_SetupFrame (void)
 
 	r_framecount++;
 
-// build the transformation matrix for the given view angles
+	// build the transformation matrix for the given view angles
 	VectorCopy (r_newrefdef.vieworg, r_origin);
 
 	AngleVectors (r_newrefdef.viewangles, vpn, vright, vup);
 
-// current viewcluster
+	// current viewcluster
 	if ( !( r_newrefdef.rdflags & RDF_NOWORLDMODEL ) )
 	{
 		r_oldviewcluster = r_viewcluster;
@@ -1569,11 +1569,7 @@ int R_Init ( void *hinstance, void *hWnd )
 	gl_config.multitexture = false;
 	if ( StringContainsToken( gl_config.extensions_string, "GL_ARB_multitexture" ) )
 	{
-		/*if ( gl_config.renderer == GL_RENDERER_INTEL && !gl_intel_allow_multitexture->value )
-		{
-			ri.Con_Printf( PRINT_ALL, "...ignoring GL_ARB_multitexture due to Intel graphics\nSet gl_intel_allow_multitexture to 1 and vid_restart to enable.\n" );
-		}
-		else*/ if ( gl_ext_multitexture->value )
+		if ( gl_ext_multitexture->value )
 		{
 			qglMultiTexCoord2f = ( void * ) qwglGetProcAddress( "glMultiTexCoord2fARB" );
 			qglActiveTextureARB = ( void * ) qwglGetProcAddress( "glActiveTextureARB" );
@@ -1721,7 +1717,6 @@ void R_Shutdown (void)
 	{
 		if (gl_lms.lightmap_update[i])
 		{
-		//	Z_Free(gl_lms.lightmap_update[i]);
 			free(gl_lms.lightmap_update[i]);
 			gl_lms.lightmap_update[i]=NULL; /* FS: Hunk_Alloc crashes in static builds without this */
 		}

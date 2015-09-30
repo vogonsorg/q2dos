@@ -73,14 +73,14 @@ void GL_EnableMultitexture( qboolean enable )
 
 	if ( enable )
 	{
-		GL_SelectTexture( GL_TEXTURE1 );
+		GL_SelectTexture( gl_texture1 );
 		qglEnable( GL_TEXTURE_2D );
 		GL_TexEnv( GL_REPLACE );
 		gl_state.multitextureEnabled = true;	/* Knightmare added */
 	}
 	else
 	{
-		GL_SelectTexture( GL_TEXTURE1 );
+		GL_SelectTexture( gl_texture1 );
 		qglDisable( GL_TEXTURE_2D );
 		GL_TexEnv( GL_REPLACE );
 		gl_state.multitextureEnabled = false;	/* Knightmare added */
