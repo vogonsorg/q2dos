@@ -331,10 +331,10 @@ void R_DrawTriangleOutlines (msurface_t *surf, qboolean multitexture, qboolean a
 			GL_TexEnv (GL_REPLACE);
 		}
 		else if (multitexture) {
-			GL_SelectTexture (GL_TEXTURE0);
+			GL_SelectTexture (gl_texture0);
 			qglGetTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, &tex_state0);
 
-			GL_SelectTexture (GL_TEXTURE1);
+			GL_SelectTexture (gl_texture1);
 			qglGetTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, &tex_state1);
 
 			GL_EnableMultitexture(false);
@@ -364,10 +364,10 @@ void R_DrawTriangleOutlines (msurface_t *surf, qboolean multitexture, qboolean a
 		else if (multitexture) {
 			GL_EnableMultitexture(true);
         
-			GL_SelectTexture (GL_TEXTURE0);
+			GL_SelectTexture (gl_texture0);
 			GL_TexEnv (tex_state0);
 
-			GL_SelectTexture (GL_TEXTURE1);
+			GL_SelectTexture (gl_texture1);
 			GL_TexEnv (tex_state1);
 		}
     }
@@ -947,7 +947,7 @@ void R_RebuildLightmaps (void)
 
 		if ( !gl_config.newTexFormat )
 		{	// update full width of lm texture, because glPixelStorei isn't supported
-			GL_MBind( GL_TEXTURE1, gl_state.lightmap_textures + i );
+			GL_MBind( gl_texture1, gl_state.lightmap_textures + i );
 			qglTexSubImage2D (GL_TEXTURE_2D, 0,
 					0, gl_lms.lightrect[i].top, 
 					LM_BLOCK_WIDTH, (gl_lms.lightrect[i].bottom - gl_lms.lightrect[i].top), 
@@ -960,7 +960,7 @@ void R_RebuildLightmaps (void)
 				qglPixelStorei (GL_UNPACK_ROW_LENGTH, LM_BLOCK_WIDTH);
 				storeSet = true;
 			}
-			GL_MBind( GL_TEXTURE1, gl_state.lightmap_textures + i );
+			GL_MBind( gl_texture1, gl_state.lightmap_textures + i );
 			qglTexSubImage2D (GL_TEXTURE_2D, 0,
 							gl_lms.lightrect[i].left, gl_lms.lightrect[i].top,
 							(gl_lms.lightrect[i].right - gl_lms.lightrect[i].left), (gl_lms.lightrect[i].bottom - gl_lms.lightrect[i].top),
@@ -1022,12 +1022,12 @@ dynamic:
 		if ( ( surf->styles[map] >= 32 || surf->styles[map] == 0 ) && ( surf->dlightframe != r_framecount ) )
 		{
 			R_SetCacheState( surf );
-			GL_MBind( GL_TEXTURE1, gl_state.lightmap_textures + surf->lightmaptexturenum );
+			GL_MBind( gl_texture1, gl_state.lightmap_textures + surf->lightmaptexturenum );
 			lmtex = surf->lightmaptexturenum;
 		}
 		else
 		{
-			GL_MBind( GL_TEXTURE1, gl_state.lightmap_textures + 0 );
+			GL_MBind( gl_texture1, gl_state.lightmap_textures + 0 );
 			lmtex = 0;
 		}
 
@@ -1876,7 +1876,7 @@ void GL_BeginBuildingLightmaps (model_t *m)
 	r_framecount = 1;		// no dlightcache
 
 	GL_EnableMultitexture( true );
-	GL_SelectTexture( GL_TEXTURE1);
+	GL_SelectTexture( gl_texture1);
 
 	/*
 	** setup the base lightstyles so the lightmaps won't have to be regenerated
