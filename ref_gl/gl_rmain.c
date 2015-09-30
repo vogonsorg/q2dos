@@ -1099,7 +1099,7 @@ void R_Register ( void )
 	gl_flashblend = ri.Cvar_Get ("gl_flashblend", "0", 0);
 	gl_playermip = ri.Cvar_Get ("gl_playermip", "0", 0);
 	gl_monolightmap = ri.Cvar_Get( "gl_monolightmap", "0", 0 );
-#ifdef __DJGPP_ /* FS: Don't clash with win32's usage of opengl32 and mini drivers */
+#ifdef __DJGPP__ /* FS: Don't clash with win32's usage of opengl32 and mini drivers */
 	gl_driver = ri.Cvar_Get( "gl_dosdriver", "gl.dxe", CVAR_ARCHIVE);
 #else
 	gl_driver = ri.Cvar_Get( "gl_driver", "opengl32", CVAR_ARCHIVE );
