@@ -145,8 +145,6 @@ cvar_t	*gl_lockpvs;
 
 cvar_t	*gl_3dlabs_broken;
 
-cvar_t	*r_refreshrate;
-
 cvar_t	*vid_fullscreen;
 cvar_t	*vid_gamma;
 cvar_t	*vid_ref;
@@ -1140,8 +1138,6 @@ void R_Register ( void )
 
 	gl_3dlabs_broken = ri.Cvar_Get( "gl_3dlabs_broken", "1", CVAR_ARCHIVE );
 
-	r_refreshrate = ri.Cvar_Get("r_refreshrate", "60", CVAR_ARCHIVE);
-
 	vid_fullscreen = ri.Cvar_Get( "vid_fullscreen", "1", CVAR_ARCHIVE );
 	vid_gamma = ri.Cvar_Get( "vid_gamma", "1.0", CVAR_ARCHIVE );
 	vid_ref = ri.Cvar_Get( "vid_ref", "gl", CVAR_ARCHIVE );
@@ -1783,20 +1779,6 @@ void R_BeginFrame( float camera_separation )
 		vid_gamma->modified = false;
 		UpdateGammaRamp (); /* Knightmare- hardware gamma */
 	}
-
-#if 0 /* FS: Disabled until we decide if we want to keep this */
-	if ( r_refreshrate->modified) /* FS: Refresh rate control */
-	{
-		r_refreshrate->modified = false;
-		
-		if ( gl_config.renderer & ( GL_RENDERER_VOODOO ) )
-		{
-			static char envbuffer[64];
-			Com_sprintf( envbuffer, sizeof(envbuffer), "SST_SCREENREFRESH=%i", r_refreshrate->intValue );
-			putenv( envbuffer );
-		}
-	}
-#endif
 
 	GLimp_BeginFrame( camera_separation );
 

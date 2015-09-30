@@ -36,10 +36,6 @@ extern cvar_t *scr_viewsize;	/* client/cl_scrn.c */
 static cvar_t *sw_stipplealpha;
 static cvar_t *sw_waterwarp; /* FS */
 static cvar_t *r_contentblend; /* FS */
-#if 0 /* FS: Disabled until we decide if we want to keep this */
-static cvar_t *r_refreshrate; /* FS: For 3DFX */
-static cvar_t *gl_swapinterval; /* FS: For 3DFX */
-#endif
 
 extern void M_ForceMenuOff (void);
 extern const char *Default_MenuKey( menuframework_s *m, int key );
@@ -64,10 +60,6 @@ static menulist_s		s_waterwarp_box;	/* FS */
 static menuslider_s		s_tq_slider;
 static menulist_s  		s_paletted_texture_box;
 static menulist_s		s_texfilter_box;
-#if 0 /* FS: Disabled until we decide if we want to keep this */
-static menulist_s  		s_vsync_box;
-static menulist_s		s_refresh_box;	// Knightmare- refresh rate option
-#endif
 
 static menuaction_s		s_apply_action[NUM_VID_DRIVERS];
 static menuaction_s		s_defaults_action[NUM_VID_DRIVERS];
@@ -197,14 +189,6 @@ static void TexFilterCallback( void *s )
 		Cvar_Set ("gl_texturemode", "GL_LINEAR_MIPMAP_NEAREST");
 }
 
-#if 0 /* FS: Disabled until we decide if we want to keep this */
-// Knightmare- added callback for this
-static void VSyncCallback( void *s )
-{
-	Cvar_SetValue ("gl_swapinterval", s_vsync_box.curvalue);
-}
-#endif
-
 static void ResetDefaults( void *unused )
 {
 	VID_MenuInit();
@@ -233,46 +217,11 @@ static void ApplyChanges( void *unused )
 	Cvar_SetValue("sw_waterwarp", s_waterwarp_box.curvalue);	/* FS */
 	Cvar_SetValue ("gl_picmip", 3 - s_tq_slider.curvalue);
 	Cvar_SetValue ("gl_ext_palettedtexture", s_paletted_texture_box.curvalue);
-#if 0 /* FS: Disabled until we decide if we want to keep this */
-	Cvar_SetValue ("gl_swapinterval", s_vsync_box.curvalue);
-#endif
 
 	temp = s_mode_list[SOFTWARE_MENU].curvalue;
 	Cvar_SetValue ("sw_mode", temp);
 	temp = s_mode_list[OPENGL_MENU].curvalue;
 	Cvar_SetValue ("gl_mode", temp);
-
-#if 0 /* FS: Disabled until we decide if we want to keep this */
-	// Knightmare- refesh rate option
-	switch (s_refresh_box.curvalue)
-	{
-	case 7:
-		Cvar_SetValue ("r_refreshrate", 120);
-		break;
-	case 6:
-		Cvar_SetValue ("r_refreshrate", 100);
-		break;
-	case 5:
-		Cvar_SetValue ("r_refreshrate", 85);
-		break;
-	case 4:
-		Cvar_SetValue ("r_refreshrate", 75);
-		break;
-	case 3:
-		Cvar_SetValue ("r_refreshrate", 72);
-		break;
-	case 2:
-		Cvar_SetValue ("r_refreshrate", 70);
-		break;
-	case 1:
-		Cvar_SetValue ("r_refreshrate", 60);
-		break;
-	case 0:
-	default:
-		Cvar_SetValue ("r_refreshrate", 0);
-		break;
-	}
-#endif
 
 	// Knightmare- texture filter mode
 	if (s_texfilter_box.curvalue == 1)
@@ -397,9 +346,6 @@ void	VID_Init (void)
 {
 	/* putenv() from DJGPP libc will copy, so
 	 * it is OK to use an automatic var here. */
-#if 0 /* FS: Disabled until we decide if we want to keep this */
-	char	envString[64];
-#endif
 	int	i, bpp;
 
 	viddef.width = 320;
@@ -430,20 +376,6 @@ void	VID_Init (void)
 	/* we only have 3dfx hw accel in dos: */
 	if (COM_CheckParm("-no3dfxgamma"))
 		Cvar_Set("r_ignorehwgamma", "1");
-
-#if 0 /* FS: Commented out until we decide if we want to keep this */
-	/* FS: 3DFX - Enforce the refresh rate at startup */
-	r_refreshrate = Cvar_Get("r_refreshrate", "60", CVAR_ARCHIVE);
-	r_refreshrate->description = "Refresh rate control for 3DFX OpenGL driver.";
-	Com_sprintf(envString, sizeof(envString), "SST_SCREENREFRESH=%i", r_refreshrate->intValue);
-	putenv(envString);
-
-	/* FS: 3DFX - Enforce the swap interval at startup */
-	gl_swapinterval = Cvar_Get("gl_swapinterval", "1", CVAR_ARCHIVE);
-	gl_swapinterval->description = "V-Sync control for 3DFX OpenGL driver.";
-	Com_sprintf(envString, sizeof(envString), "FX_GLIDE_SWAPINTERVAL=%i", gl_swapinterval->intValue);
-	putenv(envString);
-#endif
 
 	/* Add some console commands that we want to handle */
 	Cmd_AddCommand("vid_restart", VID_Restart_f);
@@ -516,31 +448,6 @@ int texfilter_box_setval (void)
 		return 1;
 }
 
-#if 0 /* FS: Disabled until we decide if we want to keep this */
-// Knightmare- refresh rate option
-int refresh_box_setval (void)
-{
-	int refreshVar = (int)Cvar_VariableValue ("r_refreshrate");
-
-	if (refreshVar == 120)
-		return 7;
-	else if (refreshVar == 100)
-		return 6;
-	else if (refreshVar == 85)
-		return 5;
-	else if (refreshVar == 75)
-		return 4;
-	else if (refreshVar == 72)
-		return 3;
-	else if (refreshVar == 70)
-		return 2;
-	else if (refreshVar == 60)
-		return 1;
-	else
-		return 0;
-}
-#endif
-
 void	VID_MenuInit (void)
 {
 	static const char *yesno_names[] = {
@@ -555,21 +462,6 @@ void	VID_MenuInit (void)
 		"[3Dfx OpenGL   ]",
 		0
 	};
-
-#if 0 /* FS: Disabled until we decide if we want to keep this */
-	static const char *refreshrate_names[] = 
-	{
-		"[default]",
-		"[60Hz   ]",
-		"[70Hz   ]",
-		"[72Hz   ]",
-		"[75Hz   ]",
-		"[85Hz   ]",
-		"[100Hz  ]",
-		"[120Hz  ]",
-		0
-	};
-#endif
 
 	static const char *filter_names[] =
 	{
@@ -722,26 +614,6 @@ void	VID_MenuInit (void)
 	s_texfilter_box.generic.statusbar	= "changes texture filtering mode";
 	s_texfilter_box.generic.callback	= TexFilterCallback;
 
-#if 0 /* FS: Disabled until we decide if we want to keep this */
-	s_vsync_box.generic.type		= MTYPE_SPINCONTROL;
-	s_vsync_box.generic.x			= 0;
-	s_vsync_box.generic.y			= 90;
-	s_vsync_box.generic.name		= "video sync";
-	s_vsync_box.curvalue			= Cvar_VariableValue("gl_swapinterval");
-	s_vsync_box.itemnames			= yesno_names;
-	s_vsync_box.generic.statusbar	= "sync framerate with monitor refresh";
-	s_vsync_box.generic.callback	= VSyncCallback;
-
-	// Knightmare- refresh rate option
-	s_refresh_box.generic.type			= MTYPE_SPINCONTROL;
-	s_refresh_box.generic.x				= 0;
-	s_refresh_box.generic.y				= 100;
-	s_refresh_box.generic.name			= "refresh rate";
-	s_refresh_box.curvalue				= refresh_box_setval();
-	s_refresh_box.itemnames				= refreshrate_names;
-	s_refresh_box.generic.statusbar		= "sets refresh rate for fullscreen modes";
-#endif
-
 	/* FS: ATTN  AddItem order has to be the order you want to see it in or else the cursor gets wonky! */
 	Menu_AddItem(&s_software_menu, (void *) &s_ref_list[SOFTWARE_MENU]);
 	Menu_AddItem(&s_software_menu, (void *) &s_mode_list[SOFTWARE_MENU]);
@@ -758,10 +630,6 @@ void	VID_MenuInit (void)
 	Menu_AddItem( &s_opengl_menu, ( void * ) &s_tq_slider );
 	Menu_AddItem( &s_opengl_menu, ( void * ) &s_paletted_texture_box );
 	Menu_AddItem( &s_opengl_menu, ( void * ) &s_texfilter_box );
-#if 0 /* FS: Disabled until we decide if we want to keep this */
-	Menu_AddItem( &s_opengl_menu, ( void * ) &s_vsync_box );
-	Menu_AddItem( &s_opengl_menu, ( void * ) &s_refresh_box );
-#endif
 	Menu_AddItem( &s_software_menu, ( void * ) &s_defaults_action[SOFTWARE_MENU] );
 	Menu_AddItem( &s_software_menu, ( void * ) &s_apply_action[SOFTWARE_MENU] );
 	Menu_AddItem( &s_opengl_menu, ( void * ) &s_defaults_action[OPENGL_MENU] );

@@ -170,10 +170,10 @@ typedef struct
 
 glmode_t modes[] = {
 	{"GL_NEAREST", GL_NEAREST, GL_NEAREST},
-	{"GL_LINEAR", GL_LINEAR, GL_LINEAR},
 	{"GL_NEAREST_MIPMAP_NEAREST", GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST},
-	{"GL_LINEAR_MIPMAP_NEAREST", GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR},
 	{"GL_NEAREST_MIPMAP_LINEAR", GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST},
+	{"GL_LINEAR", GL_LINEAR, GL_LINEAR},
+	{"GL_LINEAR_MIPMAP_NEAREST", GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR},
 	{"GL_LINEAR_MIPMAP_LINEAR", GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR}
 };
 
@@ -304,13 +304,23 @@ void GL_TextureMode( char *string )
 	int		i;
 	image_t	*glt;
 
-	for (i=0 ; i< NUM_GL_MODES ; i++)
+	if (string[0] == 'G' || string[0] == 'g')
 	{
-		if ( !Q_stricmp( modes[i].name, string ) )
-			break;
+		for (i=0 ; i< NUM_GL_MODES ; i++)
+		{
+			if ( !Q_stricmp( modes[i].name, string ) )
+				break;
+		}
 	}
+	else if (string[0] >= '0' || string[0] <= '5')
+	{
+		i = atoi(string);
+		ri.Cvar_Set("gl_texturemode", modes[i].name); /* FS: Reset the CVAR name to what we selected for identification later and to make the video menu sane */
+	}
+	else
+		i = NUM_GL_MODES;
 
-	if (i == NUM_GL_MODES)
+	if ((i < 0) || (i >= NUM_GL_MODES))
 	{
 		ri.Con_Printf (PRINT_ALL, "bad filter name\n");
 		return;
