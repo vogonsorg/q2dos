@@ -288,7 +288,7 @@ static void ApplyChanges( void *unused )
 		break;
 	case REF_OPENGL:
 		Cvar_Set( "vid_ref", "gl" );
-		Cvar_Set( "gl_driver", "gl.dxe" );
+		Cvar_Set( "gl_dosdriver", "gl.dxe" );
 		break;
 	}
 
