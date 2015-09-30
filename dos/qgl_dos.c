@@ -2997,7 +2997,6 @@ qboolean QGL_Init( const char *dllname )
 	int rc = -1;
 
 #ifdef GL_DLSYM
-	/* FS: TODO: Should we try again if it fails by loading gl.dxe the second time around, then finally give up? */
 	if ((opengl_dxe = dlopen (dllname, RTLD_GLOBAL)) == NULL) {
 		ri.Con_Printf(PRINT_ALL,  "QGL_Init() failed: can't open %s\n", dllname);
 		return false;

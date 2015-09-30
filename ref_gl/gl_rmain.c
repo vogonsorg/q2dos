@@ -114,7 +114,6 @@ cvar_t	*gl_log;
 cvar_t	*gl_bitdepth;
 cvar_t	*gl_drawbuffer;
 cvar_t  *gl_driver;
-cvar_t	*gl_dosdriver; /* FS: Don't clash with win32's usage of opengl32 and mini drivers */
 cvar_t	*gl_lightmap;
 cvar_t	*gl_shadows;
 cvar_t	*gl_shadowalpha; /* Knightmare- added shadow alpha */
@@ -1100,8 +1099,11 @@ void R_Register ( void )
 	gl_flashblend = ri.Cvar_Get ("gl_flashblend", "0", 0);
 	gl_playermip = ri.Cvar_Get ("gl_playermip", "0", 0);
 	gl_monolightmap = ri.Cvar_Get( "gl_monolightmap", "0", 0 );
+#ifdef __DJGPP_ /* FS: Don't clash with win32's usage of opengl32 and mini drivers */
+	gl_driver = ri.Cvar_Get( "gl_dosdriver", "gl.dxe", CVAR_ARCHIVE);
+#else
 	gl_driver = ri.Cvar_Get( "gl_driver", "opengl32", CVAR_ARCHIVE );
-	gl_dosdriver = ri.Cvar_Get ("gl_dosdriver", "gl.dxe", CVAR_ARCHIVE); /* FS: Don't clash with win32's usage of opengl32 and mini drivers */
+#endif
 
 	gl_anisotropic = ri.Cvar_Get( "gl_anisotropic", "0", CVAR_ARCHIVE );
 	gl_anisotropic_avail = ri.Cvar_Get( "gl_anisotropic_avail", "0", 0 );
@@ -1278,11 +1280,7 @@ int R_Init ( void *hinstance, void *hWnd )
 	R_Register();
 
 	// initialize our QGL dynamic bindings
-#ifdef __DJGPP__ /* FS: Don't clash with win32's usage of opengl32 and mini drivers */
-	if ( !QGL_Init( gl_dosdriver->string ) )
-#else
 	if ( !QGL_Init( gl_driver->string ) )
-#endif
 	{
 		QGL_Shutdown();
 		ri.Con_Printf (PRINT_ALL, "ref_gl::R_Init() - could not load \"%s\"\n", gl_driver->string );
@@ -1446,9 +1444,13 @@ int R_Init ( void *hinstance, void *hWnd )
 	/* Knightmare- whether to use GL_RGBA textures & GL_BGRA lightmaps
 	 * If using one of the mini-drivers, a Voodoo w/ WickedGL, or pre-1.2 driver,
 	 * use the texture formats determined by gl_texturesolidmode and gl_texturealphamode. */
-	if ( Q_stricmp(gl_driver->string, "opengl32") || gl_config.renderer == GL_RENDERER_VOODOO
-		|| (gl_config.version_major < 2 && gl_config.version_minor < 2) 
-		|| (!gl_newtextureformat || !gl_newtextureformat->value) )
+	if (
+#ifdef _WIN32
+		Q_stricmp(gl_driver->string, "opengl32") ||
+#endif
+		gl_config.renderer == GL_RENDERER_VOODOO ||
+		(gl_config.version_major < 2 && gl_config.version_minor < 2) ||
+		(!gl_newtextureformat || !gl_newtextureformat->value) )
 	{
 		ri.Con_Printf( PRINT_ALL, "...using legacy texture format\n" );
 		gl_config.newTexFormat = false;
