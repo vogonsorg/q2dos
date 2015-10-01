@@ -67,6 +67,11 @@
 ---------------------------------------------------------
 * -bpp for setting 15, 16, or 32 bpp on Voodoo 4/5 cards.
   "set vid_glbpp" will control the bpp in-game.  Requires a vid_restart.
+* gl_dosdriver to have multiple GL DXEs co-existing.  Can be useful for
+  testing out performance of Mesa vs Sage or between Mesa versions.  Can be
+  used at startup i.e. "+set gl_dosddriver glsage.dxe".  Defaults to gl.dxe
+  and changes applied to video menu will revert back to gl.dxe.  Similar to
+  gl_driver in Windows.
 * FX_GLIDE_2PPC controls the 2 Pixels Per Clock mode.  Valid only for
   Voodoo 4/5 cards.  Disabled in multi-texturing mode.  Valid values are
   -1 to disable, 0 driver decides, 1 forced on.  Default is 1.
