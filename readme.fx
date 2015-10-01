@@ -97,11 +97,11 @@
   anti-aliasing on these cards.
   - For Voodoo 4 and 5:
     0 - SLI Disabled, AA Disabled.
-    1 - SLI Disabled, AA 2x Enabled.
+    1 - SLI Disabled, 2xAA Enabled. (has issues, see Known General Issues)
   - For Voodoo 5 5500:
     2 - SLI Enabled, AA Disabled (default setting).
-    3 - SLI Enabled, AA 2x Enabled.
-    4 - SLI Disabled, AA 4x Enabled.
+    3 - SLI Enabled, 2xAA Enabled. (has issues, see Known General Issues)
+    4 - SLI Disabled, 4xAA Enabled.
   Options 5-8 are for Voodoo 5 6000 users: if you're out there, send me
   an email!
 * SSTV2_SCREENREFRESH for refresh rate control on Voodoo 2.
@@ -127,8 +127,12 @@
 ---------------------------------------------------------
 * gl_ext_multitexture is supported by the driver but appears to have an
   approximately 10fps loss on average (more in complex scenes) on everything
-  I tested it on EXCEPT in modes 1280x1024 and 1600x1200 where it really
-  helps.  It defaults to 0 by default.  If you would like to try it anyways
+  I tested it on EXCEPT:
+  * 15bpp/16bpp 1280x1024 and higher.
+  * 32bpp 1024x768 and higher.
+  * AA modes (any mode and bpp combo).
+  Since most people are likely to be using 16bpp and 640x480 through 1024x768
+  gl_ext_multitexture defaults to 0.  If you would like to try it anyways
   set it to 1 and do a vid_restart.
 * 2xAA (With or without SLI) locks if LFB WC is set.  4xAA is OK.
 
