@@ -125,6 +125,7 @@
   I tested it on EXCEPT in modes 1280x1024 and 1600x1200 where it really
   helps.  It defaults to 0 by default.  If you would like to try it anyways
   set it to 1 and do a vid_restart.
+* 2xAA (With or without SLI) locks if LFB WC is set.  4xAA is OK.
 
 8 - Known Mesa Issues
 ---------------------------------------------------------
@@ -155,17 +156,14 @@
 9 - Known Sage Issues
 ---------------------------------------------------------
 * Trilinear filtering does not work on Voodoo 4 and 5.
-* Static builds have issues with multiple vid_restarts and mode changes.
-  You seem to be allowed about 2 or 3 per session until a malloc error
-  bombs it out.  This is only going to affect users building custom builds
-  from source.  Distribution packages are unaffacted.
 * Black screens with segfaults on SSE processors (i.e. P3 and higher).
   Due to an issue with the SSE specific code in Sage, you may or may not
   be able to start the game.  As a consequence, it must be explicitly enabled
   via the sage.ini as x86.enable.sse = y.  If you build from source you can
-  force GCC SSE optimizations with -march=pentium3 and x86.enable.sse = n and
-  get similar performance without the crashes.  Distributing SSE-only builds
-  of DXEs and binaries is impractical; you must build it yourself.
+  make a static link build which will avoid the issue.  May be related to a
+  DXE3GEN issue regarding movaps/movups or a problem with SSE alignment from
+  those ASM functions.  To build a DXE to workaround the issue you must run
+  the diff in dos/3rdparty/sage yourself and rebuild.
 * Requires initialization twice for proper performance.  There is a hack in
   place until this issue can be resolved.
 
