@@ -130,16 +130,19 @@ Various code from
 * Gamespy SDK -- Released publically in 2014.
 * ggorts -- Ported 3ZB2, Action, Chaos, and DDay to Q2DOS.  Banked VGA code and
             Planar mode help.  3DFX/MesaFX help.
-* Knightmare -- Ref_soft help.
+* Glide Open Source Project -- (http://glide.sourceforge.net/)
+* Knightmare -- Ref_soft and ref_gl help, Quake 2 3.24 updates.
                 KMQuake II (http://www.markshan.com/knightmare/)
-* Mpxplay -- (http://mpxplay.sourceforge.net/)
+* Mesa -- (http://mesa3d.org/)
+* Mpxplay PCI Audio library -- (http://mpxplay.sourceforge.net/)
 * Mpxplay code importing by Ruslan Starodubov (http://sound-dos.ucoz.ru/)
-* Ogg Vorbis -- (https://www.xiph.org/)
+* OGG/Vorbis -- (https://www.xiph.org/)
+* RayeR -- Various DJGPP v2.05 upgrade help, MTRRLFBE (http://rayer.g6.cz/)
 * R1CH -- R1Q2 (http://old.r1ch.net/stuff/r1q2/)
+* Sage by Daniel Borca (http://www.github.com/dborca/sage)
 * Sezero -- WATT32, DJGPP 2.05, 3DFX/Mesa, and several other help.
             uHexen2 (http://uhexen2.sourceforge.net/)
 * Yamagi -- Updated game code from YamagiQ2 (http://www.yamagi.org/quake2/)
-* Various DJGPP v2.05 upgrade help from RayeR (http://rayer.g6.cz/)
 * Berserk, CDawg, Pat Aftermoon, Anthony Jacques, David M. Pochron, Dopefish,
   GuyP, Jitspoe, MH, MrG, NeVo, Skuller, Riot, R1ch, Psychospaz, Pooy, Sul,
   and others.
