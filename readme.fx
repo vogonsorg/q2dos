@@ -183,3 +183,10 @@
   the smoothest framerates and is recommended to play the game comfortably.
   See http://www.falconfly.de/downloads/3dfx-v5-PC-Reviewers-Guide.zip for
   more details.
+* Dynamic lights are a big performance hit on slower computers.  3DFX has no
+  hardware tnl and Quake takes no advantage of hardware tnl.  You can either
+  disable dynamic lights entirely with gl_dynamic 0, or you can use the fake
+  dynamic lighting effect with gl_flashblend 1.  Gl_flashblend 1 enables a
+  fake dynamic lighting effect that is basically free (performance) by
+  rendering coloured halo effects via OpenGL.  They are not true dynamic
+  lights, but can help seeing rocket blasts in deathmatch :).
