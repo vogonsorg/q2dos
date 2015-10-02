@@ -36,7 +36,7 @@
   one of the directories listed below and put it in the same place as
   q2.exe:
   - voodoo/sst1  -> Voodoo Graphics
-  - voodoo/sst96 -> Voodoo Rush
+  - voodoo/sst96 -> Voodoo Rush (AT3D variants only)
   - voodoo/cvg   -> Voodoo2
   - voodoo/h5    -> Banshee and Voodoo 3/4/5
 * Pick a renderer (gl.dxe) from one of the directories listed below
@@ -135,6 +135,7 @@
   gl_ext_multitexture defaults to 0.  If you would like to try it anyways
   set it to 1 and do a vid_restart.
 * 2xAA (With or without SLI) locks if LFB WC is set.  4xAA is OK.
+* Macronix variants of Voodoo Rush cards do not work.
 
 8 - Known Mesa Issues
 ---------------------------------------------------------
