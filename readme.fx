@@ -51,8 +51,7 @@
 2 - Recommended System Specs
 ---------------------------------------------------------
 * Pentium 2 400mhz.  Pentium 3 550mhz or higher for the best experience.
-* Voodoo 3.  Older cards will work, but unknown how well they perform in
-  faster computers.
+* Voodoo 2.  Older cards will work, but they don't perform very well.
 
 3 - Mesa vs. Sage
 ---------------------------------------------------------
