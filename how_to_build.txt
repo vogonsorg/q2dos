@@ -6,11 +6,19 @@ Windows: * makeallDXE.bat to build the entire source, including mods.
          * makesse.bat will build an SSE optimized build targeted for Pentium 3
            and later processors with 3DFX cards.  SSE builds are entirely
            unsupported but appear to run with no issues.
-         * minimal.bat to build an cut-down Q2DOS with no TCP/IP, Gamespy, cURL,
+         * minimal.bat to build a cut-down Q2DOS with no TCP/IP, Gamespy, cURL,
            OGG/Vorbis, and PCI Sound card support.
            Mostly for testing purposes.
          * NOTE: makesse.bat and release.bat have hard-coded paths to my
                  machine for distribution.  Check these batch files and modify
                  to your needs.
 
-Linux: * TODO sezero.
+Linux  : You need a Linux-to-DJGPP cross compiler toolchain based on DJGPP-2.05.
+         I use a toolchain with gcc-3.4.6, binutils-2.25.1 and DJGPP-2.05.
+         See the cross_build.sh to see how I do it myself; edit those scripts to
+         represent your own build environment properly.
+         * clean.sh to have a clean source tree.
+         * makeall.sh to build the entire source, including mods.
+         * individual cross_build.sh scripts to build only the wanted components.
+         * cross_mimimal.sh to build a cut-down Q2DOS with no TCP/IP, GSpy, cURL,
+           OGG/Vorbis, and PCI Sound card support.
