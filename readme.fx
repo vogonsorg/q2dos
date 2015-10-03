@@ -165,14 +165,6 @@
 9 - Known Sage Issues
 ---------------------------------------------------------
 * Trilinear filtering does not work on Voodoo 4 and 5.
-* Black screens with segfaults on SSE processors (i.e. P3 and higher).
-  Due to an issue with the SSE specific code in Sage, you may or may not
-  be able to start the game.  As a consequence, it must be explicitly enabled
-  via the sage.ini as x86.enable.sse = y.  If you build from source you can
-  make a static link build which will avoid the issue.  May be related to a
-  DXE3GEN issue regarding movaps/movups or a problem with SSE alignment from
-  those ASM functions.  To build a DXE to workaround the issue you must run
-  the diff in dos/3rdparty/sage yourself and rebuild.
 * Requires initialization twice for proper performance.  There is a hack in
   place until this issue can be resolved.
 
