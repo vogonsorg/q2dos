@@ -166,7 +166,7 @@
 ---------------------------------------------------------
 * Trilinear filtering does not work on Voodoo 4 and 5.
 * Requires initialization twice for proper performance.  There is a hack in
-  place until this issue can be resolved.
+  our client which does that automatically already until the issue is fixed.
 
 10 - Other tidbits
 ---------------------------------------------------------
