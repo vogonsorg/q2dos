@@ -1,6 +1,6 @@
 /*
  * fx_gamma.c
- * $Id: fx_gamma.c 5433 2015-09-18 08:20:11Z sezero $
+ * $Id: fx_gamma.c 5458 2015-10-04 21:29:31Z sezero $
  *
  * Small library providing gamma control functions for 3Dfx Voodoo1/2
  * cards by abusing the exposed glide symbols when using fxMesa.
@@ -149,6 +149,7 @@ int Init_3dfxGammaCtrl (void)
 
 void Shutdown_3dfxGamma (void)
 {
+	grGetString_fp = NULL;
 	grGammaCorrectionValue_fp = NULL;
 	guGammaCorrectionRGB_fp = NULL;
 	grGet_fp = NULL;
