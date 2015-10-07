@@ -25,9 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdio.h>
 
 #include <GL/gl.h>
-#ifdef _WIN32
-#include "glext.h" /* Knightmare- include new extension header */
-#endif
+#include <GL/glext.h>
 #include <math.h>
 
 #ifndef __linux__
