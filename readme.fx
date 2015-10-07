@@ -104,6 +104,26 @@
   Options 5-8 are for Voodoo 5 6000 users: if you're out there, send me
   an email!
 * SSTV2_SCREENREFRESH for refresh rate control on Voodoo 2.
+* Voodoo 1 users:
+  - SST_FASTPCIRD for fast PCI reads.
+  - SST_GRXCLK for setting the clock speed.  Mesa Readme states 57 is a safe
+    value.
+* Voodoo 2 users (Mesa Readme says this will hang SLI and Quantum3D 100SB):
+  - SSTV2_FASTMEM_RAS_READS for fast RAS read memory timings.
+  - SSTV2_FASTPCIRD for fast PCI reads.
+  - SSTV2_GRXCLK for setting the clock speed.  Mesa Readme states 95 is a safe
+    value.
+* Quantum3D Obsidian3D-2 X-24 users:
+  Mesa reports this was necessary for it to work under Linux.
+  Let us know if this is necessary for DOS as well:
+  - SSTV2_FT_CLKDEL=5
+  - SSTV2_TF0_CLKDEL=7
+  - SSTV2_TF1_CLKDEL=7
+  - SSTV2_TF2_CLKDEL=7
+  - SSTV2_SLIM_VIN_CLKDEL=3
+  - SSTV2_SLIM_VOUT_CLKDEL=2
+  - SSTV2_SLIS_VIN_CLKDEL=3
+  - SSTV2_SLIS_VOUT_CLKDEL=2
 
 5 - Interesting Mesa parameters
 ---------------------------------------------------------
