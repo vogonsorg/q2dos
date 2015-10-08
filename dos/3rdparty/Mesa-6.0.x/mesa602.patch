@@ -1,0 +1,3247 @@
+diff --git a/include/GL/gl.h b/include/GL/gl.h
+index 56b883b..99a37db 100644
+--- a/include/GL/gl.h
++++ b/include/GL/gl.h
+@@ -1,6 +1,6 @@
+ /*
+  * Mesa 3-D graphics library
+- * Version:  6.0.1
++ * Version:  6.0.2
+  *
+  * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+@@ -61,6 +61,9 @@
+ #    define GLAPI extern
+ #  endif /* _STATIC_MESA support */
+ #  define GLAPIENTRY __stdcall
++#elif defined(__CYGWIN__) && defined(USE_OPENGL32) /* use native windows opengl32 */
++#  define GLAPI extern
++#  define GLAPIENTRY __stdcall
+ #else
+ /* non-Windows compilation */
+ #  define GLAPI extern
+diff --git a/include/GL/glext.h b/include/GL/glext.h
+index 4260acd..e11736d 100644
+--- a/include/GL/glext.h
++++ b/include/GL/glext.h
+@@ -24,7 +24,7 @@ extern "C" {
+ ** 
+ ** Original Code. The Original Code is: OpenGL Sample Implementation,
+ ** Version 1.2.1, released January 26, 2000, developed by Silicon Graphics,
+-** Inc. The Original Code is Copyright (c) 1991-2002 Silicon Graphics, Inc.
++** Inc. The Original Code is Copyright (c) 1991-2004 Silicon Graphics, Inc.
+ ** Copyright in any portions created by third parties is as indicated
+ ** elsewhere herein. All Rights Reserved.
+ ** 
+@@ -52,9 +52,9 @@ extern "C" {
+ /*************************************************************/
+ 
+ /* Header file version number, required by OpenGL ABI for Linux */
+-/* glext.h last updated 2004/2/23 */
++/* glext.h last updated 2004/7/26 */
+ /* Current version at http://oss.sgi.com/projects/ogl-sample/registry/ */
+-#define GL_GLEXT_VERSION 22
++#define GL_GLEXT_VERSION 24
+ 
+ #ifndef GL_VERSION_1_2
+ #define GL_UNSIGNED_BYTE_3_3_2            0x8032
+@@ -251,7 +251,6 @@ extern "C" {
+ #define GL_NUM_COMPRESSED_TEXTURE_FORMATS 0x86A2
+ #define GL_COMPRESSED_TEXTURE_FORMATS     0x86A3
+ #define GL_CLAMP_TO_BORDER                0x812D
+-#define GL_CLAMP_TO_BORDER_SGIS           0x812D
+ #define GL_COMBINE                        0x8570
+ #define GL_COMBINE_RGB                    0x8571
+ #define GL_COMBINE_ALPHA                  0x8572
+@@ -357,7 +356,7 @@ extern "C" {
+ #define GL_DYNAMIC_READ                   0x88E9
+ #define GL_DYNAMIC_COPY                   0x88EA
+ #define GL_SAMPLES_PASSED                 0x8914
+-#define GL_FOG_COORD_SOURCE               GL_FOG_COORDINATE_SOURCE
++#define GL_FOG_COORD_SRC                  GL_FOG_COORDINATE_SOURCE
+ #define GL_FOG_COORD                      GL_FOG_COORDINATE
+ #define GL_CURRENT_FOG_COORD              GL_CURRENT_FOG_COORDINATE
+ #define GL_FOG_COORD_ARRAY_TYPE           GL_FOG_COORDINATE_ARRAY_TYPE
+@@ -749,6 +748,14 @@ extern "C" {
+ #define GL_FLOAT_MAT2_ARB                 0x8B5A
+ #define GL_FLOAT_MAT3_ARB                 0x8B5B
+ #define GL_FLOAT_MAT4_ARB                 0x8B5C
++#define GL_SAMPLER_1D_ARB                 0x8B5D
++#define GL_SAMPLER_2D_ARB                 0x8B5E
++#define GL_SAMPLER_3D_ARB                 0x8B5F
++#define GL_SAMPLER_CUBE_ARB               0x8B60
++#define GL_SAMPLER_1D_SHADOW_ARB          0x8B61
++#define GL_SAMPLER_2D_SHADOW_ARB          0x8B62
++#define GL_SAMPLER_2D_RECT_ARB            0x8B63
++#define GL_SAMPLER_2D_RECT_SHADOW_ARB     0x8B64
+ #define GL_OBJECT_DELETE_STATUS_ARB       0x8B80
+ #define GL_OBJECT_COMPILE_STATUS_ARB      0x8B81
+ #define GL_OBJECT_LINK_STATUS_ARB         0x8B82
+@@ -773,9 +780,11 @@ extern "C" {
+ #ifndef GL_ARB_fragment_shader
+ #define GL_FRAGMENT_SHADER_ARB            0x8B30
+ #define GL_MAX_FRAGMENT_UNIFORM_COMPONENTS_ARB 0x8B49
++#define GL_FRAGMENT_SHADER_DERIVATIVE_HINT_ARB 0x8B8B
+ #endif
+ 
+ #ifndef GL_ARB_shading_language_100
++#define GL_SHADING_LANGUAGE_VERSION_ARB   0x8B8C
+ #endif
+ 
+ #ifndef GL_ARB_texture_non_power_of_two
+@@ -789,6 +798,33 @@ extern "C" {
+ #ifndef GL_ARB_fragment_program_shadow
+ #endif
+ 
++#ifndef GL_ARB_draw_buffers
++#define GL_MAX_DRAW_BUFFERS_ARB           0x8824
++#define GL_DRAW_BUFFER0_ARB               0x8825
++#define GL_DRAW_BUFFER1_ARB               0x8826
++#define GL_DRAW_BUFFER2_ARB               0x8827
++#define GL_DRAW_BUFFER3_ARB               0x8828
++#define GL_DRAW_BUFFER4_ARB               0x8829
++#define GL_DRAW_BUFFER5_ARB               0x882A
++#define GL_DRAW_BUFFER6_ARB               0x882B
++#define GL_DRAW_BUFFER7_ARB               0x882C
++#define GL_DRAW_BUFFER8_ARB               0x882D
++#define GL_DRAW_BUFFER9_ARB               0x882E
++#define GL_DRAW_BUFFER10_ARB              0x882F
++#define GL_DRAW_BUFFER11_ARB              0x8830
++#define GL_DRAW_BUFFER12_ARB              0x8831
++#define GL_DRAW_BUFFER13_ARB              0x8832
++#define GL_DRAW_BUFFER14_ARB              0x8833
++#define GL_DRAW_BUFFER15_ARB              0x8834
++#endif
++
++#ifndef GL_ARB_texture_rectangle
++#define GL_TEXTURE_RECTANGLE_ARB          0x84F5
++#define GL_TEXTURE_BINDING_RECTANGLE_ARB  0x84F6
++#define GL_PROXY_TEXTURE_RECTANGLE_ARB    0x84F7
++#define GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB 0x84F8
++#endif
++
+ #ifndef GL_EXT_abgr
+ #define GL_ABGR_EXT                       0x8000
+ #endif
+@@ -1119,6 +1155,10 @@ extern "C" {
+ #define GL_CLAMP_TO_EDGE_SGIS             0x812F
+ #endif
+ 
++#ifndef GL_SGIS_texture_border_clamp
++#define GL_CLAMP_TO_BORDER_SGIS           0x812D
++#endif
++
+ #ifndef GL_EXT_blend_minmax
+ #define GL_FUNC_ADD_EXT                   0x8006
+ #define GL_MIN_EXT                        0x8007
+@@ -2662,6 +2702,11 @@ extern "C" {
+ #define GL_DRAW_BUFFER15_ATI              0x8834
+ #endif
+ 
++#ifndef GL_ATI_pixel_format_float
++#define GL_TYPE_RGBA_FLOAT_ATI            0x8820
++#define GL_COLOR_CLEAR_UNCLAMPED_VALUE_ATI 0x8835
++#endif
++
+ #ifndef GL_ATI_texture_env_combine3
+ #define GL_MODULATE_ADD_ATI               0x8744
+ #define GL_MODULATE_SIGNED_ADD_ATI        0x8745
+@@ -2774,6 +2819,33 @@ extern "C" {
+ #define GL_YCBCR_MESA                     0x8757
+ #endif
+ 
++#ifndef GL_EXT_pixel_buffer_object
++#define GL_PIXEL_PACK_BUFFER_EXT          0x88EB
++#define GL_PIXEL_UNPACK_BUFFER_EXT        0x88EC
++#define GL_PIXEL_PACK_BUFFER_BINDING_EXT  0x88ED
++#define GL_PIXEL_UNPACK_BUFFER_BINDING_EXT 0x88EF
++#endif
++
++#ifndef GL_NV_fragment_program_option
++#endif
++
++#ifndef GL_NV_fragment_program2
++#define GL_MAX_PROGRAM_EXEC_INSTRUCTIONS_NV 0x88F4
++#define GL_MAX_PROGRAM_CALL_DEPTH_NV      0x88F5
++#define GL_MAX_PROGRAM_IF_DEPTH_NV        0x88F6
++#define GL_MAX_PROGRAM_LOOP_DEPTH_NV      0x88F7
++#define GL_MAX_PROGRAM_LOOP_COUNT_NV      0x88F8
++#endif
++
++#ifndef GL_NV_vertex_program2_option
++/* reuse GL_MAX_PROGRAM_EXEC_INSTRUCTIONS_NV */
++/* reuse GL_MAX_PROGRAM_CALL_DEPTH_NV */
++#endif
++
++#ifndef GL_NV_vertex_program3
++/* reuse GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB */
++#endif
++
+ 
+ /*************************************************************/
+ 
+@@ -3668,6 +3740,18 @@ typedef GLint (APIENTRYP PFNGLGETATTRIBLOCATIONARBPROC) (GLhandleARB programObj,
+ #define GL_ARB_fragment_program_shadow 1
+ #endif
+ 
++#ifndef GL_ARB_draw_buffers
++#define GL_ARB_draw_buffers 1
++#ifdef GL_GLEXT_PROTOTYPES
++GLAPI void APIENTRY glDrawBuffersARB (GLsizei, const GLenum *);
++#endif /* GL_GLEXT_PROTOTYPES */
++typedef void (APIENTRYP PFNGLDRAWBUFFERSARBPROC) (GLsizei n, const GLenum *bufs);
++#endif
++
++#ifndef GL_ARB_texture_rectangle
++#define GL_ARB_texture_rectangle 1
++#endif
++
+ #ifndef GL_EXT_abgr
+ #define GL_EXT_abgr 1
+ #endif
+@@ -5694,6 +5778,13 @@ GLAPI void APIENTRY glDrawBuffersATI (GLsizei, const GLenum *);
+ typedef void (APIENTRYP PFNGLDRAWBUFFERSATIPROC) (GLsizei n, const GLenum *bufs);
+ #endif
+ 
++#ifndef GL_ATI_pixel_format_float
++#define GL_ATI_pixel_format_float 1
++/* This is really a WGL extension, but defines some associated GL enums.
++ * ATI does not export "GL_ATI_pixel_format_float" in the GL_EXTENSIONS string.
++ */
++#endif
++
+ #ifndef GL_ATI_texture_env_combine3
+ #define GL_ATI_texture_env_combine3 1
+ #endif
+@@ -5911,6 +6002,26 @@ typedef void (APIENTRYP PFNGLBLENDEQUATIONSEPARATEEXTPROC) (GLenum modeRGB, GLen
+ #define GL_MESA_ycbcr_texture 1
+ #endif
+ 
++#ifndef GL_EXT_pixel_buffer_object
++#define GL_EXT_pixel_buffer_object 1
++#endif
++
++#ifndef GL_NV_fragment_program_option
++#define GL_NV_fragment_program_option 1
++#endif
++
++#ifndef GL_NV_fragment_program2
++#define GL_NV_fragment_program2 1
++#endif
++
++#ifndef GL_NV_vertex_program2_option
++#define GL_NV_vertex_program2_option 1
++#endif
++
++#ifndef GL_NV_vertex_program3
++#define GL_NV_vertex_program3 1
++#endif
++
+ 
+ #ifdef __cplusplus
+ }
+diff --git a/src/mesa/array_cache/ac_import.c b/src/mesa/array_cache/ac_import.c
+index 7ec1d00..fcc00d8 100644
+--- a/src/mesa/array_cache/ac_import.c
++++ b/src/mesa/array_cache/ac_import.c
+@@ -1,8 +1,8 @@
+ /*
+  * Mesa 3-D graphics library
+- * Version:  5.1
++ * Version:  6.0.2
+  *
+- * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
++ * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a
+  * copy of this software and associated documentation files (the "Software"),
+@@ -118,7 +118,7 @@ static void reset_secondarycolor( GLcontext *ctx )
+ {
+    ACcontext *ac = AC_CONTEXT(ctx);
+ 
+-   if (ctx->Array.SecondaryColor.Enabled & _NEW_ARRAY_COLOR1) {
++   if (ctx->Array.SecondaryColor.Enabled) {
+       ac->Raw.SecondaryColor = ctx->Array.SecondaryColor;
+       STRIDE_ARRAY(ac->Raw.SecondaryColor, ac->start);
+    }
+@@ -134,7 +134,7 @@ static void reset_index( GLcontext *ctx )
+ {
+    ACcontext *ac = AC_CONTEXT(ctx);
+ 
+-   if (ctx->Array.Index.Enabled & _NEW_ARRAY_INDEX) {
++   if (ctx->Array.Index.Enabled) {
+       ac->Raw.Index = ctx->Array.Index;
+       STRIDE_ARRAY(ac->Raw.Index, ac->start);
+    }
+@@ -150,7 +150,7 @@ static void reset_fogcoord( GLcontext *ctx )
+ {
+    ACcontext *ac = AC_CONTEXT(ctx);
+ 
+-   if (ctx->Array.FogCoord.Enabled & _NEW_ARRAY_FOGCOORD) {
++   if (ctx->Array.FogCoord.Enabled) {
+       ac->Raw.FogCoord = ctx->Array.FogCoord;
+       STRIDE_ARRAY(ac->Raw.FogCoord, ac->start);
+    }
+@@ -166,7 +166,7 @@ static void reset_edgeflag( GLcontext *ctx )
+ {
+    ACcontext *ac = AC_CONTEXT(ctx);
+ 
+-   if (ctx->Array.EdgeFlag.Enabled & _NEW_ARRAY_EDGEFLAG) {
++   if (ctx->Array.EdgeFlag.Enabled) {
+       ac->Raw.EdgeFlag = ctx->Array.EdgeFlag;
+       STRIDE_ARRAY(ac->Raw.EdgeFlag, ac->start);
+    }
+@@ -197,28 +197,21 @@ static void reset_attrib( GLcontext *ctx, GLuint index )
+ /*
+  * Generic import function for color data
+  */
+-static void import( GLcontext *ctx,
+-		    GLenum type,
+-		    struct gl_client_array *to,
+-		    struct gl_client_array *from )
++static void
++import( const GLcontext *ctx,
++        GLenum destType,
++        struct gl_client_array *to,
++        const struct gl_client_array *from )
+ {
+-   GLubyte *dest;
+-   const GLubyte *src;
+-   ACcontext *ac = AC_CONTEXT(ctx);
+-
+-   if (type == 0) 
+-      type = from->Type;
++   const ACcontext *ac = AC_CONTEXT(ctx);
+ 
+-   /* The dest and source data addresses are the sum of the buffer
+-    * object's start plus the vertex array pointer/offset.
+-    */
+-   dest = ADD_POINTERS(to->BufferObj->Data, to->Ptr);
+-   src = ADD_POINTERS(from->BufferObj->Data, from->Ptr);
++   if (destType == 0) 
++      destType = from->Type;
+ 
+-   switch (type) {
++   switch (destType) {
+    case GL_FLOAT:
+-      _math_trans_4fc( (GLfloat (*)[4]) dest,
+-                       src,
++      _math_trans_4fc( (GLfloat (*)[4]) to->Ptr,
++                       from->Ptr,
+ 		       from->StrideB,
+ 		       from->Type,
+ 		       from->Size,
+@@ -230,8 +223,8 @@ static void import( GLcontext *ctx,
+       break;
+       
+    case GL_UNSIGNED_BYTE:
+-      _math_trans_4ub( (GLubyte (*)[4]) dest,
+-                       src,
++      _math_trans_4ub( (GLubyte (*)[4]) to->Ptr,
++                       from->Ptr,
+ 		       from->StrideB,
+ 		       from->Type,
+ 		       from->Size,
+@@ -243,8 +236,8 @@ static void import( GLcontext *ctx,
+       break;
+ 
+    case GL_UNSIGNED_SHORT:
+-      _math_trans_4us( (GLushort (*)[4]) dest,
+-                       src,
++      _math_trans_4us( (GLushort (*)[4]) to->Ptr,
++                       from->Ptr,
+ 		       from->StrideB,
+ 		       from->Type,
+ 		       from->Size,
+@@ -256,7 +249,7 @@ static void import( GLcontext *ctx,
+       break;
+       
+    default:
+-      ASSERT(0);
++      _mesa_problem(ctx, "Unexpected dest format in import()");
+       break;
+    }
+ }
+diff --git a/src/mesa/glapi/glapi.c b/src/mesa/glapi/glapi.c
+index eff86f4..aa91583 100644
+--- a/src/mesa/glapi/glapi.c
++++ b/src/mesa/glapi/glapi.c
+@@ -653,8 +653,13 @@ GLboolean
+ _glapi_add_entrypoint(const char *funcName, GLuint offset)
+ {
+    /* trivial rejection test */
++#ifdef MANGLE
++   if (!funcName || funcName[0] != 'm' || funcName[1] != 'g' || funcName[2] != 'l')
++      return NULL;
++#else
+    if (!funcName || funcName[0] != 'g' || funcName[1] != 'l')
+       return GL_FALSE;
++#endif
+ 
+    /* first check if the named function is already statically present */
+    {
+@@ -742,8 +747,13 @@ _glapi_get_proc_address(const char *funcName)
+ {
+    GLuint i;
+ 
++#ifdef MANGLE
++   if (funcName[0] != 'm' || funcName[1] != 'g' || funcName[2] != 'l')
++      return NULL;
++#else
+    if (funcName[0] != 'g' || funcName[1] != 'l')
+       return NULL;
++#endif
+ 
+    /* search extension functions first */
+    for (i = 0; i < NumExtEntryPoints; i++) {
+diff --git a/src/mesa/main/api_arrayelt.c b/src/mesa/main/api_arrayelt.c
+index 8aa8da6..cb49f43 100644
+--- a/src/mesa/main/api_arrayelt.c
++++ b/src/mesa/main/api_arrayelt.c
+@@ -60,9 +60,9 @@ typedef struct {
+ /*
+  * Convert GL_BYTE, GL_UNSIGNED_BYTE, .. GL_DOUBLE into an integer
+  * in the range [0, 7].  Luckily these type tokens are sequentially
+- * numbered in gl.h
++ * numbered in gl.h, except for GL_DOUBLE.
+  */
+-#define TYPE_IDX(t) ((t) & 0xf)
++#define TYPE_IDX(t) ( (t) == GL_DOUBLE ? 7 : (t) & 7 )
+ 
+ 
+ static array_func colorfuncs[2][8] = {
+diff --git a/src/mesa/main/arbparse.c b/src/mesa/main/arbparse.c
+index c776a57..79702f9 100644
+--- a/src/mesa/main/arbparse.c
++++ b/src/mesa/main/arbparse.c
+@@ -1,6 +1,6 @@
+ /*
+  * Mesa 3-D graphics library
+- * Version:  6.0
++ * Version:  6.0.2
+  *
+  * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+@@ -2856,7 +2856,7 @@ parse_string_without_adding (GLubyte ** inst, struct arb_program *Program)
+ }
+ 
+ /**
+- * \return 0 if sign is plus, 1 if sign is minus
++ * \return -1 if we parse '-', return 1 otherwise
+  */
+ static GLuint
+ parse_sign (GLubyte ** inst)
+@@ -2865,14 +2865,14 @@ parse_sign (GLubyte ** inst)
+ 
+    if (**inst == '-') {
+       (*inst)++;
+-      return 1;
++      return -1;
+    }
+    else if (**inst == '+') {
+       (*inst)++;
+-      return 0;
++      return 1;
+    }
+ 
+-   return 0;
++   return 1;
+ }
+ 
+ /**
+@@ -2905,10 +2905,7 @@ parse_integer (GLubyte ** inst, struct arb_program *Program)
+     */
+    Program->Position = parse_position (inst);
+ 
+-   if (sign)
+-      value *= -1;
+-
+-   return value;
++   return value * sign;
+ }
+ 
+ /**
+@@ -2920,9 +2917,6 @@ parse_float (GLubyte ** inst, struct arb_program *Program)
+    GLuint leading_zeros =0;
+    GLfloat value = 0;
+ 
+-#if 0
+-   tmp[0] = parse_sign (inst);  /* This is the sign of the number + - >0, - -> 1 */
+-#endif
+    tmp[1] = parse_integer (inst, Program);   /* This is the integer portion of the number */
+ 
+    /* Now we grab the fractional portion of the number (the digits after 
+@@ -2944,10 +2938,6 @@ parse_float (GLubyte ** inst, struct arb_program *Program)
+       denom *= 10;
+    denom *= (GLint) _mesa_pow( 10, leading_zeros );
+    value += (GLfloat) tmp[2] / (GLfloat) denom;
+-#if 0
+-   if (tmp[0])
+-      value *= -1;
+-#endif
+    value *= (GLfloat) _mesa_pow (10, (GLfloat) tmp[3] * (GLfloat) tmp[4]);
+ 
+    return value;
+@@ -2959,17 +2949,9 @@ parse_float (GLubyte ** inst, struct arb_program *Program)
+ static GLfloat
+ parse_signed_float (GLubyte ** inst, struct arb_program *Program)
+ {
+-   GLint negate;
+-   GLfloat value;
+-
+-   negate = parse_sign (inst);
+-
+-   value = parse_float (inst, Program);
+-
+-   if (negate)
+-      value *= -1;
+-
+-   return value;
++   GLint sign = parse_sign (inst);
++   GLfloat value = parse_float (inst, Program);
++   return value * sign;
+ }
+ 
+ /**
+@@ -4637,7 +4619,7 @@ parse_extended_swizzle_mask (GLubyte ** inst, GLubyte * mask, GLboolean * Negate
+ 
+    *Negate = GL_FALSE;
+    for (a = 0; a < 4; a++) {
+-      if (parse_sign (inst))
++      if (parse_sign (inst) == -1)
+          *Negate = GL_TRUE;
+ 
+       swz = *(*inst)++;
+@@ -4847,7 +4829,7 @@ parse_vector_src_reg (GLcontext * ctx, GLubyte ** inst,
+                       GLubyte * Swizzle, GLboolean *IsRelOffset)
+ {
+    /* Grab the sign */
+-   *Negate = parse_sign (inst);
++   *Negate = (parse_sign (inst) == -1);
+ 
+    /* And the src reg */
+    if (parse_src_reg (ctx, inst, vc_head, Program, File, Index, IsRelOffset))
+@@ -4868,7 +4850,7 @@ parse_scalar_src_reg (GLcontext * ctx, GLubyte ** inst,
+                       GLubyte * Swizzle, GLboolean *IsRelOffset)
+ {
+    /* Grab the sign */
+-   *Negate = parse_sign (inst);
++   *Negate = (parse_sign (inst) == -1);
+ 
+    /* And the src reg */
+    if (parse_src_reg (ctx, inst, vc_head, Program, File, Index, IsRelOffset))
+diff --git a/src/mesa/main/context.c b/src/mesa/main/context.c
+index e554f75..0bc1381 100644
+--- a/src/mesa/main/context.c
++++ b/src/mesa/main/context.c
+@@ -6,9 +6,9 @@
+ 
+ /*
+  * Mesa 3-D graphics library
+- * Version:  5.1
++ * Version:  6.0.2
+  *
+- * Copyright (C) 1999-2002  Brian Paul   All Rights Reserved.
++ * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a
+  * copy of this software and associated documentation files (the "Software"),
+@@ -893,8 +893,10 @@ alloc_shared_state( GLcontext *ctx )
+    if (ss->DefaultFragmentProgram)
+       _mesa_delete_program(ctx, ss->DefaultFragmentProgram);
+ #endif
++#if FEATURE_ARB_vertex_buffer_object
+    if (ss->BufferObjects)
+       _mesa_DeleteHashTable(ss->BufferObjects);
++#endif
+ 
+    if (ss->Default1D)
+       (*ctx->Driver.DeleteTexture)(ctx, ss->Default1D);
+@@ -940,6 +942,13 @@ free_shared_state( GLcontext *ctx, struct gl_shared_state *ss )
+ 
+    /* Free texture objects */
+    ASSERT(ctx->Driver.DeleteTexture);
++   /* the default textures */
++   (*ctx->Driver.DeleteTexture)(ctx, ss->Default1D);
++   (*ctx->Driver.DeleteTexture)(ctx, ss->Default2D);
++   (*ctx->Driver.DeleteTexture)(ctx, ss->Default3D);
++   (*ctx->Driver.DeleteTexture)(ctx, ss->DefaultCubeMap);
++   (*ctx->Driver.DeleteTexture)(ctx, ss->DefaultRect);
++   /* all other textures */
+    while (1) {
+       GLuint texName = _mesa_HashFirstEntry(ss->TexObjects);
+       if (texName) {
+@@ -972,9 +981,16 @@ free_shared_state( GLcontext *ctx, struct gl_shared_state *ss )
+    }
+    _mesa_DeleteHashTable(ss->Programs);
+ #endif
++#if FEATURE_ARB_vertex_program
++   _mesa_delete_program(ctx, ss->DefaultVertexProgram);
++#endif
++#if FEATURE_ARB_fragment_program
++   _mesa_delete_program(ctx, ss->DefaultFragmentProgram);
++#endif
+ 
++#if FEATURE_ARB_vertex_buffer_object
+    _mesa_DeleteHashTable(ss->BufferObjects);
+-
++#endif
+    _glthread_DESTROY_MUTEX(ss->Mutex);
+ 
+    FREE(ss);
+@@ -1499,19 +1515,11 @@ _mesa_free_context_data( GLcontext *ctx )
+    _mesa_free_matrix_data( ctx );
+    _mesa_free_viewport_data( ctx );
+    _mesa_free_colortables_data( ctx );
+-#if FEATURE_NV_vertex_program
+-   if (ctx->VertexProgram.Current) {
+-      ctx->VertexProgram.Current->Base.RefCount--;
+-      if (ctx->VertexProgram.Current->Base.RefCount <= 0)
+-         _mesa_delete_program(ctx, &(ctx->VertexProgram.Current->Base));
+-   }
+-#endif
+-#if FEATURE_NV_fragment_program
+-   if (ctx->FragmentProgram.Current) {
+-      ctx->FragmentProgram.Current->Base.RefCount--;
+-      if (ctx->FragmentProgram.Current->Base.RefCount <= 0)
+-         _mesa_delete_program(ctx, &(ctx->FragmentProgram.Current->Base));
+-   }
++   _mesa_free_program_data( ctx );
++   _mesa_free_occlude_data(ctx);
++
++#if FEATURE_ARB_vertex_buffer_object
++   _mesa_delete_buffer_object(ctx, ctx->Array.NullBufferObj);
+ #endif
+ 
+    /* Shared context state (display lists, textures, etc) */
+diff --git a/src/mesa/main/depth.c b/src/mesa/main/depth.c
+index eb8c8b8..f758fc5 100644
+--- a/src/mesa/main/depth.c
++++ b/src/mesa/main/depth.c
+@@ -1,8 +1,8 @@
+ /*
+  * Mesa 3-D graphics library
+- * Version:  5.1
++ * Version:  6.0.2
+  *
+- * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
++ * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a
+  * copy of this software and associated documentation files (the "Software"),
+@@ -177,10 +177,4 @@ void _mesa_init_depth( GLcontext * ctx )
+       ctx->DepthMaxF = (GLfloat) ctx->DepthMax;
+    }
+    ctx->MRD = 1.0;  /* Minimum resolvable depth value, for polygon offset */
+-
+-#if FEATURE_ARB_occlusion_query
+-   ctx->Occlusion.QueryObjects = _mesa_NewHashTable();
+-#endif
+-   ctx->OcclusionResult = GL_FALSE;
+-   ctx->OcclusionResultSaved = GL_FALSE;
+ }
+diff --git a/src/mesa/main/dlist.c b/src/mesa/main/dlist.c
+index 3fe3007..3fd5877 100644
+--- a/src/mesa/main/dlist.c
++++ b/src/mesa/main/dlist.c
+@@ -1,11 +1,6 @@
+-/**
+- * \file dlist.c
+- * Display lists management functions.
+- */
+-
+ /*
+  * Mesa 3-D graphics library
+- * Version:  6.0
++ * Version:  6.0.2
+  *
+  * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+@@ -28,6 +23,11 @@
+  */
+ 
+ 
++/**
++ * \file dlist.c
++ * Display lists management functions.
++ */
++
+ #include "glheader.h"
+ #include "imports.h"
+ #include "api_arrayelt.h"
+@@ -65,6 +65,7 @@
+ #include "dlist.h"
+ #include "macros.h"
+ #include "matrix.h"
++#include "occlude.h"
+ #include "pixel.h"
+ #include "points.h"
+ #include "polygon.h"
+@@ -309,7 +310,9 @@ typedef enum {
+         /* GL_ARB_vertex/fragment_program */
+         OPCODE_PROGRAM_STRING_ARB,
+         OPCODE_PROGRAM_ENV_PARAMETER_ARB,
+-
++        /* GL_ARB_occlusion_query */
++        OPCODE_BEGIN_QUERY_ARB,
++        OPCODE_END_QUERY_ARB,
+ 
+ 	/* Vertex attributes -- fallback for when optimized display
+ 	 * list build isn't active.
+@@ -770,6 +773,10 @@ void _mesa_init_lists( void )
+       InstSize[OPCODE_PROGRAM_STRING_ARB] = 5;
+       InstSize[OPCODE_PROGRAM_ENV_PARAMETER_ARB] = 7;
+ #endif
++#if FEATURE_ARB_occlusion_query
++      InstSize[OPCODE_BEGIN_QUERY_ARB] = 3;
++      InstSize[OPCODE_END_QUERY_ARB] = 2;
++#endif
+       InstSize[OPCODE_ATTR_1F] = 3;
+       InstSize[OPCODE_ATTR_2F] = 4;
+       InstSize[OPCODE_ATTR_3F] = 5;
+@@ -3200,10 +3207,16 @@ static void GLAPIENTRY save_TexEnvfv( GLenum target, GLenum pname, const GLfloat
+    if (n) {
+       n[1].e = target;
+       n[2].e = pname;
+-      n[3].f = params[0];
+-      n[4].f = params[1];
+-      n[5].f = params[2];
+-      n[6].f = params[3];
++      if (pname == GL_TEXTURE_ENV_COLOR) {
++         n[3].f = params[0];
++         n[4].f = params[1];
++         n[5].f = params[2];
++         n[6].f = params[3];
++      }
++      else {
++         n[3].f = params[0];
++         n[4].f = n[5].f = n[6].f = 0.0F;
++      }
+    }
+    if (ctx->ExecuteFlag) {
+       (*ctx->Exec->TexEnvfv)( target, pname, params );
+@@ -3229,10 +3242,16 @@ static void GLAPIENTRY save_TexEnvi( GLenum target, GLenum pname, GLint param )
+ static void GLAPIENTRY save_TexEnviv( GLenum target, GLenum pname, const GLint *param )
+ {
+    GLfloat p[4];
+-   p[0] = INT_TO_FLOAT( param[0] );
+-   p[1] = INT_TO_FLOAT( param[1] );
+-   p[2] = INT_TO_FLOAT( param[2] );
+-   p[3] = INT_TO_FLOAT( param[3] );
++   if (pname == GL_TEXTURE_ENV_COLOR) {
++      p[0] = INT_TO_FLOAT( param[0] );
++      p[1] = INT_TO_FLOAT( param[1] );
++      p[2] = INT_TO_FLOAT( param[2] );
++      p[3] = INT_TO_FLOAT( param[3] );
++   }
++   else {
++      p[0] = (GLfloat) param[0];
++      p[1] = p[2] = p[3] = 0.0F;
++   }
+    save_TexEnvfv( target, pname, p );
+ }
+ 
+@@ -4587,6 +4606,42 @@ save_ProgramEnvParameter4dvARB(GLenum target, GLuint index,
+ #endif /* FEATURE_ARB_vertex_program || FEATURE_ARB_fragment_program */
+ 
+ 
++#ifdef FEATURE_ARB_occlusion_query
++
++static void GLAPIENTRY
++save_BeginQueryARB(GLenum target, GLuint id)
++{
++   GET_CURRENT_CONTEXT(ctx);
++   Node *n;
++   ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
++   n = ALLOC_INSTRUCTION( ctx, OPCODE_BEGIN_QUERY_ARB, 2 );
++   if (n) {
++      n[1].e = target;
++      n[2].ui = id;
++   }
++   if (ctx->ExecuteFlag) {
++      (*ctx->Exec->BeginQueryARB)( target, id );
++   }
++}
++
++
++static void GLAPIENTRY
++save_EndQueryARB(GLenum target)
++{
++   GET_CURRENT_CONTEXT(ctx);
++   Node *n;
++   ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
++   n = ALLOC_INSTRUCTION( ctx, OPCODE_END_QUERY_ARB, 1 );
++   if (n) {
++      n[1].e = target;
++   }
++   if (ctx->ExecuteFlag) {
++      (*ctx->Exec->EndQueryARB)( target );
++   }
++}
++
++#endif /* FEATURE_ARB_occlusion_query */
++
+ 
+ 
+ static void save_Attr1f( GLenum attr, GLfloat x )
+@@ -5095,7 +5150,7 @@ static void GLAPIENTRY save_MultiTexCoord4fv( GLenum target, const GLfloat *v )
+ }
+ 
+ 
+-static void enum_error() 
++static void enum_error( void ) 
+ {
+    GET_CURRENT_CONTEXT( ctx );
+    _mesa_error( ctx, GL_INVALID_ENUM, "VertexAttribfNV" );
+@@ -5935,7 +5990,14 @@ execute_list( GLcontext *ctx, GLuint list )
+                                                    n[4].f, n[5].f, n[6].f);
+             break;
+ #endif
+-
++#if FEATURE_ARB_occlusion_query
++         case OPCODE_BEGIN_QUERY_ARB:
++            ctx->Exec->BeginQueryARB(n[1].e, n[2].ui);
++            break;
++         case OPCODE_END_QUERY_ARB:
++            ctx->Exec->EndQueryARB(n[1].e);
++            break;
++#endif
+ 	 case OPCODE_ATTR_1F:
+ 	    (*ctx->Exec->VertexAttrib1fNV)(n[1].e, n[2].f);
+ 	    break;
+@@ -7491,6 +7553,17 @@ _mesa_init_dlist_table( struct _glapi_table *table, GLuint tableSize )
+    table->MapBufferARB = _mesa_MapBufferARB;
+    table->UnmapBufferARB = _mesa_UnmapBufferARB;
+ #endif
++
++#if FEATURE_ARB_occlusion_query
++   table->BeginQueryARB = save_BeginQueryARB;
++   table->EndQueryARB = save_EndQueryARB;
++   table->GenQueriesARB = _mesa_GenQueriesARB;
++   table->DeleteQueriesARB = _mesa_DeleteQueriesARB;
++   table->IsQueryARB = _mesa_IsQueryARB;
++   table->GetQueryivARB = _mesa_GetQueryivARB;
++   table->GetQueryObjectivARB = _mesa_GetQueryObjectivARB;
++   table->GetQueryObjectuivARB = _mesa_GetQueryObjectuivARB;
++#endif
+ }
+ 
+ 
+diff --git a/src/mesa/main/extensions.c b/src/mesa/main/extensions.c
+index 1e9ce3e..d6959e2 100644
+--- a/src/mesa/main/extensions.c
++++ b/src/mesa/main/extensions.c
+@@ -1,6 +1,6 @@
+ /*
+  * Mesa 3-D graphics library
+- * Version:  6.0.1
++ * Version:  6.0.2
+  *
+  * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+@@ -159,7 +159,7 @@ _mesa_enable_sw_extensions(GLcontext *ctx)
+ {
+    ctx->Extensions.ARB_depth_texture = GL_TRUE;
+ #if FEATURE_ARB_fragment_program
+-   /*ctx->Extensions.ARB_fragment_program = GL_TRUE;*/
++   ctx->Extensions.ARB_fragment_program = GL_TRUE;
+ #endif
+    ctx->Extensions.ARB_imaging = GL_TRUE;
+    ctx->Extensions.ARB_multitexture = GL_TRUE;
+@@ -176,7 +176,7 @@ _mesa_enable_sw_extensions(GLcontext *ctx)
+    ctx->Extensions.ARB_texture_mirrored_repeat = GL_TRUE;
+    ctx->Extensions.ARB_texture_non_power_of_two = GL_TRUE;
+ #if FEATURE_ARB_vertex_program
+-   /*ctx->Extensions.ARB_vertex_program = GL_TRUE;*/
++   ctx->Extensions.ARB_vertex_program = GL_TRUE;
+ #endif
+ #if FEATURE_ARB_vertex_buffer_object
+    ctx->Extensions.ARB_vertex_buffer_object = GL_TRUE;
+@@ -284,11 +284,9 @@ void
+ _mesa_enable_1_4_extensions(GLcontext *ctx)
+ {
+    ctx->Extensions.ARB_depth_texture = GL_TRUE;
+-   ctx->Extensions.ARB_fragment_program = GL_TRUE;
+    ctx->Extensions.ARB_shadow = GL_TRUE;
+    ctx->Extensions.ARB_texture_env_crossbar = GL_TRUE;
+    ctx->Extensions.ARB_texture_mirrored_repeat = GL_TRUE;
+-   ctx->Extensions.ARB_vertex_program = GL_TRUE;
+    ctx->Extensions.ARB_window_pos = GL_TRUE;
+    ctx->Extensions.EXT_blend_color = GL_TRUE;
+    ctx->Extensions.EXT_blend_func_separate = GL_TRUE;
+diff --git a/src/mesa/main/image.c b/src/mesa/main/image.c
+index 648ad8f..4a6e095 100644
+--- a/src/mesa/main/image.c
++++ b/src/mesa/main/image.c
+@@ -5,9 +5,9 @@
+ 
+ /*
+  * Mesa 3-D graphics library
+- * Version:  5.1
++ * Version:  6.0.2
+  *
+- * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
++ * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a
+  * copy of this software and associated documentation files (the "Software"),
+@@ -394,7 +394,6 @@ _mesa_is_legal_format_and_type( GLenum format, GLenum type )
+                return GL_FALSE;
+          }
+       case GL_RGB:
+-      case GL_BGR:
+          switch (type) {
+             case GL_BYTE:
+             case GL_UNSIGNED_BYTE:
+@@ -412,6 +411,20 @@ _mesa_is_legal_format_and_type( GLenum format, GLenum type )
+             default:
+                return GL_FALSE;
+          }
++      case GL_BGR:
++         switch (type) {
++            case GL_BYTE:
++            case GL_UNSIGNED_BYTE:
++            case GL_SHORT:
++            case GL_UNSIGNED_SHORT:
++            case GL_INT:
++            case GL_UNSIGNED_INT:
++            case GL_FLOAT:
++            case GL_HALF_FLOAT_NV:
++               return GL_TRUE;
++            default:
++               return GL_FALSE;
++         }
+       case GL_RGBA:
+       case GL_BGRA:
+       case GL_ABGR_EXT:
+@@ -2274,6 +2287,10 @@ extract_float_rgba(GLuint n, GLfloat rgba[][4],
+          greenIndex = 1;
+          blueIndex = 2;
+          alphaIndex = -1;
++         rComp = 0;
++         gComp = 1;
++         bComp = 2;
++         aComp = 3;
+          stride = 3;
+          break;
+       case GL_BGR:
+@@ -2281,6 +2298,10 @@ extract_float_rgba(GLuint n, GLfloat rgba[][4],
+          greenIndex = 1;
+          blueIndex = 0;
+          alphaIndex = -1;
++         rComp = 2;
++         gComp = 1;
++         bComp = 0;
++         aComp = 3;
+          stride = 3;
+          break;
+       case GL_RGBA:
+@@ -2408,10 +2429,10 @@ extract_float_rgba(GLuint n, GLfloat rgba[][4],
+             GLuint i;
+             for (i = 0; i < n; i ++) {
+                GLubyte p = ubsrc[i];
+-               rgba[i][RCOMP] = ((p >> 5)      ) * (1.0F / 7.0F);
+-               rgba[i][GCOMP] = ((p >> 2) & 0x7) * (1.0F / 7.0F);
+-               rgba[i][BCOMP] = ((p     ) & 0x3) * (1.0F / 3.0F);
+-               rgba[i][ACOMP] = 1.0F;
++               rgba[i][rComp] = ((p >> 5)      ) * (1.0F / 7.0F);
++               rgba[i][gComp] = ((p >> 2) & 0x7) * (1.0F / 7.0F);
++               rgba[i][bComp] = ((p     ) & 0x3) * (1.0F / 3.0F);
++               rgba[i][aComp] = 1.0F;
+             }
+          }
+          break;
+@@ -2421,10 +2442,10 @@ extract_float_rgba(GLuint n, GLfloat rgba[][4],
+             GLuint i;
+             for (i = 0; i < n; i ++) {
+                GLubyte p = ubsrc[i];
+-               rgba[i][RCOMP] = ((p     ) & 0x7) * (1.0F / 7.0F);
+-               rgba[i][GCOMP] = ((p >> 3) & 0x7) * (1.0F / 7.0F);
+-               rgba[i][BCOMP] = ((p >> 6)      ) * (1.0F / 3.0F);
+-               rgba[i][ACOMP] = 1.0F;
++               rgba[i][rComp] = ((p     ) & 0x7) * (1.0F / 7.0F);
++               rgba[i][gComp] = ((p >> 3) & 0x7) * (1.0F / 7.0F);
++               rgba[i][bComp] = ((p >> 6)      ) * (1.0F / 3.0F);
++               rgba[i][aComp] = 1.0F;
+             }
+          }
+          break;
+@@ -2435,10 +2456,10 @@ extract_float_rgba(GLuint n, GLfloat rgba[][4],
+             for (i = 0; i < n; i ++) {
+                GLushort p = ussrc[i];
+                SWAP2BYTE(p);
+-               rgba[i][RCOMP] = ((p >> 11)       ) * (1.0F / 31.0F);
+-               rgba[i][GCOMP] = ((p >>  5) & 0x3f) * (1.0F / 63.0F);
+-               rgba[i][BCOMP] = ((p      ) & 0x1f) * (1.0F / 31.0F);
+-               rgba[i][ACOMP] = 1.0F;
++               rgba[i][rComp] = ((p >> 11)       ) * (1.0F / 31.0F);
++               rgba[i][gComp] = ((p >>  5) & 0x3f) * (1.0F / 63.0F);
++               rgba[i][bComp] = ((p      ) & 0x1f) * (1.0F / 31.0F);
++               rgba[i][aComp] = 1.0F;
+             }
+          }
+          else {
+@@ -2446,10 +2467,10 @@ extract_float_rgba(GLuint n, GLfloat rgba[][4],
+             GLuint i;
+             for (i = 0; i < n; i ++) {
+                GLushort p = ussrc[i];
+-               rgba[i][RCOMP] = ((p >> 11)       ) * (1.0F / 31.0F);
+-               rgba[i][GCOMP] = ((p >>  5) & 0x3f) * (1.0F / 63.0F);
+-               rgba[i][BCOMP] = ((p      ) & 0x1f) * (1.0F / 31.0F);
+-               rgba[i][ACOMP] = 1.0F;
++               rgba[i][rComp] = ((p >> 11)       ) * (1.0F / 31.0F);
++               rgba[i][gComp] = ((p >>  5) & 0x3f) * (1.0F / 63.0F);
++               rgba[i][bComp] = ((p      ) & 0x1f) * (1.0F / 31.0F);
++               rgba[i][aComp] = 1.0F;
+             }
+          }
+          break;
+@@ -2460,10 +2481,10 @@ extract_float_rgba(GLuint n, GLfloat rgba[][4],
+             for (i = 0; i < n; i ++) {
+                GLushort p = ussrc[i];
+                SWAP2BYTE(p);
+-               rgba[i][RCOMP] = ((p      ) & 0x1f) * (1.0F / 31.0F);
+-               rgba[i][GCOMP] = ((p >>  5) & 0x3f) * (1.0F / 63.0F);
+-               rgba[i][BCOMP] = ((p >> 11)       ) * (1.0F / 31.0F);
+-               rgba[i][ACOMP] = 1.0F;
++               rgba[i][rComp] = ((p      ) & 0x1f) * (1.0F / 31.0F);
++               rgba[i][gComp] = ((p >>  5) & 0x3f) * (1.0F / 63.0F);
++               rgba[i][bComp] = ((p >> 11)       ) * (1.0F / 31.0F);
++               rgba[i][aComp] = 1.0F;
+             }
+          }
+          else {
+@@ -2471,10 +2492,10 @@ extract_float_rgba(GLuint n, GLfloat rgba[][4],
+             GLuint i;
+             for (i = 0; i < n; i ++) {
+                GLushort p = ussrc[i];
+-               rgba[i][RCOMP] = ((p      ) & 0x1f) * (1.0F / 31.0F);
+-               rgba[i][GCOMP] = ((p >>  5) & 0x3f) * (1.0F / 63.0F);
+-               rgba[i][BCOMP] = ((p >> 11)       ) * (1.0F / 31.0F);
+-               rgba[i][ACOMP] = 1.0F;
++               rgba[i][rComp] = ((p      ) & 0x1f) * (1.0F / 31.0F);
++               rgba[i][gComp] = ((p >>  5) & 0x3f) * (1.0F / 63.0F);
++               rgba[i][bComp] = ((p >> 11)       ) * (1.0F / 31.0F);
++               rgba[i][aComp] = 1.0F;
+             }
+          }
+          break;
+diff --git a/src/mesa/main/imports.h b/src/mesa/main/imports.h
+index 5cdac06..2a37c2f 100644
+--- a/src/mesa/main/imports.h
++++ b/src/mesa/main/imports.h
+@@ -8,7 +8,7 @@
+ 
+ /*
+  * Mesa 3-D graphics library
+- * Version:  6.0
++ * Version:  6.0.2
+  *
+  * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+@@ -223,7 +223,9 @@ extern void _ext_mesa_free_pixelbuffer( void *pb );
+  ***/
+ #if defined(__i386__) || defined(__386__) || defined(__sparc__) || \
+     defined(__s390x__) || defined(__powerpc__) || \
+-    ( defined(__alpha__) && ( defined(__IEEE_FLOAT) || !defined(VMS) ) )
++    defined(__AMD64__) || defined(__amd64__) || \
++    defined(ia64) || defined(__ia64__) || \
++    (defined(__alpha__) && (defined(__IEEE_FLOAT) || !defined(VMS)))
+ #define USE_IEEE
+ #define IEEE_ONE 0x3f800000
+ #endif
+@@ -307,7 +309,7 @@ static INLINE int IS_INF_OR_NAN( float x )
+ #define IS_INF_OR_NAN(x)        (!isfinite(x))
+ #elif defined(finite)
+ #define IS_INF_OR_NAN(x)        (!finite(x))
+-#elif __VMS
++#elif defined(__VMS)
+ #define IS_INF_OR_NAN(x)        (!finite(x))
+ #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+ #define IS_INF_OR_NAN(x)        (!isfinite(x))
+diff --git a/src/mesa/main/nvvertexec.c b/src/mesa/main/nvvertexec.c
+index 9663b38..7c654fb 100644
+--- a/src/mesa/main/nvvertexec.c
++++ b/src/mesa/main/nvvertexec.c
+@@ -1,6 +1,6 @@
+ /*
+  * Mesa 3-D graphics library
+- * Version:  6.0.1
++ * Version:  6.0.2
+  *
+  * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+@@ -68,15 +68,8 @@ _mesa_init_vp_registers(GLcontext *ctx)
+     * here - Karl
+     */
+    if (ctx->VertexProgram.Current->Parameters) {
+-      /* Grab the state */			  
++      /* Grab the state GL state and put into registers */
+       _mesa_load_state_parameters(ctx, ctx->VertexProgram.Current->Parameters);
+-
+-      /* And copy it into the program state */
+-      for (i=0; i<ctx->VertexProgram.Current->Parameters->NumParameters; i++) {
+-         MEMCPY(ctx->VertexProgram.Parameters[i], 
+-                &ctx->VertexProgram.Current->Parameters->Parameters[i].Values,
+-                4*sizeof(GLfloat));				
+-      }				  
+    }
+ }
+ 
+@@ -238,25 +231,31 @@ get_register_pointer( const struct vp_src_register *source,
+         (source->File == PROGRAM_STATE_VAR) );
+       if (reg < 0 || reg > MAX_NV_VERTEX_PROGRAM_PARAMS)
+          return zeroVec;
+-      else
++      else if (source->File == PROGRAM_ENV_PARAM)
+          return state->Parameters[reg];
++      else
++         return state->Current->Parameters->Parameters[reg].Values;
+    }
+    else {
+       switch (source->File) {
+          case PROGRAM_TEMPORARY:
++            ASSERT(source->Index < MAX_NV_VERTEX_PROGRAM_TEMPS);
+             return state->Temporaries[source->Index];
+          case PROGRAM_INPUT:
++            ASSERT(source->Index < MAX_NV_VERTEX_PROGRAM_INPUTS);
+             return state->Inputs[source->Index];
+          case PROGRAM_LOCAL_PARAM:
+-            /* XXX fix */
+-            return state->Temporaries[source->Index]; 
++            ASSERT(source->Index < MAX_PROGRAM_LOCAL_PARAMS);
++            return state->Current->Base.LocalParams[source->Index];
+          case PROGRAM_ENV_PARAM:
++            ASSERT(source->Index < MAX_NV_VERTEX_PROGRAM_PARAMS);
+             return state->Parameters[source->Index];
+          case PROGRAM_STATE_VAR:
+-            return state->Parameters[source->Index];
++            ASSERT(source->Index < state->Current->Parameters->NumParameters);
++            return state->Current->Parameters->Parameters[source->Index].Values;
+          default:
+             _mesa_problem(NULL,
+-                          "Bad source register file in fetch_vector4(vp)");
++                          "Bad source register file in get_register_pointer");
+             return NULL;
+       }
+    }
+diff --git a/src/mesa/main/occlude.c b/src/mesa/main/occlude.c
+index d329f11..bc61a47 100644
+--- a/src/mesa/main/occlude.c
++++ b/src/mesa/main/occlude.c
+@@ -1,6 +1,6 @@
+ /*
+  * Mesa 3-D graphics library
+- * Version:  6.1
++ * Version:  6.0.2
+  *
+  * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+@@ -45,20 +45,6 @@ struct occlusion_query
+ };
+ 
+ 
+-
+-void
+-_mesa_init_occlude(GLcontext *ctx)
+-{
+-#if FEATURE_ARB_occlusion_query
+-   ctx->Occlusion.QueryObjects = _mesa_NewHashTable();
+-#endif
+-
+-   ctx->OcclusionResult = GL_FALSE;
+-   ctx->OcclusionResultSaved = GL_FALSE;
+-}
+-
+-
+-
+ /**
+  * Allocate a new occlusion query object.
+  * \param target - must be GL_SAMPLES_PASSED_ARB at this time
+@@ -327,3 +313,41 @@ _mesa_GetQueryObjectuivARB(GLuint id, GLenum pname, GLuint *params)
+          return;
+    }
+ }
++
++
++
++/**
++ * Allocate/init the context state related to occlusion query objects.
++ */
++void
++_mesa_init_occlude(GLcontext *ctx)
++{
++#if FEATURE_ARB_occlusion_query
++   ctx->Occlusion.QueryObjects = _mesa_NewHashTable();
++#endif
++   ctx->OcclusionResult = GL_FALSE;
++   ctx->OcclusionResultSaved = GL_FALSE;
++}
++
++
++/**
++ * Free the context state related to occlusion query objects.
++ */
++void
++_mesa_free_occlude_data(GLcontext *ctx)
++{
++   while (1) {
++      GLuint query = _mesa_HashFirstEntry(ctx->Occlusion.QueryObjects);
++      if (query) {
++         struct occlusion_query *q = (struct occlusion_query *)
++            _mesa_HashLookup(ctx->Occlusion.QueryObjects, query);
++         ASSERT(q);
++         delete_query_object(q);
++         _mesa_HashRemove(ctx->Occlusion.QueryObjects, query);
++      }
++      else {
++         break;
++      }
++   }
++   _mesa_DeleteHashTable(ctx->Occlusion.QueryObjects);
++}
+diff --git a/src/mesa/main/occlude.h b/src/mesa/main/occlude.h
+index 5696463..acf1910 100644
+--- a/src/mesa/main/occlude.h
++++ b/src/mesa/main/occlude.h
+@@ -1,8 +1,8 @@
+ /*
+  * Mesa 3-D graphics library
+- * Version:  5.1
++ * Version:  6.0.2
+  *
+- * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
++ * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a
+  * copy of this software and associated documentation files (the "Software"),
+@@ -30,6 +30,9 @@
+ extern void
+ _mesa_init_occlude(GLcontext *ctx);
+ 
++extern void
++_mesa_free_occlude_data(GLcontext *ctx);
++
+ extern void GLAPIENTRY
+ _mesa_GenQueriesARB(GLsizei n, GLuint *ids);
+ 
+diff --git a/src/mesa/main/program.c b/src/mesa/main/program.c
+index 22b687a..1e3f365 100644
+--- a/src/mesa/main/program.c
++++ b/src/mesa/main/program.c
+@@ -1,6 +1,6 @@
+ /*
+  * Mesa 3-D graphics library
+- * Version:  6.0
++ * Version:  6.0.2
+  *
+  * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+@@ -47,7 +47,7 @@
+ 
+ 
+ /**
+- * Init context's program state
++ * Init context's vertex/fragment program state
+  */
+ void
+ _mesa_init_program(GLcontext *ctx)
+@@ -81,6 +81,37 @@ _mesa_init_program(GLcontext *ctx)
+ 
+ 
+ /**
++ * Free a context's vertex/fragment program state
++ */
++void
++_mesa_free_program_data(GLcontext *ctx)
++{
++#if FEATURE_NV_vertex_program
++   if (ctx->VertexProgram.Current) {
++      ctx->VertexProgram.Current->Base.RefCount--;
++      if (ctx->VertexProgram.Current->Base.RefCount <= 0) {
++         _mesa_HashRemove(ctx->Shared->Programs,
++                          ctx->VertexProgram.Current->Base.Id);
++         _mesa_delete_program(ctx, &(ctx->VertexProgram.Current->Base));
++      }
++   }
++#endif
++#if FEATURE_NV_fragment_program
++   if (ctx->FragmentProgram.Current) {
++      ctx->FragmentProgram.Current->Base.RefCount--;
++      if (ctx->FragmentProgram.Current->Base.RefCount <= 0) {
++         _mesa_HashRemove(ctx->Shared->Programs,
++                          ctx->FragmentProgram.Current->Base.Id);
++         _mesa_delete_program(ctx, &(ctx->FragmentProgram.Current->Base));
++      }
++   }
++#endif
++   _mesa_free((void *) ctx->Program.ErrorString);
++}
++
++
++
++/**
+  * Set the vertex/fragment program error state (position and error string).
+  * This is generally called from within the parsers.
+  */
+@@ -180,8 +211,8 @@ _mesa_alloc_program(GLcontext *ctx, GLenum target, GLuint id)
+ 
+ 
+ /**
+- * Delete a program and remove it from the hash table, ignoring the
+- * reference count.
++ * Delete a program, ignoring the reference count.
++ * Don't remove it from the hash table, the caller should do that.
+  */
+ void
+ _mesa_delete_program(GLcontext *ctx, struct program *prog)
+@@ -195,15 +226,16 @@ _mesa_delete_program(GLcontext *ctx, struct program *prog)
+       struct vertex_program *vprog = (struct vertex_program *) prog;
+       if (vprog->Instructions)
+          _mesa_free(vprog->Instructions);
++      if (vprog->Parameters)
++         _mesa_free_parameter_list(vprog->Parameters);
+    }
+    else if (prog->Target == GL_FRAGMENT_PROGRAM_NV ||
+             prog->Target == GL_FRAGMENT_PROGRAM_ARB) {
+       struct fragment_program *fprog = (struct fragment_program *) prog;
+       if (fprog->Instructions)
+          _mesa_free(fprog->Instructions);
+-      if (fprog->Parameters) {
++      if (fprog->Parameters)
+          _mesa_free_parameter_list(fprog->Parameters);
+-      }
+    }
+    _mesa_free(prog);
+ }
+@@ -948,6 +980,8 @@ _mesa_DeletePrograms(GLsizei n, const GLuint *ids)
+             if (prog->RefCount <= 0) {
+                _mesa_delete_program(ctx, prog);
+             }
++            /* always remove from hash table */
++            _mesa_HashRemove(ctx->Shared->Programs, ids[i]);
+          }
+       }
+    }
+diff --git a/src/mesa/main/program.h b/src/mesa/main/program.h
+index 3c2aa1c..53cd418 100644
+--- a/src/mesa/main/program.h
++++ b/src/mesa/main/program.h
+@@ -48,6 +48,9 @@ extern void
+ _mesa_init_program(GLcontext *ctx);
+ 
+ extern void
++_mesa_free_program_data(GLcontext *ctx);
++
++extern void
+ _mesa_set_program_error(GLcontext *ctx, GLint pos, const char *string);
+ 
+ extern const GLubyte *
+diff --git a/src/mesa/main/teximage.c b/src/mesa/main/teximage.c
+index c47d9dc..e3597d2 100644
+--- a/src/mesa/main/teximage.c
++++ b/src/mesa/main/teximage.c
+@@ -1,6 +1,6 @@
+ /*
+  * Mesa 3-D graphics library
+- * Version:  6.0.1
++ * Version:  6.0.2
+  *
+  * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+@@ -334,6 +334,7 @@ is_color_format(GLenum format)
+       case GL_INTENSITY16:
+       case 3:
+       case GL_RGB:
++      case GL_BGR:
+       case GL_R3_G3_B2:
+       case GL_RGB4:
+       case GL_RGB5:
+@@ -343,6 +344,7 @@ is_color_format(GLenum format)
+       case GL_RGB16:
+       case 4:
+       case GL_RGBA:
++      case GL_BGRA:
+       case GL_RGBA2:
+       case GL_RGBA4:
+       case GL_RGB5_A1:
+@@ -380,6 +382,39 @@ is_index_format(GLenum format)
+ 
+ 
+ /**
++ * Test if the given internal texture format is a depth component format.
++ */
++static GLboolean
++is_depth_format(GLenum internalFormat)
++{
++   switch (internalFormat) {
++      case GL_DEPTH_COMPONENT16_ARB:
++      case GL_DEPTH_COMPONENT24_ARB:
++      case GL_DEPTH_COMPONENT32_ARB:
++      case GL_DEPTH_COMPONENT:
++         return GL_TRUE;
++      default:
++         return GL_FALSE;
++   }
++}
++
++
++/**
++ * Test if the given internal texture format is a YCbCr format.
++ */
++static GLboolean
++is_ycbcr_format(GLenum internalFormat)
++{
++   switch (internalFormat) {
++      case GL_YCBCR_MESA:
++         return GL_TRUE;
++      default:
++         return GL_FALSE;
++   }
++}
++
++
++/**
+  * Test if it is a supported compressed format.
+  * 
+  * \param internalFormat the internal format token provided by the user.
+@@ -1240,16 +1275,25 @@ texture_error_check( GLcontext *ctx, GLenum target,
+       return GL_TRUE;
+    }
+ 
+-   if (format == GL_YCBCR_MESA || internalFormat == GL_YCBCR_MESA) {
++   /* make sure internal format and format basically agree */
++   if ((is_color_format(internalFormat) != is_color_format(format)) ||
++       (is_index_format(internalFormat) != is_index_format(format)) ||
++       (is_depth_format(internalFormat) != is_depth_format(format)) ||
++       (is_ycbcr_format(internalFormat) != is_ycbcr_format(format))) {
++      if (!isProxy)
++         _mesa_error(ctx, GL_INVALID_OPERATION,
++                     "glTexImage(internalFormat/format)");
++      return GL_TRUE;
++   }
++
++   /* additional checks for ycbcr textures */
++   if (internalFormat == GL_YCBCR_MESA) {
+       ASSERT(ctx->Extensions.MESA_ycbcr_texture);
+-      if (format != GL_YCBCR_MESA ||
+-          internalFormat != GL_YCBCR_MESA ||
+-          (type != GL_UNSIGNED_SHORT_8_8_MESA &&
+-          type != GL_UNSIGNED_SHORT_8_8_REV_MESA)) {
++      if (type != GL_UNSIGNED_SHORT_8_8_MESA &&
++          type != GL_UNSIGNED_SHORT_8_8_REV_MESA) {
+          char message[100];
+          _mesa_sprintf(message,
+-                 "glTexImage%d(format/type/internalFormat YCBCR mismatch",
+-                 dimensions);
++                 "glTexImage%d(format/type YCBCR mismatch", dimensions);
+          _mesa_error(ctx, GL_INVALID_ENUM, message);
+          return GL_TRUE; /* error */
+       }
+@@ -1273,6 +1317,21 @@ texture_error_check( GLcontext *ctx, GLenum target,
+       }
+    }
+ 
++   /* additional checks for depth textures */
++   if (_mesa_base_tex_format(ctx, internalFormat) == GL_DEPTH_COMPONENT) {
++      /* Only 1D and 2D textures supported */
++      if (target != GL_TEXTURE_1D &&
++          target != GL_PROXY_TEXTURE_1D &&
++          target != GL_TEXTURE_2D &&
++          target != GL_PROXY_TEXTURE_2D) {
++         if (!isProxy)
++            _mesa_error(ctx, GL_INVALID_ENUM,
++                        "glTexImage(target/internalFormat)");
++         return GL_TRUE;
++      }
++   }
++
++   /* additional checks for compressed textures */
+    if (is_compressed_format(ctx, internalFormat)) {
+       if (target == GL_TEXTURE_2D || target == GL_PROXY_TEXTURE_2D) {
+          /* OK */
+diff --git a/src/mesa/main/texstate.c b/src/mesa/main/texstate.c
+index d604ba7..fd6e0c2 100644
+--- a/src/mesa/main/texstate.c
++++ b/src/mesa/main/texstate.c
+@@ -1,8 +1,8 @@
+ /*
+  * Mesa 3-D graphics library
+- * Version:  5.1
++ * Version:  6.0.2
+  *
+- * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
++ * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a
+  * copy of this software and associated documentation files (the "Software"),
+@@ -1768,7 +1768,7 @@ _mesa_GetTexParameterfv( GLenum target, GLenum pname, GLfloat *params )
+       case GL_TEXTURE_LOD_BIAS:
+          if (ctx->Extensions.EXT_texture_lod_bias) {
+             *params = obj->LodBias;
+-            break;
++            return;
+          }
+          break;
+       default:
+@@ -1797,12 +1797,6 @@ _mesa_GetTexParameteriv( GLenum target, GLenum pname, GLint *params )
+    switch (pname) {
+       case GL_TEXTURE_MAG_FILTER:
+          *params = (GLint) obj->MagFilter;
+-      case GL_TEXTURE_LOD_BIAS:
+-         if (ctx->Extensions.EXT_texture_lod_bias) {
+-            *params = (GLint) obj->LodBias;
+-            break;
+-         }
+-         break;
+          return;
+       case GL_TEXTURE_MIN_FILTER:
+          *params = (GLint) obj->MinFilter;
+@@ -1902,6 +1896,12 @@ _mesa_GetTexParameteriv( GLenum target, GLenum pname, GLint *params )
+             return;
+          }
+          break;
++      case GL_TEXTURE_LOD_BIAS:
++         if (ctx->Extensions.EXT_texture_lod_bias) {
++            *params = (GLint) obj->LodBias;
++            return;
++         }
++         break;
+       default:
+          ; /* silence warnings */
+    }
+diff --git a/src/mesa/main/texstore.c b/src/mesa/main/texstore.c
+index 899201e..11b281f 100644
+--- a/src/mesa/main/texstore.c
++++ b/src/mesa/main/texstore.c
+@@ -1602,9 +1602,7 @@ make_2d_mipmap(const struct gl_texture_format *format, GLint border,
+    const GLint dstRowStride = bpt * dstWidth;
+    const GLubyte *srcA, *srcB;
+    GLubyte *dst;
+-   GLint row, colStride;
+-
+-   colStride = (srcWidth == dstWidth) ? 1 : 2;
++   GLint row;
+ 
+    /* Compute src and dst pointers, skipping any border */
+    srcA = srcPtr + border * ((srcWidth + 1) * bpt);
+diff --git a/src/mesa/main/version.h b/src/mesa/main/version.h
+index 655ca63..7092a9c 100644
+--- a/src/mesa/main/version.h
++++ b/src/mesa/main/version.h
+@@ -1,6 +1,6 @@
+ /*
+  * Mesa 3-D graphics library
+- * Version:  6.0.1
++ * Version:  6.0.2
+  *
+  * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+@@ -30,8 +30,8 @@
+ /* Mesa version */
+ #define MESA_MAJOR 6
+ #define MESA_MINOR 0
+-#define MESA_PATCH 1
+-#define MESA_VERSION_STRING "6.0.1"
++#define MESA_PATCH 2
++#define MESA_VERSION_STRING "6.0.2"
+ 
+ /* To make version comparison easy */
+ #define MESA_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
+diff --git a/src/mesa/math/m_debug_clip.c b/src/mesa/math/m_debug_clip.c
+index 867850c..ae8108b 100644
+--- a/src/mesa/math/m_debug_clip.c
++++ b/src/mesa/math/m_debug_clip.c
+@@ -1,9 +1,8 @@
+-
+ /*
+  * Mesa 3-D graphics library
+- * Version:  5.0
++ * Version:  6.1
+  *
+- * Copyright (C) 1999-2001  Brian Paul   All Rights Reserved.
++ * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a
+  * copy of this software and associated documentation files (the "Software"),
+@@ -37,6 +36,11 @@
+ #include "m_debug.h"
+ #include "m_debug_util.h"
+ 
++#ifdef __UNIXOS2__
++/* The linker doesn't like empty files */
++static char dummy;
++#endif
++
+ #ifdef DEBUG  /* This code only used for debugging */
+ 
+ static clip_func *clip_tab[2] = {
+@@ -189,9 +193,10 @@ static clip_func ref_cliptest[5] = {
+  * Cliptest tests
+  */
+ 
+-static GLfloat s[TEST_COUNT][4] ALIGN16;
+-static GLfloat d[TEST_COUNT][4] ALIGN16;
+-static GLfloat r[TEST_COUNT][4] ALIGN16;
++ALIGN16(static GLfloat, s[TEST_COUNT][4]);
++ALIGN16(static GLfloat, d[TEST_COUNT][4]);
++ALIGN16(static GLfloat, r[TEST_COUNT][4]);
++
+ 
+ static int test_cliptest_function( clip_func func, int np,
+ 				   int psize, long *cycles )
+diff --git a/src/mesa/math/m_debug_norm.c b/src/mesa/math/m_debug_norm.c
+index 4eac6f6..e403998 100644
+--- a/src/mesa/math/m_debug_norm.c
++++ b/src/mesa/math/m_debug_norm.c
+@@ -38,6 +38,11 @@
+ #include "m_debug_util.h"
+ 
+ 
++#ifdef __UNIXOS2__
++/* The linker doesn't like empty files */
++static char dummy;
++#endif
++
+ #ifdef DEBUG  /* This code only used for debugging */
+ 
+ 
+diff --git a/src/mesa/math/m_debug_util.h b/src/mesa/math/m_debug_util.h
+index 9df8430..c07cdcf 100644
+--- a/src/mesa/math/m_debug_util.h
++++ b/src/mesa/math/m_debug_util.h
+@@ -1,9 +1,8 @@
+-
+ /*
+  * Mesa 3-D graphics library
+- * Version:  3.5
++ * Version:  6.1
+  *
+- * Copyright (C) 1999-2001  Brian Paul   All Rights Reserved.
++ * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a
+  * copy of this software and associated documentation files (the "Software"),
+@@ -265,11 +264,13 @@ enum { NIL = 0, ONE = 1, NEG = -1, VAR = 2 };
+ /* Ensure our arrays are correctly aligned.
+  */
+ #if defined(__GNUC__)
+-#  define ALIGN16	__attribute__ ((aligned (16)))
++#  define ALIGN16(type, array)	type array __attribute__ ((aligned (16)))
+ #elif defined(__MSC__)
+-#  define ALIGN16	__declspec(align(16)) /* GH: Does this work? */
++#  define ALIGN16(type, array)	type array __declspec(align(16)) /* GH: Does this work? */
+ #elif defined(__WATCOMC__)
+-#  define ALIGN16	                    /* Watcom does not support this */ 
++#  define ALIGN16(type, array)	                    /* Watcom does not support this */ 
++#elif defined(__xlC__)
++#  define ALIGN16(type, array)       type __align (16) array 
+ #else
+ #  warning "ALIGN16 will not 16-byte align!\n"
+ #  define ALIGN16
+diff --git a/src/mesa/math/m_debug_xform.c b/src/mesa/math/m_debug_xform.c
+index e173d14..b634527 100644
+--- a/src/mesa/math/m_debug_xform.c
++++ b/src/mesa/math/m_debug_xform.c
+@@ -1,9 +1,8 @@
+-
+ /*
+  * Mesa 3-D graphics library
+- * Version:  3.5
++ * Version:  6.1
+  *
+- * Copyright (C) 1999-2001  Brian Paul   All Rights Reserved.
++ * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a
+  * copy of this software and associated documentation files (the "Software"),
+@@ -38,6 +37,11 @@
+ #include "m_debug.h"
+ #include "m_debug_util.h"
+ 
++#ifdef __UNIXOS2__
++/* The linker doesn't like empty files */
++static char dummy;
++#endif
++
+ #ifdef DEBUG  /* This code only used for debugging */
+ 
+ 
+@@ -157,9 +161,9 @@ static void init_matrix( GLfloat *m )
+    m[3] = 11.0; m[7] = 23.0; m[11] = 91.0; m[15] =  9.0;
+ }
+ 
+-static GLfloat s[TEST_COUNT][4] ALIGN16;
+-static GLfloat d[TEST_COUNT][4] ALIGN16;
+-static GLfloat r[TEST_COUNT][4] ALIGN16;
++ALIGN16(static GLfloat, s[TEST_COUNT][4]);
++ALIGN16(static GLfloat, d[TEST_COUNT][4]);
++ALIGN16(static GLfloat, r[TEST_COUNT][4]);
+ 
+ static int test_transform_function( transform_func func, int psize,
+ 				    int mtype, long *cycles )
+diff --git a/src/mesa/math/m_xform.c b/src/mesa/math/m_xform.c
+index 8bb5e62..c1d543b 100644
+--- a/src/mesa/math/m_xform.c
++++ b/src/mesa/math/m_xform.c
+@@ -185,7 +185,7 @@ void _mesa_transform_point_sz( GLfloat Q[4], const GLfloat M[16],
+ /*
+  * This is called only once.  It initializes several tables with pointers
+  * to optimized transformation functions.  This is where we can test for
+- * AMD 3Dnow! capability, Intel Katmai, etc. and hook in the right code.
++ * AMD 3Dnow! capability, Intel SSE, etc. and hook in the right code.
+  */
+ void
+ _math_init_transformation( void )
+diff --git a/src/mesa/swrast/s_context.c b/src/mesa/swrast/s_context.c
+index c69d4cf..a43b678 100644
+--- a/src/mesa/swrast/s_context.c
++++ b/src/mesa/swrast/s_context.c
+@@ -1,8 +1,8 @@
+ /*
+  * Mesa 3-D graphics library
+- * Version:  5.1
++ * Version:  6.0.2
+  *
+- * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
++ * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a
+  * copy of this software and associated documentation files (the "Software"),
+@@ -302,7 +302,7 @@ _swrast_validate_texture_sample( GLcontext *ctx, GLuint texUnit,
+    _swrast_validate_derived( ctx );
+ 
+    /* Compute min/mag filter threshold */
+-   if (tObj->MinFilter != tObj->MagFilter) {
++   if (tObj && tObj->MinFilter != tObj->MagFilter) {
+       if (tObj->MagFilter == GL_LINEAR
+           && (tObj->MinFilter == GL_NEAREST_MIPMAP_NEAREST ||
+               tObj->MinFilter == GL_NEAREST_MIPMAP_LINEAR)) {
+diff --git a/src/mesa/swrast/s_drawpix.c b/src/mesa/swrast/s_drawpix.c
+index 5d4093f..7e1c1d7 100644
+--- a/src/mesa/swrast/s_drawpix.c
++++ b/src/mesa/swrast/s_drawpix.c
+@@ -1,8 +1,8 @@
+ /*
+  * Mesa 3-D graphics library
+- * Version:  5.1
++ * Version:  6.0.2
+  *
+- * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
++ * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a
+  * copy of this software and associated documentation files (the "Software"),
+@@ -93,10 +93,11 @@ _swrast_clip_pixelrect(const GLcontext *ctx,
+ static GLboolean
+ fast_draw_pixels(GLcontext *ctx, GLint x, GLint y,
+                  GLsizei width, GLsizei height,
+-                 GLenum format, GLenum type, const GLvoid *pixels)
++                 GLenum format, GLenum type,
++                 const struct gl_pixelstore_attrib *unpack,
++                 const GLvoid *pixels)
+ {
+    SWcontext *swrast = SWRAST_CONTEXT(ctx);
+-   const struct gl_pixelstore_attrib *unpack = &ctx->Unpack;
+    struct sw_span span;
+ 
+    INIT_SPAN(span, GL_BITMAP, 0, 0, SPAN_RGBA);
+@@ -289,7 +290,7 @@ fast_draw_pixels(GLcontext *ctx, GLint x, GLint y,
+             if (ctx->Pixel.ZoomX==1.0F && ctx->Pixel.ZoomY==1.0F) {
+                /* no zooming */
+                GLint row;
+-               ASSERT(drawWidth < MAX_WIDTH);
++               ASSERT(drawWidth <= MAX_WIDTH);
+                for (row=0; row<drawHeight; row++) {
+                   GLint i;
+ 		  for (i=0;i<drawWidth;i++) {
+@@ -306,7 +307,7 @@ fast_draw_pixels(GLcontext *ctx, GLint x, GLint y,
+             else if (ctx->Pixel.ZoomX==1.0F && ctx->Pixel.ZoomY==-1.0F) {
+                /* upside-down */
+                GLint row;
+-               ASSERT(drawWidth < MAX_WIDTH);
++               ASSERT(drawWidth <= MAX_WIDTH);
+                for (row=0; row<drawHeight; row++) {
+                   GLint i;
+                   for (i=0;i<drawWidth;i++) {
+@@ -323,7 +324,7 @@ fast_draw_pixels(GLcontext *ctx, GLint x, GLint y,
+             else {
+                /* with zooming */
+                GLint row;
+-               ASSERT(drawWidth < MAX_WIDTH);
++               ASSERT(drawWidth <= MAX_WIDTH);
+                for (row=0; row<drawHeight; row++) {
+                   GLint i;
+ 		  for (i=0;i<drawWidth;i++) {
+@@ -351,7 +352,7 @@ fast_draw_pixels(GLcontext *ctx, GLint x, GLint y,
+             if (ctx->Pixel.ZoomX==1.0F && ctx->Pixel.ZoomY==1.0F) {
+                /* no zooming */
+                GLint row;
+-               ASSERT(drawWidth < MAX_WIDTH);
++               ASSERT(drawWidth <= MAX_WIDTH);
+                for (row=0; row<drawHeight; row++) {
+                   GLint i;
+                   GLchan *ptr = src;
+@@ -370,7 +371,7 @@ fast_draw_pixels(GLcontext *ctx, GLint x, GLint y,
+             else if (ctx->Pixel.ZoomX==1.0F && ctx->Pixel.ZoomY==-1.0F) {
+                /* upside-down */
+                GLint row;
+-               ASSERT(drawWidth < MAX_WIDTH);
++               ASSERT(drawWidth <= MAX_WIDTH);
+                for (row=0; row<drawHeight; row++) {
+                   GLint i;
+                   GLchan *ptr = src;
+@@ -389,7 +390,7 @@ fast_draw_pixels(GLcontext *ctx, GLint x, GLint y,
+             else {
+                /* with zooming */
+                GLint row;
+-               ASSERT(drawWidth < MAX_WIDTH);
++               ASSERT(drawWidth <= MAX_WIDTH);
+                for (row=0; row<drawHeight; row++) {
+                   GLchan *ptr = src;
+                   GLint i;
+@@ -419,7 +420,7 @@ fast_draw_pixels(GLcontext *ctx, GLint x, GLint y,
+                /* no zooming */
+                GLint row;
+                for (row=0; row<drawHeight; row++) {
+-                  ASSERT(drawWidth < MAX_WIDTH);
++                  ASSERT(drawWidth <= MAX_WIDTH);
+                   _mesa_map_ci8_to_rgba(ctx, drawWidth, src, span.array->rgba);
+                   (*swrast->Driver.WriteRGBASpan)(ctx, drawWidth, destX, destY,
+                                  (const GLchan (*)[4]) span.array->rgba, NULL);
+@@ -432,7 +433,7 @@ fast_draw_pixels(GLcontext *ctx, GLint x, GLint y,
+                /* upside-down */
+                GLint row;
+                for (row=0; row<drawHeight; row++) {
+-                  ASSERT(drawWidth < MAX_WIDTH);
++                  ASSERT(drawWidth <= MAX_WIDTH);
+                   _mesa_map_ci8_to_rgba(ctx, drawWidth, src, span.array->rgba);
+                   destY--;
+                   (*swrast->Driver.WriteRGBASpan)(ctx, drawWidth, destX, destY,
+@@ -445,7 +446,7 @@ fast_draw_pixels(GLcontext *ctx, GLint x, GLint y,
+                /* with zooming */
+                GLint row;
+                for (row=0; row<drawHeight; row++) {
+-                  ASSERT(drawWidth < MAX_WIDTH);
++                  ASSERT(drawWidth <= MAX_WIDTH);
+                   _mesa_map_ci8_to_rgba(ctx, drawWidth, src, span.array->rgba);
+                   span.x = destX;
+                   span.y = destY;
+@@ -495,7 +496,9 @@ fast_draw_pixels(GLcontext *ctx, GLint x, GLint y,
+ static void
+ draw_index_pixels( GLcontext *ctx, GLint x, GLint y,
+                    GLsizei width, GLsizei height,
+-                   GLenum type, const GLvoid *pixels )
++                   GLenum type,
++                   const struct gl_pixelstore_attrib *unpack,
++                   const GLvoid *pixels )
+ {
+    const GLboolean zoom = ctx->Pixel.ZoomX!=1.0 || ctx->Pixel.ZoomY!=1.0;
+    GLint row, skipPixels;
+@@ -519,12 +522,12 @@ draw_index_pixels( GLcontext *ctx, GLint x, GLint y,
+                           ? MAX_WIDTH : (width - skipPixels);
+       ASSERT(spanEnd <= MAX_WIDTH);
+       for (row = 0; row < height; row++, span.y++) {
+-         const GLvoid *source = _mesa_image_address(&ctx->Unpack, pixels,
++         const GLvoid *source = _mesa_image_address(unpack, pixels,
+                                                     width, height,
+                                                     GL_COLOR_INDEX, type,
+                                                     0, row, skipPixels);
+          _mesa_unpack_index_span(ctx, span.end, GL_UNSIGNED_INT,
+-                                 span.array->index, type, source, &ctx->Unpack,
++                                 span.array->index, type, source, unpack,
+                                  ctx->_ImageTransferState);
+ 
+          /* These may get changed during writing/clipping */
+@@ -549,7 +552,9 @@ draw_index_pixels( GLcontext *ctx, GLint x, GLint y,
+ static void
+ draw_stencil_pixels( GLcontext *ctx, GLint x, GLint y,
+                      GLsizei width, GLsizei height,
+-                     GLenum type, const GLvoid *pixels )
++                     GLenum type,
++                     const struct gl_pixelstore_attrib *unpack,
++                     const GLvoid *pixels )
+ {
+    const GLboolean zoom = ctx->Pixel.ZoomX!=1.0 || ctx->Pixel.ZoomY!=1.0;
+    const GLint desty = y;
+@@ -584,12 +589,12 @@ draw_stencil_pixels( GLcontext *ctx, GLint x, GLint y,
+          GLstencil values[MAX_WIDTH];
+          GLenum destType = (sizeof(GLstencil) == sizeof(GLubyte))
+                          ? GL_UNSIGNED_BYTE : GL_UNSIGNED_SHORT;
+-         const GLvoid *source = _mesa_image_address(&ctx->Unpack, pixels,
++         const GLvoid *source = _mesa_image_address(unpack, pixels,
+                                                     width, height,
+                                                     GL_COLOR_INDEX, type,
+                                                     0, row, skipPixels);
+          _mesa_unpack_index_span(ctx, spanWidth, destType, values,
+-                                 type, source, &ctx->Unpack,
++                                 type, source, unpack,
+                                  ctx->_ImageTransferState);
+          if (ctx->_ImageTransferState & IMAGE_SHIFT_OFFSET_BIT) {
+             _mesa_shift_and_offset_stencil(ctx, spanWidth, values);
+@@ -618,7 +623,9 @@ draw_stencil_pixels( GLcontext *ctx, GLint x, GLint y,
+ static void
+ draw_depth_pixels( GLcontext *ctx, GLint x, GLint y,
+                    GLsizei width, GLsizei height,
+-                   GLenum type, const GLvoid *pixels )
++                   GLenum type,
++                   const struct gl_pixelstore_attrib *unpack,
++                   const GLvoid *pixels )
+ {
+    const GLboolean bias_or_scale = ctx->Pixel.DepthBias!=0.0 || ctx->Pixel.DepthScale!=1.0;
+    const GLboolean zoom = ctx->Pixel.ZoomX != 1.0 || ctx->Pixel.ZoomY != 1.0;
+@@ -645,37 +652,51 @@ draw_depth_pixels( GLcontext *ctx, GLint x, GLint y,
+    if (ctx->Texture._EnabledCoordUnits)
+       _swrast_span_default_texcoords(ctx, &span);
+ 
+-   if (type == GL_UNSIGNED_SHORT && ctx->Visual.depthBits == 16
+-       && !bias_or_scale && !zoom && ctx->Visual.rgbMode
+-       && width < MAX_WIDTH) {
++   if (type == GL_UNSIGNED_SHORT
++       && ctx->Visual.depthBits == 16
++       && !bias_or_scale
++       && !zoom
++       && ctx->Visual.rgbMode
++       && width <= MAX_WIDTH) {
+       /* Special case: directly write 16-bit depth values */
+       GLint row;
+       span.x = x;
+       span.y = y;
+       span.end = width;
+       for (row = 0; row < height; row++, span.y++) {
+-         const GLushort *zptr = (const GLushort *)
+-            _mesa_image_address(&ctx->Unpack, pixels, width, height,
++         const GLushort *zSrc = (const GLushort *)
++            _mesa_image_address(unpack, pixels, width, height,
+                                 GL_DEPTH_COMPONENT, type, 0, row, 0);
+          GLint i;
+          for (i = 0; i < width; i++)
+-            span.array->z[i] = zptr[i];
++            span.array->z[i] = zSrc[i];
+          _swrast_write_rgba_span(ctx, &span);
+       }
+    }
+-   else if (type == GL_UNSIGNED_INT && ctx->Visual.depthBits == 32
+-            && !bias_or_scale && !zoom && ctx->Visual.rgbMode
+-            && width < MAX_WIDTH) {
+-      /* Special case: directly write 32-bit depth values */
++   else if (type == GL_UNSIGNED_INT
++            && sizeof(GLdepth) == 4
++            && !bias_or_scale
++            && !zoom
++            && ctx->Visual.rgbMode
++            && width <= MAX_WIDTH) {
++      /* Special case: shift 32-bit values down to ctx->Visual.depthBits */
++      const GLint shift = 32 - ctx->Visual.depthBits;
+       GLint row;
+       span.x = x;
+       span.y = y;
+       span.end = width;
+       for (row = 0; row < height; row++, span.y++) {
+-         const GLuint *zptr = (const GLuint *)
+-            _mesa_image_address(&ctx->Unpack, pixels, width, height,
++         const GLuint *zSrc = (const GLuint *)
++            _mesa_image_address(unpack, pixels, width, height,
+                                 GL_DEPTH_COMPONENT, type, 0, row, 0);
+-         MEMCPY(span.array->z, zptr, width * sizeof(GLdepth));
++         if (shift == 0) {
++            MEMCPY(span.array->z, zSrc, width * sizeof(GLdepth));
++         }
++         else {
++            GLint col;
++            for (col = 0; col < width; col++)
++               span.array->z[col] = zSrc[col] >> shift;
++         }
+          _swrast_write_rgba_span(ctx, &span);
+       }
+    }
+@@ -692,10 +713,10 @@ draw_depth_pixels( GLcontext *ctx, GLint x, GLint y,
+          ASSERT(span.end <= MAX_WIDTH);
+          for (row = 0; row < height; row++, spanY++) {
+             GLfloat floatSpan[MAX_WIDTH];
+-            const GLvoid *src = _mesa_image_address(&ctx->Unpack,
+-                                                    pixels, width, height,
+-                                                    GL_DEPTH_COMPONENT, type,
+-                                                    0, row, skipPixels);
++            const GLvoid *zSrc = _mesa_image_address(unpack,
++                                                     pixels, width, height,
++                                                     GL_DEPTH_COMPONENT, type,
++                                                     0, row, skipPixels);
+ 
+             /* Set these for each row since the _swrast_write_* function may
+              * change them while clipping.
+@@ -705,13 +726,13 @@ draw_depth_pixels( GLcontext *ctx, GLint x, GLint y,
+             span.end = spanEnd;
+ 
+             _mesa_unpack_depth_span(ctx, span.end, floatSpan, type,
+-                                    src, &ctx->Unpack);
++                                    zSrc, unpack);
+             /* clamp depth values to [0,1] and convert from floats to ints */
+             {
+-               const GLfloat zs = ctx->DepthMaxF;
++               const GLfloat zScale = ctx->DepthMaxF;
+                GLuint i;
+                for (i = 0; i < span.end; i++) {
+-                  span.array->z[i] = (GLdepth) (floatSpan[i] * zs + 0.5F);
++                  span.array->z[i] = (GLdepth) (floatSpan[i] * zScale);
+                }
+             }
+             if (zoom) {
+@@ -737,10 +758,11 @@ draw_depth_pixels( GLcontext *ctx, GLint x, GLint y,
+ static void
+ draw_rgba_pixels( GLcontext *ctx, GLint x, GLint y,
+                   GLsizei width, GLsizei height,
+-                  GLenum format, GLenum type, const GLvoid *pixels )
++                  GLenum format, GLenum type,
++                  const struct gl_pixelstore_attrib *unpack,
++                  const GLvoid *pixels )
+ {
+    SWcontext *swrast = SWRAST_CONTEXT(ctx);
+-   const struct gl_pixelstore_attrib *unpack = &ctx->Unpack;
+    const GLboolean zoom = ctx->Pixel.ZoomX!=1.0 || ctx->Pixel.ZoomY!=1.0;
+    const GLint desty = y;
+    GLboolean quickDraw;
+@@ -756,7 +778,7 @@ draw_rgba_pixels( GLcontext *ctx, GLint x, GLint y,
+    }
+ 
+    /* Try an optimized glDrawPixels first */
+-   if (fast_draw_pixels(ctx, x, y, width, height, format, type, pixels))
++   if (fast_draw_pixels(ctx, x, y, width, height, format, type, unpack, pixels))
+       return;
+ 
+    if (ctx->Depth.Test)
+@@ -906,7 +928,6 @@ _swrast_DrawPixels( GLcontext *ctx,
+ 		    const GLvoid *pixels )
+ {
+    SWcontext *swrast = SWRAST_CONTEXT(ctx);
+-   (void) unpack;
+ 
+    if (swrast->NewState)
+       _swrast_validate_derived( ctx );
+@@ -915,16 +936,16 @@ _swrast_DrawPixels( GLcontext *ctx,
+ 
+    switch (format) {
+    case GL_STENCIL_INDEX:
+-      draw_stencil_pixels( ctx, x, y, width, height, type, pixels );
++      draw_stencil_pixels( ctx, x, y, width, height, type, unpack, pixels );
+       break;
+    case GL_DEPTH_COMPONENT:
+-      draw_depth_pixels( ctx, x, y, width, height, type, pixels );
++      draw_depth_pixels( ctx, x, y, width, height, type, unpack, pixels );
+       break;
+    case GL_COLOR_INDEX:
+       if (ctx->Visual.rgbMode)
+-	 draw_rgba_pixels(ctx, x,y, width, height, format, type, pixels);
++	 draw_rgba_pixels(ctx, x,y, width, height, format, type, unpack, pixels);
+       else
+-	 draw_index_pixels(ctx, x, y, width, height, type, pixels);
++	 draw_index_pixels(ctx, x, y, width, height, type, unpack, pixels);
+       break;
+    case GL_RED:
+    case GL_GREEN:
+@@ -937,7 +958,7 @@ _swrast_DrawPixels( GLcontext *ctx,
+    case GL_RGBA:
+    case GL_BGRA:
+    case GL_ABGR_EXT:
+-      draw_rgba_pixels(ctx, x, y, width, height, format, type, pixels);
++      draw_rgba_pixels(ctx, x, y, width, height, format, type, unpack, pixels);
+       break;
+    default:
+       _mesa_error( ctx, GL_INVALID_ENUM, "glDrawPixels(format)" );
+@@ -962,7 +983,6 @@ _swrast_DrawDepthPixelsMESA( GLcontext *ctx,
+                              const struct gl_pixelstore_attrib *unpack )
+ {
+    SWcontext *swrast = SWRAST_CONTEXT(ctx);
+-   (void) unpack;
+ 
+    if (swrast->NewState)
+       _swrast_validate_derived( ctx );
+@@ -972,9 +992,9 @@ _swrast_DrawDepthPixelsMESA( GLcontext *ctx,
+    switch (colorFormat) {
+    case GL_COLOR_INDEX:
+       if (ctx->Visual.rgbMode)
+-	 draw_rgba_pixels(ctx, x,y, width, height, colorFormat, colorType, colors);
++	 draw_rgba_pixels(ctx, x,y, width, height, colorFormat, colorType, unpack, colors);
+       else
+-	 draw_index_pixels(ctx, x, y, width, height, colorType, colors);
++	 draw_index_pixels(ctx, x, y, width, height, colorType, unpack, colors);
+       break;
+    case GL_RED:
+    case GL_GREEN:
+@@ -987,7 +1007,7 @@ _swrast_DrawDepthPixelsMESA( GLcontext *ctx,
+    case GL_RGBA:
+    case GL_BGRA:
+    case GL_ABGR_EXT:
+-      draw_rgba_pixels(ctx, x, y, width, height, colorFormat, colorType, colors);
++      draw_rgba_pixels(ctx, x, y, width, height, colorFormat, colorType, unpack, colors);
+       break;
+    default:
+       _mesa_error( ctx, GL_INVALID_ENUM,
+diff --git a/src/mesa/swrast/s_nvfragprog.c b/src/mesa/swrast/s_nvfragprog.c
+index 3124c89..f7aac44 100644
+--- a/src/mesa/swrast/s_nvfragprog.c
++++ b/src/mesa/swrast/s_nvfragprog.c
+@@ -1,6 +1,6 @@
+ /*
+  * Mesa 3-D graphics library
+- * Version:  6.0
++ * Version:  6.0.2
+  *
+  * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+@@ -390,6 +390,7 @@ store_vector4( const struct fp_instruction *inst,
+    const GLboolean clamp = inst->Saturate;
+    const GLboolean updateCC = inst->UpdateCondRegister;
+    GLfloat *dstReg;
++   GLfloat dummyReg[4];
+    GLfloat clampedValue[4];
+    const GLboolean *writeMask = dest->WriteMask;
+    GLboolean condWriteMask[4];
+@@ -401,6 +402,9 @@ store_vector4( const struct fp_instruction *inst,
+       case PROGRAM_TEMPORARY:
+          dstReg = machine->Temporaries[dest->Index];
+          break;
++      case PROGRAM_WRITE_ONLY:
++         dstReg = dummyReg;
++         return;
+       default:
+          _mesa_problem(NULL, "bad register file in store_vector4(fp)");
+          return;
+diff --git a/src/mesa/swrast/s_points.c b/src/mesa/swrast/s_points.c
+index 096f8aa..c92a795 100644
+--- a/src/mesa/swrast/s_points.c
++++ b/src/mesa/swrast/s_points.c
+@@ -144,12 +144,12 @@
+ /*
+  * Sprite (textured point)
+  */
+-#define FLAGS (RGBA | SPRITE)
++#define FLAGS (RGBA | SPRITE | SPECULAR)
+ #define NAME sprite_point
+ #include "s_pointtemp.h"
+ 
+ 
+-#define FLAGS (RGBA | ATTENUATE | SPRITE)
++#define FLAGS (RGBA | SPRITE | SPECULAR | ATTENUATE)
+ #define NAME atten_sprite_point
+ #include "s_pointtemp.h"
+ 
+diff --git a/src/mesa/swrast/s_span.c b/src/mesa/swrast/s_span.c
+index 118cec4..3b9a1c8 100644
+--- a/src/mesa/swrast/s_span.c
++++ b/src/mesa/swrast/s_span.c
+@@ -1,8 +1,8 @@
+ /*
+  * Mesa 3-D graphics library
+- * Version:  5.1
++ * Version:  6.0.2
+  *
+- * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
++ * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a
+  * copy of this software and associated documentation files (the "Software"),
+@@ -841,7 +841,9 @@ _swrast_write_index_span( GLcontext *ctx, struct sw_span *span)
+    }
+ 
+    /* if we get here, something passed the depth test */
+-   ctx->OcclusionResult = GL_TRUE;
++   if (ctx->Depth.OcclusionTest) {
++      ctx->OcclusionResult = GL_TRUE;
++   }
+ 
+ #if FEATURE_ARB_occlusion_query
+    if (ctx->Occlusion.Active) {
+@@ -1054,7 +1056,9 @@ _swrast_write_rgba_span( GLcontext *ctx, struct sw_span *span)
+    }
+ 
+    /* if we get here, something passed the depth test */
+-   ctx->OcclusionResult = GL_TRUE;
++   if (ctx->Depth.OcclusionTest) {
++      ctx->OcclusionResult = GL_TRUE;
++   }
+ 
+ #if FEATURE_ARB_occlusion_query
+    if (ctx->Occlusion.Active) {
+@@ -1304,7 +1308,9 @@ _swrast_write_texture_span( GLcontext *ctx, struct sw_span *span)
+    }
+ 
+    /* if we get here, some fragments passed the depth test */
+-   ctx->OcclusionResult = GL_TRUE;
++   if (ctx->Depth.OcclusionTest) {
++      ctx->OcclusionResult = GL_TRUE;
++   }
+ 
+ #if FEATURE_ARB_occlusion_query
+    if (ctx->Occlusion.Active) {
+diff --git a/src/mesa/swrast/s_stencil.c b/src/mesa/swrast/s_stencil.c
+index 73bddc3..d4386c4 100644
+--- a/src/mesa/swrast/s_stencil.c
++++ b/src/mesa/swrast/s_stencil.c
+@@ -1,9 +1,8 @@
+-
+ /*
+  * Mesa 3-D graphics library
+- * Version:  4.1
++ * Version:  6.0.2
+  *
+- * Copyright (C) 1999-2002  Brian Paul   All Rights Reserved.
++ * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a
+  * copy of this software and associated documentation files (the "Software"),
+@@ -1183,7 +1182,7 @@ clear_software_stencil_buffer( GLcontext *ctx )
+ #else
+             GLint i;
+             for (i = 0; i < width; i++)
+-               stencil[x] = ctx->Stencil.Clear;
++               stencil[i] = ctx->Stencil.Clear;
+ #endif
+          }
+       }
+diff --git a/src/mesa/swrast/s_texture.c b/src/mesa/swrast/s_texture.c
+index 2342179..1f7e691 100644
+--- a/src/mesa/swrast/s_texture.c
++++ b/src/mesa/swrast/s_texture.c
+@@ -1,8 +1,8 @@
+ /*
+  * Mesa 3-D graphics library
+- * Version:  5.1
++ * Version:  6.0.2
+  *
+- * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
++ * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a
+  * copy of this software and associated documentation files (the "Software"),
+@@ -2969,8 +2969,8 @@ sample_depth_texture2(const GLcontext *ctx,
+ /**
+  * We use this function when a texture object is in an "incomplete" state.
+  * When a fragment program attempts to sample an incomplete texture we
+- * return black.
+- * Note: frag progs don't observe texture enable/disable flags.
++ * return black (see issue 23 in GL_ARB_fragment_program spec).
++ * Note: fragment programss don't observe the texture enable/disable flags.
+  */
+ static void
+ null_sample_func( GLcontext *ctx, GLuint texUnit,
+@@ -2978,16 +2978,21 @@ null_sample_func( GLcontext *ctx, GLuint texUnit,
+ 		  const GLfloat texcoords[][4], const GLfloat lambda[],
+ 		  GLchan rgba[][4])
+ {
++   GLuint i;
+    (void) ctx;
+    (void) texUnit;
+    (void) tObj;
+    (void) texcoords;
+    (void) lambda;
+-   _mesa_bzero(rgba, n * 4 * sizeof(GLchan));
++   for (i = 0; i < n; i++) {
++      rgba[i][RCOMP] = 0;
++      rgba[i][GCOMP] = 0;
++      rgba[i][BCOMP] = 0;
++      rgba[i][ACOMP] = CHAN_MAX;
++   }
+ }
+ 
+ 
+-
+ /**
+  * Setup the texture sampling function for this texture object.
+  */
+@@ -2995,101 +3000,102 @@ texture_sample_func
+ _swrast_choose_texture_sample_func( GLcontext *ctx,
+ 				    const struct gl_texture_object *t )
+ {
+-   const GLboolean needLambda = (GLboolean) (t->MinFilter != t->MagFilter);
+-   const GLenum format = t->Image[t->BaseLevel]->Format;
+-
+-   if (!t->Complete) {
++   if (!t || !t->Complete) {
+       return &null_sample_func;
+    }
+-
+-   switch (t->Target) {
+-   case GL_TEXTURE_1D:
+-      if (format == GL_DEPTH_COMPONENT) {
+-         return &sample_depth_texture;
+-      }
+-      else if (needLambda) {
+-         return &sample_lambda_1d;
+-      }
+-      else if (t->MinFilter == GL_LINEAR) {
+-         return &sample_linear_1d;
+-      }
+-      else {
+-         ASSERT(t->MinFilter == GL_NEAREST);
+-         return &sample_nearest_1d;
+-      }
+-      break;
+-   case GL_TEXTURE_2D:
+-      if (format == GL_DEPTH_COMPONENT) {
+-         return &sample_depth_texture;
+-      }
+-      else if (needLambda) {
+-         return &sample_lambda_2d;
+-      }
+-      else if (t->MinFilter == GL_LINEAR) {
+-         return &sample_linear_2d;
+-      }
+-      else {
+-         GLint baseLevel = t->BaseLevel;
+-         ASSERT(t->MinFilter == GL_NEAREST);
+-         if (t->WrapS == GL_REPEAT &&
+-             t->WrapT == GL_REPEAT &&
+-             t->_IsPowerOfTwo &&
+-             t->Image[baseLevel]->Border == 0 &&
+-             t->Image[baseLevel]->TexFormat->MesaFormat == MESA_FORMAT_RGB) {
+-            return &opt_sample_rgb_2d;
+-         }
+-         else if (t->WrapS == GL_REPEAT &&
+-                  t->WrapT == GL_REPEAT &&
+-                  t->_IsPowerOfTwo &&
+-                  t->Image[baseLevel]->Border == 0 &&
+-                  t->Image[baseLevel]->TexFormat->MesaFormat == MESA_FORMAT_RGBA) {
+-            return &opt_sample_rgba_2d;
+-         }
+-         else {
+-            return &sample_nearest_2d;
+-         }
+-      }
+-      break;
+-   case GL_TEXTURE_3D:
+-      if (needLambda) {
+-         return &sample_lambda_3d;
+-      }
+-      else if (t->MinFilter == GL_LINEAR) {
+-         return &sample_linear_3d;
+-      }
+-      else {
+-         ASSERT(t->MinFilter == GL_NEAREST);
+-         return &sample_nearest_3d;
+-      }
+-      break;
+-   case GL_TEXTURE_CUBE_MAP:
+-      if (needLambda) {
+-         return &sample_lambda_cube;
+-      }
+-      else if (t->MinFilter == GL_LINEAR) {
+-         return &sample_linear_cube;
+-      }
+-      else {
+-         ASSERT(t->MinFilter == GL_NEAREST);
+-         return &sample_nearest_cube;
+-      }
+-      break;
+-   case GL_TEXTURE_RECTANGLE_NV:
+-      if (needLambda) {
+-         return &sample_lambda_rect;
+-      }
+-      else if (t->MinFilter == GL_LINEAR) {
+-         return &sample_linear_rect;
+-      }
+-      else {
+-         ASSERT(t->MinFilter == GL_NEAREST);
+-         return &sample_nearest_rect;
+-      }
+-      break;
+-   default:
+-      _mesa_problem(ctx,
+-                    "invalid target in _swrast_choose_texture_sample_func");
+-      return &null_sample_func;
++   else {
++     const GLboolean needLambda = (GLboolean) (t->MinFilter != t->MagFilter);
++     const GLenum format = t->Image[t->BaseLevel]->Format;
++
++     switch (t->Target) {
++     case GL_TEXTURE_1D:
++        if (format == GL_DEPTH_COMPONENT) {
++           return &sample_depth_texture;
++        }
++        else if (needLambda) {
++           return &sample_lambda_1d;
++        }
++        else if (t->MinFilter == GL_LINEAR) {
++           return &sample_linear_1d;
++        }
++        else {
++           ASSERT(t->MinFilter == GL_NEAREST);
++           return &sample_nearest_1d;
++        }
++        break;
++     case GL_TEXTURE_2D:
++        if (format == GL_DEPTH_COMPONENT) {
++           return &sample_depth_texture;
++        }
++        else if (needLambda) {
++           return &sample_lambda_2d;
++        }
++        else if (t->MinFilter == GL_LINEAR) {
++           return &sample_linear_2d;
++        }
++        else {
++           GLint baseLevel = t->BaseLevel;
++           ASSERT(t->MinFilter == GL_NEAREST);
++           if (t->WrapS == GL_REPEAT &&
++               t->WrapT == GL_REPEAT &&
++               t->_IsPowerOfTwo &&
++               t->Image[baseLevel]->Border == 0 &&
++               t->Image[baseLevel]->TexFormat->MesaFormat == MESA_FORMAT_RGB) {
++              return &opt_sample_rgb_2d;
++           }
++           else if (t->WrapS == GL_REPEAT &&
++                    t->WrapT == GL_REPEAT &&
++                    t->_IsPowerOfTwo &&
++                    t->Image[baseLevel]->Border == 0 &&
++                    t->Image[baseLevel]->TexFormat->MesaFormat == MESA_FORMAT_RGBA) {
++              return &opt_sample_rgba_2d;
++           }
++           else {
++              return &sample_nearest_2d;
++           }
++        }
++        break;
++     case GL_TEXTURE_3D:
++        if (needLambda) {
++           return &sample_lambda_3d;
++        }
++        else if (t->MinFilter == GL_LINEAR) {
++           return &sample_linear_3d;
++        }
++        else {
++           ASSERT(t->MinFilter == GL_NEAREST);
++           return &sample_nearest_3d;
++        }
++        break;
++     case GL_TEXTURE_CUBE_MAP:
++        if (needLambda) {
++           return &sample_lambda_cube;
++        }
++        else if (t->MinFilter == GL_LINEAR) {
++           return &sample_linear_cube;
++        }
++        else {
++           ASSERT(t->MinFilter == GL_NEAREST);
++           return &sample_nearest_cube;
++        }
++        break;
++     case GL_TEXTURE_RECTANGLE_NV:
++        if (needLambda) {
++           return &sample_lambda_rect;
++        }
++        else if (t->MinFilter == GL_LINEAR) {
++           return &sample_linear_rect;
++        }
++        else {
++           ASSERT(t->MinFilter == GL_NEAREST);
++           return &sample_nearest_rect;
++        }
++        break;
++     default:
++        _mesa_problem(ctx,
++                      "invalid target in _swrast_choose_texture_sample_func");
++        return &null_sample_func;
++     }
+    }
+ }
+ 
+diff --git a/src/mesa/swrast/s_triangle.c b/src/mesa/swrast/s_triangle.c
+index 02adcf8..18b7c35 100644
+--- a/src/mesa/swrast/s_triangle.c
++++ b/src/mesa/swrast/s_triangle.c
+@@ -1,8 +1,8 @@
+ /*
+  * Mesa 3-D graphics library
+- * Version:  5.1
++ * Version:  6.0.2
+  *
+- * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
++ * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a
+  * copy of this software and associated documentation files (the "Software"),
+@@ -101,7 +101,6 @@ GLboolean _swrast_culltriangle( GLcontext *ctx,
+ #define NAME flat_rgba_triangle
+ #define INTERP_Z 1
+ #define INTERP_FOG 1
+-#define DEPTH_TYPE DEFAULT_SOFTWARE_DEPTH_TYPE
+ #define SETUP_CODE				\
+    ASSERT(ctx->Texture._EnabledCoordUnits == 0);\
+    ASSERT(ctx->Light.ShadeModel==GL_FLAT);	\
+@@ -125,7 +124,6 @@ GLboolean _swrast_culltriangle( GLcontext *ctx,
+ #define NAME smooth_rgba_triangle
+ #define INTERP_Z 1
+ #define INTERP_FOG 1
+-#define DEPTH_TYPE DEFAULT_SOFTWARE_DEPTH_TYPE
+ #define INTERP_RGB 1
+ #define INTERP_ALPHA 1
+ #define SETUP_CODE				\
+@@ -191,6 +189,7 @@ GLboolean _swrast_culltriangle( GLcontext *ctx,
+  * Render an RGB, GL_DECAL, textured triangle.
+  * Interpolate S,T, GL_LESS depth test, w/out mipmapping or
+  * perspective correction.
++ * Depth buffer bits must be <= sizeof(DEFAULT_SOFTWARE_DEPTH_TYPE)
+  *
+  * No fog.
+  */
+@@ -526,7 +525,6 @@ affine_span(GLcontext *ctx, struct sw_span *span,
+ #define NAME affine_textured_triangle
+ #define INTERP_Z 1
+ #define INTERP_FOG 1
+-#define DEPTH_TYPE DEFAULT_SOFTWARE_DEPTH_TYPE
+ #define INTERP_RGB 1
+ #define INTERP_ALPHA 1
+ #define INTERP_INT_TEX 1
+@@ -798,7 +796,6 @@ fast_persp_span(GLcontext *ctx, struct sw_span *span,
+ #define NAME persp_textured_triangle
+ #define INTERP_Z 1
+ #define INTERP_FOG 1
+-#define DEPTH_TYPE DEFAULT_SOFTWARE_DEPTH_TYPE
+ #define INTERP_RGB 1
+ #define INTERP_ALPHA 1
+ #define INTERP_TEX 1
+@@ -870,7 +867,6 @@ fast_persp_span(GLcontext *ctx, struct sw_span *span,
+ #define INTERP_Z 1
+ #define INTERP_W 1
+ #define INTERP_FOG 1
+-#define DEPTH_TYPE DEFAULT_SOFTWARE_DEPTH_TYPE
+ #define INTERP_RGB 1
+ #define INTERP_SPEC 1
+ #define INTERP_ALPHA 1
+@@ -889,7 +885,6 @@ fast_persp_span(GLcontext *ctx, struct sw_span *span,
+ #define INTERP_Z 1
+ #define INTERP_W 1
+ #define INTERP_FOG 1
+-#define DEPTH_TYPE DEFAULT_SOFTWARE_DEPTH_TYPE
+ #define INTERP_RGB 1
+ #define INTERP_ALPHA 1
+ #define INTERP_SPEC 1
+@@ -903,22 +898,39 @@ fast_persp_span(GLcontext *ctx, struct sw_span *span,
+  * Special tri function for occlusion testing
+  */
+ #define NAME occlusion_zless_triangle
+-#define DO_OCCLUSION_TEST
+ #define INTERP_Z 1
+-#define DEPTH_TYPE DEFAULT_SOFTWARE_DEPTH_TYPE
+ #define SETUP_CODE						\
++   ASSERT(ctx->Depth.Test);					\
++   ASSERT(!ctx->Depth.Mask);					\
++   ASSERT(ctx->Depth.Func == GL_LESS);				\
+    if (ctx->OcclusionResult && !ctx->Occlusion.Active) {	\
+       return;							\
+    }
+-#define RENDER_SPAN( span )				\
+-   GLuint i;						\
+-   for (i = 0; i < span.end; i++) {			\
+-      GLdepth z = FixedToDepth(span.z);			\
+-      if (z < zRow[i]) {				\
+-         ctx->OcclusionResult = GL_TRUE;		\
+-         ctx->Occlusion.PassedCounter++;		\
+-      }							\
+-      span.z += span.zStep;				\
++#define RENDER_SPAN( span )						\
++   if (ctx->Visual.depthBits <= 16) {					\
++      GLuint i;								\
++      const GLushort *zRow = (const GLushort *)				\
++         _swrast_zbuffer_address(ctx, span.x, span.y);			\
++      for (i = 0; i < span.end; i++) {					\
++         GLdepth z = FixedToDepth(span.z);				\
++         if (z < zRow[i]) {						\
++            ctx->OcclusionResult = GL_TRUE;				\
++            ctx->Occlusion.PassedCounter++;				\
++         }								\
++         span.z += span.zStep;						\
++      }									\
++   }									\
++   else {								\
++      GLuint i;								\
++      const GLuint *zRow = (const GLuint *)				\
++         _swrast_zbuffer_address(ctx, span.x, span.y);			\
++      for (i = 0; i < span.end; i++) {					\
++         if (span.z < zRow[i]) {					\
++            ctx->OcclusionResult = GL_TRUE;				\
++            ctx->Occlusion.PassedCounter++;				\
++         }								\
++         span.z += span.zStep;						\
++      }									\
+    }
+ #include "s_tritemp.h"
+ 
+@@ -1089,7 +1101,8 @@ _swrast_choose_triangle( GLcontext *ctx )
+ 			&& ctx->Depth.Func == GL_LESS
+ 			&& ctx->Depth.Mask == GL_TRUE)
+ 		       || swrast->_RasterMask == TEXTURE_BIT)
+-		   && ctx->Polygon.StippleFlag == GL_FALSE) {
++		   && ctx->Polygon.StippleFlag == GL_FALSE
++                   && ctx->Visual.depthBits <= 16) {
+ 		  if (swrast->_RasterMask == (DEPTH_BIT | TEXTURE_BIT)) {
+ 		     USE(simple_z_textured_triangle);
+ 		  }
+diff --git a/src/mesa/swrast/s_tritemp.h b/src/mesa/swrast/s_tritemp.h
+index d7571f5..a0a3b3a 100644
+--- a/src/mesa/swrast/s_tritemp.h
++++ b/src/mesa/swrast/s_tritemp.h
+@@ -1,8 +1,8 @@
+ /*
+  * Mesa 3-D graphics library
+- * Version:  5.1
++ * Version:  6.0.2
+  *
+- * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
++ * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a
+  * copy of this software and associated documentation files (the "Software"),
+@@ -221,9 +221,6 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
+       oneOverArea = 1.0F / area;
+    }
+ 
+-#ifndef DO_OCCLUSION_TEST
+-   ctx->OcclusionResult = GL_TRUE;
+-#endif
+    span.facing = ctx->_Facing; /* for 2-sided stencil test */
+ 
+    /* Edge setup.  For a triangle strip these could be reused... */
+@@ -354,15 +351,15 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
+ #ifdef INTERP_RGB
+       span.interpMask |= SPAN_RGBA;
+       if (ctx->Light.ShadeModel == GL_SMOOTH) {
+-         GLfloat eMaj_dr = (GLfloat) ((ColorTemp) vMax->color[RCOMP] - vMin->color[RCOMP]);
+-         GLfloat eBot_dr = (GLfloat) ((ColorTemp) vMid->color[RCOMP] - vMin->color[RCOMP]);
+-         GLfloat eMaj_dg = (GLfloat) ((ColorTemp) vMax->color[GCOMP] - vMin->color[GCOMP]);
+-         GLfloat eBot_dg = (GLfloat) ((ColorTemp) vMid->color[GCOMP] - vMin->color[GCOMP]);
+-         GLfloat eMaj_db = (GLfloat) ((ColorTemp) vMax->color[BCOMP] - vMin->color[BCOMP]);
+-         GLfloat eBot_db = (GLfloat) ((ColorTemp) vMid->color[BCOMP] - vMin->color[BCOMP]);
++         GLfloat eMaj_dr = (GLfloat) ((ColorTemp) vMax->color[RCOMP] - (ColorTemp) vMin->color[RCOMP]);
++         GLfloat eBot_dr = (GLfloat) ((ColorTemp) vMid->color[RCOMP] - (ColorTemp) vMin->color[RCOMP]);
++         GLfloat eMaj_dg = (GLfloat) ((ColorTemp) vMax->color[GCOMP] - (ColorTemp) vMin->color[GCOMP]);
++         GLfloat eBot_dg = (GLfloat) ((ColorTemp) vMid->color[GCOMP] - (ColorTemp) vMin->color[GCOMP]);
++         GLfloat eMaj_db = (GLfloat) ((ColorTemp) vMax->color[BCOMP] - (ColorTemp) vMin->color[BCOMP]);
++         GLfloat eBot_db = (GLfloat) ((ColorTemp) vMid->color[BCOMP] - (ColorTemp) vMin->color[BCOMP]);
+ #  ifdef INTERP_ALPHA
+-         GLfloat eMaj_da = (GLfloat) ((ColorTemp) vMax->color[ACOMP] - vMin->color[ACOMP]);
+-         GLfloat eBot_da = (GLfloat) ((ColorTemp) vMid->color[ACOMP] - vMin->color[ACOMP]);
++         GLfloat eMaj_da = (GLfloat) ((ColorTemp) vMax->color[ACOMP] - (ColorTemp) vMin->color[ACOMP]);
++         GLfloat eBot_da = (GLfloat) ((ColorTemp) vMid->color[ACOMP] - (ColorTemp) vMin->color[ACOMP]);
+ #  endif
+          span.drdx = oneOverArea * (eMaj_dr * eBot.dy - eMaj.dy * eBot_dr);
+          span.drdy = oneOverArea * (eMaj.dx * eBot_dr - eMaj_dr * eBot.dx);
+@@ -417,12 +414,12 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
+ #ifdef INTERP_SPEC
+       span.interpMask |= SPAN_SPEC;
+       if (ctx->Light.ShadeModel == GL_SMOOTH) {
+-         GLfloat eMaj_dsr = (GLfloat) ((ColorTemp) vMax->specular[RCOMP] - vMin->specular[RCOMP]);
+-         GLfloat eBot_dsr = (GLfloat) ((ColorTemp) vMid->specular[RCOMP] - vMin->specular[RCOMP]);
+-         GLfloat eMaj_dsg = (GLfloat) ((ColorTemp) vMax->specular[GCOMP] - vMin->specular[GCOMP]);
+-         GLfloat eBot_dsg = (GLfloat) ((ColorTemp) vMid->specular[GCOMP] - vMin->specular[GCOMP]);
+-         GLfloat eMaj_dsb = (GLfloat) ((ColorTemp) vMax->specular[BCOMP] - vMin->specular[BCOMP]);
+-         GLfloat eBot_dsb = (GLfloat) ((ColorTemp) vMid->specular[BCOMP] - vMin->specular[BCOMP]);
++         GLfloat eMaj_dsr = (GLfloat) ((ColorTemp) vMax->specular[RCOMP] - (ColorTemp) vMin->specular[RCOMP]);
++         GLfloat eBot_dsr = (GLfloat) ((ColorTemp) vMid->specular[RCOMP] - (ColorTemp) vMin->specular[RCOMP]);
++         GLfloat eMaj_dsg = (GLfloat) ((ColorTemp) vMax->specular[GCOMP] - (ColorTemp) vMin->specular[GCOMP]);
++         GLfloat eBot_dsg = (GLfloat) ((ColorTemp) vMid->specular[GCOMP] - (ColorTemp) vMin->specular[GCOMP]);
++         GLfloat eMaj_dsb = (GLfloat) ((ColorTemp) vMax->specular[BCOMP] - (ColorTemp) vMin->specular[BCOMP]);
++         GLfloat eBot_dsb = (GLfloat) ((ColorTemp) vMid->specular[BCOMP] - (ColorTemp) vMin->specular[BCOMP]);
+          span.dsrdx = oneOverArea * (eMaj_dsr * eBot.dy - eMaj.dy * eBot_dsr);
+          span.dsrdy = oneOverArea * (eMaj.dx * eBot_dsr - eMaj_dsr * eBot.dx);
+          span.dsgdx = oneOverArea * (eMaj_dsg * eBot.dy - eMaj.dy * eBot_dsg);
+@@ -1179,5 +1176,4 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
+ 
+ #undef FixedToDepth
+ 
+-#undef DO_OCCLUSION_TEST
+ #undef NAME
+diff --git a/src/mesa/tnl/t_save_api.c b/src/mesa/tnl/t_save_api.c
+index a6e7ffd..58f0f56 100644
+--- a/src/mesa/tnl/t_save_api.c
++++ b/src/mesa/tnl/t_save_api.c
+@@ -475,7 +475,7 @@ static void _save_upgrade_vertex( GLcontext *ctx,
+ 
+       /* Need to note this and fix up at runtime (or loopback):
+        */
+-      if (tnl->save.currentsz[attr] == 0) {
++      if (tnl->save.currentsz[attr][0] == 0) {
+ 	 assert(oldsz == 0);
+ 	 tnl->save.dangling_attr_ref = GL_TRUE;
+ 	 _mesa_debug(0, "_save_upgrade_vertex: dangling reference attr %d\n", 
+@@ -498,10 +498,16 @@ static void _save_upgrade_vertex( GLcontext *ctx,
+ 	 for (j = 0 ; j < _TNL_ATTRIB_MAX ; j++) {
+ 	    if (tnl->save.attrsz[j]) {
+ 	       if (j == attr) {
+-		  ASSIGN_4V( dest, 0, 0, 0, 1 );
+-		  COPY_SZ_4V( dest, oldsz, data );
+-		  data += oldsz;
+-		  dest += newsz;
++                  if (oldsz) {
++                     ASSIGN_4V( dest, 0, 0, 0, 1 );
++                     COPY_SZ_4V( dest, oldsz, data );
++                     data += oldsz;
++                     dest += newsz;
++                  }
++                  else {
++                     COPY_SZ_4V( dest, newsz, tnl->save.current[attr] );
++                     dest += newsz;
++                  }
+ 	       }
+ 	       else {
+ 		  GLint sz = tnl->save.attrsz[j];
+@@ -1467,8 +1473,7 @@ void _tnl_NewList( GLcontext *ctx, GLuint list, GLenum mode )
+ 
+ void _tnl_EndList( GLcontext *ctx )
+ {
+-   TNLcontext *tnl = TNL_CONTEXT(ctx);
+-   assert(tnl->save.vertex_size == 0);
++   assert(TNL_CONTEXT(ctx)->save.vertex_size == 0);
+ }
+  
+ void _tnl_BeginCallList( GLcontext *ctx, GLuint list )
+diff --git a/src/mesa/tnl/t_vb_lighttmp.h b/src/mesa/tnl/t_vb_lighttmp.h
+index cd79885..2eaf61f 100644
+--- a/src/mesa/tnl/t_vb_lighttmp.h
++++ b/src/mesa/tnl/t_vb_lighttmp.h
+@@ -28,7 +28,7 @@
+  */
+ 
+ 
+-#if (IDX & LIGHT_TWOSIDE)
++#if IDX & LIGHT_TWOSIDE
+ #  define NR_SIDES 2
+ #else
+ #  define NR_SIDES 1
+@@ -283,18 +283,19 @@ static void TAG(light_rgba)( GLcontext *ctx,
+       GLfloat sum[2][3];
+       struct gl_light *light;
+ 
+-      if ( IDX & LIGHT_MATERIAL ) {
+-	 update_materials( ctx, store );
+-	 sumA[0] = ctx->Light.Material.Attrib[MAT_ATTRIB_FRONT_DIFFUSE][3];
++#if IDX & LIGHT_MATERIAL
++      update_materials( ctx, store );
++      sumA[0] = ctx->Light.Material.Attrib[MAT_ATTRIB_FRONT_DIFFUSE][3];
+ #if IDX & LIGHT_TWOSIDE
+-         sumA[1] = ctx->Light.Material.Attrib[MAT_ATTRIB_BACK_DIFFUSE][3];
++      sumA[1] = ctx->Light.Material.Attrib[MAT_ATTRIB_BACK_DIFFUSE][3];
++#endif
+ #endif
+-      }
+ 
+       COPY_3V(sum[0], base[0]);
+ 
+-      if ( IDX & LIGHT_TWOSIDE )
+-	 COPY_3V(sum[1], base[1]);
++#if IDX & LIGHT_TWOSIDE
++      COPY_3V(sum[1], base[1]);
++#endif
+ 
+       /* Add contribution from each enabled light source */
+       foreach (light, &ctx->Light.EnabledList) {
+@@ -467,12 +468,16 @@ static void TAG(light_fast_rgba_single)( GLcontext *ctx,
+ 
+       GLfloat n_dot_VP;
+ 
+-      if ( IDX & LIGHT_MATERIAL )
+-	 update_materials( ctx, store );
++#if IDX & LIGHT_MATERIAL
++      update_materials( ctx, store );
++#endif
+ 
+       /* No attenuation, so incoporate _MatAmbient into base color.
+        */
+-      if ( j == 0 || (IDX & LIGHT_MATERIAL) ) {
++#if !(IDX & LIGHT_MATERIAL)
++      if ( j == 0 )
++#endif
++      {
+ 	 COPY_3V(base[0], light->_MatAmbient[0]);
+ 	 ACC_3V(base[0], ctx->Light._BaseColor[0] );
+ 	 base[0][3] = ctx->Light.Material.Attrib[MAT_ATTRIB_FRONT_DIFFUSE][3];
+@@ -565,14 +570,14 @@ static void TAG(light_fast_rgba)( GLcontext *ctx,
+ 
+       GLfloat sum[2][3];
+ 
+-      if ( IDX & LIGHT_MATERIAL ) {
+-	 update_materials( ctx, store );
++#if IDX & LIGHT_MATERIAL
++      update_materials( ctx, store );
+ 
+-	 sumA[0] = ctx->Light.Material.Attrib[MAT_ATTRIB_FRONT_DIFFUSE][3];
++      sumA[0] = ctx->Light.Material.Attrib[MAT_ATTRIB_FRONT_DIFFUSE][3];
+ #if IDX & LIGHT_TWOSIDE
+-         sumA[1] = ctx->Light.Material.Attrib[MAT_ATTRIB_BACK_DIFFUSE][3];
++      sumA[1] = ctx->Light.Material.Attrib[MAT_ATTRIB_BACK_DIFFUSE][3];
++#endif
+ #endif
+-      }
+ 
+ 
+       COPY_3V(sum[0], ctx->Light._BaseColor[0]);
+@@ -675,14 +680,15 @@ static void TAG(light_ci)( GLcontext *ctx,
+       GLuint side = 0;
+       struct gl_light *light;
+ 
+-      if ( IDX & LIGHT_MATERIAL )
+-	 update_materials( ctx, store );
++#if IDX & LIGHT_MATERIAL
++      update_materials( ctx, store );
++#endif
+ 
+       diffuse[0] = specular[0] = 0.0F;
+ 
+-      if ( IDX & LIGHT_TWOSIDE ) {
++#if IDX & LIGHT_TWOSIDE
+ 	 diffuse[1] = specular[1] = 0.0F;
+-      }
++#endif
+ 
+       /* Accumulate diffuse and specular from each light source */
+       foreach (light, &ctx->Light.EnabledList) {
+diff --git a/src/mesa/tnl/t_vtx_api.c b/src/mesa/tnl/t_vtx_api.c
+index a9a1c5b..0ce2568 100644
+--- a/src/mesa/tnl/t_vtx_api.c
++++ b/src/mesa/tnl/t_vtx_api.c
+@@ -267,10 +267,15 @@ static void _tnl_wrap_upgrade_vertex( GLcontext *ctx,
+ 	 for (j = 0 ; j < _TNL_ATTRIB_MAX ; j++) {
+ 	    if (tnl->vtx.attrsz[j]) {
+ 	       if (j == attr) {
+-		  COPY_SZ_4V( dest, newsz, tnl->vtx.current[j] );
+-		  COPY_SZ_4V( dest, oldsz, data );
+-		  data += oldsz;
+-		  dest += newsz;
++                  if (oldsz) {
++                     ASSIGN_4V( dest, 0, 0, 0, 1 );
++                     COPY_SZ_4V( dest, oldsz, data );
++                     data += oldsz;
++                     dest += newsz;
++		  } else {
++		     COPY_SZ_4V( dest, newsz, tnl->vtx.current[j] );
++		     dest += newsz;
++		  }
+ 	       }
+ 	       else {
+ 		  GLuint sz = tnl->vtx.attrsz[j];
+diff --git a/src/mesa/x86/3dnow_normal.S b/src/mesa/x86/3dnow_normal.S
+index 07755b2..99c3889 100644
+--- a/src/mesa/x86/3dnow_normal.S
++++ b/src/mesa/x86/3dnow_normal.S
+@@ -1,4 +1,4 @@
+-/* $Id: 3dnow_normal.S,v 1.6 2003/11/26 08:32:35 dborca Exp $ */
++/* $Id: 3dnow_normal.S,v 1.6.2.2 2004/04/26 10:02:29 alanh Exp $ */
+ 
+ /*
+  * Mesa 3-D graphics library
+@@ -28,6 +28,8 @@
+  * 3Dnow assembly code by Holger Waechtler
+  */
+ 
++#ifdef USE_3DNOW_ASM
++
+ #include "matypes.h"
+ #include "norm_args.h"
+ 
+@@ -41,7 +43,7 @@ ALIGNTEXT16
+ GLOBL GLNAME(_mesa_3dnow_transform_normalize_normals)
+ GLNAME(_mesa_3dnow_transform_normalize_normals):
+ 
+- #define FRAME_OFFSET 12
++#define FRAME_OFFSET 12
+ 
+     PUSH_L     ( EDI )
+     PUSH_L     ( ESI )
+@@ -67,8 +69,8 @@ GLNAME(_mesa_3dnow_transform_normalize_normals):
+     PUSH_L     ( EAX )
+     PUSH_L     ( EDX )                  /*  save counter & pointer for   */
+                                         /*  the normalize pass           */
+- #undef  FRAME_OFFSET
+- #define FRAME_OFFSET 24
++#undef  FRAME_OFFSET
++#define FRAME_OFFSET 24
+ 
+     MOVQ       ( M(0), MM3 )            /*  m1              | m0         */
+     MOVQ       ( M(4), MM4 )            /*  m5              | m4         */
+@@ -218,8 +220,8 @@ ALIGNTEXT16
+ GLOBL GLNAME(_mesa_3dnow_transform_normalize_normals_no_rot)
+ GLNAME(_mesa_3dnow_transform_normalize_normals_no_rot):
+ 
+- #undef FRAME_OFFSET
+- #define FRAME_OFFSET 12
++#undef FRAME_OFFSET
++#define FRAME_OFFSET 12
+ 
+     PUSH_L     ( EDI )
+     PUSH_L     ( ESI )
+@@ -357,8 +359,8 @@ ALIGNTEXT16
+ GLOBL GLNAME(_mesa_3dnow_transform_rescale_normals_no_rot)
+ GLNAME(_mesa_3dnow_transform_rescale_normals_no_rot):
+ 
+- #undef FRAME_OFFSET
+- #define FRAME_OFFSET 12
++#undef FRAME_OFFSET
++#define FRAME_OFFSET 12
+ 
+     PUSH_L     ( EDI )
+     PUSH_L     ( ESI )
+@@ -428,8 +430,8 @@ ALIGNTEXT16
+ GLOBL GLNAME(_mesa_3dnow_transform_rescale_normals)
+ GLNAME(_mesa_3dnow_transform_rescale_normals):
+ 
+- #undef  FRAME_OFFSET
+- #define FRAME_OFFSET 8
++#undef  FRAME_OFFSET
++#define FRAME_OFFSET 8
+ 
+     PUSH_L     ( EDI )
+     PUSH_L     ( ESI )
+@@ -525,8 +527,8 @@ ALIGNTEXT16
+ GLOBL GLNAME(_mesa_3dnow_transform_normals_no_rot)
+ GLNAME(_mesa_3dnow_transform_normals_no_rot):
+ 
+- #undef  FRAME_OFFSET
+- #define FRAME_OFFSET 8
++#undef  FRAME_OFFSET
++#define FRAME_OFFSET 8
+ 
+     PUSH_L     ( EDI )
+     PUSH_L     ( ESI )
+@@ -591,8 +593,8 @@ ALIGNTEXT16
+ GLOBL GLNAME(_mesa_3dnow_transform_normals)
+ GLNAME(_mesa_3dnow_transform_normals):
+ 
+- #undef  FRAME_OFFSET
+- #define FRAME_OFFSET 8
++#undef  FRAME_OFFSET
++#define FRAME_OFFSET 8
+ 
+     PUSH_L     ( EDI )
+     PUSH_L     ( ESI )
+@@ -675,8 +677,8 @@ ALIGNTEXT16
+ GLOBL GLNAME(_mesa_3dnow_normalize_normals)
+ GLNAME(_mesa_3dnow_normalize_normals):
+ 
+- #undef  FRAME_OFFSET
+- #define FRAME_OFFSET 12
++#undef  FRAME_OFFSET
++#define FRAME_OFFSET 12
+ 
+     PUSH_L     ( EDI )
+     PUSH_L     ( ESI )
+@@ -786,8 +788,8 @@ ALIGNTEXT16
+ GLOBL GLNAME(_mesa_3dnow_rescale_normals)
+ GLNAME(_mesa_3dnow_rescale_normals):
+ 
+- #undef  FRAME_OFFSET
+- #define FRAME_OFFSET 8
++#undef  FRAME_OFFSET
++#define FRAME_OFFSET 8
+     PUSH_L     ( EDI )
+     PUSH_L     ( ESI )
+ 
+@@ -834,3 +836,5 @@ LLBL (G3R_end):
+     POP_L      ( ESI )
+     POP_L      ( EDI )
+     RET
++
++#endif
+diff --git a/src/mesa/x86/3dnow_xform1.S b/src/mesa/x86/3dnow_xform1.S
+index 9957676..7776011 100644
+--- a/src/mesa/x86/3dnow_xform1.S
++++ b/src/mesa/x86/3dnow_xform1.S
+@@ -1,4 +1,4 @@
+-/* $Id: 3dnow_xform1.S,v 1.1 2001/03/29 06:46:16 gareth Exp $ */
++/* $Id: 3dnow_xform1.S,v 1.1.18.1 2004/04/26 10:02:29 alanh Exp $ */
+ 
+ /*
+  * Mesa 3-D graphics library
+@@ -24,6 +24,7 @@
+  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  */
+ 
++#ifdef USE_3DNOW_ASM
+ #include "matypes.h"
+ #include "xform_args.h"
+ 
+@@ -421,3 +422,5 @@ LLBL( G3TP3R_3 ):
+     POP_L     ( EDI )
+     POP_L     ( ESI )
+     RET
++
++#endif
+diff --git a/src/mesa/x86/3dnow_xform2.S b/src/mesa/x86/3dnow_xform2.S
+index cb3a853..3e703ef 100644
+--- a/src/mesa/x86/3dnow_xform2.S
++++ b/src/mesa/x86/3dnow_xform2.S
+@@ -1,4 +1,4 @@
+-/* $Id: 3dnow_xform2.S,v 1.1 2001/03/29 06:46:16 gareth Exp $ */
++/* $Id: 3dnow_xform2.S,v 1.1.18.1 2004/04/26 10:02:29 alanh Exp $ */
+ 
+ /*
+  * Mesa 3-D graphics library
+@@ -24,6 +24,7 @@
+  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  */
+ 
++#ifdef USE_3DNOW_ASM
+ #include "matypes.h"
+ #include "xform_args.h"
+ 
+@@ -462,3 +463,4 @@ LLBL( G3TPIR_4 ):
+     POP_L     ( EDI )
+     POP_L     ( ESI )
+     RET
++#endif
+diff --git a/src/mesa/x86/3dnow_xform3.S b/src/mesa/x86/3dnow_xform3.S
+index c1e3bf9..c91c61a 100644
+--- a/src/mesa/x86/3dnow_xform3.S
++++ b/src/mesa/x86/3dnow_xform3.S
+@@ -1,4 +1,4 @@
+-/* $Id: 3dnow_xform3.S,v 1.2 2001/10/22 01:21:16 brianp Exp $ */
++/* $Id: 3dnow_xform3.S,v 1.2.18.1 2004/04/26 10:02:29 alanh Exp $ */
+ 
+ /*
+  * Mesa 3-D graphics library
+@@ -24,6 +24,7 @@
+  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  */
+ 
++#ifdef USE_3DNOW_ASM
+ #include "matypes.h"
+ #include "xform_args.h"
+ 
+@@ -546,3 +547,4 @@ LLBL( G3TPIR_2 ):
+     POP_L     ( EDI )
+     POP_L     ( ESI )
+     RET
++#endif
+diff --git a/src/mesa/x86/3dnow_xform4.S b/src/mesa/x86/3dnow_xform4.S
+index 0336b70..3eae7af 100644
+--- a/src/mesa/x86/3dnow_xform4.S
++++ b/src/mesa/x86/3dnow_xform4.S
+@@ -1,4 +1,4 @@
+-/* $Id: 3dnow_xform4.S,v 1.2 2001/10/22 01:21:16 brianp Exp $ */
++/* $Id: 3dnow_xform4.S,v 1.2.18.1 2004/04/26 10:02:29 alanh Exp $ */
+ 
+ /*
+  * Mesa 3-D graphics library
+@@ -24,6 +24,7 @@
+  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  */
+ 
++#ifdef USE_3DNOW_ASM
+ #include "matypes.h"
+ #include "xform_args.h"
+ 
+@@ -555,3 +556,4 @@ LLBL( G3TPIR_2 ):
+     POP_L     ( EDI )
+     POP_L     ( ESI )
+     RET
++#endif
+diff --git a/src/mesa/x86/assyntax.h b/src/mesa/x86/assyntax.h
+index f37bde3..668b14d 100644
+--- a/src/mesa/x86/assyntax.h
++++ b/src/mesa/x86/assyntax.h
+@@ -274,9 +274,7 @@
+ #define GLOBL		CHOICE(.globl, .globl, .extern)
+ #define GLOBAL		GLOBL
+ #define EXTERN		GLOBL
+-/*
+-#define ALIGNTEXT32	CHOICE(.align 32, .align ARG2(5,0x90), .align 32)
+-*/
++#ifndef __AOUT__
+ #define ALIGNTEXT32	CHOICE(.align 32, .balign 32, .align 32)
+ #define ALIGNTEXT16	CHOICE(.align 16, .balign 16, .align 16)
+ #define ALIGNTEXT8	CHOICE(.align 8, .balign 8, .align 8)
+@@ -294,6 +292,26 @@
+ #define ALIGNDATA8	CHOICE(.align 8, .balign ARG2(8,0x0), .align 8)
+ #define ALIGNDATA4	CHOICE(.align 4, .balign ARG2(4,0x0), .align 4)
+ #define ALIGNDATA2	CHOICE(.align 2, .balign ARG2(2,0x0), .align 2)
++#else
++/* 'as -aout' on FreeBSD doesn't have .balign */
++#define ALIGNTEXT32	CHOICE(.align 32, .align ARG2(5,0x90), .align 32)
++#define ALIGNTEXT16	CHOICE(.align 16, .align ARG2(4,0x90), .align 16)
++#define ALIGNTEXT8	CHOICE(.align 8, .align ARG2(3,0x90), .align 8)
++#define ALIGNTEXT4	CHOICE(.align 4, .align ARG2(2,0x90), .align 4)
++#define ALIGNTEXT2	CHOICE(.align 2, .align ARG2(1,0x90), .align 2)
++/* ALIGNTEXT4ifNOP is the same as ALIGNTEXT4, but only if the space is
++ * guaranteed to be filled with NOPs.  Otherwise it does nothing.
++ */
++#define ALIGNTEXT32ifNOP	CHOICE(.align 32, .align ARG2(5,0x90), /*can't do it*/)
++#define ALIGNTEXT16ifNOP	CHOICE(.align 16, .align ARG2(4,0x90), /*can't do it*/)
++#define ALIGNTEXT8ifNOP	CHOICE(.align 8, .align ARG2(3,0x90), /*can't do it*/)
++#define ALIGNTEXT4ifNOP	CHOICE(.align 4, .align ARG2(2,0x90), /*can't do it*/)
++#define ALIGNDATA32	CHOICE(.align 32, .align ARG2(5,0x0), .align 32)
++#define ALIGNDATA16	CHOICE(.align 16, .align ARG2(4,0x0), .align 16)
++#define ALIGNDATA8	CHOICE(.align 8, .align ARG2(3,0x0), .align 8)
++#define ALIGNDATA4	CHOICE(.align 4, .align ARG2(2,0x0), .align 4)
++#define ALIGNDATA2	CHOICE(.align 2, .align ARG2(1,0x0), .align 2)
++#endif /* __AOUT__ */
+ #define FILE(s)		CHOICE(.file s, .file s, .file s)
+ #define STRING(s)	CHOICE(.string s, .asciz s, .asciz s)
+ #define D_LONG		CHOICE(.long, .long, .data4)
+diff --git a/src/mesa/x86/common_x86.c b/src/mesa/x86/common_x86.c
+index a8daada..90fa7e4 100644
+--- a/src/mesa/x86/common_x86.c
++++ b/src/mesa/x86/common_x86.c
+@@ -28,7 +28,7 @@
+  *
+  * Written by Holger Waechtler <holger@akaflieg.extern.tu-berlin.de>
+  * Changed by Andre Werthmann <wertmann@cs.uni-potsdam.de> for using the
+- * new Katmai functions.
++ * new SSE functions.
+  */
+ 
+ /* XXX these includes should probably go into imports.h or glheader.h */
+diff --git a/src/mesa/x86/common_x86_asm.h b/src/mesa/x86/common_x86_asm.h
+index 83e1521..c01487b 100644
+--- a/src/mesa/x86/common_x86_asm.h
++++ b/src/mesa/x86/common_x86_asm.h
+@@ -1,4 +1,4 @@
+-/* $Id: common_x86_asm.h,v 1.10 2002/10/29 20:28:57 brianp Exp $ */
++/* $Id: common_x86_asm.h,v 1.10.14.1 2004/04/26 10:02:29 alanh Exp $ */
+ 
+ /*
+  * Mesa 3-D graphics library
+@@ -30,7 +30,7 @@
+  *
+  * Written by Holger Waechtler <holger@akaflieg.extern.tu-berlin.de>
+  * Changed by Andre Werthmann <wertmann@cs.uni-potsdam.de> for using the
+- * new Katmai functions
++ * new SSE functions
+  *
+  * Reimplemented by Gareth Hughes in a more
+  * future-proof manner, based on code in the Linux kernel.
+diff --git a/src/mesa/x86/mmx_blend.S b/src/mesa/x86/mmx_blend.S
+index d049aa1..f7326cd 100644
+--- a/src/mesa/x86/mmx_blend.S
++++ b/src/mesa/x86/mmx_blend.S
+@@ -1,9 +1,11 @@
++
+ /*
+  * Written by José Fonseca <j_r_fonseca@yahoo.co.uk>
+  */
+ 
+-#include "matypes.h"
+ 
++#ifdef USE_MMX_ASM
++#include "matypes.h"
+ 
+ /* integer multiplication - alpha plus one
+  *
+@@ -361,3 +363,4 @@ TWO(MOVQ       ( MM1, REGIND(rgba) ))
+ 
+ #include "mmx_blendtmp.h"
+ 
++#endif
+diff --git a/src/mesa/x86/sse_normal.S b/src/mesa/x86/sse_normal.S
+index 64bd384..3c5e119 100644
+--- a/src/mesa/x86/sse_normal.S
++++ b/src/mesa/x86/sse_normal.S
+@@ -1,4 +1,4 @@
+-/* $Id: sse_normal.S,v 1.3 2003/11/26 08:32:36 dborca Exp $ */
++/* $Id: sse_normal.S,v 1.3.2.1 2004/04/26 10:02:29 alanh Exp $ */
+ 
+ /*
+  * Mesa 3-D graphics library
+@@ -31,6 +31,7 @@
+   *   data (trans-matrix, src_vert, dst_vert) needs to be 16byte aligned !
+   */
+ 
++#ifdef USE_SSE_ASM
+ #include "matypes.h"
+ #include "norm_args.h"
+ 
+@@ -250,3 +251,4 @@ LLBL(K_G3TNNRR_finish):
+ 	POP_L	( ESI )
+ 	RET
+ #undef FRAME_OFFSET
++#endif
+diff --git a/src/mesa/x86/sse_xform1.S b/src/mesa/x86/sse_xform1.S
+index 89c5567..36e1d8a 100644
+--- a/src/mesa/x86/sse_xform1.S
++++ b/src/mesa/x86/sse_xform1.S
+@@ -1,4 +1,4 @@
+-/* $Id: sse_xform1.S,v 1.1 2001/03/29 06:46:27 gareth Exp $ */
++/* $Id: sse_xform1.S,v 1.1.18.1 2004/04/26 10:02:29 alanh Exp $ */
+ 
+ /*
+  * Mesa 3-D graphics library
+@@ -31,6 +31,7 @@
+   *   data (trans-matrix, src_vert, dst_vert) needs to be 16byte aligned !
+   */
+ 
++#ifdef USE_SSE_ASM
+ #include "matypes.h"
+ #include "xform_args.h"
+ 
+@@ -431,3 +432,4 @@ LLBL(K_GTP13P3DR_finish):
+ 	POP_L( ESI )
+ 	RET
+ #undef FRAME_OFFSET
++#endif
+diff --git a/src/mesa/x86/sse_xform2.S b/src/mesa/x86/sse_xform2.S
+index f936088..88bb5d3 100644
+--- a/src/mesa/x86/sse_xform2.S
++++ b/src/mesa/x86/sse_xform2.S
+@@ -1,4 +1,4 @@
+-/* $Id: sse_xform2.S,v 1.1 2001/03/29 06:46:27 gareth Exp $ */
++/* $Id: sse_xform2.S,v 1.1.18.1 2004/04/26 10:02:29 alanh Exp $ */
+ 
+ /*
+  * Mesa 3-D graphics library
+@@ -31,6 +31,7 @@
+   *   data (trans-matrix, src_vert, dst_vert) needs to be 16byte aligned !
+   */
+ 
++#ifdef USE_SSE_ASM
+ #include "matypes.h"
+ #include "xform_args.h"
+ 
+@@ -450,3 +451,4 @@ LLBL(K_GTP23P3DR_finish):
+ 	POP_L( ESI )
+ 	RET
+ #undef FRAME_OFFSET
++#endif
+diff --git a/src/mesa/x86/sse_xform3.S b/src/mesa/x86/sse_xform3.S
+index ff989c3..e40d980 100644
+--- a/src/mesa/x86/sse_xform3.S
++++ b/src/mesa/x86/sse_xform3.S
+@@ -1,4 +1,4 @@
+-/* $Id: sse_xform3.S,v 1.1 2001/03/29 06:46:27 gareth Exp $ */
++/* $Id: sse_xform3.S,v 1.1.18.1 2004/04/26 10:02:29 alanh Exp $ */
+ 
+ /*
+  * Mesa 3-D graphics library
+@@ -31,6 +31,7 @@
+   *   data (trans-matrix, src_vert, dst_vert) needs to be 16byte aligned !
+   */
+ 
++#ifdef USE_SSE_ASM
+ #include "matypes.h"
+ #include "xform_args.h"
+ 
+@@ -496,3 +497,4 @@ LLBL(K_GTP3P3DR_finish):
+ 	POP_L( ESI )
+ 	RET
+ #undef FRAME_OFFSET
++#endif
+diff --git a/src/mesa/x86/sse_xform4.S b/src/mesa/x86/sse_xform4.S
+index 13cb2a3..27b3787 100644
+--- a/src/mesa/x86/sse_xform4.S
++++ b/src/mesa/x86/sse_xform4.S
+@@ -1,4 +1,4 @@
+-/* $Id: sse_xform4.S,v 1.1 2001/03/29 06:46:27 gareth Exp $ */
++/* $Id: sse_xform4.S,v 1.1.18.1 2004/04/26 10:02:29 alanh Exp $ */
+ 
+ /*
+  * Mesa 3-D graphics library
+@@ -24,6 +24,7 @@
+  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  */
+ 
++#ifdef USE_SSE_ASM
+ #include "matypes.h"
+ #include "xform_args.h"
+ 
+@@ -224,3 +225,4 @@ LLBL( sse_identity_done ):
+ 	POP_L( EDI )
+ 	POP_L( ESI )
+ 	RET
++#endif

@@ -1,0 +1,880 @@
+diff -urNp Mesa-6.0.1/include/GL/dmesa.h Mesa-6.0.x/include/GL/dmesa.h
+--- Mesa-6.0.1/include/GL/dmesa.h	2003-12-19 13:26:46.000000000 +0200
++++ Mesa-6.0.x/include/GL/dmesa.h	2015-10-05 05:55:00.000000000 +0300
+@@ -126,6 +126,12 @@ GLboolean DMesaMoveBuffer (GLint xpos, G
+ GLboolean DMesaResizeBuffer (GLint width, GLint height);
+ 
+ /*
++ * DMesa functions
++ */
++typedef void (*DMesaProc) (void);
++DMesaProc DMesaGetProcAddress (const char *name);
++
++/*
+  * Set palette index, using normalized values.
+  */
+ void DMesaSetCI (int ndx, GLfloat red, GLfloat green, GLfloat blue);
+diff -urNp Mesa-6.0.1/Makefile.DJ Mesa-6.0.x/Makefile.DJ
+--- Mesa-6.0.1/Makefile.DJ	2003-12-19 13:26:46.000000000 +0200
++++ Mesa-6.0.x/Makefile.DJ	2015-10-05 05:55:00.000000000 +0300
+@@ -71,34 +71,23 @@ CPU ?= pentium
+ 
+ GLU ?= mesa
+ 
+-CFLAGS = -Wall -W -pedantic
+-CFLAGS += -O2 -ffast-math -mcpu=$(CPU)
++CFLAGS = -Wall
++CFLAGS += -O2 -ffast-math -fno-strict-aliasing -mtune=$(CPU)
+ 
+ export CFLAGS
+ 
+-ifeq ($(wildcard $(addsuffix /rm.exe,$(subst ;, ,$(PATH)))),)
+-UNLINK = del $(subst /,\,$(1))
+-else
+-UNLINK = $(RM) $(1)
+-endif
++UNLINK = rm -f $(1)
+ 
+-all: libgl libglu libglut
++all: libgl
+ 
+ libgl: lib
+ 	$(MAKE) -f Makefile.DJ -C src/mesa
+-libglu: lib
+-	$(MAKE) -f Makefile.DJ -C src/glu/$(GLU)
+-libglut: lib
+-	$(MAKE) -f Makefile.DJ -C src/glut/dos
+ 
+ lib:
+ 	mkdir lib
+ 
+ clean:
+ 	$(MAKE) -f Makefile.DJ clean -C src/mesa
+-	$(MAKE) -f Makefile.DJ clean -C src/glu/mesa
+-	$(MAKE) -f Makefile.DJ clean -C src/glu/sgi
+-	$(MAKE) -f Makefile.DJ clean -C src/glut/dos
+ 
+ realclean: clean
+ 	-$(call UNLINK,lib/*.a)
+diff -urNp Mesa-6.0.1/src/mesa/drivers/dos/dmesa.c Mesa-6.0.x/src/mesa/drivers/dos/dmesa.c
+--- Mesa-6.0.1/src/mesa/drivers/dos/dmesa.c	2004-01-16 18:32:32.000000000 +0200
++++ Mesa-6.0.x/src/mesa/drivers/dos/dmesa.c	2015-10-05 05:55:00.000000000 +0300
+@@ -1350,6 +1350,15 @@ void *DMesaGetCurrentContext (void)
+ 
+ 
+ 
++DMesaProc
++DMesaGetProcAddress (const char *name)
++{
++   DMesaProc p = (DMesaProc)_glapi_get_proc_address(name);
++   return p;
++}
++
++
++
+ int DMesaGetIntegerv (GLenum pname, GLint *params)
+ {
+  switch (pname) {
+diff -urNp Mesa-6.0.1/src/mesa/drivers/dri/common/depthtmp.h Mesa-6.0.x/src/mesa/drivers/dri/common/depthtmp.h
+--- Mesa-6.0.1/src/mesa/drivers/dri/common/depthtmp.h	2003-08-06 21:12:22.000000000 +0300
++++ Mesa-6.0.x/src/mesa/drivers/dri/common/depthtmp.h	2015-10-05 05:55:00.000000000 +0300
+@@ -100,6 +100,7 @@ static void TAG(WriteDepthPixels)( GLcon
+ }
+ 
+ 
++#if 0
+ /* Read depth spans and pixels
+  */
+ static void TAG(ReadDepthSpan)( GLcontext *ctx,
+@@ -132,6 +133,7 @@ static void TAG(ReadDepthSpan)( GLcontex
+       }
+    HW_READ_UNLOCK();
+ }
++#endif
+ 
+ static void TAG(ReadDepthPixels)( GLcontext *ctx, GLuint n,
+ 				  const GLint x[], const GLint y[],
+diff -urNp Mesa-6.0.1/src/mesa/drivers/dri/common/spantmp.h Mesa-6.0.x/src/mesa/drivers/dri/common/spantmp.h
+--- Mesa-6.0.1/src/mesa/drivers/dri/common/spantmp.h	2003-08-06 21:12:22.000000000 +0300
++++ Mesa-6.0.x/src/mesa/drivers/dri/common/spantmp.h	2015-10-05 05:55:00.000000000 +0300
+@@ -199,6 +199,7 @@ static void TAG(WriteMonoRGBAPixels)( co
+ }
+ 
+ 
++#if 0
+ static void TAG(ReadRGBASpan)( const GLcontext *ctx,
+ 			       GLuint n, GLint x, GLint y,
+ 			       GLubyte rgba[][4])
+@@ -223,6 +224,7 @@ static void TAG(ReadRGBASpan)( const GLc
+       }
+    HW_READ_UNLOCK();
+ }
++#endif
+ 
+ 
+ static void TAG(ReadRGBAPixels)( const GLcontext *ctx,
+diff -urNp Mesa-6.0.1/src/mesa/drivers/glide/fxdd.c Mesa-6.0.x/src/mesa/drivers/glide/fxdd.c
+--- Mesa-6.0.1/src/mesa/drivers/glide/fxdd.c	2004-01-14 19:35:43.000000000 +0200
++++ Mesa-6.0.x/src/mesa/drivers/glide/fxdd.c	2015-10-05 05:55:00.000000000 +0300
+@@ -1270,7 +1270,7 @@ static const struct tnl_pipeline_stage *
+ int
+ fxDDInitFxMesaContext(fxMesaContext fxMesa)
+ {
+-   int i;
++/* int i;*/
+    GLcontext *ctx = fxMesa->glCtx;
+ 
+    FX_setupGrVertexLayout();
+@@ -1653,7 +1653,7 @@ void
+ fxSetupDDPointers(GLcontext * ctx)
+ {
+    fxMesaContext fxMesa = FX_CONTEXT(ctx);
+-   TNLcontext *tnl = TNL_CONTEXT(ctx);
++/* TNLcontext *tnl = TNL_CONTEXT(ctx);*/
+ 
+    if (TDFX_DEBUG & VERBOSE_DRIVER) {
+       fprintf(stderr, "fxSetupDDPointers()\n");
+diff -urNp Mesa-6.0.1/src/mesa/drivers/glide/fxddtex.c Mesa-6.0.x/src/mesa/drivers/glide/fxddtex.c
+--- Mesa-6.0.1/src/mesa/drivers/glide/fxddtex.c	2004-01-15 18:02:28.000000000 +0200
++++ Mesa-6.0.x/src/mesa/drivers/glide/fxddtex.c	2015-10-05 05:55:00.000000000 +0300
+@@ -48,6 +48,7 @@
+ #include "texutil.h"
+ 
+ 
++#if 0
+ void
+ fxPrintTextureData(tfxTexInfo * ti)
+ {
+@@ -80,6 +81,7 @@ fxPrintTextureData(tfxTexInfo * ti)
+ 	   (ti->fixedPalette) ? "Fixed palette" : "Non fixed palette");
+    fprintf(stderr, "\t%s\n", (ti->validated) ? "Validated" : "Not validated");
+ }
++#endif
+ 
+ 
+ /************************************************************************/
+@@ -821,6 +823,7 @@ fetch_a8r8g8b8(const struct gl_texture_i
+ }
+ 
+ 
++#if 0
+ static void
+ PrintTexture(int w, int h, int c, const GLubyte * data)
+ {
+@@ -836,6 +839,7 @@ PrintTexture(int w, int h, int c, const 
+       fprintf(stderr, "\n");
+    }
+ }
++#endif
+ 
+ 
+ GLboolean fxDDIsCompressedFormat ( GLcontext *ctx, GLenum internalFormat )
+diff -urNp Mesa-6.0.1/src/mesa/drivers/glide/fxsetup.c Mesa-6.0.x/src/mesa/drivers/glide/fxsetup.c
+--- Mesa-6.0.1/src/mesa/drivers/glide/fxsetup.c	2004-01-15 18:02:28.000000000 +0200
++++ Mesa-6.0.x/src/mesa/drivers/glide/fxsetup.c	2015-10-05 05:55:00.000000000 +0300
+@@ -1349,7 +1349,7 @@ fxDDBlendFuncSeparate(GLcontext * ctx, G
+    fxMesaContext fxMesa = FX_CONTEXT(ctx);
+    tfxUnitsState *us = &fxMesa->unitsState;
+    GLboolean have32bpp = (fxMesa->colDepth == 32);
+-   GLboolean haveAlpha = fxMesa->haveHwAlpha;
++/* GLboolean haveAlpha = fxMesa->haveHwAlpha;*/
+    GrAlphaBlendFnc_t sfact, dfact, asfact, adfact;
+ 
+    /* [dBorca] Hack alert:
+diff -urNp Mesa-6.0.1/src/mesa/drivers/glide/fxtexman.c Mesa-6.0.x/src/mesa/drivers/glide/fxtexman.c
+--- Mesa-6.0.1/src/mesa/drivers/glide/fxtexman.c	2004-01-14 19:35:43.000000000 +0200
++++ Mesa-6.0.x/src/mesa/drivers/glide/fxtexman.c	2015-10-05 05:55:00.000000000 +0300
+@@ -239,9 +239,9 @@ fxTMFindStartAddr(fxMesaContext fxMesa, 
+ 
+ int fxTMCheckStartAddr (fxMesaContext fxMesa, GLint tmu, tfxTexInfo *ti)
+ {
+- MemRange *prev, *tmp;
++ MemRange /* *prev,*/ *tmp;
+  int size;
+- struct gl_texture_object *obj;
++/*struct gl_texture_object *obj;*/
+ 
+  if (fxMesa->HaveTexUma) {
+     return FXTRUE;
+diff -urNp Mesa-6.0.1/src/mesa/drivers/glide/glide3x_dxe.c Mesa-6.0.x/src/mesa/drivers/glide/glide3x_dxe.c
+--- Mesa-6.0.1/src/mesa/drivers/glide/glide3x_dxe.c	1970-01-01 02:00:00.000000000 +0200
++++ Mesa-6.0.x/src/mesa/drivers/glide/glide3x_dxe.c	2015-10-05 05:55:00.000000000 +0300
+@@ -0,0 +1,176 @@
++/* C source for generating a dummy glide3x.dxe to be used when
++ * generating an import library for a dxe depending on glide3x.
++ *
++ * gcc -Wall -c glide3x.c -o glide3x.o
++ * dxe3gen -o glide3x.dxe -E _gr -E _gu -U glide3x.o
++ */
++
++/* common gr and gu symbols exported by all
++ * sst1, sst96, cvg, h3 and h5 glide3x.dxe:
++ */
++void grAADrawTriangle () {}
++void grAlphaBlendFunction () {}
++void grAlphaCombine () {}
++void grAlphaControlsITRGBLighting () {}
++void grAlphaTestFunction () {}
++void grAlphaTestReferenceValue () {}
++void grBufferClear () {}
++void grBufferSwap () {}
++void grCheckForRoom () {}
++void grChromakeyMode () {}
++void grChromakeyValue () {}
++void grClipWindow () {}
++void grColorCombine () {}
++void grColorMask () {}
++void grConstantColorValue () {}
++void grCoordinateSpace () {}
++void grCullMode () {}
++void grDepthBiasLevel () {}
++void grDepthBufferFunction () {}
++void grDepthBufferMode () {}
++void grDepthMask () {}
++void grDepthRange () {}
++void grDisable () {}
++void grDisableAllEffects () {}
++void grDitherMode () {}
++void grDrawLine () {}
++void grDrawPoint () {}
++void grDrawTriangle () {}
++void grDrawVertexArray () {}
++void grDrawVertexArrayContiguous () {}
++void grEnable () {}
++void grErrorSetCallback () {}
++void grFinish () {}
++void grFlush () {}
++void grFogColorValue () {}
++void grFogMode () {}
++void grFogTable () {}
++void grGet () {}
++void grGetProcAddress () {}
++void grGetRegistryOrEnvironmentString () {}
++void grGetString () {}
++void grGlideGetState () {}
++void grGlideGetVersion () {}
++void grGlideGetVertexLayout () {}
++void grGlideInit () {}
++void grGlideSetState () {}
++void grGlideSetVertexLayout () {}
++void grGlideShutdown () {}
++void grLfbConstantAlpha () {}
++void grLfbConstantDepth () {}
++void grLfbLock () {}
++void grLfbReadRegion () {}
++void grLfbUnlock () {}
++void grLfbWriteColorFormat () {}
++void grLfbWriteColorSwizzle () {}
++void grLfbWriteRegion () {}
++void grLoadGammaTable () {}
++void grQueryResolutions () {}
++void grRenderBuffer () {}
++void grReset () {}
++void grSelectContext () {}
++void grSetNumPendingBuffers () {}
++void grSplash () {}
++void grSstOrigin () {}
++void grSstSelect () {}
++void grSstVidMode () {}
++void grSstWinClose () {}
++void grSstWinOpen () {}
++void grTexCalcMemRequired () {}
++void grTexClampMode () {}
++void grTexCombine () {}
++void grTexDetailControl () {}
++void grTexDownloadMipMap () {}
++void grTexDownloadMipMapLevel () {}
++void grTexDownloadMipMapLevelPartial () {}
++void grTexDownloadTable () {}
++void grTexDownloadTableExt () {}
++void grTexDownloadTablePartial () {}
++void grTexFilterMode () {}
++void grTexLodBiasValue () {}
++void grTexMaxAddress () {}
++void grTexMinAddress () {}
++void grTexMipMapMode () {}
++void grTexMultibase () {}
++void grTexMultibaseAddress () {}
++void grTexNCCTable () {}
++void grTexSource () {}
++void grTexTextureMemRequired () {}
++void grTriStats () {}
++void grVertexLayout () {}
++void grViewport () {}
++void gu3dfGetInfo () {}
++void gu3dfLoad () {}
++void guFogGenerateExp () {}
++void guFogGenerateExp2 () {}
++void guFogGenerateLinear () {}
++void guFogTableIndexToW () {}
++void guGammaCorrectionRGB () {}
++
++/* external libc symbols required by all of
++ * sst1, sst96, cvg, h3 and h5 glide3x.dxe:
++ */
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include <math.h>
++#include <assert.h>
++#include <errno.h>
++#include <unistd.h>
++#include <time.h>
++#include <signal.h>
++#include <dos.h>
++#include <dpmi.h>
++#include <sys/nearptr.h>
++#include <setjmp.h>
++#include <crt0.h>
++long EXTSYM0000 = (long) &_crt0_startup_flags;
++long EXTSYM0001 = (long) &__dj_assert;
++long EXTSYM0002 = (long) &__djgpp_base_address;
++long EXTSYM0003 = (long) &__djgpp_nearptr_disable;
++long EXTSYM0004 = (long) &__djgpp_nearptr_enable;
++long EXTSYM0005 = (long) &__dj_stderr;
++long EXTSYM0006 = (long) &__dj_stdout;
++long EXTSYM0007 = (long) &__dpmi_free_physical_address_mapping;
++long EXTSYM0008 = (long) &__dpmi_physical_address_mapping;
++long EXTSYM0009 = (long) &atof;
++long EXTSYM0010 = (long) &atoi;
++long EXTSYM0011 = (long) &atol;
++long EXTSYM0012 = (long) &clock;
++long EXTSYM0013 = (long) &exit;
++long EXTSYM0014 = (long) &fclose;
++long EXTSYM0015 = (long) &fflush;
++long EXTSYM0016 = (long) &fgetc;
++long EXTSYM0017 = (long) &fgets;
++long EXTSYM0018 = (long) &fopen;
++long EXTSYM0019 = (long) &fprintf;
++long EXTSYM0020 = (long) &fread;
++long EXTSYM0021 = (long) &free;
++long EXTSYM0022 = (long) &fwrite;
++long EXTSYM0023 = (long) &getc;
++long EXTSYM0024 = (long) &getenv;
++long EXTSYM0025 = (long) &int86;
++long EXTSYM0026 = (long) &longjmp;
++long EXTSYM0027 = (long) &malloc;
++long EXTSYM0028 = (long) &memcpy;
++long EXTSYM0029 = (long) &memset;
++long EXTSYM0030 = (long) &pow;
++long EXTSYM0031 = (long) &printf;
++long EXTSYM0032 = (long) &putenv;
++long EXTSYM0033 = (long) &puts;
++long EXTSYM0034 = (long) &setjmp;
++long EXTSYM0035 = (long) &signal;
++long EXTSYM0036 = (long) &sprintf;
++long EXTSYM0037 = (long) &sscanf;
++long EXTSYM0038 = (long) &strcat;
++long EXTSYM0039 = (long) &strchr;
++long EXTSYM0040 = (long) &strcmp;
++long EXTSYM0041 = (long) &strcpy;
++long EXTSYM0042 = (long) &strncat;
++long EXTSYM0043 = (long) &strncpy;
++long EXTSYM0044 = (long) &strtok;
++long EXTSYM0045 = (long) &strtoul;
++long EXTSYM0046 = (long) &usleep;
++long EXTSYM0047 = (long) &vfprintf;
++long EXTSYM0048 = (long) &vsprintf;
++
+diff -urNp Mesa-6.0.1/src/mesa/glapi/glapi.c Mesa-6.0.x/src/mesa/glapi/glapi.c
+--- Mesa-6.0.1/src/mesa/glapi/glapi.c	2004-01-08 16:26:50.000000000 +0200
++++ Mesa-6.0.x/src/mesa/glapi/glapi.c	2015-10-05 05:55:00.000000000 +0300
+@@ -784,7 +784,7 @@ _glapi_get_proc_address(const char *func
+ }
+ 
+ 
+-
++#ifdef DEBUG
+ /*
+  * Return the name of the function at the given dispatch offset.
+  * This is only intended for debugging.
+@@ -809,7 +809,7 @@ _glapi_get_proc_name(GLuint offset)
+    }
+    return NULL;
+ }
+-
++#endif
+ 
+ 
+ /*
+diff -urNp Mesa-6.0.1/src/mesa/main/arbfragparse.c Mesa-6.0.x/src/mesa/main/arbfragparse.c
+--- Mesa-6.0.1/src/mesa/main/arbfragparse.c	2004-03-30 19:10:19.000000000 +0300
++++ Mesa-6.0.x/src/mesa/main/arbfragparse.c	2015-10-05 05:55:00.000000000 +0300
+@@ -38,6 +38,7 @@
+ #include "arbparse.h"
+ #include "arbfragparse.h"
+ 
++#if DEBUG_FP
+ static void
+ debug_fp_inst(GLint num, struct fp_instruction *fp)
+ {
+@@ -178,6 +179,7 @@ debug_fp_inst(GLint num, struct fp_instr
+       fprintf(stderr, "\n");
+    }
+ }
++#endif
+ 
+ void
+ _mesa_parse_arb_fragment_program(GLcontext * ctx, GLenum target,
+@@ -230,8 +232,10 @@ _mesa_parse_arb_fragment_program(GLconte
+ 
+ #if DEBUG_FP
+    debug_fp_inst(ap.Base.NumInstructions, ap.FPInstructions);
++/*
+ #else
+    (void) debug_fp_inst;
++*/
+ #endif
+ 
+    program->Instructions   = ap.FPInstructions;
+diff -urNp Mesa-6.0.1/src/mesa/main/arbvertparse.c Mesa-6.0.x/src/mesa/main/arbvertparse.c
+--- Mesa-6.0.1/src/mesa/main/arbvertparse.c	2004-03-30 19:10:23.000000000 +0300
++++ Mesa-6.0.x/src/mesa/main/arbvertparse.c	2015-10-05 05:55:00.000000000 +0300
+@@ -44,6 +44,7 @@
+ #include "arbparse.h"
+ 
+ 
++#if DEBUG_VP
+ static GLvoid
+ debug_vp_inst(GLint num, struct vp_instruction *vp)
+ {
+@@ -166,7 +167,7 @@ debug_vp_inst(GLint num, struct vp_instr
+       fprintf(stderr, "\n");
+    }
+ }
+-
++#endif
+ 
+ void
+ _mesa_parse_arb_vertex_program(GLcontext * ctx, GLenum target,
+@@ -216,8 +217,10 @@ _mesa_parse_arb_vertex_program(GLcontext
+ 
+ #if DEBUG_VP
+    debug_vp_inst(ap.Base.NumInstructions, ap.VPInstructions);
++/*
+ #else
+    (void) debug_vp_inst;
++*/
+ #endif
+ 
+ }
+diff -urNp Mesa-6.0.1/src/mesa/main/debug.c Mesa-6.0.x/src/mesa/main/debug.c
+--- Mesa-6.0.1/src/mesa/main/debug.c	2003-09-18 19:33:11.000000000 +0300
++++ Mesa-6.0.x/src/mesa/main/debug.c	2015-10-05 05:55:00.000000000 +0300
+@@ -29,6 +29,7 @@
+ #include "debug.h"
+ #include "get.h"
+ 
++#if 0
+ /**
+  * Primitive names
+  */
+@@ -47,7 +48,9 @@ const char *_mesa_prim_name[GL_POLYGON+4
+    "inside unkown primitive",
+    "unknown state"
+ };
++#endif
+ 
++#ifdef MESA_DEBUG
+ void
+ _mesa_print_state( const char *msg, GLuint state )
+ {
+@@ -106,6 +109,7 @@ _mesa_print_tri_caps( const char *name, 
+ 	   (flags & DD_TRI_CULL_FRONT_BACK) ? "cull-all, " : ""
+       );
+ }
++#endif
+ 
+ 
+ void
+diff -urNp Mesa-6.0.1/src/mesa/main/dlist.c Mesa-6.0.x/src/mesa/main/dlist.c
+--- Mesa-6.0.1/src/mesa/main/dlist.c	2004-04-02 20:35:14.000000000 +0300
++++ Mesa-6.0.x/src/mesa/main/dlist.c	2015-10-05 05:55:00.000000000 +0300
+@@ -6183,9 +6183,10 @@ _mesa_EndList( void )
+    /* Install the list */
+    _mesa_HashInsert(ctx->Shared->DisplayList, ctx->ListState.CurrentListNum, ctx->ListState.CurrentListPtr);
+ 
+-
++#ifdef DEBUG
+    if (MESA_VERBOSE & VERBOSE_DISPLAY_LIST)
+       mesa_print_display_list(ctx->ListState.CurrentListNum);
++#endif
+ 
+    ctx->ListState.CurrentListNum = 0;
+    ctx->ListState.CurrentListPtr = NULL;
+@@ -7494,7 +7495,7 @@ _mesa_init_dlist_table( struct _glapi_ta
+ }
+ 
+ 
+-
++#ifdef DEBUG
+ /***
+  *** Debugging code
+  ***/
+@@ -7503,7 +7504,6 @@ static const char *enum_string( GLenum k
+    return _mesa_lookup_enum_by_nr( k );
+ }
+ 
+-
+ /*
+  * Print the commands in a display list.  For debugging only.
+  * TODO: many commands aren't handled yet.
+@@ -7701,7 +7701,6 @@ static void GLAPIENTRY print_list( GLcon
+ }
+ 
+ 
+-
+ /*
+  * Clients may call this function to help debug display list problems.
+  * This function is _ONLY_FOR_DEBUGGING_PURPOSES_.  It may be removed,
+@@ -7712,7 +7711,7 @@ void mesa_print_display_list( GLuint lis
+    GET_CURRENT_CONTEXT(ctx);
+    print_list( ctx, list );
+ }
+-
++#endif
+ 
+ /**********************************************************************/
+ /*****                      Initialization                        *****/
+diff -urNp Mesa-6.0.1/src/mesa/main/hash.c Mesa-6.0.x/src/mesa/main/hash.c
+--- Mesa-6.0.1/src/mesa/main/hash.c	2003-07-17 16:44:01.000000000 +0300
++++ Mesa-6.0.x/src/mesa/main/hash.c	2015-10-05 05:55:00.000000000 +0300
+@@ -263,7 +263,7 @@ GLuint _mesa_HashFirstEntry(struct _mesa
+ }
+ 
+ 
+-
++#ifdef HASH_TEST_HARNESS
+ /**
+  * Dump contents of hash table for debugging.
+  * 
+@@ -281,6 +281,7 @@ void _mesa_HashPrint(const struct _mesa_
+       }
+    }
+ }
++#endif
+ 
+ 
+ 
+diff -urNp Mesa-6.0.1/src/mesa/main/imports.c Mesa-6.0.x/src/mesa/main/imports.c
+--- Mesa-6.0.1/src/mesa/main/imports.c	2003-12-05 13:25:15.000000000 +0200
++++ Mesa-6.0.x/src/mesa/main/imports.c	2015-10-05 05:55:00.000000000 +0300
+@@ -839,7 +839,7 @@ _mesa_printf( const char *fmtString, ...
+ #if defined(XFree86LOADER) && defined(IN_MODULE)
+    xf86printf("%s", s);
+ #else
+-   printf("%s", s);
++   fprintf(stderr, "%s", s);
+ #endif
+ }
+ 
+diff -urNp Mesa-6.0.1/src/mesa/main/mtypes.h Mesa-6.0.x/src/mesa/main/mtypes.h
+--- Mesa-6.0.1/src/mesa/main/mtypes.h	2004-03-18 17:43:39.000000000 +0200
++++ Mesa-6.0.x/src/mesa/main/mtypes.h	2015-10-05 05:55:00.000000000 +0300
+@@ -2275,8 +2275,10 @@ struct __GLcontextRec {
+ };
+ 
+ 
++#if 0
+ /** The string names for GL_POINT, GL_LINE_LOOP, etc */
+ extern const char *_mesa_prim_name[GL_POLYGON+4];
++#endif
+ 
+ 
+ #ifdef MESA_DEBUG
+diff -urNp Mesa-6.0.1/src/mesa/main/nvfragparse.c Mesa-6.0.x/src/mesa/main/nvfragparse.c
+--- Mesa-6.0.1/src/mesa/main/nvfragparse.c	2004-04-02 20:22:35.000000000 +0300
++++ Mesa-6.0.x/src/mesa/main/nvfragparse.c	2015-10-05 05:55:00.000000000 +0300
+@@ -1500,7 +1500,7 @@ _mesa_parse_nv_fragment_program(GLcontex
+    }
+ }
+ 
+-
++#ifdef DEBUG
+ static void
+ PrintSrcReg(const struct fragment_program *program,
+             const struct fp_src_register *src)
+@@ -1672,7 +1672,6 @@ PrintDstReg(const struct fp_dst_register
+    }
+ }
+ 
+-
+ /**
+  * Print (unparse) the given vertex program.  Just for debugging.
+  */
+@@ -1749,7 +1748,7 @@ _mesa_print_nv_fragment_program(const st
+    }
+    _mesa_printf("END\n");
+ }
+-
++#endif
+ 
+ const char *
+ _mesa_nv_fragment_input_register_name(GLuint i)
+diff -urNp Mesa-6.0.1/src/mesa/main/nvvertexec.c Mesa-6.0.x/src/mesa/main/nvvertexec.c
+--- Mesa-6.0.1/src/mesa/main/nvvertexec.c	2004-02-04 17:45:15.000000000 +0200
++++ Mesa-6.0.x/src/mesa/main/nvvertexec.c	2015-10-05 05:55:00.000000000 +0300
+@@ -173,7 +173,7 @@ _mesa_init_tracked_matrices(GLcontext *c
+ }
+ 
+ 
+-
++#ifdef DEBUG
+ /**
+  * For debugging.  Dump the current vertex program machine registers.
+  */
+@@ -221,7 +221,7 @@ _mesa_dump_vp_state( const struct vertex
+    }
+    _mesa_printf("\n");
+ }
+-
++#endif
+ 
+ 
+ /**
+diff -urNp Mesa-6.0.1/src/mesa/main/nvvertparse.c Mesa-6.0.x/src/mesa/main/nvvertparse.c
+--- Mesa-6.0.1/src/mesa/main/nvvertparse.c	2004-02-04 17:45:15.000000000 +0200
++++ Mesa-6.0.x/src/mesa/main/nvvertparse.c	2015-10-05 05:55:00.000000000 +0300
+@@ -292,6 +292,7 @@ static const char *OutputRegisters[MAX_N
+    "TEX0", "TEX1", "TEX2", "TEX3", "TEX4", "TEX5", "TEX6", "TEX7", NULL
+ };
+ 
++#ifdef DEBUG
+ /* NOTE: the order here must match opcodes in nvvertprog.h */
+ static const char *Opcodes[] = {
+    "MOV", "LIT", "RCP", "RSQ", "EXP", "LOG", "MUL", "ADD", "DP3", "DP4",
+@@ -301,8 +302,7 @@ static const char *Opcodes[] = {
+    "FLR", "FRC", "EX2", "LG2", "POW", "XPD", "SWZ",
+    NULL
+ };
+-
+-
++#endif
+ 
+ /**
+  * Parse a temporary register: Rnn
+@@ -1319,6 +1319,7 @@ _mesa_parse_nv_vertex_program(GLcontext 
+ }
+ 
+ 
++#ifdef DEBUG
+ static void
+ PrintSrcReg(const struct vp_src_register *src)
+ {
+@@ -1398,7 +1399,6 @@ PrintDstReg(const struct vp_dst_register
+    }
+ }
+ 
+-
+ /**
+  * Print a single NVIDIA vertex program instruction.
+  */
+@@ -1463,7 +1463,6 @@ _mesa_print_nv_vertex_instruction(const 
+    }
+ }
+ 
+-
+ /**
+  * Print (unparse) the given vertex program.  Just for debugging.
+  */
+@@ -1478,6 +1477,7 @@ _mesa_print_nv_vertex_program(const stru
+          return;
+    }
+ }
++#endif
+ 
+ 
+ const char *
+diff -urNp Mesa-6.0.1/src/mesa/main/texstate.c Mesa-6.0.x/src/mesa/main/texstate.c
+--- Mesa-6.0.1/src/mesa/main/texstate.c	2004-03-24 02:09:05.000000000 +0200
++++ Mesa-6.0.x/src/mesa/main/texstate.c	2015-10-05 05:55:00.000000000 +0300
+@@ -115,7 +115,7 @@ _mesa_copy_texture_state( const GLcontex
+    }
+ }
+ 
+-
++#ifdef DEBUG
+ /*
+  * For debugging
+  */
+@@ -143,7 +143,7 @@ _mesa_print_texunit_state( GLcontext *ct
+    _mesa_printf("  GL_ALPHA_SCALE = %d\n", 1 << texUnit->CombineScaleShiftA);
+    _mesa_printf("  GL_TEXTURE_ENV_COLOR = (%f, %f, %f, %f)\n", texUnit->EnvColor[0], texUnit->EnvColor[1], texUnit->EnvColor[2], texUnit->EnvColor[3]);
+ }
+-
++#endif
+ 
+ 
+ /**********************************************************************/
+diff -urNp Mesa-6.0.1/src/mesa/Makefile.DJ Mesa-6.0.x/src/mesa/Makefile.DJ
+--- Mesa-6.0.1/src/mesa/Makefile.DJ	2004-01-08 16:26:50.000000000 +0200
++++ Mesa-6.0.x/src/mesa/Makefile.DJ	2015-10-05 05:55:00.000000000 +0300
+@@ -59,7 +59,7 @@
+ 
+ 
+ .PHONY: all clean
+-.INTERMEDIATE: x86/gen_matypes.exe
++.INTERMEDIATE: x86/gen_matypes.exe glide3x.dxe
+ 
+ TOP = ../..
+ GLIDE ?= $(TOP)/glide3
+@@ -68,8 +68,7 @@ GL_LIB = libgl.a
+ GL_DXE = gl.dxe
+ GL_IMP = libigl.a
+ 
+-export LD_LIBRARY_PATH := $(LD_LIBRARY_PATH);$(LIBDIR);$(GLIDE)/lib
+-
++HOST_CC = gcc
+ CC = gcc
+ CFLAGS += -I$(TOP)/include -I. -Imain -Iglapi
+ ifeq ($(FX),1)
+@@ -83,13 +82,7 @@ endif
+ AR = ar
+ ARFLAGS = rus
+ 
+-HAVEDXE3 = $(wildcard $(DJDIR)/bin/dxe3gen.exe)
+-
+-ifeq ($(wildcard $(addsuffix /rm.exe,$(subst ;, ,$(PATH)))),)
+-UNLINK = del $(subst /,\,$(1))
+-else
+-UNLINK = $(RM) $(1)
+-endif
++UNLINK = rm -f $(1)
+ 
+ include sources
+ 
+@@ -193,15 +186,12 @@ $(LIBDIR)/$(GL_LIB): $(OBJECTS)
+ 	$(AR) $(ARFLAGS) $@ $^
+ 
+ $(LIBDIR)/$(GL_DXE) $(LIBDIR)/$(GL_IMP): $(OBJECTS)
+-ifeq ($(HAVEDXE3),)
+-	$(warning Missing DXE3 package... Skipping $(GL_DXE))
+-else
+ ifeq ($(FX),1)
+-	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -Y $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa -P glide3x.dxe -U $^
++$(LIBDIR)/$(GL_DXE) $(LIBDIR)/$(GL_IMP): glide3x.dxe
++	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -Y $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa -P glide3x.dxe -U $(OBJECTS)
+ else
+ 	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -Y $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa -U $^
+ endif
+-endif
+ 
+ $(X86_OBJECTS): x86/matypes.h
+ 
+@@ -209,7 +199,15 @@ x86/matypes.h: x86/gen_matypes.exe
+ 	$< > $@
+ 
+ x86/gen_matypes.exe: x86/gen_matypes.c
+-	$(CC) -o $@ $(CFLAGS) -s $<
++	$(HOST_CC) -o $@ $(CFLAGS) -s $<
++
++# dxe3gen needs glide3x.dxe when generating the import lib libigl.a.
++# so we generate a dummy glide3x.dxe to cover common glide3x exports
++# and all possible libc dependencies:
++drivers/glide/glide3x_dxe.o: drivers/glide/glide3x_dxe.c
++	$(CC) -O0 -Wall -o $@ -c $<
++glide3x.dxe: drivers/glide/glide3x_dxe.o
++	-dxe3gen -o glide3x.dxe -E _gr -E _gu -U $<
+ 
+ clean:
+ 	-$(call UNLINK,array_cache/*.o)
+diff -urNp Mesa-6.0.1/src/mesa/math/m_matrix.c Mesa-6.0.x/src/mesa/math/m_matrix.c
+--- Mesa-6.0.1/src/mesa/math/m_matrix.c	2004-02-05 17:05:00.000000000 +0200
++++ Mesa-6.0.x/src/mesa/math/m_matrix.c	2015-10-05 05:55:00.000000000 +0300
+@@ -41,6 +41,7 @@
+ #include "m_matrix.h"
+ 
+ 
++#if 0
+ /**
+  * Names of the corresponding GLmatrixtype values.
+  */
+@@ -53,6 +54,7 @@ static const char *types[] = {
+    "MATRIX_2D_NO_ROT",
+    "MATRIX_3D"
+ };
++#endif
+ 
+ 
+ /**
+@@ -198,7 +200,7 @@ _math_matrix_mul_floats( GLmatrix *dest,
+ /**********************************************************************/
+ /** \name Matrix output */
+ /*@{*/
+-
++#if 0
+ /**
+  * Print a matrix array.
+  *
+@@ -236,7 +238,7 @@ _math_matrix_print( const GLmatrix *m )
+       _mesa_debug(NULL, "  - not available\n");
+    }
+ }
+-
++#endif
+ /*@}*/
+ 
+ 
+diff -urNp Mesa-6.0.1/src/mesa/math/m_vector.c Mesa-6.0.x/src/mesa/math/m_vector.c
+--- Mesa-6.0.1/src/mesa/math/m_vector.c	2003-11-24 17:23:19.000000000 +0200
++++ Mesa-6.0.x/src/mesa/math/m_vector.c	2015-10-05 05:55:00.000000000 +0300
+@@ -134,7 +134,7 @@ void _mesa_vector4f_free( GLvector4f *v 
+    }
+ }
+ 
+-
++#ifdef DEBUG
+ /*
+  * For debugging
+  */
+@@ -186,5 +186,5 @@ void _mesa_vector4f_print( GLvector4f *v
+       }
+    }
+ }
+-
++#endif
+ 
+diff -urNp Mesa-6.0.1/src/mesa/sources Mesa-6.0.x/src/mesa/sources
+--- Mesa-6.0.1/src/mesa/sources	2004-02-24 06:46:56.000000000 +0200
++++ Mesa-6.0.x/src/mesa/sources	2015-10-05 05:55:00.000000000 +0300
+@@ -138,8 +138,8 @@ ASM_C_SOURCES =	\
+ 	x86/common_x86.c \
+ 	x86/x86.c \
+ 	x86/3dnow.c \
+-	x86/sse.c \
+-	sparc/sparc.c
++	x86/sse.c
++#	sparc/sparc.c
+ 
+ X86_SOURCES =			\
+ 	x86/common_x86_asm.S	\
+diff -urNp Mesa-6.0.1/src/mesa/x86/matypes.h Mesa-6.0.x/src/mesa/x86/matypes.h
+--- Mesa-6.0.1/src/mesa/x86/matypes.h	2004-01-09 18:40:12.000000000 +0200
++++ Mesa-6.0.x/src/mesa/x86/matypes.h	2015-10-05 05:55:00.000000000 +0300
+@@ -15,16 +15,16 @@
+ 
+ #define CTX_DRIVER_CTX              	844
+ 
+-#define CTX_LIGHT_ENABLED           	38176
+-#define CTX_LIGHT_SHADE_MODEL       	38180
+-#define CTX_LIGHT_COLOR_MAT_FACE    	38184
+-#define CTX_LIGHT_COLOR_MAT_MODE    	38188
+-#define CTX_LIGHT_COLOR_MAT_MASK    	38192
+-#define CTX_LIGHT_COLOR_MAT_ENABLED 	38196
+-#define CTX_LIGHT_ENABLED_LIST      	38200
+-#define CTX_LIGHT_NEED_VERTS        	42557
+-#define CTX_LIGHT_FLAGS             	42560
+-#define CTX_LIGHT_BASE_COLOR        	42564
++#define CTX_LIGHT_ENABLED           	38196
++#define CTX_LIGHT_SHADE_MODEL       	38200
++#define CTX_LIGHT_COLOR_MAT_FACE    	38204
++#define CTX_LIGHT_COLOR_MAT_MODE    	38208
++#define CTX_LIGHT_COLOR_MAT_MASK    	38212
++#define CTX_LIGHT_COLOR_MAT_ENABLED 	38216
++#define CTX_LIGHT_ENABLED_LIST      	38220
++#define CTX_LIGHT_NEED_VERTS        	42577
++#define CTX_LIGHT_FLAGS             	42580
++#define CTX_LIGHT_BASE_COLOR        	42584
+ 
+ 
+ /* =============================================================
