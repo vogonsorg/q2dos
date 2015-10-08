@@ -25,11 +25,9 @@ By Neozeed, [HCI]Mara'akate, and sezero.
 |  2 - What works?                        |
 |  3 - What works but needs more testing? |
 |  4 - What doesn't work                  |
-|  5 - Interesting Mesa Parameters        |
-|  6 - Interesting Sage Parameters        |
-|  7 - Tips and other misc. info          |
-|  8 - 3DFX Notes                         |
-|  9 - Links and Credits                  |
+|  5 - Tips and other misc. info          |
+|  6 - 3DFX Notes                         |
+|  7 - Links and Credits                  |
 +-----------------------------------------+
 
 1 - What's required?
