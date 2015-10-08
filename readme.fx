@@ -135,8 +135,6 @@
 * MESA_FX_IGNORE_TEXFMT set to any value (including 0) to disable the
   32bpp-like quality on 16bpp modes.  This causes a slightly performance hit.
   This is enabled by default, and only affects Voodoo 4 and 5.
-* MESA_CODEGEN enables code generation for TnL code.  May help performance,
-  but I have personally seen no benefits.
 
 6 - Interesting Sage parameters
 ---------------------------------------------------------
@@ -173,14 +171,6 @@
   enabled.
 * Trilinear filtering is disabled by default on Voodoo 4/5 unless you use
   MESA_FX_IGNORE_CMBEXT.
-* Warehouse maps with power cubes.  Grabbing/adding a power cube to/from a
-  generator uses a dynamic lighting effect to dim or turn on the lights.
-  This effect drastically slows the renderer down briefly for a few seconds
-  until the effect is finished.  The issue persists on Mesa v6.1 and higher
-  due to the tnl code being completely overhauled.  The offending gl functions
-  are in DrawGLPolyChain in gl_rsurf.c.  You can use Mesa v6.0.1 or Sage
-  if it truly bothers you. DMesaGetProcAddress will have to be re-added to the
-  Mesa v6.0.1 code (trivial to do so, do a grep for it in current Mesa code).
 
 9 - Known Sage Issues
 ---------------------------------------------------------
