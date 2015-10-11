@@ -37,9 +37,7 @@ static uint8_t pcibios_GetBus(void)
 	int386(PCI_SERVICE, &reg, &reg);
 
 	if(reg.w.cflag)
-	{
 		return 0;
-	}
 
 	return 1;
 }

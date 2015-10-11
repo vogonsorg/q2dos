@@ -34,9 +34,7 @@ struct dosmem_t *pds_dpmi_dos_allocmem(unsigned int size)
 #ifdef __DJGPP__
   #ifndef ZDM
 	if(!__djgpp_nearptr_enable())
-	{
 		return NULL;
-	}
   #endif
 
 	__asm__("movl %0,%%ebx"::"m"(size));
@@ -82,9 +80,7 @@ unsigned long pds_dpmi_map_physical_memory(unsigned long phys_addr,unsigned long
 	mi.size = memsize;
 
 	if(__dpmi_physical_address_mapping(&mi) != 0)
-	{
 		return 0;
-	}
 
 	au_map_selector = __dpmi_allocate_ldt_descriptors(1);
 	__dpmi_set_segment_base_address (au_map_selector,mi.address);
@@ -106,9 +102,7 @@ unsigned long pds_dpmi_map_physical_memory(unsigned long phys_addr,unsigned long
 	int386(0x31,&regs,&regs);
 
 	if(regs.w.cflag)
-	{
 		return 0;
-	}
 
 	ret = ((unsigned long)regs.w.bx<<16) | (regs.w.cx&0xffff);
 

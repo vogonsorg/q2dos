@@ -96,7 +96,6 @@ static unsigned int snd_audigyls_selector(struct emu10k1_card *card,struct mpxpl
 	if((card->chips&EMU_CHIPS_0106) && ((card->serial==0x10021102) || (card->serial==0x10051102)))
 	{
 		mpxplay_debugf(SBL_DEBUG_OUTPUT,"selected : audigy ls");
-
 		return 1;
 	}
 
@@ -108,7 +107,6 @@ static unsigned int snd_live24_selector(struct emu10k1_card *card,struct mpxplay
 	if((card->chips&EMU_CHIPS_0106) && ((card->serial==0x10061102) || (card->serial==0x10071102) || (card->serial==0x10091462) || (card->serial==0x30381297) || (card->serial==0x10121102) || !card->card_capabilities->subsystem))
 	{
 		mpxplay_debugf(SBL_DEBUG_OUTPUT,"selected : live24");
-
 		return 1;
 	}
 
@@ -226,9 +224,7 @@ static unsigned int snd_live24_buffer_init(struct emu10k1_card *card,struct mpxp
 	card->dm=pds_dpmi_dos_allocmem(CA0106_DMABUF_PERIODS*2*sizeof(uint32_t)+card->pcmout_bufsize);
 
 	if(!card->dm)
-	{
 		return 0;
-	}
 
 	card->virtualpagetable=(uint32_t *)card->dm->linearptr;
 	card->pcmout_buffer=((char *)card->virtualpagetable)+CA0106_DMABUF_PERIODS*2*sizeof(uint32_t);
@@ -246,24 +242,24 @@ static void snd_ca0106_pcm_prepare_playback(struct emu10k1_card *card,struct mpx
 
 	switch(aui->freq_card)
 	{
-		 case 44100:
-			reg40_set = 0x10000 << (channel<<1);
-			reg71_set = 0x01010000;
-			break;
+	case 44100:
+		reg40_set = 0x10000 << (channel<<1);
+		reg71_set = 0x01010000;
+		break;
 
-		case 96000:
-			reg40_set = 0x20000 << (channel<<1);
-			reg71_set = 0x02020000;
-			break;
+	case 96000:
+		reg40_set = 0x20000 << (channel<<1);
+		reg71_set = 0x02020000;
+		break;
 
-		case 192000:
-			reg40_set = 0x30000 << (channel<<1);
-			reg71_set = 0x03030000;
-			break;
-		default: // 48000
-			reg40_set = 0;
-			reg71_set = 0;
-			break;
+	case 192000:
+		reg40_set = 0x30000 << (channel<<1);
+		reg71_set = 0x03030000;
+		break;
+	default: // 48000
+		reg40_set = 0;
+		reg71_set = 0;
+		break;
 	}
 
 	i = snd_ca0106_ptr_read(card, 0x40, 0); // control host to fifo
@@ -276,12 +272,10 @@ static void snd_ca0106_pcm_prepare_playback(struct emu10k1_card *card,struct mpx
 
 	i=inl(card->iobase+HCFG);               // control bit width
 
-	if(aui->bits_card==32)
-	{
+	if(aui->bits_card==32) {
 		i|=HCFG_PLAYBACK_S32_LE;
 	}
-	else
-	{
+	else {
 		i&=~HCFG_PLAYBACK_S32_LE;
 	}
 
@@ -328,31 +322,24 @@ static void snd_live24_setrate(struct emu10k1_card *card,struct mpxplay_audioout
 
 	aui->chan_card=2;
 
-	if(aui->bits_set>16)
-	{
+	if(aui->bits_set>16) {
 		aui->bits_card=32;
 	}
-	else
-	{
+	else {
 		aui->bits_card=16;
 	}
 
-	if(aui->freq_set==44100)     // forced 44.1k dac output
-	{
+	if(aui->freq_set==44100) {   // forced 44.1k dac output
 		aui->freq_card=44100;
 	}
-	else if(aui->freq_card!=48000)
-	{
-		if(aui->freq_card<=22050)
-		{
+	else if(aui->freq_card!=48000) {
+		if(aui->freq_card<=22050) {
 			aui->freq_card=48000;
 		}
-		else if((aui->freq_card<=96000) || (card->serial==0x10121102)) // (44.1->96) because 44.1k dac out sounds bad (?)
-		{
+		else if((aui->freq_card<=96000) || (card->serial==0x10121102)) { // (44.1->96) because 44.1k dac out sounds bad (?)
 			aui->freq_card=96000;
 		}
-		else
-		{
+		else {
 			aui->freq_card=192000;
 		}
 	}
@@ -389,8 +376,7 @@ static unsigned int snd_live24_pcm_pointer_playback(struct emu10k1_card *card,st
 	ptr1 = snd_ca0106_ptr_read(card, PLAYBACK_POINTER, channel);
 	ptr4 = snd_ca0106_ptr_read(card, PLAYBACK_LIST_PTR, channel);
 
-	if(ptr3!=ptr4)
-	{
+	if(ptr3!=ptr4) {
 		ptr1=snd_ca0106_ptr_read(card, PLAYBACK_POINTER, channel);
 	}
 

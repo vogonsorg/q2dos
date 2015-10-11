@@ -171,7 +171,7 @@ extern void pds_dpmi_unmap_physycal_memory(unsigned long linear_address);
 extern unsigned int MDma_get_max_pcmoutbufsize(unsigned int pagesize,unsigned int samplesize);
 extern unsigned int MDma_init_pcmoutbuf(unsigned int maxbufsize,unsigned int pagesize);
 extern void MDma_clearbuf(void);
-extern void MDma_writedata(char *src,unsigned long left);
+extern void MDma_writedata(const char *src,unsigned long left);
 extern unsigned int MDma_bufpos(void);
 
 // out pcm defs
@@ -393,7 +393,7 @@ extern void AU_stop(void);
 extern void AU_close(void);
 extern void AU_setrate(unsigned int *fr, unsigned int *bt, unsigned int *ch);
 extern void AU_setmixer_all(unsigned int vol);
-extern void AU_writedata(char *pcm, long len, unsigned int look);
+extern void AU_writedata(const char *pcm, long len);
 
 extern void pds_delay_10us(unsigned int ticks);
 extern mpxp_uint64_t pds_gettimeu(void); // usec

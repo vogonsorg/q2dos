@@ -1331,7 +1331,7 @@ static long SBLIVE_getbufpos(struct mpxplay_audioout_info_s *aui)
  return aui->card_dma_lastgoodpos;
 }
 
-static void SBLIVE_clearbuf()
+static void SBLIVE_clearbuf(void)
 {
  struct mpxplay_audioout_info_s *aui=&au_infos;
  struct emu10k1_card *card=aui->card_private_data;

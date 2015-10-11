@@ -72,7 +72,7 @@ char* AU_search(unsigned int config)
 	return NULL;
 }
 
-void AU_start()
+void AU_start(void)
 {
 	struct mpxplay_audioout_info_s *aui=&au_infos;
 
@@ -84,7 +84,7 @@ void AU_start()
 	}
 }
 
-void AU_stop()
+void AU_stop(void)
 {
 	struct mpxplay_audioout_info_s *aui=&au_infos;
 
@@ -99,7 +99,7 @@ void AU_stop()
 	}
 }
 
-void AU_close()
+void AU_close(void)
 {
 	struct mpxplay_audioout_info_s *aui=&au_infos;
 
@@ -108,7 +108,7 @@ void AU_close()
 }
 
 #ifndef SDR
-unsigned int AU_cardbuf_space()
+unsigned int AU_cardbuf_space(void)
 {
 	struct mpxplay_audioout_info_s *aui=&au_infos;
 
@@ -149,7 +149,7 @@ unsigned int AU_cardbuf_space()
 	return (aui->card_dmaspace>aui->card_bufprotect) ? (aui->card_dmaspace-aui->card_bufprotect):0;
 }
 
-void AU_writedata(char* pcm, long len, unsigned int look)
+void AU_writedata(const char* pcm, long len)
 {
 	struct mpxplay_audioout_info_s *aui=&au_infos;
 
@@ -168,13 +168,6 @@ void AU_writedata(char* pcm, long len, unsigned int look)
 				MDma_writedata(pcm,outbytes_putblock);
 				pcm+=outbytes_putblock;
 				len-=outbytes_putblock;
-			}
-
-			if(look & kbhit())
-			{
-				getch();
-				AU_close();
-				exit(-1);
 			}
 		}
 		while(len);
@@ -227,14 +220,11 @@ aucards_onemixerchan_s *AU_search_mixerchan(aucards_allmixerchan_s *mixeri,unsig
 	while(*mixeri)
 	{
 		if((*mixeri)->mixchan==mixchannum)
-		{
 			return (*mixeri);
-		}
 
 		if(++i >= AU_MIXCHANS_NUM)
-		{
 			break;
-		}
+
 		mixeri++;
 	}
 
@@ -253,69 +243,48 @@ void AU_setmixer_one(unsigned int mixchannum,unsigned int setmode,int newvalue)
 	function=AU_MIXCHANFUNCS_GETFUNC(mixchannum);
 
 	if(function>=AU_MIXCHANFUNCS_NUM)
-	{
 		return;
-	}
 
 	channel=AU_MIXCHANFUNCS_GETCHAN(mixchannum);
 
 	if(channel>AU_MIXCHANS_NUM)
-	{
 		return;
-	}
 
 	if(!cardi->card_writemixer || !cardi->card_readmixer || !cardi->card_mixerchans)
-	{
 		return;
-	}
 
 	onechi=AU_search_mixerchan(cardi->card_mixerchans,mixchannum);
 
 	if(!onechi)
-	{
 		return;
-	}
 
 	subchannelnum=onechi->subchannelnum;
 
 	if(!subchannelnum || (subchannelnum>AU_MIXERCHAN_MAX_SUBCHANNELS))
-	{
 		return;
-	}
 
  //calculate new percent
 	switch(setmode)
 	{
-		case MIXER_SETMODE_ABSOLUTE:
-			newpercentval=newvalue;
-			break;
-		case MIXER_SETMODE_RELATIVE:
-			if(function==AU_MIXCHANFUNC_VOLUME)
-			{
-				newpercentval=aui->card_mixer_values[channel]+newvalue;
-			}
-			else if(newvalue<0)
-			{
-				newpercentval=0;
-			}
-			else
-			{
-				newpercentval=100;
-				break;
-			}
-		default:
-			return;
+	case MIXER_SETMODE_ABSOLUTE:
+		newpercentval=newvalue;
+		break;
+	case MIXER_SETMODE_RELATIVE:
+		if(function==AU_MIXCHANFUNC_VOLUME)
+			newpercentval=aui->card_mixer_values[channel]+newvalue;
+		else if(newvalue<0)
+			newpercentval=0;
+		else	newpercentval=100;
+		break;
+	default:
+		return;
 	}
 
 	if(newpercentval<0)
-	{
 		newpercentval=0;
-	}
 
 	if(newpercentval>100)
-	{
 		newpercentval=100;
-	}
 
 	ENTER_CRITICAL;
 
@@ -326,21 +295,15 @@ void AU_setmixer_one(unsigned int mixchannum,unsigned int setmode,int newvalue)
 		unsigned long currchval, newchval;
 
 		if((subchi->submixch_register>AU_MIXERCHAN_MAX_REGISTER) || !subchi->submixch_max || (subchi->submixch_shift>AU_MIXERCHAN_MAX_BITS)) // invalid subchannel infos
-		{
 			continue;
-		}
 
 		newchval=(unsigned long)(((float)newpercentval*(float)subchi->submixch_max+49.0)/100.0); // percent to chval (rounding up)
 
 		if(newchval>subchi->submixch_max)
-		{
 			newchval=subchi->submixch_max;
-		}
 	
 		if(subchi->submixch_infobits&SUBMIXCH_INFOBIT_REVERSEDVALUE)   // reverse value if required
-		{
 			newchval=subchi->submixch_max-newchval;
-		}
 
 		newchval<<=subchi->submixch_shift;                             // shift to position
 
@@ -353,8 +316,7 @@ void AU_setmixer_one(unsigned int mixchannum,unsigned int setmode,int newvalue)
 
 	LEAVE_CRITICAL;
 
-	if(function==AU_MIXCHANFUNC_VOLUME)
-	{
+	if(function==AU_MIXCHANFUNC_VOLUME) {
 		aui->card_mixer_values[channel]=newpercentval;
 	}
 }
@@ -372,59 +334,39 @@ int AU_getmixer_one(unsigned int mixchannum)
 	function=AU_MIXCHANFUNCS_GETFUNC(mixchannum);
 
 	if(function>=AU_MIXCHANFUNCS_NUM)
-	{
 		return -1;
-	}
 
 	channel=AU_MIXCHANFUNCS_GETCHAN(mixchannum);
 
 	if(channel>AU_MIXCHANS_NUM)
-	{
 		return -1;
-	}
 
 	if(!cardi->card_readmixer || !cardi->card_mixerchans)
-	{
 		return -1;
-	}
 
 	onechi=AU_search_mixerchan(cardi->card_mixerchans,mixchannum);
-
 	if(!onechi)
-	{
 		return -1;
-	}
 
 	subchannelnum=onechi->subchannelnum;
-
 	if(!subchannelnum || (subchannelnum>AU_MIXERCHAN_MAX_SUBCHANNELS))
-	{
 		return -1;
-	}
 
 	// we read one (the left at stereo) sub-channel only
 	subchi=&(onechi->submixerchans[0]);
-
 	if((subchi->submixch_register>AU_MIXERCHAN_MAX_REGISTER) || (subchi->submixch_shift>AU_MIXERCHAN_MAX_BITS)) // invalid subchannel infos
-	{
 		return -1;
-	}
 
 	value=cardi->card_readmixer(aui,subchi->submixch_register);	// read
 	value>>=subchi->submixch_shift;					// shift
 	value&=subchi->submixch_max;					// mask
 
 	if(subchi->submixch_infobits&SUBMIXCH_INFOBIT_REVERSEDVALUE)// reverse value if required
-	{
 		value=subchi->submixch_max-value;
-	}
 
 	value=(float)value*100.0/(float)subchi->submixch_max;		// chval to percent
-
 	if(value>100)
-	{
 		value=100;
-	}
 
 	return value;
 }

@@ -497,7 +497,7 @@ static void snd_intel_measure_ac97_clock(struct mpxplay_audioout_info_s *aui)
 
 //------------------------------------------------------------------------
 
-static void INTELICH_writedata()
+static void INTELICH_writedata(void)
 {
 struct mpxplay_audioout_info_s *aui=&au_infos;
  struct intel_card_s *card=aui->card_private_data;

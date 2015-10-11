@@ -9,13 +9,13 @@ void pds_delay_10us(unsigned int ticks) //each tick is 10us
 
 	for(i=0;i<ticks;i++)
 	{
-		outp(0x43,64); // chanel 1 only read (NOT modify!) chanels 0 & 2 is free!
-		oldtsc=inp(0x41);
+		outb(0x43,64); // chanel 1 only read (NOT modify!) chanels 0 & 2 is free!
+		oldtsc=inb(0x41);
 
 		do
 		{
-			outp(0x43,64);
-			tsctemp=inp(0x41);
+			outb(0x43,64);
+			tsctemp=inb(0x41);
 
 			if(tsctemp<=oldtsc)
 			{

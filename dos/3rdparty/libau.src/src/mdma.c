@@ -5,14 +5,10 @@ unsigned int MDma_get_max_pcmoutbufsize(unsigned int pagesize, unsigned int samp
 	unsigned int bufsize;
 
 	if(!pagesize)
-	{
 		pagesize=AUCARDS_DMABUFSIZE_BLOCK;
-	}
 
 	if(samplesize<2)
-	{
 		samplesize=2;
-	}
 
 	bufsize=AUCARDS_DMABUFSIZE_NORMAL;
 	// 2x bufsize at 32-bit output (1.5x at 24)
@@ -21,9 +17,7 @@ unsigned int MDma_get_max_pcmoutbufsize(unsigned int pagesize, unsigned int samp
 	bufsize-=(bufsize%pagesize);
 
 	if(bufsize>AUCARDS_DMABUFSIZE_MAX)
-	{
 		bufsize=AUCARDS_DMABUFSIZE_MAX-(AUCARDS_DMABUFSIZE_MAX%pagesize);
-	}
 
 	return bufsize;
 }
@@ -35,13 +29,13 @@ unsigned int MDma_init_pcmoutbuf(unsigned int maxbufsize, unsigned int pagesize)
 
 	switch(aui->card_wave_id)
 	{
-		case MPXPLAY_WAVEID_PCM_FLOAT:
-			bit_width=32;
-			break;
+	case MPXPLAY_WAVEID_PCM_FLOAT:
+		bit_width=32;
+		break;
 
-		default:
-			bit_width=aui->bits_card;
-			break;
+	default:
+		bit_width=aui->bits_card;
+		break;
 	}
 
 	dmabufsize=maxbufsize;
@@ -50,14 +44,10 @@ unsigned int MDma_init_pcmoutbuf(unsigned int maxbufsize, unsigned int pagesize)
 	dmabufsize-=(dmabufsize%pagesize);
 
 	if(dmabufsize<(pagesize*2))
-	{
 		dmabufsize=(pagesize*2);
-	}
 
 	if(dmabufsize>maxbufsize)
-	{
 		dmabufsize=maxbufsize-(maxbufsize%pagesize);
-	}
 
 	funcbit_smp_value_put(aui->card_bytespersign,aui->chan_card*((bit_width+7)/8));
 	funcbit_smp_value_put(aui->card_dmasize,dmabufsize);
@@ -71,7 +61,7 @@ unsigned int MDma_init_pcmoutbuf(unsigned int maxbufsize, unsigned int pagesize)
 	return dmabufsize;
 }
 
-void MDma_clearbuf()
+void MDma_clearbuf(void)
 {
 	struct mpxplay_audioout_info_s *aui=&au_infos;
 #ifdef ZDM
@@ -88,17 +78,14 @@ void MDma_clearbuf()
 #endif /* ZDM */
 }
 
-unsigned int MDma_bufpos()
+unsigned int MDma_bufpos(void)
 {
 	struct mpxplay_audioout_info_s *aui=&au_infos;
 	unsigned int bufpos = aui->card_handler->cardbuf_pos(aui);
 
 	if(bufpos>=aui->card_dmasize)
-	{
 		bufpos=0;		// checking
-	}
-	else
-	{
+	else {
 		bufpos-=(bufpos%aui->card_bytespersign);	// round
 	}
 
@@ -107,12 +94,10 @@ unsigned int MDma_bufpos()
 	//sets a new put-pointer in this case
 #endif
 	{
-		if(bufpos>=aui->card_outbytes)
-		{
+		if(bufpos>=aui->card_outbytes) {
 			aui->card_dmalastput=bufpos-aui->card_outbytes;
 		}
-		else
-		{
+		else {
 			aui->card_dmalastput=aui->card_dmasize+bufpos-aui->card_outbytes;
 		}
 
@@ -122,7 +107,7 @@ unsigned int MDma_bufpos()
 	return bufpos;
 }
 
-void MDma_writedata(char *src,unsigned long left)
+void MDma_writedata(const char *src,unsigned long left)
 {
 	struct mpxplay_audioout_info_s *aui=&au_infos;
 	unsigned int todo;
@@ -134,22 +119,20 @@ void MDma_writedata(char *src,unsigned long left)
 #endif
 
 	todo = aui->card_dmasize-aui->card_dmalastput;
- 
-	if(todo<=left)
-	{
+
+	if(todo<=left) {
 #ifdef ZDM
 		dosmemput(src,todo,(unsigned int)aui->card_DMABUFF+aui->card_dmalastput);
 #else
 		memcpy(aui->card_DMABUFF+aui->card_dmalastput,src,todo);
 #endif /* ZDM */
 
-	aui->card_dmalastput=0;
-	left-=todo;
-	src+=todo;
+		aui->card_dmalastput=0;
+		left-=todo;
+		src+=todo;
 	}
 
-	if(left)
-	{
+	if(left) {
 #ifdef ZDM
 		dosmemput(src,left,(unsigned int)aui->card_DMABUFF+aui->card_dmalastput);
 #else
@@ -158,8 +141,7 @@ void MDma_writedata(char *src,unsigned long left)
 		aui->card_dmalastput+=left;
 	}
 
-	if(aui->card_handler->cardbuf_writedata)
-	{
+	if(aui->card_handler->cardbuf_writedata) {
 		aui->card_handler->cardbuf_writedata();
 	}
 }
