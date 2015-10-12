@@ -27,7 +27,6 @@ struct dosmem_t{
  unsigned short selector;
  char *linearptr;
 };
-extern struct dosmem_t au_dosmem; /* dpmi.c */
 
 #define NEWFUNC_ASM
 
@@ -383,7 +382,7 @@ typedef struct mpxplay_audioout_info_s{
 extern struct mpxplay_audioout_info_s au_infos;
 
 //main soundcard routines
-extern char* AU_search(unsigned int config);
+extern const char* AU_search(unsigned int config);
 extern unsigned int AU_cardbuf_space(void);
 extern void AU_start(void);
 extern void AU_stop(void);

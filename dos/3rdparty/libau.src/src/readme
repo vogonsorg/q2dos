@@ -7,7 +7,7 @@ All changes its code let me know. (starus2009@mail.ru)
 ********************************************************************************
 
 //main soundcard routines:
-char* AU_search(unsigned int config); config = 0 (for LINE_OUT) or 1 for STEREO_SPEAKER_OUT (only Intel HDA chips)
+const char* AU_search(unsigned int config); config = 0 (for LINE_OUT) or 1 for STEREO_SPEAKER_OUT (only Intel HDA chips)
 uint AU_cardbuf_space(void); return free space in buffer (sample position)
 void AU_start(void); start DMA
 void AU_stop(void); stop DMA
