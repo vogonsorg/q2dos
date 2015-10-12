@@ -19,7 +19,7 @@ Returns false if nothing is found.
 */
 qboolean PCI_Init(void)
 {
-	struct mpxplay_audioout_info_s *aui=&au_infos;
+	const struct mpxplay_audioout_info_s *aui;
 	const char *c;
 
 	c = AU_search(1);/* 1: stereo speaker output (meaningful only for Intel HDA chips) */
@@ -38,10 +38,11 @@ qboolean PCI_Init(void)
 		dma.channels=channels;
 		AU_setrate(&speed,&samplebits,&channels);
 
-		/* not sure but I think these can change in the setrate */
+		aui = AU_getinfo();
 		dma.speed=aui->freq_card;
 		dma.samplebits=aui->bits_set;
 		dma.channels=aui->chan_set;
+
 		if(dma.speed != s_khz->intValue) /* FS: In theory, our rate was not liked, so force the change. */
 			Cvar_SetValue("s_khz", dma.speed);
 		Com_DPrintf(DEVELOPER_MSG_SOUND, "Post AU_setrate %d/%d/%d\n",dma.speed,dma.samplebits,dma.channels);
@@ -49,9 +50,8 @@ qboolean PCI_Init(void)
 		dma.samples = aui->card_dmasize/aui->bytespersample_card;
 		dma.samplepos = 0;
 		dma.submission_chunk = 1;
-
-		memset(aui->card_DMABUFF, 0, aui->card_dmasize); /* FS: Clear the dma buffer on Init */
 		dma.buffer = (unsigned char *) aui->card_DMABUFF;
+		memset(dma.buffer, 0, aui->card_dmasize);
 
 		AU_setmixer_all(80); /* 80% volume */
 		AU_start();
