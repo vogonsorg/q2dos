@@ -102,7 +102,7 @@ typedef struct pci_config_s
 	uint8_t bFunc;
 	uint16_t vendor_id;
 	uint16_t device_id;
-	char *device_name;     // from pci_device_s
+	const char *device_name;// from pci_device_s
 	uint16_t device_type;  // from pci_device_s
 }pci_config_s;
 
@@ -110,7 +110,7 @@ extern struct pci_config_s libau_pci;
 
 typedef struct pci_device_s
 {
-	char *device_name;     // a short id string
+	const char *device_name;// a short id string
 	uint16_t vendor_id;    // pci vendor id
 	uint16_t device_id;    // pci device id
 	uint16_t device_type;  // internal device type

@@ -1197,7 +1197,7 @@ static void sblive_select_mixer(struct emu10k1_card *card);
 
 static void SBLIVE_card_info(struct mpxplay_audioout_info_s *aui)
 {
- struct emu10k1_card *card=aui->card_private_data;
+ struct emu10k1_card *card=(struct emu10k1_card *)aui->card_private_data;
  sprintf(libau_istr,"SBA : SB %s (%8.8lX)(bits:16%s) on port:%4.4lX irq:%u",
          ((card->card_capabilities->longname)? card->card_capabilities->longname:card->pci_dev->device_name),
          card->serial,((card->chips&EMU_CHIPS_24BIT)? ",24":""),
@@ -1278,7 +1278,7 @@ err_adetect:
 
 static void SBLIVE_close(struct mpxplay_audioout_info_s *aui)
 {
- struct emu10k1_card *card=aui->card_private_data;
+ struct emu10k1_card *card=(struct emu10k1_card *)aui->card_private_data;
  if(card){
   if(card->iobase)
    if(card->driver_funcs->hw_close)    card->driver_funcs->hw_close(card);
@@ -1289,7 +1289,7 @@ static void SBLIVE_close(struct mpxplay_audioout_info_s *aui)
 
 static void SBLIVE_setrate(struct mpxplay_audioout_info_s *aui)
 {
- struct emu10k1_card *card=aui->card_private_data;
+ struct emu10k1_card *card=(struct emu10k1_card *)aui->card_private_data;
 
  aui->card_wave_id=MPXPLAY_WAVEID_PCM_SLE;
 
@@ -1299,7 +1299,7 @@ static void SBLIVE_setrate(struct mpxplay_audioout_info_s *aui)
 
 static void SBLIVE_start(struct mpxplay_audioout_info_s *aui)
 {
- struct emu10k1_card *card=aui->card_private_data;
+ struct emu10k1_card *card=(struct emu10k1_card *)aui->card_private_data;
 
  if(card->driver_funcs->start_playback)
   card->driver_funcs->start_playback(card);
@@ -1307,7 +1307,7 @@ static void SBLIVE_start(struct mpxplay_audioout_info_s *aui)
 
 static void SBLIVE_stop(struct mpxplay_audioout_info_s *aui)
 {
- struct emu10k1_card *card=aui->card_private_data;
+ struct emu10k1_card *card=(struct emu10k1_card *)aui->card_private_data;
 
  if(card->driver_funcs->stop_playback)
   card->driver_funcs->stop_playback(card);
@@ -1315,7 +1315,7 @@ static void SBLIVE_stop(struct mpxplay_audioout_info_s *aui)
 
 static long SBLIVE_getbufpos(struct mpxplay_audioout_info_s *aui)
 {
- struct emu10k1_card *card=aui->card_private_data;
+ struct emu10k1_card *card=(struct emu10k1_card *)aui->card_private_data;
  unsigned long bufpos;
 
  if(card->driver_funcs->pcm_pointer_playback)
@@ -1334,21 +1334,21 @@ static long SBLIVE_getbufpos(struct mpxplay_audioout_info_s *aui)
 static void SBLIVE_clearbuf(void)
 {
  struct mpxplay_audioout_info_s *aui=&au_infos;
- struct emu10k1_card *card=aui->card_private_data;
+ struct emu10k1_card *card=(struct emu10k1_card *)aui->card_private_data;
  MDma_clearbuf();
  if(card->driver_funcs->clear_cache)  card->driver_funcs->clear_cache(card);
 }
 
 static void SBLIVE_writeMIXER(struct mpxplay_audioout_info_s *aui,unsigned long reg, unsigned long val)
 {
- struct emu10k1_card *card=aui->card_private_data;
+ struct emu10k1_card *card=(struct emu10k1_card *)aui->card_private_data;
  if(card->driver_funcs->mixer_write)
   card->driver_funcs->mixer_write(card,reg,val);
 }
 
 static unsigned long SBLIVE_readMIXER(struct mpxplay_audioout_info_s *aui,unsigned long reg)
 {
- struct emu10k1_card *card=aui->card_private_data;
+ struct emu10k1_card *card=(struct emu10k1_card *)aui->card_private_data;
  unsigned int retval;
  if(card->driver_funcs->mixer_read)
   retval=card->driver_funcs->mixer_read(card,reg);

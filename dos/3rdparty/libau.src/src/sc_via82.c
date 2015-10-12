@@ -19,8 +19,6 @@
 #include "pcibios.h"
 #include "ac97_def.h"
 
-struct	via82xx_card	via;
-
 // ac97
 #define VIA_REG_AC97_CTRL               0x80
 #define VIA_REG_AC97_CODEC_ID_PRIMARY   0x00000000
@@ -106,12 +104,12 @@ struct via82xx_card
  int pcmout_pages;
 };
 
+struct	via82xx_card	via;
+
 static void via82xx_AC97Codec_ready(unsigned int baseport);
 static void via82xx_ac97_write(unsigned int baseport,unsigned int reg, unsigned int value);
 static unsigned int via82xx_ac97_read(unsigned int baseport, unsigned int reg);
 static void via82xx_dxs_write(unsigned int baseport,unsigned int reg, unsigned int val);
-
-extern unsigned int intsoundconfig,intsoundcontrol;
 
 static unsigned int via8233_dxs_volume=0x02;
 
@@ -216,7 +214,7 @@ static void VIA82XX_close(struct mpxplay_audioout_info_s *aui);
 
 static void VIA82XX_card_info(struct mpxplay_audioout_info_s *aui)
 {
- struct via82xx_card *card=aui->card_private_data;
+ struct via82xx_card *card=(struct via82xx_card *)aui->card_private_data;
  sprintf(libau_istr,"VIA : %s soundcard found on port:%4.4lX irq:%u chiprev:%2.2X model:%4.4X",
 	 card->pci_dev->device_name,card->iobase,card->irq,(unsigned)card->chiprev,(unsigned)card->model);
 }
@@ -246,7 +244,7 @@ static int VIA82XX_adetect(struct mpxplay_audioout_info_s *aui)
 			    +card->pcmout_bufsize   // pcm output
 			    +4096 );                // to round
 if(!card->dm) goto err_adetect;
- card->virtualpagetable=(void *)(((uint32_t)card->dm->linearptr+4095)&(~4095));
+ card->virtualpagetable=(unsigned long *)(((uint32_t)card->dm->linearptr+4095)&(~4095));
  card->pcmout_buffer=(char *)card->virtualpagetable+VIRTUALPAGETABLESIZE;
 
  aui->card_DMABUFF=card->pcmout_buffer;
@@ -266,7 +264,7 @@ err_adetect:
 
 static void VIA82XX_close(struct mpxplay_audioout_info_s *aui)
 {
- struct via82xx_card *card=aui->card_private_data;
+ struct via82xx_card *card=(struct via82xx_card *)aui->card_private_data;
  if(card){
   if(card->iobase)   via82xx_chip_close(card);
   pds_dpmi_dos_freemem();
@@ -276,7 +274,7 @@ static void VIA82XX_close(struct mpxplay_audioout_info_s *aui)
 
 static void VIA82XX_setrate(struct mpxplay_audioout_info_s *aui)
 {
- struct via82xx_card *card=aui->card_private_data;
+ struct via82xx_card *card=(struct via82xx_card *)aui->card_private_data;
  unsigned int dmabufsize,pagecount,spdif_rate;
  unsigned long pcmbufp;
 
@@ -366,7 +364,7 @@ _farnspokel((unsigned int)&card->virtualpagetable[pagecount*2+1],VIA_TBL_BIT_EOL
 
 static void VIA82XX_start(struct mpxplay_audioout_info_s *aui)
 {
- struct via82xx_card *card=aui->card_private_data;
+ struct via82xx_card *card=(struct via82xx_card *)aui->card_private_data;
  if(card->pci_dev->device_id==PCI_DEVICE_ID_VT82C686)
   outb(card->iobase + VIA_REG_OFFSET_CONTROL, VIA_REG_CTRL_START);
  else
@@ -375,13 +373,13 @@ static void VIA82XX_start(struct mpxplay_audioout_info_s *aui)
 
 static void VIA82XX_stop(struct mpxplay_audioout_info_s *aui)
 {
- struct via82xx_card *card=aui->card_private_data;
+ struct via82xx_card *card=(struct via82xx_card *)aui->card_private_data;
  outb(card->iobase + VIA_REG_OFFSET_CONTROL, VIA_REG_CTRL_PAUSE);
 }
 
 static long VIA82XX_getbufpos(struct mpxplay_audioout_info_s *aui)
 {
- struct via82xx_card *card=aui->card_private_data;
+ struct via82xx_card *card=(struct via82xx_card *)aui->card_private_data;
  unsigned int baseport=card->iobase;
  unsigned long idx,count,bufpos;
 
@@ -490,7 +488,7 @@ static unsigned int via82xx_dxs_read(unsigned int baseport,unsigned int reg)
 
 static void VIA82XX_writeMIXER(struct mpxplay_audioout_info_s *aui,unsigned long reg, unsigned long val)
 {
- struct via82xx_card *card=aui->card_private_data;
+ struct via82xx_card *card=(struct via82xx_card *)aui->card_private_data;
 
  //if((reg==VIA_REG_OFS_PLAYBACK_VOLUME_L) || (reg==VIA_REG_OFS_PLAYBACK_VOLUME_R)){
  if(reg>=256){ // VIA_REG_OFS_PLAYBACK_VOLUME_X
@@ -502,7 +500,7 @@ static void VIA82XX_writeMIXER(struct mpxplay_audioout_info_s *aui,unsigned long
 
 static unsigned long VIA82XX_readMIXER(struct mpxplay_audioout_info_s *aui,unsigned long reg)
 {
- struct via82xx_card *card=aui->card_private_data;
+ struct via82xx_card *card=(struct via82xx_card *)aui->card_private_data;
  unsigned int retval=0;
 
  //if((reg==VIA_REG_OFS_PLAYBACK_VOLUME_L) || (reg==VIA_REG_OFS_PLAYBACK_VOLUME_R)){

@@ -14,7 +14,7 @@
 
 typedef struct emu_card_version_s
 {
-	char *longname;
+	const char *longname;
 	uint16_t device;
 	uint8_t  revision;
 	uint32_t subsystem;     // serial

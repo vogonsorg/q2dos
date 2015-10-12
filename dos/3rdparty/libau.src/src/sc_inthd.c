@@ -27,8 +27,6 @@
 #include "pcibios.h"
 #include "sc_inthd.h"
 
-struct	intelhd_card_s	ihd;
-
 #ifdef SDR
 struct hda_gnode stuff[64];
 #endif
@@ -66,9 +64,11 @@ struct intelhd_card_s
  unsigned int  config_select;
 };
 
+struct	intelhd_card_s	ihd;
+
 struct codec_vendor_list_s{
  unsigned short vendor_id;
- char *vendor_name;
+ const char *vendor_name;
 };
 
 struct hda_rate_tbl {
@@ -1055,7 +1055,7 @@ static struct codec_vendor_list_s codecvendorlist[]={
 
 static void INTELHD_close(struct mpxplay_audioout_info_s *aui);
 
-static char *ihd_search_vendorname(unsigned int vendorid)
+static const char *ihd_search_vendorname(unsigned int vendorid)
 {
  struct codec_vendor_list_s *cl=&codecvendorlist[0];
  do{
@@ -1068,7 +1068,7 @@ static char *ihd_search_vendorname(unsigned int vendorid)
 
 static void INTELHD_card_info(struct mpxplay_audioout_info_s *aui)
 {
- struct intelhd_card_s *card=aui->card_private_data;
+ struct intelhd_card_s *card=(struct intelhd_card_s *)aui->card_private_data;
  sprintf(libau_istr,"IHD : %s (%4.4X%4.4X) -> %s (%8.8X) (max %ldkHz/%dbit%s/%dch)\n",
          card->pci_dev->device_name,
          (unsigned int)card->pci_dev->vendor_id,(unsigned int)card->pci_dev->device_id,
@@ -1128,7 +1128,7 @@ err_adetect:
 
 static void INTELHD_close(struct mpxplay_audioout_info_s *aui)
 {
- struct intelhd_card_s *card=aui->card_private_data;
+ struct intelhd_card_s *card=(struct intelhd_card_s *)aui->card_private_data;
  if(card){
   if(card->iobase){
    snd_ihd_hw_close(card);
@@ -1144,7 +1144,7 @@ static void INTELHD_close(struct mpxplay_audioout_info_s *aui)
 
 static void INTELHD_setrate(struct mpxplay_audioout_info_s *aui)
 {
- struct intelhd_card_s *card=aui->card_private_data;
+ struct intelhd_card_s *card=(struct intelhd_card_s *)aui->card_private_data;
 
  aui->card_wave_id=0x0001;
  aui->chan_card=aui->chan_set;
@@ -1160,7 +1160,7 @@ static void INTELHD_setrate(struct mpxplay_audioout_info_s *aui)
 
 static void INTELHD_start(struct mpxplay_audioout_info_s *aui)
 {
- struct intelhd_card_s *card=aui->card_private_data;
+ struct intelhd_card_s *card=(struct intelhd_card_s *)aui->card_private_data;
  unsigned int timeout;
  //const unsigned int stream_index=0;
  //azx_writeb(card, INTCTL, azx_readb(card, INTCTL) | (1 << stream_index)); // enable SIE
@@ -1177,7 +1177,7 @@ static void INTELHD_start(struct mpxplay_audioout_info_s *aui)
 
 static void INTELHD_stop(struct mpxplay_audioout_info_s *aui)
 {
- struct intelhd_card_s *card=aui->card_private_data;
+ struct intelhd_card_s *card=(struct intelhd_card_s *)aui->card_private_data;
  unsigned int timeout;
  //const unsigned int stream_index=0;
  azx_sd_writeb(card, SD_CTL, azx_sd_readb(card, SD_CTL) & ~(SD_CTL_DMA_START | SD_INT_MASK)); // stop DMA
@@ -1194,7 +1194,7 @@ static void INTELHD_stop(struct mpxplay_audioout_info_s *aui)
 
 static long INTELHD_getbufpos(struct mpxplay_audioout_info_s *aui)
 {
- struct intelhd_card_s *card=aui->card_private_data;
+ struct intelhd_card_s *card=(struct intelhd_card_s *)aui->card_private_data;
  unsigned long bufpos;
 
  bufpos=azx_sd_readl(card, SD_LPIB);
@@ -1213,14 +1213,14 @@ static long INTELHD_getbufpos(struct mpxplay_audioout_info_s *aui)
 
 static void INTELHD_writeMIXER(struct mpxplay_audioout_info_s *aui,unsigned long reg, unsigned long val)
 {
- struct intelhd_card_s *card=aui->card_private_data;
+ struct intelhd_card_s *card=(struct intelhd_card_s *)aui->card_private_data;
  snd_hda_put_vol_mute(card,reg,0,HDA_OUTPUT,0,val);
  snd_hda_put_vol_mute(card,reg,1,HDA_OUTPUT,0,val);
 }
 
 static unsigned long INTELHD_readMIXER(struct mpxplay_audioout_info_s *aui,unsigned long reg)
 {
- struct intelhd_card_s *card=aui->card_private_data;
+ struct intelhd_card_s *card=(struct intelhd_card_s *)aui->card_private_data;
  return snd_hda_get_vol_mute(card,reg,0,HDA_OUTPUT,0);
 }
 

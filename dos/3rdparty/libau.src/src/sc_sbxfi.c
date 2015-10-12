@@ -22,8 +22,6 @@
 #include "libaudef.h"
 #include "pcibios.h"
 
-struct	emu20kx_card_s	xfi;
-
 #define EMU20KX_MAX_CHANNELS     8
 #define EMU20KX_MAX_BYTES        4
 
@@ -173,7 +171,7 @@ enum MIXER_PORT_T {
  NUM_MIX_PORTS
 };
 
-typedef struct emu20kx_card_s
+struct emu20kx_card_s
 {
  unsigned long   iobase;
  unsigned int    irq;
@@ -197,7 +195,9 @@ typedef struct emu20kx_card_s
 
  unsigned long dac_output_freq; // DAC is set to this, other freqs are converted to this by card
 
-}ensoniq_card_s;
+};
+
+struct	emu20kx_card_s	xfi;
 
 //-------------------------------------------------------------------------
 static inline uint32_t hw_read_20kx(struct emu20kx_card_s *card,uint32_t reg)
@@ -779,7 +779,7 @@ static void EMU20KX_close(struct mpxplay_audioout_info_s *aui);
 
 static void EMU20KX_card_info(struct mpxplay_audioout_info_s *aui)
 {
- struct emu20kx_card_s *card=aui->card_private_data;
+ struct emu20kx_card_s *card=(struct emu20kx_card_s *)aui->card_private_data;
  sprintf(libau_istr,"XFI : Creative %s (%4.4X) found on port:%4.4lX irq:%u",
          card->pci_dev->device_name,card->subsys_id,card->iobase,card->irq);
 }
@@ -824,7 +824,7 @@ err_adetect:
 
 static void EMU20KX_close(struct mpxplay_audioout_info_s *aui)
 {
- struct emu20kx_card_s *card=aui->card_private_data;
+ struct emu20kx_card_s *card=(struct emu20kx_card_s *)aui->card_private_data;
  if(card){
   if(card->iobase){
    snd_emu20kx_chip_close(card);
@@ -837,7 +837,7 @@ static void EMU20KX_close(struct mpxplay_audioout_info_s *aui)
 
 static void EMU20KX_setrate(struct mpxplay_audioout_info_s *aui)
 {
- struct emu20kx_card_s *card=aui->card_private_data;
+ struct emu20kx_card_s *card=(struct emu20kx_card_s *)aui->card_private_data;
  snd_emu20kx_set_output_format(card,aui);
  MDma_init_pcmoutbuf(card->pcmout_bufsize,EMU20KX_PAGESIZE);
  snd_emu20kx_prepare_playback(card,aui);
@@ -845,7 +845,7 @@ static void EMU20KX_setrate(struct mpxplay_audioout_info_s *aui)
 
 static void EMU20KX_start(struct mpxplay_audioout_info_s *aui)
 {
- struct emu20kx_card_s *card=aui->card_private_data;
+ struct emu20kx_card_s *card=(struct emu20kx_card_s *)aui->card_private_data;
  set_field(&card->src_ctl,SRCCTL_BM, 1);
  set_field(&card->src_ctl,SRCCTL_STATE, SRC_STATE_INIT);
  hw_write_20kx(card, SRCCTL+card->src_idx*0x100, card->src_ctl);
@@ -853,7 +853,7 @@ static void EMU20KX_start(struct mpxplay_audioout_info_s *aui)
 
 static void EMU20KX_stop(struct mpxplay_audioout_info_s *aui)
 {
- struct emu20kx_card_s *card=aui->card_private_data;
+ struct emu20kx_card_s *card=(struct emu20kx_card_s *)aui->card_private_data;
  set_field(&card->src_ctl,SRCCTL_BM, 0);
  set_field(&card->src_ctl,SRCCTL_STATE, SRC_STATE_OFF);
  hw_write_20kx(card, SRCCTL+card->src_idx*0x100, card->src_ctl);
@@ -863,7 +863,7 @@ static void EMU20KX_stop(struct mpxplay_audioout_info_s *aui)
 
 static long EMU20KX_getbufpos(struct mpxplay_audioout_info_s *aui)
 {
- struct emu20kx_card_s *card=aui->card_private_data;
+ struct emu20kx_card_s *card=(struct emu20kx_card_s *)aui->card_private_data;
  unsigned long bufpos=0,ctl_ca;
 
  ctl_ca=hw_read_20kx(card, SRCCA+card->src_idx*0x100);

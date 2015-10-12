@@ -204,9 +204,6 @@ extern unsigned int MDma_bufpos(void);
 
 //#define REFRESH_DELAY_JOYMOUSE (INT08_CYCLES_NEW/36) // 38 char/s
 
-#define MPXPLAY_INTSOUNDDECODER_DISALLOW intsoundcntrl_save=intsoundcontrol;funcbit_disable(intsoundcontrol,INTSOUND_DECODER);
-#define MPXPLAY_INTSOUNDDECODER_ALLOW    if(intsoundconfig&INTSOUND_DECODER) funcbit_copy(intsoundcontrol,intsoundcntrl_save,INTSOUND_DECODER);
-
 //wave (codec) IDs at input/output
 #define MPXPLAY_WAVEID_UNKNOWN   0x0000
 #define MPXPLAY_WAVEID_PCM_SLE   0x0001 // signed little endian
@@ -327,7 +324,7 @@ typedef struct aucards_onemixerchan_s* aucards_allmixerchan_s;
 struct mpxplay_audioout_info_s;
 
 typedef struct one_sndcard_info{
- char *shortname;
+ const char *shortname;
  unsigned long infobits;
 
  int  (*card_config)(struct mpxplay_audioout_info_s *); // not used yet

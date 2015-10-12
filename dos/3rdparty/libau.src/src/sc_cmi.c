@@ -19,8 +19,6 @@
 #include "pcibios.h"
 #include "ac97_def.h"
 
-struct	cmi8x38_card	cmi;
-
 #define CMI8X38_LINK_MULTICHAN 1
 
 #define PCMBUFFERPAGESIZE      4096
@@ -319,7 +317,7 @@ struct	cmi8x38_card	cmi;
 #endif
 
 
-typedef struct cmi8x38_card
+struct cmi8x38_card
 {
  unsigned long   iobase;
  unsigned short	 model;
@@ -356,12 +354,12 @@ typedef struct cmi8x38_card
  int shift;
  //int ac3_shift;	/* extra shift: 1 on soft ac3 mode */
 
-}cmi8x38_card;
+};
+
+static struct cmi8x38_card	cmi;
 
 //static void cmi8x38_ac97_write(unsigned int baseport,unsigned int reg, unsigned int value);
 //static unsigned int cmi8x38_ac97_read(unsigned int baseport, unsigned int reg);
-
-extern unsigned int intsoundconfig,intsoundcontrol;
 
 //-------------------------------------------------------------------------
 // low level write & read
@@ -373,7 +371,7 @@ extern unsigned int intsoundconfig,intsoundcontrol;
 #define snd_cmipci_read_16(cm,reg) inw(cm->iobase+reg)
 #define snd_cmipci_read_32(cm,reg) inl(cm->iobase+reg)
 
-static void snd_cmipci_set_bit(cmi8x38_card *cm, unsigned int cmd, unsigned int flag)
+static void snd_cmipci_set_bit(struct cmi8x38_card *cm, unsigned int cmd, unsigned int flag)
 {
  unsigned int val;
  val = snd_cmipci_read_32(cm, cmd);
@@ -381,7 +379,7 @@ static void snd_cmipci_set_bit(cmi8x38_card *cm, unsigned int cmd, unsigned int 
  snd_cmipci_write_32(cm, cmd, val);
 }
 
-static void snd_cmipci_clear_bit(cmi8x38_card *cm, unsigned int cmd, unsigned int flag)
+static void snd_cmipci_clear_bit(struct cmi8x38_card *cm, unsigned int cmd, unsigned int flag)
 {
  unsigned int val;
  val = snd_cmipci_read_32(cm, cmd);
@@ -389,13 +387,13 @@ static void snd_cmipci_clear_bit(cmi8x38_card *cm, unsigned int cmd, unsigned in
  snd_cmipci_write_32(cm, cmd, val);
 }
 
-static void snd_cmipci_mixer_write(cmi8x38_card *cm, unsigned char idx, unsigned char data)
+static void snd_cmipci_mixer_write(struct cmi8x38_card *cm, unsigned char idx, unsigned char data)
 {
  snd_cmipci_write_8(cm, CM_REG_SB16_ADDR, idx);
  snd_cmipci_write_8(cm, CM_REG_SB16_DATA, data);
 }
 
-static unsigned int snd_cmipci_mixer_read(cmi8x38_card *cm, unsigned char idx)
+static unsigned int snd_cmipci_mixer_read(struct cmi8x38_card *cm, unsigned char idx)
 {
  snd_cmipci_write_8(cm, CM_REG_SB16_ADDR, idx);
  return snd_cmipci_read_8(cm, CM_REG_SB16_DATA);
@@ -415,7 +413,7 @@ static unsigned int snd_cmipci_rate_freq(unsigned int rate)
  return 7; // 48k
 }
 
-static void snd_cmipci_ch_reset(cmi8x38_card *cm, int ch)
+static void snd_cmipci_ch_reset(struct cmi8x38_card *cm, int ch)
 {
  int reset = CM_RST_CH0 << ch;
  snd_cmipci_write_32(cm, CM_REG_FUNCTRL0, CM_CHADC0 | reset);
@@ -423,7 +421,7 @@ static void snd_cmipci_ch_reset(cmi8x38_card *cm, int ch)
  pds_delay_10us(1);
 }
 
-static int set_dac_channels(cmi8x38_card *cm, int channels)
+static int set_dac_channels(struct cmi8x38_card *cm, int channels)
 {
  /*if(channels > 2){
   if(!cm->can_multi_ch)
@@ -458,7 +456,7 @@ static int set_dac_channels(cmi8x38_card *cm, int channels)
  return 0;
 }
 
-static void query_chip(cmi8x38_card *cm)
+static void query_chip(struct cmi8x38_card *cm)
 {
  unsigned int detect;
 
@@ -570,7 +568,7 @@ static void CMI8X38_close(struct mpxplay_audioout_info_s *aui);
 
 static void CMI8X38_card_info(struct mpxplay_audioout_info_s *aui)
 {
- struct cmi8x38_card *card=aui->card_private_data;
+ struct cmi8x38_card *card=(struct cmi8x38_card *)aui->card_private_data;
  sprintf(libau_istr,"CMI : %s soundcard found on port:%4.4lX irq:%u chipver:%d max-chans:%d",
          card->pci_dev->device_name,card->iobase,card->irq,card->chip_version,card->max_channels);
 }
@@ -599,7 +597,7 @@ static int CMI8X38_adetect(struct mpxplay_audioout_info_s *aui)
  card->dm=pds_dpmi_dos_allocmem( card->pcmout_bufsize      // pcm output
                             +PCMBUFFERPAGESIZE );      // to round
  if(!card->dm)goto err_adetect;
- card->pcmout_buffer=(void *)(((uint32_t)card->dm->linearptr+PCMBUFFERPAGESIZE-1)&(~(PCMBUFFERPAGESIZE-1))); // buffer begins on page (4096 bytes) boundary
+ card->pcmout_buffer=(char *)(((uint32_t)card->dm->linearptr+PCMBUFFERPAGESIZE-1)&(~(PCMBUFFERPAGESIZE-1))); // buffer begins on page (4096 bytes) boundary
 
  aui->card_DMABUFF=card->pcmout_buffer;
 
@@ -619,7 +617,7 @@ err_adetect:
 
 static void CMI8X38_close(struct mpxplay_audioout_info_s *aui)
 {
- struct cmi8x38_card *card=aui->card_private_data;
+ struct cmi8x38_card *card=(struct cmi8x38_card *)aui->card_private_data;
  if(card){
   if(card->iobase)   cmi8x38_chip_close(card);
   pds_dpmi_dos_freemem();
@@ -629,7 +627,7 @@ static void CMI8X38_close(struct mpxplay_audioout_info_s *aui)
 
 static void CMI8X38_setrate(struct mpxplay_audioout_info_s *aui)
 {
- struct cmi8x38_card *card=aui->card_private_data;
+ struct cmi8x38_card *card=(struct cmi8x38_card *)aui->card_private_data;
  unsigned int dmabufsize,val,freqnum;
 
  if(aui->freq_card<5512)
@@ -710,7 +708,7 @@ static void CMI8X38_setrate(struct mpxplay_audioout_info_s *aui)
 
 static void CMI8X38_start(struct mpxplay_audioout_info_s *aui)
 {
- struct cmi8x38_card *card=aui->card_private_data;
+ struct cmi8x38_card *card=(struct cmi8x38_card *)aui->card_private_data;
  card->ctrl |= CM_CHEN0;
  card->ctrl &= ~CM_PAUSE0;
  snd_cmipci_write_32(card, CM_REG_FUNCTRL0, card->ctrl);
@@ -718,14 +716,14 @@ static void CMI8X38_start(struct mpxplay_audioout_info_s *aui)
 
 static void CMI8X38_stop(struct mpxplay_audioout_info_s *aui)
 {
- struct cmi8x38_card *card=aui->card_private_data;
+ struct cmi8x38_card *card=(struct cmi8x38_card *)aui->card_private_data;
  card->ctrl |= CM_PAUSE0;
  snd_cmipci_write_32(card, CM_REG_FUNCTRL0, card->ctrl);
 }
 
 static long CMI8X38_getbufpos(struct mpxplay_audioout_info_s *aui)
 {
- struct cmi8x38_card *card=aui->card_private_data;
+ struct cmi8x38_card *card=(struct cmi8x38_card *)aui->card_private_data;
  unsigned long bufpos;
 
  bufpos = snd_cmipci_read_16(card, CM_REG_CH0_FRAME2);
@@ -746,13 +744,13 @@ static long CMI8X38_getbufpos(struct mpxplay_audioout_info_s *aui)
 
 static void CMI8X38_writeMIXER(struct mpxplay_audioout_info_s *aui,unsigned long reg, unsigned long val)
 {
- struct cmi8x38_card *card=aui->card_private_data;
+ struct cmi8x38_card *card=(struct cmi8x38_card *)aui->card_private_data;
  snd_cmipci_mixer_write(card,reg,val);
 }
 
 static unsigned long CMI8X38_readMIXER(struct mpxplay_audioout_info_s *aui,unsigned long reg)
 {
- struct cmi8x38_card *card=aui->card_private_data;
+ struct cmi8x38_card *card=(struct cmi8x38_card *)aui->card_private_data;
  return snd_cmipci_mixer_read(card,reg);
 }
 

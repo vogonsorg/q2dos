@@ -1,7 +1,6 @@
 #include "libaudef.h"
 
-struct dosmem_t au_dosmem;
-
+static struct dosmem_t au_dosmem;
 #ifdef ZDM
 unsigned short au_map_selector;
 #endif
