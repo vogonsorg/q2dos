@@ -12,6 +12,8 @@ all: libau.a
 
 clean:
 	rm -f *.o
+distclean: clean
+	rm -f *.a
 
 %.o : %.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
