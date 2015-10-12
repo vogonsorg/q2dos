@@ -72,6 +72,11 @@ const char* AU_search(unsigned int config)
 	return NULL;
 }
 
+const struct mpxplay_audioout_info_s *AU_getinfo(void)
+{
+	return &au_infos;
+}
+
 void AU_start(void)
 {
 	struct mpxplay_audioout_info_s *aui=&au_infos;

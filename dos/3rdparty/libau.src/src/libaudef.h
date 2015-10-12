@@ -383,6 +383,7 @@ extern struct mpxplay_audioout_info_s au_infos;
 
 //main soundcard routines
 extern const char* AU_search(unsigned int config);
+extern const struct mpxplay_audioout_info_s *AU_getinfo(void);
 extern unsigned int AU_cardbuf_space(void);
 extern void AU_start(void);
 extern void AU_stop(void);
