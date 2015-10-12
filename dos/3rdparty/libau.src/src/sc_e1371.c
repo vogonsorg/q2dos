@@ -419,7 +419,7 @@ static void snd_es1371_prepare_playback(struct ensoniq_card_s *card,struct mpxpl
 
 //-------------------------------------------------------------------------
 static pci_device_s ensoniq_devices[]={
- //{"ES1370",0x1274,0x5000, 0}, // not supported/implemented
+//{"ES1370",0x1274,0x5000, 0}, // not supported/implemented
  {"ES1371",0x1274,0x1371, 0},
  {"ES1373",0x1274,0x5880, 0}, // CT5880
  {"EV1938",0x1102,0x8938, 0}, // Ectiva
@@ -439,7 +439,7 @@ static void ES1371_close(struct mpxplay_audioout_info_s *aui);
 static void ES1371_card_info(struct mpxplay_audioout_info_s *aui)
 {
  struct ensoniq_card_s *card=(struct ensoniq_card_s *)aui->card_private_data;
- sprintf(libau_istr,"ENS : Ensoniq %s found on port:%4.4lX irq:%u rev:%2.2X",
+ sprintf(libau_istr,"Ensoniq %s on port:%4.4lX irq:%u rev:%2.2X",
          card->pci_dev->device_name,card->port,card->irq,card->chiprev);
 }
 

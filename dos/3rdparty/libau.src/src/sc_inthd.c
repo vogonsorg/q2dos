@@ -698,10 +698,10 @@ static unsigned int snd_ihd_buffer_init(struct mpxplay_audioout_info_s *aui,stru
  card->pcmout_buffer=(char *)(beginmem_aligned+BDL_SIZE);
 
 #ifndef ZDM
-card->sd_addr = card->iobase;
+ card->sd_addr = card->iobase;
 #else
-card->sd_addr = 0;
-#endif 
+ card->sd_addr = 0;
+#endif
 
  gcap = (unsigned long)azx_sd_readw(card,GCAP);
  if(!(INTHD_USE_FIXED_SDO) && (gcap & 0xF000)) // number of playback streams
@@ -1069,7 +1069,7 @@ static const char *ihd_search_vendorname(unsigned int vendorid)
 static void INTELHD_card_info(struct mpxplay_audioout_info_s *aui)
 {
  struct intelhd_card_s *card=(struct intelhd_card_s *)aui->card_private_data;
- sprintf(libau_istr,"IHD : %s (%4.4X%4.4X) -> %s (%8.8X) (max %ldkHz/%dbit%s/%dch)\n",
+ sprintf(libau_istr,"IHD: %s (%4.4X%4.4X) -> %s (%8.8X) (max %ldkHz/%dbit%s/%dch)\n",
          card->pci_dev->device_name,
          (unsigned int)card->pci_dev->vendor_id,(unsigned int)card->pci_dev->device_id,
          ihd_search_vendorname(card->codec_vendor_id>>16),(unsigned int)card->codec_vendor_id,
