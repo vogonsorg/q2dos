@@ -247,10 +247,27 @@ findBestRes (int width, int height)
 {
 #define GLIDE_RESOLUTION(w, h) { GR_RESOLUTION_##w##x##h, w, h }
     static int resolutions[][3] = {
+	GLIDE_RESOLUTION(320, 200),
+	GLIDE_RESOLUTION(320, 240),
+	GLIDE_RESOLUTION(512, 384),
+	GLIDE_RESOLUTION(640, 400),
 	GLIDE_RESOLUTION(640, 480),
 	GLIDE_RESOLUTION(800, 600),
 	GLIDE_RESOLUTION(1024, 768),
-	GLIDE_RESOLUTION(1280, 1024)
+	GLIDE_RESOLUTION(1280, 1024),
+	GLIDE_RESOLUTION(1600, 1200),
+	/**/
+	GLIDE_RESOLUTION(400, 300),
+	GLIDE_RESOLUTION(856, 480),
+	GLIDE_RESOLUTION(960, 720),
+	GLIDE_RESOLUTION(1152, 864),
+	GLIDE_RESOLUTION(1280, 960),
+	GLIDE_RESOLUTION(1600, 1024),
+	GLIDE_RESOLUTION(1792, 1344),
+	GLIDE_RESOLUTION(1856, 1392),
+	GLIDE_RESOLUTION(1920, 1440),
+	GLIDE_RESOLUTION(2048, 1536),
+	GLIDE_RESOLUTION(2048, 2048)
     };
     unsigned i;
     for (i = 0; i < sizeof(resolutions) / sizeof(resolutions[0]); i++) {
@@ -500,7 +517,10 @@ sage_open (int db_flag,
     allow_texuma      = hwext_texuma && !YES("3dfx.disable.texuma");
     allow_texmirror   = hwext_texmirror && !YES("3dfx.disable.texmirror");
     allow_fogcoord    = hwext_fogcoord && !YES("3dfx.disable.fogcoord");
-    allow_32bpt       = (/*fb_color == 24 &&*/ hwext_texfmt) && !YES("3dfx.disable.32bpt"); /* FS: Mesa doesn't check fb_color, it just checks if we have the ARGB_8888 and friends texture format. */
+    allow_32bpt       = hwext_texfmt && !YES("3dfx.disable.32bpt");
+#if 0 /* FS: only check if we have the ARGB_8888 & co, like Mesa. */
+    if (fb_color != 24) allow_32bpt = 0;
+#endif
     allow_blendsquare = (hardware >= GR_SSTTYPE_Voodoo4) && !YES("3dfx.disable.blendsquare");
     allow_combine     = GL_TRUE && !YES("3dfx.disable.combine");
     allow_multitex    = (getInteger(GR_NUM_TMU) > 1) && !YES("3dfx.disable.multitex");
