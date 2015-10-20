@@ -52,7 +52,7 @@ By Neozeed, [HCI]Mara'akate, and sezero.
 ---------------------------------------------------------
 * 3DFX OpenGL rendering.
 * Playing in a Windows 9x DOS box.
-* Modern sound cards like AC'97 or HDA
+* Several PCI sound cards like AC'97 or HDA (run with -sndpci)
 * Mouse wheel support. (see info below.)
 * Hor+ FOV scaling. (see info below.)
 
