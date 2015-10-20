@@ -1069,7 +1069,7 @@ static const char *ihd_search_vendorname(unsigned int vendorid)
 static void INTELHD_card_info(struct mpxplay_audioout_info_s *aui)
 {
  struct intelhd_card_s *card=(struct intelhd_card_s *)aui->card_private_data;
- sprintf(libau_istr,"IHD: %s (%4.4X%4.4X) -> %s (%8.8X) (max %ldkHz/%dbit%s/%dch)\n",
+ sprintf(aui->infostr,"IHD: %s (%4.4X%4.4X) -> %s (%8.8X) (max %ldkHz/%dbit%s/%dch)\n",
          card->pci_dev->device_name,
          (unsigned int)card->pci_dev->vendor_id,(unsigned int)card->pci_dev->device_id,
          ihd_search_vendorname(card->codec_vendor_id>>16),(unsigned int)card->codec_vendor_id,
@@ -1152,7 +1152,7 @@ static void INTELHD_setrate(struct mpxplay_audioout_info_s *aui)
  card->dacout_num_bits=aui->bits_set;
 
  card->format_val=snd_hda_calc_stream_format(aui,card);
- card->pcmout_dmasize=MDma_init_pcmoutbuf(card->pcmout_bufsize,AZX_PERIOD_SIZE);
+ card->pcmout_dmasize=MDma_init_pcmoutbuf(aui,card->pcmout_bufsize,AZX_PERIOD_SIZE);
 
  azx_setup_periods(card);
  azx_setup_controller(card);

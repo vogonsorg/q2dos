@@ -1,4 +1,5 @@
 #include "libaudef.h"
+#include "libau.h"
 
 #define SOUNDCARD_BUFFER_PROTECTION 32 /* in bytes (required for PCI cards) */
 #define AU_MIXCHANS_OUTS 4
@@ -31,16 +32,19 @@ static one_sndcard_info *all_sndcard_info[]=
 	NULL
 };
 
-struct mpxplay_audioout_info_s au_infos;
+static struct mpxplay_audioout_info_s au_infos = { {0}, };
 
-char libau_istr[100];
-
-const char* AU_search(unsigned int config)
+au_context *AU_search(unsigned int config)
 {
-	struct mpxplay_audioout_info_s *aui=&au_infos;
+	struct mpxplay_audioout_info_s *aui;
 	one_sndcard_info **asip;
 	unsigned int i;
 
+	aui = &au_infos;
+	if (aui->infostr[0])
+		return aui;/* already active */
+
+	memset(aui,0,sizeof(struct mpxplay_audioout_info_s));
 	aui->card_select_config=config;
 
 	/* DEFAULT SETTING */
@@ -61,7 +65,7 @@ const char* AU_search(unsigned int config)
 		if(aui->card_handler->card_detect(aui))
 		{
 			aui->card_handler->card_info(aui);
-			return libau_istr;
+			return aui;
 		}
 
 		asip++;
@@ -69,53 +73,55 @@ const char* AU_search(unsigned int config)
 	}
 	while(aui->card_handler);
 
+	aui->infostr[0] = 0;
 	return NULL;
 }
 
-const struct mpxplay_audioout_info_s *AU_getinfo(void)
+const struct auinfo_s *AU_getinfo(au_context *ctx)
 {
-	return &au_infos;
+	return (struct auinfo_s *) ctx;
 }
 
-void AU_start(void)
+void AU_start(au_context *ctx)
 {
-	struct mpxplay_audioout_info_s *aui=&au_infos;
+	struct mpxplay_audioout_info_s *aui = (struct mpxplay_audioout_info_s *)ctx;
 
 	if(!(aui->card_infobits&AUINFOS_CARDINFOBIT_PLAYING))
 	{
 		funcbit_smp_enable(aui->card_infobits,AUINFOS_CARDINFOBIT_PLAYING);
-		aui->card_handler->cardbuf_clear();
+		aui->card_handler->cardbuf_clear(aui);
 		aui->card_handler->card_start(aui);
 	}
 }
 
-void AU_stop(void)
+void AU_stop(au_context *ctx)
 {
-	struct mpxplay_audioout_info_s *aui=&au_infos;
+	struct mpxplay_audioout_info_s *aui = (struct mpxplay_audioout_info_s *)ctx;
 
 	if(aui->card_infobits&AUINFOS_CARDINFOBIT_PLAYING)
 	{
 		funcbit_smp_disable(aui->card_infobits,AUINFOS_CARDINFOBIT_PLAYING);
 		aui->card_handler->card_stop(aui);
 #ifdef SDR
-		MDma_bufpos();
+		MDma_bufpos(aui);
 #endif
 		aui->card_dmaspace=aui->card_dmasize-aui->card_dmalastput;
 	}
 }
 
-void AU_close(void)
+void AU_close(au_context *ctx)
 {
-	struct mpxplay_audioout_info_s *aui=&au_infos;
+	struct mpxplay_audioout_info_s *aui = (struct mpxplay_audioout_info_s *)ctx;
 
-	AU_stop();
+	AU_stop(ctx);
 	aui->card_handler->card_close(aui);
+	aui->infostr[0] = 0;
 }
 
 #ifndef SDR
-unsigned int AU_cardbuf_space(void)
+unsigned int AU_cardbuf_space(au_context *ctx)
 {
-	struct mpxplay_audioout_info_s *aui=&au_infos;
+	struct mpxplay_audioout_info_s *aui = (struct mpxplay_audioout_info_s *)ctx;
 
 	if(aui->card_dmalastput>=aui->card_dmasize)	// checking
 	{
@@ -127,7 +133,7 @@ unsigned int AU_cardbuf_space(void)
 
 		if(aui->card_infobits&AUINFOS_CARDINFOBIT_PLAYING)
 		{
-			bufpos = MDma_bufpos();
+			bufpos = MDma_bufpos(aui);
 		}
 		else
 		{
@@ -154,40 +160,39 @@ unsigned int AU_cardbuf_space(void)
 	return (aui->card_dmaspace>aui->card_bufprotect) ? (aui->card_dmaspace-aui->card_bufprotect):0;
 }
 
-void AU_writedata(const char* pcm, long len)
+void AU_writedata(au_context *ctx, const char* pcm, long len)
 {
-	struct mpxplay_audioout_info_s *aui=&au_infos;
+	struct mpxplay_audioout_info_s *aui = (struct mpxplay_audioout_info_s *)ctx;
+	unsigned long space;
+	unsigned int outbytes_putblock;
 
 	aui->card_outbytes =min(len,(aui->card_dmasize/4));
 	aui->card_outbytes-=(aui->card_outbytes%aui->card_bytespersign);
 
+	do
 	{
-		unsigned long space;
-		do
-		{
-			space=AU_cardbuf_space();
+		space=AU_cardbuf_space(ctx);
 
-			if(space>=aui->card_bytespersign)
-			{
-				unsigned int outbytes_putblock=min(space,len);
-				MDma_writedata(pcm,outbytes_putblock);
-				pcm+=outbytes_putblock;
-				len-=outbytes_putblock;
-			}
+		if(space>=aui->card_bytespersign)
+		{
+			outbytes_putblock=min(space,len);
+			MDma_writedata(aui,pcm,outbytes_putblock);
+			pcm+=outbytes_putblock;
+			len-=outbytes_putblock;
 		}
-		while(len);
 	}
+	while(len);
 }
 #endif /* SDR */
 
-void AU_setrate(unsigned int *fr, unsigned int *bt, unsigned int *ch)
+void AU_setrate(au_context *ctx, unsigned int *fr, unsigned int *bt, unsigned int *ch)
 {
-	struct mpxplay_audioout_info_s *aui=&au_infos;
+	struct mpxplay_audioout_info_s *aui = (struct mpxplay_audioout_info_s *)ctx;
 	unsigned long buffer_protection;
 
 	if(aui->card_infobits&AUINFOS_CARDINFOBIT_PLAYING)
 	{
-		AU_stop();
+		AU_stop(ctx);
 	}
 
 	aui->freq_card=aui->freq_set=*fr;
@@ -207,18 +212,9 @@ void AU_setrate(unsigned int *fr, unsigned int *bt, unsigned int *ch)
 	buffer_protection+=aui->card_bytespersign-1;
 	buffer_protection-=(buffer_protection%aui->card_bytespersign);
 	aui->card_bufprotect=buffer_protection;
-
-#ifndef SDR
-	sprintf(libau_istr, "Ok! : set %iHz/%ibit/%ich -> DMA_size: %lu at address: %ph\n",
-			*fr, *bt, *ch, aui->card_dmasize, aui->card_DMABUFF
-	#ifdef __DJGPP__
-							- __djgpp_conventional_base
-	#endif
-		);
-#endif /* SDR */
 }
 
-aucards_onemixerchan_s *AU_search_mixerchan(aucards_allmixerchan_s *mixeri,unsigned int mixchannum)
+static aucards_onemixerchan_s *search_mixerchan(aucards_allmixerchan_s *mixeri,unsigned int mixchannum)
 {
 	unsigned int i=0;
 
@@ -236,9 +232,9 @@ aucards_onemixerchan_s *AU_search_mixerchan(aucards_allmixerchan_s *mixeri,unsig
 	return NULL;
 }
 
-void AU_setmixer_one(unsigned int mixchannum,unsigned int setmode,int newvalue)
+static
+void AU_setmixer_one(struct mpxplay_audioout_info_s *aui, unsigned int mixchannum,unsigned int setmode,int newvalue)
 {
-	struct mpxplay_audioout_info_s *aui=&au_infos;
 	one_sndcard_info *cardi=aui->card_handler;
 	aucards_onemixerchan_s *onechi; // one mixer channel infos (master,pcm,etc.)
 	unsigned int subchannelnum, sch, channel, function;
@@ -258,7 +254,7 @@ void AU_setmixer_one(unsigned int mixchannum,unsigned int setmode,int newvalue)
 	if(!cardi->card_writemixer || !cardi->card_readmixer || !cardi->card_mixerchans)
 		return;
 
-	onechi=AU_search_mixerchan(cardi->card_mixerchans,mixchannum);
+	onechi=search_mixerchan(cardi->card_mixerchans,mixchannum);
 
 	if(!onechi)
 		return;
@@ -327,9 +323,9 @@ void AU_setmixer_one(unsigned int mixchannum,unsigned int setmode,int newvalue)
 }
 
 /*
-int AU_getmixer_one(unsigned int mixchannum)
+static
+int AU_getmixer_one(struct mpxplay_audioout_info_s *aui, unsigned int mixchannum)
 {
-	struct mpxplay_audioout_info_s *aui=&au_infos;
 	one_sndcard_info *cardi=aui->card_handler;
 	aucards_onemixerchan_s *onechi; // one mixer channel infos (master,pcm,etc.)
 	aucards_submixerchan_s *subchi; // one subchannel infos (left,right,etc.)
@@ -349,7 +345,7 @@ int AU_getmixer_one(unsigned int mixchannum)
 	if(!cardi->card_readmixer || !cardi->card_mixerchans)
 		return -1;
 
-	onechi=AU_search_mixerchan(cardi->card_mixerchans,mixchannum);
+	onechi=search_mixerchan(cardi->card_mixerchans,mixchannum);
 	if(!onechi)
 		return -1;
 
@@ -377,15 +373,15 @@ int AU_getmixer_one(unsigned int mixchannum)
 }
 */
 
-void AU_setmixer_all(unsigned int vol)
+void AU_setmixer_all(au_context *ctx, unsigned int vol)
 {
-	struct mpxplay_audioout_info_s *aui=&au_infos;
+	struct mpxplay_audioout_info_s *aui = (struct mpxplay_audioout_info_s *)ctx;
 	unsigned int i;
 
 	aui->card_master_volume=vol;
 
 	for(i=0;i<AU_MIXCHANS_OUTS;i++)
 	{
-		AU_setmixer_one(AU_MIXCHANFUNCS_PACK(au_mixchan_outs[i],AU_MIXCHANFUNC_VOLUME),MIXER_SETMODE_ABSOLUTE,vol);
+		AU_setmixer_one(aui,AU_MIXCHANFUNCS_PACK(au_mixchan_outs[i],AU_MIXCHANFUNC_VOLUME),MIXER_SETMODE_ABSOLUTE,vol);
 	}
 }

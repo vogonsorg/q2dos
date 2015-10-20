@@ -439,7 +439,7 @@ static void ES1371_close(struct mpxplay_audioout_info_s *aui);
 static void ES1371_card_info(struct mpxplay_audioout_info_s *aui)
 {
  struct ensoniq_card_s *card=(struct ensoniq_card_s *)aui->card_private_data;
- sprintf(libau_istr,"Ensoniq %s on port:%4.4lX irq:%u rev:%2.2X",
+ sprintf(aui->infostr,"Ensoniq %s on port:%4.4lX irq:%u rev:%2.2X",
          card->pci_dev->device_name,card->port,card->irq,card->chiprev);
 }
 
@@ -514,7 +514,7 @@ static void ES1371_setrate(struct mpxplay_audioout_info_s *aui)
  else if(aui->freq_card>48000)
   aui->freq_card=48000;
 
- MDma_init_pcmoutbuf(card->pcmout_bufsize,ES1371_DMABUF_ALIGN);
+ MDma_init_pcmoutbuf(aui,card->pcmout_bufsize,ES1371_DMABUF_ALIGN);
 
  snd_es1371_prepare_playback(card,aui);
 }

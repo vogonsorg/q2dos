@@ -780,7 +780,7 @@ static void EMU20KX_close(struct mpxplay_audioout_info_s *aui);
 static void EMU20KX_card_info(struct mpxplay_audioout_info_s *aui)
 {
  struct emu20kx_card_s *card=(struct emu20kx_card_s *)aui->card_private_data;
- sprintf(libau_istr,"XFI: Creative %s (%4.4X) on port:%4.4lX irq:%u",
+ sprintf(aui->infostr,"XFI: Creative %s (%4.4X) on port:%4.4lX irq:%u",
          card->pci_dev->device_name,card->subsys_id,card->iobase,card->irq);
 }
 
@@ -839,7 +839,7 @@ static void EMU20KX_setrate(struct mpxplay_audioout_info_s *aui)
 {
  struct emu20kx_card_s *card=(struct emu20kx_card_s *)aui->card_private_data;
  snd_emu20kx_set_output_format(card,aui);
- MDma_init_pcmoutbuf(card->pcmout_bufsize,EMU20KX_PAGESIZE);
+ MDma_init_pcmoutbuf(aui,card->pcmout_bufsize,EMU20KX_PAGESIZE);
  snd_emu20kx_prepare_playback(card,aui);
 }
 

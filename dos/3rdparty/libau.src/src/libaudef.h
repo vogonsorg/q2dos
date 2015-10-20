@@ -1,5 +1,5 @@
-#ifndef MPXPLAY_AU_DEF_H
-#define MPXPLAY_AU_DEF_H
+#ifndef LIBAU_DEF_H
+#define LIBAU_DEF_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -167,11 +167,12 @@ extern void pds_dpmi_unmap_physycal_memory(unsigned long linear_address);
 #define DMAMODE_AUTOINIT_OFF 0
 #define DMAMODE_AUTOINIT_ON  0x10
 
+struct mpxplay_audioout_info_s;
 extern unsigned int MDma_get_max_pcmoutbufsize(unsigned int pagesize,unsigned int samplesize);
-extern unsigned int MDma_init_pcmoutbuf(unsigned int maxbufsize,unsigned int pagesize);
-extern void MDma_clearbuf(void);
-extern void MDma_writedata(const char *src,unsigned long left);
-extern unsigned int MDma_bufpos(void);
+extern unsigned int MDma_init_pcmoutbuf(struct mpxplay_audioout_info_s *aui,unsigned int maxbufsize,unsigned int pagesize);
+extern void MDma_clearbuf(struct mpxplay_audioout_info_s *aui);
+extern void MDma_writedata(struct mpxplay_audioout_info_s *aui,const char *src,unsigned long left);
+extern unsigned int MDma_bufpos(struct mpxplay_audioout_info_s *aui);
 
 // out pcm defs
 #define PCM_OUTSAMPLES    1152     // at 44100Hz
@@ -335,9 +336,9 @@ typedef struct one_sndcard_info{
  void (*card_close)(struct mpxplay_audioout_info_s *);  // close soundcard
  void (*card_setrate)(struct mpxplay_audioout_info_s *);// set freqency,channels,bits
 
- void (*cardbuf_writedata)(void); // write output data into the card's buffer
+ void (*cardbuf_writedata)(struct mpxplay_audioout_info_s *); // write output data into the card's buffer
  long (*cardbuf_pos)(struct mpxplay_audioout_info_s *);  // get the buffer (playing) position (usually the DMA buffer get-position)(returns negative number on error)
- void (*cardbuf_clear)(void);// clear the soundcard buffer (usually the DMA buffer)
+ void (*cardbuf_clear)(struct mpxplay_audioout_info_s *);// clear the soundcard buffer (usually the DMA buffer)
  void (*cardbuf_int_monitor)(struct mpxplay_audioout_info_s *); // interrupt (DMA) monitor function
  void (*irq_routine)(struct mpxplay_audioout_info_s *);  // as is
 
@@ -348,22 +349,24 @@ typedef struct one_sndcard_info{
 
 //card and mixer data
 typedef struct mpxplay_audioout_info_s{
- unsigned int  samplenum;
- unsigned char bytespersample_card;
- unsigned int  freq_set;
- unsigned int  freq_song;
+ /* members shared with struct auinfo_s:
+  * _must_ overlap with struct auinfo_s */
+ char          infostr[96];
+ char         *card_DMABUFF;
+ unsigned long card_dmasize;
+ unsigned int  bytespersample_card;
  unsigned int  freq_card;
- unsigned int  chan_set;
- unsigned char chan_song;
- unsigned char chan_card;
  unsigned int  bits_set;
- unsigned char bits_song;
- unsigned char bits_card;
+ unsigned int  chan_set;
+ /* members private to libau */
+ unsigned int  samplenum;
+ unsigned int  freq_set;
+ unsigned int  chan_card;
+ unsigned int  bits_card;
  unsigned int   card_wave_id;    // 0x0001,0x0003,0x0055,0x2000,etc.
  unsigned long  card_controlbits;  // card control flags
  unsigned long  card_infobits;     // card info flags
  unsigned long  card_outbytes;     // samplenum*bytespersample_card
- unsigned long  card_dmasize;
  unsigned long  card_dmalastput;
  unsigned long  card_dmaspace;
  unsigned long  card_dmafilled;
@@ -372,33 +375,17 @@ typedef struct mpxplay_audioout_info_s{
  unsigned int   card_bufprotect;
  unsigned int	card_select_config;	//STEREO_SPEAKER_OUT or LINE_HP_OUT
  struct dosmem_t *card_dma_dosmem;
- char *card_DMABUFF;
  one_sndcard_info *card_handler; // function structure of the card
  void *card_private_data;        // extra private datas can be pointed here (with malloc)
  int card_master_volume;
  int card_mixer_values[AU_MIXCHANS_NUM]; // -1, 0-100
 }mpxplay_audioout_info_s;
 
-extern struct mpxplay_audioout_info_s au_infos;
-
-//main soundcard routines
-extern const char* AU_search(unsigned int config);
-extern const struct mpxplay_audioout_info_s *AU_getinfo(void);
-extern unsigned int AU_cardbuf_space(void);
-extern void AU_start(void);
-extern void AU_stop(void);
-extern void AU_close(void);
-extern void AU_setrate(unsigned int *fr, unsigned int *bt, unsigned int *ch);
-extern void AU_setmixer_all(unsigned int vol);
-extern void AU_writedata(const char *pcm, long len);
-
 extern void pds_delay_10us(unsigned int ticks);
 extern mpxp_uint64_t pds_gettimeu(void); // usec
 
 #ifdef MPXPLAY_USE_DEBUGF
-
 #include <stdarg.h>
-
 static void mpxplay_debugf(FILE *fp,const char *format, ...)
 {
  va_list ap;
@@ -414,10 +401,10 @@ static void mpxplay_debugf(FILE *fp,const char *format, ...)
   fclose(fp);
  }else  printf(sout);
 }
-
+#elif defined (__GNUC__) && !(defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
+#define mpxplay_debugf(fmt, args...)	do {} while (0)
 #else
- #define mpxplay_debugf(...)
+#define mpxplay_debugf(...)		do {} while (0)
+#endif
 
-#endif/*MPXPLAY_USE_DEBUGF */
-
-#endif /* MPXPLAY_AU_DEF_H */
+#endif /* LIBAU_DEF_H */

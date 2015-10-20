@@ -344,7 +344,7 @@ static void snd_live24_setrate(struct emu10k1_card *card,struct mpxplay_audioout
 		}
 	}
 
-	dmabufsize=MDma_init_pcmoutbuf(card->pcmout_bufsize,CA0106_DMABUF_ALIGN);
+	dmabufsize=MDma_init_pcmoutbuf(aui,card->pcmout_bufsize,CA0106_DMABUF_ALIGN);
 	card->period_size=(dmabufsize/CA0106_DMABUF_PERIODS);
 	mpxplay_debugf(SBL_DEBUG_OUTPUT,"buffer config: bufsize:%d period_size:%d",dmabufsize,card->period_size);
 

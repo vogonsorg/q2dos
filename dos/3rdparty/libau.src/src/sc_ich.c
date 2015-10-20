@@ -347,7 +347,7 @@ static void INTELICH_close(struct mpxplay_audioout_info_s *aui);
 static void INTELICH_card_info(struct mpxplay_audioout_info_s *aui)
 {
  struct intel_card_s *card=(struct intel_card_s *)aui->card_private_data;
- sprintf(libau_istr,"ICH: Intel %s found on port:%4.4lX irq:%u (type:%s, bits:16%s)",
+ sprintf(aui->infostr,"ICH: Intel %s found on port:%4.4lX irq:%u (type:%s, bits:16%s)",
          card->pci_dev->device_name,card->baseport_bm,card->irq,
          ich_devnames[card->device_type],((card->device_type==DEVICE_INTEL_ICH4)? ",20":""));
 }
@@ -422,7 +422,7 @@ static void INTELICH_setrate(struct mpxplay_audioout_info_s *aui)
     aui->freq_card=48000;
  }
 
- dmabufsize=MDma_init_pcmoutbuf(card->pcmout_bufsize,ICH_DMABUF_ALIGN);
+ dmabufsize=MDma_init_pcmoutbuf(aui,card->pcmout_bufsize,ICH_DMABUF_ALIGN);
  card->period_size_bytes=dmabufsize/ICH_DMABUF_PERIODS;
 
  snd_intel_prepare_playback(card,aui);
@@ -461,10 +461,10 @@ static void snd_intel_measure_ac97_clock(struct mpxplay_audioout_info_s *aui)
  aui->bits_card=16;
 
  dmabufsize=min(card->pcmout_bufsize,AUCARDS_DMABUFSIZE_NORMAL); // to avoid longer test at -ddma, -ob 24
- dmabufsize=MDma_init_pcmoutbuf(dmabufsize,ICH_DMABUF_ALIGN);
+ dmabufsize=MDma_init_pcmoutbuf(aui,dmabufsize,ICH_DMABUF_ALIGN);
  card->period_size_bytes=dmabufsize/ICH_DMABUF_PERIODS;
  snd_intel_prepare_playback(card,aui);
- MDma_clearbuf();
+ MDma_clearbuf(aui);
 
  INTELICH_start(aui);
  starttime=pds_gettimeu();
@@ -497,9 +497,8 @@ static void snd_intel_measure_ac97_clock(struct mpxplay_audioout_info_s *aui)
 
 //------------------------------------------------------------------------
 
-static void INTELICH_writedata(void)
+static void INTELICH_writedata(mpxplay_audioout_info_s *aui)
 {
-struct mpxplay_audioout_info_s *aui=&au_infos;
  struct intel_card_s *card=(struct intel_card_s *)aui->card_private_data;
  unsigned int index = aui->card_dmalastput/card->period_size_bytes;
  snd_intel_write_8(card,ICH_PO_LVI_REG,(index-1)%ICH_DMABUF_PERIODS); // set stop position (to keep playing in an endless loop)
@@ -517,7 +516,7 @@ static long INTELICH_getbufpos(struct mpxplay_audioout_info_s *aui)
   //mpxplay_debugf(ICH_DEBUG_OUTPUT,"index1: %d",index);
   if(index>=ICH_DMABUF_PERIODS){
    if(retry>1)    continue;
-   MDma_clearbuf();
+   MDma_clearbuf(aui);
    snd_intel_write_8(card,ICH_PO_LVI_REG,(ICH_DMABUF_PERIODS-1));
    snd_intel_write_8(card,ICH_PO_CIV_REG,0);
    funcbit_enable(aui->card_infobits,AUINFOS_CARDINFOBIT_DMAUNDERRUN);
@@ -530,7 +529,7 @@ static long INTELICH_getbufpos(struct mpxplay_audioout_info_s *aui)
   //mpxplay_debugf(ICH_DEBUG_OUTPUT,"pcmpos: %d",pcmpos);
   if(!pcmpos || (pcmpos>card->period_size_bytes)){
    if(snd_intel_read_8(card,ICH_PO_LVI_REG)==index){
-    MDma_clearbuf();
+    MDma_clearbuf(aui);
     snd_intel_write_8(card,ICH_PO_LVI_REG,(index-1)%ICH_DMABUF_PERIODS); // to keep playing in an endless loop
     snd_intel_write_8(card,ICH_PO_CIV_REG,index); // ???
     funcbit_enable(aui->card_infobits,AUINFOS_CARDINFOBIT_DMAUNDERRUN);

@@ -215,7 +215,7 @@ static void VIA82XX_close(struct mpxplay_audioout_info_s *aui);
 static void VIA82XX_card_info(struct mpxplay_audioout_info_s *aui)
 {
  struct via82xx_card *card=(struct via82xx_card *)aui->card_private_data;
- sprintf(libau_istr,"VIA %s on port:%4.4lX irq:%u chiprev:%2.2X model:%4.4X",
+ sprintf(aui->infostr,"VIA %s on port:%4.4lX irq:%u chiprev:%2.2X model:%4.4X",
 	 card->pci_dev->device_name,card->iobase,card->irq,(unsigned)card->chiprev,(unsigned)card->model);
 }
 
@@ -289,7 +289,7 @@ static void VIA82XX_setrate(struct mpxplay_audioout_info_s *aui)
  aui->bits_card=16;
  aui->card_wave_id=MPXPLAY_WAVEID_PCM_SLE;
 
- dmabufsize=MDma_init_pcmoutbuf(card->pcmout_bufsize,PCMBUFFERPAGESIZE);
+ dmabufsize=MDma_init_pcmoutbuf(aui,card->pcmout_bufsize,PCMBUFFERPAGESIZE);
 
  // page tables
  card->pcmout_pages=dmabufsize/PCMBUFFERPAGESIZE;

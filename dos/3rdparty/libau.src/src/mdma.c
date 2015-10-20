@@ -22,9 +22,8 @@ unsigned int MDma_get_max_pcmoutbufsize(unsigned int pagesize, unsigned int samp
 	return bufsize;
 }
 
-unsigned int MDma_init_pcmoutbuf(unsigned int maxbufsize, unsigned int pagesize)
+unsigned int MDma_init_pcmoutbuf(struct mpxplay_audioout_info_s *aui, unsigned int maxbufsize, unsigned int pagesize)
 {
-	struct mpxplay_audioout_info_s *aui=&au_infos;
 	unsigned int dmabufsize, bit_width, tmp;
 
 	switch(aui->card_wave_id)
@@ -61,9 +60,8 @@ unsigned int MDma_init_pcmoutbuf(unsigned int maxbufsize, unsigned int pagesize)
 	return dmabufsize;
 }
 
-void MDma_clearbuf(void)
+void MDma_clearbuf(struct mpxplay_audioout_info_s *aui)
 {
-	struct mpxplay_audioout_info_s *aui=&au_infos;
 #ifdef ZDM
 	unsigned long addr = (unsigned int)aui->card_DMABUFF;
 	int i;
@@ -78,9 +76,8 @@ void MDma_clearbuf(void)
 #endif /* ZDM */
 }
 
-unsigned int MDma_bufpos(void)
+unsigned int MDma_bufpos(struct mpxplay_audioout_info_s *aui)
 {
-	struct mpxplay_audioout_info_s *aui=&au_infos;
 	unsigned int bufpos = aui->card_handler->cardbuf_pos(aui);
 
 	if(bufpos>=aui->card_dmasize)
@@ -107,9 +104,8 @@ unsigned int MDma_bufpos(void)
 	return bufpos;
 }
 
-void MDma_writedata(const char *src,unsigned long left)
+void MDma_writedata(struct mpxplay_audioout_info_s *aui,const char *src,unsigned long left)
 {
-	struct mpxplay_audioout_info_s *aui=&au_infos;
 	unsigned int todo;
 
 	aui->card_outbytes = left;
@@ -142,6 +138,6 @@ void MDma_writedata(const char *src,unsigned long left)
 	}
 
 	if(aui->card_handler->cardbuf_writedata) {
-		aui->card_handler->cardbuf_writedata();
+		aui->card_handler->cardbuf_writedata(aui);
 	}
 }

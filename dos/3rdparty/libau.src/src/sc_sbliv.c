@@ -852,7 +852,7 @@ static void snd_emu10kx_setrate(struct emu10k1_card *card,struct mpxplay_audioou
    aui->freq_card=limit;
  }
 
- dmabufsize=MDma_init_pcmoutbuf(card->pcmout_bufsize,EMUPAGESIZE);
+ dmabufsize=MDma_init_pcmoutbuf(aui,card->pcmout_bufsize,EMUPAGESIZE);
 
  if(aui->freq_card==44100)
   snd_emu_set_spdif_freq(card,44100);
@@ -1025,7 +1025,7 @@ static void snd_p16v_setrate(struct emu10k1_card *card,struct mpxplay_audioout_i
      aui->freq_card=192000;
   }
 
- dmabufsize=MDma_init_pcmoutbuf(card->pcmout_bufsize,AUDIGY2_P16V_DMABUF_ALIGN);
+ dmabufsize=MDma_init_pcmoutbuf(aui,card->pcmout_bufsize,AUDIGY2_P16V_DMABUF_ALIGN);
  card->period_size=(dmabufsize/AUDIGY2_P16V_PERIODS);
  mpxplay_debugf(SBL_DEBUG_OUTPUT,"buffer config: bufsize:%d period_size:%d",dmabufsize,card->period_size);
 
@@ -1198,7 +1198,7 @@ static void sblive_select_mixer(struct emu10k1_card *card);
 static void SBLIVE_card_info(struct mpxplay_audioout_info_s *aui)
 {
  struct emu10k1_card *card=(struct emu10k1_card *)aui->card_private_data;
- sprintf(libau_istr,"SB %s (%8.8lX)(bits:16%s) on port:%4.4lX irq:%u",
+ sprintf(aui->infostr,"SB %s (%8.8lX)(bits:16%s) on port:%4.4lX irq:%u",
          ((card->card_capabilities->longname)? card->card_capabilities->longname:card->pci_dev->device_name),
          card->serial,((card->chips&EMU_CHIPS_24BIT)? ",24":""),
          card->iobase,card->irq);
@@ -1331,11 +1331,10 @@ static long SBLIVE_getbufpos(struct mpxplay_audioout_info_s *aui)
  return aui->card_dma_lastgoodpos;
 }
 
-static void SBLIVE_clearbuf(void)
+static void SBLIVE_clearbuf(struct mpxplay_audioout_info_s *aui)
 {
- struct mpxplay_audioout_info_s *aui=&au_infos;
  struct emu10k1_card *card=(struct emu10k1_card *)aui->card_private_data;
- MDma_clearbuf();
+ MDma_clearbuf(aui);
  if(card->driver_funcs->clear_cache)  card->driver_funcs->clear_cache(card);
 }
 
