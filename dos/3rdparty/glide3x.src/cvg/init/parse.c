@@ -466,7 +466,12 @@ static int sst1InitFgets(char *string, FILE *stream)
 
 static __inline int sst1_isspace (int c)
 {
-	return (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\v');
+    switch(c) {
+    case ' ':  case '\t':
+    case '\n': case '\r':
+    case '\f': case '\v': return 1;
+    }
+    return 0;
 }
 
 static int sst1InitFgetc(FILE *stream)
