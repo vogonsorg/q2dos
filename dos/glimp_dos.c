@@ -120,8 +120,6 @@ static void VID_ShutdownGamma (void)
 
 /*****************************************************************************/
 
-qboolean GLimp_InitGL (void);
-
 extern cvar_t *vid_fullscreen;
 extern cvar_t *vid_ref;
 
@@ -145,6 +143,7 @@ static const int NUM_GL_RESOLUTIONS = (int) (sizeof(resolutions) / sizeof(resolu
 rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
 {
 	int width, height, bpp;
+	int stencil = 0;
 
 	ri.Con_Printf( PRINT_ALL, "Initializing OpenGL display\n");
 
@@ -166,6 +165,12 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 		return rserr_invalid_mode;
 
 	VID_InitGamma();
+
+	qglGetIntegerv(GL_STENCIL_BITS, &stencil);
+	gl_config.have_stencil = !!stencil;
+	if (gl_config.have_stencil)
+		ri.Con_Printf(PRINT_ALL, "... Using %d bit stencil buffer\n", stencil);
+	else	ri.Con_Printf(PRINT_ALL, "... Stencil buffer not found\n");
 
 	*pwidth = width;
 	*pheight = height;

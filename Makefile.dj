@@ -23,9 +23,9 @@ REF_DXE=1
 # compile which renderer if REF_DXE=0 : enable ONLY ONE!
 REF_STATIC_SOFT=1
 REF_STATIC_GL=0
-# compile which gl driver if REF_DXE=0 and REF_STATIC_GL=1
-# valid values: mesa, sage, or fxmesa
-REFGL_DRIVER=sage
+# compile for which gl driver if REF_DXE=0 and REF_STATIC_GL=1
+# mesa, sage, or fxmesa
+REFGL_DRIVER=fxmesa
 # compile which glide driver,if REF_DXE=0 and REF_STATIC_GL=1
 # sst1=Voodoo Graphics, sst96=Voodoo Rush
 # cvg=Voodoo2, h5=Banshee and Voodoo3/4/5
@@ -107,10 +107,7 @@ CFLAGS += -Idos/3rdparty/include -Idos/3rdparty/include/glide3
 LDFLAGS += -Ldos/3rdparty/lib/$(GLDIR) -lgl -Ldos/3rdparty/lib/$(FX_GLIDE_HW) -lglide3x
 REF_STATIC_SOFT=0
 ifeq ($(REFGL_DRIVER),fxmesa)
-GLDIR=mesa
 CPPFLAGS+= -DREFGL_FXMESA
-else
-GLDIR=$(REFGL_DRIVER)
 endif
 ifeq ($(REFGL_DRIVER),mesa)
 CPPFLAGS+= -DREFGL_MESA
@@ -118,6 +115,7 @@ endif
 ifeq ($(REFGL_DRIVER),sage)
 CPPFLAGS+= -DREFGL_SAGE
 endif
+GLDIR=$(REFGL_DRIVER)
 endif
 endif
 
