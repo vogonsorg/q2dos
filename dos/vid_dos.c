@@ -552,14 +552,14 @@ void	VID_MenuInit (void)
 		s_defaults_action[i].generic.type		= MTYPE_ACTION;
 		s_defaults_action[i].generic.name		= "reset to defaults";
 		s_defaults_action[i].generic.x			= 0;
-		s_defaults_action[i].generic.y			= 140;
+		s_defaults_action[i].generic.y			= 130;
 		s_defaults_action[i].generic.callback	= ResetDefaults;
 		s_defaults_action[i].generic.statusbar	= "resets all video settings to internal defaults";
 
 		s_apply_action[i].generic.type		= MTYPE_ACTION;
 		s_apply_action[i].generic.name		= "apply changes";
 		s_apply_action[i].generic.x			= 0;
-		s_apply_action[i].generic.y			= 150;
+		s_apply_action[i].generic.y			= 140;
 		s_apply_action[i].generic.callback	= ApplyChanges;
 	}
 
