@@ -452,6 +452,8 @@ extern	int	jacket_armor_index;
 extern	int	combat_armor_index;
 extern	int	body_armor_index;
 
+extern	int gibsthisframe;
+extern	int lastgibframe;
 
 // means of death
 #define MOD_UNKNOWN			0

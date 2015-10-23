@@ -361,6 +361,10 @@ void ExitLevel (void)
 			ent->health = ent->client->pers.max_health;
 		}
 	}
+
+	gibsthisframe = 0;
+	lastgibframe = 0;
+
 	level.fadeFrames = 0; /* FS: Zaero specific game dll changes */
 	level.exitintermission = 0; /* FS: Zaero specific game dll changes: moved after changemap = NULL */
 	level.intermissiontime = 0; /* FS: Zaero specific game dll changes: moved after changemap = NULL */

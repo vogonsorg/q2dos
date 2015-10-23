@@ -2,8 +2,8 @@
 
 #include "g_local.h"
 
-int gibsthisframe = 0;
-int lastgibframe = 0;
+int gibsthisframe;
+int lastgibframe;
 
 /*
  * QUAKED func_group (0 0 0) ?

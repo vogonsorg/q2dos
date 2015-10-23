@@ -539,6 +539,8 @@ extern	int	tbombs_index;
 extern	int	empnuke_index;
 extern	int	plasmashield_index;
 
+extern	int gibsthisframe;
+extern	int lastgibframe;
 
 // means of death
 #define MOD_UNKNOWN			    0

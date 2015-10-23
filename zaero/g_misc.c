@@ -2,8 +2,9 @@
 
 #include "g_local.h"
 
-int	gibsthisframe = 0;
-int lastgibframe = 0;
+int	gibsthisframe;
+int lastgibframe;
+
 qboolean SV_movestep (edict_t *ent, vec3_t move, qboolean relink); /* FS: Zaero specific game dll changes */
 
 void
