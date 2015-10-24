@@ -1,6 +1,6 @@
 del *.obj
 del *.lib
-wmaker -h -f makewatc
+wmaker -h -f Makefile.wat
 
 wlib -q -b -t au_cards.lib +au.obj
 wlib -q -b -t au_cards.lib +ac97_def.obj

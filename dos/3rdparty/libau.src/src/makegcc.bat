@@ -1,4 +1,4 @@
 del *.o
 del *.a
-make -f makegcc
+make -f Makefile.dj
 del *.o
