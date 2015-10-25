@@ -14,6 +14,8 @@ USE_OGG=1
 USE_TREMOR=1
 # pci sound card support:
 USE_SNDPCI=1
+# pci sound card support as dxe3:
+SNDPCI_DXE=0
 # cd audio support:
 USE_CDAUDIO=1
 # abrash's asm optimizations:
@@ -76,7 +78,11 @@ endif
 ifeq ($(USE_SNDPCI),1)
 CPPFLAGS+= -DUSE_SNDPCI
 CFLAGS+= -Idos/3rdparty/include
+ifeq ($(SNDPCI_DXE),1)
+CPPFLAGS+= -DSNDPCI_DXE
+else
 LDFLAGS+= -Ldos/3rdparty/lib -lau
+endif
 endif
 
 ifeq ($(USE_CDAUDIO),1)
