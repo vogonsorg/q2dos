@@ -3019,7 +3019,7 @@ void QGL_Shutdown( void )
 #ifdef _MSC_VER
 #	pragma warning (disable : 4113 4133 4047 )
 #endif
-#define GPA(func) GetProcAddress(glw_state.hinstOpenGL,#func)
+#define GPA(func) (void *) GetProcAddress(glw_state.hinstOpenGL,#func)
 
 /*
 ** QGL_Init
