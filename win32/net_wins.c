@@ -43,8 +43,8 @@ static cvar_t	*noudp;
 static cvar_t	*noipx;
 
 loopback_t	loopbacks[2];
-int			ip_sockets[2];
-int			ipx_sockets[2];
+SOCKET			ip_sockets[2];
+SOCKET			ipx_sockets[2];
 
 char *NET_ErrorString (void);
 
@@ -335,7 +335,7 @@ qboolean	NET_GetPacket (netsrc_t sock, netadr_t *net_from, sizebuf_t *net_messag
 	int 	ret;
 	struct sockaddr from;
 	int		fromlen;
-	int		net_socket;
+	SOCKET		net_socket;
 	int		protocol;
 	int		err;
 
@@ -358,7 +358,7 @@ qboolean	NET_GetPacket (netsrc_t sock, netadr_t *net_from, sizebuf_t *net_messag
 
 		SockadrToNetadr (&from, net_from);
 
-		if (ret == -1)
+		if (ret == SOCKET_ERROR)
 		{
 			err = WSAGetLastError();
 
@@ -398,7 +398,7 @@ void NET_SendPacket (netsrc_t sock, int length, void *data, netadr_t to)
 {
 	int		ret;
 	struct sockaddr	addr;
-	int		net_socket;
+	SOCKET		net_socket;
 
 	if ( to.type == NA_LOOPBACK )
 	{
@@ -439,7 +439,7 @@ void NET_SendPacket (netsrc_t sock, int length, void *data, netadr_t to)
 	NetadrToSockadr (&to, &addr);
 
 	ret = sendto (net_socket, data, length, 0, &addr, sizeof(addr) );
-	if (ret == -1)
+	if (ret == SOCKET_ERROR)
 	{
 		int err = WSAGetLastError();
 
@@ -481,15 +481,15 @@ void NET_SendPacket (netsrc_t sock, int length, void *data, netadr_t to)
 NET_Socket
 ====================
 */
-int NET_IPSocket (char *net_interface, int port)
+SOCKET NET_IPSocket (char *net_interface, int port)
 {
-	int					newsocket;
+	SOCKET			newsocket;
 	struct sockaddr_in	address;
 	u_long			_true = true;
 	int					i = 1;
 	int					err;
 
-	if ((newsocket = socket (PF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
+	if ((newsocket = socket (PF_INET, SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET)
 	{
 		err = WSAGetLastError();
 		if (err != WSAEAFNOSUPPORT)
@@ -498,14 +498,14 @@ int NET_IPSocket (char *net_interface, int port)
 	}
 
 	// make it non-blocking
-	if (ioctlsocket (newsocket, FIONBIO, &_true) == -1)
+	if (ioctlsocket (newsocket, FIONBIO, &_true) == SOCKET_ERROR)
 	{
 		Com_Printf ("WARNING: UDP_OpenSocket: ioctl FIONBIO: %s\n", NET_ErrorString());
 		return 0;
 	}
 
 	// make it broadcast capable
-	if (setsockopt(newsocket, SOL_SOCKET, SO_BROADCAST, (char *)&i, sizeof(i)) == -1)
+	if (setsockopt(newsocket, SOL_SOCKET, SO_BROADCAST, (char *)&i, sizeof(i)) == SOCKET_ERROR)
 	{
 		Com_Printf ("WARNING: UDP_OpenSocket: setsockopt SO_BROADCAST: %s\n", NET_ErrorString());
 		return 0;
@@ -523,7 +523,7 @@ int NET_IPSocket (char *net_interface, int port)
 
 	address.sin_family = AF_INET;
 
-	if( bind (newsocket, (void *)&address, sizeof(address)) == -1)
+	if ( bind (newsocket, (void *)&address, sizeof(address)) == SOCKET_ERROR)
 	{
 		Com_Printf ("WARNING: UDP_OpenSocket: bind: %s\n", NET_ErrorString());
 		closesocket (newsocket);
@@ -591,14 +591,14 @@ void NET_OpenIP (void)
 IPX_Socket
 ====================
 */
-int NET_IPXSocket (int port)
+SOCKET NET_IPXSocket (int port)
 {
-	int					newsocket;
+	SOCKET			newsocket;
 	struct sockaddr_ipx	address;
 	u_long					_true = 1;
 	int					err;
 
-	if ((newsocket = socket (PF_IPX, SOCK_DGRAM, NSPROTO_IPX)) == -1)
+	if ((newsocket = socket (PF_IPX, SOCK_DGRAM, NSPROTO_IPX)) == INVALID_SOCKET)
 	{
 		err = WSAGetLastError();
 		if (err != WSAEAFNOSUPPORT)
@@ -607,14 +607,14 @@ int NET_IPXSocket (int port)
 	}
 
 	// make it non-blocking
-	if (ioctlsocket (newsocket, FIONBIO, &_true) == -1)
+	if (ioctlsocket (newsocket, FIONBIO, &_true) == SOCKET_ERROR)
 	{
 		Com_Printf ("WARNING: IPX_Socket: ioctl FIONBIO: %s\n", NET_ErrorString());
 		return 0;
 	}
 
 	// make it broadcast capable
-	if (setsockopt(newsocket, SOL_SOCKET, SO_BROADCAST, (char *)&_true, sizeof(_true)) == -1)
+	if (setsockopt(newsocket, SOL_SOCKET, SO_BROADCAST, (char *)&_true, sizeof(_true)) == SOCKET_ERROR)
 	{
 		Com_Printf ("WARNING: IPX_Socket: setsockopt SO_BROADCAST: %s\n", NET_ErrorString());
 		return 0;
@@ -628,7 +628,7 @@ int NET_IPXSocket (int port)
 	else
 		address.sa_socket = htons((short)port);
 
-	if( bind (newsocket, (void *)&address, sizeof(address)) == -1)
+	if( bind (newsocket, (void *)&address, sizeof(address)) == SOCKET_ERROR)
 	{
 		Com_Printf ("WARNING: IPX_Socket: bind: %s\n", NET_ErrorString());
 		closesocket (newsocket);
@@ -733,7 +733,7 @@ void NET_Sleep(double msec)
     struct timeval timeout;
 	fd_set	fdset;
 	extern cvar_t *dedicated;
-	int i;
+	SOCKET i;
 
 	if (!dedicated || !dedicated->value)
 		return; // we're not a server, just run full speed
