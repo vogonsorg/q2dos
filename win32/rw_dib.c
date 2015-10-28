@@ -295,12 +295,12 @@ void DIB_SetPalette( const unsigned char *_pal )
 
 		if ( ( sww_state.hPal = CreatePalette( pLogPal ) ) == NULL )
 		{
-			ri.Sys_Error( ERR_FATAL, "DIB_SetPalette() - CreatePalette failed(%x)\n", GetLastError() );
+			ri.Sys_Error( ERR_FATAL, "DIB_SetPalette() - CreatePalette failed(%x)\n", (unsigned int) GetLastError() );
 		}
 
 		if ( ( hpalOld = SelectPalette( hDC, sww_state.hPal, FALSE ) ) == NULL )
 		{
-			ri.Sys_Error( ERR_FATAL, "DIB_SetPalette() - SelectPalette failed(%x)\n",GetLastError() );
+			ri.Sys_Error( ERR_FATAL, "DIB_SetPalette() - SelectPalette failed(%x)\n", (unsigned int) GetLastError() );
 		}
 
 		if ( sww_state.hpalOld == NULL )

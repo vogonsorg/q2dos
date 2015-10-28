@@ -98,7 +98,7 @@ static qboolean VerifyDriver( void )
 {
 	char buffer[1024];
 
-	strcpy( buffer, qglGetString( GL_RENDERER ) );
+	strcpy( buffer, (const char *) qglGetString( GL_RENDERER ) );
 	strlwr( buffer );
 	if ( strcmp( buffer, "gdi generic" ) == 0 )
 		if ( !glw_state.mcd_accelerated )
@@ -599,7 +599,7 @@ qboolean GLimp_InitGL (void)
 	InitGammaRamp ();
 
 	// Knightmare- stencil buffer
-	if (strstr(qglGetString(GL_RENDERER), "Voodoo3")) {
+	if (strstr((const char *)qglGetString(GL_RENDERER), "Voodoo3")) {
 		ri.Con_Printf( PRINT_ALL, "... Voodoo3 has no stencil buffer\n" );
 	} else {
 		if (pfd.cStencilBits) {
