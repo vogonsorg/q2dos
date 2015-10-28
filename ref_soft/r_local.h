@@ -26,13 +26,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../client/ref.h"
 
-#ifdef __DJGPP__ // FS: 2.05 finally has stdint.h!
-	#include <stdint.h>
+#ifdef __DJGPP__ /* djgpp-2.04 and newer. */
+#include <stdint.h>
+#elif defined(_MSC_VER)
+#include "msinttypes/stdint.h"
 #else
-	#ifndef intptr_t // FS: Jack Whitham's fixes.  This is probably not portable for non-x86.
-		typedef int	intptr_t;
-	#endif // intptr_t
-#endif // __DJGPP__
+#include <stdint.h>
+#endif
 
 
 #define REF_VERSION     "SOFT 0.01"
