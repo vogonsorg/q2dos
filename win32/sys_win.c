@@ -496,13 +496,22 @@ void *Sys_GetGameAPI (void *parms)
 	char	cwd[MAX_OSPATH];
 
 
-#if defined _M_IX86
+#if defined(_M_IX86) || defined(__i386__)
 	const char *gamename = "gamex86.dll";
 
 #ifdef NDEBUG
 	const char *debugdir = "release";
 #else
 	const char *debugdir = "debug";
+#endif
+
+#elif defined(_M_X64) || defined(__x86_64__)
+	const char *gamename = "gamex64.dll";
+
+#ifdef NDEBUG
+	const char *debugdir = "releasex86";
+#else
+	const char *debugdir = "debugx86";
 #endif
 
 #elif defined _M_ALPHA
