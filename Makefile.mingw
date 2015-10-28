@@ -123,7 +123,7 @@ OBJECTS = $(CLIENT) $(CLIENTASM) $(QCOMMON) $(COMMONASM) $(SERVER) $(WIN32)
 all: quake2
 
 quake2: $(OBJECTS)
-	$(CC) -o $(EXE) $(OBJECTS) $(VORBIS_LIBS) $(CURL_LIBS) $(LDLIBS)
+	$(CC) -o $(EXE) $(LDFLAGS) $(OBJECTS) $(VORBIS_LIBS) $(CURL_LIBS) $(LDLIBS)
 
 clean:
 	rm -f qcommon/*.o
