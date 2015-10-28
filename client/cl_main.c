@@ -2700,7 +2700,7 @@ static void GameSpy_Sort_By_Ping(GServerList lst)
 				continue;
 			}
 
-			if(Q_strncmp(gspye->ServerGetStringValue(server, "hostname","(NONE)"), "(NONE)", 6) == 0) /* FS: A server that timed-out or we aborted early */
+			if (strncmp(gspye->ServerGetStringValue(server, "hostname","(NONE)"), "(NONE)", 6) == 0) /* FS: A server that timed-out or we aborted early */
 			{
 				continue;
 			}

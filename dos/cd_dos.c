@@ -704,7 +704,7 @@ static void CD_f (void)
 			return;
 		}
 		for (n = 1; n <= ret; n++)
-			remap[n] = Q_atoi(Cmd_Argv (n+1));
+			remap[n] = atoi(Cmd_Argv (n+1));
 		return;
 	}
 
@@ -716,13 +716,13 @@ static void CD_f (void)
 
 	if (Q_strcasecmp(command, "play") == 0)
 	{
-		CDAudio_Play(Q_atoi(Cmd_Argv (2)), false);
+		CDAudio_Play(atoi(Cmd_Argv (2)), false);
 		return;
 	}
 
 	if (Q_strcasecmp(command, "loop") == 0)
 	{
-		CDAudio_Play(Q_atoi(Cmd_Argv (2)), true);
+		CDAudio_Play(atoi(Cmd_Argv (2)), true);
 		return;
 	}
 

@@ -2930,9 +2930,9 @@ static void FormatGamespyList (void)
 
 					Q_strncpyz(gamespy_server_names[m_num_gamespy_servers], browserList[j].hostname, 20);
 
-					if(Q_strlen(browserList[j].hostname) >= 20)
+					if (strlen(browserList[j].hostname) >= 20)
 					{
-						Q_strcat(gamespy_server_names[m_num_gamespy_servers], "...");
+						strcat(gamespy_server_names[m_num_gamespy_servers], "...");
 					}
 
 					Com_sprintf(buffer, sizeof(buffer), " [%d] %d/%d", browserList[j].ping, browserList[j].curPlayers, browserList[j].maxPlayers);
@@ -2968,9 +2968,9 @@ static void FormatGamespyList (void)
 
 				Q_strncpyz(gamespy_server_names[m_num_gamespy_servers-skip], browserListAll[j].hostname, 20);
 
-				if(Q_strlen(browserListAll[j].hostname) >= 20)
+				if (strlen(browserListAll[j].hostname) >= 20)
 				{
-					Q_strcat(gamespy_server_names[m_num_gamespy_servers-skip], "...");
+					strcat(gamespy_server_names[m_num_gamespy_servers-skip], "...");
 				}
 
 				Com_sprintf(buffer, sizeof(buffer), " [%d] %d/%d", browserListAll[j].ping, browserListAll[j].curPlayers, browserListAll[j].maxPlayers);

@@ -389,7 +389,7 @@ qboolean BLASTER_Init(void)
 	p = COM_CheckParm ("-dsp");
 	if (p && p < com_argc - 1)
 	{
-		p = Q_atoi (com_argv[p+1]);
+		p = atoi (com_argv[p+1]);
 		if (p < 2 || p > 4)
 			Com_Printf ("-dsp parameter can only be 2, 3, or 4\n");
 		else if (p > dsp_version)
@@ -410,7 +410,7 @@ qboolean BLASTER_Init(void)
 	}
 
 	if (rc)
-		dma.speed = Q_atoi(com_argv[rc+1]);
+		dma.speed = atoi(com_argv[rc+1]);
 
 // version 4 cards (sb 16) do 16 bit stereo
 	if (dsp_version >= 4)
