@@ -1,3 +1,5 @@
+CC = gcc
+
 # enable evil 3dfx glide hacks for native hardware gamma:
 USE_3DFXGAMMA=1
 # abrash's asm optimizations:
