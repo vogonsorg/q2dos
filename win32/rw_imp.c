@@ -252,7 +252,7 @@ void SWimp_EndFrame (void)
 
 		memset( &ddsd, 0, sizeof( ddsd ) );
 		ddsd.dwSize = sizeof( ddsd );
-	
+
 		sww_state.lpddsOffScreenBuffer->lpVtbl->Lock( sww_state.lpddsOffScreenBuffer, NULL, &ddsd, DDLOCK_WAIT, NULL );
 
 		vid.buffer = ddsd.lpSurface;
@@ -407,10 +407,12 @@ Sys_MakeCodeWriteable
 */
 void Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length)
 {
+#if id386
 	DWORD  flOldProtect;
 
 	if (!VirtualProtect((LPVOID)startaddr, length, PAGE_READWRITE, &flOldProtect))
- 		ri.Sys_Error(ERR_FATAL, "Protection change failed\n");
+		ri.Sys_Error(ERR_FATAL, "Protection change failed\n");
+#endif
 }
 
 /*
