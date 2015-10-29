@@ -9,6 +9,7 @@ del /s /q *.user
 del /s /q *.aps
 del /s /q *.idb
 del /s /q *.pdb
+del /s /q *.res
 del /s /q gam*.dxe
 del /s /q gam*.dll
 del /s /q ref*.dxe
