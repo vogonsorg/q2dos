@@ -46,7 +46,6 @@ CURL_LIBS = -Lwin32/lib -lcurl
 endif
 
 WIN32 = win32/cd_win.o \
-	win32/conproc.o \
 	win32/in_win.o \
 	win32/net_wins.o \
 	win32/q_shwin.o \

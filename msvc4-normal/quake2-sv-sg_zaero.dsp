@@ -628,10 +628,6 @@ SOURCE=..\QCOMMON\common.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\WIN32\conproc.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\CLIENT\console.c
 # End Source File
 # Begin Source File
@@ -717,10 +713,6 @@ SOURCE=..\client\cdaudio.h
 # Begin Source File
 
 SOURCE=..\client\client.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\win32\conproc.h
 # End Source File
 # Begin Source File
 

@@ -29,7 +29,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <direct.h>
 #include <io.h>
 #include <conio.h>
-#include "../win32/conproc.h"
 
 #define MINIMUM_WIN_MEMORY	0x0a00000
 #define MAXIMUM_WIN_MEMORY	0x1000000
@@ -81,9 +80,6 @@ void Sys_Error (char *error, ...)
 	if (qwclsemaphore)
 		CloseHandle (qwclsemaphore);
 
-// shut down QHOST hooks if necessary
-	DeinitConProc ();
-
 	exit (1);
 }
 
@@ -96,9 +92,6 @@ void Sys_Quit (void)
 	CloseHandle (qwclsemaphore);
 	if (dedicated && dedicated->value)
 		FreeConsole ();
-
-// shut down QHOST hooks if necessary
-	DeinitConProc ();
 
 	exit (0);
 }
@@ -247,9 +240,6 @@ void Sys_Init (void)
 			Sys_Error ("Couldn't create dedicated server console");
 		hinput = GetStdHandle (STD_INPUT_HANDLE);
 		houtput = GetStdHandle (STD_OUTPUT_HANDLE);
-	
-		// let QHOST hook in
-		InitConProc (argc, argv);
 	}
 }
 
@@ -270,7 +260,6 @@ char *Sys_ConsoleInput (void)
 
 	if (!dedicated || !dedicated->value)
 		return NULL;
-
 
 	for ( ;; )
 	{
@@ -568,7 +557,7 @@ void *Sys_GetGameAPI (void *parms)
 	GetGameAPI = (void *)GetProcAddress (game_library, "GetGameAPI");
 	if (!GetGameAPI)
 	{
-		Sys_UnloadGame ();		
+		Sys_UnloadGame ();
 		return NULL;
 	}
 #endif	//end of GAME_HARD_LINKED
