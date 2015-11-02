@@ -1,0 +1,54 @@
+CC = gcc
+CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
+CPPFLAGS = -DWITH_ACEBOT
+LDFLAGS = -shared -Wl,--enable-auto-image-base -Wl,--no-undefined
+
+GAME = \
+	c_base.o \
+	c_botai.o \
+	c_botmisc.o \
+	c_botnav.o \
+	c_cam.o \
+	c_item.o \
+	c_weapon.o \
+	g_cmds.o \
+	g_combat.o \
+	g_ctf.o \
+	g_func.o \
+	g_items.o \
+	g_main.o \
+	g_misc.o \
+	g_phys.o \
+	g_save.o \
+	g_spawn.o \
+	g_svcmds.o \
+	g_target.o \
+	g_trigger.o \
+	g_utils.o \
+	g_weapon.o \
+	gslog.o \
+	m_move.o \
+	p_client.o \
+	p_hud.o \
+	p_menu.o \
+	p_view.o \
+	p_weapon.o \
+	q_shared.o \
+	stdlog.o
+
+.PHONY: all test clean
+#
+
+OBJECTS =  $(GAME)
+
+all: gamex64.dll
+
+gamex64.dll:	$(OBJECTS) game.def
+	$(CC) -o gamex64.dll $(LDFLAGS) $(OBJECTS) game.def
+
+clean:
+	rm -f *.o
+
+%.o : %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
