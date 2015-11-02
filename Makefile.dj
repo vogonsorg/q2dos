@@ -15,7 +15,7 @@ USE_TREMOR=1
 # pci sound card support:
 USE_SNDPCI=1
 # pci sound card support as dxe3:
-SNDPCI_DXE=0
+SNDPCI_DXE=1
 # cd audio support:
 USE_CDAUDIO=1
 # abrash's asm optimizations:
