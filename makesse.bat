@@ -10,6 +10,11 @@ copy /y q2fx.exe q2sage.exe
 upx -9 q2sage.exe
 
 make -f Makefile.dj clean
+make -f Makefile.dj USE_SSE=1 REF_DXE=0 REF_STATIC_GL=1 REFGL_DRIVER=fxmesa
+upx -9 q2fx.exe
+copy /y q2fx.exe q2fx3.exe
+
+make -f Makefile.dj clean
 make -f Makefile.dj USE_SSE=1 REF_DXE=0 REF_STATIC_GL=1 REFGL_DRIVER=mesa
 upx -9 q2fx.exe
 
@@ -32,6 +37,7 @@ cd..
 
 copy q2sse.exe release
 copy q2fx.exe release
+copy q2fx3.exe release
 copy q2sage.exe release
 copy ref_gl\ref_gl.dxe release
 copy readme.fx release
