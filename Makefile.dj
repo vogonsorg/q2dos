@@ -38,7 +38,7 @@ USE_3DFXGAMMA=1
 
 CC = gcc
 ifeq ($(DEBUG),1)
-CFLAGS = -g -Wall -Werror -O0 -fno-strict-aliasing
+CFLAGS = -Wall -Werror -g -fno-strict-aliasing
 else
 CFLAGS = -Wall -Werror -O2 -fno-strict-aliasing -fomit-frame-pointer
 endif

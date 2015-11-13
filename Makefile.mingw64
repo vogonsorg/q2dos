@@ -1,10 +1,5 @@
-CC = gcc
-RC = windres
-CFLAGS = -O2 -fno-strict-aliasing -fomit-frame-pointer
-LDFLAGS = -mwindows
-LDLIBS = -lwinmm -lws2_32
-EXE = q2.exe
-
+# features selection :
+#
 # gamespy/server browser:
 USE_GAMESPY=1
 # dynamically linked gamespy:
@@ -15,6 +10,18 @@ USE_CURL=1
 USE_OGG=1
 # use tremor library for ogg/vorbis:
 USE_TREMOR=0
+
+CC = gcc
+RC = windres
+ifeq ($(DEBUG),1)
+CFLAGS = -Wall -g -fno-strict-aliasing
+else
+CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
+endif
+CPPFLAGS = -DCLIENT_SPLIT_NETFRAME
+LDFLAGS = -mwindows
+LDLIBS = -lwinmm -lws2_32
+EXE = q2.exe
 
 ifeq ($(USE_GAMESPY),1)
 CPPFLAGS+= -DGAMESPY
@@ -106,7 +113,7 @@ SERVER = server/sv_ccmds.o \
 	server/sv_user.o \
 	server/sv_world.o
 
-OBJECTS = $(CLIENT) $(QCOMMON) $(SERVER) $(WIN32) $(WIN32RES)
+OBJECTS = $(CLIENT) $(QCOMMON) $(SERVER) $(GAMESPY) $(WIN32) $(WIN32RES)
 
 
 .PHONY: clean
