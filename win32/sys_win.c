@@ -478,39 +478,35 @@ void *GetGameAPI (void *import);
 void *Sys_GetGameAPI (void *parms)
 {
 #ifndef GAME_HARD_LINKED
-
 	void	*(*GetGameAPI) (void *);
 	char	name[MAX_OSPATH];
 	char	*path;
 	char	cwd[MAX_OSPATH];
 
 
-#if defined(_M_X64) || defined(__x86_64__)
+#if defined(_M_X64) || defined(_M_AMD64) || defined(__x86_64__)
 	const char *gamename = "gamex64.dll";
-
-#ifdef NDEBUG
-	const char *debugdir = "releasex86";
-#else
-	const char *debugdir = "debugx86";
-#endif
+	#ifdef NDEBUG
+	const char *debugdir = "releasex64";
+	#else
+	const char *debugdir = "debugx64";
+	#endif
 
 #elif defined(_M_IX86) || defined(__i386__)
 	const char *gamename = "gamex86.dll";
-
-#ifdef NDEBUG
+	#ifdef NDEBUG
 	const char *debugdir = "release";
-#else
+	#else
 	const char *debugdir = "debug";
-#endif
+	#endif
 
 #elif defined _M_ALPHA
 	const char *gamename = "gameaxp.dll";
-
-#ifdef NDEBUG
+	#ifdef NDEBUG
 	const char *debugdir = "releaseaxp";
-#else
+	#else
 	const char *debugdir = "debugaxp";
-#endif
+	#endif
 
 #endif
 
@@ -560,7 +556,7 @@ void *Sys_GetGameAPI (void *parms)
 		Sys_UnloadGame ();
 		return NULL;
 	}
-#endif	//end of GAME_HARD_LINKED
+#endif	/* ! GAME_HARD_LINKED */
 
 	return GetGameAPI (parms);
 }
