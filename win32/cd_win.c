@@ -56,7 +56,7 @@ static void CDAudio_Eject(void)
 
 	dwReturn = mciSendCommand(wDeviceID, MCI_SET, MCI_SET_DOOR_OPEN, (DWORD_PTR)NULL);
 	if (dwReturn)
-		Com_DPrintf(DEVELOPER_MSG_CD, "MCI_SET_DOOR_OPEN failed (%i)\n", dwReturn);
+		Com_DPrintf(DEVELOPER_MSG_CD, "MCI_SET_DOOR_OPEN failed (%u)\n", (unsigned int)dwReturn);
 }
 
 
@@ -66,7 +66,7 @@ static void CDAudio_CloseDoor(void)
 
 	dwReturn = mciSendCommand(wDeviceID, MCI_SET, MCI_SET_DOOR_CLOSED, (DWORD_PTR)NULL);
 	if (dwReturn)
-		Com_DPrintf(DEVELOPER_MSG_CD, "MCI_SET_DOOR_CLOSED failed (%i)\n", dwReturn);
+		Com_DPrintf(DEVELOPER_MSG_CD, "MCI_SET_DOOR_CLOSED failed (%u)\n", (unsigned int)dwReturn);
 }
 
 
@@ -142,7 +142,7 @@ void CDAudio_Play2(int track, qboolean looping)
 	dwReturn = mciSendCommand(wDeviceID, MCI_STATUS, MCI_STATUS_ITEM | MCI_TRACK | MCI_WAIT, (DWORD_PTR) (LPVOID) &mciStatusParms);
 	if (dwReturn)
 	{
-		Com_DPrintf(DEVELOPER_MSG_CD, "MCI_STATUS failed (%i)\n", dwReturn);
+		Com_DPrintf(DEVELOPER_MSG_CD, "MCI_STATUS failed (%u)\n", (unsigned int)dwReturn);
 		return;
 	}
 	if (mciStatusParms.dwReturn != MCI_CDA_TRACK_AUDIO)
@@ -157,7 +157,7 @@ void CDAudio_Play2(int track, qboolean looping)
 	dwReturn = mciSendCommand(wDeviceID, MCI_STATUS, MCI_STATUS_ITEM | MCI_TRACK | MCI_WAIT, (DWORD_PTR) (LPVOID) &mciStatusParms);
 	if (dwReturn)
 	{
-		Com_DPrintf(DEVELOPER_MSG_CD, "MCI_STATUS failed (%i)\n", dwReturn);
+		Com_DPrintf(DEVELOPER_MSG_CD, "MCI_STATUS failed (%u)\n", (unsigned int)dwReturn);
 		return;
 	}
 
@@ -175,7 +175,7 @@ void CDAudio_Play2(int track, qboolean looping)
 	dwReturn = mciSendCommand(wDeviceID, MCI_PLAY, MCI_NOTIFY | MCI_FROM | MCI_TO, (DWORD_PTR)(LPVOID) &mciPlayParms);
 	if (dwReturn)
 	{
-		Com_DPrintf(DEVELOPER_MSG_CD, "CDAudio: MCI_PLAY failed (%i)\n", dwReturn);
+		Com_DPrintf(DEVELOPER_MSG_CD, "CDAudio: MCI_PLAY failed (%u)\n", (unsigned int)dwReturn);
 		return;
 	}
 
@@ -208,7 +208,7 @@ void CDAudio_Stop(void)
 
 	dwReturn = mciSendCommand(wDeviceID, MCI_STOP, 0, (DWORD_PTR)NULL);
 	if (dwReturn)
-		Com_DPrintf(DEVELOPER_MSG_CD, "MCI_STOP failed (%i)", dwReturn);
+		Com_DPrintf(DEVELOPER_MSG_CD, "MCI_STOP failed (%u)", (unsigned int)dwReturn);
 
 	wasPlaying = false;
 	playing = false;
@@ -229,7 +229,7 @@ void CDAudio_Pause(void)
 	mciGenericParms.dwCallback = (DWORD_PTR)cl_hwnd;
 	dwReturn = mciSendCommand(wDeviceID, MCI_PAUSE, 0, (DWORD_PTR)(LPVOID) &mciGenericParms);
 	if (dwReturn)
-		Com_DPrintf(DEVELOPER_MSG_CD, "MCI_PAUSE failed (%i)", dwReturn);
+		Com_DPrintf(DEVELOPER_MSG_CD, "MCI_PAUSE failed (%u)", (unsigned int)dwReturn);
 
 	wasPlaying = playing;
 	playing = false;
@@ -262,7 +262,7 @@ void CDAudio_Resume(void)
 	dwReturn = mciSendCommand(wDeviceID, MCI_STATUS, MCI_STATUS_ITEM | MCI_WAIT, (DWORD_PTR) (LPVOID) &mciStatusParms);
 	if (dwReturn)
 	{
-		Com_DPrintf(DEVELOPER_MSG_CD, "CDAudio: MCI_STATUS failed (%i)\n", dwReturn);
+		Com_DPrintf(DEVELOPER_MSG_CD, "CDAudio: MCI_STATUS failed (%u)\n", (unsigned int)dwReturn);
 		return;
 	}
 	mciPlayParms.dwFrom = mciStatusParms.dwReturn;
@@ -271,7 +271,7 @@ void CDAudio_Resume(void)
 	dwReturn = mciSendCommand(wDeviceID, MCI_PLAY, MCI_FROM | MCI_TO | MCI_NOTIFY, (DWORD_PTR)(LPVOID) &mciPlayParms);
 	if (dwReturn)
 	{
-		Com_DPrintf(DEVELOPER_MSG_CD, "CDAudio: MCI_PLAY failed (%i)\n", dwReturn);
+		Com_DPrintf(DEVELOPER_MSG_CD, "CDAudio: MCI_PLAY failed (%u)\n", (unsigned int)dwReturn);
 		return;
 	}
 	playing = true;
@@ -473,7 +473,7 @@ int CDAudio_Init(void)
 	dwReturn = mciSendCommand(0, MCI_OPEN, MCI_OPEN_TYPE | MCI_OPEN_SHAREABLE, (DWORD_PTR) (LPVOID) &mciOpenParms);
 	if (dwReturn)
 	{
-		Com_Printf("CDAudio_Init: MCI_OPEN failed (%i)\n", dwReturn);
+		Com_Printf("CDAudio_Init: MCI_OPEN failed (%u)\n", (unsigned int)dwReturn);
 		return -1;
 	}
 	wDeviceID = mciOpenParms.wDeviceID;
@@ -483,7 +483,7 @@ int CDAudio_Init(void)
 	dwReturn = mciSendCommand(wDeviceID, MCI_SET, MCI_SET_TIME_FORMAT, (DWORD_PTR)(LPVOID) &mciSetParms);
 	if (dwReturn)
 	{
-		Com_Printf("MCI_SET_TIME_FORMAT failed (%i)\n", dwReturn);
+		Com_Printf("MCI_SET_TIME_FORMAT failed (%u)\n", (unsigned int)dwReturn);
 		mciSendCommand(wDeviceID, MCI_CLOSE, 0, (DWORD_PTR)NULL);
 		return -1;
 	}

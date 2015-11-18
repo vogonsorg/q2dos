@@ -485,22 +485,22 @@ void *Sys_GetGameAPI (void *parms)
 	char	cwd[MAX_OSPATH];
 
 
-#if defined(_M_IX86) || defined(__i386__)
-	const char *gamename = "gamex86.dll";
-
-#ifdef NDEBUG
-	const char *debugdir = "release";
-#else
-	const char *debugdir = "debug";
-#endif
-
-#elif defined(_M_X64) || defined(__x86_64__)
+#if defined(_M_X64) || defined(__x86_64__)
 	const char *gamename = "gamex64.dll";
 
 #ifdef NDEBUG
 	const char *debugdir = "releasex86";
 #else
 	const char *debugdir = "debugx86";
+#endif
+
+#elif defined(_M_IX86) || defined(__i386__)
+	const char *gamename = "gamex86.dll";
+
+#ifdef NDEBUG
+	const char *debugdir = "release";
+#else
+	const char *debugdir = "debug";
 #endif
 
 #elif defined _M_ALPHA
@@ -597,7 +597,6 @@ void ParseCommandLine (LPSTR lpCmdLine)
 				*lpCmdLine = 0;
 				lpCmdLine++;
 			}
-			
 		}
 	}
 
@@ -609,7 +608,6 @@ void Detect_WinNT() /* FS: Detect if we're using Windows XP for alt+tab appcompa
 	DWORD WinLowByte, WinHiByte;
 	DWORD dwDisp, dwDisp2;
 	DWORD dwAppCompat = 1;
-
 	HKEY hk, hk2;
 
 	WinVersion = GetVersion();
@@ -624,7 +622,7 @@ void Detect_WinNT() /* FS: Detect if we're using Windows XP for alt+tab appcompa
 
 		RegSetValueEx(hk, "{b1899c0f-fdfd-42d0-b489-c254bdbb539d}", 0, REG_DWORD, (const byte *) &dwAppCompat, sizeof(DWORD));
 		RegCloseKey(hk);
-		Com_DPrintf(DEVELOPER_MSG_STANDARD, "Windows NT Version: %d\n", WinLowByte);
+		Com_DPrintf(DEVELOPER_MSG_STANDARD, "Windows NT Version: %u\n", (unsigned int)WinLowByte);
 	}
 
 	if(WinLowByte == 6) /* FS: Windows 7 */
@@ -636,7 +634,7 @@ void Detect_WinNT() /* FS: Detect if we're using Windows XP for alt+tab appcompa
 
 		RegSetValueEx(hk, "{b1899c0f-fdfd-42d0-b489-c254bdbb539d}", 0, REG_DWORD, (const byte *) &dwAppCompat, sizeof(DWORD));
 		RegCloseKey(hk);
-		Com_DPrintf(DEVELOPER_MSG_STANDARD, "Windows NT Version: %d\n", WinLowByte);
+		Com_DPrintf(DEVELOPER_MSG_STANDARD, "Windows NT Version: %u\n", (unsigned int)WinLowByte);
 	}
 }
 
@@ -650,7 +648,7 @@ HINSTANCE	global_hInstance;
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    MSG				msg;
+	MSG			msg;
 	double				time, oldtime, newtime;
 	char			*cddir;
 
@@ -699,7 +697,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 				Com_Quit ();
 			sys_msg_time = (double)msg.time;
 			TranslateMessage (&msg);
-   			DispatchMessage (&msg);
+			DispatchMessage (&msg);
 		}
 
 		do

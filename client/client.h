@@ -27,6 +27,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef __DJGPP__ /* djgpp-2.04 and newer. */
+#include <stdint.h>
+#elif defined(_MSC_VER)
+#include "msinttypes/stdint.h"
+#else
+#include <stdint.h>
+#endif
+
 #include "ref.h"
 
 #include "vid.h"

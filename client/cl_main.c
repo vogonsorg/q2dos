@@ -2722,7 +2722,6 @@ static void GameSpy_Sort_By_Ping(GServerList lst)
 static void ListCallBack(GServerList lst, int msg, void *instance, void *param1, void *param2)
 {
 	GServer server;
-	int percent;
 	int numplayers;
 
 	if (msg == LIST_PROGRESS)
@@ -2749,8 +2748,7 @@ static void ListCallBack(GServerList lst, int msg, void *instance, void *param1,
 
 		if(param2)
 		{
-			percent = (int)(param2);
-			cls.gamespypercent = percent;
+			cls.gamespypercent = (int) (intptr_t)param2;
 		}
 	}
 	else if (msg == LIST_STATECHANGED)

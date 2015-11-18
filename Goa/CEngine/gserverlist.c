@@ -647,7 +647,7 @@ static GError ServerListQueryLoop(GServerList serverlist)
 										LIST_PROGRESS, 
 										serverlist->instance,
 										server,
-										(void *)((serverlist->nextupdate * 100) / ArrayLength(serverlist->servers))); //percent done
+										(void *)(intptr_t)((serverlist->nextupdate * 100) / ArrayLength(serverlist->servers))); //percent done
 					serverlist->updatelist[i].serverindex = -1; //reuse the updatelist
 				}
 				else
