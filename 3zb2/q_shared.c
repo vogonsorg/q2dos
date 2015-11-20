@@ -417,7 +417,7 @@ dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
 		sides |= 2;
 
 	if (sides == 0)
-		BOPS_Error ();
+		Sys_Error ("BoxOnPlaneSide: sides==0");
 
 	return sides;
 }
