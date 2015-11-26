@@ -57,7 +57,7 @@
 ---------------------------------------------------------
 * Sage is much faster than Mesa, very close to or in some cases exceeding
   Windows performance compared to the OpenGL ICD by AmigaMerlin v2.9.
-  It is not totally perfect, it has it's own share of issues read below
+  It is not totally perfect, it has it's own share of issues.  Read below
   for more information.
 * Mesa has been more thoroughly tested but also has it's own share of issues.
   Read below for more information.
