@@ -47,7 +47,6 @@ void Draw_InitLocal (void)
 }
 
 
-
 /*
 ================
 Draw_Char
@@ -155,7 +154,7 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 		GL_EnableMultitexture(false);
 	/* end Knightmare */
 
-	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) && !gl->has_alpha)
+	if ((gl_config.renderer & (GL_RENDERER_MCD|GL_RENDERER_RENDITION)) && !gl->has_alpha)
 		qglDisable (GL_ALPHA_TEST);
 
 	GL_Bind (gl->texnum);
@@ -170,7 +169,7 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 	qglVertex2f (x, y+h);
 	qglEnd ();
 
-	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) && !gl->has_alpha)
+	if ((gl_config.renderer & (GL_RENDERER_MCD|GL_RENDERER_RENDITION)) && !gl->has_alpha)
 		qglEnable (GL_ALPHA_TEST);
 }
 
@@ -192,7 +191,7 @@ void Draw_Pic (int x, int y, char *pic)
 	if (scrap_dirty)
 		Scrap_Upload ();
 
-	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) && !gl->has_alpha)
+	if ((gl_config.renderer & (GL_RENDERER_MCD|GL_RENDERER_RENDITION)) && !gl->has_alpha)
 		qglDisable (GL_ALPHA_TEST);
 
 	GL_Bind (gl->texnum);
@@ -207,7 +206,7 @@ void Draw_Pic (int x, int y, char *pic)
 	qglVertex2f (x, y+gl->height);
 	qglEnd ();
 
-	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) )  && !gl->has_alpha)
+	if ((gl_config.renderer & (GL_RENDERER_MCD|GL_RENDERER_RENDITION)) && !gl->has_alpha)
 		qglEnable (GL_ALPHA_TEST);
 }
 
@@ -230,7 +229,7 @@ void Draw_TileClear (int x, int y, int w, int h, char *pic)
 		return;
 	}
 
-	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) )  && !image->has_alpha)
+	if ((gl_config.renderer & (GL_RENDERER_MCD|GL_RENDERER_RENDITION)) && !image->has_alpha)
 		qglDisable (GL_ALPHA_TEST);
 
 	GL_Bind (image->texnum);
@@ -245,10 +244,9 @@ void Draw_TileClear (int x, int y, int w, int h, char *pic)
 	qglVertex2f (x, y+h);
 	qglEnd ();
 
-	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) )  && !image->has_alpha)
+	if ((gl_config.renderer & (GL_RENDERER_MCD|GL_RENDERER_RENDITION)) && !image->has_alpha)
 		qglEnable (GL_ALPHA_TEST);
 }
-
 
 /*
 =============
@@ -313,9 +311,7 @@ void Draw_FadeScreen (void)
 	qglDisable (GL_BLEND);
 }
 
-
 //====================================================================
-
 
 /*
 =============
@@ -417,7 +413,7 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	if ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) 
+	if (gl_config.renderer & (GL_RENDERER_MCD|GL_RENDERER_RENDITION))
 		qglDisable (GL_ALPHA_TEST);
 
 	qglBegin (GL_QUADS);
@@ -436,7 +432,7 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 	if (image8)
 		free(image8);
 
-	if ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) 
+	if (gl_config.renderer & (GL_RENDERER_MCD|GL_RENDERER_RENDITION))
 		qglEnable (GL_ALPHA_TEST);
 }
 #else
@@ -523,7 +519,7 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	if ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) 
+	if (gl_config.renderer & (GL_RENDERER_MCD|GL_RENDERER_RENDITION))
 		qglDisable (GL_ALPHA_TEST);
 
 	qglBegin (GL_QUADS);
@@ -537,7 +533,8 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 	qglVertex2f (x, y+h);
 	qglEnd ();
 
-	if ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) 
+	if (gl_config.renderer & (GL_RENDERER_MCD|GL_RENDERER_RENDITION))
 		qglEnable (GL_ALPHA_TEST);
 }
 #endif
+
