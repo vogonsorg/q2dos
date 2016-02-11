@@ -1,50 +1,45 @@
-/*
-Copyright (C) 2015 Q2DOS developers.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
-
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-*/
-
-/* dynamic module loading/unloading with DJGPP DXE3 */
+/* Dynamic module loading/unloading with DJGPP DXE3
+ * Copyright (C) 2015 Q2DOS developers.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or (at
+ * your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 
 #include <dlfcn.h>
 #include <sys/dxe.h>
 
-#include <sys/stat.h>
-#include <dir.h>
 #include <assert.h>
 #include <errno.h>
+#include <sys/stat.h>
+#include <dir.h>
 #include <io.h>
 #include <unistd.h>
-#include <ctype.h>
 #include <time.h>
 #include <signal.h>
-
-#ifndef REF_HARD_LINKED
 #include <dos.h>
 #include <dpmi.h>
+#ifndef REF_HARD_LINKED /* for ref_soft */
 #include <sys/movedata.h>
-#include "dosisms.h" /* ref_soft */
-/* FS: 3dfx */
+#include "dosisms.h"
+#endif
 #include <sys/nearptr.h>
 #include <setjmp.h>
 #include <crt0.h>
-#endif
-
+#include <ctype.h>
 #if defined(GAMESPY) && !defined(GAMESPY_HARD_LINKED)
+/* for watt-32 symbols */
 #include <tcp.h>
 #include <netdb.h>
 #include <arpa/inet.h>
@@ -54,11 +49,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (__dj_assert)
-	DXE_EXPORT (__dj_ctype_tolower)
-	DXE_EXPORT (__dj_ctype_toupper)
 	DXE_EXPORT (__dj_huge_val)
 	DXE_EXPORT (__dj_stderr)
-	DXE_EXPORT (_doprnt)
+	DXE_EXPORT (__dj_ctype_tolower)
+	DXE_EXPORT (__dj_ctype_toupper)
+	DXE_EXPORT (__dj_ctype_flags)
+	DXE_EXPORT (_doprnt) /* for local vsnprintf() implementation */
 	DXE_EXPORT (bsearch)
 	DXE_EXPORT (acos)
 	DXE_EXPORT (asin)
@@ -87,6 +83,7 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (fseek)
 	DXE_EXPORT (fwrite)
 	DXE_EXPORT (getc)
+	DXE_EXPORT (ungetc)
 	DXE_EXPORT (localtime)
 	DXE_EXPORT (malloc)
 	DXE_EXPORT (calloc)
@@ -123,17 +120,12 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (strrchr)
 	DXE_EXPORT (strstr)
 	DXE_EXPORT (strtod)
-#if 0
-	DXE_EXPORT (strtok)
-	DXE_EXPORT (strtok_r)
-#endif
 	DXE_EXPORT (strtol)
 	DXE_EXPORT (tan)
 	DXE_EXPORT (time)
 	DXE_EXPORT (gettimeofday)
 	DXE_EXPORT (tolower)
 	DXE_EXPORT (uclock)
-	DXE_EXPORT (ungetc)
 	DXE_EXPORT (usleep)
 	DXE_EXPORT (vsprintf)
 	DXE_EXPORT (vsnprintf)
@@ -154,7 +146,6 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (dlsym)
 
 	/* FS: 3dfx */
-	DXE_EXPORT (__dj_ctype_flags)
 	DXE_EXPORT (__dj_stdout)
 	DXE_EXPORT (__djgpp_base_address)
 	DXE_EXPORT (__djgpp_nearptr_enable)
@@ -177,19 +168,20 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (putenv)
 	DXE_EXPORT (setjmp)
 	DXE_EXPORT (signal)
+	DXE_EXPORT (strcspn)
 	DXE_EXPORT (strlwr)
 	DXE_EXPORT (strncat)
 	DXE_EXPORT (strtok)
+#if 0
+	DXE_EXPORT (strtok_r)
+#endif
 	DXE_EXPORT (strtoul)
 	DXE_EXPORT (vfprintf)
 
-	/* FS: Mesa 6.4.x */
-	DXE_EXPORT (ldexp)
-
-	/* FS: SAGE */
-	DXE_EXPORT (strcspn)
+	DXE_EXPORT (ldexp)	/* for Mesa 6.4.x */
 #endif
 #if defined(GAMESPY) && !defined(GAMESPY_HARD_LINKED)
+	/* watt-32 library symbols */
 	DXE_EXPORT(send)
 	DXE_EXPORT(sendto)
 	DXE_EXPORT(socket)
