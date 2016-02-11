@@ -152,7 +152,6 @@
   gl_ext_multitexture defaults to 0.  If you would like to try it anyways
   set it to 1 and do a vid_restart.
 * 2xAA (With or without SLI) locks if LFB WC is set.  4xAA is OK.
-* Macronix variants of Voodoo Rush cards do not work.
 
 8 - Known Mesa Issues
 ---------------------------------------------------------
@@ -192,3 +191,4 @@
   fake dynamic lighting effect that is basically free (performance) by
   rendering coloured halo effects via OpenGL.  They are not true dynamic
   lights, but can help seeing rocket blasts in deathmatch :).
+
