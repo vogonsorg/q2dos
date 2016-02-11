@@ -36,7 +36,7 @@
   one of the directories listed below and put it in the same place as
   q2.exe:
   - voodoo/sst1  -> Voodoo Graphics
-  - voodoo/sst96 -> Voodoo Rush (AT3D variants only)
+  - voodoo/sst96 -> Voodoo Rush
   - voodoo/cvg   -> Voodoo2
   - voodoo/h5    -> Banshee and Voodoo 3/4/5
 * Pick a renderer (gl.dxe) from one of the directories listed below
@@ -191,4 +191,3 @@
   fake dynamic lighting effect that is basically free (performance) by
   rendering coloured halo effects via OpenGL.  They are not true dynamic
   lights, but can help seeing rocket blasts in deathmatch :).
-
