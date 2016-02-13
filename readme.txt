@@ -40,6 +40,7 @@ By Neozeed, [HCI]Mara'akate, and sezero.
 ---------------------------------------------------------
 * VGA (320x200 and 320x240)
 * SVGA (Banked and LFB)
+* 3DFX OpenGL rendering.
 * Mouse
 * Keyboard
 * Sound Blaster and Gravis UltraSound family
@@ -50,7 +51,6 @@ By Neozeed, [HCI]Mara'akate, and sezero.
 
 3 - What works but needs more testing?
 ---------------------------------------------------------
-* 3DFX OpenGL rendering.
 * Playing in a Windows 9x DOS box.
 * Several PCI sound cards like AC'97 or HDA (run with -sndpci)
 * Mouse wheel support. (see info below.)

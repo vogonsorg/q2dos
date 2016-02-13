@@ -59,8 +59,6 @@
   Windows performance compared to the OpenGL ICD by AmigaMerlin v2.9.
   It is not totally perfect, it has it's own share of issues.  Read below
   for more information.
-* Mesa has been more thoroughly tested but also has it's own share of issues.
-  Read below for more information.
 
 4 - Interesting parameters
 ---------------------------------------------------------
