@@ -10,13 +10,9 @@ all: lib/libGL.a lib/gl.dxe
 CC = gcc
 HOST_CC = gcc
 CFLAGS = -Wall -W -pedantic
-ifeq ($(DEBUG), 1)
-CFLAGS += -g
-CFLAGS += -O0
-else
 CFLAGS += -O2
-endif
-# CFLAGS += -ffast-math -DFAST_MATH
+#CFLAGS += -g
+#CFLAGS += -ffast-math -DFAST_MATH
 CFLAGS += -I. -Iinclude -Idrivers
 CFLAGS += -Wno-unused
 CFLAGS += -D__DOS__
@@ -24,11 +20,7 @@ LD = $(CC)
 LDFLAGS =
 LDLIBS = -lm
 AS = nasm
-ifeq ($(DEBUG),1)
-ASFLAGS = -O0 -fcoff -D__DJGPP__ -Ix86/ -Imain/ --prefix _
-else
 ASFLAGS = -O6 -fcoff -D__DJGPP__ -Ix86/ -Imain/ --prefix _
-endif
 AR = ar
 ARFLAGS = crus
 DXE3GEN = dxe3gen
@@ -36,14 +28,6 @@ DXE3FLAGS = -E _sage_ -E _gl -X _gl_
 ifeq ($(DRIVER),glide)
 DXE3FLAGS+= -P glide3x.dxe
 endif
-
-# MSS begin
-ifeq ($(MSS),1)
-CFLAGS += -DMSS=1 -include mss.h
-LDFLAGS += -Llib
-LDLIBS += -lmss
-endif
-# MSS end
 
 CORE_SOURCES = \
 	util/cfg.c \
@@ -127,7 +111,7 @@ x86/x86.inc: x86/x86gen.exe
 	$< -o $@
 
 x86/x86gen.exe: x86/x86gen.c glinternal.h main/context.h main/matrix.h tnl/tnl.h x86/cpu.h
-	$(HOST_CC) -o $@ $(CFLAGS) $(LDFLAGS) $<
+	$(HOST_CC) -o $@ $(CFLAGS) $<
 
 clean::
 	-$(RM) $(OBJECTS)
