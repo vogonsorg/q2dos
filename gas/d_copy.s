@@ -133,7 +133,7 @@ C(VGA_UpdateLinearScreen):
 	movl	height(%esp),%ebp
 LLRowLoop:
 	movl	%ebx,%ecx
-	rep/movsl	(%esi),(%edi)
+	rep movsl	(%esi),(%edi)
 	addl	%eax,%esi
 	addl	%edx,%edi
 	decl	%ebp
