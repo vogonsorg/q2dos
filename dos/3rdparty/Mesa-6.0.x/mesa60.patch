@@ -708,7 +708,7 @@ diff -urNp Mesa-6.0.1/src/mesa/main/texstate.c Mesa-6.0.x/src/mesa/main/texstate
  /**********************************************************************/
 diff -urNp Mesa-6.0.1/src/mesa/Makefile.DJ Mesa-6.0.x/src/mesa/Makefile.DJ
 --- Mesa-6.0.1/src/mesa/Makefile.DJ	2004-01-08 16:26:50.000000000 +0200
-+++ Mesa-6.0.x/src/mesa/Makefile.DJ	2015-10-05 05:55:00.000000000 +0300
++++ Mesa-6.0.x/src/mesa/Makefile.DJ	2016-02-25 07:55:00.000000000 +0200
 @@ -59,7 +59,7 @@
  
  
@@ -753,9 +753,10 @@ diff -urNp Mesa-6.0.1/src/mesa/Makefile.DJ Mesa-6.0.x/src/mesa/Makefile.DJ
  ifeq ($(FX),1)
 -	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -Y $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa -P glide3x.dxe -U $^
 +$(LIBDIR)/$(GL_DXE) $(LIBDIR)/$(GL_IMP): glide3x.dxe
-+	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -Y $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa -P glide3x.dxe -U $(OBJECTS)
++	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -Y $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -X _gl_ -E _DMesa -P glide3x.dxe -U $(OBJECTS)
  else
- 	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -Y $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa -U $^
+-	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -Y $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa -U $^
++	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -Y $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -X _gl_ -E _DMesa -U $^
  endif
 -endif
  

@@ -188,9 +188,9 @@ $(LIBDIR)/$(GL_LIB): $(OBJECTS)
 $(LIBDIR)/$(GL_DXE) $(LIBDIR)/$(GL_IMP): $(OBJECTS)
 ifeq ($(FX),1)
 $(LIBDIR)/$(GL_DXE) $(LIBDIR)/$(GL_IMP): glide3x.dxe
-	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -Y $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa -P glide3x.dxe -U $(OBJECTS)
+	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -Y $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -X _gl_ -E _DMesa -P glide3x.dxe -U $(OBJECTS)
 else
-	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -Y $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -E _DMesa -U $^
+	-dxe3gen -o $(LIBDIR)/$(GL_DXE) -Y $(LIBDIR)/$(GL_IMP) -D $(LIBNAME) -E _gl -X _gl_ -E _DMesa -U $^
 endif
 
 $(X86_OBJECTS): x86/matypes.h
