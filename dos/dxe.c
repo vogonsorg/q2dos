@@ -30,16 +30,19 @@
 #include <signal.h>
 #include <dos.h>
 #include <dpmi.h>
-#ifndef REF_HARD_LINKED /* for ref_soft */
-#include <sys/movedata.h>
-#include "dosisms.h"
-#endif
 #include <sys/nearptr.h>
+#include <sys/movedata.h>
 #include <setjmp.h>
 #include <crt0.h>
 #include <ctype.h>
-#if defined(GAMESPY) && !defined(GAMESPY_HARD_LINKED)
-/* for watt-32 symbols */
+#if 1 /* for mesa w/o 3dfx glide */
+#include <stubinfo.h>
+#include <sys/exceptn.h>
+#endif
+#ifndef REF_HARD_LINKED /* for ref_soft */
+#include "dosisms.h"
+#endif
+#if defined(GAMESPY) && !defined(GAMESPY_HARD_LINKED) /* for watt-32 symbols */
 #include <tcp.h>
 #include <netdb.h>
 #include <arpa/inet.h>
@@ -48,14 +51,120 @@
 #include "../qcommon/qcommon.h"
 
 DXE_EXPORT_TABLE (syms)
+	/* dlfcn */
+	DXE_EXPORT (dlclose)
+	DXE_EXPORT (dlopen)
+	DXE_EXPORT (dlsym)
+
+	/* assert */
 	DXE_EXPORT (__dj_assert)
-	DXE_EXPORT (__dj_huge_val)
+	/* errno */
+	DXE_EXPORT (errno)
+	/* setjmp */
+	DXE_EXPORT (longjmp)
+	DXE_EXPORT (setjmp)
+	/* signal */
+	DXE_EXPORT (signal)
+
+	/* stdlib */
+	DXE_EXPORT (abort)
+	DXE_EXPORT (exit)
+	DXE_EXPORT (rand)
+	DXE_EXPORT (srand)
+	DXE_EXPORT (bsearch)
+	DXE_EXPORT (atol)
+	DXE_EXPORT (strtod)
+	DXE_EXPORT (strtol)
+	DXE_EXPORT (strtoul)
+	DXE_EXPORT (qsort)
+	DXE_EXPORT (getenv)
+	DXE_EXPORT (putenv)
+	DXE_EXPORT (malloc)
+	DXE_EXPORT (calloc)
+	DXE_EXPORT (realloc)
+	DXE_EXPORT (free)
+
+	/* string */
+	DXE_EXPORT (memcmp)
+	DXE_EXPORT (memcpy)
+	DXE_EXPORT (memset)
+	DXE_EXPORT (memmove)
+	DXE_EXPORT (strcat)
+	DXE_EXPORT (strncat)
+	DXE_EXPORT (strchr)
+	DXE_EXPORT (strcmp)
+	DXE_EXPORT (strcpy)
+	DXE_EXPORT (strdup)
+	DXE_EXPORT (strlen)
+	DXE_EXPORT (strncmp)
+	DXE_EXPORT (strncpy)
+	DXE_EXPORT (strrchr)
+	DXE_EXPORT (strstr)
+	DXE_EXPORT (strcspn)
+	DXE_EXPORT (strtok)
+#if 0
+	DXE_EXPORT (strtok_r)
+#endif
+	DXE_EXPORT (strcasecmp)
+	DXE_EXPORT (stricmp)
+	DXE_EXPORT (strnicmp)
+	DXE_EXPORT (strlwr)
+	DXE_EXPORT (strupr)
+
+	/* stdio */
 	DXE_EXPORT (__dj_stderr)
+	DXE_EXPORT (__dj_stdout)
+	DXE_EXPORT (_doprnt) /* for local vsnprintf implementation */
+	DXE_EXPORT (fopen)
+	DXE_EXPORT (freopen)
+	DXE_EXPORT (fclose)
+	DXE_EXPORT (fflush)
+	DXE_EXPORT (fread)
+	DXE_EXPORT (fwrite)
+	DXE_EXPORT (fseek)
+	DXE_EXPORT (feof)
+	DXE_EXPORT (getc)
+	DXE_EXPORT (ungetc)
+	DXE_EXPORT (fgetc)
+	DXE_EXPORT (fgets)
+	DXE_EXPORT (fputc)
+	DXE_EXPORT (fputs)
+	DXE_EXPORT (putc)
+	DXE_EXPORT (puts)
+	DXE_EXPORT (fprintf)
+	DXE_EXPORT (printf)
+	DXE_EXPORT (sprintf)
+	DXE_EXPORT (vsprintf)
+	DXE_EXPORT (vsnprintf)
+	DXE_EXPORT (vfprintf)
+	DXE_EXPORT (fscanf)
+	DXE_EXPORT (sscanf)
+
+	/* dir */
+	DXE_EXPORT (findfirst)
+	DXE_EXPORT (findnext)
+	/* sys/stat */
+	DXE_EXPORT (mkdir)
+	/* unistd */
+	DXE_EXPORT (usleep)
+	/* time */
+	DXE_EXPORT (clock)
+	DXE_EXPORT (uclock)
+	DXE_EXPORT (time)
+	DXE_EXPORT (gettimeofday)
+	DXE_EXPORT (localtime)
+	DXE_EXPORT (asctime)
+	DXE_EXPORT (strftime)
+
+	/* ctype */
 	DXE_EXPORT (__dj_ctype_tolower)
 	DXE_EXPORT (__dj_ctype_toupper)
 	DXE_EXPORT (__dj_ctype_flags)
-	DXE_EXPORT (_doprnt) /* for local vsnprintf() implementation */
-	DXE_EXPORT (bsearch)
+	DXE_EXPORT (tolower)
+	DXE_EXPORT (toupper)
+
+	/* math */
+	DXE_EXPORT (__dj_huge_val)
 	DXE_EXPORT (acos)
 	DXE_EXPORT (asin)
 	DXE_EXPORT (atan)
@@ -63,125 +172,55 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (atof)
 	DXE_EXPORT (atoi)
 	DXE_EXPORT (ceil)
-	DXE_EXPORT (cos)
-	DXE_EXPORT (errno)
-	DXE_EXPORT (exit)
-	DXE_EXPORT (fclose)
-	DXE_EXPORT (feof)
-	DXE_EXPORT (findfirst)
-	DXE_EXPORT (findnext)
-	DXE_EXPORT (fgetc)
-	DXE_EXPORT (fgets)
-	DXE_EXPORT (floor)
-	DXE_EXPORT (fopen)
-	DXE_EXPORT (fprintf)
-	DXE_EXPORT (fputc)
-	DXE_EXPORT (fputs)
-	DXE_EXPORT (fread)
-	DXE_EXPORT (free)
-	DXE_EXPORT (fscanf)
-	DXE_EXPORT (fseek)
-	DXE_EXPORT (fwrite)
-	DXE_EXPORT (getc)
-	DXE_EXPORT (ungetc)
-	DXE_EXPORT (localtime)
-	DXE_EXPORT (malloc)
-	DXE_EXPORT (calloc)
-	DXE_EXPORT (realloc)
-	DXE_EXPORT (memcmp)
-	DXE_EXPORT (memcpy)
-	DXE_EXPORT (memset)
-	DXE_EXPORT (memmove)
-	DXE_EXPORT (mkdir)
-	DXE_EXPORT (pow)
-	DXE_EXPORT (printf)
-	DXE_EXPORT (putc)
-	DXE_EXPORT (puts)
-	DXE_EXPORT (qsort)
-	DXE_EXPORT (rand)
 	DXE_EXPORT (sin)
-	DXE_EXPORT (sprintf)
-	DXE_EXPORT (sqrt)
-	DXE_EXPORT (srand)
-	DXE_EXPORT (sscanf)
-	DXE_EXPORT (stpcpy)
-	DXE_EXPORT (strcasecmp)
-	DXE_EXPORT (strcat)
-	DXE_EXPORT (strchr)
-	DXE_EXPORT (strcmp)
-	DXE_EXPORT (strcpy)
-	DXE_EXPORT (strdup)
-	DXE_EXPORT (strftime)
-	DXE_EXPORT (stricmp)
-	DXE_EXPORT (strlen)
-	DXE_EXPORT (strncmp)
-	DXE_EXPORT (strncpy)
-	DXE_EXPORT (strnicmp)
-	DXE_EXPORT (strrchr)
-	DXE_EXPORT (strstr)
-	DXE_EXPORT (strtod)
-	DXE_EXPORT (strtol)
+	DXE_EXPORT (cos)
 	DXE_EXPORT (tan)
-	DXE_EXPORT (time)
-	DXE_EXPORT (gettimeofday)
-	DXE_EXPORT (tolower)
-	DXE_EXPORT (uclock)
-	DXE_EXPORT (usleep)
-	DXE_EXPORT (vsprintf)
-	DXE_EXPORT (vsnprintf)
+	DXE_EXPORT (floor)
+	DXE_EXPORT (sqrt)
+	DXE_EXPORT (pow)
+	DXE_EXPORT (exp)
+	DXE_EXPORT (frexp)
+	DXE_EXPORT (ldexp)
+
+	/* crt0 */
+	DXE_EXPORT (_crt0_startup_flags)
+	/* nearptr */
+	DXE_EXPORT (__djgpp_base_address)
+	DXE_EXPORT (__djgpp_nearptr_enable)
+	DXE_EXPORT (__djgpp_nearptr_disable)
+	/* movedata */
+	DXE_EXPORT (dosmemput)
+	DXE_EXPORT (movedata)
+	/* dos */
+	DXE_EXPORT (enable)
+	DXE_EXPORT (disable)
+	DXE_EXPORT (int86)
+
 #ifndef REF_HARD_LINKED
+	/* dpmi */
 	DXE_EXPORT (__dpmi_int)
 	DXE_EXPORT (__dpmi_physical_address_mapping)
+	DXE_EXPORT (__dpmi_free_physical_address_mapping)
 
-	/* functions from dos_v2.c used by ref_soft: */
-	DXE_EXPORT (dosmemput)
+#if 1 /* for mesa w/o 3dfx glide */
+	DXE_EXPORT (__dpmi_allocate_ldt_descriptors)
+	DXE_EXPORT (__dpmi_free_ldt_descriptor)
+	DXE_EXPORT (__dpmi_get_segment_base_address)
+	DXE_EXPORT (__dpmi_set_segment_base_address)
+	DXE_EXPORT (__dpmi_set_segment_limit)
+	/* stubinfo.h, exceptn.h */
+	DXE_EXPORT (_stubinfo)
+	DXE_EXPORT (__djgpp_dos_sel)
+#endif
+
+	/* dos_v2.c functions for ref_soft */
 	DXE_EXPORT (dos_getmemory)
 	DXE_EXPORT (dos_freememory)
 	DXE_EXPORT (ptr2real)
 	DXE_EXPORT (real2ptr)
+#endif /* ! REF_HARD_LINKED */
 
-	/* FS: ref_gl */
-	DXE_EXPORT (dlclose)
-	DXE_EXPORT (dlopen)
-	DXE_EXPORT (dlsym)
-
-	/* FS: 3dfx */
-	DXE_EXPORT (__dj_stdout)
-	DXE_EXPORT (__djgpp_base_address)
-	DXE_EXPORT (__djgpp_nearptr_enable)
-	DXE_EXPORT (__djgpp_nearptr_disable)
-	DXE_EXPORT (__dpmi_free_physical_address_mapping)
-	DXE_EXPORT (_crt0_startup_flags)
-	DXE_EXPORT (abort)
-	DXE_EXPORT (asctime)
-	DXE_EXPORT (atol)
-	DXE_EXPORT (clock)
-	DXE_EXPORT (exp)
-	DXE_EXPORT (fflush)
-	DXE_EXPORT (frexp)
-	DXE_EXPORT (freopen)
-	DXE_EXPORT (getenv)
-	DXE_EXPORT (enable)
-	DXE_EXPORT (disable)
-	DXE_EXPORT (int86)
-	DXE_EXPORT (longjmp)
-	DXE_EXPORT (putenv)
-	DXE_EXPORT (setjmp)
-	DXE_EXPORT (signal)
-	DXE_EXPORT (strcspn)
-	DXE_EXPORT (strlwr)
-	DXE_EXPORT (strncat)
-	DXE_EXPORT (strtok)
-#if 0
-	DXE_EXPORT (strtok_r)
-#endif
-	DXE_EXPORT (strtoul)
-	DXE_EXPORT (vfprintf)
-
-	DXE_EXPORT (ldexp)	/* for Mesa 6.4.x */
-#endif
-#if defined(GAMESPY) && !defined(GAMESPY_HARD_LINKED)
-	/* watt-32 library symbols */
+#if defined(GAMESPY) && !defined(GAMESPY_HARD_LINKED) /* watt-32 library symbols */
 	DXE_EXPORT(send)
 	DXE_EXPORT(sendto)
 	DXE_EXPORT(socket)
