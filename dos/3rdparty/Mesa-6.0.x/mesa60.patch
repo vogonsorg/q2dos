@@ -1121,3 +1121,46 @@ diff -urNp Mesa-6.0.1/src/mesa/x86/matypes.h Mesa-6.0.x/src/mesa/x86/matypes.h
  
  
  /* =============================================================
+
+
+from mesa6.2:
+
+commit d4636e74c86fad221c57a3a1704106e2367fc230
+Author: Daniel Borca <dborca@users.sourceforge.net>
+Date:   Tue Jan 20 14:15:35 2004 +0000
+
+    fixed a bug in VGA initialization routine
+
+diff --git a/src/mesa/drivers/dos/vga.c b/src/mesa/drivers/dos/vga.c
+index 3a4bd9b..c8c0151 100644
+--- a/src/mesa/drivers/dos/vga.c
++++ b/src/mesa/drivers/dos/vga.c
+@@ -40,8 +40,24 @@
+ 
+ 
+ static vl_mode modes[] = {
+-       {0x13 | 0x4000, 320, 200, 320, 8, -1, 320*200},
+-       {0xffff, -1, -1, -1, -1, -1, -1}
++       {
++        /* .xres    = */ 320,
++        /* .yres    = */ 200,
++        /* .bpp     = */ 8,
++        /* .mode    = */ 0x13 | 0x4000,
++        /* .scanlen = */ 320,
++        /* .sel     = */ -1,
++        /* .gran    = */ 320*200
++       },
++       {
++        /* .xres    = */ -1,
++        /* .yres    = */ -1,
++        /* .bpp     = */ -1,
++        /* .mode    = */ 0xffff,
++        /* .scanlen = */ -1,
++        /* .sel     = */ -1,
++        /* .gran    = */ -1
++       }
+ };
+ 
+ static word16 vga_ver;
+
+
