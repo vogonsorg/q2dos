@@ -220,24 +220,6 @@ typedef struct _VG96Info {
     FxU32 tfxRam;
 } VG96Info;
 
-/*-------------------------------------------------------------------
-  Structure: H3Info
-  Date: 10/4
-  Implementor(s): jdt
-  Library: Init
-  Description:
-  Capabilities of H3
-  Members:
-  h3Rev  - revision of H3 
-  fbRam  - frame buffer ram
-  texRam - texture ram
-  -------------------------------------------------------------------*/
-typedef struct _H3Info {
-    FxU32 h3Rev;
-    FxU32 fbRam;
-    FxU32 texRam;
-} H3Info;
-
 typedef enum { INIT_VOODOO,
                INIT_VG96,
                NUM_3DFX_PRODUCTS
@@ -284,7 +266,6 @@ typedef struct _InitDeviceInfo {
     union {
       VGInfo   vgInfo;
       VG96Info vg96Info;
-      H3Info   h3Info;
     } hwDep;
     InitRegisterDesc regs;
 } InitDeviceInfo;

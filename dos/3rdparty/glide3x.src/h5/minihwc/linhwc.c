@@ -62,7 +62,7 @@ hwcCheckMemSize(hwcBoardInfo *bInfo, FxU32 xres, FxU32 yres, FxU32 nColBuffers,
 #include <string.h>
 #include <math.h>
 #include <X11/Xlib.h>
-#include <X11/extensions/xf86dga.h>
+/*#include <X11/extensions/xf86dga.h>*/
 #include <X11/extensions/xf86vmode.h>
 #include "lindri.h"
 
@@ -79,8 +79,10 @@ static FxU32 __attribute_used fenceVar;
 # define P6FENCE asm volatile("mf.a" ::: "memory");
 #elif defined (__alpha__)
 # define P6FENCE asm volatile("mb" ::: "memory");
-#else
+#elif (defined(__i386__) || defined(__x86_64__))
 # define P6FENCE asm("xchg %%eax, %0" : : "m" (fenceVar) : "eax");
+#else
+# error "No P6FENCE asm for this architecture"
 #endif
 
 #define MAXFIFOSIZE     0x40000
