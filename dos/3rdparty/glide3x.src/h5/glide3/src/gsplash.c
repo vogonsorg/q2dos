@@ -160,6 +160,22 @@
  * Updated grSplash code to set all of the necessary state itself rather
  * than expecting the caller to do so.
  */
+#ifndef GLIDE_SPLASH
+#include <3dfx.h>
+#define FX_DLL_DEFINITION
+#include <fxdll.h>
+#include <glide.h>
+#include "fxglide.h"
+GR_DIENTRY(grSplash,void,(float x, float y,
+                          float w, float h,
+                          FxU32 frameNumber)) {
+/* nothing */
+}
+
+#elif !defined(_WIN32)
+#include "gsplash0.c"
+
+#else /* win32 version */
 #include <math.h>
 
 #include <3dfx.h>
@@ -197,7 +213,6 @@ GR_DIENTRY(grSplash,void,(float x, float y,
   GDBG_INFO_MORE(gc->myLevel,"(%f,%f,%f,%f,%d)\n",
                  x, y, w, h, frameNumber);
 
-#if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
 #if (GLIDE_PLATFORM & GLIDE_HW_SST2)
 #else
   {
@@ -213,8 +228,9 @@ GR_DIENTRY(grSplash,void,(float x, float y,
     grGlideSetState((const void*)&glideState);
   }
 #endif
-#endif /* (GLIDE_PLATFORM & GLIDE_OS_WIN32) */
 
   GR_END();
 #undef FN_NAME
 }
+
+#endif

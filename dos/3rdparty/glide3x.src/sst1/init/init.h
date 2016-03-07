@@ -240,7 +240,6 @@ typedef struct _H3Info {
 
 typedef enum { INIT_VOODOO,
                INIT_VG96,
-               INIT_H3,
                NUM_3DFX_PRODUCTS
 } TDFXHwClass;
 
@@ -261,11 +260,7 @@ typedef struct _InitRegisterDesc {
       FxU8 mclockHi;
       FxU8 mclockLo;
     } VG96RegDesc;
-    struct {
-      FxU32
-        *baseAddress;           /* Base address */
-      } BansheeRegDesc;
-    } hwDep;
+  } hwDep;
 } InitRegisterDesc;
 
 /*-------------------------------------------------------------------
