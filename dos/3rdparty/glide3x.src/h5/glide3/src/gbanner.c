@@ -105,12 +105,7 @@
 #include "fxglide.h"
 #include "fxcmd.h"
 
-#if !defined(GLIDE_PLUG)
-void
-_grShamelessPlug (void) {
-}
-
-#else /* GLIDE_PLUG */
+#ifdef GLIDE_PLUG
 
 #if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
 static const void *

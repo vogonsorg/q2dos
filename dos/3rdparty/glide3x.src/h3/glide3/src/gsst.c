@@ -698,9 +698,11 @@ clearBuffers( GrGC *gc )
 static void 
 doSplash( void ) 
 {
+#if defined(GLIDE_SPLASH) || ((GLIDE_PLATFORM & GLIDE_OS_WIN32) && defined(GLIDE_PLUG))
   GR_DCL_GC;
+#endif
 
-#if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
+#if (GLIDE_PLATFORM & GLIDE_OS_WIN32) && (defined(GLIDE_SPLASH)||defined(GLIDE_PLUG))
   {
     FxBool
       didLoad;
@@ -744,6 +746,7 @@ doSplash( void )
   }
 #endif /* (GLIDE_PLATFORM & GLIDE_OS_WIN32) */
 
+#ifdef GLIDE_SPLASH
   if (_GlideRoot.environment.noSplash == 0) {
     grSplash(0.0f, 0.0f, 
              (float)gc->state.screen_width,
@@ -751,6 +754,7 @@ doSplash( void )
              0);
   }
   _GlideRoot.environment.noSplash = 1;
+#endif
 } /* doSplash */
 
 

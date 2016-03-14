@@ -2677,8 +2677,10 @@ GR_ENTRY(grBufferSwap, void, (FxU32 swapInterval))
   }
 #endif
 
+#ifdef GLIDE_PLUG
   /* optionally display the 3Dfx powerfield logo overlay */
   if (_GlideRoot.environment.shamelessPlug) _grShamelessPlug();
+#endif
 
 #if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
   if (_GlideRoot.environment.aaToggleKey) {
@@ -2797,7 +2799,6 @@ GR_ENTRY(grBufferSwap, void, (FxU32 swapInterval))
     GR_ASSERT(j != -1);
 
     gc->swapsPending++;
-
   }
 #endif
 
@@ -2955,8 +2956,10 @@ GR_ENTRY(grDRIBufferSwap, void, (FxU32 swapInterval))
     _grChipMask( SST_CHIP_MASK_ALL_CHIPS );
   }
 #endif
+#ifdef GLIDE_PLUG
   /* optionally display the 3Dfx powerfield logo overlay */
   if (_GlideRoot.environment.shamelessPlug) _grShamelessPlug();
+#endif
 
   /* check for environmental override */
   if (_GlideRoot.environment.swapInterval >= 0) {
