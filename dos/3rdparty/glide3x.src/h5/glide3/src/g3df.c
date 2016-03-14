@@ -110,6 +110,7 @@
 
 #include "fxglide.h"
 
+#if 0
 static const FxU32 _gr_aspect_index_table[] =
 {
    3,
@@ -120,6 +121,7 @@ static const FxU32 _gr_aspect_index_table[] =
    2,
    3,
 };
+#endif
 
 static FxBool ReadDataShort(FILE *, FxU16 *data);
 static FxBool ReadDataLong(FILE *, FxU32 *data);
