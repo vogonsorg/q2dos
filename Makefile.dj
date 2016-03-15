@@ -44,6 +44,8 @@ CFLAGS = -Wall -Werror -O2 -fno-strict-aliasing -fomit-frame-pointer
 endif
 CPPFLAGS = -DCLIENT_SPLIT_NETFRAME
 LDFLAGS =
+CLIBS = -lc -lgcc
+#CLIBS += -lm
 EXE = q2.exe
 
 ifeq ($(USE_SSE),1)
@@ -270,7 +272,7 @@ OBJECTS = $(CLIENT) $(CLIENTASM) $(QCOMMON) $(COMMONASM) $(COMMONREFASM) $(SERVE
 all: q2dos
 
 q2dos: $(OBJECTS)
-	$(CC) $(OBJECTS) $(LDFLAGS) $(GLIDE_LIBS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) -lm -o $(EXE)
+	$(CC) $(OBJECTS) $(LDFLAGS) $(GLIDE_LIBS) $(VORBIS_LIBS) $(CURL_LIBS) $(WATT32_LIBS) $(CLIBS) -o $(EXE)
 
 clean:
 	rm -f qcommon/*.o
