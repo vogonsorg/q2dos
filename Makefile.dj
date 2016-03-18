@@ -127,6 +127,9 @@ GLDIR=$(REFGL_DRIVER)
 endif
 endif
 
+# needed if building against djgpp <= 2.03
+#VSNPRINTF = dos/vsnprntf.o
+
 DOS = dos/dos_v2.o \
 	dos/cd_dos.o \
 	dos/vid_dos.o \
@@ -137,6 +140,7 @@ DOS = dos/dos_v2.o \
 	dos/in_dos.o \
 	$(NET_OBJ) \
 	dos/q_shdos.o \
+	$(VSNPRINTF) \
 	dos/dxe.o \
 	dos/sys_dos.o
 
