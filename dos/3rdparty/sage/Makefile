@@ -10,15 +10,18 @@ CC = gcc
 HOST_CC = gcc
 CFLAGS = -Wall -W -pedantic
 CFLAGS += -O2
+#CFLAGS += -DNDEBUG
 #CFLAGS += -g
 #CFLAGS += -ffast-math -DFAST_MATH
 CFLAGS += -I. -Iinclude -Idrivers
 CFLAGS += -Wno-unused
+# disable software scaledown of hardware-unsupported large textures
+#CFLAGS += -DFX_RESCALEHACK=0
 LD = $(CC)
 LDFLAGS =
 LDLIBS = -lm
 AS = nasm
-ASFLAGS = -O6 -felf -D__linux__ -Ix86/ -Imain/
+ASFLAGS = -O2 -felf -D__linux__ -Ix86/ -Imain/
 
 CORE_SOURCES = \
 	util/cfg.c \

@@ -10,15 +10,18 @@ CC = mingw32-gcc
 HOST_CC = mingw32-gcc
 CFLAGS = -Wall -W -pedantic
 CFLAGS += -O2
+#CFLAGS += -DNDEBUG
 #CFLAGS += -g
 CFLAGS += -ffast-math -DFAST_MATH
 CFLAGS += -I. -Iinclude -Idrivers
 CFLAGS += -Wno-unused
+# disable software scaledown of hardware-unsupported large textures
+#CFLAGS += -DFX_RESCALEHACK=0
 LD = $(CC)
 LDFLAGS = -Wl,--enable-auto-image-base -Wl,--no-undefined
 LDLIBS = -lm
 AS = nasm
-ASFLAGS = -O6 -fwin32 -D__WIN32__ -Ix86/ -Imain/ --prefix _
+ASFLAGS = -O2 -fwin32 -D__WIN32__ -Ix86/ -Imain/ --prefix _
 RC = windres
 RCFLAGS = -O coff
 DLLTOOL = dlltool

@@ -10,14 +10,17 @@ CC = /opt/intel/cc/9.0/bin/icc
 HOST_CC = /opt/intel/cc/9.0/bin/icc
 CFLAGS = -Wall
 CFLAGS += -O2 -ip
+#CFLAGS += -DNDEBUG
 #CFLAGS += -g
 #CFLAGS += -rcd -xK -DFAST_MATH
 CFLAGS += -I. -Iinclude -Idrivers
+# disable software scaledown of hardware-unsupported large textures
+#CFLAGS += -DFX_RESCALEHACK=0
 LD = $(CC)
 LDFLAGS = -i-static
 LDLIBS = -lm
 AS = nasm
-ASFLAGS = -O6 -felf -D__linux__ -Ix86/ -Imain/
+ASFLAGS = -O2 -felf -D__linux__ -Ix86/ -Imain/
 
 CORE_SOURCES = \
 	util/cfg.c \

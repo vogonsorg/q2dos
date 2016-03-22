@@ -11,16 +11,19 @@ CC = gcc
 HOST_CC = gcc
 CFLAGS = -Wall -W -pedantic
 CFLAGS += -O2
+#CFLAGS += -DNDEBUG
 #CFLAGS += -g
 #CFLAGS += -ffast-math -DFAST_MATH
 CFLAGS += -I. -Iinclude -Idrivers
 CFLAGS += -Wno-unused
 CFLAGS += -D__DOS__
+# disable software scaledown of hardware-unsupported large textures
+CFLAGS += -DFX_RESCALEHACK=0
 LD = $(CC)
 LDFLAGS =
 LDLIBS = -lm
 AS = nasm
-ASFLAGS = -O6 -fcoff -D__DJGPP__ -Ix86/ -Imain/ --prefix _
+ASFLAGS = -O2 -fcoff -D__DJGPP__ -Ix86/ -Imain/ --prefix _
 AR = ar
 ARFLAGS = crus
 DXE3GEN = dxe3gen

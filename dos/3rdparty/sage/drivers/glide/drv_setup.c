@@ -409,11 +409,7 @@ is_pow2 (int n)
 	return 0;
     }
 
-    while ((n & 1) == 0) {
-	n >>= 1;
-    }
-
-    return !(n & ~1);
+    return !(n & (n - 1));
 }
 
 
@@ -1420,6 +1416,7 @@ convertStencilOp (GLenum op)
 	    return GR_STENCILOP_DECR_WRAP;
 	default:
 	    gl_assert(0);
+	    return GR_STENCILOP_KEEP;
    }
 }
 
@@ -1452,6 +1449,7 @@ drv_setupStencil (void)
 }
 
 
+#if FX_RESCALEHACK
 static void
 scale_down (const TEX_IMG *srcTexImg, TEX_IMG *dstTexImg, const TEXDEF *texDef)
 {
@@ -1491,3 +1489,4 @@ scale_down (const TEX_IMG *srcTexImg, TEX_IMG *dstTexImg, const TEXDEF *texDef)
     dstFxImg->width = realDstWidth;
     dstFxImg->height = realDstHeight;
 }
+#endif
