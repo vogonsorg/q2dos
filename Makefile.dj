@@ -114,6 +114,7 @@ EXE = q2fx.exe
 CFLAGS += -Idos/3rdparty/include -Idos/3rdparty/include/glide3
 LDFLAGS += -Ldos/3rdparty/lib/$(GLDIR) -lgl -Ldos/3rdparty/lib/$(FX_GLIDE_HW) -lglide3x
 REF_STATIC_SOFT=0
+# compile which gl driver in: mesa, sage, or fxmesa. (only one.)
 ifeq ($(REFGL_DRIVER),fxmesa)
 CPPFLAGS+= -DREFGL_FXMESA
 endif

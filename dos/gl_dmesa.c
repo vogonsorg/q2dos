@@ -22,7 +22,7 @@
 #include "../ref_gl/gl_local.h"
 #include "glimp_dos.h"
 
-#if !defined(GL_DLSYM) && !defined(REFGL_MESA)
+#if !defined(REFGL_MESA)
 int DMESA_LoadAPI (void *handle)
 {
 	return -1;
