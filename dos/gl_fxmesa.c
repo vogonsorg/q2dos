@@ -31,6 +31,9 @@
  *   instead of hardware type (int).
  * Mesa-5.1 -> 6.x:
  * - fxQueryHardware() became a private function.
+ *
+ * NOTE: Direct use of fxMesa api from Mesa >= 5.1 doesn't seem to work.
+ * So, DON'T.
  */
 
 #include "../ref_gl/gl_local.h"
