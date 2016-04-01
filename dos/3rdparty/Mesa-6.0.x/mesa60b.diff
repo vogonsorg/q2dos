@@ -1,0 +1,185 @@
+diff -urNp Mesa-6.0.1/src/mesa/drivers/glide/fxapi.c Mesa-6.0.x/src/mesa/drivers/glide/fxapi.c
+--- Mesa-6.0.1/src/mesa/drivers/glide/fxapi.c	2016-03-21 22:41:50.000000000 +0200
++++ Mesa-6.0.x/src/mesa/drivers/glide/fxapi.c	2016-03-27 07:11:10.000000000 +0300
+@@ -202,7 +202,7 @@ gl3DfxSetPaletteEXT(GLuint * pal)
+ 
+ static GrScreenResolution_t fxBestResolution (int width, int height)
+ {
+- static int resolutions[][5] = {
++ static const int resolutions[][5] = {
+ #if 1 /* Voodoo^2 can't fullscreen these, because of Glide */
+         { 320,  200, GR_RESOLUTION_320x200  },
+         { 320,  240, GR_RESOLUTION_320x240  },
+diff -urNp Mesa-6.0.1/src/mesa/drivers/glide/fxsetup.c Mesa-6.0.x/src/mesa/drivers/glide/fxsetup.c
+--- Mesa-6.0.1/src/mesa/drivers/glide/fxsetup.c	2015-10-05 05:55:00.000000000 +0300
++++ Mesa-6.0.x/src/mesa/drivers/glide/fxsetup.c	2016-03-27 07:11:10.000000000 +0300
+@@ -195,6 +195,7 @@ fxTexValidate(GLcontext * ctx, struct gl
+    ti->info.data = NULL;
+ }
+ 
++#if FX_DEBUG
+ static void
+ fxPrintUnitsMode(const char *msg, GLuint mode)
+ {
+@@ -227,6 +228,7 @@ fxPrintUnitsMode(const char *msg, GLuint
+ 	   (mode & FX_UM_ALPHA_ITERATED) ? "ALPHA_ITERATED, " : "",
+ 	   (mode & FX_UM_ALPHA_CONSTANT) ? "ALPHA_CONSTANT, " : "");
+ }
++#endif
+ 
+ static GLuint
+ fxGetTexSetConfiguration(GLcontext * ctx,
+@@ -352,8 +354,10 @@ fxGetTexSetConfiguration(GLcontext * ctx
+ 
+    unitsmode |= (ifmt | envmode);
+ 
++#if FX_DEBUG
+    if (TDFX_DEBUG & (VERBOSE_DRIVER | VERBOSE_TEXTURE))
+       fxPrintUnitsMode("fxGetTexSetConfiguration", unitsmode);
++#endif
+ 
+    return unitsmode;
+ }
+@@ -2102,6 +2106,7 @@ fxDDShadeModel(GLcontext * ctx, GLenum m
+ /************************************************************************/
+ /****************************** Units SetUp *****************************/
+ /************************************************************************/
++#if FX_DEBUG
+ static void
+ fx_print_state_flags(const char *msg, GLuint flags)
+ {
+@@ -2118,6 +2123,7 @@ fx_print_state_flags(const char *msg, GL
+ 	   (flags & FX_NEW_CULL) ? "cull, " : "",
+ 	   (flags & FX_NEW_STENCIL) ? "stencil, " : "");
+ }
++#endif
+ 
+ void
+ fxSetupFXUnits(GLcontext * ctx)
+@@ -2125,8 +2131,10 @@ fxSetupFXUnits(GLcontext * ctx)
+    fxMesaContext fxMesa = FX_CONTEXT(ctx);
+    GLuint newstate = fxMesa->new_state;
+ 
++#if FX_DEBUG
+    if (TDFX_DEBUG & VERBOSE_DRIVER)
+       fx_print_state_flags("fxSetupFXUnits", newstate);
++#endif
+ 
+    if (newstate) {
+       if (newstate & FX_NEW_TEXTURING)
+diff -urNp Mesa-6.0.1/src/mesa/drivers/glide/fxtris.c Mesa-6.0.x/src/mesa/drivers/glide/fxtris.c
+--- Mesa-6.0.1/src/mesa/drivers/glide/fxtris.c	2004-01-08 16:26:50.000000000 +0200
++++ Mesa-6.0.x/src/mesa/drivers/glide/fxtris.c	2016-03-27 07:11:10.000000000 +0300
+@@ -219,7 +219,7 @@ fx_fallback_point( fxMesaContext fxMesa,
+ /***********************************************************************
+  *                 Functions to draw basic primitives                  *
+  ***********************************************************************/
+-
++#if 0 /**/
+ static void fx_print_vertex( GLcontext *ctx, const GrVertex *v )
+ {
+  fprintf(stderr, "fx_print_vertex:\n");
+@@ -231,6 +231,7 @@ static void fx_print_vertex( GLcontext *
+    
+  fprintf(stderr, "\n");
+ }
++#endif /**/
+ 
+ #define DO_FALLBACK 0
+ 
+@@ -1237,7 +1238,7 @@ static void fxRunPipeline( GLcontext *ct
+ }
+ 
+ 
+-static GLenum reduced_prim[GL_POLYGON+1] = {
++static const GLenum reduced_prim[GL_POLYGON+1] = {
+    GL_POINTS,
+    GL_LINES,
+    GL_LINES,
+@@ -1298,7 +1299,7 @@ static void fxRenderFinish( GLcontext *c
+ /*               Manage total rasterization fallbacks                 */
+ /**********************************************************************/
+ 
+-static char *fallbackStrings[] = {
++static const char *fallbackStrings[] = {
+    "1D/3D Texture map",
+    "glDrawBuffer(GL_FRONT_AND_BACK)",
+    "Separate specular color",
+@@ -1313,7 +1314,7 @@ static char *fallbackStrings[] = {
+ };
+ 
+ 
+-static char *getFallbackString(GLuint bit)
++static const char *getFallbackString(GLuint bit)
+ {
+    int i = 0;
+    while (bit > 1) {
+@@ -1382,8 +1383,9 @@ void fxDDInitTriFuncs( GLcontext *ctx )
+    tnl->Driver.Render.ResetLineStipple = _swrast_ResetLineStipple;
+    tnl->Driver.Render.BuildVertices = fxBuildVertices;
+    tnl->Driver.Render.Multipass = NULL;
+-   
++#if 0 /**/
+    (void) fx_print_vertex;
++#endif /**/
+ }
+ 
+ 
+diff -urNp Mesa-6.0.1/src/mesa/drivers/glide/fxwgl.c Mesa-6.0.x/src/mesa/drivers/glide/fxwgl.c
+--- Mesa-6.0.1/src/mesa/drivers/glide/fxwgl.c	2004-01-15 18:02:28.000000000 +0200
++++ Mesa-6.0.x/src/mesa/drivers/glide/fxwgl.c	2016-03-27 07:11:10.000000000 +0300
+@@ -64,19 +64,12 @@ extern "C"
+ #pragma warning( disable : 4273 )
+ #endif
+ 
+-struct __extensions__
+-{
+-   PROC proc;
+-   char *name;
+-};
+-
+ struct __pixelformat__
+ {
+    PIXELFORMATDESCRIPTOR pfd;
+    GLint mesaAttr[MAX_MESA_ATTRS];
+ };
+ 
+-WINGDIAPI void GLAPIENTRY gl3DfxSetPaletteEXT(GLuint *);
+ static GLushort gammaTable[3*256];
+ 
+ struct __pixelformat__ pix[] = {
+diff -urNp Mesa-6.0.1/src/mesa/glapi/glprocs.h Mesa-6.0.x/src/mesa/glapi/glprocs.h
+--- Mesa-6.0.1/src/mesa/glapi/glprocs.h	2003-11-25 00:30:33.000000000 +0200
++++ Mesa-6.0.x/src/mesa/glapi/glprocs.h	2016-03-27 07:11:10.000000000 +0300
+@@ -4,7 +4,7 @@
+  * the GetProcAddress() function
+  */
+ 
+-static struct name_address_offset static_functions[] = {
++static const struct name_address_offset static_functions[] = {
+    { "glNewList", (GLvoid *) glNewList, _gloffset_NewList },
+    { "glEndList", (GLvoid *) glEndList, _gloffset_EndList },
+    { "glCallList", (GLvoid *) glCallList, _gloffset_CallList },
+diff -urNp Mesa-6.0.1/src/mesa/Makefile.DJ Mesa-6.0.x/src/mesa/Makefile.DJ
+--- Mesa-6.0.1/src/mesa/Makefile.DJ	2016-03-22 22:51:00.000000000 +0200
++++ Mesa-6.0.x/src/mesa/Makefile.DJ	2016-03-27 07:11:10.000000000 +0300
+@@ -71,6 +71,7 @@ GL_IMP = libigl.a
+ HOST_CC = gcc
+ CC = gcc
+ CFLAGS += -I$(TOP)/include -I. -Imain -Iglapi
++CFLAGS += -DNDEBUG
+ DXE_EXPORTS= -E _gl -X _gl_ -X _glb
+ DXE_EXPORTS+= -E _DMesa
+ ifeq ($(FX),1)
+diff -urNp Mesa-6.0.1/src/mesa/math/m_matrix.c Mesa-6.0.x/src/mesa/math/m_matrix.c
+--- Mesa-6.0.1/src/mesa/math/m_matrix.c	2015-10-05 05:55:00.000000000 +0300
++++ Mesa-6.0.x/src/mesa/math/m_matrix.c	2016-03-27 07:11:10.000000000 +0300
+@@ -60,7 +60,7 @@ static const char *types[] = {
+ /**
+  * Identity matrix.
+  */
+-static GLfloat Identity[16] = {
++static const GLfloat Identity[16] = {
+    1.0, 0.0, 0.0, 0.0,
+    0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 1.0, 0.0,

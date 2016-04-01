@@ -219,7 +219,7 @@ fx_fallback_point( fxMesaContext fxMesa,
 /***********************************************************************
  *                 Functions to draw basic primitives                  *
  ***********************************************************************/
-
+#if 0 /**/
 static void fx_print_vertex( GLcontext *ctx, const GrVertex *v )
 {
  fprintf(stderr, "fx_print_vertex:\n");
@@ -231,6 +231,7 @@ static void fx_print_vertex( GLcontext *ctx, const GrVertex *v )
    
  fprintf(stderr, "\n");
 }
+#endif /**/
 
 #define DO_FALLBACK 0
 
@@ -1237,7 +1238,7 @@ static void fxRunPipeline( GLcontext *ctx )
 }
 
 
-static GLenum reduced_prim[GL_POLYGON+1] = {
+static const GLenum reduced_prim[GL_POLYGON+1] = {
    GL_POINTS,
    GL_LINES,
    GL_LINES,
@@ -1298,7 +1299,7 @@ static void fxRenderFinish( GLcontext *ctx )
 /*               Manage total rasterization fallbacks                 */
 /**********************************************************************/
 
-static char *fallbackStrings[] = {
+static const char *fallbackStrings[] = {
    "1D/3D Texture map",
    "glDrawBuffer(GL_FRONT_AND_BACK)",
    "Separate specular color",
@@ -1313,7 +1314,7 @@ static char *fallbackStrings[] = {
 };
 
 
-static char *getFallbackString(GLuint bit)
+static const char *getFallbackString(GLuint bit)
 {
    int i = 0;
    while (bit > 1) {
@@ -1382,8 +1383,9 @@ void fxDDInitTriFuncs( GLcontext *ctx )
    tnl->Driver.Render.ResetLineStipple = _swrast_ResetLineStipple;
    tnl->Driver.Render.BuildVertices = fxBuildVertices;
    tnl->Driver.Render.Multipass = NULL;
-   
+#if 0 /**/
    (void) fx_print_vertex;
+#endif /**/
 }
 
 

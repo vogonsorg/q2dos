@@ -71,6 +71,7 @@ GL_IMP = libigl.a
 HOST_CC = gcc
 CC = gcc
 CFLAGS += -I$(TOP)/include -I. -Imain -Iglapi
+CFLAGS += -DNDEBUG
 DXE_EXPORTS= -E _gl -X _gl_ -X _glb
 DXE_EXPORTS+= -E _DMesa
 ifeq ($(FX),1)

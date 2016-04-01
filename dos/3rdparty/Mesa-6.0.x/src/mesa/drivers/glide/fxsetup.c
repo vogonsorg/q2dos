@@ -195,6 +195,7 @@ fxTexValidate(GLcontext * ctx, struct gl_texture_object *tObj)
    ti->info.data = NULL;
 }
 
+#if FX_DEBUG
 static void
 fxPrintUnitsMode(const char *msg, GLuint mode)
 {
@@ -227,6 +228,7 @@ fxPrintUnitsMode(const char *msg, GLuint mode)
 	   (mode & FX_UM_ALPHA_ITERATED) ? "ALPHA_ITERATED, " : "",
 	   (mode & FX_UM_ALPHA_CONSTANT) ? "ALPHA_CONSTANT, " : "");
 }
+#endif
 
 static GLuint
 fxGetTexSetConfiguration(GLcontext * ctx,
@@ -352,8 +354,10 @@ fxGetTexSetConfiguration(GLcontext * ctx,
 
    unitsmode |= (ifmt | envmode);
 
+#if FX_DEBUG
    if (TDFX_DEBUG & (VERBOSE_DRIVER | VERBOSE_TEXTURE))
       fxPrintUnitsMode("fxGetTexSetConfiguration", unitsmode);
+#endif
 
    return unitsmode;
 }
@@ -2102,6 +2106,7 @@ fxDDShadeModel(GLcontext * ctx, GLenum mode)
 /************************************************************************/
 /****************************** Units SetUp *****************************/
 /************************************************************************/
+#if FX_DEBUG
 static void
 fx_print_state_flags(const char *msg, GLuint flags)
 {
@@ -2118,6 +2123,7 @@ fx_print_state_flags(const char *msg, GLuint flags)
 	   (flags & FX_NEW_CULL) ? "cull, " : "",
 	   (flags & FX_NEW_STENCIL) ? "stencil, " : "");
 }
+#endif
 
 void
 fxSetupFXUnits(GLcontext * ctx)
@@ -2125,8 +2131,10 @@ fxSetupFXUnits(GLcontext * ctx)
    fxMesaContext fxMesa = FX_CONTEXT(ctx);
    GLuint newstate = fxMesa->new_state;
 
+#if FX_DEBUG
    if (TDFX_DEBUG & VERBOSE_DRIVER)
       fx_print_state_flags("fxSetupFXUnits", newstate);
+#endif
 
    if (newstate) {
       if (newstate & FX_NEW_TEXTURING)

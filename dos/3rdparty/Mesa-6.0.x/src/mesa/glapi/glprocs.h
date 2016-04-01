@@ -4,7 +4,7 @@
  * the GetProcAddress() function
  */
 
-static struct name_address_offset static_functions[] = {
+static const struct name_address_offset static_functions[] = {
    { "glNewList", (GLvoid *) glNewList, _gloffset_NewList },
    { "glEndList", (GLvoid *) glEndList, _gloffset_EndList },
    { "glCallList", (GLvoid *) glCallList, _gloffset_CallList },
