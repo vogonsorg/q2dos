@@ -974,28 +974,6 @@ void hwcSLIReadDisable(hwcBoardInfo *bInfo)
 #endif
 }
 
-#include <linutil.h>
-
-/*-------------------------------------------------------------------
-  Function: tlKbHit
-  Date: 2/28
-  Implementor(s): jdt
-  Library: test library
-  Description:
-  Returns true if there are pending characters in the input queue
-  Arguments:
-  none
-  Return:
-  nonzero if keys in queue
-  -------------------------------------------------------------------*/
-int  hwcKbHit( void ) {
-  return lin_kbhit();
-}
-
-char hwcGetCH( void ) {
-  return lin_getch();
-}
-
 void grDRIImportFifo(int fifoPtr, int fifoRead)
 {
   _grImportFifo(fifoPtr, fifoRead);
