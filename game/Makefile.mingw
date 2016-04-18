@@ -1,7 +1,7 @@
 CC = gcc
-CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
+CFLAGS = -m32 -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 CPPFLAGS = -Did386=1
-LDFLAGS = -shared -Wl,--enable-auto-image-base -Wl,--no-undefined
+LDFLAGS = -m32 -shared -Wl,--enable-auto-image-base -Wl,--no-undefined
 
 GAME = m_tank.o \
 	p_client.o \

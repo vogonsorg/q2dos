@@ -1,8 +1,8 @@
 CC = gcc
 
-CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
+CFLAGS = -m64 -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 CPPFLAGS =
-LDFLAGS = -shared -Wl,--enable-auto-image-base -Wl,--no-undefined
+LDFLAGS = -m64 -shared -Wl,--enable-auto-image-base -Wl,--no-undefined
 LDLIBS = -lwinmm -lgdi32
 
 REFSOFT = ../game/q_shared.o \

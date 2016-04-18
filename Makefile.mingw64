@@ -14,12 +14,12 @@ USE_TREMOR=0
 CC = gcc
 RC = windres
 ifeq ($(DEBUG),1)
-CFLAGS = -Wall -g -fno-strict-aliasing
+CFLAGS = -m64 -Wall -g -fno-strict-aliasing
 else
-CFLAGS = -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
+CFLAGS = -m64 -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 endif
 CPPFLAGS = -DCLIENT_SPLIT_NETFRAME
-LDFLAGS = -mwindows
+LDFLAGS = -m64 -mwindows
 LDLIBS = -lwinmm -lws2_32
 EXE = q2.exe
 
@@ -137,5 +137,5 @@ clean:
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(VORBIS_CFLAGS) $(CURL_CFLAGS) -c $< -o $@
 
 %.res: %.rc
-	$(RC) --output-format=coff -o $@ $<
+	$(RC) --output-format=coff --target=pe-x86-64 -o $@ $<
 
