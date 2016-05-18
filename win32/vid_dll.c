@@ -756,7 +756,7 @@ void VID_Init (void)
 #endif
 
 	/* Disable the 3Dfx splash screen */
-	putenv("FX_GLIDE_NO_SPLASH=0");
+	putenv("FX_GLIDE_NO_SPLASH=1");
 	/* don't let fxMesa cheat multitexturing */
 	putenv("FX_DONT_FAKE_MULTITEX=1");
 
