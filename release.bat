@@ -20,8 +20,8 @@ FOR %%A IN (0 1 2 3 4 5 6 7 8 9) DO IF ERRORLEVEL %%A0 SET ERR10=%%A
 FOR %%A IN (0 1 2 3 4 5 6 7 8 9) DO IF ERRORLEVEL %ERR10%%%A SET ERR1=%%A
 SET DAY=%ERR10%%ERR1%
 
-F:
-cd "F:\PROJ\Q2DOS"
+E:
+cd "E:\PROJ\Q2DOS"
 del Q2DOS_EXE_%MONTH%%DAY%%YEAR%.7Z
 del Q2DOS_EXE_LATEST.7Z
 rd /s /q release
@@ -75,12 +75,12 @@ cd\
 cd "program files"
 cd "7-zip"
 REM Uploading this as _LATEST.7Z to bitbucket now
-REM 7z.exe a -mx9 -mmt "F:\PROJ\Q2DOS\Q2DOS_EXE_%MONTH%%DAY%%YEAR%.7Z" "F:\PROJ\Q2DOS\RELEASE\*"
+REM 7z.exe a -mx9 -mmt "E:\PROJ\Q2DOS\Q2DOS_EXE_%MONTH%%DAY%%YEAR%.7Z" "E:\PROJ\Q2DOS\RELEASE\*"
 
-7z.exe a -mx9 -mmt "F:\PROJ\Q2DOS\Q2DOS_EXE_LATEST.7Z" "F:\PROJ\Q2DOS\RELEASE\*"
+7z.exe a -mx9 -mmt "E:\PROJ\Q2DOS\Q2DOS_EXE_LATEST.7Z" "E:\PROJ\Q2DOS\RELEASE\*"
 
-cd F:\PROJ\Q2DOS
-rd /s /q F:\PROJ\Q2DOS\RELEASE
+cd E:\PROJ\Q2DOS
+rd /s /q E:\PROJ\Q2DOS\RELEASE
 
-F:
-cd "F:\PROJ\Q2DOS"
+E:
+cd "E:\PROJ\Q2DOS"

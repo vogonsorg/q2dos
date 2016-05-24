@@ -47,8 +47,8 @@ C:
 cd\
 cd "program files"
 cd "7-zip"
-7z.exe a -mx9 -mmt "F:\PROJ\Q2DOS\Q2DOS_SSE_LATEST.7Z" "F:\PROJ\Q2DOS\RELEASE\*"
+7z.exe a -mx9 -mmt "E:\PROJ\Q2DOS\Q2DOS_SSE_LATEST.7Z" "E:\PROJ\Q2DOS\RELEASE\*"
 
-F:
-cd F:\PROJ\Q2DOS
-rd /s /q F:\PROJ\Q2DOS\RELEASE
+E:
+cd E:\PROJ\Q2DOS
+rd /s /q E:\PROJ\Q2DOS\RELEASE
