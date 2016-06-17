@@ -1,26 +1,26 @@
 @echo off
 call setenv.bat
-make -f Makefile.dj clean
-make -f Makefile.dj USE_SSE=1
+make %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj clean
+make %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj USE_SSE=1
 upx -9 q2sse.exe
 
-make -f Makefile.dj clean
-make -f Makefile.dj USE_SSE=1 REF_DXE=0 REF_STATIC_GL=1 REFGL_DRIVER=sage
+make %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj clean
+make %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj USE_SSE=1 REF_DXE=0 REF_STATIC_GL=1 REFGL_DRIVER=sage
 copy /y q2fx.exe q2sage.exe
 upx -9 q2sage.exe
 
-make -f Makefile.dj clean
-make -f Makefile.dj USE_SSE=1 REF_DXE=0 REF_STATIC_GL=1 REFGL_DRIVER=fxmesa
+make %1 %2 %3 %4 %5 %6 %7 %8 %9 %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj clean
+make %1 %2 %3 %4 %5 %6 %7 %8 %9 %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj USE_SSE=1 REF_DXE=0 REF_STATIC_GL=1 REFGL_DRIVER=fxmesa
 upx -9 q2fx.exe
 copy /y q2fx.exe q2fx3.exe
 
-make -f Makefile.dj clean
-make -f Makefile.dj USE_SSE=1 REF_DXE=0 REF_STATIC_GL=1 REFGL_DRIVER=mesa
+make %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj clean
+make %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj USE_SSE=1 REF_DXE=0 REF_STATIC_GL=1 REFGL_DRIVER=mesa
 upx -9 q2fx.exe
 
 cd ref_gl
-make -f Makefile.dj clean
-make -f Makefile.dj USE_SSE=1
+make %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj clean
+make %1 %2 %3 %4 %5 %6 %7 %8 %9 -f Makefile.dj USE_SSE=1
 
 cd..
 
