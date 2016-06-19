@@ -160,7 +160,7 @@ static void SCR_DrawTime (void) /* FS: Draw current time */
 	utc = time (NULL);
 	local = localtime (&utc);
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 	if (cl_drawtime->intValue == 1)
 		timefmt = "%H:%M:%S %p";
 	else	timefmt = "%I:%M:%S %p";

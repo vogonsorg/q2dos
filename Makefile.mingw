@@ -23,6 +23,8 @@ endif
 CPPFLAGS = -DCLIENT_SPLIT_NETFRAME
 LDFLAGS = -m32 -mwindows
 LDLIBS = -lwinmm -lws2_32
+# for doing -march= targets.  Mostly for my own fooling around.
+MARCHFLAGS =
 EXE = q2.exe
 
 ifeq ($(USE_ASM),1)
@@ -148,13 +150,13 @@ clean:
 DO_AS=$(CC) -x assembler-with-cpp
 
 %.o : %.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(VORBIS_CFLAGS) $(CURL_CFLAGS) -c $< -o $@
+	$(CC) $(MARCHFLAGS) $(CFLAGS) $(CPPFLAGS) $(VORBIS_CFLAGS) $(CURL_CFLAGS) -c $< -o $@
 
 %.o: %.S
-	$(DO_AS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(DO_AS) $(MARCHFLAGS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 %.o: %.s
-	$(DO_AS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(DO_AS) $(MARCHFLAGS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 %.res: %.rc
 	$(RC) --output-format=coff --target=pe-i386 -o $@ $<
