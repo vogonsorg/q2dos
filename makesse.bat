@@ -43,7 +43,7 @@ copy ref_gl\ref_gl.dxe release
 copy readme.fx release
 copy readme.txt release
 
-C:
+E:
 cd\
 cd "program files"
 cd "7-zip"

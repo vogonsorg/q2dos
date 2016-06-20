@@ -160,15 +160,10 @@ static void SCR_DrawTime (void) /* FS: Draw current time */
 	utc = time (NULL);
 	local = localtime (&utc);
 
-#ifdef _WIN32
 	if (cl_drawtime->intValue == 1)
 		timefmt = "%H:%M:%S %p";
 	else	timefmt = "%I:%M:%S %p";
-#else
-	if (cl_drawtime->intValue == 1)
-		timefmt = "%k:%M:%S %p";
-	else	timefmt = "%l:%M:%S %p";
-#endif
+
 	strftime (st, sizeof (st), timefmt, local);
 
 	x = viddef.width - strlen(st) * 8;

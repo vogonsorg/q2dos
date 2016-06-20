@@ -14,6 +14,7 @@
 # ignore all the windows binaries - they shouldn't be committed! 
 Debug/
 Release/
+win32/q2.res
 out.txt
 q2*.exe
 q2dos_*.7z

@@ -70,7 +70,7 @@ copy xsrc\gamex86.dxe release\xatrix
 copy zaero\gamex86.dxe release\zaero
 xcopy dos\3rdparty\lib_dxe release /E
 
-C:
+E:
 cd\
 cd "program files"
 cd "7-zip"
