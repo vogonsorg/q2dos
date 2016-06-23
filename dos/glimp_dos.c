@@ -11,12 +11,6 @@
 **
 */
 
-#include <termios.h>
-#include <sys/ioctl.h>
-#include <sys/stat.h>
-#include <stdarg.h>
-#include <stdio.h>
-
 #include "../ref_gl/gl_local.h"
 #include "../client/keys.h"
 #include "vid_dos.h"
