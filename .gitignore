@@ -12,11 +12,13 @@
 *.dxe
 *.clwbin/
 # ignore all the windows binaries - they shouldn't be committed! 
+_build/
 Debug/
 Release/
 win32/q2.res
 out.txt
 q2*.exe
+Q2DOS_*.7z
 q2dos_*.7z
 q2
 q2ace
