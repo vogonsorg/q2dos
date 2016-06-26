@@ -248,7 +248,7 @@ struct ulong_long {
 
 #define MAX_COOKIES       10
 #define MAX_HOSTLEN       80           /**< most strings are limited */
-#define MAX_ADDRESSES     1024 // FS: Was 10           /**< # of addresses in resolvers */
+#define MAX_ADDRESSES     10           /**< # of addresses in resolvers */
 
 #define SAFETY_TCP        0x538F25A3L  /**< marker signatures */
 #define SAFETY_UDP        0x3E45E154L

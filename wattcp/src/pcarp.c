@@ -659,7 +659,7 @@ struct route_entry  {
        DWORD  gate_ip; /* ... we use this gateway */
      };
 
-#define route_top_of_cache    1024 // FS: Was 32
+#define route_top_of_cache    32
 #define route_top_pending     route_top_of_cache
 #define route_top_free        route_first_pending
 #define route_top_dynamic     route_first_free

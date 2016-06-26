@@ -213,7 +213,7 @@ struct sockproto {
 /*
  * Maximum queue length specifiable by listen.
  */
-#define SOMAXCONN       1024 // FS: Was 32
+#define SOMAXCONN       32
 #define MSG_OOB         0x1             /* process out-of-band data */
 #define MSG_PEEK        0x2             /* peek at incoming message */
 #define MSG_DONTROUTE   0x4             /* send without using routing tables */
@@ -222,7 +222,7 @@ struct sockproto {
 #define MSG_CTRUNC      0x20            /* control data lost before delivery */
 #define MSG_WAITALL     0x40            /* wait for full request or error */
 
-#define MSG_MAXIOVLEN   256 // FS: Was 16
+#define MSG_MAXIOVLEN   16
 
 
 /*

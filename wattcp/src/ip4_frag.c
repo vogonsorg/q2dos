@@ -51,8 +51,8 @@
 #include "ip4_out.h"
 #include "ip4_frag.h"
 
-#define MAX_IP_FRAGS     64 // FS: Was 2   /* max # of fragmented IP-packets */
-#define MAX_IP_HOLDTIME  120 // FS: Was 15  /* time (in sec) to hold before discarding */
+#define MAX_IP_FRAGS     2   /* max # of fragmented IP-packets */
+#define MAX_IP_HOLDTIME  15  /* time (in sec) to hold before discarding */
 
 int _ip4_frag_reasm = MAX_IP_HOLDTIME;
 
