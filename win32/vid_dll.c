@@ -557,9 +557,9 @@ void VID_FreeReflib (void)
 #ifndef REF_HARD_LINKED
 	if ( !FreeLibrary( reflib_library ) )
 		Com_Error( ERR_FATAL, "Reflib FreeLibrary failed" );
+	reflib_library = NULL;
 #endif
 	memset (&re, 0, sizeof(re));
-	reflib_library = NULL;
 	reflib_active  = false;
 }
 
