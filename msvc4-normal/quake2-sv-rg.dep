@@ -1,0 +1,1406 @@
+# Microsoft Developer Studio Generated Dependency File, included by quake2-sv-rg.mak
+
+..\Goa\CEngine\darray.c : \
+	"..\game\q_shared.h"\
+	"..\Goa\CEngine\darray.h"\
+	"..\Goa\CEngine\goaceng.h"\
+	"..\goa\gspy.h"\
+	"..\Goa\nonport.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\Goa\CEngine\gserver.c : \
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	"..\Goa\CEngine\goaceng.h"\
+	"..\Goa\CEngine\gserver.h"\
+	"..\Goa\CEngine\hashtable.h"\
+	"..\goa\gspy.h"\
+	"..\Goa\nonport.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\server\server.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\Goa\CEngine\gserverlist.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\Goa\CEngine\darray.h"\
+	"..\Goa\CEngine\goaceng.h"\
+	"..\Goa\CEngine\gserver.h"\
+	"..\Goa\CEngine\gutil.h"\
+	"..\Goa\CEngine\hashtable.h"\
+	"..\goa\gspy.h"\
+	"..\Goa\nonport.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\Goa\CEngine\gutil.c : \
+	"..\Goa\CEngine\gutil.h"\
+	
+
+..\Goa\CEngine\hashtable.c : \
+	"..\game\q_shared.h"\
+	"..\Goa\CEngine\darray.h"\
+	"..\Goa\CEngine\goaceng.h"\
+	"..\Goa\CEngine\hashtable.h"\
+	"..\goa\gspy.h"\
+	"..\Goa\nonport.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\Goa\nonport.c : \
+	"..\game\q_shared.h"\
+	"..\Goa\CEngine\goaceng.h"\
+	"..\goa\gspy.h"\
+	"..\Goa\nonport.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\CLIENT\cl_cin.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\snd_loc.h"\
+	"..\client\snd_ogg.h"\
+	"..\client\snd_wavstream.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\CLIENT\cl_ents.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\CLIENT\cl_fx.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\client\cl_http.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\CLIENT\cl_input.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\CLIENT\cl_inv.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\CLIENT\cl_main.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\gspy.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\CLIENT\cl_newfx.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\CLIENT\cl_parse.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\snd_loc.h"\
+	"..\client\snd_ogg.h"\
+	"..\client\snd_wavstream.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\CLIENT\cl_pred.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\CLIENT\cl_scrn.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\CLIENT\cl_tent.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\CLIENT\cl_view.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\CLIENT\snd_dma.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\snd_loc.h"\
+	"..\client\snd_ogg.h"\
+	"..\client\snd_wavstream.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\CLIENT\snd_mem.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\snd_loc.h"\
+	"..\client\snd_ogg.h"\
+	"..\client\snd_wavstream.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\CLIENT\snd_mix.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\snd_loc.h"\
+	"..\client\snd_ogg.h"\
+	"..\client\snd_wavstream.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\client\snd_stream.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\snd_loc.h"\
+	"..\client\snd_ogg.h"\
+	"..\client\snd_wavstream.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"..\win32\include\ogg\ogg.h"\
+	"..\win32\include\ogg\os_types.h"\
+	"..\win32\include\vorbis\codec.h"\
+	"..\win32\include\vorbis\vorbisfile.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\client\snd_wavstream.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\snd_loc.h"\
+	"..\client\snd_ogg.h"\
+	"..\client\snd_wavstream.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\WIN32\snd_win.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\snd_loc.h"\
+	"..\client\snd_ogg.h"\
+	"..\client\snd_wavstream.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"..\win32\winquake.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\SERVER\sv_ccmds.c : \
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\server\server.h"\
+	
+
+..\SERVER\sv_ents.c : \
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\server\server.h"\
+	
+
+..\SERVER\sv_game.c : \
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\server\server.h"\
+	
+
+..\SERVER\sv_init.c : \
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\server\server.h"\
+	
+
+..\SERVER\sv_main.c : \
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\server\server.h"\
+	
+
+..\SERVER\sv_send.c : \
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\server\server.h"\
+	
+
+..\SERVER\sv_user.c : \
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\server\server.h"\
+	
+
+..\SERVER\sv_world.c : \
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\server\server.h"\
+	
+
+..\WIN32\cd_win.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\win32\glw_imp.c : \
+	"..\client\ref.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\ref_gl\gl_local.h"\
+	"..\ref_gl\gl_model.h"\
+	"..\ref_gl\qgl.h"\
+	"..\win32\glw_win.h"\
+	"..\win32\include\gl\glext.h"\
+	"..\win32\winquake.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\WIN32\in_win.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"..\win32\winquake.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\win32\net_wins.c : \
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\WIN32\q_shwin.c : \
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\winquake.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\win32\qgl_win.c : \
+	"..\client\ref.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\ref_gl\gl_local.h"\
+	"..\ref_gl\gl_model.h"\
+	"..\ref_gl\qgl.h"\
+	"..\win32\glw_win.h"\
+	"..\win32\include\gl\glext.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\WIN32\sys_win.c : \
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\winquake.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\WIN32\vid_dll.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"..\win32\winquake.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\WIN32\vid_menu.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\qmenu.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\GAME\g_ai.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\g_chase.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\g_cmds.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_player.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\g_combat.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\g_func.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\g_items.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\g_main.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\g_misc.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\g_monster.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\g_phys.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\g_save.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	"..\game\tables\clientfields.h"\
+	"..\game\tables\fields.h"\
+	"..\game\tables\gamefunc_decs.h"\
+	"..\game\tables\gamefunc_list.h"\
+	"..\game\tables\gamemmove_decs.h"\
+	"..\game\tables\gamemmove_list.h"\
+	"..\game\tables\levelfields.h"\
+	
+
+..\GAME\g_spawn.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\g_svcmds.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\g_target.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\g_trigger.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\g_turret.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\g_utils.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\g_weapon.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_berserk.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_berserk.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_boss2.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_boss2.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_boss3.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_boss32.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_boss31.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_boss31.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_boss32.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_boss32.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_brain.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_brain.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_chick.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_chick.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_flash.c : \
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_flipper.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_flipper.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_float.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_float.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_flyer.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_flyer.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_gladiator.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_gladiator.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_gunner.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_gunner.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_hover.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_hover.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_infantry.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_infantry.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_insane.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_insane.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_medic.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_medic.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_move.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_mutant.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_mutant.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_parasite.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_parasite.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_soldier.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_soldier.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_supertank.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_supertank.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\m_tank.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_tank.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\p_client.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_player.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\p_hud.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\p_trail.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\p_view.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_player.h"\
+	"..\game\q_shared.h"\
+	
+
+..\GAME\p_weapon.c : \
+	"..\game\g_local.h"\
+	"..\game\game.h"\
+	"..\game\m_player.h"\
+	"..\game\q_shared.h"\
+	
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+!ENDIF 
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+!ENDIF 
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+!ENDIF 
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+!ENDIF 
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+!ENDIF 
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+!ENDIF 
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+!ENDIF 
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+!ENDIF 
+
+!IF  "$(CFG)" == "quake2 - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
+
+!ENDIF 
+
+..\ref_gl\gl_draw.c : \
+	"..\client\ref.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\ref_gl\gl_local.h"\
+	"..\ref_gl\gl_model.h"\
+	"..\ref_gl\qgl.h"\
+	"..\win32\include\gl\glext.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\ref_gl\gl_image.c : \
+	"..\client\ref.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\ref_gl\gl_local.h"\
+	"..\ref_gl\gl_model.h"\
+	"..\ref_gl\qgl.h"\
+	"..\win32\include\gl\glext.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\ref_gl\gl_light.c : \
+	"..\client\ref.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\ref_gl\gl_local.h"\
+	"..\ref_gl\gl_model.h"\
+	"..\ref_gl\qgl.h"\
+	"..\win32\include\gl\glext.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\ref_gl\gl_mesh.c : \
+	"..\client\ref.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\ref_gl\anorms.h"\
+	"..\ref_gl\anormtab.h"\
+	"..\ref_gl\gl_local.h"\
+	"..\ref_gl\gl_model.h"\
+	"..\ref_gl\qgl.h"\
+	"..\win32\include\gl\glext.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\ref_gl\gl_model.c : \
+	"..\client\ref.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\ref_gl\gl_local.h"\
+	"..\ref_gl\gl_model.h"\
+	"..\ref_gl\qgl.h"\
+	"..\win32\include\gl\glext.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\ref_gl\gl_rmain.c : \
+	"..\client\ref.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\ref_gl\gl_local.h"\
+	"..\ref_gl\gl_model.h"\
+	"..\ref_gl\qgl.h"\
+	"..\win32\include\gl\glext.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\ref_gl\gl_rmisc.c : \
+	"..\client\ref.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\ref_gl\gl_local.h"\
+	"..\ref_gl\gl_model.h"\
+	"..\ref_gl\qgl.h"\
+	"..\win32\include\gl\glext.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\ref_gl\gl_rsurf.c : \
+	"..\client\ref.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\ref_gl\gl_local.h"\
+	"..\ref_gl\gl_model.h"\
+	"..\ref_gl\qgl.h"\
+	"..\win32\include\gl\glext.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\ref_gl\gl_warp.c : \
+	"..\client\ref.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\ref_gl\gl_local.h"\
+	"..\ref_gl\gl_model.h"\
+	"..\ref_gl\qgl.h"\
+	"..\ref_gl\warpsin.h"\
+	"..\win32\include\gl\glext.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\QCOMMON\cmd.c : \
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	
+
+..\QCOMMON\cmodel.c : \
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	
+
+..\QCOMMON\common.c : \
+	"..\client\anorms.h"\
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	
+
+..\CLIENT\console.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\QCOMMON\crc.c : \
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	
+
+..\QCOMMON\cvar.c : \
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	
+
+..\QCOMMON\files.c : \
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	
+
+..\CLIENT\keys.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\CLIENT\menu.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\qmenu.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\snd_loc.h"\
+	"..\client\snd_ogg.h"\
+	"..\client\snd_wavstream.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\QCOMMON\net_chan.c : \
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	
+
+..\QCOMMON\pmove.c : \
+	"..\game\q_shared.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	
+
+..\win32\q2.rc : \
+	"..\win32\q2.ico"\
+	
+
+..\GAME\q_shared.c : \
+	"..\game\q_shared.h"\
+	
+
+..\CLIENT\qmenu.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\qmenu.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
+
+..\CLIENT\x86.c : \
+	"..\client\cdaudio.h"\
+	"..\client\client.h"\
+	"..\client\console.h"\
+	"..\client\input.h"\
+	"..\client\keys.h"\
+	"..\client\ref.h"\
+	"..\client\screen.h"\
+	"..\client\sound.h"\
+	"..\client\vid.h"\
+	"..\game\q_shared.h"\
+	"..\libcurl\include\curl\curl.h"\
+	"..\libcurl\include\curl\curlbuild.h"\
+	"..\libcurl\include\curl\curlrules.h"\
+	"..\libcurl\include\curl\curlver.h"\
+	"..\libcurl\include\curl\easy.h"\
+	"..\libcurl\include\curl\multi.h"\
+	"..\qcommon\qcommon.h"\
+	"..\qcommon\qfiles.h"\
+	"..\win32\include\msinttypes\stdint.h"\
+	"c:\program files (x86)\microsoft visual studio\vc98\include\basetsd.h"\
+	
