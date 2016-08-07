@@ -70,6 +70,9 @@ copy xsrc\gamex86.dxe release\xatrix
 copy zaero\gamex86.dxe release\zaero
 xcopy dos\3rdparty\lib_dxe release /E
 
+REM copy a default gl.dxe
+copy dos\3rdparty\lib_dxe\opengl\fxmesa\gl.dxe release
+
 E:
 cd\
 cd "program files"

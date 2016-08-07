@@ -46,6 +46,9 @@ cp -p zaero/gamex86.dxe _build/zaero
 # gamespy shit
 cp -p Goa/gamespy.dxe _build
 
+# copy a default gl.dxe
+cp -p dos/3rdparty/lib_dxe/opengl/fxmesa/gl.dxe _build
+
 cd _build || exit 1
 unix2dos -k readme.txt
 unix2dos -k readme.fx
