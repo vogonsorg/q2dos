@@ -1,5 +1,6 @@
 CC = gcc
 CFLAGS = -m64 -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
+CFLAGS+= -ffast-math
 CPPFLAGS = -DWITH_ACEBOT
 LDFLAGS = -m64 -shared -Wl,--enable-auto-image-base -Wl,--no-undefined
 

@@ -17,6 +17,7 @@ ifeq ($(DEBUG),1)
 CFLAGS = -m64 -Wall -g -fno-strict-aliasing
 else
 CFLAGS = -m64 -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
+CFLAGS+= -ffast-math
 endif
 CPPFLAGS = -DCLIENT_SPLIT_NETFRAME
 LDFLAGS = -m64 -mwindows
