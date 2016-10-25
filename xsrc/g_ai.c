@@ -1031,7 +1031,7 @@ qboolean ai_checkattack (edict_t *self, float dist)
 		VectorCopy (self->enemy->s.origin, self->monsterinfo.last_sighting);
 	}
 
-	if (coop && (self->monsterinfo.search_time < level.time))
+	if (coop && coop->value && (self->monsterinfo.search_time < level.time))
 	{
 		if (FindTarget (self))
 		{
@@ -1043,7 +1043,6 @@ qboolean ai_checkattack (edict_t *self, float dist)
 	enemy_range = range(self, self->enemy);
 	VectorSubtract (self->enemy->s.origin, self->s.origin, temp);
 	enemy_yaw = vectoyaw(temp);
-
 
 	// JDC self->ideal_yaw = enemy_yaw;
 
