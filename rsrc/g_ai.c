@@ -1286,6 +1286,14 @@ ai_checkattack(edict_t *self, float dist)
 		VectorCopy(self->enemy->s.origin, self->monsterinfo.blind_fire_target);
 		self->monsterinfo.blind_fire_delay = 0;
 	}
+	
+	if (coop && coop->value && (self->monsterinfo.search_time < level.time))
+	{
+		if (FindTarget(self))
+		{
+			return true;
+		}
+	}
 
 	enemy_infront = infront(self, self->enemy);
 	enemy_range = range(self, self->enemy);
@@ -1573,14 +1581,6 @@ ai_run(edict_t *self, float dist)
 			{
 				return;
 			}
-		}
-	}
-
-	if (coop->value)
-	{
-		if (FindTarget(self))
-		{
-			return;
 		}
 	}
 
