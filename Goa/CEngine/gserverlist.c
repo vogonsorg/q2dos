@@ -42,6 +42,8 @@ static cvar_t	*cl_master_server_retries;
 static cvar_t	*cl_master_server_port;
 static cvar_t	*cl_master_server_ip;
 static cvar_t	*cl_master_server_timeout;
+static cvar_t	*cl_master_server_optout;
+static cvar_t	*playerName;
 
 gspyimport_t gspyi;
 
@@ -86,6 +88,8 @@ void InitGamespy(void)
 	cl_master_server_port = gspyi.cvar("cl_master_server_port", "28900", CVAR_ARCHIVE);
 	cl_master_server_ip = gspyi.cvar("cl_master_server_ip", "maraakate.org", CVAR_ARCHIVE);
 	cl_master_server_timeout = gspyi.cvar("cl_master_server_timeout", "3000", CVAR_ARCHIVE);
+	cl_master_server_optout = gspyi.cvar("cl_master_server_optout", "0", CVAR_ARCHIVE);
+	playerName = gspyi.cvar("name", "unnamed", CVAR_USERINFO | CVAR_ARCHIVE);
 }
 
 void ShutdownGamespy (void)
@@ -322,6 +326,7 @@ static void ServerListModeChange(GServerList serverlist, GServerListState newsta
 static GError SendListRequest(GServerList serverlist)
 {
 	char data[256], *ptr, result[64];
+	char *clientName = "OPT-OUT"; /* FS: Allow people to opt-out of me getting their username in list requests */
 	int len;
 	int error = 0;
 	int retry = 0;
@@ -356,9 +361,15 @@ retryRecv:
 	gs_encrypt   ( (uchar *) serverlist->seckey, 6, (uchar *)ptr, 6 );
 	gs_encode ( (uchar *)ptr, 6, (uchar *)result );
 
+	 /* FS: Allow people to opt-out of me getting their username in list requests */
+	if(!cl_master_server_optout->intValue)
+	{
+		clientName = playerName->string;
+	}
+
 	//validate to the master
-	sprintf(data, "\\gamename\\%s\\gamever\\%s\\location\\0\\validate\\%s\\final\\\\queryid\\1.1\\",
-			serverlist->enginename, ENGINE_VERSION, result); //validate us		
+	sprintf(data, "\\gamename\\%s\\gamever\\%s\\location\\0\\clientname\\%s\\validate\\%s\\final\\\\queryid\\1.1\\",
+			serverlist->enginename, ENGINE_VERSION, clientName, result); //validate us		
 	gspyi.dprint(DEVELOPER_MSG_GAMESPY, "Gamespy validate to the master: %s\n", data);
 
 	len = send ( serverlist->slsocket, data, strlen(data), 0 );

@@ -181,8 +181,14 @@ static void ApplyChanges( void *unused )
 	// Knightmare- refesh rate option
 	switch (s_refresh_box.curvalue)
 	{
-	case 9:
+	case 11:
 		Cvar_SetValue ("r_displayrefresh", 150);
+		break;
+	case 10:
+		Cvar_SetValue ("r_displayrefresh", 144);
+		break;
+	case 9:
+		Cvar_SetValue ("r_displayrefresh", 140);
 		break;
 	case 8:
 		Cvar_SetValue ("r_displayrefresh", 120);
@@ -303,6 +309,10 @@ int refresh_box_setval (void)
 	int refreshVar = (int)Cvar_VariableValue ("r_displayrefresh");
 
 	if (refreshVar == 150)
+		return 11;
+	else if (refreshVar == 144)
+		return 10;
+	else if (refreshVar == 140)
 		return 9;
 	else if (refreshVar == 120)
 		return 8;
@@ -445,6 +455,8 @@ void VID_MenuInit( void )
 		"[100Hz  ]",
 		"[110Hz  ]",
 		"[120Hz  ]",
+		"[140Hz  ]", /* FS: I have a 21" CRT that can do this for 1024x748 and lower */
+		"[144Hz  ]",
 		"[150Hz  ]",
 		0
 	};

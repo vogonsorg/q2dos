@@ -121,6 +121,7 @@ static cvar_t	*cl_master_server_port;
 static cvar_t	*cl_master_server_queries;
 static cvar_t	*cl_master_server_timeout;
 static cvar_t	*cl_master_server_retries;
+static cvar_t	*cl_master_server_optout;
 /*static */cvar_t	*s_gamespy_sounds;
 #endif
 
@@ -1769,6 +1770,8 @@ void CL_InitLocal (void)
 	cl_master_server_timeout->description = "Timeout (in milliseconds) to give up on pinging a server.";
 	cl_master_server_retries = Cvar_Get("cl_master_server_retries", "20", CVAR_ARCHIVE);
 	cl_master_server_retries->description = "Number of retries to attempt for receiving the server list.  Formula is 50ms + 10ms for each retry.";
+	cl_master_server_optout = Cvar_Get("cl_master_server_optout", "0", CVAR_ARCHIVE);
+	cl_master_server_optout->description = "Opt-out of sending your Quake 2 Username in GameSpy list requests.";
 	s_gamespy_sounds = Cvar_Get("s_gamespysounds", "0", CVAR_ARCHIVE);
 	s_gamespy_sounds->description = "Play the complete.wav and abort.wav from GameSpy3D if it exists in sounds/gamespy.";
 #endif
