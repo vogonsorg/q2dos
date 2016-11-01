@@ -353,9 +353,9 @@ void M_ReactToDamage (edict_t *targ, edict_t *attacker)
                 if (targ->enemy)
                         if (targ->enemy->client)
                                 targ->oldenemy = targ->enemy;
-                        targ->enemy = attacker;
-                        if (!(targ->monsterinfo.aiflags & AI_DUCKED))
-                                FoundTarget (targ);
+                targ->enemy = attacker;
+                if (!(targ->monsterinfo.aiflags & AI_DUCKED))
+                        FoundTarget (targ);
         }
         else
         // otherwise get mad at whoever they are mad at (help our buddy)
@@ -363,9 +363,9 @@ void M_ReactToDamage (edict_t *targ, edict_t *attacker)
                 if (targ->enemy)
                         if (targ->enemy->client)
                                 targ->oldenemy = targ->enemy;
-                        targ->enemy = attacker->enemy;
-                        if (!(targ->monsterinfo.aiflags & AI_DUCKED))
-                                FoundTarget (targ);
+                targ->enemy = attacker->enemy;
+                if (!(targ->monsterinfo.aiflags & AI_DUCKED))
+                        FoundTarget (targ);
         }
 }
 

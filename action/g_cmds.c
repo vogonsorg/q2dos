@@ -490,40 +490,40 @@ void Cmd_Use_f (edict_t *ent)
                 s = SNIPER_NAME;
         if (!Q_stricmp(s, "bfg10k"))
                 s = KNIFE_NAME;
-                 // zucc - let people pull up a knife ready to be thrown
-                 if (!Q_stricmp(s, "throwing combat knife"))
-                 {
-                         if ( ent->client->curr_weap != KNIFE_NUM )
-                         {
-                                 ent->client->resp.knife_mode = 1;
-                         }
-                         // switch to throwing mode if a knife is already out
-                         else
-                         {
-                                 Cmd_New_Weapon_f( ent );
-                         }
-                         s = KNIFE_NAME;
-                 }
-                 if (!Q_stricmp(s, "slashing combat knife"))
-                 {
-                         if ( ent->client->curr_weap != KNIFE_NUM )
-                         {
-                                 ent->client->resp.knife_mode = 0;
-                         }
-                         // switch to slashing mode if a knife is already out
-                         else
-                         {
-                                 Cmd_New_Weapon_f( ent );
-                         }
-                         s = KNIFE_NAME;
-                 }
+        // zucc - let people pull up a knife ready to be thrown
+        if (!Q_stricmp(s, "throwing combat knife"))
+        {
+                if ( ent->client->curr_weap != KNIFE_NUM )
+                {
+                        ent->client->resp.knife_mode = 1;
+                }
+                // switch to throwing mode if a knife is already out
+                else
+                {
+                        Cmd_New_Weapon_f( ent );
+                }
+                s = KNIFE_NAME;
+        }
+        if (!Q_stricmp(s, "slashing combat knife"))
+        {
+                if ( ent->client->curr_weap != KNIFE_NUM )
+                {
+                        ent->client->resp.knife_mode = 0;
+                }
+                // switch to slashing mode if a knife is already out
+                else
+                {
+                        Cmd_New_Weapon_f( ent );
+                }
+                s = KNIFE_NAME;
+        }
         if (!Q_stricmp(s, "grenade launcher"))
                 s = M4_NAME;
         if (!Q_stricmp(s, "grenades"))
                 s = GRENADE_NAME;
 
-                it = FindItem (s);
-        
+        it = FindItem (s);
+
 //FIREBLADE
         if (!it || (ent->solid == SOLID_NOT && ent->deadflag != DEAD_DEAD))
 //FIREBLADE

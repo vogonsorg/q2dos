@@ -826,21 +826,19 @@ void SV_Physics_Toss (edict_t *ent)
         if (!ent->inuse)
                 return;
 
-                // zucc added from action to cause blood splatters
-                if (trace.fraction < 1 && ent->movetype == MOVETYPE_BLOOD)
+        // zucc added from action to cause blood splatters
+        if (trace.fraction < 1 && ent->movetype == MOVETYPE_BLOOD)
+        {
+                if (!ent->splatted)
                 {
-                        if (!ent->splatted)
-                        {
-                                AddSplat (ent->owner, ent->s.origin, &trace);
-                                ent->splatted = true;
-                        }
-                        
-                        return;
+                        AddSplat (ent->owner, ent->s.origin, &trace);
+                        ent->splatted = true;
                 }
 
+                return;
+        }
 
-        
-                if (trace.fraction < 1)
+        if (trace.fraction < 1)
         {
                 if (ent->movetype == MOVETYPE_BOUNCE)    
                         backoff = 1.4;  // 1.5 is normal  -Zucc/FB

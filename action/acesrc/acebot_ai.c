@@ -595,7 +595,7 @@ qboolean ACEAI_CheckShot(edict_t *self)
 // Choose the best weapon for bot (simplified)
 ///////////////////////////////////////////////////////////////////////
 void ACEAI_ChooseWeapon(edict_t *self)
-{	
+{
 	float range;
 	vec3_t v;
 	
@@ -612,29 +612,29 @@ void ACEAI_ChooseWeapon(edict_t *self)
 	// Base selection on distance.
 	VectorSubtract (self->s.origin, self->enemy->s.origin, v);
 	range = VectorLength(v);
-		
-	// Longer range 
+
+	// Longer range
 	if(range > 1000)
 	{
 		if(ACEIT_ChangeSniperSpecialWeapon(self,FindItem(SNIPER_NAME)))
 			return;
-		
+
 		if(ACEIT_ChangeM3SpecialWeapon(self,FindItem(M3_NAME)))
 			return;
-		
+
 		if(ACEIT_ChangeM4SpecialWeapon(self,FindItem(M4_NAME)))
 			return;
-		
+
 		if(ACEIT_ChangeMP5SpecialWeapon(self,FindItem(MP5_NAME)))
-   		   return;
+			return;
 
 		if(ACEIT_ChangeMK23SpecialWeapon(self,FindItem(MK23_NAME)))
-   		   return;
+			return;
 	}
-	
-	// Longer range 
+
+	// Longer range
 	if(range > 700)
-	{		
+	{
 		if(ACEIT_ChangeM3SpecialWeapon(self,FindItem(M3_NAME)))
 			return;
 		
@@ -642,80 +642,77 @@ void ACEAI_ChooseWeapon(edict_t *self)
 			return;
 		
 		if(ACEIT_ChangeMP5SpecialWeapon(self,FindItem(MP5_NAME)))
-   		   return;
+			return;
 
-	if(ACEIT_ChangeSniperSpecialWeapon(self,FindItem(SNIPER_NAME)))
-		return;
+		if(ACEIT_ChangeSniperSpecialWeapon(self,FindItem(SNIPER_NAME)))
+			return;
 	
 		if(ACEIT_ChangeMK23SpecialWeapon(self,FindItem(MK23_NAME)))
-   		   return;
+			return;
 	}
-	
-	// Longer range 
+
+	// Longer range
 	if(range > 500)
-	{		
+	{
 		if(ACEIT_ChangeMP5SpecialWeapon(self,FindItem(MP5_NAME)))
-   		   return;
+			return;
 
 		if(ACEIT_ChangeM3SpecialWeapon(self,FindItem(M3_NAME)))
 			return;
-		
+
 		if(ACEIT_ChangeM4SpecialWeapon(self,FindItem(M4_NAME)))
 			return;
-		
-	if(ACEIT_ChangeSniperSpecialWeapon(self,FindItem(SNIPER_NAME)))
-		return;
-	
+
+		if(ACEIT_ChangeSniperSpecialWeapon(self,FindItem(SNIPER_NAME)))
+			return;
+
 		if(ACEIT_ChangeMK23SpecialWeapon(self,FindItem(MK23_NAME)))
-   		   return;
+			return;
 	}
-	
-	// Longer range 
+
+	// Longer range
 	if(range > 300)
-	{		
+	{
 		if(ACEIT_ChangeM4SpecialWeapon(self,FindItem(M4_NAME)))
 			return;
-		
+
 		if(ACEIT_ChangeMP5SpecialWeapon(self,FindItem(MP5_NAME)))
-   		   return;
+			return;
 
 		if(ACEIT_ChangeM3SpecialWeapon(self,FindItem(M3_NAME)))
 			return;
-		
-	if(ACEIT_ChangeSniperSpecialWeapon(self,FindItem(SNIPER_NAME)))
-		return;
-	
+
+		if(ACEIT_ChangeSniperSpecialWeapon(self,FindItem(SNIPER_NAME)))
+			return;
+
 		if(ACEIT_ChangeMK23SpecialWeapon(self,FindItem(MK23_NAME)))
-   		   return;
+			return;
 	}
-	
-	// Short range	   
+
+	// Short range
 	if(ACEIT_ChangeHCSpecialWeapon(self,FindItem(HC_NAME)))
 		return;
-	
+
 	if(ACEIT_ChangeSniperSpecialWeapon(self,FindItem(SNIPER_NAME)))
 		return;
-	
+
 	if(ACEIT_ChangeM3SpecialWeapon(self,FindItem(M3_NAME)))
 		return;
-	
+
 	if(ACEIT_ChangeM4SpecialWeapon(self,FindItem(M4_NAME)))
 		return;
-	
+
 	if(ACEIT_ChangeMP5SpecialWeapon(self,FindItem(MP5_NAME)))
-   	   return;
+		return;
 	
 	if(ACEIT_ChangeDualSpecialWeapon(self,FindItem(DUAL_NAME)))
-   	   return;
+		return;
 
 	if(ACEIT_ChangeMK23SpecialWeapon(self,FindItem(MK23_NAME)))
-   	   return;
-	
-	if(ACEIT_ChangeWeapon(self,FindItem(KNIFE_NAME)))
-   	   return;
-	
-	return;
+		return;
 
+	if(ACEIT_ChangeWeapon(self,FindItem(KNIFE_NAME)))
+		return;
 }
 
 void ACEAI_Cmd_Choose (edict_t *ent, char *s)
