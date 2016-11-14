@@ -74,20 +74,20 @@
  * in tables/ are changed, otherwise
  * strange things may happen.
  */
-#define SAVEGAMEVER "YQ2-1"
+#define SAVEGAMEVER "YQ2-2"
 
 /*
  * This macros are used to
  * prohibit loading of savegames
  * created on other systems or
  * architectures. This will
- * crash q2 in spectacular
+ * crash q2 in spectecular
  * ways
  */
-#if defined(__APPLE__)
- #define OS "MacOS X"
-#elif defined(__FreeBSD__)
+#if defined(__FreeBSD__)
  #define OS "FreeBSD"
+#elif defined(__APPLE__)
+ #define OS "MacOS X"
 #elif defined(__OpenBSD__)
  #define OS "OpenBSD"
 #elif defined(__linux__)
@@ -126,7 +126,7 @@ typedef struct
 /*
  * Connects a human readable
  * mmove_t string with the
- * corresponding pointer
+ * correspondig pointer
  * */
 typedef struct
 {
@@ -153,7 +153,7 @@ functionList_t functionList[] = {
 };
 
 /*
- * Prototypes for forward
+ * Prtotypes for forward
  * declaration for all game
  * mmove_t functions.
  */
@@ -202,71 +202,82 @@ field_t clientfields[] = {
 void
 InitGame(void)
 {
-	gi.dprintf(DEVELOPER_MSG_SAVE, "Game is starting up.\n");
-	gi.dprintf(DEVELOPER_MSG_SAVE, "Game is %s built on %s.\n", GAMEVERSION, __DATE__);
+	gi.dprintf(DEVELOPER_MSG_GAME, "Game is starting up.\n");
+	gi.dprintf(DEVELOPER_MSG_GAME, "Game is %s built on %s.\n", GAMEVERSION, __DATE__);
 
-	gun_x = gi.cvar("gun_x", "0", 0);
-	gun_y = gi.cvar("gun_y", "0", 0);
-	gun_z = gi.cvar("gun_z", "0", 0);
-	sv_rollspeed = gi.cvar("sv_rollspeed", "200", 0);
-	sv_rollangle = gi.cvar("sv_rollangle", "2", 0);
-	sv_maxvelocity = gi.cvar("sv_maxvelocity", "2000", 0);
-	sv_gravity = gi.cvar("sv_gravity", "800", 0);
+	gun_x = gi.cvar ("gun_x", "0", 0);
+	gun_y = gi.cvar ("gun_y", "0", 0);
+	gun_z = gi.cvar ("gun_z", "0", 0);
+	sv_rollspeed = gi.cvar ("sv_rollspeed", "200", 0);
+	sv_rollangle = gi.cvar ("sv_rollangle", "2", 0);
+	sv_maxvelocity = gi.cvar ("sv_maxvelocity", "2000", 0);
+	sv_gravity = gi.cvar ("sv_gravity", "800", 0);
+	sv_stopspeed = gi.cvar ("sv_stopspeed", "100", 0);
+	g_showlogic = gi.cvar ("g_showlogic", "0", 0);
+	huntercam = gi.cvar ("huntercam", "1", CVAR_SERVERINFO|CVAR_LATCH);
+	strong_mines = gi.cvar ("strong_mines", "0", 0);
+	randomrespawn = gi.cvar ("randomrespawn", "0", 0);
 
 	/* noset vars */
-	dedicated = gi.cvar("dedicated", "0", CVAR_NOSET);
+	dedicated = gi.cvar ("dedicated", "0", CVAR_NOSET);
 
 	/* latched vars */
-	sv_cheats = gi.cvar("cheats", "0", CVAR_SERVERINFO | CVAR_LATCH);
-	gi.cvar("gamename", GAMEVERSION, CVAR_SERVERINFO | CVAR_LATCH);
-	gi.cvar("gamedate", __DATE__, CVAR_SERVERINFO | CVAR_LATCH);
-	maxclients = gi.cvar("maxclients", "4", CVAR_SERVERINFO | CVAR_LATCH);
-	maxspectators = gi.cvar("maxspectators", "4", CVAR_SERVERINFO);
-	deathmatch = gi.cvar("deathmatch", "0", CVAR_LATCH);
-	coop = gi.cvar("coop", "0", CVAR_LATCH);
-	coop_item_respawn = gi.cvar("coop_item_respawn", "1", CVAR_SERVERINFO); // FS: Added
-	skill = gi.cvar("skill", "1", CVAR_LATCH);
-	maxentities = gi.cvar("maxentities", "1024", CVAR_LATCH);
+	sv_cheats = gi.cvar ("cheats", "0", CVAR_SERVERINFO|CVAR_LATCH);
+	gi.cvar ("gamename", GAMEVERSION , CVAR_SERVERINFO | CVAR_LATCH);
+	gi.cvar ("gamedate", __DATE__ , CVAR_SERVERINFO | CVAR_LATCH);
+	maxclients = gi.cvar ("maxclients", "4", CVAR_SERVERINFO | CVAR_LATCH);
+	maxspectators = gi.cvar ("maxspectators", "4", CVAR_SERVERINFO);
+	deathmatch = gi.cvar ("deathmatch", "0", CVAR_LATCH);
+	coop = gi.cvar ("coop", "0", CVAR_LATCH);
+	skill = gi.cvar ("skill", "1", CVAR_LATCH);
+	maxentities = gi.cvar ("maxentities", "1024", CVAR_LATCH);
+	gamerules = gi.cvar ("gamerules", "0", CVAR_LATCH);			//PGM
 
 	/* change anytime vars */
-	dmflags = gi.cvar("dmflags", "0", CVAR_SERVERINFO);
-	fraglimit = gi.cvar("fraglimit", "0", CVAR_SERVERINFO);
-	timelimit = gi.cvar("timelimit", "0", CVAR_SERVERINFO);
-	password = gi.cvar("password", "", CVAR_USERINFO);
-	spectator_password = gi.cvar("spectator_password", "", CVAR_USERINFO);
-	needpass = gi.cvar("needpass", "0", CVAR_SERVERINFO);
-	filterban = gi.cvar("filterban", "1", 0);
-	g_select_empty = gi.cvar("g_select_empty", "0", CVAR_ARCHIVE);
-	run_pitch = gi.cvar("run_pitch", "0.002", 0);
-	run_roll = gi.cvar("run_roll", "0.005", 0);
-	bob_up = gi.cvar("bob_up", "0.005", 0);
-	bob_pitch = gi.cvar("bob_pitch", "0.002", 0);
-	bob_roll = gi.cvar("bob_roll", "0.002", 0);
+	dmflags = gi.cvar ("dmflags", "0", CVAR_SERVERINFO);
+	fraglimit = gi.cvar ("fraglimit", "0", CVAR_SERVERINFO);
+	timelimit = gi.cvar ("timelimit", "0", CVAR_SERVERINFO);
+	password = gi.cvar ("password", "", CVAR_USERINFO);
+	spectator_password = gi.cvar ("spectator_password", "", CVAR_USERINFO);
+	filterban = gi.cvar ("filterban", "1", 0);
+
+	g_select_empty = gi.cvar ("g_select_empty", "0", CVAR_ARCHIVE);
+
+	run_pitch = gi.cvar ("run_pitch", "0.002", 0);
+	run_roll = gi.cvar ("run_roll", "0.005", 0);
+	bob_up  = gi.cvar ("bob_up", "0.005", 0);
+	bob_pitch = gi.cvar ("bob_pitch", "0.002", 0);
+	bob_roll = gi.cvar ("bob_roll", "0.002", 0);
 
 	/* flood control */
-	flood_msgs = gi.cvar("flood_msgs", "4", 0);
-	flood_persecond = gi.cvar("flood_persecond", "4", 0);
-	flood_waitdelay = gi.cvar("flood_waitdelay", "10", 0);
+	flood_msgs = gi.cvar ("flood_msgs", "4", 0);
+	flood_persecond = gi.cvar ("flood_persecond", "4", 0);
+	flood_waitdelay = gi.cvar ("flood_waitdelay", "10", 0);
 
 	/* dm map list */
-	sv_maplist = gi.cvar("sv_maplist", "", 0);
+	sv_maplist = gi.cvar ("sv_maplist", "", 0);
 
 	/* items */
-	InitItems();
+	InitItems ();
 
 	game.helpmessage1[0] = 0;
 	game.helpmessage2[0] = 0;
 
 	/* initialize all entities for this game */
 	game.maxentities = maxentities->value;
-	g_edicts = gi.TagMalloc(game.maxentities * sizeof(g_edicts[0]), TAG_GAME);
+	g_edicts =  gi.TagMalloc (game.maxentities * sizeof(g_edicts[0]), TAG_GAME);
 	globals.edicts = g_edicts;
 	globals.max_edicts = game.maxentities;
 
 	/* initialize all clients for this game */
 	game.maxclients = maxclients->value;
-	game.clients = gi.TagMalloc(game.maxclients * sizeof(game.clients[0]), TAG_GAME);
-	globals.num_edicts = game.maxclients + 1;
+	game.clients = gi.TagMalloc (game.maxclients * sizeof(game.clients[0]), TAG_GAME);
+	globals.num_edicts = game.maxclients+1;
+
+	if (gamerules)
+	{
+		InitGameRules();
+	}
 }
 
 /* ========================================================= */
@@ -460,10 +471,10 @@ WriteField1(FILE *f, field_t *field, byte *base)
 				{
 					gi.error ("WriteField1: function not in list, can't save game");
 				}
-
+				
 				len = strlen(func->funcStr)+1;
 			}
-
+			
 			*(int *)p = len;
 			break;
 		case F_MMOVE:
@@ -475,7 +486,7 @@ WriteField1(FILE *f, field_t *field, byte *base)
 			else
 			{
 				mmove = GetMmoveByAddress (*(mmove_t **)p);
-
+				
 				if (!mmove)
 				{
 					gi.error ("WriteField1: mmove not in list, can't save game");
@@ -483,7 +494,7 @@ WriteField1(FILE *f, field_t *field, byte *base)
 
 				len = strlen(mmove->mmoveStr)+1;
 			}
-
+			
 			*(int *)p = len;
 			break;
 		default:
@@ -518,26 +529,27 @@ WriteField2(FILE *f, field_t *field, byte *base)
 
 			break;
 		case F_FUNCTION:
-
+			
 			if (*(byte **)p)
 			{
 				func = GetFunctionByAddress (*(byte **)p);
-
+				
 				if (!func)
 				{
 					gi.error ("WriteField2: function not in list, can't save game");
 				}
-
+				
 				len = strlen(func->funcStr)+1;
 				fwrite (func->funcStr, len, 1, f);
 			}
 
 			break;
 		case F_MMOVE:
-
+			
 			if (*(byte **)p)
 			{
 				mmove = GetMmoveByAddress (*(mmove_t **)p);
+
 				if (!mmove)
 				{
 					gi.error ("WriteField2: mmove not in list, can't save game");
@@ -679,7 +691,7 @@ ReadField(FILE *f, field_t *field, byte *base)
 				}
 
 				fread (funcStr, len, 1, f);
-
+				
 				if ( !(*(mmove_t **)p = FindMmoveByName (funcStr)) )
 				{
 					gi.error ("ReadField: mmove %s not found in table, can't load game", funcStr);
@@ -757,7 +769,7 @@ WriteGame(const char *filename, qboolean autosave)
 	int i;
 	char str_ver[32];
 	char str_game[32];
-	char str_os[32];
+    char str_os[32];
 	char str_arch[32];
 
 	if (!autosave)
@@ -778,10 +790,10 @@ WriteGame(const char *filename, qboolean autosave)
 	memset(str_os, 0, sizeof(str_os));
 	memset(str_arch, 0, sizeof(str_arch));
 
-	strncpy(str_ver, SAVEGAMEVER, sizeof(str_ver) - 1);
-	strncpy(str_game, GAMEVERSION, sizeof(str_game) - 1);
-	strncpy(str_os, OS, sizeof(str_os) - 1);
-	strncpy(str_arch, ARCH, sizeof(str_arch) - 1);
+	strncpy(str_ver, SAVEGAMEVER, sizeof(str_ver));
+	strncpy(str_game, GAMEVERSION, sizeof(str_game));
+	strncpy(str_os, OS, sizeof(str_os));
+    strncpy(str_arch, ARCH, sizeof(str_arch));
 
 	fwrite(str_ver, sizeof(str_ver), 1, f);
 	fwrite(str_game, sizeof(str_game), 1, f);
@@ -900,7 +912,7 @@ WriteEdict(FILE *f, edict_t *ent)
 }
 
 /*
- * Helper function to write the
+ * Helper fcuntion to write the
  * level local data into a file.
  * Called by WriteLevel.
  */
@@ -1016,10 +1028,10 @@ ReadLevelLocals(FILE *f)
 
 /*
  * Reads a level back into the memory.
- * SpawnEntities were already called
+ * SpawnEntities were allready called
  * in the same way when the level was
  * saved. All world links were cleared
- * before this function was called. When
+ * befor this function was called. When
  * this function is called, no clients
  * are connected to the server.
  */

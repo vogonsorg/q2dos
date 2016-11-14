@@ -1,86 +1,66 @@
-/*
-Copyright (C) 1997-2001 Id Software, Inc.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
-
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-*/
 
 #include "g_local.h"
 
-#define MAX_IPFILTERS 1024
 
-void
-Svcmd_Test_f(void)
+void	Svcmd_Test_f (void)
 {
-	gi.cprintf(NULL, PRINT_HIGH, "Svcmd_Test_f()\n");
+	gi.cprintf (NULL, PRINT_HIGH, "Svcmd_Test_f()\n");
 }
 
 /*
- * ==============================================================================
- *
- * PACKET FILTERING
- *
- *
- * You can add or remove addresses from the filter list with:
- *
- * addip <ip>
- * removeip <ip>
- *
- * The ip address is specified in dot format, and any unspecified
- * digits will match any value, so you can specify an entire class
- * C network with "addip 192.246.40".
- *
- * Removeip will only remove an address specified exactly the same
- * way. You cannot addip a subnet, then removeip a single host.
- *
- * listip
- *  Prints the current list of filters.
- *
- * writeip
- *  Dumps "addip <ip>" commands to listip.cfg so it can be execed
- *  at a later date. The filter lists are not saved and restored
- *  by default, because I belive it would cause too much confusion.
- *
- * filterban <0 or 1>
- *  If 1 (the default), then ip addresses matching the current list
- *  will be prohibited from entering the game.This is the default
- *  setting.
- *  If 0, then only addresses matching the list will be allowed.
- *  This lets you easily set up a private game, or a game that only
- *  allows players from your local network.
- *
- * ==============================================================================
- */
+==============================================================================
+
+PACKET FILTERING
+ 
+
+You can add or remove addresses from the filter list with:
+
+addip <ip>
+removeip <ip>
+
+The ip address is specified in dot format, and any unspecified digits will match any value, so you can specify an entire class C network with "addip 192.246.40".
+
+Removeip will only remove an address specified exactly the same way.  You cannot addip a subnet, then removeip a single host.
+
+listip
+Prints the current list of filters.
+
+writeip
+Dumps "addip <ip>" commands to listip.cfg so it can be execed at a later date.  The filter lists are not saved and restored by default, because I beleive it would cause too much confusion.
+
+filterban <0 or 1>
+
+If 1 (the default), then ip addresses matching the current list will be prohibited from entering the game.  This is the default setting.
+
+If 0, then only addresses matching the list will be allowed.  This lets you easily set up a private game, or a game that only allows players from your local network.
+
+
+==============================================================================
+*/
 
 typedef struct
 {
-	unsigned mask;
-	unsigned compare;
+	unsigned	mask;
+	unsigned	compare;
 } ipfilter_t;
 
-ipfilter_t ipfilters[MAX_IPFILTERS];
-int numipfilters;
+#define	MAX_IPFILTERS	1024
 
+ipfilter_t	ipfilters[MAX_IPFILTERS];
+int			numipfilters;
+
+/*
+=================
+StringToFilter
+=================
+*/
 qboolean
 StringToFilter(char *s, ipfilter_t *f)
 {
-	char num[128];
-	int i, j;
-	byte b[4];
-	byte m[4];
+	char	num[128];
+	int		i, j;
+	byte	b[4];
+	byte	m[4];
 
 	if (!s || !f)
 	{
@@ -109,7 +89,7 @@ StringToFilter(char *s, ipfilter_t *f)
 		}
 
 		num[j] = 0;
-		b[i] = (int)strtol(num, (char **)NULL, 10);
+		b[i] = atoi(num);
 
 		if (b[i] != 0)
 		{
@@ -260,8 +240,7 @@ SVCmd_ListIP_f(void)
 	for (i = 0; i < numipfilters; i++)
 	{
 		*(unsigned *)b = ipfilters[i].compare;
-		gi.cprintf(NULL, PRINT_HIGH, "%3i.%3i.%3i.%3i\n", b[0],
-				b[1], b[2], b[3]);
+		gi.cprintf(NULL, PRINT_HIGH, "%3i.%3i.%3i.%3i\n", b[0], b[1], b[2], b[3]);
 	}
 }
 
@@ -308,8 +287,8 @@ SVCmd_WriteIP_f(void)
 
 /*
  * ServerCommand will be called when an "sv" command is issued.
- * The game can issue gi.argc() / gi.argv() commands to get the rest
- * of the parameters
+ * The game can issue gi.argc() / gi.argv() commands to get the
+ * rest of the parameters
  */
 void
 ServerCommand(void)

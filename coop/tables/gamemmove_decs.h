@@ -1,24 +1,4 @@
 /*
- * Copyright (C) 1997-2001 Id Software, Inc.
- * Copyright (C) 2011 Knightmare
- * Copyright (C) 2011 Yamagi Burmeister
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
- *
  * =======================================================================
  *
  * Prototypes for every mmove_t in the game.so.
@@ -26,6 +6,43 @@
  * =======================================================================
  */
 
+extern mmove_t widow2_move_really_dead ;
+extern mmove_t widow2_move_dead ;
+extern mmove_t widow2_move_death ;
+extern mmove_t widow2_move_pain ;
+extern mmove_t widow2_move_tongs ;
+extern mmove_t widow2_move_spawn ;
+extern mmove_t widow2_move_attack_disrupt ;
+extern mmove_t widow2_move_attack_post_beam ;
+extern mmove_t widow2_move_attack_beam ;
+extern mmove_t widow2_move_attack_pre_beam ;
+extern mmove_t widow2_move_run ;
+extern mmove_t widow2_move_walk ;
+extern mmove_t widow2_move_stand ;
+extern mmove_t widow_move_attack_kick ;
+extern mmove_t widow_move_death ;
+extern mmove_t widow_move_pain_light ;
+extern mmove_t widow_move_pain_heavy ;
+extern mmove_t widow_move_spawn ;
+extern mmove_t widow_move_attack_pre_rail ;
+extern mmove_t widow_move_attack_rail_r ;
+extern mmove_t widow_move_attack_rail_l ;
+extern mmove_t widow_move_attack_rail ;
+extern mmove_t widow_move_attack_pre_blaster ;
+extern mmove_t widow_move_run_attack ;
+extern mmove_t widow_move_run ;
+extern mmove_t widow_move_walk ;
+extern mmove_t widow_move_stand ;
+extern mmove_t widow_move_attack_blaster ;
+extern mmove_t widow_move_attack_post_blaster_l ;
+extern mmove_t widow_move_attack_post_blaster_r ;
+extern mmove_t widow_move_attack_post_blaster ;
+extern mmove_t turret_move_run ;
+extern mmove_t turret_move_seek ;
+extern mmove_t turret_move_ready_gun ;
+extern mmove_t turret_move_stand ;
+extern mmove_t turret_move_fire_blind ;
+extern mmove_t turret_move_fire ;
 extern mmove_t tank_move_death ;
 extern mmove_t tank_move_attack_chain ;
 extern mmove_t tank_move_attack_post_rocket ;
@@ -60,6 +77,24 @@ extern mmove_t supertank_move_turn_right ;
 extern mmove_t supertank_move_forward ;
 extern mmove_t supertank_move_run ;
 extern mmove_t supertank_move_stand ;
+extern mmove_t stalker_move_death ;
+extern mmove_t stalker_move_jump_down ;
+extern mmove_t stalker_move_jump_up ;
+extern mmove_t stalker_move_dodge_run ;
+extern mmove_t stalker_move_jump_straightup ;
+extern mmove_t stalker_move_swing_r ;
+extern mmove_t stalker_move_swing_l ;
+extern mmove_t stalker_move_shoot ;
+extern mmove_t stalker_move_pain ;
+extern mmove_t stalker_move_false_death_start ;
+extern mmove_t stalker_move_false_death ;
+extern mmove_t stalker_move_false_death_end ;
+extern mmove_t stalker_move_walk ;
+extern mmove_t stalker_move_run ;
+extern mmove_t stalker_move_stand ;
+extern mmove_t stalker_move_idle2 ;
+extern mmove_t stalker_move_idle ;
+extern mmove_t soldier_move_blind ;
 extern mmove_t soldier_move_death6 ;
 extern mmove_t soldier_move_death5 ;
 extern mmove_t soldier_move_death4 ;
@@ -83,6 +118,8 @@ extern mmove_t soldier_move_walk1 ;
 extern mmove_t soldier_move_stand3 ;
 extern mmove_t soldier_move_stand1 ;
 extern mmove_t parasite_move_death ;
+extern mmove_t parasite_move_jump_down ;
+extern mmove_t parasite_move_jump_up ;
 extern mmove_t parasite_move_break ;
 extern mmove_t parasite_move_drain ;
 extern mmove_t parasite_move_pain1 ;
@@ -108,6 +145,7 @@ extern mmove_t mutant_move_start_walk ;
 extern mmove_t mutant_move_walk ;
 extern mmove_t mutant_move_idle ;
 extern mmove_t mutant_move_stand ;
+extern mmove_t medic_move_callReinforcements;
 extern mmove_t medic_move_attackCable ;
 extern mmove_t medic_move_attackBlaster ;
 extern mmove_t medic_move_attackHyperBlaster ;
@@ -136,6 +174,8 @@ extern mmove_t insane_move_downtoup ;
 extern mmove_t insane_move_uptodown ;
 extern mmove_t insane_move_stand_insane ;
 extern mmove_t insane_move_stand_normal ;
+extern mmove_t infantry_move_jump2 ;
+extern mmove_t infantry_move_jump ;
 extern mmove_t infantry_move_attack2 ;
 extern mmove_t infantry_move_attack1 ;
 extern mmove_t infantry_move_duck ;
@@ -148,22 +188,21 @@ extern mmove_t infantry_move_run ;
 extern mmove_t infantry_move_walk ;
 extern mmove_t infantry_move_fidget ;
 extern mmove_t infantry_move_stand ;
+extern mmove_t hover_move_start_attack2;
+extern mmove_t hover_move_attack2;
+extern mmove_t hover_move_end_attack2;
 extern mmove_t hover_move_end_attack ;
 extern mmove_t hover_move_attack1 ;
 extern mmove_t hover_move_start_attack ;
-extern mmove_t hover_move_backward ;
 extern mmove_t hover_move_death1 ;
 extern mmove_t hover_move_run ;
 extern mmove_t hover_move_walk ;
-extern mmove_t hover_move_forward ;
-extern mmove_t hover_move_land ;
 extern mmove_t hover_move_pain1 ;
 extern mmove_t hover_move_pain2 ;
 extern mmove_t hover_move_pain3 ;
-extern mmove_t hover_move_takeoff ;
-extern mmove_t hover_move_stop2 ;
-extern mmove_t hover_move_stop1 ;
 extern mmove_t hover_move_stand ;
+extern mmove_t gunner_move_jump2 ;
+extern mmove_t gunner_move_jump ;
 extern mmove_t gunner_move_attack_grenade ;
 extern mmove_t gunner_move_endfire_chain ;
 extern mmove_t gunner_move_fire_chain ;
@@ -189,6 +228,7 @@ extern mmove_t gladiator_move_stand ;
 extern mmove_t flyer_move_loop_melee ;
 extern mmove_t flyer_move_end_melee ;
 extern mmove_t flyer_move_start_melee ;
+extern mmove_t flyer_move_attack3 ;
 extern mmove_t flyer_move_attack2 ;
 extern mmove_t flyer_move_bankleft ;
 extern mmove_t flyer_move_bankright ;
@@ -200,6 +240,7 @@ extern mmove_t flyer_move_rollleft ;
 extern mmove_t flyer_move_rollright ;
 extern mmove_t flyer_move_stop ;
 extern mmove_t flyer_move_start ;
+extern mmove_t flyer_move_kamikaze ;
 extern mmove_t flyer_move_run ;
 extern mmove_t flyer_move_walk ;
 extern mmove_t flyer_move_stand ;
@@ -241,6 +282,21 @@ extern mmove_t chick_move_run ;
 extern mmove_t chick_move_start_run ;
 extern mmove_t chick_move_stand ;
 extern mmove_t chick_move_fidget ;
+extern mmove_t carrier_move_death ;
+extern mmove_t carrier_move_pain_light ;
+extern mmove_t carrier_move_pain_heavy ;
+extern mmove_t carrier_move_spawn ;
+extern mmove_t carrier_move_attack_rail ;
+extern mmove_t carrier_move_attack_rocket ;
+extern mmove_t carrier_move_attack_post_gren ;
+extern mmove_t carrier_move_attack_gren ;
+extern mmove_t carrier_move_attack_pre_gren ;
+extern mmove_t carrier_move_attack_post_mg ;
+extern mmove_t carrier_move_attack_mg ;
+extern mmove_t carrier_move_attack_pre_mg ;
+extern mmove_t carrier_move_run ;
+extern mmove_t carrier_move_walk ;
+extern mmove_t carrier_move_stand ;
 extern mmove_t brain_move_run ;
 extern mmove_t brain_move_attack2 ;
 extern mmove_t brain_move_attack1 ;

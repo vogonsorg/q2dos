@@ -1,22 +1,3 @@
-/*
-Copyright (C) 1997-2001 Id Software, Inc.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
-
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-*/
 
 #include "g_local.h"
 
@@ -34,7 +15,6 @@ edict_t *g_edicts;
 
 cvar_t *deathmatch;
 cvar_t *coop;
-cvar_t	*coop_item_respawn; // FS: Added
 cvar_t *dmflags;
 cvar_t *skill;
 cvar_t *fraglimit;
@@ -46,57 +26,59 @@ cvar_t *maxclients;
 cvar_t *maxspectators;
 cvar_t *maxentities;
 cvar_t *g_select_empty;
-#ifndef GAME_HARD_LINKED
-cvar_t  *dedicated;
-#else
-extern cvar_t *dedicated;
-#endif
-cvar_t	*filterban;
+cvar_t *dedicated;
 
-cvar_t	*sv_maxvelocity;
-cvar_t	*sv_gravity;
+cvar_t *filterban;
 
-cvar_t	*sv_rollspeed;
-cvar_t	*sv_rollangle;
-cvar_t	*gun_x;
-cvar_t	*gun_y;
-cvar_t	*gun_z;
+cvar_t *sv_maxvelocity;
+cvar_t *sv_gravity;
 
-cvar_t	*run_pitch;
-cvar_t	*run_roll;
-cvar_t	*bob_up;
-cvar_t	*bob_pitch;
-cvar_t	*bob_roll;
+cvar_t *sv_rollspeed;
+cvar_t *sv_rollangle;
+cvar_t *gun_x;
+cvar_t *gun_y;
+cvar_t *gun_z;
 
-cvar_t	*sv_cheats;
+cvar_t *run_pitch;
+cvar_t *run_roll;
+cvar_t *bob_up;
+cvar_t *bob_pitch;
+cvar_t *bob_roll;
 
-cvar_t	*flood_msgs;
-cvar_t	*flood_persecond;
-cvar_t	*flood_waitdelay;
+cvar_t *sv_cheats;
 
-cvar_t	*sv_maplist;
+cvar_t *flood_msgs;
+cvar_t *flood_persecond;
+cvar_t *flood_waitdelay;
 
-cvar_t *gib_on;
-void SpawnEntities (char *mapname, char *entities, char *spawnpoint);
-void ClientThink (edict_t *ent, usercmd_t *cmd);
-qboolean ClientConnect (edict_t *ent, char *userinfo);
-void ClientUserinfoChanged (edict_t *ent, char *userinfo);
-void ClientDisconnect (edict_t *ent);
-void ClientBegin (edict_t *ent);
-void ClientCommand (edict_t *ent);
-void RunEntity (edict_t *ent);
-void WriteGame (char *filename, qboolean autosave);
-void ReadGame (char *filename);
-void WriteLevel (char *filename);
-void ReadLevel (char *filename);
-void InitGame (void);
-void G_RunFrame (void);
+cvar_t *sv_maplist;
+cvar_t *sv_stopspeed;
 
+cvar_t *g_showlogic;
+cvar_t *gamerules;
+cvar_t *huntercam;
+cvar_t *strong_mines;
+cvar_t *randomrespawn;
 
-//===================================================================
+void SpawnEntities(char *mapname, char *entities, char *spawnpoint);
+void ClientThink(edict_t *ent, usercmd_t *cmd);
+qboolean ClientConnect(edict_t *ent, char *userinfo);
+void ClientUserinfoChanged(edict_t *ent, char *userinfo);
+void ClientDisconnect(edict_t *ent);
+void ClientBegin(edict_t *ent);
+void ClientCommand(edict_t *ent);
+void RunEntity(edict_t *ent);
+void WriteGame(char *filename, qboolean autosave);
+void ReadGame(char *filename);
+void WriteLevel(char *filename);
+void ReadLevel(char *filename);
+void InitGame(void);
+void G_RunFrame(void);
 
+/* =================================================================== */
 
-void ShutdownGame (void)
+void
+ShutdownGame(void)
 {
 	gi.dprintf(DEVELOPER_MSG_GAME, "==== ShutdownGame ====\n");
 
@@ -183,12 +165,12 @@ ClientEndServerFrames
 */
 void ClientEndServerFrames (void)
 {
-	int i;
-	edict_t *ent;
+	int		i;
+	edict_t	*ent;
 
-	/* calc the player views now that all
-	   pushing  and damage has been added */
-	for (i = 0; i < maxclients->value; i++)
+	// calc the player views now that all pushing
+	// and damage has been added
+	for (i=0 ; i<maxclients->value ; i++)
 	{
 		ent = g_edicts + 1 + i;
 
@@ -197,7 +179,7 @@ void ClientEndServerFrames (void)
 			continue;
 		}
 
-		ClientEndServerFrame(ent);
+		ClientEndServerFrame (ent);
 	}
 }
 
@@ -217,7 +199,7 @@ edict_t *CreateTargetChangeLevel(char *map)
 		return NULL;
 	}
 
-	ent = G_Spawn();
+	ent = G_Spawn ();
 	ent->classname = "target_changelevel";
 	Com_sprintf(level.nextmap, sizeof(level.nextmap), "%s", map);
 	ent->map = level.nextmap;
@@ -293,13 +275,15 @@ void EndDMLevel (void)
 	{
 		BeginIntermission(CreateTargetChangeLevel(level.nextmap));
 	}
-	else    /* search for a changelevel */
+	else /* search for a changelevel */
 	{
 		ent = G_Find(NULL, FOFS(classname), "target_changelevel");
 
 		if (!ent)
-		{   /* the map designer didn't include a changelevel,
-			   so create a fake ent that goes back to the same level */
+		{
+			/* the map designer didn't include a changelevel,
+			   so create a fake ent that goes back to the same
+			   level */
 			BeginIntermission(CreateTargetChangeLevel(level.mapname));
 			return;
 		}
@@ -308,13 +292,8 @@ void EndDMLevel (void)
 	}
 }
 
-
-/*
-=================
-CheckNeedPass
-=================
-*/
-void CheckNeedPass (void)
+void
+CheckNeedPass(void)
 {
 	int need;
 
@@ -341,12 +320,8 @@ void CheckNeedPass (void)
 	}
 }
 
-/*
-=================
-CheckDMRules
-=================
-*/
-void CheckDMRules (void)
+void
+CheckDMRules(void)
 {
 	int i;
 	gclient_t *cl;
@@ -359,6 +334,14 @@ void CheckDMRules (void)
 	if (!deathmatch->value)
 	{
 		return;
+	}
+
+	if (gamerules && gamerules->value && DMGame.CheckDMRules)
+	{
+		if (DMGame.CheckDMRules())
+		{
+			return;
+		}
 	}
 
 	if (timelimit->value)
@@ -392,13 +375,8 @@ void CheckDMRules (void)
 	}
 }
 
-
-/*
-=============
-ExitLevel
-=============
-*/
-void ExitLevel (void)
+void
+ExitLevel(void)
 {
 	int i;
 	edict_t *ent;
@@ -432,13 +410,10 @@ void ExitLevel (void)
 }
 
 /*
-================
-G_RunFrame
-
-Advances the world by 0.1 seconds
-================
-*/
-void G_RunFrame (void)
+ * Advances the world by 0.1 seconds
+ */
+void
+G_RunFrame(void)
 {
 	int i;
 	edict_t *ent;
@@ -456,9 +431,8 @@ void G_RunFrame (void)
 		return;
 	}
 
-	/* treat each object in turn
-	   even the world gets a chance
-	   to think */
+	/* treat each object in turn  even the
+	   world gets a chance to think */
 	ent = &g_edicts[0];
 
 	for (i = 0; i < globals.num_edicts; i++, ent++)

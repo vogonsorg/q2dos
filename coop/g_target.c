@@ -1,38 +1,25 @@
-/*
-Copyright (C) 1997-2001 Id Software, Inc.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
-
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-*/
 #include "g_local.h"
+
+#define LASER_ON 0x0001
+#define LASER_RED 0x0002
+#define LASER_GREEN 0x0004
+#define LASER_BLUE 0x0008
+#define LASER_YELLOW 0x0010
+#define LASER_ORANGE 0x0020
+#define LASER_FAT 0x0040
+#define LASER_STOPWINDOW 0x0080
+
+void ED_CallSpawn(edict_t *ent);
 
 /*
  * QUAKED target_temp_entity (1 0 0) (-8 -8 -8) (8 8 8)
- * Fire an origin based temp entity event to the clients.
  *
- *  "style"	type byte
+ * Fire an origin based temp entity event to the clients.
+ * "style"		type byte
  */
 void
-Use_Target_Tent(edict_t *ent, edict_t *other /* unused */, edict_t *activator /* unused */)
+Use_Target_Tent(edict_t *ent, edict_t *other, edict_t *activator)
 {
-	if (!ent)
-	{
-		return;
-	}
-
 	gi.WriteByte(svc_temp_entity);
 	gi.WriteByte(ent->style);
 	gi.WritePosition(ent->s.origin);
@@ -42,31 +29,22 @@ Use_Target_Tent(edict_t *ent, edict_t *other /* unused */, edict_t *activator /*
 void
 SP_target_temp_entity(edict_t *ent)
 {
-	if (!ent)
-	{
-		return;
-	}
-
 	ent->use = Use_Target_Tent;
 }
-
-/* ========================================================== */
 
 /*
  * QUAKED target_speaker (1 0 0) (-8 -8 -8) (8 8 8) looped-on looped-off reliable
  *
- * "noise" wav file to play
- *
+ * "noise"		wav file to play
  * "attenuation"
- *   -1 = none, send to whole level
- *    1 = normal fighting sounds
- *    2 = idle sound level
- *    3 = ambient sound level
- *
+ * -1 = none, send to whole level
+ * 1 = normal fighting sounds
+ * 2 = idle sound level
+ * 3 = ambient sound level
  * "volume"	0.0 to 1.0
  *
- * Normal sounds play each time the target is used.
- * The reliable flag can be set for crucial voiceovers.
+ * Normal sounds play each time the target is used. The reliable flag can be set for
+ * crucial voiceovers.
  *
  * Looped sounds are always atten 3 / vol 1, and the use function toggles it on/off.
  * Multiple identical looping sounds will just increase volume without any speed cost.
@@ -83,7 +61,7 @@ Use_Target_Speaker(edict_t *ent, edict_t *other /* unused */, edict_t *activator
 
 	if (ent->spawnflags & 3)
 	{
-		/* looping sound toggles */
+	 	/* looping sound toggles */
 		if (ent->s.sound)
 		{
 			ent->s.sound = 0; /* turn it off */
@@ -95,7 +73,7 @@ Use_Target_Speaker(edict_t *ent, edict_t *other /* unused */, edict_t *activator
 	}
 	else
 	{
-		/* normal sound */
+	 	/* normal sound */
 		if (ent->spawnflags & 4)
 		{
 			chan = CHAN_VOICE | CHAN_RELIABLE;
@@ -106,7 +84,7 @@ Use_Target_Speaker(edict_t *ent, edict_t *other /* unused */, edict_t *activator
 		}
 
 		/* use a positioned_sound, because this entity won't
-		   normally be sent to any clients because it is invisible */
+		   normally be  sent to any clients because it is invisible */
 		gi.positioned_sound(ent->s.origin, ent, chan, ent->noise_index,
 				ent->volume, ent->attenuation, 0);
 	}
@@ -124,8 +102,7 @@ SP_target_speaker(edict_t *ent)
 
 	if (!st.noise)
 	{
-		gi.dprintf(DEVELOPER_MSG_GAME, "target_speaker with no noise set at %s\n",
-				vtos(ent->s.origin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "target_speaker with no noise set at %s\n", vtos(ent->s.origin));
 		return;
 	}
 
@@ -191,6 +168,7 @@ Use_Target_Help(edict_t *ent, edict_t *other /* unused */, edict_t *activator /*
 
 /*
  * QUAKED target_help (1 0 1) (-16 -16 -24) (16 16 24) help1
+ *
  * When fired, the "message" key becomes the current personal computer string,
  * and the message light will be set on all clients status bars.
  */
@@ -204,15 +182,14 @@ SP_target_help(edict_t *ent)
 
 	if (deathmatch->value)
 	{
-		/* auto-remove for deathmatch */
+	 	/* auto-remove for deathmatch */
 		G_FreeEdict(ent);
 		return;
 	}
 
 	if (!ent->message)
 	{
-		gi.dprintf(DEVELOPER_MSG_GAME, "%s with no message at %s\n", ent->classname,
-				vtos(ent->s.origin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s with no message at %s\n", ent->classname, vtos(ent->s.origin));
 		G_FreeEdict(ent);
 		return;
 	}
@@ -224,10 +201,12 @@ SP_target_help(edict_t *ent)
 
 /*
  * QUAKED target_secret (1 0 1) (-8 -8 -8) (8 8 8)
- * Counts a secret found. These are single use targets.
+ *
+ * Counts a secret found.
+ * These are single use targets.
  */
 void
-use_target_secret(edict_t *ent, edict_t *other /* unused */, edict_t *activator /* acticator */)
+use_target_secret(edict_t *ent, edict_t *other /* unused */, edict_t *activator /* unused */)
 {
 	if (!ent)
 	{
@@ -252,7 +231,7 @@ SP_target_secret(edict_t *ent)
 
 	if (deathmatch->value)
 	{
-		/* auto-remove for deathmatch */
+	 	/* auto-remove for deathmatch */
 		G_FreeEdict(ent);
 		return;
 	}
@@ -268,7 +247,7 @@ SP_target_secret(edict_t *ent)
 	ent->svflags = SVF_NOCLIENT;
 	level.total_secrets++;
 
-	/* Map quirk for mine3 */
+	/* map bug hack */
 	if (!Q_stricmp(level.mapname, "mine3") && (ent->s.origin[0] == 280) &&
 		(ent->s.origin[1] == -2048) && (ent->s.origin[2] == -624))
 	{
@@ -280,7 +259,8 @@ SP_target_secret(edict_t *ent)
 
 /*
  * QUAKED target_goal (1 0 1) (-8 -8 -8) (8 8 8)
- * Counts a goal completed. These are single use targets.
+ * Counts a goal completed.
+ * These are single use targets.
  */
 void
 use_target_goal(edict_t *ent, edict_t *other /* unused */, edict_t *activator /* unused */)
@@ -313,7 +293,7 @@ SP_target_goal(edict_t *ent)
 
 	if (deathmatch->value)
 	{
-		/* auto-remove for deathmatch */
+	 	/* auto-remove for deathmatch */
 		G_FreeEdict(ent);
 		return;
 	}
@@ -354,8 +334,8 @@ target_explosion_explode(edict_t *self)
 	gi.WritePosition(self->s.origin);
 	gi.multicast(self->s.origin, MULTICAST_PHS);
 
-	T_RadiusDamage(self, self->activator, self->dmg, NULL,
-			self->dmg + 40, MOD_EXPLOSIVE);
+	T_RadiusDamage(self, self->activator, self->dmg,
+			NULL, self->dmg + 40, MOD_EXPLOSIVE);
 
 	save = self->delay;
 	self->delay = 0;
@@ -366,12 +346,12 @@ target_explosion_explode(edict_t *self)
 void
 use_target_explosion(edict_t *self, edict_t *other /* unused */, edict_t *activator)
 {
-	self->activator = activator;
-
 	if (!self || !activator)
 	{
 		return;
 	}
+
+	self->activator = activator;
 
 	if (!self->delay)
 	{
@@ -399,12 +379,13 @@ SP_target_explosion(edict_t *ent)
 
 /*
  * QUAKED target_changelevel (1 0 0) (-8 -8 -8) (8 8 8)
+ *
  * Changes level to "map" when fired
  */
 void
 use_target_changelevel(edict_t *self, edict_t *other, edict_t *activator)
 {
-	if (!self || !other  || !activator)
+	if (!self || !other || !activator)
 	{
 		return;
 	}
@@ -427,8 +408,7 @@ use_target_changelevel(edict_t *self, edict_t *other, edict_t *activator)
 		(other != world))
 	{
 		T_Damage(other, self, self, vec3_origin, other->s.origin,
-				vec3_origin, 10 * other->max_health, 1000,
-				0, MOD_EXIT);
+				vec3_origin, 10 * other->max_health, 1000, 0, MOD_EXIT);
 		return;
 	}
 
@@ -466,9 +446,8 @@ SP_target_changelevel(edict_t *ent)
 		return;
 	}
 
-	/* Mapquirk for secret exists in fact1 and fact3 */
-	if ((Q_stricmp(level.mapname, "fact1") == 0) &&
-		   	(Q_stricmp(ent->map, "fact3") == 0))
+	/* ugly hack because *SOMEBODY* screwed up their map */
+	if ((Q_stricmp(level.mapname, "fact1") == 0) && (Q_stricmp(ent->map, "fact3") == 0))
 	{
 		ent->map = "fact3$secret1";
 	}
@@ -495,6 +474,7 @@ SP_target_changelevel(edict_t *ent)
  * "dmg"	if set, does a radius damage at this location when it splashes
  *          useful for lava/sparks
  */
+
 void
 use_target_splash(edict_t *self, edict_t *other /* unused */, edict_t *activator)
 {
@@ -552,7 +532,6 @@ SP_target_splash(edict_t *self)
  *  speed how fast it should be moving otherwise it
  *  will just be dropped
  */
-void ED_CallSpawn(edict_t *ent);
 
 void
 use_target_spawner(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */)
@@ -577,14 +556,13 @@ use_target_spawner(edict_t *self, edict_t *other /* unused */, edict_t *activato
 	{
 		VectorCopy(self->movedir, ent->velocity);
 	}
+
+	ent->s.renderfx |= RF_IR_VISIBLE; /* PGM */
 }
 
 void
 SP_target_spawner(edict_t *self)
 {
-	vec3_t	forward;
-	vec3_t	fact2spawnpoint1 = {-1504,512,72};
-
 	if (!self)
 	{
 		return;
@@ -592,15 +570,6 @@ SP_target_spawner(edict_t *self)
 
 	self->use = use_target_spawner;
 	self->svflags = SVF_NOCLIENT;
-
-	/* Maphack for the insane spawner in Mobs-Egerlings
-	   beloved fact2. Found in KMQuake2 */
-	if (!Q_stricmp(level.mapname, "fact2")
-		&& VectorCompare(self->s.origin, fact2spawnpoint1) )
-	{
-		VectorSet (forward, 0, 0, 1);
-		VectorMA (self->s.origin, -8, forward, self->s.origin);
-	}
 
 	if (self->speed)
 	{
@@ -620,15 +589,15 @@ SP_target_spawner(edict_t *self)
  */
 
 void
-use_target_blaster(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */)
+use_target_blaster(edict_t *self, edict_t *other, edict_t *activator)
 {
 	if (!self)
 	{
 		return;
 	}
 
-	fire_blaster(self, self->s.origin, self->movedir, self->dmg,
-			self->speed, EF_BLASTER, MOD_TARGET_BLASTER);
+	fire_blaster(self, self->s.origin, self->movedir,
+			self->dmg, self->speed, EF_BLASTER, MOD_TARGET_BLASTER);
 	gi.sound(self, CHAN_VOICE, self->noise_index, 1, ATTN_NORM, 0);
 }
 
@@ -661,22 +630,21 @@ SP_target_blaster(edict_t *self)
 
 /*
  * QUAKED target_crosslevel_trigger (.5 .5 .5) (-8 -8 -8) (8 8 8) trigger1 trigger2 trigger3 trigger4 trigger5 trigger6 trigger7 trigger8
- * Once this trigger is touched/used, any trigger_crosslevel_target with
- * the same trigger number is automatically used when a level is started
- * within the same unit.  It is OK to check multiple triggers. Message,
- * delay, target, and killtarget also work.
+ *
+ * Once this trigger is touched/used, any trigger_crosslevel_target
+ * with the same trigger number is automatically used when a level
+ * is started within the same unit. It is OK to check multiple triggers.
+ * Message, delay, target, and killtarget also work.
  */
 void
-trigger_crosslevel_trigger_use(edict_t *self, edict_t *other /* unused */,
-		edict_t *activator)
+trigger_crosslevel_trigger_use(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */)
 {
-	if (!self || !activator)
+	if (!self)
 	{
 		return;
 	}
 
 	game.serverflags |= self->spawnflags;
-	G_UseTargets (self, activator);
 	G_FreeEdict(self);
 }
 
@@ -694,12 +662,12 @@ SP_target_crosslevel_trigger(edict_t *self)
 
 /*
  * QUAKED target_crosslevel_target (.5 .5 .5) (-8 -8 -8) (8 8 8) trigger1 trigger2 trigger3 trigger4 trigger5 trigger6 trigger7 trigger8
- * Triggered by a trigger_crosslevel elsewhere within a unit.
- * If multiple triggers are checked, all must be true. Delay,
- * target and killtarget also work.
  *
- * "delay" delay before using targets if the trigger has been
- *         activated (default 1)
+ * Triggered by a trigger_crosslevel elsewhere within a unit.
+ * If multiple triggers are checked, all must be true.
+ * Delay, target and killtarget also work.
+ *
+ * "delay" delay before using targets if the trigger has been activated (default 1)
  */
 void
 target_crosslevel_target_think(edict_t *self)
@@ -709,8 +677,7 @@ target_crosslevel_target_think(edict_t *self)
 		return;
 	}
 
-	if (self->spawnflags ==
-		(game.serverflags & SFL_CROSS_TRIGGER_MASK & self->spawnflags))
+	if (self->spawnflags == (game.serverflags & SFL_CROSS_TRIGGER_MASK & self->spawnflags))
 	{
 		G_UseTargets(self, self);
 		G_FreeEdict(self);
@@ -739,9 +706,11 @@ SP_target_crosslevel_target(edict_t *self)
 /* ========================================================== */
 
 /*
- * QUAKED target_laser (0 .5 .8) (-8 -8 -8) (8 8 8) START_ON RED GREEN BLUE YELLOW ORANGE FAT
+ * QUAKED target_laser (0 .5 .8) (-8 -8 -8) (8 8 8) START_ON RED GREEN BLUE YELLOW ORANGE FAT WINDOWSTOP
  * When triggered, fires a laser.  You can either set a target
  * or a direction.
+ *
+ * WINDOWSTOP - stops at CONTENTS_WINDOW
  */
 void
 target_laser_think(edict_t *self)
@@ -787,8 +756,15 @@ target_laser_think(edict_t *self)
 
 	while (1)
 	{
-		tr = gi.trace(start, NULL, NULL, end, ignore,
-				CONTENTS_SOLID | CONTENTS_MONSTER | CONTENTS_DEADMONSTER);
+		if (self->spawnflags & LASER_STOPWINDOW)
+		{
+			tr = gi.trace(start, NULL, NULL, end, ignore, MASK_SHOT);
+		}
+		else
+		{
+			tr = gi.trace(start, NULL, NULL, end, ignore,
+					CONTENTS_SOLID | CONTENTS_MONSTER | CONTENTS_DEADMONSTER);
+		}
 
 		if (!tr.ent)
 		{
@@ -798,21 +774,13 @@ target_laser_think(edict_t *self)
 		/* hurt it if we can */
 		if ((tr.ent->takedamage) && !(tr.ent->flags & FL_IMMUNE_LASER))
 		{
-			T_Damage(tr.ent,
-					self,
-					self->activator,
-					self->movedir,
-					tr.endpos,
-					vec3_origin,
-					self->dmg,
-					1,
-					DAMAGE_ENERGY,
-					MOD_TARGET_LASER);
+			T_Damage(tr.ent, self, self->activator, self->movedir, tr.endpos,
+					vec3_origin, self->dmg, 1, DAMAGE_ENERGY, MOD_TARGET_LASER);
 		}
 
-		/* if we hit something that's not a monster
-		   or player or is immune to lasers, we're done */
-		if (!(tr.ent->svflags & SVF_MONSTER) && (!tr.ent->client))
+		/* if we hit something that's not a monster or player or is immune to lasers, we're done */
+		if (!(tr.ent->svflags & SVF_MONSTER) && (!tr.ent->client) &&
+			!(tr.ent->svflags & SVF_DAMAGEABLE))
 		{
 			if (self->spawnflags & 0x80000000)
 			{
@@ -944,9 +912,8 @@ target_laser_start(edict_t *self)
 
 			if (!ent)
 			{
-				gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s: %s is a bad target\n",
-						self->classname, vtos(self->s.origin),
-						self->target);
+				gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s: %s is a bad target\n", self->classname,
+						vtos(self->s.origin), self->target);
 			}
 
 			self->enemy = ent;
@@ -987,7 +954,6 @@ SP_target_laser(edict_t *self)
 		return;
 	}
 
-	/* let everything else get spawned before we start firing */
 	self->think = target_laser_start;
 	self->nextthink = level.time + 1;
 }
@@ -996,9 +962,11 @@ SP_target_laser(edict_t *self)
 
 /*
  * QUAKED target_lightramp (0 .5 .8) (-8 -8 -8) (8 8 8) TOGGLE
- *  speed		How many seconds the ramping will take
- *  message		two letters; starting lightlevel and ending lightlevel
+ *
+ * speed		How many seconds the ramping will take
+ * message		two letters; starting lightlevel and ending lightlevel
  */
+
 void
 target_lightramp_think(edict_t *self)
 {
@@ -1009,8 +977,7 @@ target_lightramp_think(edict_t *self)
 		return;
 	}
 
-	style[0] = 'a' + self->movedir[0] +
-			   (level.time - self->timestamp) / FRAMETIME * self->movedir[2];
+	style[0] = 'a' + self->movedir[0] + (level.time - self->timestamp) / FRAMETIME * self->movedir[2];
 	style[1] = 0;
 	gi.configstring(CS_LIGHTS + self->enemy->style, style);
 
@@ -1056,8 +1023,8 @@ target_lightramp_use(edict_t *self, edict_t *other /* unused */, edict_t *activa
 			if (strcmp(e->classname, "light") != 0)
 			{
 				gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s ", self->classname, vtos(self->s.origin));
-				gi.dprintf(DEVELOPER_MSG_GAME, "target %s (%s at %s) is not a light\n",
-						self->target, e->classname, vtos(e->s.origin));
+				gi.dprintf(DEVELOPER_MSG_GAME, "target %s (%s at %s) is not a light\n", self->target,
+						e->classname, vtos(e->s.origin));
 			}
 			else
 			{
@@ -1067,9 +1034,8 @@ target_lightramp_use(edict_t *self, edict_t *other /* unused */, edict_t *activa
 
 		if (!self->enemy)
 		{
-			gi.dprintf(DEVELOPER_MSG_GAME, "%s target %s not found at %s\n",
-					self->classname, self->target,
-					vtos(self->s.origin));
+			gi.dprintf(DEVELOPER_MSG_GAME, "%s target %s not found at %s\n", self->classname,
+					self->target, vtos(self->s.origin));
 			G_FreeEdict(self);
 			return;
 		}
@@ -1092,8 +1058,7 @@ SP_target_lightramp(edict_t *self)
 		(self->message[1] < 'a') || (self->message[1] > 'z') ||
 		(self->message[0] == self->message[1]))
 	{
-		gi.dprintf(DEVELOPER_MSG_GAME, "target_lightramp has bad ramp (%s) at %s\n",
-				self->message, vtos(self->s.origin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "target_lightramp has bad ramp (%s) at %s\n", self->message, vtos(self->s.origin));
 		G_FreeEdict(self);
 		return;
 	}
@@ -1106,8 +1071,7 @@ SP_target_lightramp(edict_t *self)
 
 	if (!self->target)
 	{
-		gi.dprintf(DEVELOPER_MSG_GAME, "%s with no target at %s\n", self->classname,
-				vtos(self->s.origin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s with no target at %s\n", self->classname, vtos(self->s.origin));
 		G_FreeEdict(self);
 		return;
 	}
@@ -1118,18 +1082,18 @@ SP_target_lightramp(edict_t *self)
 
 	self->movedir[0] = self->message[0] - 'a';
 	self->movedir[1] = self->message[1] - 'a';
-	self->movedir[2] =
-		(self->movedir[1] - self->movedir[0]) / (self->speed / FRAMETIME);
+	self->movedir[2] = (self->movedir[1] - self->movedir[0]) / (self->speed / FRAMETIME);
 }
 
 /* ========================================================== */
 
 /*
- * QUAKED target_earthquake (1 0 0) (-8 -8 -8) (8 8 8)
+ * QUAKED target_earthquake (1 0 0) (-8 -8 -8) (8 8 8) SILENT
+ *
  * When triggered, this initiates a level-wide earthquake.
  * All players and monsters are affected.
- *  "speed"		severity of the quake (default:200)
- *  "count"		duration of the quake (default:5)
+ * "speed"		severity of the quake (default:200)
+ * "count"		duration of the quake (default:5)
  */
 void
 target_earthquake_think(edict_t *self)
@@ -1142,11 +1106,14 @@ target_earthquake_think(edict_t *self)
 		return;
 	}
 
-	if (self->last_move_time < level.time)
+	if (!(self->spawnflags & 1))
 	{
-		gi.positioned_sound(self->s.origin, self, CHAN_AUTO,
-				self->noise_index, 1.0, ATTN_NONE, 0);
-		self->last_move_time = level.time + 0.5;
+		if (self->last_move_time < level.time)
+		{
+			gi.positioned_sound(self->s.origin, self, CHAN_AUTO, self->noise_index,
+					1.0, ATTN_NONE, 0);
+			self->last_move_time = level.time + 0.5;
+		}
 	}
 
 	for (i = 1, e = g_edicts + i; i < globals.num_edicts; i++, e++)
@@ -1202,8 +1169,7 @@ SP_target_earthquake(edict_t *self)
 
 	if (!self->targetname)
 	{
-		gi.dprintf(DEVELOPER_MSG_GAME, "untargeted %s at %s\n", self->classname,
-				vtos(self->s.origin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "untargeted %s at %s\n", self->classname, vtos( self->s.origin));
 	}
 
 	if (!self->count)
@@ -1220,5 +1186,8 @@ SP_target_earthquake(edict_t *self)
 	self->think = target_earthquake_think;
 	self->use = target_earthquake_use;
 
-	self->noise_index = gi.soundindex("world/quake.wav");
+	if (!(self->spawnflags & 1))
+	{
+		self->noise_index = gi.soundindex("world/quake.wav");
+	}
 }

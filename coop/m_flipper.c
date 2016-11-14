@@ -1,23 +1,4 @@
 /*
-Copyright (C) 1997-2001 Id Software, Inc.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
-
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-*/
-/*
 ==============================================================================
 
 FLIPPER
@@ -45,12 +26,11 @@ mframe_t flipper_frames_stand[] = {
 	{ai_stand, 0, NULL}
 };
 
-mmove_t flipper_move_stand =
-{
+mmove_t flipper_move_stand = {
 	FRAME_flphor01,
-	FRAME_flphor01,
-	flipper_frames_stand,
-	NULL
+   	FRAME_flphor01,
+   	flipper_frames_stand,
+   	NULL
 };
 
 void
@@ -90,11 +70,10 @@ mframe_t flipper_frames_run[] = {
 	{ai_run, FLIPPER_RUN_SPEED, NULL},
 	{ai_run, FLIPPER_RUN_SPEED, NULL},
 	{ai_run, FLIPPER_RUN_SPEED, NULL},
-	{ai_run, FLIPPER_RUN_SPEED, NULL} /* 29 */
+	{ai_run, FLIPPER_RUN_SPEED, NULL}  /* 29 */
 };
 
-mmove_t flipper_move_run_loop =
-{
+mmove_t flipper_move_run_loop = {
 	FRAME_flpver06,
    	FRAME_flpver29,
    	flipper_frames_run,
@@ -121,11 +100,10 @@ mframe_t flipper_frames_run_start[] = {
 	{ai_run, 8, NULL}
 };
 
-mmove_t flipper_move_run_start =
-{
+mmove_t flipper_move_run_start = {
 	FRAME_flpver01,
    	FRAME_flpver06,
-	flipper_frames_run_start,
+   	flipper_frames_run_start,
    	flipper_run_loop
 };
 
@@ -168,12 +146,11 @@ mframe_t flipper_frames_walk[] = {
 	{ai_walk, 4, NULL}
 };
 
-mmove_t flipper_move_walk =
-{
+mmove_t flipper_move_walk = {
 	FRAME_flphor01,
-	FRAME_flphor24,
-	flipper_frames_walk,
-	NULL
+   	FRAME_flphor24,
+   	flipper_frames_walk,
+   	NULL
 };
 
 void
@@ -195,8 +172,7 @@ mframe_t flipper_frames_start_run[] = {
 	{ai_run, 8, flipper_run}
 };
 
-mmove_t flipper_move_start_run =
-{
+mmove_t flipper_move_start_run = {
 	FRAME_flphor01,
    	FRAME_flphor05,
    	flipper_frames_start_run,
@@ -222,8 +198,7 @@ mframe_t flipper_frames_pain2[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t flipper_move_pain2 =
-{
+mmove_t flipper_move_pain2 = {
 	FRAME_flppn101,
    	FRAME_flppn105,
    	flipper_frames_pain2,
@@ -237,12 +212,12 @@ mframe_t flipper_frames_pain1[] = {
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL}
 };
-mmove_t flipper_move_pain1 =
-{
+
+mmove_t flipper_move_pain1 = {
 	FRAME_flppn201,
    	FRAME_flppn205,
-	flipper_frames_pain1,
-	flipper_run
+   	flipper_frames_pain1,
+   	flipper_run
 };
 
 void
@@ -293,12 +268,11 @@ mframe_t flipper_frames_attack[] = {
 	{ai_charge, 0, NULL}
 };
 
-mmove_t flipper_move_attack =
-{
+mmove_t flipper_move_attack = {
 	FRAME_flpbit01,
-	FRAME_flpbit20,
-	flipper_frames_attack,
-	flipper_run
+   	FRAME_flpbit20,
+   	flipper_frames_attack,
+   	flipper_run
 };
 
 void
@@ -313,8 +287,7 @@ flipper_melee(edict_t *self)
 }
 
 void
-flipper_pain(edict_t *self, edict_t *other /* unused */,
-		float kick /* unused */, int damage)
+flipper_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 {
 	int n;
 
@@ -434,12 +407,11 @@ mframe_t flipper_frames_death[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t flipper_move_death =
-{
+mmove_t flipper_move_death = {
 	FRAME_flpdth01,
-	FRAME_flpdth56,
-	flipper_frames_death,
-	flipper_dead
+   	FRAME_flpdth56,
+   	flipper_frames_death,
+   	flipper_dead
 };
 
 void
@@ -467,22 +439,19 @@ flipper_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /*
 	/* check for gib */
 	if (self->health <= self->gib_health)
 	{
-		gi.sound(self, CHAN_VOICE, gi.soundindex( "misc/udeath.wav"), 1, ATTN_NORM, 0);
+		gi.sound(self, CHAN_VOICE, gi.soundindex("misc/udeath.wav"), 1, ATTN_NORM, 0);
 
 		for (n = 0; n < 2; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/bone/tris.md2",
-					damage, GIB_ORGANIC);
+			ThrowGib(self, "models/objects/gibs/bone/tris.md2", damage, GIB_ORGANIC);
 		}
 
 		for (n = 0; n < 2; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2",
-					damage, GIB_ORGANIC);
+			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 		}
 
-		ThrowHead(self, "models/objects/gibs/sm_meat/tris.md2",
-				damage, GIB_ORGANIC);
+		ThrowHead(self, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 		self->deadflag = DEAD_DEAD;
 		return;
 	}

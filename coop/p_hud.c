@@ -1,25 +1,4 @@
-/*
-Copyright (C) 1997-2001 Id Software, Inc.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
-
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-*/
 #include "g_local.h"
-
-
 
 /*
 ======================================================================
@@ -28,7 +7,6 @@ INTERMISSION
 
 ======================================================================
 */
-
 
 void
 MoveClientToIntermission(edict_t *ent)
@@ -60,6 +38,11 @@ MoveClientToIntermission(edict_t *ent)
 	ent->client->enviro_framenum = 0;
 	ent->client->grenade_blew_up = false;
 	ent->client->grenade_time = 0;
+
+	ent->client->ps.rdflags &= ~RDF_IRGOGGLES;
+	ent->client->ir_framenum = 0;
+	ent->client->nuke_framenum = 0;
+	ent->client->double_framenum = 0;
 
 	ent->viewheight = 0;
 	ent->s.modelindex = 0;
@@ -182,16 +165,6 @@ BeginIntermission(edict_t *targ)
 	VectorCopy(ent->s.origin, level.intermission_origin);
 	VectorCopy(ent->s.angles, level.intermission_angle);
 
-	/* In fact1 the intermission collides
-	   with an area portal, resulting in
-	   clutterings */
-	if (!Q_stricmp(level.mapname, "fact1"))
-	{
-		level.intermission_origin[0] = 1037.0;
-		level.intermission_origin[1] = 1100.0;
-		level.intermission_origin[2] = 222.0;
-	}
-
 	/* move all clients to the intermission point */
 	for (i = 0; i < maxclients->value; i++)
 	{
@@ -207,7 +180,7 @@ BeginIntermission(edict_t *targ)
 }
 
 void
-DeathmatchScoreboardMessage(edict_t *ent, edict_t *killer)
+DeathmatchScoreboardMessage(edict_t *ent, edict_t *killer /* can be NULL */)
 {
 	char entry[1024];
 	char string[1400];
@@ -221,7 +194,7 @@ DeathmatchScoreboardMessage(edict_t *ent, edict_t *killer)
 	edict_t *cl_ent;
 	char *tag;
 
-	if (!ent) /* killer can be NULL */
+	if (!ent)
 	{
 		return;
 	}
@@ -292,10 +265,18 @@ DeathmatchScoreboardMessage(edict_t *ent, edict_t *killer)
 			tag = NULL;
 		}
 
+		/* allow new DM games to override the tag picture */
+		if (gamerules && gamerules->value)
+		{
+			if (DMGame.DogTag)
+			{
+				DMGame.DogTag(cl_ent, killer, &tag);
+			}
+		}
+
 		if (tag)
 		{
-			Com_sprintf(entry, sizeof(entry),
-					"xv %i yv %i picn %s ", x + 32, y, tag);
+			Com_sprintf(entry, sizeof(entry), "xv %i yv %i picn %s ", x + 32, y, tag);
 			j = strlen(entry);
 
 			if (stringlength + j > 1024)
@@ -308,8 +289,7 @@ DeathmatchScoreboardMessage(edict_t *ent, edict_t *killer)
 		}
 
 		/* send the layout */
-		Com_sprintf(entry, sizeof(entry),
-				"client %i %i %i %i %i %i ",
+		Com_sprintf(entry, sizeof(entry), "client %i %i %i %i %i %i ",
 				x, y, sorted[i], cl->resp.score, cl->ping,
 				(level.framenum - cl->resp.enterframe) / 600);
 		j = strlen(entry);
@@ -327,8 +307,11 @@ DeathmatchScoreboardMessage(edict_t *ent, edict_t *killer)
 	gi.WriteString(string);
 }
 
+/*
+ * Draw help computer.
+ */
 void
-HelpComputer(edict_t *ent)
+HelpComputerMessage(edict_t *ent)
 {
 	char string[1024];
 	char *sk;
@@ -357,15 +340,14 @@ HelpComputer(edict_t *ent)
 
 	/* send the layout */
 	Com_sprintf(string, sizeof(string),
-			"xv 32 yv 8 picn help " /* background */
-			"xv 202 yv 12 string2 \"%s\" " /* skill */
-			"xv 0 yv 24 cstring2 \"%s\" " /* level name */
-			"xv 0 yv 54 cstring2 \"%s\" " /* help 1 */
-			"xv 0 yv 110 cstring2 \"%s\" " /* help 2 */
+			"xv 32 yv 8 picn help "			/* background */
+			"xv 202 yv 12 string2 \"%s\" "  /* skill */
+			"xv 0 yv 24 cstring2 \"%s\" "   /* level name */
+			"xv 0 yv 54 cstring2 \"%s\" "   /* help 1 */
+			"xv 0 yv 110 cstring2 \"%s\" "  /* help 2 */
 			"xv 50 yv 164 string2 \" kills     goals    secrets\" "
 			"xv 50 yv 172 string2 \"%3i/%3i     %i/%i       %i/%i\" ",
-			sk,
-			level.level_name,
+			sk, level.level_name,
 			game.helpmessage1,
 			game.helpmessage2,
 			level.killed_monsters, level.total_monsters,
@@ -374,27 +356,28 @@ HelpComputer(edict_t *ent)
 
 	gi.WriteByte(svc_layout);
 	gi.WriteString(string);
-	gi.unicast (ent, true); // FS: Don't remove this DOS needs this!
 }
 
+/*
+ * Display the current help message
+ */
 void
 InventoryMessage(edict_t *ent)
 {
-        int i;
+	int i;
 
-        if (!ent)
-        {
-                return;
-        }
+	if (!ent)
+	{
+		return;
+	}
 
-        gi.WriteByte(svc_inventory);
+	gi.WriteByte(svc_inventory);
 
-        for (i = 0; i < MAX_ITEMS; i++)
-        {
-                gi.WriteShort(ent->client->pers.inventory[i]);
-        }
+	for (i = 0; i < MAX_ITEMS; i++)
+	{
+		gi.WriteShort(ent->client->pers.inventory[i]);
+	}
 }
-
 
 /* ======================================================================= */
 
@@ -439,8 +422,7 @@ G_SetStats(edict_t *ent)
 		{
 			/* ran out of cells for power armor */
 			ent->flags &= ~FL_POWER_ARMOR;
-			gi.sound(ent, CHAN_ITEM, gi.soundindex(
-							"misc/power2.wav"), 1, ATTN_NORM, 0);
+			gi.sound(ent, CHAN_ITEM, gi.soundindex( "misc/power2.wav"), 1, ATTN_NORM, 0);
 			power_armor_type = 0;
 		}
 	}
@@ -476,28 +458,58 @@ G_SetStats(edict_t *ent)
 	if (ent->client->quad_framenum > level.framenum)
 	{
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex("p_quad");
+		ent->client->ps.stats[STAT_TIMER] = (ent->client->quad_framenum - level.framenum) / 10;
+	}
+	else if (ent->client->double_framenum > level.framenum)
+	{
+		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex("p_double");
 		ent->client->ps.stats[STAT_TIMER] =
-			(ent->client->quad_framenum - level.framenum) / 10;
+			(ent->client->double_framenum - level.framenum) / 10;
 	}
 	else if (ent->client->invincible_framenum > level.framenum)
 	{
-		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex(
-				"p_invulnerability");
-		ent->client->ps.stats[STAT_TIMER] =
-			(ent->client->invincible_framenum - level.framenum) / 10;
+		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex( "p_invulnerability");
+		ent->client->ps.stats[STAT_TIMER] = (ent->client->invincible_framenum - level.framenum) / 10;
 	}
 	else if (ent->client->enviro_framenum > level.framenum)
 	{
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex("p_envirosuit");
-		ent->client->ps.stats[STAT_TIMER] =
-			(ent->client->enviro_framenum - level.framenum) / 10;
+		ent->client->ps.stats[STAT_TIMER] = (ent->client->enviro_framenum - level.framenum) / 10;
 	}
 	else if (ent->client->breather_framenum > level.framenum)
 	{
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex("p_rebreather");
-		ent->client->ps.stats[STAT_TIMER] =
-			(ent->client->breather_framenum - level.framenum) / 10;
+		ent->client->ps.stats[STAT_TIMER] = (ent->client->breather_framenum - level.framenum) / 10;
 	}
+	else if (ent->client->owned_sphere)
+	{
+		if (ent->client->owned_sphere->spawnflags == 1) /* defender */
+		{
+			ent->client->ps.stats[STAT_TIMER_ICON] =
+				gi.imageindex("p_defender");
+		}
+		else if (ent->client->owned_sphere->spawnflags == 2) /* hunter */
+		{
+			ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex("p_hunter");
+		}
+		else if (ent->client->owned_sphere->spawnflags == 4) /* vengeance */
+		{
+			ent->client->ps.stats[STAT_TIMER_ICON] =
+				gi.imageindex("p_vengeance");
+		}
+		else /* error case */
+		{
+			ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex("i_fixme");
+		}
+
+		ent->client->ps.stats[STAT_TIMER] =
+			(int)(ent->client->owned_sphere->wait - level.time);
+	}
+	else if (ent->client->ir_framenum > level.framenum)
+	{
+		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex("p_ir");
+		ent->client->ps.stats[STAT_TIMER] =
+			(ent->client->ir_framenum - level.framenum) / 10; }
 	else
 	{
 		ent->client->ps.stats[STAT_TIMER_ICON] = 0;
@@ -511,8 +523,7 @@ G_SetStats(edict_t *ent)
 	}
 	else
 	{
-		ent->client->ps.stats[STAT_SELECTED_ICON] =
-			gi.imageindex(itemlist[ent->client->pers.selected_item].icon);
+		ent->client->ps.stats[STAT_SELECTED_ICON] = gi.imageindex(itemlist[ent->client->pers.selected_item].icon);
 	}
 
 	ent->client->ps.stats[STAT_SELECTED_ITEM] = ent->client->pers.selected_item;
@@ -522,8 +533,7 @@ G_SetStats(edict_t *ent)
 
 	if (deathmatch->value)
 	{
-		if ((ent->client->pers.health <= 0) || level.intermissiontime ||
-			ent->client->showscores)
+		if ((ent->client->pers.health <= 0) || level.intermissiontime || ent->client->showscores)
 		{
 			ent->client->ps.stats[STAT_LAYOUTS] |= 1;
 		}
@@ -555,16 +565,14 @@ G_SetStats(edict_t *ent)
 		ent->client->ps.stats[STAT_HELPICON] = gi.imageindex("i_help");
 	}
 	else if (((ent->client->pers.hand == CENTER_HANDED) ||
-			  (ent->client->ps.fov > 91)) &&
-			 ent->client->pers.weapon)
+			  (ent->client->ps.fov > 91)) && ent->client->pers.weapon)
 	{
 		cvar_t *gun;
 		gun = gi.cvar("cl_gun", "2", 0);
 
 		if (gun->value != 2)
 		{
-			ent->client->ps.stats[STAT_HELPICON] = gi.imageindex(
-					ent->client->pers.weapon->icon);
+			ent->client->ps.stats[STAT_HELPICON] = gi.imageindex(ent->client->pers.weapon->icon);
 		}
 		else
 		{
@@ -613,6 +621,7 @@ G_SetSpectatorStats(edict_t *ent)
 	{
 		return;
 	}
+
 	cl = ent->client;
 
 	if (!cl->chase_target)

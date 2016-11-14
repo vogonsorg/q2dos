@@ -1,23 +1,4 @@
 /*
-Copyright (C) 1997-2001 Id Software, Inc.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
-
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-*/
-/*
 ==============================================================================
 
 mutant
@@ -27,7 +8,6 @@ mutant
 
 #include "g_local.h"
 #include "m_mutant.h"
-
 
 static int sound_swing;
 static int sound_hit;
@@ -42,6 +22,8 @@ static int sound_step1;
 static int sound_step2;
 static int sound_step3;
 static int sound_thud;
+
+void mutant_walk(edict_t *self);
 
 void
 mutant_step(edict_t *self)
@@ -83,6 +65,11 @@ mutant_sight(edict_t *self, edict_t *other /* unused */)
 void
 mutant_search(edict_t *self)
 {
+	if (!self)
+	{
+		return;
+	}
+
 	gi.sound(self, CHAN_VOICE, sound_search, 1, ATTN_NORM, 0);
 }
 
@@ -107,7 +94,7 @@ mframe_t mutant_frames_stand[] = {
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL},
-	{ai_stand, 0, NULL}, /* 10 */
+	{ai_stand, 0, NULL},        /* 10 */
 
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL},
@@ -118,7 +105,7 @@ mframe_t mutant_frames_stand[] = {
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL},
-	{ai_stand, 0, NULL}, /* 20 */
+	{ai_stand, 0, NULL},        /* 20 */
 
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL},
@@ -129,7 +116,7 @@ mframe_t mutant_frames_stand[] = {
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL},
-	{ai_stand, 0, NULL}, /* 30 */
+	{ai_stand, 0, NULL},        /* 30 */
 
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL},
@@ -140,7 +127,7 @@ mframe_t mutant_frames_stand[] = {
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL},
-	{ai_stand, 0, NULL}, /* 40 */
+	{ai_stand, 0, NULL},        /* 40 */
 
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL},
@@ -151,16 +138,16 @@ mframe_t mutant_frames_stand[] = {
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL},
-	{ai_stand, 0, NULL}, /* 50 */
+	{ai_stand, 0, NULL},        /* 50 */
 
 	{ai_stand, 0, NULL}
 };
 
-mmove_t mutant_move_stand =
-{
+mmove_t mutant_move_stand = {
 	FRAME_stand101,
-	FRAME_stand151,
-	mutant_frames_stand, NULL
+   	FRAME_stand151,
+   	mutant_frames_stand,
+   	NULL
 };
 
 void
@@ -192,10 +179,10 @@ mframe_t mutant_frames_idle[] = {
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL},
-	{ai_stand, 0, NULL}, /* scratch loop start */
+	{ai_stand, 0, NULL},                    /* scratch loop start */
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL},
-	{ai_stand, 0, mutant_idle_loop}, /* scratch loop end */
+	{ai_stand, 0, mutant_idle_loop},        /* scratch loop end */
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL},
@@ -204,8 +191,7 @@ mframe_t mutant_frames_idle[] = {
 	{ai_stand, 0, NULL}
 };
 
-mmove_t mutant_move_idle =
-{
+mmove_t mutant_move_idle = {
 	FRAME_stand152,
    	FRAME_stand164,
    	mutant_frames_idle,
@@ -224,8 +210,6 @@ mutant_idle(edict_t *self)
 	gi.sound(self, CHAN_VOICE, sound_idle, 1, ATTN_IDLE, 0);
 }
 
-void mutant_walk(edict_t *self);
-
 mframe_t mutant_frames_walk[] = {
 	{ai_walk, 3, NULL},
 	{ai_walk, 1, NULL},
@@ -241,10 +225,9 @@ mframe_t mutant_frames_walk[] = {
 	{ai_walk, 6, NULL}
 };
 
-mmove_t mutant_move_walk =
-{
+mmove_t mutant_move_walk = {
 	FRAME_walk05,
-	FRAME_walk16,
+   	FRAME_walk16,
    	mutant_frames_walk,
    	NULL
 };
@@ -267,11 +250,10 @@ mframe_t mutant_frames_start_walk[] = {
 	{ai_walk, 1, NULL}
 };
 
-mmove_t mutant_move_start_walk =
-{
+mmove_t mutant_move_start_walk = {
 	FRAME_walk01,
-	FRAME_walk04,
-	mutant_frames_start_walk,
+   	FRAME_walk04,
+   	mutant_frames_start_walk,
    	mutant_walk_loop
 };
 
@@ -295,8 +277,7 @@ mframe_t mutant_frames_run[] = {
 	{ai_run, 10, NULL}
 };
 
-mmove_t mutant_move_run =
-{
+mmove_t mutant_move_run = {
 	FRAME_run03,
    	FRAME_run08,
    	mutant_frames_run,
@@ -378,8 +359,7 @@ mutant_check_refire(edict_t *self)
 		return;
 	}
 
-	if (((skill->value == 3) &&
-		 (random() < 0.5)) || (range(self, self->enemy) == RANGE_MELEE))
+	if (((skill->value == 3) && (random() < 0.5)) || (range(self, self->enemy) == RANGE_MELEE))
 	{
 		self->monsterinfo.nextframe = FRAME_attack09;
 	}
@@ -395,8 +375,7 @@ mframe_t mutant_frames_attack[] = {
 	{ai_charge, 0, mutant_check_refire}
 };
 
-mmove_t mutant_move_attack =
-{
+mmove_t mutant_move_attack = {
 	FRAME_attack09,
    	FRAME_attack15,
    	mutant_frames_attack,
@@ -415,10 +394,10 @@ mutant_melee(edict_t *self)
 }
 
 void
-mutant_jump_touch(edict_t *self, edict_t *other,
-		cplane_t *plane /* unused */, csurface_t *surf /* unused */)
+mutant_jump_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */,
+		csurface_t *surf /* unused */)
 {
-	if (!self)
+	if (!self || !other)
 	{
 		return;
 	}
@@ -518,10 +497,9 @@ mframe_t mutant_frames_jump[] = {
 	{ai_charge, 0, NULL}
 };
 
-mmove_t mutant_move_jump =
-{
+mmove_t mutant_move_jump = {
 	FRAME_attack01,
-	FRAME_attack08,
+   	FRAME_attack08,
    	mutant_frames_jump,
    	mutant_run
 };
@@ -631,10 +609,9 @@ mframe_t mutant_frames_pain1[] = {
 	{ai_move, 5, NULL}
 };
 
-mmove_t mutant_move_pain1 =
-{
+mmove_t mutant_move_pain1 = {
 	FRAME_pain101,
-	FRAME_pain105,
+   	FRAME_pain105,
    	mutant_frames_pain1,
    	mutant_run
 };
@@ -648,8 +625,7 @@ mframe_t mutant_frames_pain2[] = {
 	{ai_move, 4, NULL}
 };
 
-mmove_t mutant_move_pain2 =
-{
+mmove_t mutant_move_pain2 = {
 	FRAME_pain201,
    	FRAME_pain206,
    	mutant_frames_pain2,
@@ -670,19 +646,22 @@ mframe_t mutant_frames_pain3[] = {
 	{ai_move, 1, NULL}
 };
 
-mmove_t mutant_move_pain3 =
-{
+mmove_t mutant_move_pain3 = {
 	FRAME_pain301,
-	FRAME_pain311,
-	mutant_frames_pain3,
-	mutant_run
+   	FRAME_pain311,
+   	mutant_frames_pain3,
+   	mutant_run
 };
 
 void
-mutant_pain(edict_t *self, edict_t *other /* unused */,
-		float kick /* unused */, int damage /* unused */)
+mutant_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 {
 	float r;
+
+	if (!self)
+	{
+		return;
+	}
 
 	if (self->health < (self->max_health / 2))
 	{
@@ -749,8 +728,7 @@ mframe_t mutant_frames_death1[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t mutant_move_death1 =
-{
+mmove_t mutant_move_death1 = {
 	FRAME_death101,
    	FRAME_death109,
    	mutant_frames_death1,
@@ -770,18 +748,16 @@ mframe_t mutant_frames_death2[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t mutant_move_death2 =
-{
+mmove_t mutant_move_death2 = {
 	FRAME_death201,
-	FRAME_death210,
-	mutant_frames_death2,
-	mutant_dead
+   	FRAME_death210,
+   	mutant_frames_death2,
+   	mutant_dead
 };
 
 void
-mutant_die(edict_t *self, edict_t *inflictor /* unused */,
-		edict_t *attacker /* unused */, int damage,
-		vec3_t point /* unused */)
+mutant_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* unsued */,
+		int damage, vec3_t point /* unused */)
 {
 	int n;
 
@@ -792,22 +768,19 @@ mutant_die(edict_t *self, edict_t *inflictor /* unused */,
 
 	if (self->health <= self->gib_health)
 	{
-		gi.sound(self, CHAN_VOICE, gi.soundindex( "misc/udeath.wav"), 1, ATTN_NORM, 0);
+		gi.sound(self, CHAN_VOICE, gi.soundindex("misc/udeath.wav"), 1, ATTN_NORM, 0);
 
 		for (n = 0; n < 2; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/bone/tris.md2",
-					damage, GIB_ORGANIC);
+			ThrowGib(self, "models/objects/gibs/bone/tris.md2", damage, GIB_ORGANIC);
 		}
 
 		for (n = 0; n < 4; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2",
-					damage, GIB_ORGANIC);
+			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 		}
 
-		ThrowHead(self, "models/objects/gibs/head2/tris.md2",
-				damage, GIB_ORGANIC);
+		ThrowHead(self, "models/objects/gibs/head2/tris.md2", damage, GIB_ORGANIC);
 		self->deadflag = DEAD_DEAD;
 		return;
 	}

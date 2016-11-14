@@ -1,29 +1,10 @@
 /*
- * Copyright (C) 1997-2001 Id Software, Inc.
- * Copyright (C) 2011 Yamagi Burmeister
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
- *
  * =======================================================================
  *
  * Game fields to be saved.
  *
  * =======================================================================
- */
+ */ 
 
 {"classname", FOFS(classname), F_LSTRING},
 {"model", FOFS(model), F_LSTRING},
@@ -105,4 +86,17 @@
 {"minpitch", STOFS(minpitch), F_FLOAT, FFL_SPAWNTEMP},
 {"maxpitch", STOFS(maxpitch), F_FLOAT, FFL_SPAWNTEMP},
 {"nextmap", STOFS(nextmap), F_LSTRING, FFL_SPAWNTEMP},
-{0, 0, 0, 0}
+{"bad_area", FOFS(bad_area), F_EDICT},
+{"hint_chain", FOFS(hint_chain), F_EDICT},
+{"monster_hint_chain", FOFS(monster_hint_chain), F_EDICT},
+{"target_hint_chain", FOFS(target_hint_chain), F_EDICT},
+{"goal_hint", FOFS(monsterinfo.goal_hint), F_EDICT},
+{"badMedic1", FOFS(monsterinfo.badMedic1), F_EDICT},
+{"badMedic2", FOFS(monsterinfo.badMedic2), F_EDICT},
+{"last_player_enemy", FOFS(monsterinfo.last_player_enemy), F_EDICT},
+{"commander", FOFS(monsterinfo.commander), F_EDICT},
+{"blocked", FOFS(monsterinfo.blocked), F_FUNCTION, FFL_NOSPAWN},
+{"duck", FOFS(monsterinfo.duck), F_FUNCTION, FFL_NOSPAWN},
+{"unduck", FOFS(monsterinfo.unduck), F_FUNCTION, FFL_NOSPAWN},
+{"sidestep", FOFS(monsterinfo.sidestep), F_FUNCTION, FFL_NOSPAWN},
+{0, 0, 0, 0} 

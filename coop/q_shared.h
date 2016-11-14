@@ -450,8 +450,6 @@ COLLISION DETECTION
 #define	SURF_FLOWING	0x40	// scroll towards angle
 #define	SURF_NODRAW		0x80	// don't bother referencing the texture
 
-#define SURF_ALPHATEST	0x02000000	// Knightmare- alpha test flag
-
 
 // content masks
 #define	MASK_ALL				(-1)
@@ -463,7 +461,6 @@ COLLISION DETECTION
 #define	MASK_OPAQUE				(CONTENTS_SOLID|CONTENTS_SLIME|CONTENTS_LAVA)
 #define	MASK_SHOT				(CONTENTS_SOLID|CONTENTS_MONSTER|CONTENTS_WINDOW|CONTENTS_DEADMONSTER)
 #define MASK_CURRENT			(CONTENTS_CURRENT_0|CONTENTS_CURRENT_90|CONTENTS_CURRENT_180|CONTENTS_CURRENT_270|CONTENTS_CURRENT_UP|CONTENTS_CURRENT_DOWN)
-#define MASK_SHOT_NO_WINDOW		(CONTENTS_SOLID|CONTENTS_MONSTER|CONTENTS_DEADMONSTER)
 
 
 // gi.BoxEdicts() can return a list of either solid or trigger entities
@@ -689,8 +686,6 @@ typedef struct
 #define	RDF_IRGOGGLES		4
 #define RDF_UVGOGGLES		8
 //ROGUE
-
-#define RDF_FOVADAPT		0x40000000 /* FS: For sezeros fov_adapt CVAR */
 
 //
 // muzzle flashes / player effects

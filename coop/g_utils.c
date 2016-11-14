@@ -1,27 +1,13 @@
-/*
-Copyright (C) 1997-2001 Id Software, Inc.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
-
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-*/
 // g_utils.c -- misc utility functions for game module
 
 #include "g_local.h"
 
 #define MAXCHOICES 8
+
+vec3_t VEC_UP = {0, -1, 0};
+vec3_t MOVEDIR_UP = {0, 0, 1};
+vec3_t VEC_DOWN = {0, -2, 0};
+vec3_t MOVEDIR_DOWN = {0, 0, -1};
 
 void
 G_ProjectSource(vec3_t point, vec3_t distance, vec3_t forward,
@@ -29,23 +15,40 @@ G_ProjectSource(vec3_t point, vec3_t distance, vec3_t forward,
 {
 	result[0] = point[0] + forward[0] * distance[0] + right[0] * distance[1];
 	result[1] = point[1] + forward[1] * distance[0] + right[1] * distance[1];
+	result[2] = point[2] + forward[2] * distance[0] + right[2] * distance[1] + distance[2];
+}
+
+void
+G_ProjectSource2(vec3_t point, vec3_t distance, vec3_t forward,
+		vec3_t right, vec3_t up, vec3_t result)
+{
+	result[0] = point[0] + forward[0] * distance[0] + right[0] * distance[1] +
+				up[0] * distance[2];
+	result[1] = point[1] + forward[1] * distance[0] + right[1] * distance[1] +
+				up[1] * distance[2];
 	result[2] = point[2] + forward[2] * distance[0] + right[2] * distance[1] +
-				distance[2];
+				up[2] * distance[2];
 }
 
 /*
- * Searches all active entities for the next
- * one that holds the matching string at fieldofs
- * (use the FOFS() macro) in the structure.
+ * Searches all active entities for the next one that holds
+ * the matching string at fieldofs (use the FOFS() macro) in
+ * the structure.
  *
- * Searches beginning at the edict after from, or
- * the beginning. If NULL, NULL will be returned
- * if the end of the list is reached.
+ * Searches beginning at the edict after from, or the beginning
+ * if NULL.
+ *
+ * NULL will be returned if the end of the list is reached.
  */
 edict_t *
 G_Find(edict_t *from, int fieldofs, char *match)
 {
 	char *s;
+
+	if (!match)
+	{
+		return NULL;
+	}
 
 	if (!from)
 	{
@@ -54,11 +57,6 @@ G_Find(edict_t *from, int fieldofs, char *match)
 	else
 	{
 		from++;
-	}
-
-	if (!match)
-	{
-		return NULL;
 	}
 
 	for ( ; from < &g_edicts[globals.num_edicts]; from++)
@@ -85,8 +83,7 @@ G_Find(edict_t *from, int fieldofs, char *match)
 }
 
 /*
- * Returns entities that have origins
- * within a spherical area
+ * Returns entities that have origins within a spherical area
  */
 edict_t *
 findradius(edict_t *from, vec3_t org, float rad)
@@ -117,8 +114,7 @@ findradius(edict_t *from, vec3_t org, float rad)
 
 		for (j = 0; j < 3; j++)
 		{
-			eorg[j] = org[j] - (from->s.origin[j] +
-					   (from->mins[j] + from->maxs[j]) * 0.5);
+			eorg[j] = org[j] - (from->s.origin[j] + (from->mins[j] + from->maxs[j]) * 0.5);
 		}
 
 		if (VectorLength(eorg) > rad)
@@ -133,14 +129,71 @@ findradius(edict_t *from, vec3_t org, float rad)
 }
 
 /*
- * Searches all active entities for
- * the next one that holds the matching
- * string at fieldofs (use the FOFS() macro)
- * in the structure.
+ * Returns entities that have origins within a spherical area
+ */
+edict_t *
+findradius2(edict_t *from, vec3_t org, float rad)
+{
+	/* rad must be positive */
+	vec3_t eorg;
+	int j;
+
+	if (!from)
+	{
+		from = g_edicts;
+	}
+	else
+	{
+		from++;
+	}
+
+	for ( ; from < &g_edicts[globals.num_edicts]; from++)
+	{
+		if (!from->inuse)
+		{
+			continue;
+		}
+
+		if (from->solid == SOLID_NOT)
+		{
+			continue;
+		}
+
+		if (!from->takedamage)
+		{
+			continue;
+		}
+
+		if (!(from->svflags & SVF_DAMAGEABLE))
+		{
+			continue;
+		}
+
+		for (j = 0; j < 3; j++)
+		{
+			eorg[j] = org[j] - (from->s.origin[j] + (from->mins[j] + from->maxs[j]) * 0.5);
+		}
+
+		if (VectorLength(eorg) > rad)
+		{
+			continue;
+		}
+
+		return from;
+	}
+
+	return NULL;
+}
+
+/*
+ * Searches all active entities for the next one that holds
+ * the matching string at fieldofs (use the FOFS() macro) in
+ * the structure.
  *
- * Searches beginning at the edict after from,
- * or the beginning. If NULL, NULL will be
- * returned if the end of the list is reached.
+ * Searches beginning at the edict after from, or the beginning
+ * if NULL.
+ *
+ * NULL will be returned if the end of the list is reached.
  */
 edict_t *
 G_PickTarget(char *targetname)
@@ -194,22 +247,24 @@ Think_Delay(edict_t *ent)
 }
 
 /*
- * The global "activator" should be set to
- * the entity that initiated the firing.
+ * the global "activator" should be set to the entity that initiated the firing.
  *
- * If self.delay is set, a DelayedUse entity
- * will be created that will actually do the
- * SUB_UseTargets after that many seconds have passed.
+ * If self.delay is set, a DelayedUse entity will be created that will actually
+ * do the SUB_UseTargets after that many seconds have passed.
  *
  * Centerprints any self.message to the activator.
  *
  * Search for (string)targetname in all entities that
  * match (string)self.target and call their .use function
+ *
+ * ==============================
  */
 void
 G_UseTargets(edict_t *ent, edict_t *activator)
 {
 	edict_t *t;
+	edict_t *master;
+	qboolean done = false;
 
 	if (!ent || !activator)
 	{
@@ -248,8 +303,7 @@ G_UseTargets(edict_t *ent, edict_t *activator)
 		}
 		else
 		{
-			gi.sound(activator, CHAN_AUTO, gi.soundindex(
-							"misc/talk1.wav"), 1, ATTN_NORM, 0);
+			gi.sound(activator, CHAN_AUTO, gi.soundindex("misc/talk1.wav"), 1, ATTN_NORM, 0);
 		}
 	}
 
@@ -260,19 +314,23 @@ G_UseTargets(edict_t *ent, edict_t *activator)
 
 		while ((t = G_Find(t, FOFS(targetname), ent->killtarget)))
 		{
-			/* decrement secret count if target_secret is removed */
-			if (!Q_stricmp(t->classname,"target_secret"))
+			/* if this entity is part of a train, cleanly remove it */
+			if (t->flags & FL_TEAMSLAVE)
 			{
-				level.total_secrets--;
-			}
-			/* same deal with target_goal, but also turn off CD music if applicable */
-			else if (!Q_stricmp(t->classname,"target_goal"))
-			{
-				level.total_goals--;
-
-				if (level.found_goals >= level.total_goals)
+				if (t->teammaster)
 				{
-					gi.configstring (CS_CDTRACK, "0");
+					master = t->teammaster;
+
+					while (!done)
+					{
+						if (master->teamchain == t)
+						{
+							master->teamchain = t->teamchain;
+							done = true;
+						}
+
+						master = master->teamchain;
+					}
 				}
 			}
 
@@ -333,9 +391,8 @@ tv(float x, float y, float z)
 	static vec3_t vecs[8];
 	float *v;
 
-	/* use an array so that multiple
-	   tempvectors won't collide
-	   for a while */
+	/* use an array so that multiple tempvectors
+	   won't collide for a while */
 	v = vecs[index];
 	index = (index + 1) & 7;
 
@@ -366,11 +423,6 @@ vtos(vec3_t v)
 	return s;
 }
 
-vec3_t VEC_UP = {0, -1, 0};
-vec3_t MOVEDIR_UP = {0, 0, 1};
-vec3_t VEC_DOWN = {0, -2, 0};
-vec3_t MOVEDIR_DOWN = {0, 0, -1};
-
 void
 G_SetMovedir(vec3_t angles, vec3_t movedir)
 {
@@ -397,20 +449,55 @@ vectoyaw(vec3_t vec)
 
 	if (vec[PITCH] == 0)
 	{
-		yaw = 0;
-
-		if (vec[YAW] > 0)
+		if (vec[YAW] == 0)
+		{
+			yaw = 0;
+		}
+		else if (vec[YAW] > 0)
 		{
 			yaw = 90;
 		}
-		else if (vec[YAW] < 0)
+		else
 		{
-			yaw = -90;
+			yaw = 270;
 		}
 	}
 	else
 	{
 		yaw = (int)(atan2(vec[YAW], vec[PITCH]) * 180 / M_PI);
+
+		if (yaw < 0)
+		{
+			yaw += 360;
+		}
+	}
+
+	return yaw;
+}
+
+float
+vectoyaw2(vec3_t vec)
+{
+	float yaw;
+
+	if (vec[PITCH] == 0)
+	{
+		if (vec[YAW] == 0)
+		{
+			yaw = 0;
+		}
+		else if (vec[YAW] > 0)
+		{
+			yaw = 90;
+		}
+		else
+		{
+			yaw = 270;
+		}
+	}
+	else
+	{
+		yaw = (atan2(vec[YAW], vec[PITCH]) * 180 / M_PI);
 
 		if (yaw < 0)
 		{
@@ -452,7 +539,7 @@ vectoangles(vec3_t value1, vec3_t angles)
 		}
 		else
 		{
-			yaw = -90;
+			yaw = 270;
 		}
 
 		if (yaw < 0)
@@ -474,10 +561,74 @@ vectoangles(vec3_t value1, vec3_t angles)
 	angles[ROLL] = 0;
 }
 
+#ifndef GAME_HARD_LINKED
+/* vectoangles2() is duplicated at the engine side in client/cl_newfx.c
+ * remember that if you ever attempt to change it!!
+ */
+void
+vectoangles2(vec3_t value1, vec3_t angles)
+{
+	float forward;
+	float yaw, pitch;
+
+	if ((value1[1] == 0) && (value1[0] == 0))
+	{
+		yaw = 0;
+
+		if (value1[2] > 0)
+		{
+			pitch = 90;
+		}
+		else
+		{
+			pitch = 270;
+		}
+	}
+	else
+	{
+	/* PMM - fixed to correct for pitch of 0 */
+		if (value1[0])
+		{
+			yaw = (atan2(value1[1], value1[0]) * 180 / M_PI);
+		}
+		else if (value1[1] > 0)
+		{
+			yaw = 90;
+		}
+		else
+		{
+			yaw = 270;
+		}
+
+		if (yaw < 0)
+		{
+			yaw += 360;
+		}
+
+		forward = sqrt(value1[0] * value1[0] + value1[1] * value1[1]);
+		pitch = (atan2(value1[2], forward) * 180 / M_PI);
+
+		if (pitch < 0)
+		{
+			pitch += 360;
+		}
+	}
+
+	angles[PITCH] = -pitch;
+	angles[YAW] = yaw;
+	angles[ROLL] = 0;
+}
+#endif /* !GAME_HARD_LINKED */
+
 char *
 G_CopyString(char *in)
 {
 	char *out;
+
+	if (!in)
+	{
+		return NULL;
+	}
 
 	out = gi.TagMalloc(strlen(in) + 1, TAG_LEVEL);
 	strcpy(out, in);
@@ -487,20 +638,33 @@ G_CopyString(char *in)
 void
 G_InitEdict(edict_t *e)
 {
+	if (!e)
+	{
+		return;
+	}
+
+	if (e->nextthink)
+	{
+		e->nextthink = 0;
+	}
+
 	e->inuse = true;
 	e->classname = "noclass";
 	e->gravity = 1.0;
 	e->s.number = e - g_edicts;
+
+	e->gravityVector[0] = 0.0;
+	e->gravityVector[1] = 0.0;
+	e->gravityVector[2] = -1.0;
 }
 
 /*
- * Either finds a free edict, or allocates a
- * new one.  Try to avoid reusing an entity
- * that was recently freed, because it can
- * cause the client to think the entity
- * morphed into something else instead of
- * being removed and recreated, which can
- * cause interpolated angles and bad trails.
+ * Either finds a free edict, or allocates a new one.
+ * Try to avoid reusing an entity that was recently freed,
+ * because it can cause the client to think the entity
+ * morphed into something else instead of being removed
+ * and recreated, which can cause interpolated angles and
+ * bad trails.
  */
 edict_t *
 G_Spawn(void)
@@ -512,11 +676,10 @@ G_Spawn(void)
 
 	for (i = maxclients->value + 1; i < globals.num_edicts; i++, e++)
 	{
-		/* the first couple seconds of
-		   server time can involve a lot of
-		   freeing and allocating, so relax
-		   the replacement policy */
-		if (!e->inuse && ((e->freetime < 2) || (level.time - e->freetime > 0.5)))
+		/* the first couple seconds of server time can involve a lot of
+		   freeing and allocating, so relax the replacement policy */
+		if (!e->inuse &&
+			((e->freetime < 2) || (level.time - e->freetime > 0.5)))
 		{
 			G_InitEdict(e);
 			return e;
@@ -539,21 +702,16 @@ G_Spawn(void)
 void
 G_FreeEdict(edict_t *ed)
 {
+	if (!ed)
+	{
+		return;
+	}
+
 	gi.unlinkentity(ed); /* unlink from world */
 
-	if (deathmatch->value || coop->value)
+	if ((ed - g_edicts) <= (maxclients->value + BODY_QUEUE_SIZE))
 	{
-		if ((ed - g_edicts) <= (maxclients->value + BODY_QUEUE_SIZE))
-		{
-			return;
-		}
-	}
-	else
-	{
-		if ((ed - g_edicts) <= maxclients->value)
-		{
-			return;
-		}
+		return;
 	}
 
 	memset(ed, 0, sizeof(*ed));
@@ -603,10 +761,8 @@ G_TouchTriggers(edict_t *ent)
 }
 
 /*
- * Call after linking a new trigger
- * in during gameplay to force all
- * entities it covers to immediately
- * touch it
+ * Call after linking a new trigger in during gameplay
+ * to force all entities it covers to immediately touch it
  */
 void
 G_TouchSolids(edict_t *ent)
@@ -619,8 +775,7 @@ G_TouchSolids(edict_t *ent)
 		return;
 	}
 
-	num = gi.BoxEdicts(ent->absmin, ent->absmax, touch,
-			MAX_EDICTS, AREA_SOLID);
+	num = gi.BoxEdicts(ent->absmin, ent->absmax, touch, MAX_EDICTS, AREA_SOLID);
 
 	/* be careful, it is possible to have an entity in this
 	   list removed before we get to it (killtriggered) */
@@ -646,9 +801,8 @@ G_TouchSolids(edict_t *ent)
 }
 
 /*
- * Kills all entities that would touch the
- * proposed new positioning of ent. Ent s
- * hould be unlinked before calling this!
+ * Kills all entities that would touch the proposed new positioning
+ * of ent. Ent should be unlinked before calling this!
  */
 qboolean
 KillBox(edict_t *ent)
@@ -662,8 +816,8 @@ KillBox(edict_t *ent)
 
 	while (1)
 	{
-		tr = gi.trace(ent->s.origin, ent->mins, ent->maxs, ent->s.origin,
-				NULL, MASK_PLAYERSOLID);
+		tr = gi.trace(ent->s.origin, ent->mins, ent->maxs,
+				ent->s.origin, NULL, MASK_PLAYERSOLID);
 
 		if (!tr.ent)
 		{
@@ -683,4 +837,3 @@ KillBox(edict_t *ent)
 
 	return true; /* all clear */
 }
-

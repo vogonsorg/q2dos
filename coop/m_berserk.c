@@ -1,23 +1,4 @@
 /*
-Copyright (C) 1997-2001 Id Software, Inc.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
-
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-*/
-/*
 ==============================================================================
 
 BERSERK
@@ -35,10 +16,12 @@ static int sound_punch;
 static int sound_sight;
 static int sound_search;
 
+void berserk_fidget(edict_t *self);
+
 void
-berserk_sight(edict_t *self, edict_t *other /* unused */)
+berserk_sight(edict_t *self, edict_t *other)
 {
-	if (!self)
+	if (!self || !other)
 	{
 		return;
 	}
@@ -57,8 +40,6 @@ berserk_search(edict_t *self)
 	gi.sound(self, CHAN_VOICE, sound_search, 1, ATTN_NORM, 0);
 }
 
-void berserk_fidget(edict_t *self);
-
 mframe_t berserk_frames_stand[] = {
 	{ai_stand, 0, berserk_fidget},
 	{ai_stand, 0, NULL},
@@ -67,12 +48,12 @@ mframe_t berserk_frames_stand[] = {
 	{ai_stand, 0, NULL}
 };
 
-mmove_t berserk_move_stand =
-{
+mmove_t berserk_move_stand = {
 	FRAME_stand1,
-	FRAME_stand5,
-	berserk_frames_stand,
-	NULL};
+   	FRAME_stand5,
+   	berserk_frames_stand,
+   	NULL
+};
 
 void
 berserk_stand(edict_t *self)
@@ -108,8 +89,7 @@ mframe_t berserk_frames_stand_fidget[] = {
 	{ai_stand, 0, NULL}
 };
 
-mmove_t berserk_move_stand_fidget =
-{
+mmove_t berserk_move_stand_fidget = {
 	FRAME_standb1,
 	FRAME_standb20,
 	berserk_frames_stand_fidget,
@@ -152,12 +132,12 @@ mframe_t berserk_frames_walk[] = {
 	{ai_walk, 4.7, NULL},
 	{ai_walk, 4.8, NULL}
 };
-mmove_t berserk_move_walk =
-{
+
+mmove_t berserk_move_walk = {
 	FRAME_walkc1,
-	FRAME_walkc11,
-	berserk_frames_walk,
-	NULL
+   	FRAME_walkc11,
+   	berserk_frames_walk,
+   	NULL
 };
 
 void
@@ -180,12 +160,11 @@ mframe_t berserk_frames_run1[] = {
 	{ai_run, 19, NULL}
 };
 
-mmove_t berserk_move_run1 =
-{
+mmove_t berserk_move_run1 = {
 	FRAME_run1,
-	FRAME_run6,
-	berserk_frames_run1,
-	NULL
+   	FRAME_run6,
+   	berserk_frames_run1,
+   	NULL
 };
 
 void
@@ -209,14 +188,14 @@ berserk_run(edict_t *self)
 void
 berserk_attack_spike(edict_t *self)
 {
-	static vec3_t aim = {MELEE_DISTANCE, 0, -24};
+	static vec3_t 	aim = {MELEE_DISTANCE, 0, -24};
 
 	if (!self)
 	{
 		return;
 	}
 
-	fire_hit(self, aim, (15 + (rand() % 6)), 400); /*	Faster attack -- upwards and backwards */
+	fire_hit(self, aim, (15 + (rand() % 6)), 400);
 }
 
 void
@@ -241,12 +220,11 @@ mframe_t berserk_frames_attack_spike[] = {
 	{ai_charge, 0, NULL}
 };
 
-mmove_t berserk_move_attack_spike =
-{
+mmove_t berserk_move_attack_spike = {
 	FRAME_att_c1,
-	FRAME_att_c8,
-	berserk_frames_attack_spike,
-	berserk_run
+   	FRAME_att_c8,
+   	berserk_frames_attack_spike,
+   	berserk_run
 };
 
 void
@@ -260,7 +238,7 @@ berserk_attack_club(edict_t *self)
 	}
 
 	VectorSet(aim, MELEE_DISTANCE, self->mins[0], -4);
-	fire_hit(self, aim, (5 + (rand() % 6)), 400);       /* Slower attack */
+	fire_hit(self, aim, (5 + (rand() % 6)), 400);
 }
 
 mframe_t berserk_frames_attack_club[] = {
@@ -278,19 +256,16 @@ mframe_t berserk_frames_attack_club[] = {
 	{ai_charge, 0, NULL}
 };
 
-mmove_t berserk_move_attack_club =
-{
+mmove_t berserk_move_attack_club = {
 	FRAME_att_c9,
-	FRAME_att_c20,
-	berserk_frames_attack_club,
+   	FRAME_att_c20,
+   	berserk_frames_attack_club,
    	berserk_run
 };
 
 void
 berserk_strike(edict_t *self)
 {
-	/* Unused, but removal is
-	   very PITA. Let it be... */
 }
 
 mframe_t berserk_frames_attack_strike[] = {
@@ -310,12 +285,11 @@ mframe_t berserk_frames_attack_strike[] = {
 	{ai_move, 13.6, NULL}
 };
 
-mmove_t berserk_move_attack_strike =
-{
+mmove_t berserk_move_attack_strike = {
 	FRAME_att_c21,
    	FRAME_att_c34,
    	berserk_frames_attack_strike,
-	berserk_run
+   	berserk_run
 };
 
 void
@@ -343,12 +317,12 @@ mframe_t berserk_frames_pain1[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t berserk_move_pain1 =
-{
+mmove_t berserk_move_pain1 = {
 	FRAME_painc1,
-	FRAME_painc4,
-	berserk_frames_pain1,
-	berserk_run};
+   	FRAME_painc4,
+   	berserk_frames_pain1,
+   	berserk_run
+};
 
 mframe_t berserk_frames_pain2[] = {
 	{ai_move, 0, NULL},
@@ -373,17 +347,15 @@ mframe_t berserk_frames_pain2[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t berserk_move_pain2 =
-{
+mmove_t berserk_move_pain2 = {
 	FRAME_painb1,
-	FRAME_painb20,
-	berserk_frames_pain2,
-	berserk_run
+   	FRAME_painb20,
+   	berserk_frames_pain2,
+   	berserk_run
 };
 
 void
-berserk_pain(edict_t *self, edict_t *other /* unused */,
-		float kick /* unused */, int damage)
+berserk_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 {
 	if (!self)
 	{
@@ -450,12 +422,11 @@ mframe_t berserk_frames_death1[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t berserk_move_death1 =
-{
+mmove_t berserk_move_death1 = {
 	FRAME_death1,
-	FRAME_death13,
-	berserk_frames_death1,
-	berserk_dead
+   	FRAME_death13,
+   	berserk_frames_death1,
+   	berserk_dead
 };
 
 mframe_t berserk_frames_death2[] = {
@@ -469,16 +440,16 @@ mframe_t berserk_frames_death2[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t berserk_move_death2 =
-{
+mmove_t berserk_move_death2 = {
 	FRAME_deathc1,
    	FRAME_deathc8,
-	berserk_frames_death2,
-	berserk_dead};
+   	berserk_frames_death2,
+   	berserk_dead
+};
 
 void
 berserk_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* unused */,
-		int damage, vec3_t point /* unused */)
+		int damage, vec3_t point)
 {
 	int n;
 
@@ -489,22 +460,19 @@ berserk_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /*
 
 	if (self->health <= self->gib_health)
 	{
-		gi.sound(self, CHAN_VOICE, gi.soundindex( "misc/udeath.wav"), 1, ATTN_NORM, 0);
+		gi.sound(self, CHAN_VOICE, gi.soundindex("misc/udeath.wav"), 1, ATTN_NORM, 0);
 
 		for (n = 0; n < 2; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/bone/tris.md2",
-					damage, GIB_ORGANIC);
+			ThrowGib(self, "models/objects/gibs/bone/tris.md2", damage, GIB_ORGANIC);
 		}
 
 		for (n = 0; n < 4; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2",
-					damage, GIB_ORGANIC);
+			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 		}
 
-		ThrowHead(self, "models/objects/gibs/head2/tris.md2",
-				damage, GIB_ORGANIC);
+		ThrowHead(self, "models/objects/gibs/head2/tris.md2", damage, GIB_ORGANIC);
 		self->deadflag = DEAD_DEAD;
 		return;
 	}

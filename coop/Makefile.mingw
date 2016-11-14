@@ -3,13 +3,8 @@ CFLAGS = -m32 -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 CPPFLAGS = -Did386=1
 LDFLAGS = -m32 -shared -Wl,--enable-auto-image-base -Wl,--no-undefined
 
-GAME = m_tank.o \
-	p_client.o \
-	p_hud.o \
-	p_trail.o \
-	p_view.o \
-	p_weapon.o \
-	q_shared.o \
+GAME = dm_ball.o \
+	dm_tag.o \
 	g_ai.o \
 	g_chase.o \
 	g_cmds.o \
@@ -19,9 +14,16 @@ GAME = m_tank.o \
 	g_main.o \
 	g_misc.o \
 	g_monster.o \
+	g_newai.o \
+	g_newdm.o \
+	g_newfnc.o \
+	g_newtarg.o \
+	g_newtrig.o \
+	g_newweap.o \
 	g_phys.o \
 	g_save.o \
 	g_spawn.o \
+	g_sphere.o \
 	g_svcmds.o \
 	g_target.o \
 	g_trigger.o \
@@ -35,6 +37,7 @@ GAME = m_tank.o \
 	m_boss31.o \
 	m_boss32.o \
 	m_brain.o \
+	m_carrier.o \
 	m_chick.o \
 	m_flash.o \
 	m_flipper.o \
@@ -50,7 +53,18 @@ GAME = m_tank.o \
 	m_mutant.o \
 	m_parasite.o \
 	m_soldier.o \
-	m_supertank.o
+	m_stalker.o \
+	m_supertank.o \
+	m_tank.o \
+	m_turret.o \
+	m_widow.o \
+	m_widow2.o \
+	p_client.o \
+	p_hud.o \
+	p_trail.o \
+	p_view.o \
+	p_weapon.o \
+	q_shared.o
 
 .PHONY: all test clean
 #
@@ -59,8 +73,8 @@ OBJECTS =  $(GAME)
 
 all: gamex86.dll
 
-gamex86.dll:	$(OBJECTS) game.def
-	$(CC) -o gamex86.dll $(LDFLAGS) $(OBJECTS) game.def
+gamex86.dll:	$(OBJECTS) rogue.def
+	$(CC) -o gamex86.dll $(LDFLAGS) $(OBJECTS) rogue.def
 
 clean:
 	rm -f *.o
@@ -75,4 +89,3 @@ DO_AS=$(CC) -x assembler-with-cpp
 
 %.o: %.s
 	$(DO_AS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
-

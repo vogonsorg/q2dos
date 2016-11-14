@@ -1,31 +1,12 @@
-/*
-Copyright (C) 1997-2001 Id Software, Inc.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
-
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-*/
 // g_turret.c
 
 #include "g_local.h"
 
-void infantry_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
-		int damage);
+qboolean FindTarget(edict_t *self);
+void infantry_die(edict_t *self, edict_t *inflictor, edict_t *attacker, int damage);
 void infantry_stand(edict_t *self);
 void monster_use(edict_t *self, edict_t *other, edict_t *activator);
-qboolean FindTarget(edict_t *self);
+void SpawnTargetingSystem(edict_t *turret);
 
 void
 AnglesNormalize(vec3_t vec)
@@ -104,12 +85,13 @@ turret_blocked(edict_t *self, edict_t *other)
  * "speed"		default 50
  * "dmg"		default 10
  * "angle"		point this forward
- * "target"	    point this at an info_notnull at the muzzle tip
+ * "target"	point this at an info_notnull at the muzzle tip
  * "minpitch"	min acceptable pitch angle : default -30
  * "maxpitch"	max acceptable pitch angle : default 30
- * "minyaw"	    min acceptable yaw angle   : default 0
- * "maxyaw"	    max acceptable yaw angle   : default 360
+ * "minyaw"	min acceptable yaw angle   : default 0
+ * "maxyaw"	max acceptable yaw angle   : default 360
  */
+
 void
 turret_breach_fire(edict_t *self)
 {
@@ -131,8 +113,7 @@ turret_breach_fire(edict_t *self)
 	damage = 100 + random() * 50;
 	speed = 550 + 50 * skill->value;
 	fire_rocket(self->teammaster->owner, start, f, damage, speed, 150, damage);
-	gi.positioned_sound(start, self, CHAN_WEAPON,
-			gi.soundindex("weapons/rocklf1a.wav"), 1, ATTN_NORM, 0);
+	gi.positioned_sound(start, self, CHAN_WEAPON, gi.soundindex("weapons/rocklf1a.wav"), 1, ATTN_NORM, 0);
 }
 
 void
@@ -271,10 +252,8 @@ turret_breach_think(edict_t *self)
 		/* x & y */
 		angle = self->s.angles[1] + self->owner->move_origin[1];
 		angle *= (M_PI * 2 / 360);
-		target[0] = SnapToEights(self->s.origin[0] + cos(
-					angle) * self->owner->move_origin[0]);
-		target[1] = SnapToEights(self->s.origin[1] + sin(
-					angle) * self->owner->move_origin[0]);
+		target[0] = SnapToEights(self->s.origin[0] + cos(angle) * self->owner->move_origin[0]);
+		target[1] = SnapToEights(self->s.origin[1] + sin(angle) * self->owner->move_origin[0]);
 		target[2] = self->owner->s.origin[2];
 
 		VectorSubtract(target, self->owner->s.origin, dir);
@@ -283,9 +262,7 @@ turret_breach_think(edict_t *self)
 
 		/* z */
 		angle = self->s.angles[PITCH] * (M_PI * 2 / 360);
-		target_z = SnapToEights(
-				self->s.origin[2] + self->owner->move_origin[0] * tan(
-					angle) + self->owner->move_origin[2]);
+		target_z = SnapToEights(self->s.origin[2] + self->owner->move_origin[0] * tan(angle) + self->owner->move_origin[2]);
 
 		diff = target_z - self->owner->s.origin[2];
 		self->owner->velocity[2] = diff * 1.0 / FRAMETIME;
@@ -309,15 +286,21 @@ turret_breach_finish_init(edict_t *self)
 	/* get and save info for muzzle location */
 	if (!self->target)
 	{
-		gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s needs a target\n", self->classname,
-				vtos(self->s.origin));
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s needs a target\n", self->classname, vtos(self->s.origin));
 	}
 	else
 	{
 		self->target_ent = G_PickTarget(self->target);
-		VectorSubtract(self->target_ent->s.origin,
-				self->s.origin, self->move_origin);
-		G_FreeEdict(self->target_ent);
+
+		if (self->target_ent)
+		{
+			VectorSubtract(self->target_ent->s.origin, self->s.origin, self->move_origin);
+			G_FreeEdict(self->target_ent);
+		}
+		else
+		{
+			gi.dprintf(DEVELOPER_MSG_GAME, "could not find target entity for %s at %s\n", self->classname, vtos(self->s.origin));
+		}
 	}
 
 	self->teammaster->dmg = self->dmg;
@@ -405,7 +388,7 @@ SP_turret_base(edict_t *self)
  */
 void
 turret_driver_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
-		int damage, vec3_t point /* unused */)
+	   	int damage, vec3_t point)
 {
 	edict_t *ent;
 
@@ -535,9 +518,7 @@ turret_driver_link(edict_t *self)
 	self->move_origin[2] = self->s.origin[2] - self->target_ent->s.origin[2];
 
 	/* add the driver to the end of them team chain */
-	for (ent = self->target_ent->teammaster;
-		 ent->teamchain;
-		 ent = ent->teamchain)
+	for (ent = self->target_ent->teammaster; ent->teamchain; ent = ent->teamchain)
 	{
 	}
 
@@ -592,13 +573,236 @@ SP_turret_driver(edict_t *self)
 
 		if (!self->item)
 		{
-			gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s has bad item: %s\n", self->classname,
-					vtos(self->s.origin), st.item);
+			gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s has bad item: %s\n", self->classname, vtos(self->s.origin), st.item);
 		}
 	}
 
 	self->think = turret_driver_link;
 	self->nextthink = level.time + FRAMETIME;
 
+	gi.linkentity(self);
+}
+
+/*
+ * invisible turret drivers so we can have unmanned turrets.
+ * originally designed to shoot at func_trains and such, so they
+ * fire at the center of the bounding box, rather than the entity's
+ * origin. */
+
+void
+turret_brain_think(edict_t *self)
+{
+	vec3_t target;
+	vec3_t dir;
+	vec3_t endpos;
+	float reaction_time;
+	trace_t trace;
+
+	if (!self)
+	{
+		return;
+	}
+
+	self->nextthink = level.time + FRAMETIME;
+
+	if (self->enemy)
+	{
+		if (!self->enemy->inuse)
+		{
+			self->enemy = NULL;
+		}
+		else if (self->enemy->takedamage && (self->enemy->health <= 0))
+		{
+			self->enemy = NULL;
+		}
+	}
+
+	if (!self->enemy)
+	{
+		if (!FindTarget(self))
+		{
+			return;
+		}
+
+		self->monsterinfo.trail_time = level.time;
+		self->monsterinfo.aiflags &= ~AI_LOST_SIGHT;
+	}
+	else
+	{
+		VectorAdd(self->enemy->absmax, self->enemy->absmin, endpos);
+		VectorScale(endpos, 0.5, endpos);
+
+		trace = gi.trace(self->target_ent->s.origin, vec3_origin, vec3_origin,
+				endpos, self->target_ent, MASK_SHOT);
+
+		if ((trace.fraction == 1) || (trace.ent == self->enemy))
+		{
+			if (self->monsterinfo.aiflags & AI_LOST_SIGHT)
+			{
+				self->monsterinfo.trail_time = level.time;
+				self->monsterinfo.aiflags &= ~AI_LOST_SIGHT;
+			}
+		}
+		else
+		{
+			self->monsterinfo.aiflags |= AI_LOST_SIGHT;
+			return;
+		}
+	}
+
+	/* let the turret know where we want it to aim */
+	VectorCopy(endpos, target);
+	VectorSubtract(target, self->target_ent->s.origin, dir);
+	vectoangles(dir, self->target_ent->move_angles);
+
+	/* decide if we should shoot */
+	if (level.time < self->monsterinfo.attack_finished)
+	{
+		return;
+	}
+
+	if (self->delay)
+	{
+		reaction_time = self->delay;
+	}
+	else
+	{
+		reaction_time = (3 - skill->value) * 1.0;
+	}
+
+	if ((level.time - self->monsterinfo.trail_time) < reaction_time)
+	{
+		return;
+	}
+
+	self->monsterinfo.attack_finished = level.time + reaction_time + 1.0;
+	self->target_ent->spawnflags |= 65536;
+}
+
+void
+turret_brain_link(edict_t *self)
+{
+	vec3_t vec;
+	edict_t *ent;
+
+	if (!self)
+	{
+		return;
+	}
+
+	if (self->killtarget)
+	{
+		self->enemy = G_PickTarget(self->killtarget);
+	}
+
+	self->think = turret_brain_think;
+	self->nextthink = level.time + FRAMETIME;
+
+	self->target_ent = G_PickTarget(self->target);
+	self->target_ent->owner = self;
+	self->target_ent->teammaster->owner = self;
+	VectorCopy(self->target_ent->s.angles, self->s.angles);
+
+	vec[0] = self->target_ent->s.origin[0] - self->s.origin[0];
+	vec[1] = self->target_ent->s.origin[1] - self->s.origin[1];
+	vec[2] = 0;
+	self->move_origin[0] = VectorLength(vec);
+
+	VectorSubtract(self->s.origin, self->target_ent->s.origin, vec);
+	vectoangles(vec, vec);
+	AnglesNormalize(vec);
+	self->move_origin[1] = vec[1];
+
+	self->move_origin[2] = self->s.origin[2] - self->target_ent->s.origin[2];
+
+	/* add the driver to the end of them team chain */
+	for (ent = self->target_ent->teammaster; ent->teamchain; ent = ent->teamchain)
+	{
+	}
+
+	ent->teamchain = self;
+	self->teammaster = self->target_ent->teammaster;
+	self->flags |= FL_TEAMSLAVE;
+}
+
+void
+turret_brain_deactivate(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	self->think = NULL;
+	self->nextthink = 0;
+}
+
+void
+turret_brain_activate(edict_t *self, edict_t *other /* unused */, edict_t *activator)
+{
+	if (!self || !activator)
+	{
+		return;
+	}
+
+	if (!self->enemy)
+	{
+		self->enemy = activator;
+	}
+
+	/* wait at least 3 seconds to fire. */
+	self->monsterinfo.attack_finished = level.time + 3;
+	self->use = turret_brain_deactivate;
+
+	self->think = turret_brain_link;
+	self->nextthink = level.time + FRAMETIME;
+}
+
+/*
+ * QUAKED turret_invisible_brain (1 .5 0) (-16 -16 -16) (16 16 16)
+ * Invisible brain to drive the turret.
+ *
+ * Does not search for targets. If targeted, can only be turned on once
+ * and then off once. After that they are completely disabled.
+ *
+ * "delay" the delay between firing (default ramps for skill level)
+ * "Target" the turret breach
+ * "Killtarget" the item you want it to attack.
+ * Target the brain if you want it activated later, instead of immediately. It will wait 3 seconds
+ * before firing to acquire the target.
+ */
+void
+SP_turret_invisible_brain(edict_t *self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	if (!self->killtarget)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "turret_invisible_brain with no killtarget!\n");
+		G_FreeEdict(self);
+		return;
+	}
+
+	if (!self->target)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "turret_invisible_brain with no target!\n");
+		G_FreeEdict(self);
+		return;
+	}
+
+	if (self->targetname)
+	{
+		self->use = turret_brain_activate;
+	}
+	else
+	{
+		self->think = turret_brain_link;
+		self->nextthink = level.time + FRAMETIME;
+	}
+
+	self->movetype = MOVETYPE_PUSH;
 	gi.linkentity(self);
 }

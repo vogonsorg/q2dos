@@ -1,23 +1,4 @@
 /*
-Copyright (C) 1997-2001 Id Software, Inc.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
-
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-*/
-/*
 ==============================================================================
 
 TANK
@@ -28,10 +9,11 @@ TANK
 #include "g_local.h"
 #include "m_tank.h"
 
-
 void tank_refire_rocket(edict_t *self);
 void tank_doattack_rocket(edict_t *self);
 void tank_reattack_blaster(edict_t *self);
+void tank_walk(edict_t *self);
+void tank_run(edict_t *self);
 
 static int sound_thud;
 static int sound_pain;
@@ -130,8 +112,7 @@ mframe_t tank_frames_stand[] = {
 	{ai_stand, 0, NULL}
 };
 
-mmove_t tank_move_stand =
-{
+mmove_t tank_move_stand = {
 	FRAME_stand01,
    	FRAME_stand30,
    	tank_frames_stand,
@@ -149,8 +130,6 @@ tank_stand(edict_t *self)
 	self->monsterinfo.currentmove = &tank_move_stand;
 }
 
-void tank_walk(edict_t *self);
-
 mframe_t tank_frames_start_walk[] = {
 	{ai_walk, 0, NULL},
 	{ai_walk, 6, NULL},
@@ -158,10 +137,9 @@ mframe_t tank_frames_start_walk[] = {
 	{ai_walk, 11, tank_footstep}
 };
 
-mmove_t tank_move_start_walk =
-{
+mmove_t tank_move_start_walk = {
 	FRAME_walk01,
-	FRAME_walk04,
+   	FRAME_walk04,
    	tank_frames_start_walk,
    	tank_walk
 };
@@ -185,11 +163,10 @@ mframe_t tank_frames_walk[] = {
 	{ai_walk, 6, tank_footstep}
 };
 
-mmove_t tank_move_walk =
-{
+mmove_t tank_move_walk = {
 	FRAME_walk05,
-	FRAME_walk20,
-	tank_frames_walk,
+   	FRAME_walk20,
+   	tank_frames_walk,
    	NULL
 };
 
@@ -201,11 +178,10 @@ mframe_t tank_frames_stop_walk[] = {
 	{ai_walk, 4, tank_footstep}
 };
 
-mmove_t tank_move_stop_walk =
-{
+mmove_t tank_move_stop_walk = {
 	FRAME_walk21,
    	FRAME_walk25,
-	tank_frames_stop_walk,
+   	tank_frames_stop_walk,
    	tank_stand
 };
 
@@ -220,8 +196,6 @@ tank_walk(edict_t *self)
 	self->monsterinfo.currentmove = &tank_move_walk;
 }
 
-void tank_run(edict_t *self);
-
 mframe_t tank_frames_start_run[] = {
 	{ai_run, 0, NULL},
 	{ai_run, 6, NULL},
@@ -229,12 +203,11 @@ mframe_t tank_frames_start_run[] = {
 	{ai_run, 11, tank_footstep}
 };
 
-mmove_t tank_move_start_run =
-{
+mmove_t tank_move_start_run = {
 	FRAME_walk01,
    	FRAME_walk04,
    	tank_frames_start_run,
-	tank_run
+   	tank_run
 };
 
 mframe_t tank_frames_run[] = {
@@ -256,8 +229,7 @@ mframe_t tank_frames_run[] = {
 	{ai_run, 6, tank_footstep}
 };
 
-mmove_t tank_move_run =
-{
+mmove_t tank_move_run = {
 	FRAME_walk05,
    	FRAME_walk20,
    	tank_frames_run,
@@ -272,8 +244,7 @@ mframe_t tank_frames_stop_run[] = {
 	{ai_run, 4, tank_footstep}
 };
 
-mmove_t tank_move_stop_run =
-{
+mmove_t tank_move_stop_run = {
 	FRAME_walk21,
    	FRAME_walk25,
    	tank_frames_stop_run,
@@ -321,8 +292,7 @@ mframe_t tank_frames_pain1[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t tank_move_pain1 =
-{
+mmove_t tank_move_pain1 = {
 	FRAME_pain101,
    	FRAME_pain104,
    	tank_frames_pain1,
@@ -337,8 +307,7 @@ mframe_t tank_frames_pain2[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t tank_move_pain2 =
-{
+mmove_t tank_move_pain2 = {
 	FRAME_pain201,
    	FRAME_pain205,
    	tank_frames_pain2,
@@ -364,17 +333,15 @@ mframe_t tank_frames_pain3[] = {
 	{ai_move, 0, tank_footstep}
 };
 
-mmove_t tank_move_pain3 =
-{
+mmove_t tank_move_pain3 = {
 	FRAME_pain301,
-	FRAME_pain316,
-	tank_frames_pain3,
-	tank_run
+   	FRAME_pain316,
+   	tank_frames_pain3,
+   	tank_run
 };
 
 void
-tank_pain(edict_t *self, edict_t *other /* other */,
-	   	float kick /* other */, int damage)
+tank_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 {
 	if (!self)
 	{
@@ -470,8 +437,8 @@ TankBlaster(edict_t *self)
 	}
 
 	AngleVectors(self->s.angles, forward, right, NULL);
-	G_ProjectSource(self->s.origin, monster_flash_offset[flash_number],
-			forward, right, start);
+	G_ProjectSource(self->s.origin, monster_flash_offset[flash_number], forward,
+			right, start);
 
 	VectorCopy(self->enemy->s.origin, end);
 	end[2] += self->enemy->viewheight;
@@ -483,6 +450,11 @@ TankBlaster(edict_t *self)
 void
 TankStrike(edict_t *self)
 {
+	if (!self)
+	{
+		return;
+	}
+
 	gi.sound(self, CHAN_WEAPON, sound_strike, 1, ATTN_NORM, 0);
 }
 
@@ -514,8 +486,8 @@ TankRocket(edict_t *self)
 	}
 
 	AngleVectors(self->s.angles, forward, right, NULL);
-	G_ProjectSource(self->s.origin, monster_flash_offset[flash_number],
-			forward, right, start);
+	G_ProjectSource(self->s.origin, monster_flash_offset[flash_number], forward,
+			right, start);
 
 	VectorCopy(self->enemy->s.origin, vec);
 	vec[2] += self->enemy->viewheight;
@@ -571,9 +543,8 @@ TankMachineGun(edict_t *self)
 
 	AngleVectors(dir, forward, NULL, NULL);
 
-	monster_fire_bullet(self, start, forward, 20, 4,
-			DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD,
-			flash_number);
+	monster_fire_bullet(self, start, forward, 20, 4, DEFAULT_BULLET_HSPREAD,
+			DEFAULT_BULLET_VSPREAD, flash_number);
 }
 
 mframe_t tank_frames_attack_blast[] = {
@@ -586,22 +557,17 @@ mframe_t tank_frames_attack_blast[] = {
 	{ai_charge, -1, NULL},
 	{ai_charge, -1, NULL},
 	{ai_charge, 0, NULL},
-	{ai_charge, 0, TankBlaster}, /* 10 */
+	{ai_charge, 0, TankBlaster},        /* 10 */
 	{ai_charge, 0, NULL},
 	{ai_charge, 0, NULL},
 	{ai_charge, 0, TankBlaster},
 	{ai_charge, 0, NULL},
 	{ai_charge, 0, NULL},
-	{ai_charge, 0, TankBlaster} /* 16 */
+	{ai_charge, 0, TankBlaster}         /* 16 */
 };
-
 mmove_t tank_move_attack_blast =
-{
-	FRAME_attak101,
-	FRAME_attak116,
-	tank_frames_attack_blast,
-	tank_reattack_blaster
-};
+{FRAME_attak101, FRAME_attak116, tank_frames_attack_blast,
+ tank_reattack_blaster};
 
 mframe_t tank_frames_reattack_blast[] = {
 	{ai_charge, 0, NULL},
@@ -609,32 +575,30 @@ mframe_t tank_frames_reattack_blast[] = {
 	{ai_charge, 0, TankBlaster},
 	{ai_charge, 0, NULL},
 	{ai_charge, 0, NULL},
-	{ai_charge, 0, TankBlaster} /* 16 */
+	{ai_charge, 0, TankBlaster}         /* 16 */
 };
 
-mmove_t tank_move_reattack_blast =
-{
+mmove_t tank_move_reattack_blast = {
 	FRAME_attak111,
-	FRAME_attak116,
-	tank_frames_reattack_blast,
+   	FRAME_attak116,
+   	tank_frames_reattack_blast,
 	tank_reattack_blaster
 };
 
 mframe_t tank_frames_attack_post_blast[] = {
-	{ai_move, 0, NULL}, /* 17 */
+	{ai_move, 0, NULL},                 /* 17 */
 	{ai_move, 0, NULL},
 	{ai_move, 2, NULL},
 	{ai_move, 3, NULL},
 	{ai_move, 2, NULL},
-	{ai_move, -2, tank_footstep} /* 22 */
+	{ai_move, -2, tank_footstep}        /* 22 */
 };
 
-mmove_t tank_move_attack_post_blast =
-{
+mmove_t tank_move_attack_post_blast = {
 	FRAME_attak117,
-	FRAME_attak122,
-	tank_frames_attack_post_blast,
-	tank_run
+   	FRAME_attak122,
+   	tank_frames_attack_post_blast,
+   	tank_run
 };
 
 void
@@ -716,8 +680,7 @@ mframe_t tank_frames_attack_strike[] = {
 	{ai_move, -2, tank_footstep}
 };
 
-mmove_t tank_move_attack_strike =
-{
+mmove_t tank_move_attack_strike = {
 	FRAME_attak201,
    	FRAME_attak238,
    	tank_frames_attack_strike,
@@ -734,7 +697,7 @@ mframe_t tank_frames_attack_pre_rocket[] = {
 	{ai_charge, 0, NULL},
 	{ai_charge, 0, NULL},
 	{ai_charge, 0, NULL},
-	{ai_charge, 0, NULL}, /* 10 */
+	{ai_charge, 0, NULL},           /* 10 */
 
 	{ai_charge, 0, NULL},
 	{ai_charge, 1, NULL},
@@ -745,41 +708,39 @@ mframe_t tank_frames_attack_pre_rocket[] = {
 	{ai_charge, 0, NULL},
 	{ai_charge, 0, NULL},
 	{ai_charge, 0, NULL},
-	{ai_charge, 0, NULL}, /* 20 */
+	{ai_charge, 0, NULL},           /* 20 */
 
 	{ai_charge, -3, NULL}
 };
 
-mmove_t tank_move_attack_pre_rocket =
-{
+mmove_t tank_move_attack_pre_rocket = {
 	FRAME_attak301,
-	FRAME_attak321,
-	tank_frames_attack_pre_rocket,
+   	FRAME_attak321,
+   	tank_frames_attack_pre_rocket,
 	tank_doattack_rocket
 };
 
 mframe_t tank_frames_attack_fire_rocket[] = {
-	{ai_charge, -3, NULL}, /* Loop Start 22 */
+	{ai_charge, -3, NULL},          /* Loop Start	22 */
 	{ai_charge, 0, NULL},
-	{ai_charge, 0, TankRocket}, /* 24 */
+	{ai_charge, 0, TankRocket},     /* 24 */
 	{ai_charge, 0, NULL},
 	{ai_charge, 0, NULL},
 	{ai_charge, 0, TankRocket},
 	{ai_charge, 0, NULL},
 	{ai_charge, 0, NULL},
-	{ai_charge, -1, TankRocket} /* 30 Loop End */
+	{ai_charge, -1, TankRocket}     /* 30	Loop End */
 };
 
-mmove_t tank_move_attack_fire_rocket =
-{
+mmove_t tank_move_attack_fire_rocket = {
 	FRAME_attak322,
-	FRAME_attak330,
-	tank_frames_attack_fire_rocket,
+   	FRAME_attak330,
+   	tank_frames_attack_fire_rocket,
 	tank_refire_rocket
 };
 
 mframe_t tank_frames_attack_post_rocket[] = {
-	{ai_charge, 0, NULL}, /* 31 */
+	{ai_charge, 0, NULL},           /* 31 */
 	{ai_charge, -1, NULL},
 	{ai_charge, -1, NULL},
 	{ai_charge, 0, NULL},
@@ -788,7 +749,7 @@ mframe_t tank_frames_attack_post_rocket[] = {
 	{ai_charge, 4, NULL},
 	{ai_charge, 2, NULL},
 	{ai_charge, 0, NULL},
-	{ai_charge, 0, NULL}, /* 40 */
+	{ai_charge, 0, NULL},           /* 40 */
 
 	{ai_charge, 0, NULL},
 	{ai_charge, -9, NULL},
@@ -799,15 +760,14 @@ mframe_t tank_frames_attack_post_rocket[] = {
 	{ai_charge, 0, NULL},
 	{ai_charge, 0, NULL},
 	{ai_charge, 0, NULL},
-	{ai_charge, 0, NULL}, /* 50 */
+	{ai_charge, 0, NULL},           /* 50 */
 
 	{ai_charge, 0, NULL},
 	{ai_charge, 0, NULL},
 	{ai_charge, 0, NULL}
 };
 
-mmove_t tank_move_attack_post_rocket =
-{
+mmove_t tank_move_attack_post_rocket = {
 	FRAME_attak331,
    	FRAME_attak353,
    	tank_frames_attack_post_rocket,
@@ -846,12 +806,11 @@ mframe_t tank_frames_attack_chain[] = {
 	{ai_charge, 0, NULL}
 };
 
-mmove_t tank_move_attack_chain =
-{
+mmove_t tank_move_attack_chain = {
 	FRAME_attak401,
    	FRAME_attak429,
-	tank_frames_attack_chain,
-	tank_run
+   	tank_frames_attack_chain,
+   	tank_run
 };
 
 void
@@ -871,8 +830,7 @@ tank_refire_rocket(edict_t *self)
 			{
 				if (random() <= 0.4)
 				{
-					self->monsterinfo.currentmove =
-						&tank_move_attack_fire_rocket;
+					self->monsterinfo.currentmove = &tank_move_attack_fire_rocket;
 					return;
 				}
 			}
@@ -948,7 +906,7 @@ tank_attack(edict_t *self)
 		else if (r < 0.66)
 		{
 			self->monsterinfo.currentmove = &tank_move_attack_pre_rocket;
-			self->pain_debounce_time = level.time + 5.0;    /* no pain for a while */
+			self->pain_debounce_time = level.time + 5.0; /* no pain for a while */
 		}
 		else
 		{
@@ -1008,18 +966,16 @@ mframe_t tank_frames_death1[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t tank_move_death =
-{
+mmove_t tank_move_death = {
 	FRAME_death101,
    	FRAME_death132,
-	tank_frames_death1,
+   	tank_frames_death1,
    	tank_dead
 };
 
 void
-tank_die(edict_t *self, edict_t *inflictor /* unused */,
-		edict_t *attacker /* unused */, int damage,
-		vec3_t point /* unused */)
+tank_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* unused */,
+		int damage, vec3_t point /* unused */)
 {
 	int n;
 
@@ -1031,24 +987,21 @@ tank_die(edict_t *self, edict_t *inflictor /* unused */,
 	/* check for gib */
 	if (self->health <= self->gib_health)
 	{
-		gi.sound(self, CHAN_VOICE, gi.soundindex("misc/udeath.wav"), 1, ATTN_NORM, 0);
+		gi.sound(self, CHAN_VOICE, gi.soundindex(
+						"misc/udeath.wav"), 1, ATTN_NORM, 0);
 
-		for (n = 0; n < 1; n++)
+		for (n = 0; n < 1 /*4*/; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2",
-					damage, GIB_ORGANIC);
+			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 		}
 
 		for (n = 0; n < 4; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/sm_metal/tris.md2",
-					damage, GIB_METALLIC);
+			ThrowGib(self, "models/objects/gibs/sm_metal/tris.md2", damage, GIB_METALLIC);
 		}
 
-		ThrowGib(self, "models/objects/gibs/chest/tris.md2",
-				damage, GIB_ORGANIC);
-		ThrowHead(self, "models/objects/gibs/gear/tris.md2",
-				damage, GIB_METALLIC);
+		ThrowGib(self, "models/objects/gibs/chest/tris.md2", damage, GIB_ORGANIC);
+		ThrowHead(self, "models/objects/gibs/gear/tris.md2", damage, GIB_METALLIC);
 		self->deadflag = DEAD_DEAD;
 		return;
 	}
@@ -1066,9 +1019,12 @@ tank_die(edict_t *self, edict_t *inflictor /* unused */,
 	self->monsterinfo.currentmove = &tank_move_death;
 }
 
+
 /*
  * QUAKED monster_tank (1 .5 0) (-32 -32 -16) (32 32 72) Ambush Trigger_Spawn Sight
+ */
 
+/*
  * QUAKED monster_tank_commander (1 .5 0) (-32 -32 -16) (32 32 72) Ambush Trigger_Spawn Sight
  */
 void

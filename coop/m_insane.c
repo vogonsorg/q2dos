@@ -1,23 +1,4 @@
 /*
-Copyright (C) 1997-2001 Id Software, Inc.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
-
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-*/
-/*
 ==============================================================================
 
 insane
@@ -33,50 +14,6 @@ static int sound_shake;
 static int sound_moan;
 static int sound_scream[8];
 
-void
-insane_fist(edict_t *self)
-{
-	if (!self)
-	{
-		return;
-	}
-
-	gi.sound(self, CHAN_VOICE, sound_fist, 1, ATTN_IDLE, 0);
-}
-
-void
-insane_shake(edict_t *self)
-{
-	if (!self)
-	{
-		return;
-	}
-
-	gi.sound(self, CHAN_VOICE, sound_shake, 1, ATTN_IDLE, 0);
-}
-
-void
-insane_moan(edict_t *self)
-{
-	if (!self)
-	{
-		return;
-	}
-
-	gi.sound(self, CHAN_VOICE, sound_moan, 1, ATTN_IDLE, 0);
-}
-
-void
-insane_scream(edict_t *self)
-{
-	if (!self)
-	{
-		return;
-	}
-
-	gi.sound(self, CHAN_VOICE, sound_scream[rand() % 8], 1, ATTN_IDLE, 0);
-}
-
 void insane_stand(edict_t *self);
 void insane_dead(edict_t *self);
 void insane_cross(edict_t *self);
@@ -85,6 +22,30 @@ void insane_run(edict_t *self);
 void insane_checkdown(edict_t *self);
 void insane_checkup(edict_t *self);
 void insane_onground(edict_t *self);
+
+void
+insane_fist(edict_t *self)
+{
+	gi.sound(self, CHAN_VOICE, sound_fist, 1, ATTN_IDLE, 0);
+}
+
+void
+insane_shake(edict_t *self)
+{
+	gi.sound(self, CHAN_VOICE, sound_shake, 1, ATTN_IDLE, 0);
+}
+
+void
+insane_moan(edict_t *self)
+{
+	gi.sound(self, CHAN_VOICE, sound_moan, 1, ATTN_IDLE, 0);
+}
+
+void
+insane_scream(edict_t *self)
+{
+	gi.sound(self, CHAN_VOICE, sound_scream[rand() % 8], 1, ATTN_IDLE, 0);
+}
 
 mframe_t insane_frames_stand_normal[] = {
 	{ai_stand, 0, NULL},
@@ -95,10 +56,9 @@ mframe_t insane_frames_stand_normal[] = {
 	{ai_stand, 0, insane_checkdown}
 };
 
-mmove_t insane_move_stand_normal =
-{
+mmove_t insane_move_stand_normal = {
 	FRAME_stand60,
-	FRAME_stand65,
+   	FRAME_stand65,
    	insane_frames_stand_normal,
    	insane_stand
 };
@@ -136,11 +96,10 @@ mframe_t insane_frames_stand_insane[] = {
 	{ai_stand, 0, insane_checkdown}
 };
 
-mmove_t insane_move_stand_insane =
-{
+mmove_t insane_move_stand_insane = {
 	FRAME_stand65,
    	FRAME_stand94,
-	insane_frames_stand_insane,
+   	insane_frames_stand_insane,
    	insane_stand
 };
 
@@ -190,8 +149,7 @@ mframe_t insane_frames_uptodown[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t insane_move_uptodown =
-{
+mmove_t insane_move_uptodown = {
 	FRAME_stand1,
    	FRAME_stand40,
    	insane_frames_uptodown,
@@ -199,33 +157,32 @@ mmove_t insane_move_uptodown =
 };
 
 mframe_t insane_frames_downtoup[] = {
-	{ai_move, -0.7, NULL}, /* 41 */
-	{ai_move, -1.2, NULL}, /* 42 */
-	{ai_move, -1.5, NULL}, /* 43 */
-	{ai_move, -4.5, NULL}, /* 44 */
-	{ai_move, -3.5, NULL}, /* 45 */
-	{ai_move, -0.2, NULL}, /* 46 */
-	{ai_move, 0, NULL}, /* 47 */
-	{ai_move, -1.3, NULL}, /* 48 */
-	{ai_move, -3, NULL}, /* 49 */
-	{ai_move, -2, NULL}, /* 50 */
-	{ai_move, 0, NULL}, /* 51 */
-	{ai_move, 0, NULL}, /* 52 */
-	{ai_move, 0, NULL}, /* 53 */
-	{ai_move, -3.3, NULL}, /* 54 */
-	{ai_move, -1.6, NULL}, /* 55 */
-	{ai_move, -0.3, NULL}, /* 56 */
-	{ai_move, 0, NULL}, /* 57 */
-	{ai_move, 0, NULL}, /* 58 */
-	{ai_move, 0, NULL}  /* 59 */
+	{ai_move, -0.7, NULL},              /* 41 */
+	{ai_move, -1.2, NULL},              /* 42 */
+	{ai_move, -1.5, NULL},              /* 43 */
+	{ai_move, -4.5, NULL},              /* 44 */
+	{ai_move, -3.5, NULL},              /* 45 */
+	{ai_move, -0.2, NULL},              /* 46 */
+	{ai_move, 0, NULL},					/* 47 */
+	{ai_move, -1.3, NULL},              /* 48 */
+	{ai_move, -3, NULL},                /* 49 */
+	{ai_move, -2, NULL},				/* 50 */
+	{ai_move, 0, NULL},                 /* 51 */
+	{ai_move, 0, NULL},                 /* 52 */
+	{ai_move, 0, NULL},                 /* 53 */
+	{ai_move, -3.3, NULL},              /* 54 */
+	{ai_move, -1.6, NULL},              /* 55 */
+	{ai_move, -0.3, NULL},              /* 56 */
+	{ai_move, 0, NULL},                 /* 57 */
+	{ai_move, 0, NULL},                 /* 58 */
+	{ai_move, 0, NULL}                  /* 59 */
 };
 
-mmove_t insane_move_downtoup =
-{
+mmove_t insane_move_downtoup = {
 	FRAME_stand41,
-	FRAME_stand59,
-	insane_frames_downtoup,
-	insane_stand
+   	FRAME_stand59,
+   	insane_frames_downtoup,
+   	insane_stand
 };
 
 mframe_t insane_frames_jumpdown[] = {
@@ -236,16 +193,15 @@ mframe_t insane_frames_jumpdown[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t insane_move_jumpdown =
-{
+mmove_t insane_move_jumpdown = {
 	FRAME_stand96,
-	FRAME_stand100,
+   	FRAME_stand100,
    	insane_frames_jumpdown,
    	insane_onground
 };
 
 mframe_t insane_frames_down[] = {
-	{ai_move, 0, NULL}, /* 100 */
+	{ai_move, 0, NULL},             /* 100 */
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
@@ -255,7 +211,7 @@ mframe_t insane_frames_down[] = {
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
-	{ai_move, 0, NULL}, /* 110 */
+	{ai_move, 0, NULL},             /* 110 */
 	{ai_move, -1.7, NULL},
 	{ai_move, -1.6, NULL},
 	{ai_move, 0, NULL},
@@ -265,7 +221,7 @@ mframe_t insane_frames_down[] = {
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
-	{ai_move, 0, NULL}, /* 120 */
+	{ai_move, 0, NULL},             /* 120 */
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
@@ -275,7 +231,7 @@ mframe_t insane_frames_down[] = {
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
-	{ai_move, 0, NULL}, /* 130 */
+	{ai_move, 0, NULL},             /* 130 */
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
 	{ai_move, 0, insane_moan},
@@ -285,7 +241,7 @@ mframe_t insane_frames_down[] = {
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
-	{ai_move, 0, NULL}, /* 140 */
+	{ai_move, 0, NULL},             /* 140 */
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
@@ -295,7 +251,7 @@ mframe_t insane_frames_down[] = {
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
-	{ai_move, 0, NULL}, /* 150 */
+	{ai_move, 0, NULL},             /* 150 */
 	{ai_move, 0.5, NULL},
 	{ai_move, 0, NULL},
 	{ai_move, -0.2, insane_scream},
@@ -305,13 +261,12 @@ mframe_t insane_frames_down[] = {
 	{ai_move, 0.6, NULL},
 	{ai_move, 0.8, NULL},
 	{ai_move, 0.7, NULL},
-	{ai_move, 0, insane_checkup} /* 160 */
+	{ai_move, 0, insane_checkup}    /* 160 */
 };
 
-mmove_t insane_move_down =
-{
+mmove_t insane_move_down = {
 	FRAME_stand100,
-	FRAME_stand160,
+   	FRAME_stand160,
    	insane_frames_down,
    	insane_onground
 };
@@ -332,62 +287,59 @@ mframe_t insane_frames_walk_normal[] = {
 	{ai_walk, 0, NULL}
 };
 
-mmove_t insane_move_walk_normal =
-{
-	FRAME_walk27,
-	FRAME_walk39,
-	insane_frames_walk_normal,
-	insane_walk};
-
-mmove_t insane_move_run_normal =
-{
+mmove_t insane_move_walk_normal = {
 	FRAME_walk27,
    	FRAME_walk39,
    	insane_frames_walk_normal,
-	insane_run
+   	insane_walk
+};
+
+mmove_t insane_move_run_normal = {
+	FRAME_walk27,
+   	FRAME_walk39,
+   	insane_frames_walk_normal,
+   	insane_run
 };
 
 mframe_t insane_frames_walk_insane[] = {
-	{ai_walk, 0, insane_scream}, /* walk 1 */
-	{ai_walk, 3.4, NULL}, /* walk 2 */
-	{ai_walk, 3.6, NULL}, /* 3 */
-	{ai_walk, 2.9, NULL}, /* 4 */
-	{ai_walk, 2.2, NULL}, /* 5 */
-	{ai_walk, 2.6, NULL}, /* 6 */
-	{ai_walk, 0, NULL}, /* 7 */
-	{ai_walk, 0.7, NULL}, /* 8 */
-	{ai_walk, 4.8, NULL}, /* 9 */
-	{ai_walk, 5.3, NULL}, /* 10 */
-	{ai_walk, 1.1, NULL}, /* 11 */
-	{ai_walk, 2, NULL}, /* 12 */
-	{ai_walk, 0.5, NULL}, /* 13 */
-	{ai_walk, 0, NULL}, /* 14 */
-	{ai_walk, 0, NULL}, /* 15 */
-	{ai_walk, 4.9, NULL}, /* 16 */
-	{ai_walk, 6.7, NULL}, /* 17 */
-	{ai_walk, 3.8, NULL}, /* 18 */
-	{ai_walk, 2, NULL}, /* 19 */
-	{ai_walk, 0.2, NULL}, /* 20 */
-	{ai_walk, 0, NULL}, /* 21 */
-	{ai_walk, 3.4, NULL}, /* 22 */
-	{ai_walk, 6.4, NULL}, /* 23 */
-	{ai_walk, 5, NULL}, /* 24 */
-	{ai_walk, 1.8, NULL}, /* 25 */
-	{ai_walk, 0, NULL} /* 26 */
+	{ai_walk, 0, insane_scream},    /* walk 1 */
+	{ai_walk, 3.4, NULL},           /* walk 2 */
+	{ai_walk, 3.6, NULL},           /* 3 */
+	{ai_walk, 2.9, NULL},           /* 4 */
+	{ai_walk, 2.2, NULL},           /* 5 */
+	{ai_walk, 2.6, NULL},           /* 6 */
+	{ai_walk, 0, NULL},             /* 7 */
+	{ai_walk, 0.7, NULL},           /* 8 */
+	{ai_walk, 4.8, NULL},           /* 9 */
+	{ai_walk, 5.3, NULL},           /* 10 */
+	{ai_walk, 1.1, NULL},           /* 11 */
+	{ai_walk, 2, NULL},             /* 12 */
+	{ai_walk, 0.5, NULL},           /* 13 */
+	{ai_walk, 0, NULL},             /* 14 */
+	{ai_walk, 0, NULL},             /* 15 */
+	{ai_walk, 4.9, NULL},           /* 16 */
+	{ai_walk, 6.7, NULL},           /* 17 */
+	{ai_walk, 3.8, NULL},           /* 18 */
+	{ai_walk, 2, NULL},             /* 19 */
+	{ai_walk, 0.2, NULL},           /* 20 */
+	{ai_walk, 0, NULL},             /* 21 */
+	{ai_walk, 3.4, NULL},           /* 22 */
+	{ai_walk, 6.4, NULL},           /* 23 */
+	{ai_walk, 5, NULL},             /* 24 */
+	{ai_walk, 1.8, NULL},           /* 25 */
+	{ai_walk, 0, NULL}              /* 26 */
 };
 
-mmove_t insane_move_walk_insane =
-{
+mmove_t insane_move_walk_insane = {
 	FRAME_walk1,
    	FRAME_walk26,
    	insane_frames_walk_insane,
    	insane_walk
 };
 
-mmove_t insane_move_run_insane =
-{
+mmove_t insane_move_run_insane = {
 	FRAME_walk1,
-	FRAME_walk26,
+   	FRAME_walk26,
    	insane_frames_walk_insane,
    	insane_run
 };
@@ -406,8 +358,7 @@ mframe_t insane_frames_stand_pain[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t insane_move_stand_pain =
-{
+mmove_t insane_move_stand_pain = {
 	FRAME_st_pain2,
    	FRAME_st_pain12,
    	insane_frames_stand_pain,
@@ -434,12 +385,11 @@ mframe_t insane_frames_stand_death[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t insane_move_stand_death =
-{
+mmove_t insane_move_stand_death = {
 	FRAME_st_death2,
    	FRAME_st_death18,
    	insane_frames_stand_death,
-	insane_dead
+   	insane_dead
 };
 
 mframe_t insane_frames_crawl[] = {
@@ -454,19 +404,17 @@ mframe_t insane_frames_crawl[] = {
 	{ai_walk, 2.4, NULL}
 };
 
-mmove_t insane_move_crawl =
-{
+mmove_t insane_move_crawl = {
 	FRAME_crawl1,
    	FRAME_crawl9,
    	insane_frames_crawl,
    	NULL
 };
 
-mmove_t insane_move_runcrawl =
-{
+mmove_t insane_move_runcrawl = {
 	FRAME_crawl1,
    	FRAME_crawl9,
-	insane_frames_crawl,
+   	insane_frames_crawl,
    	NULL
 };
 
@@ -482,8 +430,7 @@ mframe_t insane_frames_crawl_pain[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t insane_move_crawl_pain =
-{
+mmove_t insane_move_crawl_pain = {
 	FRAME_cr_pain2,
    	FRAME_cr_pain10,
    	insane_frames_crawl_pain,
@@ -500,10 +447,9 @@ mframe_t insane_frames_crawl_death[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t insane_move_crawl_death =
-{
+mmove_t insane_move_crawl_death = {
 	FRAME_cr_death10,
-	FRAME_cr_death16,
+   	FRAME_cr_death16,
    	insane_frames_crawl_death,
    	insane_dead
 };
@@ -526,10 +472,9 @@ mframe_t insane_frames_cross[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t insane_move_cross =
-{
+mmove_t insane_move_cross = {
 	FRAME_cross1,
-	FRAME_cross15,
+   	FRAME_cross15,
    	insane_frames_cross,
    	insane_cross
 };
@@ -552,12 +497,11 @@ mframe_t insane_frames_struggle_cross[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t insane_move_struggle_cross =
-{
+mmove_t insane_move_struggle_cross = {
 	FRAME_cross16,
    	FRAME_cross30,
-	insane_frames_struggle_cross,
-	insane_cross
+   	insane_frames_struggle_cross,
+   	insane_cross
 };
 
 void
@@ -586,7 +530,7 @@ insane_walk(edict_t *self)
 		return;
 	}
 
-	if (self->spawnflags & 16)
+	if (self->spawnflags & 16) /* Hold Ground? */
 	{
 		if (self->s.frame == FRAME_cr_pain10)
 		{
@@ -618,7 +562,7 @@ insane_run(edict_t *self)
 		return;
 	}
 
-	if (self->spawnflags & 16)
+	if (self->spawnflags & 16) /* Hold Ground? */
 	{
 		if (self->s.frame == FRAME_cr_pain10)
 		{
@@ -627,12 +571,11 @@ insane_run(edict_t *self)
 		}
 	}
 
-	if (self->spawnflags & 4)
+	if (self->spawnflags & 4) /* Crawling? */
 	{
 		self->monsterinfo.currentmove = &insane_move_runcrawl;
 	}
 	else
-
 	if (random() <= 0.5) /* Else, mix it up */
 	{
 		self->monsterinfo.currentmove = &insane_move_run_normal;
@@ -644,8 +587,7 @@ insane_run(edict_t *self)
 }
 
 void
-insane_pain(edict_t *self, edict_t *other /* unused */,
-	   	float kick /* unused */, int damage)
+insane_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 {
 	int l, r;
 
@@ -680,8 +622,7 @@ insane_pain(edict_t *self, edict_t *other /* unused */,
 		l = 100;
 	}
 
-	gi.sound(self, CHAN_VOICE, gi.soundindex(va("player/male/pain%i_%i.wav",
-							l, r)), 1, ATTN_IDLE, 0);
+	gi.sound(self, CHAN_VOICE, gi.soundindex(va("player/male/pain%i_%i.wav", l, r)), 1, ATTN_IDLE, 0);
 
 	if (skill->value == 3)
 	{
@@ -819,9 +760,8 @@ insane_dead(edict_t *self)
 }
 
 void
-insane_die(edict_t *self, edict_t *inflictor /* unused */,
-		edict_t *attacker /* unused */, int damage,
-		vec3_t point /* unused */)
+insane_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* unused */,
+		int damage, vec3_t point /* unused */)
 {
 	int n;
 
@@ -832,22 +772,20 @@ insane_die(edict_t *self, edict_t *inflictor /* unused */,
 
 	if (self->health <= self->gib_health)
 	{
-		gi.sound(self, CHAN_VOICE, gi.soundindex( "misc/udeath.wav"), 1, ATTN_IDLE, 0);
+		gi.sound(self, CHAN_VOICE, gi.soundindex(
+						"misc/udeath.wav"), 1, ATTN_IDLE, 0);
 
 		for (n = 0; n < 2; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/bone/tris.md2",
-					damage, GIB_ORGANIC);
+			ThrowGib(self, "models/objects/gibs/bone/tris.md2", damage, GIB_ORGANIC);
 		}
 
 		for (n = 0; n < 4; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2",
-					damage, GIB_ORGANIC);
+			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 		}
 
-		ThrowHead(self, "models/objects/gibs/head2/tris.md2",
-				damage, GIB_ORGANIC);
+		ThrowHead(self, "models/objects/gibs/head2/tris.md2", damage, GIB_ORGANIC);
 		self->deadflag = DEAD_DEAD;
 		return;
 	}
@@ -857,8 +795,7 @@ insane_die(edict_t *self, edict_t *inflictor /* unused */,
 		return;
 	}
 
-	gi.sound(self, CHAN_VOICE, gi.soundindex(va("player/male/death%i.wav",
-							(rand() % 4) + 1)), 1, ATTN_IDLE, 0);
+	gi.sound(self, CHAN_VOICE, gi.soundindex(va("player/male/death%i.wav", (rand() % 4) + 1)), 1, ATTN_IDLE, 0);
 
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;

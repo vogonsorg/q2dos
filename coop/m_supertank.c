@@ -1,23 +1,4 @@
 /*
-Copyright (C) 1997-2001 Id Software, Inc.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
-
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-*/
-/*
 ==============================================================================
 
 SUPERTANK
@@ -40,6 +21,10 @@ static int sound_search2;
 static int tread_sound;
 
 void BossExplode(edict_t *self);
+void supertank_dead(edict_t *self);
+void supertankRocket(edict_t *self);
+void supertankMachineGun(edict_t *self);
+void supertank_reattack1(edict_t *self);
 
 void
 TreadSound(edict_t *self)
@@ -69,11 +54,6 @@ supertank_search(edict_t *self)
 		gi.sound(self, CHAN_VOICE, sound_search2, 1, ATTN_NORM, 0);
 	}
 }
-
-void supertank_dead(edict_t *self);
-void supertankRocket(edict_t *self);
-void supertankMachineGun(edict_t *self);
-void supertank_reattack1(edict_t *self);
 
 mframe_t supertank_frames_stand[] = {
 	{ai_stand, 0, NULL},
@@ -138,12 +118,11 @@ mframe_t supertank_frames_stand[] = {
 	{ai_stand, 0, NULL}
 };
 
-mmove_t supertank_move_stand =
-{
+mmove_t supertank_move_stand = {
 	FRAME_stand_1,
-	FRAME_stand_60,
-	supertank_frames_stand,
-	NULL
+   	FRAME_stand_60,
+   	supertank_frames_stand,
+   	NULL
 };
 
 void
@@ -178,11 +157,10 @@ mframe_t supertank_frames_run[] = {
 	{ai_run, 12, NULL}
 };
 
-mmove_t supertank_move_run =
-{
+mmove_t supertank_move_run = {
 	FRAME_forwrd_1,
    	FRAME_forwrd_18,
-	supertank_frames_run,
+   	supertank_frames_run,
    	NULL
 };
 
@@ -207,12 +185,11 @@ mframe_t supertank_frames_forward[] = {
 	{ai_walk, 4, NULL}
 };
 
-mmove_t supertank_move_forward =
-{
+mmove_t supertank_move_forward = {
 	FRAME_forwrd_1,
-	FRAME_forwrd_18,
-	supertank_frames_forward,
-	NULL
+   	FRAME_forwrd_18,
+   	supertank_frames_forward,
+   	NULL
 };
 
 void
@@ -276,12 +253,11 @@ mframe_t supertank_frames_turn_right[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t supertank_move_turn_right =
-{
+mmove_t supertank_move_turn_right = {
 	FRAME_right_1,
    	FRAME_right_18,
-	supertank_frames_turn_right,
-	supertank_run
+   	supertank_frames_turn_right,
+   	supertank_run
 };
 
 mframe_t supertank_frames_turn_left[] = {
@@ -305,11 +281,10 @@ mframe_t supertank_frames_turn_left[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t supertank_move_turn_left =
-{
+mmove_t supertank_move_turn_left = {
 	FRAME_left_1,
-	FRAME_left_18,
-	supertank_frames_turn_left,
+   	FRAME_left_18,
+   	supertank_frames_turn_left,
    	supertank_run
 };
 
@@ -320,8 +295,7 @@ mframe_t supertank_frames_pain3[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t supertank_move_pain3 =
-{
+mmove_t supertank_move_pain3 = {
 	FRAME_pain3_9,
    	FRAME_pain3_12,
    	supertank_frames_pain3,
@@ -335,8 +309,7 @@ mframe_t supertank_frames_pain2[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t supertank_move_pain2 =
-{
+mmove_t supertank_move_pain2 = {
 	FRAME_pain2_5,
    	FRAME_pain2_8,
    	supertank_frames_pain2,
@@ -350,8 +323,7 @@ mframe_t supertank_frames_pain1[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t supertank_move_pain1 =
-{
+mmove_t supertank_move_pain1 = {
 	FRAME_pain1_1,
    	FRAME_pain1_4,
    	supertank_frames_pain1,
@@ -385,10 +357,9 @@ mframe_t supertank_frames_death1[] = {
 	{ai_move, 0, BossExplode}
 };
 
-mmove_t supertank_move_death =
-{
+mmove_t supertank_move_death = {
 	FRAME_death_1,
-	FRAME_death_24,
+   	FRAME_death_24,
    	supertank_frames_death1,
    	supertank_dead
 };
@@ -414,8 +385,7 @@ mframe_t supertank_frames_backward[] = {
 	{ai_walk, 0, NULL}
 };
 
-mmove_t supertank_move_backward =
-{
+mmove_t supertank_move_backward = {
 	FRAME_backwd_1,
    	FRAME_backwd_18,
    	supertank_frames_backward,
@@ -431,8 +401,7 @@ mframe_t supertank_frames_attack4[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t supertank_move_attack4 =
-{
+mmove_t supertank_move_attack4 = {
 	FRAME_attak4_1,
    	FRAME_attak4_6,
    	supertank_frames_attack4,
@@ -469,8 +438,7 @@ mframe_t supertank_frames_attack3[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t supertank_move_attack3 =
-{
+mmove_t supertank_move_attack3 = {
 	FRAME_attak3_1,
    	FRAME_attak3_27,
    	supertank_frames_attack3,
@@ -507,8 +475,7 @@ mframe_t supertank_frames_attack2[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t supertank_move_attack2 =
-{
+mmove_t supertank_move_attack2 = {
 	FRAME_attak2_1,
    	FRAME_attak2_27,
    	supertank_frames_attack2,
@@ -524,11 +491,10 @@ mframe_t supertank_frames_attack1[] = {
 	{ai_charge, 0, supertankMachineGun},
 };
 
-mmove_t supertank_move_attack1 =
-{
+mmove_t supertank_move_attack1 = {
 	FRAME_attak1_1,
-	FRAME_attak1_6,
-	supertank_frames_attack1,
+   	FRAME_attak1_6,
+   	supertank_frames_attack1,
    	supertank_reattack1
 };
 
@@ -549,10 +515,9 @@ mframe_t supertank_frames_end_attack1[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t supertank_move_end_attack1 =
-{
+mmove_t supertank_move_end_attack1 = {
 	FRAME_attak1_7,
-	FRAME_attak1_20,
+   	FRAME_attak1_20,
    	supertank_frames_end_attack1,
    	supertank_run
 };
@@ -583,8 +548,7 @@ supertank_reattack1(edict_t *self)
 }
 
 void
-supertank_pain(edict_t *self, edict_t *other /* unused */,
-	   	float kick /* unused */, int damage)
+supertank_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 {
 	if (!self)
 	{
@@ -653,7 +617,7 @@ supertankRocket(edict_t *self)
 	vec3_t vec;
 	int flash_number;
 
-	if (!self)
+	if (!self->enemy || !self->enemy->inuse)
 	{
 		return;
 	}
@@ -697,7 +661,13 @@ supertankMachineGun(edict_t *self)
 		return;
 	}
 
-	flash_number = MZ2_SUPERTANK_MACHINEGUN_1 + (self->s.frame - FRAME_attak1_1);
+	if (!self->enemy || !self->enemy->inuse)
+	{
+		return;
+	}
+
+	flash_number = MZ2_SUPERTANK_MACHINEGUN_1 +
+				   (self->s.frame - FRAME_attak1_1);
 
 	dir[0] = 0;
 	dir[1] = self->s.angles[1];
@@ -716,9 +686,8 @@ supertankMachineGun(edict_t *self)
 		VectorNormalize(forward);
 	}
 
-	monster_fire_bullet(self, start, forward, 6, 4,
-			DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD,
-			flash_number);
+	monster_fire_bullet(self, start, forward, 6, 4, DEFAULT_BULLET_HSPREAD,
+			DEFAULT_BULLET_VSPREAD, flash_number);
 }
 
 void
@@ -823,20 +792,16 @@ BossExplode(edict_t *self)
 
 			for (n = 0; n < 4; n++)
 			{
-				ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2",
-						500, GIB_ORGANIC);
+				ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2", 500, GIB_ORGANIC);
 			}
 
 			for (n = 0; n < 8; n++)
 			{
-				ThrowGib(self, "models/objects/gibs/sm_metal/tris.md2",
-						500, GIB_METALLIC);
+				ThrowGib(self, "models/objects/gibs/sm_metal/tris.md2", 500, GIB_METALLIC);
 			}
 
-			ThrowGib(self, "models/objects/gibs/chest/tris.md2",
-				500, GIB_ORGANIC);
-			ThrowHead(self, "models/objects/gibs/gear/tris.md2",
-				500, GIB_METALLIC);
+			ThrowGib(self, "models/objects/gibs/chest/tris.md2", 500, GIB_ORGANIC);
+			ThrowHead(self, "models/objects/gibs/gear/tris.md2", 500, GIB_METALLIC);
 			self->deadflag = DEAD_DEAD;
 			return;
 	}
@@ -850,9 +815,8 @@ BossExplode(edict_t *self)
 }
 
 void
-supertank_die(edict_t *self, edict_t *inflictor /* unused */,
-		edict_t *attacker /* unused */, int damage /* unused */,
-		vec3_t point /* unused */)
+supertank_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* unused */,
+		int damage /* unused */, vec3_t point /* unused */)
 {
 	if (!self)
 	{
@@ -864,6 +828,27 @@ supertank_die(edict_t *self, edict_t *inflictor /* unused */,
 	self->takedamage = DAMAGE_NO;
 	self->count = 0;
 	self->monsterinfo.currentmove = &supertank_move_death;
+}
+
+qboolean
+supertank_blocked(edict_t *self, float dist)
+{
+	if (!self)
+	{
+		return false;
+	}
+
+	if (blocked_checkshot(self, 0.25 + (0.05 * skill->value)))
+	{
+		return true;
+	}
+
+	if (blocked_checkplat(self, dist))
+	{
+		return true;
+	}
+
+	return false;
 }
 
 /*
@@ -912,6 +897,7 @@ SP_monster_supertank(edict_t *self)
 	self->monsterinfo.search = supertank_search;
 	self->monsterinfo.melee = NULL;
 	self->monsterinfo.sight = NULL;
+	self->monsterinfo.blocked = supertank_blocked;
 
 	gi.linkentity(self);
 
@@ -919,4 +905,6 @@ SP_monster_supertank(edict_t *self)
 	self->monsterinfo.scale = MODEL_SCALE;
 
 	walkmonster_start(self);
+
+	self->monsterinfo.aiflags |= AI_IGNORE_SHOTS;
 }
