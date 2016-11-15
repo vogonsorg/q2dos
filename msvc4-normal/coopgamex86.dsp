@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir "."
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "id386=1" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D id386=1 /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x1009 /d "NDEBUG"
@@ -69,7 +69,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir "."
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D id386=1 /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x1009 /d "_DEBUG"
@@ -90,6 +90,14 @@ LINK32=link.exe
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;for;f90"
+# Begin Source File
+
+SOURCE=..\coop\dm_ball.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\dm_tag.c
+# End Source File
 # Begin Source File
 
 SOURCE=..\coop\g_ai.c
@@ -128,6 +136,30 @@ SOURCE=..\coop\g_monster.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\coop\g_newai.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_newdm.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_newfnc.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_newtarg.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_newtrig.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_newweap.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\coop\g_phys.c
 # End Source File
 # Begin Source File
@@ -137,6 +169,10 @@ SOURCE=..\coop\g_save.c
 # Begin Source File
 
 SOURCE=..\coop\g_spawn.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_sphere.c
 # End Source File
 # Begin Source File
 
@@ -192,11 +228,23 @@ SOURCE=..\coop\m_boss32.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\coop\m_boss5.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\coop\m_brain.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\coop\m_carrier.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\coop\m_chick.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_fixbot.c
 # End Source File
 # Begin Source File
 
@@ -213,6 +261,14 @@ SOURCE=..\coop\m_float.c
 # Begin Source File
 
 SOURCE=..\coop\m_flyer.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_gekk.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_gladb.c
 # End Source File
 # Begin Source File
 
@@ -256,11 +312,27 @@ SOURCE=..\coop\m_soldier.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\coop\m_stalker.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\coop\m_supertank.c
 # End Source File
 # Begin Source File
 
 SOURCE=..\coop\m_tank.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_turret.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_widow.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_widow2.c
 # End Source File
 # Begin Source File
 
@@ -352,7 +424,15 @@ SOURCE=..\coop\m_brain.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\coop\m_carrier.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\coop\m_chick.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_fixbot.h
 # End Source File
 # Begin Source File
 
@@ -365,6 +445,10 @@ SOURCE=..\coop\m_float.h
 # Begin Source File
 
 SOURCE=..\coop\m_flyer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_gekk.h
 # End Source File
 # Begin Source File
 
@@ -412,11 +496,27 @@ SOURCE=..\coop\m_soldier.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\coop\m_stalker.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\coop\m_supertank.h
 # End Source File
 # Begin Source File
 
 SOURCE=..\coop\m_tank.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_turret.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_widow.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\m_widow2.h
 # End Source File
 # Begin Source File
 

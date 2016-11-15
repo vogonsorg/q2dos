@@ -8,6 +8,7 @@
 
 #pragma warning(disable : 4018)     // signed/unsigned mismatch
 #pragma warning(disable : 4305)		// truncation from const double to float
+#pragma warning(disable : 4996)		/* FS: Shut up about VS2005 shit */
 #endif
 
 #include <math.h>
