@@ -335,7 +335,7 @@ Cmd_Give_f(edict_t *ent)
 				continue;
 			}
 
-			if (it->flags & IT_NOT_GIVEABLE)
+			if ((game.gametype == rogue_coop) && (it->flags & IT_NOT_GIVEABLE)) /* FS: Coop: Rogue specific */
 			{
 				continue;
 			}
@@ -371,10 +371,13 @@ Cmd_Give_f(edict_t *ent)
 		return;
 	}
 
-	if (it->flags & IT_NOT_GIVEABLE)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		gi.dprintf(DEVELOPER_MSG_GAME, "item cannot be given\n");
-		return;
+		if (it->flags & IT_NOT_GIVEABLE)
+		{
+			gi.dprintf(DEVELOPER_MSG_GAME, "item cannot be given\n");
+			return;
+		}
 	}
 
 	index = ITEM_INDEX(it);
@@ -397,7 +400,7 @@ Cmd_Give_f(edict_t *ent)
 		SpawnItem(it_ent, it);
 
 		/* since some items don't actually spawn when you say to .. */
-		if (!it_ent->inuse)
+		if ((game.gametype == rogue_coop) && (!it_ent->inuse)) /* FS: Coop: Rogue specific */
 		{
 			return;
 		}
@@ -543,44 +546,82 @@ Cmd_Use_f(edict_t *ent)
 	index = ITEM_INDEX(it);
 	if (!ent->client->pers.inventory[index])
 	{
-		/* FS: Added dual weapon switching from Xatrix code */
-		if (strcmp (it->pickup_name, "Blaster") == 0)
+		if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 		{
-			it = FindItem ("Chainfist");
-			index = ITEM_INDEX (it);
-			if (!ent->client->pers.inventory[index])
+			/* FS: Added dual weapon switching from Xatrix code */
+			if (strcmp (it->pickup_name, "Blaster") == 0)
 			{
-				gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+				it = FindItem ("Chainfist");
+				index = ITEM_INDEX (it);
+				if (!ent->client->pers.inventory[index])
+				{
+					gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+					return;
+				}
+			}
+			else if (strcmp (it->pickup_name, "Chaingun") == 0)
+			{
+				it = FindItem ("ETF Rifle");
+				index = ITEM_INDEX (it);
+				if (!ent->client->pers.inventory[index])
+				{
+					gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+					return;
+				}
+			}
+			else if (strcmp (it->pickup_name, "Grenade Launcher") == 0)
+			{
+				it = FindItem ("Prox Launcher");
+				index = ITEM_INDEX (it);
+				if (!ent->client->pers.inventory[index])
+				{
+					gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+					return;
+				}
+			}
+			else if (strcmp (it->pickup_name, "HyperBlaster") == 0)
+			{
+				it = FindItem ("Plasma Beam");
+				index = ITEM_INDEX (it);
+				if (!ent->client->pers.inventory[index])
+				{
+					gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+					return;
+				}
+			}
+			else
+			{
+				gi.cprintf(ent, PRINT_HIGH, "Out of item: %s\n", s);
 				return;
 			}
 		}
-		else if (strcmp (it->pickup_name, "Chaingun") == 0)
+		else if (game.gametype == xatrix_coop) /* FS: Coop: Xatrix specific */
 		{
-			it = FindItem ("ETF Rifle");
-			index = ITEM_INDEX (it);
-			if (!ent->client->pers.inventory[index])
+			// RAFAEL
+			if (strcmp (it->pickup_name, "HyperBlaster") == 0)
 			{
-				gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
-				return;
+				it = FindItem ("Ionripper");
+				index = ITEM_INDEX (it);
+				if (!ent->client->pers.inventory[index])
+				{
+					gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+					return;
+				}
 			}
-		}
-		else if (strcmp (it->pickup_name, "Grenade Launcher") == 0)
-		{
-			it = FindItem ("Prox Launcher");
-			index = ITEM_INDEX (it);
-			if (!ent->client->pers.inventory[index])
+			// RAFAEL
+			else if (strcmp (it->pickup_name, "Railgun") == 0)
 			{
-				gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
-				return;
+				it = FindItem ("Phalanx");
+				index = ITEM_INDEX (it);
+				if (!ent->client->pers.inventory[index])
+				{
+					gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+					return;
+				}
 			}
-		}
-		else if (strcmp (it->pickup_name, "HyperBlaster") == 0)
-		{
-			it = FindItem ("Plasma Beam");
-			index = ITEM_INDEX (it);
-			if (!ent->client->pers.inventory[index])
+			else
 			{
-				gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+				gi.cprintf(ent, PRINT_HIGH, "Out of item: %s\n", s);
 				return;
 			}
 		}
@@ -628,44 +669,82 @@ Cmd_Drop_f(edict_t *ent)
 
 	if (!ent->client->pers.inventory[index])
 	{
-		/* FS: Added dual weapon switching from Xatrix code */
-		if (strcmp (it->pickup_name, "Blaster") == 0)
+		if(game.gametype == rogue_coop) /* FS: Coop: Rogue Specific */
 		{
-			it = FindItem ("Chainfist");
-			index = ITEM_INDEX (it);
-			if (!ent->client->pers.inventory[index])
+			/* FS: Added dual weapon switching from Xatrix code */
+			if (strcmp (it->pickup_name, "Blaster") == 0)
 			{
-				gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+				it = FindItem ("Chainfist");
+				index = ITEM_INDEX (it);
+				if (!ent->client->pers.inventory[index])
+				{
+					gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+					return;
+				}
+			}
+			else if (strcmp (it->pickup_name, "Chaingun") == 0)
+			{
+				it = FindItem ("ETF Rifle");
+				index = ITEM_INDEX (it);
+				if (!ent->client->pers.inventory[index])
+				{
+					gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+					return;
+				}
+			}
+			else if (strcmp (it->pickup_name, "Grenade Launcher") == 0)
+			{
+				it = FindItem ("Prox Launcher");
+				index = ITEM_INDEX (it);
+				if (!ent->client->pers.inventory[index])
+				{
+					gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+					return;
+				}
+			}
+			else if (strcmp (it->pickup_name, "HyperBlaster") == 0)
+			{
+				it = FindItem ("Plasma Beam");
+				index = ITEM_INDEX (it);
+				if (!ent->client->pers.inventory[index])
+				{
+					gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+					return;
+				}
+			}
+			else
+			{
+				gi.cprintf(ent, PRINT_HIGH, "Out of item: %s\n", s);
 				return;
 			}
 		}
-		else if (strcmp (it->pickup_name, "Chaingun") == 0)
+		else if(game.gametype == xatrix_coop) /* FS: Coop: Xatrix specific */
 		{
-			it = FindItem ("ETF Rifle");
-			index = ITEM_INDEX (it);
-			if (!ent->client->pers.inventory[index])
+			// RAFAEL
+			if (strcmp (it->pickup_name, "HyperBlaster") == 0)
 			{
-				gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
-				return;
+				it = FindItem ("Ionripper");
+				index = ITEM_INDEX (it);
+				if (!ent->client->pers.inventory[index])
+				{
+					gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+					return;
+				}
 			}
-		}
-		else if (strcmp (it->pickup_name, "Grenade Launcher") == 0)
-		{
-			it = FindItem ("Prox Launcher");
-			index = ITEM_INDEX (it);
-			if (!ent->client->pers.inventory[index])
+			// RAFAEL
+			else if (strcmp (it->pickup_name, "Railgun") == 0)
 			{
-				gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
-				return;
+				it = FindItem ("Phalanx");
+				index = ITEM_INDEX (it);
+				if (!ent->client->pers.inventory[index])
+				{
+					gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+					return;
+				}
 			}
-		}
-		else if (strcmp (it->pickup_name, "HyperBlaster") == 0)
-		{
-			it = FindItem ("Plasma Beam");
-			index = ITEM_INDEX (it);
-			if (!ent->client->pers.inventory[index])
+			else
 			{
-				gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+				gi.cprintf(ent, PRINT_HIGH, "Out of item: %s\n", s);
 				return;
 			}
 		}
@@ -980,7 +1059,8 @@ Cmd_Kill_f(edict_t *ent)
 		return;
 	}
 
-	if ((level.time - ent->client->respawn_time) < 5)
+	if (((level.time - ent->client->respawn_time) < 5) ||
+		(ent->client->resp.spectator))
 	{
 		return;
 	}
@@ -989,16 +1069,19 @@ Cmd_Kill_f(edict_t *ent)
 	ent->health = 0;
 	meansOfDeath = MOD_SUICIDE;
 
-	/* make sure no trackers are still hurting us. */
-	if (ent->client->tracker_pain_framenum)
+	if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		RemoveAttackingPainDaemons(ent);
-	}
+		/* make sure no trackers are still hurting us. */
+		if (ent->client->tracker_pain_framenum)
+		{
+			RemoveAttackingPainDaemons(ent);
+		}
 
-	if (ent->client->owned_sphere)
-	{
-		G_FreeEdict(ent->client->owned_sphere);
-		ent->client->owned_sphere = NULL;
+		if (ent->client->owned_sphere)
+		{
+			G_FreeEdict(ent->client->owned_sphere);
+			ent->client->owned_sphere = NULL;
+		}
 	}
 
 	player_die(ent, ent, ent, 100000, vec3_origin);
@@ -1277,12 +1360,12 @@ Cmd_Say_f(edict_t *ent, qboolean team, qboolean arg0)
 }
 
 void
-Cmd_Ent_Count_f(edict_t *ent)
+Cmd_Ent_Count_f(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	int x;
 	edict_t *e;
 
-	if (!ent)
+	if (game.gametype != rogue_coop || !ent)
 	{
 		return;
 	}
@@ -1326,7 +1409,8 @@ Cmd_PlayerList_f(edict_t *ent)
 		Com_sprintf(st, sizeof(st), "%02d:%02d %4d %3d %s%s\n",
 				(level.framenum - e2->client->resp.enterframe) / 600,
 				((level.framenum - e2->client->resp.enterframe) % 600) / 10,
-				e2->client->ping, e2->client->resp.score,
+				e2->client->ping,
+				e2->client->resp.score,
 				e2->client->pers.netname,
 				e2->client->resp.spectator ? " (spectator)" : "");
 
@@ -1393,6 +1477,18 @@ ClientCommand(edict_t *ent)
 	if (level.intermissiontime)
 	{
 		return;
+	}
+
+	if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		if (Q_stricmp(cmd, "entcount") == 0)
+		{
+			Cmd_Ent_Count_f(ent);
+		}
+		else if (Q_stricmp(cmd, "disguise") == 0)
+		{
+			ent->flags |= FL_DISGUISED;
+		}
 	}
 
 	if (Q_stricmp(cmd, "use") == 0)
@@ -1482,14 +1578,6 @@ ClientCommand(edict_t *ent)
 	else if (Q_stricmp(cmd, "playerlist") == 0)
 	{
 		Cmd_PlayerList_f(ent);
-	}
-	else if (Q_stricmp(cmd, "entcount") == 0)
-	{
-		Cmd_Ent_Count_f(ent);
-	}
-	else if (Q_stricmp(cmd, "disguise") == 0)
-	{
-		ent->flags |= FL_DISGUISED;
 	}
 	else /* anything that doesn't match a command will be a chat */
 	{

@@ -277,6 +277,8 @@ InitGame(void)
 	game.clients = gi.TagMalloc (game.maxclients * sizeof(game.clients[0]), TAG_GAME);
 	globals.num_edicts = game.maxclients+1;
 
+	game.gametype = rogue_coop; /* FS: Coop: FIXME -- hardcoded to Rogue for now */
+
 	if (gamerules)
 	{
 		InitGameRules();
