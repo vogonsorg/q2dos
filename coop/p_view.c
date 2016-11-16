@@ -259,7 +259,7 @@ SV_CalcViewOffset(edict_t *ent)
 	{
 		VectorClear(angles);
 
-		if (ent->flags & FL_SAM_RAIMI)
+		if ((game.gametype == rogue_coop) && (ent->flags & FL_SAM_RAIMI)) /* FS: Coop: Rogue specific */
 		{
 			ent->client->ps.viewangles[ROLL] = 0;
 			ent->client->ps.viewangles[PITCH] = 0;
@@ -407,7 +407,7 @@ SV_CalcGunOffset(edict_t *ent)
 		return;
 	}
 
-	if (!heatbeam)
+	if (!heatbeam) /* FS: Coop: Rogue specific.  Probably OK to leave as-is. */
 	{
 		heatbeam = FindItemByClassname("weapon_plasmabeam");
 	}
@@ -560,7 +560,7 @@ SV_CalcBlend(edict_t *ent)
 			SV_AddBlend(0, 0, 1, 0.08, ent->client->ps.blend);
 		}
 	}
-	else if (ent->client->double_framenum > level.framenum)
+	else if (ent->client->double_framenum > level.framenum) /* FS: Coop: Rogue specific */
 	{
 		remaining = ent->client->double_framenum - level.framenum;
 
@@ -572,6 +572,21 @@ SV_CalcBlend(edict_t *ent)
 		if ((remaining > 30) || (remaining & 4))
 		{
 			SV_AddBlend(0.9, 0.7, 0, 0.08, ent->client->ps.blend);
+		}
+	}
+	else if (ent->client->quadfire_framenum > level.framenum) /* FS: Coop: Xatrix specific */
+	{
+		remaining = ent->client->quadfire_framenum - level.framenum;
+
+		if (remaining == 30) /* beginning to fade */
+		{
+			gi.sound(ent, CHAN_ITEM, gi.soundindex("items/quadfire2.wav"),
+				   	1, ATTN_NORM, 0);
+		}
+
+		if ((remaining > 30) || (remaining & 4))
+		{
+			SV_AddBlend(1, 0.2, 0.5, 0.08, ent->client->ps.blend);
 		}
 	}
 	else if (ent->client->invincible_framenum > level.framenum)
@@ -617,14 +632,14 @@ SV_CalcBlend(edict_t *ent)
 		}
 	}
 
-	if (ent->client->nuke_framenum > level.framenum)
+	if (ent->client->nuke_framenum > level.framenum) /* FS: Coop: Rogue specific */
 	{
 		float brightness;
 		brightness = (ent->client->nuke_framenum - level.framenum) / 20.0;
 		SV_AddBlend(1, 1, 1, brightness, ent->client->ps.blend);
 	}
 
-	if (ent->client->ir_framenum > level.framenum)
+	if (ent->client->ir_framenum > level.framenum) /* FS: Coop: Rogue specific */
 	{
 		remaining = ent->client->ir_framenum - level.framenum;
 
@@ -646,8 +661,11 @@ SV_CalcBlend(edict_t *ent)
 	/* add for damage */
 	if (ent->client->damage_alpha > 0)
 	{
-		SV_AddBlend(ent->client->damage_blend[0], ent->client->damage_blend[1],
-				ent->client->damage_blend[2], ent->client->damage_alpha, ent->client->ps.blend);
+		SV_AddBlend(ent->client->damage_blend[0],
+				ent->client->damage_blend[1],
+				ent->client->damage_blend[2],
+				ent->client->damage_alpha,
+				ent->client->ps.blend);
 	}
 
 	if (ent->client->bonus_alpha > 0)
@@ -986,19 +1004,19 @@ G_SetClientEffects(edict_t *ent)
 	ent->s.effects = 0;
 
 	/* player is always ir visible, even dead. */
-	ent->s.renderfx = RF_IR_VISIBLE;
+	ent->s.renderfx = RF_IR_VISIBLE; /* FS: Coop: Rogue specific */
 
 	if ((ent->health <= 0) || level.intermissiontime)
 	{
 		return;
 	}
 
-	if (ent->flags & FL_DISGUISED)
+	if (ent->flags & FL_DISGUISED) /* FS: Coop: Rogue specific */
 	{
 		ent->s.renderfx |= RF_USE_DISGUISE;
 	}
 
-	if (gamerules && gamerules->value)
+	if (gamerules && gamerules->value) /* FS: Coop: Rogue specific */
 	{
 		if (DMGame.PlayerEffects)
 		{
@@ -1031,7 +1049,17 @@ G_SetClientEffects(edict_t *ent)
 		}
 	}
 
-	if (ent->client->double_framenum > level.framenum)
+	if (ent->client->quadfire_framenum > level.framenum) /* FS: Coop: Xatrix specific */
+	{
+		remaining = ent->client->quadfire_framenum - level.framenum;
+
+		if ((remaining > 30) || (remaining & 4))
+		{
+			ent->s.effects |= EF_QUAD;
+		}
+	}
+
+	if (ent->client->double_framenum > level.framenum) /* FS: Coop: Rogue specific */
 	{
 		remaining = ent->client->double_framenum - level.framenum;
 
@@ -1041,13 +1069,14 @@ G_SetClientEffects(edict_t *ent)
 		}
 	}
 
+	/* FS: Coop: Rogue specific */
 	if ((ent->client->owned_sphere) &&
 		(ent->client->owned_sphere->spawnflags == 1))
 	{
 		ent->s.effects |= EF_HALF_DAMAGE;
 	}
 
-	if (ent->client->tracker_pain_framenum > level.framenum)
+	if (ent->client->tracker_pain_framenum > level.framenum) /* FS: Coop: Rogue specific */
 	{
 		ent->s.effects |= EF_TRACKERTRAIL;
 	}
@@ -1135,6 +1164,10 @@ G_SetClientSound(edict_t *ent)
 	else if (strcmp(weap, "weapon_bfg") == 0)
 	{
 		ent->s.sound = gi.soundindex("weapons/bfg_hum.wav");
+	}
+	else if (strcmp(weap, "weapon_phalanx") == 0) /* FS: Coop: Xatrix specific */
+	{
+		ent->s.sound = gi.soundindex("weapons/phaloop.wav");
 	}
 	else if (ent->client->weapon_sound)
 	{
