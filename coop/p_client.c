@@ -1748,6 +1748,23 @@ PutClientInServer(edict_t *ent)
 	ChangeWeapon(ent);
 }
 
+void Client_PrintMOTD (edict_t *client) /* FS: MOTD */
+{
+	char string[256];
+	char *ptr = NULL;
+
+	if(!motd || !motd->string[0] || !client)
+		return;
+
+	Com_sprintf(string,sizeof(string),motd->string);
+	ptr = string;
+	while( (ptr = strchr(ptr,'|')) )
+	{
+		*ptr = '\n';
+	}
+	gi.centerprintf(client, string);
+}
+
 /*
  * A client has just connected to the server in
  * deathmatch mode, so clear everything out before
@@ -1786,6 +1803,8 @@ ClientBeginDeathmatch(edict_t *ent)
 	}
 
 	gi.bprintf(PRINT_HIGH, "%s entered the game\n", ent->client->pers.netname);
+
+	Client_PrintMOTD(ent); /* FS: Coop: Added */
 
 	/* make sure all view stuff is valid */
 	ClientEndServerFrame(ent);
@@ -1852,6 +1871,8 @@ ClientBegin(edict_t *ent)
 			gi.multicast(ent->s.origin, MULTICAST_PVS);
 
 			gi.bprintf(PRINT_HIGH, "%s entered the game\n", ent->client->pers.netname);
+
+			Client_PrintMOTD(ent); /* FS: Coop: Added */
 		}
 	}
 
