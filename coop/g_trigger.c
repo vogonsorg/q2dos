@@ -392,6 +392,12 @@ trigger_key_use(edict_t *self, edict_t *other /* unused */, edict_t *activator)
 				ent->client->pers.inventory[index] = 0;
 			}
 		}
+
+		if(activator->client->pers.netname && self->item->pickup_name) /* FS: Broadcast that a key/powercube/etc has been used */
+		{
+			gi.bprintf(PRINT_HIGH, "\x02[MAPMSG][%s]: ", activator->client->pers.netname);
+			gi.bprintf(PRINT_HIGH, "The %s has been used.\n", self->item->pickup_name);
+		}
 	}
 	else
 	{

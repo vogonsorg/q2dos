@@ -1005,7 +1005,7 @@ Pickup_Key(edict_t *ent, edict_t *other)
 
 		if(ent->item && ent->item->pickup_name && other->client->pers.netname && coopReturn == true)
 		{
-			gi.bprintf(PRINT_HIGH,"\x02[%s]:", other->client->pers.netname);
+			gi.bprintf(PRINT_HIGH,"\x02[%s]: ", other->client->pers.netname);
 			gi.bprintf(PRINT_HIGH, "Team, everyone has the %s!\n", ent->item->pickup_name);
 		}
 
