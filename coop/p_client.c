@@ -670,7 +670,15 @@ player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 					self->client->pers.inventory[n];
 			}
 
-			self->client->pers.inventory[n] = 0;
+			if(!coop->intValue) /* FS: Coop: Keep inventory on respawn. */
+			{
+				self->client->pers.inventory[n] = 0;
+			}
+			else
+			{
+				self->client->resp.coop_respawn.inventory[n] =
+					self->client->pers.inventory[n];
+			}
 		}
 	}
 
@@ -811,6 +819,21 @@ InitClientPersistant(gclient_t *client)
 	client->pers.selected_item = ITEM_INDEX(item);
 	client->pers.inventory[client->pers.selected_item] = 1;
 
+	if (coop->intValue) /* FS: Coop: We always have a shotgun available. */
+	{
+		gitem_t *ammo_item;
+		int ammo_index;
+
+		item = FindItem("Shotgun");
+
+		client->pers.selected_item = ITEM_INDEX(item);
+		client->pers.inventory[client->pers.selected_item] = 1;
+
+		ammo_item = FindItem(item->ammo);
+		ammo_index = ITEM_INDEX(ammo_item);
+		client->pers.inventory[ammo_index] = 100;
+	}
+
 	client->pers.weapon = item;
 
 	client->pers.health = 100;
@@ -828,6 +851,53 @@ InitClientPersistant(gclient_t *client)
 	client->pers.max_flechettes = 200;
 
 	client->pers.connected = true;
+}
+
+void
+InitClientCoopPersistant(edict_t *ent) /* FS: Coop: Give back some goodies on respawn. */
+{
+	gclient_t *client;
+	gitem_t *item;
+	edict_t *it_ent;
+
+	if (!ent || !ent->client)
+		return;
+	if (!coop->intValue)
+		return;
+
+	client = ent->client;
+	client->pers.max_bullets = 200;
+	client->pers.max_shells = 100;
+	client->pers.max_rockets = 50;
+	client->pers.max_grenades = 50;
+	client->pers.max_cells = 200;
+	client->pers.max_slugs = 50;
+
+	switch(client->resp.coop_respawn.ammoUpgrade)
+	{
+		case COOP_BACKPACK:
+			item = FindItem("ammo pack");
+			break;
+		case COOP_BANDOLIER:
+			item = FindItem("bandolier");
+			break;
+		default:
+			item = NULL;
+			break;
+	}
+
+	if (item)
+	{
+		it_ent = G_Spawn();
+		it_ent->classname = item->classname;
+		SpawnItem(it_ent, item);
+		Touch_Item(it_ent, ent, NULL, NULL);
+
+		if (it_ent->inuse)
+		{
+			G_FreeEdict(it_ent);
+		}
+	}
 }
 
 void
@@ -1615,6 +1685,12 @@ PutClientInServer(edict_t *ent)
 
 	client->resp = resp;
 
+	if (coop->intValue) /* FS: Coop: Don't move this!  Resets max_health from adrenaline boosts */
+	{
+		ent->client->pers.health = ent->client->resp.coop_respawn.max_health;
+		ent->client->pers.max_health = ent->client->resp.coop_respawn.max_health;
+	}
+
 	/* copy some data from the client to the entity */
 	FetchClientEntData(ent);
 
@@ -1746,6 +1822,8 @@ PutClientInServer(edict_t *ent)
 	/* force the current weapon up */
 	client->newweapon = client->pers.weapon;
 	ChangeWeapon(ent);
+
+	InitClientCoopPersistant(ent); /* FS: Coop: Don't move this!  If too early it will fudge some things up */
 }
 
 void Client_PrintMOTD (edict_t *client) /* FS: MOTD */

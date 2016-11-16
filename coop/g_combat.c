@@ -113,6 +113,91 @@ CanDamage(edict_t *targ, edict_t *inflictor)
 	return false;
 }
 
+char *GetProperMonsterName (char *monsterName) /* FS: Coop: Get proper name for classname */
+{
+	if(!monsterName)
+		return "Unknown Monster";
+	else if(!strcmp("monster_soldier", monsterName))
+		return "Shotgun Guard";
+	else if(!strcmp("monster_soldier_light", monsterName))
+		return "Light Guard";
+	else if(!strcmp("monster_soldier_ss", monsterName))
+		return "Machinegun Guard";
+	else if(!strcmp("monster_flipper", monsterName))
+		return "Barracuda Shark";
+	else if(!strcmp("monster_flyer", monsterName))
+		return "Flyer";
+	else if(!strcmp("monster_infantry", monsterName))
+		return "Enforcer";
+	else if(!strcmp("monster_handler", monsterName))
+		return "Enforcer";
+	else if(!strcmp("monster_parasite", monsterName))
+		return "Parasite";
+	else if(!strcmp("monster_gunner", monsterName))
+		return "Gunner";
+	else if(!strcmp("monster_chick", monsterName))
+		return "Iron Maiden";
+	else if(!strcmp("monster_floater", monsterName))
+		return "Technician";
+	else if(!strcmp("monster_berserk", monsterName))
+		return "Berserker";
+	else if(!strcmp("monster_hover", monsterName))
+		return "Icarus";
+	else if(!strcmp("monster_medic", monsterName))
+		return "Medic";
+	else if(!strcmp("monster_mutant", monsterName))
+		return "Mutant";
+	else if(!strcmp("monster_brain", monsterName))
+		return "Brain";
+	else if(!strcmp("monster_gladiator", monsterName))
+		return "Gladiator";
+	else if(!strcmp("monster_tank", monsterName))
+		return "Tank";
+	else if(!strcmp("monster_tank_commander", monsterName))
+		return "Tank Commander";
+	else if(!strcmp("monster_supertank", monsterName))
+		return "Super Tank";
+	else if(!strcmp("monster_jorg", monsterName))
+		return "Jorg";
+	else if(!strcmp("makron", monsterName))
+		return "Makron";
+	else if(!strcmp("misc_insane", monsterName))
+		return "Prisoner";
+	/* FS: Xatrix specific stuff */
+	else if(!strcmp("monster_gekk", monsterName))
+		return "Gekk";
+	else if(!strcmp("monster_soldier_hypergun", monsterName))
+		return "Hypergun Guard";
+	else
+		return monsterName;
+}
+
+char *GetCoopInsult (void) /* FS: Coop: Pick a random insult */
+{
+	int x;
+
+	srand ((unsigned)time (NULL));
+	x = rand() % 7;
+	switch(x)
+	{
+		case 0:
+			return "was killed by";
+		case 1:
+			return "was creamed by";
+		case 2:
+			return "was annihilated by";
+		case 3:
+			return "was torn to bits by";
+		case 4:
+			return "sucked it down to";
+		case 5:
+			return "was ripped apart by";
+		case 6:
+			return "bowed down to";
+	}
+	return "was killed by";
+}
+
 void
 Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 		int damage, vec3_t point)
@@ -205,6 +290,10 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 	if ((targ->svflags & SVF_MONSTER) && (targ->deadflag != DEAD_DEAD))
 	{
 		targ->touch = NULL;
+		if(attacker && attacker->client && attacker->client->pers.netname) /* FS: Coop: Announce who we killed */
+		{
+			gi.bprintf(PRINT_HIGH, "%s %s %s\n", GetProperMonsterName(targ->classname), GetCoopInsult(), attacker->client->pers.netname);
+		}
 		monster_death_use(targ);
 	}
 

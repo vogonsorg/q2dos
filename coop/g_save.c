@@ -229,6 +229,7 @@ InitGame(void)
 	maxspectators = gi.cvar ("maxspectators", "4", CVAR_SERVERINFO);
 	deathmatch = gi.cvar ("deathmatch", "0", CVAR_LATCH);
 	coop = gi.cvar ("coop", "0", CVAR_LATCH);
+	coop_item_respawn = gi.cvar("coop_item_respawn", "1", CVAR_SERVERINFO); /* FS: Coop: Added */
 	motd = gi.cvar ("motd", "0", 0); /* FS: Coop: Added */
 	skill = gi.cvar ("skill", "1", CVAR_LATCH);
 	maxentities = gi.cvar ("maxentities", "1024", CVAR_LATCH);
@@ -240,6 +241,7 @@ InitGame(void)
 	timelimit = gi.cvar ("timelimit", "0", CVAR_SERVERINFO);
 	password = gi.cvar ("password", "", CVAR_USERINFO);
 	spectator_password = gi.cvar ("spectator_password", "", CVAR_USERINFO);
+	needpass = gi.cvar ("needpass", "0", CVAR_SERVERINFO);
 	filterban = gi.cvar ("filterban", "1", 0);
 
 	g_select_empty = gi.cvar ("g_select_empty", "0", CVAR_ARCHIVE);

@@ -15,6 +15,7 @@ edict_t *g_edicts;
 
 cvar_t *deathmatch;
 cvar_t *coop;
+cvar_t *coop_item_respawn; /* FS: Coop: Added */
 cvar_t *motd; /* FS: Coop: Added */
 cvar_t *dmflags;
 cvar_t *skill;
@@ -293,8 +294,8 @@ void EndDMLevel (void)
 	}
 }
 
-void
-CheckNeedPass(void)
+
+void CheckNeedPass (void)
 {
 	int need;
 

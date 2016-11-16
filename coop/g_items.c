@@ -113,6 +113,16 @@ FindItem(char *pickup_name)
 
 /* ====================================================================== */
 
+qboolean Coop_Respawn (void) /* FS: Coop */
+{
+	if(coop->intValue && coop_item_respawn->intValue)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 void
 DoRespawn(edict_t *ent)
 {
@@ -206,7 +216,7 @@ Pickup_Powerup(edict_t *ent, edict_t *other)
 
 	other->client->pers.inventory[ITEM_INDEX(ent->item)]++;
 
-	if (deathmatch->value)
+	if (deathmatch->value || Coop_Respawn()) /* FS: Coop: Added */
 	{
 		if (!(ent->spawnflags & DROPPED_ITEM))
 		{
@@ -265,12 +275,17 @@ Pickup_Adrenaline(edict_t *ent, edict_t *other)
 		other->max_health += 1;
 	}
 
+	if (coop->intValue) /* FS: Coop: Keep +1 bonuses during respawn */
+	{
+		other->client->resp.coop_respawn.max_health += 1;
+	}
+
 	if (other->health < other->max_health)
 	{
 		other->health = other->max_health;
 	}
 
-	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value))
+	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value || Coop_Respawn()) ) /* FS: Coop: Added */
 	{
 		SetRespawn(ent, ent->item->quantity);
 	}
@@ -288,7 +303,7 @@ Pickup_AncientHead(edict_t *ent, edict_t *other)
 
 	other->max_health += 2;
 
-	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value))
+	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value || Coop_Respawn()) ) /* FS: Coop: Added */
 	{
 		SetRespawn(ent, ent->item->quantity);
 	}
@@ -362,9 +377,14 @@ Pickup_Bandolier(edict_t *ent, edict_t *other)
 		}
 	}
 
-	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value))
+	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value || Coop_Respawn()) ) /* FS: Coop: Added */
 	{
 		SetRespawn(ent, ent->item->quantity);
+	}
+
+	if (coop->intValue) /* FS: Coop: Keep bandolier during respawn */
+	{
+		other->client->resp.coop_respawn.ammoUpgrade = COOP_BANDOLIER;
 	}
 
 	return true;

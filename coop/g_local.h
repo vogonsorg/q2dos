@@ -1,7 +1,7 @@
 // g_local.h -- local definitions for game module
 
-#ifndef ROGUE_LOCAL_H
-#define ROGUE_LOCAL_H
+#ifndef COOP_LOCAL_H
+#define COOP_LOCAL_H
 #include "q_shared.h"
 
 // define GAME_INCLUDE so that game.h does not define the
@@ -11,7 +11,7 @@
 #include "game.h"
 
 // the "gameversion" client command will print this plus compile date
-#define GAMEVERSION "rogue"
+#define GAMEVERSION "maracoop"
 
 // protocol bytes that can be directly added to messages
 #define	svc_muzzleflash		1
@@ -578,6 +578,14 @@ extern	int lastgibframe;
 #define MOD_TRIGGER_HURT	31
 #define MOD_HIT				32
 #define MOD_TARGET_BLASTER	33
+// Xatrix: RAFAEL 14-APR-98
+#define MOD_RIPPER				34
+#define MOD_PHALANX				35
+#define MOD_BRAINTENTACLE		36
+#define MOD_BLASTOFF			37
+#define MOD_GEKK				38
+#define MOD_TRAP				39
+// Xatrix: END 14-APR-98
 #define MOD_FRIENDLY_FIRE	0x8000000
 
 //========
@@ -617,6 +625,7 @@ extern	edict_t			*g_edicts;
 extern	cvar_t	*maxentities;
 extern	cvar_t	*deathmatch;
 extern	cvar_t	*coop;
+extern	cvar_t	*coop_item_respawn; /* FS: Coop: Added */
 extern	cvar_t	*motd; /* FS: Coop: Added */
 extern	cvar_t	*dmflags;
 extern	cvar_t	*skill;
@@ -624,6 +633,7 @@ extern	cvar_t	*fraglimit;
 extern	cvar_t	*timelimit;
 extern	cvar_t	*password;
 extern	cvar_t	*spectator_password;
+extern	cvar_t	*needpass;
 extern	cvar_t	*g_select_empty;
 extern	cvar_t	*dedicated;
 
@@ -1102,6 +1112,8 @@ void RemoveAttackingPainDaemons (edict_t *self);
 #define	ANIM_DEATH		5
 #define	ANIM_REVERSE	6
 
+#define COOP_BANDOLIER	1 /* FS: Coop: For respawn */
+#define COOP_BACKPACK	2 /* FS: Coop: For respawn */
 
 // client data that stays across multiple level loads
 typedef struct
@@ -1137,6 +1149,8 @@ typedef struct
 
 	int			game_helpchanged;
 	int			helpchanged;
+
+	int			ammoUpgrade; /* FS: Coop: For respawn */
 
 	qboolean	spectator;			// client is a spectator
 
