@@ -2558,6 +2558,12 @@ door_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */,
 
 	self->touch_debounce_time = level.time + 5.0;
 
+	if(coop->intValue && other->client && other->client->pers.netname) /* FS: Coop: Print any use target stuff as global map message to all players */
+	{
+		gi.bprintf(PRINT_HIGH, "\x02[MAPMSG][%s]: ", other->client->pers.netname);
+		gi.bprintf(PRINT_HIGH, "%s\n", self->message);
+	}
+
 	gi.centerprintf(other, "%s", self->message);
 	gi.sound(other, CHAN_AUTO, gi.soundindex("misc/talk1.wav"), 1, ATTN_NORM, 0);
 }

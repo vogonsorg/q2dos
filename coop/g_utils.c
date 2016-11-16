@@ -295,6 +295,12 @@ G_UseTargets(edict_t *ent, edict_t *activator)
 	/* print the message */
 	if ((ent->message) && !(activator->svflags & SVF_MONSTER))
 	{
+		if(coop->intValue && activator->client && activator->client->pers.netname && strcmp("This item must be activated to use it.", ent->message)) /* FS: Coop: Print any use target stuff as global map message to all players */
+		{
+			gi.bprintf(PRINT_HIGH, "\x02[MAPMSG][%s]: ", activator->client->pers.netname);
+			gi.bprintf(PRINT_HIGH, "%s\n", ent->message);
+		}
+
 		gi.centerprintf(activator, "%s", ent->message);
 
 		if (ent->noise_index)
