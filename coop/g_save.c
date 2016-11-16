@@ -230,7 +230,7 @@ InitGame(void)
 	deathmatch = gi.cvar ("deathmatch", "0", CVAR_LATCH);
 	coop = gi.cvar ("coop", "0", CVAR_LATCH);
 	coop_item_respawn = gi.cvar("coop_item_respawn", "1", CVAR_SERVERINFO); /* FS: Coop: Added */
-	motd = gi.cvar ("motd", "0", 0); /* FS: Coop: Added */
+	motd = gi.cvar ("motd", "", 0); /* FS: Coop: Added */
 	skill = gi.cvar ("skill", "1", CVAR_LATCH);
 	maxentities = gi.cvar ("maxentities", "1024", CVAR_LATCH);
 	gamerules = gi.cvar ("gamerules", "0", CVAR_LATCH);			//PGM
