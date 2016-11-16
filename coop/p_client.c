@@ -7,6 +7,38 @@ void ClientUserinfoChanged(edict_t *ent, char *userinfo);
 void SP_misc_teleporter_dest(edict_t *ent);
 void Touch_Item(edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf);
 
+void
+SP_FixCoopSpots(edict_t *self)
+{
+	/* Entity number 292 is an unnamed info_player_start
+	   next to a named info_player_start. Delete it, if
+	   we're in coop since it screws up the spawnpoint
+	   selection heuristic in SelectCoopSpawnPoint(). 
+	   This unnamed info_player_start is selected as
+	   spawnpoint for player 0, therefor none of the
+	   named info_coop_start() matches... */
+	if(Q_stricmp(level.mapname, "xware") == 0)
+	{
+		if (self->s.number == 292)
+		{
+			G_FreeEdict(self);
+			self = NULL;
+		}
+	}
+}
+
+void
+SP_CreateCoopSpots(edict_t *self)
+{
+	/* Necessary for savegame compatiblity */
+}
+
+void
+SP_CreateUnnamedSpawn(edict_t *self)
+{
+	/* Necessary for savegame compatiblity */
+}
+
 /*
  * QUAKED info_player_start (1 0 0) (-16 -16 -24) (16 16 32)
  *
@@ -24,6 +56,9 @@ SP_info_player_start(edict_t *self)
 	{
 		return;
 	}
+
+	/* Fix coop spawn points */
+	SP_FixCoopSpots(self);
 }
 
 /*
@@ -74,7 +109,7 @@ SP_info_player_coop(edict_t *self)
  * needs to be checked
  */
 void
-SP_info_player_coop_lava(edict_t *self)
+SP_info_player_coop_lava(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -98,13 +133,23 @@ SP_info_player_coop_lava(edict_t *self)
 void
 SP_info_player_intermission(void)
 {
+	/* This function cannot be removed
+	 * since the info_player_intermission
+	 * needs a callback function. Like
+	 * every entity. */
 }
 
 /* ======================================================================= */
 
 void
-player_pain(edict_t *self, edict_t *other, float kick, int damage)
+player_pain(edict_t *self /* unsued */, edict_t *other /* unused */,
+		float kick /* unused */, int damage /* unused */)
 {
+	/* Player pain is handled at the end
+	 * of the frame in P_DamageFeedback.
+	 * This function is still here since
+	 * the player is an entity and needs
+	 * a pain callback */
 }
 
 qboolean
@@ -123,6 +168,11 @@ IsFemale(edict_t *ent)
 	}
 
 	info = Info_ValueForKey(ent->client->pers.userinfo, "gender");
+
+	if (strstr(info, "crakhor"))
+	{
+		return true;
+	}
 
 	if ((info[0] == 'f') || (info[0] == 'F'))
 	{
@@ -148,6 +198,11 @@ IsNeutral(edict_t *ent)
 	}
 
 	info = Info_ValueForKey(ent->client->pers.userinfo, "gender");
+
+	if (strstr(info, "crakhor"))
+	{
+		return false;
+	}
 
 	if ((info[0] != 'f') && (info[0] != 'F') && (info[0] != 'm') &&
 		(info[0] != 'M'))
@@ -221,6 +276,10 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker
 			case MOD_TRIGGER_HURT:
 				message = "was in the wrong place";
 				break;
+			case MOD_GEKK: /* FS: Coop: Xatrix specific */
+			case MOD_BRAINTENTACLE:
+				message = "that's gotta hurt";
+				break;
 			default:
 				break;
 		}
@@ -268,7 +327,7 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker
 				case MOD_BFG_BLAST:
 					message = "should have used a smaller gun";
 					break;
-				case MOD_DOPPLE_EXPLODE:
+				case MOD_DOPPLE_EXPLODE: /* FS: Coop: Rogue specific */
 
 					if (IsNeutral(self))
 					{
@@ -283,6 +342,9 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker
 						message = "got caught in his own trap";
 					}
 
+					break;
+				case MOD_TRAP: /* FS: Coop: Xatrix specific */
+					message = "sucked into his own trap";
 					break;
 				default:
 
@@ -390,60 +452,70 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker
 					message = "tried to invade";
 					message2 = "'s personal space";
 					break;
-				case MOD_CHAINFIST:
+				case MOD_CHAINFIST: /* FS: Coop: Rogue specific */
 					message = "was shredded by";
 					message2 = "'s ripsaw";
 					break;
-				case MOD_DISINTEGRATOR:
+				case MOD_DISINTEGRATOR: /* FS: Coop: Rogue specific */
 					message = "lost his grip courtesy of";
 					message2 = "'s disintegrator";
 					break;
-				case MOD_ETF_RIFLE:
+				case MOD_ETF_RIFLE: /* FS: Coop: Rogue specific */
 					message = "was perforated by";
 					break;
-				case MOD_HEATBEAM:
+				case MOD_HEATBEAM: /* FS: Coop: Rogue specific */
 					message = "was scorched by";
 					message2 = "'s plasma beam";
 					break;
-				case MOD_TESLA:
+				case MOD_TESLA: /* FS: Coop: Rogue specific */
 					message = "was enlightened by";
 					message2 = "'s tesla mine";
 					break;
-				case MOD_PROX:
+				case MOD_PROX: /* FS: Coop: Rogue specific */
 					message = "got too close to";
 					message2 = "'s proximity mine";
 					break;
-				case MOD_NUKE:
+				case MOD_NUKE: /* FS: Coop: Rogue specific */
 					message = "was nuked by";
 					message2 = "'s antimatter bomb";
 					break;
-				case MOD_VENGEANCE_SPHERE:
+				case MOD_VENGEANCE_SPHERE: /* FS: Coop: Rogue specific */
 					message = "was purged by";
 					message2 = "'s vengeance sphere";
 					break;
-				case MOD_DEFENDER_SPHERE:
+				case MOD_DEFENDER_SPHERE: /* FS: Coop: Rogue specific */
 					message = "had a blast with";
 					message2 = "'s defender sphere";
 					break;
-				case MOD_HUNTER_SPHERE:
+				case MOD_HUNTER_SPHERE: /* FS: Coop: Rogue specific */
 					message = "was killed like a dog by";
 					message2 = "'s hunter sphere";
 					break;
-				case MOD_TRACKER:
+				case MOD_TRACKER: /* FS: Coop: Rogue specific */
 					message = "was annihilated by";
 					message2 = "'s disruptor";
 					break;
-				case MOD_DOPPLE_EXPLODE:
+				case MOD_DOPPLE_EXPLODE: /* FS: Coop: Rogue specific */
 					message = "was blown up by";
 					message2 = "'s doppleganger";
 					break;
-				case MOD_DOPPLE_VENGEANCE:
+				case MOD_DOPPLE_VENGEANCE: /* FS: Coop: Rogue specific */
 					message = "was purged by";
 					message2 = "'s doppleganger";
 					break;
-				case MOD_DOPPLE_HUNTER:
+				case MOD_DOPPLE_HUNTER: /* FS: Coop: Rogue specific */
 					message = "was hunted down by";
 					message2 = "'s doppleganger";
+					break;
+				case MOD_RIPPER: /* FS: Coop: Xatrix specific */
+					message = "ripped to shreds by";
+					message2 = "'s ripper gun";
+					break;
+				case MOD_PHALANX: /* FS: Coop: Xatrix specific */
+					message = "was evaporated by";
+					break;
+				case MOD_TRAP: /* FS: Coop: Xatrix specific */
+					message = "caught in trap by";
 					break;
 				default:
 					break;
@@ -454,7 +526,7 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker
 				gi.bprintf(PRINT_MEDIUM, "%s %s %s%s\n", self->client->pers.netname,
 						message, attacker->client->pers.netname, message2);
 
-				if (gamerules && gamerules->value)
+				if (gamerules && gamerules->value) /* FS: Coop: Rogue specific */
 				{
 					if (DMGame.Score)
 					{
@@ -492,7 +564,7 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker
 
 	if (deathmatch->value)
 	{
-		if (gamerules && gamerules->value)
+		if (gamerules && gamerules->value) /* FS: Coop: Rogue specific */
 		{
 			if (DMGame.Score)
 			{
@@ -514,6 +586,7 @@ TossClientWeapon(edict_t *self)
 	gitem_t *item;
 	edict_t *drop;
 	qboolean quad;
+	qboolean quadfire; /* FS: Coop: Xatrix specific */
 	float spread;
 
 	if (!self)
@@ -547,9 +620,22 @@ TossClientWeapon(edict_t *self)
 		quad = (self->client->quad_framenum > (level.framenum + 10));
 	}
 
+	if (!((int)(dmflags->value) & DF_QUADFIRE_DROP)) /* FS: Coop: Xatrix specific */
+	{
+		quadfire = false;
+	}
+	else
+	{
+		quadfire = (self->client->quadfire_framenum > (level.framenum + 10));
+	}
+
 	if (item && quad)
 	{
 		spread = 22.5;
+	}
+	else if (item && quadfire) /* FS: Coop: Xatrix specific */
+	{
+		spread = 12.5;
 	}
 	else
 	{
@@ -573,6 +659,19 @@ TossClientWeapon(edict_t *self)
 
 		drop->touch = Touch_Item;
 		drop->nextthink = level.time + (self->client->quad_framenum - level.framenum) * FRAMETIME;
+		drop->think = G_FreeEdict;
+	}
+
+	if (quadfire) /* FS: Coop: Xatrix specific */
+	{
+		self->client->v_angle[YAW] += spread;
+		drop = Drop_Item(self, FindItemByClassname("item_quadfire"));
+		self->client->v_angle[YAW] -= spread;
+		drop->spawnflags |= DROPPED_PLAYER_ITEM;
+
+		drop->touch = Touch_Item;
+		drop->nextthink = level.time + (self->client->quadfire_framenum -
+						   level.framenum) * FRAMETIME;
 		drop->think = G_FreeEdict;
 	}
 }
@@ -601,21 +700,49 @@ LookAtKiller(edict_t *self, edict_t *inflictor, edict_t *attacker)
 		return;
 	}
 
-	if (dir[0])
+	if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		self->client->killer_yaw = 180 / M_PI * atan2(dir[1], dir[0]);
+		if (dir[0])
+		{
+			self->client->killer_yaw = 180 / M_PI * atan2(dir[1], dir[0]);
+		}
+		else if (dir[1] > 0)
+		{
+			self->client->killer_yaw = 90;
+		}
+		else if (dir[1] < 0)
+		{
+			self->client->killer_yaw = 270;
+		}
+		else
+		{
+			self->client->killer_yaw = 0;
+		}
 	}
-	else if (dir[1] > 0)
+	else /* FS: Coop: Different angles */
 	{
-		self->client->killer_yaw = 90;
-	}
-	else if (dir[1] < 0)
-	{
-		self->client->killer_yaw = 270;
-	}
-	else
-	{
-		self->client->killer_yaw = 0;
+		if (dir[0])
+		{
+			self->client->killer_yaw = 180 / M_PI * atan2(dir[1], dir[0]);
+		}
+		else
+		{
+			self->client->killer_yaw = 0;
+
+			if (dir[1] > 0)
+			{
+				self->client->killer_yaw = 90;
+			}
+			else if (dir[1] < 0)
+			{
+				self->client->killer_yaw = -90;
+			}
+		}
+
+		if (self->client->killer_yaw < 0)
+		{
+			self->client->killer_yaw += 360;
+		}
 	}
 }
 
@@ -682,6 +809,7 @@ player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 		}
 	}
 
+	/* FS: Coop: Rogue specific */
 	if (gamerules && gamerules->value) /* if we're in a dm game, alert the game */
 	{
 		if (DMGame.PlayerDeath)
@@ -697,9 +825,10 @@ player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 	self->client->enviro_framenum = 0;
 	self->flags &= ~FL_POWER_ARMOR;
 
-	self->client->double_framenum = 0;
+	self->client->double_framenum = 0; /* FS: Coop: Rogue specific */
+	self->client->quadfire_framenum = 0; /* FS: Coop: Xatrix specific */
 
-	if (self->client->owned_sphere)
+	if (self->client->owned_sphere) /* FS: Coop: Rogue specific */
 	{
 		edict_t *sphere;
 
@@ -708,20 +837,20 @@ player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 	}
 
 	/* if we've been killed by the tracker, GIB! */
-	if ((meansOfDeath & ~MOD_FRIENDLY_FIRE) == MOD_TRACKER)
+	if ((meansOfDeath & ~MOD_FRIENDLY_FIRE) == MOD_TRACKER) /* FS: Coop: Rogue specific */
 	{
 		self->health = -100;
 		damage = 400;
 	}
 
 	/* make sure no trackers are still hurting us. */
-	if (self->client->tracker_pain_framenum)
+	if (self->client->tracker_pain_framenum) /* FS: Coop: Rogue specific */
 	{
 		RemoveAttackingPainDaemons(self);
 	}
 
 	/* if we got obliterated by the nuke, don't gib */
-	if ((self->health < -80) && (meansOfDeath == MOD_NUKE))
+	if ((self->health < -80) && (meansOfDeath == MOD_NUKE)) /* FS: Coop: Rogue specific */
 	{
 		self->flags |= FL_NOGIB;
 	}
@@ -729,7 +858,7 @@ player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 	if (self->health < -40)
 	{
 		/* don't toss gibs if we got vaped by the nuke */
-		if (!(self->flags & FL_NOGIB))
+		if ((!(self->flags & FL_NOGIB)) && (game.gametype == rogue_coop)) /* FS: Coop: Rogue specific */
 		{
 			/* gib */
 			gi.sound(self, CHAN_BODY, gi.soundindex( "misc/udeath.wav"), 1, ATTN_NORM, 0);
@@ -748,8 +877,20 @@ player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 				ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 			}
 		}
+		else /* FS: Coop: Code dupe for clarity */
+		{
+			/* gib */
+			gi.sound(self, CHAN_BODY, gi.soundindex("misc/udeath.wav"),
+				   	1, ATTN_NORM, 0);
 
-		self->flags &= ~FL_NOGIB;
+			for (n = 0; n < 4; n++)
+			{
+				ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2",
+						damage, GIB_ORGANIC);
+			}
+		}
+
+		self->flags &= ~FL_NOGIB; /* FS: Coop: Rogue specific.  Probably OK as-is. */
 		ThrowClientHead(self, damage);
 		self->takedamage = DAMAGE_NO;
 	}
@@ -846,10 +987,14 @@ InitClientPersistant(gclient_t *client)
 	client->pers.max_cells = 200;
 	client->pers.max_slugs = 50;
 
+	/* FS: Coop: Rogue specific */
 	client->pers.max_prox = 50;
 	client->pers.max_tesla = 50;
 	client->pers.max_flechettes = 200;
 
+	/* FS: Coop: Xatrix specific */
+	client->pers.max_magslug = 50;
+	client->pers.max_trap = 5;
 	client->pers.connected = true;
 }
 
@@ -977,7 +1122,7 @@ PlayersRangeFromSpot(edict_t *spot)
 
 	if (!spot)
 	{
-		return 0.0;
+		return 0.0f;
 	}
 
 	bestplayerdistance = 9999999;
@@ -1121,7 +1266,7 @@ SelectDeathmatchSpawnPoint(void)
 }
 
 edict_t *
-SelectLavaCoopSpawnPoint(edict_t *ent)
+SelectLavaCoopSpawnPoint(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	int index;
 	edict_t *spot = NULL;
@@ -1238,7 +1383,7 @@ SelectCoopSpawnPoint(edict_t *ent)
 		return NULL;
 	}
 
-	if (!Q_stricmp(level.mapname, "rmine2p") || !Q_stricmp(level.mapname, "rmine2"))
+	if (!Q_stricmp(level.mapname, "rmine2p") || !Q_stricmp(level.mapname, "rmine2")) /* FS: Coop: Rogue specific */
 	{
 		return SelectLavaCoopSpawnPoint(ent);
 	}
@@ -1293,6 +1438,7 @@ SelectSpawnPoint(edict_t *ent, vec3_t origin, vec3_t angles)
 {
 	edict_t *spot = NULL;
 	edict_t *coopspot = NULL;
+	int dist;
 	int index;
 	int counter = 0;
 	vec3_t d;
@@ -1369,7 +1515,20 @@ SelectSpawnPoint(edict_t *ent, vec3_t origin, vec3_t angles)
 
 				VectorSubtract(coopspot->s.origin, spot->s.origin, d);
 
-				if ((VectorLength(d) < 550))
+				/* In xship the coop spawnpoints are farther
+				   away than in other maps. Quirk around this.
+				   Oh well... */
+				/* FS: Coop: Xatrix specific */
+				if (Q_stricmp(level.mapname, "xship") == 0)
+				{
+					dist = 2500;
+				}
+				else
+				{
+					dist = 550;
+				}
+
+				if ((VectorLength(d) < dist))
 				{
 					if (index == counter)
 					{
@@ -1635,7 +1794,7 @@ PutClientInServer(edict_t *ent)
 
 	/* find a spawn point. do it before setting health back
 	   up, so farthest ranging doesn't count this client */
-	if (gamerules && gamerules->value && DMGame.SelectSpawnPoint)
+	if (gamerules && gamerules->value && DMGame.SelectSpawnPoint) /* FS: Coop: Rogue specific */
 	{
 		DMGame.SelectSpawnPoint(ent, spawn_origin, spawn_angles);
 	}
@@ -1749,7 +1908,7 @@ PutClientInServer(edict_t *ent)
 		}
 	}
 
-	if (client->pers.weapon)
+	if (client->pers.weapon) /* FS: Coop: Rogue specific, but looks like a fix/workaround.  Probably OK as-is. */
 	{
 		client->ps.gunindex = gi.modelindex(client->pers.weapon->view_model);
 	}
@@ -1758,11 +1917,13 @@ PutClientInServer(edict_t *ent)
 		client->ps.gunindex = 0;
 	}
 
-
 	/* clear entity state values */
 	ent->s.effects = 0;
 	ent->s.modelindex = 255; /* will use the skin specified model */
 	ent->s.modelindex2 = 255; /* custom gun model */
+
+	/* sknum is player num and weapon number
+	   weapon number will be added in changeweapon */
 	ent->s.skinnum = ent - g_edicts - 1;
 
 	ent->s.frame = 0;
@@ -1810,6 +1971,7 @@ PutClientInServer(edict_t *ent)
 
 	/* my tribute to cash's level-specific hacks. I hope
 	 *   live up to his trailblazing cheese. */
+	/* FS: Coop: Rogue specific */
 	if (Q_stricmp(level.mapname, "rboss") == 0)
 	{
 		/* if you get on to rboss in single player or coop, ensure
@@ -1864,7 +2026,7 @@ ClientBeginDeathmatch(edict_t *ent)
 	G_InitEdict(ent);
 	InitClientResp(ent->client);
 
-	if (gamerules && gamerules->value && DMGame.ClientBegin)
+	if (gamerules && gamerules->value && DMGame.ClientBegin) /* FS: Coop: Rogue specific */
 	{
 		DMGame.ClientBegin(ent);
 	}
@@ -2162,13 +2324,14 @@ ClientDisconnect(edict_t *ent)
 
 	gi.bprintf(PRINT_HIGH, "%s disconnected\n", ent->client->pers.netname);
 
+ 	/* FS: Coop: Rogue specific.  Probably OK to leave as-is. */
 	/* make sure no trackers are still hurting us. */
 	if (ent->client->tracker_pain_framenum)
 	{
 		RemoveAttackingPainDaemons(ent);
 	}
 
-	if (ent->client->owned_sphere)
+	if (ent->client->owned_sphere) /* FS: Coop: Rogue specific */
 	{
 		if (ent->client->owned_sphere->inuse)
 		{
@@ -2178,7 +2341,7 @@ ClientDisconnect(edict_t *ent)
 		ent->client->owned_sphere = NULL;
 	}
 
-	if (gamerules && gamerules->value)
+	if (gamerules && gamerules->value) /* FS: Coop: Rogue specific */
 	{
 		if (DMGame.PlayerDisconnect)
 		{
@@ -2250,7 +2413,7 @@ PrintPmove(pmove_t *pm)
 
 	c1 = CheckBlock(&pm->s, sizeof(pm->s));
 	c2 = CheckBlock(&pm->cmd, sizeof(pm->cmd));
-	Com_Printf("sv %3i:%i %i\n", pm->cmd.impulse, c1, c2);
+	gi.dprintf(DEVELOPER_MSG_GAME, "sv %3i:%i %i\n", pm->cmd.impulse, c1, c2);
 }
 
 /*
@@ -2317,7 +2480,15 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 			client->ps.pmove.pm_type = PM_NORMAL;
 		}
 
-		client->ps.pmove.gravity = sv_gravity->value * ent->gravity;
+		if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+		{
+			client->ps.pmove.gravity = sv_gravity->value * ent->gravity;
+		}
+		else
+		{
+			client->ps.pmove.gravity = sv_gravity->value;
+		}
+
 		pm.s = client->ps.pmove;
 
 		for (i = 0; i < 3; i++)
@@ -2367,7 +2538,7 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 			PlayerNoise(ent, ent->s.origin, PNOISE_SELF);
 		}
 
-		if (ent->flags & FL_SAM_RAIMI)
+		if ((game.gametype == rogue_coop) && (ent->flags & FL_SAM_RAIMI)) /* FS: Coop: Rogue specific */
 		{
 			ent->viewheight = 8;
 		}
@@ -2399,7 +2570,10 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 
 		gi.linkentity(ent);
 
-		ent->gravity = 1.0;
+		if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+		{
+			ent->gravity = 1.0;
+		}
 
 		if (ent->movetype != MOVETYPE_NOCLIP)
 		{
@@ -2584,7 +2758,7 @@ ClientBeginServerFrame(edict_t *ent)
  * the disruptor attaches to clients to damage them.
  */
 void
-RemoveAttackingPainDaemons(edict_t *self)
+RemoveAttackingPainDaemons(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	edict_t *tracker;
 

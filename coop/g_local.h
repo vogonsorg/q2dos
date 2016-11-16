@@ -1147,6 +1147,10 @@ typedef struct
 	int			max_cells;
 	int			max_slugs;
 
+	/* XATRIX */
+	int			max_magslug;
+	int			max_trap;
+
 	gitem_t		*weapon;
 	gitem_t		*lastweapon;
 
