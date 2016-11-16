@@ -283,6 +283,7 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 	if ((targ->movetype == MOVETYPE_PUSH) ||
 		(targ->movetype == MOVETYPE_STOP) || (targ->movetype == MOVETYPE_NONE))
 	{
+		/* doors, triggers, etc */
 		targ->die(targ, inflictor, attacker, damage, point);
 		return;
 	}

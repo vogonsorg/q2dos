@@ -39,10 +39,16 @@ MoveClientToIntermission(edict_t *ent)
 	ent->client->grenade_blew_up = false;
 	ent->client->grenade_time = 0;
 
+	/* FS: Coop: Rogue specific */
 	ent->client->ps.rdflags &= ~RDF_IRGOGGLES;
 	ent->client->ir_framenum = 0;
 	ent->client->nuke_framenum = 0;
 	ent->client->double_framenum = 0;
+
+	/* FS: Coop: Xatrix specific */
+	ent->client->quadfire_framenum = 0;
+	ent->client->trap_blew_up = false;
+	ent->client->trap_time = 0;
 
 	ent->viewheight = 0;
 	ent->s.modelindex = 0;
@@ -52,6 +58,8 @@ MoveClientToIntermission(edict_t *ent)
 	ent->s.effects = 0;
 	ent->s.sound = 0;
 	ent->solid = SOLID_NOT;
+
+	gi.linkentity(ent);
 
 	/* add the layout */
 	if (deathmatch->value || coop->value)
@@ -265,6 +273,7 @@ DeathmatchScoreboardMessage(edict_t *ent, edict_t *killer /* can be NULL */)
 			tag = NULL;
 		}
 
+		/* FS: Coop: Xatrix specific */
 		/* allow new DM games to override the tag picture */
 		if (gamerules && gamerules->value)
 		{
@@ -305,6 +314,20 @@ DeathmatchScoreboardMessage(edict_t *ent, edict_t *killer /* can be NULL */)
 
 	gi.WriteByte(svc_layout);
 	gi.WriteString(string);
+}
+
+/*
+==================
+DeathmatchScoreboard
+
+Draw instead of help message.
+Note that it isn't that hard to overflow the 1400 byte message limit!
+==================
+*/
+void DeathmatchScoreboard (edict_t *ent) /* FS: Coop: Xatrix */
+{
+	DeathmatchScoreboardMessage (ent, ent->enemy);
+	gi.unicast (ent, true);
 }
 
 /*
@@ -461,11 +484,17 @@ G_SetStats(edict_t *ent)
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex("p_quad");
 		ent->client->ps.stats[STAT_TIMER] = (ent->client->quad_framenum - level.framenum) / 10;
 	}
-	else if (ent->client->double_framenum > level.framenum)
+	else if (ent->client->double_framenum > level.framenum) /* FS: Coop: Rogue specific */
 	{
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex("p_double");
 		ent->client->ps.stats[STAT_TIMER] =
 			(ent->client->double_framenum - level.framenum) / 10;
+	}
+	else if (ent->client->quadfire_framenum > level.framenum) /* FS: Coop: Xatrix specific */
+	{
+		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex("p_quadfire");
+		ent->client->ps.stats[STAT_TIMER] = (ent->client->quadfire_framenum
+			   	- level.framenum) / 10;
 	}
 	else if (ent->client->invincible_framenum > level.framenum)
 	{
@@ -482,7 +511,7 @@ G_SetStats(edict_t *ent)
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex("p_rebreather");
 		ent->client->ps.stats[STAT_TIMER] = (ent->client->breather_framenum - level.framenum) / 10;
 	}
-	else if (ent->client->owned_sphere)
+	else if (ent->client->owned_sphere) /* FS: Coop: Rogue specific */
 	{
 		if (ent->client->owned_sphere->spawnflags == 1) /* defender */
 		{
@@ -506,7 +535,7 @@ G_SetStats(edict_t *ent)
 		ent->client->ps.stats[STAT_TIMER] =
 			(int)(ent->client->owned_sphere->wait - level.time);
 	}
-	else if (ent->client->ir_framenum > level.framenum)
+	else if (ent->client->ir_framenum > level.framenum) /* FS: Coop: Rogue specific */
 	{
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex("p_ir");
 		ent->client->ps.stats[STAT_TIMER] =

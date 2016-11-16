@@ -871,6 +871,9 @@ void ThrowHead (edict_t *self, char *gibname, int damage, int type);
 void ThrowClientHead (edict_t *self, int damage);
 void ThrowGib (edict_t *self, char *gibname, int damage, int type);
 void BecomeExplosion1(edict_t *self);
+/* XATRIX */
+void ThrowHeadACID (edict_t *self, char *gibname, int damage, int type);
+void ThrowGibACID (edict_t *self, char *gibname, int damage, int type);
 
 //
 // g_ai.c
@@ -910,6 +913,8 @@ void fire_rocket(edict_t *self, vec3_t start, vec3_t dir, int damage,
 void fire_rail (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick);
 void fire_bfg(edict_t *self, vec3_t start, vec3_t dir,
 		int damage, int speed, float damage_radius);
+/* XATRIX */
+void fire_plasma (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage);
 
 //
 // g_ptrail.c
@@ -1248,6 +1253,11 @@ struct gclient_s
 
 	qboolean	grenade_blew_up;
 	float		grenade_time;
+	// RAFAEL
+	float		quadfire_framenum; /* FS: Coop: Xatrix specific */
+	qboolean	trap_blew_up; /* FS: Coop: Xatrix specific */
+	float		trap_time; /* FS: Coop: Xatrix specific */
+
 	int			silencer_shots;
 	int			weapon_sound;
 

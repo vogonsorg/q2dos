@@ -1449,6 +1449,7 @@ CopyToBodyQue(edict_t *ent)
 
 	gi.unlinkentity(ent);
 	gi.unlinkentity(body);
+
 	body->s = ent->s;
 	body->s.number = body - g_edicts;
 
@@ -1519,8 +1520,8 @@ spectator_respawn(edict_t *ent)
 		return;
 	}
 
-	/* if the user wants to become a spectator, make sure
-	   he doesn't exceed max_spectators */
+	/* if the user wants to become a spectator,
+	   make sure he doesn't exceed max_spectators */
 	if (ent->client->pers.spectator)
 	{
 		char *value = Info_ValueForKey(ent->client->pers.userinfo, "spectator");
@@ -1550,6 +1551,8 @@ spectator_respawn(edict_t *ent)
 		{
 			gi.cprintf(ent, PRINT_HIGH, "Server spectator limit is full.");
 			ent->client->pers.spectator = false;
+
+			/* reset his spectator var */
 			gi.WriteByte(svc_stufftext);
 			gi.WriteString("spectator 0\n");
 			gi.unicast(ent, true);
@@ -1558,6 +1561,8 @@ spectator_respawn(edict_t *ent)
 	}
 	else
 	{
+		/* he was a spectator and wants to join the
+		   game he must have the right password */
 		char *value = Info_ValueForKey(ent->client->pers.userinfo, "password");
 
 		if (*password->string && strcmp(password->string, "none") &&
@@ -2432,8 +2437,8 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 	client->buttons = ucmd->buttons;
 	client->latched_buttons |= client->buttons & ~client->oldbuttons;
 
-	/* save light level the player is
-	    tanding on for monster sighting AI */
+	/* save light level the player is standing
+	   on for monster sighting AI */
 	ent->light_level = ucmd->lightlevel;
 
 	/* fire weapon from final position if needed */
