@@ -289,7 +289,13 @@ typedef struct gitem_s
 	char		*precaches;		// string of all models, sounds, and images this item will use
 } gitem_t;
 
-
+/* FS: Coop: Hint for which rule sets we apply */
+typedef enum
+{
+	vanilla_coop,
+	xatrix_coop,
+	rogue_coop
+} gametype_t;
 
 //
 // this structure is left intact through an entire game
@@ -320,6 +326,7 @@ typedef struct
 	int			num_items;
 
 	qboolean	autosaved;
+	gametype_t	gametype; /* FS: Coop: Hint for which rule sets we apply */
 } game_locals_t;
 
 
