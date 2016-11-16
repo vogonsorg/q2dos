@@ -356,6 +356,7 @@ HelpComputerMessage(edict_t *ent)
 
 	gi.WriteByte(svc_layout);
 	gi.WriteString(string);
+	gi.unicast (ent, true); /* FS: Don't remove this DOS needs this! */
 }
 
 /*
