@@ -1139,3 +1139,91 @@ fire_bfg(edict_t *self, vec3_t start, vec3_t dir, int damage,
 
 	gi.linkentity(bfg);
 }
+
+/* XATRIX */
+void plasma_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
+{
+	vec3_t origin;
+
+	if (!ent || !other || !plane || !surf)
+	{
+		return;
+	}
+	
+	if (other == ent->owner)
+	{
+		return;
+	}
+
+	if (surf && (surf->flags & SURF_SKY))
+	{
+		G_FreeEdict(ent);
+		return;
+	}
+
+	if (ent->owner->client)
+	{
+		PlayerNoise(ent->owner, ent->s.origin, PNOISE_IMPACT);
+	}
+
+	/* calculate position for the explosion entity */
+	VectorMA(ent->s.origin, -0.02, ent->velocity, origin);
+
+	if (other->takedamage)
+	{
+		T_Damage(other, ent, ent->owner, ent->velocity, ent->s.origin,
+				plane->normal, ent->dmg, 0, 0, MOD_PHALANX);
+	}
+
+	T_RadiusDamage(ent, ent->owner, ent->radius_dmg, other,
+			ent->dmg_radius, MOD_PHALANX);
+
+	gi.WriteByte(svc_temp_entity);
+	gi.WriteByte(TE_PLASMA_EXPLOSION);
+	gi.WritePosition(origin);
+	gi.multicast(ent->s.origin, MULTICAST_PVS);
+
+	G_FreeEdict(ent);
+}
+
+/* XATRIX */
+void fire_plasma (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage)
+{
+	edict_t *plasma;
+
+	if (!self)
+	{
+		return;
+	}
+
+	plasma = G_Spawn();
+	VectorCopy (start, plasma->s.origin);
+	VectorCopy (dir, plasma->movedir);
+	vectoangles (dir, plasma->s.angles);
+	VectorScale (dir, speed, plasma->velocity);
+	plasma->movetype = MOVETYPE_FLYMISSILE;
+	plasma->clipmask = MASK_SHOT;
+	plasma->solid = SOLID_BBOX;
+
+	VectorClear (plasma->mins);
+	VectorClear (plasma->maxs);
+	
+	plasma->owner = self;
+	plasma->touch = plasma_touch;
+	plasma->nextthink = level.time + 8000/speed;
+	plasma->think = G_FreeEdict;
+	plasma->dmg = damage;
+	plasma->radius_dmg = radius_damage;
+	plasma->dmg_radius = damage_radius;
+	plasma->s.sound = gi.soundindex ("weapons/rockfly.wav");
+	
+	plasma->s.modelindex = gi.modelindex ("sprites/s_photon.sp2");
+	plasma->s.effects |= EF_PLASMA | EF_ANIM_ALLFAST;
+	
+	if (self->client)
+	{
+		check_dodge (self, plasma->s.origin, dir, speed);
+	}
+
+	gi.linkentity (plasma);
+}

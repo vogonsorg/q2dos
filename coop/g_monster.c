@@ -108,6 +108,142 @@ monster_fire_heat(edict_t *self, vec3_t start, vec3_t dir, vec3_t offset,
 	gi.multicast(start, MULTICAST_PVS);
 }
 
+/* XATRIX */
+void
+dabeam_hit(edict_t *self)
+{
+	edict_t *ignore;
+	vec3_t start;
+	vec3_t end;
+	trace_t tr;
+
+  	if (!self)
+	{
+		return;
+	}
+
+	ignore = self;
+	VectorCopy(self->s.origin, start);
+	VectorMA(start, 2048, self->movedir, end);
+
+	while (1)
+	{
+		tr = gi.trace(start, NULL, NULL, end, ignore,
+				CONTENTS_SOLID | CONTENTS_MONSTER | CONTENTS_DEADMONSTER);
+
+		if (!tr.ent)
+		{
+			break;
+		}
+
+		/* hurt it if we can */
+		if ((tr.ent->takedamage) && !(tr.ent->flags & FL_IMMUNE_LASER) &&
+			(tr.ent != self->owner))
+		{
+			T_Damage(tr.ent, self, self->owner, self->movedir, tr.endpos,
+					vec3_origin, self->dmg, skill->value, DAMAGE_ENERGY,
+					MOD_TARGET_LASER);
+		}
+
+		if (self->dmg < 0) /* healer ray */
+		{
+			/* when player is at 100 health
+			   just undo health fix */
+			if (tr.ent->client && (tr.ent->health > 100))
+			{
+				tr.ent->health += self->dmg;
+			}
+		}
+
+		/* if we hit something that's not a monster or
+		   player or is immune to lasers, we're done */
+		if (!(tr.ent->svflags & SVF_MONSTER) && (!tr.ent->client))
+		{
+			if (self->spawnflags & 0x80000000)
+			{
+				self->spawnflags &= ~0x80000000;
+				gi.WriteByte(svc_temp_entity);
+				gi.WriteByte(TE_LASER_SPARKS);
+				gi.WriteByte(10);
+				gi.WritePosition(tr.endpos);
+				gi.WriteDir(tr.plane.normal);
+				gi.WriteByte(self->s.skinnum);
+				gi.multicast(tr.endpos, MULTICAST_PVS);
+			}
+
+			break;
+		}
+
+		ignore = tr.ent;
+		VectorCopy(tr.endpos, start);
+	}
+
+	VectorCopy(tr.endpos, self->s.old_origin);
+	self->nextthink = level.time + 0.1;
+	self->think = G_FreeEdict;
+}
+
+/* XATRIX */
+void
+monster_dabeam(edict_t *self)
+{
+	vec3_t last_movedir;
+	vec3_t point;
+
+  	if (!self)
+	{
+		return;
+	}
+
+	self->movetype = MOVETYPE_NONE;
+	self->solid = SOLID_NOT;
+	self->s.renderfx |= RF_BEAM | RF_TRANSLUCENT;
+	self->s.modelindex = 1;
+
+	self->s.frame = 2;
+
+	if (self->owner->monsterinfo.aiflags & AI_MEDIC)
+	{
+		self->s.skinnum = 0xf3f3f1f1;
+	}
+	else
+	{
+		self->s.skinnum = 0xf2f2f0f0;
+	}
+
+	if (self->enemy)
+	{
+		VectorCopy(self->movedir, last_movedir);
+		VectorMA(self->enemy->absmin, 0.5, self->enemy->size, point);
+
+		if (self->owner->monsterinfo.aiflags & AI_MEDIC)
+		{
+			point[0] += sin(level.time) * 8;
+		}
+
+		VectorSubtract(point, self->s.origin, self->movedir);
+		VectorNormalize(self->movedir);
+
+		if (!VectorCompare(self->movedir, last_movedir))
+		{
+			self->spawnflags |= 0x80000000;
+		}
+	}
+	else
+	{
+		G_SetMovedir(self->s.angles, self->movedir);
+	}
+
+	self->think = dabeam_hit;
+	self->nextthink = level.time + 0.1;
+	VectorSet(self->mins, -8, -8, -8);
+	VectorSet(self->maxs, 8, 8, 8);
+	gi.linkentity(self);
+
+	self->spawnflags |= 0x80000001;
+	self->svflags &= ~SVF_NOCLIENT;
+}
+
 void
 monster_fire_grenade(edict_t *self, vec3_t start, vec3_t aimdir,
 		int damage, int speed, int flashtype)

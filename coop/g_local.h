@@ -861,7 +861,8 @@ void monster_fire_heat(edict_t *self, vec3_t start, vec3_t dir, vec3_t offset,
 void stationarymonster_start (edict_t *self);	
 void monster_done_dodge (edict_t *self);
 //ROGUE
-
+/* XATRIX */
+void monster_dabeam (edict_t *self);
 
 //
 // g_misc.c

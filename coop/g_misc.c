@@ -277,6 +277,136 @@ ThrowHead(edict_t *self, char *gibname, int damage, int type)
 	gi.linkentity(self);
 }
 
+/*XATRIX */
+void
+ThrowGibACID(edict_t *self, char *gibname, int damage, int type)
+{
+	edict_t *gib;
+	vec3_t vd;
+	vec3_t origin;
+	vec3_t size;
+	float vscale;
+
+	if (!self || !gibname)
+	{
+		return;
+	}
+
+	if (level.framenum > lastgibframe)
+	{
+		gibsthisframe = 0;
+		lastgibframe = level.framenum;
+	}
+
+	gibsthisframe++;
+
+	if (gibsthisframe > 20)
+	{
+		return;
+	}
+
+	gib = G_Spawn();
+
+	VectorScale(self->size, 0.5, size);
+	VectorAdd(self->absmin, size, origin);
+	gib->s.origin[0] = origin[0] + crandom() * size[0];
+	gib->s.origin[1] = origin[1] + crandom() * size[1];
+	gib->s.origin[2] = origin[2] + crandom() * size[2];
+
+	/* gi.setmodel (gib, gibname); */
+	gib->s.modelindex = gi.modelindex(gibname);
+
+	gib->clipmask = MASK_SHOT;
+	gib->solid = SOLID_BBOX;
+
+	gib->s.effects |= EF_GREENGIB;
+	/* note to self check this */
+	gib->s.renderfx |= RF_FULLBRIGHT;
+	gib->flags |= FL_NO_KNOCKBACK;
+	gib->takedamage = DAMAGE_YES;
+	gib->die = gib_die;
+	gib->dmg = 2;
+
+	if (type == GIB_ORGANIC)
+	{
+		gib->movetype = MOVETYPE_TOSS;
+		vscale = 3.0;
+	}
+	else
+	{
+		gib->movetype = MOVETYPE_BOUNCE;
+		vscale = 1.0;
+	}
+
+	VelocityForDamage(damage, vd);
+	VectorMA(self->velocity, vscale, vd, gib->velocity);
+	ClipGibVelocity(gib);
+	gib->avelocity[0] = random() * 600;
+	gib->avelocity[1] = random() * 600;
+	gib->avelocity[2] = random() * 600;
+
+	gib->think = G_FreeEdict;
+	gib->nextthink = level.time + 10 + random() * 10;
+
+	gi.linkentity(gib);
+}
+
+/*XATRIX */
+void
+ThrowHeadACID(edict_t *self, char *gibname, int damage, int type)
+{
+	vec3_t vd;
+	float vscale;
+
+    if (!self || !gibname)
+	{
+		return;
+	}
+	
+	self->s.skinnum = 0;
+	self->s.frame = 0;
+	VectorClear(self->mins);
+	VectorClear(self->maxs);
+
+	self->s.modelindex2 = 0;
+	gi.setmodel(self, gibname);
+
+	self->clipmask = MASK_SHOT;
+	self->solid = SOLID_BBOX;
+
+	self->s.effects |= EF_GREENGIB;
+	self->s.effects &= ~EF_FLIES;
+	self->s.effects |= RF_FULLBRIGHT;
+	self->s.sound = 0;
+	self->flags |= FL_NO_KNOCKBACK;
+	self->svflags &= ~SVF_MONSTER;
+	self->takedamage = DAMAGE_YES;
+	self->die = gib_die;
+	self->dmg = 2;
+
+	if (type == GIB_ORGANIC)
+	{
+		self->movetype = MOVETYPE_TOSS;
+		vscale = 0.5;
+	}
+	else
+	{
+		self->movetype = MOVETYPE_BOUNCE;
+		vscale = 1.0;
+	}
+
+	VelocityForDamage(damage, vd);
+	VectorMA(self->velocity, vscale, vd, self->velocity);
+	ClipGibVelocity(self);
+
+	self->avelocity[YAW] = crandom() * 600;
+
+	self->think = G_FreeEdict;
+	self->nextthink = level.time + 10 + random() * 10;
+
+	gi.linkentity(self);
+}
+
 void
 ThrowClientHead(edict_t *self, int damage)
 {
