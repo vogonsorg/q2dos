@@ -72,7 +72,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="odbc32.lib odbccp32.lib ws2_32.lib winmm.lib"
-				OutputFile=".\Debug/quake2.exe"
+				OutputFile=".\Debug/q2.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				IgnoreDefaultLibraryNames="LIBCMT"
@@ -168,7 +168,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="odbc32.lib odbccp32.lib ws2_32.lib winmm.lib"
-				OutputFile=".\Release/quake2.exe"
+				OutputFile=".\Release/q2.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				IgnoreDefaultLibraryNames="libcmtd.lib"
