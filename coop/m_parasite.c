@@ -619,7 +619,7 @@ parasite_attack(edict_t *self)
 }
 
 void
-parasite_jump_down(edict_t *self)
+parasite_jump_down(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t forward, up;
 
@@ -636,7 +636,7 @@ parasite_jump_down(edict_t *self)
 }
 
 void
-parasite_jump_up(edict_t *self)
+parasite_jump_up(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t forward, up;
 
@@ -653,7 +653,7 @@ parasite_jump_up(edict_t *self)
 }
 
 void
-parasite_jump_wait_land(edict_t *self)
+parasite_jump_wait_land(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -675,6 +675,7 @@ parasite_jump_wait_land(edict_t *self)
 	}
 }
 
+/* FS: Coop: Rogue specific */
 mframe_t parasite_frames_jump_up[] = {
 	{ai_move, -8, NULL},
 	{ai_move, -8, NULL},
@@ -686,6 +687,7 @@ mframe_t parasite_frames_jump_up[] = {
 	{ai_move, 0, NULL}
 };
 
+/* FS: Coop: Rogue specific */
 mmove_t parasite_move_jump_up = {
 	FRAME_jump01,
    	FRAME_jump08,
@@ -693,6 +695,7 @@ mmove_t parasite_move_jump_up = {
    	parasite_run
 };
 
+/* FS: Coop: Rogue specific */
 mframe_t parasite_frames_jump_down[] = {
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
@@ -704,6 +707,7 @@ mframe_t parasite_frames_jump_down[] = {
 	{ai_move, 0, NULL}
 };
 
+/* FS: Coop: Rogue specific */
 mmove_t parasite_move_jump_down = {
 	FRAME_jump01,
    	FRAME_jump08,
@@ -712,7 +716,7 @@ mmove_t parasite_move_jump_down = {
 };
 
 void
-parasite_jump(edict_t *self)
+parasite_jump(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -735,7 +739,7 @@ parasite_jump(edict_t *self)
 }
 
 qboolean
-parasite_blocked(edict_t *self, float dist)
+parasite_blocked(edict_t *self, float dist) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -762,7 +766,7 @@ parasite_blocked(edict_t *self, float dist)
 }
 
 qboolean
-parasite_checkattack(edict_t *self)
+parasite_checkattack(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t f, r, offset, start, end;
 	trace_t tr;
@@ -945,8 +949,12 @@ SP_monster_parasite(edict_t *self)
 	self->monsterinfo.attack = parasite_attack;
 	self->monsterinfo.sight = parasite_sight;
 	self->monsterinfo.idle = parasite_idle;
-	self->monsterinfo.blocked = parasite_blocked;
-	self->monsterinfo.checkattack = parasite_checkattack;
+
+	if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		self->monsterinfo.blocked = parasite_blocked;
+		self->monsterinfo.checkattack = parasite_checkattack;
+	}
 
 	gi.linkentity(self);
 

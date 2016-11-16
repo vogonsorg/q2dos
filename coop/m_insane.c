@@ -26,24 +26,44 @@ void insane_onground(edict_t *self);
 void
 insane_fist(edict_t *self)
 {
+	if (!self)
+	{
+		return;
+	}
+
 	gi.sound(self, CHAN_VOICE, sound_fist, 1, ATTN_IDLE, 0);
 }
 
 void
 insane_shake(edict_t *self)
 {
+	if (!self)
+	{
+		return;
+	}
+
 	gi.sound(self, CHAN_VOICE, sound_shake, 1, ATTN_IDLE, 0);
 }
 
 void
 insane_moan(edict_t *self)
 {
+	if (!self)
+	{
+		return;
+	}
+
 	gi.sound(self, CHAN_VOICE, sound_moan, 1, ATTN_IDLE, 0);
 }
 
 void
 insane_scream(edict_t *self)
 {
+	if (!self)
+	{
+		return;
+	}
+
 	gi.sound(self, CHAN_VOICE, sound_scream[rand() % 8], 1, ATTN_IDLE, 0);
 }
 

@@ -617,7 +617,7 @@ supertankRocket(edict_t *self)
 	vec3_t vec;
 	int flash_number;
 
-	if (!self->enemy || !self->enemy->inuse)
+	if (!self || !self->enemy || !self->enemy->inuse)
 	{
 		return;
 	}
@@ -656,18 +656,12 @@ supertankMachineGun(edict_t *self)
 	vec3_t forward, right;
 	int flash_number;
 
-	if (!self)
+	if (!self || !self->enemy || !self->enemy->inuse)
 	{
 		return;
 	}
 
-	if (!self->enemy || !self->enemy->inuse)
-	{
-		return;
-	}
-
-	flash_number = MZ2_SUPERTANK_MACHINEGUN_1 +
-				   (self->s.frame - FRAME_attak1_1);
+	flash_number = MZ2_SUPERTANK_MACHINEGUN_1 + (self->s.frame - FRAME_attak1_1);
 
 	dir[0] = 0;
 	dir[1] = self->s.angles[1];
@@ -831,7 +825,7 @@ supertank_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker 
 }
 
 qboolean
-supertank_blocked(edict_t *self, float dist)
+supertank_blocked(edict_t *self, float dist) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -897,14 +891,30 @@ SP_monster_supertank(edict_t *self)
 	self->monsterinfo.search = supertank_search;
 	self->monsterinfo.melee = NULL;
 	self->monsterinfo.sight = NULL;
-	self->monsterinfo.blocked = supertank_blocked;
+
+	if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		self->monsterinfo.blocked = supertank_blocked;
+	}
 
 	gi.linkentity(self);
 
 	self->monsterinfo.currentmove = &supertank_move_stand;
 	self->monsterinfo.scale = MODEL_SCALE;
 
+	if(game.gametype == xatrix_coop) /* FS: Coop: Xatrix specific */
+	{
+		if (self->spawnflags & 8)
+		{
+			self->monsterinfo.power_armor_type = POWER_ARMOR_SHIELD;
+			self->monsterinfo.power_armor_power = 400;
+		}
+	}
+
 	walkmonster_start(self);
 
-	self->monsterinfo.aiflags |= AI_IGNORE_SHOTS;
+	if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		self->monsterinfo.aiflags |= AI_IGNORE_SHOTS;
+	}
 }

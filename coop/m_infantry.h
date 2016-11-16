@@ -210,6 +210,7 @@
 #define FRAME_attak207        	205
 #define FRAME_attak208        	206
 
+/* FS: Coop: Rogue specific */
 //PGM
 #define FRAME_jump01			207
 #define FRAME_jump02			208

@@ -19,9 +19,9 @@ static int sound_search;
 void berserk_fidget(edict_t *self);
 
 void
-berserk_sight(edict_t *self, edict_t *other)
+berserk_sight(edict_t *self, edict_t *other /* unused */)
 {
-	if (!self || !other)
+  	if (!self)
 	{
 		return;
 	}
@@ -355,7 +355,8 @@ mmove_t berserk_move_pain2 = {
 };
 
 void
-berserk_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
+berserk_pain(edict_t *self, edict_t *other /* unsued */,
+		float kick /* unused */, int damage)
 {
 	if (!self)
 	{

@@ -212,11 +212,11 @@ InitGame(void)
 	sv_rollangle = gi.cvar ("sv_rollangle", "2", 0);
 	sv_maxvelocity = gi.cvar ("sv_maxvelocity", "2000", 0);
 	sv_gravity = gi.cvar ("sv_gravity", "800", 0);
-	sv_stopspeed = gi.cvar ("sv_stopspeed", "100", 0);
-	g_showlogic = gi.cvar ("g_showlogic", "0", 0);
-	huntercam = gi.cvar ("huntercam", "1", CVAR_SERVERINFO|CVAR_LATCH);
-	strong_mines = gi.cvar ("strong_mines", "0", 0);
-	randomrespawn = gi.cvar ("randomrespawn", "0", 0);
+	sv_stopspeed = gi.cvar ("sv_stopspeed", "100", 0); /* FS: Coop: Rogue specific */
+	g_showlogic = gi.cvar ("g_showlogic", "0", 0); /* FS: Coop: Rogue specific */
+	huntercam = gi.cvar ("huntercam", "1", CVAR_SERVERINFO|CVAR_LATCH); /* FS: Coop: Rogue specific */
+	strong_mines = gi.cvar ("strong_mines", "0", 0); /* FS: Coop: Rogue specific */
+	randomrespawn = gi.cvar ("randomrespawn", "0", 0); /* FS: Coop: Rogue specific */
 
 	/* noset vars */
 	dedicated = gi.cvar ("dedicated", "0", CVAR_NOSET);
@@ -233,7 +233,7 @@ InitGame(void)
 	motd = gi.cvar ("motd", "", 0); /* FS: Coop: Added */
 	skill = gi.cvar ("skill", "1", CVAR_LATCH);
 	maxentities = gi.cvar ("maxentities", "1024", CVAR_LATCH);
-	gamerules = gi.cvar ("gamerules", "0", CVAR_LATCH);			//PGM
+	gamerules = gi.cvar ("gamerules", "0", CVAR_LATCH); /* FS: Coop: Rogue specific */
 
 	/* change anytime vars */
 	dmflags = gi.cvar ("dmflags", "0", CVAR_SERVERINFO);
@@ -279,7 +279,7 @@ InitGame(void)
 
 	game.gametype = rogue_coop; /* FS: Coop: FIXME -- hardcoded to Rogue for now */
 
-	if (gamerules)
+	if (gamerules) /* FS: Coop: Rogue specific */
 	{
 		InitGameRules();
 	}

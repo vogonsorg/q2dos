@@ -1,8 +1,8 @@
 
 // game.h -- game dll information visible to server
 
-#ifndef ROGUE_GAME_H
-#define ROGUE_GAME_H
+#ifndef MARACOOP_GAME_H
+#define MARACOOP_GAME_H
 #define	GAME_API_VERSION	3
 
 // edict->svflags
@@ -220,4 +220,4 @@ typedef struct
 } game_export_t;
 
 game_export_t *GetGameAPI (game_import_t *import);
-#endif /* ROGUE_GAME_H */
+#endif /* MARACOOP_GAME_H */

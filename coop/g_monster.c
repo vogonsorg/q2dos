@@ -108,7 +108,7 @@ monster_fire_heat(edict_t *self, vec3_t start, vec3_t dir, vec3_t offset,
 	gi.multicast(start, MULTICAST_PVS);
 }
 
-/* XATRIX */
+/* FS: Coop: Xatrix specific */
 void
 dabeam_hit(edict_t *self)
 {
@@ -183,7 +183,7 @@ dabeam_hit(edict_t *self)
 	self->think = G_FreeEdict;
 }
 
-/* XATRIX */
+/* FS: Coop: Xatrix specific */
 void
 monster_dabeam(edict_t *self)
 {
@@ -1074,7 +1074,9 @@ monster_start_go(edict_t *self)
 
 		target = NULL;
 		notcombat = false;
-		fixup = false; while ((target = G_Find(target, FOFS(targetname), self->target)) != NULL)
+		fixup = false;
+
+		while ((target = G_Find(target, FOFS(targetname), self->target)) != NULL)
 		{
 			if (strcmp(target->classname, "point_combat") == 0)
 			{
