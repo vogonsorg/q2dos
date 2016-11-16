@@ -961,31 +961,55 @@ Pickup_Key(edict_t *ent, edict_t *other)
 		return false;
 	}
 
-	if (coop->value)
+	if (coop->value) /* FS: Coop: Distribute keys and special items */
 	{
-		if (strcmp(ent->classname, "key_power_cube") == 0)
+		int i;
+		edict_t *client;
+		qboolean coopReturn = false;
+
+		/* respawn any dead clients */
+		for (i = 0; i < maxclients->value; i++)
 		{
-			if (other->client->pers.power_cubes &
-				((ent->spawnflags & 0x0000ff00) >> 8))
+			client = g_edicts + 1 + i;
+
+			if (!client || !client->inuse)
 			{
-				return false;
+				continue;
 			}
 
-			other->client->pers.inventory[ITEM_INDEX(ent->item)]++;
-			other->client->pers.power_cubes |=
-				((ent->spawnflags & 0x0000ff00) >> 8);
-		}
-		else
-		{
-			if (other->client->pers.inventory[ITEM_INDEX(ent->item)])
+			if (strcmp(ent->classname, "key_power_cube") == 0)
 			{
-				return false;
+				if (client->client->pers.power_cubes &
+					((ent->spawnflags & 0x0000ff00) >> 8))
+				{
+					continue;
+				}
+
+				client->client->pers.inventory[ITEM_INDEX(ent->item)]++;
+				client->client->pers.power_cubes |=
+					((ent->spawnflags & 0x0000ff00) >> 8);
+			}
+			else
+			{
+				if (client->client->pers.inventory[ITEM_INDEX(ent->item)])
+				{
+					continue;
+				}
+
+				client->client->pers.inventory[ITEM_INDEX(ent->item)] = 1;
 			}
 
-			other->client->pers.inventory[ITEM_INDEX(ent->item)] = 1;
+			if(client == other) /* FS: Coop: If this client is the one who walked over then set the proper return qboolean */
+				coopReturn = true;
 		}
 
-		return true;
+		if(ent->item && ent->item->pickup_name && other->client->pers.netname && coopReturn == true)
+		{
+			gi.bprintf(PRINT_HIGH,"\x02[%s]:", other->client->pers.netname);
+			gi.bprintf(PRINT_HIGH, "Team, everyone has the %s!\n", ent->item->pickup_name);
+		}
+
+		return coopReturn;
 	}
 
 	other->client->pers.inventory[ITEM_INDEX(ent->item)]++;
