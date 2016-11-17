@@ -184,7 +184,7 @@ Move_Begin(edict_t *ent)
 void
 Move_Calc(edict_t *ent, vec3_t dest, void (*func)(edict_t *))
 {
-	if (!ent)
+ 	if (!ent || !func)
 	{
 		return;
 	}
@@ -275,14 +275,17 @@ AngleMove_Begin(edict_t *ent)
 		return;
 	}
 
-	/* accelerate as needed */
-	if (ent->moveinfo.speed < ent->speed)
+	if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		ent->moveinfo.speed += ent->accel;
-
-		if (ent->moveinfo.speed > ent->speed)
+		/* accelerate as needed */
+		if (ent->moveinfo.speed < ent->speed)
 		{
-			ent->moveinfo.speed = ent->speed;
+			ent->moveinfo.speed += ent->accel;
+
+			if (ent->moveinfo.speed > ent->speed)
+			{
+				ent->moveinfo.speed = ent->speed;
+			}
 		}
 	}
 
@@ -313,24 +316,33 @@ AngleMove_Begin(edict_t *ent)
 	/* scale the destdelta vector by the time spent traveling to get velocity */
 	VectorScale(destdelta, 1.0 / traveltime, ent->avelocity);
 
-	/* if we're done accelerating, act as a normal rotation */
-	if (ent->moveinfo.speed >= ent->speed)
+	if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		/* if we're done accelerating, act as a normal rotation */
+		if (ent->moveinfo.speed >= ent->speed)
+		{
+			/* set nextthink to trigger a think when dest is reached */
+			ent->nextthink = level.time + frames * FRAMETIME;
+			ent->think = AngleMove_Final;
+		}
+		else
+		{
+			ent->nextthink = level.time + FRAMETIME;
+			ent->think = AngleMove_Begin;
+		}
+	}
+	else
 	{
 		/* set nextthink to trigger a think when dest is reached */
 		ent->nextthink = level.time + frames * FRAMETIME;
 		ent->think = AngleMove_Final;
-	}
-	else
-	{
-		ent->nextthink = level.time + FRAMETIME;
-		ent->think = AngleMove_Begin;
 	}
 }
 
 void
 AngleMove_Calc(edict_t *ent, void (*func)(edict_t *))
 {
-	if (!ent)
+ 	if (!ent || !func)
 	{
 		return;
 	}
@@ -338,11 +350,14 @@ AngleMove_Calc(edict_t *ent, void (*func)(edict_t *))
 	VectorClear(ent->avelocity);
 	ent->moveinfo.endfunc = func;
 
-	/* if we're supposed to accelerate, this will
-	   tell anglemove_begin to do so */
-	if (ent->accel != ent->speed)
+	if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		ent->moveinfo.speed = 0;
+		/* if we're supposed to accelerate, this will
+		   tell anglemove_begin to do so */
+		if (ent->accel != ent->speed)
+		{
+			ent->moveinfo.speed = 0;
+		}
 	}
 
 	if (level.current_entity ==
@@ -500,7 +515,13 @@ Think_AccelMove(edict_t *ent)
 	}
 
 	ent->moveinfo.remaining_distance -= ent->moveinfo.current_speed;
-	plat_CalcAcceleratedMove(&ent->moveinfo);
+
+	/* FS: Coop: Rogue always does this */
+	if ((game.gametype == rogue_coop) || (ent->moveinfo.current_speed == 0)) /* starting or blocked */
+	{
+		plat_CalcAcceleratedMove(&ent->moveinfo);
+	}
+
 	plat_Accelerate(&ent->moveinfo);
 
 	/* will the entire move complete on next frame? */
@@ -562,7 +583,10 @@ plat_hit_bottom(edict_t *ent)
 
 	ent->moveinfo.state = STATE_BOTTOM;
 
-	plat2_kill_danger_area(ent);
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		plat2_kill_danger_area(ent);
+	}
 }
 
 void
@@ -612,7 +636,10 @@ plat_go_up(edict_t *ent)
 	ent->moveinfo.state = STATE_UP;
 	Move_Calc(ent, ent->moveinfo.start_origin, plat_hit_top);
 
-	plat2_spawn_danger_area(ent);
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		plat2_spawn_danger_area(ent);
+	}
 }
 
 void
@@ -640,11 +667,14 @@ plat_blocked(edict_t *self, edict_t *other)
 		return;
 	}
 
-	/* gib dead things */
-	if (other->health < 1)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		T_Damage(other, self, self, vec3_origin, other->s.origin,
-				vec3_origin, 100, 1, 0, MOD_CRUSH);
+		/* gib dead things */
+		if (other->health < 1)
+		{
+			T_Damage(other, self, self, vec3_origin, other->s.origin,
+					vec3_origin, 100, 1, 0, MOD_CRUSH);
+		}
 	}
 
 	T_Damage(other, self, self, vec3_origin, other->s.origin,
@@ -663,24 +693,32 @@ plat_blocked(edict_t *self, edict_t *other)
 void
 Use_Plat(edict_t *ent, edict_t *other, edict_t *activator /* unused */)
 {
-	if (!ent || !other)
+	if (!ent)
 	{
 		return;
 	}
 
-	/* if a monster is using us, then allow the activity when stopped. */
-	if (other->svflags & SVF_MONSTER)
+	if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (ent->moveinfo.state == STATE_TOP)
+		if (!other)
 		{
-			plat_go_down(ent);
-		}
-		else if (ent->moveinfo.state == STATE_BOTTOM)
-		{
-			plat_go_up(ent);
+			return;
 		}
 
-		return;
+		/* if a monster is using us, then allow the activity when stopped. */
+		if (other->svflags & SVF_MONSTER)
+		{
+			if (ent->moveinfo.state == STATE_TOP)
+			{
+				plat_go_down(ent);
+			}
+			else if (ent->moveinfo.state == STATE_BOTTOM)
+			{
+				plat_go_up(ent);
+			}
+
+			return;
+		}
 	}
 
 	if (ent->think)
@@ -722,6 +760,7 @@ Touch_Plat_Center(edict_t *ent, edict_t *other, cplane_t *plane /* unsed */,
 	}
 }
 
+/* FS: Coop: FIXME? Rogue set this to edict_t, otherwise it is void! */
 edict_t *
 plat_spawn_inside_trigger(edict_t *ent)
 {
@@ -895,7 +934,7 @@ SP_func_plat(edict_t *ent)
 }
 
 void
-plat2_spawn_danger_area(edict_t *ent)
+plat2_spawn_danger_area(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	vec3_t mins, maxs;
 
@@ -912,7 +951,7 @@ plat2_spawn_danger_area(edict_t *ent)
 }
 
 void
-plat2_kill_danger_area(edict_t *ent)
+plat2_kill_danger_area(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	edict_t *t;
 
@@ -933,7 +972,7 @@ plat2_kill_danger_area(edict_t *ent)
 }
 
 void
-plat2_hit_top(edict_t *ent)
+plat2_hit_top(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	if (!ent)
 	{
@@ -990,7 +1029,7 @@ plat2_hit_top(edict_t *ent)
 }
 
 void
-plat2_hit_bottom(edict_t *ent)
+plat2_hit_bottom(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	if (!ent)
 	{
@@ -1048,7 +1087,7 @@ plat2_hit_bottom(edict_t *ent)
 }
 
 void
-plat2_go_down(edict_t *ent)
+plat2_go_down(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	if (!ent)
 	{
@@ -1074,7 +1113,7 @@ plat2_go_down(edict_t *ent)
 }
 
 void
-plat2_go_up(edict_t *ent)
+plat2_go_up(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	if (!ent)
 	{
@@ -1102,7 +1141,7 @@ plat2_go_up(edict_t *ent)
 }
 
 void
-plat2_operate(edict_t *ent, edict_t *other)
+plat2_operate(edict_t *ent, edict_t *other) /* FS: Coop: Rogue specific */
 {
 	int otherState;
 	float pauseTime;
@@ -1190,8 +1229,7 @@ plat2_operate(edict_t *ent, edict_t *other)
 }
 
 void
-Touch_Plat_Center2(edict_t *ent, edict_t *other,
-		cplane_t *plane /* unused */, csurface_t *surf /* unused */)
+Touch_Plat_Center2(edict_t *ent, edict_t *other, cplane_t *plane /* unused */, csurface_t *surf /* unused */) /* FS: Coop: Rogue specific */
 {
 	if (!ent || !other)
 	{
@@ -1214,7 +1252,7 @@ Touch_Plat_Center2(edict_t *ent, edict_t *other,
 }
 
 void
-plat2_blocked(edict_t *self, edict_t *other)
+plat2_blocked(edict_t *self, edict_t *other) /* FS: Coop: Rogue specific */
 {
 	if (!self || !other)
 	{
@@ -1257,8 +1295,7 @@ plat2_blocked(edict_t *self, edict_t *other)
 }
 
 void
-Use_Plat2(edict_t *ent, edict_t *other /* unused */,
-	   	edict_t *activator)
+Use_Plat2(edict_t *ent, edict_t *other /* unused */, edict_t *activator) /* FS: Coop: Rogue specific */
 {
 	edict_t *trigger;
 	int i;
@@ -1297,8 +1334,7 @@ Use_Plat2(edict_t *ent, edict_t *other /* unused */,
 }
 
 void
-plat2_activate(edict_t *ent, edict_t *other /* unused */,
-	   	edict_t *activator /* unused */)
+plat2_activate(edict_t *ent, edict_t *other /* unused */, edict_t *activator /* unused */) /* FS: Coop: Rogue specific */
 {
 	edict_t *trigger;
 
@@ -1347,7 +1383,7 @@ plat2_activate(edict_t *ent, edict_t *other /* unused */,
  *
  */
 void
-SP_func_plat2(edict_t *ent)
+SP_func_plat2(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	edict_t *trigger;
 
@@ -1480,7 +1516,7 @@ SP_func_plat2(edict_t *ent)
  * ACCEL means it will accelerate to it's final speed and decelerate when shutting down.
  */
 void
-rotating_accel(edict_t *self)
+rotating_accel(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	float current_speed;
 
@@ -1506,7 +1542,7 @@ rotating_accel(edict_t *self)
 }
 
 void
-rotating_decel(edict_t *self)
+rotating_decel(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	float current_speed;
 
@@ -1573,14 +1609,22 @@ rotating_use(edict_t *self, edict_t *other /* unused */,
 	{
 		self->s.sound = 0;
 
-		if (self->spawnflags & 8192) /* Decelerate */
+		if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 		{
-			rotating_decel(self);
+			if (self->spawnflags & 8192) /* Decelerate */
+			{
+				rotating_decel(self);
+			}
+			else
+			{
+				VectorClear(self->avelocity);
+				G_UseTargets(self, self);
+				self->touch = NULL;
+			}
 		}
 		else
 		{
 			VectorClear(self->avelocity);
-			G_UseTargets(self, self);
 			self->touch = NULL;
 		}
 	}
@@ -1588,14 +1632,21 @@ rotating_use(edict_t *self, edict_t *other /* unused */,
 	{
 		self->s.sound = self->moveinfo.sound_middle;
 
-		if (self->spawnflags & 8192) /* accelerate */
+		if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 		{
-			rotating_accel(self);
+			if (self->spawnflags & 8192) /* accelerate */
+			{
+				rotating_accel(self);
+			}
+			else
+			{
+				VectorScale(self->movedir, self->speed, self->avelocity);
+				G_UseTargets(self, self);
+			}
 		}
 		else
 		{
 			VectorScale(self->movedir, self->speed, self->avelocity);
-			G_UseTargets(self, self);
 		}
 
 		if (self->spawnflags & 16)
@@ -1678,24 +1729,27 @@ SP_func_rotating(edict_t *ent)
 		ent->s.effects |= EF_ANIM_ALLFAST;
 	}
 
-	if (ent->spawnflags & 8192) /* Accelerate / Decelerate */
+	if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (!ent->accel)
+		if (ent->spawnflags & 8192) /* Accelerate / Decelerate */
 		{
-			ent->accel = 1;
-		}
-		else if (ent->accel > ent->speed)
-		{
-			ent->accel = ent->speed;
-		}
+			if (!ent->accel)
+			{
+				ent->accel = 1;
+			}
+			else if (ent->accel > ent->speed)
+			{
+				ent->accel = ent->speed;
+			}
 
-		if (!ent->decel)
-		{
-			ent->decel = 1;
-		}
-		else if (ent->decel > ent->speed)
-		{
-			ent->decel = ent->speed;
+			if (!ent->decel)
+			{
+				ent->decel = 1;
+			}
+			else if (ent->decel > ent->speed)
+			{
+				ent->decel = ent->speed;
+			}
 		}
 	}
 
@@ -2148,7 +2202,7 @@ door_go_up(edict_t *self, edict_t *activator)
 }
 
 void
-smart_water_go_up(edict_t *self)
+smart_water_go_up(edict_t *self) /* FS: Coop: Rogue Specific */
 {
 	float distance;
 	edict_t *lowestPlayer;
@@ -2262,7 +2316,7 @@ void
 door_use(edict_t *self, edict_t *other /* unused */, edict_t *activator)
 {
 	edict_t *ent;
-	vec3_t center;
+	vec3_t center; /* FS: Coop: Rogue specific */
 
 	if (!self || !activator)
 	{
@@ -2291,17 +2345,20 @@ door_use(edict_t *self, edict_t *other /* unused */, edict_t *activator)
 		}
 	}
 
-	/* smart water is different */
-	VectorAdd(self->mins, self->maxs, center);
-	VectorScale(center, 0.5, center);
-
-	if ((gi.pointcontents(center) & MASK_WATER) && self->spawnflags & 2)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		self->message = NULL;
-		self->touch = NULL;
-		self->enemy = activator;
-		smart_water_go_up(self);
-		return;
+		/* smart water is different */
+		VectorAdd(self->mins, self->maxs, center);
+		VectorScale(center, 0.5, center);
+
+		if ((gi.pointcontents(center) & MASK_WATER) && self->spawnflags & 2)
+		{
+			self->message = NULL;
+			self->touch = NULL;
+			self->enemy = activator;
+			smart_water_go_up(self);
+			return;
+		}
 	}
 
 	/* trigger all paired doors */
@@ -2701,8 +2758,7 @@ SP_func_door(edict_t *ent)
 }
 
 void
-Door_Activate(edict_t *self, edict_t *other /* unused */,
-	   	edict_t *activator /* unused */)
+Door_Activate(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -2899,18 +2955,21 @@ SP_func_door_rotating(edict_t *ent)
 		ent->think = Think_SpawnDoorTrigger;
 	}
 
-	if (ent->spawnflags & DOOR_INACTIVE)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		ent->takedamage = DAMAGE_NO;
-		ent->die = NULL;
-		ent->think = NULL;
-		ent->nextthink = 0;
-		ent->use = Door_Activate;
+		if (ent->spawnflags & DOOR_INACTIVE)
+		{
+			ent->takedamage = DAMAGE_NO;
+			ent->die = NULL;
+			ent->think = NULL;
+			ent->nextthink = 0;
+			ent->use = Door_Activate;
+		}
 	}
 }
 
 void
-smart_water_blocked(edict_t *self, edict_t *other)
+smart_water_blocked(edict_t *self, edict_t *other) /* FS: Coop: Rogue specific */
 {
 	if (!self || !other)
 	{
@@ -3019,14 +3078,17 @@ SP_func_water(edict_t *self)
 
 	self->moveinfo.accel = self->moveinfo.decel = self->moveinfo.speed = self->speed;
 
-	if (self->spawnflags & 2)   /* smart water */
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (!self->accel)
+		if (self->spawnflags & 2)   /* smart water */
 		{
-			self->accel = 20;
-		}
+			if (!self->accel)
+			{
+				self->accel = 20;
+			}
 
-		self->blocked = smart_water_blocked;
+			self->blocked = smart_water_blocked;
+		}
 	}
 
 	if (!self->wait)
@@ -3065,6 +3127,11 @@ SP_func_water(edict_t *self)
 void
 train_blocked(edict_t *self, edict_t *other)
 {
+	if (!self || !other)
+	{
+		return;
+	}
+
 	if (!(other->svflags & SVF_MONSTER) && (!other->client))
 	{
 		/* give it a chance to go away on it's own terms (like gibs) */
@@ -3075,7 +3142,7 @@ train_blocked(edict_t *self, edict_t *other)
 		if (other)
 		{
 			/* Hack for entity without an origin near the model */
-			VectorMA(other->absmin, 0.5, other->size, other->s.origin);
+			VectorMA (other->absmin, 0.5, other->size, other->s.origin);
 			BecomeExplosion1(other);
 		}
 
@@ -3132,7 +3199,14 @@ train_wait(edict_t *self)
 		}
 		else if (self->spawnflags & TRAIN_TOGGLE)
 		{
-			self->target_ent = NULL;
+			if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+			{
+				self->target_ent = NULL;
+			}
+			else
+			{
+				train_next(self);
+			}
 			self->spawnflags &= ~TRAIN_START_ON;
 			VectorClear(self->velocity);
 			self->nextthink = 0;
@@ -3157,7 +3231,7 @@ train_wait(edict_t *self)
 }
 
 void
-train_piece_wait(edict_t *self)
+train_piece_wait(edict_t *self) /* FS: Coop: Rogue specific */
 {
 }
 
@@ -3209,30 +3283,33 @@ again:
 		goto again;
 	}
 
-	if (ent->speed)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		self->speed = ent->speed;
-		self->moveinfo.speed = ent->speed;
+		if (ent->speed)
+		{
+			self->speed = ent->speed;
+			self->moveinfo.speed = ent->speed;
 
-		if (ent->accel)
-		{
-			self->moveinfo.accel = ent->accel;
-		}
-		else
-		{
-			self->moveinfo.accel = ent->speed;
-		}
+			if (ent->accel)
+			{
+				self->moveinfo.accel = ent->accel;
+			}
+			else
+			{
+				self->moveinfo.accel = ent->speed;
+			}
 
-		if (ent->decel)
-		{
-			self->moveinfo.decel = ent->decel;
-		}
-		else
-		{
-			self->moveinfo.decel = ent->speed;
-		}
+			if (ent->decel)
+			{
+				self->moveinfo.decel = ent->decel;
+			}
+			else
+			{
+				self->moveinfo.decel = ent->speed;
+			}
 
-		self->moveinfo.current_speed = 0;
+			self->moveinfo.current_speed = 0;
+		}
 	}
 
 	self->moveinfo.wait = ent->wait;
@@ -3257,26 +3334,29 @@ again:
 	Move_Calc(self, dest, train_wait);
 	self->spawnflags |= TRAIN_START_ON;
 
-	if (self->team)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		edict_t *e;
-		vec3_t dir, dst;
-
-		VectorSubtract(dest, self->s.origin, dir);
-
-		for (e = self->teamchain; e; e = e->teamchain)
+		if (self->team)
 		{
-			VectorAdd(dir, e->s.origin, dst);
-			VectorCopy(e->s.origin, e->moveinfo.start_origin);
-			VectorCopy(dst, e->moveinfo.end_origin);
+			edict_t *e;
+			vec3_t dir, dst;
 
-			e->moveinfo.state = STATE_TOP;
-			e->speed = self->speed;
-			e->moveinfo.speed = self->moveinfo.speed;
-			e->moveinfo.accel = self->moveinfo.accel;
-			e->moveinfo.decel = self->moveinfo.decel;
-			e->movetype = MOVETYPE_PUSH;
-			Move_Calc(e, dst, train_piece_wait);
+			VectorSubtract(dest, self->s.origin, dir);
+
+			for (e = self->teamchain; e; e = e->teamchain)
+			{
+				VectorAdd(dir, e->s.origin, dst);
+				VectorCopy(e->s.origin, e->moveinfo.start_origin);
+				VectorCopy(dst, e->moveinfo.end_origin);
+
+				e->moveinfo.state = STATE_TOP;
+				e->speed = self->speed;
+				e->moveinfo.speed = self->moveinfo.speed;
+				e->moveinfo.accel = self->moveinfo.accel;
+				e->moveinfo.decel = self->moveinfo.decel;
+				e->movetype = MOVETYPE_PUSH;
+				Move_Calc(e, dst, train_piece_wait);
+			}
 		}
 	}
 }
@@ -3349,7 +3429,7 @@ void
 train_use(edict_t *self, edict_t *other /* unused */,
 	   	edict_t *activator)
 {
-	if (!self || !other)
+	if (!self || !activator)
 	{
 		return;
 	}
@@ -3552,7 +3632,7 @@ func_timer_think(edict_t *self)
 void
 func_timer_use(edict_t *self, edict_t *other /* unused */, edict_t *activator)
 {
-	if (!self)
+	if (!self || !activator)
 	{
 		return;
 	}
@@ -3773,6 +3853,11 @@ door_secret_move5(edict_t *self)
 void
 door_secret_move6(edict_t *self)
 {
+	if (!self)
+	{
+		return;
+	}
+
 	Move_Calc(self, vec3_origin, door_secret_done);
 }
 
@@ -3834,7 +3919,7 @@ door_secret_die(edict_t *self, edict_t *inflictor /* unused */,
 		edict_t *attacker, int damage /* unused */,
 		vec3_t point /* unused */)
 {
-	if (!self)
+	if (!self || !attacker)
 	{
 		return;
 	}
@@ -3850,7 +3935,7 @@ SP_func_door_secret(edict_t *ent)
 	float side;
 	float width;
 	float length;
-	
+
 	if (!ent)
 	{
 		return;
@@ -3972,3 +4057,229 @@ SP_func_killbox(edict_t *ent)
 	ent->use = use_killbox;
 	ent->svflags = SVF_NOCLIENT;
 }
+
+/*
+ * QUAKED rotating_light (0 .5 .8) (-8 -8 -8) (8 8 8) START_OFF ALARM
+ * "health"	if set, the light may be killed.
+ */
+
+#define START_OFF 1
+
+void
+rotating_light_alarm(edict_t *self) /* FS: Coop: Xatrix specific */
+{
+	if (!self)
+	{
+		return;
+	}
+
+	if (self->spawnflags & START_OFF)
+	{
+		self->think = NULL;
+		self->nextthink = 0;
+	}
+	else
+	{
+		gi.sound(self, CHAN_NO_PHS_ADD + CHAN_VOICE,
+				self->moveinfo.sound_start, 1,
+				ATTN_STATIC, 0);
+		self->nextthink = level.time + 1;
+	}
+}
+
+void
+rotating_light_killed(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* unused */, int damage /* unused */, vec3_t point /* unused */) /* FS: Coop: Xatrix specific */
+{
+	if (!self)
+	{
+		return;
+	}
+
+	gi.WriteByte(svc_temp_entity);
+	gi.WriteByte(TE_WELDING_SPARKS);
+	gi.WriteByte(30);
+	gi.WritePosition(self->s.origin);
+	gi.WriteDir(vec3_origin);
+	gi.WriteByte(0xe0 + (rand() & 7));
+	gi.multicast(self->s.origin, MULTICAST_PVS);
+
+	self->s.effects &= ~EF_SPINNINGLIGHTS;
+	self->use = NULL;
+
+	self->think = G_FreeEdict;
+	self->nextthink = level.time + 0.1;
+}
+
+void
+rotating_light_use(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */) /* FS: Coop: Xatrix specific */
+{
+	if (!self)
+	{
+		return;
+	}
+
+	if (self->spawnflags & START_OFF)
+	{
+		self->spawnflags &= ~START_OFF;
+		self->s.effects |= EF_SPINNINGLIGHTS;
+
+		if (self->spawnflags & 2)
+		{
+			self->think = rotating_light_alarm;
+			self->nextthink = level.time + 0.1;
+		}
+	}
+	else
+	{
+		self->spawnflags |= START_OFF;
+		self->s.effects &= ~EF_SPINNINGLIGHTS;
+	}
+}
+
+void
+SP_rotating_light(edict_t *self) /* FS: Coop: Xatrix specific */
+{
+	if (!self)
+	{
+		return;
+	}
+
+	self->movetype = MOVETYPE_STOP;
+	self->solid = SOLID_BBOX;
+
+	self->s.modelindex = gi.modelindex("models/objects/light/tris.md2");
+
+	self->s.frame = 0;
+
+	self->use = rotating_light_use;
+
+	if (self->spawnflags & START_OFF)
+	{
+		self->s.effects &= ~EF_SPINNINGLIGHTS;
+	}
+	else
+	{
+		self->s.effects |= EF_SPINNINGLIGHTS;
+	}
+
+	if (!self->speed)
+	{
+		self->speed = 32;
+	}
+
+	if (!self->health)
+	{
+		self->health = 10;
+		self->max_health = self->health;
+		self->die = rotating_light_killed;
+		self->takedamage = DAMAGE_YES;
+	}
+	else
+	{
+		self->max_health = self->health;
+		self->die = rotating_light_killed;
+		self->takedamage = DAMAGE_YES;
+	}
+
+	if (self->spawnflags & 2)
+	{
+		self->moveinfo.sound_start = gi.soundindex("misc/alarm.wav");
+	}
+
+	gi.linkentity(self);
+}
+
+/*
+ * QUAKED func_object_repair (1 .5 0) (-8 -8 -8) (8 8 8)
+ * object to be repaired.
+ * The default delay is 1 second
+ * "delay" the delay in seconds for spark to occur
+ */
+void
+object_repair_fx(edict_t *ent) /* FS: Coop: Xatrix specific */
+{
+	if (!ent)
+	{
+		return;
+	}
+
+	ent->nextthink = level.time + ent->delay;
+
+	if (ent->health <= 100)
+	{
+		ent->health++;
+	}
+	else
+	{
+		gi.WriteByte(svc_temp_entity);
+		gi.WriteByte(TE_WELDING_SPARKS);
+		gi.WriteByte(10);
+		gi.WritePosition(ent->s.origin);
+		gi.WriteDir(vec3_origin);
+		gi.WriteByte(0xe0 + (rand() & 7));
+		gi.multicast(ent->s.origin, MULTICAST_PVS);
+	}
+}
+
+void
+object_repair_dead(edict_t *ent) /* FS: Coop: Xatrix specific */
+{
+	if (!ent)
+	{
+		return;
+	}
+
+	G_UseTargets(ent, ent);
+	ent->nextthink = level.time + 0.1;
+	ent->think = object_repair_fx;
+}
+
+void
+object_repair_sparks(edict_t *ent) /* FS: Coop: Xatrix specific */
+{
+	if (!ent)
+	{
+		return;
+	}
+
+	if (ent->health < 0)
+	{
+		ent->nextthink = level.time + 0.1;
+		ent->think = object_repair_dead;
+		return;
+	}
+
+	ent->nextthink = level.time + ent->delay;
+
+	gi.WriteByte(svc_temp_entity);
+	gi.WriteByte(TE_WELDING_SPARKS);
+	gi.WriteByte(10);
+	gi.WritePosition(ent->s.origin);
+	gi.WriteDir(vec3_origin);
+	gi.WriteByte(0xe0 + (rand() & 7));
+	gi.multicast(ent->s.origin, MULTICAST_PVS);
+}
+
+void
+SP_object_repair(edict_t *ent) /* FS: Coop: Xatrix specific */
+{
+	if (!ent)
+	{
+		return;
+	}
+
+	ent->movetype = MOVETYPE_NONE;
+	ent->solid = SOLID_BBOX;
+	ent->classname = "object_repair";
+	VectorSet(ent->mins, -8, -8, 8);
+	VectorSet(ent->maxs, 8, 8, 8);
+	ent->think = object_repair_sparks;
+	ent->nextthink = level.time + 1.0;
+	ent->health = 100;
+
+	if (!ent->delay)
+	{
+		ent->delay = 1.0;
+	}
+}
+
