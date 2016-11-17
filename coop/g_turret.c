@@ -2,11 +2,12 @@
 
 #include "g_local.h"
 
-qboolean FindTarget(edict_t *self);
-void infantry_die(edict_t *self, edict_t *inflictor, edict_t *attacker, int damage);
+void infantry_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
+		int damage);
 void infantry_stand(edict_t *self);
 void monster_use(edict_t *self, edict_t *other, edict_t *activator);
-void SpawnTargetingSystem(edict_t *turret);
+qboolean FindTarget(edict_t *self);
+void SpawnTargetingSystem(edict_t *turret); /* FS: Coop: Rogue specific */
 
 void
 AnglesNormalize(vec3_t vec)
@@ -292,7 +293,7 @@ turret_breach_finish_init(edict_t *self)
 	{
 		self->target_ent = G_PickTarget(self->target);
 
-		if (self->target_ent)
+		if (self->target_ent) /* FS: Coop: Rogue specific, but I think this is a potential fix.  Probably OK as-is. */
 		{
 			VectorSubtract(self->target_ent->s.origin, self->s.origin, self->move_origin);
 			G_FreeEdict(self->target_ent);
@@ -388,7 +389,7 @@ SP_turret_base(edict_t *self)
  */
 void
 turret_driver_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
-	   	int damage, vec3_t point)
+		int damage, vec3_t point /* unused */)
 {
 	edict_t *ent;
 
@@ -590,7 +591,7 @@ SP_turret_driver(edict_t *self)
  * origin. */
 
 void
-turret_brain_think(edict_t *self)
+turret_brain_think(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t target;
 	vec3_t dir;
@@ -680,7 +681,7 @@ turret_brain_think(edict_t *self)
 }
 
 void
-turret_brain_link(edict_t *self)
+turret_brain_link(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t vec;
 	edict_t *ent;
@@ -726,7 +727,7 @@ turret_brain_link(edict_t *self)
 }
 
 void
-turret_brain_deactivate(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */)
+turret_brain_deactivate(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -738,7 +739,7 @@ turret_brain_deactivate(edict_t *self, edict_t *other /* unused */, edict_t *act
 }
 
 void
-turret_brain_activate(edict_t *self, edict_t *other /* unused */, edict_t *activator)
+turret_brain_activate(edict_t *self, edict_t *other /* unused */, edict_t *activator) /* FS: Coop: Rogue specific */
 {
 	if (!self || !activator)
 	{
@@ -772,7 +773,7 @@ turret_brain_activate(edict_t *self, edict_t *other /* unused */, edict_t *activ
  * before firing to acquire the target.
  */
 void
-SP_turret_invisible_brain(edict_t *self)
+SP_turret_invisible_brain(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
