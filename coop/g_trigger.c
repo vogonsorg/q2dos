@@ -11,6 +11,8 @@
 
 static int windsound;
 
+void trigger_push_active (edict_t *self); /* FS: Coop: Xatrix specific */
+
 void
 InitTrigger(edict_t *self)
 {
@@ -84,7 +86,7 @@ Use_Multi(edict_t *ent, edict_t *other /* unused */, edict_t *activator)
 		return;
 	}
 
-	if (ent->spawnflags & TRIGGER_TOGGLE)
+	if ((game.gametype == rogue_coop) && (ent->spawnflags & TRIGGER_TOGGLE)) /* FS: Coop: Rogue specific */
 	{
 		if (ent->solid == SOLID_TRIGGER)
 		{
@@ -205,7 +207,8 @@ SP_trigger_multiple(edict_t *ent)
 	ent->movetype = MOVETYPE_NONE;
 	ent->svflags |= SVF_NOCLIENT;
 
-	if (ent->spawnflags & (TRIGGER_TRIGGERED | TRIGGER_TOGGLE))
+	if ( ( (game.gametype != rogue_coop) && (ent->spawnflags & 4)) || 
+	     ( (game.gametype == rogue_coop) && (ent->spawnflags & (TRIGGER_TRIGGERED | TRIGGER_TOGGLE))) ) /* FS: Coop: Rogue specific */
 	{
 		ent->solid = SOLID_NOT;
 		ent->use = trigger_enable;
@@ -554,7 +557,7 @@ trigger_push_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */, 
 			/* don't take falling damage immediately from this */
 			VectorCopy(other->velocity, other->client->oldvelocity);
 
-			if (!(self->spawnflags & PUSH_SILENT) &&
+			if (!(self->spawnflags & PUSH_SILENT) && /* FS: Coop: Rogue specific.  Probably OK as-is. */
 				(other->fly_sound_debounce_time < level.time))
 			{
 				other->fly_sound_debounce_time = level.time + 1.5;
@@ -570,7 +573,7 @@ trigger_push_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */, 
 }
 
 void
-trigger_push_use(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */)
+trigger_push_use(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -587,6 +590,74 @@ trigger_push_use(edict_t *self, edict_t *other /* unused */, edict_t *activator 
 	}
 
 	gi.linkentity(self);
+}
+
+void trigger_effect (edict_t *self) /* FS: Coop: Xatrix specific */
+{
+	vec3_t origin;
+	vec3_t size;
+	int i;
+
+  	if (!self)
+	{
+		return;
+	}
+
+	VectorScale(self->size, 0.5, size);
+	VectorAdd(self->absmin, size, origin);
+
+	for (i = 0; i < 10; i++)
+	{
+		origin[2] += (self->speed * 0.01) * (i + random());
+		gi.WriteByte(svc_temp_entity);
+		gi.WriteByte(TE_TUNNEL_SPARKS);
+		gi.WriteByte(1);
+		gi.WritePosition(origin);
+		gi.WriteDir(vec3_origin);
+		gi.WriteByte(0x74 + (rand() & 7));
+		gi.multicast(self->s.origin, MULTICAST_PVS);
+	}
+}
+
+void trigger_push_inactive (edict_t *self) /* FS: Coop: Xatrix specific */
+{
+  	if (!self)
+	{
+		return;
+	}
+
+	if (self->delay > level.time)
+	{
+		self->nextthink = level.time + 0.1;
+	}
+	else
+	{
+		self->touch = trigger_push_touch;
+		self->think = trigger_push_active;
+		self->nextthink = level.time + 0.1;
+		self->delay = self->nextthink + self->wait;
+	}
+}
+
+void trigger_push_active (edict_t *self) /* FS: Coop: Xatrix specific */
+{
+  	if (!self)
+	{
+		return;
+	}
+
+	if (self->delay > level.time)
+	{
+		self->nextthink = level.time + 0.1;
+		trigger_effect(self);
+	}
+	else
+	{
+		self->touch = NULL;
+		self->think = trigger_push_inactive;
+		self->nextthink = level.time + 0.1;
+		self->delay = self->nextthink + self->wait;
+	}
 }
 
 /*
@@ -611,27 +682,42 @@ SP_trigger_push(edict_t *self)
 	windsound = gi.soundindex("misc/windfly.wav");
 	self->touch = trigger_push_touch;
 
+	if ((game.gametype == xatrix_coop) && (self->spawnflags & 2)) /* FS: Coop: Xatrix specific */
+	{
+		if (!self->wait)
+		{
+			self->wait = 10;
+		}
+
+		self->think = trigger_push_active;
+		self->nextthink = level.time + 0.1;
+		self->delay = self->nextthink + self->wait;
+	}
+
 	if (!self->speed)
 	{
 		self->speed = 1000;
 	}
 
-	if (self->targetname) /* toggleable */
+	if (game.gametype == rogue_coop)
 	{
-		self->use = trigger_push_use;
-
-		if (self->spawnflags & PUSH_START_OFF)
+		if (self->targetname) /* toggleable */
 		{
-			self->solid = SOLID_NOT;
+			self->use = trigger_push_use;
+
+			if (self->spawnflags & PUSH_START_OFF)
+			{
+				self->solid = SOLID_NOT;
+			}
 		}
-	}
-	else if (self->spawnflags & PUSH_START_OFF)
-	{
-		gi.dprintf(DEVELOPER_MSG_GAME, "trigger_push is START_OFF but not targeted.\n");
-		self->svflags = 0;
-		self->touch = NULL;
-		self->solid = SOLID_BSP;
-		self->movetype = MOVETYPE_PUSH;
+		else if (self->spawnflags & PUSH_START_OFF)
+		{
+			gi.dprintf(DEVELOPER_MSG_GAME, "trigger_push is START_OFF but not targeted.\n");
+			self->svflags = 0;
+			self->touch = NULL;
+			self->solid = SOLID_BSP;
+			self->movetype = MOVETYPE_PUSH;
+		}
 	}
 
 	gi.linkentity(self);
@@ -651,31 +737,6 @@ SP_trigger_push(edict_t *self)
  * "dmg"			default 5 (whole numbers only)
  *
  */
-void
-hurt_use(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */)
-{
-	if (!self)
-	{
-		return;
-	}
-
-	if (self->solid == SOLID_NOT)
-	{
-		self->solid = SOLID_TRIGGER;
-	}
-	else
-	{
-		self->solid = SOLID_NOT;
-	}
-
-	gi.linkentity(self);
-
-	if (!(self->spawnflags & 2))
-	{
-		self->use = NULL;
-	}
-}
-
 void
 hurt_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */, csurface_t *surf /* unused */)
 {
@@ -727,6 +788,44 @@ hurt_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */, csurface
 }
 
 void
+hurt_use(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	if (self->solid == SOLID_NOT)
+	{
+		int	i, num; /* FS: FIXME: Watch this.  I believe this is YQ2 game.dll specific addition, but I think it's OK to add */
+		edict_t	*touch[MAX_EDICTS], *hurtme; /* FS: FIXME: Watch this.  I believe this is YQ2 game.dll specific addition, but I think it's OK to add */
+
+		self->solid = SOLID_TRIGGER;
+		num = gi.BoxEdicts (self->absmin, self->absmax, /* FS: FIXME: Watch this.  I believe this is YQ2 game.dll specific addition, but I think it's OK to add */
+			   	touch, MAX_EDICTS, AREA_SOLID);
+
+		/* Check for idle monsters in
+		   trigger hurt */
+		for (i = 0 ; i < num ; i++) /* FS: FIXME: Watch this.  I believe this is YQ2 game.dll specific addition, but I think it's OK to add */
+		{
+			hurtme = touch[i];
+			hurt_touch (self, hurtme, NULL, NULL);
+		}
+	}
+	else
+	{
+		self->solid = SOLID_NOT;
+	}
+
+	gi.linkentity(self);
+
+	if (!(self->spawnflags & 2))
+	{
+		self->use = NULL;
+	}
+}
+
+void
 SP_trigger_hurt(edict_t *self)
 {
 	if (!self)
@@ -762,7 +861,7 @@ SP_trigger_hurt(edict_t *self)
 }
 
 void
-trigger_gravity_use(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */)
+trigger_gravity_use(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -781,7 +880,19 @@ trigger_gravity_use(edict_t *self, edict_t *other /* unused */, edict_t *activat
 	gi.linkentity(self);
 }
 
-/* PGM */
+/*
+==============================================================================
+
+trigger_gravity
+
+==============================================================================
+*/
+
+/*QUAKED trigger_gravity (.5 .5 .5) ?
+Changes the touching entites gravity to
+the value of "gravity".  1.0 is standard
+gravity for the level.
+*/
 
 void
 trigger_gravity_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */, csurface_t *surf /* unused */)
@@ -820,21 +931,34 @@ SP_trigger_gravity(edict_t *self)
 
 	InitTrigger(self);
 
-	self->gravity = atof(st.gravity);
-
-	if (self->spawnflags & 1) /* TOGGLE */
+	/* FS: FIXME: What is the deal with all the different conversions going on here with self->gravity? */
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		self->use = trigger_gravity_use;
-	}
+		self->gravity = atof(st.gravity);
 
-	if (self->spawnflags & 2) /* START_OFF */
+		if (self->spawnflags & 1) /* TOGGLE */
+		{
+			self->use = trigger_gravity_use;
+		}
+
+		if (self->spawnflags & 2) /* START_OFF */
+		{
+			self->use = trigger_gravity_use;
+			self->solid = SOLID_NOT;
+		}
+		self->touch = trigger_gravity_touch;
+		gi.linkentity(self);
+	}
+	else if (game.gametype == xatrix_coop) /* FS: Coop: Xatrix specific */
 	{
-		self->use = trigger_gravity_use;
-		self->solid = SOLID_NOT;
+		self->gravity = atoi(st.gravity);
+		self->touch = trigger_gravity_touch;
 	}
-
-	self->touch = trigger_gravity_touch;
-	gi.linkentity(self);
+	else /* FS: Coop: Vanilla specific */
+	{
+		self->gravity = (int)strtol(st.gravity, (char **)NULL, 10);
+		self->touch = trigger_gravity_touch;
+	}
 }
 
 /*
