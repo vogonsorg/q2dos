@@ -1003,6 +1003,7 @@ extern void tracker_pain_daemon_think ( edict_t * self ) ;
 extern void fire_blaster2 ( edict_t * self , vec3_t start , vec3_t dir , int damage , int speed , int effect , qboolean hyper ) ;
 extern void blaster2_touch ( edict_t * self , edict_t * other , cplane_t * plane , csurface_t * surf ) ;
 extern void fire_heat ( edict_t * self , vec3_t start , vec3_t aimdir , vec3_t offset , int damage , int kick , qboolean monster ) ;
+extern void fire_heat_xatrix (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage); /* FS: Coop: Xatrix specific */
 extern void fire_beams ( edict_t * self , vec3_t start , vec3_t aimdir , vec3_t offset , int damage , int kick , int te_beam , int te_impact , int mod ) ;
 extern void fire_tesla ( edict_t * self , vec3_t start , vec3_t aimdir , int damage_multiplier , int speed ) ;
 extern void tesla_lava ( edict_t * ent , edict_t * other , cplane_t * plane , csurface_t * surf ) ;

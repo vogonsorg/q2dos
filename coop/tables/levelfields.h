@@ -11,5 +11,5 @@
 {"sight_entity", LLOFS(sight_entity), F_EDICT},
 {"sound_entity", LLOFS(sound_entity), F_EDICT},
 {"sound2_entity", LLOFS(sound2_entity), F_EDICT},
-{"disguise_violator", LLOFS(disguise_violator), F_EDICT},
+{"disguise_violator", LLOFS(disguise_violator), F_EDICT}, /* FS: Coop: Rogue specific */
 {NULL, 0, F_INT} 

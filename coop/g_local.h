@@ -97,7 +97,11 @@ typedef enum
 	AMMO_CELLS,
 	AMMO_SLUGS,
 
-	//ROGUE
+	/* FS: Coop: Xatrix specific */
+	AMMO_MAGSLUG,
+	AMMO_TRAP,
+
+	/* FS: Coop: Rogue specific */
 	AMMO_FLECHETTES,
 	AMMO_TESLA,
 	AMMO_PROX
@@ -236,6 +240,8 @@ typedef struct
 #define IT_STAY_COOP		0x00000008
 #define IT_KEY				0x00000010
 #define IT_POWERUP			0x00000020
+#define IT_XATRIX			0x00000040 /* FS: Coop: Xatrix specific */
+#define IT_ROGUE			0x00000080 /* FS: Coop: Rogue specific */
 
 // ROGUE
 #define IT_MELEE			0x00000040
@@ -255,11 +261,14 @@ typedef struct
 #define WEAP_RAILGUN			10
 #define WEAP_BFG				11
 
-#define WEAP_DISRUPTOR			12		// PGM
-#define WEAP_ETFRIFLE			13		// PGM
-#define WEAP_PLASMA				14		// PGM
-#define WEAP_PROXLAUNCH			15		// PGM
-#define WEAP_CHAINFIST			16		// PGM
+#define WEAP_DISRUPTOR			12 /* FS: Coop: Rogue specific */
+#define WEAP_ETFRIFLE			13 /* FS: Coop: Rogue specific */
+#define WEAP_PLASMA				14 /* FS: Coop: Rogue specific */
+#define WEAP_PROXLAUNCH			15 /* FS: Coop: Rogue specific */
+#define WEAP_CHAINFIST			16 /* FS: Coop: Rogue specific */
+
+#define WEAP_PHALANX			17 /* FS: Coop: Xatrix specific */
+#define WEAP_BOOMER				18 /* FS: Coop: Xatrix specific */
 
 typedef struct gitem_s
 {

@@ -9,5 +9,5 @@
 {"pers.weapon", CLOFS(pers.weapon), F_ITEM},
 {"pers.lastweapon", CLOFS(pers.lastweapon), F_ITEM},
 {"newweapon", CLOFS(newweapon), F_ITEM},
-{"owned_sphere", CLOFS(owned_sphere), F_EDICT},
+{"owned_sphere", CLOFS(owned_sphere), F_EDICT}, /* FS: Coop: Rogue specific */
 {NULL, 0, F_INT}

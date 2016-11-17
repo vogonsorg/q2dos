@@ -1,5 +1,6 @@
 #include "g_local.h"
 
+void monster_start_go(edict_t *self);
 
 //
 // monster weapons
@@ -58,7 +59,7 @@ monster_fire_blaster(edict_t *self, vec3_t start, vec3_t dir, int damage, int sp
 }
 
 void
-monster_fire_blaster2(edict_t *self, vec3_t start, vec3_t dir, int damage,
+monster_fire_blaster2(edict_t *self, vec3_t start, vec3_t dir, int damage, /* FS: Coop: Rogue specific */
 		int speed, int flashtype, int effect)
 {
 	if (!self)
@@ -75,7 +76,7 @@ monster_fire_blaster2(edict_t *self, vec3_t start, vec3_t dir, int damage,
 }
 
 void
-monster_fire_tracker(edict_t *self, vec3_t start, vec3_t dir, int damage,
+monster_fire_tracker(edict_t *self, vec3_t start, vec3_t dir, int damage, /* FS: Coop: Rogue specific */
 		int speed, edict_t *enemy, int flashtype)
 {
 	if (!self || !enemy)
@@ -92,15 +93,15 @@ monster_fire_tracker(edict_t *self, vec3_t start, vec3_t dir, int damage,
 }
 
 void
-monster_fire_heat(edict_t *self, vec3_t start, vec3_t dir, vec3_t offset,
-		int damage, int kick, int flashtype)
+monster_fire_heat(edict_t *self, vec3_t start, vec3_t dir, int damage, /* FS: Coop: Xatrix specific */
+		int speed, int flashtype)
 {
 	if (!self)
 	{
 		return;
 	}
 
-	fire_heat(self, start, dir, offset, damage, kick, true);
+	fire_heat_xatrix(self, start, dir, offset, damage, kick, true);
 
 	gi.WriteByte(svc_muzzleflash2);
 	gi.WriteShort(self - g_edicts);
@@ -108,9 +109,8 @@ monster_fire_heat(edict_t *self, vec3_t start, vec3_t dir, vec3_t offset,
 	gi.multicast(start, MULTICAST_PVS);
 }
 
-/* FS: Coop: Xatrix specific */
 void
-dabeam_hit(edict_t *self)
+dabeam_hit(edict_t *self) /* FS: Coop: Xatrix specific */
 {
 	edict_t *ignore;
 	vec3_t start;
@@ -183,9 +183,8 @@ dabeam_hit(edict_t *self)
 	self->think = G_FreeEdict;
 }
 
-/* FS: Coop: Xatrix specific */
 void
-monster_dabeam(edict_t *self)
+monster_dabeam(edict_t *self) /* FS: Coop: Xatrix specific */
 {
 	vec3_t last_movedir;
 	vec3_t point;
@@ -287,7 +286,14 @@ monster_fire_railgun(edict_t *self, vec3_t start, vec3_t aimdir,
 		return;
 	}
 
-	if (!(gi.pointcontents(start) & MASK_SOLID))
+	if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		if (!(gi.pointcontents(start) & MASK_SOLID))
+		{
+			fire_rail(self, start, aimdir, damage, kick);
+		}
+	}
+	else
 	{
 		fire_rail(self, start, aimdir, damage, kick);
 	}
@@ -866,8 +872,6 @@ monster_use(edict_t *self, edict_t *other /* unused */, edict_t *activator)
 	FoundTarget(self);
 }
 
-void monster_start_go(edict_t *self);
-
 void
 monster_triggered_spawn(edict_t *self)
 {
@@ -1184,7 +1188,7 @@ walkmonster_start_go(edict_t *self)
 		self->yaw_speed = 20;
 	}
 
-	if (!(strcmp(self->classname, "monster_stalker")))
+	if ((game.gametype == rogue_coop) && !(strcmp(self->classname, "monster_stalker"))) /* FS: Coop: Rogue specific */
 	{
 		self->viewheight = 15;
 	}
@@ -1290,10 +1294,10 @@ swimmonster_start(edict_t *self)
 	monster_start(self);
 }
 
-void stationarymonster_start_go(edict_t *self);
+void stationarymonster_start_go(edict_t *self); /* FS: Coop: Rogue specific */
 
 void
-stationarymonster_triggered_spawn(edict_t *self)
+stationarymonster_triggered_spawn(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -1330,7 +1334,7 @@ stationarymonster_triggered_spawn(edict_t *self)
 }
 
 void
-stationarymonster_triggered_spawn_use(edict_t *self, edict_t *other /* unused */, edict_t *activator)
+stationarymonster_triggered_spawn_use(edict_t *self, edict_t *other /* unused */, edict_t *activator) /* FS: Coop: Rogue specific */
 {
 	if (!self || !activator)
 	{
@@ -1350,7 +1354,7 @@ stationarymonster_triggered_spawn_use(edict_t *self, edict_t *other /* unused */
 }
 
 void
-stationarymonster_triggered_start(edict_t *self)
+stationarymonster_triggered_start(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -1365,7 +1369,7 @@ stationarymonster_triggered_start(edict_t *self)
 }
 
 void
-stationarymonster_start_go(edict_t *self)
+stationarymonster_start_go(edict_t *self) /* FS: Coop: Rogue specific */
 {
 
 	if (!self)
@@ -1387,7 +1391,7 @@ stationarymonster_start_go(edict_t *self)
 }
 
 void
-stationarymonster_start(edict_t *self)
+stationarymonster_start(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -1399,7 +1403,7 @@ stationarymonster_start(edict_t *self)
 }
 
 void
-monster_done_dodge(edict_t *self)
+monster_done_dodge(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{

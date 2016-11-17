@@ -71,13 +71,7 @@ fire_hit(edict_t *self, vec3_t aim, int damage, int kick)
 	float range;
 	vec3_t dir;
 
-	if (!self)
-	{
-		return false;
-	}
-
-	/* Lazarus: Paranoia check */
-	if (!self->enemy)
+	if (!self || !self->enemy)
 	{
 		return false;
 	}

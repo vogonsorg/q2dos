@@ -247,6 +247,7 @@
 #define FRAME_deathc7         	242
 #define FRAME_deathc8         	243
 
+/* FS: Coop: Rogue specific */
 //PGM
 #define FRAME_jump1				244
 #define FRAME_jump2				245

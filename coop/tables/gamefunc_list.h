@@ -1003,6 +1003,7 @@
 {"fire_blaster2", (byte *)fire_blaster2},
 {"blaster2_touch", (byte *)blaster2_touch},
 {"fire_heat", (byte *)fire_heat},
+{"fire_heat_xatrix", (byte *)fire_heat_xatrix}, /* FS: Coop: Xatrix specific */
 {"fire_beams", (byte *)fire_beams},
 {"fire_tesla", (byte *)fire_tesla},
 {"tesla_lava", (byte *)tesla_lava},
