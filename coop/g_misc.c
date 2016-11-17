@@ -5,7 +5,7 @@
 int gibsthisframe;
 int lastgibframe;
 
-extern void M_WorldEffects(edict_t *ent);
+extern void M_WorldEffects(edict_t *ent); /* FS: Coop: Rogue specific */
 
 /* ===================================================== */
 
@@ -221,7 +221,7 @@ ThrowGib(edict_t *self, char *gibname, int damage, int type)
 
 	gib->think = G_FreeEdict;
 	gib->nextthink = level.time + 10 + random() * 10;
-	gib->s.renderfx |= RF_IR_VISIBLE;
+	gib->s.renderfx |= RF_IR_VISIBLE; /* FS: Coop: Rogue specific.  Probably OK as-is. */
 
 	gi.linkentity(gib);
 }
@@ -251,6 +251,7 @@ ThrowHead(edict_t *self, char *gibname, int damage, int type)
 	self->flags |= FL_NO_KNOCKBACK;
 	self->svflags &= ~SVF_MONSTER;
 	self->takedamage = DAMAGE_YES;
+	self->targetname = NULL;
 	self->die = gib_die;
 
 	if (type == GIB_ORGANIC)
@@ -277,9 +278,8 @@ ThrowHead(edict_t *self, char *gibname, int damage, int type)
 	gi.linkentity(self);
 }
 
-/*XATRIX */
 void
-ThrowGibACID(edict_t *self, char *gibname, int damage, int type)
+ThrowGibACID(edict_t *self, char *gibname, int damage, int type) /* FS: Coop: Xatrix specific */
 {
 	edict_t *gib;
 	vec3_t vd;
@@ -351,9 +351,8 @@ ThrowGibACID(edict_t *self, char *gibname, int damage, int type)
 	gi.linkentity(gib);
 }
 
-/*XATRIX */
 void
-ThrowHeadACID(edict_t *self, char *gibname, int damage, int type)
+ThrowHeadACID(edict_t *self, char *gibname, int damage, int type) /* FS: Coop: Xatrix specific */
 {
 	vec3_t vd;
 	float vscale;
@@ -1128,8 +1127,8 @@ func_explosive_explode(edict_t *self, edict_t *inflictor, edict_t *attacker,
 	vec3_t size;
 	int count;
 	int mass;
-	edict_t *master;
-	qboolean done = false;
+	edict_t *master; /* FS: Coop: Rogue specific */
+	qboolean done = false; /* FS: Coop: Rogue specific */
 
     if (!self || !inflictor || !attacker)
 	{
@@ -1198,24 +1197,27 @@ func_explosive_explode(edict_t *self, edict_t *inflictor, edict_t *attacker,
 		ThrowDebris(self, "models/objects/debris2/tris.md2", 2, chunkorigin);
 	}
 
-	if (self->flags & FL_TEAMSLAVE)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (self->teammaster)
+		if (self->flags & FL_TEAMSLAVE)
 		{
-			master = self->teammaster;
-
-			/* because mappers (other than jim (usually)) are stupid.... */
-			if (master && master->inuse)
+			if (self->teammaster)
 			{
-				while (!done)
-				{
-					if (master->teamchain == self)
-					{
-						master->teamchain = self->teamchain;
-						done = true;
-					}
+				master = self->teammaster;
 
-					master = master->teamchain;
+				/* because mappers (other than jim (usually)) are stupid.... */
+				if (master && master->inuse)
+				{
+					while (!done)
+					{
+						if (master->teamchain == self)
+						{
+							master->teamchain = self->teamchain;
+							done = true;
+						}
+
+						master = master->teamchain;
+					}
 				}
 			}
 		}
@@ -1245,7 +1247,7 @@ func_explosive_use(edict_t *self, edict_t *other, edict_t *activator /* unused *
 }
 
 void
-func_explosive_activate(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */)
+func_explosive_activate(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -1279,7 +1281,7 @@ func_explosive_spawn(edict_t *self, edict_t *other /* unused */, edict_t *activa
 }
 
 void
-SP_func_explosive(edict_t *self)
+SP_func_explosive_rogue (edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -1337,6 +1339,73 @@ SP_func_explosive(edict_t *self)
 
 	if ((self->use != func_explosive_use) &&
 		(self->use != func_explosive_activate))
+	{
+		if (!self->health)
+		{
+			self->health = 100;
+		}
+
+		self->die = func_explosive_explode;
+		self->takedamage = DAMAGE_YES;
+	}
+
+	gi.linkentity(self);
+}
+
+void
+SP_func_explosive(edict_t *self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		SP_func_explosive_rogue(self);
+	}
+
+	if (deathmatch->value)
+	{
+		/* auto-remove for deathmatch */
+		G_FreeEdict(self);
+		return;
+	}
+
+	self->movetype = MOVETYPE_PUSH;
+
+	gi.modelindex("models/objects/debris1/tris.md2");
+	gi.modelindex("models/objects/debris2/tris.md2");
+
+	gi.setmodel(self, self->model);
+
+	if (self->spawnflags & 1)
+	{
+		self->svflags |= SVF_NOCLIENT;
+		self->solid = SOLID_NOT;
+		self->use = func_explosive_spawn;
+	}
+	else
+	{
+		self->solid = SOLID_BSP;
+
+		if (self->targetname)
+		{
+			self->use = func_explosive_use;
+		}
+	}
+
+	if (self->spawnflags & 2)
+	{
+		self->s.effects |= EF_ANIM_ALL;
+	}
+
+	if (self->spawnflags & 4)
+	{
+		self->s.effects |= EF_ANIM_ALLFAST;
+	}
+
+	if (self->use != func_explosive_use)
 	{
 		if (!self->health)
 		{
@@ -1486,7 +1555,7 @@ barrel_delay(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker,
 }
 
 void
-barrel_think(edict_t *self)
+barrel_think(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -1504,7 +1573,7 @@ barrel_think(edict_t *self)
 }
 
 void
-barrel_start(edict_t *self)
+barrel_start(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -1525,7 +1594,8 @@ SP_misc_explobox(edict_t *self)
 	}
 
 	if (deathmatch->value)
-	{   /* auto-remove for deathmatch */
+	{
+		/* auto-remove for deathmatch */
 		G_FreeEdict(self);
 		return;
 	}
@@ -1562,7 +1632,16 @@ SP_misc_explobox(edict_t *self)
 	self->monsterinfo.aiflags = AI_NOSTEP;
 
 	self->touch = barrel_touch;
-	self->think = barrel_start;
+
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		self->think = barrel_start;
+	}
+	else
+	{
+		self->think = M_droptofloor;
+	}
+
 	self->nextthink = level.time + 2 * FRAMETIME;
 
 	gi.linkentity(self);
@@ -1601,6 +1680,13 @@ misc_blackhole_think(edict_t *self)
 	}
 }
 
+void misc_blackhole_transparent (edict_t *ent)
+{
+	ent->s.renderfx = RF_TRANSLUCENT;
+	ent->prethink = NULL;
+	gi.linkentity(ent);
+}
+
 void
 SP_misc_blackhole(edict_t *ent)
 {
@@ -1617,6 +1703,10 @@ SP_misc_blackhole(edict_t *ent)
 	ent->s.renderfx = RF_TRANSLUCENT;
 	ent->use = misc_blackhole_use;
 	ent->think = misc_blackhole_think;
+	if (game.gametype != rogue_coop) /* FS: Coop: Rogue doesn't use this */
+	{
+	    ent->prethink = misc_blackhole_transparent;
+	}
 	ent->nextthink = level.time + 2 * FRAMETIME;
 	gi.linkentity(ent);
 }
@@ -1871,13 +1961,19 @@ misc_deadsoldier_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *at
 		int damage, vec3_t point /* unused */)
 {
 	int n;
+	int health = -80;
 
 	if (!self)
 	{
 		return;
 	}
 
-	if (self->health > -30)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		health = -30;
+	}
+
+	if (self->health > health)
 	{
 		return;
 	}
@@ -1997,6 +2093,45 @@ SP_misc_viper(edict_t *ent)
 	ent->movetype = MOVETYPE_PUSH;
 	ent->solid = SOLID_NOT;
 	ent->s.modelindex = gi.modelindex("models/ships/viper/tris.md2");
+	VectorSet(ent->mins, -16, -16, 0);
+	VectorSet(ent->maxs, 16, 16, 32);
+
+	ent->think = func_train_find;
+	ent->nextthink = level.time + FRAMETIME;
+	ent->use = misc_viper_use;
+	ent->svflags |= SVF_NOCLIENT;
+	ent->moveinfo.accel = ent->moveinfo.decel = ent->moveinfo.speed = ent->speed;
+
+	gi.linkentity(ent);
+}
+
+/*
+ * QUAKED misc_crashviper (1 .5 0) (-176 -120 -24) (176 120 72)
+ * This is a large viper about to crash
+ */
+void
+SP_misc_crashviper(edict_t *ent) /* FS: Coop: Xatrix specific */
+{
+	if (!ent)
+	{
+		return;
+	}
+
+	if (!ent->target)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "misc_viper without a target at %s\n", vtos(ent->absmin));
+		G_FreeEdict(ent);
+		return;
+	}
+
+	if (!ent->speed)
+	{
+		ent->speed = 300;
+	}
+
+	ent->movetype = MOVETYPE_PUSH;
+	ent->solid = SOLID_NOT;
+	ent->s.modelindex = gi.modelindex("models/ships/bigviper/tris.md2");
 	VectorSet(ent->mins, -16, -16, 0);
 	VectorSet(ent->maxs, 16, 16, 32);
 
@@ -2130,6 +2265,65 @@ SP_misc_viper_bomb(edict_t *self)
 	gi.linkentity(self);
 }
 
+/*
+ * QUAKED misc_viper_missile (1 0 0) (-8 -8 -8) (8 8 8)
+ * "dmg"	how much boom should the bomb make? the default value is 250
+ */
+
+void
+misc_viper_missile_use(edict_t *self, edict_t *other, edict_t *activator) /* FS: Coop: Xatrix specific */
+{
+	vec3_t forward, right, up;
+	vec3_t start, dir;
+	vec3_t vec;
+
+	if (!self)
+	{
+		return;
+	}
+
+	AngleVectors(self->s.angles, forward, right, up);
+
+	self->enemy = G_Find(NULL, FOFS(targetname), self->target);
+
+	VectorCopy(self->enemy->s.origin, vec);
+
+	VectorCopy(self->s.origin, start);
+	VectorSubtract(vec, start, dir);
+	VectorNormalize(dir);
+
+	monster_fire_rocket(self, start, dir, self->dmg, 500, MZ2_CHICK_ROCKET_1);
+
+	self->nextthink = level.time + 0.1;
+	self->think = G_FreeEdict;
+}
+
+void
+SP_misc_viper_missile(edict_t *self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	self->movetype = MOVETYPE_NONE;
+	self->solid = SOLID_NOT;
+	VectorSet(self->mins, -8, -8, -8);
+	VectorSet(self->maxs, 8, 8, 8);
+
+	if (!self->dmg)
+	{
+		self->dmg = 250;
+	}
+
+	self->s.modelindex = gi.modelindex("models/objects/bomb/tris.md2");
+
+	self->use = misc_viper_missile_use;
+	self->svflags |= SVF_NOCLIENT;
+
+	gi.linkentity(self);
+}
+
 extern void train_use(edict_t *self, edict_t *other, edict_t *activator);
 extern void func_train_find(edict_t *self);
 
@@ -2187,6 +2381,52 @@ SP_misc_strogg_ship(edict_t *ent)
 	ent->use = misc_strogg_ship_use;
 	ent->svflags |= SVF_NOCLIENT;
 	ent->moveinfo.accel = ent->moveinfo.decel = ent->moveinfo.speed = ent->speed;
+
+	gi.linkentity(ent);
+}
+
+/*
+ * QUAKED misc_transport (1 0 0) (-8 -8 -8) (8 8 8) TRIGGER_SPAWN
+ * Maxx's transport at end of game
+ */
+void
+SP_misc_transport(edict_t *ent) /* FS: Coop: Xatrix specific */
+{
+	if (!ent)
+	{
+		return;
+	}
+
+	if (!ent->target)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "%s without a target at %s\n", ent->classname,
+				vtos(ent->absmin));
+		G_FreeEdict(ent);
+		return;
+	}
+
+	if (!ent->speed)
+	{
+		ent->speed = 300;
+	}
+
+	ent->movetype = MOVETYPE_PUSH;
+	ent->solid = SOLID_NOT;
+	ent->s.modelindex = gi.modelindex("models/objects/ship/tris.md2");
+
+	VectorSet(ent->mins, -16, -16, 0);
+	VectorSet(ent->maxs, 16, 16, 32);
+
+	ent->think = func_train_find;
+	ent->nextthink = level.time + FRAMETIME;
+	ent->use = misc_strogg_ship_use;
+	ent->svflags |= SVF_NOCLIENT;
+	ent->moveinfo.accel = ent->moveinfo.decel = ent->moveinfo.speed = ent->speed;
+
+	if (!(ent->spawnflags & 1))
+	{
+		ent->spawnflags |= 1;
+	}
 
 	gi.linkentity(ent);
 }
@@ -2493,12 +2733,36 @@ func_clock_reset(edict_t *self)
 	}
 }
 
+/*
+ * This is an evil hack to
+ * prevent a rare crash at
+ * biggun exit. */
+typedef struct zhead_s
+{
+   struct zhead_s *prev, *next;
+   short magic;
+   short tag;
+   int size;
+} zhead_t;
+
 void
 func_clock_format_countdown(edict_t *self)
 {
+	zhead_t *z;
+	int size;
+
 	if (!self)
 	{
 		return;
+	}
+
+	z = ( zhead_t * )self->message - 1;
+	size = z->size - sizeof (zhead_t);
+
+	if (size < CLOCK_MESSAGE_SIZE)
+	{
+		gi.TagFree (self->message);
+		self->message = gi.TagMalloc (CLOCK_MESSAGE_SIZE, TAG_LEVEL);
 	}
 
 	if (self->style == 0)
@@ -2523,7 +2787,8 @@ func_clock_format_countdown(edict_t *self)
 	if (self->style == 2)
 	{
 		Com_sprintf(self->message, CLOCK_MESSAGE_SIZE, "%2i:%2i:%2i",
-				self->health / 3600, (self->health - (self->health / 3600) * 3600) / 60,
+				self->health / 3600,
+				(self->health - (self->health / 3600) * 3600) / 60,
 				self->health % 60);
 
 		if (self->message[3] == ' ')
@@ -2611,6 +2876,8 @@ func_clock_think(edict_t *self)
 
 		if (!(self->spawnflags & 8))
 		{
+			self->think = G_FreeEdict;
+			self->nextthink = level.time + 1;
 			return;
 		}
 
@@ -2695,7 +2962,8 @@ SP_func_clock(edict_t *self)
 /* ================================================================================= */
 
 void
-teleporter_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */, csurface_t *surf /* unused */)
+teleporter_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */,
+		csurface_t *surf /* unused */)
 {
 	edict_t *dest;
 	int i;
@@ -2815,8 +3083,85 @@ SP_misc_teleporter_dest(edict_t *ent)
 	gi.linkentity(ent);
 }
 
+/*
+ * QUAKED misc_amb4 (1 0 0) (-16 -16 -16) (16 16 16)
+ * Mal's amb4 loop entity
+ */
+static int amb4sound;
+
 void
-misc_nuke_core_use(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */)
+amb4_think(edict_t *ent) /* FS: Coop: Xatrix specific */
+{
+	if (!ent)
+	{
+		return;
+	}
+
+	ent->nextthink = level.time + 2.7;
+	gi.sound(ent, CHAN_VOICE, amb4sound, 1, ATTN_NONE, 0);
+}
+
+void
+SP_misc_amb4(edict_t *ent) /* FS: Coop: Xatrix specific */
+{
+	if (!ent)
+	{
+		return;
+	}
+
+	ent->think = amb4_think;
+	ent->nextthink = level.time + 1;
+	amb4sound = gi.soundindex("world/amb4.wav");
+	gi.linkentity(ent);
+}
+
+/*
+ * QUAKED misc_nuke (1 0 0) (-16 -16 -16) (16 16 16)
+ */
+void
+use_nuke(edict_t *self, edict_t *other, edict_t *activator) /* FS: Coop: Xatrix specific */
+{
+	edict_t *from = g_edicts;
+
+	if (!self)
+	{
+		return;
+	}
+
+	for ( ; from < &g_edicts[globals.num_edicts]; from++)
+	{
+		if (from == self)
+		{
+			continue;
+		}
+
+		if (from->client)
+		{
+			T_Damage(from, self, self, vec3_origin, from->s.origin,
+					vec3_origin, 100000, 1, 0, MOD_TRAP);
+		}
+		else if (from->svflags & SVF_MONSTER)
+		{
+			G_FreeEdict(from);
+		}
+	}
+
+	self->use = NULL;
+}
+
+void
+SP_misc_nuke(edict_t *ent) /* FS: Coop: Xatrix specific */
+{
+	if (!ent)
+	{
+		return;
+	}
+
+	ent->use = use_nuke;
+}
+
+void
+misc_nuke_core_use(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -2839,7 +3184,7 @@ misc_nuke_core_use(edict_t *self, edict_t *other /* unused */, edict_t *activato
  * toggles visible/not visible. starts visible.
  */
 void
-SP_misc_nuke_core(edict_t *ent)
+SP_misc_nuke_core(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	if (!ent)
 	{
