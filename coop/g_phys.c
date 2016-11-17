@@ -62,6 +62,14 @@ SV_TestEntityPosition(edict_t *ent)
 
 	if (trace.startsolid)
 	{
+		if (game.gametype == vanilla_coop) /* FS: Coop: Vanilla specific */
+		{
+			if ((ent->svflags & SVF_DEADMONSTER) && (trace.ent->client || (trace.ent->svflags & SVF_MONSTER)))
+			{
+				return NULL;
+			}
+		}
+
 		return g_edicts;
 	}
 
@@ -78,16 +86,27 @@ SV_CheckVelocity(edict_t *ent)
 		return;
 	}
 
-	/* bound velocity */
-	for (i = 0; i < 3; i++)
+	if (game.gametype == vanilla_coop) /* FS: Coop: Vanilla specific */
 	{
-		if (ent->velocity[i] > sv_maxvelocity->value)
+		if (VectorLength(ent->velocity) > sv_maxvelocity->value)
 		{
-			ent->velocity[i] = sv_maxvelocity->value;
+			VectorNormalize(ent->velocity);
+			VectorScale(ent->velocity, sv_maxvelocity->value, ent->velocity);
 		}
-		else if (ent->velocity[i] < -sv_maxvelocity->value)
+	}
+	else
+	{
+		/* bound velocity */
+		for (i = 0; i < 3; i++)
 		{
-			ent->velocity[i] = -sv_maxvelocity->value;
+			if (ent->velocity[i] > sv_maxvelocity->value)
+			{
+				ent->velocity[i] = sv_maxvelocity->value;
+			}
+			else if (ent->velocity[i] < -sv_maxvelocity->value)
+			{
+				ent->velocity[i] = -sv_maxvelocity->value;
+			}
 		}
 	}
 }
@@ -367,7 +386,7 @@ SV_AddGravity(edict_t *ent)
 		return;
 	}
 
-	if (ent->gravityVector[2] > 0)
+	if ((game.gametype == rogue_coop) && (ent->gravityVector[2] > 0)) /* FS: Coop: Rogue specific */
 	{
 		VectorMA(ent->velocity, ent->gravity * sv_gravity->value * FRAMETIME,
 				ent->gravityVector, ent->velocity);
@@ -506,7 +525,7 @@ SV_PushEntity(edict_t *ent, vec3_t push)
 	vec3_t end;
 	int mask;
 
-	if (!ent)
+	if (!ent) /* FS: Coop: Rogue specific.  Probably OK as-is. */
 	{
 		memset(&trace,0,sizeof(trace_t));
 		return trace;
@@ -527,6 +546,15 @@ retry:
 
 	trace = gi.trace(start, ent->mins, ent->maxs, end, ent, mask);
 
+	if (game.gametype == vanilla_coop) /* FS: Coop: Vanilla specific */
+	{
+		if (trace.startsolid || trace.allsolid)
+		{
+			mask ^= CONTENTS_DEADMONSTER;
+			trace = gi.trace (start, ent->mins, ent->maxs, end, ent, mask);
+		}
+	}
+
 	VectorCopy(trace.endpos, ent->s.origin);
 	gi.linkentity(ent);
 
@@ -544,7 +572,10 @@ retry:
 		}
 	}
 
-	ent->gravity = 1.0;
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		ent->gravity = 1.0;
+	}
 
 	if (ent->inuse)
 	{
@@ -681,7 +712,24 @@ SV_Push(edict_t *pusher, vec3_t move, vec3_t amove)
 			VectorSubtract(check->s.origin, pusher->s.origin, org);
 			org2[0] = DotProduct(org, forward);
 			org2[1] = -DotProduct(org, right);
-			org2[2] = DotProduct(org, up);
+
+			/* Quirk for blocking Elevators when
+			   running under amd64. This is most
+			   likey  caused by a too high float
+			   precision. -_-  */
+			/* FS: Coop: Xatrix specific hack */
+			if (((pusher->s.number == 285) &&
+				 (Q_strcasecmp(level.mapname, "xcompnd2") == 0)) ||
+				((pusher->s.number == 520) &&
+				 (Q_strcasecmp(level.mapname, "xsewer2") == 0)))
+			{
+				org2[2] = DotProduct(org, up) + 2;
+			}
+			else
+			{
+				org2[2] = DotProduct(org, up);
+			}
+
 			VectorSubtract(org2, org, move2);
 			VectorAdd(check->s.origin, move2, check->s.origin);
 
@@ -818,7 +866,7 @@ SV_Physics_Pusher(edict_t *ent)
 		for (part = ent; part; part = part->teamchain)
 		{
 			/* prevent entities that are on trains that have gone away from thinking! */
-			if (part->inuse)
+			if ((game.gametype != rogue_coop) || (game.gametype == rogue_coop && part->inuse)) /* FS: Coop: Rogue specific */
 			{
 				SV_RunThink(part);
 			}
@@ -907,18 +955,28 @@ SV_Physics_Toss(edict_t *ent)
 	}
 
 	/* if onground, return without moving */
-	if (ent->groundentity && (ent->gravity > 0.0))
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		return;
+		if (ent->groundentity && (ent->gravity > 0.0))
+		{
+			return;
+		}
 	}
-
+	else
+	{
+		if (ent->groundentity)
+		{
+			return;
+		}
+	}
 	VectorCopy(ent->s.origin, old_origin);
 
 	SV_CheckVelocity(ent);
 
 	/* add gravity */
 	if ((ent->movetype != MOVETYPE_FLY) &&
-		(ent->movetype != MOVETYPE_FLYMISSILE))
+		(ent->movetype != MOVETYPE_FLYMISSILE)
+		&& (ent->movetype != MOVETYPE_WALLBOUNCE)) /* FS: Coop: Xatrix specific -- MOVETYPE_WALLBOUNCE */
 	{
 		SV_AddGravity(ent);
 	}
@@ -937,7 +995,11 @@ SV_Physics_Toss(edict_t *ent)
 
 	if (trace.fraction < 1)
 	{
-		if (ent->movetype == MOVETYPE_BOUNCE)
+		if (ent->movetype == MOVETYPE_WALLBOUNCE) /* FS: Coop: Xatrix specific */
+		{
+			backoff = 2.0;
+		}
+		else if (ent->movetype == MOVETYPE_BOUNCE)
 		{
 			backoff = 1.5;
 		}
@@ -948,8 +1010,14 @@ SV_Physics_Toss(edict_t *ent)
 
 		ClipVelocity(ent->velocity, trace.plane.normal, ent->velocity, backoff);
 
+		if (ent->movetype == MOVETYPE_WALLBOUNCE) /* FS: Coop: Xatrix specific */
+		{
+			vectoangles(ent->velocity, ent->s.angles);
+		}
+
 		/* stop if on ground */
-		if (trace.plane.normal[2] > 0.7)
+		if ((trace.plane.normal[2] > 0.7) &&
+			(ent->movetype != MOVETYPE_WALLBOUNCE)) /* FS: Coop: Xatrix specific -- MOVETYPE_WALLBOUNCE */
 		{
 			if ((ent->velocity[2] < 60) || (ent->movetype != MOVETYPE_BOUNCE))
 			{
@@ -1171,8 +1239,14 @@ SV_Physics_Step(edict_t *ent)
 		}
 
 		SV_FlyMove(ent, FRAMETIME, mask);
+
 		gi.linkentity(ent);
-		ent->gravity = 1.0;
+
+		if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+		{
+			ent->gravity = 1.0;
+		}
+
 		G_TouchTriggers(ent);
 
 		if (!ent->inuse)
@@ -1192,7 +1266,7 @@ SV_Physics_Step(edict_t *ent)
 		}
 	}
 
-	if (!ent->inuse) /* g_touchtrigger free problem */
+	if (!ent->inuse) /* FS: Coop: Rogue specific -- "g_touchtrigger free problem".  Looks like a workaround/fix.  Probably OK as-is. */
 	{
 		return;
 	}
@@ -1204,15 +1278,15 @@ SV_Physics_Step(edict_t *ent)
 void
 G_RunEntity(edict_t *ent)
 {
-	trace_t trace;
-	vec3_t previous_origin;
+	trace_t trace; /* FS: Coop: Rogue specific */
+	vec3_t previous_origin; /* FS: Coop: Rogue specific */
 
 	if (!ent)
 	{
 		return;
 	}
 
-	if (ent->movetype == MOVETYPE_STEP)
+	if ((game.gametype == rogue_coop) && (ent->movetype == MOVETYPE_STEP)) /* FS: Coop: Rogue specific */
 	{
 		VectorCopy(ent->s.origin, previous_origin);
 	}
@@ -1243,14 +1317,17 @@ G_RunEntity(edict_t *ent)
 		case MOVETYPE_FLYMISSILE:
 			SV_Physics_Toss(ent);
 			break;
-		case MOVETYPE_NEWTOSS:
+		case MOVETYPE_NEWTOSS: /* FS: Coop: Rogue specific */
 			SV_Physics_NewToss(ent);
+			break;
+		case MOVETYPE_WALLBOUNCE: /* FS: Coop: Xatrix specific */
+			SV_Physics_Toss(ent);
 			break;
 		default:
 			gi.error("SV_Physics: bad movetype %i", (int)ent->movetype);
 	}
 
-	if (ent->movetype == MOVETYPE_STEP)
+	if ((game.gametype == rogue_coop) && (ent->movetype == MOVETYPE_STEP)) /* FS: Coop: Rogue specific */
 	{
 		/* if we moved, check and fix origin if needed */
 		if (!VectorCompare(ent->s.origin, previous_origin))
@@ -1271,7 +1348,7 @@ G_RunEntity(edict_t *ent)
  * no velocity, do nothing. With velocity, slide.
  */
 void
-SV_Physics_NewToss(edict_t *ent)
+SV_Physics_NewToss(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	trace_t trace;
 	vec3_t move;

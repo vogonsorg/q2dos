@@ -213,7 +213,8 @@ MOVETYPE_FLY,
 MOVETYPE_TOSS,			// gravity
 MOVETYPE_FLYMISSILE,	// extra size to monsters
 MOVETYPE_BOUNCE,
-MOVETYPE_NEWTOSS		// PGM - for deathball
+MOVETYPE_WALLBOUNCE,	/* FS: Coop: Xatrix specific */
+MOVETYPE_NEWTOSS		/* FS: Coop: Rogue specific */
 } movetype_t;
 
 
