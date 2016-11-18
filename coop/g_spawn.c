@@ -1,11 +1,11 @@
 
 #include "g_local.h"
 
-#define LEG_WAIT_TIME 1
-#define MAX_LEGSFRAME 23
+#define LEG_WAIT_TIME 1 /* FS: Coop: Rogue specific */
+#define MAX_LEGSFRAME 23 /* FS: Coop: Rogue specific */
 
-#define SPAWNGROW_LIFESPAN 0.3
-#define STEPSIZE 18
+#define SPAWNGROW_LIFESPAN 0.3 /* FS: Coop: Rogue specific */
+#define STEPSIZE 18 /* FS: Coop: Rogue specific */
 
 typedef struct
 {
@@ -65,6 +65,7 @@ void SP_target_crosslevel_trigger(edict_t *ent);
 void SP_target_crosslevel_target(edict_t *ent);
 void SP_target_laser(edict_t *self);
 void SP_target_help(edict_t *ent);
+void SP_target_actor(edict_t *ent);
 void SP_target_lightramp(edict_t *self);
 void SP_target_earthquake(edict_t *ent);
 void SP_target_character(edict_t *ent);
@@ -84,6 +85,7 @@ void SP_point_combat(edict_t *self);
 void SP_misc_explobox(edict_t *self);
 void SP_misc_banner(edict_t *self);
 void SP_misc_satellite_dish(edict_t *self);
+void SP_misc_actor(edict_t *self);
 void SP_misc_gib_arm(edict_t *self);
 void SP_misc_gib_leg(edict_t *self);
 void SP_misc_gib_head(edict_t *self);
@@ -128,44 +130,62 @@ void SP_turret_breach(edict_t *self);
 void SP_turret_base(edict_t *self);
 void SP_turret_driver(edict_t *self);
 
-void SP_func_plat2(edict_t *ent);
-void SP_func_door_secret2(edict_t *ent);
-void SP_func_force_wall(edict_t *ent);
-void SP_info_player_coop_lava(edict_t *self);
-void SP_info_teleport_destination(edict_t *self);
-void SP_trigger_teleport(edict_t *self);
-void SP_trigger_disguise(edict_t *self);
-void SP_monster_stalker(edict_t *self);
-void SP_monster_turret(edict_t *self);
-void SP_target_steam(edict_t *self);
-void SP_target_anger(edict_t *self);
-void SP_target_killplayers(edict_t *self);
+void SP_func_plat2(edict_t *ent); /* FS: Coop: Rogue specific */
+void SP_func_door_secret2(edict_t *ent); /* FS: Coop: Rogue specific */
+void SP_func_force_wall(edict_t *ent); /* FS: Coop: Rogue specific */
+void SP_info_player_coop_lava(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_info_teleport_destination(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_trigger_teleport(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_trigger_disguise(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_monster_stalker(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_monster_turret(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_target_steam(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_target_anger(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_target_killplayers(edict_t *self); /* FS: Coop: Rogue specific */
 
-void SP_target_blacklight(edict_t *self);
-void SP_target_orb(edict_t *self);
+void SP_target_blacklight(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_target_orb(edict_t *self); /* FS: Coop: Rogue specific */
 
-void SP_hint_path(edict_t *self);
-void SP_monster_carrier(edict_t *self);
-void SP_monster_widow(edict_t *self);
-void SP_monster_widow2(edict_t *self);
-void SP_dm_tag_token(edict_t *self);
-void SP_dm_dball_goal(edict_t *self);
-void SP_dm_dball_ball(edict_t *self);
-void SP_dm_dball_team1_start(edict_t *self);
-void SP_dm_dball_team2_start(edict_t *self);
-void SP_dm_dball_ball_start(edict_t *self);
-void SP_dm_dball_speed_change(edict_t *self);
-void SP_monster_kamikaze(edict_t *self);
-void SP_turret_invisible_brain(edict_t *self);
-void SP_xatrix_item(edict_t *self);
-void SP_misc_nuke_core(edict_t *self);
+void SP_hint_path(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_monster_carrier(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_monster_widow(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_monster_widow2(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_dm_tag_token(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_dm_dball_goal(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_dm_dball_ball(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_dm_dball_team1_start(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_dm_dball_team2_start(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_dm_dball_ball_start(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_dm_dball_speed_change(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_monster_kamikaze(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_turret_invisible_brain(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_xatrix_item(edict_t *self); /* FS: Coop: Rogue specific */
+void SP_misc_nuke_core(edict_t *self); /* FS: Coop: Rogue specific */
 
-void ThrowMoreStuff(edict_t *self, vec3_t point);
-void ThrowSmallStuff(edict_t *self, vec3_t point);
-void ThrowWidowGibLoc(edict_t *self, char *gibname, int damage,
-		int type, vec3_t startpos, qboolean fade);
-void ThrowWidowGibSized(edict_t *self, char *gibname, int damage, int type,
+void ThrowMoreStuff(edict_t *self, vec3_t point); /* FS: Coop: Rogue specific */
+void ThrowSmallStuff(edict_t *self, vec3_t point); /* FS: Coop: Rogue specific */
+void ThrowWidowGibLoc(edict_t *self, char *gibname, int damage, /* FS: Coop: Rogue specific */
+		int type, vec3_t startpos, qboolean fade); /* FS: Coop: Rogue specific */
+void ThrowWidowGibSized(edict_t *self, char *gibname, int damage, int type, /* FS: Coop: Rogue specific */
 		vec3_t startpos, int hitsound, qboolean fade);
+
+void SP_monster_soldier_hypergun (edict_t *self); /* FS: Coop: Xatrix specific */
+void SP_monster_soldier_lasergun (edict_t *self); /* FS: Coop: Xatrix specific */
+void SP_monster_soldier_ripper (edict_t *self); /* FS: Coop: Xatrix specific */
+void SP_monster_fixbot (edict_t *self); /* FS: Coop: Xatrix specific */
+void SP_monster_gekk (edict_t *self); /* FS: Coop: Xatrix specific */
+void SP_monster_chick_heat (edict_t *self); /* FS: Coop: Xatrix specific */
+void SP_monster_gladb (edict_t *self); /* FS: Coop: Xatrix specific */
+void SP_monster_boss5 (edict_t *self); /* FS: Coop: Xatrix specific */
+void SP_rotating_light (edict_t *self); /* FS: Coop: Xatrix specific */
+void SP_object_repair (edict_t *self); /* FS: Coop: Xatrix specific */
+void SP_misc_crashviper (edict_t *ent); /* FS: Coop: Xatrix specific */
+void SP_misc_viper_missile (edict_t *self); /* FS: Coop: Xatrix specific */
+void SP_misc_amb4 (edict_t *ent); /* FS: Coop: Xatrix specific */
+void SP_target_mal_laser (edict_t *ent); /* FS: Coop: Xatrix specific */
+void SP_misc_transport (edict_t *ent); /* FS: Coop: Xatrix specific */
+
+void SP_misc_nuke (edict_t *ent); /* FS: Coop: Xatrix specific */
 
 spawn_t spawns[] = {
 	{"item_health", SP_item_health},
@@ -195,6 +215,9 @@ spawn_t spawns[] = {
 	{"func_explosive", SP_func_explosive},
 	{"func_killbox", SP_func_killbox},
 
+	{"func_object_repair", SP_object_repair}, /* FS: Coop: Xatrix specific */
+	{"rotating_light", SP_rotating_light}, /* FS: Coop: Xatrix specific */
+
 	{"trigger_always", SP_trigger_always},
 	{"trigger_once", SP_trigger_once},
 	{"trigger_multiple", SP_trigger_multiple},
@@ -220,10 +243,14 @@ spawn_t spawns[] = {
 	{"target_crosslevel_target", SP_target_crosslevel_target},
 	{"target_laser", SP_target_laser},
 	{"target_help", SP_target_help},
+	{"target_actor", SP_target_actor}, /* FS: Coop: Xatrix specific */
 	{"target_lightramp", SP_target_lightramp},
 	{"target_earthquake", SP_target_earthquake},
 	{"target_character", SP_target_character},
 	{"target_string", SP_target_string},
+
+	{"target_mal_laser", SP_target_mal_laser}, /* FS: Coop: Xatrix specific */
+
 
 	{"worldspawn", SP_worldspawn},
 	{"viewthing", SP_viewthing},
@@ -240,6 +267,7 @@ spawn_t spawns[] = {
 	{"misc_explobox", SP_misc_explobox},
 	{"misc_banner", SP_misc_banner},
 	{"misc_satellite_dish", SP_misc_satellite_dish},
+	{"misc_actor", SP_misc_actor}, /* FS: Coop: Xatrix specific */
 	{"misc_gib_arm", SP_misc_gib_arm},
 	{"misc_gib_leg", SP_misc_gib_leg},
 	{"misc_gib_head", SP_misc_gib_head},
@@ -255,7 +283,12 @@ spawn_t spawns[] = {
 	{"misc_eastertank", SP_misc_eastertank},
 	{"misc_easterchick", SP_misc_easterchick},
 	{"misc_easterchick2", SP_misc_easterchick2},
-
+	{"misc_crashviper", SP_misc_crashviper}, /* FS: Coop: Xatrix specific */
+	{"misc_viper_missile", SP_misc_viper_missile}, /* FS: Coop: Xatrix specific */
+	{"misc_amb4", SP_misc_amb4}, /* FS: Coop: Xatrix specific */
+	{"misc_transport", SP_misc_transport}, /* FS: Coop: Xatrix specific */
+	{"misc_nuke", SP_misc_nuke}, /* FS: Coop: Xatrix specific */
+	
 	{"monster_berserk", SP_monster_berserk},
 	{"monster_gladiator", SP_monster_gladiator},
 	{"monster_gunner", SP_monster_gunner},
@@ -281,46 +314,55 @@ spawn_t spawns[] = {
 
 	{"monster_commander_body", SP_monster_commander_body},
 
+	{"monster_soldier_hypergun", SP_monster_soldier_hypergun}, /* FS: Coop: Xatrix specific */
+	{"monster_soldier_lasergun", SP_monster_soldier_lasergun}, /* FS: Coop: Xatrix specific */
+	{"monster_soldier_ripper",	SP_monster_soldier_ripper}, /* FS: Coop: Xatrix specific */
+	{"monster_fixbot", SP_monster_fixbot}, /* FS: Coop: Xatrix specific */
+	{"monster_gekk", SP_monster_gekk}, /* FS: Coop: Xatrix specific */
+	{"monster_chick_heat", SP_monster_chick_heat}, /* FS: Coop: Xatrix specific */
+	{"monster_gladb", SP_monster_gladb}, /* FS: Coop: Xatrix specific */
+	{"monster_boss5", SP_monster_boss5}, /* FS: Coop: Xatrix specific */
+	
 	{"turret_breach", SP_turret_breach},
 	{"turret_base", SP_turret_base},
 	{"turret_driver", SP_turret_driver},
 
-	{"func_plat2", SP_func_plat2},
-	{"func_door_secret2", SP_func_door_secret2},
-	{"func_force_wall", SP_func_force_wall},
-	{"trigger_teleport", SP_trigger_teleport},
-	{"trigger_disguise", SP_trigger_disguise},
-	{"info_teleport_destination", SP_info_teleport_destination},
-	{"info_player_coop_lava", SP_info_player_coop_lava},
-	{"monster_stalker", SP_monster_stalker},
-	{"monster_turret", SP_monster_turret},
-	{"target_steam", SP_target_steam},
-	{"target_anger", SP_target_anger},
-	{"target_killplayers", SP_target_killplayers},
-	{"target_blacklight", SP_target_blacklight},
-	{"target_orb", SP_target_orb},
-	{"monster_daedalus", SP_monster_hover},
-	{"hint_path", SP_hint_path},
-	{"monster_carrier", SP_monster_carrier},
-	{"monster_widow", SP_monster_widow},
-	{"monster_widow2", SP_monster_widow2},
-	{"monster_medic_commander", SP_monster_medic},
-	{"dm_tag_token", SP_dm_tag_token},
-	{"dm_dball_goal", SP_dm_dball_goal},
-	{"dm_dball_ball", SP_dm_dball_ball},
-	{"dm_dball_team1_start", SP_dm_dball_team1_start},
-	{"dm_dball_team2_start", SP_dm_dball_team2_start},
-	{"dm_dball_ball_start", SP_dm_dball_ball_start},
-	{"dm_dball_speed_change", SP_dm_dball_speed_change},
-	{"monster_kamikaze", SP_monster_kamikaze},
-	{"turret_invisible_brain", SP_turret_invisible_brain},
-	{"misc_nuke_core", SP_misc_nuke_core},
+	{"func_plat2", SP_func_plat2}, /* FS: Coop: Rogue specific */
+	{"func_door_secret2", SP_func_door_secret2}, /* FS: Coop: Rogue specific */
+	{"func_force_wall", SP_func_force_wall}, /* FS: Coop: Rogue specific */
+	{"trigger_teleport", SP_trigger_teleport}, /* FS: Coop: Rogue specific */
+	{"trigger_disguise", SP_trigger_disguise}, /* FS: Coop: Rogue specific */
+	{"info_teleport_destination", SP_info_teleport_destination}, /* FS: Coop: Rogue specific */
+	{"info_player_coop_lava", SP_info_player_coop_lava}, /* FS: Coop: Rogue specific */
+	{"monster_stalker", SP_monster_stalker}, /* FS: Coop: Rogue specific */
+	{"monster_turret", SP_monster_turret}, /* FS: Coop: Rogue specific */
+	{"target_steam", SP_target_steam}, /* FS: Coop: Rogue specific */
+	{"target_anger", SP_target_anger}, /* FS: Coop: Rogue specific */
+	{"target_killplayers", SP_target_killplayers}, /* FS: Coop: Rogue specific */
+	{"target_blacklight", SP_target_blacklight}, /* FS: Coop: Rogue specific */
+	{"target_orb", SP_target_orb}, /* FS: Coop: Rogue specific */
+	{"monster_daedalus", SP_monster_hover}, /* FS: Coop: Rogue specific */
+	{"hint_path", SP_hint_path}, /* FS: Coop: Rogue specific */
+	{"monster_carrier", SP_monster_carrier}, /* FS: Coop: Rogue specific */
+	{"monster_widow", SP_monster_widow}, /* FS: Coop: Rogue specific */
+	{"monster_widow2", SP_monster_widow2}, /* FS: Coop: Rogue specific */
+	{"monster_medic_commander", SP_monster_medic}, /* FS: Coop: Rogue specific */
+	{"dm_tag_token", SP_dm_tag_token}, /* FS: Coop: Rogue specific */
+	{"dm_dball_goal", SP_dm_dball_goal}, /* FS: Coop: Rogue specific */
+	{"dm_dball_ball", SP_dm_dball_ball}, /* FS: Coop: Rogue specific */
+	{"dm_dball_team1_start", SP_dm_dball_team1_start}, /* FS: Coop: Rogue specific */
+	{"dm_dball_team2_start", SP_dm_dball_team2_start}, /* FS: Coop: Rogue specific */
+	{"dm_dball_ball_start", SP_dm_dball_ball_start}, /* FS: Coop: Rogue specific */
+	{"dm_dball_speed_change", SP_dm_dball_speed_change}, /* FS: Coop: Rogue specific */
+	{"monster_kamikaze", SP_monster_kamikaze}, /* FS: Coop: Rogue specific */
+	{"turret_invisible_brain", SP_turret_invisible_brain}, /* FS: Coop: Rogue specific */
+	{"misc_nuke_core", SP_misc_nuke_core}, /* FS: Coop: Rogue specific */
 
-	{"ammo_magslug", SP_xatrix_item},
-	{"ammo_trap", SP_xatrix_item},
-	{"item_quadfire", SP_xatrix_item},
-	{"weapon_boomer", SP_xatrix_item},
-	{"weapon_phalanx", SP_xatrix_item},
+	{"ammo_magslug", SP_xatrix_item}, /* FS: Coop: Rogue specific */
+	{"ammo_trap", SP_xatrix_item}, /* FS: Coop: Rogue specific */
+	{"item_quadfire", SP_xatrix_item}, /* FS: Coop: Rogue specific */
+	{"weapon_boomer", SP_xatrix_item}, /* FS: Coop: Rogue specific */
+	{"weapon_phalanx", SP_xatrix_item}, /* FS: Coop: Rogue specific */
 
 	{NULL, NULL}
 };
@@ -343,26 +385,31 @@ ED_CallSpawn(edict_t *ent)
 	if (!ent->classname)
 	{
 		gi.dprintf(DEVELOPER_MSG_GAME, "ED_CallSpawn: NULL classname\n");
+		G_FreeEdict(ent);
+		ent = NULL;
 		return;
 	}
 
-	ent->gravityVector[0] = 0.0;
-	ent->gravityVector[1] = 0.0;
-	ent->gravityVector[2] = -1.0;
-
-	if (!strcmp(ent->classname, "weapon_nailgun"))
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		ent->classname = (FindItem("ETF Rifle"))->classname;
-	}
+		ent->gravityVector[0] = 0.0;
+		ent->gravityVector[1] = 0.0;
+		ent->gravityVector[2] = -1.0;
 
-	if (!strcmp(ent->classname, "ammo_nails"))
-	{
-		ent->classname = (FindItem("Flechettes"))->classname;
-	}
+		if (!strcmp(ent->classname, "weapon_nailgun"))
+		{
+			ent->classname = (FindItem("ETF Rifle"))->classname;
+		}
 
-	if (!strcmp(ent->classname, "weapon_heatbeam"))
-	{
-		ent->classname = (FindItem("Plasma Beam"))->classname;
+		if (!strcmp(ent->classname, "ammo_nails"))
+		{
+			ent->classname = (FindItem("Flechettes"))->classname;
+		}
+
+		if (!strcmp(ent->classname, "weapon_heatbeam"))
+		{
+			ent->classname = (FindItem("Plasma Beam"))->classname;
+		}
 	}
 
 	/* check item spawn functions */
@@ -580,7 +627,8 @@ ED_ParseEdict(char *data, edict_t *ent)
  * All but the last will have the teamchain field set to the next one
  */
 void
-G_FixTeams(void)
+G_FixTeams(void) /* FS: Coop: Rogue specific */
+
 {
 	edict_t *e, *e2, *chain;
 	int i, j;
@@ -710,7 +758,10 @@ G_FindTeams(void)
 		}
 	}
 
-	G_FixTeams();
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		G_FixTeams();
+	}
 
 	gi.dprintf(DEVELOPER_MSG_GAME, "%i teams with %i entities.\n", c, c2);
 }
@@ -804,6 +855,7 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 		}
 
 		/* ahh, the joys of map hacks .. */
+		/* FS: Coop: Rogue specific map hacks */
 		if (!Q_stricmp(level.mapname, "rhangar2") &&
 			!Q_stricmp(ent->classname, "func_door_rotating") &&
 			ent->targetname && !Q_stricmp(ent->targetname, "t265"))
@@ -840,25 +892,28 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 			}
 			else if (coop->value)
 			{
-				if (ent->spawnflags & SPAWNFLAG_NOT_COOP)
+				if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 				{
-					G_FreeEdict(ent);
-					inhibit++;
-					continue;
-				}
-
-				/* stuff marked !easy & !med & !hard are coop only, all levels */
-				if (!((ent->spawnflags & SPAWNFLAG_NOT_EASY) &&
-					  (ent->spawnflags & SPAWNFLAG_NOT_MEDIUM) &&
-					  (ent->spawnflags & SPAWNFLAG_NOT_HARD)))
-				{
-					if (((skill->value == 0) && (ent->spawnflags & SPAWNFLAG_NOT_EASY)) ||
-						((skill->value == 1) && (ent->spawnflags & SPAWNFLAG_NOT_MEDIUM)) ||
-						(((skill->value == 2) || (skill->value == 3)) && (ent->spawnflags & SPAWNFLAG_NOT_HARD)))
+					if (ent->spawnflags & SPAWNFLAG_NOT_COOP)
 					{
 						G_FreeEdict(ent);
 						inhibit++;
 						continue;
+					}
+
+					/* stuff marked !easy & !med & !hard are coop only, all levels */
+					if (!((ent->spawnflags & SPAWNFLAG_NOT_EASY) &&
+						  (ent->spawnflags & SPAWNFLAG_NOT_MEDIUM) &&
+						  (ent->spawnflags & SPAWNFLAG_NOT_HARD)))
+					{
+						if (((skill->value == 0) && (ent->spawnflags & SPAWNFLAG_NOT_EASY)) ||
+							((skill->value == 1) && (ent->spawnflags & SPAWNFLAG_NOT_MEDIUM)) ||
+							(((skill->value == 2) || (skill->value == 3)) && (ent->spawnflags & SPAWNFLAG_NOT_HARD)))
+						{
+							G_FreeEdict(ent);
+							inhibit++;
+							continue;
+						}
 					}
 				}
 			}
@@ -878,13 +933,16 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 				  SPAWNFLAG_NOT_HARD | SPAWNFLAG_NOT_COOP | SPAWNFLAG_NOT_DEATHMATCH);
 		}
 
-		ent->gravityVector[0] = 0.0;
-		ent->gravityVector[1] = 0.0;
-		ent->gravityVector[2] = -1.0;
+		if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+		{
+			ent->gravityVector[0] = 0.0;
+			ent->gravityVector[1] = 0.0;
+			ent->gravityVector[2] = -1.0;
+		}
 
 		ED_CallSpawn(ent);
 
-		ent->s.renderfx |= RF_IR_VISIBLE;
+		ent->s.renderfx |= RF_IR_VISIBLE; /* FS: Coop: Rogue specific.  Probably OK as-is. */
 	}
 
 	gi.dprintf(DEVELOPER_MSG_GAME, "%i entities inhibited.\n", inhibit);
@@ -893,23 +951,26 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 
 	PlayerTrail_Init();
 
-	if (deathmatch->value)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (randomrespawn && randomrespawn->value)
+		if (deathmatch->value)
 		{
-			PrecacheForRandomRespawn();
+			if (randomrespawn && randomrespawn->value)
+			{
+				PrecacheForRandomRespawn();
+			}
 		}
-	}
-	else
-	{
-		InitHintPaths();
-	}
-
-	if (deathmatch->value && gamerules && gamerules->value)
-	{
-		if (DMGame.PostInitSetup)
+		else
 		{
-			DMGame.PostInitSetup();
+			InitHintPaths();
+		}
+
+		if (deathmatch->value && gamerules && gamerules->value)
+		{
+			if (DMGame.PostInitSetup)
+			{
+				DMGame.PostInitSetup();
+			}
 		}
 	}
 }
@@ -1038,18 +1099,18 @@ char *dm_statusbar =
 
 /* spectator */
 "if 17 "
-"xv 0 "
-"yb -58 "
-"string2 \"SPECTATOR MODE\" "
+  "xv 0 "
+  "yb -58 "
+  "string2 \"SPECTATOR MODE\" "
 "endif "
 
 /* chase camera */
 "if 16 "
-"xv 0 "
-"yb -68 "
-"string \"Chasing\" "
-"xv 64 "
-"stat_string 16 "
+  "xv 0 "
+  "yb -68 "
+  "string \"Chasing\" "
+  "xv 64 "
+  "stat_string 16 "
 "endif "
 ;
 
@@ -1189,11 +1250,13 @@ SP_worldspawn(edict_t *ent)
 		gi.modelindex("#w_hyperblaster.md2");
 		gi.modelindex("#w_railgun.md2");
 		gi.modelindex("#w_bfg.md2");
-		gi.modelindex("#w_disrupt.md2");
-		gi.modelindex("#w_etfrifle.md2");
-		gi.modelindex("#w_plasma.md2");
-		gi.modelindex("#w_plauncher.md2");
-		gi.modelindex("#w_chainfist.md2");
+		gi.modelindex("#w_disrupt.md2"); /* FS: Coop: Rogue specific */
+		gi.modelindex("#w_etfrifle.md2"); /* FS: Coop: Rogue specific */
+		gi.modelindex("#w_plasma.md2"); /* FS: Coop: Rogue specific */
+		gi.modelindex("#w_plauncher.md2"); /* FS: Coop: Rogue specific */
+		gi.modelindex("#w_chainfist.md2"); /* FS: Coop: Rogue specific */
+		gi.modelindex("#w_phalanx.md2"); /* FS: Coop: Xatrix specific */
+		gi.modelindex("#w_ripper.md2"); /* FS: Coop: Xatrix specific */
 	}
 
 	/* ------------------- */
@@ -1214,7 +1277,7 @@ SP_worldspawn(edict_t *ent)
 	gi.soundindex("misc/h2ohit1.wav");      /* landing splash */
 
 	gi.soundindex("items/damage.wav");
-	gi.soundindex("misc/ddamage1.wav");
+	gi.soundindex("misc/ddamage1.wav"); /* FS: Coop: Rogue specific */
 	gi.soundindex("items/protect.wav");
 	gi.soundindex("items/protect4.wav");
 	gi.soundindex("weapons/noammo.wav");
@@ -1287,7 +1350,7 @@ SP_worldspawn(edict_t *ent)
  */
 
 edict_t *
-CreateMonster(vec3_t origin, vec3_t angles, char *classname)
+CreateMonster(vec3_t origin, vec3_t angles, char *classname) /* FS: Coop: Rogue specific */
 {
 	edict_t *newEnt;
 
@@ -1311,7 +1374,7 @@ CreateMonster(vec3_t origin, vec3_t angles, char *classname)
 }
 
 edict_t *
-CreateFlyMonster(vec3_t origin, vec3_t angles, vec3_t mins,
+CreateFlyMonster(vec3_t origin, vec3_t angles, vec3_t mins, /* FS: Coop: Rogue specific */
 		vec3_t maxs, char *classname)
 {
 	if (!classname)
@@ -1334,7 +1397,7 @@ CreateFlyMonster(vec3_t origin, vec3_t angles, vec3_t mins,
 }
 
 edict_t *
-CreateGroundMonster(vec3_t origin, vec3_t angles, vec3_t entMins,
+CreateGroundMonster(vec3_t origin, vec3_t angles, vec3_t entMins, /* FS: Coop: Rogue specific */
 		vec3_t entMaxs, char *classname, int height)
 {
 	edict_t *newEnt;
@@ -1374,7 +1437,7 @@ CreateGroundMonster(vec3_t origin, vec3_t angles, vec3_t entMins,
 }
 
 qboolean
-FindSpawnPoint(vec3_t startpoint, vec3_t mins, vec3_t maxs,
+FindSpawnPoint(vec3_t startpoint, vec3_t mins, vec3_t maxs, /* FS: Coop: Rogue specific */
 		vec3_t spawnpoint, float maxMoveUp)
 {
 	trace_t tr;
@@ -1408,7 +1471,7 @@ FindSpawnPoint(vec3_t startpoint, vec3_t mins, vec3_t maxs,
 }
 
 qboolean
-CheckSpawnPoint(vec3_t origin, vec3_t mins, vec3_t maxs)
+CheckSpawnPoint(vec3_t origin, vec3_t mins, vec3_t maxs) /* FS: Coop: Rogue specific */
 {
 	trace_t tr;
 
@@ -1434,7 +1497,7 @@ CheckSpawnPoint(vec3_t origin, vec3_t mins, vec3_t maxs)
 }
 
 qboolean
-CheckGroundSpawnPoint(vec3_t origin, vec3_t entMins, vec3_t entMaxs,
+CheckGroundSpawnPoint(vec3_t origin, vec3_t entMins, vec3_t entMaxs, /* FS: Coop: Rogue specific */
 		float height, float gravity)
 {
 	trace_t tr;
@@ -1562,7 +1625,7 @@ CheckGroundSpawnPoint(vec3_t origin, vec3_t entMins, vec3_t entMaxs,
 }
 
 void
-DetermineBBox(char *classname, vec3_t mins, vec3_t maxs)
+DetermineBBox(char *classname, vec3_t mins, vec3_t maxs) /* FS: Coop: Rogue specific */
 {
 	edict_t *newEnt;
 
@@ -1588,7 +1651,7 @@ DetermineBBox(char *classname, vec3_t mins, vec3_t maxs)
 
 
 void
-spawngrow_think(edict_t *self)
+spawngrow_think(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	int i;
 
@@ -1631,7 +1694,7 @@ spawngrow_think(edict_t *self)
 }
 
 void
-SpawnGrow_Spawn(vec3_t startpos, int size)
+SpawnGrow_Spawn(vec3_t startpos, int size) /* FS: Coop: Rogue specific */
 {
 	edict_t *ent;
 	int i;
@@ -1682,7 +1745,7 @@ SpawnGrow_Spawn(vec3_t startpos, int size)
 }
 
 void
-widowlegs_think(edict_t *self)
+widowlegs_think(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t offset;
 	vec3_t point;
@@ -1779,7 +1842,7 @@ widowlegs_think(edict_t *self)
 }
 
 void
-Widowlegs_Spawn(vec3_t startpos, vec3_t angles)
+Widowlegs_Spawn(vec3_t startpos, vec3_t angles) /* FS: Coop: Rogue specific */
 {
 	edict_t *ent;
 
