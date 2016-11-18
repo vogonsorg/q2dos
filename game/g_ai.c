@@ -1056,7 +1056,7 @@ ai_checkattack(edict_t *self)
 	}
 
 	/* look for other coop players here */
-	if (coop->value && (self->monsterinfo.search_time < level.time))
+	if (coop && coop->value && (self->monsterinfo.search_time < level.time))
 	{
 		if (FindTarget(self))
 		{

@@ -1039,6 +1039,7 @@ void fire_blaster2(edict_t *self, vec3_t start, vec3_t aimdir, int damage,
 void fire_heat(edict_t *self, vec3_t start, vec3_t aimdir, vec3_t offset,
 		int damage, int kick,
 		qboolean monster);
+void fire_heat_xatrix (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage); /* FS: Coop: Xatrix specific */
 void fire_tracker(edict_t *self, vec3_t start, vec3_t dir, int damage,
 		int speed, edict_t *enemy);
 

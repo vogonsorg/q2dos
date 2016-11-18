@@ -49,7 +49,7 @@ AI_SetSightClient(void)
 		ent = &g_edicts[check];
 
 		if (ent->inuse && (ent->health > 0) &&
-			!(ent->flags & (FL_NOTARGET | FL_DISGUISED)))
+			!(ent->flags & (FL_NOTARGET | FL_DISGUISED))) /* FS: Coop: Rogue specific -- FL_DISGUISED */
 		{
 			level.sight_client = ent;
 			return; /* got one */
@@ -100,54 +100,80 @@ ai_stand(edict_t *self, float dist)
 		M_walkmove(self, self->s.angles[YAW], dist);
 	}
 
-	if (self->monsterinfo.aiflags & AI_STAND_GROUND)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (self->enemy)
+		if (self->monsterinfo.aiflags & AI_STAND_GROUND)
 		{
-			VectorSubtract(self->enemy->s.origin, self->s.origin, v);
-			self->ideal_yaw = vectoyaw(v);
-
-			if ((self->s.angles[YAW] != self->ideal_yaw) &&
-				self->monsterinfo.aiflags & AI_TEMP_STAND_GROUND)
+			if (self->enemy)
 			{
-				self->monsterinfo.aiflags &=
-					~(AI_STAND_GROUND | AI_TEMP_STAND_GROUND);
-				self->monsterinfo.run(self);
-			}
+				VectorSubtract(self->enemy->s.origin, self->s.origin, v);
+				self->ideal_yaw = vectoyaw(v);
 
-			if (!(self->monsterinfo.aiflags & AI_MANUAL_STEERING))
-			{
-				M_ChangeYaw(self);
-			}
+				if ((self->s.angles[YAW] != self->ideal_yaw) &&
+					self->monsterinfo.aiflags & AI_TEMP_STAND_GROUND)
+				{
+					self->monsterinfo.aiflags &=
+						~(AI_STAND_GROUND | AI_TEMP_STAND_GROUND);
+					self->monsterinfo.run(self);
+				}
 
-			/* find out if we're going to be shooting */
-			retval = ai_checkattack(self, 0);
+				if (!(self->monsterinfo.aiflags & AI_MANUAL_STEERING))
+				{
+					M_ChangeYaw(self);
+				}
 
-			/* record sightings of player */
-			if ((self->enemy) && (self->enemy->inuse) &&
-				(visible(self, self->enemy)))
-			{
-				self->monsterinfo.aiflags &= ~AI_LOST_SIGHT;
-				VectorCopy(self->enemy->s.origin, self->monsterinfo.last_sighting);
-				VectorCopy(self->enemy->s.origin, self->monsterinfo.blind_fire_target);
-				self->monsterinfo.trail_time = level.time;
-				self->monsterinfo.blind_fire_delay = 0;
+				/* find out if we're going to be shooting */
+				retval = ai_checkattack(self, 0);
+
+				/* record sightings of player */
+				if ((self->enemy) && (self->enemy->inuse) &&
+					(visible(self, self->enemy)))
+				{
+					self->monsterinfo.aiflags &= ~AI_LOST_SIGHT;
+					VectorCopy(self->enemy->s.origin, self->monsterinfo.last_sighting);
+					VectorCopy(self->enemy->s.origin, self->monsterinfo.blind_fire_target);
+					self->monsterinfo.trail_time = level.time;
+					self->monsterinfo.blind_fire_delay = 0;
+				}
+				/* check retval to make sure we're not blindfiring */
+				else if (!retval)
+				{
+					FindTarget(self);
+					return;
+				}
 			}
-			/* check retval to make sure we're not blindfiring */
-			else if (!retval)
+			else
 			{
 				FindTarget(self);
-				return;
 			}
-		}
-		else
-		{
-			FindTarget(self);
-		}
 
-		return;
+			return;
+		}
 	}
+	else
+	{
+		if (self->monsterinfo.aiflags & AI_STAND_GROUND)
+		{
+			if (self->enemy)
+			{
+				VectorSubtract (self->enemy->s.origin, self->s.origin, v);
+				self->ideal_yaw = vectoyaw(v);
+				if (self->s.angles[YAW] != self->ideal_yaw && self->monsterinfo.aiflags & AI_TEMP_STAND_GROUND)
+				{
+					self->monsterinfo.aiflags &= ~(AI_STAND_GROUND | AI_TEMP_STAND_GROUND);
+					self->monsterinfo.run (self);
+				}
+				M_ChangeYaw (self);
+				ai_checkattack (self, 0);
+			}
+			else
+			{
+				FindTarget(self);
+			}
 
+			return;
+		}
+	}
 	if (FindTarget(self))
 	{
 		return;
@@ -180,12 +206,12 @@ ai_stand(edict_t *self, float dist)
 void
 ai_walk(edict_t *self, float dist)
 {
-	M_MoveToGoal(self, dist);
-
 	if (!self)
 	{
 		return;
 	}
+
+	M_MoveToGoal (self, dist);
 
 	/* check for noticing a player */
 	if (FindTarget(self))
@@ -219,22 +245,25 @@ ai_charge(edict_t *self, float dist)
 	vec3_t v;
 	float ofs;
 
-	if (!self)
+	if (!self || !self->enemy || !self->enemy->inuse)
 	{
 		return;
 	}
 
-	if (!self->enemy || !self->enemy->inuse)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		return;
-	}
+		if (visible(self, self->enemy))
+		{
+			VectorCopy(self->enemy->s.origin, self->monsterinfo.blind_fire_target);
+		}
 
-	if (visible(self, self->enemy))
-	{
-		VectorCopy(self->enemy->s.origin, self->monsterinfo.blind_fire_target);
+		if (!(self->monsterinfo.aiflags & AI_MANUAL_STEERING))
+		{
+			VectorSubtract(self->enemy->s.origin, self->s.origin, v);
+			self->ideal_yaw = vectoyaw(v);
+		}
 	}
-
-	if (!(self->monsterinfo.aiflags & AI_MANUAL_STEERING))
+	else
 	{
 		VectorSubtract(self->enemy->s.origin, self->s.origin, v);
 		self->ideal_yaw = vectoyaw(v);
@@ -244,37 +273,44 @@ ai_charge(edict_t *self, float dist)
 
 	if (dist)
 	{
-		if (self->monsterinfo.aiflags & AI_CHARGING)
+		if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 		{
-			M_MoveToGoal(self, dist);
-			return;
-		}
-
-		/* circle strafe support */
-		if (self->monsterinfo.attack_state == AS_SLIDING)
-		{
-			/* if we're fighting a tesla, NEVER circle strafe */
-			if ((self->enemy) && (self->enemy->classname) &&
-				(!strcmp(self->enemy->classname, "tesla")))
+			if (self->monsterinfo.aiflags & AI_CHARGING)
 			{
-				ofs = 0;
-			}
-			else if (self->monsterinfo.lefty)
-			{
-				ofs = 90;
-			}
-			else
-			{
-				ofs = -90;
-			}
-
-			if (M_walkmove(self, self->ideal_yaw + ofs, dist))
-			{
+				M_MoveToGoal(self, dist);
 				return;
 			}
 
-			self->monsterinfo.lefty = 1 - self->monsterinfo.lefty;
-			M_walkmove(self, self->ideal_yaw - ofs, dist);
+			/* circle strafe support */
+			if (self->monsterinfo.attack_state == AS_SLIDING)
+			{
+				/* if we're fighting a tesla, NEVER circle strafe */
+				if ((self->enemy) && (self->enemy->classname) &&
+					(!strcmp(self->enemy->classname, "tesla")))
+				{
+					ofs = 0;
+				}
+				else if (self->monsterinfo.lefty)
+				{
+					ofs = 90;
+				}
+				else
+				{
+					ofs = -90;
+				}
+
+				if (M_walkmove(self, self->ideal_yaw + ofs, dist))
+				{
+					return;
+				}
+
+				self->monsterinfo.lefty = 1 - self->monsterinfo.lefty;
+				M_walkmove(self, self->ideal_yaw - ofs, dist);
+			}
+			else
+			{
+				M_walkmove(self, self->s.angles[YAW], dist);
+			}
 		}
 		else
 		{
@@ -307,7 +343,7 @@ ai_turn(edict_t *self, float dist)
 		return;
 	}
 
-	if (!(self->monsterinfo.aiflags & AI_MANUAL_STEERING))
+	if ((game.gametype != rogue_coop) || ((game.gametype == rogue_coop) && (!(self->monsterinfo.aiflags & AI_MANUAL_STEERING))) )
 	{
 		M_ChangeYaw(self);
 	}
@@ -401,11 +437,20 @@ visible(edict_t *self, edict_t *other)
 	spot2[2] += other->viewheight;
 	trace = gi.trace(spot1, vec3_origin, vec3_origin, spot2, self, MASK_OPAQUE);
 
-	if ((trace.fraction == 1.0) || (trace.ent == other))
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		return true;
+		if ((trace.fraction == 1.0) || (trace.ent == other))
+		{
+			return true;
+		}
 	}
-
+	else
+	{
+		if (trace.fraction == 1.0)
+		{
+			return true;
+		}
+	}
 	return false;
 }
 
@@ -420,22 +465,17 @@ infront(edict_t *self, edict_t *other)
 	float dot;
 	vec3_t forward;
 
-	if ((self == NULL) || (other == NULL))
+	if (!self || !other)
 	{
 		return false;
 	}
 
 	AngleVectors(self->s.angles, forward, NULL, NULL);
 
-	if ((self == NULL) || (other == NULL))
-	{
-		return false;
-	}
-
-	VectorSubtract(other->s.origin, self->s.origin, vec);
-	VectorNormalize(vec);
-	dot = DotProduct(vec, forward);
-
+	VectorSubtract (other->s.origin, self->s.origin, vec);
+	VectorNormalize (vec);
+	dot = DotProduct (vec, forward);
+	
 	if (dot > 0.3)
 	{
 		return true;
@@ -463,9 +503,9 @@ HuntTarget(edict_t *self)
 		self->monsterinfo.stand(self);
 	}
 	else
-	if (self->monsterinfo.run)
 	{
-		self->monsterinfo.run(self);
+		if ((game.gametype == rogue_coop && self->monsterinfo.run) || (game.gametype != rogue_coop)) /* FS: Coop: Rogue specific */
+			self->monsterinfo.run(self);
 	}
 
 	VectorSubtract(self->enemy->s.origin, self->s.origin, vec);
@@ -489,7 +529,7 @@ FoundTarget(edict_t *self)
 	/* let other monsters see this monster for a while */
 	if (self->enemy->client)
 	{
-		if (self->enemy->flags & FL_DISGUISED)
+		if (self->enemy->flags & FL_DISGUISED) /* FS: Coop: Rogue specific */
 		{
 			self->enemy->flags &= ~FL_DISGUISED;
 		}
@@ -503,8 +543,12 @@ FoundTarget(edict_t *self)
 
 	VectorCopy(self->enemy->s.origin, self->monsterinfo.last_sighting);
 	self->monsterinfo.trail_time = level.time;
-	VectorCopy(self->enemy->s.origin, self->monsterinfo.blind_fire_target);
-	self->monsterinfo.blind_fire_delay = 0;
+
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		VectorCopy(self->enemy->s.origin, self->monsterinfo.blind_fire_target);
+		self->monsterinfo.blind_fire_delay = 0;
+	}
 
 	if (!self->combattarget)
 	{
@@ -593,7 +637,7 @@ FindTarget(edict_t *self)
 			return false;
 		}
 	}
-	else if (level.disguise_violation_framenum > level.framenum)
+	else if ((game.gametype == rogue_coop) && (level.disguise_violation_framenum > level.framenum)) /* FS: Coop: Rogue specific */
 	{
 		client = level.disguise_violator;
 	}
@@ -630,7 +674,7 @@ FindTarget(edict_t *self)
 		return true;
 	}
 
-	if ((self->monsterinfo.aiflags & AI_HINT_PATH) && (coop) && (coop->value))
+	if ((game.gametype == rogue_coop) && (self->monsterinfo.aiflags & AI_HINT_PATH) && (coop) && (coop->value)) /* FS: Coop: Rogue specific */
 	{
 		heardit = false;
 	}
@@ -757,7 +801,11 @@ FindTarget(edict_t *self)
 
 		self->ideal_yaw = vectoyaw(temp);
 
-		if (!(self->monsterinfo.aiflags & AI_MANUAL_STEERING))
+		if ((game.gametype == rogue_coop) && (!(self->monsterinfo.aiflags & AI_MANUAL_STEERING))) /* FS: Coop: Rogue specific */
+		{
+			M_ChangeYaw(self);
+		}
+		else
 		{
 			M_ChangeYaw(self);
 		}
@@ -769,7 +817,7 @@ FindTarget(edict_t *self)
 
 	/* if we got an enemy, we need to bail out of
 	   hint paths, so take over here */
-	if (self->monsterinfo.aiflags & AI_HINT_PATH)
+	if ((game.gametype == rogue_coop) && (self->monsterinfo.aiflags & AI_HINT_PATH)) /* FS: Coop: Rogue specific */
 	{
 		/* this calls foundtarget for us */
 		hintpath_stop(self);
@@ -839,50 +887,57 @@ M_CheckAttack(edict_t *self)
 		/* do we have a clear shot? */
 		if (tr.ent != self->enemy)
 		{
-			/* we want them to go ahead and shoot at info_notnulls if they can. */
-			if ((self->enemy->solid != SOLID_NOT) || (tr.fraction < 1.0))
+			if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 			{
-				/* if we can't see our target, and we're not
-				   blocked by a monster, go into blind fire
-				   if available */
-				if ((!(tr.ent->svflags & SVF_MONSTER)) &&
-					(!visible(self, self->enemy)))
+				/* we want them to go ahead and shoot at info_notnulls if they can. */
+				if ((self->enemy->solid != SOLID_NOT) || (tr.fraction < 1.0))
 				{
-					if ((self->monsterinfo.blindfire) &&
-						(self->monsterinfo.blind_fire_delay <= 20.0))
+					/* if we can't see our target, and we're not
+					   blocked by a monster, go into blind fire
+					   if available */
+					if ((!(tr.ent->svflags & SVF_MONSTER)) &&
+						(!visible(self, self->enemy)))
 					{
-						if (level.time < self->monsterinfo.attack_finished)
+						if ((self->monsterinfo.blindfire) &&
+							(self->monsterinfo.blind_fire_delay <= 20.0))
 						{
-							return false;
-						}
-
-						if (level.time <
-							(self->monsterinfo.trail_time +
-							 self->monsterinfo.blind_fire_delay))
-						{
-							/* wait for our time */
-							return false;
-						}
-						else
-						{
-							/* make sure we're not going to shoot a monster */
-							tr = gi.trace(spot1, NULL, NULL,
-									self->monsterinfo.blind_fire_target,
-									self, CONTENTS_MONSTER);
-
-							if (tr.allsolid || tr.startsolid ||
-								((tr.fraction < 1.0) &&
-								 (tr.ent != self->enemy)))
+							if (level.time < self->monsterinfo.attack_finished)
 							{
 								return false;
 							}
 
-							self->monsterinfo.attack_state = AS_BLIND;
-							return true;
+							if (level.time <
+								(self->monsterinfo.trail_time +
+								 self->monsterinfo.blind_fire_delay))
+							{
+								/* wait for our time */
+								return false;
+							}
+							else
+							{
+								/* make sure we're not going to shoot a monster */
+								tr = gi.trace(spot1, NULL, NULL,
+										self->monsterinfo.blind_fire_target,
+										self, CONTENTS_MONSTER);
+
+								if (tr.allsolid || tr.startsolid ||
+									((tr.fraction < 1.0) &&
+									 (tr.ent != self->enemy)))
+								{
+									return false;
+								}
+
+								self->monsterinfo.attack_state = AS_BLIND;
+								return true;
+							}
 						}
 					}
-				}
 
+					return false;
+				}
+			}
+			else
+			{
 				return false;
 			}
 		}
@@ -894,8 +949,11 @@ M_CheckAttack(edict_t *self)
 		/* don't always melee in easy mode */
 		if ((skill->value == 0) && (rand() & 3))
 		{
-			/* fix for melee only monsters & strafing */
-			self->monsterinfo.attack_state = AS_STRAIGHT;
+			if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+			{
+				/* fix for melee only monsters & strafing */
+				self->monsterinfo.attack_state = AS_STRAIGHT;
+			}
 			return false;
 		}
 
@@ -914,8 +972,11 @@ M_CheckAttack(edict_t *self)
 	/* missile attack */
 	if (!self->monsterinfo.attack)
 	{
-		/* fix for melee only monsters & strafing */
-		self->monsterinfo.attack_state = AS_STRAIGHT;
+		if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+		{
+			/* fix for melee only monsters & strafing */
+			self->monsterinfo.attack_state = AS_STRAIGHT;
+		}
 		return false;
 	}
 
@@ -960,59 +1021,75 @@ M_CheckAttack(edict_t *self)
 	}
 
 	/* go ahead and shoot every time if it's a info_notnull */
-	if ((random() < chance) || (self->enemy->solid == SOLID_NOT))
+	if ((random() < chance) || ((game.gametype == rogue_coop) && (self->enemy->solid == SOLID_NOT)) ) /* FS: Coop: Rogue specific */
 	{
 		self->monsterinfo.attack_state = AS_MISSILE;
 		self->monsterinfo.attack_finished = level.time + 2 * random();
 		return true;
 	}
 
-	/* daedalus should strafe more.. this can be done
-	   here or in a customized check_attack code for
-	   the hover. */
-	if (self->flags & FL_FLY)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		/* originally, just 0.3 */
-		float strafe_chance;
-
-		if (!(strcmp(self->classname, "monster_daedalus")))
+		/* daedalus should strafe more.. this can be done
+		   here or in a customized check_attack code for
+		   the hover. */
+		if (self->flags & FL_FLY)
 		{
-			strafe_chance = 0.8;
+			/* originally, just 0.3 */
+			float strafe_chance;
+
+			if (!(strcmp(self->classname, "monster_daedalus")))
+			{
+				strafe_chance = 0.8;
+			}
+			else
+			{
+				strafe_chance = 0.6;
+			}
+
+			/* if enemy is tesla, never strafe */
+			if ((self->enemy) && (self->enemy->classname) &&
+				(!strcmp(self->enemy->classname, "tesla")))
+			{
+				strafe_chance = 0;
+			}
+
+			if (random() < strafe_chance)
+			{
+				self->monsterinfo.attack_state = AS_SLIDING;
+			}
+			else
+			{
+				self->monsterinfo.attack_state = AS_STRAIGHT;
+			}
 		}
 		else
 		{
-			strafe_chance = 0.6;
-		}
-
-		/* if enemy is tesla, never strafe */
-		if ((self->enemy) && (self->enemy->classname) &&
-			(!strcmp(self->enemy->classname, "tesla")))
-		{
-			strafe_chance = 0;
-		}
-
-		if (random() < strafe_chance)
-		{
-			self->monsterinfo.attack_state = AS_SLIDING;
-		}
-		else
-		{
-			self->monsterinfo.attack_state = AS_STRAIGHT;
+			/* do we want the monsters strafing? */
+			if (random() < 0.4)
+			{
+				self->monsterinfo.attack_state = AS_SLIDING;
+			}
+			else
+			{
+				self->monsterinfo.attack_state = AS_STRAIGHT;
+			}
 		}
 	}
 	else
 	{
-		/* do we want the monsters strafing? */
-		if (random() < 0.4)
+		if (self->flags & FL_FLY)
 		{
-			self->monsterinfo.attack_state = AS_SLIDING;
-		}
-		else
-		{
-			self->monsterinfo.attack_state = AS_STRAIGHT;
+			if (random() < 0.3)
+			{
+				self->monsterinfo.attack_state = AS_SLIDING;
+			}
+			else
+			{
+				self->monsterinfo.attack_state = AS_STRAIGHT;
+			}
 		}
 	}
-
 	return false;
 }
 
@@ -1030,7 +1107,14 @@ ai_run_melee(edict_t *self)
 
 	self->ideal_yaw = enemy_yaw;
 
-	if (!(self->monsterinfo.aiflags & AI_MANUAL_STEERING))
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		if (!(self->monsterinfo.aiflags & AI_MANUAL_STEERING))
+		{
+			M_ChangeYaw(self);
+		}
+	}
+	else
 	{
 		M_ChangeYaw(self);
 	}
@@ -1056,7 +1140,14 @@ ai_run_missile(edict_t *self)
 
 	self->ideal_yaw = enemy_yaw;
 
-	if (!(self->monsterinfo.aiflags & AI_MANUAL_STEERING))
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		if (!(self->monsterinfo.aiflags & AI_MANUAL_STEERING))
+		{
+			M_ChangeYaw(self);
+		}
+	}
+	else
 	{
 		M_ChangeYaw(self);
 	}
@@ -1065,8 +1156,16 @@ ai_run_missile(edict_t *self)
 	{
 		self->monsterinfo.attack(self);
 
-		if ((self->monsterinfo.attack_state == AS_MISSILE) ||
-			(self->monsterinfo.attack_state == AS_BLIND))
+		if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+		{
+
+			if ((self->monsterinfo.attack_state == AS_MISSILE) ||
+				(self->monsterinfo.attack_state == AS_BLIND))
+			{
+				self->monsterinfo.attack_state = AS_STRAIGHT;
+			}
+		}
+		else
 		{
 			self->monsterinfo.attack_state = AS_STRAIGHT;
 		}
@@ -1078,7 +1177,7 @@ ai_run_missile(edict_t *self)
  * aproximately the same range
  */
 void
-ai_run_slide(edict_t *self, float distance)
+ai_run_slide_rogue (edict_t *self, float distance) /* FS: Coop: Rogue specific */
 {
 	float ofs;
 	float angle;
@@ -1139,6 +1238,45 @@ ai_run_slide(edict_t *self, float distance)
 
 	/* the move failed, so signal the caller (ai_run) to try going straight */
 	self->monsterinfo.attack_state = AS_STRAIGHT;
+}
+
+/*
+ * Strafe sideways, but stay at
+ * aproximately the same range
+ */
+void
+ai_run_slide(edict_t *self, float distance)
+{
+	float	ofs;
+
+	if (!self)
+	{
+		return;
+	}
+
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		ai_run_slide_rogue(self, distance); /* FS: Coop: Rogue -- lazy, easier this way */
+		return;
+	}
+	self->ideal_yaw = enemy_yaw;
+	M_ChangeYaw (self);
+
+	if (self->monsterinfo.lefty)
+	{
+		ofs = 90;
+	}
+	else
+	{
+		ofs = -90;
+	}
+	if (M_walkmove (self, self->ideal_yaw + ofs, distance))
+	{
+		return;
+	}
+		
+	self->monsterinfo.lefty = 1 - self->monsterinfo.lefty;
+	M_walkmove (self, self->ideal_yaw - ofs, distance);
 }
 
 /*
@@ -1243,7 +1381,7 @@ ai_checkattack(edict_t *self, float dist)
 			self->oldenemy = NULL;
 			HuntTarget(self);
 		}
-		else if (self->monsterinfo.last_player_enemy &&
+		else if ((game.gametype == rogue_coop) && (self->monsterinfo.last_player_enemy) && /* FS: Coop: Rogue specific */
 				 (self->monsterinfo.last_player_enemy->health > 0))
 		{
 			self->enemy = self->monsterinfo.last_player_enemy;
@@ -1281,10 +1419,13 @@ ai_checkattack(edict_t *self, float dist)
 	{
 		self->monsterinfo.search_time = level.time + 5;
 		VectorCopy(self->enemy->s.origin, self->monsterinfo.last_sighting);
-		self->monsterinfo.aiflags &= ~AI_LOST_SIGHT;
-		self->monsterinfo.trail_time = level.time;
-		VectorCopy(self->enemy->s.origin, self->monsterinfo.blind_fire_target);
-		self->monsterinfo.blind_fire_delay = 0;
+		if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+		{
+			self->monsterinfo.aiflags &= ~AI_LOST_SIGHT;
+			self->monsterinfo.trail_time = level.time;
+			VectorCopy(self->enemy->s.origin, self->monsterinfo.blind_fire_target);
+			self->monsterinfo.blind_fire_delay = 0;
+		}
 	}
 	
 	if (coop && coop->value && (self->monsterinfo.search_time < level.time))
@@ -1299,38 +1440,67 @@ ai_checkattack(edict_t *self, float dist)
 	enemy_range = range(self, self->enemy);
 	VectorSubtract(self->enemy->s.origin, self->s.origin, temp);
 	enemy_yaw = vectoyaw(temp);
-	retval = self->monsterinfo.checkattack(self);
 
-	if (retval)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
+		retval = self->monsterinfo.checkattack(self);
+
+		if (retval)
+		{
+			if (self->monsterinfo.attack_state == AS_MISSILE)
+			{
+				ai_run_missile(self);
+				return true;
+			}
+
+			if (self->monsterinfo.attack_state == AS_MELEE)
+			{
+				ai_run_melee(self);
+				return true;
+			}
+
+			/* added so monsters can shoot blind */
+			if (self->monsterinfo.attack_state == AS_BLIND)
+			{
+				ai_run_missile(self);
+				return true;
+			}
+
+			/* if enemy is not currently visible,
+			   we will never attack */
+			if (!enemy_vis)
+			{
+				return false;
+			}
+		}
+
+		return retval;
+	}
+	else
+	{
+		// JDC self->ideal_yaw = enemy_yaw;
+
 		if (self->monsterinfo.attack_state == AS_MISSILE)
 		{
-			ai_run_missile(self);
+			ai_run_missile (self);
 			return true;
 		}
 
 		if (self->monsterinfo.attack_state == AS_MELEE)
 		{
-			ai_run_melee(self);
+			ai_run_melee (self);
 			return true;
 		}
 
-		/* added so monsters can shoot blind */
-		if (self->monsterinfo.attack_state == AS_BLIND)
-		{
-			ai_run_missile(self);
-			return true;
-		}
-
-		/* if enemy is not currently visible,
-		   we will never attack */
+		// if enemy is not currently visible, we will never attack
 		if (!enemy_vis)
 		{
 			return false;
 		}
-	}
 
-	return retval;
+		return self->monsterinfo.checkattack (self);
+	}
+	return self->monsterinfo.checkattack (self); /* FS: Compiler warning */
 }
 
 /*
@@ -1338,7 +1508,7 @@ ai_checkattack(edict_t *self, float dist)
  * it is trying to kill
  */
 void
-ai_run(edict_t *self, float dist)
+ai_run_rogue(edict_t *self, float dist) /* FS: Coop: Rogue specific */
 {
 	vec3_t v;
 	edict_t *tempgoal;
@@ -1734,3 +1904,226 @@ ai_run(edict_t *self, float dist)
 		self->goalentity = save;
 	}
 }
+
+
+/*
+ * The monster has an enemy
+ * it is trying to kill
+ */
+void
+ai_run(edict_t *self, float dist)
+{
+	vec3_t		v;
+	edict_t		*tempgoal;
+	edict_t		*save;
+	qboolean	new;
+	edict_t		*marker;
+	float		d1, d2;
+	trace_t		tr;
+	vec3_t		v_forward, v_right;
+	float		left, center, right;
+	vec3_t		left_target, right_target;
+
+	if (!self)
+	{
+		return;
+	}
+
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		ai_run_rogue(self, dist);
+		return;
+	}
+
+	/* if we're going to a combat point, just proceed */
+	if (self->monsterinfo.aiflags & AI_COMBAT_POINT)
+	{
+		M_MoveToGoal(self, dist);
+		return;
+	}
+
+	if (self->monsterinfo.aiflags & AI_SOUND_TARGET)
+	{
+		VectorSubtract (self->s.origin, self->enemy->s.origin, v);
+		if (VectorLength(v) < 64)
+		{
+			self->monsterinfo.aiflags |= (AI_STAND_GROUND | AI_TEMP_STAND_GROUND);
+			self->monsterinfo.stand (self);
+			return;
+		}
+
+		M_MoveToGoal (self, dist);
+
+		if (!FindTarget (self))
+		{
+			return;
+		}
+	}
+
+	if (ai_checkattack (self, dist))
+	{
+		return;
+	}
+
+	if (self->monsterinfo.attack_state == AS_SLIDING)
+	{
+		ai_run_slide (self, dist);
+		return;
+	}
+
+	if (enemy_vis)
+	{
+//		if (self.aiflags & AI_LOST_SIGHT)
+//			dprint("regained sight\n");
+		M_MoveToGoal (self, dist);
+		self->monsterinfo.aiflags &= ~AI_LOST_SIGHT;
+		VectorCopy(self->enemy->s.origin, self->monsterinfo.last_sighting);
+		self->monsterinfo.trail_time = level.time;
+		return;
+	}
+
+	if ((self->monsterinfo.search_time) && (level.time > (self->monsterinfo.search_time + 20)))
+	{
+		M_MoveToGoal (self, dist);
+		self->monsterinfo.search_time = 0;
+		return;
+	}
+
+	save = self->goalentity;
+	tempgoal = G_Spawn();
+	self->goalentity = tempgoal;
+
+	new = false;
+
+	if (!(self->monsterinfo.aiflags & AI_LOST_SIGHT))
+	{
+		/* just lost sight of the player, decide where to go first */
+		self->monsterinfo.aiflags |= (AI_LOST_SIGHT | AI_PURSUIT_LAST_SEEN);
+		self->monsterinfo.aiflags &= ~(AI_PURSUE_NEXT | AI_PURSUE_TEMP);
+		new = true;
+	}
+
+	if (self->monsterinfo.aiflags & AI_PURSUE_NEXT)
+	{
+		self->monsterinfo.aiflags &= ~AI_PURSUE_NEXT;
+
+		/* give ourself more time since we got this far */
+		self->monsterinfo.search_time = level.time + 5;
+
+		if (self->monsterinfo.aiflags & AI_PURSUE_TEMP)
+		{
+			self->monsterinfo.aiflags &= ~AI_PURSUE_TEMP;
+			marker = NULL;
+			VectorCopy(self->monsterinfo.saved_goal, self->monsterinfo.last_sighting);
+			new = true;
+		}
+		else if (self->monsterinfo.aiflags & AI_PURSUIT_LAST_SEEN)
+		{
+			self->monsterinfo.aiflags &= ~AI_PURSUIT_LAST_SEEN;
+			marker = PlayerTrail_PickFirst(self);
+		}
+		else
+		{
+			marker = PlayerTrail_PickNext(self);
+		}
+
+		if (marker)
+		{
+			VectorCopy(marker->s.origin, self->monsterinfo.last_sighting);
+			self->monsterinfo.trail_time = marker->timestamp;
+			self->s.angles[YAW] = self->ideal_yaw = marker->s.angles[YAW];
+			new = true;
+		}
+	}
+
+	VectorSubtract(self->s.origin, self->monsterinfo.last_sighting, v);
+	d1 = VectorLength(v);
+
+	if (d1 <= dist)
+	{
+		self->monsterinfo.aiflags |= AI_PURSUE_NEXT;
+		dist = d1;
+	}
+
+	VectorCopy(self->monsterinfo.last_sighting, self->goalentity->s.origin);
+
+	if (new)
+	{
+		tr = gi.trace(self->s.origin, self->mins, self->maxs,
+				self->monsterinfo.last_sighting, self,
+				MASK_PLAYERSOLID);
+
+		if (tr.fraction < 1)
+		{
+			VectorSubtract(self->goalentity->s.origin, self->s.origin, v);
+			d1 = VectorLength(v);
+			center = tr.fraction;
+			d2 = d1 * ((center + 1) / 2);
+			self->s.angles[YAW] = self->ideal_yaw = vectoyaw(v);
+			AngleVectors(self->s.angles, v_forward, v_right, NULL);
+
+			VectorSet(v, d2, -16, 0);
+			G_ProjectSource(self->s.origin, v, v_forward, v_right, left_target);
+			tr = gi.trace(self->s.origin, self->mins, self->maxs,
+					left_target, self, MASK_PLAYERSOLID);
+			left = tr.fraction;
+
+			VectorSet(v, d2, 16, 0);
+			G_ProjectSource(self->s.origin, v, v_forward, v_right, right_target);
+			tr = gi.trace(self->s.origin, self->mins, self->maxs, right_target,
+					self, MASK_PLAYERSOLID);
+			right = tr.fraction;
+
+			center = (d1 * center) / d2;
+
+			if ((left >= center) && (left > right))
+			{
+				if (left < 1)
+				{
+					VectorSet(v, d2 * left * 0.5, -16, 0);
+					G_ProjectSource(self->s.origin, v, v_forward,
+							v_right, left_target);
+				}
+
+				VectorCopy(self->monsterinfo.last_sighting, self->monsterinfo.saved_goal);
+				self->monsterinfo.aiflags |= AI_PURSUE_TEMP;
+				VectorCopy(left_target, self->goalentity->s.origin);
+				VectorCopy(left_target, self->monsterinfo.last_sighting);
+				VectorSubtract(self->goalentity->s.origin, self->s.origin, v);
+				self->s.angles[YAW] = self->ideal_yaw = vectoyaw(v);
+			}
+			else if ((right >= center) && (right > left))
+			{
+				if (right < 1)
+				{
+					VectorSet(v, d2 * right * 0.5, 16, 0);
+					G_ProjectSource(self->s.origin, v, v_forward, v_right,
+							right_target);
+				}
+
+				VectorCopy(self->monsterinfo.last_sighting,
+						self->monsterinfo.saved_goal);
+				self->monsterinfo.aiflags |= AI_PURSUE_TEMP;
+				VectorCopy(right_target, self->goalentity->s.origin);
+				VectorCopy(right_target, self->monsterinfo.last_sighting);
+				VectorSubtract(self->goalentity->s.origin, self->s.origin, v);
+				self->s.angles[YAW] = self->ideal_yaw = vectoyaw(v);
+			}
+		}
+	}
+
+	M_MoveToGoal(self, dist);
+
+	if (!self->inuse)
+	{
+		return;
+	}
+
+	G_FreeEdict(tempgoal);
+
+	if (self)
+	{
+		self->goalentity = save;
+	}
+}
+

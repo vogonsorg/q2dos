@@ -152,6 +152,7 @@
 #define FRAME_walk22          	147
 #define FRAME_walk23          	148
 
+/* FS: Coop: Rogue specific */
 #define FRAME_jump01			149
 #define FRAME_jump02			150
 #define FRAME_jump03			151

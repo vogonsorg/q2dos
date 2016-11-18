@@ -121,6 +121,7 @@
 #define FRAME_stand34           116
 #define FRAME_stand35           117
 
+/* FS: Coop: Rogue specific */
 #define FRAME_jump01			118
 #define FRAME_jump02			119
 #define FRAME_jump03			120
