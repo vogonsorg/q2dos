@@ -1,13 +1,13 @@
 #include "g_local.h"
 
-#define LASER_ON 0x0001
-#define LASER_RED 0x0002
-#define LASER_GREEN 0x0004
-#define LASER_BLUE 0x0008
-#define LASER_YELLOW 0x0010
-#define LASER_ORANGE 0x0020
-#define LASER_FAT 0x0040
-#define LASER_STOPWINDOW 0x0080
+#define LASER_ON 0x0001 /* FS: Coop: Rogue specific */
+#define LASER_RED 0x0002 /* FS: Coop: Rogue specific */
+#define LASER_GREEN 0x0004 /* FS: Coop: Rogue specific */
+#define LASER_BLUE 0x0008 /* FS: Coop: Rogue specific */
+#define LASER_YELLOW 0x0010 /* FS: Coop: Rogue specific */
+#define LASER_ORANGE 0x0020 /* FS: Coop: Rogue specific */
+#define LASER_FAT 0x0040 /* FS: Coop: Rogue specific */
+#define LASER_STOPWINDOW 0x0080 /* FS: Coop: Rogue specific */
 
 void ED_CallSpawn(edict_t *ent);
 
@@ -18,8 +18,13 @@ void ED_CallSpawn(edict_t *ent);
  * "style"		type byte
  */
 void
-Use_Target_Tent(edict_t *ent, edict_t *other, edict_t *activator)
+Use_Target_Tent(edict_t *ent, edict_t *other /* unused */, edict_t *activator /* unused */)
 {
+	if (!ent)
+	{
+		return;
+	}
+
 	gi.WriteByte(svc_temp_entity);
 	gi.WriteByte(ent->style);
 	gi.WritePosition(ent->s.origin);
@@ -29,6 +34,11 @@ Use_Target_Tent(edict_t *ent, edict_t *other, edict_t *activator)
 void
 SP_target_temp_entity(edict_t *ent)
 {
+	if (!ent)
+	{
+		return;
+	}
+
 	ent->use = Use_Target_Tent;
 }
 
@@ -247,7 +257,7 @@ SP_target_secret(edict_t *ent)
 	ent->svflags = SVF_NOCLIENT;
 	level.total_secrets++;
 
-	/* map bug hack */
+    /* Map quirk for mine3 */
 	if (!Q_stricmp(level.mapname, "mine3") && (ent->s.origin[0] == 280) &&
 		(ent->s.origin[1] == -2048) && (ent->s.origin[2] == -624))
 	{
@@ -379,13 +389,12 @@ SP_target_explosion(edict_t *ent)
 
 /*
  * QUAKED target_changelevel (1 0 0) (-8 -8 -8) (8 8 8)
- *
  * Changes level to "map" when fired
  */
 void
 use_target_changelevel(edict_t *self, edict_t *other, edict_t *activator)
 {
-	if (!self || !other || !activator)
+	if (!self || !other  || !activator)
 	{
 		return;
 	}
@@ -408,7 +417,8 @@ use_target_changelevel(edict_t *self, edict_t *other, edict_t *activator)
 		(other != world))
 	{
 		T_Damage(other, self, self, vec3_origin, other->s.origin,
-				vec3_origin, 10 * other->max_health, 1000, 0, MOD_EXIT);
+				vec3_origin, 10 * other->max_health, 1000,
+				0, MOD_EXIT);
 		return;
 	}
 
@@ -446,8 +456,9 @@ SP_target_changelevel(edict_t *ent)
 		return;
 	}
 
-	/* ugly hack because *SOMEBODY* screwed up their map */
-	if ((Q_stricmp(level.mapname, "fact1") == 0) && (Q_stricmp(ent->map, "fact3") == 0))
+	/* Mapquirk for secret exists in fact1 and fact3 */
+	if ((Q_stricmp(level.mapname, "fact1") == 0) &&
+		   	(Q_stricmp(ent->map, "fact3") == 0))
 	{
 		ent->map = "fact3$secret1";
 	}
@@ -557,12 +568,15 @@ use_target_spawner(edict_t *self, edict_t *other /* unused */, edict_t *activato
 		VectorCopy(self->movedir, ent->velocity);
 	}
 
-	ent->s.renderfx |= RF_IR_VISIBLE; /* PGM */
+	ent->s.renderfx |= RF_IR_VISIBLE; /* FS: Coop: Rogue specific */
 }
 
 void
 SP_target_spawner(edict_t *self)
 {
+	vec3_t	forward;
+	vec3_t	fact2spawnpoint1 = {-1504,512,72};
+
 	if (!self)
 	{
 		return;
@@ -570,6 +584,15 @@ SP_target_spawner(edict_t *self)
 
 	self->use = use_target_spawner;
 	self->svflags = SVF_NOCLIENT;
+
+	/* Maphack for the insane spawner in Mobs-Egerlings
+	   beloved fact2. Found in KMQuake2 */
+	if (!Q_stricmp(level.mapname, "fact2")
+		&& VectorCompare(self->s.origin, fact2spawnpoint1) )
+	{
+		VectorSet (forward, 0, 0, 1);
+		VectorMA (self->s.origin, -8, forward, self->s.origin);
+	}
 
 	if (self->speed)
 	{
@@ -589,7 +612,7 @@ SP_target_spawner(edict_t *self)
  */
 
 void
-use_target_blaster(edict_t *self, edict_t *other, edict_t *activator)
+use_target_blaster(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */)
 {
 	if (!self)
 	{
@@ -630,14 +653,14 @@ SP_target_blaster(edict_t *self)
 
 /*
  * QUAKED target_crosslevel_trigger (.5 .5 .5) (-8 -8 -8) (8 8 8) trigger1 trigger2 trigger3 trigger4 trigger5 trigger6 trigger7 trigger8
- *
- * Once this trigger is touched/used, any trigger_crosslevel_target
- * with the same trigger number is automatically used when a level
- * is started within the same unit. It is OK to check multiple triggers.
- * Message, delay, target, and killtarget also work.
+ * Once this trigger is touched/used, any trigger_crosslevel_target with
+ * the same trigger number is automatically used when a level is started
+ * within the same unit.  It is OK to check multiple triggers. Message,
+ * delay, target, and killtarget also work.
  */
 void
-trigger_crosslevel_trigger_use(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */)
+trigger_crosslevel_trigger_use(edict_t *self, edict_t *other /* unused */,
+		edict_t *activator)
 {
 	if (!self)
 	{
@@ -645,6 +668,11 @@ trigger_crosslevel_trigger_use(edict_t *self, edict_t *other /* unused */, edict
 	}
 
 	game.serverflags |= self->spawnflags;
+
+	if (activator)
+	{
+		G_UseTargets (self, activator); /* FS: Coop: FIXME? Not in xsrc or rsrc */
+	}
 	G_FreeEdict(self);
 }
 
@@ -756,7 +784,7 @@ target_laser_think(edict_t *self)
 
 	while (1)
 	{
-		if (self->spawnflags & LASER_STOPWINDOW)
+		if ((game.gametype == rogue_coop) && (self->spawnflags & LASER_STOPWINDOW)) /* FS: Coop: Rogue specific */
 		{
 			tr = gi.trace(start, NULL, NULL, end, ignore, MASK_SHOT);
 		}
@@ -780,7 +808,7 @@ target_laser_think(edict_t *self)
 
 		/* if we hit something that's not a monster or player or is immune to lasers, we're done */
 		if (!(tr.ent->svflags & SVF_MONSTER) && (!tr.ent->client) &&
-			!(tr.ent->svflags & SVF_DAMAGEABLE))
+			!(tr.ent->svflags & SVF_DAMAGEABLE)) /* FS: Coop: Rogue specific: Added SVF_DAMAGEABLE */
 		{
 			if (self->spawnflags & 0x80000000)
 			{
@@ -954,18 +982,164 @@ SP_target_laser(edict_t *self)
 		return;
 	}
 
+	/* let everything else get spawned before we start firing */
 	self->think = target_laser_start;
 	self->nextthink = level.time + 1;
 }
 
-/* ========================================================== */
 
-/*
- * QUAKED target_lightramp (0 .5 .8) (-8 -8 -8) (8 8 8) TOGGLE
- *
- * speed		How many seconds the ramping will take
- * message		two letters; starting lightlevel and ending lightlevel
- */
+// RAFAEL 15-APR-98
+/*QUAKED target_mal_laser (1 0 0) (-4 -4 -4) (4 4 4) START_ON RED GREEN BLUE YELLOW ORANGE FAT
+Mal's laser
+*/
+void target_mal_laser_on (edict_t *self) /* FS: Coop: Xatrix specific */
+{
+  	if (!self)
+	{
+		return;
+	}
+
+	if (!self->activator)
+	{
+		self->activator = self;
+	}
+
+	self->spawnflags |= 0x80000001;
+	self->svflags &= ~SVF_NOCLIENT;
+	self->nextthink = level.time + self->wait + self->delay;
+}
+
+void target_mal_laser_off (edict_t *self)
+{
+  	if (!self)
+	{
+		return;
+	}
+
+	self->spawnflags &= ~1;
+	self->svflags |= SVF_NOCLIENT;
+	self->nextthink = 0;
+}
+
+void target_mal_laser_use (edict_t *self, edict_t *other, edict_t *activator)
+{
+	if (!self || !activator)
+	{
+		return;
+	}
+
+	self->activator = activator;
+
+	if (self->spawnflags & 1)
+	{
+		target_mal_laser_off(self);
+	}
+	else
+	{
+		target_mal_laser_on(self);
+	}
+}
+
+void mal_laser_think (edict_t *self) /* FS: Coop: Xatrix specific */
+{
+  	if (!self)
+	{
+		return;
+	}
+
+	target_laser_think(self);
+	self->nextthink = level.time + self->wait + 0.1;
+	self->spawnflags |= 0x80000000;
+}
+
+void SP_target_mal_laser (edict_t *self) /* FS: Coop: Xatrix specific */
+{
+  	if (!self)
+	{
+		return;
+	}
+
+	self->movetype = MOVETYPE_NONE;
+	self->solid = SOLID_NOT;
+	self->s.renderfx |= RF_BEAM | RF_TRANSLUCENT;
+	self->s.modelindex = 1; /* must be non-zero */
+
+	/* set the beam diameter */
+	if (self->spawnflags & 64)
+	{
+		self->s.frame = 16;
+	}
+	else
+	{
+		self->s.frame = 4;
+	}
+
+	/* set the color */
+	if (self->spawnflags & 2)
+	{
+		self->s.skinnum = 0xf2f2f0f0;
+	}
+	else if (self->spawnflags & 4)
+	{
+		self->s.skinnum = 0xd0d1d2d3;
+	}
+	else if (self->spawnflags & 8)
+	{
+		self->s.skinnum = 0xf3f3f1f1;
+	}
+	else if (self->spawnflags & 16)
+	{
+		self->s.skinnum = 0xdcdddedf;
+	}
+	else if (self->spawnflags & 32)
+	{
+		self->s.skinnum = 0xe0e1e2e3;
+	}
+
+	G_SetMovedir(self->s.angles, self->movedir);
+
+	if (!self->delay)
+	{
+		self->delay = 0.1;
+	}
+
+	if (!self->wait)
+	{
+		self->wait = 0.1;
+	}
+
+	if (!self->dmg)
+	{
+		self->dmg = 5;
+	}
+
+	VectorSet(self->mins, -8, -8, -8);
+	VectorSet(self->maxs, 8, 8, 8);
+
+	self->nextthink = level.time + self->delay;
+	self->think = mal_laser_think;
+
+	self->use = target_mal_laser_use;
+
+	gi.linkentity(self);
+
+	if (self->spawnflags & 1)
+	{
+		target_mal_laser_on(self);
+	}
+	else
+	{
+		target_mal_laser_off(self);
+	}
+}
+// END	15-APR-98
+
+//==========================================================
+
+/*QUAKED target_lightramp (0 .5 .8) (-8 -8 -8) (8 8 8) TOGGLE
+speed		How many seconds the ramping will take
+message		two letters; starting lightlevel and ending lightlevel
+*/
 
 void
 target_lightramp_think(edict_t *self)
@@ -1106,12 +1280,24 @@ target_earthquake_think(edict_t *self)
 		return;
 	}
 
-	if (!(self->spawnflags & 1))
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		if (!(self->spawnflags & 1))
+		{
+			if (self->last_move_time < level.time)
+			{
+				gi.positioned_sound(self->s.origin, self, CHAN_AUTO, self->noise_index,
+						1.0, ATTN_NONE, 0);
+				self->last_move_time = level.time + 0.5;
+			}
+		}
+	}
+	else
 	{
 		if (self->last_move_time < level.time)
 		{
-			gi.positioned_sound(self->s.origin, self, CHAN_AUTO, self->noise_index,
-					1.0, ATTN_NONE, 0);
+			gi.positioned_sound(self->s.origin, self, CHAN_AUTO,
+					self->noise_index, 1.0, ATTN_NONE, 0);
 			self->last_move_time = level.time + 0.5;
 		}
 	}
@@ -1186,7 +1372,14 @@ SP_target_earthquake(edict_t *self)
 	self->think = target_earthquake_think;
 	self->use = target_earthquake_use;
 
-	if (!(self->spawnflags & 1))
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		if (!(self->spawnflags & 1))
+		{
+			self->noise_index = gi.soundindex("world/quake.wav");
+		}
+	}
+	else
 	{
 		self->noise_index = gi.soundindex("world/quake.wav");
 	}
