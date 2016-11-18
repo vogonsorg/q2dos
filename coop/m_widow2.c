@@ -144,7 +144,7 @@ Widow2Beam(edict_t *self)
 		target[2] += self->enemy->viewheight - 10;
 		VectorSubtract(target, start, forward);
 		VectorNormalize(forward);
-		monster_fire_heat(self, start, forward, vec3_origin, 10, 50, flashnum);
+		monster_fire_heat_rogue(self, start, forward, vec3_origin, 10, 50, flashnum);
 	}
 	else if ((self->s.frame >= FRAME_spawn04) && (self->s.frame <= FRAME_spawn14))
 	{
@@ -161,7 +161,7 @@ Widow2Beam(edict_t *self)
 		vec[YAW] -= sweep_angles[flashnum - MZ2_WIDOW2_BEAM_SWEEP_1];
 
 		AngleVectors(vec, forward, NULL, NULL);
-		monster_fire_heat(self, start, forward, vec3_origin, 10, 50, flashnum);
+		monster_fire_heat_rogue(self, start, forward, vec3_origin, 10, 50, flashnum);
 	}
 	else
 	{
@@ -175,7 +175,7 @@ Widow2Beam(edict_t *self)
 		VectorSubtract(target, start, forward);
 		VectorNormalize(forward);
 
-		monster_fire_heat(self, start, forward, vec3_origin, 10, 50, 0);
+		monster_fire_heat_rogue(self, start, forward, vec3_origin, 10, 50, 0);
 	}
 }
 

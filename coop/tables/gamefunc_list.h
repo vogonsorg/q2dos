@@ -1002,7 +1002,7 @@
 {"tracker_pain_daemon_think", (byte *)tracker_pain_daemon_think},
 {"fire_blaster2", (byte *)fire_blaster2},
 {"blaster2_touch", (byte *)blaster2_touch},
-{"fire_heat", (byte *)fire_heat},
+{"fire_heat_rogue", (byte *)fire_heat_rogue},
 {"fire_heat_xatrix", (byte *)fire_heat_xatrix}, /* FS: Coop: Xatrix specific */
 {"fire_beams", (byte *)fire_beams},
 {"fire_tesla", (byte *)fire_tesla},
@@ -1138,7 +1138,7 @@
 {"monster_fire_railgun", (byte *)monster_fire_railgun},
 {"monster_fire_rocket", (byte *)monster_fire_rocket},
 {"monster_fire_grenade", (byte *)monster_fire_grenade},
-{"monster_fire_heat", (byte *)monster_fire_heat},
+{"monster_fire_heat_rogue", (byte *)monster_fire_heat_rogue},
 {"monster_fire_tracker", (byte *)monster_fire_tracker},
 {"monster_fire_blaster2", (byte *)monster_fire_blaster2},
 {"monster_fire_blaster", (byte *)monster_fire_blaster},

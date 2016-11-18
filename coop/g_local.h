@@ -850,6 +850,24 @@ void monster_fire_railgun(edict_t *self, vec3_t start, vec3_t aimdir, int damage
 		int kick, int flashtype);
 void monster_fire_bfg(edict_t *self, vec3_t start, vec3_t aimdir, int damage,
 		int speed, int kick, float damage_radius, int flashtype);
+
+/* FS: Coop: Rogue specific */
+void monster_fire_blaster2(edict_t *self, vec3_t start, vec3_t dir, int damage,
+		int speed, int flashtype, int effect);
+void monster_fire_tracker(edict_t *self, vec3_t start, vec3_t dir, int damage,
+		int speed, edict_t *enemy, int flashtype);
+void monster_fire_heat_rogue(edict_t *self, vec3_t start, vec3_t dir, vec3_t offset,
+		int damage, int kick, int flashtype);
+void stationarymonster_start (edict_t *self);	
+void monster_done_dodge (edict_t *self);
+
+/* FS: Coop: Xatrix specific */
+void monster_fire_ionripper (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, int flashtype, int effect);
+void monster_fire_heat_xatrix (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, int flashtype);
+void monster_dabeam (edict_t *self);
+void monster_fire_blueblaster (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, int flashtype, int effect);
+
+
 void M_droptofloor (edict_t *ent);
 void monster_think (edict_t *self);
 void walkmonster_start (edict_t *self);
@@ -861,18 +879,6 @@ void M_CatagorizePosition (edict_t *ent);
 qboolean M_CheckAttack (edict_t *self);
 void M_FlyCheck (edict_t *self);
 void M_CheckGround (edict_t *ent);
-//ROGUE
-void monster_fire_blaster2(edict_t *self, vec3_t start, vec3_t dir, int damage,
-		int speed, int flashtype, int effect);
-void monster_fire_tracker(edict_t *self, vec3_t start, vec3_t dir, int damage,
-		int speed, edict_t *enemy, int flashtype);
-void monster_fire_heat(edict_t *self, vec3_t start, vec3_t dir, vec3_t offset,
-		int damage, int kick, int flashtype);
-void stationarymonster_start (edict_t *self);	
-void monster_done_dodge (edict_t *self);
-//ROGUE
-/* XATRIX */
-void monster_dabeam (edict_t *self);
 
 //
 // g_misc.c
@@ -923,8 +929,12 @@ void fire_rocket(edict_t *self, vec3_t start, vec3_t dir, int damage,
 void fire_rail (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick);
 void fire_bfg(edict_t *self, vec3_t start, vec3_t dir,
 		int damage, int speed, float damage_radius);
-/* XATRIX */
+/* FS: Coop: Xatrix specific */
+void fire_ionripper (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, int effect);
+void fire_heat (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage);
+void fire_blueblaster (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, int effect);
 void fire_plasma (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage);
+void fire_trap (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius, qboolean held);
 
 //
 // g_ptrail.c
@@ -1036,7 +1046,7 @@ void fire_tesla(edict_t *self, vec3_t start, vec3_t aimdir, int damage,
 		int speed);
 void fire_blaster2(edict_t *self, vec3_t start, vec3_t aimdir, int damage,
 		int speed, int effect, qboolean hyper);
-void fire_heat(edict_t *self, vec3_t start, vec3_t aimdir, vec3_t offset,
+void fire_heat_rogue(edict_t *self, vec3_t start, vec3_t aimdir, vec3_t offset,
 		int damage, int kick,
 		qboolean monster);
 void fire_heat_xatrix (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage); /* FS: Coop: Xatrix specific */
@@ -1453,6 +1463,7 @@ struct edict_s
 
 	char		*musictrack;	// Knightmare- for specifying OGG or CD track
 
+	int			orders; /* FS: Coop: Xatrix specific */
 //=========
 //ROGUE
 	int			plat2flags;
@@ -1528,4 +1539,4 @@ int  DBall_CheckDMRules (void);
 //void Tag_PlayerDisconnect (edict_t *ent);
 //int  Tag_ChangeDamage (edict_t *targ, edict_t *attacker, int damage);
 
-#endif /* ROGUE_LOCAL_H */
+#endif /* COOP_LOCAL_H */

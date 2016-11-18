@@ -93,7 +93,60 @@ monster_fire_tracker(edict_t *self, vec3_t start, vec3_t dir, int damage, /* FS:
 }
 
 void
-monster_fire_heat(edict_t *self, vec3_t start, vec3_t dir, int damage, /* FS: Coop: Xatrix specific */
+monster_fire_heat_rogue(edict_t *self, vec3_t start, vec3_t dir, vec3_t offset,
+		int damage, int kick, int flashtype)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	fire_heat_rogue(self, start, dir, offset, damage, kick, true);
+
+	gi.WriteByte(svc_muzzleflash2);
+	gi.WriteShort(self - g_edicts);
+	gi.WriteByte(flashtype);
+	gi.multicast(start, MULTICAST_PVS);
+}
+
+
+
+void
+monster_fire_blueblaster(edict_t *self, vec3_t start, vec3_t dir, int damage, /* FS: Coop: Xatrix specific */
+		int speed, int flashtype, int effect)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	fire_blueblaster(self, start, dir, damage, speed, effect);
+
+	gi.WriteByte(svc_muzzleflash2);
+	gi.WriteShort(self - g_edicts);
+	gi.WriteByte(MZ_BLUEHYPERBLASTER);
+	gi.multicast(start, MULTICAST_PVS);
+}
+
+void
+monster_fire_ionripper(edict_t *self, vec3_t start, vec3_t dir, int damage, /* FS: Coop: Xatrix specific */
+		int speed, int flashtype, int effect)
+{
+ 	if (!self)
+	{
+		return;
+	}
+
+	fire_ionripper(self, start, dir, damage, speed, effect);
+
+	gi.WriteByte(svc_muzzleflash2);
+	gi.WriteShort(self - g_edicts);
+	gi.WriteByte(flashtype);
+	gi.multicast(start, MULTICAST_PVS);
+}
+
+void
+monster_fire_heat_xatrix(edict_t *self, vec3_t start, vec3_t dir, int damage, /* FS: Coop: Xatrix specific */
 		int speed, int flashtype)
 {
 	if (!self)
@@ -101,7 +154,7 @@ monster_fire_heat(edict_t *self, vec3_t start, vec3_t dir, int damage, /* FS: Co
 		return;
 	}
 
-	fire_heat_xatrix(self, start, dir, offset, damage, kick, true);
+	fire_heat_xatrix(self, start, dir, damage, speed, damage, damage);
 
 	gi.WriteByte(svc_muzzleflash2);
 	gi.WriteShort(self - g_edicts);
@@ -402,32 +455,59 @@ M_CheckGround(edict_t *ent)
 		return;
 	}
 
-	if ((ent->velocity[2] * ent->gravityVector[2]) < -100)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		ent->groundentity = NULL;
-		return;
-	}
-
-	/* if the hull point one-quarter unit down is solid the entity is on ground */
-	point[0] = ent->s.origin[0];
-	point[1] = ent->s.origin[1];
-	point[2] = ent->s.origin[2] + (0.25 * ent->gravityVector[2]);
-
-	trace = gi.trace(ent->s.origin, ent->mins, ent->maxs,
-			point, ent, MASK_MONSTERSOLID);
-
-	/* check steepness */
-	if (ent->gravityVector[2] < 0) /* normal gravity */
-	{
-		if ((trace.plane.normal[2] < 0.7) && !trace.startsolid)
+		if ((ent->velocity[2] * ent->gravityVector[2]) < -100)
 		{
 			ent->groundentity = NULL;
 			return;
 		}
+
+		/* if the hull point one-quarter unit down is solid the entity is on ground */
+		point[0] = ent->s.origin[0];
+		point[1] = ent->s.origin[1];
+		point[2] = ent->s.origin[2] + (0.25 * ent->gravityVector[2]);
+
+		trace = gi.trace(ent->s.origin, ent->mins, ent->maxs,
+				point, ent, MASK_MONSTERSOLID);
+
+		/* check steepness */
+		if (ent->gravityVector[2] < 0) /* normal gravity */
+		{
+			if ((trace.plane.normal[2] < 0.7) && !trace.startsolid)
+			{
+				ent->groundentity = NULL;
+				return;
+			}
+		}
+		else /* inverted gravity */
+		{
+			if ((trace.plane.normal[2] > -0.7) && !trace.startsolid)
+			{
+				ent->groundentity = NULL;
+				return;
+			}
+		}
 	}
-	else /* inverted gravity */
+	else
 	{
-		if ((trace.plane.normal[2] > -0.7) && !trace.startsolid)
+		if (ent->velocity[2] > 100)
+		{
+			ent->groundentity = NULL;
+			return;
+		}
+
+		/* if the hull point one-quarter unit down
+		   is solid the entity is on ground */
+		point[0] = ent->s.origin[0];
+		point[1] = ent->s.origin[1];
+		point[2] = ent->s.origin[2] - 0.25;
+
+		trace = gi.trace(ent->s.origin, ent->mins, ent->maxs,
+				point, ent, MASK_MONSTERSOLID);
+
+		/* check steepness */
+		if ((trace.plane.normal[2] < 0.7) && !trace.startsolid)
 		{
 			ent->groundentity = NULL;
 			return;
@@ -621,17 +701,26 @@ M_droptofloor(edict_t *ent)
 		return;
 	}
 
-	if (ent->gravityVector[2] < 0)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		if (ent->gravityVector[2] < 0)
+		{
+			ent->s.origin[2] += 1;
+			VectorCopy(ent->s.origin, end);
+			end[2] -= 256;
+		}
+		else
+		{
+			ent->s.origin[2] -= 1;
+			VectorCopy(ent->s.origin, end);
+			end[2] += 256;
+		}
+	}
+	else
 	{
 		ent->s.origin[2] += 1;
 		VectorCopy(ent->s.origin, end);
 		end[2] -= 256;
-	}
-	else
-	{
-		ent->s.origin[2] -= 1;
-		VectorCopy(ent->s.origin, end);
-		end[2] += 256;
 	}
 
 	trace = gi.trace(ent->s.origin, ent->mins, ent->maxs,
@@ -686,46 +775,49 @@ M_SetEffects(edict_t *ent)
 		}
 	}
 
-	if (ent->monsterinfo.quad_framenum > level.framenum)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		remaining = ent->monsterinfo.quad_framenum - level.framenum;
-
-		if ((remaining > 30) || (remaining & 4))
+		if (ent->monsterinfo.quad_framenum > level.framenum)
 		{
-			ent->s.effects |= EF_QUAD;
+			remaining = ent->monsterinfo.quad_framenum - level.framenum;
+
+			if ((remaining > 30) || (remaining & 4))
+			{
+				ent->s.effects |= EF_QUAD;
+			}
 		}
-	}
-	else
-	{
-		ent->s.effects &= ~EF_QUAD;
-	}
-
-	if (ent->monsterinfo.double_framenum > level.framenum)
-	{
-		remaining = ent->monsterinfo.double_framenum - level.framenum;
-
-		if ((remaining > 30) || (remaining & 4))
+		else
 		{
-			ent->s.effects |= EF_DOUBLE;
+			ent->s.effects &= ~EF_QUAD;
 		}
-	}
-	else
-	{
-		ent->s.effects &= ~EF_DOUBLE;
-	}
 
-	if (ent->monsterinfo.invincible_framenum > level.framenum)
-	{
-		remaining = ent->monsterinfo.invincible_framenum - level.framenum;
-
-		if ((remaining > 30) || (remaining & 4))
+		if (ent->monsterinfo.double_framenum > level.framenum)
 		{
-			ent->s.effects |= EF_PENT;
+			remaining = ent->monsterinfo.double_framenum - level.framenum;
+
+			if ((remaining > 30) || (remaining & 4))
+			{
+				ent->s.effects |= EF_DOUBLE;
+			}
 		}
-	}
-	else
-	{
-		ent->s.effects &= ~EF_PENT;
+		else
+		{
+			ent->s.effects &= ~EF_DOUBLE;
+		}
+
+		if (ent->monsterinfo.invincible_framenum > level.framenum)
+		{
+			remaining = ent->monsterinfo.invincible_framenum - level.framenum;
+
+			if ((remaining > 30) || (remaining & 4))
+			{
+				ent->s.effects |= EF_PENT;
+			}
+		}
+		else
+		{
+			ent->s.effects &= ~EF_PENT;
+		}
 	}
 }
 
@@ -861,7 +953,7 @@ monster_use(edict_t *self, edict_t *other /* unused */, edict_t *activator)
 		return;
 	}
 
-	if (activator->flags & FL_DISGUISED)
+	if ((game.gametype == rogue_coop) && (activator->flags & FL_DISGUISED)) /* FS: Coop: Rogue specific */
 	{
 		return;
 	}
@@ -891,16 +983,33 @@ monster_triggered_spawn(edict_t *self)
 
 	monster_start_go(self);
 
+	if ((game.gametype == xatrix_coop) && (strcmp(self->classname, "monster_fixbot") == 0)) /* FS: Coop: Xatrix specific */
+	{
+		if (self->spawnflags & 16 || self->spawnflags & 8 || self->spawnflags &
+			4)
+		{
+			self->enemy = NULL;
+			return;
+		}
+	}
+
 	if (self->enemy && !(self->spawnflags & 1) &&
 		!(self->enemy->flags & FL_NOTARGET))
 	{
-		if (!(self->enemy->flags & FL_DISGUISED))
+		if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 		{
-			FoundTarget(self);
+			if (!(self->enemy->flags & FL_DISGUISED))
+			{
+				FoundTarget(self);
+			}
+			else
+			{
+				self->enemy = NULL;
+			}
 		}
 		else
 		{
-			self->enemy = NULL;
+			FoundTarget(self);
 		}
 	}
 	else
@@ -1002,7 +1111,7 @@ monster_start(edict_t *self)
 	}
 
 	if ((!(self->monsterinfo.aiflags & AI_GOOD_GUY)) &&
-		(!(self->monsterinfo.aiflags & AI_DO_NOT_COUNT)))
+		(!(self->monsterinfo.aiflags & AI_DO_NOT_COUNT))) /* FS: Coop: Rogue specific flag */
 	{
 		level.total_monsters++;
 	}
@@ -1046,10 +1155,13 @@ monster_start(edict_t *self)
 								   self->monsterinfo.currentmove->firstframe + 1));
 	}
 
-	self->monsterinfo.base_height = self->maxs[2];
-	self->monsterinfo.quad_framenum = 0;
-	self->monsterinfo.double_framenum = 0;
-	self->monsterinfo.invincible_framenum = 0;
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		self->monsterinfo.base_height = self->maxs[2];
+		self->monsterinfo.quad_framenum = 0;
+		self->monsterinfo.double_framenum = 0;
+		self->monsterinfo.invincible_framenum = 0;
+	}
 
 	return true;
 }
