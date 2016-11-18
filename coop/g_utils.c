@@ -15,11 +15,12 @@ G_ProjectSource(vec3_t point, vec3_t distance, vec3_t forward,
 {
 	result[0] = point[0] + forward[0] * distance[0] + right[0] * distance[1];
 	result[1] = point[1] + forward[1] * distance[0] + right[1] * distance[1];
-	result[2] = point[2] + forward[2] * distance[0] + right[2] * distance[1] + distance[2];
+	result[2] = point[2] + forward[2] * distance[0] + right[2] * distance[1] +
+				distance[2];
 }
 
 void
-G_ProjectSource2(vec3_t point, vec3_t distance, vec3_t forward,
+G_ProjectSource2(vec3_t point, vec3_t distance, vec3_t forward, /* FS: Coop: Rogue specific */
 		vec3_t right, vec3_t up, vec3_t result)
 {
 	result[0] = point[0] + forward[0] * distance[0] + right[0] * distance[1] +
@@ -31,14 +32,13 @@ G_ProjectSource2(vec3_t point, vec3_t distance, vec3_t forward,
 }
 
 /*
- * Searches all active entities for the next one that holds
- * the matching string at fieldofs (use the FOFS() macro) in
- * the structure.
+ * Searches all active entities for the next
+ * one that holds the matching string at fieldofs
+ * (use the FOFS() macro) in the structure.
  *
- * Searches beginning at the edict after from, or the beginning
- * if NULL.
- *
- * NULL will be returned if the end of the list is reached.
+ * Searches beginning at the edict after from, or
+ * the beginning. If NULL, NULL will be returned
+ * if the end of the list is reached.
  */
 edict_t *
 G_Find(edict_t *from, int fieldofs, char *match)
@@ -83,7 +83,8 @@ G_Find(edict_t *from, int fieldofs, char *match)
 }
 
 /*
- * Returns entities that have origins within a spherical area
+ * Returns entities that have origins
+ * within a spherical area
  */
 edict_t *
 findradius(edict_t *from, vec3_t org, float rad)
@@ -114,7 +115,8 @@ findradius(edict_t *from, vec3_t org, float rad)
 
 		for (j = 0; j < 3; j++)
 		{
-			eorg[j] = org[j] - (from->s.origin[j] + (from->mins[j] + from->maxs[j]) * 0.5);
+			eorg[j] = org[j] - (from->s.origin[j] +
+					   (from->mins[j] + from->maxs[j]) * 0.5);
 		}
 
 		if (VectorLength(eorg) > rad)
@@ -132,7 +134,7 @@ findradius(edict_t *from, vec3_t org, float rad)
  * Returns entities that have origins within a spherical area
  */
 edict_t *
-findradius2(edict_t *from, vec3_t org, float rad)
+findradius2(edict_t *from, vec3_t org, float rad) /* FS: Coop: Rogue specific */
 {
 	/* rad must be positive */
 	vec3_t eorg;
@@ -186,14 +188,14 @@ findradius2(edict_t *from, vec3_t org, float rad)
 }
 
 /*
- * Searches all active entities for the next one that holds
- * the matching string at fieldofs (use the FOFS() macro) in
- * the structure.
+ * Searches all active entities for
+ * the next one that holds the matching
+ * string at fieldofs (use the FOFS() macro)
+ * in the structure.
  *
- * Searches beginning at the edict after from, or the beginning
- * if NULL.
- *
- * NULL will be returned if the end of the list is reached.
+ * Searches beginning at the edict after from,
+ * or the beginning. If NULL, NULL will be
+ * returned if the end of the list is reached.
  */
 edict_t *
 G_PickTarget(char *targetname)
@@ -247,24 +249,24 @@ Think_Delay(edict_t *ent)
 }
 
 /*
- * the global "activator" should be set to the entity that initiated the firing.
+ * The global "activator" should be set to
+ * the entity that initiated the firing.
  *
- * If self.delay is set, a DelayedUse entity will be created that will actually
- * do the SUB_UseTargets after that many seconds have passed.
+ * If self.delay is set, a DelayedUse entity
+ * will be created that will actually do the
+ * SUB_UseTargets after that many seconds have passed.
  *
  * Centerprints any self.message to the activator.
  *
  * Search for (string)targetname in all entities that
  * match (string)self.target and call their .use function
- *
- * ==============================
  */
 void
 G_UseTargets(edict_t *ent, edict_t *activator)
 {
 	edict_t *t;
-	edict_t *master;
-	qboolean done = false;
+	edict_t *master; /* FS: Coop: Rogue specific */
+	qboolean done = false; /* FS: Coop: Rogue specific */
 
 	if (!ent || !activator)
 	{
@@ -309,7 +311,8 @@ G_UseTargets(edict_t *ent, edict_t *activator)
 		}
 		else
 		{
-			gi.sound(activator, CHAN_AUTO, gi.soundindex("misc/talk1.wav"), 1, ATTN_NORM, 0);
+			gi.sound(activator, CHAN_AUTO, gi.soundindex(
+							"misc/talk1.wav"), 1, ATTN_NORM, 0);
 		}
 	}
 
@@ -320,23 +323,42 @@ G_UseTargets(edict_t *ent, edict_t *activator)
 
 		while ((t = G_Find(t, FOFS(targetname), ent->killtarget)))
 		{
-			/* if this entity is part of a train, cleanly remove it */
-			if (t->flags & FL_TEAMSLAVE)
+			if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 			{
-				if (t->teammaster)
+				/* if this entity is part of a train, cleanly remove it */
+				if (t->flags & FL_TEAMSLAVE)
 				{
-					master = t->teammaster;
-
-					while (!done)
+					if (t->teammaster)
 					{
-						if (master->teamchain == t)
-						{
-							master->teamchain = t->teamchain;
-							done = true;
-						}
+						master = t->teammaster;
 
-						master = master->teamchain;
+						while (!done)
+						{
+							if (master->teamchain == t)
+							{
+								master->teamchain = t->teamchain;
+								done = true;
+							}
+
+							master = master->teamchain;
+						}
 					}
+				}
+			}
+
+			/* decrement secret count if target_secret is removed */
+			if (!Q_stricmp(t->classname,"target_secret"))
+			{
+				level.total_secrets--;
+			}
+			/* same deal with target_goal, but also turn off CD music if applicable */
+			else if (!Q_stricmp(t->classname,"target_goal"))
+			{
+				level.total_goals--;
+
+				if (level.found_goals >= level.total_goals)
+				{
+					gi.configstring (CS_CDTRACK, "0");
 				}
 			}
 
@@ -397,8 +419,9 @@ tv(float x, float y, float z)
 	static vec3_t vecs[8];
 	float *v;
 
-	/* use an array so that multiple tempvectors
-	   won't collide for a while */
+	/* use an array so that multiple
+	   tempvectors won't collide
+	   for a while */
 	v = vecs[index];
 	index = (index + 1) & 7;
 
@@ -449,7 +472,7 @@ G_SetMovedir(vec3_t angles, vec3_t movedir)
 }
 
 float
-vectoyaw(vec3_t vec)
+vectoyaw_rogue(vec3_t vec) /* FS: Coop: Rogue specific */
 {
 	float yaw;
 
@@ -482,7 +505,44 @@ vectoyaw(vec3_t vec)
 }
 
 float
-vectoyaw2(vec3_t vec)
+vectoyaw(vec3_t vec)
+{
+	float yaw;
+
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		yaw = vectoyaw_rogue(vec);
+		return yaw;
+	}
+
+	if (vec[PITCH] == 0)
+	{
+		yaw = 0;
+
+		if (vec[YAW] > 0)
+		{
+			yaw = 90;
+		}
+		else if (vec[YAW] < 0)
+		{
+			yaw = -90;
+		}
+	}
+	else
+	{
+		yaw = (int)(atan2(vec[YAW], vec[PITCH]) * 180 / M_PI);
+
+		if (yaw < 0)
+		{
+			yaw += 360;
+		}
+	}
+
+	return yaw;
+}
+
+float
+vectoyaw2(vec3_t vec) /* FS: Coop: Rogue specific */
 {
 	float yaw;
 
@@ -545,7 +605,14 @@ vectoangles(vec3_t value1, vec3_t angles)
 		}
 		else
 		{
-			yaw = 270;
+			if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+			{
+				yaw = 270;
+			}
+			else
+			{
+				yaw = -90;
+			}
 		}
 
 		if (yaw < 0)
@@ -572,7 +639,7 @@ vectoangles(vec3_t value1, vec3_t angles)
  * remember that if you ever attempt to change it!!
  */
 void
-vectoangles2(vec3_t value1, vec3_t angles)
+vectoangles2(vec3_t value1, vec3_t angles) /* FS: Coop: Rogue specific */
 {
 	float forward;
 	float yaw, pitch;
@@ -649,7 +716,7 @@ G_InitEdict(edict_t *e)
 		return;
 	}
 
-	if (e->nextthink)
+	if ((game.gametype == rogue_coop) && (e->nextthink)) /* FS: Coop: Rogue specific.  Possible fix/workaround? */
 	{
 		e->nextthink = 0;
 	}
@@ -659,9 +726,12 @@ G_InitEdict(edict_t *e)
 	e->gravity = 1.0;
 	e->s.number = e - g_edicts;
 
-	e->gravityVector[0] = 0.0;
-	e->gravityVector[1] = 0.0;
-	e->gravityVector[2] = -1.0;
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		e->gravityVector[0] = 0.0;
+		e->gravityVector[1] = 0.0;
+		e->gravityVector[2] = -1.0;
+	}
 }
 
 /*
@@ -708,6 +778,7 @@ G_Spawn(void)
 void
 G_FreeEdict(edict_t *ed)
 {
+
 	if (!ed)
 	{
 		return;
@@ -715,9 +786,19 @@ G_FreeEdict(edict_t *ed)
 
 	gi.unlinkentity(ed); /* unlink from world */
 
-	if ((ed - g_edicts) <= (maxclients->value + BODY_QUEUE_SIZE))
+	if (deathmatch->value || coop->value)
 	{
-		return;
+		if ((ed - g_edicts) <= (maxclients->value + BODY_QUEUE_SIZE))
+		{
+			return;
+		}
+	}
+	else
+	{
+		if ((ed - g_edicts) <= maxclients->value)
+		{
+			return;
+		}
 	}
 
 	memset(ed, 0, sizeof(*ed));
@@ -767,8 +848,10 @@ G_TouchTriggers(edict_t *ent)
 }
 
 /*
- * Call after linking a new trigger in during gameplay
- * to force all entities it covers to immediately touch it
+ * Call after linking a new trigger
+ * in during gameplay to force all
+ * entities it covers to immediately
+ * touch it
  */
 void
 G_TouchSolids(edict_t *ent)
@@ -781,7 +864,8 @@ G_TouchSolids(edict_t *ent)
 		return;
 	}
 
-	num = gi.BoxEdicts(ent->absmin, ent->absmax, touch, MAX_EDICTS, AREA_SOLID);
+	num = gi.BoxEdicts(ent->absmin, ent->absmax, touch,
+			MAX_EDICTS, AREA_SOLID);
 
 	/* be careful, it is possible to have an entity in this
 	   list removed before we get to it (killtriggered) */
@@ -807,8 +891,9 @@ G_TouchSolids(edict_t *ent)
 }
 
 /*
- * Kills all entities that would touch the proposed new positioning
- * of ent. Ent should be unlinked before calling this!
+ * Kills all entities that would touch the
+ * proposed new positioning of ent. Ent s
+ * hould be unlinked before calling this!
  */
 qboolean
 KillBox(edict_t *ent)
@@ -822,8 +907,8 @@ KillBox(edict_t *ent)
 
 	while (1)
 	{
-		tr = gi.trace(ent->s.origin, ent->mins, ent->maxs,
-				ent->s.origin, NULL, MASK_PLAYERSOLID);
+		tr = gi.trace(ent->s.origin, ent->mins, ent->maxs, ent->s.origin,
+				NULL, MASK_PLAYERSOLID);
 
 		if (!tr.ent)
 		{
@@ -843,3 +928,4 @@ KillBox(edict_t *ent)
 
 	return true; /* all clear */
 }
+
