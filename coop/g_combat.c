@@ -41,8 +41,8 @@ CanDamage(edict_t *targ, edict_t *inflictor)
 	{
 		VectorAdd(targ->absmin, targ->absmax, dest);
 		VectorScale(dest, 0.5, dest);
-		trace = gi.trace(inflictor->s.origin, vec3_origin,
-				vec3_origin, dest, inflictor, MASK_SOLID);
+		trace = gi.trace(inflictor->s.origin, vec3_origin, vec3_origin,
+				dest, inflictor, MASK_SOLID);
 
 		if (trace.fraction == 1.0)
 		{
@@ -57,9 +57,8 @@ CanDamage(edict_t *targ, edict_t *inflictor)
 		return false;
 	}
 
-	trace = gi.trace(inflictor->s.origin, vec3_origin,
-			vec3_origin, targ->s.origin, inflictor,
-			MASK_SOLID);
+	trace = gi.trace(inflictor->s.origin, vec3_origin, vec3_origin,
+			targ->s.origin, inflictor, MASK_SOLID);
 
 	if (trace.fraction == 1.0)
 	{
@@ -69,8 +68,8 @@ CanDamage(edict_t *targ, edict_t *inflictor)
 	VectorCopy(targ->s.origin, dest);
 	dest[0] += 15.0;
 	dest[1] += 15.0;
-	trace = gi.trace(inflictor->s.origin, vec3_origin,
-			vec3_origin, dest, inflictor, MASK_SOLID);
+	trace = gi.trace(inflictor->s.origin, vec3_origin, vec3_origin,
+			dest, inflictor, MASK_SOLID);
 
 	if (trace.fraction == 1.0)
 	{
@@ -202,7 +201,7 @@ void
 Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 		int damage, vec3_t point)
 {
-    if (!targ || !inflictor || !attacker)
+	if (!targ || !inflictor || !attacker)
 	{
 		return;
 	}
@@ -281,7 +280,8 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 	}
 
 	if ((targ->movetype == MOVETYPE_PUSH) ||
-		(targ->movetype == MOVETYPE_STOP) || (targ->movetype == MOVETYPE_NONE))
+		(targ->movetype == MOVETYPE_STOP) ||
+		(targ->movetype == MOVETYPE_NONE))
 	{
 		/* doors, triggers, etc */
 		targ->die(targ, inflictor, attacker, damage, point);
@@ -302,7 +302,7 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 }
 
 void
-SpawnDamage(int type, vec3_t origin, vec3_t normal, int damage)
+SpawnDamage(int type, vec3_t origin, vec3_t normal)
 {
 	gi.WriteByte(svc_temp_entity);
 	gi.WriteByte(type);
@@ -312,13 +312,10 @@ SpawnDamage(int type, vec3_t origin, vec3_t normal, int damage)
 }
 
 /*
- * ============
- * T_Damage
- *
- * targ		entity that is being damaged
+ * targ			entity that is being damaged
  * inflictor	entity that is causing the damage
- * attacker	entity that caused the inflictor to damage targ
- *  example: targ=monster, inflictor=rocket, attacker=player
+ * attacker		entity that caused the inflictor to damage targ
+ *      example: targ=monster, inflictor=rocket, attacker=player
  *
  * dir			direction of the attack
  * point		point at which the damage is being inflicted
@@ -326,23 +323,23 @@ SpawnDamage(int type, vec3_t origin, vec3_t normal, int damage)
  * damage		amount of damage being inflicted
  * knockback	force to be applied against targ as a result of the damage
  *
- * dflags		these flags are used to control how T_Damage works
- *  DAMAGE_RADIUS			damage was indirect (from a nearby explosion)
- *  DAMAGE_NO_ARMOR			armor does not protect from this damage
- *  DAMAGE_ENERGY			damage is from an energy based weapon
- *  DAMAGE_NO_KNOCKBACK		do not affect velocity, just view angles
- *  DAMAGE_BULLET			damage is from a bullet (used for ricochets)
- *  DAMAGE_NO_PROTECTION	kills godmode, armor, everything
- * ============
+ * dflags -> these flags are used to control how T_Damage works
+ *      DAMAGE_RADIUS			damage was indirect (from a nearby explosion)
+ *      DAMAGE_NO_ARMOR			armor does not protect from this damage
+ *      DAMAGE_ENERGY			damage is from an energy based weapon
+ *      DAMAGE_NO_KNOCKBACK		do not affect velocity, just view angles
+ *      DAMAGE_BULLET			damage is from a bullet (used for ricochets)
+ *      DAMAGE_NO_PROTECTION	kills godmode, armor, everything
  */
+
 int
-CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal,
-		int damage, int dflags)
+CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
+		int dflags)
 {
 	gclient_t *client;
 	int save;
 	int power_armor_type;
-	int index = 0;
+	int index;
 	int damagePerCell;
 	int pa_te_type;
 	int power = 0;
@@ -357,6 +354,8 @@ CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal,
 	{
 		return 0;
 	}
+
+	index = 0;
 
 	client = ent->client;
 
@@ -379,6 +378,7 @@ CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal,
 	{
 		power_armor_type = ent->monsterinfo.power_armor_type;
 		power = ent->monsterinfo.power_armor_power;
+		index = 0;
 	}
 	else
 	{
@@ -443,7 +443,7 @@ CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal,
 		save = damage;
 	}
 
-	SpawnDamage(pa_te_type, point, normal, save);
+	SpawnDamage(pa_te_type, point, normal);
 	ent->powerarmor_time = level.time + 0.2;
 
 	if (dflags & DAMAGE_NO_REG_ARMOR)
@@ -468,8 +468,8 @@ CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal,
 }
 
 int
-CheckArmor(edict_t *ent, vec3_t point, vec3_t normal,
-		int damage, int te_sparks, int dflags)
+CheckArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
+		int te_sparks, int dflags)
 {
 	gclient_t *client;
 	int save;
@@ -527,7 +527,7 @@ CheckArmor(edict_t *ent, vec3_t point, vec3_t normal,
 	}
 
 	client->pers.inventory[index] -= save;
-	SpawnDamage(te_sparks, point, normal, save);
+	SpawnDamage(te_sparks, point, normal);
 
 	return save;
 }
@@ -625,9 +625,9 @@ M_ReactToDamage(edict_t *targ, edict_t *attacker, edict_t *inflictor)
 	{
 		targ->monsterinfo.aiflags &= ~AI_SOUND_TARGET;
 
-		/* this can only happen in coop (both new and
-		   old enemies are clients) only switch if can't
-		   see the current enemy */
+		/* this can only happen in coop (both new and old
+		   enemies are clients)  only switch if can't see
+		   the current enemy */
 		if (targ->enemy && targ->enemy->client)
 		{
 			if (visible(targ, targ->enemy))
@@ -649,6 +649,9 @@ M_ReactToDamage(edict_t *targ, edict_t *attacker, edict_t *inflictor)
 		return;
 	}
 
+	/* it's the same base (walk/swim/fly) type and a
+	   different classname and it's not a tank
+	   (they spray too much), get mad at them */
 	if (((targ->flags & (FL_FLY | FL_SWIM)) ==
 		 (attacker->flags & (FL_FLY | FL_SWIM))) &&
 		(strcmp(targ->classname, attacker->classname) != 0) &&
@@ -863,7 +866,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	{
 		take = 0;
 		save = damage;
-		SpawnDamage(te_sparks, point, normal, save);
+		SpawnDamage(te_sparks, point, normal);
 	}
 
 	/* check for invincibility */
@@ -928,22 +931,22 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		/* need more blood for chainfist. */
 		if (targ->flags & FL_MECHANICAL)
 		{
-			SpawnDamage(TE_ELECTRIC_SPARKS, point, normal, take);
+			SpawnDamage(TE_ELECTRIC_SPARKS, point, normal);
 		}
 		else if ((targ->svflags & SVF_MONSTER) || (client))
 		{
 			if (mod == MOD_CHAINFIST)
 			{
-				SpawnDamage(TE_MOREBLOOD, point, normal, 255);
+				SpawnDamage(TE_MOREBLOOD, point, normal);
 			}
 			else
 			{
-				SpawnDamage(TE_BLOOD, point, normal, take);
+				SpawnDamage(TE_BLOOD, point, normal);
 			}
 		}
 		else
 		{
-			SpawnDamage(te_sparks, point, normal, take);
+			SpawnDamage(te_sparks, point, normal);
 		}
 
 		targ->health = targ->health - take;
@@ -1015,8 +1018,8 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	}
 
 	/* add to the damage inflicted on a player this frame
-	   the total will be turned into screen blends and view angle kicks
-	   at the end of the frame */
+	   the total will be turned into screen blends and view
+	   angle kicks at the end of the frame */
 	if (client)
 	{
 		client->damage_parmor += psave;
@@ -1076,7 +1079,7 @@ T_RadiusDamage(edict_t *inflictor, edict_t *attacker, float damage,
 }
 
 void
-T_RadiusNukeDamage(edict_t *inflictor, edict_t *attacker, float damage,
+T_RadiusNukeDamage(edict_t *inflictor, edict_t *attacker, float damage, /* FS: Coop: Rogue specific */
 		edict_t *ignore, float radius, int mod)
 {
 	float points;
@@ -1203,7 +1206,7 @@ T_RadiusNukeDamage(edict_t *inflictor, edict_t *attacker, float damage,
  * anything with classname=ignoreClass
  */
 void
-T_RadiusClassDamage(edict_t *inflictor, edict_t *attacker, float damage,
+T_RadiusClassDamage(edict_t *inflictor, edict_t *attacker, float damage, /* FS: Coop: Rogue specific */
 		char *ignoreClass, float radius, int mod)
 {
 	float points;

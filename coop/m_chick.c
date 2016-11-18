@@ -86,7 +86,8 @@ mframe_t chick_frames_fidget[] = {
 	{ai_stand, 0, NULL}
 };
 
-mmove_t chick_move_fidget = {
+mmove_t chick_move_fidget =
+{
 	FRAME_stand201,
    	FRAME_stand230,
    	chick_frames_fidget,
@@ -145,7 +146,8 @@ mframe_t chick_frames_stand[] = {
 	{ai_stand, 0, chick_fidget},
 };
 
-mmove_t chick_move_stand = {
+mmove_t chick_move_stand =
+{
 	FRAME_stand101,
    	FRAME_stand130,
    	chick_frames_stand,
@@ -176,7 +178,8 @@ mframe_t chick_frames_start_run[] = {
 	{ai_run, 3, NULL}
 };
 
-mmove_t chick_move_start_run = {
+mmove_t chick_move_start_run =
+{
 	FRAME_walk01,
    	FRAME_walk10,
    	chick_frames_start_run,
@@ -196,7 +199,8 @@ mframe_t chick_frames_run[] = {
 	{ai_run, 7, NULL}
 };
 
-mmove_t chick_move_run = {
+mmove_t chick_move_run =
+{
 	FRAME_walk11,
    	FRAME_walk20,
    	chick_frames_run,
@@ -216,7 +220,8 @@ mframe_t chick_frames_walk[] = {
 	{ai_walk, 7, NULL}
 };
 
-mmove_t chick_move_walk = {
+mmove_t chick_move_walk =
+{
 	FRAME_walk11,
    	FRAME_walk20,
    	chick_frames_walk,
@@ -242,7 +247,10 @@ chick_run(edict_t *self)
 		return;
 	}
 
-	monster_done_dodge(self);
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		monster_done_dodge(self);
+	}
 
 	if (self->monsterinfo.aiflags & AI_STAND_GROUND)
 	{
@@ -269,10 +277,12 @@ mframe_t chick_frames_pain1[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t chick_move_pain1 = {
+mmove_t chick_move_pain1 =
+{
 	FRAME_pain101,
    	FRAME_pain105,
-   	chick_frames_pain1, chick_run
+   	chick_frames_pain1,
+   	chick_run
 };
 
 mframe_t chick_frames_pain2[] = {
@@ -283,10 +293,11 @@ mframe_t chick_frames_pain2[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t chick_move_pain2 = {
+mmove_t chick_move_pain2 =
+{
 	FRAME_pain201,
    	FRAME_pain205,
-   	chick_frames_pain2,
+	chick_frames_pain2,
    	chick_run
 };
 
@@ -314,10 +325,11 @@ mframe_t chick_frames_pain3[] = {
 	{ai_move, 2, NULL}
 };
 
-mmove_t chick_move_pain3 = {
+mmove_t chick_move_pain3 =
+{
 	FRAME_pain301,
    	FRAME_pain321,
-   	chick_frames_pain3,
+	chick_frames_pain3,
    	chick_run
 };
 
@@ -331,11 +343,22 @@ chick_pain(edict_t *self, edict_t *other /* other */, float kick /* other */, in
 		return;
 	}
 
-	monster_done_dodge(self);
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		monster_done_dodge(self);
+	}
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		// Knightmare- show right pain skin for beta class
+		if ( (game.gametype == xatrix_coop) && !strcmp(self->classname, "monster_chick_heat") ) /* FS: Coop: Xatrix specific */
+		{
+			self->s.skinnum = 2;
+		}
+		else
+		{
+			self->s.skinnum = 1;
+		}
 	}
 
 	if (level.time < self->pain_debounce_time)
@@ -365,8 +388,11 @@ chick_pain(edict_t *self, edict_t *other /* other */, float kick /* other */, in
 		return; /* no pain anims in nightmare */
 	}
 
-	/* clear this from blindfire */
-	self->monsterinfo.aiflags &= ~AI_MANUAL_STEERING;
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		/* clear this from blindfire */
+		self->monsterinfo.aiflags &= ~AI_MANUAL_STEERING;
+	}
 
 	if (damage <= 10)
 	{
@@ -381,10 +407,13 @@ chick_pain(edict_t *self, edict_t *other /* other */, float kick /* other */, in
 		self->monsterinfo.currentmove = &chick_move_pain3;
 	}
 
-	/* clear duck flag */
-	if (self->monsterinfo.aiflags & AI_DUCKED)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		monster_duck_up(self);
+		/* clear duck flag */
+		if (self->monsterinfo.aiflags & AI_DUCKED)
+		{
+			monster_duck_up(self);
+		}
 	}
 }
 
@@ -430,7 +459,8 @@ mframe_t chick_frames_death2[] = {
 	{ai_move, 1, NULL}
 };
 
-mmove_t chick_move_death2 = {
+mmove_t chick_move_death2 =
+{
 	FRAME_death201,
    	FRAME_death223,
    	chick_frames_death2,
@@ -452,16 +482,18 @@ mframe_t chick_frames_death1[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t chick_move_death1 = {
+mmove_t chick_move_death1 =
+{
 	FRAME_death101,
-   	FRAME_death112,
-   	chick_frames_death1,
-   	chick_dead
+	FRAME_death112,
+	chick_frames_death1,
+	chick_dead
 };
 
 void
-chick_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* unused */,
-		int damage, vec3_t point /* unused */)
+chick_die(edict_t *self, edict_t *inflictor /* unused */,
+		edict_t *attacker /* unused */, int damage,
+		vec3_t point /*unused */)
 {
 	int n;
 
@@ -473,20 +505,22 @@ chick_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* u
 	/* check for gib */
 	if (self->health <= self->gib_health)
 	{
-		gi.sound(self, CHAN_VOICE, gi.soundindex("misc/udeath.wav"), 1, ATTN_NORM, 0);
+		gi.sound(self, CHAN_VOICE, gi.soundindex( "misc/udeath.wav"), 1, ATTN_NORM, 0);
 
 		for (n = 0; n < 2; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/bone/tris.md2", damage,
-					GIB_ORGANIC);
+			ThrowGib(self, "models/objects/gibs/bone/tris.md2",
+					damage, GIB_ORGANIC);
 		}
 
 		for (n = 0; n < 4; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
+			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2",
+					damage, GIB_ORGANIC);
 		}
 
-		ThrowHead(self, "models/objects/gibs/head2/tris.md2", damage, GIB_ORGANIC);
+		ThrowHead(self, "models/objects/gibs/head2/tris.md2",
+				damage, GIB_ORGANIC);
 		self->deadflag = DEAD_DEAD;
 		return;
 	}
@@ -514,7 +548,77 @@ chick_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* u
 	}
 }
 
+void
+chick_duck_down(edict_t *self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	if (self->monsterinfo.aiflags & AI_DUCKED)
+	{
+		return;
+	}
+
+	self->monsterinfo.aiflags |= AI_DUCKED;
+	self->maxs[2] -= 32;
+	self->takedamage = DAMAGE_YES;
+	self->monsterinfo.pausetime = level.time + 1;
+	gi.linkentity(self);
+}
+
+void
+chick_duck_hold(edict_t *self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	if (level.time >= self->monsterinfo.pausetime)
+	{
+		self->monsterinfo.aiflags &= ~AI_HOLD_FRAME;
+	}
+	else
+	{
+		self->monsterinfo.aiflags |= AI_HOLD_FRAME;
+	}
+}
+
+void
+chick_duck_up(edict_t *self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	self->monsterinfo.aiflags &= ~AI_DUCKED;
+	self->maxs[2] += 32;
+	self->takedamage = DAMAGE_AIM;
+	gi.linkentity(self);
+}
+
 mframe_t chick_frames_duck[] = {
+	{ai_move, 0, chick_duck_down},
+	{ai_move, 1, NULL},
+	{ai_move, 4, chick_duck_hold},
+	{ai_move, -4, NULL},
+	{ai_move, -5, chick_duck_up},
+	{ai_move, 3, NULL},
+	{ai_move, 1, NULL}
+};
+
+mmove_t chick_move_duck =
+{
+	FRAME_duck01,
+	FRAME_duck07,
+	chick_frames_duck,
+	chick_run
+};
+
+mframe_t chick_frames_duck_rogue[] = { /* FS: Coop: Rogue specific */
 	{ai_move, 0, monster_duck_down},
 	{ai_move, 1, NULL},
 	{ai_move, 4, monster_duck_hold},
@@ -524,12 +628,34 @@ mframe_t chick_frames_duck[] = {
 	{ai_move, 1, NULL}
 };
 
-mmove_t chick_move_duck = {
+mmove_t chick_move_duck_rogue = /* FS: Coop: Rogue specific */
+{
 	FRAME_duck01,
-   	FRAME_duck07,
-   	chick_frames_duck,
-   	chick_run
+	FRAME_duck07,
+	chick_frames_duck_rogue,
+	chick_run
 };
+
+void
+chick_dodge(edict_t *self, edict_t *attacker, float eta /* unused */, trace_t *fake /* unused */)
+{
+	if (!self || !attacker)
+	{
+		return;
+	}
+
+	if (random() > 0.25)
+	{
+		return;
+	}
+
+	if (!self->enemy)
+	{
+		self->enemy = attacker;
+	}
+
+	self->monsterinfo.currentmove = &chick_move_duck;
+}
 
 void
 ChickSlash(edict_t *self)
@@ -547,7 +673,7 @@ ChickSlash(edict_t *self)
 }
 
 void
-ChickRocket(edict_t *self)
+ChickRocket_Rogue(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t forward, right;
 	vec3_t start;
@@ -681,6 +807,44 @@ ChickRocket(edict_t *self)
 }
 
 void
+ChickRocket(edict_t *self)
+{
+	vec3_t forward, right;
+	vec3_t start;
+	vec3_t dir;
+	vec3_t vec;
+
+  	if (!self)
+	{
+		return;
+	}
+
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		ChickRocket_Rogue(self);
+		return;
+	}
+
+	AngleVectors(self->s.angles, forward, right, NULL);
+	G_ProjectSource(self->s.origin, monster_flash_offset[MZ2_CHICK_ROCKET_1],
+			forward, right, start);
+
+	VectorCopy(self->enemy->s.origin, vec);
+	vec[2] += self->enemy->viewheight;
+	VectorSubtract(vec, start, dir);
+	VectorNormalize(dir);
+
+	if ((game.gametype == xatrix_coop) && (self->s.skinnum > 1)) /* FS: Coop: Xatrix specific */
+	{
+		monster_fire_heat_xatrix(self, start, dir, 50, 500, MZ2_CHICK_ROCKET_1);
+	}
+	else
+	{
+		monster_fire_rocket(self, start, dir, 50, 500, MZ2_CHICK_ROCKET_1);
+	}
+}
+
+void
 Chick_PreAttack1(edict_t *self)
 {
 	if (!self)
@@ -718,10 +882,11 @@ mframe_t chick_frames_start_attack1[] = {
 	{ai_charge, 0, chick_attack1}
 };
 
-mmove_t chick_move_start_attack1 = {
+mmove_t chick_move_start_attack1 =
+{
 	FRAME_attak101,
    	FRAME_attak113,
-   	chick_frames_start_attack1,
+	chick_frames_start_attack1,
    	NULL
 };
 
@@ -742,11 +907,12 @@ mframe_t chick_frames_attack1[] = {
 	{ai_charge, 3, chick_rerocket}
 };
 
-mmove_t chick_move_attack1 = {
+mmove_t chick_move_attack1 =
+{
 	FRAME_attak114,
-   	FRAME_attak127,
-   	chick_frames_attack1,
-   	NULL
+	FRAME_attak127,
+	chick_frames_attack1,
+	NULL
 };
 
 mframe_t chick_frames_end_attack1[] = {
@@ -757,11 +923,12 @@ mframe_t chick_frames_end_attack1[] = {
 	{ai_charge, -2, NULL}
 };
 
-mmove_t chick_move_end_attack1 = {
+mmove_t chick_move_end_attack1 =
+{
 	FRAME_attak128,
    	FRAME_attak132,
    	chick_frames_end_attack1,
-   	chick_run
+	chick_run
 };
 
 void
@@ -772,23 +939,43 @@ chick_rerocket(edict_t *self)
 		return;
 	}
 
-	if (self->monsterinfo.aiflags & AI_MANUAL_STEERING)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		self->monsterinfo.aiflags &= ~AI_MANUAL_STEERING;
-		self->monsterinfo.currentmove = &chick_move_end_attack1;
-		return;
-	}
-
-	if (self->enemy->health > 0)
-	{
-		if (range(self, self->enemy) > RANGE_MELEE)
+		if (self->monsterinfo.aiflags & AI_MANUAL_STEERING)
 		{
-			if (visible(self, self->enemy))
+			self->monsterinfo.aiflags &= ~AI_MANUAL_STEERING;
+			self->monsterinfo.currentmove = &chick_move_end_attack1;
+			return;
+		}
+
+		if (self->enemy->health > 0)
+		{
+			if (range(self, self->enemy) > RANGE_MELEE)
 			{
-				if (random() <= (0.6 + (0.05 * ((float)skill->value))))
+				if (visible(self, self->enemy))
 				{
-					self->monsterinfo.currentmove = &chick_move_attack1;
-					return;
+					if (random() <= (0.6 + (0.05 * ((float)skill->value))))
+					{
+						self->monsterinfo.currentmove = &chick_move_attack1;
+						return;
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		if (self->enemy->health > 0)
+		{
+			if (range(self, self->enemy) > RANGE_MELEE)
+			{
+				if (visible(self, self->enemy))
+				{
+					if (random() <= 0.6)
+					{
+						self->monsterinfo.currentmove = &chick_move_attack1;
+						return;
+					}
 				}
 			}
 		}
@@ -820,11 +1007,12 @@ mframe_t chick_frames_slash[] = {
 	{ai_charge, -2, chick_reslash}
 };
 
-mmove_t chick_move_slash = {
+mmove_t chick_move_slash =
+{
 	FRAME_attak204,
-   	FRAME_attak212,
-   	chick_frames_slash,
-   	NULL
+	FRAME_attak212,
+	chick_frames_slash,
+	NULL
 };
 
 mframe_t chick_frames_end_slash[] = {
@@ -834,10 +1022,11 @@ mframe_t chick_frames_end_slash[] = {
 	{ai_charge, 0, NULL}
 };
 
-mmove_t chick_move_end_slash = {
+mmove_t chick_move_end_slash =
+{
 	FRAME_attak213,
    	FRAME_attak216,
-   	chick_frames_end_slash,
+	chick_frames_end_slash,
    	chick_run
 };
 
@@ -886,11 +1075,12 @@ mframe_t chick_frames_start_slash[] = {
 	{ai_charge, 3, NULL}
 };
 
-mmove_t chick_move_start_slash = {
+mmove_t chick_move_start_slash =
+{
 	FRAME_attak201,
    	FRAME_attak203,
    	chick_frames_start_slash,
-   	chick_slash
+	chick_slash
 };
 
 void
@@ -907,53 +1097,56 @@ chick_melee(edict_t *self)
 void
 chick_attack(edict_t *self)
 {
-	float r, chance;
+	float r, chance; /* FS: Coop: Rogue specific */
 
 	if (!self)
 	{
 		return;
 	}
 
-	monster_done_dodge(self);
-
-	if (self->monsterinfo.attack_state == AS_BLIND)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		/* setup shot probabilities */
-		if (self->monsterinfo.blind_fire_delay < 1.0)
-		{
-			chance = 1.0;
-		}
-		else if (self->monsterinfo.blind_fire_delay < 7.5)
-		{
-			chance = 0.4;
-		}
-		else
-		{
-			chance = 0.1;
-		}
+		monster_done_dodge(self);
 
-		r = random();
-
-		/* minimum of 2 seconds, plus 0-3, after the shots are done */
-		self->monsterinfo.blind_fire_delay += 4.0 + 1.5 + random();
-
-		/* don't shoot at the origin */
-		if (VectorCompare(self->monsterinfo.blind_fire_target, vec3_origin))
+		if (self->monsterinfo.attack_state == AS_BLIND)
 		{
+			/* setup shot probabilities */
+			if (self->monsterinfo.blind_fire_delay < 1.0)
+			{
+				chance = 1.0;
+			}
+			else if (self->monsterinfo.blind_fire_delay < 7.5)
+			{
+				chance = 0.4;
+			}
+			else
+			{
+				chance = 0.1;
+			}
+
+			r = random();
+
+			/* minimum of 2 seconds, plus 0-3, after the shots are done */
+			self->monsterinfo.blind_fire_delay += 4.0 + 1.5 + random();
+
+			/* don't shoot at the origin */
+			if (VectorCompare(self->monsterinfo.blind_fire_target, vec3_origin))
+			{
+				return;
+			}
+
+			/* don't shoot if the dice say not to */
+			if (r > chance)
+			{
+				return;
+			}
+
+			/* turn on manual steering to signal both manual steering and blindfire */
+			self->monsterinfo.aiflags |= AI_MANUAL_STEERING;
+			self->monsterinfo.currentmove = &chick_move_start_attack1;
+			self->monsterinfo.attack_finished = level.time + 2 * random();
 			return;
 		}
-
-		/* don't shoot if the dice say not to */
-		if (r > chance)
-		{
-			return;
-		}
-
-		/* turn on manual steering to signal both manual steering and blindfire */
-		self->monsterinfo.aiflags |= AI_MANUAL_STEERING;
-		self->monsterinfo.currentmove = &chick_move_start_attack1;
-		self->monsterinfo.attack_finished = level.time + 2 * random();
-		return;
 	}
 
 	self->monsterinfo.currentmove = &chick_move_start_attack1;
@@ -971,7 +1164,7 @@ chick_sight(edict_t *self, edict_t *other /* unused */)
 }
 
 qboolean
-chick_blocked(edict_t *self, float dist)
+chick_blocked(edict_t *self, float dist) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -992,7 +1185,7 @@ chick_blocked(edict_t *self, float dist)
 }
 
 void
-chick_duck(edict_t *self, float eta)
+chick_duck(edict_t *self, float eta) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -1024,12 +1217,12 @@ chick_duck(edict_t *self, float eta)
 	monster_duck_down(self);
 
 	self->monsterinfo.nextframe = FRAME_duck01;
-	self->monsterinfo.currentmove = &chick_move_duck;
+	self->monsterinfo.currentmove = &chick_move_duck_rogue;
 	return;
 }
 
 void
-chick_sidestep(edict_t *self)
+chick_sidestep(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -1088,7 +1281,15 @@ SP_monster_chick(edict_t *self)
 
 	self->movetype = MOVETYPE_STEP;
 	self->solid = SOLID_BBOX;
-	self->s.modelindex = gi.modelindex("models/monsters/bitch2/tris.md2");
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		self->s.modelindex = gi.modelindex("models/monsters/bitch2/tris.md2");
+	}
+	else
+	{
+		self->s.modelindex = gi.modelindex("models/monsters/bitch/tris.md2");
+	}
+
 	VectorSet(self->mins, -16, -16, 0);
 	VectorSet(self->maxs, 16, 16, 56);
 
@@ -1102,20 +1303,48 @@ SP_monster_chick(edict_t *self)
 	self->monsterinfo.stand = chick_stand;
 	self->monsterinfo.walk = chick_walk;
 	self->monsterinfo.run = chick_run;
-	self->monsterinfo.dodge = M_MonsterDodge;
-	self->monsterinfo.duck = chick_duck;
-	self->monsterinfo.unduck = monster_duck_up;
-	self->monsterinfo.sidestep = chick_sidestep;
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		self->monsterinfo.dodge = M_MonsterDodge;
+		self->monsterinfo.duck = chick_duck;
+		self->monsterinfo.unduck = monster_duck_up;
+		self->monsterinfo.sidestep = chick_sidestep;
+	}
+	else
+	{
+		self->monsterinfo.dodge = chick_dodge;
+	}
 	self->monsterinfo.attack = chick_attack;
 	self->monsterinfo.melee = chick_melee;
 	self->monsterinfo.sight = chick_sight;
-	self->monsterinfo.blocked = chick_blocked;
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		self->monsterinfo.blocked = chick_blocked;
+	}
 
 	gi.linkentity(self);
 
 	self->monsterinfo.currentmove = &chick_move_stand;
 	self->monsterinfo.scale = MODEL_SCALE;
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		self->monsterinfo.blindfire = true;
+	}
 
-	self->monsterinfo.blindfire = true;
 	walkmonster_start(self);
+}
+
+/*
+ * QUAKED monster_chick_heat (1 .5 0) (-16 -16 -24) (16 16 32) Ambush Trigger_Spawn Sight
+ */
+void
+SP_monster_chick_heat(edict_t *self) /* FS: Coop: Xatrix specific */
+{
+  	if (!self)
+	{
+		return;
+	}
+
+	SP_monster_chick(self);
+	self->s.skinnum = 3;
 }
