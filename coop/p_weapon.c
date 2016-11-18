@@ -11,19 +11,21 @@
 #define GRENADE_MINSPEED 400
 #define GRENADE_MAXSPEED 800
 
-#define CHAINFIST_REACH 64
+#define CHAINFIST_REACH 64 /* FS: Coop: Rogue specific */
 
-#define HEATBEAM_DM_DMG 15
-#define HEATBEAM_SP_DMG 15
+#define HEATBEAM_DM_DMG 15 /* FS: Coop: Rogue specific */
+#define HEATBEAM_SP_DMG 15 /* FS: Coop: Rogue specific */
 
 static qboolean is_quad;
-static byte damage_multiplier;
+static qboolean is_quadfire; /* FS: Coop: Xatrix specific */
+static byte damage_multiplier; /* FS: Coop: Rogue specific */
 static byte is_silenced;
 
 void weapon_grenade_fire(edict_t *ent, qboolean held);
+void weapon_trap_fire (edict_t *ent, qboolean held); /* FS: Coop: Xatrix specific */
 
 byte
-P_DamageModifier(edict_t *ent)
+P_DamageModifier(edict_t *ent) /* FS: Coop: Rogue addition.  Set damage_multiplier. */
 {
 	is_quad = 0;
 	damage_multiplier = 1;
@@ -83,7 +85,7 @@ P_ProjectSource(gclient_t *client, vec3_t point, vec3_t distance, vec3_t forward
 }
 
 void
-P_ProjectSource2(gclient_t *client, vec3_t point, vec3_t distance, vec3_t forward,
+P_ProjectSource2(gclient_t *client, vec3_t point, vec3_t distance, vec3_t forward, /* FS: Coop: Rogue specific */
 		vec3_t right, vec3_t up, vec3_t result)
 {
 	vec3_t _distance;
@@ -144,16 +146,19 @@ PlayerNoise(edict_t *who, vec3_t where, int type)
 		return;
 	}
 
-	if (who->flags & FL_DISGUISED)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (type == PNOISE_WEAPON)
+		if (who->flags & FL_DISGUISED)
 		{
-			level.disguise_violator = who;
-			level.disguise_violation_framenum = level.framenum + 5;
-		}
-		else
-		{
-			return;
+			if (type == PNOISE_WEAPON)
+			{
+				level.disguise_violator = who;
+				level.disguise_violation_framenum = level.framenum + 5;
+			}
+			else
+			{
+				return;
+			}
 		}
 	}
 
@@ -225,8 +230,8 @@ Pickup_Weapon(edict_t *ent, edict_t *other)
 		if (ent->item->ammo)
 		{
 			ammo = FindItem(ent->item->ammo);
-
-			if ((int)dmflags->value & DF_INFINITE_AMMO)
+			/* Don't get infinite ammo with trap */
+			if ( ((int)dmflags->value & DF_INFINITE_AMMO) && Q_stricmp(ent->item->pickup_name, "ammo_trap") ) /* FS: Coop: Xatrix specific -- Added ammo_trap*/
 			{
 				Add_Ammo(other, ammo, 1000);
 			}
@@ -358,6 +363,7 @@ NoAmmoWeaponChange(edict_t *ent)
 		return;
 	}
 
+	/* FS: Coop: Rogue specific */
 	if ((ent->client->pers.inventory[ITEM_INDEX(FindItem("cells"))] >= 2) &&
 		ent->client->pers.inventory[ITEM_INDEX(FindItem("Plasma Beam"))])
 	{
@@ -365,10 +371,31 @@ NoAmmoWeaponChange(edict_t *ent)
 		return;
 	}
 
+	/* FS: Coop: Rogue specific */
 	if (ent->client->pers.inventory[ITEM_INDEX(FindItem("flechettes"))] &&
 		ent->client->pers.inventory[ITEM_INDEX(FindItem("etf rifle"))])
 	{
 		ent->client->newweapon = FindItem("etf rifle");
+		return;
+	}
+
+	/* FS: Coop: Xatrix specific */
+	if (ent->client->pers.inventory[ITEM_INDEX (FindItem ("mag slug"))] &&
+		ent->client->pers.inventory[ITEM_INDEX (FindItem ("phalanx"))])
+	{
+		ent->client->newweapon = FindItem ("phalanx");	
+	}
+	/* FS: Coop: Xatrix specific */
+	if (ent->client->pers.inventory[ITEM_INDEX (FindItem ("cells"))] &&
+		ent->client->pers.inventory[ITEM_INDEX (FindItem ("ionripper"))])
+	{
+		ent->client->newweapon = FindItem ("ionrippergun");
+	}
+	
+	if (ent->client->pers.inventory[ITEM_INDEX(FindItem("cells"))] &&
+		ent->client->pers.inventory[ITEM_INDEX(FindItem("hyperblaster"))])
+	{
+		ent->client->newweapon = FindItem("hyperblaster");
 		return;
 	}
 
@@ -424,7 +451,15 @@ Think_Weapon(edict_t *ent)
 	/* call active weapon think routine */
 	if (ent->client->pers.weapon && ent->client->pers.weapon->weaponthink)
 	{
-		P_DamageModifier(ent);
+		if (game.gametype != rogue_coop)
+		{
+			is_quad = (ent->client->quad_framenum > level.framenum);
+			is_quadfire = (ent->client->quadfire_framenum > level.framenum); /* FS: Coop: Xatrix specific */
+		}
+		else
+		{
+			P_DamageModifier(ent); /* FS: Coop: Rogue addition.  Sets damage_multiplier. */
+		}
 
 		if (ent->client->silencer_shots)
 		{
@@ -483,7 +518,7 @@ Use_Weapon(edict_t *ent, gitem_t *item)
 }
 
 /* FS: Adapated from Xatrix Code */
-void Use_Weapon2 (edict_t *ent, gitem_t *item)
+void Use_Weapon2_Rogue (edict_t *ent, gitem_t *item)
 {
 	int			ammo_index;
 	gitem_t		*ammo_item;
@@ -562,6 +597,93 @@ void Use_Weapon2 (edict_t *ent, gitem_t *item)
 	ent->client->newweapon = item;
 }
 
+void Use_Weapon2_Xatrix (edict_t *ent, gitem_t *item) /* FS: Coop: Xatrix specific */
+{
+	int			ammo_index;
+	gitem_t		*ammo_item;
+	gitem_t		*nextitem;
+	int			index;
+
+	if (!ent || !item)
+	{
+		return;
+	}
+
+	if (strcmp (item->pickup_name, "HyperBlaster") == 0)
+	{
+		if (item == ent->client->pers.weapon)
+		{
+			item = FindItem ("Ionripper");
+			index = ITEM_INDEX (item);
+			if (!ent->client->pers.inventory[index])
+			{
+				item = FindItem ("HyperBlaster");
+			}
+		}
+	}
+	else if (strcmp (item->pickup_name, "Railgun") == 0)
+	{
+		ammo_item = FindItem(item->ammo);
+		ammo_index = ITEM_INDEX(ammo_item);
+		if (!ent->client->pers.inventory[ammo_index])
+		{
+			nextitem = FindItem ("Phalanx");
+			ammo_item = FindItem(nextitem->ammo);
+			ammo_index = ITEM_INDEX(ammo_item);
+			if (ent->client->pers.inventory[ammo_index])
+			{
+				item = FindItem ("Phalanx");
+				index = ITEM_INDEX (item);
+				if (!ent->client->pers.inventory[index])
+				{
+					item = FindItem ("Railgun");
+				}
+			}
+		}
+		else if (item == ent->client->pers.weapon)
+		{
+			item = FindItem ("Phalanx");
+			index = ITEM_INDEX (item);
+			if (!ent->client->pers.inventory[index])
+			{
+				item = FindItem ("Railgun");
+			}
+		}
+	}
+
+	// see if we're already using it
+	if (item == ent->client->pers.weapon)
+		return;
+
+	if (item->ammo)
+	{
+		ammo_item = FindItem(item->ammo);
+		ammo_index = ITEM_INDEX(ammo_item);
+		if (!ent->client->pers.inventory[ammo_index] && !g_select_empty->value)
+		{
+			gi.cprintf (ent, PRINT_HIGH, "No %s for %s.\n", ammo_item->pickup_name, item->pickup_name);
+			return;
+		}
+	}
+
+	// change to this weapon when down
+	ent->client->newweapon = item;
+}
+
+void Use_Weapon2 (edict_t *ent, gitem_t *item) /* FS */
+{
+	if (game.gametype == rogue_coop)
+	{
+		Use_Weapon2_Rogue(ent, item);
+		return;
+	}
+	else if (game.gametype == xatrix_coop)
+	{
+		Use_Weapon2_Xatrix(ent, item);
+		return;
+	}
+}
+
 void
 Drop_Weapon(edict_t *ent, gitem_t *item)
 {
@@ -602,7 +724,7 @@ Weapon_Generic(edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST, int F
 {
 	int n;
 
-	if (!ent || !pause_frames || !fire)
+	if (!ent || !fire_frames || !fire)
 	{
 		return;
 	}
@@ -752,7 +874,7 @@ Weapon_Generic(edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST, int F
 				{
 					gi.sound(ent, CHAN_ITEM, gi.soundindex("items/damage3.wav"), 1, ATTN_NORM, 0);
 				}
-				else if (ent->client->double_framenum > level.framenum)
+				else if ((game.gametype == rogue_coop) && (ent->client->double_framenum > level.framenum)) /* FS: Coop: Rogue specific */
 				{
 					gi.sound(ent, CHAN_ITEM, gi.soundindex("misc/ddamage3.wav"), 1, ATTN_NORM, 0);
 				}
@@ -783,7 +905,7 @@ Weapon_Generic(edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST, int F
  */
 
 void
-weapon_grenade_fire(edict_t *ent, qboolean held)
+weapon_grenade_fire_rogue (edict_t *ent, qboolean held) /* FS: Coop: Rogue specific */
 {
 	vec3_t offset;
 	vec3_t forward, right, up;
@@ -840,6 +962,75 @@ weapon_grenade_fire(edict_t *ent, qboolean held)
 			fire_prox(ent, start, forward, damage_multiplier, speed);
 			break;
 	}
+
+	if (!((int)dmflags->value & DF_INFINITE_AMMO))
+	{
+		ent->client->pers.inventory[ent->client->ammo_index]--;
+	}
+
+	ent->client->grenade_time = level.time + 1.0;
+
+	if (ent->deadflag || (ent->s.modelindex != 255)) /* VWep animations screw up corpses */
+	{
+		return;
+	}
+
+	if (ent->health <= 0)
+	{
+		return;
+	}
+
+	if (ent->client->ps.pmove.pm_flags & PMF_DUCKED)
+	{
+		ent->client->anim_priority = ANIM_ATTACK;
+		ent->s.frame = FRAME_crattak1 - 1;
+		ent->client->anim_end = FRAME_crattak3;
+	}
+	else
+	{
+		ent->client->anim_priority = ANIM_REVERSE;
+		ent->s.frame = FRAME_wave08;
+		ent->client->anim_end = FRAME_wave01;
+	}
+}
+
+void
+weapon_grenade_fire(edict_t *ent, qboolean held)
+{
+	vec3_t offset;
+	vec3_t forward, right;
+	vec3_t start;
+	int damage = 125;
+	float timer;
+	int speed;
+	float radius;
+
+	if (!ent)
+	{
+		return;
+	}
+
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		weapon_grenade_fire_rogue(ent, held);
+		return;
+	}
+
+	radius = damage + 40;
+
+	if (is_quad)
+	{
+		damage *= 4;
+	}
+
+	VectorSet(offset, 8, 8, ent->viewheight - 8);
+	AngleVectors(ent->client->v_angle, forward, right, NULL);
+	P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+
+	timer = ent->client->grenade_time - level.time;
+	speed = GRENADE_MINSPEED + (GRENADE_TIMER - timer) *
+		((GRENADE_MAXSPEED - GRENADE_MINSPEED) / GRENADE_TIMER);
+	fire_grenade2(ent, start, forward, damage, speed, timer, radius, held);
 
 	if (!((int)dmflags->value & DF_INFINITE_AMMO))
 	{
@@ -1022,15 +1213,145 @@ Throw_Generic(edict_t *ent, int FRAME_FIRE_LAST, int FRAME_IDLE_LAST, int FRAME_
 void
 Weapon_Grenade(edict_t *ent)
 {
-	static int pause_frames[] = {29, 34, 39, 48, 0};
+	static int pause_frames[] = {29, 34, 39, 48, 0}; /* FS: Coop: Rogue specific */
 
 	if (!ent)
 	{
 		return;
 	}
 
-	Throw_Generic(ent, 15, 48, 5, 11, 12, pause_frames,
-			GRENADE_TIMER, weapon_grenade_fire);
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		Throw_Generic(ent, 15, 48, 5, 11, 12, pause_frames,
+				GRENADE_TIMER, weapon_grenade_fire);
+		return;
+	}
+
+	if ((ent->client->newweapon) && (ent->client->weaponstate == WEAPON_READY))
+	{
+		ChangeWeapon(ent);
+		return;
+	}
+
+	if (ent->client->weaponstate == WEAPON_ACTIVATING)
+	{
+		ent->client->weaponstate = WEAPON_READY;
+		ent->client->ps.gunframe = 16;
+		return;
+	}
+
+	if (ent->client->weaponstate == WEAPON_READY)
+	{
+		if (((ent->client->latched_buttons |
+			  ent->client->buttons) & BUTTON_ATTACK))
+		{
+			ent->client->latched_buttons &= ~BUTTON_ATTACK;
+
+			if (ent->client->pers.inventory[ent->client->ammo_index])
+			{
+				ent->client->ps.gunframe = 1;
+				ent->client->weaponstate = WEAPON_FIRING;
+				ent->client->grenade_time = 0;
+			}
+			else
+			{
+				if (level.time >= ent->pain_debounce_time)
+				{
+					gi.sound(ent, CHAN_VOICE, gi.soundindex(
+								"weapons/noammo.wav"), 1, ATTN_NORM, 0);
+					ent->pain_debounce_time = level.time + 1;
+				}
+
+				NoAmmoWeaponChange(ent);
+			}
+
+			return;
+		}
+
+		if ((ent->client->ps.gunframe == 29) ||
+			(ent->client->ps.gunframe == 34) ||
+			(ent->client->ps.gunframe == 39) ||
+			(ent->client->ps.gunframe == 48))
+		{
+			if (rand() & 15)
+			{
+				return;
+			}
+		}
+
+		if (++ent->client->ps.gunframe > 48)
+		{
+			ent->client->ps.gunframe = 16;
+		}
+
+		return;
+	}
+
+	if (ent->client->weaponstate == WEAPON_FIRING)
+	{
+		if (ent->client->ps.gunframe == 5)
+		{
+			gi.sound(ent, CHAN_WEAPON, gi.soundindex(
+							"weapons/hgrena1b.wav"), 1, ATTN_NORM, 0);
+		}
+
+		if (ent->client->ps.gunframe == 11)
+		{
+			if (!ent->client->grenade_time)
+			{
+				ent->client->grenade_time = level.time + GRENADE_TIMER + 0.2;
+				ent->client->weapon_sound = gi.soundindex(
+						"weapons/hgrenc1b.wav");
+			}
+
+			/* they waited too long, detonate it in their hand */
+			if (!ent->client->grenade_blew_up &&
+				(level.time >= ent->client->grenade_time))
+			{
+				ent->client->weapon_sound = 0;
+				weapon_grenade_fire(ent, true);
+				ent->client->grenade_blew_up = true;
+			}
+
+			if (ent->client->buttons & BUTTON_ATTACK)
+			{
+				return;
+			}
+
+			if (ent->client->grenade_blew_up)
+			{
+				if (level.time >= ent->client->grenade_time)
+				{
+					ent->client->ps.gunframe = 15;
+					ent->client->grenade_blew_up = false;
+				}
+				else
+				{
+					return;
+				}
+			}
+		}
+
+		if (ent->client->ps.gunframe == 12)
+		{
+			ent->client->weapon_sound = 0;
+			weapon_grenade_fire(ent, false);
+		}
+
+		if ((ent->client->ps.gunframe == 15) &&
+			(level.time < ent->client->grenade_time))
+		{
+			return;
+		}
+
+		ent->client->ps.gunframe++;
+
+		if (ent->client->ps.gunframe == 16)
+		{
+			ent->client->grenade_time = 0;
+			ent->client->weaponstate = WEAPON_READY;
+		}
+	}
 }
 
 void
@@ -1090,7 +1411,7 @@ weapon_grenadelauncher_fire(edict_t *ent)
 		return;
 	}
 
-	switch (ent->client->pers.weapon->tag)
+	switch (ent->client->pers.weapon->tag) /* FS: Coop: Rogue specific */
 	{
 		case AMMO_PROX:
 			damage = 90;
@@ -1114,7 +1435,7 @@ weapon_grenadelauncher_fire(edict_t *ent)
 	VectorScale(forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
 
-	switch (ent->client->pers.weapon->tag)
+	switch (ent->client->pers.weapon->tag) /* FS: Coop: Rogue specific */
 	{
 		case AMMO_PROX:
 			fire_prox(ent, start, forward, damage_multiplier, 600);
@@ -1152,10 +1473,15 @@ Weapon_GrenadeLauncher(edict_t *ent)
 
 	Weapon_Generic(ent, 5, 16, 59, 64, pause_frames,
 			fire_frames, weapon_grenadelauncher_fire);
+
+	/* FS: Coop: Xatrix specific */
+	if (is_quadfire)
+		Weapon_Generic (ent, 5, 16, 59, 64, pause_frames, fire_frames, weapon_grenadelauncher_fire);
+
 }
 
 void
-Weapon_ProxLauncher(edict_t *ent)
+Weapon_ProxLauncher(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	static int pause_frames[] = {34, 51, 59, 0};
 	static int fire_frames[] = {6, 0};
@@ -1239,6 +1565,10 @@ Weapon_RocketLauncher(edict_t *ent)
 
 	Weapon_Generic(ent, 4, 12, 50, 54, pause_frames,
 			fire_frames, Weapon_RocketLauncher_Fire);
+
+	/* FS: Coop: Xatrix specific */
+	if (is_quadfire)
+		Weapon_Generic (ent, 4, 12, 50, 54, pause_frames, fire_frames, Weapon_RocketLauncher_Fire);
 }
 
 /*
@@ -1331,6 +1661,10 @@ Weapon_Blaster(edict_t *ent)
 
 	Weapon_Generic(ent, 4, 8, 52, 55, pause_frames,
 			fire_frames, Weapon_Blaster_Fire);
+
+	// RAFAEL
+	if (is_quadfire) /* FS: Coop: Xatrix specific */
+		Weapon_Generic (ent, 4, 8, 52, 55, pause_frames, fire_frames, Weapon_Blaster_Fire);
 }
 
 void
@@ -1440,6 +1774,10 @@ Weapon_HyperBlaster(edict_t *ent)
 
 	Weapon_Generic(ent, 5, 20, 49, 53, pause_frames,
 			fire_frames, Weapon_HyperBlaster_Fire);
+
+	/* FS: Coop: Xatrix specific */
+	if (is_quadfire)
+		Weapon_Generic (ent, 5, 20, 49, 53, pause_frames, fire_frames, Weapon_HyperBlaster_Fire);
 }
 
 /*
@@ -1567,8 +1905,12 @@ Weapon_Machinegun(edict_t *ent)
 		return;
 	}
 
-	Weapon_Generic(ent, 3, 5, 45, 49, pause_frames, fire_frames,
-			Machinegun_Fire);
+	Weapon_Generic(ent, 3, 5, 45, 49, pause_frames,
+			fire_frames, Machinegun_Fire);
+
+	/* FS: Coop: Xatrix specific */
+	if (is_quadfire)
+		Weapon_Generic (ent, 3, 5, 45, 49, pause_frames, fire_frames, Machinegun_Fire);
 }
 
 void
@@ -1730,8 +2072,11 @@ Weapon_Chaingun(edict_t *ent)
 		return;
 	}
 
-	Weapon_Generic(ent, 4, 31, 61, 64, pause_frames, fire_frames,
-			Chaingun_Fire);
+	Weapon_Generic(ent, 4, 31, 61, 64, pause_frames, fire_frames, Chaingun_Fire);
+
+	/* FS: Coop: Xatrix specific */
+	if (is_quadfire)
+		Weapon_Generic (ent, 4, 31, 61, 64, pause_frames, fire_frames, Chaingun_Fire);
 }
 
 /*
@@ -1815,6 +2160,10 @@ Weapon_Shotgun(edict_t *ent)
 
 	Weapon_Generic(ent, 7, 18, 36, 39, pause_frames,
 			fire_frames, weapon_shotgun_fire);
+
+	/* FS: Coop: Xatrix specific */
+	if (is_quadfire)
+		Weapon_Generic (ent, 7, 18, 36, 39, pause_frames, fire_frames, weapon_shotgun_fire);
 }
 
 void
@@ -1885,6 +2234,10 @@ Weapon_SuperShotgun(edict_t *ent)
 
 	Weapon_Generic(ent, 6, 17, 57, 61, pause_frames,
 			fire_frames, weapon_supershotgun_fire);
+
+	/* FS: Coop: Xatrix specific */
+	if (is_quadfire)
+		Weapon_Generic (ent, 6, 17, 57, 61, pause_frames, fire_frames, weapon_supershotgun_fire);
 }
 
 /*
@@ -1964,6 +2317,10 @@ Weapon_Railgun(edict_t *ent)
 
 	Weapon_Generic(ent, 3, 18, 56, 61, pause_frames,
 			fire_frames, weapon_railgun_fire);
+
+	/* FS: Coop: Xatrix specific */
+	if (is_quadfire)
+		Weapon_Generic (ent, 3, 18, 56, 61, pause_frames, fire_frames, weapon_railgun_fire);
 }
 
 /*
@@ -2059,12 +2416,16 @@ Weapon_BFG(edict_t *ent)
 
 	Weapon_Generic(ent, 8, 32, 55, 58, pause_frames,
 			fire_frames, weapon_bfg_fire);
+
+	/* FS: Coop: Xatrix specific */
+	if (is_quadfire)
+		Weapon_Generic (ent, 8, 32, 55, 58, pause_frames, fire_frames, weapon_bfg_fire);
 }
 
 /* CHAINFIST */
 
 void
-weapon_chainfist_fire(edict_t *ent)
+weapon_chainfist_fire(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	vec3_t offset;
 	vec3_t forward, right, up;
@@ -2111,7 +2472,7 @@ weapon_chainfist_fire(edict_t *ent)
  * this spits out some smoke from the motor. it's a two-stroke, you know.
  */
 void
-chainfist_smoke(edict_t *ent)
+chainfist_smoke(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	vec3_t tempVec, forward, right, up;
 	vec3_t offset;
@@ -2132,7 +2493,7 @@ chainfist_smoke(edict_t *ent)
 }
 
 void
-Weapon_ChainFist(edict_t *ent)
+Weapon_ChainFist(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	static int pause_frames[] = {0};
 	static int fire_frames[] = {8, 9, 16, 17, 18, 30, 31, 0};
@@ -2227,7 +2588,7 @@ Weapon_ChainFist(edict_t *ent)
 /* Disintegrator */
 
 void
-weapon_tracker_fire(edict_t *self)
+weapon_tracker_fire(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t forward, right;
 	vec3_t start;
@@ -2312,7 +2673,7 @@ weapon_tracker_fire(edict_t *self)
 }
 
 void
-Weapon_Disintegrator(edict_t *ent)
+Weapon_Disintegrator(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	static int pause_frames[] = {14, 19, 23, 0};
 	static int fire_frames[] = {5, 0};
@@ -2329,7 +2690,7 @@ Weapon_Disintegrator(edict_t *ent)
  * ======================================================================
  */
 void
-weapon_etf_rifle_fire(edict_t *ent)
+weapon_etf_rifle_fire(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	vec3_t forward, right, up;
 	vec3_t start, tempPt;
@@ -2423,7 +2784,7 @@ weapon_etf_rifle_fire(edict_t *ent)
 }
 
 void
-Weapon_ETF_Rifle(edict_t *ent)
+Weapon_ETF_Rifle(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	static int pause_frames[] = {18, 28, 0};
 	static int fire_frames[] = {6, 7, 0};
@@ -2452,7 +2813,7 @@ Weapon_ETF_Rifle(edict_t *ent)
 }
 
 void
-Heatbeam_Fire(edict_t *ent)
+Heatbeam_Fire(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	vec3_t start;
 	vec3_t forward, right, up;
@@ -2576,3 +2937,342 @@ Weapon_Heatbeam(edict_t *ent)
 
 	Weapon_Generic(ent, 8, 12, 39, 44, pause_frames, fire_frames, Heatbeam_Fire);
 }
+
+//======================================================================
+
+
+// RAFAEL
+/*
+	RipperGun
+*/
+
+void weapon_ionripper_fire (edict_t *ent) /* FS: Coop: Xatrix specific */
+{
+	vec3_t	start;
+	vec3_t	forward, right;
+	vec3_t	offset;
+	vec3_t	tempang;
+	int		damage;
+	int		kick;
+
+  	if (!ent)
+	{
+		return;
+	}
+
+	if (deathmatch->value)
+	{
+		// tone down for deathmatch
+		damage = 30;
+		kick = 40;
+	}
+	else
+	{
+		damage = 50;
+		kick = 60;
+	}
+	
+	if (is_quad)
+	{
+		damage *= 4;
+		kick *= 4;
+	}
+
+	VectorCopy (ent->client->v_angle, tempang);
+	tempang[YAW] += crandom();
+
+	AngleVectors (tempang, forward, right, NULL);
+	
+	VectorScale (forward, -3, ent->client->kick_origin);
+	ent->client->kick_angles[0] = -3;
+
+	// VectorSet (offset, 0, 7, ent->viewheight - 8);
+	VectorSet (offset, 16, 7, ent->viewheight - 8);
+
+	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
+
+	fire_ionripper (ent, start, forward, damage, 500, EF_IONRIPPER);
+
+	// send muzzle flash
+	gi.WriteByte (svc_muzzleflash);
+	gi.WriteShort (ent - g_edicts);
+	gi.WriteByte (MZ_IONRIPPER | is_silenced);
+	gi.multicast (ent->s.origin, MULTICAST_PVS);
+
+	ent->client->ps.gunframe++;
+	PlayerNoise (ent, start, PNOISE_WEAPON);
+
+	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+		ent->client->pers.inventory[ent->client->ammo_index] -= ent->client->pers.weapon->quantity;
+	
+	if (ent->client->pers.inventory[ent->client->ammo_index] < 0)
+		ent->client->pers.inventory[ent->client->ammo_index] = 0;
+}
+
+
+void Weapon_Ionripper (edict_t *ent) /* FS: Coop: Xatrix specific */
+{
+	static int pause_frames[] = {36, 0};
+	static int fire_frames[] = {5, 0};
+
+  	if (!ent)
+		return;
+
+	Weapon_Generic (ent, 4, 6, 36, 39, pause_frames, fire_frames, weapon_ionripper_fire);
+
+	if (is_quadfire)
+		Weapon_Generic (ent, 4, 6, 36, 39, pause_frames, fire_frames, weapon_ionripper_fire);
+}
+
+
+// 
+//	Phalanx
+//
+
+void weapon_phalanx_fire (edict_t *ent) /* FS: Coop: Xatrix specific */
+{
+	vec3_t		start;
+	vec3_t		forward, right, up;
+	vec3_t		offset;
+	vec3_t		v;
+	int			damage;
+	float		damage_radius;
+	int			radius_damage;
+
+  	if (!ent)
+	{
+		return;
+	}
+
+	damage = 70 + (int)(random() * 10.0);
+	radius_damage = 120;
+	damage_radius = 120;
+	
+	if (is_quad)
+	{
+		damage *= 4;
+		radius_damage *= 4;
+	}
+
+	AngleVectors (ent->client->v_angle, forward, right, NULL);
+
+	VectorScale (forward, -2, ent->client->kick_origin);
+	ent->client->kick_angles[0] = -2;
+
+	VectorSet(offset, 0, 8,  ent->viewheight-8);
+	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
+
+	if (ent->client->ps.gunframe == 8)
+	{
+		v[PITCH] = ent->client->v_angle[PITCH];
+		v[YAW]   = ent->client->v_angle[YAW] - 1.5;
+		v[ROLL]  = ent->client->v_angle[ROLL];
+		AngleVectors (v, forward, right, up);
+		
+		radius_damage = 30;
+		damage_radius = 120;
+	
+		fire_plasma (ent, start, forward, damage, 725, damage_radius, radius_damage);
+
+		if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+			ent->client->pers.inventory[ent->client->ammo_index]--;
+	}
+	else
+	{
+		v[PITCH] = ent->client->v_angle[PITCH];
+		v[YAW]   = ent->client->v_angle[YAW] + 1.5;
+		v[ROLL]  = ent->client->v_angle[ROLL];
+		AngleVectors (v, forward, right, up);
+		fire_plasma (ent, start, forward, damage, 725, damage_radius, radius_damage);
+
+		// send muzzle flash
+		gi.WriteByte (svc_muzzleflash);
+		gi.WriteShort (ent-g_edicts);
+		gi.WriteByte (MZ_PHALANX | is_silenced);
+		gi.multicast (ent->s.origin, MULTICAST_PVS);
+		
+		PlayerNoise(ent, start, PNOISE_WEAPON);
+	}
+	
+	ent->client->ps.gunframe++;
+	
+}
+
+void Weapon_Phalanx (edict_t *ent) /* FS: Coop: Xatrix specific */
+{
+	static int	pause_frames[]	= {29, 42, 55, 0};
+	static int	fire_frames[]	= {7, 8, 0};
+
+  	if (!ent)
+		return;
+
+	Weapon_Generic (ent, 5, 20, 58, 63, pause_frames, fire_frames, weapon_phalanx_fire);
+
+	if (is_quadfire)
+		Weapon_Generic (ent, 5, 20, 58, 63, pause_frames, fire_frames, weapon_phalanx_fire);
+}
+
+/*
+======================================================================
+
+TRAP
+
+======================================================================
+*/
+
+#define TRAP_TIMER			5.0
+#define TRAP_MINSPEED		300
+#define TRAP_MAXSPEED		700
+
+void weapon_trap_fire (edict_t *ent, qboolean held) /* FS: Coop: Xatrix specific */
+{
+	vec3_t	offset;
+	vec3_t	forward, right;
+	vec3_t	start;
+	int		damage = 125;
+	float	timer;
+	int		speed;
+	float	radius;
+
+  	if (!ent)
+		return;
+
+	radius = damage+40;
+	if (is_quad)
+		damage *= 4;
+
+	VectorSet(offset, 8, 8, ent->viewheight-8);
+	AngleVectors (ent->client->v_angle, forward, right, NULL);
+	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
+
+	timer = ent->client->grenade_time - level.time;
+	speed = GRENADE_MINSPEED + (GRENADE_TIMER - timer) * ((GRENADE_MAXSPEED - GRENADE_MINSPEED) / GRENADE_TIMER);
+	// fire_grenade2 (ent, start, forward, damage, speed, timer, radius, held);
+	fire_trap (ent, start, forward, damage, speed, timer, radius, held);
+	
+// you don't get infinite traps!  ZOID
+//	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+
+	ent->client->pers.inventory[ent->client->ammo_index]--;
+
+	ent->client->grenade_time = level.time + 1.0;
+}
+
+void Weapon_Trap (edict_t *ent) /* FS: Coop: Xatrix specific */
+{
+  	if (!ent)
+	{
+		return;
+	}
+
+	if ((ent->client->newweapon) && (ent->client->weaponstate == WEAPON_READY))
+	{
+		ChangeWeapon (ent);
+		return;
+	}
+
+	if (ent->client->weaponstate == WEAPON_ACTIVATING)
+	{
+		ent->client->weaponstate = WEAPON_READY;
+		ent->client->ps.gunframe = 16;
+		return;
+	}
+
+	if (ent->client->weaponstate == WEAPON_READY)
+	{
+		if ( ((ent->client->latched_buttons|ent->client->buttons) & BUTTON_ATTACK) )
+		{
+			ent->client->latched_buttons &= ~BUTTON_ATTACK;
+			if (ent->client->pers.inventory[ent->client->ammo_index])
+			{
+				ent->client->ps.gunframe = 1;
+				ent->client->weaponstate = WEAPON_FIRING;
+				ent->client->grenade_time = 0;
+			}
+			else
+			{
+				if (level.time >= ent->pain_debounce_time)
+				{
+					gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/noammo.wav"), 1, ATTN_NORM, 0);
+					ent->pain_debounce_time = level.time + 1;
+				}
+				NoAmmoWeaponChange (ent);
+			}
+			return;
+		}
+
+		if ((ent->client->ps.gunframe == 29) || (ent->client->ps.gunframe == 34) || (ent->client->ps.gunframe == 39) || (ent->client->ps.gunframe == 48))
+		{
+			if (rand()&15)
+				return;
+		}
+
+		if (++ent->client->ps.gunframe > 48)
+			ent->client->ps.gunframe = 16;
+		return;
+	}
+
+	if (ent->client->weaponstate == WEAPON_FIRING)
+	{
+		if (ent->client->ps.gunframe == 5)
+			// RAFAEL 16-APR-98
+			// gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/hgrena1b.wav"), 1, ATTN_NORM, 0);
+			gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/trapcock.wav"), 1, ATTN_NORM, 0);
+			// END 16-APR-98
+
+		if (ent->client->ps.gunframe == 11)
+		{
+			if (!ent->client->grenade_time)
+			{
+				ent->client->grenade_time = level.time + GRENADE_TIMER + 0.2;
+				// RAFAEL 16-APR-98
+				ent->client->weapon_sound = gi.soundindex("weapons/traploop.wav");
+				// END 16-APR-98
+			}
+
+			// they waited too long, detonate it in their hand
+			if (!ent->client->grenade_blew_up && level.time >= ent->client->grenade_time)
+			{
+				ent->client->weapon_sound = 0;
+				weapon_trap_fire (ent, true);
+				ent->client->grenade_blew_up = true;
+			}
+
+			if (ent->client->buttons & BUTTON_ATTACK)
+				return;
+
+			if (ent->client->grenade_blew_up)
+			{
+				if (level.time >= ent->client->grenade_time)
+				{
+					ent->client->ps.gunframe = 15;
+					ent->client->grenade_blew_up = false;
+				}
+				else
+				{
+					return;
+				}
+			}
+		}
+
+		if (ent->client->ps.gunframe == 12)
+		{
+			ent->client->weapon_sound = 0;
+			weapon_trap_fire (ent, false);
+			if (ent->client->pers.inventory[ent->client->ammo_index] == 0)
+				NoAmmoWeaponChange (ent);
+		}
+
+		if ((ent->client->ps.gunframe == 15) && (level.time < ent->client->grenade_time))
+			return;
+
+		ent->client->ps.gunframe++;
+
+		if (ent->client->ps.gunframe == 16)
+		{
+			ent->client->grenade_time = 0;
+			ent->client->weaponstate = WEAPON_READY;
+		}
+	}
+}
+

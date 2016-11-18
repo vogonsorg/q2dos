@@ -54,13 +54,13 @@ cvar_t *flood_persecond;
 cvar_t *flood_waitdelay;
 
 cvar_t *sv_maplist;
-cvar_t *sv_stopspeed;
+cvar_t *sv_stopspeed; /* FS: Coop: Rogue specific */
 
-cvar_t *g_showlogic;
-cvar_t *gamerules;
-cvar_t *huntercam;
-cvar_t *strong_mines;
-cvar_t *randomrespawn;
+cvar_t *g_showlogic; /* FS: Coop: Rogue specific */
+cvar_t *gamerules; /* FS: Coop: Rogue specific */
+cvar_t *huntercam; /* FS: Coop: Rogue specific */
+cvar_t *strong_mines; /* FS: Coop: Rogue specific */
+cvar_t *randomrespawn; /* FS: Coop: Rogue specific */
 
 void SpawnEntities(char *mapname, char *entities, char *spawnpoint);
 void ClientThink(edict_t *ent, usercmd_t *cmd);
@@ -338,7 +338,7 @@ CheckDMRules(void)
 		return;
 	}
 
-	if (gamerules && gamerules->value && DMGame.CheckDMRules)
+	if (gamerules && gamerules->value && DMGame.CheckDMRules) /* FS: Coop: Rogue specific */
 	{
 		if (DMGame.CheckDMRules())
 		{
