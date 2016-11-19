@@ -2,13 +2,13 @@
 
 #include "g_local.h"
 
-void M_SetEffects(edict_t *self);
+void M_SetEffects(edict_t *self); /* FS: Coop: Rogue specific */
 
 /*
  * clean up heal targets for medic
  */
 void
-cleanupHealTarget(edict_t *ent)
+cleanupHealTarget(edict_t *ent) /* FS: Coop: Rogue specific */
 {
 	if (!ent)
 	{
@@ -211,7 +211,7 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 		targ->health = -999;
 	}
 
-	if (targ->monsterinfo.aiflags & AI_MEDIC)
+	if ((game.gametype == rogue_coop) && (targ->monsterinfo.aiflags & AI_MEDIC)) /* FS: Coop: Rogue specific */
 	{
 		if (targ->enemy)
 		{
@@ -229,52 +229,64 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 
 	if ((targ->svflags & SVF_MONSTER) && (targ->deadflag != DEAD_DEAD))
 	{
-		/* free up slot for spawned monster if it's spawned */
-		if (targ->monsterinfo.aiflags & AI_SPAWNED_CARRIER)
+		if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 		{
-			if (targ->monsterinfo.commander &&
-				targ->monsterinfo.commander->inuse &&
-				!strcmp(targ->monsterinfo.commander->classname, "monster_carrier"))
+			/* free up slot for spawned monster if it's spawned */
+			if (targ->monsterinfo.aiflags & AI_SPAWNED_CARRIER)
 			{
-				targ->monsterinfo.commander->monsterinfo.monster_slots++;
-			}
-		}
-
-		if (targ->monsterinfo.aiflags & AI_SPAWNED_MEDIC_C)
-		{
-			if (targ->monsterinfo.commander)
-			{
-				if (targ->monsterinfo.commander->inuse &&
-					!strcmp(targ->monsterinfo.commander->classname, "monster_medic_commander"))
+				if (targ->monsterinfo.commander &&
+					targ->monsterinfo.commander->inuse &&
+					!strcmp(targ->monsterinfo.commander->classname, "monster_carrier"))
 				{
 					targ->monsterinfo.commander->monsterinfo.monster_slots++;
 				}
 			}
-		}
 
-		if (targ->monsterinfo.aiflags & AI_SPAWNED_WIDOW)
-		{
-			/* need to check this because we can
-			   have variable numbers of coop players */
-			if (targ->monsterinfo.commander &&
-				targ->monsterinfo.commander->inuse &&
-				!strncmp(targ->monsterinfo.commander->classname, "monster_widow", 13))
+			if (targ->monsterinfo.aiflags & AI_SPAWNED_MEDIC_C)
 			{
-				if (targ->monsterinfo.commander->monsterinfo.monster_used > 0)
+				if (targ->monsterinfo.commander)
 				{
-					targ->monsterinfo.commander->monsterinfo.monster_used--;
+					if (targ->monsterinfo.commander->inuse &&
+						!strcmp(targ->monsterinfo.commander->classname, "monster_medic_commander"))
+					{
+						targ->monsterinfo.commander->monsterinfo.monster_slots++;
+					}
+				}
+			}
+
+			if (targ->monsterinfo.aiflags & AI_SPAWNED_WIDOW)
+			{
+				/* need to check this because we can
+				   have variable numbers of coop players */
+				if (targ->monsterinfo.commander &&
+					targ->monsterinfo.commander->inuse &&
+					!strncmp(targ->monsterinfo.commander->classname, "monster_widow", 13))
+				{
+					if (targ->monsterinfo.commander->monsterinfo.monster_used > 0)
+					{
+						targ->monsterinfo.commander->monsterinfo.monster_used--;
+					}
 				}
 			}
 		}
 
 		if ((!(targ->monsterinfo.aiflags & AI_GOOD_GUY)) &&
-			(!(targ->monsterinfo.aiflags & AI_DO_NOT_COUNT)))
+			(!(targ->monsterinfo.aiflags & AI_DO_NOT_COUNT))) /* FS: Coop: Rogue specific -- Added AI_DO_NOT_COUNT */
 		{
 			level.killed_monsters++;
 
 			if (coop->value && attacker->client)
 			{
 				attacker->client->resp.score++;
+			}
+
+			if (game.gametype != rogue_coop) /* FS: Coop: Rogue handles this elsewhere */
+			{
+				/* medics won't heal monsters that they kill themselves */
+				if (strcmp(attacker->classname, "monster_medic") == 0)
+				{
+					targ->owner = attacker;
+				}
 			}
 		}
 	}
@@ -359,7 +371,7 @@ CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 
 	client = ent->client;
 
-	if (dflags & (DAMAGE_NO_ARMOR | DAMAGE_NO_POWER_ARMOR))
+	if (dflags & (DAMAGE_NO_ARMOR | DAMAGE_NO_POWER_ARMOR)) /* FS: Coop: Rogue specific -- Added DAMAGE_NO_POWER_ARMOR */
 	{
 		return 0;
 	}
@@ -424,7 +436,7 @@ CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 	}
 
 	/* etf rifle */
-	if (dflags & DAMAGE_NO_REG_ARMOR)
+	if ((game.gametype == rogue_coop) && (dflags & DAMAGE_NO_REG_ARMOR)) /* FS: Coop: Rogue specific */
 	{
 		save = (power * damagePerCell) / 2;
 	}
@@ -446,7 +458,7 @@ CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 	SpawnDamage(pa_te_type, point, normal);
 	ent->powerarmor_time = level.time + 0.2;
 
-	if (dflags & DAMAGE_NO_REG_ARMOR)
+	if ((game.gametype == rogue_coop) && (dflags & DAMAGE_NO_REG_ARMOR)) /* FS: Coop: Rogue specific */
 	{
 		power_used = (save / damagePerCell) * 2;
 	}
@@ -493,7 +505,7 @@ CheckArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 		return 0;
 	}
 
-	if (dflags & (DAMAGE_NO_ARMOR | DAMAGE_NO_REG_ARMOR))
+	if (dflags & (DAMAGE_NO_ARMOR | DAMAGE_NO_REG_ARMOR)) /* FS: Coop: Rogue specific -- Added DAMAGE_NO_REG_ARMOR */
 	{
 		return 0;
 	}
@@ -535,9 +547,14 @@ CheckArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 void
 M_ReactToDamage(edict_t *targ, edict_t *attacker, edict_t *inflictor)
 {
-	qboolean new_tesla;
+	qboolean new_tesla; /* FS: Coop: Rogue specific */
 
     if (!targ || !attacker || !inflictor)
+	{
+		return;
+	}
+
+	if (targ->health <= 0)
 	{
 		return;
 	}
@@ -547,20 +564,23 @@ M_ReactToDamage(edict_t *targ, edict_t *attacker, edict_t *inflictor)
 		return;
 	}
 
-	/* logic for tesla - if you are hit by a tesla,
-	   and can't see who you should be mad at (attacker)
-	   attack the tesla also, target the tesla if it's
-	   a "new" tesla */
-	if ((inflictor) && (!strcmp(inflictor->classname, "tesla")))
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		new_tesla = MarkTeslaArea(targ, inflictor);
-
-		if (new_tesla)
+		/* logic for tesla - if you are hit by a tesla,
+		   and can't see who you should be mad at (attacker)
+		   attack the tesla also, target the tesla if it's
+		   a "new" tesla */
+		if ((inflictor) && (!strcmp(inflictor->classname, "tesla")))
 		{
-			TargetTesla(targ, inflictor);
-		}
+			new_tesla = MarkTeslaArea(targ, inflictor);
 
-		return;
+			if (new_tesla)
+			{
+				TargetTesla(targ, inflictor);
+			}
+
+			return;
+		}
 	}
 
 	if ((attacker == targ) || (attacker == targ->enemy))
@@ -579,48 +599,51 @@ M_ReactToDamage(edict_t *targ, edict_t *attacker, edict_t *inflictor)
 		}
 	}
 
-	/* if we're currently mad at something
-	   a target_anger made us mad at, ignore
-	   damage */
-	if (targ->enemy && targ->monsterinfo.aiflags & AI_TARGET_ANGER)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		float percentHealth;
-
-		/* make sure whatever we were pissed at is still around. */
-		if (targ->enemy->inuse)
+		/* if we're currently mad at something
+		   a target_anger made us mad at, ignore
+		   damage */
+		if (targ->enemy && targ->monsterinfo.aiflags & AI_TARGET_ANGER)
 		{
+			float percentHealth;
+
+			/* make sure whatever we were pissed at is still around. */
+			if (targ->enemy->inuse)
+			{
+				percentHealth = (float)(targ->health) / (float)(targ->max_health);
+
+				if (targ->enemy->inuse && (percentHealth > 0.33))
+				{
+					return;
+				}
+			}
+
+			/* remove the target anger flag */
+			targ->monsterinfo.aiflags &= ~AI_TARGET_ANGER;
+		}
+
+		/* if we're healing someone, do like above and try to stay with them */
+		if ((targ->enemy) && (targ->monsterinfo.aiflags & AI_MEDIC))
+		{
+			float percentHealth;
+
 			percentHealth = (float)(targ->health) / (float)(targ->max_health);
 
-			if (targ->enemy->inuse && (percentHealth > 0.33))
+			/* ignore it some of the time */
+			if (targ->enemy->inuse && (percentHealth > 0.25))
 			{
 				return;
 			}
-		}
 
-		/* remove the target anger flag */
-		targ->monsterinfo.aiflags &= ~AI_TARGET_ANGER;
+			/* remove the medic flag */
+			targ->monsterinfo.aiflags &= ~AI_MEDIC;
+			cleanupHealTarget(targ->enemy);
+		}
 	}
 
-	/* if we're healing someone, do like above and try to stay with them */
-	if ((targ->enemy) && (targ->monsterinfo.aiflags & AI_MEDIC))
-	{
-		float percentHealth;
-
-		percentHealth = (float)(targ->health) / (float)(targ->max_health);
-
-		/* ignore it some of the time */
-		if (targ->enemy->inuse && (percentHealth > 0.25))
-		{
-			return;
-		}
-
-		/* remove the medic flag */
-		targ->monsterinfo.aiflags &= ~AI_MEDIC;
-		cleanupHealTarget(targ->enemy);
-	}
-
-	/* if attacker is a client, get mad at them
-	   because he's good and we're not */
+	/* if attacker is a client, get mad at
+	   them because he's good and we're not */
 	if (attacker->client)
 	{
 		targ->monsterinfo.aiflags &= ~AI_SOUND_TARGET;
@@ -655,8 +678,12 @@ M_ReactToDamage(edict_t *targ, edict_t *attacker, edict_t *inflictor)
 	if (((targ->flags & (FL_FLY | FL_SWIM)) ==
 		 (attacker->flags & (FL_FLY | FL_SWIM))) &&
 		(strcmp(targ->classname, attacker->classname) != 0) &&
-		!(attacker->monsterinfo.aiflags & AI_IGNORE_SHOTS) &&
-		!(targ->monsterinfo.aiflags & AI_IGNORE_SHOTS))
+		(strcmp(attacker->classname, "monster_tank") != 0) &&
+		(strcmp(attacker->classname, "monster_supertank") != 0) &&
+		(strcmp(attacker->classname, "monster_makron") != 0) &&
+		(strcmp(attacker->classname, "monster_jorg") != 0) && 
+		!(attacker->monsterinfo.aiflags & AI_IGNORE_SHOTS) && /* FS: Coop: Rogue specific */
+		!(targ->monsterinfo.aiflags & AI_IGNORE_SHOTS)) /* FS: Coop: Rogue specific */
 	{
 		if (targ->enemy && targ->enemy->client)
 		{
@@ -703,7 +730,7 @@ M_ReactToDamage(edict_t *targ, edict_t *attacker, edict_t *inflictor)
 }
 
 qboolean
-CheckTeamDamage(edict_t *targ, edict_t *attacker)
+CheckTeamDamage(edict_t *targ, edict_t *attacker) /* FS: Coop: Rogue specific */
 {
 	return false;
 }
@@ -719,7 +746,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	int asave;
 	int psave;
 	int te_sparks;
-	int sphere_notified;
+	int sphere_notified; /* FS: Coop: Rogue specific */
 
 	if (!targ || !inflictor || !attacker)
 	{
@@ -731,7 +758,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		return;
 	}
 
-	sphere_notified = false;
+	sphere_notified = false; /* FS: Coop: Rogue specific */
 
 	/* friendly fire avoidance. If enabled you can't
 	   hurt teammates (but you can hurt yourself)
@@ -744,7 +771,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		{
 			/* nukes kill everyone */
 			if ((((int)(dmflags->value) & DF_NO_FRIENDLY_FIRE) || coop->intValue) && /* FS: Coop: No friendly fire in Coop */
-				(mod != MOD_NUKE))
+				(mod != MOD_NUKE)) /* FS: Coop: Rogue specific */
 			{
 				damage = 0;
 			}
@@ -758,21 +785,24 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	meansOfDeath = mod;
 
 	/* allow the deathmatch game to change values */
-	if (deathmatch->value && gamerules && gamerules->value)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (DMGame.ChangeDamage)
+		if (deathmatch->value && gamerules && gamerules->value)
 		{
-			damage = DMGame.ChangeDamage(targ, attacker, damage, mod);
-		}
+			if (DMGame.ChangeDamage)
+			{
+				damage = DMGame.ChangeDamage(targ, attacker, damage, mod);
+			}
 
-		if (DMGame.ChangeKnockback)
-		{
-			knockback = DMGame.ChangeKnockback(targ, attacker, knockback, mod);
-		}
+			if (DMGame.ChangeKnockback)
+			{
+				knockback = DMGame.ChangeKnockback(targ, attacker, knockback, mod);
+			}
 
-		if (!damage)
-		{
-			return;
+			if (!damage)
+			{
+				return;
+			}
 		}
 	}
 
@@ -789,15 +819,18 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 
 	client = targ->client;
 
-	/* defender sphere takes half damage */
-	if ((client) && (client->owned_sphere) &&
-		(client->owned_sphere->spawnflags == 1))
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		damage *= 0.5;
-
-		if (!damage)
+		/* defender sphere takes half damage */
+		if ((client) && (client->owned_sphere) &&
+			(client->owned_sphere->spawnflags == 1))
 		{
-			damage = 1;
+			damage *= 0.5;
+
+			if (!damage)
+			{
+				damage = 1;
+			}
 		}
 	}
 
@@ -846,7 +879,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 
 			if (targ->client && (attacker == targ))
 			{
-				/* the rocket jump hack... */
+				/* This allows rocket jumps */
 				VectorScale(dir, 1600.0 * (float)knockback / mass, kvel);
 			}
 			else
@@ -870,9 +903,8 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	}
 
 	/* check for invincibility */
-	if ((client &&
-		 (client->invincible_framenum > level.framenum)) &&
-		!(dflags & DAMAGE_NO_PROTECTION))
+	if ((client && (client->invincible_framenum > level.framenum)) &&
+		!(dflags & DAMAGE_NO_PROTECTION) && (mod != MOD_TRAP)) /* FS: Coop: Xatrix specific: MOD_TRAP */
 	{
 		if (targ->pain_debounce_time < level.time)
 		{
@@ -885,18 +917,21 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	}
 
 	/* check for monster invincibility */
-	if (((targ->svflags & SVF_MONSTER) &&
-		 (targ->monsterinfo.invincible_framenum > level.framenum)) &&
-		!(dflags & DAMAGE_NO_PROTECTION))
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (targ->pain_debounce_time < level.time)
+		if (((targ->svflags & SVF_MONSTER) &&
+			 (targ->monsterinfo.invincible_framenum > level.framenum)) &&
+			!(dflags & DAMAGE_NO_PROTECTION))
 		{
-			gi.sound(targ, CHAN_ITEM, gi.soundindex( "items/protect4.wav"), 1, ATTN_NORM, 0);
-			targ->pain_debounce_time = level.time + 2;
-		}
+			if (targ->pain_debounce_time < level.time)
+			{
+				gi.sound(targ, CHAN_ITEM, gi.soundindex( "items/protect4.wav"), 1, ATTN_NORM, 0);
+				targ->pain_debounce_time = level.time + 2;
+			}
 
-		take = 0;
-		save = damage;
+			take = 0;
+			save = damage;
+		}
 	}
 
 	psave = CheckPowerArmor(targ, point, normal, take, dflags);
@@ -914,14 +949,17 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		return;
 	}
 
-	/* this option will do damage both to the armor
-	   and person. originally for DPU rounds */
-	if (dflags & DAMAGE_DESTROY_ARMOR)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (!(targ->flags & FL_GODMODE) && !(dflags & DAMAGE_NO_PROTECTION) &&
-			!(client && (client->invincible_framenum > level.framenum)))
+		/* this option will do damage both to the armor
+		   and person. originally for DPU rounds */
+		if (dflags & DAMAGE_DESTROY_ARMOR)
 		{
-			take = damage;
+			if (!(targ->flags & FL_GODMODE) && !(dflags & DAMAGE_NO_PROTECTION) &&
+				!(client && (client->invincible_framenum > level.framenum)))
+			{
+				take = damage;
+			}
 		}
 	}
 
@@ -929,15 +967,19 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	if (take)
 	{
 		/* need more blood for chainfist. */
-		if (targ->flags & FL_MECHANICAL)
+		if ((game.gametype == rogue_coop) && (targ->flags & FL_MECHANICAL)) /* FS: Coop: Rogue specific */
 		{
 			SpawnDamage(TE_ELECTRIC_SPARKS, point, normal);
 		}
 		else if ((targ->svflags & SVF_MONSTER) || (client))
 		{
-			if (mod == MOD_CHAINFIST)
+			if ((game.gametype == rogue_coop) && (mod == MOD_CHAINFIST)) /* FS: Coop: Rogue specific */
 			{
 				SpawnDamage(TE_MOREBLOOD, point, normal);
+			}
+			else if ((game.gametype == xatrix_coop) && (strcmp(targ->classname, "monster_gekk") == 0)) /* FS: Coop: Xatrix specific */
+			{
+				SpawnDamage(TE_GREENBLOOD, point, normal);
 			}
 			else
 			{
@@ -951,14 +993,17 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 
 		targ->health = targ->health - take;
 
-		/* spheres need to know who to shoot at */
-		if (client && client->owned_sphere)
+		if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 		{
-			sphere_notified = true;
-
-			if (client->owned_sphere->pain)
+			/* spheres need to know who to shoot at */
+			if (client && client->owned_sphere)
 			{
-				client->owned_sphere->pain(client->owned_sphere, attacker, 0, 0);
+				sphere_notified = true;
+
+				if (client->owned_sphere->pain)
+				{
+					client->owned_sphere->pain(client->owned_sphere, attacker, 0, 0);
+				}
 			}
 		}
 
@@ -974,15 +1019,18 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		}
 	}
 
-	/* spheres need to know who to shoot at */
-	if (!sphere_notified)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (client && client->owned_sphere)
+		/* spheres need to know who to shoot at */
+		if (!sphere_notified)
 		{
-			if (client->owned_sphere->pain)
+			if (client && client->owned_sphere)
 			{
-				client->owned_sphere->pain(client->owned_sphere, attacker, 0,
-						0);
+				if (client->owned_sphere->pain)
+				{
+					client->owned_sphere->pain(client->owned_sphere, attacker, 0,
+							0);
+				}
 			}
 		}
 	}
@@ -1071,8 +1119,9 @@ T_RadiusDamage(edict_t *inflictor, edict_t *attacker, float damage,
 			if (CanDamage(ent, inflictor))
 			{
 				VectorSubtract(ent->s.origin, inflictor->s.origin, dir);
-				T_Damage(ent, inflictor, attacker, dir, inflictor->s.origin, vec3_origin,
-						(int)points, (int)points, DAMAGE_RADIUS, mod);
+				T_Damage(ent, inflictor, attacker, dir, inflictor->s.origin,
+						vec3_origin, (int)points, (int)points, DAMAGE_RADIUS,
+						mod);
 			}
 		}
 	}
