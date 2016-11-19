@@ -73,12 +73,12 @@ mframe_t gladiator_frames_stand[] = {
 	{ai_stand, 0, NULL},
 	{ai_stand, 0, NULL}
 };
-
-mmove_t gladiator_move_stand = {
+mmove_t gladiator_move_stand =
+{
 	FRAME_stand1,
-   	FRAME_stand7,
-   	gladiator_frames_stand,
-   	NULL
+	FRAME_stand7,
+	gladiator_frames_stand,
+	NULL
 };
 
 void
@@ -111,11 +111,12 @@ mframe_t gladiator_frames_walk[] = {
 	{ai_walk, 8, NULL}
 };
 
-mmove_t gladiator_move_walk = {
+mmove_t gladiator_move_walk =
+{
 	FRAME_walk1,
-   	FRAME_walk16,
-   	gladiator_frames_walk,
-   	NULL
+	FRAME_walk16,
+	gladiator_frames_walk,
+	NULL
 };
 
 void
@@ -138,11 +139,12 @@ mframe_t gladiator_frames_run[] = {
 	{ai_run, 13, NULL}
 };
 
-mmove_t gladiator_move_run = {
+mmove_t gladiator_move_run =
+{
 	FRAME_run1,
-   	FRAME_run6,
-   	gladiator_frames_run,
-   	NULL
+	FRAME_run6,
+	gladiator_frames_run,
+	NULL
 };
 
 void
@@ -205,11 +207,12 @@ mframe_t gladiator_frames_attack_melee[] = {
 	{ai_charge, 0, NULL}
 };
 
-mmove_t gladiator_move_attack_melee = {
+mmove_t gladiator_move_attack_melee =
+{
 	FRAME_melee1,
-   	FRAME_melee17,
-   	gladiator_frames_attack_melee,
-   	gladiator_run
+	FRAME_melee17,
+	gladiator_frames_attack_melee,
+	gladiator_run
 };
 
 void
@@ -258,11 +261,12 @@ mframe_t gladiator_frames_attack_gun[] = {
 	{ai_charge, 0, NULL}
 };
 
-mmove_t gladiator_move_attack_gun = {
+mmove_t gladiator_move_attack_gun =
+{
 	FRAME_attack1,
-   	FRAME_attack9,
-   	gladiator_frames_attack_gun,
-   	gladiator_run
+	FRAME_attack9,
+	gladiator_frames_attack_gun,
+	gladiator_run
 };
 
 void
@@ -301,11 +305,12 @@ mframe_t gladiator_frames_pain[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t gladiator_move_pain = {
+mmove_t gladiator_move_pain =
+{
 	FRAME_pain1,
-   	FRAME_pain6,
-   	gladiator_frames_pain,
-   	gladiator_run
+	FRAME_pain6,
+	gladiator_frames_pain,
+	gladiator_run
 };
 
 mframe_t gladiator_frames_pain_air[] = {
@@ -318,15 +323,17 @@ mframe_t gladiator_frames_pain_air[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t gladiator_move_pain_air = {
+mmove_t gladiator_move_pain_air =
+{
 	FRAME_painup1,
-   	FRAME_painup7,
-   	gladiator_frames_pain_air,
-   	gladiator_run
+	FRAME_painup7,
+	gladiator_frames_pain_air,
+	gladiator_run
 };
 
 void
-gladiator_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
+gladiator_pain(edict_t *self, edict_t *other /* unused */,
+		float kick /* unused */, int damage)
 {
 	if (!self)
 	{
@@ -416,16 +423,18 @@ mframe_t gladiator_frames_death[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t gladiator_move_death = {
+mmove_t gladiator_move_death =
+{
 	FRAME_death1,
-   	FRAME_death22,
-   	gladiator_frames_death,
-   	gladiator_dead
+	FRAME_death22,
+	gladiator_frames_death,
+	gladiator_dead
 };
 
 void
-gladiator_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* unused */,
-		int damage, vec3_t point /* unused */)
+gladiator_die(edict_t *self, edict_t *inflictor /* unused */,
+	   	edict_t *attacker /* unused */, int damage /*unused */,
+		vec3_t point)
 {
 	int n;
 
@@ -437,19 +446,22 @@ gladiator_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker 
 	/* check for gib */
 	if (self->health <= self->gib_health)
 	{
-		gi.sound(self, CHAN_VOICE, gi.soundindex("misc/udeath.wav"), 1, ATTN_NORM, 0);
+		gi.sound(self, CHAN_VOICE, gi.soundindex( "misc/udeath.wav"), 1, ATTN_NORM, 0);
 
 		for (n = 0; n < 2; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/bone/tris.md2", damage, GIB_ORGANIC);
+			ThrowGib(self, "models/objects/gibs/bone/tris.md2",
+					damage, GIB_ORGANIC);
 		}
 
 		for (n = 0; n < 4; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
+			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2",
+					damage, GIB_ORGANIC);
 		}
 
-		ThrowHead(self, "models/objects/gibs/head2/tris.md2", damage, GIB_ORGANIC);
+		ThrowHead(self, "models/objects/gibs/head2/tris.md2",
+				damage, GIB_ORGANIC);
 		self->deadflag = DEAD_DEAD;
 		return;
 	}

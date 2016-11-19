@@ -1464,6 +1464,11 @@ soldier_die(edict_t *self, edict_t *inflictor /* unused */,
 {
 	int n;
 
+  	if (!self)
+	{
+		return;
+	}
+
 	/* check for gib */
 	if (self->health <= self->gib_health)
 	{
