@@ -3971,18 +3971,28 @@ SP_xatrix_item(edict_t *self) /* FS: Coop: Rogue specific */
 	int i;
 	char *spawnClass = NULL;
 
-	if (!self)
+	if (!self || !self->classname)
 	{
 		return;
 	}
 
-	if(game.gametype == xatrix_coop) /* FS: FIXME: Coop: Redirect these from g_spawn.c */
+	if(game.gametype == xatrix_coop) /* FS: FIXME: Coop: This should work for Xatrix, but need to test the maps that have these items to be sure. */
 	{
-		return;
-	}
+		/* check item spawn functions */
+		for (i = 0, item = itemlist; i < game.num_items; i++, item++)
+		{
+			if (!item->classname)
+			{
+				continue;
+			}
 
-	if (!self->classname)
-	{
+			if (!strcmp(item->classname, self->classname))
+			{
+				/* found it */
+				SpawnItem(self, item);
+				return;
+			}
+		}
 		return;
 	}
 
