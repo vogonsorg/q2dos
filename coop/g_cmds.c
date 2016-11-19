@@ -251,6 +251,34 @@ Cmd_Give_f(edict_t *ent)
 				continue;
 			}
 
+			switch(game.gametype) /* FS: Check our game modes and don't add what we aren't supposed to have. */
+			{
+				case vanilla_coop:
+					if (it->flags & IT_XATRIX)
+					{
+						continue;
+					}
+					if (it->flags & IT_ROGUE)
+					{
+						continue;
+					}
+					break;
+				case xatrix_coop:
+					if (it->flags & IT_ROGUE)
+					{
+						continue;
+					}
+					break;
+				case rogue_coop:
+					if (it->flags & IT_XATRIX)
+					{
+						continue;
+					}
+					break;
+				default:
+					break;
+			}
+
 			ent->client->pers.inventory[i] += 1;
 		}
 
@@ -274,6 +302,34 @@ Cmd_Give_f(edict_t *ent)
 			if (!(it->flags & IT_AMMO))
 			{
 				continue;
+			}
+
+			switch(game.gametype) /* FS: Check our game modes and don't add what we aren't supposed to have. */
+			{
+				case vanilla_coop:
+					if (it->flags & IT_XATRIX)
+					{
+						continue;
+					}
+					if (it->flags & IT_ROGUE)
+					{
+						continue;
+					}
+					break;
+				case xatrix_coop:
+					if (it->flags & IT_ROGUE)
+					{
+						continue;
+					}
+					break;
+				case rogue_coop:
+					if (it->flags & IT_XATRIX)
+					{
+						continue;
+					}
+					break;
+				default:
+					break;
 			}
 
 			Add_Ammo(ent, it, 1000);
@@ -343,6 +399,34 @@ Cmd_Give_f(edict_t *ent)
 			if (it->flags & (IT_ARMOR | IT_WEAPON | IT_AMMO))
 			{
 				continue;
+			}
+
+			switch(game.gametype) /* FS: Check our game modes and don't add what we aren't supposed to have. */
+			{
+				case vanilla_coop:
+					if (it->flags & IT_XATRIX)
+					{
+						continue;
+					}
+					if (it->flags & IT_ROGUE)
+					{
+						continue;
+					}
+					break;
+				case xatrix_coop:
+					if (it->flags & IT_ROGUE)
+					{
+						continue;
+					}
+					break;
+				case rogue_coop:
+					if (it->flags & IT_XATRIX)
+					{
+						continue;
+					}
+					break;
+				default:
+					break;
 			}
 
 			ent->client->pers.inventory[i] = 1;
