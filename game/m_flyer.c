@@ -48,7 +48,7 @@ void flyer_stand(edict_t *self);
 void flyer_nextmove(edict_t *self);
 
 void
-flyer_sight(edict_t *self, edict_t *other /* other */)
+flyer_sight(edict_t *self, edict_t *other /* unused */)
 {
 	if (!self)
 	{
@@ -497,7 +497,7 @@ flyer_fire(edict_t *self, int flash_number)
 	vec3_t dir;
 	int effect;
 
-	if (!self)
+	if (!self || !self->enemy || !self->enemy->inuse)
 	{
 		return;
 	}
