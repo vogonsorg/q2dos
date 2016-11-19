@@ -268,7 +268,7 @@ G_UseTargets(edict_t *ent, edict_t *activator)
 	edict_t *master; /* FS: Coop: Rogue specific */
 	qboolean done = false; /* FS: Coop: Rogue specific */
 
-	if (!ent || !activator)
+	if (!ent) /* FS: DO NOT PARANOIA CHECK ACTIVATOR! BREAKS PLATS IN XWARE.BSP! */
 	{
 		return;
 	}

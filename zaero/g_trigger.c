@@ -287,7 +287,7 @@ void
 trigger_relay_use(edict_t *self, edict_t *other /* unused */,
 	   	edict_t *activator)
 {
-	if (!self || !activator)
+	if (!self) /* FS: DO NOT PARANOIA CHECK ACTIVATOR!  BREAKS XWARE.BSP PLATS! */
 	{
 		return;
 	}
