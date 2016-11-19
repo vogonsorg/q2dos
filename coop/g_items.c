@@ -2707,7 +2707,7 @@ always owned, never in the world
 
 	/* QUAKED weapon_plasmabeam (.3 .3 1) (-16 -16 -16) (16 16 16) TRIGGER_SPAWN */
 	{
-		"weapon_plasmabeam",
+		"weapon_plasmabeam", /* FS: Coop: Rogue specific */
 		Pickup_Weapon,
 		Use_Weapon,
 		Drop_Weapon,
@@ -2720,7 +2720,7 @@ always owned, never in the world
 		0,
 		2,
 		"Cells",
-		IT_WEAPON,
+		IT_WEAPON|IT_ROGUE,
 		WEAP_PLASMA,
 		NULL,
 		0,
@@ -2802,7 +2802,7 @@ always owned, never in the world
 
 	/* QUAKED weapon_chainfist (.3 .3 1) (-16 -16 -16) (16 16 16) TRIGGER_SPAWN */
 	{
-		"weapon_chainfist",
+		"weapon_chainfist", /* FS: Coop: Rogue specific */
 		Pickup_Weapon,
 		Use_Weapon,
 		Drop_Weapon,
@@ -2815,7 +2815,7 @@ always owned, never in the world
 		0,
 		0,
 		NULL,
-		IT_WEAPON | IT_MELEE,
+		IT_WEAPON | IT_MELEE | IT_ROGUE,
 		WEAP_CHAINFIST,
 		NULL,
 		1,
@@ -2824,7 +2824,7 @@ always owned, never in the world
 
 	/* QUAKED weapon_disintegrator (.3 .3 1) (-16 -16 -16) (16 16 16) TRIGGER_SPAWN */
 	{
-		"weapon_disintegrator",
+		"weapon_disintegrator", /* FS: Coop: Rogue specific */
 		Pickup_Weapon,
 		Use_Weapon,
 		Drop_Weapon,
@@ -2837,7 +2837,7 @@ always owned, never in the world
 		0,
 		1,
 		"Rounds",
-		IT_WEAPON | IT_STAY_COOP,
+		IT_WEAPON | IT_STAY_COOP | IT_ROGUE,
 		WEAP_DISRUPTOR,
 		NULL,
 		1,
