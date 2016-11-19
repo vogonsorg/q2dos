@@ -1495,6 +1495,7 @@ mmove_t soldier_move_duck =
    	soldier_frames_duck,
    	soldier_run
 };
+
 void
 soldier_dodge(edict_t *self, edict_t *attacker, float eta, trace_t *fake /* unused */)
 {
@@ -2089,7 +2090,7 @@ soldier_duck(edict_t *self, float eta) /* FS: Coop: Rogue specific */
 	if (skill->value == 0)
 	{
 		self->monsterinfo.nextframe = FRAME_duck01;
-		self->monsterinfo.currentmove = &soldier_move_duck;
+		self->monsterinfo.currentmove = &soldier_move_duck_rogue;
 		self->monsterinfo.duck_wait_time = level.time + eta + 1;
 		return;
 	}
@@ -2099,7 +2100,7 @@ soldier_duck(edict_t *self, float eta) /* FS: Coop: Rogue specific */
 	if (r > (skill->value * 0.3))
 	{
 		self->monsterinfo.nextframe = FRAME_duck01;
-		self->monsterinfo.currentmove = &soldier_move_duck;
+		self->monsterinfo.currentmove = &soldier_move_duck_rogue;
 		self->monsterinfo.duck_wait_time = level.time + eta + (0.1 * (3 - skill->value));
 	}
 	else
