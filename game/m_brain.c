@@ -43,6 +43,8 @@ static int sound_search;
 static int sound_melee1;
 static int sound_melee2;
 static int sound_melee3;
+void brain_run(edict_t *self);
+void brain_dead(edict_t *self);
 
 void
 brain_sight(edict_t *self, edict_t *other /* unused */)
@@ -66,8 +68,6 @@ brain_search(edict_t *self)
 	gi.sound(self, CHAN_VOICE, sound_search, 1, ATTN_NORM, 0);
 }
 
-void brain_run(edict_t *self);
-void brain_dead(edict_t *self);
 
 mframe_t brain_frames_stand[] = {
 	{ai_stand, 0, NULL},
