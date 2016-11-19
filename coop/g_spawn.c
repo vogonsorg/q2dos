@@ -916,6 +916,17 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 						}
 					}
 				}
+				else
+				{
+					if (((skill->value == 0) && (ent->spawnflags & SPAWNFLAG_NOT_EASY)) ||
+						((skill->value == 1) && (ent->spawnflags & SPAWNFLAG_NOT_MEDIUM)) ||
+						(((skill->value == 2) || (skill->value == 3)) && (ent->spawnflags & SPAWNFLAG_NOT_HARD)))
+					{
+						G_FreeEdict(ent);
+						inhibit++;
+						continue;
+					}
+				}
 			}
 			else
 			{

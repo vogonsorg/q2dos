@@ -24,13 +24,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define STEPSIZE 18
 #define DI_NODIR -1
 
-int c_yes, c_no;
 
 /*
  * Returns false if any part of the
  * bottom of the entity is off an edge
  * that is not a staircase.
  */
+int c_yes, c_no;
+
 qboolean
 M_CheckBottom(edict_t *ent)
 {
@@ -487,11 +488,6 @@ SV_NewChaseDir(edict_t *actor, edict_t *enemy, float dist)
 	float tdir, olddir, turnaround;
 
 	if (!actor || !enemy)
-	{
-		return;
-	}
-
-	if (!enemy)
 	{
 		return;
 	}

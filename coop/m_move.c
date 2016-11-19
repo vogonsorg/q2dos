@@ -2,16 +2,17 @@
 
 #include "g_local.h"
 
-#define DI_NODIR -1
 #define STEPSIZE 18
+#define DI_NODIR -1
 
 /* this is used for communications out of
  * sv_movestep to say what entity is blocking us */
 edict_t *new_bad; /* FS: Coop: Rogue specific */
 
 /*
- * Returns false if any part of the bottom of the
- * entity is off an edge that is not a staircase.
+ * Returns false if any part of the
+ * bottom of the entity is off an edge
+ * that is not a staircase.
  */
 int c_yes, c_no;
 
@@ -31,9 +32,9 @@ M_CheckBottom(edict_t *ent)
 	VectorAdd(ent->s.origin, ent->mins, mins);
 	VectorAdd(ent->s.origin, ent->maxs, maxs);
 
-	/* if all of the points under the corners are solid world, don't bother
-	   with the tougher checksthe corners must be within 16 of the midpoint */
-
+	/* if all of the points under the corners are solid
+	   world, don't bother with the tougher checks
+	   the corners must be within 16 of the midpoint */
 	start[2] = mins[2] - 1;
 
 	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
