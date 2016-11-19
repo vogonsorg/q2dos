@@ -230,6 +230,8 @@ InitGame(void)
 	deathmatch = gi.cvar ("deathmatch", "0", CVAR_LATCH);
 	coop = gi.cvar ("coop", "0", CVAR_LATCH);
 	coop_item_respawn = gi.cvar("coop_item_respawn", "1", CVAR_SERVERINFO); /* FS: Coop: Added */
+	sv_coop_gamemode = gi.cvar("sv_coop_gamemode", "vanilla", CVAR_NOSET); /* FS: Coop: Added */
+	sv_coop_gamemode->description = "Internal CVAR used to keep track of current gamemode during DLL resets.";
 	motd = gi.cvar ("motd", "", 0); /* FS: Coop: Added */
 	skill = gi.cvar ("skill", "1", CVAR_LATCH);
 	maxentities = gi.cvar ("maxentities", "1024", CVAR_LATCH);
@@ -260,6 +262,19 @@ InitGame(void)
 	/* dm map list */
 	sv_maplist = gi.cvar ("sv_maplist", "", 0);
 
+	if(!strcmp(sv_coop_gamemode->string, "rogue")) /* FS: Coop: Set the proper coop gamemode */
+	{
+		game.gametype = rogue_coop;
+	}
+	else if (!strcmp(sv_coop_gamemode->string, "xatrix"))
+	{
+		game.gametype = xatrix_coop;
+	}
+	else
+	{
+		game.gametype = vanilla_coop;
+	}
+
 	/* items */
 	InitItems ();
 
@@ -276,8 +291,6 @@ InitGame(void)
 	game.maxclients = maxclients->value;
 	game.clients = gi.TagMalloc (game.maxclients * sizeof(game.clients[0]), TAG_GAME);
 	globals.num_edicts = game.maxclients+1;
-
-	game.gametype = rogue_coop; /* FS: Coop: FIXME -- hardcoded to Rogue for now */
 
 	if (gamerules) /* FS: Coop: Rogue specific */
 	{
@@ -777,6 +790,8 @@ WriteGame(const char *filename, qboolean autosave)
     char str_os[32];
 	char str_arch[32];
 
+	return; /* FS: FIXME: Not yet... */
+
 	if (!autosave)
 	{
 		SaveClientData();
@@ -956,6 +971,8 @@ WriteLevel(const char *filename)
 	int i;
 	edict_t *ent;
 	FILE *f;
+
+	return; /* FS: FIXME: Not yet... */
 
 	f = fopen(filename, "wb");
 

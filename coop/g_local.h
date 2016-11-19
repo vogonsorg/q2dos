@@ -636,6 +636,7 @@ extern	cvar_t	*maxentities;
 extern	cvar_t	*deathmatch;
 extern	cvar_t	*coop;
 extern	cvar_t	*coop_item_respawn; /* FS: Coop: Added */
+extern	cvar_t	*sv_coop_gamemode; /* FS: Coop: Added */
 extern	cvar_t	*motd; /* FS: Coop: Added */
 extern	cvar_t	*dmflags;
 extern	cvar_t	*skill;

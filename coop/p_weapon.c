@@ -451,15 +451,9 @@ Think_Weapon(edict_t *ent)
 	/* call active weapon think routine */
 	if (ent->client->pers.weapon && ent->client->pers.weapon->weaponthink)
 	{
-		if (game.gametype != rogue_coop)
-		{
-			is_quad = (ent->client->quad_framenum > level.framenum);
-			is_quadfire = (ent->client->quadfire_framenum > level.framenum); /* FS: Coop: Xatrix specific */
-		}
-		else
-		{
-			P_DamageModifier(ent); /* FS: Coop: Rogue addition.  Sets damage_multiplier. */
-		}
+
+		P_DamageModifier(ent); /* FS: Coop: Rogue addition.  Sets damage_multiplier. */
+		is_quadfire = (ent->client->quadfire_framenum > level.framenum); /* FS: Coop: Xatrix specific */
 
 		if (ent->client->silencer_shots)
 		{
@@ -680,6 +674,11 @@ void Use_Weapon2 (edict_t *ent, gitem_t *item) /* FS */
 	else if (game.gametype == xatrix_coop)
 	{
 		Use_Weapon2_Xatrix(ent, item);
+		return;
+	}
+	else
+	{
+		Use_Weapon(ent, item);
 		return;
 	}
 }

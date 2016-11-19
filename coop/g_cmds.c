@@ -1512,6 +1512,41 @@ Cmd_PlayerList_f(edict_t *ent)
 }
 
 void
+Cmd_Coop_Gamemode(edict_t *ent, gametype_t gametype) /* FS: Coop: Gamemode voting */
+{
+	char command[1024];
+
+	if (!ent || !ent->client || !ent->client->pers.netname)
+	{
+		return;
+	}
+
+	switch(gametype)
+	{
+		case vanilla_coop:
+			gi.bprintf(PRINT_HIGH, "%s votes to change gamemode to iD coop!\n", ent->client->pers.netname);
+			gi.cvar_forceset("sv_coop_gamemode", "vanilla");
+			Com_sprintf(command, sizeof(command), "map base1\n");
+			gi.AddCommandString(command);
+			return;
+		case rogue_coop:
+			gi.bprintf(PRINT_HIGH, "%s votes to change gamemode to Rogue coop!\n", ent->client->pers.netname);
+			gi.cvar_forceset("sv_coop_gamemode", "rogue");
+			Com_sprintf(command, sizeof(command), "map rmine1\n");
+			gi.AddCommandString(command);
+			return;
+		case xatrix_coop:
+			gi.bprintf(PRINT_HIGH, "%s votes to change gamemode to Xatrix coop!\n", ent->client->pers.netname);
+			gi.cvar_forceset("sv_coop_gamemode", "xatrix");
+			Com_sprintf(command, sizeof(command), "map xswamp\n");
+			gi.AddCommandString(command);
+			return;
+		default:
+			break;
+	}
+}
+
+void
 ClientCommand(edict_t *ent)
 {
 	char *cmd;
@@ -1527,6 +1562,24 @@ ClientCommand(edict_t *ent)
 	}
 
 	cmd = gi.argv(0);
+
+	if (Q_stricmp(cmd, "idcoop") == 0) /* FS: Coop: Game mode switching */
+	{
+		Cmd_Coop_Gamemode(ent, vanilla_coop);
+		return;
+	}
+
+	if (Q_stricmp(cmd, "roguecoop") == 0) /* FS: Coop: Game mode switching */
+	{
+		Cmd_Coop_Gamemode(ent, rogue_coop);
+		return;
+	}
+
+	if (Q_stricmp(cmd, "xatrixcoop") == 0) /* FS: Coop: Game mode switching */
+	{
+		Cmd_Coop_Gamemode(ent, xatrix_coop);
+		return;
+	}
 
 	if (Q_stricmp(cmd, "players") == 0)
 	{

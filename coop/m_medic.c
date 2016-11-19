@@ -478,7 +478,8 @@ mframe_t medic_frames_stand[] = {
 	{ai_stand, 0, NULL},
 };
 
-mmove_t medic_move_stand = {
+mmove_t medic_move_stand =
+{
 	FRAME_wait1,
    	FRAME_wait90,
    	medic_frames_stand,
