@@ -9,21 +9,21 @@ MEDIC
 #include "g_local.h"
 #include "m_medic.h"
 
-#define MEDIC_MIN_DISTANCE 32
-#define MEDIC_MAX_HEAL_DISTANCE 400
-#define MEDIC_TRY_TIME 10.0
+#define MEDIC_MIN_DISTANCE 32 /* FS: Coop: Rogue specific */
+#define MEDIC_MAX_HEAL_DISTANCE 400 /* FS: Coop: Rogue specific */
+#define MEDIC_TRY_TIME 10.0 /* FS: Coop: Rogue specific */
 
 qboolean visible(edict_t *self, edict_t *other);
 void M_SetEffects(edict_t *ent);
-qboolean FindTarget(edict_t *self);
-void HuntTarget(edict_t *self);
-void FoundTarget(edict_t *self);
+qboolean FindTarget(edict_t *self); /* FS: Coop: Rogue specific */
+void HuntTarget(edict_t *self); /* FS: Coop: Rogue specific */
+void FoundTarget(edict_t *self); /* FS: Coop: Rogue specific */
 char *ED_NewString(char *string);
-void spawngrow_think(edict_t *self);
-void SpawnGrow_Spawn(vec3_t startpos, int size);
+void spawngrow_think(edict_t *self); /* FS: Coop: Rogue specific */
+void SpawnGrow_Spawn(vec3_t startpos, int size); /* FS: Coop: Rogue specific */
 void ED_CallSpawn(edict_t *ent);
-void M_FliesOff(edict_t *self);
-void M_FliesOn(edict_t *self);
+void M_FliesOff(edict_t *self); /* FS: Coop: Rogue specific */
+void M_FliesOn(edict_t *self); /* FS: Coop: Rogue specific */
 
 static int sound_idle1;
 static int sound_pain1;
@@ -36,7 +36,7 @@ static int sound_hook_hit;
 static int sound_hook_heal;
 static int sound_hook_retract;
 
-/* commander sounds */
+/* FS: Coop: Rogue specific */
 static int commander_sound_idle1;
 static int commander_sound_pain1;
 static int commander_sound_pain2;
@@ -49,7 +49,7 @@ static int commander_sound_hook_heal;
 static int commander_sound_hook_retract;
 static int commander_sound_spawn;
 
-char *reinforcements[] = {
+char *reinforcements[] = { /* FS: Coop: Rogue specific */
 	"monster_soldier_light",  /* 0 */
 	"monster_soldier",        /* 1 */
 	"monster_soldier_ss",     /* 2 */
@@ -59,7 +59,7 @@ char *reinforcements[] = {
 	"monster_gladiator"       /* 6 */
 };
 
-vec3_t reinforcement_mins[] = {
+vec3_t reinforcement_mins[] = { /* FS: Coop: Rogue specific */
 	{-16, -16, -24},
 	{-16, -16, -24},
 	{-16, -16, -24},
@@ -69,7 +69,7 @@ vec3_t reinforcement_mins[] = {
 	{-32, -32, -24}
 };
 
-vec3_t reinforcement_maxs[] = {
+vec3_t reinforcement_maxs[] = { /* FS: Coop: Rogue specific */
 	{16, 16, 32},
 	{16, 16, 32},
 	{16, 16, 32},
@@ -79,7 +79,7 @@ vec3_t reinforcement_maxs[] = {
 	{32, 32, 64}
 };
 
-vec3_t reinforcement_position[] = {
+vec3_t reinforcement_position[] = { /* FS: Coop: Rogue specific */
 	{80, 0, 0},
 	{40, 60, 0},
 	{40, -60, 0},
@@ -88,7 +88,7 @@ vec3_t reinforcement_position[] = {
 };
 
 void
-cleanupHeal(edict_t *self, qboolean change_frame)
+cleanupHeal(edict_t *self, qboolean change_frame) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -111,7 +111,7 @@ cleanupHeal(edict_t *self, qboolean change_frame)
 }
 
 void
-abortHeal(edict_t *self, qboolean change_frame, qboolean gib, qboolean mark)
+abortHeal(edict_t *self, qboolean change_frame, qboolean gib, qboolean mark) /* FS: Coop: Rogue specific */
 {
 	int hurt;
 	static vec3_t pain_normal = {0, 0, 1};
@@ -170,7 +170,7 @@ abortHeal(edict_t *self, qboolean change_frame, qboolean gib, qboolean mark)
 }
 
 qboolean
-canReach(edict_t *self, edict_t *other)
+canReach(edict_t *self, edict_t *other) /* FS: Coop: Rogue specific */
 {
 	vec3_t spot1;
 	vec3_t spot2;
@@ -197,7 +197,7 @@ canReach(edict_t *self, edict_t *other)
 }
 
 edict_t *
-medic_FindDeadMonster(edict_t *self)
+medic_FindDeadMonster_rogue(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	float radius;
 	edict_t *ent = NULL;
@@ -301,8 +301,78 @@ medic_FindDeadMonster(edict_t *self)
 	return best;
 }
 
+edict_t *
+medic_FindDeadMonster(edict_t *self)
+{
+	edict_t *ent = NULL;
+	edict_t *best = NULL;
+
+	if (!self)
+	{
+		return NULL;
+	}
+
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		return medic_FindDeadMonster_rogue(self);
+	}
+
+	while ((ent = findradius(ent, self->s.origin, 1024)) != NULL)
+	{
+		if (ent == self)
+		{
+			continue;
+		}
+
+		if (!(ent->svflags & SVF_MONSTER))
+		{
+			continue;
+		}
+
+		if (ent->monsterinfo.aiflags & AI_GOOD_GUY)
+		{
+			continue;
+		}
+
+		if (ent->owner)
+		{
+			continue;
+		}
+
+		if (ent->health > 0)
+		{
+			continue;
+		}
+
+		if (ent->nextthink)
+		{
+			continue;
+		}
+
+		if (!visible(self, ent))
+		{
+			continue;
+		}
+
+		if (!best)
+		{
+			best = ent;
+			continue;
+		}
+
+		if (ent->max_health <= best->max_health)
+		{
+			continue;
+		}
+
+		best = ent;
+	}
+
+	return best;
+}
+
 void
-medic_idle(edict_t *self)
+medic_idle_rogue(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	edict_t *ent;
 
@@ -323,7 +393,7 @@ medic_idle(edict_t *self)
 
 	if (!self->oldenemy)
 	{
-		ent = medic_FindDeadMonster(self);
+		ent = medic_FindDeadMonster_rogue(self);
 
 		if (ent)
 		{
@@ -337,7 +407,36 @@ medic_idle(edict_t *self)
 }
 
 void
-medic_search(edict_t *self)
+medic_idle(edict_t *self)
+{
+	edict_t *ent;
+
+	if (!self)
+	{
+		return;
+	}
+
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		medic_idle_rogue(self);
+		return;
+	}
+
+	gi.sound(self, CHAN_VOICE, sound_idle1, 1, ATTN_IDLE, 0);
+
+	ent = medic_FindDeadMonster(self);
+
+	if (ent)
+	{
+		self->enemy = ent;
+		self->enemy->owner = self;
+		self->monsterinfo.aiflags |= AI_MEDIC;
+		FoundTarget(self);
+	}
+}
+
+void
+medic_search_rogue(edict_t *self)
 {
 	edict_t *ent;
 
@@ -367,6 +466,39 @@ medic_search(edict_t *self)
 }
 
 void
+medic_search(edict_t *self)
+{
+	edict_t *ent;
+
+	if (!self)
+	{
+		return;
+	}
+
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		medic_search_rogue(self);
+		return;
+	}
+
+	gi.sound(self, CHAN_VOICE, sound_search, 1, ATTN_IDLE, 0);
+
+	if (!self->oldenemy)
+	{
+		ent = medic_FindDeadMonster(self);
+
+		if (ent)
+		{
+			self->oldenemy = self->enemy;
+			self->enemy = ent;
+			self->enemy->owner = self;
+			self->monsterinfo.aiflags |= AI_MEDIC;
+			FoundTarget(self);
+		}
+	}
+}
+
+void
 medic_sight(edict_t *self, edict_t *other /* unused */)
 {
 	if (!self)
@@ -375,7 +507,7 @@ medic_sight(edict_t *self, edict_t *other /* unused */)
 	}
 
 	/* commander sounds */
-	if (self->mass == 400)
+	if ((game.gametype != rogue_coop) || (self->mass == 400)) /* FS: Coop: Rogue specific */
 	{
 		gi.sound(self, CHAN_VOICE, sound_sight, 1, ATTN_NORM, 0);
 	}
@@ -512,7 +644,8 @@ mframe_t medic_frames_walk[] = {
 	{ai_walk, 9.3, NULL}
 };
 
-mmove_t medic_move_walk = {
+mmove_t medic_move_walk =
+{
 	FRAME_walk1,
    	FRAME_walk12,
    	medic_frames_walk,
@@ -530,10 +663,27 @@ medic_walk(edict_t *self)
 	self->monsterinfo.currentmove = &medic_move_walk;
 }
 
-mframe_t medic_frames_run[] = {
+mframe_t medic_frames_run_rogue[] = {
 	{ai_run, 18, NULL},
 	{ai_run, 22.5, NULL},
 	{ai_run, 25.4, monster_done_dodge},
+	{ai_run, 23.4, NULL},
+	{ai_run, 24, NULL},
+	{ai_run, 35.6, NULL}
+};
+
+mmove_t medic_move_run_rogue =
+{
+	FRAME_run1,
+	FRAME_run6,
+	medic_frames_run_rogue,
+   	NULL
+};
+
+mframe_t medic_frames_run[] = {
+	{ai_run, 18, NULL},
+	{ai_run, 22.5, NULL},
+	{ai_run, 25.4, NULL},
 	{ai_run, 23.4, NULL},
 	{ai_run, 24, NULL},
 	{ai_run, 35.6, NULL}
@@ -555,19 +705,36 @@ medic_run(edict_t *self)
 		return;
 	}
 
-	monster_done_dodge(self);
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		monster_done_dodge(self);
+	}
 
 	if (!(self->monsterinfo.aiflags & AI_MEDIC))
 	{
 		edict_t *ent;
 
-		ent = medic_FindDeadMonster(self);
+		if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+		{
+			ent = medic_FindDeadMonster_rogue(self);
+		}
+		else
+		{
+			ent = medic_FindDeadMonster(self);
+		}
 
 		if (ent)
 		{
 			self->oldenemy = self->enemy;
 			self->enemy = ent;
-			self->enemy->monsterinfo.healer = self;
+			if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+			{
+				self->enemy->monsterinfo.healer = self;
+			}
+			else
+			{
+				self->enemy->owner = self;
+			}
 			self->monsterinfo.aiflags |= AI_MEDIC;
 			FoundTarget(self);
 			return;
@@ -580,7 +747,14 @@ medic_run(edict_t *self)
 	}
 	else
 	{
-		self->monsterinfo.currentmove = &medic_move_run;
+		if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+		{
+			self->monsterinfo.currentmove = &medic_move_run_rogue;
+		}
+		else
+		{
+			self->monsterinfo.currentmove = &medic_move_run;
+		}
 	}
 }
 
@@ -595,9 +769,10 @@ mframe_t medic_frames_pain1[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t medic_move_pain1 = {
+mmove_t medic_move_pain1 =
+{
 	FRAME_paina1,
-   	FRAME_paina8,
+	FRAME_paina8,
    	medic_frames_pain1,
    	medic_run
 };
@@ -620,7 +795,8 @@ mframe_t medic_frames_pain2[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t medic_move_pain2 = {
+mmove_t medic_move_pain2 =
+{
 	FRAME_painb1,
    	FRAME_painb15,
    	medic_frames_pain2,
@@ -628,18 +804,22 @@ mmove_t medic_move_pain2 = {
 };
 
 void
-medic_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
+medic_pain(edict_t *self, edict_t *other /* unused */,
+		float kick, int damage /* unused */)
 {
 	if (!self)
 	{
 		return;
 	}
 
-	monster_done_dodge(self);
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		monster_done_dodge(self);
+	}
 
 	if ((self->health < (self->max_health / 2)))
 	{
-		if (self->mass > 400)
+		if ((game.gametype == rogue_coop) && (self->mass > 400)) /* FS: Coop: Rogue specific */
 		{
 			self->s.skinnum = 3;
 		}
@@ -661,49 +841,65 @@ medic_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 		return; /* no pain anims in nightmare */
 	}
 
-	/* if we're healing someone, we ignore pain */
-	if (self->monsterinfo.aiflags & AI_MEDIC)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		return;
-	}
-
-	if (self->mass > 400)
-	{
-		if (damage < 35)
+		/* if we're healing someone, we ignore pain */
+		if (self->monsterinfo.aiflags & AI_MEDIC)
 		{
-			gi.sound(self, CHAN_VOICE, commander_sound_pain1, 1, ATTN_NORM, 0);
 			return;
 		}
 
-		self->monsterinfo.aiflags &= ~AI_MANUAL_STEERING;
-		self->monsterinfo.aiflags &= ~AI_HOLD_FRAME;
-
-		gi.sound(self, CHAN_VOICE, commander_sound_pain2, 1, ATTN_NORM, 0);
-
-		if (random() < (min(((float)damage * 0.005), 0.5))) /* no more than 50% chance of big pain */
+		if (self->mass > 400)
 		{
-			self->monsterinfo.currentmove = &medic_move_pain2;
+			if (damage < 35)
+			{
+				gi.sound(self, CHAN_VOICE, commander_sound_pain1, 1, ATTN_NORM, 0);
+				return;
+			}
+
+			self->monsterinfo.aiflags &= ~AI_MANUAL_STEERING;
+			self->monsterinfo.aiflags &= ~AI_HOLD_FRAME;
+
+			gi.sound(self, CHAN_VOICE, commander_sound_pain2, 1, ATTN_NORM, 0);
+
+			if (random() < (min(((float)damage * 0.005), 0.5))) /* no more than 50% chance of big pain */
+			{
+				self->monsterinfo.currentmove = &medic_move_pain2;
+			}
+			else
+			{
+				self->monsterinfo.currentmove = &medic_move_pain1;
+			}
+		}
+		else if (random() < 0.5)
+		{
+			self->monsterinfo.currentmove = &medic_move_pain1;
+			gi.sound(self, CHAN_VOICE, sound_pain1, 1, ATTN_NORM, 0);
 		}
 		else
 		{
-			self->monsterinfo.currentmove = &medic_move_pain1;
+			self->monsterinfo.currentmove = &medic_move_pain2;
+			gi.sound(self, CHAN_VOICE, sound_pain2, 1, ATTN_NORM, 0);
 		}
-	}
-	else if (random() < 0.5)
-	{
-		self->monsterinfo.currentmove = &medic_move_pain1;
-		gi.sound(self, CHAN_VOICE, sound_pain1, 1, ATTN_NORM, 0);
+
+		/* clear duck flag */
+		if (self->monsterinfo.aiflags & AI_DUCKED)
+		{
+			monster_duck_up(self);
+		}
 	}
 	else
 	{
-		self->monsterinfo.currentmove = &medic_move_pain2;
-		gi.sound(self, CHAN_VOICE, sound_pain2, 1, ATTN_NORM, 0);
-	}
-
-	/* clear duck flag */
-	if (self->monsterinfo.aiflags & AI_DUCKED)
-	{
-		monster_duck_up(self);
+		if (random() < 0.5)
+		{
+			self->monsterinfo.currentmove = &medic_move_pain1;
+			gi.sound(self, CHAN_VOICE, sound_pain1, 1, ATTN_NORM, 0);
+		}
+		else
+		{
+			self->monsterinfo.currentmove = &medic_move_pain2;
+			gi.sound(self, CHAN_VOICE, sound_pain2, 1, ATTN_NORM, 0);
+		}
 	}
 }
 
@@ -715,7 +911,7 @@ medic_fire_blaster(edict_t *self)
 	vec3_t end;
 	vec3_t dir;
 	int effect;
-	int damage = 2;
+	int damage = 2; /* FS: Coop: Rogue specific */
 
 	if (!self)
 	{
@@ -752,21 +948,20 @@ medic_fire_blaster(edict_t *self)
 	end[2] += self->enemy->viewheight;
 	VectorSubtract(end, start, dir);
 
-	if (!strcmp(self->enemy->classname, "tesla"))
+	if ((game.gametype == rogue_coop) && (!strcmp(self->enemy->classname, "tesla"))) /* FS: Coop: Rogue specific */
 	{
 		damage = 3;
 	}
 
 	/* medic commander shoots blaster2 */
-	if (self->mass > 400)
+	if ((game.gametype == rogue_coop) && (self->mass > 400)) /* FS: Coop: Rogue specific */
 	{
 		monster_fire_blaster2(self, start, dir, damage,
 				1000, MZ2_MEDIC_BLASTER_2, effect);
 	}
 	else
 	{
-		monster_fire_blaster(self, start, dir, damage,
-				1000, MZ2_MEDIC_BLASTER_1, effect);
+		monster_fire_blaster(self, start, dir, damage, 1000, MZ2_MEDIC_BLASTER_1, effect);
 	}
 }
 
@@ -819,7 +1014,8 @@ mframe_t medic_frames_death[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t medic_move_death = {
+mmove_t medic_move_death =
+{
 	FRAME_death1,
    	FRAME_death30,
    	medic_frames_death,
@@ -827,8 +1023,9 @@ mmove_t medic_move_death = {
 };
 
 void
-medic_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* unused */,
-		int damage, vec3_t point /* unused */)
+medic_die(edict_t *self, edict_t *inflictor /* unused */,
+		edict_t *attacker /* unused */, int damage,
+		vec3_t point /* unused */)
 {
 	int n;
 
@@ -837,22 +1034,31 @@ medic_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* u
 		return;
 	}
 
+	/* if we had a pending patient, free him up for another medic */
+	if ((game.gametype != rogue_coop) && (self->enemy) && (self->enemy->owner == self)) /* FS: Coop: Rogue does it differently. */
+	{
+		self->enemy->owner = NULL;
+	}
+
 	/* check for gib */
 	if (self->health <= self->gib_health)
 	{
-		gi.sound(self, CHAN_VOICE, gi.soundindex("misc/udeath.wav"), 1, ATTN_NORM, 0);
+		gi.sound(self, CHAN_VOICE, gi.soundindex( "misc/udeath.wav"), 1, ATTN_NORM, 0);
 
 		for (n = 0; n < 2; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/bone/tris.md2", damage, GIB_ORGANIC);
+			ThrowGib(self, "models/objects/gibs/bone/tris.md2",
+					damage, GIB_ORGANIC);
 		}
 
 		for (n = 0; n < 4; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
+			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2",
+					damage, GIB_ORGANIC);
 		}
 
-		ThrowHead(self, "models/objects/gibs/head2/tris.md2", damage, GIB_ORGANIC);
+		ThrowHead(self, "models/objects/gibs/head2/tris.md2",
+				damage, GIB_ORGANIC);
 		self->deadflag = DEAD_DEAD;
 		return;
 	}
@@ -863,7 +1069,7 @@ medic_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* u
 	}
 
 	/* regular death */
-	if (self->mass == 400)
+	if ((game.gametype != rogue_coop) || (self->mass == 400)) /* FS: Coop: Rogue specific */
 	{
 		gi.sound(self, CHAN_VOICE, sound_die, 1, ATTN_NORM, 0);
 	}
@@ -878,7 +1084,59 @@ medic_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* u
 	self->monsterinfo.currentmove = &medic_move_death;
 }
 
-mframe_t medic_frames_duck[] = {
+void
+medic_duck_down(edict_t *self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	if (self->monsterinfo.aiflags & AI_DUCKED)
+	{
+		return;
+	}
+
+	self->monsterinfo.aiflags |= AI_DUCKED;
+	self->maxs[2] -= 32;
+	self->takedamage = DAMAGE_YES;
+	self->monsterinfo.pausetime = level.time + 1;
+	gi.linkentity(self);
+}
+
+void
+medic_duck_hold(edict_t *self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	if (level.time >= self->monsterinfo.pausetime)
+	{
+		self->monsterinfo.aiflags &= ~AI_HOLD_FRAME;
+	}
+	else
+	{
+		self->monsterinfo.aiflags |= AI_HOLD_FRAME;
+	}
+}
+
+void
+medic_duck_up(edict_t *self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	self->monsterinfo.aiflags &= ~AI_DUCKED;
+	self->maxs[2] += 32;
+	self->takedamage = DAMAGE_AIM;
+	gi.linkentity(self);
+}
+
+mframe_t medic_frames_duck_rogue[] = {
 	{ai_move, -1, NULL},
 	{ai_move, -1, NULL},
 	{ai_move, -1, monster_duck_down},
@@ -897,12 +1155,61 @@ mframe_t medic_frames_duck[] = {
 	{ai_move, -1, NULL}
 };
 
-mmove_t medic_move_duck = {
+mmove_t medic_move_duck_rogue =
+{
+	FRAME_duck1,
+   	FRAME_duck16,
+   	medic_frames_duck_rogue,
+   	medic_run
+};
+
+mframe_t medic_frames_duck[] = {
+	{ai_move, -1, NULL},
+	{ai_move, -1, NULL},
+	{ai_move, -1, medic_duck_down},
+	{ai_move, -1, medic_duck_hold},
+	{ai_move, -1, NULL},
+	{ai_move, -1, NULL},
+	{ai_move, -1, medic_duck_up},
+	{ai_move, -1, NULL},
+	{ai_move, -1, NULL},
+	{ai_move, -1, NULL},
+	{ai_move, -1, NULL},
+	{ai_move, -1, NULL},
+	{ai_move, -1, NULL},
+	{ai_move, -1, NULL},
+	{ai_move, -1, NULL},
+	{ai_move, -1, NULL}
+};
+
+mmove_t medic_move_duck =
+{
 	FRAME_duck1,
    	FRAME_duck16,
    	medic_frames_duck,
    	medic_run
 };
+
+void
+medic_dodge(edict_t *self, edict_t *attacker, float eta /* unused */, trace_t *fake /* unused */)
+{
+  	if (!self || !attacker)
+	{
+		return;
+	}
+
+	if (random() > 0.25)
+	{
+		return;
+	}
+
+	if (!self->enemy)
+	{
+		self->enemy = attacker;
+	}
+
+	self->monsterinfo.currentmove = &medic_move_duck;
+}
 
 mframe_t medic_frames_attackHyperBlaster[] = {
 	{ai_charge, 0, NULL},
@@ -923,7 +1230,8 @@ mframe_t medic_frames_attackHyperBlaster[] = {
 	{ai_charge, 0, medic_fire_blaster}
 };
 
-mmove_t medic_move_attackHyperBlaster = {
+mmove_t medic_move_attackHyperBlaster =
+{
 	FRAME_attack15,
    	FRAME_attack30,
    	medic_frames_attackHyperBlaster,
@@ -980,7 +1288,7 @@ medic_hook_launch(edict_t *self)
 	}
 
 	/* commander sounds */
-	if (self->mass == 400)
+	if ((game.gametype != rogue_coop) || (self->mass == 400)) /* FS: Coop: Rogue specific */
 	{
 		gi.sound(self, CHAN_WEAPON, sound_hook_launch, 1, ATTN_NORM, 0);
 	}
@@ -1004,7 +1312,7 @@ static vec3_t medic_cable_offsets[] = {
 };
 
 void
-medic_cable_attack(edict_t *self)
+medic_cable_attack_rogue(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t offset, start, end, f, r;
 	trace_t tr;
@@ -1193,6 +1501,117 @@ medic_cable_attack(edict_t *self)
 }
 
 void
+medic_cable_attack(edict_t *self)
+{
+	vec3_t offset, start, end, f, r;
+	trace_t tr;
+	vec3_t dir, angles;
+	float distance;
+
+	if (!self)
+	{
+		return;
+	}
+
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		medic_cable_attack_rogue(self);
+		return;
+	}
+
+	if ((!self->enemy) || (!self->enemy->inuse))
+	{
+		return;
+	}
+
+	AngleVectors(self->s.angles, f, r, NULL);
+	VectorCopy(medic_cable_offsets[self->s.frame - FRAME_attack42], offset);
+	G_ProjectSource(self->s.origin, offset, f, r, start);
+
+	/* check for max distance */
+	VectorSubtract(start, self->enemy->s.origin, dir);
+	distance = VectorLength(dir);
+
+	if (distance > 256)
+	{
+		return;
+	}
+
+	/* check for min/max pitch */
+	vectoangles(dir, angles);
+
+	if (angles[0] < -180)
+	{
+		angles[0] += 360;
+	}
+
+	if (fabs(angles[0]) > 45)
+	{
+		return;
+	}
+
+	tr = gi.trace(start, NULL, NULL, self->enemy->s.origin, self, MASK_SHOT);
+
+	if ((tr.fraction != 1.0) && (tr.ent != self->enemy))
+	{
+		return;
+	}
+
+	if (self->s.frame == FRAME_attack43)
+	{
+		gi.sound(self->enemy, CHAN_AUTO, sound_hook_hit, 1, ATTN_NORM, 0);
+		self->enemy->monsterinfo.aiflags |= AI_RESURRECTING;
+	}
+	else if (self->s.frame == FRAME_attack50)
+	{
+		self->enemy->spawnflags = 0;
+		self->enemy->monsterinfo.aiflags = 0;
+		self->enemy->target = NULL;
+		self->enemy->targetname = NULL;
+		self->enemy->combattarget = NULL;
+		self->enemy->deathtarget = NULL;
+		self->enemy->owner = self;
+		ED_CallSpawn(self->enemy);
+		self->enemy->owner = NULL;
+
+		if (self->enemy->think)
+		{
+			self->enemy->nextthink = level.time;
+			self->enemy->think(self->enemy);
+		}
+
+		self->enemy->monsterinfo.aiflags |= AI_RESURRECTING;
+
+		if (self->oldenemy && self->oldenemy->client)
+		{
+			self->enemy->enemy = self->oldenemy;
+			FoundTarget(self->enemy);
+		}
+	}
+	else
+	{
+		if (self->s.frame == FRAME_attack44)
+		{
+			gi.sound(self, CHAN_WEAPON, sound_hook_heal, 1, ATTN_NORM, 0);
+		}
+	}
+
+	/* adjust start for beam origin being in middle of a segment */
+	VectorMA(start, 8, f, start);
+
+	/* adjust end z for end spot since the monster is currently dead */
+	VectorCopy(self->enemy->s.origin, end);
+	end[2] = self->enemy->absmin[2] + self->enemy->size[2] / 2;
+
+	gi.WriteByte(svc_temp_entity);
+	gi.WriteByte(TE_MEDIC_CABLE_ATTACK);
+	gi.WriteShort(self - g_edicts);
+	gi.WritePosition(start);
+	gi.WritePosition(end);
+	gi.multicast(self->s.origin, MULTICAST_PVS);
+}
+
+void
 medic_hook_retract(edict_t *self)
 {
 	if (!self)
@@ -1200,37 +1619,45 @@ medic_hook_retract(edict_t *self)
 		return;
 	}
 
-	if (self->mass == 400)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		gi.sound(self, CHAN_WEAPON, sound_hook_retract, 1, ATTN_NORM, 0);
-	}
-	else
-	{
-		gi.sound(self, CHAN_WEAPON, sound_hook_retract, 1, ATTN_NORM, 0);
-	}
-
-	self->monsterinfo.aiflags &= ~AI_MEDIC;
-
-	if ((self->oldenemy) && (self->oldenemy->inuse))
-	{
-		self->enemy = self->oldenemy;
-	}
-	else
-	{
-		self->enemy = NULL;
-		self->oldenemy = NULL;
-
-		if (!FindTarget(self))
+		if (self->mass == 400)
 		{
-			/* no valid enemy, so stop acting */
-			self->monsterinfo.pausetime = level.time + 100000000;
-			self->monsterinfo.stand(self);
-			return;
+			gi.sound(self, CHAN_WEAPON, sound_hook_retract, 1, ATTN_NORM, 0);
 		}
+		else
+		{
+			gi.sound(self, CHAN_WEAPON, sound_hook_retract, 1, ATTN_NORM, 0);
+		}
+
+		self->monsterinfo.aiflags &= ~AI_MEDIC;
+
+		if ((self->oldenemy) && (self->oldenemy->inuse))
+		{
+			self->enemy = self->oldenemy;
+		}
+		else
+		{
+			self->enemy = NULL;
+			self->oldenemy = NULL;
+
+			if (!FindTarget(self))
+			{
+				/* no valid enemy, so stop acting */
+				self->monsterinfo.pausetime = level.time + 100000000;
+				self->monsterinfo.stand(self);
+				return;
+			}
+		}
+	}
+	else
+	{
+		gi.sound(self, CHAN_WEAPON, sound_hook_retract, 1, ATTN_NORM, 0);
+		self->enemy->monsterinfo.aiflags &= ~AI_RESURRECTING;
 	}
 }
 
-mframe_t medic_frames_attackCable[] = {
+mframe_t medic_frames_attackCable_rogue[] = {
 	{ai_charge, 2, NULL},                     /* 33 */
 	{ai_charge, 3, NULL},
 	{ai_charge, 5, NULL},
@@ -1261,7 +1688,48 @@ mframe_t medic_frames_attackCable[] = {
 	{ai_move, 1.3, NULL}                      /* 60 */
 
 };
-mmove_t medic_move_attackCable = {
+mmove_t medic_move_attackCable_rogue =
+{
+	FRAME_attack33,
+   	FRAME_attack60,
+   	medic_frames_attackCable_rogue,
+   	medic_run
+};
+
+
+mframe_t medic_frames_attackCable[] = {
+	{ai_move, 2, NULL},
+	{ai_move, 3, NULL},
+	{ai_move, 5, NULL},
+	{ai_move, 4.4, NULL},
+	{ai_charge, 4.7, NULL},
+	{ai_charge, 5, NULL},
+	{ai_charge, 6, NULL},
+	{ai_charge, 4, NULL},
+	{ai_charge, 0, NULL},
+	{ai_move, 0, medic_hook_launch},
+	{ai_move, 0, medic_cable_attack},
+	{ai_move, 0, medic_cable_attack},
+	{ai_move, 0, medic_cable_attack},
+	{ai_move, 0, medic_cable_attack},
+	{ai_move, 0, medic_cable_attack},
+	{ai_move, 0, medic_cable_attack},
+	{ai_move, 0, medic_cable_attack},
+	{ai_move, 0, medic_cable_attack},
+	{ai_move, 0, medic_cable_attack},
+	{ai_move, -15, medic_hook_retract},
+	{ai_move, -1.5, NULL},
+	{ai_move, -1.2, NULL},
+	{ai_move, -3, NULL},
+	{ai_move, -2, NULL},
+	{ai_move, 0.3, NULL},
+	{ai_move, 0.7, NULL},
+	{ai_move, 1.2, NULL},
+	{ai_move, 1.3, NULL}
+};
+
+mmove_t medic_move_attackCable =
+{
 	FRAME_attack33,
    	FRAME_attack60,
    	medic_frames_attackCable,
@@ -1269,7 +1737,7 @@ mmove_t medic_move_attackCable = {
 };
 
 void
-medic_start_spawn(edict_t *self)
+medic_start_spawn(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -1281,7 +1749,7 @@ medic_start_spawn(edict_t *self)
 }
 
 void
-medic_determine_spawn(edict_t *self)
+medic_determine_spawn(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t f, r, offset, startpoint, spawnpoint;
 	float lucky;
@@ -1409,7 +1877,7 @@ medic_determine_spawn(edict_t *self)
 }
 
 void
-medic_spawngrows(edict_t *self)
+medic_spawngrows(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t f, r, offset, startpoint, spawnpoint;
 	int summonStr;
@@ -1488,7 +1956,7 @@ medic_spawngrows(edict_t *self)
 }
 
 void
-medic_finish_spawn(edict_t *self)
+medic_finish_spawn(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	edict_t *ent;
 	vec3_t f, r, offset, startpoint, spawnpoint;
@@ -1609,7 +2077,7 @@ medic_finish_spawn(edict_t *self)
 	}
 }
 
-mframe_t medic_frames_callReinforcements[] = {
+mframe_t medic_frames_callReinforcements[] = { /* FS: Coop: Rogue specific */
 	{ai_charge, 2, NULL},                     /* 33 */
 	{ai_charge, 3, NULL},
 	{ai_charge, 5, NULL},
@@ -1640,7 +2108,7 @@ mframe_t medic_frames_callReinforcements[] = {
 	{ai_move, 1.3, NULL}                      /* 60 */
 };
 
-mmove_t medic_move_callReinforcements = {
+mmove_t medic_move_callReinforcements = { /* FS: Coop: Rogue specific */
 	FRAME_attack33,
    	FRAME_attack60,
    	medic_frames_callReinforcements,
@@ -1650,51 +2118,65 @@ mmove_t medic_move_callReinforcements = {
 void
 medic_attack(edict_t *self)
 {
-	int enemy_range;
-	float r;
+	int enemy_range; /* FS: Coop: Rogue specific */
+	float r; /* FS: Coop: Rogue specific */
 
 	if (!self)
 	{
 		return;
 	}
 
-	monster_done_dodge(self);
-
-	enemy_range = range(self, self->enemy);
-
-	/* signal from checkattack to spawn */
-	if (self->monsterinfo.aiflags & AI_BLOCKED)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		self->monsterinfo.currentmove = &medic_move_callReinforcements;
-		self->monsterinfo.aiflags &= ~AI_BLOCKED;
-	}
+		monster_done_dodge(self);
 
-	r = random();
+		enemy_range = range(self, self->enemy);
 
-	if (self->monsterinfo.aiflags & AI_MEDIC)
-	{
-		if ((self->mass > 400) && (r > 0.8) &&
-			(self->monsterinfo.monster_slots > 2))
+		/* signal from checkattack to spawn */
+		if (self->monsterinfo.aiflags & AI_BLOCKED)
 		{
 			self->monsterinfo.currentmove = &medic_move_callReinforcements;
+			self->monsterinfo.aiflags &= ~AI_BLOCKED;
+		}
+
+		r = random();
+
+		if (self->monsterinfo.aiflags & AI_MEDIC)
+		{
+			if ((self->mass > 400) && (r > 0.8) &&
+				(self->monsterinfo.monster_slots > 2))
+			{
+				self->monsterinfo.currentmove = &medic_move_callReinforcements;
+			}
+			else
+			{
+				self->monsterinfo.currentmove = &medic_move_attackCable_rogue;
+			}
 		}
 		else
 		{
-			self->monsterinfo.currentmove = &medic_move_attackCable;
+			if (self->monsterinfo.attack_state == AS_BLIND)
+			{
+				self->monsterinfo.currentmove = &medic_move_callReinforcements;
+				return;
+			}
+
+			if ((self->mass > 400) && (r > 0.2) && (enemy_range != RANGE_MELEE) &&
+				(self->monsterinfo.monster_slots > 2))
+			{
+				self->monsterinfo.currentmove = &medic_move_callReinforcements;
+			}
+			else
+			{
+				self->monsterinfo.currentmove = &medic_move_attackBlaster;
+			}
 		}
 	}
 	else
 	{
-		if (self->monsterinfo.attack_state == AS_BLIND)
+		if (self->monsterinfo.aiflags & AI_MEDIC)
 		{
-			self->monsterinfo.currentmove = &medic_move_callReinforcements;
-			return;
-		}
-
-		if ((self->mass > 400) && (r > 0.2) && (enemy_range != RANGE_MELEE) &&
-			(self->monsterinfo.monster_slots > 2))
-		{
-			self->monsterinfo.currentmove = &medic_move_callReinforcements;
+			self->monsterinfo.currentmove = &medic_move_attackCable;
 		}
 		else
 		{
@@ -1711,64 +2193,74 @@ medic_checkattack(edict_t *self)
 		return false;
 	}
 
-	if (self->monsterinfo.aiflags & AI_MEDIC)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		/* if our target went away */
-		if ((!self->enemy) || (!self->enemy->inuse))
+		if (self->monsterinfo.aiflags & AI_MEDIC)
 		{
-			abortHeal(self, true, false, false);
-			return false;
+			/* if our target went away */
+			if ((!self->enemy) || (!self->enemy->inuse))
+			{
+				abortHeal(self, true, false, false);
+				return false;
+			}
+
+			/* if we ran out of time, give up */
+			if (self->timestamp < level.time)
+			{
+				abortHeal(self, true, false, true);
+				self->timestamp = 0;
+				return false;
+			}
+
+			if (realrange(self, self->enemy) < MEDIC_MAX_HEAL_DISTANCE + 10)
+			{
+				medic_attack(self);
+				return true;
+			}
+			else
+			{
+				self->monsterinfo.attack_state = AS_STRAIGHT;
+				return false;
+			}
 		}
 
-		/* if we ran out of time, give up */
-		if (self->timestamp < level.time)
+		if (self->enemy->client &&
+			!visible(self, self->enemy) && (self->monsterinfo.monster_slots > 2))
 		{
-			abortHeal(self, true, false, true);
-			self->timestamp = 0;
-			return false;
+			self->monsterinfo.attack_state = AS_BLIND;
+			return true;
 		}
 
-		if (realrange(self, self->enemy) < MEDIC_MAX_HEAL_DISTANCE + 10)
+		if ((random() < 0.8) && (self->monsterinfo.monster_slots > 5) &&
+			(realrange(self, self->enemy) > 150))
+		{
+			self->monsterinfo.aiflags |= AI_BLOCKED;
+			self->monsterinfo.attack_state = AS_MISSILE;
+			return true;
+		}
+
+		if (skill->value > 0)
+		{
+			if (self->monsterinfo.aiflags & AI_STAND_GROUND)
+			{
+				self->monsterinfo.attack_state = AS_MISSILE;
+				return true;
+			}
+		}
+	}
+	else
+	{
+		if (self->monsterinfo.aiflags & AI_MEDIC)
 		{
 			medic_attack(self);
 			return true;
 		}
-		else
-		{
-			self->monsterinfo.attack_state = AS_STRAIGHT;
-			return false;
-		}
 	}
-
-	if (self->enemy->client &&
-		!visible(self, self->enemy) && (self->monsterinfo.monster_slots > 2))
-	{
-		self->monsterinfo.attack_state = AS_BLIND;
-		return true;
-	}
-
-	if ((random() < 0.8) && (self->monsterinfo.monster_slots > 5) &&
-		(realrange(self, self->enemy) > 150))
-	{
-		self->monsterinfo.aiflags |= AI_BLOCKED;
-		self->monsterinfo.attack_state = AS_MISSILE;
-		return true;
-	}
-
-	if (skill->value > 0)
-	{
-		if (self->monsterinfo.aiflags & AI_STAND_GROUND)
-		{
-			self->monsterinfo.attack_state = AS_MISSILE;
-			return true;
-		}
-	}
-
 	return M_CheckAttack(self);
 }
 
 void
-MedicCommanderCache(void)
+MedicCommanderCache(void) /* FS: Coop: Rogue specific */
 {
 	edict_t *newEnt;
 	int i;
@@ -1793,7 +2285,7 @@ MedicCommanderCache(void)
 }
 
 void
-medic_duck(edict_t *self, float eta)
+medic_duck(edict_t *self, float eta) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -1807,7 +2299,7 @@ medic_duck(edict_t *self, float eta)
 	}
 
 	if ((self->monsterinfo.currentmove == &medic_move_attackHyperBlaster) ||
-		(self->monsterinfo.currentmove == &medic_move_attackCable) ||
+		(self->monsterinfo.currentmove == &medic_move_attackCable_rogue) ||
 		(self->monsterinfo.currentmove == &medic_move_attackBlaster) ||
 		(self->monsterinfo.currentmove == &medic_move_callReinforcements))
 	{
@@ -1830,12 +2322,12 @@ medic_duck(edict_t *self, float eta)
 	monster_duck_down(self);
 
 	self->monsterinfo.nextframe = FRAME_duck1;
-	self->monsterinfo.currentmove = &medic_move_duck;
+	self->monsterinfo.currentmove = &medic_move_duck_rogue;
 	return;
 }
 
 void
-medic_sidestep(edict_t *self)
+medic_sidestep(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -1843,7 +2335,7 @@ medic_sidestep(edict_t *self)
 	}
 
 	if ((self->monsterinfo.currentmove == &medic_move_attackHyperBlaster) ||
-		(self->monsterinfo.currentmove == &medic_move_attackCable) ||
+		(self->monsterinfo.currentmove == &medic_move_attackCable_rogue) ||
 		(self->monsterinfo.currentmove == &medic_move_attackBlaster) ||
 		(self->monsterinfo.currentmove == &medic_move_callReinforcements))
 	{
@@ -1855,14 +2347,14 @@ medic_sidestep(edict_t *self)
 		}
 	}
 
-	if (self->monsterinfo.currentmove != &medic_move_run)
+	if (self->monsterinfo.currentmove != &medic_move_run_rogue)
 	{
-		self->monsterinfo.currentmove = &medic_move_run;
+		self->monsterinfo.currentmove = &medic_move_run_rogue;
 	}
 }
 
 qboolean
-medic_blocked(edict_t *self, float dist)
+medic_blocked(edict_t *self, float dist) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -1888,7 +2380,7 @@ medic_blocked(edict_t *self, float dist)
  * QUAKED monster_medic (1 .5 0) (-16 -16 -24) (16 16 32) Ambush Trigger_Spawn Sight
  */
 void
-SP_monster_medic(edict_t *self)
+SP_monster_medic_rogue(edict_t *self)
 {
 	if (!self)
 	{
@@ -2000,4 +2492,69 @@ SP_monster_medic(edict_t *self)
 
 		self->s.skinnum = 0;
 	}
+}
+
+void
+SP_monster_medic(edict_t *self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	if (deathmatch->value)
+	{
+		G_FreeEdict(self);
+		return;
+	}
+
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		SP_monster_medic_rogue(self);
+		return;
+	}
+
+	sound_idle1 = gi.soundindex("medic/idle.wav");
+	sound_pain1 = gi.soundindex("medic/medpain1.wav");
+	sound_pain2 = gi.soundindex("medic/medpain2.wav");
+	sound_die = gi.soundindex("medic/meddeth1.wav");
+	sound_sight = gi.soundindex("medic/medsght1.wav");
+	sound_search = gi.soundindex("medic/medsrch1.wav");
+	sound_hook_launch = gi.soundindex("medic/medatck2.wav");
+	sound_hook_hit = gi.soundindex("medic/medatck3.wav");
+	sound_hook_heal = gi.soundindex("medic/medatck4.wav");
+	sound_hook_retract = gi.soundindex("medic/medatck5.wav");
+
+	gi.soundindex("medic/medatck1.wav");
+
+	self->movetype = MOVETYPE_STEP;
+	self->solid = SOLID_BBOX;
+	self->s.modelindex = gi.modelindex("models/monsters/medic/tris.md2");
+	VectorSet(self->mins, -24, -24, -24);
+	VectorSet(self->maxs, 24, 24, 32);
+
+	self->health = 300;
+	self->gib_health = -130;
+	self->mass = 400;
+
+	self->pain = medic_pain;
+	self->die = medic_die;
+
+	self->monsterinfo.stand = medic_stand;
+	self->monsterinfo.walk = medic_walk;
+	self->monsterinfo.run = medic_run;
+	self->monsterinfo.dodge = medic_dodge;
+	self->monsterinfo.attack = medic_attack;
+	self->monsterinfo.melee = NULL;
+	self->monsterinfo.sight = medic_sight;
+	self->monsterinfo.idle = medic_idle;
+	self->monsterinfo.search = medic_search;
+	self->monsterinfo.checkattack = medic_checkattack;
+
+	gi.linkentity(self);
+
+	self->monsterinfo.currentmove = &medic_move_stand;
+	self->monsterinfo.scale = MODEL_SCALE;
+
+	walkmonster_start(self);
 }
