@@ -538,10 +538,11 @@ mframe_t medic_frames_run[] = {
 	{ai_run, 35.6, NULL}
 };
 
-mmove_t medic_move_run = {
+mmove_t medic_move_run =
+{
 	FRAME_run1,
-   	FRAME_run6,
-   	medic_frames_run,
+	FRAME_run6,
+	medic_frames_run,
    	NULL
 };
 
@@ -964,9 +965,9 @@ mframe_t medic_frames_attackBlaster[] = {
 
 mmove_t medic_move_attackBlaster = {
 	FRAME_attack1,
-   	FRAME_attack14,
-   	medic_frames_attackBlaster,
-   	medic_run
+	FRAME_attack14,
+	medic_frames_attackBlaster,
+	medic_run
 };
 
 void

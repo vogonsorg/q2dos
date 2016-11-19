@@ -36,6 +36,13 @@ static int sound_open;
 static int sound_search;
 static int sound_sight;
 
+qboolean visible(edict_t *self, edict_t *other);
+void GunnerGrenade(edict_t *self);
+void GunnerFire(edict_t *self);
+void gunner_fire_chain(edict_t *self);
+void gunner_refire_chain(edict_t *self);
+void gunner_stand(edict_t *self);
+
 void
 gunner_idlesound(edict_t *self)
 {
@@ -68,14 +75,6 @@ gunner_search(edict_t *self)
 
 	gi.sound(self, CHAN_VOICE, sound_search, 1, ATTN_NORM, 0);
 }
-
-qboolean visible(edict_t *self, edict_t *other);
-void GunnerGrenade(edict_t *self);
-void GunnerFire(edict_t *self);
-void gunner_fire_chain(edict_t *self);
-void gunner_refire_chain(edict_t *self);
-
-void gunner_stand(edict_t *self);
 
 mframe_t gunner_frames_fidget[] = {
 	{ai_stand, 0, NULL},

@@ -22,7 +22,6 @@ void GunnerGrenade(edict_t *self);
 void GunnerFire(edict_t *self);
 void gunner_fire_chain(edict_t *self);
 void gunner_refire_chain(edict_t *self);
-
 void gunner_stand(edict_t *self);
 
 void
@@ -114,10 +113,11 @@ mframe_t gunner_frames_fidget[] = {
 	{ai_stand, 0, NULL}
 };
 
-mmove_t gunner_move_fidget = {
+mmove_t gunner_move_fidget =
+{
 	FRAME_stand31,
    	FRAME_stand70,
-   	gunner_frames_fidget,
+	gunner_frames_fidget,
    	gunner_stand
 };
 
@@ -175,11 +175,12 @@ mframe_t gunner_frames_stand[] = {
 	{ai_stand, 0, gunner_fidget}
 };
 
-mmove_t gunner_move_stand = {
+mmove_t gunner_move_stand =
+{
 	FRAME_stand01,
-   	FRAME_stand30,
-   	gunner_frames_stand,
-   	NULL
+	FRAME_stand30,
+	gunner_frames_stand,
+	NULL
 };
 
 void
@@ -209,11 +210,12 @@ mframe_t gunner_frames_walk[] = {
 	{ai_walk, 4, NULL}
 };
 
-mmove_t gunner_move_walk = {
+mmove_t gunner_move_walk =
+{
 	FRAME_walk07,
-   	FRAME_walk19,
-   	gunner_frames_walk,
-   	NULL
+	FRAME_walk19,
+	gunner_frames_walk,
+	NULL
 };
 
 void
@@ -227,7 +229,7 @@ gunner_walk(edict_t *self)
 	self->monsterinfo.currentmove = &gunner_move_walk;
 }
 
-mframe_t gunner_frames_run[] = {
+mframe_t gunner_frames_run_rogue[] = {
 	{ai_run, 26, NULL},
 	{ai_run, 9, NULL},
 	{ai_run, 9, NULL},
@@ -238,11 +240,31 @@ mframe_t gunner_frames_run[] = {
 	{ai_run, 6, NULL}
 };
 
-mmove_t gunner_move_run = {
+mmove_t gunner_move_run_rogue =
+{
 	FRAME_run01,
    	FRAME_run08,
-   	gunner_frames_run,
-   	NULL
+	gunner_frames_run_rogue,
+	NULL
+};
+
+mframe_t gunner_frames_run[] = {
+	{ai_run, 26, NULL},
+	{ai_run, 9, NULL},
+	{ai_run, 9, NULL},
+	{ai_run, 9, NULL},
+	{ai_run, 15, NULL},
+	{ai_run, 10, NULL},
+	{ai_run, 13, NULL},
+	{ai_run, 6, NULL}
+};
+
+mmove_t gunner_move_run =
+{
+	FRAME_run01,
+   	FRAME_run08,
+	gunner_frames_run,
+	NULL
 };
 
 void
@@ -253,7 +275,10 @@ gunner_run(edict_t *self)
 		return;
 	}
 
-	monster_done_dodge(self);
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		monster_done_dodge(self);
+	}
 
 	if (self->monsterinfo.aiflags & AI_STAND_GROUND)
 	{
@@ -261,7 +286,14 @@ gunner_run(edict_t *self)
 	}
 	else
 	{
-		self->monsterinfo.currentmove = &gunner_move_run;
+		if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+		{
+			self->monsterinfo.currentmove = &gunner_move_run_rogue;
+		}
+		else
+		{
+			self->monsterinfo.currentmove = &gunner_move_run;
+		}
 	}
 }
 
@@ -274,11 +306,12 @@ mframe_t gunner_frames_runandshoot[] = {
 	{ai_run, 20, NULL}
 };
 
-mmove_t gunner_move_runandshoot = {
+mmove_t gunner_move_runandshoot =
+{
 	FRAME_runs01,
-   	FRAME_runs06,
+	FRAME_runs06,
    	gunner_frames_runandshoot,
-   	NULL
+	NULL
 };
 
 void
@@ -300,11 +333,12 @@ mframe_t gunner_frames_pain3[] = {
 	{ai_move, 1, NULL}
 };
 
-mmove_t gunner_move_pain3 = {
+mmove_t gunner_move_pain3 =
+{
 	FRAME_pain301,
-   	FRAME_pain305,
-   	gunner_frames_pain3,
-   	gunner_run
+	FRAME_pain305,
+	gunner_frames_pain3,
+	gunner_run
 };
 
 mframe_t gunner_frames_pain2[] = {
@@ -318,11 +352,12 @@ mframe_t gunner_frames_pain2[] = {
 	{ai_move, -7, NULL}
 };
 
-mmove_t gunner_move_pain2 = {
+mmove_t gunner_move_pain2 =
+{
 	FRAME_pain201,
-   	FRAME_pain208,
-   	gunner_frames_pain2,
-   	gunner_run
+	FRAME_pain208,
+	gunner_frames_pain2,
+	gunner_run
 };
 
 mframe_t gunner_frames_pain1[] = {
@@ -346,15 +381,17 @@ mframe_t gunner_frames_pain1[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t gunner_move_pain1 = {
+mmove_t gunner_move_pain1 =
+{
 	FRAME_pain101,
-   	FRAME_pain118,
-   	gunner_frames_pain1,
-   	gunner_run
+	FRAME_pain118,
+	gunner_frames_pain1,
+	gunner_run
 };
 
 void
-gunner_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
+gunner_pain(edict_t *self, edict_t *other /* unused */,
+	   	float kick /* unused */, int damage)
 {
 	if (!self)
 	{
@@ -363,14 +400,24 @@ gunner_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		if (game.gametype == vanilla_coop) /* FS: Coop: Vanilla specific */
+		{
+			self->s.skinnum |= 1;
+		}
+		else
+		{
+			self->s.skinnum = 1;
+		}
 	}
 
-	monster_done_dodge(self);
-
-	if (!self->groundentity)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		return;
+		monster_done_dodge(self);
+
+		if (!self->groundentity)
+		{
+			return;
+		}
 	}
 
 	if (level.time < self->pain_debounce_time)
@@ -407,11 +454,14 @@ gunner_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 		self->monsterinfo.currentmove = &gunner_move_pain1;
 	}
 
-	self->monsterinfo.aiflags &= ~AI_MANUAL_STEERING;
-
-	if (self->monsterinfo.aiflags & AI_DUCKED)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		monster_duck_up(self);
+		self->monsterinfo.aiflags &= ~AI_MANUAL_STEERING;
+
+		if (self->monsterinfo.aiflags & AI_DUCKED)
+		{
+			monster_duck_up(self);
+		}
 	}
 }
 
@@ -445,16 +495,18 @@ mframe_t gunner_frames_death[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t gunner_move_death = {
+mmove_t gunner_move_death =
+{
 	FRAME_death01,
-   	FRAME_death11,
-   	gunner_frames_death,
-   	gunner_dead
+	FRAME_death11,
+	gunner_frames_death,
+	gunner_dead
 };
 
 void
-gunner_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* unused */,
-		int damage, vec3_t point /* unused */)
+gunner_die(edict_t *self, edict_t *inflictor /* unused */,
+		edict_t *attacker /* unused */, int damage /* unused */,
+		vec3_t point)
 {
 	int n;
 
@@ -463,22 +515,31 @@ gunner_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* 
 		return;
 	}
 
+	if (game.gametype == vanilla_coop) /* FS: Coop: Vanilla specific */
+	{
+		self->s.skinnum |= 1;
+		self->monsterinfo.power_armor_type = POWER_ARMOR_NONE;
+	}
+
 	/* check for gib */
 	if (self->health <= self->gib_health)
 	{
-		gi.sound(self, CHAN_VOICE, gi.soundindex("misc/udeath.wav"), 1, ATTN_NORM, 0);
+		gi.sound(self, CHAN_VOICE, gi.soundindex( "misc/udeath.wav"), 1, ATTN_NORM, 0);
 
 		for (n = 0; n < 2; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/bone/tris.md2", damage, GIB_ORGANIC);
+			ThrowGib(self, "models/objects/gibs/bone/tris.md2",
+					damage, GIB_ORGANIC);
 		}
 
 		for (n = 0; n < 4; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
+			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2",
+					damage, GIB_ORGANIC);
 		}
 
-		ThrowHead(self, "models/objects/gibs/head2/tris.md2", damage, GIB_ORGANIC);
+		ThrowHead(self, "models/objects/gibs/head2/tris.md2",
+				damage, GIB_ORGANIC);
 		self->deadflag = DEAD_DEAD;
 		return;
 	}
@@ -503,6 +564,11 @@ gunner_duck_down(edict_t *self)
 		return;
 	}
 
+	if ((game.gametype != rogue_coop) && (self->monsterinfo.aiflags & AI_DUCKED)) /* FS: Coop: Rogue does it differently */
+	{
+		return;
+	}
+
 	self->monsterinfo.aiflags |= AI_DUCKED;
 
 	if (skill->value >= 2)
@@ -513,18 +579,59 @@ gunner_duck_down(edict_t *self)
 		}
 	}
 
-	self->maxs[2] = self->monsterinfo.base_height - 32;
-	self->takedamage = DAMAGE_YES;
-
-	if (self->monsterinfo.duck_wait_time < level.time)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		self->monsterinfo.duck_wait_time = level.time + 1;
+		self->maxs[2] = self->monsterinfo.base_height - 32;
+		self->takedamage = DAMAGE_YES;
+
+		if (self->monsterinfo.duck_wait_time < level.time)
+		{
+			self->monsterinfo.duck_wait_time = level.time + 1;
+		}
+	}
+	else
+	{
+		self->maxs[2] -= 32;
+		self->takedamage = DAMAGE_YES;
+		self->monsterinfo.pausetime = level.time + 1;
 	}
 
 	gi.linkentity(self);
 }
 
-mframe_t gunner_frames_duck[] = {
+void
+gunner_duck_hold(edict_t *self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	if (level.time >= self->monsterinfo.pausetime)
+	{
+		self->monsterinfo.aiflags &= ~AI_HOLD_FRAME;
+	}
+	else
+	{
+		self->monsterinfo.aiflags |= AI_HOLD_FRAME;
+	}
+}
+
+void
+gunner_duck_up(edict_t *self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	self->monsterinfo.aiflags &= ~AI_DUCKED;
+	self->maxs[2] += 32;
+	self->takedamage = DAMAGE_AIM;
+	gi.linkentity(self);
+}
+
+mframe_t gunner_frames_duck_rogue[] = {
 	{ai_move, 1, gunner_duck_down},
 	{ai_move, 1, NULL},
 	{ai_move, 1, monster_duck_hold},
@@ -535,14 +642,61 @@ mframe_t gunner_frames_duck[] = {
 	{ai_move, -1, NULL}
 };
 
-mmove_t gunner_move_duck = {
+mmove_t gunner_move_duck_rogue =
+{
 	FRAME_duck01,
-   	FRAME_duck08,
-   	gunner_frames_duck,
-   	gunner_run
+	FRAME_duck08,
+	gunner_frames_duck_rogue,
+	gunner_run
 };
 
-/* gunner dodge moved below so I know about attack sequences */
+mframe_t gunner_frames_duck[] = {
+	{ai_move, 1, gunner_duck_down},
+	{ai_move, 1, NULL},
+	{ai_move, 1, gunner_duck_hold},
+	{ai_move, 0, NULL},
+	{ai_move, -1, NULL},
+	{ai_move, -1, NULL},
+	{ai_move, 0, gunner_duck_up},
+	{ai_move, -1, NULL}
+};
+
+mmove_t gunner_move_duck =
+{
+	FRAME_duck01,
+	FRAME_duck08,
+	gunner_frames_duck,
+	gunner_run
+};
+
+void
+gunner_dodge(edict_t *self, edict_t *attacker, float eta /* unused */, trace_t *fake /* unused */)
+{
+	if (!self || !attacker)
+	{
+		return;
+	}
+
+	if (random() > 0.25)
+	{
+		return;
+	}
+
+	if (!self->enemy)
+	{
+		self->enemy = attacker;
+	}
+
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		self->monsterinfo.currentmove = &gunner_move_duck_rogue;
+	}
+	else
+	{
+		self->monsterinfo.currentmove = &gunner_move_duck;
+	}
+}
+
 void
 gunner_opengun(edict_t *self)
 {
@@ -563,12 +717,7 @@ GunnerFire(edict_t *self)
 	vec3_t aim;
 	int flash_number;
 
-	if (!self)
-	{
-		return;
-	}
-
-	if (!self->enemy || !self->enemy->inuse)
+	if (!self || !self->enemy || !self->enemy->inuse)
 	{
 		return;
 	}
@@ -591,7 +740,7 @@ GunnerFire(edict_t *self)
 }
 
 qboolean
-gunner_grenade_check(edict_t *self)
+gunner_grenade_check(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t start;
 	vec3_t forward, right;
@@ -659,7 +808,7 @@ gunner_grenade_check(edict_t *self)
 }
 
 void
-GunnerGrenade(edict_t *self)
+GunnerGrenade_Rogue(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t start;
 	vec3_t forward, right, up;
@@ -759,6 +908,51 @@ GunnerGrenade(edict_t *self)
 	monster_fire_grenade(self, start, aim, 50, 600, flash_number);
 }
 
+void
+GunnerGrenade(edict_t *self)
+{
+	vec3_t start;
+	vec3_t forward, right;
+	vec3_t aim;
+	int flash_number;
+
+	if (!self)
+	{
+		return;
+	}
+
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		GunnerGrenade_Rogue(self);
+		return;
+	}
+
+	if (self->s.frame == FRAME_attak105)
+	{
+		flash_number = MZ2_GUNNER_GRENADE_1;
+	}
+	else if (self->s.frame == FRAME_attak108)
+	{
+		flash_number = MZ2_GUNNER_GRENADE_2;
+	}
+	else if (self->s.frame == FRAME_attak111)
+	{
+		flash_number = MZ2_GUNNER_GRENADE_3;
+	}
+	else
+	{
+		flash_number = MZ2_GUNNER_GRENADE_4;
+	}
+
+	AngleVectors(self->s.angles, forward, right, NULL);
+	G_ProjectSource(self->s.origin, monster_flash_offset[flash_number],
+			forward, right, start);
+
+	VectorCopy(forward, aim);
+
+	monster_fire_grenade(self, start, aim, 50, 600, flash_number);
+}
+
 mframe_t gunner_frames_attack_chain[] = {
 	{ai_charge, 0, gunner_opengun},
 	{ai_charge, 0, NULL},
@@ -769,11 +963,12 @@ mframe_t gunner_frames_attack_chain[] = {
 	{ai_charge, 0, NULL}
 };
 
-mmove_t gunner_move_attack_chain = {
+mmove_t gunner_move_attack_chain =
+{
 	FRAME_attak209,
-   	FRAME_attak215,
-   	gunner_frames_attack_chain,
-   	gunner_fire_chain
+	FRAME_attak215,
+	gunner_frames_attack_chain,
+	gunner_fire_chain
 };
 
 mframe_t gunner_frames_fire_chain[] = {
@@ -787,11 +982,12 @@ mframe_t gunner_frames_fire_chain[] = {
 	{ai_charge, 0, GunnerFire}
 };
 
-mmove_t gunner_move_fire_chain = {
+mmove_t gunner_move_fire_chain =
+{
 	FRAME_attak216,
-   	FRAME_attak223,
-   	gunner_frames_fire_chain,
-   	gunner_refire_chain
+	FRAME_attak223,
+	gunner_frames_fire_chain,
+	gunner_refire_chain
 };
 
 mframe_t gunner_frames_endfire_chain[] = {
@@ -804,15 +1000,16 @@ mframe_t gunner_frames_endfire_chain[] = {
 	{ai_charge, 0, NULL}
 };
 
-mmove_t gunner_move_endfire_chain = {
+mmove_t gunner_move_endfire_chain =
+{
 	FRAME_attak224,
-   	FRAME_attak230,
-   	gunner_frames_endfire_chain,
-   	gunner_run
+	FRAME_attak230,
+	gunner_frames_endfire_chain,
+	gunner_run
 };
 
 void
-gunner_blind_check(edict_t *self)
+gunner_blind_check(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t aim;
 
@@ -853,87 +1050,109 @@ mframe_t gunner_frames_attack_grenade[] = {
 	{ai_charge, 0, NULL}
 };
 
-mmove_t gunner_move_attack_grenade = {
+mmove_t gunner_move_attack_grenade =
+{
 	FRAME_attak101,
 	FRAME_attak121,
-   	gunner_frames_attack_grenade,
-   	gunner_run
+	gunner_frames_attack_grenade,
+	gunner_run
 };
 
 void
 gunner_attack(edict_t *self)
 {
-	float chance, r;
+	float chance, r; /* FS: Coop: Rogue specific */
 
 	if (!self)
 	{
 		return;
 	}
 
-	monster_done_dodge(self);
-
-	if (self->monsterinfo.attack_state == AS_BLIND)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		/* setup shot probabilities */
-		if (self->monsterinfo.blind_fire_delay < 1.0)
+		monster_done_dodge(self);
+
+		if (self->monsterinfo.attack_state == AS_BLIND)
 		{
-			chance = 1.0;
+			/* setup shot probabilities */
+			if (self->monsterinfo.blind_fire_delay < 1.0)
+			{
+				chance = 1.0;
+			}
+			else if (self->monsterinfo.blind_fire_delay < 7.5)
+			{
+				chance = 0.4;
+			}
+			else
+			{
+				chance = 0.1;
+			}
+
+			r = random();
+
+			/* minimum of 2 seconds, plus 0-3, after the shots are done */
+			self->monsterinfo.blind_fire_delay += 2.1 + 2.0 + random() * 3.0;
+
+			/* don't shoot at the origin */
+			if (VectorCompare(self->monsterinfo.blind_fire_target, vec3_origin))
+			{
+				return;
+			}
+
+			/* don't shoot if the dice say not to */
+			if (r > chance)
+			{
+				return;
+			}
+
+			/* turn on manual steering to signal both manual steering and blindfire */
+			self->monsterinfo.aiflags |= AI_MANUAL_STEERING;
+
+			if (gunner_grenade_check(self))
+			{
+				/* if the check passes, go for the attack */
+				self->monsterinfo.currentmove = &gunner_move_attack_grenade;
+				self->monsterinfo.attack_finished = level.time + 2 * random();
+			}
+
+			/* turn off blindfire flag */
+			self->monsterinfo.aiflags &= ~AI_MANUAL_STEERING;
+			return;
 		}
-		else if (self->monsterinfo.blind_fire_delay < 7.5)
+
+		/* gunner needs to use his chaingun if he's being attacked by a tesla. */
+		if ((range(self, self->enemy) == RANGE_MELEE) || self->bad_area)
 		{
-			chance = 0.4;
+			self->monsterinfo.currentmove = &gunner_move_attack_chain;
 		}
 		else
 		{
-			chance = 0.1;
+			if ((random() <= 0.5) && gunner_grenade_check(self))
+			{
+				self->monsterinfo.currentmove = &gunner_move_attack_grenade;
+			}
+			else
+			{
+				self->monsterinfo.currentmove = &gunner_move_attack_chain;
+			}
 		}
-
-		r = random();
-
-		/* minimum of 2 seconds, plus 0-3, after the shots are done */
-		self->monsterinfo.blind_fire_delay += 2.1 + 2.0 + random() * 3.0;
-
-		/* don't shoot at the origin */
-		if (VectorCompare(self->monsterinfo.blind_fire_target, vec3_origin))
-		{
-			return;
-		}
-
-		/* don't shoot if the dice say not to */
-		if (r > chance)
-		{
-			return;
-		}
-
-		/* turn on manual steering to signal both manual steering and blindfire */
-		self->monsterinfo.aiflags |= AI_MANUAL_STEERING;
-
-		if (gunner_grenade_check(self))
-		{
-			/* if the check passes, go for the attack */
-			self->monsterinfo.currentmove = &gunner_move_attack_grenade;
-			self->monsterinfo.attack_finished = level.time + 2 * random();
-		}
-
-		/* turn off blindfire flag */
-		self->monsterinfo.aiflags &= ~AI_MANUAL_STEERING;
-		return;
-	}
-
-	/* gunner needs to use his chaingun if he's being attacked by a tesla. */
-	if ((range(self, self->enemy) == RANGE_MELEE) || self->bad_area)
-	{
-		self->monsterinfo.currentmove = &gunner_move_attack_chain;
 	}
 	else
 	{
-		if ((random() <= 0.5) && gunner_grenade_check(self))
+		if (range(self, self->enemy) == RANGE_MELEE)
 		{
-			self->monsterinfo.currentmove = &gunner_move_attack_grenade;
+			self->monsterinfo.currentmove = &gunner_move_attack_chain;
 		}
 		else
 		{
-			self->monsterinfo.currentmove = &gunner_move_attack_chain;
+			if (random() <= 0.5)
+			{
+				self->monsterinfo.currentmove = &gunner_move_attack_grenade;
+			}
+			else
+			{
+				self->monsterinfo.currentmove = &gunner_move_attack_chain;
+			}
 		}
 	}
 }
@@ -973,7 +1192,7 @@ gunner_refire_chain(edict_t *self)
 }
 
 void
-gunner_jump_now(edict_t *self)
+gunner_jump_now(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t forward, up;
 
@@ -990,7 +1209,7 @@ gunner_jump_now(edict_t *self)
 }
 
 void
-gunner_jump2_now(edict_t *self)
+gunner_jump2_now(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t forward, up;
 
@@ -1007,7 +1226,7 @@ gunner_jump2_now(edict_t *self)
 }
 
 void
-gunner_jump_wait_land(edict_t *self)
+gunner_jump_wait_land(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -1029,7 +1248,7 @@ gunner_jump_wait_land(edict_t *self)
 	}
 }
 
-mframe_t gunner_frames_jump[] = {
+mframe_t gunner_frames_jump[] = { /* FS: Coop: Rogue specific */
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
@@ -1042,14 +1261,14 @@ mframe_t gunner_frames_jump[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t gunner_move_jump = {
+mmove_t gunner_move_jump = { /* FS: Coop: Rogue specific */
 	FRAME_jump01,
    	FRAME_jump10,
    	gunner_frames_jump,
    	gunner_run
 };
 
-mframe_t gunner_frames_jump2[] = {
+mframe_t gunner_frames_jump2[] = { /* FS: Coop: Rogue specific */
 	{ai_move, -8, NULL},
 	{ai_move, -4, NULL},
 	{ai_move, -4, NULL},
@@ -1062,7 +1281,7 @@ mframe_t gunner_frames_jump2[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t gunner_move_jump2 = {
+mmove_t gunner_move_jump2 = { /* FS: Coop: Rogue specific */
 	FRAME_jump01,
    	FRAME_jump10,
    	gunner_frames_jump2,
@@ -1070,7 +1289,7 @@ mmove_t gunner_move_jump2 = {
 };
 
 void
-gunner_jump(edict_t *self)
+gunner_jump(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -1095,7 +1314,7 @@ gunner_jump(edict_t *self)
 }
 
 qboolean
-gunner_blocked(edict_t *self, float dist)
+gunner_blocked(edict_t *self, float dist) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -1123,7 +1342,7 @@ gunner_blocked(edict_t *self, float dist)
 
 /* new duck code */
 void
-gunner_duck(edict_t *self, float eta)
+gunner_duck(edict_t *self, float eta) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -1163,12 +1382,12 @@ gunner_duck(edict_t *self, float eta)
 	gunner_duck_down(self);
 
 	self->monsterinfo.nextframe = FRAME_duck01;
-	self->monsterinfo.currentmove = &gunner_move_duck;
+	self->monsterinfo.currentmove = &gunner_move_duck_rogue;
 	return;
 }
 
 void
-gunner_sidestep(edict_t *self)
+gunner_sidestep(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -1194,9 +1413,9 @@ gunner_sidestep(edict_t *self)
 		}
 	}
 
-	if (self->monsterinfo.currentmove != &gunner_move_run)
+	if (self->monsterinfo.currentmove != &gunner_move_run_rogue)
 	{
-		self->monsterinfo.currentmove = &gunner_move_run;
+		self->monsterinfo.currentmove = &gunner_move_run_rogue;
 	}
 }
 
@@ -1244,21 +1463,35 @@ SP_monster_gunner(edict_t *self)
 	self->monsterinfo.stand = gunner_stand;
 	self->monsterinfo.walk = gunner_walk;
 	self->monsterinfo.run = gunner_run;
-	self->monsterinfo.dodge = M_MonsterDodge;
-	self->monsterinfo.duck = gunner_duck;
-	self->monsterinfo.unduck = monster_duck_up;
-	self->monsterinfo.sidestep = gunner_sidestep;
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		self->monsterinfo.dodge = M_MonsterDodge;
+		self->monsterinfo.duck = gunner_duck;
+		self->monsterinfo.unduck = monster_duck_up;
+		self->monsterinfo.sidestep = gunner_sidestep;
+	}
+	else
+	{
+		self->monsterinfo.dodge = gunner_dodge;
+	}
 	self->monsterinfo.attack = gunner_attack;
 	self->monsterinfo.melee = NULL;
 	self->monsterinfo.sight = gunner_sight;
 	self->monsterinfo.search = gunner_search;
-	self->monsterinfo.blocked = gunner_blocked;
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		self->monsterinfo.blocked = gunner_blocked;
+	}
 
 	gi.linkentity(self);
 
 	self->monsterinfo.currentmove = &gunner_move_stand;
 	self->monsterinfo.scale = MODEL_SCALE;
 
-	self->monsterinfo.blindfire = true;
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		self->monsterinfo.blindfire = true;
+	}
+
 	walkmonster_start(self);
 }

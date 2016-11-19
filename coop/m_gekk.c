@@ -1817,7 +1817,7 @@ mmove_t gekk_move_rduck = {
 };
 
 void
-gekk_dodge(edict_t *self, edict_t *attacker, float eta)
+gekk_dodge(edict_t *self, edict_t *attacker, float eta, trace_t *fake /* unused */)
 {
 	float r;
 
