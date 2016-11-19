@@ -378,11 +378,6 @@ M_ChangeYaw(edict_t *ent)
 		return;
 	}
 
-	if (!ent)
-	{
-		return;
-	}
-
 	current = anglemod(ent->s.angles[YAW]);
 	ideal = ent->ideal_yaw;
 
@@ -491,11 +486,6 @@ SV_NewChaseDir(edict_t *actor, edict_t *enemy, float dist)
 	float tdir, olddir, turnaround;
 
 	if (!actor || !enemy)
-	{
-		return;
-	}
-
-	if (!enemy)
 	{
 		return;
 	}
