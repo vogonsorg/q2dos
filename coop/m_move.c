@@ -7,7 +7,7 @@
 
 /* this is used for communications out of
  * sv_movestep to say what entity is blocking us */
-edict_t *new_bad;
+edict_t *new_bad; /* FS: Coop: Rogue specific */
 
 /*
  * Returns false if any part of the bottom of the
@@ -36,9 +36,12 @@ M_CheckBottom(edict_t *ent)
 
 	start[2] = mins[2] - 1;
 
-	if (ent->gravityVector[2] > 0)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		start[2] = maxs[2] + 1;
+		if (ent->gravityVector[2] > 0)
+		{
+			start[2] = maxs[2] + 1;
+		}
 	}
 
 	for (x = 0; x <= 1; x++)
@@ -60,21 +63,30 @@ M_CheckBottom(edict_t *ent)
 
 realcheck:
 	c_no++;
+
+	/* check it for real... */
 	start[2] = mins[2];
 
 	/* the midpoint must be within 16 of the bottom */
 	start[0] = stop[0] = (mins[0] + maxs[0]) * 0.5;
 	start[1] = stop[1] = (mins[1] + maxs[1]) * 0.5;
 
-	if (ent->gravityVector[2] < 0)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		start[2] = mins[2];
-		stop[2] = start[2] - STEPSIZE - STEPSIZE;
+		if (ent->gravityVector[2] < 0)
+		{
+			start[2] = mins[2];
+			stop[2] = start[2] - STEPSIZE - STEPSIZE;
+		}
+		else
+		{
+			start[2] = maxs[2];
+			stop[2] = start[2] + STEPSIZE + STEPSIZE;
+		}
 	}
 	else
 	{
-		start[2] = maxs[2];
-		stop[2] = start[2] + STEPSIZE + STEPSIZE;
+		stop[2] = start[2] - 2 * STEPSIZE;
 	}
 
 	trace = gi.trace(start, vec3_origin, vec3_origin,
@@ -98,7 +110,7 @@ realcheck:
 			trace = gi.trace(start, vec3_origin, vec3_origin,
 					stop, ent, MASK_MONSTERSOLID);
 
-			if (ent->gravityVector[2] > 0)
+			if ((game.gametype == rogue_coop) && (ent->gravityVector[2] > 0)) /* FS: Coop: Rogue specific */
 			{
 				if ((trace.fraction != 1.0) && (trace.endpos[2] < bottom))
 				{
@@ -118,8 +130,7 @@ realcheck:
 					bottom = trace.endpos[2];
 				}
 
-				if ((trace.fraction == 1.0) ||
-					(mid - trace.endpos[2] > STEPSIZE))
+				if ((trace.fraction == 1.0) || (mid - trace.endpos[2] > STEPSIZE))
 				{
 					return false;
 				}
@@ -132,7 +143,7 @@ realcheck:
 }
 
 qboolean
-IsBadAhead(edict_t *self, edict_t *bad, vec3_t move)
+IsBadAhead(edict_t *self, edict_t *bad, vec3_t move) /* FS: Coop: Rogue specific */
 {
 	vec3_t dir;
 	vec3_t forward;
@@ -169,9 +180,12 @@ IsBadAhead(edict_t *self, edict_t *bad, vec3_t move)
 }
 
 /*
- * The move will be adjusted for slopes and stairs, but if the move isn't
- * possible, no move is done, false is returned, and
- * pr_global_struct->trace_normal is set to the normal of the blocking wall
+ * Called by monster program code.
+ * The move will be adjusted for slopes
+ * and stairs, but if the move isn't
+ * possible, no move is done, false is
+ * returned, and pr_global_struct->trace_normal
+ * is set to the normal of the blocking wall
  */
 qboolean
 SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
@@ -183,42 +197,45 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 	float stepsize;
 	vec3_t test;
 	int contents;
-	edict_t *current_bad = NULL;
-	float minheight;
+	edict_t *current_bad = NULL; /* FS: Coop: Rogue specific */
+	float minheight; /* FS: Coop: Rogue specific */
 
 	if (!ent)
 	{
 		return false;
 	}
 
-	if (ent->health > 0)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		current_bad = CheckForBadArea(ent);
-
-		if (current_bad)
+		if (ent->health > 0)
 		{
-			ent->bad_area = current_bad;
+			current_bad = CheckForBadArea(ent);
 
-			if (ent->enemy && !strcmp(ent->enemy->classname, "tesla"))
+			if (current_bad)
 			{
-				/* if the tesla is in front of us, back up... */
-				if (IsBadAhead(ent, current_bad, move))
+				ent->bad_area = current_bad;
+
+				if (ent->enemy && !strcmp(ent->enemy->classname, "tesla"))
 				{
-					VectorScale(move, -1, move);
+					/* if the tesla is in front of us, back up... */
+					if (IsBadAhead(ent, current_bad, move))
+					{
+						VectorScale(move, -1, move);
+					}
 				}
 			}
-		}
-		else if (ent->bad_area)
-		{
-			/* if we're no longer in a bad area, get back to business. */
-			ent->bad_area = NULL;
-
-			if (ent->oldenemy)
+			else if (ent->bad_area)
 			{
-				ent->enemy = ent->oldenemy;
-				ent->goalentity = ent->oldenemy;
-				FoundTarget(ent);
-				return true;
+				/* if we're no longer in a bad area, get back to business. */
+				ent->bad_area = NULL;
+
+				if (ent->oldenemy)
+				{
+					ent->enemy = ent->oldenemy;
+					ent->goalentity = ent->oldenemy;
+					FoundTarget(ent);
+					return true;
+				}
 			}
 		}
 	}
@@ -248,7 +265,7 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 				{
 					/* we want the carrier to stay a certain distance off the ground,
 					   to help prevent him from shooting his fliers, who spawn in below him */
-					if (!strcmp(ent->classname, "monster_carrier"))
+					if ((game.gametype == rogue_coop) && (!strcmp(ent->classname, "monster_carrier"))) /* FS: Coop: Rogue specific */
 					{
 						minheight = 104;
 					}
@@ -272,6 +289,42 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 				}
 				else
 				{
+					if ((game.gametype == xatrix_coop) && (strcmp(ent->classname, "monster_fixbot") == 0)) /* FS: Coop: Xatrix specific */
+					{
+						if ((ent->s.frame >= 105) && (ent->s.frame <= 120))
+						{
+							if (dz > 12)
+							{
+								neworg[2]--;
+							}
+							else if (dz < -12)
+							{
+								neworg[2]++;
+							}
+						}
+						else if ((ent->s.frame >= 31) && (ent->s.frame <= 88))
+						{
+							if (dz > 12)
+							{
+								neworg[2] -= 12;
+							}
+							else if (dz < -12)
+							{
+								neworg[2] += 12;
+							}
+						}
+						else
+						{
+							if (dz > 12)
+							{
+								neworg[2] -= 8;
+							}
+							else if (dz < -12)
+							{
+								neworg[2] += 8;
+							}
+						}
+					}
 					if (dz > 8)
 					{
 						neworg[2] -= 8;
@@ -291,8 +344,8 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 				}
 			}
 
-			trace = gi.trace(ent->s.origin, ent->mins, ent->maxs, neworg,
-					ent, MASK_MONSTERSOLID);
+			trace = gi.trace(ent->s.origin, ent->mins, ent->maxs,
+					neworg, ent, MASK_MONSTERSOLID);
 
 			/* fly monsters don't enter water voluntarily */
 			if (ent->flags & FL_FLY)
@@ -328,16 +381,34 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 				}
 			}
 
-			if ((trace.fraction == 1) && (!trace.allsolid) && (!trace.startsolid))
+			if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 			{
-				VectorCopy(trace.endpos, ent->s.origin);
+				if ((trace.fraction == 1) && (!trace.allsolid) && (!trace.startsolid))
+				{
+					VectorCopy(trace.endpos, ent->s.origin);
 
-				if (!current_bad && CheckForBadArea(ent))
-				{
-					VectorCopy(oldorg, ent->s.origin);
+					if (!current_bad && CheckForBadArea(ent))
+					{
+						VectorCopy(oldorg, ent->s.origin);
+					}
+					else
+					{
+						if (relink)
+						{
+							gi.linkentity(ent);
+							G_TouchTriggers(ent);
+						}
+
+						return true;
+					}
 				}
-				else
+			}
+			else
+			{
+				if (trace.fraction == 1)
 				{
+					VectorCopy(trace.endpos, ent->s.origin);
+
 					if (relink)
 					{
 						gi.linkentity(ent);
@@ -367,9 +438,18 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 		stepsize = 1;
 	}
 
-	/* trace from 1 stepsize gravityUp to 2 stepsize gravityDown. */
-	VectorMA(neworg, -1 * stepsize, ent->gravityVector, neworg);
-	VectorMA(neworg, 2 * stepsize, ent->gravityVector, end);
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		/* trace from 1 stepsize gravityUp to 2 stepsize gravityDown. */
+		VectorMA(neworg, -1 * stepsize, ent->gravityVector, neworg);
+		VectorMA(neworg, 2 * stepsize, ent->gravityVector, end);
+	}
+	else
+	{
+		neworg[2] += stepsize;
+		VectorCopy(neworg, end);
+		end[2] -= stepsize * 2;
+	}
 
 	trace = gi.trace(neworg, ent->mins, ent->maxs, end, ent, MASK_MONSTERSOLID);
 
@@ -381,8 +461,8 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 	if (trace.startsolid)
 	{
 		neworg[2] -= stepsize;
-		trace = gi.trace(neworg, ent->mins, ent->maxs, end,
-				ent, MASK_MONSTERSOLID);
+		trace = gi.trace(neworg, ent->mins, ent->maxs,
+				end, ent, MASK_MONSTERSOLID);
 
 		if (trace.allsolid || trace.startsolid)
 		{
@@ -396,7 +476,7 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 		test[0] = trace.endpos[0];
 		test[1] = trace.endpos[1];
 
-		if (ent->gravityVector[2] > 0)
+		if ((game.gametype == rogue_coop) && (ent->gravityVector[2] > 0)) /* FS: Coop: Rogue specific */
 		{
 			test[2] = trace.endpos[2] + ent->maxs[2] - 1;
 		}
@@ -427,39 +507,46 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 			}
 
 			ent->groundentity = NULL;
-
 			return true;
 		}
 
-		return false;/* walked off an edge */
+		return false; /* walked off an edge */
 	}
 
 	/* check point traces down for dangling corners */
 	VectorCopy(trace.endpos, ent->s.origin);
 
-	if (ent->health > 0)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		/* use AI_BLOCKED to tell the calling layer that we're now mad at a tesla */
-		new_bad = CheckForBadArea(ent);
-
-		if (!current_bad && new_bad)
+		if (ent->health > 0)
 		{
-			if (new_bad->owner)
+			/* use AI_BLOCKED to tell the calling layer that we're now mad at a tesla */
+			new_bad = CheckForBadArea(ent);
+
+			if (!current_bad && new_bad)
 			{
-				if (!strcmp(new_bad->owner->classname, "tesla"))
+				if (new_bad->owner)
 				{
-					if ((!(ent->enemy)) || (!(ent->enemy->inuse)))
+					if (!strcmp(new_bad->owner->classname, "tesla"))
 					{
-						TargetTesla(ent, new_bad->owner);
-						ent->monsterinfo.aiflags |= AI_BLOCKED;
-					}
-					else if (!strcmp(ent->enemy->classname, "telsa"))
-					{
-					}
-					else if ((ent->enemy) && (ent->enemy->client))
-					{
-						if (visible(ent, ent->enemy))
+						if ((!(ent->enemy)) || (!(ent->enemy->inuse)))
 						{
+							TargetTesla(ent, new_bad->owner);
+							ent->monsterinfo.aiflags |= AI_BLOCKED;
+						}
+						else if (!strcmp(ent->enemy->classname, "telsa"))
+						{
+						}
+						else if ((ent->enemy) && (ent->enemy->client))
+						{
+							if (visible(ent, ent->enemy))
+							{
+							}
+							else
+							{
+								TargetTesla(ent, new_bad->owner);
+								ent->monsterinfo.aiflags |= AI_BLOCKED;
+							}
 						}
 						else
 						{
@@ -467,16 +554,11 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 							ent->monsterinfo.aiflags |= AI_BLOCKED;
 						}
 					}
-					else
-					{
-						TargetTesla(ent, new_bad->owner);
-						ent->monsterinfo.aiflags |= AI_BLOCKED;
-					}
 				}
-			}
 
-			VectorCopy(oldorg, ent->s.origin);
-			return false;
+				VectorCopy(oldorg, ent->s.origin);
+				return false;
+			}
 		}
 	}
 
@@ -484,8 +566,9 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 	{
 		if (ent->flags & FL_PARTIALGROUND)
 		{
-			/* entity had floor mostly pulled out from
-			    nderneath it and is trying to correct */
+			/* entity had floor mostly pulled out
+			   from underneath it and is trying to
+			   correct */
 			if (relink)
 			{
 				gi.linkentity(ent);
@@ -507,6 +590,7 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 	ent->groundentity = trace.ent;
 	ent->groundentity_linkcount = trace.ent->linkcount;
 
+	/* the move is ok */
 	if (relink)
 	{
 		gi.linkentity(ent);
@@ -590,9 +674,12 @@ SV_StepDirection(edict_t *ent, float yaw, float dist)
 		return false;
 	}
 
-	if (!ent->inuse)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		return true;
+		if (!ent->inuse)
+		{
+			return true;
+		}
 	}
 
 	ent->ideal_yaw = yaw;
@@ -607,16 +694,19 @@ SV_StepDirection(edict_t *ent, float yaw, float dist)
 
 	if (SV_movestep(ent, move, false))
 	{
-		ent->monsterinfo.aiflags &= ~AI_BLOCKED;
-
-		if (!ent->inuse)
+		if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 		{
-			return true;
+			ent->monsterinfo.aiflags &= ~AI_BLOCKED;
+
+			if (!ent->inuse)
+			{
+				return true;
+			}
 		}
 
 		delta = ent->s.angles[YAW] - ent->ideal_yaw;
 
-		if (strncmp(ent->classname, "monster_widow", 13))
+		if (strncmp(ent->classname, "monster_widow", 13)) /* FS: Coop: Rogue specific: Added check for monster_widow */
 		{
 			if ((delta > 45) && (delta < 315))
 			{
@@ -728,23 +818,27 @@ SV_NewChaseDir(edict_t *actor, edict_t *enemy, float dist)
 		return;
 	}
 
-	if (actor->monsterinfo.blocked)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if ((actor->inuse) && (actor->health > 0))
+		if (actor->monsterinfo.blocked)
 		{
-			if ((actor->monsterinfo.blocked)(actor, dist))
+			if ((actor->inuse) && (actor->health > 0))
 			{
-				return;
+				if ((actor->monsterinfo.blocked)(actor, dist))
+				{
+					return;
+				}
 			}
 		}
 	}
 
+	/* there is no direct path to the player, so pick another direction */
 	if ((olddir != DI_NODIR) && SV_StepDirection(actor, olddir, dist))
 	{
 		return;
 	}
 
-	if (rand() & 1) /*randomly determine direction of search*/
+	if (rand() & 1) /* randomly determine direction of search */
 	{
 		for (tdir = 0; tdir <= 315; tdir += 45)
 		{
@@ -772,9 +866,9 @@ SV_NewChaseDir(edict_t *actor, edict_t *enemy, float dist)
 
 	actor->ideal_yaw = olddir; /* can't move */
 
-	/* if a bridge was pulled out from underneath a monster,
-	   it may not have a valid standing position at all */
-
+	/* if a bridge was pulled out from underneath
+	   a monster, it may not have a valid standing
+	   position at all */
 	if (!M_CheckBottom(actor))
 	{
 		SV_FixCheckBottom(actor);
@@ -830,19 +924,33 @@ M_MoveToGoal(edict_t *ent, float dist)
 		return;
 	}
 
-	if ((((rand() & 3) == 1) &&
-		 !(ent->monsterinfo.aiflags & AI_CHARGING)) ||
-		!SV_StepDirection(ent, ent->ideal_yaw, dist))
+	/* bump around... */
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (ent->monsterinfo.aiflags & AI_BLOCKED)
+		if ((((rand() & 3) == 1) &&
+			 !(ent->monsterinfo.aiflags & AI_CHARGING)) ||
+			!SV_StepDirection(ent, ent->ideal_yaw, dist))
 		{
-			ent->monsterinfo.aiflags &= ~AI_BLOCKED;
-			return;
-		}
+			if (ent->monsterinfo.aiflags & AI_BLOCKED)
+			{
+				ent->monsterinfo.aiflags &= ~AI_BLOCKED;
+				return;
+			}
 
-		if (ent->inuse)
+			if (ent->inuse)
+			{
+				SV_NewChaseDir(ent, goal, dist);
+			}
+		}
+	}
+	else
+	{
+		if (((rand() & 3) == 1) || !SV_StepDirection(ent, ent->ideal_yaw, dist))
 		{
-			SV_NewChaseDir(ent, goal, dist);
+			if (ent->inuse)
+			{
+				SV_NewChaseDir(ent, goal, dist);
+			}
 		}
 	}
 }
@@ -870,6 +978,9 @@ M_walkmove(edict_t *ent, float yaw, float dist)
 	move[2] = 0;
 
 	retval = SV_movestep(ent, move, true);
-	ent->monsterinfo.aiflags &= ~AI_BLOCKED;
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		ent->monsterinfo.aiflags &= ~AI_BLOCKED;
+	}
 	return retval;
 }

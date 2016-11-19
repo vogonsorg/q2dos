@@ -329,7 +329,8 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 	if (!M_CheckBottom(ent))
 	{
 		if (ent->flags & FL_PARTIALGROUND)
-		{   /* entity had floor mostly pulled out
+		{
+			/* entity had floor mostly pulled out
 			   from underneath it and is trying to
 			   correct */
 			if (relink)
@@ -372,11 +373,6 @@ M_ChangeYaw(edict_t *ent)
 	float current;
 	float move;
 	float speed;
-
-	if (!ent)
-	{
-		return;
-	}
 
 	if (!ent)
 	{
