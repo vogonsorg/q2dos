@@ -49,9 +49,10 @@ mframe_t infantry_frames_stand[] = {
 	{ai_stand, 0, NULL}
 };
 
-mmove_t infantry_move_stand = {
+mmove_t infantry_move_stand =
+{
 	FRAME_stand50,
-   	FRAME_stand71,
+	FRAME_stand71,
    	infantry_frames_stand,
    	NULL
 };
@@ -119,11 +120,12 @@ mframe_t infantry_frames_fidget[] = {
 	{ai_stand, -2, NULL}
 };
 
-mmove_t infantry_move_fidget = {
+mmove_t infantry_move_fidget =
+{
 	FRAME_stand01,
-   	FRAME_stand49,
-   	infantry_frames_fidget,
-   	infantry_stand
+	FRAME_stand49,
+	infantry_frames_fidget,
+	infantry_stand
 };
 
 void
@@ -153,10 +155,11 @@ mframe_t infantry_frames_walk[] = {
 	{ai_walk, 5, NULL}
 };
 
-mmove_t infantry_move_walk = {
+mmove_t infantry_move_walk =
+{
 	FRAME_walk03,
-   	FRAME_walk14,
-   	infantry_frames_walk,
+	FRAME_walk14,
+	infantry_frames_walk,
    	NULL
 };
 
@@ -171,7 +174,7 @@ infantry_walk(edict_t *self)
 	self->monsterinfo.currentmove = &infantry_move_walk;
 }
 
-mframe_t infantry_frames_run[] = {
+mframe_t infantry_frames_run_rogue[] = {
 	{ai_run, 10, NULL},
 	{ai_run, 20, NULL},
 	{ai_run, 5, NULL},
@@ -182,10 +185,29 @@ mframe_t infantry_frames_run[] = {
 	{ai_run, 6, NULL}
 };
 
-mmove_t infantry_move_run = {
+mmove_t infantry_move_run_rogue = {
 	FRAME_run01,
    	FRAME_run08,
-   	infantry_frames_run,
+   	infantry_frames_run_rogue,
+   	NULL
+};
+
+mframe_t infantry_frames_run[] = {
+	{ai_run, 10, NULL},
+	{ai_run, 20, NULL},
+	{ai_run, 5, NULL},
+	{ai_run, 7, NULL},
+	{ai_run, 30, NULL},
+	{ai_run, 35, NULL},
+	{ai_run, 2, NULL},
+	{ai_run, 6, NULL}
+};
+
+mmove_t infantry_move_run =
+{
+	FRAME_run01,
+	FRAME_run08,
+	infantry_frames_run,
    	NULL
 };
 
@@ -197,7 +219,10 @@ infantry_run(edict_t *self)
 		return;
 	}
 
-	monster_done_dodge(self);
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		monster_done_dodge(self);
+	}
 
 	if (self->monsterinfo.aiflags & AI_STAND_GROUND)
 	{
@@ -205,7 +230,14 @@ infantry_run(edict_t *self)
 	}
 	else
 	{
-		self->monsterinfo.currentmove = &infantry_move_run;
+		if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+		{
+			self->monsterinfo.currentmove = &infantry_move_run_rogue;
+		}
+		else
+		{
+			self->monsterinfo.currentmove = &infantry_move_run;
+		}
 	}
 }
 
@@ -222,7 +254,8 @@ mframe_t infantry_frames_pain1[] = {
 	{ai_move, 2, NULL}
 };
 
-mmove_t infantry_move_pain1 = {
+mmove_t infantry_move_pain1 =
+{
 	FRAME_pain101,
    	FRAME_pain110,
    	infantry_frames_pain1,
@@ -242,15 +275,17 @@ mframe_t infantry_frames_pain2[] = {
 	{ai_move, 2, NULL}
 };
 
-mmove_t infantry_move_pain2 = {
+mmove_t infantry_move_pain2 =
+{
 	FRAME_pain201,
-   	FRAME_pain210,
-   	infantry_frames_pain2,
-   	infantry_run
+	FRAME_pain210,
+	infantry_frames_pain2,
+	infantry_run
 };
 
 void
-infantry_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
+infantry_pain(edict_t *self, edict_t *other /* unused */,
+	   	float kick /* unused */, int damage)
 {
 	int n;
 
@@ -264,12 +299,15 @@ infantry_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage
 		self->s.skinnum = 1;
 	}
 
-	if (!self->groundentity)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		return;
-	}
+		if (!self->groundentity)
+		{
+			return;
+		}
 
-	monster_done_dodge(self);
+		monster_done_dodge(self);
+	}
 
 	if (level.time < self->pain_debounce_time)
 	{
@@ -296,10 +334,13 @@ infantry_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage
 		gi.sound(self, CHAN_VOICE, sound_pain2, 1, ATTN_NORM, 0);
 	}
 
-	/* clear duck flag */
-	if (self->monsterinfo.aiflags & AI_DUCKED)
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		monster_duck_up(self);
+		/* clear duck flag */
+		if (self->monsterinfo.aiflags & AI_DUCKED)
+		{
+			monster_duck_up(self);
+		}
 	}
 }
 
@@ -325,19 +366,23 @@ InfantryMachineGun(edict_t *self)
 	vec3_t forward, right;
 	vec3_t vec;
 	int flash_number;
+	int frame_number = FRAME_attak111; /* FS: Coop */
 
-	if (!self)
+	if (!self || !self->enemy || !self->enemy->inuse)
 	{
 		return;
 	}
 
-	if (!self->enemy || !self->enemy->inuse)
+	if (game.gametype == xatrix_coop) /* FS: Coop: Xatrix specific */
 	{
-		return;
+		frame_number = FRAME_attak103;
+	}
+	else if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		frame_number = FRAME_attak104;
 	}
 
-	/* new attack start frame */
-	if (self->s.frame == FRAME_attak104)
+	if (self->s.frame == frame_number)
 	{
 		flash_number = MZ2_INFANTRY_MACHINEGUN_1;
 		AngleVectors(self->s.angles, forward, right, NULL);
@@ -358,7 +403,8 @@ InfantryMachineGun(edict_t *self)
 	}
 	else
 	{
-		flash_number = MZ2_INFANTRY_MACHINEGUN_2 + (self->s.frame - FRAME_death211);
+		flash_number = MZ2_INFANTRY_MACHINEGUN_2 +
+					   (self->s.frame - FRAME_death211);
 
 		AngleVectors(self->s.angles, forward, right, NULL);
 		G_ProjectSource(self->s.origin, monster_flash_offset[flash_number],
@@ -368,8 +414,9 @@ InfantryMachineGun(edict_t *self)
 		AngleVectors(vec, forward, NULL, NULL);
 	}
 
-	monster_fire_bullet(self, start, forward, 3, 4, DEFAULT_BULLET_HSPREAD,
-			DEFAULT_BULLET_VSPREAD, flash_number);
+	monster_fire_bullet(self, start, forward, 3, 4,
+			DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD,
+			flash_number);
 }
 
 void
@@ -423,11 +470,12 @@ mframe_t infantry_frames_death1[] = {
 	{ai_move, -3, NULL}
 };
 
-mmove_t infantry_move_death1 = {
+mmove_t infantry_move_death1 =
+{
 	FRAME_death101,
-   	FRAME_death120,
-   	infantry_frames_death1,
-   	infantry_dead
+	FRAME_death120,
+	infantry_frames_death1,
+	infantry_dead
 };
 
 /* Off with his head */
@@ -459,9 +507,10 @@ mframe_t infantry_frames_death2[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t infantry_move_death2 = {
+mmove_t infantry_move_death2 =
+{
 	FRAME_death201,
-   	FRAME_death225,
+	FRAME_death225,
    	infantry_frames_death2,
    	infantry_dead
 };
@@ -478,7 +527,8 @@ mframe_t infantry_frames_death3[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t infantry_move_death3 = {
+mmove_t infantry_move_death3 =
+{
 	FRAME_death301,
    	FRAME_death309,
    	infantry_frames_death3,
@@ -486,8 +536,9 @@ mmove_t infantry_move_death3 = {
 };
 
 void
-infantry_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* unused */,
-		int damage, vec3_t point /* unused */)
+infantry_die(edict_t *self, edict_t *inflictor /* unused */,
+		edict_t *attacker /* unused */, int damage,
+		vec3_t point /* unused */)
 {
 	int n;
 
@@ -499,19 +550,22 @@ infantry_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /
 	/* check for gib */
 	if (self->health <= self->gib_health)
 	{
-		gi.sound(self, CHAN_VOICE, gi.soundindex("misc/udeath.wav"), 1, ATTN_NORM, 0);
+		gi.sound(self, CHAN_VOICE, gi.soundindex( "misc/udeath.wav"), 1, ATTN_NORM, 0);
 
 		for (n = 0; n < 2; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/bone/tris.md2", damage, GIB_ORGANIC);
+			ThrowGib(self, "models/objects/gibs/bone/tris.md2",
+					damage, GIB_ORGANIC);
 		}
 
 		for (n = 0; n < 4; n++)
 		{
-			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
+			ThrowGib(self, "models/objects/gibs/sm_meat/tris.md2",
+					damage, GIB_ORGANIC);
 		}
 
-		ThrowHead(self, "models/objects/gibs/head2/tris.md2", damage, GIB_ORGANIC);
+		ThrowHead(self, "models/objects/gibs/head2/tris.md2",
+				damage, GIB_ORGANIC);
 		self->deadflag = DEAD_DEAD;
 		return;
 	}
@@ -544,7 +598,59 @@ infantry_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /
 	}
 }
 
-mframe_t infantry_frames_duck[] = {
+void
+infantry_duck_down(edict_t *self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	if (self->monsterinfo.aiflags & AI_DUCKED)
+	{
+		return;
+	}
+
+	self->monsterinfo.aiflags |= AI_DUCKED;
+	self->maxs[2] -= 32;
+	self->takedamage = DAMAGE_YES;
+	self->monsterinfo.pausetime = level.time + 1;
+	gi.linkentity(self);
+}
+
+void
+infantry_duck_hold(edict_t *self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	if (level.time >= self->monsterinfo.pausetime)
+	{
+		self->monsterinfo.aiflags &= ~AI_HOLD_FRAME;
+	}
+	else
+	{
+		self->monsterinfo.aiflags |= AI_HOLD_FRAME;
+	}
+}
+
+void
+infantry_duck_up(edict_t *self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	self->monsterinfo.aiflags &= ~AI_DUCKED;
+	self->maxs[2] += 32;
+	self->takedamage = DAMAGE_AIM;
+	gi.linkentity(self);
+}
+
+mframe_t infantry_frames_duck_rogue[] = {
 	{ai_move, -2, monster_duck_down},
 	{ai_move, -5, monster_duck_hold},
 	{ai_move, 3, NULL},
@@ -552,22 +658,81 @@ mframe_t infantry_frames_duck[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t infantry_move_duck = {
+mmove_t infantry_move_duck_rogue =
+{
 	FRAME_duck01,
-   	FRAME_duck05,
-   	infantry_frames_duck,
-   	infantry_run
+	FRAME_duck05,
+	infantry_frames_duck_rogue,
+	infantry_run
 };
+
+mframe_t infantry_frames_duck[] = {
+	{ai_move, -2, infantry_duck_down},
+	{ai_move, -5, infantry_duck_hold},
+	{ai_move, 3, NULL},
+	{ai_move, 4, infantry_duck_up},
+	{ai_move, 0, NULL}
+};
+
+mmove_t infantry_move_duck =
+{
+	FRAME_duck01,
+	FRAME_duck05,
+	infantry_frames_duck,
+	infantry_run
+};
+
+void
+infantry_dodge(edict_t *self, edict_t *attacker, float eta /* unused */, trace_t *fake /* unused */)
+{
+	if (!self || !attacker)
+	{
+		return;
+	}
+
+	if (random() > 0.25)
+	{
+		return;
+	}
+
+	if (!self->enemy)
+	{
+		self->enemy = attacker;
+	}
+
+	self->monsterinfo.currentmove = &infantry_move_duck;
+}
+
+void
+infantry_set_firetime(edict_t *self) /* FS: Coop: Xatrix specific */
+{
+	int n;
+
+	if (!self)
+	{
+		return;
+	}
+
+	n = (rand() & 15) + 5;
+	self->monsterinfo.pausetime = level.time + n * FRAMETIME;
+}
 
 void
 infantry_cock_gun(edict_t *self)
 {
+	int n; /* FS: Coop: Vanilla specific */
 	if (!self)
 	{
 		return;
 	}
 
 	gi.sound(self, CHAN_WEAPON, sound_weapon_cock, 1, ATTN_NORM, 0);
+
+	if (game.gametype == vanilla_coop) /* FS: Coop: Vanilla specific */
+	{
+		n = (rand() & 15) + 3 + 7;
+		self->monsterinfo.pausetime = level.time + n * FRAMETIME;
+	}
 }
 
 void
@@ -591,7 +756,7 @@ infantry_fire(edict_t *self)
 }
 
 void
-infantry_fire_prep(edict_t *self)
+infantry_fire_prep(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	int n;
 
@@ -604,7 +769,7 @@ infantry_fire_prep(edict_t *self)
 	self->monsterinfo.pausetime = level.time + n * FRAMETIME;
 }
 
-mframe_t infantry_frames_attack1[] = {
+mframe_t infantry_frames_attack1_rogue[] = {
 	{ai_charge, -3, NULL},                  /* 101 */
 	{ai_charge, -2, NULL},                  /* 102 */
 	{ai_charge, -1, infantry_fire_prep},    /* 103 */
@@ -622,10 +787,63 @@ mframe_t infantry_frames_attack1[] = {
 	{ai_charge, 4, NULL}                    /* 115 */
 };
 
-mmove_t infantry_move_attack1 = {
+mmove_t infantry_move_attack1_rogue = {
 	FRAME_attak101,
    	FRAME_attak115,
-   	infantry_frames_attack1,
+   	infantry_frames_attack1_rogue,
+   	infantry_run
+};
+
+mframe_t infantry_frames_attack1_xatrix[] = {
+	{ai_charge, 10, infantry_set_firetime},
+	{ai_charge, 6, NULL},
+	{ai_charge, 0, infantry_fire},
+	{ai_charge, 0, NULL},
+	{ai_charge, 1, NULL},
+	{ai_charge, -7, NULL},
+	{ai_charge, -6, NULL},
+	{ai_charge, -1, NULL},
+	{ai_charge, 0, infantry_cock_gun},
+	{ai_charge, 0, NULL},
+	{ai_charge, 0, NULL},
+	{ai_charge, 0, NULL},
+	{ai_charge, 0, NULL},
+	{ai_charge, -1, NULL},
+	{ai_charge, -1, NULL}
+};
+
+mmove_t infantry_move_attack1_xatrix =
+{
+	FRAME_attak101,
+   	FRAME_attak115,
+	infantry_frames_attack1_xatrix,
+   	infantry_run
+};
+
+
+mframe_t infantry_frames_attack1_vanilla[] = {
+	{ai_charge, 4, NULL},
+	{ai_charge, -1, NULL},
+	{ai_charge, -1, NULL},
+	{ai_charge, 0, infantry_cock_gun},
+	{ai_charge, -1, NULL},
+	{ai_charge, 1, NULL},
+	{ai_charge, 1, NULL},
+	{ai_charge, 2, NULL},
+	{ai_charge, -2, NULL},
+	{ai_charge, -3, NULL},
+	{ai_charge, 1, infantry_fire},
+	{ai_charge, 5, NULL},
+	{ai_charge, -1, NULL},
+	{ai_charge, -2, NULL},
+	{ai_charge, -3, NULL}
+};
+
+mmove_t infantry_move_attack1_vanilla =
+{
+	FRAME_attak101,
+   	FRAME_attak115,
+	infantry_frames_attack1_vanilla,
    	infantry_run
 };
 
@@ -669,11 +887,12 @@ mframe_t infantry_frames_attack2[] = {
 	{ai_charge, 3, NULL},
 };
 
-mmove_t infantry_move_attack2 = {
+mmove_t infantry_move_attack2 =
+{
 	FRAME_attak201,
    	FRAME_attak208,
-   	infantry_frames_attack2,
-   	infantry_run
+	infantry_frames_attack2,
+	infantry_run
 };
 
 void
@@ -684,7 +903,10 @@ infantry_attack(edict_t *self)
 		return;
 	}
 
-	monster_done_dodge(self);
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		monster_done_dodge(self);
+	}
 
 	if (range(self, self->enemy) == RANGE_MELEE)
 	{
@@ -692,12 +914,24 @@ infantry_attack(edict_t *self)
 	}
 	else
 	{
-		self->monsterinfo.currentmove = &infantry_move_attack1;
+		switch(game.gametype) /* FS: Coop: Different for every game! */
+		{
+			case rogue_coop:
+				self->monsterinfo.currentmove = &infantry_move_attack1_rogue;
+				break;
+			case xatrix_coop:
+				self->monsterinfo.currentmove = &infantry_move_attack1_xatrix;
+				break;
+			case vanilla_coop:
+			default:
+				self->monsterinfo.currentmove = &infantry_move_attack1_vanilla;
+				break;
+		}
 	}
 }
 
 void
-infantry_jump_now(edict_t *self)
+infantry_jump_now(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t forward, up;
 
@@ -714,7 +948,7 @@ infantry_jump_now(edict_t *self)
 }
 
 void
-infantry_jump2_now(edict_t *self)
+infantry_jump2_now(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t forward, up;
 
@@ -731,7 +965,7 @@ infantry_jump2_now(edict_t *self)
 }
 
 void
-infantry_jump_wait_land(edict_t *self)
+infantry_jump_wait_land(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -753,7 +987,7 @@ infantry_jump_wait_land(edict_t *self)
 	}
 }
 
-mframe_t infantry_frames_jump[] = {
+mframe_t infantry_frames_jump[] = { /* FS: Coop: Rogue specific */
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
 	{ai_move, 0, NULL},
@@ -766,14 +1000,14 @@ mframe_t infantry_frames_jump[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t infantry_move_jump = {
+mmove_t infantry_move_jump = { /* FS: Coop: Rogue specific */
 	FRAME_jump01,
    	FRAME_jump10,
    	infantry_frames_jump,
    	infantry_run
 };
 
-mframe_t infantry_frames_jump2[] = {
+mframe_t infantry_frames_jump2[] = { /* FS: Coop: Rogue specific */
 	{ai_move, -8, NULL},
 	{ai_move, -4, NULL},
 	{ai_move, -4, NULL},
@@ -786,7 +1020,7 @@ mframe_t infantry_frames_jump2[] = {
 	{ai_move, 0, NULL}
 };
 
-mmove_t infantry_move_jump2 = {
+mmove_t infantry_move_jump2 = { /* FS: Coop: Rogue specific */
 	FRAME_jump01,
    	FRAME_jump10,
    	infantry_frames_jump2,
@@ -794,7 +1028,7 @@ mmove_t infantry_move_jump2 = {
 };
 
 void
-infantry_jump(edict_t *self)
+infantry_jump(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -819,7 +1053,7 @@ infantry_jump(edict_t *self)
 }
 
 qboolean
-infantry_blocked(edict_t *self, float dist)
+infantry_blocked(edict_t *self, float dist) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -846,7 +1080,7 @@ infantry_blocked(edict_t *self, float dist)
 }
 
 void
-infantry_duck(edict_t *self, float eta)
+infantry_duck(edict_t *self, float eta) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -860,7 +1094,7 @@ infantry_duck(edict_t *self, float eta)
 		return;
 	}
 
-	if ((self->monsterinfo.currentmove == &infantry_move_attack1) ||
+	if ((self->monsterinfo.currentmove == &infantry_move_attack1_rogue) ||
 		(self->monsterinfo.currentmove == &infantry_move_attack2))
 	{
 		/* if we're shooting, and not on easy, don't dodge */
@@ -885,12 +1119,12 @@ infantry_duck(edict_t *self, float eta)
 	monster_duck_down(self);
 
 	self->monsterinfo.nextframe = FRAME_duck01;
-	self->monsterinfo.currentmove = &infantry_move_duck;
+	self->monsterinfo.currentmove = &infantry_move_duck_rogue;
 	return;
 }
 
 void
-infantry_sidestep(edict_t *self)
+infantry_sidestep(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	if (!self)
 	{
@@ -904,7 +1138,7 @@ infantry_sidestep(edict_t *self)
 		return;
 	}
 
-	if ((self->monsterinfo.currentmove == &infantry_move_attack1) ||
+	if ((self->monsterinfo.currentmove == &infantry_move_attack1_rogue) ||
 		(self->monsterinfo.currentmove == &infantry_move_attack2))
 	{
 		/* if we're shooting, and not on easy, don't dodge */
@@ -915,9 +1149,9 @@ infantry_sidestep(edict_t *self)
 		}
 	}
 
-	if (self->monsterinfo.currentmove != &infantry_move_run)
+	if (self->monsterinfo.currentmove != &infantry_move_run_rogue)
 	{
-		self->monsterinfo.currentmove = &infantry_move_run;
+		self->monsterinfo.currentmove = &infantry_move_run_rogue;
 	}
 }
 
@@ -968,15 +1202,25 @@ SP_monster_infantry(edict_t *self)
 	self->monsterinfo.stand = infantry_stand;
 	self->monsterinfo.walk = infantry_walk;
 	self->monsterinfo.run = infantry_run;
-	self->monsterinfo.dodge = M_MonsterDodge;
-	self->monsterinfo.duck = infantry_duck;
-	self->monsterinfo.unduck = monster_duck_up;
-	self->monsterinfo.sidestep = infantry_sidestep;
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		self->monsterinfo.dodge = M_MonsterDodge;
+		self->monsterinfo.duck = infantry_duck;
+		self->monsterinfo.unduck = monster_duck_up;
+		self->monsterinfo.sidestep = infantry_sidestep;
+	}
+	else
+	{
+		self->monsterinfo.dodge = infantry_dodge;
+	}
 	self->monsterinfo.attack = infantry_attack;
 	self->monsterinfo.melee = NULL;
 	self->monsterinfo.sight = infantry_sight;
 	self->monsterinfo.idle = infantry_fidget;
-	self->monsterinfo.blocked = infantry_blocked;
+	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	{
+		self->monsterinfo.blocked = infantry_blocked;
+	}
 
 	gi.linkentity(self);
 
