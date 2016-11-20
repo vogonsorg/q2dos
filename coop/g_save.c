@@ -790,8 +790,6 @@ WriteGame(const char *filename, qboolean autosave)
     char str_os[32];
 	char str_arch[32];
 
-	return; /* FS: FIXME: Not yet... */
-
 	if (!autosave)
 	{
 		SaveClientData();
@@ -971,8 +969,6 @@ WriteLevel(const char *filename)
 	int i;
 	edict_t *ent;
 	FILE *f;
-
-	return; /* FS: FIXME: Not yet... */
 
 	f = fopen(filename, "wb");
 
