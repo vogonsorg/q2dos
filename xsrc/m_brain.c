@@ -1100,6 +1100,7 @@ SP_monster_brain(edict_t *self)
 	self->monsterinfo.walk = brain_walk;
 	self->monsterinfo.run = brain_run;
 	self->monsterinfo.dodge = brain_dodge;
+	self->monsterinfo.attack = brain_attack;
 	self->monsterinfo.melee = brain_melee;
 	self->monsterinfo.sight = brain_sight;
 	self->monsterinfo.search = brain_search;
