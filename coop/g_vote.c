@@ -278,7 +278,7 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 		mapToken = strtok_r(NULL, separators, &listPtr);
 	}
 
-	return true;
+	return false;
 }
 
 void vote_map (edict_t *ent, const char *mapName)
