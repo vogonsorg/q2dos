@@ -187,6 +187,8 @@ void SP_misc_transport (edict_t *ent); /* FS: Coop: Xatrix specific */
 
 void SP_misc_nuke (edict_t *ent); /* FS: Coop: Xatrix specific */
 
+void SP_SetCDTrack(int track); /* FS: Coop: Added */
+
 spawn_t spawns[] = {
 	{"item_health", SP_item_health},
 	{"item_health_small", SP_item_health_small},
@@ -1183,7 +1185,7 @@ SP_worldspawn(edict_t *ent)
 
 	gi.configstring(CS_SKYROTATE, va("%f", st.skyrotate));
 	gi.configstring(CS_SKYAXIS, va("%f %f %f", st.skyaxis[0], st.skyaxis[1], st.skyaxis[2]));
-	gi.configstring(CS_CDTRACK, va("%i", ent->sounds));
+	SP_SetCDTrack(ent->sounds); /* FS: Coop: Moved here to get it right for all game modes */
 	gi.configstring(CS_MAXCLIENTS, va("%i", (int)(maxclients->value)));
 
 	/* status bar program */
@@ -1870,4 +1872,40 @@ Widowlegs_Spawn(vec3_t startpos, vec3_t angles) /* FS: Coop: Rogue specific */
 
 	ent->nextthink = level.time + FRAMETIME;
 	gi.linkentity(ent);
+}
+
+void
+SP_SetCDTrack(int track) /* FS: Coop: Added */
+{
+	int modifiedTrack;
+
+	if (game.gametype == rogue_coop)
+	{
+		if (track >= 2 && track <= 11)
+			modifiedTrack = track + 10;
+		else
+			modifiedTrack = track;
+	}
+	// an out-of-order mix from Q2 and Rogue CDs
+	else if (game.gametype == xatrix_coop)
+	{
+		switch(track)
+		{
+			case 2: modifiedTrack = 9;	break;
+			case 3: modifiedTrack = 13;	break;
+			case 4: modifiedTrack = 14;	break;
+			case 5: modifiedTrack = 7;	break;
+			case 6: modifiedTrack = 16;	break;
+			case 7: modifiedTrack = 2;	break;
+			case 8: modifiedTrack = 15;	break;
+			case 9: modifiedTrack = 3;	break;
+			case 10: modifiedTrack = 4;	break;
+			case 11: modifiedTrack = 18; break;
+			default: modifiedTrack = track; break;
+		}
+	}
+	else
+		modifiedTrack = track;
+
+	gi.configstring(CS_CDTRACK, va("%i", modifiedTrack));
 }
