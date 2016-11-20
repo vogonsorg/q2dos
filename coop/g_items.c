@@ -48,6 +48,8 @@ void Use_QuadFire(edict_t *ent, gitem_t *item); /* FS: Coop: Xatrix specific */
 static int quad_drop_timeout_hack;
 static int quad_fire_drop_timeout_hack; /* FS: Coop: Xatrix specific */
 
+extern void ED_CallSpawn(edict_t *ent); /* FS: Coop: For SP_Xatrix_item */
+
 /* ====================================================================== */
 
 gitem_t *
@@ -3978,21 +3980,7 @@ SP_xatrix_item(edict_t *self) /* FS: Coop: Rogue specific */
 
 	if(game.gametype == xatrix_coop) /* FS: FIXME: Coop: This should work for Xatrix, but need to test the maps that have these items to be sure. */
 	{
-		/* check item spawn functions */
-		for (i = 0, item = itemlist; i < game.num_items; i++, item++)
-		{
-			if (!item->classname)
-			{
-				continue;
-			}
-
-			if (!strcmp(item->classname, self->classname))
-			{
-				/* found it */
-				SpawnItem(self, item);
-				return;
-			}
-		}
+		ED_CallSpawn(self);
 		return;
 	}
 
