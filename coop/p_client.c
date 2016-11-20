@@ -1991,6 +1991,7 @@ PutClientInServer(edict_t *ent)
 	ChangeWeapon(ent);
 
 	InitClientCoopPersistant(ent); /* FS: Coop: Don't move this!  If too early it will fudge some things up */
+	vote_connect(ent); /* FS: Coop: Voting */
 }
 
 void Client_PrintMOTD (edict_t *client) /* FS: MOTD */
@@ -2673,6 +2674,8 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 			UpdateChaseCam(other);
 		}
 	}
+
+	vote_Think(); /* FS: Coop: Voting */
 }
 
 /*

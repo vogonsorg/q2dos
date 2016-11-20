@@ -17,6 +17,11 @@ cvar_t *deathmatch;
 cvar_t *coop;
 cvar_t *coop_item_respawn; /* FS: Coop: Added */
 cvar_t *sv_coop_gamemode; /* FS: Coop: Added */
+cvar_t *sv_vote_enabled; /* FS: Coop: Voting */
+cvar_t *sv_vote_disallow_flags; /* FS: Coop: Voting */
+cvar_t *sv_vote_assume_yes; /* FS: Coop: Voting */
+cvar_t *sv_vote_timer; /* FS: Coop: Voting */
+cvar_t *sv_vote_private; /* FS: Coop: Voting */
 cvar_t *motd; /* FS: Coop: Added */
 cvar_t *dmflags;
 cvar_t *skill;
@@ -390,6 +395,8 @@ ExitLevel(void)
 	level.changemap = NULL;
 	level.exitintermission = 0;
 	level.intermissiontime = 0;
+
+	vote_Reset(); /* FS: Coop: Voting */
 	ClientEndServerFrames();
 
 	/* clear some things before going to next level */

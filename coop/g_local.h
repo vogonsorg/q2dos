@@ -107,6 +107,12 @@ typedef enum
 	AMMO_PROX
 } ammo_t;
 
+typedef enum /* FS: Coop: Voting */
+{
+	NOT_VOTED,
+	VOTE_YES,
+	VOTE_NO
+} vote_t;
 
 //deadflag
 #define DEAD_NO					0
@@ -636,6 +642,11 @@ extern	cvar_t	*maxentities;
 extern	cvar_t	*deathmatch;
 extern	cvar_t	*coop;
 extern	cvar_t	*coop_item_respawn; /* FS: Coop: Added */
+extern	cvar_t	*sv_vote_enabled; /* FS: Coop: Voting */
+extern	cvar_t	*sv_vote_disallow_flags; /* FS: Coop: Voting */
+extern	cvar_t	*sv_vote_assume_yes; /* FS: Coop: Voting */
+extern	cvar_t	*sv_vote_timer; /* FS: Coop: Voting */
+extern	cvar_t	*sv_vote_private; /* FS: Coop: Voting */
 extern	cvar_t	*sv_coop_gamemode; /* FS: Coop: Added */
 extern	cvar_t	*motd; /* FS: Coop: Added */
 extern	cvar_t	*dmflags;
@@ -1126,6 +1137,13 @@ void Widowlegs_Spawn (vec3_t startpos, vec3_t angles);
 //
 void RemoveAttackingPainDaemons (edict_t *self);
 
+//
+// g_vote.c
+//
+void vote_Think (void);
+void vote_Reset (void);
+void vote_command (edict_t *ent);
+void vote_connect (edict_t *ent);
 
 // ROGUE PROTOTYPES
 //====================
@@ -1310,6 +1328,8 @@ struct gclient_s
 	edict_t		*owned_sphere;		// this points to the player's sphere
 //ROGUE
 //=======
+	qboolean	voteInitiator; /* FS: Coop: Voting */
+	vote_t		hasVoted; /* FS: Coop: Voting */
 };
 
 

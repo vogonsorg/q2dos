@@ -730,6 +730,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\coop\g_vote.c"
+				>
+			</File>
+			<File
 				RelativePath="..\coop\g_weapon.c"
 				>
 				<FileConfiguration

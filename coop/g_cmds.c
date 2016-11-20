@@ -1319,6 +1319,69 @@ Cmd_Wave_f(edict_t *ent)
 	}
 }
 
+/* FS: Map voting from chat messages */
+void sayCmd_CheckVote(edict_t *ent, char *voteChat)
+{
+
+	if(!voteChat || voteChat[0] == '\0')
+		return;
+
+	if(!stricmp(voteChat, "vote yes"))
+	{
+		gi.WriteByte(svc_stufftext);
+		gi.WriteString("vote yes\n");
+		gi.unicast(ent, true);
+	}
+	else if(!stricmp(voteChat, "vote no"))
+	{
+		gi.WriteByte(svc_stufftext);
+		gi.WriteString("vote no\n");
+		gi.unicast(ent, true);
+	}
+	else if(!stricmp(voteChat, "vote stop"))
+	{
+		gi.WriteByte(svc_stufftext);
+		gi.WriteString("vote stop\n");
+		gi.unicast(ent, true);
+	}
+	else if(!stricmp(voteChat, "vote restartmap"))
+	{
+		gi.WriteByte(svc_stufftext);
+		gi.WriteString("vote restartmap\n");
+		gi.unicast(ent, true);
+	}
+	else if(!strncmp(voteChat, "vote map ", 9))
+	{
+		gi.WriteByte(svc_stufftext);
+		gi.WriteString(va("%s\n", voteChat));
+		gi.unicast(ent, true);
+	}
+	else if(!strncmp(voteChat, "vote gamemode ", 14))
+	{
+		gi.WriteByte(svc_stufftext);
+		gi.WriteString(va("%s\n", voteChat));
+		gi.unicast(ent, true);
+	}
+	else if(!strncmp(voteChat, "vote skill ", 11))
+	{
+		gi.WriteByte(svc_stufftext);
+		gi.WriteString(va("%s\n", voteChat));
+		gi.unicast(ent, true);
+	}
+	else if ( !stricmp(voteChat, "vote help")	|| !stricmp(voteChat, "vote list") || !stricmp(voteChat, "vote cmds")	|| !stricmp(voteChat, "vote commands") )
+	{
+		gi.WriteByte(svc_stufftext);
+		gi.WriteString("vote help\n");
+		gi.unicast(ent, true);
+	}
+	else if (!stricmp(voteChat, "vote progress"))
+	{
+		gi.WriteByte(svc_stufftext);
+		gi.WriteString("vote progress\n");
+		gi.unicast(ent, true);
+	}
+}
+
 void
 Cmd_Say_f(edict_t *ent, qboolean team, qboolean arg0)
 {
@@ -1417,6 +1480,8 @@ Cmd_Say_f(edict_t *ent, qboolean team, qboolean arg0)
 		gi.cprintf(NULL, PRINT_CHAT, "%s", text);
 	}
 
+	sayCmd_CheckVote(ent, p); /* FS: Check if it's a voting command */
+
 	for (j = 1; j <= game.maxclients; j++)
 	{
 		other = &g_edicts[j];
@@ -1512,11 +1577,11 @@ Cmd_PlayerList_f(edict_t *ent)
 }
 
 void
-Cmd_Coop_Gamemode(edict_t *ent, gametype_t gametype) /* FS: Coop: Gamemode voting */
+Cmd_Coop_Gamemode(edict_t *ent, gametype_t gametype) /* FS: TODO: Make this a server only command */
 {
 	char command[1024];
 
-	if (!ent || !ent->client || !ent->client->pers.netname)
+	if (!ent)
 	{
 		return;
 	}
@@ -1524,19 +1589,19 @@ Cmd_Coop_Gamemode(edict_t *ent, gametype_t gametype) /* FS: Coop: Gamemode votin
 	switch(gametype)
 	{
 		case vanilla_coop:
-			gi.bprintf(PRINT_HIGH, "%s votes to change gamemode to iD coop!\n", ent->client->pers.netname);
+			gi.bprintf(PRINT_HIGH, "Changing gamemode to iD coop!\n");
 			gi.cvar_forceset("sv_coop_gamemode", "vanilla");
 			Com_sprintf(command, sizeof(command), "map base1\n");
 			gi.AddCommandString(command);
 			return;
 		case rogue_coop:
-			gi.bprintf(PRINT_HIGH, "%s votes to change gamemode to Rogue coop!\n", ent->client->pers.netname);
+			gi.bprintf(PRINT_HIGH, "Changing gamemode to Rogue coop!\n");
 			gi.cvar_forceset("sv_coop_gamemode", "rogue");
 			Com_sprintf(command, sizeof(command), "map rmine1\n");
 			gi.AddCommandString(command);
 			return;
 		case xatrix_coop:
-			gi.bprintf(PRINT_HIGH, "%s votes to change gamemode to Xatrix coop!\n", ent->client->pers.netname);
+			gi.bprintf(PRINT_HIGH, "Changing gamemode to Xatrix coop!\n");
 			gi.cvar_forceset("sv_coop_gamemode", "xatrix");
 			Com_sprintf(command, sizeof(command), "map xswamp\n");
 			gi.AddCommandString(command);
@@ -1563,21 +1628,9 @@ ClientCommand(edict_t *ent)
 
 	cmd = gi.argv(0);
 
-	if (Q_stricmp(cmd, "idcoop") == 0) /* FS: Coop: Game mode switching */
+	if (Q_stricmp(cmd, "vote") == 0) /* FS: Coop: Voting */
 	{
-		Cmd_Coop_Gamemode(ent, vanilla_coop);
-		return;
-	}
-
-	if (Q_stricmp(cmd, "roguecoop") == 0) /* FS: Coop: Game mode switching */
-	{
-		Cmd_Coop_Gamemode(ent, rogue_coop);
-		return;
-	}
-
-	if (Q_stricmp(cmd, "xatrixcoop") == 0) /* FS: Coop: Game mode switching */
-	{
-		Cmd_Coop_Gamemode(ent, xatrix_coop);
+		vote_command(ent);
 		return;
 	}
 

@@ -760,7 +760,7 @@ Touch_Plat_Center(edict_t *ent, edict_t *other, cplane_t *plane /* unsed */,
 	}
 }
 
-/* FS: Coop: FIXME? Rogue set this to edict_t, otherwise it is void! */
+/* FS: Coop: Rogue changes this to edict_t. */
 edict_t *
 plat_spawn_inside_trigger(edict_t *ent)
 {
