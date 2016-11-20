@@ -6,8 +6,6 @@
 #include "g_local.h"
 #include "m_player.h"
 
-//#include "time.h" /* FS: For vote_random */
-
 
 #ifndef _MSC_VER /* FS: Unix */
 #include <sys/stat.h>
@@ -35,6 +33,7 @@ int voteYes;
 int voteClients;
 int printOnce;
 int voteCoopSkill;
+const char coopMapFile[] = "mapcoop.txt";
 char voteCbufCmdExecute[MAX_OSPATH];
 char voteMap[MAX_OSPATH];
 char voteType[16];
@@ -69,6 +68,7 @@ void vote_DefaultNoVotes (void);
 void vote_NewPlayerMessage (edict_t *ent);
 void vote_progress (edict_t *ent);
 int clientsInGame (void);
+qboolean vote_mapcheck (edict_t *ent, const char *mapName);
 
 int clientsInGame (void)
 {
@@ -202,6 +202,85 @@ void vote_command(edict_t *ent)
 	}
 }
 
+qboolean vote_mapcheck (edict_t *ent, const char *mapName)
+{
+	char mapCheck[MAX_QPATH];
+	char fileName[MAX_OSPATH];
+	char *mapToken = NULL;
+	char *gameTypeToken = NULL;
+	char *fileBuffer = NULL;
+	char *listPtr = NULL;
+	char separators[] = ",\n";
+	long fileSize;
+	FILE *f = NULL;
+	size_t toEOF = 0;
+
+	if(!ent || !mapName)
+	{
+		return false;
+	}
+
+	Com_sprintf(fileName, sizeof(fileName), "coop/%s", coopMapFile);
+
+	f = fopen(fileName, "r");
+	if(!f)
+	{
+		gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: couldn't find '%s'!\n", coopMapFile);
+		return false;
+	}
+
+	/* obtain file size */
+	fseek (f , 0 , SEEK_END);
+	fileSize = ftell (f);
+	rewind(f);
+	fileBuffer = (char *)malloc(sizeof(char)*(fileSize+2)); // FS: In case we have to add a newline terminator
+	if(!fileBuffer)
+	{
+		gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: can't allocate memory for fileBuffer!\n");
+		return false;
+	}
+	toEOF = fread(fileBuffer, sizeof(char), fileSize, f);
+	fclose(f);
+	if(toEOF <= 0)
+	{
+		gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: cannot read file '%s' into memory!\n", coopMapFile);
+		return false;
+	}
+
+	/* FS: Add newline terminator for some paranoia */
+	fileBuffer[toEOF] = '\n';
+	fileBuffer[toEOF+1] = '\0';
+
+	mapToken = strtok_r(fileBuffer, separators, &listPtr);
+	if(!mapToken)
+	{
+		return false;
+	}
+
+	Com_sprintf(mapCheck, sizeof(mapCheck), "%s.bsp", mapName);
+
+	while(mapToken)
+	{
+		if(!Q_stricmp(mapToken, mapCheck))
+		{
+			mapToken = strtok_r(NULL, separators, &listPtr);
+			if(mapToken)
+			{
+				Com_sprintf(voteGamemode, sizeof(voteGamemode), "%s", mapToken);
+				return true;
+			}
+			else
+			{
+				gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: %s with no gamemode in '%s'!\n", mapCheck, coopMapFile);
+				return false;
+			}
+		}
+		mapToken = strtok_r(NULL, separators, &listPtr);
+	}
+
+	return true;
+}
+
 void vote_map (edict_t *ent, const char *mapName)
 {
 	if (bVoteInProgress)
@@ -226,6 +305,12 @@ void vote_map (edict_t *ent, const char *mapName)
 	if(sv_vote_disallow_flags->intValue & VOTE_NOMAP)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Voting for map changes are not allowed on this server.  Vote cancelled.\n");
+		return;
+	}
+
+	if(!vote_mapcheck(ent,mapName))
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Map %s doesn't exist!\n", mapName);
 		return;
 	}
 
@@ -589,7 +674,8 @@ void vote_Passed (void)
 	}
 	else
 	{
-		Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "wait;wait;wait;wait;wait;gamemap %s\n", voteMap);
+		gi.cvar_forceset("sv_coop_gamemode", voteGamemode);
+		Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "wait;wait;wait;wait;wait;map %s\n", voteMap);
 	}
 
 	vote_Reset();
