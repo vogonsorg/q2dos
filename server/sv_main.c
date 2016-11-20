@@ -55,6 +55,7 @@ cvar_t  *sv_iplimit;                    // r1ch: max connections from a single I
 cvar_t  *sv_reconnect_limit;    // minimum seconds between connect messages
 cvar_t	*sv_entfile;	// Knightmare 6/25/12- cvar to control use of .ent files
 cvar_t	*sv_skipcinematics; /* FS: Skip cinematics if we chose to do so */
+cvar_t	*sv_downloadserver; /* FS: From R1Q2: HTTP Downloading */
 
 void Master_Shutdown (void);
 
@@ -530,8 +531,11 @@ gotnewcl:
 	strncpy (newcl->userinfo, userinfo, sizeof(newcl->userinfo)-1);
 	SV_UserinfoChanged (newcl);
 
-	// send the connect packet to the client
-	Netchan_OutOfBandPrint (NS_SERVER, adr, "client_connect");
+	// r1: note we could ideally send this twice but it prints unsightly message on original client.
+	if (sv_downloadserver->string[0])
+		Netchan_OutOfBandPrint (NS_SERVER, adr, "client_connect dlserver=%s", sv_downloadserver->string);
+	else
+		Netchan_OutOfBandPrint (NS_SERVER, adr, "client_connect");
 
 	Netchan_Setup (NS_SERVER, &newcl->netchan , adr, qport);
 
@@ -1114,6 +1118,10 @@ void SV_Init (void)
 /* FS: Added */
 	sv_skipcinematics = Cvar_Get ("sv_skipcinematics", "0", CVAR_ARCHIVE);
 	sv_skipcinematics->description = "Skip the loading of *.cin cinematics";
+
+/* FS: From R1Q2: HTTP Downloading */
+	sv_downloadserver = Cvar_Get ("sv_downloadserver", "", 0);
+	sv_downloadserver->description = "URL to a location where clients can download game content over HTTP. Default empty.  Path leads to game dir name.  i.e. quake2.com/baseq2/maps\n";
 
 	sv_noreload = Cvar_Get ("sv_noreload", "0", 0);
 
