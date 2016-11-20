@@ -1165,6 +1165,12 @@ SP_monster_brain(edict_t *self)
 	{
 		self->monsterinfo.dodge = brain_dodge;
 	}
+
+	if(game.gametype == xatrix_coop) /* FS: Coop: Xatrix specific */
+	{
+		self->monsterinfo.attack = brain_attack;
+	}
+
 	self->monsterinfo.melee = brain_melee;
 	self->monsterinfo.sight = brain_sight;
 	self->monsterinfo.search = brain_search;
