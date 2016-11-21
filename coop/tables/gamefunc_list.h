@@ -50,8 +50,6 @@
 {"VectorCompare", (byte *)VectorCompare},
 {"AddPointToBounds", (byte *)AddPointToBounds},
 {"ClearBounds", (byte *)ClearBounds},
-{"BoxOnPlaneSide", (byte *)BoxOnPlaneSide},
-{"BOPS_Error", (byte *)BOPS_Error},
 {"BoxOnPlaneSide2", (byte *)BoxOnPlaneSide2},
 {"anglemod", (byte *)anglemod},
 {"LerpAngle", (byte *)LerpAngle},

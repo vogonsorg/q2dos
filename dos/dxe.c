@@ -142,6 +142,7 @@ DXE_EXPORT_TABLE (syms)
 	DXE_EXPORT (vfprintf)
 	DXE_EXPORT (fscanf)
 	DXE_EXPORT (sscanf)
+	DXE_EXPORT (rewind)
 
 	/* dir */
 	DXE_EXPORT (findfirst)
