@@ -232,6 +232,9 @@ InitGame(void)
 	coop_item_respawn = gi.cvar("coop_item_respawn", "1", CVAR_SERVERINFO); /* FS: Coop: Added */
 	sv_coop_gamemode = gi.cvar("sv_coop_gamemode", "vanilla", CVAR_NOSET); /* FS: Coop: Added */
 	sv_coop_gamemode->description = "Internal CVAR used to keep track of current gamemode during DLL resets.";
+	sv_coop_reset_hack = gi.cvar("sv_coop_reset_hack", "1", 0);
+	sv_coop_reset_hack->description = "Reset the internal timers every 3 hours if no clients are connected.  Works around frametime overflow errors.  Experimental.";
+
 	motd = gi.cvar ("motd", "", 0); /* FS: Coop: Added */
 	skill = gi.cvar ("skill", "1", CVAR_LATCH);
 	maxentities = gi.cvar ("maxentities", "1024", CVAR_LATCH);

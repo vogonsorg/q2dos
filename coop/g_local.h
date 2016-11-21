@@ -648,6 +648,7 @@ extern	cvar_t	*sv_vote_assume_yes; /* FS: Coop: Voting */
 extern	cvar_t	*sv_vote_timer; /* FS: Coop: Voting */
 extern	cvar_t	*sv_vote_private; /* FS: Coop: Voting */
 extern	cvar_t	*sv_coop_gamemode; /* FS: Coop: Added */
+extern	cvar_t	*sv_coop_reset_hack; /* FS: Coop: Gross reset frametime hack shit */
 extern	cvar_t	*motd; /* FS: Coop: Added */
 extern	cvar_t	*dmflags;
 extern	cvar_t	*skill;
@@ -1496,8 +1497,6 @@ struct edict_s
 	edict_t		*monster_hint_chain;
 	edict_t		*target_hint_chain;
 	int			hint_chain_id;
-	// FIXME - debug help!
-	float		lastMoveTime;
 //ROGUE
 //=========
 	int			coopBackpackInventory[MAX_ITEMS]; /* FS: Coop: Spawn a backpack with our stuff */

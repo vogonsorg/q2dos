@@ -22,6 +22,7 @@ cvar_t *sv_vote_disallow_flags; /* FS: Coop: Voting */
 cvar_t *sv_vote_assume_yes; /* FS: Coop: Voting */
 cvar_t *sv_vote_timer; /* FS: Coop: Voting */
 cvar_t *sv_vote_private; /* FS: Coop: Voting */
+cvar_t *sv_coop_reset_hack; /* FS: Coop: Long uptime reset hack :( */
 cvar_t *motd; /* FS: Coop: Added */
 cvar_t *dmflags;
 cvar_t *skill;
@@ -422,14 +423,184 @@ ExitLevel(void)
 /*
  * Advances the world by 0.1 seconds
  */
+#if 0 /* FS: Force framenum overflow and reset testing */
+static qboolean firstStart = true;
+#endif
+
+int G_Clients_Connected (void)
+{
+	edict_t	*ent;
+	int i, clientsInGame;
+
+	i = clientsInGame = 0;
+
+	for (i=0 ; i<maxclients->value ; i++)
+	{
+		ent = &g_edicts [i + 1];
+		if (ent->inuse && ent->client)
+		{
+			clientsInGame++;
+		}
+	}
+	return clientsInGame;
+}
+
+void G_ResetTimer_Hack (void) /* FS: Some of the grossest shit of all time.  Reset everything to avoid the integer to float overflow timer bullshit */
+{
+	int i;
+	edict_t *ent;
+
+	if(sv_coop_reset_hack->intValue && (level.time > 10800.0f) && !G_Clients_Connected()) /* FS: Every 3 hours reset the timers.  The game seems to start fucking up around 4 hours of idleness */
+	{
+		gi.cprintf(NULL, PRINT_HIGH, "Resetting timers...\n");
+
+		level.framenum = 55; /* FS: Dont start at 0, advance it a bit */
+		level.time = level.framenum * FRAMETIME;
+		lastgibframe = 0;
+
+		ent = &g_edicts[0];
+
+		for (i = 0; i < globals.num_edicts; i++, ent++)
+		{
+			if (!ent->inuse)
+			{
+				continue;
+			}
+
+			if(ent->monsterinfo.trail_time)
+			{
+				ent->monsterinfo.trail_time = level.time + 0.1f;
+			}
+			if(ent->monsterinfo.idle_time)
+			{
+				ent->monsterinfo.idle_time = level.time + 0.1f;
+			}
+
+			if(ent->monsterinfo.pausetime)
+			{
+				ent->monsterinfo.pausetime = level.time + 0.1f;
+			}
+
+			if(ent->monsterinfo.last_hint_time)
+			{
+				ent->monsterinfo.last_hint_time = level.time + 0.1f;
+			}
+
+			if(ent->monsterinfo.pausetime)
+			{
+				ent->monsterinfo.pausetime = 100000000;
+			}
+
+			if(ent->monsterinfo.next_duck_time)
+			{
+				ent->monsterinfo.next_duck_time = level.time + 0.1f;
+			}
+
+			if(ent->monsterinfo.duck_wait_time)
+			{
+				ent->monsterinfo.duck_wait_time = level.time + 0.1f;
+			}
+
+			if(ent->monsterinfo.blind_fire_delay)
+			{
+				ent->monsterinfo.blind_fire_delay = level.time + 0.1f;
+			}
+
+			if(ent->monsterinfo.quad_framenum)
+			{
+				ent->monsterinfo.quad_framenum = 0.0f;
+			}
+
+			if(ent->monsterinfo.invincible_framenum)
+			{
+				ent->monsterinfo.invincible_framenum = 0.0f;
+			}
+
+			if(ent->monsterinfo.double_framenum)
+			{
+				ent->monsterinfo.double_framenum = 0.0f;
+			}
+
+			if(ent->air_finished)
+			{
+				ent->air_finished = level.time + 1.0f;
+			}
+
+			if(ent->powerarmor_time)
+			{
+				ent->powerarmor_time = level.time + 0.2f;
+			}
+
+			/* FS: TODO: Check ent->wait and ent->delay and re-apply per situation since a few rely on level.time */
+
+			if(ent->teleport_time)
+			{
+				ent->teleport_time = level.time;
+			}
+
+			if(ent->touch_debounce_time)
+			{
+				ent->touch_debounce_time = level.time + 0.1f;
+			}
+
+			if(ent->pain_debounce_time)
+			{
+				ent->pain_debounce_time = level.time + 0.1f;
+			}
+
+			if(ent->damage_debounce_time)
+			{
+				ent->damage_debounce_time = level.time + 0.1f;
+			}
+
+			if(ent->fly_sound_debounce_time)
+			{
+				ent->fly_sound_debounce_time = level.time + 0.1f;
+			}
+
+			if(ent->last_move_time)
+			{
+				ent->last_move_time = 0.1f;
+			}
+
+			if(ent->timestamp)
+			{
+				ent->timestamp = level.time + 0.1f;
+			}
+
+			if(ent->think)
+			{
+				ent->nextthink = level.time + 0.1f;
+			}
+
+			if(ent->monsterinfo.stand)
+			{
+				ent->monsterinfo.stand(ent);
+			}
+		}
+	}
+}
+
 void
 G_RunFrame(void)
 {
 	int i;
 	edict_t *ent;
 
+#if 0 /* FS: Force framenum overflow and reset testing */
+	if(firstStart && level.framenum > 5)
+	{
+		level.framenum = 10790*10;
+		firstStart = false;
+//		gi.cprintf(NULL, PRINT_CHAT, "framenum: %i\n", level.framenum);
+	}
+#endif
+
 	level.framenum++;
 	level.time = level.framenum * FRAMETIME;
+
+	G_ResetTimer_Hack(); /* FS: Some of the most grossest shit of all time.  Reset the counters after long uptimes */
+//	gi.cprintf(NULL, PRINT_CHAT, "framenum: %i [%f]\n", level.framenum, level.time);
 
 	/* choose a client for monsters to target this frame */
 	AI_SetSightClient();
