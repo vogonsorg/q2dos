@@ -371,11 +371,23 @@ qboolean	NET_GetPacket (netsrc_t sock, netadr_t *net_from, sizebuf_t *net_messag
 			}
 
 			if (dedicated->value)	// let dedicated servers continue after errors
-				Com_Printf ("NET_GetPacket: %s from %s\n", NET_ErrorString(),
-						NET_AdrToString(*net_from));
+			{
+				if(err == WSAECONNRESET) /* FS: Don't need to see this spam from connecting to ourselves */
+				{
+					Com_DPrintf (DEVELOPER_MSG_NET, "NET_GetPacket: %s from %s\n", NET_ErrorString(),
+							NET_AdrToString(*net_from));
+				}
+				else
+				{
+					Com_Printf ("NET_GetPacket: %s from %s\n", NET_ErrorString(),
+							NET_AdrToString(*net_from));
+				}
+			}
 			else
+			{
 				Com_Error (ERR_DROP, "NET_GetPacket: %s from %s", 
 						NET_ErrorString(), NET_AdrToString(*net_from));
+			}
 			continue;
 		}
 

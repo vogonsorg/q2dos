@@ -993,7 +993,7 @@ void Master_Heartbeat (void)
 	for (i=0 ; i<MAX_MASTERS ; i++)
 		if (master_adr[i].port)
 		{
-			Com_Printf ("Sending heartbeat to %s\n", NET_AdrToString (master_adr[i]));
+			Com_DPrintf (DEVELOPER_MSG_NET, "Sending heartbeat to %s\n", NET_AdrToString (master_adr[i])); /* FS: Was Com_Printf */
 			Netchan_OutOfBandPrint (NS_SERVER, master_adr[i], "heartbeat\n%s", string);
 		}
 }
@@ -1022,7 +1022,7 @@ void Master_Shutdown (void)
 		if (master_adr[i].port)
 		{
 			if (i > 0)
-				Com_Printf ("Sending heartbeat to %s\n", NET_AdrToString (master_adr[i]));
+				Com_DPrintf (DEVELOPER_MSG_NET, "Sending heartbeat to %s\n", NET_AdrToString (master_adr[i])); /* FS: Was Com_Printf */
 			Netchan_OutOfBandPrint (NS_SERVER, master_adr[i], "shutdown");
 		}
 }

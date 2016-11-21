@@ -1719,6 +1719,11 @@ spectator_respawn(edict_t *ent)
 			gi.unicast(ent, true);
 			return;
 		}
+
+		if (coop->intValue) /* FS: Coop: Spawn a backpack with our stuff */
+		{
+			Spawn_CoopBackpack(ent);
+		}
 	}
 	else
 	{
