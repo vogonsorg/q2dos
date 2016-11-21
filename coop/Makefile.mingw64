@@ -48,7 +48,7 @@ GAME = dm_ball.o \
 	m_float.o \
 	m_flyer.o \
 	m_gekk.o \
-	m_gladb.c
+	m_gladb.o \
 	m_gladiator.o \
 	m_gunner.o \
 	m_hover.o \
