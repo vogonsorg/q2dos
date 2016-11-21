@@ -1022,11 +1022,11 @@ InitClientCoopPersistant(edict_t *ent) /* FS: Coop: Give back some goodies on re
 
 	switch(client->resp.coop_respawn.ammoUpgrade)
 	{
-		case COOP_BACKPACK:
-			item = FindItem("Ammo Pack");
-			break;
 		case COOP_BANDOLIER:
 			item = FindItem("Bandolier");
+			break;
+		case COOP_BACKPACK:
+			item = FindItem("Ammo Pack");
 			break;
 		default:
 			item = NULL;

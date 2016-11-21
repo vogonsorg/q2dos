@@ -1502,6 +1502,8 @@ struct edict_s
 //=========
 	int			coopBackpackInventory[MAX_ITEMS]; /* FS: Coop: Spawn a backpack with our stuff */
 	char		*coopBackpackNetname; /* FS: Coop: Spawn a backpack with our stuff */
+	int			coopBackpackMaxHealth; /* FS: Coop: Backpack max health */
+	int			coopBackpackAmmoUpgrade; /* FS: Coop: Backpack bandolier and ammo packs */
 };
 
 //=============

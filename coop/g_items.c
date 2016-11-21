@@ -338,12 +338,12 @@ Pickup_AncientHead(edict_t *ent, edict_t *other)
 }
 
 qboolean
-Pickup_Bandolier(edict_t *ent, edict_t *other)
+Pickup_Bandolier(edict_t *ent /* may be null */, edict_t *other)
 {
 	gitem_t *item;
 	int index;
 
-	if (!ent || !other)
+	if (!other)
 	{
 		return false;
 	}
@@ -408,7 +408,7 @@ Pickup_Bandolier(edict_t *ent, edict_t *other)
 		}
 	}
 
-	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value || Coop_Respawn()) ) /* FS: Coop: Added */
+	if ((ent) && (!(ent->spawnflags & DROPPED_ITEM)) && (deathmatch->value || Coop_Respawn()) ) /* FS: Coop: Added */
 	{
 		SetRespawn(ent, ent->item->quantity);
 	}
@@ -422,12 +422,12 @@ Pickup_Bandolier(edict_t *ent, edict_t *other)
 }
 
 qboolean
-Pickup_Pack(edict_t *ent, edict_t *other)
+Pickup_Pack(edict_t *ent /* may be null */, edict_t *other)
 {
 	gitem_t *item;
 	int index;
 
- 	if (!ent || !other)
+ 	if (!other)
 	{
 		return false;
 	}
@@ -592,7 +592,7 @@ Pickup_Pack(edict_t *ent, edict_t *other)
 		}
 	}
 
-	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value || Coop_Respawn()) ) /* FS: Coop: Added */
+	if ((ent) && (!(ent->spawnflags & DROPPED_ITEM)) && (deathmatch->value || Coop_Respawn()) ) /* FS: Coop: Added */
 	{
 		SetRespawn(ent, ent->item->quantity);
 	}
@@ -4093,7 +4093,9 @@ void Spawn_CoopBackpack(edict_t *ent)
 		backpack->coopBackpackInventory[i] = ent->client->pers.inventory[i];
 	}
 
+	backpack->coopBackpackMaxHealth = ent->max_health;
 	backpack->coopBackpackNetname = strdup(ent->client->pers.netname);
+	backpack->coopBackpackAmmoUpgrade = ent->client->resp.coop_respawn.ammoUpgrade;
 
 	gi.dprintf(DEVELOPER_MSG_GAME, "Spawn_CoopBackpack: Spawn Coop Back for %s.\n", ent->client->pers.netname);
 }
@@ -4109,6 +4111,31 @@ Pickup_CoopBackpack(edict_t *ent, edict_t *other) /* FS: Coop: Spawn a backpack 
 	}
 
 	gi.cprintf(other, PRINT_HIGH, "You picked up %s's backpack.\n", ent->coopBackpackNetname);
+
+	if(ent->coopBackpackMaxHealth > other->max_health) /* FS: Coop: Give back adrenaline boosts */
+	{
+		other->max_health = ent->coopBackpackMaxHealth;
+		other->client->resp.coop_respawn.max_health = ent->coopBackpackMaxHealth;
+		if (other->health < other->max_health)
+		{
+			other->health = other->max_health;
+		}
+	}
+
+	if(ent->coopBackpackAmmoUpgrade > other->client->resp.coop_respawn.ammoUpgrade)
+	{
+		switch(ent->coopBackpackAmmoUpgrade)
+		{
+			case COOP_BANDOLIER:
+				Pickup_Bandolier(NULL, other);
+				break;
+			case COOP_BACKPACK:
+				Pickup_Pack(NULL, other);
+				break;
+			default:
+				break;
+		}
+	}
 
 	for(i = 1; i <= MAX_ITEMS; i++)
 	{
