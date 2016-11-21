@@ -438,13 +438,10 @@ qboolean OpenSpot (edict_t *ent, mos_t class)
 			continue;
 		if (cl_ent->ai)
 			continue;
-		if (!cl_ent->client || 
-			!cl_ent->client->resp.team_on ||
-			!cl_ent->client->resp.team_on->mos ||
-			cl_ent->client->resp.team_on->index != ent->client->resp.team_on->index)
-			continue; 
-			if (class ==
-			cl_ent->client->resp.mos)
+		if (!cl_ent->client || !cl_ent->client->resp.team_on || !cl_ent->client->resp.team_on->mos ||
+				cl_ent->client->resp.team_on->index != ent->client->resp.team_on->index)
+			continue;
+		if (class == cl_ent->client->resp.mos)
 			taken++;
 	}
 
@@ -1352,8 +1349,8 @@ void MapVote(edict_t *ent)
 		else
 			add = "";
 
-			theText = gi.TagMalloc(sizeof("1234567890123456789012345"), TAG_GAME);
-			strcat(theText, va("      %s %s",add,votemaps[i]));
+		theText = gi.TagMalloc(sizeof("1234567890123456789012345"), TAG_GAME);
+		strcat(theText, va("      %s %s",add,votemaps[i]));
 
 		client_menu(ent, 7+(i*2),  theText,		PMENU_ALIGN_LEFT,	NULL, VoteMap );
 	}

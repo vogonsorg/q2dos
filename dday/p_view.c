@@ -2237,8 +2237,10 @@ void ClientEndServerFrame (edict_t *ent)
 				//if (ent->client->v_angle[0] > 40)
 			}
 			else
+			{
 				ent->stance_view = 4;
 				ent->viewheight = 4;
+			}
 		}
 	}
 

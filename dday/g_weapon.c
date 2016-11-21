@@ -4917,28 +4917,26 @@ void Weapon_Shotgun_Fire (edict_t *ent)
 
 qboolean fire_katana ( edict_t *self, vec3_t start, vec3_t dir, int damage, int kick)
 {
-    trace_t tr; //detect whats in front of you up to range "vec3_t end"
+	trace_t tr; //detect whats in front of you up to range "vec3_t end"
 
-    vec3_t end;
+	vec3_t end;
 
 	vec3_t	vec;
 	float	dot;
 	vec3_t	forward;
 
-    // Figure out what we hit, if anything:
-    VectorMA (start, 55, dir, end);  //calculates the range vector //50 is sword range
-    tr = gi.trace (self->s.origin, NULL, NULL, end, self, MASK_SHOT);
+	// Figure out what we hit, if anything:
+	VectorMA (start, 55, dir, end);  //calculates the range vector //50 is sword range
+	tr = gi.trace (self->s.origin, NULL, NULL, end, self, MASK_SHOT);
                         // figures out what in front of the player up till "end"
-    
-   // Figure out what to do about what we hit, if anything
 
-    if (!((tr.surface) && (tr.surface->flags & SURF_SKY)))
-    {
-        if (tr.fraction < 1.0)
-        {
-            if (tr.ent->takedamage)
-            {
-
+	// Figure out what to do about what we hit, if anything
+	if (!((tr.surface) && (tr.surface->flags & SURF_SKY)))
+	{
+		if (tr.fraction < 1.0)
+		{
+			if (tr.ent->takedamage)
+			{
 				if (tr.ent->client && 
 					tr.ent->client->pers.weapon &&
 					tr.ent->client->pers.weapon->classnameb == WEAPON_KATANA)
@@ -4951,36 +4949,34 @@ qboolean fire_katana ( edict_t *self, vec3_t start, vec3_t dir, int damage, int 
 					if (dot > 0.6  &&
 						tr.ent->client->weaponstate != WEAPON_FIRING)
 					{
-						if (random() < .5)	
+						if (random() < .5)
 							gi.sound (self, CHAN_AUTO, gi.soundindex("jpn/katana/hit1.wav") , 1, ATTN_NORM, 0);
-						else
-							gi.sound (self, CHAN_AUTO, gi.soundindex("jpn/katana/hit2.wav") , 1, ATTN_NORM, 0);
-							gi.WriteByte (svc_temp_entity);
-							gi.WriteByte (TE_SPARKS);
-							gi.WritePosition (tr.endpos);
-							gi.WriteDir (tr.endpos);
-							gi.multicast (tr.endpos, MULTICAST_PVS);
+						else	gi.sound (self, CHAN_AUTO, gi.soundindex("jpn/katana/hit2.wav") , 1, ATTN_NORM, 0);
+						gi.WriteByte (svc_temp_entity);
+						gi.WriteByte (TE_SPARKS);
+						gi.WritePosition (tr.endpos);
+						gi.WriteDir (tr.endpos);
+						gi.multicast (tr.endpos, MULTICAST_PVS);
 					}
 					else
 					{
 						T_Damage (tr.ent, self, self, dir, tr.endpos, tr.plane.normal, 100, 50, 0,MOD_KNIFE);//faf
-					  gi.sound (self, CHAN_AUTO, gi.soundindex("brain/melee3.wav") , 1, ATTN_NORM, 0); 
+						gi.sound (self, CHAN_AUTO, gi.soundindex("brain/melee3.wav") , 1, ATTN_NORM, 0); 
 					}
 				}
 				else
 				{
 					T_Damage (tr.ent, self, self, dir, tr.endpos, tr.plane.normal, 100, 50, 0,MOD_KNIFE);//faf
-	                gi.sound (self, CHAN_AUTO, gi.soundindex("brain/melee3.wav") , 1, ATTN_NORM, 0); 
+					gi.sound (self, CHAN_AUTO, gi.soundindex("brain/melee3.wav") , 1, ATTN_NORM, 0); 
 				}
-
-            }
-            else
-            {
-                gi.WriteByte (svc_temp_entity);
-                gi.WriteByte (TE_SPARKS);
-                gi.WritePosition (tr.endpos);
-                gi.WriteDir (tr.plane.normal);
-                gi.multicast (tr.endpos, MULTICAST_PVS);
+			}
+			else
+			{
+				gi.WriteByte (svc_temp_entity);
+				gi.WriteByte (TE_SPARKS);
+				gi.WritePosition (tr.endpos);
+				gi.WriteDir (tr.plane.normal);
+				gi.multicast (tr.endpos, MULTICAST_PVS);
 
 				if (tr.surface && Surface(tr.surface->name, SURF_WOOD))
 				{
@@ -5014,12 +5010,11 @@ qboolean fire_katana ( edict_t *self, vec3_t start, vec3_t dir, int damage, int 
 					gi.sound (self, CHAN_AUTO, gi.soundindex("jpn/katana/hit1.wav") , 1, ATTN_NORM, 0);
 				else
 					gi.sound (self, CHAN_AUTO, gi.soundindex("jpn/katana/hit2.wav") , 1, ATTN_NORM, 0);
-
-            }
+			}
 			return true;
-        }
-    }
-    return false;
+		}
+	}
+	return false;
 }
 
 
@@ -6099,36 +6094,36 @@ void Weapon_Panzerfaust_Fire (edict_t *ent)
 	if (ent->client->next_fire_frame > level.framenum)
 		return;
 
-		// Add the new ones.
-		if (gi.pointcontents(ent->s.origin) & MASK_WATER) {
-			if (ent->client->machinegun_shots == 0)
-				safe_centerprintf(ent, "Get out the water to fire!!\n");
-			firewrong = 1;
-			ent->client->machinegun_shots = 1;
-		}
+	// Add the new ones.
+	if (gi.pointcontents(ent->s.origin) & MASK_WATER) {
+		if (ent->client->machinegun_shots == 0)
+			safe_centerprintf(ent, "Get out the water to fire!!\n");
+		firewrong = 1;
+		ent->client->machinegun_shots = 1;
+	}
 
-		else if (!ent->client->aim) {
-//			if (ent->client->machinegun_shots == 0)
-//				safe_centerprintf(ent, "You have gotta AIM it, Tommy Atkins!!\n");
-			firewrong = 1;
-			ent->client->machinegun_shots = 1;
-		}
+	else if (!ent->client->aim) {
+//		if (ent->client->machinegun_shots == 0)
+//			safe_centerprintf(ent, "You have gotta AIM it, Tommy Atkins!!\n");
+		firewrong = 1;
+		ent->client->machinegun_shots = 1;
+	}
 
-		else if ((ent->stanceflags == STANCE_STAND) || (ent->stanceflags == STANCE_CRAWL)) {
-			if (ent->client->machinegun_shots == 0)
-				safe_centerprintf(ent, "You have to kneel to fire!\n");
-			firewrong = 1;
-			ent->client->machinegun_shots = 1;
-		}
+	else if ((ent->stanceflags == STANCE_STAND) || (ent->stanceflags == STANCE_CRAWL)) {
+		if (ent->client->machinegun_shots == 0)
+			safe_centerprintf(ent, "You have to kneel to fire!\n");
+		firewrong = 1;
+		ent->client->machinegun_shots = 1;
+	}
 
-		//else if (ent->stanceflags == STANCE_CRAWL) {
-		//	if (ent->client->machinegun_shots == 0)
-		//		safe_centerprintf(ent, "Get up on one knee, Tommy Atkins!!\n");
-		//	firewrong = 1;
-		//	ent->client->machinegun_shots = 1;
-		//		}
+	//else if (ent->stanceflags == STANCE_CRAWL) {
+	//	if (ent->client->machinegun_shots == 0)
+	//		safe_centerprintf(ent, "Get up on one knee, Tommy Atkins!!\n");
+	//	firewrong = 1;
+	//	ent->client->machinegun_shots = 1;
+	//		}
 
-		if (firewrong == 1) {
+	if (firewrong == 1) {
 		//gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/noammo.wav"),1, ATTN_NORM, 0);
 		//ent->pain_debounce_time = level.time + 1;
 		//ent->client->ps.gunframe= (ent->client->aim)?guninfo->LastAFire + 1:

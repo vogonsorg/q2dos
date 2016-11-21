@@ -1160,8 +1160,8 @@ void Cmd_Use_f (edict_t *ent)
 
 	if (Q_stricmp(s, "gibmachine") == 0)
 	{
-	if(easter_egg->value==0)
-		return;
+		if(easter_egg->value==0)
+			return;
 		
 		if (ent->client->gibmachine == flame_normal)
 		{

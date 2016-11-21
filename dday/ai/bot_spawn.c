@@ -69,21 +69,17 @@ void Assign_Bot_Class (edict_t *self)
 
 		if (!cl_ent->inuse)
 			continue;
-		if (!cl_ent->client || 
-			!cl_ent->client->resp.team_on ||
-			!cl_ent->client->resp.team_on->mos ||
-			cl_ent->client->resp.team_on->index != self->client->resp.team_on->index)
-			continue; 
-		
-//			if (cl_ent == ent && ent->client->resp.mos == INFANTRY)
+		if (!cl_ent->client || !cl_ent->client->resp.team_on || !cl_ent->client->resp.team_on->mos ||
+				cl_ent->client->resp.team_on->index != self->client->resp.team_on->index)
+			continue;
+//		if (cl_ent == ent && ent->client->resp.mos == INFANTRY)
 		if (cl_ent == self)// && (!self->client->resp.AlreadySpawned || self->client->resp.changeteam))
-		continue;
-
-		if (!self->client->resp.mos || 
-			cl_ent->client->resp.mos != self->client->resp.mos)
 			continue;
 
-			taken++;
+		if (!self->client->resp.mos || cl_ent->client->resp.mos != self->client->resp.mos)
+			continue;
+
+		taken++;
 	}
 
 	// Now set the available for this class
@@ -280,14 +276,14 @@ void BOT_SetName(edict_t *bot, char *name, char *skin, int team)
 	edict_t *e;
 	qboolean gotname = false;
 
-	char * usanames [14] = {"SaBOTeur", "BOTched", "loBOTomy", "Dipsymama", "saBOTage", "G.I. Joe", "Audie", "Winters", "Speirs", "Blithe", "Jim", "Bob", "Patton", "Eisenhower"};
-	char * grmnames [14] = {"VerBOTen", "PolkaBOT", "BOTskrieg", "BOTwurst", "VolksBOT", "Adolf", "Lars", "Franz", "Frederick", "Niels", "Erik", "Goebbels", "Goering", "Rommel"};
-	char * rusnames [14] = {"Stalin", "Zhukov", "Molotov", "Igor", "Vladimir", "Boris", "Viktor", "Dmitri", "KalashniBOT", "ShishkaBOT", "CosmoBOT", "Rostislav", "KGBot", "BOTshevik"}; 
-	char * gbrnames [14] = {"Churchill", "Montgomery", "Prats", "Strokes", "Sgt. Leper", "Ewan", "Oliver", "Jack", "Edward", "Charles", "Ethan", "Jeeves", "Godfrey", "Thomas"};
-	char * polnames [14] = {"Jakub", "Krzysztof", "Szymon", "Maciej", "Filip", "Pawel", "Kamil", "Kacper", "Bartek", "Nilew", "Dominik", "Fryderyk", "Gustaw", "Jozef"};
-	char * itanames [14] = {"Mario", "Luigi", "Fat Tony", "Don Bot", "Adolfo", "Alonzo", "Angelo", "Aldo", "Mussolini", "Carlo", "Emilio", "Vincenzo", "Giovanni", "Paolo"};
-	char * jpnnames [14] = {"Daisuke", "Kazuki", "Takumi", "Tatsuya", "Naoto", "Daichi", "Izumi", "Katsutohi", "Shinakio", "Naoko", "Tojo", "Hirohito", "Yamamoto", "Miyagi"};
-	char * ddaynames [14] = {"Dummy", "Muff", "Dimferno", "Dipsymama", "Botcom", "Vap'd", "Hack Bot 1", "Hack Bot 2", "Icky", "Moho", "Dork", "MentalSod", "GriNerd", "tomatovego"};
+	const char * usanames [14] = {"SaBOTeur", "BOTched", "loBOTomy", "Dipsymama", "saBOTage", "G.I. Joe", "Audie", "Winters", "Speirs", "Blithe", "Jim", "Bob", "Patton", "Eisenhower"};
+	const char * grmnames [14] = {"VerBOTen", "PolkaBOT", "BOTskrieg", "BOTwurst", "VolksBOT", "Adolf", "Lars", "Franz", "Frederick", "Niels", "Erik", "Goebbels", "Goering", "Rommel"};
+	const char * rusnames [14] = {"Stalin", "Zhukov", "Molotov", "Igor", "Vladimir", "Boris", "Viktor", "Dmitri", "KalashniBOT", "ShishkaBOT", "CosmoBOT", "Rostislav", "KGBot", "BOTshevik"}; 
+	const char * gbrnames [14] = {"Churchill", "Montgomery", "Prats", "Strokes", "Sgt. Leper", "Ewan", "Oliver", "Jack", "Edward", "Charles", "Ethan", "Jeeves", "Godfrey", "Thomas"};
+	const char * polnames [14] = {"Jakub", "Krzysztof", "Szymon", "Maciej", "Filip", "Pawel", "Kamil", "Kacper", "Bartek", "Nilew", "Dominik", "Fryderyk", "Gustaw", "Jozef"};
+	const char * itanames [14] = {"Mario", "Luigi", "Fat Tony", "Don Bot", "Adolfo", "Alonzo", "Angelo", "Aldo", "Mussolini", "Carlo", "Emilio", "Vincenzo", "Giovanni", "Paolo"};
+	const char * jpnnames [14] = {"Daisuke", "Kazuki", "Takumi", "Tatsuya", "Naoto", "Daichi", "Izumi", "Katsutohi", "Shinakio", "Naoko", "Tojo", "Hirohito", "Yamamoto", "Miyagi"};
+	const char * ddaynames [14] = {"Dummy", "Muff", "Dimferno", "Dipsymama", "Botcom", "Vap'd", "Hack Bot 1", "Hack Bot 2", "Icky", "Moho", "Dork", "MentalSod", "GriNerd", "tomatovego"};
 
 	for (j=0; j<50 && gotname == false; j++)
 	{

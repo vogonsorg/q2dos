@@ -502,18 +502,7 @@ M_CheckGround(edict_t *ent)
 		point[0] = ent->s.origin[0];
 		point[1] = ent->s.origin[1];
 		point[2] = ent->s.origin[2] - 0.25;
-
-		trace = gi.trace(ent->s.origin, ent->mins, ent->maxs,
-				point, ent, MASK_MONSTERSOLID);
-
-		/* check steepness */
-		if ((trace.plane.normal[2] < 0.7) && !trace.startsolid)
-		{
-			ent->groundentity = NULL;
-			return;
-		}
 	}
-
 	if (!trace.startsolid && !trace.allsolid)
 	{
 		VectorCopy(trace.endpos, ent->s.origin);
