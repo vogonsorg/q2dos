@@ -65,29 +65,8 @@ void Vote_Random_History_Add (const char *mapname);
 void Vote_Clear_Random_History(void);
 qboolean Vote_Check_Random_History(const char *mapname);
 void vote_DefaultNoVotes (void);
-void vote_NewPlayerMessage (edict_t *ent);
 void vote_progress (edict_t *ent);
-int clientsInGame (void);
 qboolean vote_mapcheck (edict_t *ent, const char *mapName);
-
-int clientsInGame (void)
-{
-	edict_t	*ent;
-	int i, clientsInGame;
-	i = clientsInGame = 0;// FS: Clear it out
-
-	for (i=0 ; i<maxclients->value ; i++)
-	{
-		ent = &g_edicts [i + 1];
-		if (ent->inuse && ent->client)
-		{
-			if (ent->client->pers.spectator) // FS: Don't count spectators
-				continue;
-			clientsInGame++;
-		}
-	}
-	return clientsInGame;
-}
 
 void vote_command(edict_t *ent)
 {
@@ -152,8 +131,10 @@ void vote_command(edict_t *ent)
 			return;
 		}
 		else
+		{
 			vote_gamemode(ent,gi.argv(2));
 			return;
+		}
 	}
 	else if(!stricmp(gi.argv(1), "skill"))
 	{
@@ -283,6 +264,11 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 
 void vote_map (edict_t *ent, const char *mapName)
 {
+	if(!ent || !ent->client)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_map from a non-player!\n");
+	}
+
 	if (bVoteInProgress)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "A vote is already in progress for %s: %s!\n", voteType, whatAreWeVotingFor);
@@ -316,23 +302,28 @@ void vote_map (edict_t *ent, const char *mapName)
 
 	Com_sprintf(voteMap, MAX_OSPATH, "%s", mapName);
 	vote_Broadcast("%s votes for %s! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname, voteMap);
-	voteClients = clientsInGame();
+	voteClients = P_Clients_Connected(false);
 	bVoteInProgress = 1;
 	Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "%s", voteMap);
 	Com_sprintf(voteType, 16, "map");
 
-	if(!ent->client)
-		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_map from a non-player!\n");
-	else
-		ent->client->voteInitiator = true;
+	ent->client->voteInitiator = true;
 
 	if(sv_vote_assume_yes->intValue)
+	{
 		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
+	}
+
 	return;
 }
 
 void vote_gamemode(edict_t *ent, const char *gamemode)
 {
+	if(!ent || !ent->client)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_gamemode from a non-player!\n");
+	}
+
 	if (bVoteInProgress)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "A vote is already in progress for %s: %s!\n", voteType, whatAreWeVotingFor);
@@ -383,9 +374,9 @@ void vote_gamemode(edict_t *ent, const char *gamemode)
 		return;
 	}
 
-	voteClients = clientsInGame();
+	voteClients = P_Clients_Connected(false);
 	bVoteInProgress = 1;
-	voteClients = clientsInGame();
+	voteClients = P_Clients_Connected(false);
 	Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "%s", voteGamemode);
 	Com_sprintf(voteType, 16, "gamemode");
 	vote_Broadcast("%s votes for %s: %s! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname, voteType, whatAreWeVotingFor);
@@ -393,14 +384,17 @@ void vote_gamemode(edict_t *ent, const char *gamemode)
 	if(sv_vote_assume_yes->intValue)
 		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
 
-	if(!ent->client)
-		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_gamemode from a non-player!\n");
-	else
-		ent->client->voteInitiator = true;
+	ent->client->voteInitiator = true;
 }
 
 void vote_coopskill(edict_t *ent, int skill)
 {
+	if(!ent || !ent->client)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_coopskill from a non-player!\n");
+		return;
+	}
+
 	if (bVoteInProgress)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "A vote is already in progress for %s: %s!\n", voteType, whatAreWeVotingFor);
@@ -440,19 +434,18 @@ void vote_coopskill(edict_t *ent, int skill)
 			return;
 	}
 
-	voteClients = clientsInGame();
+	voteClients = P_Clients_Connected(false);
 	bVoteInProgress = 1;
-	voteClients = clientsInGame();
+	voteClients = P_Clients_Connected(false);
 	Com_sprintf(voteType, 16, "coop difficulty");
 	vote_Broadcast("%s votes for %s: %s! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname, voteType, whatAreWeVotingFor);
 
 	if(sv_vote_assume_yes->intValue)
+	{
 		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
+	}
 
-	if(!ent->client)
-		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_coopskill from a non-player!\n");
-	else
-		ent->client->voteInitiator = true;
+	ent->client->voteInitiator = true;
 }
 
 void vote_random (edict_t *ent)
@@ -462,6 +455,11 @@ void vote_random (edict_t *ent)
 
 void vote_restartmap (edict_t *ent)
 {
+	if(!ent || !ent->client)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_map from a non-player!\n");
+	}
+
 	if (bVoteInProgress)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "A vote is already in progress for %s: %s!\n", voteType, whatAreWeVotingFor);
@@ -478,22 +476,26 @@ void vote_restartmap (edict_t *ent)
 
 	Com_sprintf(voteMap, MAX_OSPATH, "%s", level.mapname);
 	vote_Broadcast("%s votes for restarting the map! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname);
-	voteClients = clientsInGame();
+	voteClients = P_Clients_Connected(false);
 	bVoteInProgress = 1;
 	Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "%s", voteMap);
 	Com_sprintf(voteType, 16, "restartmap");
 
-	if(!ent->client)
-		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_map from a non-player!\n");
-	else
-		ent->client->voteInitiator = true;
+	ent->client->voteInitiator = true;
 
 	if(sv_vote_assume_yes->intValue)
+	{
 		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
+	}
 }
 
 void vote_stop(edict_t *ent)
 {
+	if(!ent || !ent->client) /* FS: This should never happen, but you never know... */
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_stop from a non-player!\n");
+		return;
+	}
 
 	if (!bVoteInProgress)
 	{
@@ -501,11 +503,6 @@ void vote_stop(edict_t *ent)
 		return;
 	}
 
-	if(!ent->client) /* FS: This should never happen, but you never know... */
-	{
-		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_stop from a non-player!\n");
-		return;
-	}
 	if(ent->client->voteInitiator == true)
 	{
 		vote_Broadcast("Voting cancelled by %s!\n", ent->client->pers.netname);
@@ -521,7 +518,7 @@ void vote_stop(edict_t *ent)
 
 void vote_yes(edict_t *ent, qboolean bAssume)
 {
-	if(!ent->client) /* FS: This should never happen, but you never know... */
+	if(!ent || !ent->client) /* FS: This should never happen, but you never know... */
 	{
 		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_yes from a non-player!\n");
 		return;
@@ -555,7 +552,7 @@ void vote_yes(edict_t *ent, qboolean bAssume)
 
 void vote_no(edict_t *ent)
 {
-	if(!ent->client) /* FS: This should never happen, but you never know... */
+	if(!ent || !ent->client) /* FS: This should never happen, but you never know... */
 	{
 		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_no from a non-player!\n");
 		return;
@@ -578,10 +575,16 @@ void vote_no(edict_t *ent)
 		/* FS: count a vote... */
 		ent->client->hasVoted = VOTE_NO;
 		voteNo++;
+
 		if(sv_vote_private->intValue)
+		{
 			gi.cprintf(ent, PRINT_HIGH, "Your vote 'no' for %s has been counted\n", whatAreWeVotingFor);
+		}
 		else
+		{
 			vote_Broadcast("%s votes no. Yes: %i, No: %i.\n", ent->client->pers.netname, voteYes, voteNo);
+		}
+
 		vote_Think();
 		return;
 	}
@@ -589,7 +592,7 @@ void vote_no(edict_t *ent)
 
 void vote_disconnect_recalc(edict_t *ent)
 {
-	if(!ent->client) /* FS: This should never happen, but you never know... */
+	if(!ent || !ent->client) /* FS: This should never happen, but you never know... */
 	{
 		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_disconnect_recalc from a non-player!\n");
 		return;
@@ -603,9 +606,13 @@ void vote_disconnect_recalc(edict_t *ent)
 	if (ent->client->hasVoted)
 	{
 		if ((ent->client->hasVoted == VOTE_YES) && (voteYes))
+		{
 			voteYes--;
+		}
 		else if ((ent->client->hasVoted == VOTE_NO) && (voteNo))
+		{
 			voteNo--;
+		}
 	}
 }
 
@@ -622,7 +629,9 @@ void vote_Reset(void)
 
 	/* FS: Don't do this in single player */
 	if (game.maxclients <= 1)
+	{
 		return;
+	}
 
 	/* FS: Reset the hasVoted qbooleanean. */
 	for(z = 0; z < game.maxclients; z++ )
@@ -687,9 +696,14 @@ void vote_Passed (void)
 void vote_Failed (qboolean bTied)
 {
 	if(bTied)
+	{
 		vote_Broadcast("Vote ended in a tie for %s, not changing the %s! Yes: %i, No: %i\n", whatAreWeVotingFor, voteType, voteYes, voteNo);
+	}
 	else
+	{
 		vote_Broadcast("Vote failed for %s! Yes: %i, No: %i\n", whatAreWeVotingFor, voteYes, voteNo);
+	}
+
 	vote_Reset();
 	return;
 }
@@ -709,7 +723,9 @@ void vote_Broadcast(const char *fmt, ...)
 	clients = 0;
 
 	if(dedicated->intValue)
+	{
 		gi.cprintf(NULL, PRINT_CHAT, "%s", msg); /* FS: Send it to dedicated console too. */
+	}
 
 	for(z = 0; z < game.maxclients; z++ )
 	{
@@ -722,7 +738,7 @@ void vote_Broadcast(const char *fmt, ...)
 		if(pClient->client)
 		{
 			gi.cprintf(pClient, PRINT_CHAT, msg);
-//			gi.StartEntitySound (pClient, CHAN_AUTO, gi.SoundIndex("global/a_ames.wav"), 1.0f, ATTN_NORM_MIN,ATTN_NORM_MAX);
+			gi.sound(pClient, CHAN_AUTO, gi.soundindex("misc/talk.wav"), 1, ATTN_NORM, 0);
 		}
 	}
 }
@@ -735,21 +751,25 @@ void vote_Decide(void)
 		vote_Failed(false);
 		return;
 	}
+
 	if(voteYes > voteNo)
 	{
 		vote_Passed();
 		return;
 	}
+
 	if (voteNo > voteYes)
 	{
 		vote_Failed(false);
 		return;
 	}
+
 	if (voteNo == voteYes) /* FS: Tie is a failure */
 	{
 		vote_Failed(true);
 		return;
 	}
+
 	return;
 }
 
@@ -758,7 +778,7 @@ void vote_Think(void)
 	if(!bVoteInProgress || !sv_vote_enabled->intValue)
 		return;
 
-	voteClients = clientsInGame();
+	voteClients = P_Clients_Connected(false);
 
 	if(voteNo + voteYes >= voteClients)
 	{
@@ -781,7 +801,6 @@ void vote_Think(void)
 		vote_Decide();
 		return;
 	}
-
 	else if(level.time + 10.0f >= voteTimer && level.time + 9.0f <= voteTimer && printOnce == 0)
 	{
 		vote_Broadcast("10 seconds remaining for %s vote: %s.\n", voteType, whatAreWeVotingFor);
@@ -823,7 +842,7 @@ void vote_Think(void)
 
 void vote_connect (edict_t *ent)
 {
-	if(!ent)
+	if(!ent || !ent->client)
 	{
 		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_connect from a non-player!\n");
 		return;
@@ -856,7 +875,9 @@ void Vote_Clear_Random_History(void)
 	while(1)
 	{
 		if (i < 0)
+		{
 			return;
+		}
 		random_map_array[i][0] = 0;
 		i--;
 	}
@@ -900,33 +921,24 @@ void vote_DefaultNoVotes (void)
 		if( pClient->client )
 		{
 			if (pClient->client->pers.spectator) /* FS: Don't count spectators */
+			{
 				continue;
+			}
 
 			if(pClient->client->hasVoted)
+			{
 				continue;
+			}
+
 			pClient->client->hasVoted = VOTE_NO;
 			voteNo++;
 		}
 	}
 }
 
-void vote_NewPlayerMessage (edict_t *ent)
-{
-	if(!ent)
-	{
-		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_NewPlayerMessage from a non-player!\n");
-		return;
-	}
-
-	if (bVoteInProgress)
-	{
-		gi.cprintf(ent, PRINT_HIGH, "A vote is in progress for %s: %s! Use vote yes or vote no to submit your vote!\n", voteType, whatAreWeVotingFor);
-	}
-}
-
 void vote_progress (edict_t *ent)
 {
-	if(!ent)
+	if(!ent || !ent->client)
 	{
 		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_NewPlayerMessage from a non-player!\n");
 		return;

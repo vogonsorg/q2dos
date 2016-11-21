@@ -7,8 +7,6 @@ void ClientUserinfoChanged(edict_t *ent, char *userinfo);
 void SP_misc_teleporter_dest(edict_t *ent);
 void Touch_Item(edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf);
 
-extern void Spawn_CoopBackpack(edict_t *ent); /* FS: Coop: Spawn a backpack with our stuff */
-
 void
 SP_FixCoopSpots(edict_t *self)
 {
@@ -2336,6 +2334,16 @@ ClientDisconnect(edict_t *ent)
 		Spawn_CoopBackpack(ent);
 	}
 
+	if(ent->client->voteInitiator == true) /* FS: Coop: Voting stuff */
+	{
+		vote_stop(ent);
+	}
+
+	if(ent->client->hasVoted == true) /* FS: Coop: Voting stuff */
+	{
+		vote_disconnect_recalc(ent);
+	}
+
 	gi.bprintf(PRINT_HIGH, "%s disconnected\n", ent->client->pers.netname);
 
  	/* FS: Coop: Rogue specific.  Probably OK to leave as-is. */
@@ -2799,4 +2807,26 @@ RemoveAttackingPainDaemons(edict_t *self) /* FS: Coop: Rogue specific */
 	{
 		self->client->tracker_pain_framenum = 0;
 	}
+}
+
+int P_Clients_Connected (qboolean spectators) /* FS: Coop: Find out how many players are in the game */
+{
+	edict_t	*ent;
+	int i, clientsInGame;
+
+	i = clientsInGame = 0;
+
+	for (i=0 ; i<maxclients->value ; i++)
+	{
+		ent = &g_edicts [i + 1];
+		if (ent->inuse && ent->client)
+		{
+			if (!spectators && ent->client->pers.spectator) // FS: Don't count spectators
+			{
+				continue;
+			}
+			clientsInGame++;
+		}
+	}
+	return clientsInGame;
 }

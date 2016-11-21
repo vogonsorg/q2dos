@@ -83,6 +83,13 @@ void WriteLevel(char *filename);
 void ReadLevel(char *filename);
 void InitGame(void);
 void G_RunFrame(void);
+void G_ResetTimer_Hack (void); /* FS: Some of the grossest shit of all time.  Reset everything to avoid the integer to float overflow timer bullshit */
+
+#ifdef FRAMENUM_TIMER_TEST /* FS: Force framenum overflow and reset testing */
+#ifdef _DEBUG
+static qboolean firstStart = true;
+#endif // _DEBUG
+#endif // FRAMENUM_TIMER_TEST
 
 /* =================================================================== */
 
@@ -423,26 +430,84 @@ ExitLevel(void)
 /*
  * Advances the world by 0.1 seconds
  */
-#if 0 /* FS: Force framenum overflow and reset testing */
-static qboolean firstStart = true;
-#endif
-
-int G_Clients_Connected (void)
+void
+G_RunFrame(void)
 {
-	edict_t	*ent;
-	int i, clientsInGame;
+	int i;
+	edict_t *ent;
 
-	i = clientsInGame = 0;
-
-	for (i=0 ; i<maxclients->value ; i++)
+#ifdef FRAMENUM_TIMER_TEST /* FS: Force framenum overflow and reset testing */
+#ifdef _DEBUG
+	if(firstStart && level.framenum > 5) /* FS: Need a few frames for physics to settle down and activate before you can fudge it forward */
 	{
-		ent = &g_edicts [i + 1];
-		if (ent->inuse && ent->client)
-		{
-			clientsInGame++;
-		}
+		level.framenum = 10790*10;
+		firstStart = false;
+//		gi.cprintf(NULL, PRINT_CHAT, "framenum: %i\n", level.framenum);
 	}
-	return clientsInGame;
+#endif // _DEBUG
+#endif // FRAMENUM_TIMER_TEST
+
+	level.framenum++;
+	level.time = level.framenum * FRAMETIME;
+
+	G_ResetTimer_Hack(); /* FS: Some of the most grossest shit of all time.  Reset the counters after long uptimes */
+//	gi.cprintf(NULL, PRINT_CHAT, "framenum: %i [%f]\n", level.framenum, level.time);
+
+	/* choose a client for monsters to target this frame */
+	AI_SetSightClient();
+
+	/* exit intermissions */
+	if (level.exitintermission)
+	{
+		ExitLevel();
+		return;
+	}
+
+	/* treat each object in turn  even the
+	   world gets a chance to think */
+	ent = &g_edicts[0];
+
+	for (i = 0; i < globals.num_edicts; i++, ent++)
+	{
+		if (!ent->inuse)
+		{
+			continue;
+		}
+
+		level.current_entity = ent;
+
+		VectorCopy(ent->s.origin, ent->s.old_origin);
+
+		/* if the ground entity moved, make sure we are still on it */
+		if ((ent->groundentity) &&
+			(ent->groundentity->linkcount != ent->groundentity_linkcount))
+		{
+			ent->groundentity = NULL;
+
+			if (!(ent->flags & (FL_SWIM | FL_FLY)) &&
+				(ent->svflags & SVF_MONSTER))
+			{
+				M_CheckGround(ent);
+			}
+		}
+
+		if ((i > 0) && (i <= maxclients->value))
+		{
+			ClientBeginServerFrame(ent);
+			continue;
+		}
+
+		G_RunEntity(ent);
+	}
+
+	/* see if it is time to end a deathmatch */
+	CheckDMRules();
+
+	/* see if needpass needs updated */
+	CheckNeedPass();
+
+	/* build the playerstate_t structures for all players */
+	ClientEndServerFrames();
 }
 
 void G_ResetTimer_Hack (void) /* FS: Some of the grossest shit of all time.  Reset everything to avoid the integer to float overflow timer bullshit */
@@ -450,7 +515,7 @@ void G_ResetTimer_Hack (void) /* FS: Some of the grossest shit of all time.  Res
 	int i;
 	edict_t *ent;
 
-	if(sv_coop_reset_hack->intValue && (level.time > 10800.0f) && !G_Clients_Connected()) /* FS: Every 3 hours reset the timers.  The game seems to start fucking up around 4 hours of idleness */
+	if(sv_coop_reset_hack->intValue && (level.time > 10800.0f) && !P_Clients_Connected(true)) /* FS: Every 3 hours reset the timers.  The game seems to start fucking up around 4 hours of idleness */
 	{
 		gi.cprintf(NULL, PRINT_HIGH, "Resetting timers...\n");
 
@@ -579,82 +644,4 @@ void G_ResetTimer_Hack (void) /* FS: Some of the grossest shit of all time.  Res
 			}
 		}
 	}
-}
-
-void
-G_RunFrame(void)
-{
-	int i;
-	edict_t *ent;
-
-#if 0 /* FS: Force framenum overflow and reset testing */
-	if(firstStart && level.framenum > 5)
-	{
-		level.framenum = 10790*10;
-		firstStart = false;
-//		gi.cprintf(NULL, PRINT_CHAT, "framenum: %i\n", level.framenum);
-	}
-#endif
-
-	level.framenum++;
-	level.time = level.framenum * FRAMETIME;
-
-	G_ResetTimer_Hack(); /* FS: Some of the most grossest shit of all time.  Reset the counters after long uptimes */
-//	gi.cprintf(NULL, PRINT_CHAT, "framenum: %i [%f]\n", level.framenum, level.time);
-
-	/* choose a client for monsters to target this frame */
-	AI_SetSightClient();
-
-	/* exit intermissions */
-	if (level.exitintermission)
-	{
-		ExitLevel();
-		return;
-	}
-
-	/* treat each object in turn  even the
-	   world gets a chance to think */
-	ent = &g_edicts[0];
-
-	for (i = 0; i < globals.num_edicts; i++, ent++)
-	{
-		if (!ent->inuse)
-		{
-			continue;
-		}
-
-		level.current_entity = ent;
-
-		VectorCopy(ent->s.origin, ent->s.old_origin);
-
-		/* if the ground entity moved, make sure we are still on it */
-		if ((ent->groundentity) &&
-			(ent->groundentity->linkcount != ent->groundentity_linkcount))
-		{
-			ent->groundentity = NULL;
-
-			if (!(ent->flags & (FL_SWIM | FL_FLY)) &&
-				(ent->svflags & SVF_MONSTER))
-			{
-				M_CheckGround(ent);
-			}
-		}
-
-		if ((i > 0) && (i <= maxclients->value))
-		{
-			ClientBeginServerFrame(ent);
-			continue;
-		}
-
-		G_RunEntity(ent);
-	}
-
-	/* see if it is time to end a deathmatch */
-	CheckDMRules();
-
-	/* see if needpass needs updated */
-	CheckNeedPass();
-
-	/* build the playerstate_t structures for all players */
-	ClientEndServerFrames();
 }

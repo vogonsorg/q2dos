@@ -771,6 +771,7 @@ gitem_t	*GetItemByIndex (int index);
 qboolean Add_Ammo (edict_t *ent, gitem_t *item, int count);
 void Touch_Item(edict_t *ent, edict_t *other, cplane_t *plane,
 		csurface_t *surf);
+void Spawn_CoopBackpack(edict_t *ent); /* FS: Coop: Spawn a backpack with our stuff */
 
 //
 // g_utils.c
@@ -1137,6 +1138,7 @@ void Widowlegs_Spawn (vec3_t startpos, vec3_t angles);
 // p_client.c
 //
 void RemoveAttackingPainDaemons (edict_t *self);
+int P_Clients_Connected (qboolean spectators); /* FS: Coop: Find out how many players are in the game */
 
 //
 // g_vote.c
@@ -1145,6 +1147,8 @@ void vote_Think (void);
 void vote_Reset (void);
 void vote_command (edict_t *ent);
 void vote_connect (edict_t *ent);
+void vote_disconnect_recalc(edict_t *ent);
+void vote_stop (edict_t *ent);
 
 // ROGUE PROTOTYPES
 //====================
