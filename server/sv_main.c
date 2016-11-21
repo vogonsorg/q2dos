@@ -256,7 +256,7 @@ SVC_Ack
 */
 void SVC_Ack (void)
 {
-	Com_Printf ("Ping acknowledge from %s\n", NET_AdrToString(net_from));
+	Com_DPrintf (DEVELOPER_MSG_NET, "Ping acknowledge from %s\n", NET_AdrToString(net_from)); /* FS: Was Com_Printf */
 }
 
 /*

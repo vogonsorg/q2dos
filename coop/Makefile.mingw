@@ -29,6 +29,7 @@ GAME = dm_ball.o \
 	g_trigger.o \
 	g_turret.o \
 	g_utils.o \
+	g_vote.o \
 	g_weapon.o \
 	m_actor.o \
 	m_berserk.o \
@@ -36,13 +37,17 @@ GAME = dm_ball.o \
 	m_boss3.o \
 	m_boss31.o \
 	m_boss32.o \
+	m_boss5.o \
 	m_brain.o \
 	m_carrier.o \
 	m_chick.o \
+	m_fixbot.o \
 	m_flash.o \
 	m_flipper.o \
 	m_float.o \
 	m_flyer.o \
+	m_gekk.o \
+	m_gladb.c
 	m_gladiator.o \
 	m_gunner.o \
 	m_hover.o \
@@ -73,8 +78,8 @@ OBJECTS =  $(GAME)
 
 all: gamex86.dll
 
-gamex86.dll:	$(OBJECTS) rogue.def
-	$(CC) -o gamex86.dll $(LDFLAGS) $(OBJECTS) rogue.def
+gamex86.dll:	$(OBJECTS) game.def
+	$(CC) -o gamex86.dll $(LDFLAGS) $(OBJECTS) game.def
 
 clean:
 	rm -f *.o
