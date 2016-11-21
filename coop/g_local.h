@@ -1500,6 +1500,8 @@ struct edict_s
 	float		lastMoveTime;
 //ROGUE
 //=========
+	int			coopBackpackInventory[MAX_ITEMS]; /* FS: Coop: Spawn a backpack with our stuff */
+	char		*coopBackpackNetname; /* FS: Coop: Spawn a backpack with our stuff */
 };
 
 //=============

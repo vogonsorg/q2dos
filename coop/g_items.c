@@ -4,6 +4,9 @@
 #define HEALTH_TIMED 2
 
 qboolean Pickup_Weapon(edict_t *ent, edict_t *other);
+qboolean Pickup_CoopBackpack(edict_t *ent, edict_t *other); /* FS: Coop: Spawn a backpack with our stuff */
+void Spawn_CoopBackpack(edict_t *ent); /* FS: Coop: Spawn a backpack with our stuff */
+
 void Use_Weapon(edict_t *ent, gitem_t *inv);
 void Use_Weapon2(edict_t *ent, gitem_t *inv); /* FS: Coop: Xatrix and Rogue specific */
 void Drop_Weapon(edict_t *ent, gitem_t *inv);
@@ -3821,6 +3824,29 @@ tank commander's head
 /* precache */ "items/s_health.wav items/n_health.wav items/l_health.wav items/m_health.wav"
 	},
 
+/*QUAKED item_pack (.3 .3 1) (-16 -16 -16) (16 16 16)
+*/
+	{ /* FS: Coop: Spawn a backpack with our stuff */
+		NULL,
+		Pickup_CoopBackpack,
+		NULL,
+		NULL,
+		NULL,
+		"items/pkup.wav",
+		"models/items/pack/tris.md2", EF_ROTATE,
+		NULL,
+/* icon */		"i_pack",
+/* pickup */	"Coop Backpack",
+/* width */		2,
+		180,
+		NULL,
+		0,
+		0,
+		NULL,
+		0,
+/* precache */ ""
+	},
+
 	/* end of list marker */
 	{NULL}
 };
@@ -4035,4 +4061,65 @@ SP_xatrix_item(edict_t *self) /* FS: Coop: Rogue specific */
 			return;
 		}
 	}
+}
+
+void Spawn_CoopBackpack(edict_t *ent)
+{
+	edict_t *backpack;
+	gitem_t *it;
+	int i;
+
+	if (!ent || !ent->client)
+	{
+		gi.dprintf(DEVELOPER_MSG_VERBOSE, "Spawn_CoopBackpack: ent or ent->client is NULL!\n");
+		return;
+	}
+
+	it = FindItem("Coop Backpack");
+	if(!it)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "Spawn_CoopBackpack: Can't find Coop Backpack.\n");
+		return;
+	}
+
+	backpack = G_Spawn();
+	backpack->classname = it->classname = "item_coop_backpack"; /* FS: classname is purposely NULL for my paranoia of nobody adding it directly to an ent file override, etc. */
+	SpawnItem(backpack, it);
+
+	VectorCopy(ent->s.origin, backpack->s.origin); /* FS: Copy off the player's origin */
+
+	for(i = 1; i <= MAX_ITEMS; i++)
+	{
+		backpack->coopBackpackInventory[i] = ent->client->pers.inventory[i];
+	}
+
+	backpack->coopBackpackNetname = strdup(ent->client->pers.netname);
+
+	gi.dprintf(DEVELOPER_MSG_GAME, "Spawn_CoopBackpack: Spawn Coop Back for %s.\n", ent->client->pers.netname);
+}
+
+qboolean
+Pickup_CoopBackpack(edict_t *ent, edict_t *other) /* FS: Coop: Spawn a backpack with the goodies */
+{
+	int i;
+
+	if (!ent || !ent->coopBackpackNetname || !other || !other->client)
+	{
+		return false;
+	}
+
+	gi.cprintf(other, PRINT_HIGH, "You picked up %s's backpack.\n", ent->coopBackpackNetname);
+
+	for(i = 1; i <= MAX_ITEMS; i++)
+	{
+		if(ent->coopBackpackInventory[i] > other->client->pers.inventory[i])
+		{
+			other->client->pers.inventory[i] = ent->coopBackpackInventory[i];
+		}
+	}
+
+	free(ent->coopBackpackNetname);
+	ent->coopBackpackNetname = NULL;
+
+	return true;
 }

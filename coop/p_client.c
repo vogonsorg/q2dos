@@ -7,6 +7,8 @@ void ClientUserinfoChanged(edict_t *ent, char *userinfo);
 void SP_misc_teleporter_dest(edict_t *ent);
 void Touch_Item(edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf);
 
+extern void Spawn_CoopBackpack(edict_t *ent); /* FS: Coop: Spawn a backpack with our stuff */
+
 void
 SP_FixCoopSpots(edict_t *self)
 {
@@ -2321,6 +2323,11 @@ ClientDisconnect(edict_t *ent)
 	if (!ent->client)
 	{
 		return;
+	}
+
+	if (coop->intValue) /* FS: Coop: Spawn a backpack with our stuff */
+	{
+		Spawn_CoopBackpack(ent);
 	}
 
 	gi.bprintf(PRINT_HIGH, "%s disconnected\n", ent->client->pers.netname);
