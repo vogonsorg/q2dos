@@ -1956,6 +1956,7 @@ PutClientInServer(edict_t *ent)
 		ent->solid = SOLID_NOT;
 		ent->svflags |= SVF_NOCLIENT;
 		ent->client->ps.gunindex = 0;
+		ent->flags |= FL_NOTARGET; /* FS: Coop: Don't confuse AI */
 		gi.linkentity(ent);
 		return;
 	}
@@ -2160,7 +2161,7 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 	s = Info_ValueForKey(userinfo, "spectator");
 
 	/* spectators are only supported in deathmatch */
-	if (deathmatch->value && *s && strcmp(s, "0"))
+	if ((deathmatch->value || coop->intValue) && *s && strcmp(s, "0"))
 	{
 		ent->client->pers.spectator = true;
 	}
@@ -2707,7 +2708,7 @@ ClientBeginServerFrame(edict_t *ent)
 
 	client = ent->client;
 
-	if (deathmatch->value &&
+	if ((deathmatch->value || coop->intValue) &&
 		(client->pers.spectator != client->resp.spectator) &&
 		((level.time - client->respawn_time) >= 5))
 	{

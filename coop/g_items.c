@@ -1116,6 +1116,18 @@ Pickup_Key(edict_t *ent, edict_t *other)
 		{
 			gi.bprintf(PRINT_HIGH,"\x02[%s]: ", other->client->pers.netname);
 			gi.bprintf(PRINT_HIGH, "Team, everyone has the %s!\n", ent->item->pickup_name);
+
+			for (i = 0; i < maxclients->value; i++)
+			{
+				client = g_edicts + 1 + i;
+
+				if (!client || !client->inuse)
+				{
+					continue;
+				}
+
+				gi.sound(client, CHAN_AUTO, gi.soundindex("misc/talk.wav"), 1, ATTN_NORM, 0);
+			}
 		}
 
 		return coopReturn;
@@ -4088,7 +4100,7 @@ void Spawn_CoopBackpack(edict_t *ent)
 
 	VectorCopy(ent->s.origin, backpack->s.origin); /* FS: Copy off the player's origin */
 
-	for(i = 1; i <= MAX_ITEMS; i++)
+	for(i = 1; i < MAX_ITEMS; i++)
 	{
 		backpack->coopBackpackInventory[i] = ent->client->pers.inventory[i];
 	}
@@ -4137,7 +4149,7 @@ Pickup_CoopBackpack(edict_t *ent, edict_t *other) /* FS: Coop: Spawn a backpack 
 		}
 	}
 
-	for(i = 1; i <= MAX_ITEMS; i++)
+	for(i = 1; i < MAX_ITEMS; i++)
 	{
 		if(ent->coopBackpackInventory[i] > other->client->pers.inventory[i])
 		{
