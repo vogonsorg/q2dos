@@ -230,9 +230,9 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 	}
 
 	/* obtain file size */
-	fseek (f , 0 , SEEK_END);
+	fseek (f, 0, SEEK_END);
 	fileSize = ftell (f);
-	rewind(f);
+	fseek (f, 0, SEEK_SET);
 	fileBuffer = (char *)malloc(sizeof(char)*(fileSize+2)); // FS: In case we have to add a newline terminator
 	if(!fileBuffer)
 	{
