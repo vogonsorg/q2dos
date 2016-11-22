@@ -166,7 +166,34 @@ char *GetProperMonsterName (char *monsterName) /* FS: Coop: Get proper name for 
 	else if(!strcmp("monster_gekk", monsterName))
 		return "Gekk";
 	else if(!strcmp("monster_soldier_hypergun", monsterName))
-		return "Hypergun Guard";
+		return "Hyper Blaster Guard";
+	else if(!strcmp("monster_soldier_lasergun", monsterName))
+		return "Laser Guard";
+	else if(!strcmp("monster_soldier_ripper", monsterName))
+		return "Ripper Guard";
+	else if(!strcmp("monster_fixbot", monsterName))
+		return "Repair Bot";
+	else if(!strcmp("monster_chick_heat", monsterName))
+		return "Iron Maiden (Beta Class)";
+	else if(!strcmp("monster_gladb", monsterName))
+		return "Gladiator (Beta Class)";
+	else if(!strcmp("monster_boss5", monsterName))
+		return "Tank Boss";
+	/* FS: Rogue specific stuff */
+	else if(!strcmp("monster_turret", monsterName))
+		return "Turret";
+	else if(!strcmp("monster_daedalus", monsterName))
+		return "Daedalus";
+	else if(!strcmp("monster_carrier", monsterName))
+		return "Carrier";
+	else if(!strcmp("monster_medic_commander", monsterName))
+		return "Medic Commander";
+	else if(!strcmp("monster_widow", monsterName))
+		return "Stalker";
+	else if(!strcmp("monster_widow2", monsterName))
+		return "Stalker";
+	else if(!strcmp("monster_kamikaze", monsterName))
+		return "Kamikaze Flyer";
 	else
 		return monsterName;
 }
