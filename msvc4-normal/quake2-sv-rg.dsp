@@ -70,7 +70,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../win32/include" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D id386=1 /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "GAMESPY_HARD_LINKED" /D "OGG_SUPPORT" /D "USE_CURL" /D "USE_JOYSTICK" /FR /YX /FD /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../win32/include" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D id386=1 /D "REF_HARD_LINKED" /D "GAME_HARD_LINKED" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "GAMESPY_HARD_LINKED" /D "USE_CURL" /D "USE_JOYSTICK" /FR /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x1009 /d "_DEBUG"
@@ -265,41 +265,17 @@ SOURCE=..\win32\qgl_win.c
 # Begin Source File
 
 SOURCE=..\WIN32\rw_ddraw.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\WIN32\rw_dib.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\WIN32\rw_imp.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -512,430 +488,132 @@ SOURCE=..\GAME\p_weapon.c
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_aclip.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\ref_soft\r_aclipa.asm
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-# Begin Custom Build
-OutDir=.\Debug
-InputPath=..\ref_soft\r_aclipa.asm
-InputName=r_aclipa
-
-"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
-
-# End Custom Build
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_alias.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_bsp.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_draw.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\ref_soft\r_draw16.asm
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-# Begin Custom Build
-OutDir=.\Debug
-InputPath=..\ref_soft\r_draw16.asm
-InputName=r_draw16
-
-"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
-
-# End Custom Build
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\ref_soft\r_drawa.asm
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-# Begin Custom Build
-OutDir=.\Debug
-InputPath=..\ref_soft\r_drawa.asm
-InputName=r_drawa
-
-"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
-
-# End Custom Build
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_edge.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\ref_soft\r_edgea.asm
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-# Begin Custom Build
-OutDir=.\Debug
-InputPath=..\ref_soft\r_edgea.asm
-InputName=r_edgea
-
-"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
-
-# End Custom Build
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_image.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_light.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_main.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_misc.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_model.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_part.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_poly.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\ref_soft\r_polysa.asm
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-# Begin Custom Build
-OutDir=.\Debug
-InputPath=..\ref_soft\r_polysa.asm
-InputName=r_polysa
-
-"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
-
-# End Custom Build
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_polyse.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_rast.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_scan.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\ref_soft\r_scana.asm
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-# Begin Custom Build
-OutDir=.\Debug
-InputPath=..\ref_soft\r_scana.asm
-InputName=r_scana
-
-"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
-
-# End Custom Build
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\ref_soft\r_spr8.asm
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-# Begin Custom Build
-OutDir=.\Debug
-InputPath=..\ref_soft\r_spr8.asm
-InputName=r_spr8
-
-"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
-
-# End Custom Build
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_sprite.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\REF_SOFT\r_surf.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\ref_soft\r_surf8.asm
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-# Begin Custom Build
-OutDir=.\Debug
-InputPath=..\ref_soft\r_surf8.asm
-InputName=r_surf8
-
-"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
-
-# End Custom Build
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\ref_soft\r_varsa.asm
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-# Begin Custom Build
-OutDir=.\Debug
-InputPath=..\ref_soft\r_varsa.asm
-InputName=r_varsa
-
-"$(OUTDIR)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)
-
-# End Custom Build
-
-!ENDIF 
-
 # End Source File
 # End Group
 # Begin Group "DOS"
@@ -969,15 +647,7 @@ SOURCE=..\dos\dosisms.h
 # Begin Source File
 
 SOURCE=..\dos\dxe.c
-
-!IF  "$(CFG)" == "quake2 - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "quake2 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
