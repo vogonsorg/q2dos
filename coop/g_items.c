@@ -415,7 +415,7 @@ Pickup_Bandolier(edict_t *ent /* may be null */, edict_t *other)
 
 	if (coop->intValue) /* FS: Coop: Keep bandolier during respawn */
 	{
-		other->client->resp.coop_respawn.ammoUpgrade = COOP_BANDOLIER;
+		other->client->pers.ammoUpgrade = other->client->resp.coop_respawn.ammoUpgrade = COOP_BANDOLIER;
 	}
 
 	return true;
@@ -599,7 +599,7 @@ Pickup_Pack(edict_t *ent /* may be null */, edict_t *other)
 
 	if (coop->intValue)
 	{
-		other->client->resp.coop_respawn.ammoUpgrade = COOP_BACKPACK; /* FS: Coop: Keep backpack during respawn */
+		other->client->pers.ammoUpgrade = other->client->resp.coop_respawn.ammoUpgrade = COOP_BACKPACK; /* FS: Coop: Keep backpack during respawn */
 	}
 
 	return true;
@@ -4107,7 +4107,7 @@ void Spawn_CoopBackpack(edict_t *ent)
 
 	backpack->coopBackpackMaxHealth = ent->max_health;
 	backpack->coopBackpackNetname = strdup(ent->client->pers.netname);
-	backpack->coopBackpackAmmoUpgrade = ent->client->resp.coop_respawn.ammoUpgrade;
+	backpack->coopBackpackAmmoUpgrade = ent->client->pers.ammoUpgrade;
 
 	gi.dprintf(DEVELOPER_MSG_GAME, "Spawn_CoopBackpack: Spawn Coop Back for %s.\n", ent->client->pers.netname);
 }
@@ -4134,7 +4134,7 @@ Pickup_CoopBackpack(edict_t *ent, edict_t *other) /* FS: Coop: Spawn a backpack 
 		}
 	}
 
-	if(ent->coopBackpackAmmoUpgrade > other->client->resp.coop_respawn.ammoUpgrade)
+	if(ent->coopBackpackAmmoUpgrade > other->client->pers.ammoUpgrade)
 	{
 		switch(ent->coopBackpackAmmoUpgrade)
 		{
