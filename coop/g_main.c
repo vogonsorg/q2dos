@@ -85,6 +85,7 @@ void InitGame(void);
 void G_RunFrame(void);
 void G_ResetTimer_Hack (void); /* FS: Some of the grossest shit of all time.  Reset everything to avoid the integer to float overflow timer bullshit */
 
+//#define FRAMENUM_TIMER_TEST
 #ifdef FRAMENUM_TIMER_TEST /* FS: Force framenum overflow and reset testing */
 #ifdef _DEBUG
 static qboolean firstStart = true;
@@ -440,7 +441,7 @@ G_RunFrame(void)
 #ifdef _DEBUG
 	if(firstStart && level.framenum > 5) /* FS: Need a few frames for physics to settle down and activate before you can fudge it forward */
 	{
-		level.framenum = 10790*10;
+		level.framenum = 10790*10*8;
 		firstStart = false;
 //		gi.cprintf(NULL, PRINT_CHAT, "framenum: %i\n", level.framenum);
 	}
@@ -635,7 +636,10 @@ void G_ResetTimer_Hack (void) /* FS: Some of the grossest shit of all time.  Res
 
 			if(ent->think)
 			{
-				ent->nextthink = level.time + 0.1f;
+				if(ent->nextthink)
+				{
+					ent->nextthink = level.time + 0.1f;
+				}
 			}
 
 			if(ent->monsterinfo.stand)
