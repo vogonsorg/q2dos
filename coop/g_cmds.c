@@ -46,6 +46,14 @@ OnSameTeam(edict_t *ent1, edict_t *ent2)
 		return false;
 	}
 
+	if(coop->intValue) /* FS: Coop: No friendly fire bullshit */
+	{
+		if(ent1->client && ent2->client)
+		{
+			return true;
+		}
+	}
+
 	if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS)))
 	{
 		return false;
