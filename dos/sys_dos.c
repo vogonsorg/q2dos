@@ -87,8 +87,8 @@ static void TrapKey(void)
 	keybuf_head = (keybuf_head + 1) & (KEYBUF_SIZE-1);
 }
 
-double	sys_msg_time;
-double	sys_frame_time;
+unsigned int	sys_msg_time;
+unsigned int	sys_frame_time;
 int	sys_checksum;
 
 int		end_of_memory;
@@ -361,7 +361,7 @@ void	Sys_ConsoleOutput (char *string)
 }
 
 // Knightmare- added this to fix CPU usage
-void Sys_Sleep (unsigned msec)
+void Sys_Sleep (int msec)
 {
 	usleep (msec*1000);
 }
@@ -484,7 +484,7 @@ static void Sys_DefaultExceptionHandler(int whatever)
 
 int main (int argc, char **argv)
 {
-	double time, oldtime, newtime;
+	int time, oldtime, newtime;
 
 	printf ("Quake 2 DOS v%4.2f\n", VERSION);
 

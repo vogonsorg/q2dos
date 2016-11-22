@@ -63,7 +63,7 @@ LRESULT WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 
 static qboolean s_alttab_disabled;
 
-extern	double	sys_msg_time;
+extern	unsigned int	sys_msg_time;
 
 /*
 ** WIN32 helper functions

@@ -70,7 +70,7 @@ typedef struct
 {
 	qboolean		valid;			// cleared if delta parsing was invalid
 	int				serverframe;
-	double				servertime;		// server time the message is valid for (in msec)
+	int				servertime;		// server time the message is valid for (in msec)
 	int				deltaframe;
 	byte			areabits[MAX_MAP_AREAS/8];		// portalarea visibility bits
 	player_state_t	playerstate;
@@ -158,7 +158,7 @@ typedef struct
 	int			timeoutcount;
 
 	int			timedemo_frames;
-	double		timedemo_start;
+	int			timedemo_start;
 
 	qboolean	refresh_prepped;	// false if on new level or new ref dll
 	qboolean	sound_prepped;		// ambient sounds can start
@@ -168,7 +168,7 @@ typedef struct
 
 	usercmd_t	cmd;
 	usercmd_t	cmds[CMD_BACKUP];	// each mesage will send several old cmds
-	double			cmd_time[CMD_BACKUP];	// time sent, for calculating pings
+	int			cmd_time[CMD_BACKUP];	// time sent, for calculating pings
 	short		predicted_origins[CMD_BACKUP][3];	// for debug comparing against server
 
 	float		predicted_step;				// for stair up smoothing
@@ -189,7 +189,7 @@ typedef struct
 	// and teleport direction changes
 	vec3_t		viewangles;
 
-	double			time;			// this is the time value that the client
+	int			time;			// this is the time value that the client
 								// is rendering at.  always <= cls.realtime
 	float		lerpfrac;		// between oldframe and frame
 
@@ -207,7 +207,7 @@ typedef struct
 	// non-gameserver infornamtion
 	// FIXME: move this cinematic stuff into the cin_t structure
 	FILE		*cinematic_file;
-	double			cinematictime;		// cls.realtime for first cinematic frame
+	int			cinematictime;		// cls.realtime for first cinematic frame
 	int			cinematicframe;
 	unsigned char	cinematicpalette[768];
 	qboolean	cinematicpalette_active;
@@ -271,16 +271,16 @@ typedef struct
 	keydest_t	key_dest;
 
 	int			framecount;
-	double		spamTime; /* FS: From R1Q2 */
-	double		lastSpamTime; /* FS: From R1Q2 */
-	double		realtime;			// always increasing, no clamping, etc
-	double		frametime;			// seconds since last frame
-	double		netFrameTime;		// seconds since last packet frame
-	double		renderFrameTime;	// seconds since last refresh frame
+	int	spamTime; /* FS: From R1Q2 */
+	int	lastSpamTime; /* FS: From R1Q2 */
+	int	realtime;			// always increasing, no clamping, etc
+	float			frametime;			// seconds since last frame
+	float			netFrameTime;		// seconds since last packet frame
+	float			renderFrameTime;	// seconds since last refresh frame
 	qboolean	forcePacket;		// forces a packet to be sent the next frame
 
 // screen rendering information
-	double		disable_screen;		// showing loading plaque between levels
+	float		disable_screen;		// showing loading plaque between levels
 									// or changing rendering dlls
 									// if time gets > 30 seconds ahead, break it
 	int			disable_servercount;	// when we receive a frame and cl.servercount
@@ -288,7 +288,7 @@ typedef struct
 
 // connection information
 	char		servername[256];	// name of server from original connect
-	double		connect_time;		// for connection retransmits
+	float		connect_time;		// for connection retransmits
 
 	int			quakePort;			// a 16 bit value that allows quake servers
 									// to work around address translating routers
@@ -419,7 +419,7 @@ typedef struct
 	vec3_t	color;
 	vec3_t	origin;
 	float	radius;
-	double	die;				// stop lighting after this time
+	float	die;				// stop lighting after this time
 	float	decay;				// drop this each second
 	float	minlight;			// don't add when contributing less
 } cdlight_t;
@@ -449,9 +449,9 @@ typedef struct cl_sustain
 {
 	int			id;
 	int			type;
-	double			endtime;
-	double			nextthink;
-	double			thinkinterval;
+	int			endtime;
+	int			nextthink;
+	int			thinkinterval;
 	vec3_t		org;
 	vec3_t		dir;
 	int			color;
@@ -479,7 +479,7 @@ typedef struct particle_s
 {
 	struct particle_s	*next;
 
-	double		time;
+	float		time;
 
 	vec3_t		org;
 	vec3_t		vel;
@@ -595,8 +595,8 @@ void CL_WriteConfig_f (void);	/* Knightmare- added writeconfig command */
 typedef struct
 {
 	int			down[2];		// key nums holding it down
-	double		downtime;		// msec timestamp
-	double		msec;			// msec down this frame
+	unsigned	downtime;		// msec timestamp
+	unsigned	msec;			// msec down this frame
 	int			state;
 } kbutton_t;
 

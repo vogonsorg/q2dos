@@ -24,8 +24,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "dosisms.h"
 #include "../client/client.h"
 
-extern	double		sys_msg_time;
-extern	double		sys_frame_time;
+extern	unsigned int		sys_msg_time;
+extern	unsigned int		sys_frame_time;
 
 static	qboolean	mouse_avail;
 static	qboolean	mouseactive;

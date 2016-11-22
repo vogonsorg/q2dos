@@ -578,7 +578,7 @@ qboolean	NET_CompareBaseAdr (netadr_t a, netadr_t b);
 qboolean	NET_IsLocalAddress (netadr_t adr);
 char		*NET_AdrToString (netadr_t a);
 qboolean	NET_StringToAdr (char *s, netadr_t *a);
-void		NET_Sleep(double msec);
+void		NET_Sleep(int msec);
 
 //============================================================================
 
@@ -805,10 +805,10 @@ extern	cvar_t *fs_basedir;
 extern	FILE *log_stats_file;
 
 // host_speeds times
-extern	double		time_before_game;
-extern	double		time_after_game;
-extern	double		time_before_ref;
-extern	double		time_after_ref;
+extern	int		time_before_game;
+extern	int		time_after_game;
+extern	int		time_before_ref;
+extern	int		time_after_ref;
 
 void Z_Free (void *ptr);
 void *Z_Malloc (int size);			// returns 0 filled memory
@@ -817,7 +817,7 @@ void Z_FreeTags (int tag);
 
 void Qcommon_Init (int argc, char **argv);
 
-void Qcommon_Frame (double msec);
+void Qcommon_Frame (int msec);
 void Qcommon_Shutdown (void);
 
 #define NUMVERTEXNORMALS	162
@@ -851,7 +851,7 @@ void	Sys_Quit (void) __attribute__((__noreturn__));
 char	*Sys_GetClipboardData( void );
 void	Sys_CopyProtect (void);
 
-void	Sys_Sleep (unsigned msec);	// Knightmare added
+void	Sys_Sleep (int msec);	// Knightmare added
 
 #ifdef __DJGPP__
 void Sys_InitDXE3 (void);
@@ -871,13 +871,13 @@ CLIENT / SERVER SYSTEMS
 void CL_Init (void);
 void CL_Drop (void);
 void CL_Shutdown (void);
-void CL_Frame (double msec);
+void CL_Frame (int msec);
 void Con_Print (char *text);
 void SCR_BeginLoadingPlaque (void);
 
 void SV_Init (void);
 void SV_Shutdown (char *finalmsg, qboolean reconnect);
-void SV_Frame (double msec);
+void SV_Frame (int msec);
 
 
 qboolean IsValidChar (int c); /* FS: From KMQ2 */

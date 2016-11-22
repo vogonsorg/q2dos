@@ -45,6 +45,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
 				Optimization="0"
 				AdditionalIncludeDirectories="../win32/include"
 				PreprocessorDefinitions="_DEBUG;id386=1;WIN32;_WINDOWS;CLIENT_SPLIT_NETFRAME;GAMESPY;USE_CURL;OGG_SUPPORT;USE_JOYSTICK"

@@ -801,11 +801,11 @@ void SV_CheckTimeouts (void)
 {
 	int		i;
 	client_t	*cl;
-	double			droppoint;
-	double			zombiepoint;
+	int			droppoint;
+	int			zombiepoint;
 
-	droppoint = svs.realtime - 1000.0f*timeout->value;
-	zombiepoint = svs.realtime - 1000.0f*zombietime->value;
+	droppoint = svs.realtime - 1000*timeout->value;
+	zombiepoint = svs.realtime - 1000*zombietime->value;
 
 	for (i=0,cl=svs.clients ; i<maxclients->value ; i++,cl++)
 	{
@@ -897,7 +897,7 @@ SV_Frame
 
 ==================
 */
-void SV_Frame (double msec)
+void SV_Frame (int msec)
 {
 	time_before_game = time_after_game = 0;
 

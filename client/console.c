@@ -462,7 +462,6 @@ void Con_DrawInput (void)
 	int		y;
 	int		i;
 	char	*text;
-	int		clsrealtime;
 
 	if (cls.key_dest == key_menu)
 		return;
@@ -470,10 +469,9 @@ void Con_DrawInput (void)
 		return;		// don't draw anything (always draw if not active)
 
 	text = key_lines[edit_line];
-
-	clsrealtime = (int)cls.realtime;
+	
 // add the cursor frame
-	text[key_linepos] = 10+((int)(clsrealtime>>8)&1);
+	text[key_linepos] = 10+((int)(cls.realtime>>8)&1);
 	
 // fill out remainder with spaces
 	for (i=key_linepos+1 ; i< con.linewidth ; i++)
@@ -509,7 +507,6 @@ void Con_DrawNotify (void)
 	int		time;
 	char	*s;
 	int		skip;
-	int		clsrealtime;
 
 	v = 0;
 	for (i= con.current-NUM_CON_TIMES+1 ; i<=con.current ; i++)
@@ -553,8 +550,7 @@ void Con_DrawNotify (void)
 			re.DrawChar ( (x+skip)<<3, v, s[x]);
 			x++;
 		}
-		clsrealtime = (int)cls.realtime;
-		re.DrawChar ( (x+skip)<<3, v, 10+((clsrealtime>>8)&1));
+		re.DrawChar ( (x+skip)<<3, v, 10+((cls.realtime>>8)&1));
 		v += 8;
 	}
 	
