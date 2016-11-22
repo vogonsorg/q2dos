@@ -2263,7 +2263,7 @@ void CL_Frame_Async (int msec)
 
 					if (log_stats_file)
 					{
-						fprintf( log_stats_file, "%f\n", now - lasttimecalled );
+						fprintf( log_stats_file, "%i\n", now - lasttimecalled );
 					}
 
 					lasttimecalled = now;
