@@ -75,8 +75,8 @@ int	Hunk_End (void)
 	return curhunksize;
 }
 
-double	curtime;
-double	Sys_Milliseconds (void)
+int	curtime;
+int	Sys_Milliseconds (void)
 {
 	curtime = (double) uclock() / (double) UCLOCKS_PER_SEC*1000; /* FS: From Q1 -- Win9X/Fast PC Fix (QIP) */
 	return curtime;

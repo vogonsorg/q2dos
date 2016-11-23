@@ -23,9 +23,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 cvar_t	*cl_nodelta;
 
-extern	double	sys_frame_time;
-double	frame_msec;
-double	old_sys_frame_time;
+extern	unsigned	sys_frame_time;
+unsigned	frame_msec;
+unsigned	old_sys_frame_time;
 
 /*
 ===============================================================================
@@ -46,7 +46,7 @@ state bit 1 is edge triggered on the up to down transition
 state bit 2 is edge triggered on the down to up transition
 
 
-Key_Event (int key, qboolean down, double time);
+Key_Event (int key, qboolean down, unsigned int time);
 
   +mlook src time
 
@@ -92,7 +92,7 @@ void KeyDown (kbutton_t *b)
 
 	// save timestamp
 	c = Cmd_Argv(2);
-	b->downtime = atof(c);
+	b->downtime = atoi(c);
 	if (!b->downtime)
 		b->downtime = sys_frame_time - 100;
 
@@ -185,7 +185,7 @@ Returns the fraction of the frame that the key was down
 float CL_KeyState (kbutton_t *key)
 {
 	float		val;
-	double			msec;
+	int			msec;
 
 	key->state &= 1;		// clear impulses
 
@@ -205,7 +205,7 @@ float CL_KeyState (kbutton_t *key)
 	}
 #endif
 
-	val = (float)msec / (float)frame_msec;
+	val = (float)msec / frame_msec;
 	if (val < 0)
 		val = 0;
 	if (val > 1)
@@ -244,9 +244,9 @@ void CL_AdjustAngles (void)
 	float	up, down;
 	
 	if (in_speed.state & 1)
-		speed = (float)cls.netFrameTime * cl_anglespeedkey->value;
+		speed = cls.netFrameTime * cl_anglespeedkey->value;
 	else
-		speed = (float)cls.netFrameTime;
+		speed = cls.netFrameTime;
 
 	if (!(in_strafe.state & 1))
 	{
@@ -335,7 +335,7 @@ CL_FinishMove
 */
 void CL_FinishMove (usercmd_t *cmd)
 {
-	double		ms;
+	int		ms;
 	int		i;
 
 //
@@ -356,7 +356,7 @@ void CL_FinishMove (usercmd_t *cmd)
 	ms = cls.netFrameTime * 1000;
 	if (ms > 250)
 		ms = 100;		// time was unreasonable
-	cmd->msec = (byte)ms;
+	cmd->msec = ms;
 
 	CL_ClampPitch ();
 	for (i=0 ; i<3 ; i++)
@@ -461,7 +461,7 @@ that occurred since last Init or RefreshCmd.
 */
 void CL_RefreshCmd (void)
 {	
-	double			ms;
+	int			ms;
 	usercmd_t	*cmd = &cl.cmds[ cls.netchan.outgoing_sequence & (CMD_BACKUP-1) ];
 
 	// get delta for this sample.
@@ -489,11 +489,11 @@ void CL_RefreshCmd (void)
 	cmd->angles[2] = ANGLE2SHORT(cl.viewangles[2]);
 
 	// Update cmd->msec for CL_PredictMove
-	ms = cls.netFrameTime * 1000;
+	ms = (int)(cls.netFrameTime * 1000);
 	if (ms > 250)
 		ms = 100;
 
-	cmd->msec = (byte)ms;
+	cmd->msec = ms;
 
 	// Update counter
 	old_sys_frame_time = sys_frame_time;

@@ -971,9 +971,9 @@ void CL_ParseServerMessage (void)
 
 				//r1: change !p_version to !version since p is for proxies
 				if ((strstr (s, "!r1q2_version") || strstr (s, "!version")) &&
-					(cls.lastSpamTime == 0.0f || cls.realtime > cls.lastSpamTime + 300000.0f)) /* FS: 5 minutes */
+					(cls.lastSpamTime == 0 || cls.realtime > cls.lastSpamTime + 300000)) /* FS: 5 minutes */
 				{
-					cls.spamTime = cls.realtime + 1500.0f; /* FS: 1.5 second delay */
+					cls.spamTime = cls.realtime + 1500; /* FS: 1.5 second delay */
 				}
 
 			}

@@ -60,10 +60,10 @@ FILE	*logfile;
 int		server_state;
 
 // host_speeds times
-double	time_before_game;
-double	time_after_game;
-double	time_before_ref;
-double	time_after_ref;
+int	time_before_game;
+int	time_after_game;
+int	time_before_ref;
+int	time_after_ref;
 
 /*
 ============================================================================
@@ -1492,12 +1492,12 @@ void Qcommon_Init (int argc, char **argv)
 Qcommon_Frame
 =================
 */
-void Qcommon_Frame (double msec)
+void Qcommon_Frame (int msec)
 {
 	char	*s;
-	double	time_before = 0.0f;
-	double	time_between = 0.0f;
-	double	time_after = 0.0f;
+	int	time_before = 0;
+	int	time_between = 0;
+	int	time_after = 0;
 
 	if (setjmp (abortframe) )
 	{
@@ -1539,11 +1539,11 @@ void Qcommon_Frame (double msec)
 	}
 	else if (timescale->value)
 	{
-		msec *= timescale->value;
+		msec = (int)(msec * timescale->value);
 
-		if (msec < 1.0f)
+		if (msec < 1)
 		{
-			msec = 1.0f;
+			msec = 1;
 		}
 	}
 

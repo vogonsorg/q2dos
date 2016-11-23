@@ -692,7 +692,7 @@ void CL_Disconnect (void)
 
 	if (cl_timedemo && cl_timedemo->value)
 	{
-		double	time;
+		int	time;
 		
 		time = Sys_Milliseconds () - cl.timedemo_start;
 		if (time > 0)
@@ -2043,12 +2043,12 @@ CL_Frame_Async
 ==================
 */
 #define FRAMETIME_MAX 0.5 /* was 0.2 */
-void CL_Frame_Async (double msec)
+void CL_Frame_Async (int msec)
 {
-	static double	packetDelta = 0;
-	static double	renderDelta = 0;
-	static double	miscDelta = 0;
-	static double  lasttimecalled;
+	static int	packetDelta = 0;
+	static int	renderDelta = 0;
+	static int	miscDelta = 0;
+	static int  lasttimecalled;
 	qboolean	packetFrame = true;
 	qboolean	renderFrame = true;
 	qboolean	miscFrame = true;
@@ -2263,7 +2263,7 @@ void CL_Frame_Async (double msec)
 
 					if (log_stats_file)
 					{
-						fprintf( log_stats_file, "%f\n", now - lasttimecalled );
+						fprintf( log_stats_file, "%i\n", now - lasttimecalled );
 					}
 
 					lasttimecalled = now;
@@ -2311,10 +2311,10 @@ CL_Frame
 
 ==================
 */
-void CL_Frame (double msec)
+void CL_Frame (int msec)
 {
-	static double	extratime;
-	static double  lasttimecalled;
+	static int	extratime;
+	static int  lasttimecalled;
 	float	fps;
 
 	if (dedicated->value)
@@ -2352,7 +2352,7 @@ void CL_Frame (double msec)
 			return;			// don't flood packets out while connecting
 		}
 
-		if (extratime < 1000/fps)
+		if (extratime < 1000.0/fps)
 		{
 			// Knightmare- added Pooy's CPU usage fix
 			if (cl_sleep->value)
@@ -2411,7 +2411,7 @@ void CL_Frame (double msec)
 			Com_sprintf(versionStr, sizeof(versionStr), "say Q2DOS %4.2f %s %s %s\n", VERSION, CPUSTRING, __DATE__, BUILDSTRING);
 		Cbuf_AddText(versionStr);
 		cls.lastSpamTime = cls.realtime;
-		cls.spamTime = 0.0f;
+		cls.spamTime = 0;
 	}
 
 	// predict all unacknowledged movements
@@ -2466,7 +2466,7 @@ void CL_Frame (double msec)
 			}
 			else
 			{
-				double now = Sys_Milliseconds();
+				int now = Sys_Milliseconds();
 
 				if ( log_stats_file )
 				{
