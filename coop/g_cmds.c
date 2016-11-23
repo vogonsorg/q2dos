@@ -1425,6 +1425,7 @@ Cmd_Say_f(edict_t *ent, qboolean team, qboolean arg0)
 
 	if (arg0)
 	{
+		p = strchr(text, 0); /*  for sayCmd_CheckVote()  */
 		strcat(text, gi.argv(0));
 		strcat(text, " ");
 		strcat(text, gi.args());

@@ -2339,7 +2339,7 @@ ClientDisconnect(edict_t *ent)
 		vote_stop(ent);
 	}
 
-	if(ent->client->hasVoted == true) /* FS: Coop: Voting stuff */
+	if(ent->client->hasVoted) /* FS: Coop: Voting stuff */
 	{
 		vote_disconnect_recalc(ent);
 	}

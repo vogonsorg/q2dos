@@ -1,20 +1,5 @@
-#if _MSC_VER
-#include <crtdbg.h>
-#include <direct.h> /* FS */
-#endif
-
 #include "g_local.h"
 #include "m_player.h"
-
-
-#ifndef _MSC_VER /* FS: Unix */
-#include <sys/stat.h>
-#include <sys/types.h>
-//#define MAX_PATH 4096 - DG: use MAX_OSPATH instead
-	#ifndef NULL
-		#define NULL 0
-	#endif // NULL
-#endif // _MSC_VER
 
 /* FS: Flags for sv_vote_disallow_flags */
 #define	VOTE_NOGAMEMODE			0x00000001
@@ -99,8 +84,7 @@ void vote_command(edict_t *ent)
 	}
 
 	if (argc <= 1 ||
-		 argc >= 2 && ( !stricmp(gi.argv(1), "help") || !stricmp(gi.argv(1), "list") || !stricmp(gi.argv(1), "cmds") || !stricmp(gi.argv(1), "commands") )
-		)
+	    (argc >= 2 && (!stricmp(gi.argv(1), "help") || !stricmp(gi.argv(1), "list") || !stricmp(gi.argv(1), "cmds") || !stricmp(gi.argv(1), "commands"))) )
 	{
 		gi.cprintf(ent, PRINT_HIGH, "usage: vote map <mapname>, vote gamemode <gamemode>, vote skill <coopskill>, vote fraglimit <fraglimit>, vote timelimit <timelimit>, vote tourney <options>, vote restartmap, vote yes, vote no, vote stop, and vote progress.\n");
 		return;
@@ -188,7 +172,6 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 	char mapCheck[MAX_QPATH];
 	char fileName[MAX_OSPATH];
 	char *mapToken = NULL;
-	char *gameTypeToken = NULL;
 	char *fileBuffer = NULL;
 	char *listPtr = NULL;
 	char separators[] = ",\n";
@@ -279,12 +262,12 @@ void vote_map (edict_t *ent, const char *mapName)
 
 	if(strstr(mapName, "."))
 	{
-		gi.cprintf(ent, PRINT_HIGH, "Map name can not contain '.'\n", mapName);
+		gi.cprintf(ent, PRINT_HIGH, "Map name can not contain '.'\n");
 		return;
 	}
 	else if(strstr(mapName, ";"))
 	{
-		gi.cprintf(ent, PRINT_HIGH, "Map name can not contain ';'\n", mapName);
+		gi.cprintf(ent, PRINT_HIGH, "Map name can not contain ';'\n");
 		return;
 	}
 
