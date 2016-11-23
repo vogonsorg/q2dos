@@ -1,0 +1,8 @@
+# modify this to meet your own setup
+
+TARGET=x86_64-w64-mingw32
+PREFIX=/opt/cross_win64
+
+PATH="$PREFIX/bin:$PATH"
+export PATH
+
