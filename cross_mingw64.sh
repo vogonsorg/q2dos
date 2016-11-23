@@ -8,4 +8,4 @@ if test "$1" = "strip"; then
 	exit 0
 fi
 
-exec make CC=$TARGET-gcc RC=$TARGET-windres -f Makefile.mingw $*
+exec make CC=$TARGET-gcc RC=$TARGET-windres -f Makefile.mingw64 $*
