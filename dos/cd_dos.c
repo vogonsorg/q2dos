@@ -779,7 +779,7 @@ void CDAudio_Update (void)
 	if (!initialized || !enabled)
 		return;
 
-	if ((curtime - lastUpdate) < 0.25)
+	if ((curtime - lastUpdate) < 250)
 		return;
 	lastUpdate = curtime;
 
@@ -787,7 +787,7 @@ void CDAudio_Update (void)
 	{
 		static double	lastCheck;
 
-		if ((curtime - lastCheck) < 5.0)
+		if ((curtime - lastCheck) < 5000)
 			return;
 		lastCheck = curtime;
 
