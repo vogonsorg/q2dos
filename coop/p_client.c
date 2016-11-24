@@ -1973,7 +1973,7 @@ PutClientInServer(edict_t *ent)
 	 	/* could't spawn in? */
 	}
 
-	if (sv_spawn_protection->intValue) /* FS: Coop: Spawn protection */
+	if ((maxclients->intValue > 1) && (sv_spawn_protection->intValue)) /* FS: Coop: Spawn protection */
 	{
 		ent->solid = SOLID_NOT; /* FS: Let players pass through other SOLID_NOT players.  For maps with bad coop spawns.  An idea from Baker. */
 		client->spawn_protection = true;
