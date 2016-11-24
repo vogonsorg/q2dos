@@ -180,6 +180,8 @@ char *GetProperMonsterName (char *monsterName) /* FS: Coop: Get proper name for 
 	else if(!strcmp("monster_boss5", monsterName))
 		return "Tank Boss";
 	/* FS: Rogue specific stuff */
+	else if(!strcmp("monster_stalker", monsterName))
+		return "Stalker";
 	else if(!strcmp("monster_turret", monsterName))
 		return "Turret";
 	else if(!strcmp("monster_daedalus", monsterName))
@@ -189,9 +191,9 @@ char *GetProperMonsterName (char *monsterName) /* FS: Coop: Get proper name for 
 	else if(!strcmp("monster_medic_commander", monsterName))
 		return "Medic Commander";
 	else if(!strcmp("monster_widow", monsterName))
-		return "Stalker";
+		return "Black Widow Guardian";
 	else if(!strcmp("monster_widow2", monsterName))
-		return "Stalker";
+		return "Black Widow Guardian";
 	else if(!strcmp("monster_kamikaze", monsterName))
 		return "Kamikaze Flyer";
 	else
