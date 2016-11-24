@@ -234,6 +234,10 @@ InitGame(void)
 	sv_coop_gamemode->description = "Internal CVAR used to keep track of current gamemode during DLL resets.";
 	sv_coop_reset_hack = gi.cvar("sv_coop_reset_hack", "1", 0);
 	sv_coop_reset_hack->description = "Reset the internal timers every 3 hours if no clients are connected.  Works around frametime overflow errors.  Experimental.";
+	sv_spawn_protection = gi.cvar("sv_spawn_protection", "1", 0); /* FS: Coop: Spawn protection */
+	sv_spawn_protection->description = "Enable spawn protection by enabling temporary invincibility and immunity from telefragging.  Time set in seconds with sv_spawn_protection_time.";
+	sv_spawn_protection_time = gi.cvar("sv_spawn_protection_time", "3", 0); /* FS: Coop: Spawn protection */
+	sv_spawn_protection_time->description = "Time set in seconds for spawn protection.  Requires sv_spawn_protection to be enabled.";
 
 	motd = gi.cvar ("motd", "", 0); /* FS: Coop: Added */
 	skill = gi.cvar ("skill", "1", CVAR_LATCH);

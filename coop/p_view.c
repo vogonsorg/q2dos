@@ -598,6 +598,32 @@ SV_CalcBlend(edict_t *ent)
 			gi.sound(ent, CHAN_ITEM, gi.soundindex("items/protect2.wav"), 1, ATTN_NORM, 0);
 		}
 
+		if (ent->client->spawn_protection) /* FS: Coop: Spawn protection */
+		{
+			if(ent->client->spawn_protection_msg)
+			{
+				char bSeconds[8]; /* FS: Boolean to detect if it's 1.5 seconds or lower for spawn protection time */
+
+				if (sv_spawn_protection_time->value >= 1.5)
+					strncpy(bSeconds, "seconds", sizeof(bSeconds)-1);
+				else
+					strncpy(bSeconds, "second", sizeof(bSeconds)-1);
+
+				gi.cprintf(ent, PRINT_HIGH, "Spawn protection expires in %1.f %s.\n", sv_spawn_protection_time->value, bSeconds);
+
+				ent->client->spawn_protection_msg = false;
+			}
+
+			if(remaining <= 30)
+			{
+				ent->client->spawn_protection = false;
+				ent->solid = SOLID_BBOX; /* FS: We're done being SOLID_NOTs, get back to normal. */
+				gi.unlinkentity(ent); /* FS: Have to unlink temporarily for KillBox to work. */
+				KillBox(ent);
+				gi.linkentity(ent);
+			}
+		}
+
 		if ((remaining > 30) || (remaining & 4))
 		{
 			SV_AddBlend(1, 1, 0, 0.08, ent->client->ps.blend);

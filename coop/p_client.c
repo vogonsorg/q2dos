@@ -1973,6 +1973,14 @@ PutClientInServer(edict_t *ent)
 	 	/* could't spawn in? */
 	}
 
+	if (sv_spawn_protection->intValue) /* FS: Coop: Spawn protection */
+	{
+		ent->solid = SOLID_NOT; /* FS: Let players pass through other SOLID_NOT players.  For maps with bad coop spawns.  An idea from Baker. */
+		client->spawn_protection = true;
+		client->spawn_protection_msg = true;
+		ent->client->invincible_framenum = level.framenum + (sv_spawn_protection_time->value * 10);
+	}
+
 	gi.linkentity(ent);
 
 	/* my tribute to cash's level-specific hacks. I hope

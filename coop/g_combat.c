@@ -797,7 +797,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		if (OnSameTeam(targ, attacker))
 		{
 			/* nukes kill everyone */
-			if ((((int)(dmflags->value) & DF_NO_FRIENDLY_FIRE) || coop->intValue) && /* FS: Coop: No friendly fire in Coop */
+			if ((((int)(dmflags->value) & DF_NO_FRIENDLY_FIRE) || coop->intValue) && (mod != MOD_TELEFRAG) && /* FS: Coop: No friendly fire in Coop, except for telefrags */
 				(mod != MOD_NUKE)) /* FS: Coop: Rogue specific */
 			{
 				damage = 0;
