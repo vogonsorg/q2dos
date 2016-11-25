@@ -82,23 +82,18 @@ int	Sys_Milliseconds (void)
 	return curtime;
 }
 
-int	Sys_LinuxTime (void) /* FS: DOS needs this for random qport */
+int	Sys_DOSTime (void) /* FS: DOS needs this for random qport */
 {
-	int linuxtime;
+	static int secbase;
 	struct timeval tp;
-	static int		secbase;
 
 	gettimeofday(&tp, NULL);
-
 	if (!secbase)
 	{
 		secbase = tp.tv_sec;
 		return tp.tv_usec/1000;
 	}
-
-	linuxtime = (tp.tv_sec - secbase)*1000 + tp.tv_usec/1000;
-
-	return linuxtime;
+	return (tp.tv_sec - secbase)*1000 + tp.tv_usec/1000;
 }
 
 void	Sys_Mkdir (char *path)
