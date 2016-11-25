@@ -535,6 +535,11 @@ void G_ResetTimer_Hack (void) /* FS: Some of the grossest shit of all time.  Res
 				continue;
 			}
 
+			if(ent->monsterinfo.search_time)
+			{
+				ent->monsterinfo.search_time = level.time + 0.1f;
+			}
+
 			if(ent->monsterinfo.trail_time)
 			{
 				ent->monsterinfo.trail_time = level.time + 0.1f;
@@ -644,9 +649,9 @@ void G_ResetTimer_Hack (void) /* FS: Some of the grossest shit of all time.  Res
 				}
 			}
 
-			if(ent->monsterinfo.stand)
+			if(ent->monsterinfo.search) /* FS: Wake up! */
 			{
-				ent->monsterinfo.stand(ent);
+				ent->monsterinfo.search(ent);
 			}
 		}
 	}
