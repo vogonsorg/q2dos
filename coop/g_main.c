@@ -549,6 +549,7 @@ void G_ResetTimer_Hack (void) /* FS: Some of the grossest shit of all time.  Res
 			{
 				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set search_time for %s: %f\n", className, ent->monsterinfo.search_time);
 				ent->monsterinfo.search_time = level.time + 0.1f;
+				setSearch = true;
 			}
 
 			if(ent->monsterinfo.trail_time)
@@ -560,6 +561,7 @@ void G_ResetTimer_Hack (void) /* FS: Some of the grossest shit of all time.  Res
 			{
 				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set idle_time for %s: %f\n", className, ent->monsterinfo.idle_time);
 				ent->monsterinfo.idle_time = level.time + 0.1f;
+				setIdle = true;
 			}
 
 			if(ent->monsterinfo.pausetime)
