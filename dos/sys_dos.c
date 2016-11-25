@@ -87,8 +87,8 @@ static void TrapKey(void)
 	keybuf_head = (keybuf_head + 1) & (KEYBUF_SIZE-1);
 }
 
-double	sys_msg_time;
-double	sys_frame_time;
+unsigned int	sys_msg_time;
+unsigned int	sys_frame_time;
 int	sys_checksum;
 
 int		end_of_memory;
@@ -172,6 +172,7 @@ void Sys_Memory_Stats_f (void)
 	Com_Printf("%d Mb available for Q2DOS.  Started with %d.\n", (Sys_Get_Physical_Memory() / 0x100000), physicalMemStart );
 	Com_Printf("%lu Virtual Mb available for Q2DOS. Started with %lu.\n", (_go32_dpmi_remaining_virtual_memory() / 0x100000), virtualMemStart );
 }
+
 /*
 ================
 Sys_PageInProgram
@@ -484,7 +485,7 @@ static void Sys_DefaultExceptionHandler(int whatever)
 
 int main (int argc, char **argv)
 {
-	double time, oldtime, newtime;
+	int time, oldtime, newtime;
 
 	printf ("Quake 2 DOS v%4.2f\n", VERSION);
 

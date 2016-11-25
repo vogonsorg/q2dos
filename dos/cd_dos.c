@@ -774,7 +774,7 @@ static void CD_f (void)
 void CDAudio_Update (void)
 {
 	int		ret;
-	static double	lastUpdate;
+	static int	lastUpdate;
 
 	if (!initialized || !enabled)
 		return;

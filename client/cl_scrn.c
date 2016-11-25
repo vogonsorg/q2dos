@@ -805,8 +805,8 @@ int entitycmpfnc( const entity_t *a, const entity_t *b )
 void SCR_TimeRefresh_f (void)
 {
 	int		i;
-	double		start, stop;
-	double	time;
+	int		start, stop;
+	float	time;
 
 	if ( cls.state != ca_active )
 		return;

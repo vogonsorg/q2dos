@@ -47,7 +47,7 @@ typedef struct
 	qboolean	attractloop;		// running cinematics and demos for the local system only
 	qboolean	loadgame;			// client begins should reuse existing entity
 
-	double	time;				// always sv.framenum * 100 msec
+	unsigned	time;				// always sv.framenum * 100 msec
 	int			framenum;
 
 	char		name[MAX_QPATH];			// map name, or cinematic name
@@ -126,8 +126,8 @@ typedef struct client_s
 	int				downloadsize;		// total bytes (can't use EOF because of paks)
 	int				downloadcount;		// bytes sent
 
-	double				lastmessage;		// sv.framenum when packet was last received
-	double				lastconnect;
+	int				lastmessage;		// sv.framenum when packet was last received
+	int				lastconnect;
 
 	int				challenge;			// challenge of this user, randomly generated
 
@@ -151,14 +151,14 @@ typedef struct
 {
 	netadr_t	adr;
 	int			challenge;
-	double			time;
+	int			time;
 } challenge_t;
 
 
 typedef struct
 {
 	qboolean	initialized;				// sv_init has completed
-	double			realtime;					// always increasing, no clamping, etc
+	int			realtime;					// always increasing, no clamping, etc
 
 	char		mapcmd[MAX_TOKEN_CHARS];	// ie: *intro.cin+base 
 

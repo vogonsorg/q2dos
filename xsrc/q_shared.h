@@ -309,9 +309,9 @@ SYSTEM SPECIFIC
 ==============================================================
 */
 
-extern	double	curtime;		// time returned by last Sys_Milliseconds
+extern	int	curtime;		// time returned by last Sys_Milliseconds
 
-double		Sys_Milliseconds (void);
+int		Sys_Milliseconds (void);
 int		Sys_LinuxTime(void); /* FS: DOS needs this for the random qport */
 void	Sys_Mkdir (char *path);
 

@@ -846,7 +846,7 @@ void SV_Status_f (void)
 			Com_Printf (" ");
 		}
 
-		Com_Printf ("%7i ", (int)(svs.realtime - cl->lastmessage) ); /* FS: On purpose, don't need extreme precision for lastmsg reporting */
+		Com_Printf ("%7i ", svs.realtime - cl->lastmessage );
 
 		s = NET_AdrToString ( cl->netchan.remote_address);
 		Com_Printf ("%s", s);

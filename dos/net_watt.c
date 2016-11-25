@@ -599,7 +599,7 @@ char *NET_ErrorString (void)
 }
 
 // sleeps msec or until net socket is ready
-void NET_Sleep(double msec)
+void NET_Sleep(int msec)
 {
 	struct timeval timeout;
 	fd_set	fdset;

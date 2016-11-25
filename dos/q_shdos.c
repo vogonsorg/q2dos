@@ -75,8 +75,8 @@ int	Hunk_End (void)
 	return curhunksize;
 }
 
-double	curtime;
-double	Sys_Milliseconds (void)
+int	curtime;
+int	Sys_Milliseconds (void)
 {
 	curtime = (double) uclock() / (UCLOCKS_PER_SEC / 1000.0);
 	return curtime;

@@ -463,7 +463,7 @@ void SVC_DirectConnect (void)
 			&& ( cl->netchan.qport == qport 
 			|| adr.port == cl->netchan.remote_address.port ) )
 		{
-			if (!NET_IsLocalAddress (adr) && (svs.realtime - cl->lastconnect) < ((int)sv_reconnect_limit->value * 1000.0f))
+			if (!NET_IsLocalAddress (adr) && (svs.realtime - cl->lastconnect) < ((int)sv_reconnect_limit->value * 1000))
 			{
 				Com_DPrintf(DEVELOPER_MSG_SERVER, "%s:reconnect rejected : too soon\n", NET_AdrToString (adr));
 				return;
@@ -801,11 +801,11 @@ void SV_CheckTimeouts (void)
 {
 	int		i;
 	client_t	*cl;
-	double			droppoint;
-	double			zombiepoint;
+	int			droppoint;
+	int			zombiepoint;
 
-	droppoint = svs.realtime - 1000.0f*timeout->value;
-	zombiepoint = svs.realtime - 1000.0f*zombietime->value;
+	droppoint = svs.realtime - 1000*timeout->value;
+	zombiepoint = svs.realtime - 1000*zombietime->value;
 
 	for (i=0,cl=svs.clients ; i<maxclients->value ; i++,cl++)
 	{
@@ -897,7 +897,7 @@ SV_Frame
 
 ==================
 */
-void SV_Frame (double msec)
+void SV_Frame (int msec)
 {
 	time_before_game = time_after_game = 0;
 
@@ -1129,7 +1129,7 @@ void SV_Init (void)
 
 	public_server = Cvar_Get ("public", "0", 0);
 
-	sv_iplimit = Cvar_Get ("sv_iplimit", "3", 0);	// r1ch: limit connections per ip address (stop zombie dos/flood)
+	sv_iplimit = Cvar_Get ("sv_iplimit", "3", 0);	/* r1ch: limit connections per ip address (stop zombie dos/flood) */
 	sv_iplimit->description = "Limit connections per IP address.  Stops zombie DoS/Flood.";
 
 	sv_reconnect_limit = Cvar_Get ("sv_reconnect_limit", "3", CVAR_ARCHIVE);
