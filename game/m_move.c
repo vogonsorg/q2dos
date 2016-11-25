@@ -24,13 +24,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define STEPSIZE 18
 #define DI_NODIR -1
 
-int c_yes, c_no;
 
 /*
  * Returns false if any part of the
  * bottom of the entity is off an edge
  * that is not a staircase.
  */
+int c_yes, c_no;
+
 qboolean
 M_CheckBottom(edict_t *ent)
 {
@@ -329,7 +330,8 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 	if (!M_CheckBottom(ent))
 	{
 		if (ent->flags & FL_PARTIALGROUND)
-		{   /* entity had floor mostly pulled out
+		{
+			/* entity had floor mostly pulled out
 			   from underneath it and is trying to
 			   correct */
 			if (relink)

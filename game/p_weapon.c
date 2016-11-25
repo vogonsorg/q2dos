@@ -943,6 +943,11 @@ Weapon_RocketLauncher(edict_t *ent)
 	static int pause_frames[] = {25, 33, 42, 50, 0};
 	static int fire_frames[] = {5, 0};
 
+  	if (!ent)
+	{
+		return;
+	}
+
 	Weapon_Generic(ent, 4, 12, 50, 54, pause_frames,
 			fire_frames, Weapon_RocketLauncher_Fire);
 }

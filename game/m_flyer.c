@@ -497,7 +497,7 @@ flyer_fire(edict_t *self, int flash_number)
 	vec3_t dir;
 	int effect;
 
-	if (!self || !self->enemy)
+	if (!self || !self->enemy || !self->enemy->inuse)
 	{
 		return;
 	}

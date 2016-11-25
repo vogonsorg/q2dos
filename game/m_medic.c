@@ -41,6 +41,8 @@ static int sound_hook_hit;
 static int sound_hook_heal;
 static int sound_hook_retract;
 
+void ED_CallSpawn(edict_t *ent);
+
 edict_t *
 medic_FindDeadMonster(edict_t *self)
 {
@@ -680,8 +682,13 @@ mmove_t medic_move_duck =
 };
 
 void
-medic_dodge(edict_t *self, edict_t *attacker, float eta)
+medic_dodge(edict_t *self, edict_t *attacker, float eta /* unused */)
 {
+  	if (!self || !attacker)
+	{
+		return;
+	}
+
 	if (random() > 0.25)
 	{
 		return;
@@ -755,8 +762,13 @@ mframe_t medic_frames_attackBlaster[] = {
 	{ai_charge, 0, NULL},
 	{ai_charge, 0, medic_continue}
 };
-mmove_t medic_move_attackBlaster =
-{FRAME_attack1, FRAME_attack14, medic_frames_attackBlaster, medic_run};
+
+mmove_t medic_move_attackBlaster = {
+	FRAME_attack1,
+	FRAME_attack14,
+	medic_frames_attackBlaster,
+	medic_run
+};
 
 void
 medic_hook_launch(edict_t *self)
@@ -768,8 +780,6 @@ medic_hook_launch(edict_t *self)
 
 	gi.sound(self, CHAN_WEAPON, sound_hook_launch, 1, ATTN_NORM, 0);
 }
-
-void ED_CallSpawn(edict_t *ent);
 
 static vec3_t medic_cable_offsets[] = {
 	{45.0, -9.2, 15.5},

@@ -215,6 +215,11 @@ mmove_t infantry_move_run =
 void
 infantry_run(edict_t *self)
 {
+  	if (!self)
+	{
+		return;
+	}
+
 	if (self->monsterinfo.aiflags & AI_STAND_GROUND)
 	{
 		self->monsterinfo.currentmove = &infantry_move_stand;

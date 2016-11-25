@@ -2327,7 +2327,7 @@ func_clock_reset(edict_t *self)
 
 /*
  * This is an evil hack to
- * prevent a rare crahs at
+ * prevent a rare crash at
  * biggun exit. */
 typedef struct zhead_s
 {
