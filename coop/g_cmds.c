@@ -203,7 +203,7 @@ Cmd_Give_f(edict_t *ent)
 	qboolean give_all;
 	edict_t *it_ent;
 
-	if (!ent)
+	if (!ent || !ent->client)
 	{
 		return;
 	}
@@ -212,6 +212,13 @@ Cmd_Give_f(edict_t *ent)
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"You must run the server with '+set cheats 1' to enable this command.\n");
+		return;
+	}
+
+	if(ent->client->pers.spectator) /* FS: Coop: No spectators and cheats, please */
+	{
+		gi.cprintf(ent, PRINT_HIGH,
+				"Spectators can't use this command.\n");
 		return;
 	}
 
@@ -514,7 +521,7 @@ Cmd_God_f(edict_t *ent)
 {
 	char *msg;
 
-	if (!ent)
+	if (!ent || !ent->client)
 	{
 		return;
 	}
@@ -523,6 +530,13 @@ Cmd_God_f(edict_t *ent)
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"You must run the server with '+set cheats 1' to enable this command.\n");
+		return;
+	}
+
+	if(ent->client->pers.spectator) /* FS: Coop: No spectators and cheats, please */
+	{
+		gi.cprintf(ent, PRINT_HIGH,
+				"Spectators can't use this command.\n");
 		return;
 	}
 
@@ -548,7 +562,7 @@ Cmd_Notarget_f(edict_t *ent)
 {
 	char *msg;
 
-	if (!ent)
+	if (!ent || !ent->client)
 	{
 		return;
 	}
@@ -557,6 +571,13 @@ Cmd_Notarget_f(edict_t *ent)
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"You must run the server with '+set cheats 1' to enable this command.\n");
+		return;
+	}
+
+	if(ent->client->pers.spectator) /* FS: Coop: No spectators and cheats, please */
+	{
+		gi.cprintf(ent, PRINT_HIGH,
+				"Spectators can't use this command.\n");
 		return;
 	}
 
@@ -579,7 +600,7 @@ Cmd_Noclip_f(edict_t *ent)
 {
 	char *msg;
 
-	if (!ent)
+	if (!ent || !ent->client)
 	{
 		return;
 	}
@@ -588,6 +609,13 @@ Cmd_Noclip_f(edict_t *ent)
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"You must run the server with '+set cheats 1' to enable this command.\n");
+		return;
+	}
+
+	if(ent->client->pers.spectator) /* FS: Coop: No spectators and cheats, please */
+	{
+		gi.cprintf(ent, PRINT_HIGH,
+				"Spectators can't use this command.\n");
 		return;
 	}
 
@@ -615,8 +643,15 @@ Cmd_Use_f(edict_t *ent)
 	gitem_t *it;
 	char *s;
 
-	if (!ent)
+	if (!ent || !ent->client)
 	{
+		return;
+	}
+
+	if(ent->client->pers.spectator) /* FS: Coop: No spectators and cheats, please */
+	{
+		gi.cprintf(ent, PRINT_HIGH,
+				"Spectators can't use this command.\n");
 		return;
 	}
 
@@ -737,8 +772,15 @@ Cmd_Drop_f(edict_t *ent)
 	gitem_t *it;
 	char *s;
 
-	if (!ent)
+	if (!ent || !ent->client)
 	{
+		return;
+	}
+
+	if(ent->client->pers.spectator) /* FS: Coop: No spectators and cheats, please */
+	{
+		gi.cprintf(ent, PRINT_HIGH,
+				"Spectators can't use this command.\n");
 		return;
 	}
 
