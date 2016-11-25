@@ -325,6 +325,13 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 		(targ->movetype == MOVETYPE_NONE))
 	{
 		/* doors, triggers, etc */
+		if(game.gametype == rogue_coop)
+		{
+			if((targ->svflags & SVF_MONSTER) && attacker && attacker->client && attacker->client->pers.netname && targ->classname && !stricmp(targ->classname, "monster_turret")) /* FS: Coop: monster_turrets have MOVETYPE_NONE so they stop here. */
+			{
+				gi.bprintf(PRINT_HIGH, "%s %s %s\n", GetProperMonsterName(targ->classname), GetCoopInsult(), attacker->client->pers.netname);
+			}
+		}
 		targ->die(targ, inflictor, attacker, damage, point);
 		return;
 	}
