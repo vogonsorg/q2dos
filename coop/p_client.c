@@ -1965,6 +1965,7 @@ PutClientInServer(edict_t *ent)
 	}
 	else
 	{
+		ent->flags &= ~FL_NOTARGET; /* FS: Coop: Don't confuse AI */
 		client->resp.spectator = false;
 	}
 

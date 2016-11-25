@@ -441,7 +441,7 @@ G_RunFrame(void)
 
 #ifdef FRAMENUM_TIMER_TEST /* FS: Force framenum overflow and reset testing */
 #ifdef _DEBUG
-	if(firstStart && level.framenum > 5) /* FS: Need a few frames for physics to settle down and activate before you can fudge it forward */
+	if(firstStart && level.framenum > 15) /* FS: Need a few frames for physics to settle down and activate before you can fudge it forward */
 	{
 		level.framenum = 10790*10*8;
 		firstStart = false;
@@ -530,77 +530,96 @@ void G_ResetTimer_Hack (void) /* FS: Some of the grossest shit of all time.  Res
 
 		for (i = 0; i < globals.num_edicts; i++, ent++)
 		{
+			qboolean setStand = false;
+			qboolean setSearch = false;
+			qboolean setIdle = false;
+			char *className = "Unknown Entity";
+
 			if (!ent->inuse)
 			{
 				continue;
 			}
 
+			if(ent->classname)
+			{
+				className = ent->classname;
+			}
+
 			if(ent->monsterinfo.search_time)
 			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set search_time for %s: %f\n", className, ent->monsterinfo.search_time);
 				ent->monsterinfo.search_time = level.time + 0.1f;
 			}
 
 			if(ent->monsterinfo.trail_time)
 			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set trail_time for %s: %f\n", className, ent->monsterinfo.trail_time);
 				ent->monsterinfo.trail_time = level.time + 0.1f;
 			}
 			if(ent->monsterinfo.idle_time)
 			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set idle_time for %s: %f\n", className, ent->monsterinfo.idle_time);
 				ent->monsterinfo.idle_time = level.time + 0.1f;
 			}
 
 			if(ent->monsterinfo.pausetime)
 			{
-				ent->monsterinfo.pausetime = level.time + 0.1f;
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set pausetime for %s: %f\n", className, ent->monsterinfo.pausetime);
+				ent->monsterinfo.pausetime = level.time + 100000000;
+				setStand = true;
 			}
 
 			if(ent->monsterinfo.last_hint_time)
 			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set last_hint_time for %s: %f\n", className, ent->monsterinfo.last_hint_time);
 				ent->monsterinfo.last_hint_time = level.time + 0.1f;
-			}
-
-			if(ent->monsterinfo.pausetime)
-			{
-				ent->monsterinfo.pausetime = 100000000;
 			}
 
 			if(ent->monsterinfo.next_duck_time)
 			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set next_duck_time for %s: %f\n", className, ent->monsterinfo.next_duck_time);
 				ent->monsterinfo.next_duck_time = level.time + 0.1f;
 			}
 
 			if(ent->monsterinfo.duck_wait_time)
 			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set duck_wait_time for %s: %f\n", className, ent->monsterinfo.duck_wait_time);
 				ent->monsterinfo.duck_wait_time = level.time + 0.1f;
 			}
 
 			if(ent->monsterinfo.blind_fire_delay)
 			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set blind_fire_delay for %s: %f\n", className, ent->monsterinfo.blind_fire_delay);
 				ent->monsterinfo.blind_fire_delay = level.time + 0.1f;
 			}
 
 			if(ent->monsterinfo.quad_framenum)
 			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set quad_framenum for %s: %f\n", className, ent->monsterinfo.quad_framenum);
 				ent->monsterinfo.quad_framenum = 0.0f;
 			}
 
 			if(ent->monsterinfo.invincible_framenum)
 			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set invincible_framenum for %s: %f\n", className, ent->monsterinfo.invincible_framenum);
 				ent->monsterinfo.invincible_framenum = 0.0f;
 			}
 
 			if(ent->monsterinfo.double_framenum)
 			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set double_framenum for %s: %f\n", className, ent->monsterinfo.double_framenum);
 				ent->monsterinfo.double_framenum = 0.0f;
 			}
 
 			if(ent->air_finished)
 			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set air_finished for %s: %f\n", className, ent->air_finished);
 				ent->air_finished = level.time + 1.0f;
 			}
 
 			if(ent->powerarmor_time)
 			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set air_finished for %s: %f\n", className, ent->powerarmor_time);
 				ent->powerarmor_time = level.time + 0.2f;
 			}
 
@@ -608,36 +627,43 @@ void G_ResetTimer_Hack (void) /* FS: Some of the grossest shit of all time.  Res
 
 			if(ent->teleport_time)
 			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set teleport_time for %s: %f\n", className, ent->teleport_time);
 				ent->teleport_time = level.time;
 			}
 
 			if(ent->touch_debounce_time)
 			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set touch_debounce_time for %s: %f\n", className, ent->touch_debounce_time);
 				ent->touch_debounce_time = level.time + 0.1f;
 			}
 
 			if(ent->pain_debounce_time)
 			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set pain_debounce_time for %s: %f\n", className, ent->pain_debounce_time);
 				ent->pain_debounce_time = level.time + 0.1f;
 			}
 
 			if(ent->damage_debounce_time)
 			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set damage_debounce_time for %s: %f\n", className, ent->damage_debounce_time);
 				ent->damage_debounce_time = level.time + 0.1f;
 			}
 
 			if(ent->fly_sound_debounce_time)
 			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set fly_sound_debounce_time for %s: %f\n", className, ent->fly_sound_debounce_time);
 				ent->fly_sound_debounce_time = level.time + 0.1f;
 			}
 
 			if(ent->last_move_time)
 			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set last_move_time for %s: %f\n", className, ent->last_move_time);
 				ent->last_move_time = 0.1f;
 			}
 
 			if(ent->timestamp)
 			{
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set timestamp for %s: %f\n", className, ent->timestamp);
 				ent->timestamp = level.time + 0.1f;
 			}
 
@@ -645,13 +671,42 @@ void G_ResetTimer_Hack (void) /* FS: Some of the grossest shit of all time.  Res
 			{
 				if(ent->nextthink)
 				{
+					gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set nextthink for %s: %f\n", className, ent->nextthink);
 					ent->nextthink = level.time + 0.1f;
 				}
 			}
 
-			if(ent->monsterinfo.search) /* FS: Wake up! */
+			if(setStand)
 			{
-				ent->monsterinfo.search(ent);
+				if(ent->monsterinfo.stand)
+				{
+					gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set Stand AI for %s\n", className);
+					ent->monsterinfo.stand(ent);
+				}
+			}
+			else if(setSearch)
+			{
+				if(ent->monsterinfo.search)
+				{
+					gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set Search AI for %s\n", className);
+					ent->monsterinfo.search(ent);
+				}
+			}
+			else if(setIdle)
+			{
+				if(ent->monsterinfo.idle)
+				{
+					gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set Idle AI for %s\n", className);
+					ent->monsterinfo.idle(ent);
+				}
+			}
+			else /* FS: Not sure what we're supposed to be doing with ourselves, so just stand there for now */
+			{
+				if(ent->monsterinfo.stand)
+				{
+					gi.dprintf(DEVELOPER_MSG_VERBOSE, "WARNING: Unknown what monster is doing.  Seting stand AI by default for %s\n", className);
+					ent->monsterinfo.stand(ent);
+				}
 			}
 		}
 	}
