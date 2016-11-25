@@ -851,7 +851,7 @@ void	Sys_Quit (void) __attribute__((__noreturn__));
 char	*Sys_GetClipboardData( void );
 void	Sys_CopyProtect (void);
 
-void	Sys_Sleep (int msec);	// Knightmare added
+void	Sys_Sleep (unsigned msec);	// Knightmare added
 
 #ifdef __DJGPP__
 void Sys_InitDXE3 (void);

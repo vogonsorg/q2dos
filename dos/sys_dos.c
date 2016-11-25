@@ -172,6 +172,7 @@ void Sys_Memory_Stats_f (void)
 	Com_Printf("%d Mb available for Q2DOS.  Started with %d.\n", (Sys_Get_Physical_Memory() / 0x100000), physicalMemStart );
 	Com_Printf("%lu Virtual Mb available for Q2DOS. Started with %lu.\n", (_go32_dpmi_remaining_virtual_memory() / 0x100000), virtualMemStart );
 }
+
 /*
 ================
 Sys_PageInProgram
@@ -361,7 +362,7 @@ void	Sys_ConsoleOutput (char *string)
 }
 
 // Knightmare- added this to fix CPU usage
-void Sys_Sleep (int msec)
+void Sys_Sleep (unsigned msec)
 {
 	usleep (msec*1000);
 }

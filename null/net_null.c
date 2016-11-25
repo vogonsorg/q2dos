@@ -275,7 +275,7 @@ void	NET_Config (qboolean multiplayer)
 }
 
 // sleeps msec or until net socket is ready
-void NET_Sleep(double msec)
+void NET_Sleep(int msec)
 {
 	if (!dedicated || !dedicated->value)
 		return; // we're not a server, just run full speed
@@ -287,8 +287,8 @@ void NET_Sleep(double msec)
 		FD_SET(ip_sockets[NS_SERVER], &fdset); // network socket
 		i = ip_sockets[NS_SERVER];
 	}
-	timeout.tv_sec = (long)msec/1000;
-	timeout.tv_usec = ((long)msec%1000)*1000;
+	timeout.tv_sec = msec/1000;
+	timeout.tv_usec = (msec%1000)*1000;
 	select(i+1, &fdset, NULL, NULL, &timeout);
 #endif
 }

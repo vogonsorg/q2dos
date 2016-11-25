@@ -314,7 +314,6 @@ char *Sys_ConsoleInput (void)
 						}
 
 						break;
-
 				}
 			}
 		}
@@ -362,7 +361,7 @@ Sys_Sleep
 Knightmare- added this to fix CPU usage
 ================
 */
-void Sys_Sleep (int msec)
+void Sys_Sleep (unsigned msec)
 {
 	Sleep (msec);
 }
@@ -391,7 +390,6 @@ void Sys_SendKeyEvents (void)
 	// grab frame time 
 	sys_frame_time = timeGetTime();	// FIXME: should this be at start?
 }
-
 
 
 /*
