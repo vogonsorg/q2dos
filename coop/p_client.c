@@ -2224,7 +2224,7 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 
 	if ((maxclients->intValue > 1) && (strlen(s)))
 	{
-		if(adminpass->string[0] && !Q_stricmp(s, adminpass->string) && !ent->client->pers.isAdmin)
+		if(adminpass->string[0] && !Q_stricmp(s, adminpass->string))
 		{
 			ent->client->pers.isAdmin = ent->client->resp.isAdmin = true;
 		}
