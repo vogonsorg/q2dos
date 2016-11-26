@@ -188,6 +188,7 @@ void SP_misc_transport (edict_t *ent); /* FS: Coop: Xatrix specific */
 void SP_misc_nuke (edict_t *ent); /* FS: Coop: Xatrix specific */
 
 void SP_SetCDTrack(int track); /* FS: Coop: Added */
+qboolean Spawn_CheckCoop_MapHacks (edict_t *ent); /* FS: Coop: Check if we have to modify some stuff for coop so we don't have to rely on distributing ent files. */
 
 spawn_t spawns[] = {
 	{"item_health", SP_item_health},
@@ -920,6 +921,13 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 				}
 				else
 				{
+					if(Spawn_CheckCoop_MapHacks(ent)) /* FS: Coop: Check if we have to modify some stuff for coop so we don't have to rely on distributing ent files. */
+					{
+						G_FreeEdict(ent);
+						inhibit++;
+						continue;
+					}
+
 					if (((skill->value == 0) && (ent->spawnflags & SPAWNFLAG_NOT_EASY)) ||
 						((skill->value == 1) && (ent->spawnflags & SPAWNFLAG_NOT_MEDIUM)) ||
 						(((skill->value == 2) || (skill->value == 3)) && (ent->spawnflags & SPAWNFLAG_NOT_HARD)))
@@ -930,7 +938,7 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 					}
 				}
 			}
-			else
+			else /* FS: Coop: Single player */
 			{
 				if (((skill->value == 0) && (ent->spawnflags & SPAWNFLAG_NOT_EASY)) ||
 					((skill->value == 1) && (ent->spawnflags & SPAWNFLAG_NOT_MEDIUM)) ||
@@ -1908,4 +1916,37 @@ SP_SetCDTrack(int track) /* FS: Coop: Added */
 		modifiedTrack = track;
 
 	gi.configstring(CS_CDTRACK, va("%i", modifiedTrack));
+}
+
+qboolean Spawn_CheckCoop_MapHacks (edict_t *ent) /* FS: Coop: Check if we have to modify some stuff for coop so we don't have to rely on distributing ent files. */
+{
+	if(!coop->intValue || !ent)
+	{
+		return false;
+	}
+
+	if (game.gametype == xatrix_coop) /* FS: Coop: Progress breaker hack in xsewer1.bsp */
+	{
+		if(!Q_stricmp(level.mapname, "xsewer1"))
+		{
+			if(ent->classname && !Q_stricmp(ent->classname, "trigger_relay") && ent->target && !Q_stricmp(ent->target, "t3") && ent->targetname && !Q_stricmp(ent->targetname, "t2"))
+			{
+				return true;
+			}
+
+			if(ent->classname && !Q_stricmp(ent->classname, "func_button") && ent->target && !Q_stricmp(ent->target, "t16") && ent->model && !Q_stricmp(ent->model, "*71"))
+			{
+				ent->message = "Overflow valve maintenance\nhatch A opened.";
+				return false;
+			}
+
+			if(ent->classname && !Q_stricmp(ent->classname, "trigger_once") && ent->model && !Q_stricmp(ent->model, "*3"))
+			{
+				ent->message = "Overflow valve maintenance\nhatch B opened.";
+				return false;
+			}
+		}
+	}
+
+	return false;
 }
