@@ -2395,7 +2395,7 @@ SP_monster_medic_rogue(edict_t *self)
 
 	self->movetype = MOVETYPE_STEP;
 	self->solid = SOLID_BBOX;
-	self->s.modelindex = gi.modelindex("models/monsters/medic/tris.md2");
+	self->s.modelindex = gi.modelindex("models/monsters/medic2/tris.md2"); /* FS: Coop: Change to medic2.  New animations, make sure download gets them */
 	VectorSet(self->mins, -24, -24, -24);
 	VectorSet(self->maxs, 24, 24, 32);
 

@@ -1188,7 +1188,16 @@ SP_monster_infantry(edict_t *self)
 
 	self->movetype = MOVETYPE_STEP;
 	self->solid = SOLID_BBOX;
-	self->s.modelindex = gi.modelindex("models/monsters/infantry/tris.md2");
+
+	if (game.gametype == vanilla_coop) /* FS: Coop: New animations, make sure download gets them. */
+	{
+		self->s.modelindex = gi.modelindex("models/monsters/infantry/tris.md2");
+	}
+	else
+	{
+		self->s.modelindex = gi.modelindex("models/monsters/infantry2/tris.md2");
+	}
+
 	VectorSet(self->mins, -16, -16, -24);
 	VectorSet(self->maxs, 16, 16, 32);
 

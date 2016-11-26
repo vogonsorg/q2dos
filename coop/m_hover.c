@@ -1027,7 +1027,16 @@ SP_monster_hover(edict_t *self)
 
 	self->movetype = MOVETYPE_STEP;
 	self->solid = SOLID_BBOX;
-	self->s.modelindex = gi.modelindex("models/monsters/hover/tris.md2");
+
+	if (game.gametype == rogue_coop) /* FS: Coop: New animations, make sure download gets them. */
+	{
+		self->s.modelindex = gi.modelindex("models/monsters/hover2/tris.md2");
+	}
+	else
+	{
+		self->s.modelindex = gi.modelindex("models/monsters/hover/tris.md2");
+	}
+
 	VectorSet(self->mins, -24, -24, -24);
 	VectorSet(self->maxs, 24, 24, 32);
 
@@ -1079,6 +1088,8 @@ SP_monster_hover(edict_t *self)
 
 			self->s.sound = gi.soundindex("hover/hovidle1.wav");
 		}
+
+		gi.modelindex("models/proj/laser2/tris.md2"); /* FS: Coop: Need to precache this */
 	}
 
 	gi.linkentity(self);

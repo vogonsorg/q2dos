@@ -1281,9 +1281,14 @@ SP_monster_chick(edict_t *self)
 
 	self->movetype = MOVETYPE_STEP;
 	self->solid = SOLID_BBOX;
-	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+
+	if (game.gametype == rogue_coop) /* FS: Coop: New animations, make sure download gets them. */
 	{
 		self->s.modelindex = gi.modelindex("models/monsters/bitch2/tris.md2");
+	}
+	else if (game.gametype == xatrix_coop)
+	{
+		self->s.modelindex = gi.modelindex("models/monsters/bitch_xatrix/tris.md2");
 	}
 	else
 	{

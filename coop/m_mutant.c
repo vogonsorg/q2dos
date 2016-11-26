@@ -838,7 +838,16 @@ SP_monster_mutant(edict_t *self)
 
 	self->movetype = MOVETYPE_STEP;
 	self->solid = SOLID_BBOX;
-	self->s.modelindex = gi.modelindex("models/monsters/mutant/tris.md2");
+
+	if (game.gametype == rogue_coop) /* FS: Coop: New animations, be sure download gets them. */
+	{
+		self->s.modelindex = gi.modelindex("models/monsters/mutant2/tris.md2");
+	}
+	else
+	{
+		self->s.modelindex = gi.modelindex("models/monsters/mutant/tris.md2");
+	}
+
 	VectorSet(self->mins, -32, -32, -24);
 	VectorSet(self->maxs, 32, 32, 48);
 

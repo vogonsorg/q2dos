@@ -128,8 +128,6 @@ char *GetProperMonsterName (char *monsterName) /* FS: Coop: Get proper name for 
 		return "Flyer";
 	else if(!strcmp("monster_infantry", monsterName))
 		return "Enforcer";
-	else if(!strcmp("monster_handler", monsterName))
-		return "Enforcer";
 	else if(!strcmp("monster_parasite", monsterName))
 		return "Parasite";
 	else if(!strcmp("monster_gunner", monsterName))
