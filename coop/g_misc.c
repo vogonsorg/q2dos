@@ -783,7 +783,16 @@ SP_viewthing(edict_t *ent)
 	ent->s.renderfx = RF_FRAMELERP;
 	VectorSet(ent->mins, -16, -16, -24);
 	VectorSet(ent->maxs, 16, 16, 32);
-	ent->s.modelindex = gi.modelindex("models/objects/banner/tris.md2");
+
+	if(game.gametype == rogue_coop) /* FS: Coop: New skins.  Make sure we download them. */
+	{
+		ent->s.modelindex = gi.modelindex("models/objects/banner2/tris.md2");
+	}
+	else
+	{
+		ent->s.modelindex = gi.modelindex("models/objects/banner/tris.md2");
+	}
+
 	gi.linkentity(ent);
 	ent->nextthink = level.time + 0.5;
 	ent->think = TH_viewthing;
@@ -1943,7 +1952,16 @@ SP_misc_banner(edict_t *ent)
 
 	ent->movetype = MOVETYPE_NONE;
 	ent->solid = SOLID_NOT;
-	ent->s.modelindex = gi.modelindex("models/objects/banner/tris.md2");
+
+	if(game.gametype == rogue_coop) /* FS: Coop: New skins.  Make sure we download them. */
+	{
+		ent->s.modelindex = gi.modelindex("models/objects/banner2/tris.md2");
+	}
+	else
+	{
+		ent->s.modelindex = gi.modelindex("models/objects/banner/tris.md2");
+	}
+
 	ent->s.frame = rand() % 16;
 	gi.linkentity(ent);
 
@@ -3041,7 +3059,15 @@ SP_misc_teleporter(edict_t *ent)
 		return;
 	}
 
-	gi.setmodel(ent, "models/objects/dmspot/tris.md2");
+	if(game.gametype == rogue_coop) /* FS: Coop: New skins.  Make sure we download them. */
+	{
+		gi.setmodel(ent, "models/objects/dmspot2/tris.md2");
+	}
+	else
+	{
+		gi.setmodel(ent, "models/objects/dmspot/tris.md2");
+	}
+
 	ent->s.skinnum = 1;
 	ent->s.effects = EF_TELEPORTER;
 	ent->s.sound = gi.soundindex("world/amb10.wav");
@@ -3075,7 +3101,15 @@ SP_misc_teleporter_dest(edict_t *ent)
 		return;
 	}
 
-	gi.setmodel(ent, "models/objects/dmspot/tris.md2");
+	if(game.gametype == rogue_coop) /* FS: Coop: New skins.  Make sure we download them. */
+	{
+		gi.setmodel(ent, "models/objects/dmspot2/tris.md2");
+	}
+	else
+	{
+		gi.setmodel(ent, "models/objects/dmspot/tris.md2");
+	}
+
 	ent->s.skinnum = 0;
 	ent->solid = SOLID_BBOX;
 	VectorSet(ent->mins, -32, -32, -24);
