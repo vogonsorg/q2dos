@@ -1043,6 +1043,8 @@ InitClientCoopPersistant(edict_t *ent) /* FS: Coop: Give back some goodies on re
 			G_FreeEdict(it_ent);
 		}
 	}
+
+	ent->flags &= ~FL_GODMODE; /* FS: Coop: Remove any carried over god mode flags from map transitions. */
 }
 
 void
