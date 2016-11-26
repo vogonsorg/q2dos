@@ -90,6 +90,7 @@ void G_ResetTimer_Hack (void); /* FS: Some of the grossest shit of all time.  Re
 //#define FRAMENUM_TIMER_TEST
 #ifdef FRAMENUM_TIMER_TEST /* FS: Force framenum overflow and reset testing */
 #ifdef _DEBUG
+cvar_t *sv_force_framenum_hack;
 static qboolean firstStart = true;
 #endif // _DEBUG
 #endif // FRAMENUM_TIMER_TEST
@@ -140,6 +141,13 @@ game_export_t *GetGameAPI (game_import_t *import)
 	globals.ServerCommand = ServerCommand;
 
 	globals.edict_size = sizeof(edict_t);
+
+#ifdef FRAMENUM_TIMER_TEST /* FS: Force framenum overflow and reset testing */
+#ifdef _DEBUG
+	sv_force_framenum_hack = gi.cvar("sv_force_framenum_hack", "0", 0);
+	sv_force_framenum_hack->modified = false;
+#endif // _DEBUG
+#endif // FRAMENUM_TIMER_TEST
 
 	return &globals;
 }
@@ -447,6 +455,13 @@ G_RunFrame(void)
 		firstStart = false;
 //		gi.cprintf(NULL, PRINT_CHAT, "framenum: %i\n", level.framenum);
 	}
+
+	if(sv_force_framenum_hack->modified)
+	{
+		level.framenum = 10790*10*8;
+		gi.cvar_forceset("sv_force_framenum_hack", "0");
+		sv_force_framenum_hack->modified = false;
+	}
 #endif // _DEBUG
 #endif // FRAMENUM_TIMER_TEST
 
@@ -537,6 +552,11 @@ void G_ResetTimer_Hack (void) /* FS: Some of the grossest shit of all time.  Res
 
 			if (!ent->inuse)
 			{
+				if(ent->freetime)
+				{
+					gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set freetime for freed entity: %f\n", ent->freetime);
+					ent->freetime = level.time;
+				}
 				continue;
 			}
 
