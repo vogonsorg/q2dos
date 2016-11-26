@@ -2224,18 +2224,18 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 
 	if ((maxclients->intValue > 1) && (strlen(s)))
 	{
-		if(adminpass->string[0] && !Q_stricmp(s, adminpass->string) && !ent->client->isAdmin)
+		if(adminpass->string[0] && !Q_stricmp(s, adminpass->string) && !ent->client->pers.isAdmin)
 		{
-			ent->client->isAdmin = true;
+			ent->client->pers.isAdmin = ent->client->resp.isAdmin = true;
 		}
 		else
 		{
-			ent->client->isAdmin = false;
+			ent->client->pers.isAdmin = ent->client->resp.isAdmin = false;
 		}
 	}
 	else
 	{
-		ent->client->isAdmin = false;
+		ent->client->pers.isAdmin = ent->client->resp.isAdmin = false;
 	}
 
 	/* save off the userinfo in case we want to check something later */
@@ -2364,12 +2364,12 @@ ClientDisconnect(edict_t *ent)
 		Spawn_CoopBackpack(ent);
 	}
 
-	if(ent->client->voteInitiator == true) /* FS: Coop: Voting stuff */
+	if(ent->voteInitiator == true) /* FS: Coop: Voting stuff */
 	{
 		vote_stop(ent);
 	}
 
-	if(ent->client->hasVoted) /* FS: Coop: Voting stuff */
+	if(ent->hasVoted) /* FS: Coop: Voting stuff */
 	{
 		vote_disconnect_recalc(ent);
 	}

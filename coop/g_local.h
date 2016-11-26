@@ -1212,6 +1212,7 @@ typedef struct
 	int			ammoUpgrade; /* FS: Coop: For respawn */
 
 	qboolean	spectator;			// client is a spectator
+	qboolean	isAdmin; /* FS: Coop: Admin goodies */
 
 //=========
 //ROGUE
@@ -1233,6 +1234,7 @@ typedef struct
 	vec3_t		cmd_angles;			// angles sent over in the last command
 
 	qboolean	spectator;			// client is a spectator
+	qboolean	isAdmin; /* FS: Coop: Admin goodies */
 } client_respawn_t;
 
 // this structure is cleared on each PutClientInServer(),
@@ -1336,12 +1338,9 @@ struct gclient_s
 	edict_t		*owned_sphere;		// this points to the player's sphere
 //ROGUE
 //=======
-	qboolean	voteInitiator; /* FS: Coop: Voting */
-	vote_t		hasVoted; /* FS: Coop: Voting */
 
 	qboolean	spawn_protection; /* FS: Coop: Spawn protection */
 	qboolean	spawn_protection_msg; /* FS: Coop: Spawn protection */
-	qboolean	isAdmin; /* FS: Coop: Admin goodies */
 };
 
 
@@ -1510,10 +1509,14 @@ struct edict_s
 	int			hint_chain_id;
 //ROGUE
 //=========
+
 	int			coopBackpackInventory[MAX_ITEMS]; /* FS: Coop: Spawn a backpack with our stuff */
 	char		*coopBackpackNetname; /* FS: Coop: Spawn a backpack with our stuff */
 	int			coopBackpackMaxHealth; /* FS: Coop: Backpack max health */
 	int			coopBackpackAmmoUpgrade; /* FS: Coop: Backpack bandolier and ammo packs */
+
+	qboolean	voteInitiator; /* FS: Coop: Voting */
+	vote_t		hasVoted; /* FS: Coop: Voting */
 };
 
 //=============

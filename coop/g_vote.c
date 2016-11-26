@@ -290,7 +290,7 @@ void vote_map (edict_t *ent, const char *mapName)
 	Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "%s", voteMap);
 	Com_sprintf(voteType, 16, "map");
 
-	ent->client->voteInitiator = true;
+	ent->voteInitiator = true;
 
 	if(sv_vote_assume_yes->intValue)
 	{
@@ -367,7 +367,7 @@ void vote_gamemode(edict_t *ent, const char *gamemode)
 	if(sv_vote_assume_yes->intValue)
 		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
 
-	ent->client->voteInitiator = true;
+	ent->voteInitiator = true;
 }
 
 void vote_coopskill(edict_t *ent, int skill)
@@ -428,7 +428,7 @@ void vote_coopskill(edict_t *ent, int skill)
 		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
 	}
 
-	ent->client->voteInitiator = true;
+	ent->voteInitiator = true;
 }
 
 void vote_random (edict_t *ent)
@@ -464,7 +464,7 @@ void vote_restartmap (edict_t *ent)
 	Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "%s", voteMap);
 	Com_sprintf(voteType, 16, "restartmap");
 
-	ent->client->voteInitiator = true;
+	ent->voteInitiator = true;
 
 	if(sv_vote_assume_yes->intValue)
 	{
@@ -486,7 +486,7 @@ void vote_stop(edict_t *ent)
 		return;
 	}
 
-	if(ent->client->voteInitiator == true)
+	if(ent->voteInitiator == true)
 	{
 		vote_Broadcast("Voting cancelled by %s!\n", ent->client->pers.netname);
 		vote_Reset();
@@ -514,7 +514,7 @@ void vote_yes(edict_t *ent, qboolean bAssume)
 		return;
 	}
 
-	if(ent->client->hasVoted)
+	if(ent->hasVoted)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "You have already voted!\n");
 		return;
@@ -522,7 +522,7 @@ void vote_yes(edict_t *ent, qboolean bAssume)
 	else
 	{
 		/* FS: count a vote... */
-		ent->client->hasVoted = VOTE_YES;
+		ent->hasVoted = VOTE_YES;
 		voteYes++;
 		if(sv_vote_private->intValue && !bAssume)
 			gi.cprintf(ent, PRINT_HIGH, "Your vote 'yes' for %s has been counted\n", whatAreWeVotingFor);
@@ -548,7 +548,7 @@ void vote_no(edict_t *ent)
 		return;
 	}
 
-	if(ent->client->hasVoted)
+	if(ent->hasVoted)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "You have already voted!\n");
 		return;
@@ -556,7 +556,7 @@ void vote_no(edict_t *ent)
 	else
 	{
 		/* FS: count a vote... */
-		ent->client->hasVoted = VOTE_NO;
+		ent->hasVoted = VOTE_NO;
 		voteNo++;
 
 		if(sv_vote_private->intValue)
@@ -586,13 +586,13 @@ void vote_disconnect_recalc(edict_t *ent)
 		return;
 	}
 
-	if (ent->client->hasVoted)
+	if (ent->hasVoted)
 	{
-		if ((ent->client->hasVoted == VOTE_YES) && (voteYes))
+		if ((ent->hasVoted == VOTE_YES) && (voteYes))
 		{
 			voteYes--;
 		}
-		else if ((ent->client->hasVoted == VOTE_NO) && (voteNo))
+		else if ((ent->hasVoted == VOTE_NO) && (voteNo))
 		{
 			voteNo--;
 		}
@@ -627,8 +627,8 @@ void vote_Reset(void)
 
 		if( pClient->client )
 		{
-			pClient->client->hasVoted = NOT_VOTED;
-			pClient->client->voteInitiator = false;
+			pClient->hasVoted = NOT_VOTED;
+			pClient->voteInitiator = false;
 		}
 	}
 
@@ -831,7 +831,7 @@ void vote_connect (edict_t *ent)
 		return;
 	}
 
-	if(bVoteInProgress)
+	if(bVoteInProgress && !ent->hasVoted)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "A vote is in progress for %s: %s. Use vote yes or vote no to submit your vote!\n", voteType, whatAreWeVotingFor);
 	}
@@ -908,12 +908,12 @@ void vote_DefaultNoVotes (void)
 				continue;
 			}
 
-			if(pClient->client->hasVoted)
+			if(pClient->hasVoted)
 			{
 				continue;
 			}
 
-			pClient->client->hasVoted = VOTE_NO;
+			pClient->hasVoted = VOTE_NO;
 			voteNo++;
 		}
 	}
