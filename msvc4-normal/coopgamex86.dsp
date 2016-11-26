@@ -196,6 +196,10 @@ SOURCE=..\coop\g_utils.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\coop\g_vote.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\coop\g_weapon.c
 # End Source File
 # Begin Source File
