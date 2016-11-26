@@ -1674,7 +1674,7 @@ extern char * GetProperMonsterName ( char * monsterName ) ;
 extern qboolean CanDamage ( edict_t * targ , edict_t * inflictor ) ;
 extern void cleanupHealTarget ( edict_t * ent ) ;
 extern void ClientCommand ( edict_t * ent ) ;
-extern void Cmd_Coop_Gamemode ( edict_t * ent , gametype_t gametype ) ;
+extern void Cmd_Coop_Gamemode ( edict_t * ent ) ;
 extern void Cmd_PlayerList_f ( edict_t * ent ) ;
 extern void Cmd_Ent_Count_f ( edict_t * ent ) ;
 extern void Cmd_Say_f ( edict_t * ent , qboolean team , qboolean arg0 ) ;

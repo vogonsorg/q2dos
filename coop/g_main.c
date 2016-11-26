@@ -26,6 +26,7 @@ cvar_t *sv_coop_reset_hack; /* FS: Coop: Long uptime reset hack :( */
 cvar_t *sv_spawn_protection; /* FS: Coop: Spawn protection */
 cvar_t *sv_spawn_protection_time; /* FS: Coop: Spawn protection */
 cvar_t *motd; /* FS: Coop: Added */
+cvar_t *adminpass; /* FS: Coop: Admin goodies */
 cvar_t *dmflags;
 cvar_t *skill;
 cvar_t *fraglimit;

@@ -652,6 +652,7 @@ extern	cvar_t	*sv_coop_reset_hack; /* FS: Coop: Gross reset frametime hack shit 
 extern	cvar_t	*sv_spawn_protection; /* FS: Coop: Spawn protection */
 extern	cvar_t	*sv_spawn_protection_time; /* FS: Coop: Spawn protection */
 extern	cvar_t	*motd; /* FS: Coop: Added */
+extern	cvar_t	*adminpass; /* FS: Coop: Admin goodies */
 extern	cvar_t	*dmflags;
 extern	cvar_t	*skill;
 extern	cvar_t	*fraglimit;
@@ -1340,6 +1341,7 @@ struct gclient_s
 
 	qboolean	spawn_protection; /* FS: Coop: Spawn protection */
 	qboolean	spawn_protection_msg; /* FS: Coop: Spawn protection */
+	qboolean	isAdmin; /* FS: Coop: Admin goodies */
 };
 
 

@@ -2219,6 +2219,25 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 		ent->client->pers.hand = atoi(s);
 	}
 
+	/* FS: Coop: Admin goodies */
+	s = Info_ValueForKey(userinfo, "adminpass");
+
+	if ((maxclients->intValue > 1) && (strlen(s)))
+	{
+		if(adminpass->string[0] && !Q_stricmp(s, adminpass->string) && !ent->client->isAdmin)
+		{
+			ent->client->isAdmin = true;
+		}
+		else
+		{
+			ent->client->isAdmin = false;
+		}
+	}
+	else
+	{
+		ent->client->isAdmin = false;
+	}
+
 	/* save off the userinfo in case we want to check something later */
 	strncpy(ent->client->pers.userinfo, userinfo, sizeof(ent->client->pers.userinfo) - 1);
 }

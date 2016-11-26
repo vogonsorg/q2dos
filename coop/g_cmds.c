@@ -408,7 +408,10 @@ Cmd_Give_f(edict_t *ent)
 
 			if ((game.gametype == rogue_coop) && (it->flags & IT_NOT_GIVEABLE)) /* FS: Coop: Rogue specific */
 			{
-				continue;
+				if(!ent->client->isAdmin) /* FS: Coop: Admin goodies */
+				{
+					continue;
+				}
 			}
 
 			if (it->flags & (IT_ARMOR | IT_WEAPON | IT_AMMO))
@@ -472,9 +475,9 @@ Cmd_Give_f(edict_t *ent)
 
 	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (it->flags & IT_NOT_GIVEABLE)
+		if ((it->flags & IT_NOT_GIVEABLE) && !ent->client->isAdmin) /* FS: Coop: Admin goodies */
 		{
-			gi.dprintf(DEVELOPER_MSG_GAME, "item cannot be given\n");
+			gi.cprintf(ent, PRINT_HIGH, "item cannot be given\n"); /* FS: Was Dprintf */
 			return;
 		}
 	}
@@ -1628,38 +1631,79 @@ Cmd_PlayerList_f(edict_t *ent)
 }
 
 void
-Cmd_Coop_Gamemode(edict_t *ent, gametype_t gametype) /* FS: TODO: Make this a server only command */
+Cmd_Coop_Gamemode(edict_t *ent) /* FS: TODO: Make this a server only command */
 {
 	char command[1024];
+	char *cmd;
+	int argc = 0;
 
-	if (!ent)
+	if (!ent || !ent->client || !ent->client->isAdmin)
 	{
 		return;
 	}
 
-	switch(gametype)
+	argc = gi.argc();
+	cmd = gi.argv(1);
+	if (argc != 2 || !cmd)
 	{
-		case vanilla_coop:
-			gi.bprintf(PRINT_HIGH, "Changing gamemode to iD coop!\n");
-			gi.cvar_forceset("sv_coop_gamemode", "vanilla");
-			Com_sprintf(command, sizeof(command), "map base1\n");
-			gi.AddCommandString(command);
-			return;
-		case rogue_coop:
-			gi.bprintf(PRINT_HIGH, "Changing gamemode to Rogue coop!\n");
-			gi.cvar_forceset("sv_coop_gamemode", "rogue");
-			Com_sprintf(command, sizeof(command), "map rmine1\n");
-			gi.AddCommandString(command);
-			return;
-		case xatrix_coop:
-			gi.bprintf(PRINT_HIGH, "Changing gamemode to Xatrix coop!\n");
-			gi.cvar_forceset("sv_coop_gamemode", "xatrix");
-			Com_sprintf(command, sizeof(command), "map xswamp\n");
-			gi.AddCommandString(command);
-			return;
-		default:
-			break;
+		gi.cprintf(ent, PRINT_CHAT, "Valid gamemodes: vanilla, rogue, xatrix\n");
+		return;
 	}
+
+	if(!Q_stricmp(cmd, "vanilla"))
+	{
+		gi.bprintf(PRINT_HIGH, "Changing gamemode to iD coop!\n");
+		gi.cvar_forceset("sv_coop_gamemode", "vanilla");
+		Com_sprintf(command, sizeof(command), "map base1\n");
+		gi.AddCommandString(command);
+	}
+	else if(!Q_stricmp(cmd, "rogue"))
+	{
+		gi.bprintf(PRINT_HIGH, "Changing gamemode to Rogue coop!\n");
+		gi.cvar_forceset("sv_coop_gamemode", "rogue");
+		Com_sprintf(command, sizeof(command), "map rmine1\n");
+		gi.AddCommandString(command);
+	}
+	else if(!Q_stricmp(cmd, "xatrix"))
+	{
+		gi.bprintf(PRINT_HIGH, "Changing gamemode to Xatrix coop!\n");
+		gi.cvar_forceset("sv_coop_gamemode", "xatrix");
+		Com_sprintf(command, sizeof(command), "map xswamp\n");
+		gi.AddCommandString(command);
+	}
+	else
+	{
+		gi.cprintf(ent, PRINT_CHAT, "Unknown gamemode: %s\n", cmd);
+	}
+}
+
+void
+Cmd_EdictCount_f (edict_t *ent) /* FS: Coop: Added for debugging */
+{
+	int i = 0, edictCount = 0, freeCount = 0;
+	edict_t *e;
+
+	if (!ent || !ent->client || !ent->client->isAdmin)
+	{
+		return;
+	}
+
+	e = &g_edicts[1]; /* FS: Skip worldspawn, but count maxclients */
+
+	for (i = 1; i < globals.num_edicts; i++, e++)
+	{
+		if (e->inuse)
+		{
+			edictCount++;
+		}
+		else
+		{
+			gi.cprintf(ent, PRINT_HIGH, "Freed edict time: %f.  Level.time: %f\n", e->freetime, level.time);
+			freeCount++;
+		}
+	}
+
+	gi.cprintf(ent, PRINT_HIGH, "Edicts in use: %i.  Edicts freed: %i.  Total edicts: %i.  Max edicts: %i\n", edictCount, freeCount, globals.num_edicts, globals.max_edicts);
 }
 
 void
@@ -1819,6 +1863,14 @@ ClientCommand(edict_t *ent)
 	else if (Q_stricmp(cmd, "playerlist") == 0)
 	{
 		Cmd_PlayerList_f(ent);
+	}
+	else if (Q_stricmp(cmd, "edictcount") == 0) /* FS: Coop: Added for debugging */
+	{
+		Cmd_EdictCount_f(ent);
+	}
+	else if (Q_stricmp(cmd, "gamemode") == 0) /* FS: Coop */
+	{
+		Cmd_Coop_Gamemode(ent);
 	}
 	else /* anything that doesn't match a command will be a chat */
 	{
