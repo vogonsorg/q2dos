@@ -7,6 +7,8 @@ void ClientUserinfoChanged(edict_t *ent, char *userinfo);
 void SP_misc_teleporter_dest(edict_t *ent);
 void Touch_Item(edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf);
 
+extern char *GetCoopInsult (void); /* FS: Coop: Pick a random insult */
+extern char *GetProperMonsterName (char *monsterName); /* FS: Coop: Get proper name for classname */
 void
 SP_FixCoopSpots(edict_t *self)
 {
@@ -596,7 +598,14 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker
 		}
 	}
 
-	gi.bprintf(PRINT_MEDIUM, "%s died.\n", self->client->pers.netname);
+	if ((coop->intValue) && (attacker->svflags & SVF_MONSTER) && (attacker->classname)) /* FS: Coop: Get a more meaningful death message if we got killed by a monster */
+	{
+		gi.bprintf(PRINT_MEDIUM, "%s %s %s\n", self->client->pers.netname, GetCoopInsult(), GetProperMonsterName(attacker->classname));
+	}
+	else
+	{
+		gi.bprintf(PRINT_MEDIUM, "%s died.\n", self->client->pers.netname);
+	}
 
 	if (deathmatch->value)
 	{

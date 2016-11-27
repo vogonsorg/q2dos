@@ -1844,6 +1844,31 @@ void Cmd_SaveCheckpoint_f (edict_t *ent) /* FS: Added */
 	}
 }
 
+void Cmd_DeleteCheckpoints_f (edict_t *ent) /* FS: Added */
+{
+	char fileName[MAX_OSPATH];
+	FILE *f = NULL;
+
+	if (!ent || !ent->client || !ent->client->pers.isAdmin || !coop->intValue)
+	{
+		return;
+	}
+
+	Com_sprintf(fileName, sizeof(fileName), "%s/maps/%s_checkpoints.txt", gamedir->string, level.mapname);
+
+	f = fopen(fileName, "w");
+	if(!f)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Error: Can't open %s for writing!\n", fileName);
+		return;
+	}
+
+	fclose(f);
+
+	gi.cprintf(ent, PRINT_HIGH, "Deleting checkpoint file: %s.\n", fileName);
+	remove(fileName);
+}
+
 void
 ClientCommand(edict_t *ent)
 {
@@ -2021,6 +2046,10 @@ ClientCommand(edict_t *ent)
 	else if (Q_stricmp(cmd, "savecheckpoints") == 0) /* FS: Coop: Added checkpoints */
 	{
 		Cmd_SaveCheckpoint_f(ent);
+	}
+	else if (Q_stricmp(cmd, "deletecheckpoints") == 0) /* FS: Coop: Added checkpoints */
+	{
+		Cmd_DeleteCheckpoints_f(ent);
 	}
 	else /* anything that doesn't match a command will be a chat */
 	{
