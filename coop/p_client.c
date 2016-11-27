@@ -126,14 +126,14 @@ SP_info_player_coop_lava(edict_t *self) /* FS: Coop: Rogue specific */
 void
 SP_info_coop_checkpoint_touch ( edict_t * self , edict_t * other , cplane_t * plane , csurface_t * surf )
 {
-	if(!self || !other || !other->client || !other->client->pers.netname)
+	if(!self || self->dmg || !other || !other->client || !other->client->pers.netname)
 	{
 		return;
 	}
 
 	gi.bprintf(PRINT_HIGH, "\x02[MAPMSG][%s]: ", other->client->pers.netname);
 	gi.bprintf(PRINT_HIGH, "You passed a checkpoint!\n");
-	self->touch = NULL;
+	self->dmg = 1; /* FS: Hint that we touched this before */
 	level.current_coop_checkpoint = self;
 }
 
@@ -147,6 +147,7 @@ SP_info_coop_checkpoint (edict_t * self )
 
 	self->model = "models/items/tagtoken/tris.md2";
 
+	self->dmg = 0;
 	self->s.origin[2] -= 15; /* FS: Don't be eye level or it looks funny */
 
 	gi.linkentity(self);

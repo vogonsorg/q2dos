@@ -201,6 +201,7 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 	if(!fileBuffer)
 	{
 		gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: can't allocate memory for fileBuffer!\n");
+		fclose(f);
 		return false;
 	}
 	toEOF = fread(fileBuffer, sizeof(char), fileSize, f);

@@ -1159,6 +1159,11 @@ ReadLevel(const char *filename)
 		/* fire any cross-level triggers */
 		if (ent->classname)
 		{
+			if(coop->intValue && !Q_stricmp(ent->classname, "info_coop_checkpoint")) /* FS: Coop: Reset checkpoints so we can touch them again */
+			{
+				ent->dmg = 0;
+			}
+
 			if (strcmp(ent->classname, "target_crosslevel_target") == 0)
 			{
 				ent->nextthink = level.time + ent->delay;

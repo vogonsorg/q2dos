@@ -1220,6 +1220,7 @@ extern edict_t * CreateFlyMonster ( vec3_t origin , vec3_t angles , vec3_t mins 
 extern edict_t * CreateMonster ( vec3_t origin , vec3_t angles , char * classname ) ;
 extern void SP_worldspawn ( edict_t * ent ) ;
 extern void SpawnEntities ( const char * mapname , char * entities , const char * spawnpoint ) ;
+extern int G_SpawnCheckpoints ( edict_t *ent );
 extern void G_FindTeams ( void ) ;
 extern void G_FixTeams ( void ) ;
 extern char * ED_ParseEdict ( char * data , edict_t * ent ) ;

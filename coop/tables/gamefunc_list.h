@@ -1212,6 +1212,7 @@
 {"CreateMonster", (byte *)CreateMonster},
 {"SP_worldspawn", (byte *)SP_worldspawn},
 {"SpawnEntities", (byte *)SpawnEntities},
+{"G_SpawnCheckpoints", (byte *)G_SpawnCheckpoints},
 {"G_FindTeams", (byte *)G_FindTeams},
 {"G_FixTeams", (byte *)G_FixTeams},
 {"ED_ParseEdict", (byte *)ED_ParseEdict},

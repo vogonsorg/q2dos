@@ -191,6 +191,8 @@ void SP_SetCDTrack(int track); /* FS: Coop: Added */
 void SP_info_coop_checkpoint (edict_t * self ); /* FS: Coop: Added */
 
 qboolean Spawn_CheckCoop_MapHacks (edict_t *ent); /* FS: Coop: Check if we have to modify some stuff for coop so we don't have to rely on distributing ent files. */
+int G_SpawnCheckpoints (edict_t *ent); /* FS: Coop: Add checkpoints if we got them */
+extern void SP_info_coop_checkpoint_touch ( edict_t * self , edict_t * other , cplane_t * plane , csurface_t * surf );
 
 spawn_t spawns[] = {
 	{"item_health", SP_item_health},
@@ -967,6 +969,11 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 		ED_CallSpawn(ent);
 
 		ent->s.renderfx |= RF_IR_VISIBLE; /* FS: Coop: Rogue specific.  Probably OK as-is. */
+	}
+
+	if (coop->intValue) /* FS: Coop: Find checkpoints to spawn if we got them */
+	{
+		inhibit += G_SpawnCheckpoints(ent);
 	}
 
 	gi.dprintf(DEVELOPER_MSG_GAME, "%i entities inhibited.\n", inhibit);
@@ -1952,4 +1959,109 @@ qboolean Spawn_CheckCoop_MapHacks (edict_t *ent) /* FS: Coop: Check if we have t
 	}
 
 	return false;
+}
+
+int G_SpawnCheckpoints (edict_t *ent)
+{
+	char fileName[MAX_OSPATH];
+	FILE *f = NULL;
+	long fileSize;
+	char *fileBuffer = NULL;
+	size_t toEOF = 0;
+
+	int inhibit = 0, found = 0;
+	const char *com_token;
+
+	Com_sprintf(fileName, sizeof(fileName), "coop/maps/%s_checkpoints.txt", level.mapname);
+	f = fopen(fileName, "r");
+	if(!f)
+	{
+//		gi.cprintf(NULL, PRINT_CHAT, "G_SpawnCheckpoints: couldn't find '%s'!\n", fileName);
+		return 0;
+	}
+
+	/* obtain file size */
+	fseek (f, 0, SEEK_END);
+	fileSize = ftell (f);
+	fseek (f, 0, SEEK_SET);
+	fileBuffer = (char *)malloc(sizeof(char)*(fileSize+2)); // FS: In case we have to add a newline terminator
+	if(!fileBuffer)
+	{
+		gi.cprintf(NULL, PRINT_CHAT, "G_SpawnCheckpoints: can't allocate memory for fileBuffer!\n");
+		fclose(f);
+		return 0;
+	}
+
+	toEOF = fread(fileBuffer, sizeof(char), fileSize, f);
+	fclose(f);
+	if(toEOF <= 0)
+	{
+		gi.cprintf(NULL, PRINT_CHAT, "G_SpawnCheckpoints: cannot read file '%s' into memory!\n", fileName);
+		return false;
+	}
+
+	/* FS: Add newline terminator for some paranoia */
+	fileBuffer[toEOF] = '\n';
+	fileBuffer[toEOF+1] = '\0';
+
+	/* parse ents */
+	while (1)
+	{
+		/* parse the opening brace */
+		com_token = COM_Parse(&fileBuffer);
+
+		if (!fileBuffer)
+		{
+			break;
+		}
+
+		if (com_token[0] != '{')
+		{
+			gi.error("ED_LoadFromFile: found %s when expecting {", com_token);
+		}
+
+		if (!ent)
+		{
+			ent = g_edicts;
+		}
+		else
+		{
+			ent = G_Spawn();
+		}
+
+		fileBuffer = ED_ParseEdict(fileBuffer, ent);
+
+		if (ent != g_edicts)
+		{
+			if(Q_stricmp(ent->classname,"info_coop_checkpoint")) /* FS: No funky stuff in these special overrides please, use ent files for that. */
+			{
+				gi.cprintf(NULL, PRINT_CHAT, "WARNING: Not an info_coop_checkpoint: %s.  Removing...\n", ent->classname);
+				G_FreeEdict(ent);
+				inhibit++;
+				continue;
+			}
+
+			ent->spawnflags &= ~(SPAWNFLAG_NOT_EASY | SPAWNFLAG_NOT_MEDIUM |
+				  SPAWNFLAG_NOT_HARD | SPAWNFLAG_NOT_COOP | SPAWNFLAG_NOT_DEATHMATCH);
+		}
+
+		if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+		{
+			ent->gravityVector[0] = 0.0;
+			ent->gravityVector[1] = 0.0;
+			ent->gravityVector[2] = -1.0;
+		}
+
+		ED_CallSpawn(ent);
+
+		ent->s.renderfx |= RF_IR_VISIBLE; /* FS: Coop: Rogue specific.  Probably OK as-is. */
+		inhibit++;
+		found++;
+	}
+
+	if(found)
+	{
+		gi.cprintf(NULL, PRINT_CHAT, "Found %i checkpoints to add\n", found);
+	}
+	return inhibit;
 }
