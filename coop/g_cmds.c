@@ -937,12 +937,24 @@ Cmd_Help_f(edict_t *ent)
 		return;
 	}
 
+	if(coop->intValue && ent->client->showscores) /* FS: Coop: Remove scoreboard on next tab and exit */
+	{
+		ent->client->showinventory = false;
+		ent->client->showscores = false;
+		ent->client->showhelp = false;
+		return;
+	}
+
 	ent->client->showinventory = false;
 	ent->client->showscores = false;
 
 	if (ent->client->showhelp)
 	{
 		ent->client->showhelp = false;
+		if (coop->intValue) /* FS: Coop: Show scoreboard on next tab */
+		{
+			Cmd_Score_f(ent);
+		}
 		return;
 	}
 
