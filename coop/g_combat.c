@@ -203,7 +203,7 @@ char *GetCoopInsult (void) /* FS: Coop: Pick a random insult */
 	int x;
 
 	srand ((unsigned)time (NULL));
-	x = rand() % 7;
+	x = rand() % 10;
 	switch(x)
 	{
 		case 0:
@@ -220,6 +220,12 @@ char *GetCoopInsult (void) /* FS: Coop: Pick a random insult */
 			return "was ripped apart by";
 		case 6:
 			return "bowed down to";
+		case 7:
+			return "was taken to the pearly gates by";
+		case 8:
+			return "was given a dirtnap by";
+		case 9:
+			return "saw the light thanks to";
 	}
 	return "was killed by";
 }
