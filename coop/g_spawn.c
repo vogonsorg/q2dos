@@ -188,6 +188,8 @@ void SP_misc_transport (edict_t *ent); /* FS: Coop: Xatrix specific */
 void SP_misc_nuke (edict_t *ent); /* FS: Coop: Xatrix specific */
 
 void SP_SetCDTrack(int track); /* FS: Coop: Added */
+void SP_info_coop_checkpoint (edict_t * self ); /* FS: Coop: Added */
+
 qboolean Spawn_CheckCoop_MapHacks (edict_t *ent); /* FS: Coop: Check if we have to modify some stuff for coop so we don't have to rely on distributing ent files. */
 
 spawn_t spawns[] = {
@@ -367,6 +369,7 @@ spawn_t spawns[] = {
 	{"weapon_boomer", SP_xatrix_item}, /* FS: Coop: Rogue specific */
 	{"weapon_phalanx", SP_xatrix_item}, /* FS: Coop: Rogue specific */
 
+	{"info_coop_checkpoint", SP_info_coop_checkpoint}, /* FS: Coop: Added */
 	{NULL, NULL}
 };
 

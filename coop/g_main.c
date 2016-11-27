@@ -415,6 +415,7 @@ ExitLevel(void)
 	level.changemap = NULL;
 	level.exitintermission = 0;
 	level.intermissiontime = 0;
+	level.current_coop_checkpoint = NULL;
 
 	vote_Reset(); /* FS: Coop: Voting */
 	ClientEndServerFrames();

@@ -123,6 +123,36 @@ SP_info_player_coop_lava(edict_t *self) /* FS: Coop: Rogue specific */
 	}
 }
 
+void
+SP_info_coop_checkpoint_touch ( edict_t * self , edict_t * other , cplane_t * plane , csurface_t * surf )
+{
+	if(!self || !other || !other->client || !other->client->pers.netname)
+	{
+		return;
+	}
+
+	gi.bprintf(PRINT_HIGH, "\x02[MAPMSG][%s]: ", other->client->pers.netname);
+	gi.bprintf(PRINT_HIGH, "You passed a checkpoint!\n");
+	self->touch = NULL;
+	level.current_coop_checkpoint = self;
+}
+
+void
+SP_info_coop_checkpoint (edict_t * self )
+{
+	self->touch = SP_info_coop_checkpoint_touch;
+	self->solid = SOLID_TRIGGER;
+
+	self->s.modelindex = gi.modelindex("models/items/tagtoken/tris.md2");
+
+	self->model = "models/items/tagtoken/tris.md2";
+
+	self->s.origin[2] -= 15; /* FS: Don't be eye level or it looks funny */
+
+	gi.linkentity(self);
+}
+
+
 /*
  * QUAKED info_player_intermission (1 0 1) (-16 -16 -24) (16 16 32)
  *
@@ -1388,6 +1418,11 @@ SelectCoopSpawnPoint(edict_t *ent)
 	if (!Q_stricmp(level.mapname, "rmine2p") || !Q_stricmp(level.mapname, "rmine2")) /* FS: Coop: Rogue specific */
 	{
 		return SelectLavaCoopSpawnPoint(ent);
+	}
+
+	if(level.current_coop_checkpoint) /* FS: Coop: Added checkpoints */
+	{
+		return level.current_coop_checkpoint;
 	}
 
 	index = ent->client - game.clients;

@@ -395,6 +395,7 @@ typedef struct
 	edict_t		*disguise_violator;
 	int			disguise_violation_framenum;
 	// ROGUE
+	edict_t		*current_coop_checkpoint; /* FS: Coop: Added Info_coop_checkpoint */
 } level_locals_t;
 
 
