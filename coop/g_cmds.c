@@ -1792,6 +1792,7 @@ void Cmd_SaveCheckpoint_f (edict_t *ent) /* FS: Added */
 	char fileName[MAX_OSPATH];
 	edict_t *e;
 	FILE *f = NULL;
+	int count = 0;
 
 	if (!ent || !ent->client || !ent->client->pers.isAdmin || !coop->intValue)
 	{
@@ -1817,10 +1818,21 @@ void Cmd_SaveCheckpoint_f (edict_t *ent) /* FS: Added */
 		{
 			Com_sprintf(checkpointString, sizeof(checkpointString), "{\n\"classname\" \"%s\"\n\"angle\" \"%i\"\n\"origin\" \"%i %i %i\"\n}\n", e->classname, (int)e->s.angles[YAW], (int)e->s.origin[0], (int)e->s.origin[1], (int)e->s.origin[2]+15);
 			fputs(checkpointString, f);
+			count++;
 		}
 	}
 
 	fclose(f);
+
+	if(count)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Saved %i checkpoints\n", count);
+	}
+	else
+	{
+		gi.cprintf(ent, PRINT_HIGH, "No checkpoints to save.  Deleting file.\n");
+		remove(fileName);
+	}
 }
 
 void
