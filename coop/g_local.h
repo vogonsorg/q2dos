@@ -1216,6 +1216,7 @@ typedef struct
 
 	qboolean	spectator;			// client is a spectator
 	qboolean	isAdmin; /* FS: Coop: Admin goodies */
+	qboolean	didMotd; /* FS: Coop: MOTD */
 
 //=========
 //ROGUE
@@ -1238,6 +1239,7 @@ typedef struct
 
 	qboolean	spectator;			// client is a spectator
 	qboolean	isAdmin; /* FS: Coop: Admin goodies */
+	qboolean	didMotd; /* FS: Coop: MOTD */
 } client_respawn_t;
 
 // this structure is cleared on each PutClientInServer(),

@@ -2066,7 +2066,7 @@ void Client_PrintMOTD (edict_t *client) /* FS: MOTD */
 	char string[256];
 	char *ptr = NULL;
 
-	if(!motd || !motd->string[0] || !client)
+	if(!motd || !motd->string[0] || !client || !client->client || client->client->pers.didMotd)
 		return;
 
 	Com_sprintf(string,sizeof(string),motd->string);
@@ -2076,6 +2076,8 @@ void Client_PrintMOTD (edict_t *client) /* FS: MOTD */
 		*ptr = '\n';
 	}
 	gi.centerprintf(client, string);
+
+	client->client->pers.didMotd = client->client->resp.didMotd = true;
 }
 
 /*
