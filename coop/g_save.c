@@ -241,6 +241,7 @@ InitGame(void)
 	adminpass = gi.cvar("adminpass", "", 0);
 	adminpass->description = "Administator password for special commands.  Not related to RCON.";
 	gamedir = gi.cvar("gamedir", "", 0); /* FS: Coop: Added */
+	nextserver = gi.cvar("nextserver", "", 0); /* FS: Coop: Added */
 
 	motd = gi.cvar ("motd", "", 0); /* FS: Coop: Added */
 	skill = gi.cvar ("skill", "1", CVAR_LATCH);

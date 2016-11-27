@@ -193,6 +193,7 @@ void SP_info_coop_checkpoint (edict_t * self ); /* FS: Coop: Added */
 qboolean Spawn_CheckCoop_MapHacks (edict_t *ent); /* FS: Coop: Check if we have to modify some stuff for coop so we don't have to rely on distributing ent files. */
 int G_SpawnCheckpoints (edict_t *ent); /* FS: Coop: Add checkpoints if we got them */
 extern void SP_info_coop_checkpoint_touch ( edict_t * self , edict_t * other , cplane_t * plane , csurface_t * surf );
+void G_CheckCoopVictory (void); /* FS: Coop: Added */
 
 spawn_t spawns[] = {
 	{"item_health", SP_item_health},
@@ -1003,6 +1004,11 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 				DMGame.PostInitSetup();
 			}
 		}
+	}
+
+	if(coop->intValue) /* FS: Coop: Check if victory.pcx is the current map, workaround the "gamemap" crap in sv_init.c */
+	{
+		G_CheckCoopVictory();
 	}
 }
 
@@ -2065,4 +2071,27 @@ int G_SpawnCheckpoints (edict_t *ent)
 		gi.cprintf(NULL, PRINT_CHAT, "Found %i checkpoints to add\n", found);
 	}
 	return inhibit;
+}
+
+void G_CheckCoopVictory (void) /* FS: Coop: Check if victory.pcx is the current map, workaround the "gamemap" crap in sv_init.c */
+{
+	if(!Q_stricmp("victory.pcx", level.mapname))
+	{
+		switch (game.gametype)
+		{
+			default:
+			case vanilla_coop:
+				gi.cvar_forceset("sv_coop_gamemode", "xatrix");
+				gi.cvar_forceset("nextserver", "map \"xswamp\"\n");
+				break;
+			case xatrix_coop:
+				gi.cvar_forceset("sv_coop_gamemode", "rogue");
+				gi.cvar_forceset("nextserver", "map \"rmine1\"\n");
+				break;
+			case rogue_coop:
+				gi.cvar_forceset("sv_coop_gamemode", "vanilla");
+				gi.cvar_forceset("nextserver", "map \"base1\"\n");
+				break;
+		}
+	}
 }

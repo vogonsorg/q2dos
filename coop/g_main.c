@@ -35,6 +35,7 @@ cvar_t *sv_spawn_protection_time; /* FS: Coop: Spawn protection */
 cvar_t *motd; /* FS: Coop: Added */
 cvar_t *adminpass; /* FS: Coop: Admin goodies */
 cvar_t *gamedir; /* FS: Coop: Added */
+cvar_t *nextserver; /* FS: Coop: Added */
 cvar_t *dmflags;
 cvar_t *skill;
 cvar_t *fraglimit;
@@ -545,6 +546,7 @@ G_RunFrame(void)
 
 	/* build the playerstate_t structures for all players */
 	ClientEndServerFrames();
+
 }
 
 void G_ResetTimer_Hack (void) /* FS: Some of the grossest shit of all time.  Reset everything to avoid the integer to float overflow timer bullshit */

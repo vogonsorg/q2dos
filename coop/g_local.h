@@ -655,6 +655,7 @@ extern	cvar_t	*sv_spawn_protection_time; /* FS: Coop: Spawn protection */
 extern	cvar_t	*motd; /* FS: Coop: Added */
 extern	cvar_t	*adminpass; /* FS: Coop: Admin goodies */
 extern	cvar_t	*gamedir; /* FS: Coop: Added */
+extern	cvar_t	*nextserver; /* FS: Coop: Added */
 extern	cvar_t	*dmflags;
 extern	cvar_t	*skill;
 extern	cvar_t	*fraglimit;
