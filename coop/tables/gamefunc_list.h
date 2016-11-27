@@ -1232,6 +1232,7 @@
 {"ReadField", (byte *)ReadField},
 {"WriteField2", (byte *)WriteField2},
 {"WriteField1", (byte *)WriteField1},
+{"G_Verify_MOTD_Length", (byte *)G_Verify_MOTD_Length},
 {"FindMmoveByName", (byte *)FindMmoveByName},
 {"GetMmoveByAddress", (byte *)GetMmoveByAddress},
 {"FindFunctionByName", (byte *)FindFunctionByName},

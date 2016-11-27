@@ -1240,6 +1240,7 @@ extern void WriteClient ( FILE * f , gclient_t * client ) ;
 extern void ReadField ( FILE * f , field_t * field , byte * base ) ;
 extern void WriteField2 ( FILE * f , field_t * field , byte * base ) ;
 extern void WriteField1 ( FILE * f , field_t * field , byte * base ) ;
+extern void G_Verify_MOTD_Length ( void );
 extern mmove_t * FindMmoveByName ( char * name ) ;
 extern mmoveList_t * GetMmoveByAddress ( mmove_t * adr ) ;
 extern byte * FindFunctionByName ( char * name ) ;
