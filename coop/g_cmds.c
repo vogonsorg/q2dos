@@ -1718,6 +1718,45 @@ Cmd_EdictCount_f (edict_t *ent) /* FS: Coop: Added for debugging */
 	gi.cprintf(ent, PRINT_HIGH, "Edicts in use: %i.  Edicts freed: %i.  Total edicts: %i.  Max edicts: %i\n", edictCount, freeCount, globals.num_edicts, globals.max_edicts);
 }
 
+void Cmd_Beam_f (edict_t *ent) /* FS: From YamaqiQ2: Beam us to direct coordinates given, for debugging. */
+{
+	vec3_t dest = {0};
+	int i = 0;
+
+	if (!ent || !ent->client || !ent->client->pers.isAdmin)
+	{
+		return;
+	}
+
+	if ((deathmatch->value || coop->value) && !sv_cheats->value)
+	{
+		gi.cprintf(ent, PRINT_HIGH,
+				"You must run the server with '+set cheats 1' to enable this command.\n");
+		return;
+	}
+
+	if(gi.argc() < 4)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Usage: beam X-Coord Y-Coord Z-Coord\n");
+		return;
+	}
+
+	for(i=0; i<3; ++i)
+	{
+		dest[i] = atof(gi.argv(i+1));
+	}
+
+	VectorCopy(dest, ent->s.origin);
+	VectorCopy(dest, ent->s.old_origin);
+	ent->s.origin[2] += 10;
+
+	ent->client->ps.pmove.pm_time = 160 >> 3;       /* hold time */
+	ent->client->ps.pmove.pm_flags |= PMF_TIME_TELEPORT;
+
+	VectorClear(ent->s.angles);
+	VectorClear(ent->client->ps.viewangles);
+}
+
 void
 ClientCommand(edict_t *ent)
 {
@@ -1883,6 +1922,10 @@ ClientCommand(edict_t *ent)
 	else if (Q_stricmp(cmd, "gamemode") == 0) /* FS: Coop */
 	{
 		Cmd_Coop_Gamemode(ent);
+	}
+	else if (Q_stricmp(cmd, "beam") == 0) /* FS: From YamagiQ2 */
+	{
+		Cmd_Beam_f(ent);
 	}
 	else /* anything that doesn't match a command will be a chat */
 	{
