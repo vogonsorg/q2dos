@@ -1759,11 +1759,11 @@ void Cmd_Beam_f (edict_t *ent) /* FS: From YamaqiQ2: Beam us to direct coordinat
 	VectorClear(ent->client->ps.viewangles);
 }
 
-void Cmd_PlaceCheckpoint_f (edict_t *ent)
+void Cmd_PlaceCheckpoint_f (edict_t *ent) /* FS: Added */
 {
 	edict_t *spawn;
 
-	if (!ent || !ent->client || !ent->client->pers.isAdmin)
+	if (!ent || !ent->client || !ent->client->pers.isAdmin || !coop->intValue)
 	{
 		return;
 	}
@@ -1784,6 +1784,43 @@ void Cmd_PlaceCheckpoint_f (edict_t *ent)
 	SP_info_coop_checkpoint(spawn);
 
 	gi.cprintf(ent, PRINT_HIGH, "Coop checkpoint created!\n");
+}
+
+void Cmd_SaveCheckpoint_f (edict_t *ent) /* FS: Added */
+{
+	char checkpointString[1024];
+	char fileName[MAX_OSPATH];
+	edict_t *e;
+	FILE *f = NULL;
+
+	if (!ent || !ent->client || !ent->client->pers.isAdmin || !coop->intValue)
+	{
+		return;
+	}
+
+	Com_sprintf(fileName, sizeof(fileName), "coop/maps/%s_checkpoints.txt", level.mapname);
+	f = fopen(fileName, "w");
+	if(!f)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Error: Can't open %s for writing!\n", fileName);
+		return;
+	}
+
+	for (e = g_edicts; e < &g_edicts[globals.num_edicts]; e++)
+	{
+		if (!e->inuse)
+		{
+			continue;
+		}
+
+		if(!Q_stricmp(e->classname, "info_coop_checkpoint"))
+		{
+			Com_sprintf(checkpointString, sizeof(checkpointString), "{\n\"classname\" \"%s\"\n\"angle\" \"%i\"\n\"origin\" \"%i %i %i\"\n}\n", e->classname, (int)e->s.angles[YAW], (int)e->s.origin[0], (int)e->s.origin[1], (int)e->s.origin[2]+15);
+			fputs(checkpointString, f);
+		}
+	}
+
+	fclose(f);
 }
 
 void
@@ -1959,6 +1996,10 @@ ClientCommand(edict_t *ent)
 	else if (Q_stricmp(cmd, "createcheckpoint") == 0) /* FS: Coop: Added checkpoints */
 	{
 		Cmd_PlaceCheckpoint_f(ent);
+	}
+	else if (Q_stricmp(cmd, "savecheckpoints") == 0) /* FS: Coop: Added checkpoints */
+	{
+		Cmd_SaveCheckpoint_f(ent);
 	}
 	else /* anything that doesn't match a command will be a chat */
 	{
