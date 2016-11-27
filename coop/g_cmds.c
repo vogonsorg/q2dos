@@ -1,6 +1,8 @@
 #include "g_local.h"
 #include "m_player.h"
 
+extern void SP_info_coop_checkpoint (edict_t * self );
+
 static char *
 ClientTeam(edict_t *ent, char* value)
 {
@@ -1757,6 +1759,33 @@ void Cmd_Beam_f (edict_t *ent) /* FS: From YamaqiQ2: Beam us to direct coordinat
 	VectorClear(ent->client->ps.viewangles);
 }
 
+void Cmd_PlaceCheckpoint_f (edict_t *ent)
+{
+	edict_t *spawn;
+
+	if (!ent || !ent->client || !ent->client->pers.isAdmin)
+	{
+		return;
+	}
+
+	spawn = G_Spawn();
+	if(!spawn)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Unable to create a checkpoint!\n");
+		return;
+	}
+
+	spawn->classname = "info_coop_checkpoint";
+	VectorCopy(ent->s.origin, spawn->s.origin);
+	spawn->s.origin[2] += 20;
+
+	spawn->s.angles[YAW] = ent->client->ps.viewangles[YAW];
+
+	SP_info_coop_checkpoint(spawn);
+
+	gi.cprintf(ent, PRINT_HIGH, "Coop checkpoint created!\n");
+}
+
 void
 ClientCommand(edict_t *ent)
 {
@@ -1926,6 +1955,10 @@ ClientCommand(edict_t *ent)
 	else if (Q_stricmp(cmd, "beam") == 0) /* FS: From YamagiQ2 */
 	{
 		Cmd_Beam_f(ent);
+	}
+	else if (Q_stricmp(cmd, "createcheckpoint") == 0) /* FS: Coop: Added checkpoints */
+	{
+		Cmd_PlaceCheckpoint_f(ent);
 	}
 	else /* anything that doesn't match a command will be a chat */
 	{
