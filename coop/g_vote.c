@@ -184,7 +184,8 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 		return false;
 	}
 
-	Com_sprintf(fileName, sizeof(fileName), "coop/%s", coopMapFile);
+	Sys_Mkdir(va("%s/maps", gamedir->string));
+	Com_sprintf(fileName, sizeof(fileName), "%s/%s", gamedir->string, coopMapFile);
 
 	f = fopen(fileName, "r");
 	if(!f)

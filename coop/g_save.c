@@ -240,6 +240,7 @@ InitGame(void)
 	sv_spawn_protection_time->description = "Time set in seconds for spawn protection.  Requires sv_spawn_protection to be enabled.";
 	adminpass = gi.cvar("adminpass", "", 0);
 	adminpass->description = "Administator password for special commands.  Not related to RCON.";
+	gamedir = gi.cvar("gamedir", "", 0); /* FS: Coop: Added */
 
 	motd = gi.cvar ("motd", "", 0); /* FS: Coop: Added */
 	skill = gi.cvar ("skill", "1", CVAR_LATCH);

@@ -1972,7 +1972,8 @@ int G_SpawnCheckpoints (edict_t *ent)
 	int inhibit = 0, found = 0;
 	const char *com_token;
 
-	Com_sprintf(fileName, sizeof(fileName), "coop/maps/%s_checkpoints.txt", level.mapname);
+	Sys_Mkdir(va("%s/maps", gamedir->string));
+	Com_sprintf(fileName, sizeof(fileName), "%s/maps/%s_checkpoints.txt", gamedir->string, level.mapname);
 	f = fopen(fileName, "r");
 	if(!f)
 	{

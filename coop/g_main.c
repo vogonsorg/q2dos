@@ -1,3 +1,10 @@
+#ifndef GAME_HARD_LINKED /* FS: Coop: For Sys_Mkdir */
+#ifdef _WIN32
+#include <direct.h>
+#else
+#include <sys/stat.h> /* mkdir() */
+#endif
+#endif
 
 #include "g_local.h"
 
@@ -27,6 +34,7 @@ cvar_t *sv_spawn_protection; /* FS: Coop: Spawn protection */
 cvar_t *sv_spawn_protection_time; /* FS: Coop: Spawn protection */
 cvar_t *motd; /* FS: Coop: Added */
 cvar_t *adminpass; /* FS: Coop: Admin goodies */
+cvar_t *gamedir; /* FS: Coop: Added */
 cvar_t *dmflags;
 cvar_t *skill;
 cvar_t *fraglimit;
@@ -179,6 +187,15 @@ void Com_Printf (char *msg, ...)
 	text[sizeof(text)-1] = 0;
 
 	gi.dprintf(DEVELOPER_MSG_GAME, "%s", text);
+}
+
+void Sys_Mkdir (char *path) /* FS: Coop: FIXME -- This could be added to something like gi.FS_CreatePath instead or similiar, but that would be non-standard to other port authors.  However, it's trivial to add.  So what-do? */
+{
+#ifdef _WIN32
+	_mkdir (path);
+#else
+	mkdir (path, 0777);
+#endif
 }
 
 #endif

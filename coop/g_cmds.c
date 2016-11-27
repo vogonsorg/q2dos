@@ -1799,7 +1799,10 @@ void Cmd_SaveCheckpoint_f (edict_t *ent) /* FS: Added */
 		return;
 	}
 
-	Com_sprintf(fileName, sizeof(fileName), "coop/maps/%s_checkpoints.txt", level.mapname);
+	Sys_Mkdir(va("%s/maps", gamedir->string));
+
+	Com_sprintf(fileName, sizeof(fileName), "%s/maps/%s_checkpoints.txt", gamedir->string, level.mapname);
+
 	f = fopen(fileName, "w");
 	if(!f)
 	{
