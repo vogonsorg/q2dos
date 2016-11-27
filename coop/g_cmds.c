@@ -1423,6 +1423,12 @@ void sayCmd_CheckVote(edict_t *ent, char *voteChat)
 		gi.WriteString(va("%s\n", voteChat));
 		gi.unicast(ent, true);
 	}
+	else if(!strncmp(voteChat, "vote warp ", 10))
+	{
+		gi.WriteByte(svc_stufftext);
+		gi.WriteString(va("%s\n", voteChat));
+		gi.unicast(ent, true);
+	}
 	else if(!strncmp(voteChat, "vote gamemode ", 14))
 	{
 		gi.WriteByte(svc_stufftext);
