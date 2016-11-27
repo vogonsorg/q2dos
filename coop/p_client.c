@@ -133,6 +133,10 @@ SP_info_coop_checkpoint_touch ( edict_t * self , edict_t * other , cplane_t * pl
 
 	gi.bprintf(PRINT_HIGH, "\x02[MAPMSG][%s]: ", other->client->pers.netname);
 	gi.bprintf(PRINT_HIGH, "You passed a checkpoint!\n");
+	self->s.effects &= ~EF_ROTATE;
+	self->s.effects |= EF_COLOR_SHELL;
+	self->s.renderfx &= ~RF_GLOW;
+	self->s.renderfx |= RF_SHELL_HALF_DAM;
 	self->dmg = 1; /* FS: Hint that we touched this before */
 	level.current_coop_checkpoint = self;
 }
@@ -146,9 +150,10 @@ SP_info_coop_checkpoint (edict_t * self )
 	self->s.modelindex = gi.modelindex("models/items/tagtoken/tris.md2");
 
 	self->model = "models/items/tagtoken/tris.md2";
-
+	self->s.effects = EF_ROTATE;
+	self->s.renderfx = RF_GLOW | RF_IR_VISIBLE;
 	self->dmg = 0;
-	self->s.origin[2] -= 15; /* FS: Don't be eye level or it looks funny */
+	self->s.origin[2] -= 20; /* FS: Don't be eye level or it looks funny */
 
 	gi.linkentity(self);
 }
