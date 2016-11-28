@@ -1049,6 +1049,7 @@ InitClientCoopPersistant(edict_t *ent) /* FS: Coop: Give back some goodies on re
 	gclient_t *client;
 	gitem_t *item;
 	edict_t *it_ent;
+	int i = 0;
 
 	if (!ent || !ent->client)
 		return;
@@ -1090,6 +1091,17 @@ InitClientCoopPersistant(edict_t *ent) /* FS: Coop: Give back some goodies on re
 	}
 
 	ent->flags &= ~FL_GODMODE; /* FS: Coop: Remove any carried over god mode flags from map transitions. */
+
+	for (i = 1; i < MAX_ITEMS; i++)
+	{
+		if(!game.inventory[i])
+			continue;
+
+		if(ent->client->pers.inventory[i] < game.inventory[i])
+		{
+			ent->client->pers.inventory[i] = game.inventory[i];
+		}
+	}
 }
 
 void

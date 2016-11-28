@@ -190,6 +190,44 @@ ValidateSelectedItem(edict_t *ent)
 	SelectNextItem(ent, -1);
 }
 
+qboolean
+Check_Coop_Item_Flags (gitem_t *it)
+{
+	if (!it)
+	{
+		return false;
+	}
+
+	switch(game.gametype) /* FS: Check our game modes and don't add what we aren't supposed to have. */
+	{
+		default:
+		case vanilla_coop:
+			if (it->flags & IT_XATRIX)
+			{
+				return false;
+			}
+			if (it->flags & IT_ROGUE)
+			{
+				return false;
+			}
+			break;
+		case xatrix_coop:
+			if (it->flags & IT_ROGUE)
+			{
+				return false;
+			}
+			break;
+		case rogue_coop:
+			if (it->flags & IT_XATRIX)
+			{
+				return false;
+			}
+			break;
+	}
+
+	return true;
+}
+
 /* ================================================================================= */
 
 /*
@@ -268,32 +306,9 @@ Cmd_Give_f(edict_t *ent)
 				continue;
 			}
 
-			switch(game.gametype) /* FS: Check our game modes and don't add what we aren't supposed to have. */
+			if(!Check_Coop_Item_Flags(it)) /* FS: Coop: Only give stuff we're supposed to have in each gamemode */
 			{
-				case vanilla_coop:
-					if (it->flags & IT_XATRIX)
-					{
-						continue;
-					}
-					if (it->flags & IT_ROGUE)
-					{
-						continue;
-					}
-					break;
-				case xatrix_coop:
-					if (it->flags & IT_ROGUE)
-					{
-						continue;
-					}
-					break;
-				case rogue_coop:
-					if (it->flags & IT_XATRIX)
-					{
-						continue;
-					}
-					break;
-				default:
-					break;
+				continue;
 			}
 
 			ent->client->pers.inventory[i] += 1;
@@ -321,32 +336,9 @@ Cmd_Give_f(edict_t *ent)
 				continue;
 			}
 
-			switch(game.gametype) /* FS: Check our game modes and don't add what we aren't supposed to have. */
+			if(!Check_Coop_Item_Flags(it)) /* FS: Coop: Only give stuff we're supposed to have in each gamemode */
 			{
-				case vanilla_coop:
-					if (it->flags & IT_XATRIX)
-					{
-						continue;
-					}
-					if (it->flags & IT_ROGUE)
-					{
-						continue;
-					}
-					break;
-				case xatrix_coop:
-					if (it->flags & IT_ROGUE)
-					{
-						continue;
-					}
-					break;
-				case rogue_coop:
-					if (it->flags & IT_XATRIX)
-					{
-						continue;
-					}
-					break;
-				default:
-					break;
+				continue;
 			}
 
 			Add_Ammo(ent, it, 1000);
@@ -421,32 +413,9 @@ Cmd_Give_f(edict_t *ent)
 				continue;
 			}
 
-			switch(game.gametype) /* FS: Check our game modes and don't add what we aren't supposed to have. */
+			if(!Check_Coop_Item_Flags(it)) /* FS: Coop: Only give stuff we're supposed to have in each gamemode */
 			{
-				case vanilla_coop:
-					if (it->flags & IT_XATRIX)
-					{
-						continue;
-					}
-					if (it->flags & IT_ROGUE)
-					{
-						continue;
-					}
-					break;
-				case xatrix_coop:
-					if (it->flags & IT_ROGUE)
-					{
-						continue;
-					}
-					break;
-				case rogue_coop:
-					if (it->flags & IT_XATRIX)
-					{
-						continue;
-					}
-					break;
-				default:
-					break;
+				continue;
 			}
 
 			ent->client->pers.inventory[i] = 1;
@@ -482,6 +451,12 @@ Cmd_Give_f(edict_t *ent)
 			gi.cprintf(ent, PRINT_HIGH, "item cannot be given\n"); /* FS: Was Dprintf */
 			return;
 		}
+	}
+
+	if(!Check_Coop_Item_Flags(it)) /* FS: Coop: Only give stuff we're supposed to have in each gamemode */
+	{
+		gi.cprintf(ent, PRINT_HIGH, "item cannot be given in this gamemode\n");
+		return;
 	}
 
 	index = ITEM_INDEX(it);

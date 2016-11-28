@@ -1065,6 +1065,8 @@ Use_Silencer(edict_t *ent, gitem_t *item)
 qboolean
 Pickup_Key(edict_t *ent, edict_t *other)
 {
+	qboolean firstHit = true;
+
 	if (!ent || !other)
 	{
 		return false;
@@ -1097,6 +1099,12 @@ Pickup_Key(edict_t *ent, edict_t *other)
 				client->client->pers.inventory[ITEM_INDEX(ent->item)]++;
 				client->client->pers.power_cubes |=
 					((ent->spawnflags & 0x0000ff00) >> 8);
+
+				if (firstHit) /* FS: Coop: Global inventory for newcomers to server */
+				{
+					game.inventory[ITEM_INDEX(ent->item)]++;
+					firstHit = false;
+				}
 			}
 			else
 			{
@@ -1106,6 +1114,12 @@ Pickup_Key(edict_t *ent, edict_t *other)
 				}
 
 				client->client->pers.inventory[ITEM_INDEX(ent->item)] = 1;
+
+				if (firstHit) /* FS: Coop: Global inventory for newcomers to server */
+				{
+					game.inventory[ITEM_INDEX(ent->item)] = 1;
+					firstHit = false;
+				}
 			}
 
 			if(client == other) /* FS: Coop: If this client is the one who walked over then set the proper return qboolean */

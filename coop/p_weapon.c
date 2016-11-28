@@ -223,6 +223,10 @@ Pickup_Weapon(edict_t *ent, edict_t *other)
 	}
 
 	other->client->pers.inventory[index]++;
+	if (coop->intValue) /* FS: Coop: Global inventory for newcomers to server */
+	{
+		game.inventory[index]++;
+	}
 
 	if (!(ent->spawnflags & DROPPED_ITEM))
 	{
@@ -234,10 +238,20 @@ Pickup_Weapon(edict_t *ent, edict_t *other)
 			if ( ((int)dmflags->value & DF_INFINITE_AMMO) && Q_stricmp(ent->item->pickup_name, "ammo_trap") ) /* FS: Coop: Xatrix specific -- Added ammo_trap*/
 			{
 				Add_Ammo(other, ammo, 1000);
+
+				if(coop->intValue) /* FS: Coop: Global inventory for newcomers to server */
+				{
+					game.inventory[ITEM_INDEX(ammo)] = 1000;
+				}
 			}
 			else
 			{
 				Add_Ammo(other, ammo, ammo->quantity);
+
+				if(coop->intValue) /* FS: Coop: Global inventory for newcomers to server */
+				{
+					game.inventory[ITEM_INDEX(ammo)] = ammo->quantity;
+				}
 			}
 		}
 

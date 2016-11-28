@@ -343,6 +343,7 @@ typedef struct
 
 	qboolean	autosaved;
 	gametype_t	gametype; /* FS: Coop: Hint for which rule sets we apply */
+	int			inventory[MAX_ITEMS]; /* FS: Coop: Globalized inventory of weapons and keys we should be having. */
 } game_locals_t;
 
 

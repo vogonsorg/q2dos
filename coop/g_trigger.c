@@ -305,6 +305,7 @@ void
 trigger_key_use(edict_t *self, edict_t *other /* unused */, edict_t *activator)
 {
 	int index;
+	qboolean firstHit = true;
 
 	if (!self|| !activator)
 	{
@@ -371,6 +372,11 @@ trigger_key_use(edict_t *self, edict_t *other /* unused */, edict_t *activator)
 
 				if (ent->client->pers.power_cubes & (1 << cube))
 				{
+					if (firstHit) /* FS: Coop: Global inventory for newcomers to server */
+					{
+						game.inventory[index]--;
+						firstHit = false;
+					}
 					ent->client->pers.inventory[index]--;
 					ent->client->pers.power_cubes &= ~(1 << cube);
 				}
@@ -393,6 +399,12 @@ trigger_key_use(edict_t *self, edict_t *other /* unused */, edict_t *activator)
 				}
 
 				ent->client->pers.inventory[index] = 0;
+
+				if (firstHit) /* FS: Coop: Global inventory for newcomers to server */
+				{
+					game.inventory[index] = 0;
+					firstHit = false;
+				}
 			}
 		}
 
