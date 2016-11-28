@@ -267,6 +267,10 @@ void QDECL SourceError( source_t *source, char *str, ... ) {
 #ifdef BSPC
 	Log_Print( "error: file %s, line %d: %s\n", source->scriptstack->filename, source->scriptstack->line, text );
 #endif //BSPC
+
+#ifdef _WIN32 /* FS: Get a more sensible error message please */
+	printf( "error: file %s, line %d: %s\n", source->scriptstack->filename, source->scriptstack->line, text );
+#endif
 } //end of the function SourceError
 //===========================================================================
 //

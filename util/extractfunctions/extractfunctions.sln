@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "extractfunctions", "extractfunctions.vcproj", "{EC3F751D-736D-42B3-8A33-B36737DF5AD3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EC3F751D-736D-42B3-8A33-B36737DF5AD3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EC3F751D-736D-42B3-8A33-B36737DF5AD3}.Debug|Win32.Build.0 = Debug|Win32
+		{EC3F751D-736D-42B3-8A33-B36737DF5AD3}.Release|Win32.ActiveCfg = Release|Win32
+		{EC3F751D-736D-42B3-8A33-B36737DF5AD3}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

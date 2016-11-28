@@ -396,13 +396,17 @@ void AddFunctionName (char *funcname, char *filename, tokenList_t *head)
 		return;
 	}
 
-#if defined( __linux__ ) || defined( __FreeBSD__ )
+//#if defined( __linux__ ) || defined( __FreeBSD__ ) /* FS: Don't dump this either */
 	// the bad thing is, this doesn't preprocess .. on __linux__ this
 	// function is not implemented (q_math.c)
-	if ( !Q_stricmp( funcname, "BoxOnPlaneSide" ) ) {
+	if ( !Q_stricmp( funcname, "BoxOnPlaneSide" ) || !Q_stricmp( funcname, "BOPS_Error" )) { /* FS: Added BOPS_Error */
 		return;
 	}
-#endif
+//#endif
+
+	if ( !Q_stricmp( funcname, "SV_FilterPacket" ) || !Q_stricmp( funcname, "StringToFilter" )) { /* FS: Not needed, causes compile errors */
+		return;
+	}
 
 	// NERVE - SMF - workaround for Graeme's predifined MACOSX functions
 	// TTimo - looks like linux version needs to escape those too
@@ -737,6 +741,9 @@ void main (int argc, char *argv[])
 	if (argc < 2 || (firstParmSet && firstParm < 1))
 		Usage ();
 	// end Knightmare
+
+	PC_AddGlobalDefine("__GNUC__ 3"); /* FS: Shut up q_shared.h */
+	PC_AddGlobalDefine("__GNUC_MINOR__ 1"); /* FS: Shut up q_shared.h */
 
 	handle = FindFirstFile (argv[1], &filedata);
 	done = (handle == INVALID_HANDLE_VALUE);

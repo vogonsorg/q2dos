@@ -1174,7 +1174,6 @@
 {"SVCmd_ListIP_f", (byte *)SVCmd_ListIP_f},
 {"SVCmd_RemoveIP_f", (byte *)SVCmd_RemoveIP_f},
 {"SVCmd_AddIP_f", (byte *)SVCmd_AddIP_f},
-{"SV_FilterPacket", (byte *)SV_FilterPacket},
 {"Svcmd_Test_f", (byte *)Svcmd_Test_f},
 {"Vengeance_Launch", (byte *)Vengeance_Launch},
 {"Hunter_Launch", (byte *)Hunter_Launch},
