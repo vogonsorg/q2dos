@@ -1169,6 +1169,8 @@ ReadLevel(const char *filename)
 			if(coop->intValue && !Q_stricmp(ent->classname, "info_coop_checkpoint")) /* FS: Coop: Reset checkpoints so we can touch them again */
 			{
 				ent->dmg = 0;
+				ent->s.effects = EF_ROTATE;
+				ent->s.renderfx = RF_GLOW | RF_IR_VISIBLE;
 			}
 
 			if (strcmp(ent->classname, "target_crosslevel_target") == 0)

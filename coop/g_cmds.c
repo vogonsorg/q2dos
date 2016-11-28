@@ -1700,7 +1700,7 @@ Cmd_Coop_Gamemode(edict_t *ent) /* FS: TODO: Make this a server only command */
 void
 Cmd_EdictCount_f (edict_t *ent) /* FS: Coop: Added for debugging */
 {
-	int i = 0, edictCount = 0, freeCount = 0;
+	int i = 0, edictCount = 0, freeCount = 0, badFreeCount = 0;
 	edict_t *e;
 
 	if (!ent || !ent->client || !ent->client->pers.isAdmin)
@@ -1718,12 +1718,19 @@ Cmd_EdictCount_f (edict_t *ent) /* FS: Coop: Added for debugging */
 		}
 		else
 		{
-			gi.cprintf(ent, PRINT_HIGH, "Freed edict time: %f.  Level.time: %f\n", e->freetime, level.time);
+			if (gi.argc() > 1) /* FS: Can cause overflows with too many cprintfs here.  So only request it if I want to see it. */
+			{
+				gi.cprintf(ent, PRINT_HIGH, "Freed edict time: %f.  Level.time: %f\n", e->freetime, level.time);
+			}
+			if(e->freetime > level.time) /* FS: This should be impossible now.  But let's keep track of it just in-case. */
+			{
+				badFreeCount++;
+			}
 			freeCount++;
 		}
 	}
 
-	gi.cprintf(ent, PRINT_HIGH, "Edicts in use: %i.  Edicts freed: %i.  Total edicts: %i.  Max edicts: %i\n", edictCount, freeCount, globals.num_edicts, globals.max_edicts);
+	gi.cprintf(ent, PRINT_HIGH, "Edicts in use: %i.  Edicts freed: %i.  Bad freetimes: %i.  Total edicts: %i.  Max edicts: %i\n", edictCount, freeCount, badFreeCount, globals.num_edicts, globals.max_edicts);
 }
 
 void Cmd_Beam_f (edict_t *ent) /* FS: From YamaqiQ2: Beam us to direct coordinates given, for debugging. */
