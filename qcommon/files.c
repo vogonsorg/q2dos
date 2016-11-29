@@ -294,18 +294,12 @@ int FS_FOpenFile (char *filename, FILE **file)
 {
 	searchpath_t	*search;
 	char			netpath[MAX_OSPATH];
-	char			*p;
 	pack_t			*pak;
 	int				i;
 	filelink_t		*link;
 	// Knightmare added
 	long			hash;
 	unsigned int	typeFlag;
-
-	//r1: fix \ to /
-	p = filename;
-	while ((p = strchr(p, '\\')))
-		p[0] = '/';
 
 	file_from_pak = 0;
 	// Knightmare added
