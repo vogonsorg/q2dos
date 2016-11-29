@@ -1005,21 +1005,6 @@ InitClientPersistant(gclient_t *client)
 	client->pers.selected_item = ITEM_INDEX(item);
 	client->pers.inventory[client->pers.selected_item] = 1;
 
-	if (coop->intValue) /* FS: Coop: We always have a shotgun available. */
-	{
-		gitem_t *ammo_item;
-		int ammo_index;
-
-		item = FindItem("Shotgun");
-
-		client->pers.selected_item = ITEM_INDEX(item);
-		client->pers.inventory[client->pers.selected_item] = 1;
-
-		ammo_item = FindItem(item->ammo);
-		ammo_index = ITEM_INDEX(ammo_item);
-		client->pers.inventory[ammo_index] = 100;
-	}
-
 	client->pers.weapon = item;
 
 	client->pers.health = 100;
@@ -1040,6 +1025,7 @@ InitClientPersistant(gclient_t *client)
 	/* FS: Coop: Xatrix specific */
 	client->pers.max_magslug = 50;
 	client->pers.max_trap = 5;
+
 	client->pers.connected = true;
 }
 
@@ -1048,8 +1034,11 @@ InitClientCoopPersistant(edict_t *ent) /* FS: Coop: Give back some goodies on re
 {
 	gclient_t *client;
 	gitem_t *item;
+	gitem_t *ammo_item;
 	edict_t *it_ent;
+	int ammo_index = 0;
 	int i = 0;
+	qboolean firstSpawn = false;
 
 	if (!ent || !ent->client)
 		return;
@@ -1063,6 +1052,27 @@ InitClientCoopPersistant(edict_t *ent) /* FS: Coop: Give back some goodies on re
 	client->pers.max_grenades = 50;
 	client->pers.max_cells = 200;
 	client->pers.max_slugs = 50;
+
+	/* FS: Make sure they always have a shotgun */
+	item = FindItem("Shotgun");
+
+	if(client->pers.inventory[ITEM_INDEX(item)] == 0) /* FS: If we don't have one yet, this is the first time we're joining in (or a DLL reload) so force the switch to it */
+	{
+		firstSpawn = true;
+	}
+
+	client->pers.selected_item = ITEM_INDEX(item);
+	client->pers.inventory[client->pers.selected_item] = 1;
+
+	ammo_item = FindItem(item->ammo);
+	ammo_index = ITEM_INDEX(ammo_item);
+
+	client->pers.inventory[ammo_index] = client->resp.coop_respawn.inventory[ammo_index] = 100;
+
+	if(firstSpawn)
+	{
+		client->pers.weapon = client->newweapon = item;
+	}
 
 	switch(client->resp.coop_respawn.ammoUpgrade)
 	{
@@ -1709,6 +1719,11 @@ respawn(edict_t *self)
 			CopyToBodyQue(self);
 		}
 
+		if(coop->intValue) /* FS: Coop: Respawn with the shotgun selected as the current weapon */
+		{
+			self->client->newweapon = self->client->pers.weapon = self->client->resp.coop_respawn.weapon = FindItem("shotgun");
+		}
+
 		self->svflags &= ~SVF_NOCLIENT;
 		PutClientInServer(self);
 
@@ -2065,11 +2080,12 @@ PutClientInServer(edict_t *ent)
 		}
 	}
 
+	InitClientCoopPersistant(ent); /* FS: Coop: Don't move this!  If too early it will fudge some things up */
+
 	/* force the current weapon up */
 	client->newweapon = client->pers.weapon;
 	ChangeWeapon(ent);
 
-	InitClientCoopPersistant(ent); /* FS: Coop: Don't move this!  If too early it will fudge some things up */
 	vote_connect(ent); /* FS: Coop: Voting */
 }
 
