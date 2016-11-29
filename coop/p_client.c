@@ -1067,7 +1067,10 @@ InitClientCoopPersistant(edict_t *ent) /* FS: Coop: Give back some goodies on re
 	ammo_item = FindItem(item->ammo);
 	ammo_index = ITEM_INDEX(ammo_item);
 
-	client->pers.inventory[ammo_index] = client->resp.coop_respawn.inventory[ammo_index] = 100;
+	if(client->pers.inventory[ammo_index] < 100) /* FS: If we already have more than this don't reset it */
+	{
+		client->pers.inventory[ammo_index] = client->resp.coop_respawn.inventory[ammo_index] = 100;
+	}
 
 	if(firstSpawn)
 	{
