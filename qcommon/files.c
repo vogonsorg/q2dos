@@ -165,7 +165,7 @@ Creates any directories needed to store the given filename
 */
 void	FS_CreatePath (char *path)
 {
-	char	*ofs;
+	char	*ofs, c;
 
 	// Knightmare added
 	if (strstr(path, "..") || strstr(path, "::") || strstr(path, "\\\\") || strstr(path, "//"))
@@ -176,11 +176,13 @@ void	FS_CreatePath (char *path)
 	
 	for (ofs = path+1 ; *ofs ; ofs++)
 	{
-		if (*ofs == '/')
+		c = *ofs;
+		// should actually check this OS-specifically!!
+		if (c == '/' || c == '\\')
 		{	// create the directory
 			*ofs = 0;
 			Sys_Mkdir (path);
-			*ofs = '/';
+			*ofs = c;
 		}
 	}
 }
