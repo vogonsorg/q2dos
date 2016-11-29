@@ -363,6 +363,16 @@ void SV_BeginDownload_f (void)
 	// r1ch fix: name is always filtered for security reasons
 	StripHighBits (name, 1);
 
+	// r1ch: ugly hack to allow server to see clients who are using http dl.
+	if (!strcmp (name, "http"))
+	{
+		if (sv_client->download)
+			SV_DropClient (sv_client);
+		else
+			sv_client->downloadsize = 1;
+		return;
+	}
+
 	// hacked by zoid to allow more conrol over download
 	// first off, no .. or global allow check
 
