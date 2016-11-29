@@ -1440,6 +1440,8 @@ Widow2Precache()
 	gi.modelindex("models/objects/gibs/sm_metal/tris.md2");
 	gi.modelindex("models/proj/laser2/tris.md2");
 	gi.modelindex("models/proj/disintegrator/tris.md2");
+	gi.modelindex("models/proj/widowbeam/tris.md2"); /* FS: Was missing */
+	gi.modelindex("models/objects/r_explode2/tris.md2"); /* FS: Was missing */
 
 	gi.modelindex("models/monsters/blackwidow/gib1/tris.md2");
 	gi.modelindex("models/monsters/blackwidow/gib2/tris.md2");

@@ -2755,7 +2755,7 @@ always owned, never in the world
 		WEAP_PLASMA,
 		NULL,
 		0,
-		"models/weapons/v_beamer2/tris.md2 weapons/bfg__l1a.wav",
+		"models/weapons/v_beamer2/tris.md2 weapons/bfg__l1a.wav models/proj/beam/tris.md2", /* FS: Missing beam precache */
 	},
 
 /*QUAKED weapon_railgun (.3 .3 1) (-16 -16 -16) (16 16 16)
@@ -3056,7 +3056,7 @@ always owned, never in the world
 		0,
 		NULL,
 		AMMO_TESLA,
-		"models/weapons/v_tesla2/tris.md2 weapons/teslaopen.wav weapons/hgrenb1a.wav weapons/hgrenb2a.wav models/weapons/g_tesla/tris.md2"
+		"models/weapons/v_tesla2/tris.md2 weapons/teslaopen.wav weapons/hgrenb1a.wav weapons/hgrenb2a.wav models/weapons/g_tesla/tris.md2 models/proj/lightning/tris.md2" /* FS: Was misisng lightning.  Needed for precache */
 	},
 
 	/* QUAKED ammo_nuke (.3 .3 1) (-16 -16 -16) (16 16 16) TRIGGER_SPAWN */
@@ -3078,7 +3078,7 @@ always owned, never in the world
 		0,
 		NULL,
 		0,
-		"weapons/nukewarn2.wav world/rumble.wav"
+		"weapons/nukewarn2.wav world/rumble.wav models/objects/r_explode2/tris.md2" /* FS: Was missing r_explode2.  Needed for precache */
 	},
 
 	/* QUAKED ammo_disruptor (.3 .3 1) (-16 -16 -16) (16 16 16) TRIGGER_SPAWN */
