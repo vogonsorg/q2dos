@@ -316,6 +316,7 @@ static void CL_StartHTTPDownload (dlqueue_t *entry, dlhandle_t *dl)
 		{
 			Com_Printf ("CL_StartHTTPDownload: Couldn't open %s for writing.\n", dl->filePath);
 			entry->state = DLQ_STATE_DONE;
+			pendingCount--; /* FS: This is needed or it gets stuck in limbo forever.  I hope someone else sees this as this bug persists in R1Q2 and anyone who uses his code. :( */
 			//CL_RemoveHTTPDownload (entry->quakePath);
 			return;
 		}
