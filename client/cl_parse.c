@@ -75,6 +75,10 @@ qboolean	CL_CheckOrDownloadFile (char *filename)
 	int	length = 0; /* FS: MSVC4 hates it elsewhere */
 	char	*p = NULL; /* FS: MSVC4 hates it elsewhere */
 
+	//r1: don't attempt same file many times
+	if (!strcmp (filename, lastfilename))
+		return true;
+
 	strcpy (lastfilename, filename);
 
 	if (strstr (filename, ".."))
