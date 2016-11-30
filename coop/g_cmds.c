@@ -1836,6 +1836,30 @@ void Cmd_DeleteCheckpoints_f (edict_t *ent) /* FS: Added */
 		return;
 	}
 
+	if(gi.argc() == 2 && !Q_stricmp(gi.argv(1), "all")) /* FS: Remove all from the map.  Maybe it was saved, transitioned this map and I don't want to restart the whole map. */
+	{
+		int count = 0;
+		edict_t *coop_checkpoint;
+
+		for (coop_checkpoint = g_edicts; coop_checkpoint < &g_edicts[globals.num_edicts]; coop_checkpoint++)
+		{
+			if(!coop_checkpoint->inuse || !coop_checkpoint->classname)
+			{
+				continue;
+			}
+
+			if(!Q_stricmp(coop_checkpoint->classname, "info_coop_checkpoint"))
+			{
+				G_FreeEdict(coop_checkpoint);
+				count++;
+			}
+
+			level.current_coop_checkpoint = NULL;
+		}
+
+		gi.cprintf(ent, PRINT_HIGH, "Removed %d info_coop_checkpoints from map.\n", count);
+	}
+
 	Com_sprintf(fileName, sizeof(fileName), "%s/maps/%s_checkpoints.txt", gamedir->string, level.mapname);
 
 	f = fopen(fileName, "w");
