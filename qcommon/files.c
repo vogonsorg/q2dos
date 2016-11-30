@@ -177,7 +177,11 @@ void	FS_CreatePath (char *path)
 	for (ofs = path+1 ; *ofs ; ofs++)
 	{
 		c = *ofs;
-		// should actually check this OS-specifically!!
+		/* FIXME: Should actually check this OS-specifically!! */
+		/* FIXME: This is here because rhangar1.bsp from the rogue mission pack stupidly
+		 *     wants a texture named "zor_temp\\door2.wal".  Their pak file does have it
+		 *     with that name.  What we do here is band-aiding the file write for such a
+		 *     stupidity.  Need a better way of handling things. */
 		if (c == '/' || c == '\\')
 		{	// create the directory
 			*ofs = 0;
