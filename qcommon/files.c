@@ -178,7 +178,7 @@ void	FS_CreatePath (char *path)
 	{
 		c = *ofs;
 		/* FIXME: Should actually check this OS-specifically!! */
-		/* FIXME: This is here because rhangar1.bsp from the rogue mission pack stupidly
+		/* FIXME: Added the '\\' check, because rhangar1.bsp from the rogue mission pack
 		 *     wants a texture named "zor_temp\\door2.wal".  Their pak file does have it
 		 *     with that name.  What we do here is band-aiding the file write for such a
 		 *     stupidity.  Need a better way of handling things. */
