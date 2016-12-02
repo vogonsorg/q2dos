@@ -27,6 +27,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef __DJGPP
 #include <libc/file.h>
 #endif
+#ifdef _WIN32
+#include <assert.h>
+#endif
 #include <ctype.h>
 #include "qcommon.h"
 
@@ -927,7 +930,14 @@ void *SZ_GetSpace (sizebuf_t *buf, int length)
 			Com_Error (ERR_FATAL, "SZ_GetSpace: overflow without allowoverflow set");
 		
 		if (length > buf->maxsize)
+		{
+#ifdef _WIN32
+#ifdef _DEBUG /* FS: FIXME TODO: Got something greater than 1400 bytes here in coop game dll, probably a svc_frame.  Need to verify where and what to do */
+			assert(false);
+#endif // _DEBUG
+#endif // _WIN32
 			Com_Error (ERR_FATAL, "SZ_GetSpace: %i is > full buffer size", length);
+		}
 			
 		Com_Printf ("SZ_GetSpace: overflow\n");
 		SZ_Clear (buf); 
