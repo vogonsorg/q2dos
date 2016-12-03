@@ -112,20 +112,20 @@ static void SCR_DrawUptime (void) /* FS: Connection time */
 	// time
 	if (cl_drawuptime->intValue == 1) /* FS: Map time or total time playing quake time */
 	{
-		minutes = (int)(cl.time/1000) / 60;
+		minutes = (cl.frame.serverframe/10) / 60;
 	}
 	else
 	{
-		minutes = (int)(Sys_Milliseconds()/1000) / 60;
+		minutes = (Sys_Milliseconds()/1000) / 60;
 	}
 
 	if (cl_drawuptime->intValue == 1)
 	{
-		seconds = (int)(cl.time/1000) - 60*minutes;
+		seconds = (cl.frame.serverframe/10) - 60*minutes;
 	}
 	else
 	{
-		seconds = (int)(Sys_Milliseconds()/1000) - 60*minutes;
+		seconds = (Sys_Milliseconds()/1000) - 60*minutes;
 	}
 
 	tens = seconds / 10;

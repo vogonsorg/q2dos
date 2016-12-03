@@ -191,6 +191,7 @@ typedef struct
 
 	int			time;			// this is the time value that the client
 								// is rendering at.  always <= cls.realtime
+	int			initial_server_frame; /* R1Q2: initial_server_frame is for fixing precision loss with high serverframes */
 	float		lerpfrac;		// between oldframe and frame
 
 	refdef_t	refdef;

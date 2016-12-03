@@ -692,7 +692,14 @@ void CL_ParseFrame (void)
 
 	cl.frame.serverframe = MSG_ReadLong (&net_message); /* FS: Regular Q2 Protocol is going to send this is a long instead of float */
 	cl.frame.deltaframe = MSG_ReadLong (&net_message);
-	cl.frame.servertime = cl.frame.serverframe*100;
+	if(cls.state != ca_active)
+	{
+		cl.frame.servertime = 0;
+	}
+	else
+	{
+		cl.frame.servertime = (cl.frame.serverframe - cl.initial_server_frame) * (100); /* R1Q2: initial_server_frame is for fixing precision loss with high serverframes */
+	}
 
 	// BIG HACK to let old demos continue to work
 	if (cls.serverProtocol != 26)
@@ -770,6 +777,11 @@ void CL_ParseFrame (void)
 		if (cls.state != ca_active)
 		{
 			cls.state = ca_active;
+
+			/* R1Q2: fix for precision loss with high serverframes (when map runs for over several hours) */
+			cl.initial_server_frame = cl.frame.serverframe;
+			cl.frame.servertime = (cl.frame.serverframe - cl.initial_server_frame) * (100);
+
 			cl.force_refdef = true;
 			cl.predicted_origin[0] = cl.frame.playerstate.pmove.origin[0]*0.125;
 			cl.predicted_origin[1] = cl.frame.playerstate.pmove.origin[1]*0.125;
