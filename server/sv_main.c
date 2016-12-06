@@ -270,6 +270,8 @@ The second parameter should be the current protocol version number.
 void SVC_Info (void)
 {
 	char	string[64];
+	char	hostname_string[17];
+	char	mapname_string[9];
 	int		i, count;
 	int		version;
 
@@ -290,7 +292,12 @@ void SVC_Info (void)
 			if (svs.clients[i].state >= cs_connected)
 				count++;
 
-		Com_sprintf (string, sizeof(string), "%16s %8s %2i/%2i\n", hostname->string, sv.name, count, (int)maxclients->value);
+		/* FS: This can overflow if the hostname or mapname is long and makes string go over 64 chars.  So copy it and truncate it */
+		strncpy(hostname_string, hostname->string, sizeof(hostname_string)-1);
+
+		strncpy(mapname_string, sv.name, sizeof(mapname_string)-1);
+
+		Com_sprintf (string, sizeof(string), "%16s %8s %2i/%2i\n", hostname_string, mapname_string, count, (int)maxclients->value);
 	}
 
 	Netchan_OutOfBandPrint (NS_SERVER, net_from, "info\n%s", string);
