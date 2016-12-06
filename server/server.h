@@ -197,7 +197,8 @@ extern	cvar_t		*sv_airaccelerate;		// don't reload level state when reentering
 											// development tool
 extern	cvar_t		*sv_enforcetime;
 
-extern	cvar_t		*sv_skipcinematics; /* FS: skip cinematics if we chose to do */
+extern	cvar_t		*sv_skipcinematics; /* FS: skip cinematics if we want to. */
+extern	cvar_t		*sv_allow_download_maps_in_paks; /* FS: Allow bsp downloads from a pak file if we want to. */
 
 extern	client_t	*sv_client;
 extern	edict_t		*sv_player;

@@ -465,7 +465,7 @@ void SV_BeginDownload_f (void)
 	if (!sv_client->download
 		// special check for maps, if it came from a pak file, don't allow
 		// download  ZOID
-		|| (strncmp(name, "maps/", 5) == 0 && file_from_pak))
+		|| (strncmp(name, "maps/", 5) == 0 && file_from_pak && !sv_allow_download_maps_in_paks->intValue)) /* FS: Allow bsp downloads from a pak file if we want to. */
 	{
 		Com_DPrintf(DEVELOPER_MSG_SERVER, "Couldn't download %s to %s\n", name, sv_client->name);
 		if (sv_client->download) {

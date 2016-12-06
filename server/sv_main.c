@@ -54,7 +54,8 @@ cvar_t  *public_server;                 // should heartbeats be sent
 cvar_t  *sv_iplimit;                    // r1ch: max connections from a single IP (prevent DoS)
 cvar_t  *sv_reconnect_limit;    // minimum seconds between connect messages
 cvar_t	*sv_entfile;	// Knightmare 6/25/12- cvar to control use of .ent files
-cvar_t	*sv_skipcinematics; /* FS: Skip cinematics if we chose to do so */
+cvar_t	*sv_skipcinematics; /* FS: Skip cinematics if we want to. */
+cvar_t	*sv_allow_download_maps_in_paks; /* FS: Allow bsp downloads from a pak file if we want to. */
 cvar_t	*sv_downloadserver; /* FS: From R1Q2: HTTP Downloading */
 
 void Master_Shutdown (void);
@@ -1122,11 +1123,16 @@ void SV_Init (void)
 // Knightmare 6/25/12- cvar to control use of .ent files
 	sv_entfile = Cvar_Get ("sv_entfile", "1", CVAR_ARCHIVE);
 	sv_entfile->description = "Toggle the use of .ent files.";
-/* FS: Added */
+
+	/* FS: Added */
 	sv_skipcinematics = Cvar_Get ("sv_skipcinematics", "0", CVAR_ARCHIVE);
 	sv_skipcinematics->description = "Skip the loading of *.cin cinematics";
 
-/* FS: From R1Q2: HTTP Downloading */
+	/* FS: Allow bsp downloads from a pak file if we want to. */
+	sv_allow_download_maps_in_paks = Cvar_Get ("sv_allow_download_maps_in_paks", "1", 0);
+	sv_allow_download_maps_in_paks->description = "Allow BSP downloads accessed from a PAK file.";
+
+	/* FS: From R1Q2: HTTP Downloading */
 	sv_downloadserver = Cvar_Get ("sv_downloadserver", "", 0);
 	sv_downloadserver->description = "URL to a location where clients can download game content over HTTP. Default empty.  Path leads to game dir name.  i.e. quake2.com/baseq2/maps\n";
 
