@@ -48,7 +48,6 @@ cvar_t	*rcon_client_password;
 cvar_t	*rcon_address;
 
 cvar_t	*cl_noskins;
-cvar_t	*cl_autoskins;
 cvar_t	*cl_footsteps;
 cvar_t	*cl_timeout;
 cvar_t	*cl_predict;
@@ -1664,9 +1663,11 @@ void CL_InitLocal (void)
 	cl_add_particles = Cvar_Get ("cl_particles", "1", 0);
 	cl_add_entities = Cvar_Get ("cl_entities", "1", 0);
 	cl_gun = Cvar_Get ("cl_gun", "1", 0);
+	cl_gun->description = "Set to 0 to disable rendering of the gun model.  Useful for screenshots.";
 	cl_footsteps = Cvar_Get ("cl_footsteps", "1", 0);
+	cl_footsteps->description = "Play footstep sounds from player.";
 	cl_noskins = Cvar_Get ("cl_noskins", "0", 0);
-	cl_autoskins = Cvar_Get ("cl_autoskins", "0", 0);
+	cl_noskins->description = "All player skins are Male/Grunt";
 	cl_predict = Cvar_Get ("cl_predict", "1", 0);
 	cl_predict->description = "Client-side movement prediction.  Recommended to leave enabled.";
 //	cl_minfps = Cvar_Get ("cl_minfps", "5", 0);
@@ -1706,10 +1707,13 @@ void CL_InitLocal (void)
 	cl_anglespeedkey = Cvar_Get ("cl_anglespeedkey", "1.5", 0);
 
 	cl_run = Cvar_Get ("cl_run", "0", CVAR_ARCHIVE);
+	cl_run->description = "Set to 1 for always run movement.";
 	freelook = Cvar_Get( "freelook", "0", CVAR_ARCHIVE );
+	freelook->description = "If enabled mouse will be used for looking around instead of moving.";
 	lookspring = Cvar_Get ("lookspring", "0", CVAR_ARCHIVE);
 	lookstrafe = Cvar_Get ("lookstrafe", "0", CVAR_ARCHIVE);
 	sensitivity = Cvar_Get ("sensitivity", "3", CVAR_ARCHIVE);
+	sensitivity->description = "Mouse sensitivity.";
 
 	m_pitch = Cvar_Get ("m_pitch", "0.022", CVAR_ARCHIVE);
 	m_yaw = Cvar_Get ("m_yaw", "0.022", 0);
@@ -1717,11 +1721,17 @@ void CL_InitLocal (void)
 	m_side = Cvar_Get ("m_side", "1", 0);
 
 	cl_shownet = Cvar_Get ("cl_shownet", "0", 0);
+	cl_shownet->description = "Shows verbose output about server packets.  1 will show current message sizes.  2 will show svc_xxx packets as they are parsed.  3 will show verbose information about delta encoding from packet entities.";
 	cl_showmiss = Cvar_Get ("cl_showmiss", "0", 0);
+	cl_showmiss->description = "Shows misses on movement prediction.";
 	cl_showclamp = Cvar_Get ("showclamp", "0", 0);
+	cl_showclamp->description = "Shows time skews from clients timer versus the servers timer.";
 	cl_timeout = Cvar_Get ("cl_timeout", "120", 0);
+	cl_timeout->description = "Timeout (in seconds) for connecting to servers.";
 	cl_paused = Cvar_Get ("paused", "0", 0);
+	cl_paused->description = "If enabled in Single Player then the game is currently paused.  Only works in multiplayer if cheats are enabled.";
 	cl_timedemo = Cvar_Get ("timedemo", "0", 0);
+	cl_timedemo->description = "Set to 1 for timing playback of demos.  Useful for bencmarking.";
 
 	rcon_client_password = Cvar_Get ("rcon_password", "", 0);
 	rcon_address = Cvar_Get ("rcon_address", "", 0);
@@ -1742,7 +1752,9 @@ void CL_InitLocal (void)
 	fov_adapt = Cvar_Get ("fov_adapt", "1", CVAR_ARCHIVE);
 	fov_adapt->description = "Hor+ style field of view (FOV) scaling: Useful for widescreen resolutions. If enabled your FOV will be scaled automatically according to the resolution.";
 	gender = Cvar_Get ("gender", "male", CVAR_USERINFO | CVAR_ARCHIVE);
+	gender->description = "Player gender.";
 	gender_auto = Cvar_Get ("gender_auto", "1", CVAR_ARCHIVE);
+	gender_auto->description = "Automatically fix the player gender if it is modified or a userinfo variable is changed.";
 	gender->modified = false; // clear this so we know when user sets it manually
 
 	cl_vwep = Cvar_Get ("cl_vwep", "1", CVAR_ARCHIVE);
