@@ -456,6 +456,22 @@ void SV_Map (qboolean attractloop, char *levelstring, qboolean loadgame)
 	else
 		spawnpoint[0] = 0;
 
+#ifdef _DEBUG
+	if(sv_override_spawn_points->intValue) /* FS: Override spawn points for debugging. */
+	{
+		ch = strstr(level, ">");
+		if (ch)
+		{
+			*ch = 0;
+		//	strncpy (spawnpoint, ch+1);
+			Q_strncpyz (spawnpoint, ch+1, sizeof(spawnpoint));
+			Com_Printf("Looking for spawnpoint %s\n", spawnpoint);
+		}
+		else
+			spawnpoint[0] = 0;
+	}
+#endif /* _DEBUG */
+
 	l = strlen(level);
 	// skip the end-of-unit flag if necessary
 	if (level[0] == '*')

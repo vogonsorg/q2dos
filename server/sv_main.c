@@ -58,6 +58,9 @@ cvar_t	*sv_skipcinematics; /* FS: Skip cinematics if we want to. */
 cvar_t	*sv_allow_download_maps_in_paks; /* FS: Allow bsp downloads from a pak file if we want to. */
 cvar_t	*sv_downloadserver; /* FS: From R1Q2: HTTP Downloading */
 cvar_t	*sv_auto_save; /* FS: Auto save toggling. */
+#ifdef _DEBUG
+cvar_t		*sv_override_spawn_points; /* FS: Override spawn points for debug testing. */
+#endif /* _DEBUG */
 
 void Master_Shutdown (void);
 
@@ -1130,6 +1133,10 @@ void SV_Init (void)
 	sv_skipcinematics->description = "Skip the loading of *.cin cinematics";
 	sv_auto_save = Cvar_Get("sv_auto_save", "1", CVAR_ARCHIVE);
 	sv_auto_save->description = "Toggles auto saving between level transitions.";
+#ifdef _DEBUG
+	sv_override_spawn_points = Cvar_Get ("sv_override_spawn_points", "0", 0); /* FS: Override spawn points for debug testing. */
+	sv_override_spawn_points->description = "Override spawn points for debug testing.  Only available in debug builds.";
+#endif /* _DEBUG */
 
 	/* FS: Allow bsp downloads from a pak file if we want to. */
 	sv_allow_download_maps_in_paks = Cvar_Get ("sv_allow_download_maps_in_paks", "1", 0);
