@@ -34,7 +34,7 @@ int random_map_index = 0;
 /* Prototypes */
 void vote_map (edict_t *ent, const char *mapName);
 void vote_gamemode(edict_t *ent, const char *gamemode);
-void vote_coopskill(edict_t *ent, int skill);
+void vote_coopskill(edict_t *ent, int skillVote);
 void vote_random (edict_t *ent);
 void vote_restartmap (edict_t *ent);
 void vote_stop (edict_t *ent);
@@ -449,7 +449,7 @@ void vote_gamemode(edict_t *ent, const char *gamemode)
 	ent->voteInitiator = true;
 }
 
-void vote_coopskill(edict_t *ent, int skill)
+void vote_coopskill(edict_t *ent, int skillVote)
 {
 	if(!ent || !ent->client)
 	{
@@ -477,7 +477,7 @@ void vote_coopskill(edict_t *ent, int skill)
 		return;
 	}
 
-	switch(skill)
+	switch(skillVote)
 	{
 		case 0:
 			voteCoopSkill = 0;
@@ -494,6 +494,12 @@ void vote_coopskill(edict_t *ent, int skill)
 		default:
 			gi.cprintf(ent, PRINT_HIGH, "error: invalid coop difficulty level!  valid options are: 0 (easy), 1 (medium), and 2 (hard).\n");
 			return;
+	}
+
+	if(skill->intValue == skillVote)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "error: skill is already %s!  Vote cancelled.\n", whatAreWeVotingFor);
+		return;
 	}
 
 	voteClients = P_Clients_Connected(false);

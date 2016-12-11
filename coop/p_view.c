@@ -602,7 +602,7 @@ SV_CalcBlend(edict_t *ent)
 		{
 			if(ent->client->spawn_protection_msg)
 			{
-				char bSeconds[8]; /* FS: Boolean to detect if it's 1.5 seconds or lower for spawn protection time */
+				char bSeconds[9]; /* FS: Boolean to detect if it's 1.5 seconds or lower for spawn protection time */
 
 				if (sv_spawn_protection_time->value >= 1.5)
 					strncpy(bSeconds, "seconds", sizeof(bSeconds)-1);
