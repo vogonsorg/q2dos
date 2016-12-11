@@ -7,7 +7,7 @@ int enemy_range;
 float enemy_yaw;
 qboolean ai_checkattack(edict_t *self, float dist);
 qboolean enemy_infront;
-qboolean enemy_vis;
+qboolean enemy_vis; /* FS: FIXME: This looks like it's to save some time on having to call visible(self,self->enemy).  But this seems kind of dangerous? */
 qboolean FindTarget(edict_t *self);
 
 /* ========================================================================== */
@@ -90,7 +90,7 @@ ai_stand(edict_t *self, float dist)
 	vec3_t v;
 	qboolean retval;
 
-	if (!self || !self->enemy || !self->enemy->inuse) /* FS: Need self->enemy check */
+	if (!self)
 	{
 		return;
 	}
@@ -245,27 +245,35 @@ ai_charge(edict_t *self, float dist)
 	vec3_t v;
 	float ofs;
 
-	if (!self || !self->enemy || !self->enemy->inuse)
+	if (!self)
 	{
 		return;
 	}
 
+	enemy_vis = visible(self,self->enemy); /* FS: Make sure we have a friend to pursue */
+
 	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (visible(self, self->enemy))
+		if (enemy_vis)
 		{
 			VectorCopy(self->enemy->s.origin, self->monsterinfo.blind_fire_target);
 		}
 
 		if (!(self->monsterinfo.aiflags & AI_MANUAL_STEERING))
 		{
-			VectorSubtract(self->enemy->s.origin, self->s.origin, v);
+			if(enemy_vis)
+			{
+				VectorSubtract(self->enemy->s.origin, self->s.origin, v);
+			}
 			self->ideal_yaw = vectoyaw(v);
 		}
 	}
 	else
 	{
-		VectorSubtract(self->enemy->s.origin, self->s.origin, v);
+		if(enemy_vis)
+		{
+			VectorSubtract(self->enemy->s.origin, self->s.origin, v);
+		}
 		self->ideal_yaw = vectoyaw(v);
 	}
 
@@ -491,7 +499,7 @@ HuntTarget(edict_t *self)
 {
 	vec3_t vec;
 
-	if (!self || !self->enemy || !self->enemy->inuse) /* FS: Need self->enemy check */
+	if (!self)
 	{
 		return;
 	}
@@ -508,7 +516,10 @@ HuntTarget(edict_t *self)
 			self->monsterinfo.run(self);
 	}
 
-	VectorSubtract(self->enemy->s.origin, self->s.origin, vec);
+	if(visible(self, self->enemy))
+	{
+		VectorSubtract(self->enemy->s.origin, self->s.origin, vec);
+	}
 	self->ideal_yaw = vectoyaw(vec);
 
 	/* wait a while before first attack */
@@ -1293,6 +1304,7 @@ ai_checkattack(edict_t *self, float dist)
 
 	if (!self || !self->enemy || !self->enemy->inuse) /* FS: Need self->enemy check */
 	{
+		enemy_vis = false;
 		return false;
 	}
 
@@ -1436,10 +1448,13 @@ ai_checkattack(edict_t *self, float dist)
 		}
 	}
 
-	enemy_infront = infront(self, self->enemy);
-	enemy_range = range(self, self->enemy);
-	VectorSubtract(self->enemy->s.origin, self->s.origin, temp);
-	enemy_yaw = vectoyaw(temp);
+	if(enemy_vis)
+	{
+		enemy_infront = infront(self, self->enemy);
+		enemy_range = range(self, self->enemy);
+		VectorSubtract(self->enemy->s.origin, self->s.origin, temp);
+		enemy_yaw = vectoyaw(temp);
+	}
 
 	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
