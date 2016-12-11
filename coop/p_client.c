@@ -146,6 +146,17 @@ SP_info_coop_checkpoint_touch ( edict_t * self , edict_t * other , cplane_t * pl
 void
 SP_info_coop_checkpoint (edict_t * self )
 {
+	if(!self)
+	{
+		return;
+	}
+
+	if((!coop->intValue) || (coop->intValue && !coop_checkpoints->intValue))
+	{
+		G_FreeEdict(self);
+		return;
+	}
+
 	self->touch = SP_info_coop_checkpoint_touch;
 	self->solid = SOLID_TRIGGER;
 

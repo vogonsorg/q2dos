@@ -230,6 +230,9 @@ InitGame(void)
 	deathmatch = gi.cvar ("deathmatch", "0", CVAR_LATCH);
 	coop = gi.cvar ("coop", "0", CVAR_LATCH);
 	coop_item_respawn = gi.cvar("coop_item_respawn", "1", CVAR_SERVERINFO); /* FS: Coop: Added */
+	coop_item_respawn->description = "Respawning weapons, ammo, and other items in coop.";
+	coop_checkpoints = gi.cvar("coop_checkpoints", "1", 0); /* FS: Coop: Added */
+	coop_checkpoints->description = "Coop checkpoints.  Uses cmds createcheckpoint, savecheckpoints, and deletecheckpoints.  Requires uses of adminpass to be set.  See source code for additional details.";
 	sv_coop_gamemode = gi.cvar("sv_coop_gamemode", "vanilla", CVAR_NOSET|CVAR_SERVERINFO); /* FS: Coop: Added */
 	sv_coop_gamemode->description = "Internal CVAR used to keep track of current gamemode during DLL resets.";
 	sv_coop_reset_hack = gi.cvar("sv_coop_reset_hack", "1", 0);

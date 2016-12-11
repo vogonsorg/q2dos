@@ -644,6 +644,7 @@ extern	cvar_t	*maxentities;
 extern	cvar_t	*deathmatch;
 extern	cvar_t	*coop;
 extern	cvar_t	*coop_item_respawn; /* FS: Coop: Added */
+extern	cvar_t	*coop_checkpoints; /* FS: Coop: Added */
 extern	cvar_t	*sv_vote_enabled; /* FS: Coop: Voting */
 extern	cvar_t	*sv_vote_disallow_flags; /* FS: Coop: Voting */
 extern	cvar_t	*sv_vote_assume_yes; /* FS: Coop: Voting */
