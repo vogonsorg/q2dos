@@ -90,7 +90,7 @@ ai_stand(edict_t *self, float dist)
 	vec3_t v;
 	qboolean retval;
 
-	if (!self)
+	if (!self || !self->enemy || !self->enemy->inuse) /* FS: Need self->enemy check */
 	{
 		return;
 	}
@@ -491,7 +491,7 @@ HuntTarget(edict_t *self)
 {
 	vec3_t vec;
 
-	if (!self)
+	if (!self || !self->enemy || !self->enemy->inuse) /* FS: Need self->enemy check */
 	{
 		return;
 	}
@@ -521,7 +521,7 @@ HuntTarget(edict_t *self)
 void
 FoundTarget(edict_t *self)
 {
-	if (!self)
+	if (!self || !self->enemy || !self->enemy->inuse) /* FS: Need self->enemy check */
 	{
 		return;
 	}
@@ -867,7 +867,7 @@ M_CheckAttack(edict_t *self)
 	float chance;
 	trace_t tr;
 
-	if (!self)
+	if (!self || !self->enemy || !self->enemy->inuse) /* FS: Need self->enemy check */
 	{
 		return false;
 	}
@@ -1291,7 +1291,7 @@ ai_checkattack(edict_t *self, float dist)
 	qboolean hesDeadJim;
 	qboolean retval;
 
-	if (!self || !self->enemy) /* FS: Added self->enemy check */
+	if (!self || !self->enemy || !self->enemy->inuse) /* FS: Need self->enemy check */
 	{
 		return false;
 	}
@@ -1924,7 +1924,7 @@ ai_run(edict_t *self, float dist)
 	float		left, center, right;
 	vec3_t		left_target, right_target;
 
-	if (!self)
+	if (!self || !self->enemy || !self->enemy->inuse) /* FS: Need self->enemy check */
 	{
 		return;
 	}
