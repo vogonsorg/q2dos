@@ -155,6 +155,16 @@ SAVEGAME FILES
 ===============================================================================
 */
 
+qboolean SV_AutoSave(void) /* FS: Auto save toggling */
+{
+	if(!sv_auto_save->intValue) /* FS: TODO: Should we just disable any auto-saving for dedicated servers? */
+	{
+		return false;
+	}
+
+	return true;
+}
+
 /*
 =====================
 SV_WipeSavegame
@@ -290,6 +300,11 @@ void SV_WriteLevelFile (void)
 {
 	char	name[MAX_OSPATH];
 	FILE	*f;
+
+	if (!SV_AutoSave()) /* FS: Auto save toggling */
+	{
+		return;
+	}
 
 	Com_DPrintf(DEVELOPER_MSG_SAVE, "SV_WriteLevelFile()\n");
 
@@ -543,14 +558,20 @@ void SV_GameMap_f (void)
 
 	Com_DPrintf(DEVELOPER_MSG_SAVE, "SV_GameMap(%s)\n", Cmd_Argv(1));
 
-	FS_CreatePath (va("%s/save/doscursv/", FS_Gamedir()));
+	if (SV_AutoSave()) /* FS: Auto save toggling */
+	{
+		FS_CreatePath (va("%s/save/doscursv/", FS_Gamedir()));
+	}
 
 	// check for clearing the current savegame
 	map = Cmd_Argv(1);
 	if (map[0] == '*')
 	{
-		// wipe all the *.sav files
-		SV_WipeSavegame ("doscursv");
+		if (SV_AutoSave()) /* FS: Auto save toggling */
+		{
+			// wipe all the *.sav files
+			SV_WipeSavegame ("doscursv");
+		}
 	}
 	else
 	{	// save the map just exited

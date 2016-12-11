@@ -57,6 +57,7 @@ cvar_t	*sv_entfile;	// Knightmare 6/25/12- cvar to control use of .ent files
 cvar_t	*sv_skipcinematics; /* FS: Skip cinematics if we want to. */
 cvar_t	*sv_allow_download_maps_in_paks; /* FS: Allow bsp downloads from a pak file if we want to. */
 cvar_t	*sv_downloadserver; /* FS: From R1Q2: HTTP Downloading */
+cvar_t	*sv_auto_save; /* FS: Auto save toggling. */
 
 void Master_Shutdown (void);
 
@@ -1127,6 +1128,8 @@ void SV_Init (void)
 	/* FS: Added */
 	sv_skipcinematics = Cvar_Get ("sv_skipcinematics", "0", CVAR_ARCHIVE);
 	sv_skipcinematics->description = "Skip the loading of *.cin cinematics";
+	sv_auto_save = Cvar_Get("sv_auto_save", "1", CVAR_ARCHIVE);
+	sv_auto_save->description = "Toggles auto saving between level transitions.";
 
 	/* FS: Allow bsp downloads from a pak file if we want to. */
 	sv_allow_download_maps_in_paks = Cvar_Get ("sv_allow_download_maps_in_paks", "1", 0);
