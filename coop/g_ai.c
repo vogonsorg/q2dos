@@ -250,18 +250,16 @@ ai_charge(edict_t *self, float dist)
 		return;
 	}
 
-	enemy_vis = visible(self,self->enemy); /* FS: Make sure we have a friend to pursue */
-
 	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (enemy_vis)
+		if (visible(self, self->enemy))
 		{
 			VectorCopy(self->enemy->s.origin, self->monsterinfo.blind_fire_target);
 		}
 
 		if (!(self->monsterinfo.aiflags & AI_MANUAL_STEERING))
 		{
-			if(enemy_vis)
+			if(self->enemy)
 			{
 				VectorSubtract(self->enemy->s.origin, self->s.origin, v);
 			}
@@ -270,7 +268,7 @@ ai_charge(edict_t *self, float dist)
 	}
 	else
 	{
-		if(enemy_vis)
+		if(self->enemy)
 		{
 			VectorSubtract(self->enemy->s.origin, self->s.origin, v);
 		}
@@ -1448,7 +1446,7 @@ ai_checkattack(edict_t *self, float dist)
 		}
 	}
 
-	if(enemy_vis)
+	if(self->enemy)
 	{
 		enemy_infront = infront(self, self->enemy);
 		enemy_range = range(self, self->enemy);
