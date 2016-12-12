@@ -144,6 +144,10 @@ ai_stand(edict_t *self, float dist)
 			}
 			else
 			{
+				if(self->teleport_time) /* FS: Allow the enemies to get aggressive stances again if we get out of view range. */
+				{
+					self->teleport_time = 0;
+				}
 				FindTarget(self);
 			}
 
@@ -168,6 +172,10 @@ ai_stand(edict_t *self, float dist)
 			}
 			else
 			{
+				if(self->teleport_time) /* FS: Allow the enemies to get aggressive stances again if we get out of view range. */
+				{
+					self->teleport_time = 0;
+				}
 				FindTarget(self);
 			}
 
