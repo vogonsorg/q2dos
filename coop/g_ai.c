@@ -144,7 +144,7 @@ ai_stand(edict_t *self, float dist)
 			}
 			else
 			{
-				if((self->teleport_time) && (self->teleport_time + 60.0f >= level.time)) /* FS: Allow the enemies to get aggressive stances again if we get out of view range for more than a minute. */
+				if((self->teleport_time) && (self->teleport_time + 60.0f <= level.time)) /* FS: Allow the enemies to get aggressive stances again if we get out of view range for more than a minute. */
 				{
 					self->teleport_time = 0;
 				}
@@ -172,7 +172,7 @@ ai_stand(edict_t *self, float dist)
 			}
 			else
 			{
-				if((self->teleport_time) && (self->teleport_time + 60.0f >= level.time)) /* FS: Allow the enemies to get aggressive stances again if we get out of view range for more than a minute. */
+				if((self->teleport_time) && (self->teleport_time + 60.0f <= level.time)) /* FS: Allow the enemies to get aggressive stances again if we get out of view range for more than a minute. */
 				{
 					self->teleport_time = 0;
 				}
