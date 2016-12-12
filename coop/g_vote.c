@@ -125,7 +125,7 @@ void vote_command(edict_t *ent)
 	{
 		if(argc <= 2)
 		{
-			gi.cprintf(ent, PRINT_HIGH, "error: you must supply a coop difficulty level!  valid options are: 0 (easy), 1 (medium), and 2 (hard).\n");
+			gi.cprintf(ent, PRINT_HIGH, "error: you must supply a coop difficulty level!  valid options are: 0 (easy), 1 (medium), 2 (hard), and 3 (nightmare).\n");
 			return;
 		}
 		else
@@ -491,8 +491,12 @@ void vote_coopskill(edict_t *ent, int skillVote)
 			voteCoopSkill = 2;
 			Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "hard");
 			break;
+		case 3:
+			voteCoopSkill = 3;
+			Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "nightmare");
+			break;
 		default:
-			gi.cprintf(ent, PRINT_HIGH, "error: invalid coop difficulty level!  valid options are: 0 (easy), 1 (medium), and 2 (hard).\n");
+			gi.cprintf(ent, PRINT_HIGH, "error: invalid coop difficulty level!  valid options are: 0 (easy), 1 (medium), 2 (hard), and 3 (nightmare).\n");
 			return;
 	}
 
