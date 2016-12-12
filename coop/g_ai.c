@@ -144,7 +144,7 @@ ai_stand(edict_t *self, float dist)
 			}
 			else
 			{
-				if(self->teleport_time) /* FS: Allow the enemies to get aggressive stances again if we get out of view range. */
+				if((self->teleport_time) && (self->teleport_time + 60.0f >= level.time)) /* FS: Allow the enemies to get aggressive stances again if we get out of view range for more than a minute. */
 				{
 					self->teleport_time = 0;
 				}
@@ -172,7 +172,7 @@ ai_stand(edict_t *self, float dist)
 			}
 			else
 			{
-				if(self->teleport_time) /* FS: Allow the enemies to get aggressive stances again if we get out of view range. */
+				if((self->teleport_time) && (self->teleport_time + 60.0f >= level.time)) /* FS: Allow the enemies to get aggressive stances again if we get out of view range for more than a minute. */
 				{
 					self->teleport_time = 0;
 				}
@@ -1331,7 +1331,7 @@ ai_checkattack(edict_t *self, float dist)
 				self->teleport_time = self->enemy->teleport_time;
 			}
 
-			if ((level.time - self->teleport_time) > 5.0f)
+			if ((level.time - self->teleport_time) > 1.0f) /* FS: Was > 5.0f.  Yamagi suggets 1.0f. */
 			{
 				if (self->goalentity == self->enemy)
 				{
