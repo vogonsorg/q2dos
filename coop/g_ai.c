@@ -174,6 +174,7 @@ ai_stand(edict_t *self, float dist)
 			return;
 		}
 	}
+
 	if (FindTarget(self))
 	{
 		return;
@@ -1317,7 +1318,12 @@ ai_checkattack(edict_t *self, float dist)
 
 		if (self->monsterinfo.aiflags & AI_SOUND_TARGET)
 		{
-			if ((level.time - self->enemy->teleport_time) > 5.0)
+			if(!self->teleport_time) /* FS: Only set this once!  Teleport_time is only used by the player, so we can set this for an enemy to not re-start the ignoring process all over again. */
+			{
+				self->teleport_time = self->enemy->teleport_time;
+			}
+
+			if ((level.time - self->teleport_time) > 5.0f)
 			{
 				if (self->goalentity == self->enemy)
 				{
