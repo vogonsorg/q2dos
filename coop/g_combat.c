@@ -232,6 +232,174 @@ char *GetCoopInsult (void) /* FS: Coop: Pick a random insult */
 	return "was killed by";
 }
 
+void GetCoopMeansOfDeath (char *monsterName, char *playerName)
+{
+	int mod;
+	char *message = NULL;
+	char *message2 = "";
+
+	if (!monsterName || !playerName)
+	{
+		return;
+	}
+
+	if (random() <= 0.20f) /* FS: One in five chance of getting a random insult to help spice it up. */
+	{
+		gi.bprintf(PRINT_MEDIUM, "%s %s %s\n", GetProperMonsterName(monsterName), GetCoopInsult(), playerName);
+		return;
+	}
+
+	mod = meansOfDeath & ~MOD_FRIENDLY_FIRE;
+
+	switch (mod)
+	{
+		case MOD_BLASTER:
+			message = "was blasted by";
+			break;
+		case MOD_SHOTGUN:
+			message = "was gunned down by";
+			break;
+		case MOD_SSHOTGUN:
+			message = "was blown away by";
+			message2 = "'s super shotgun";
+			break;
+		case MOD_MACHINEGUN:
+			message = "was machinegunned by";
+			break;
+		case MOD_CHAINGUN:
+			message = "was cut in half by";
+			message2 = "'s chaingun";
+			break;
+		case MOD_GRENADE:
+			message = "was popped by";
+			message2 = "'s grenade";
+			break;
+		case MOD_G_SPLASH:
+			message = "was shredded by";
+			message2 = "'s shrapnel";
+			break;
+		case MOD_ROCKET:
+			message = "ate";
+			message2 = "'s rocket";
+			break;
+		case MOD_R_SPLASH:
+			message = "almost dodged";
+			message2 = "'s rocket";
+			break;
+		case MOD_HYPERBLASTER:
+			message = "was melted by";
+			message2 = "'s hyperblaster";
+			break;
+		case MOD_RAILGUN:
+			message = "was railed by";
+			break;
+		case MOD_BFG_LASER:
+			message = "saw the pretty lights from";
+			message2 = "'s BFG";
+			break;
+		case MOD_BFG_BLAST:
+			message = "was disintegrated by";
+			message2 = "'s BFG blast";
+			break;
+		case MOD_BFG_EFFECT:
+			message = "couldn't hide from";
+			message2 = "'s BFG";
+			break;
+		case MOD_HANDGRENADE:
+			message = "caught";
+			message2 = "'s handgrenade";
+			break;
+		case MOD_HG_SPLASH:
+			message = "didn't see";
+			message2 = "'s handgrenade";
+			break;
+		case MOD_HELD_GRENADE:
+			message = "feels";
+			message2 = "'s pain";
+			break;
+		case MOD_TELEFRAG:
+			message = "tried to invade";
+			message2 = "'s personal space";
+			break;
+		case MOD_CHAINFIST: /* FS: Coop: Rogue specific */
+			message = "was shredded by";
+			message2 = "'s ripsaw";
+			break;
+		case MOD_DISINTEGRATOR: /* FS: Coop: Rogue specific */
+			message = "lost his grip courtesy of";
+			message2 = "'s disintegrator";
+			break;
+		case MOD_ETF_RIFLE: /* FS: Coop: Rogue specific */
+			message = "was perforated by";
+			break;
+		case MOD_HEATBEAM: /* FS: Coop: Rogue specific */
+			message = "was scorched by";
+			message2 = "'s plasma beam";
+			break;
+		case MOD_TESLA: /* FS: Coop: Rogue specific */
+			message = "was enlightened by";
+			message2 = "'s tesla mine";
+			break;
+		case MOD_PROX: /* FS: Coop: Rogue specific */
+			message = "got too close to";
+			message2 = "'s proximity mine";
+			break;
+		case MOD_NUKE: /* FS: Coop: Rogue specific */
+			message = "was nuked by";
+			message2 = "'s antimatter bomb";
+			break;
+		case MOD_VENGEANCE_SPHERE: /* FS: Coop: Rogue specific */
+			message = "was purged by";
+			message2 = "'s vengeance sphere";
+			break;
+		case MOD_DEFENDER_SPHERE: /* FS: Coop: Rogue specific */
+			message = "had a blast with";
+			message2 = "'s defender sphere";
+			break;
+		case MOD_HUNTER_SPHERE: /* FS: Coop: Rogue specific */
+			message = "was killed like a dog by";
+			message2 = "'s hunter sphere";
+			break;
+		case MOD_TRACKER: /* FS: Coop: Rogue specific */
+			message = "was annihilated by";
+			message2 = "'s disruptor";
+			break;
+		case MOD_DOPPLE_EXPLODE: /* FS: Coop: Rogue specific */
+			message = "was blown up by";
+			message2 = "'s doppleganger";
+			break;
+		case MOD_DOPPLE_VENGEANCE: /* FS: Coop: Rogue specific */
+			message = "was purged by";
+			message2 = "'s doppleganger";
+			break;
+		case MOD_DOPPLE_HUNTER: /* FS: Coop: Rogue specific */
+			message = "was hunted down by";
+			message2 = "'s doppleganger";
+			break;
+		case MOD_RIPPER: /* FS: Coop: Xatrix specific */
+			message = "ripped to shreds by";
+			message2 = "'s ripper gun";
+			break;
+		case MOD_PHALANX: /* FS: Coop: Xatrix specific */
+			message = "was evaporated by";
+			break;
+		case MOD_TRAP: /* FS: Coop: Xatrix specific */
+			message = "caught in trap by";
+			break;
+		default:
+			break;
+	}
+
+	if(message && message[0])
+	{
+		gi.bprintf(PRINT_MEDIUM, "%s %s %s%s\n", GetProperMonsterName(monsterName), message, playerName, message2);
+	}
+	else /* FS: Couldn't get means of death for some reason.  So just pick a random insult. */
+	{
+		gi.bprintf(PRINT_MEDIUM, "%s %s %s\n", GetProperMonsterName(monsterName), GetCoopInsult(), playerName);
+	}
+}
+
 void
 Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 		int damage, vec3_t point)
@@ -335,7 +503,7 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 		{
 			if((targ->svflags & SVF_MONSTER) && attacker && attacker->client && attacker->client->pers.netname && targ->classname && !stricmp(targ->classname, "monster_turret")) /* FS: Coop: monster_turrets have MOVETYPE_NONE so they stop here. */
 			{
-				gi.bprintf(PRINT_HIGH, "%s %s %s\n", GetProperMonsterName(targ->classname), GetCoopInsult(), attacker->client->pers.netname);
+				GetCoopMeansOfDeath(targ->classname, attacker->client->pers.netname);
 			}
 		}
 		targ->die(targ, inflictor, attacker, damage, point);
@@ -347,7 +515,7 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 		targ->touch = NULL;
 		if(attacker && attacker->client && attacker->client->pers.netname) /* FS: Coop: Announce who we killed */
 		{
-			gi.bprintf(PRINT_HIGH, "%s %s %s\n", GetProperMonsterName(targ->classname), GetCoopInsult(), attacker->client->pers.netname);
+			GetCoopMeansOfDeath(targ->classname, attacker->client->pers.netname);
 		}
 		monster_death_use(targ);
 	}
