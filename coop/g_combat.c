@@ -154,6 +154,8 @@ char *GetProperMonsterName (char *monsterName) /* FS: Coop: Get proper name for 
 		return "Tank Commander";
 	else if(!strcmp("monster_supertank", monsterName))
 		return "Super Tank";
+	else if(!strcmp("monster_boss2", monsterName))
+		return "Hornet";
 	else if(!strcmp("monster_jorg", monsterName))
 		return "Jorg";
 	else if(!strcmp("makron", monsterName))
