@@ -663,7 +663,7 @@ void G_ResetTimer_Hack (void) /* FS: Some of the grossest shit of all time.  Res
 
 			if(ent->powerarmor_time)
 			{
-				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set air_finished for %s: %f\n", className, ent->powerarmor_time);
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set powerarmor_time for %s: %f\n", className, ent->powerarmor_time);
 				ent->powerarmor_time = level.time + 0.2f;
 			}
 

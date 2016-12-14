@@ -1126,6 +1126,11 @@ InitClientCoopPersistant(edict_t *ent) /* FS: Coop: Give back some goodies on re
 			ent->client->pers.inventory[i] = game.inventory[i];
 		}
 	}
+
+	if(ent->client->resp.coop_respawn.savedFlags & FL_POWER_ARMOR) /* FS: Restore power armor if we had it enabled. */
+	{
+		ent->flags |= FL_POWER_ARMOR;
+	}
 }
 
 void

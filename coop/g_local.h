@@ -1446,7 +1446,7 @@ struct edict_s
 	int			max_health;
 	int			gib_health;
 	int			deadflag;
-	qboolean	show_hostile;
+	qboolean	show_hostile; /* FS: FIXME: This is being set like a float with level.time + 1.  Only one piece of code accesses it this way.  Should we make it a float and check if it breaks the AI? */
 
 	float		powerarmor_time;
 

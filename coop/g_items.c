@@ -1585,6 +1585,12 @@ Use_PowerArmor(edict_t *ent, gitem_t *item)
 	if (ent->flags & FL_POWER_ARMOR)
 	{
 		ent->flags &= ~FL_POWER_ARMOR;
+
+		if(coop->intValue && ent->client) /* FS: Save power armor state for respawn. */
+		{
+			ent->client->resp.coop_respawn.savedFlags &= ~FL_POWER_ARMOR;
+		}
+
 		gi.sound(ent, CHAN_AUTO, gi.soundindex( "misc/power2.wav"), 1, ATTN_NORM, 0);
 	}
 	else
@@ -1598,6 +1604,12 @@ Use_PowerArmor(edict_t *ent, gitem_t *item)
 		}
 
 		ent->flags |= FL_POWER_ARMOR;
+
+		if(coop->intValue && ent->client) /* FS: Save power armor state for respawn. */
+		{
+			ent->client->resp.coop_respawn.savedFlags |= FL_POWER_ARMOR;
+		}
+
 		gi.sound(ent, CHAN_AUTO, gi.soundindex("misc/power1.wav"), 1, ATTN_NORM, 0);
 	}
 }
