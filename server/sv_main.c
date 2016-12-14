@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "server.h"
 
+char uptime_infostring[80]; /* FS: Uptime for /info */
+
 netadr_t        master_adr[MAX_MASTERS];        // address of group servers
 
 client_t        *sv_client;                     // current client
@@ -214,6 +216,13 @@ char	*SV_StatusString (void)
 //	strncpy (status, Cvar_Serverinfo());
 //	strncat (status, "\n");
 	Q_strncpyz (status, Cvar_Serverinfo(), sizeof(status));
+
+	/* FS: Output uptime to info packets */
+	Q_strncatz (status, "\\uptime\\", sizeof(status));
+	SV_GetUptime();
+	Q_strncatz (status, uptime_infostring, sizeof(status));
+	/* FS: End */
+
 	Q_strncatz (status, "\n", sizeof(status));
 	statusLength = strlen(status);
 
@@ -1229,5 +1238,18 @@ void SV_Shutdown (char *finalmsg, qboolean reconnect)
 	if (svs.demofile)
 		fclose (svs.demofile);
 	memset (&svs, 0, sizeof(svs));
+}
+
+void SV_GetUptime (void) /* FS: Uptime for /info */
+{
+	int	minutes, seconds, tens, units;
+
+	// time
+	minutes = (Sys_Milliseconds()/1000) / 60;
+	seconds = (Sys_Milliseconds()/1000) - 60*minutes;
+
+	tens = seconds / 10;
+	units = seconds - 10*tens;
+	Com_sprintf (uptime_infostring, sizeof(uptime_infostring), "%3i:%i%i", minutes, tens, units);
 }
 

@@ -539,7 +539,8 @@ void SV_ShowServerinfo_f (void)
 		p++;
 	}
 
-	SV_ClientPrintf (sv_client, PRINT_HIGH, "%s\n", s);
+	SV_GetUptime(); /* FS: Get uptime */
+	SV_ClientPrintf (sv_client, PRINT_HIGH, "%s\nuptime=%s\n", s, uptime_infostring);
 	// end r1ch fix
 }
 
@@ -813,4 +814,3 @@ void SV_ExecuteClientMessage (client_t *cl)
 		}
 	}
 }
-

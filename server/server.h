@@ -212,6 +212,7 @@ extern	edict_t		*sv_player;
 //
 // sv_main.c
 //
+extern char uptime_infostring[80]; /* FS: Uptime for /info */
 void SV_FinalMessage (char *message, qboolean reconnect);
 void SV_DropClient (client_t *drop);
 client_t *GetClientFromAdr (netadr_t address); // Knightmare added
@@ -232,6 +233,7 @@ void SV_UserinfoChanged (client_t *cl);
 
 void Master_Heartbeat (void);
 void Master_Packet (void);
+void SV_GetUptime (void); /* FS: Uptime for /info */
 
 //
 // sv_init.c
