@@ -3,6 +3,26 @@
 
 extern void SP_info_coop_checkpoint (edict_t * self );
 
+static qboolean Client_CanCheat (edict_t *self) /* FS: Added */
+{
+	if (!self || !self->client)
+	{
+		return false;
+	}
+
+	if (self->client->pers.isAdmin) /* FS: Admins can do what they want >:D */
+	{
+		return true;
+	}
+
+	if (sv_cheats->intValue) /* FS: Otherwise, we need sv_cheats enabled for normal players. */
+	{
+		return true;
+	}
+
+	return false;
+}
+
 static char *
 ClientTeam(edict_t *ent, char* value)
 {
@@ -248,7 +268,7 @@ Cmd_Give_f(edict_t *ent)
 		return;
 	}
 
-	if ((deathmatch->value || coop->value) && !sv_cheats->value)
+	if ((deathmatch->value || coop->value) && !Client_CanCheat(ent))
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"You must run the server with '+set cheats 1' to enable this command.\n");
@@ -506,7 +526,7 @@ Cmd_God_f(edict_t *ent)
 		return;
 	}
 
-	if ((deathmatch->value || coop->value) && !sv_cheats->value)
+	if ((deathmatch->value || coop->value) && !Client_CanCheat(ent))
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"You must run the server with '+set cheats 1' to enable this command.\n");
@@ -547,7 +567,7 @@ Cmd_Notarget_f(edict_t *ent)
 		return;
 	}
 
-	if ((deathmatch->value || coop->value) && !sv_cheats->value)
+	if ((deathmatch->value || coop->value) && !Client_CanCheat(ent))
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"You must run the server with '+set cheats 1' to enable this command.\n");
@@ -585,7 +605,7 @@ Cmd_Noclip_f(edict_t *ent)
 		return;
 	}
 
-	if ((deathmatch->value || coop->value) && !sv_cheats->value)
+	if ((deathmatch->value || coop->value) && !Client_CanCheat(ent))
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"You must run the server with '+set cheats 1' to enable this command.\n");
@@ -1718,7 +1738,7 @@ void Cmd_Beam_f (edict_t *ent) /* FS: From YamaqiQ2: Beam us to direct coordinat
 		return;
 	}
 
-	if ((deathmatch->value || coop->value) && !sv_cheats->value)
+	if ((deathmatch->value || coop->value) && !Client_CanCheat(ent))
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"You must run the server with '+set cheats 1' to enable this command.\n");
