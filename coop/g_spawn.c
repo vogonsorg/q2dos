@@ -395,7 +395,6 @@ ED_CallSpawn(edict_t *ent)
 	{
 		gi.dprintf(DEVELOPER_MSG_GAME, "ED_CallSpawn: NULL classname\n");
 		G_FreeEdict(ent);
-		ent = NULL;
 		return;
 	}
 
