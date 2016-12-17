@@ -535,7 +535,7 @@ ED_ParseField(const char *key, const char *value, edict_t *ent)
 					((float *)(b + f->ofs))[2] = vec[2];
 					break;
 				case F_INT:
-					*(int *)(b + f->ofs) = atoi(value);
+					*(int *)(b + f->ofs) = (int)strtol(value, (char **)NULL, 10);
 					break;
 				case F_FLOAT:
 					*(float *)(b + f->ofs) = atof(value);
@@ -569,7 +569,7 @@ ED_ParseEdict(char *data, edict_t *ent)
 	char keyname[256];
 	const char *com_token;
 
-	if (!ent || !data)
+	if (!ent)
 	{
 		return NULL;
 	}

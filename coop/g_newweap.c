@@ -385,11 +385,6 @@ prox_land(edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
 		return;
 	}
 
-	if (plane == NULL)
-	{
-		return;
-	}
-
 	VectorMA(ent->s.origin, -10.0, plane->normal, land_point);
 
 	if (gi.pointcontents(land_point) & (CONTENTS_SLIME | CONTENTS_LAVA))

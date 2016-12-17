@@ -519,7 +519,7 @@ M_CheckGround(edict_t *ent)
 		VectorCopy(trace.endpos, ent->s.origin);
 		ent->groundentity = trace.ent;
 		ent->groundentity_linkcount = trace.ent->linkcount;
-		ent->velocity[2] = 0;
+		ent->velocity[2] = trace.ent->velocity[2];
 	}
 }
 
@@ -535,9 +535,9 @@ M_CatagorizePosition(edict_t *ent)
 	}
 
 	/* get waterlevel */
-	point[0] = ent->s.origin[0];
-	point[1] = ent->s.origin[1];
-	point[2] = ent->s.origin[2] + ent->mins[2] + 1;
+	point[0] = (ent->absmax[0] + ent->absmin[0])/2;
+	point[1] = (ent->absmax[1] + ent->absmin[1])/2;
+	point[2] = ent->absmin[2] + 2;
 	cont = gi.pointcontents(point);
 
 	if (!(cont & MASK_WATER))
@@ -1122,7 +1122,12 @@ monster_start(edict_t *self)
 	self->takedamage = DAMAGE_AIM;
 	self->air_finished = level.time + 12;
 	self->use = monster_use;
-	self->max_health = self->health;
+
+	if(!self->max_health)
+	{
+		self->max_health = self->health;
+	}
+
 	self->clipmask = MASK_MONSTERSOLID;
 
 	self->s.skinnum = 0;

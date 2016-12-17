@@ -943,7 +943,6 @@ SP_trigger_gravity(edict_t *self)
 
 	InitTrigger(self);
 
-	/* FS: FIXME: What is the deal with all the different conversions going on here with self->gravity? */
 	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
 		self->gravity = atof(st.gravity);
@@ -961,12 +960,7 @@ SP_trigger_gravity(edict_t *self)
 		self->touch = trigger_gravity_touch;
 		gi.linkentity(self);
 	}
-	else if (game.gametype == xatrix_coop) /* FS: Coop: Xatrix specific */
-	{
-		self->gravity = atoi(st.gravity);
-		self->touch = trigger_gravity_touch;
-	}
-	else /* FS: Coop: Vanilla specific */
+	else
 	{
 		self->gravity = (int)strtol(st.gravity, (char **)NULL, 10);
 		self->touch = trigger_gravity_touch;
