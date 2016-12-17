@@ -759,7 +759,7 @@ M_ReactToDamage(edict_t *targ, edict_t *attacker, edict_t *inflictor)
 {
 	qboolean new_tesla; /* FS: Coop: Rogue specific */
 
-    if (!targ || !attacker || !inflictor)
+    if (!targ || !attacker)
 	{
 		return;
 	}
