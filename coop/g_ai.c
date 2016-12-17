@@ -144,10 +144,6 @@ ai_stand(edict_t *self, float dist)
 			}
 			else
 			{
-				if((self->teleport_time) && (self->teleport_time + 60.0f <= level.time)) /* FS: Allow the enemies to get aggressive stances again if we get out of view range for more than a minute. */
-				{
-					self->teleport_time = 0;
-				}
 				FindTarget(self);
 			}
 
@@ -172,10 +168,6 @@ ai_stand(edict_t *self, float dist)
 			}
 			else
 			{
-				if((self->teleport_time) && (self->teleport_time + 60.0f <= level.time)) /* FS: Allow the enemies to get aggressive stances again if we get out of view range for more than a minute. */
-				{
-					self->teleport_time = 0;
-				}
 				FindTarget(self);
 			}
 
@@ -1324,22 +1316,10 @@ ai_checkattack(edict_t *self, float dist)
 			return false;
 		}
 
-		if (self->monsterinfo.aiflags & AI_SOUND_TARGET)
+		// only check sound if it's not visible anyway (=> attack if visible)
+		if (!visible(self, self->goalentity) && (self->monsterinfo.aiflags & AI_SOUND_TARGET))
 		{
-			if(!self->teleport_time) /* FS: Only set this once!  Teleport_time is only used by the player, so we can set this for an enemy to not re-start the ignoring process all over again. */
-			{
-				if (skill->intValue == 3) /* FS: Yamagi suggests them always being alert immediately in nightmare mode. */
-				{
-					self->teleport_time = level.time - 1.1f;
-					self->show_hostile = level.time + 1;
-				}
-				else
-				{
-					self->teleport_time = self->enemy->teleport_time;
-				}
-			}
-
-			if ((level.time - self->teleport_time) > 1.0f) /* FS: Was > 5.0f.  Yamagi suggets 1.0f. */
+			if ((level.time - self->enemy->teleport_time) > 5.0)
 			{
 				if (self->goalentity == self->enemy)
 				{
