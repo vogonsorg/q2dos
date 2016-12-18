@@ -9,9 +9,10 @@ Windows: * makeallDXE.bat to build the entire source, including mods.
          * minimal.bat to build a cut-down Q2DOS with no TCP/IP, Gamespy, cURL,
            OGG/Vorbis, and PCI Sound card support.
            Mostly for testing purposes.
-         * NOTE: makesse.bat and release.bat have hard-coded paths to my
-                 machine for distribution.  Check these batch files and modify
-                 to your needs.
+         * NOTE: makesse.bat and release.bat rely on %Q2DOSDEVBASE% and
+                 %SEVENZIPPATH% environment variables.  Examples:
+                 SET Q2DOSDEVBASE=C:\src\q2dos
+                 SET SEVENZIPPATH=C:\Program Files\7-zip
 
 Linux  : You need a Linux-to-DJGPP cross compiler toolchain based on DJGPP-2.05.
          I use a toolchain with gcc-3.4.6, binutils-2.25.1 and DJGPP-2.05.

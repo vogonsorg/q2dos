@@ -142,5 +142,5 @@ Various code from
             uHexen2 (http://uhexen2.sourceforge.net/)
 * Yamagi -- Updated game code from YamagiQ2 (http://www.yamagi.org/quake2/)
 * Berserk, CDawg, Pat Aftermoon, Anthony Jacques, David M. Pochron, Dopefish,
-  GuyP, Jitspoe, MH, MrG, NeVo, Skuller, Riot, R1ch, Psychospaz, Pooy, Sul,
+  GuyP, Jitspoe, MH, MrG, NeVo, Skuller, Riot, Psychospaz, Pooy, Sul,
   and others.
