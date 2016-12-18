@@ -116,6 +116,10 @@ SOURCE=..\coop\g_combat.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\coop\g_coop.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\coop\g_func.c
 # End Source File
 # Begin Source File

@@ -106,7 +106,12 @@ SelectNextItem(edict_t *ent, int itflags)
 
 	cl = ent->client;
 
-	if (cl->chase_target)
+	if (cl->menu)
+	{
+		PMenu_Next(ent);
+		return;
+	}
+	else if (cl->chase_target)
 	{
 		ChaseNext(ent);
 		return;
@@ -155,7 +160,12 @@ SelectPrevItem(edict_t *ent, int itflags)
 
 	cl = ent->client;
 
-	if (cl->chase_target)
+	if (cl->menu)
+	{
+		PMenu_Prev(ent);
+		return;
+	}
+	else if (cl->chase_target)
 	{
 		ChasePrev(ent);
 		return;
@@ -982,6 +992,13 @@ Cmd_Inven_f(edict_t *ent)
 	cl->showscores = false;
 	cl->showhelp = false;
 
+	if (ent->client->menu)
+	{
+		PMenu_Close(ent);
+		ent->client->update_chase = true;
+		return;
+	}
+
 	if (cl->showinventory)
 	{
 		cl->showinventory = false;
@@ -1001,6 +1018,12 @@ Cmd_InvUse_f(edict_t *ent)
 
 	if (!ent)
 	{
+		return;
+	}
+
+	if (ent->client->menu)
+	{
+		PMenu_Select(ent);
 		return;
 	}
 
@@ -1951,6 +1974,12 @@ ClientCommand(edict_t *ent)
 	if (Q_stricmp(cmd, "help") == 0)
 	{
 		Cmd_Help_f(ent);
+		return;
+	}
+
+	if (Q_stricmp(cmd, "menu") == 0) /* FS: Added */
+	{
+		CoopOpenJoinMenu(ent);
 		return;
 	}
 

@@ -330,6 +330,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\coop\g_coop.c"
+				>
+			</File>
+			<File
 				RelativePath="..\coop\g_func.c"
 				>
 				<FileConfiguration

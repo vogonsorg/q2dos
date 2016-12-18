@@ -67,5 +67,7 @@ void PMenu_Next(edict_t *ent);
 void PMenu_Prev(edict_t *ent);
 void PMenu_Select(edict_t *ent);
 
+void CoopOpenJoinMenu(edict_t *ent);
+
 #endif
 

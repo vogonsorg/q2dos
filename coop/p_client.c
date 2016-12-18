@@ -7,9 +7,6 @@ void ClientUserinfoChanged(edict_t *ent, char *userinfo);
 void SP_misc_teleporter_dest(edict_t *ent);
 void Touch_Item(edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf);
 
-extern char *GetCoopInsult (void); /* FS: Coop: Pick a random insult */
-extern char *GetProperMonsterName (char *monsterName); /* FS: Coop: Get proper name for classname */
-
 /*
  * The ugly as hell coop spawnpoint fixup function.
  * While coop was planed by id, it wasn't part of
@@ -2386,25 +2383,6 @@ PutClientInServer(edict_t *ent)
 	vote_connect(ent); /* FS: Coop: Voting */
 }
 
-void Client_PrintMOTD (edict_t *client) /* FS: MOTD */
-{
-	char string[256];
-	char *ptr = NULL;
-
-	if(!motd || !motd->string[0] || !client || !client->client || client->client->pers.didMotd)
-		return;
-
-	Com_sprintf(string,sizeof(string),motd->string);
-	ptr = string;
-	while( (ptr = strchr(ptr,'|')) )
-	{
-		*ptr = '\n';
-	}
-	gi.centerprintf(client, string);
-
-	client->client->pers.didMotd = client->client->resp.didMotd = true;
-}
-
 /*
  * A client has just connected to the server in
  * deathmatch mode, so clear everything out before
@@ -2444,8 +2422,6 @@ ClientBeginDeathmatch(edict_t *ent)
 
 	gi.bprintf(PRINT_HIGH, "%s entered the game\n", ent->client->pers.netname);
 
-	Client_PrintMOTD(ent); /* FS: Coop: Added */
-
 	/* make sure all view stuff is valid */
 	ClientEndServerFrame(ent);
 }
@@ -2469,6 +2445,10 @@ ClientBegin(edict_t *ent)
 	if (deathmatch->value)
 	{
 		ClientBeginDeathmatch(ent);
+		if(!ent->client->pers.didMotd)
+		{
+			CoopOpenJoinMenu(ent); /* FS: Added */
+		}
 		return;
 	}
 
@@ -2494,6 +2474,10 @@ ClientBegin(edict_t *ent)
 		ent->classname = "player";
 		InitClientResp(ent->client);
 		PutClientInServer(ent);
+		if(!ent->client->pers.didMotd)
+		{
+			CoopOpenJoinMenu(ent); /* FS: Added */
+		}
 	}
 
 	if (level.intermissiontime)
@@ -2511,8 +2495,6 @@ ClientBegin(edict_t *ent)
 			gi.multicast(ent->s.origin, MULTICAST_PVS);
 
 			gi.bprintf(PRINT_HIGH, "%s entered the game\n", ent->client->pers.netname);
-
-			Client_PrintMOTD(ent); /* FS: Coop: Added */
 		}
 	}
 
