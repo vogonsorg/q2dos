@@ -982,7 +982,7 @@ Cmd_Inven_f(edict_t *ent)
 {
 	gclient_t *cl;
 
-	if (!ent)
+	if (!ent || !ent->client)
 	{
 		return;
 	}
@@ -996,10 +996,17 @@ Cmd_Inven_f(edict_t *ent)
 	{
 		PMenu_Close(ent);
 		ent->client->update_chase = true;
-		return;
+	}
+	else
+	{
+		if(!cl->showinventory)
+		{
+			CoopOpenJoinMenu(ent);
+			return;
+		}
 	}
 
-	if (cl->showinventory)
+	if (cl->showinventory || ent->client->pers.spectator)
 	{
 		cl->showinventory = false;
 		return;

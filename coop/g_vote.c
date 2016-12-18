@@ -87,7 +87,7 @@ void vote_command(edict_t *ent)
 	if (argc <= 1 ||
 	    (argc >= 2 && (!Q_stricmp(gi.argv(1), "help") || !Q_stricmp(gi.argv(1), "list") || !Q_stricmp(gi.argv(1), "cmds") || !Q_stricmp(gi.argv(1), "commands"))) )
 	{
-		gi.cprintf(ent, PRINT_HIGH, "usage: vote map <mapname>, vote gamemode <gamemode>, vote skill <coopskill>, vote fraglimit <fraglimit>, vote timelimit <timelimit>, vote tourney <options>, vote restartmap, vote yes, vote no, vote stop, and vote progress.\n");
+		gi.cprintf(ent, PRINT_HIGH, "usage: vote map <mapname>, vote gamemode <gamemode>, vote skill <coopskill>, vote restartmap, vote yes, vote no, vote stop, and vote progress.\n");
 		return;
 	}
 	if(!Q_stricmp(gi.argv(1), "map"))
