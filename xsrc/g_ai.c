@@ -78,7 +78,12 @@ This replaces the QC functions: ai_forward, ai_back, ai_pain, and ai_painforward
 */
 void ai_move (edict_t *self, float dist)
 {
-	M_walkmove (self, self->s.angles[YAW], dist);
+	if (!self)
+	{
+		return;
+	}
+
+	M_walkmove(self, self->s.angles[YAW], dist);
 }
 
 
