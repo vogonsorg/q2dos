@@ -3772,6 +3772,11 @@ door_secret_move5(edict_t *self)
 void
 door_secret_move6(edict_t *self)
 {
+	if (!self)
+	{
+		return;
+	}
+
 	Move_Calc(self, vec3_origin, door_secret_done);
 }
 
@@ -3833,7 +3838,7 @@ door_secret_die(edict_t *self, edict_t *inflictor /* unused */,
 		edict_t *attacker, int damage /* unused */,
 		vec3_t point /* unused */)
 {
-	if (!self)
+	if (!self || !attacker)
 	{
 		return;
 	}
