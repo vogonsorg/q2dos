@@ -180,12 +180,12 @@ ai_stand(edict_t *self, float dist)
 void
 ai_walk(edict_t *self, float dist)
 {
-	M_MoveToGoal(self, dist);
-
 	if (!self)
 	{
 		return;
 	}
+
+	M_MoveToGoal(self, dist);
 
 	/* check for noticing a player */
 	if (FindTarget(self))
