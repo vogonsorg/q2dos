@@ -420,17 +420,12 @@ infront(edict_t *self, edict_t *other)
 	float dot;
 	vec3_t forward;
 
-	if ((self == NULL) || (other == NULL))
+	if (!self || !other)
 	{
 		return false;
 	}
 
 	AngleVectors(self->s.angles, forward, NULL, NULL);
-
-	if ((self == NULL) || (other == NULL))
-	{
-		return false;
-	}
 
 	VectorSubtract(other->s.origin, self->s.origin, vec);
 	VectorNormalize(vec);
@@ -443,6 +438,7 @@ infront(edict_t *self, edict_t *other)
 
 	return false;
 }
+
 
 /* ============================================================================ */
 
