@@ -1,0 +1,13 @@
+- Copy errtime.exe from release_binaries\errtime to your Windows directory or somewhere in your path that it can be loaded any time by typing "errtime" into your command prompt.  Copying the doc is optional, it's just for reference.
+- If you want to upload binaries to bitbucket copy upload_to_bitbucket directory to your root Q2DOS directory.  Also install the latest version of CURL.  It may want SSL DLLs as well if they aren't in your Windows path somewhere.  Edit upload_binary.bat as needed for this.
+- Install 7-zip.
+- Edit release_*.bat batches to change SEVENZIPPATH environment variable to your 7-zip root directory.
+- Edit upload_binary.bat if you want to upload the releases somewhere.  Requires ncftp suite.  Ncftp is included in release_binaries\ncftp if you want it.
+- Read the instructions for release_maps and follow those instructions.
+- Read the release_*.bat REM comments about what needs to be included and where.
+- Double check it.
+- Copy the release_*.bat, and upload_binaries.bat batches to your root Q2DOS direcotry.
+- Run one of the release_*.bat batches that you want.
+- Release!
+
+If you got problems, turn @echo on to @echo off and see what's barfing.
