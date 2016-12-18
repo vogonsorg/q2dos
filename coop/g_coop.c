@@ -118,6 +118,11 @@ pmenu_t votemenu[] = {
 	{"Return to Main Menu", PMENU_ALIGN_LEFT, CoopReturnToMain}
 };
 
+#define VGAMEMODEMENU_GAMEMODE 6
+#define VGAMEMODEMENU_VANILLA 8
+#define VGAMEMODEMENU_XATRIX 9
+#define VGAMEMODEMENU_ROGUE 10
+
 pmenu_t votegamemodemenu[] = {
 	{"*Quake II", PMENU_ALIGN_CENTER, NULL},
 	{"*Mara'akate and Freewill", PMENU_ALIGN_CENTER, NULL},
@@ -125,12 +130,20 @@ pmenu_t votegamemodemenu[] = {
 	{NULL, PMENU_ALIGN_CENTER, NULL},
 	{"*Gamemode", PMENU_ALIGN_CENTER, NULL},
 	{NULL, PMENU_ALIGN_CENTER, NULL},
-	{"Vanilla", PMENU_ALIGN_LEFT, CoopCheckGamemode},
+	{"*Current Gamemode: ", PMENU_ALIGN_CENTER, NULL}, /* 6 */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"Vanilla", PMENU_ALIGN_LEFT, CoopCheckGamemode}, /* 8 */
 	{"Xatrix Mission Pack", PMENU_ALIGN_LEFT, CoopCheckGamemode},
-	{"Rogue Mission Pack", PMENU_ALIGN_LEFT, CoopCheckGamemode},
+	{"Rogue Mission Pack", PMENU_ALIGN_LEFT, CoopCheckGamemode}, /* 10 */
 	{NULL, PMENU_ALIGN_CENTER, NULL},
 	{"Return to Voting Menu", PMENU_ALIGN_LEFT, CoopReturnToVoteMenu}
 };
+
+#define VSKILLMENU_SKILL 6
+#define VSKILLMENU_EASY 8
+#define VSKILLMENU_MEDIUM 9
+#define VSKILLMENU_HARD 10
+#define VSKILLMENU_NIGHTMARE 11
 
 pmenu_t voteskillmenu[] = {
 	{"*Quake II", PMENU_ALIGN_CENTER, NULL},
@@ -139,13 +152,32 @@ pmenu_t voteskillmenu[] = {
 	{NULL, PMENU_ALIGN_CENTER, NULL},
 	{"*Difficulty", PMENU_ALIGN_CENTER, NULL},
 	{NULL, PMENU_ALIGN_CENTER, NULL},
-	{"Easy", PMENU_ALIGN_LEFT, CoopCheckDifficulty},
+	{"*Current Skill: ", PMENU_ALIGN_CENTER, NULL}, /* 6 */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"Easy", PMENU_ALIGN_LEFT, CoopCheckDifficulty}, /* 8 */
 	{"Medium", PMENU_ALIGN_LEFT, CoopCheckDifficulty},
 	{"Hard", PMENU_ALIGN_LEFT, CoopCheckDifficulty},
-	{"Nightmare", PMENU_ALIGN_LEFT, CoopCheckDifficulty},
+	{"Nightmare", PMENU_ALIGN_LEFT, CoopCheckDifficulty}, /* 11 */
 	{NULL, PMENU_ALIGN_CENTER, NULL},
 	{"Return to Voting Menu", PMENU_ALIGN_LEFT, CoopReturnToVoteMenu}
 };
+
+char *GetSkillString (void)
+{
+	switch(skill->intValue)
+	{
+	case 0:
+		return "Easy";
+	case 1:
+		return "Medium";
+	case 2:
+		return "Hard";
+	case 3:
+		return "Nightmare";
+	}
+
+	return "Unknown";
+}
 
 void
 CoopReturnToMain(edict_t *ent, pmenuhnd_t *p)
@@ -234,7 +266,7 @@ CoopUpdateJoinMenu(edict_t *ent)
 	Com_sprintf(gamemode, sizeof(gamemode), "*Gamemode: %s", sv_coop_gamemode->string);
 	Com_sprintf(players, sizeof(players), "  (%d players)", numplayers);
 	Com_sprintf(spectators, sizeof(spectators), "  (%d spectators)", numspectators);
-	Com_sprintf(stats, sizeof(stats), "Skill Level: %d", skill->intValue);
+	Com_sprintf(stats, sizeof(stats), "Difficulty: %s", GetSkillString());
 
 	joinmenu[jmenu_gamemode].text = gamemode;
 	joinmenu[jmenu_players].text = players;
@@ -354,6 +386,42 @@ void CoopVoteMenu(edict_t *ent, pmenuhnd_t *p)
 	PMenu_Open(ent, votemenu, 0, sizeof(votemenu) / sizeof(pmenu_t), NULL);
 }
 
+void CoopUpdateGamemodeMenu(edict_t *ent)
+{
+	static char gamemodestring[32];
+	static char gamemode[32];
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	switch(game.gametype)
+	{
+		case vanilla_coop:
+			Com_sprintf(gamemode, sizeof(gamemode), "Vanilla");
+			votegamemodemenu[VGAMEMODEMENU_VANILLA].text = NULL;
+			votegamemodemenu[VGAMEMODEMENU_VANILLA].SelectFunc = NULL;
+			break;
+		case xatrix_coop:
+			Com_sprintf(gamemode, sizeof(gamemode), "Xatrix");
+			votegamemodemenu[VGAMEMODEMENU_XATRIX].text = NULL;
+			votegamemodemenu[VGAMEMODEMENU_XATRIX].SelectFunc = NULL;
+			break;
+		case rogue_coop:
+			Com_sprintf(gamemode, sizeof(gamemode), "Rogue");
+			votegamemodemenu[VGAMEMODEMENU_ROGUE].text = NULL;
+			votegamemodemenu[VGAMEMODEMENU_ROGUE].SelectFunc = NULL;
+			break;
+		default:
+			break;
+	}
+
+	Com_sprintf(gamemodestring, sizeof(gamemodestring), "*Current Gamemode: %s", gamemode);
+
+	votegamemodemenu[VGAMEMODEMENU_GAMEMODE].text = gamemodestring;
+}
+
 void CoopVoteGamemode(edict_t *ent, pmenuhnd_t *p)
 {
 	if(!ent || !ent->client)
@@ -362,7 +430,46 @@ void CoopVoteGamemode(edict_t *ent, pmenuhnd_t *p)
 	}
 
 	PMenu_Close(ent);
+	CoopUpdateGamemodeMenu(ent);
 	PMenu_Open(ent, votegamemodemenu, 0, sizeof(votegamemodemenu) / sizeof(pmenu_t), NULL);
+}
+
+void CoopUpdateDifficultyMenu(edict_t *ent)
+{
+	static char skillstring[32];
+	static char skillmodifier[32];
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	switch(skill->intValue)
+	{
+		case 0:
+			voteskillmenu[VSKILLMENU_EASY].text = NULL;
+			voteskillmenu[VSKILLMENU_EASY].SelectFunc = NULL;
+			break;
+		case 1:
+			voteskillmenu[VSKILLMENU_MEDIUM].text = NULL;
+			voteskillmenu[VSKILLMENU_MEDIUM].SelectFunc = NULL;
+			break;
+		case 2:
+			voteskillmenu[VSKILLMENU_HARD].text = NULL;
+			voteskillmenu[VSKILLMENU_HARD].SelectFunc = NULL;
+			break;
+		case 3:
+			voteskillmenu[VSKILLMENU_NIGHTMARE].text = NULL;
+			voteskillmenu[VSKILLMENU_NIGHTMARE].SelectFunc = NULL;
+			break;
+		default:
+			break;
+	}
+
+	Com_sprintf(skillmodifier, sizeof(skillmodifier), "%s", GetSkillString());
+	Com_sprintf(skillstring, sizeof(skillstring), "*Current Skill: %s", skillmodifier);
+
+	voteskillmenu[VSKILLMENU_SKILL].text = skillstring;
 }
 
 void CoopVoteDifficulty(edict_t *ent, pmenuhnd_t *p)
@@ -373,6 +480,7 @@ void CoopVoteDifficulty(edict_t *ent, pmenuhnd_t *p)
 	}
 
 	PMenu_Close(ent);
+	CoopUpdateDifficultyMenu(ent);
 	PMenu_Open(ent, voteskillmenu, 0, sizeof(voteskillmenu) / sizeof(pmenu_t), NULL);
 }
 
@@ -431,13 +539,13 @@ void CoopCheckGamemode(edict_t *ent, pmenuhnd_t *p)
 
 	switch(p->cur)
 	{
-		case 6:
+		case VGAMEMODEMENU_VANILLA:
 			Com_sprintf(votestring, sizeof(votestring), "cmd vote gamemode vanilla\n");
 			break;
-		case 7:
+		case VGAMEMODEMENU_XATRIX:
 			Com_sprintf(votestring, sizeof(votestring), "cmd vote gamemode xatrix\n");
 			break;
-		case 8:
+		case VGAMEMODEMENU_ROGUE:
 			Com_sprintf(votestring, sizeof(votestring), "cmd vote gamemode rogue\n");
 			break;
 		default:
@@ -464,16 +572,16 @@ void CoopCheckDifficulty(edict_t *ent, pmenuhnd_t *p)
 
 	switch(p->cur)
 	{
-		case 6:
+		case VSKILLMENU_EASY:
 			Com_sprintf(votestring, sizeof(votestring), "cmd vote skill 0\n");
 			break;
-		case 7:
+		case VSKILLMENU_MEDIUM:
 			Com_sprintf(votestring, sizeof(votestring), "cmd vote skill 1\n");
 			break;
-		case 8:
+		case VSKILLMENU_HARD:
 			Com_sprintf(votestring, sizeof(votestring), "cmd vote skill 2\n");
 			break;
-		case 9:
+		case VSKILLMENU_NIGHTMARE:
 			Com_sprintf(votestring, sizeof(votestring), "cmd vote skill 3\n");
 			break;
 		default:
