@@ -561,8 +561,12 @@ gotnewcl:
 	Netchan_Setup (NS_SERVER, &newcl->netchan , adr, qport);
 
 	newcl->state = cs_connected;
-	
+
 	SZ_Init (&newcl->datagram, newcl->datagram_buf, sizeof(newcl->datagram_buf) );
+	if ((maxclients->intValue > 1) && !(newcl->netchan.remote_address.type == NA_LOOPBACK)) /* FS: Enforce a 1400 MTU size for datagram packets. */
+	{
+		newcl->datagram.maxsize = MAX_MSGLEN_MP; /* FS: MAX_MSGLEN is now for single player */
+	}
 	newcl->datagram.allowoverflow = true;
 	newcl->lastmessage = svs.realtime;	// don't timeout
 	newcl->lastconnect = svs.realtime;
