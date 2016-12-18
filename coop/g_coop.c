@@ -54,10 +54,11 @@ pmenu_t creditsmenu[] = {
 };
 
 static const int jmenu_level = 4;
-static const int jmenu_skill = 6;
-static const int jmenu_players = 7;
-static const int jmenu_spectators = 8;
-static const int jmenu_motd = 13;
+static const int jmenu_gamemode = 5;
+static const int jmenu_skill = 7;
+static const int jmenu_players = 8;
+static const int jmenu_spectators = 9;
+static const int jmenu_motd = 14;
 
 pmenu_t joinmenu[] = {
 	{"*Quake II", PMENU_ALIGN_CENTER, NULL},
@@ -69,14 +70,14 @@ pmenu_t joinmenu[] = {
 	{NULL, PMENU_ALIGN_CENTER, NULL},
 	{NULL, PMENU_ALIGN_CENTER, NULL},
 	{NULL, PMENU_ALIGN_CENTER, NULL},
-	{NULL, PMENU_ALIGN_CENTER, NULL}, /* 9 */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL}, /* 10 */
 	{"Join The Game", PMENU_ALIGN_LEFT, CoopJoinGame},
 	{"Become a Spectator", PMENU_ALIGN_LEFT, CoopChaseCam},
 	{"Credits", PMENU_ALIGN_LEFT, CoopCredits},
 	{"Message of The Day", PMENU_ALIGN_LEFT, CoopMotd},
 	{"Voting Menu", PMENU_ALIGN_LEFT, CoopVoteMenu},
-	{NULL, PMENU_ALIGN_LEFT, NULL}, /* 15 */
-	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL}, /* 16 */
 	{NULL, PMENU_ALIGN_LEFT, NULL},
 	{"v" COOP_STRING_VERSION, PMENU_ALIGN_RIGHT, NULL},
 };
@@ -135,6 +136,7 @@ CoopUpdateJoinMenu(edict_t *ent)
 	static char players[32];
 	static char spectators[32];
 	static char stats[32];
+	static char gamemode[32];
 	int numplayers, numspectators, i;
 
 	if(!ent || !ent->client)
@@ -163,10 +165,12 @@ CoopUpdateJoinMenu(edict_t *ent)
 		}
 	}
 
+	Com_sprintf(gamemode, sizeof(gamemode), "*Gamemode: %s", sv_coop_gamemode->string);
 	Com_sprintf(players, sizeof(players), "  (%d players)", numplayers);
 	Com_sprintf(spectators, sizeof(spectators), "  (%d spectators)", numspectators);
 	Com_sprintf(stats, sizeof(stats), "Skill Level: %d", skill->intValue);
 
+	joinmenu[jmenu_gamemode].text = gamemode;
 	joinmenu[jmenu_players].text = players;
 	joinmenu[jmenu_spectators].text = spectators;
 	joinmenu[jmenu_skill].text = stats;
