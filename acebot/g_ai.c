@@ -779,7 +779,8 @@ qboolean ai_checkattack (edict_t *self, float dist)
 		if (self->monsterinfo.aiflags & AI_COMBAT_POINT)
 			return false;
 
-		if (self->monsterinfo.aiflags & AI_SOUND_TARGET)
+		/* only check sound if it's not visible anyway (=> attack if visible) */
+		if ((self->monsterinfo.aiflags & AI_SOUND_TARGET) && !visible(self, self->goalentity))
 		{
 			if ((level.time - self->enemy->last_sound_time) > 5.0)
 			{
