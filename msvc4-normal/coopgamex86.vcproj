@@ -1418,6 +1418,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\coop\menu.c"
+				>
+			</File>
+			<File
 				RelativePath="..\coop\p_client.c"
 				>
 				<FileConfiguration
@@ -1696,6 +1700,10 @@
 			</File>
 			<File
 				RelativePath="..\coop\m_widow2.h"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\menu.h"
 				>
 			</File>
 			<File

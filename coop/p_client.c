@@ -3104,6 +3104,14 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 	}
 
 	vote_Think(); /* FS: Coop: Voting */
+
+	if (client->menudirty && (client->menutime <= level.time))
+	{
+		PMenu_Do_Update(ent);
+		gi.unicast(ent, true);
+		client->menutime = level.time;
+		client->menudirty = false;
+	}
 }
 
 /*

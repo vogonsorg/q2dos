@@ -9,6 +9,7 @@
 // because we define the full size ones in this file
 #define	GAME_INCLUDE
 #include "game.h"
+#include "menu.h"
 
 // the "gameversion" client command will print this plus compile date
 #define GAMEVERSION "maracoop"
@@ -1258,6 +1259,8 @@ struct gclient_s
 	pmove_state_t		old_pmove;	// for detecting out-of-pmove changes
 
 	qboolean	showscores;			// set layout stat
+	qboolean inmenu;                /* in menu */
+	pmenuhnd_t *menu;               /* current menu */
 	qboolean	showinventory;		// set layout stat
 	qboolean	showhelp;
 	qboolean	showhelpicon;
@@ -1333,6 +1336,8 @@ struct gclient_s
 
 	edict_t		*chase_target;		// player we are chasing
 	qboolean	update_chase;		// need to update chase info?
+	float menutime;                 /* time to update menu */
+	qboolean menudirty;
 
 //=======
 //ROGUE

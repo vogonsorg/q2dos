@@ -340,6 +340,10 @@ SOURCE=..\coop\m_widow2.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\coop\menu.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\coop\p_client.c
 # End Source File
 # Begin Source File
@@ -521,6 +525,10 @@ SOURCE=..\coop\m_widow.h
 # Begin Source File
 
 SOURCE=..\coop\m_widow2.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\menu.h
 # End Source File
 # Begin Source File
 
