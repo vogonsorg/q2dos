@@ -669,10 +669,10 @@ void G_ResetTimer_Hack (void) /* FS: Some of the grossest shit of all time.  Res
 
 			/* FS: TODO: Check ent->wait and ent->delay and re-apply per situation since a few rely on level.time */
 
-			if(ent->teleport_time)
+			if(ent->last_sound_time)
 			{
-				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set teleport_time for %s: %f\n", className, ent->teleport_time);
-				ent->teleport_time = level.time;
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set last_sound_time for %s: %f\n", className, ent->last_sound_time);
+				ent->last_sound_time = level.time;
 			}
 
 			if(ent->touch_debounce_time)

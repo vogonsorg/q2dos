@@ -78,7 +78,7 @@
 {"wait", FOFS(wait), F_FLOAT},
 {"delay", FOFS(delay), F_FLOAT},
 {"random", FOFS(random), F_FLOAT},
-// teleport_time?
+// last_sound_time?
 // watertype, waterlevel?
 {"move_origin", FOFS(move_origin), F_VECTOR},
 {"move_angles", FOFS(move_angles), F_VECTOR},

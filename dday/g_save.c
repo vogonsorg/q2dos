@@ -156,7 +156,7 @@ field_t fields[] = {
 	{"weight", STOFS(weight), F_INT, FFL_SPAWNTEMP},//JABot
 
 	{"fullbright",FOFS(groundentity_linkcount),F_INT},
-	{"fog",FOFS(teleport_time),F_FLOAT},
+	{"fog",FOFS(last_sound_time),F_FLOAT},
 	{"obj_origin", FOFS(obj_origin), F_VECTOR}
 
 	
