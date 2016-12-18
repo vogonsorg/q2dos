@@ -1316,8 +1316,8 @@ ai_checkattack(edict_t *self, float dist)
 			return false;
 		}
 
-		// only check sound if it's not visible anyway (=> attack if visible)
-		if (!visible(self, self->goalentity) && (self->monsterinfo.aiflags & AI_SOUND_TARGET))
+		/* only check sound if it's not visible anyway (=> attack if visible) */
+		if ((self->monsterinfo.aiflags & AI_SOUND_TARGET) && !visible(self, self->goalentity))
 		{
 			if ((level.time - self->enemy->teleport_time) > 5.0)
 			{
