@@ -1,16 +1,33 @@
 @echo off
-move /Y Release\quake2.exe F:\quake2
-move /Y Release\ref_soft.dll F:\quake2
-move /Y Release\ref_gl.dll F:\quake2
-move /Y Release\gamespy.dll F:\quake2
-move /Y Release\gamex86.dll F:\quake2\baseq2
-move /Y 3zb2\Release\gamex86.dll F:\quake2\3zb2
-move /Y ace\Release\gamex86.dll F:\quake2\ace
-move /Y action\Release\gamex86.dll F:\quake2\action
-move /Y chaos\Release\gamex86.dll F:\quake2\chaos
-move /Y coop\Release\gamex86.dll F:\quake2\coop
-move /Y ctf\Release\gamex86.dll F:\quake2\ctf
-move /Y dday\Release\gamex86.dll F:\quake2\dday
-move /Y rogue\Release\gamex86.dll F:\quake2\rogue
-move /Y xatrix\Release\gamex86.dll F:\quake2\xatrix
-move /Y Zaero\Release\gamex86.dll F:\quake2\zaero
+set Q2DOSBINDIR=Release
+
+if not defined Q2DOSDIR ( goto failed )
+
+:startcopy
+echo Copying %Q2DOSBINDIR% Build.
+
+move /Y %Q2DOSBINDIR%\q2.exe "%Q2DOSDIR%"
+move /Y %Q2DOSBINDIR%\ref_soft.dll "%Q2DOSDIR%"
+move /Y %Q2DOSBINDIR%\ref_gl.dll "%Q2DOSDIR%"
+move /Y %Q2DOSBINDIR%\gamespy.dll "%Q2DOSDIR%"
+move /Y %Q2DOSBINDIR%\gamex86.dll "%Q2DOSDIR%\baseq2"
+move /Y 3zb2\%Q2DOSBINDIR%\gamex86.dll "%Q2DOSDIR%\3zb2"
+move /Y ace\%Q2DOSBINDIR%\gamex86.dll "%Q2DOSDIR%\ace"
+move /Y action\%Q2DOSBINDIR%\gamex86.dll "%Q2DOSDIR%\action"
+move /Y chaos\%Q2DOSBINDIR%\gamex86.dll "%Q2DOSDIR%\chaos"
+move /Y coop\%Q2DOSBINDIR%\gamex86.dll "%Q2DOSDIR%\coop"
+move /Y ctf\%Q2DOSBINDIR%\gamex86.dll "%Q2DOSDIR%\ctf"
+move /Y dday\%Q2DOSBINDIR%\gamex86.dll "%Q2DOSDIR%\dday"
+move /Y rogue\%Q2DOSBINDIR%\gamex86.dll "%Q2DOSDIR%\rogue"
+move /Y xatrix\%Q2DOSBINDIR%\gamex86.dll "%Q2DOSDIR%\xatrix"
+move /Y Zaero\%Q2DOSBINDIR%\gamex86.dll "%Q2DOSDIR%\zaero"
+
+goto end
+
+:failed
+echo Q2DOSDIR not defined!
+pause
+goto end
+
+:end
+set Q2DOSBINDIR=
