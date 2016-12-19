@@ -165,7 +165,6 @@ extern qboolean ClientConnect ( edict_t * ent , char * userinfo ) ;
 extern void ClientUserinfoChanged ( edict_t * ent , char * userinfo ) ;
 extern void ClientBegin ( edict_t * ent ) ;
 extern void ClientBeginDeathmatch ( edict_t * ent ) ;
-extern void Client_PrintMOTD ( edict_t * client ) ;
 extern void PutClientInServer ( edict_t * ent ) ;
 extern void spectator_respawn ( edict_t * ent ) ;
 extern void respawn ( edict_t * self ) ;

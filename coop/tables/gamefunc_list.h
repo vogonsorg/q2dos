@@ -157,7 +157,6 @@
 {"ClientUserinfoChanged", (byte *)ClientUserinfoChanged},
 {"ClientBegin", (byte *)ClientBegin},
 {"ClientBeginDeathmatch", (byte *)ClientBeginDeathmatch},
-{"Client_PrintMOTD", (byte *)Client_PrintMOTD},
 {"PutClientInServer", (byte *)PutClientInServer},
 {"spectator_respawn", (byte *)spectator_respawn},
 {"respawn", (byte *)respawn},

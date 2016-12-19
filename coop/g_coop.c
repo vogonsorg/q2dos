@@ -162,6 +162,31 @@ pmenu_t voteskillmenu[] = {
 	{"Return to Voting Menu", PMENU_ALIGN_LEFT, CoopReturnToVoteMenu}
 };
 
+#define MOTDMENU_START 4
+#define MOTDMENU_END 16
+#define MOTDMENU_MAXLINES MOTDMENU_END-MOTDMENU_START
+pmenu_t motdmenu[] = {
+	{"*Quake II", PMENU_ALIGN_CENTER, NULL},
+	{"*Mara'akate and Freewill", PMENU_ALIGN_CENTER, NULL},
+	{"*Custom Coop", PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL}, /* 4 */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL}, /* 16 */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"Return to Main Menu", PMENU_ALIGN_LEFT, CoopReturnToMain}
+};
+
 char *coopMapFileBuffer = NULL;
 int mapCount = 0;
 pmenu_t *votemapmenu = NULL;
@@ -351,21 +376,54 @@ void CoopJoinGame(edict_t *ent, pmenuhnd_t *p)
 	gi.unicast(ent, true);
 }
 
-void Client_PrintMOTD (edict_t *client) /* FS: MOTD */
+void CoopUpdateMotdMenu (void)
 {
-	char string[256];
-	char *ptr = NULL;
+	char separators[] = "|\n";
+	char *motdString;
+	char *listPtr = NULL;
+	char *motdToken = NULL;
+	int lineLength = 0;
+	int currentLine = 0;
+	int i = MOTDMENU_START;
 
-	if(!motd || !motd->string[0] || !client || !client->client)
-		return;
-
-	Com_sprintf(string,sizeof(string),motd->string);
-	ptr = string;
-	while( (ptr = strchr(ptr,'|')) )
+	if(!motd || !motd->string || !motd->string[0]) /* FS: TODO: Read this from a file instead of a CVAR because CVAR seems to limit at 256 chars.  Max we could possibly squeeze is about 324 chars. */
 	{
-		*ptr = '\n';
+		return;
 	}
-	gi.centerprintf(client, string);
+
+	motdString = strdup(motd->string);
+
+	motdToken = strtok_r(motdString, separators, &listPtr);
+	if(!motdToken)
+	{
+		return;
+	}
+
+	for (i = MOTDMENU_START; i < MOTDMENU_MAXLINES; i++) /* FS: Clear it out first in case if we change it later */
+	{
+		motdmenu[i].text = NULL;
+	}
+
+	i = MOTDMENU_START;
+
+	while(motdToken)
+	{
+		if(i >= MOTDMENU_MAXLINES)
+		{
+			break;
+		}
+
+		currentLine++;
+		lineLength = strlen(motdToken);
+		motdmenu[i].text = motdToken;
+		if(lineLength > 27)
+		{
+			gi.cprintf(NULL, PRINT_CHAT, "Warning: MOTD string on line %i greater than 27 chars, current length is %i.  Truncating.\n", currentLine, lineLength);
+			motdmenu[i].text[27] = 0;
+		}
+		motdToken = strtok_r(NULL, separators, &listPtr);
+		i++;
+	}
 }
 
 void CoopMotd(edict_t *ent, pmenuhnd_t *p)
@@ -376,7 +434,9 @@ void CoopMotd(edict_t *ent, pmenuhnd_t *p)
 	}
 
 	PMenu_Close(ent);
-	Client_PrintMOTD(ent);/* FS: FIXME: Temporary solution */
+
+	CoopUpdateMotdMenu();
+	PMenu_Open(ent, motdmenu, 0, sizeof(motdmenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
 }
 
 void CoopVoteMenu(edict_t *ent, pmenuhnd_t *p)
