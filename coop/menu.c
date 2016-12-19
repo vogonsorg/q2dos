@@ -26,13 +26,15 @@
 
 #include "g_local.h"
 
+void PMenu_Do_Scrolling_Update(edict_t *ent);
+
 /* Note that the pmenu entries are duplicated 
    this is so that a static set of pmenu entries can be used 
    for multiple clients and changed without interference 
    note that arg will be freed when the menu is closed, it
     must be allocated memory */
 pmenuhnd_t *
-PMenu_Open(edict_t *ent, pmenu_t *entries, int cur, int num, void *arg)
+PMenu_Open(edict_t *ent, pmenu_t *entries, int cur, int num, void *arg, int menutype)
 {
 	pmenuhnd_t *hnd;
 	pmenu_t *p;
@@ -53,14 +55,34 @@ PMenu_Open(edict_t *ent, pmenu_t *entries, int cur, int num, void *arg)
 
 	hnd->arg = arg;
 	hnd->entries = malloc(sizeof(pmenu_t) * num);
+	hnd->menutype = menutype;
 	memcpy(hnd->entries, entries, sizeof(pmenu_t) * num);
 
-	/* duplicate the strings since they may be from static memory */
-	for (i = 0; i < num; i++)
+	if(hnd->menutype == PMENU_SCROLLING)
 	{
-		if (entries[i].text)
+		i = 0;
+		while(entries)
 		{
-			hnd->entries[i].text = strdup(entries[i].text);
+			if(i >= num)
+				break;
+
+			if(entries->text)
+			{
+				hnd->entries[i].text = strdup(entries->text);
+			}
+			i++;
+			entries++;
+		}
+	}
+	else
+	{
+		/* duplicate the strings since they may be from static memory */
+		for (i = 0; i < num; i++)
+		{
+			if (entries[i].text)
+			{
+				hnd->entries[i].text = strdup(entries[i].text);
+			}
 		}
 	}
 
@@ -168,6 +190,11 @@ PMenu_Do_Update(edict_t *ent)
 	}
 
 	hnd = ent->client->menu;
+	if(hnd->menutype == PMENU_SCROLLING) /* FS: Special stuff for scrolling menu */
+	{
+		PMenu_Do_Scrolling_Update(ent);
+		return;
+	}
 
 	strcpy(string, "xv 32 yv 8 picn inventory ");
 
@@ -361,4 +388,97 @@ PMenu_Select(edict_t *ent)
 	{
 		p->SelectFunc(ent, hnd);
 	}
+}
+
+void
+PMenu_Do_Scrolling_Update(edict_t *ent)
+{
+	char string[1400];
+	int i, z, pos;
+	pmenu_t *p;
+	int x;
+	pmenuhnd_t *hnd;
+	char *t;
+	qboolean alt = false;
+
+	if (!ent->client->menu)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "warning:  ent has no menu\n");
+		return;
+	}
+
+	hnd = ent->client->menu;
+
+	pos = hnd->cur % 18;
+
+	strcpy(string, "xv 32 yv 8 picn inventory ");
+
+	for (z = 0, p = hnd->entries; z < hnd->cur - pos; z++)
+	{
+		p++;
+	}
+
+	for (i = 0; i < hnd->num; i++, p++)
+	{
+		if (i >= 18)
+			break;
+
+		if(hnd->cur >= hnd->num)
+		{
+			break;
+		}
+
+		if(i + (hnd->cur-pos) >= hnd->num)
+		{
+			break;
+		}
+
+		if (!p->text || !*(p->text))
+		{
+			continue; /* blank line */
+		}
+
+		t = p->text;
+
+		if (*t == '*')
+		{
+			alt = true;
+			t++;
+		}
+
+		sprintf(string + strlen(string), "yv %d ", 32 + i * 8);
+
+		if (p->align == PMENU_ALIGN_CENTER)
+		{
+			x = 196 / 2 - strlen(t) * 4 + 64;
+		}
+		else if (p->align == PMENU_ALIGN_RIGHT)
+		{
+			x = 64 + (196 - strlen(t) * 8);
+		}
+		else
+		{
+			x = 64;
+		}
+
+		sprintf(string + strlen(string), "xv %d ", x - ((pos == i) ? 8 : 0));
+
+		if (pos == i)
+		{
+			sprintf(string + strlen(string), "string2 \"\x0d%s\" ", t);
+		}
+		else if (alt)
+		{
+			sprintf(string + strlen(string), "string2 \"%s\" ", t);
+		}
+		else
+		{
+			sprintf(string + strlen(string), "string \"%s\" ", t);
+		}
+
+		alt = false;
+	}
+
+	gi.WriteByte(svc_layout);
+	gi.WriteString(string);
 }

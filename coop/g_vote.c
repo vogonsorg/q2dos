@@ -18,7 +18,6 @@ int voteYes;
 int voteClients;
 int printOnce;
 int voteCoopSkill;
-const char coopMapFile[] = "mapcoop.txt";
 char voteCbufCmdExecute[MAX_OSPATH];
 char voteMap[MAX_OSPATH];
 char voteType[16];
@@ -198,13 +197,19 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 		return false;
 	}
 
+	if(sv_coop_maplist->string[0] == 0)
+	{
+		gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: sv_coop_maplist CVAR empty!\n");
+		return false;
+	}
+
 	Sys_Mkdir(va("%s/maps", gamedir->string));
-	Com_sprintf(fileName, sizeof(fileName), "%s/%s", gamedir->string, coopMapFile);
+	Com_sprintf(fileName, sizeof(fileName), "%s/%s", gamedir->string, sv_coop_maplist->string);
 
 	f = fopen(fileName, "r");
 	if(!f)
 	{
-		gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: couldn't find '%s'!\n", coopMapFile);
+		gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: couldn't find '%s'!\n", sv_coop_maplist->string);
 		return false;
 	}
 
@@ -223,7 +228,7 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 	fclose(f);
 	if(toEOF <= 0)
 	{
-		gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: cannot read file '%s' into memory!\n", coopMapFile);
+		gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: cannot read file '%s' into memory!\n", sv_coop_maplist->string);
 		return false;
 	}
 
@@ -251,7 +256,7 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 			}
 			else
 			{
-				gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: %s with no gamemode in '%s'!\n", mapCheck, coopMapFile);
+				gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: %s with no gamemode in '%s'!\n", mapCheck, sv_coop_maplist->string);
 				return false;
 			}
 		}

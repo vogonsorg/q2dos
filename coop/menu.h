@@ -34,12 +34,19 @@ enum
 	PMENU_ALIGN_RIGHT
 };
 
+enum
+{
+	PMENU_NORMAL = 0,
+	PMENU_SCROLLING
+};
+
 typedef struct pmenuhnd_s
 {
 	struct pmenu_s *entries;
 	int cur;
 	int num;
 	void *arg;
+	int menutype;
 } pmenuhnd_t;
 
 typedef void (*SelectFunc_t)(edict_t *ent, pmenuhnd_t *hnd);
@@ -55,7 +62,8 @@ pmenuhnd_t *PMenu_Open(edict_t *ent,
 		pmenu_t *entries,
 		int cur,
 		int num,
-		void *arg);
+		void *arg,
+		int menutype);
 void PMenu_Close(edict_t *ent);
 void PMenu_UpdateEntry(pmenu_t *entry,
 		const char *text,

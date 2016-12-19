@@ -45,9 +45,10 @@ void CoopVoteGamemode(edict_t *ent, pmenuhnd_t *p);
 void CoopVoteDifficulty(edict_t *ent, pmenuhnd_t *p);
 void CoopVoteMap(edict_t *ent, pmenuhnd_t *p);
 void CoopVoteRestartMap(edict_t *ent, pmenuhnd_t *p);
-void CoopVoteWarpMap(edict_t *ent, pmenuhnd_t *p);
 void CoopCheckGamemode(edict_t *ent, pmenuhnd_t *p);
 void CoopCheckDifficulty(edict_t *ent, pmenuhnd_t *p);
+void votemenu_loadmaplist (void);
+void CoopVoteChangeMap(edict_t *ent, pmenuhnd_t *p);
 
 /*-----------------------------------------------------------------------*/
 
@@ -113,7 +114,6 @@ pmenu_t votemenu[] = {
 	{"Difficulty", PMENU_ALIGN_LEFT, CoopVoteDifficulty},
 	{"Change Map", PMENU_ALIGN_LEFT, CoopVoteMap},
 	{"Restart Map", PMENU_ALIGN_LEFT, CoopVoteRestartMap},
-	{"Warp to Map", PMENU_ALIGN_LEFT, CoopVoteWarpMap},
 	{NULL, PMENU_ALIGN_CENTER, NULL},
 	{"Return to Main Menu", PMENU_ALIGN_LEFT, CoopReturnToMain}
 };
@@ -161,6 +161,10 @@ pmenu_t voteskillmenu[] = {
 	{NULL, PMENU_ALIGN_CENTER, NULL},
 	{"Return to Voting Menu", PMENU_ALIGN_LEFT, CoopReturnToVoteMenu}
 };
+
+char *coopMapFileBuffer = NULL;
+int mapCount = 0;
+pmenu_t *votemapmenu = NULL;
 
 char *GetSkillString (void)
 {
@@ -292,7 +296,7 @@ CoopOpenJoinMenu(edict_t *ent)
 
 	ent->client->pers.didMotd = ent->client->resp.didMotd = true;
 	CoopUpdateJoinMenu(ent);
-	PMenu_Open(ent, joinmenu, 0, sizeof(joinmenu) / sizeof(pmenu_t), NULL);
+	PMenu_Open(ent, joinmenu, 0, sizeof(joinmenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
 }
 
 void
@@ -304,7 +308,7 @@ CoopOpenVoteMenu(edict_t *ent)
 	}
 
 	ent->client->pers.didMotd = ent->client->resp.didMotd = true;
-	PMenu_Open(ent, votemenu, 0, sizeof(votemenu) / sizeof(pmenu_t), NULL);
+	PMenu_Open(ent, votemenu, 0, sizeof(votemenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
 }
 
 void
@@ -318,7 +322,7 @@ CoopCredits(edict_t *ent, pmenuhnd_t *p)
 	PMenu_Close(ent);
 	PMenu_Open(ent, creditsmenu, -1,
 			sizeof(creditsmenu) / sizeof(pmenu_t),
-			NULL);
+			NULL, PMENU_NORMAL);
 }
 
 void CoopChaseCam(edict_t *ent, pmenuhnd_t *p)
@@ -383,7 +387,7 @@ void CoopVoteMenu(edict_t *ent, pmenuhnd_t *p)
 	}
 
 	PMenu_Close(ent);
-	PMenu_Open(ent, votemenu, 0, sizeof(votemenu) / sizeof(pmenu_t), NULL);
+	PMenu_Open(ent, votemenu, 0, sizeof(votemenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
 }
 
 void CoopUpdateGamemodeMenu(edict_t *ent)
@@ -431,7 +435,7 @@ void CoopVoteGamemode(edict_t *ent, pmenuhnd_t *p)
 
 	PMenu_Close(ent);
 	CoopUpdateGamemodeMenu(ent);
-	PMenu_Open(ent, votegamemodemenu, 0, sizeof(votegamemodemenu) / sizeof(pmenu_t), NULL);
+	PMenu_Open(ent, votegamemodemenu, 0, sizeof(votegamemodemenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
 }
 
 void CoopUpdateDifficultyMenu(edict_t *ent)
@@ -481,11 +485,57 @@ void CoopVoteDifficulty(edict_t *ent, pmenuhnd_t *p)
 
 	PMenu_Close(ent);
 	CoopUpdateDifficultyMenu(ent);
-	PMenu_Open(ent, voteskillmenu, 0, sizeof(voteskillmenu) / sizeof(pmenu_t), NULL);
+	PMenu_Open(ent, voteskillmenu, 0, sizeof(voteskillmenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
+}
+
+void CoopUpdateVoteMapMenu(edict_t *ent)
+{
+	int i = 0;
+	char *mapToken = NULL;
+	char *coopMapTokenBuffer = NULL;
+	char *listPtr = NULL;
+	char separators[] = "\n";
+
+	if(!ent || !ent->client || !coopMapFileBuffer)
+	{
+		return;
+	}
+
+	coopMapTokenBuffer = (char *)malloc(sizeof(char)*(strlen(coopMapFileBuffer)));
+	if(!coopMapTokenBuffer)
+	{
+		gi.cprintf(NULL, PRINT_CHAT, "votemenu_loadmaplist: can't allocate memory for coopMapTokenBuffer!\n");
+		return;
+	}
+	strcpy(coopMapTokenBuffer, coopMapFileBuffer);
+
+	mapToken = strtok_r(coopMapTokenBuffer, separators, &listPtr);
+	if(!mapToken)
+	{
+		return;
+	}
+
+	while(mapToken)
+	{
+		votemapmenu->text = mapToken;
+		votemapmenu->align = PMENU_ALIGN_LEFT;
+		votemapmenu->SelectFunc = CoopVoteChangeMap;
+		mapToken = strtok_r(NULL, separators, &listPtr);
+		i++;
+		votemapmenu++;
+	}
+
+	while(i)
+	{
+		i--;
+		votemapmenu--;
+	}
 }
 
 void CoopVoteMap(edict_t *ent, pmenuhnd_t *p)
 {
+	int size;
+
 	if(!ent || !ent->client)
 	{
 		return;
@@ -493,10 +543,16 @@ void CoopVoteMap(edict_t *ent, pmenuhnd_t *p)
 
 	PMenu_Close(ent);
 
-	/* FS: FIXME: Temporary solution */
-	gi.WriteByte (svc_stufftext);
-	gi.WriteString ("cmd vote help\n");
-	gi.unicast(ent, true);
+	if(!votemapmenu)
+	{
+		votemenu_loadmaplist();
+		size = sizeof(pmenu_t) * mapCount;
+		votemapmenu = malloc(size);
+		memset((pmenu_t *)votemapmenu, 0, size);
+		CoopUpdateVoteMapMenu(ent);
+	}
+
+	PMenu_Open(ent, votemapmenu, 0, mapCount, NULL, PMENU_SCROLLING);
 }
 
 void CoopVoteRestartMap(edict_t *ent, pmenuhnd_t *p)
@@ -513,18 +569,24 @@ void CoopVoteRestartMap(edict_t *ent, pmenuhnd_t *p)
 	gi.unicast(ent, true);
 }
 
-void CoopVoteWarpMap(edict_t *ent, pmenuhnd_t *p)
+void CoopVoteChangeMap(edict_t *ent, pmenuhnd_t *p)
 {
+	char mapVote[64];
+	char votestring[64];
+
 	if(!ent || !ent->client)
 	{
 		return;
 	}
 
+	Com_sprintf(mapVote, sizeof(mapVote), "%s", p->entries[p->cur].text);
+	COM_StripExtension (mapVote, mapVote);
+	Com_sprintf(votestring, sizeof(votestring), "cmd vote map %s\n", mapVote);
+
 	PMenu_Close(ent);
 
-	/* FS: FIXME: Temporary solution */
 	gi.WriteByte (svc_stufftext);
-	gi.WriteString ("cmd vote help\n");
+	gi.WriteString (votestring);
 	gi.unicast(ent, true);
 }
 
@@ -597,3 +659,83 @@ void CoopCheckDifficulty(edict_t *ent, pmenuhnd_t *p)
 	}
 }
 
+void votemenu_loadmaplist (void)
+{
+	char fileName[MAX_OSPATH];
+	char *mapToken = NULL;
+	char *coopMapTokenBuffer = NULL;
+	char *listPtr = NULL;
+	char separators[] = "\n";
+	long fileSize;
+	FILE *f = NULL;
+	size_t toEOF = 0;
+
+	if(sv_coop_maplist->string[0] == 0)
+	{
+		gi.cprintf(NULL, PRINT_CHAT, "votemenu_loadmaplist: sv_coop_maplist CVAR empty!\n");
+		return;
+	}
+
+	Sys_Mkdir(va("%s/maps", gamedir->string));
+	Com_sprintf(fileName, sizeof(fileName), "%s/%s", gamedir->string, sv_coop_maplist->string);
+
+	f = fopen(fileName, "r");
+	if(!f)
+	{
+		gi.cprintf(NULL, PRINT_CHAT, "votemenu_loadmaplist: couldn't find '%s'!\n", sv_coop_maplist->string);
+		return;
+	}
+
+	/* obtain file size */
+	fseek (f, 0, SEEK_END);
+	fileSize = ftell (f);
+	fseek (f, 0, SEEK_SET);
+
+	if(coopMapFileBuffer)
+	{
+		free(coopMapFileBuffer);
+		coopMapFileBuffer = NULL;
+	}
+
+	coopMapFileBuffer = (char *)malloc(sizeof(char)*(fileSize+2)); // FS: In case we have to add a newline terminator
+	if(!coopMapFileBuffer)
+	{
+		gi.cprintf(NULL, PRINT_CHAT, "votemenu_loadmaplist: can't allocate memory for coopMapFileBuffer!\n");
+		fclose(f);
+		return;
+	}
+	toEOF = fread(coopMapFileBuffer, sizeof(char), fileSize, f);
+	fclose(f);
+	if(toEOF <= 0)
+	{
+		gi.cprintf(NULL, PRINT_CHAT, "votemenu_loadmaplist: cannot read file '%s' into memory!\n", sv_coop_maplist->string);
+		return;
+	}
+
+	/* FS: Add newline terminator for some paranoia */
+	coopMapFileBuffer[toEOF] = '\n';
+	coopMapFileBuffer[toEOF+1] = '\0';
+
+	coopMapTokenBuffer = (char *)malloc(sizeof(char)*(fileSize+2));
+	if(!coopMapTokenBuffer)
+	{
+		gi.cprintf(NULL, PRINT_CHAT, "votemenu_loadmaplist: can't allocate memory for coopMapTokenBuffer!\n");
+		return;
+	}
+	strcpy(coopMapTokenBuffer, coopMapFileBuffer);
+
+	mapToken = strtok_r(coopMapTokenBuffer, separators, &listPtr);
+	if(!mapToken)
+	{
+		return;
+	}
+
+	mapCount = 0;
+	while(mapToken)
+	{
+		mapCount++;
+		mapToken = strtok_r(NULL, separators, &listPtr);
+	}
+
+	return;
+}

@@ -653,6 +653,7 @@ extern	cvar_t	*sv_vote_timer; /* FS: Coop: Voting */
 extern	cvar_t	*sv_vote_private; /* FS: Coop: Voting */
 extern	cvar_t	*sv_coop_gamemode; /* FS: Coop: Added */
 extern	cvar_t	*sv_coop_reset_hack; /* FS: Coop: Gross reset frametime hack shit */
+extern	cvar_t	*sv_coop_maplist; /* FS: External file we need for the map voting */
 extern	cvar_t	*sv_spawn_protection; /* FS: Coop: Spawn protection */
 extern	cvar_t	*sv_spawn_protection_time; /* FS: Coop: Spawn protection */
 extern	cvar_t	*motd; /* FS: Coop: Added */
