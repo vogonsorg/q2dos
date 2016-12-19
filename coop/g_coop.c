@@ -594,7 +594,7 @@ void CoopUpdateVoteMapMenu(edict_t *ent)
 
 void CoopVoteMap(edict_t *ent, pmenuhnd_t *p)
 {
-	int size;
+	size_t size;
 
 	if(!ent || !ent->client)
 	{
