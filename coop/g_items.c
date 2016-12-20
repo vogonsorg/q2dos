@@ -4132,7 +4132,9 @@ void Spawn_CoopBackpack(edict_t *ent)
 	}
 
 	backpack->coopBackpackMaxHealth = ent->max_health;
-	backpack->coopBackpackNetname = strdup(ent->client->pers.netname);
+	backpack->coopBackpackNetname = gi.TagMalloc(strlen(ent->client->pers.netname) + 1, TAG_GAME);
+	strcpy(backpack->coopBackpackNetname, ent->client->pers.netname);
+
 	backpack->coopBackpackAmmoUpgrade = ent->client->pers.ammoUpgrade;
 
 	gi.dprintf(DEVELOPER_MSG_GAME, "Spawn_CoopBackpack: Spawn Coop Back for %s.\n", ent->client->pers.netname);
@@ -4183,7 +4185,7 @@ Pickup_CoopBackpack(edict_t *ent, edict_t *other) /* FS: Coop: Spawn a backpack 
 		}
 	}
 
-	free(ent->coopBackpackNetname);
+	gi.TagFree(ent->coopBackpackNetname);
 	ent->coopBackpackNetname = NULL;
 
 	return true;

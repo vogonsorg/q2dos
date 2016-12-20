@@ -1227,7 +1227,6 @@ extern char * ED_ParseEdict ( char * data , edict_t * ent ) ;
 extern void ED_ParseField ( const char * key , const char * value , edict_t * ent ) ;
 extern char * ED_NewString ( const char * string ) ;
 extern void ED_CallSpawn ( edict_t * ent ) ;
-extern void G_Verify_MOTD_Length ( void ) ;
 extern void ReadLevel ( const char * filename ) ;
 extern void ReadLevelLocals ( FILE * f ) ;
 extern void ReadEdict ( FILE * f , edict_t * ent ) ;

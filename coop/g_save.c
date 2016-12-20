@@ -324,11 +324,6 @@ InitGame(void)
 	{
 		InitGameRules();
 	}
-
-	if(maxclients->intValue > 1)
-	{
-		G_Verify_MOTD_Length();
-	}
 }
 
 /* ========================================================= */
@@ -1183,40 +1178,5 @@ ReadLevel(const char *filename)
 				ent->nextthink = level.time + ent->delay;
 			}
 		}
-	}
-}
-
-void
-G_Verify_MOTD_Length (void) /* FS: Coop: Verify MOTD length for clients */
-{
-	char separators[] = "|\n";
-	char *motdString;
-	char *listPtr = NULL;
-	char *motdToken = NULL;
-	int lineLength = 0;
-	int currentLine = 0;
-
-	if(!motd || !motd->string || !motd->string[0])
-	{
-		return;
-	}
-
-	motdString = strdup(motd->string);
-
-	motdToken = strtok_r(motdString, separators, &listPtr);
-	if(!motdToken)
-	{
-		return;
-	}
-
-	while(motdToken)
-	{
-		currentLine++;
-		lineLength = strlen(motdToken);
-		if(lineLength >= 40)
-		{
-			gi.cprintf(NULL, PRINT_CHAT, "Warning: MOTD string on line %i greater than 39 chars, current length is %i.  This will truncate on clients!\n", currentLine, lineLength);
-		}
-		motdToken = strtok_r(NULL, separators, &listPtr);
 	}
 }

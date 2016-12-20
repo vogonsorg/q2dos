@@ -1219,7 +1219,6 @@
 {"ED_ParseField", (byte *)ED_ParseField},
 {"ED_NewString", (byte *)ED_NewString},
 {"ED_CallSpawn", (byte *)ED_CallSpawn},
-{"G_Verify_MOTD_Length", (byte *)G_Verify_MOTD_Length},
 {"ReadLevel", (byte *)ReadLevel},
 {"ReadLevelLocals", (byte *)ReadLevelLocals},
 {"ReadEdict", (byte *)ReadEdict},

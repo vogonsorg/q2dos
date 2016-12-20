@@ -49,6 +49,8 @@ void CoopCheckGamemode(edict_t *ent, pmenuhnd_t *p);
 void CoopCheckDifficulty(edict_t *ent, pmenuhnd_t *p);
 void votemenu_loadmaplist (void);
 void CoopVoteChangeMap(edict_t *ent, pmenuhnd_t *p);
+void votemenu_cleanup_all (void);
+void votemenu_cleanup_filebuffer (void);
 
 /*-----------------------------------------------------------------------*/
 
@@ -591,7 +593,6 @@ void CoopUpdateVoteMapMenu(edict_t *ent)
 
 void CoopVoteMap(edict_t *ent, pmenuhnd_t *p)
 {
-	int i;
 	size_t size;
 
 	if(!ent || !ent->client)
@@ -602,22 +603,21 @@ void CoopVoteMap(edict_t *ent, pmenuhnd_t *p)
 	PMenu_Close(ent);
 
 	votemenu_loadmaplist();
-	size = sizeof(pmenu_t) * mapCount;
+	size = sizeof(pmenu_t) * (mapCount + 2);
 	votemapmenu = malloc(size);
 	memset((pmenu_t *)votemapmenu, 0, size);
 	CoopUpdateVoteMapMenu(ent);
 
-	PMenu_Open(ent, votemapmenu, 0, mapCount, NULL, PMENU_SCROLLING);
+	votemapmenu[mapCount].text = NULL;
+	votemapmenu[mapCount].align = PMENU_ALIGN_LEFT;
+	votemapmenu[mapCount].SelectFunc = NULL;
 
-	for(i = 0; i < mapCount; i++)
-	{
-		if(votemapmenu[i].text)
-		{
-			free(votemapmenu[i].text);
-		}
-	}
+	votemapmenu[mapCount+1].text = "Return to Voting Menu";
+	votemapmenu[mapCount+1].align = PMENU_ALIGN_LEFT;
+	votemapmenu[mapCount+1].SelectFunc = CoopReturnToVoteMenu;
 
-	free(votemapmenu);
+	PMenu_Open(ent, votemapmenu, 0, mapCount + 2, NULL, PMENU_SCROLLING);
+	votemenu_cleanup_all();
 }
 
 void CoopVoteRestartMap(edict_t *ent, pmenuhnd_t *p)
@@ -724,6 +724,31 @@ void CoopCheckDifficulty(edict_t *ent, pmenuhnd_t *p)
 	}
 }
 
+void votemenu_cleanup_all (void)
+{
+	int i;
+
+	for(i = 0; i < mapCount; i++)
+	{
+		if(votemapmenu[i].text)
+		{
+			free(votemapmenu[i].text);
+		}
+	}
+
+	free(votemapmenu);
+	votemenu_cleanup_filebuffer();
+}
+
+void votemenu_cleanup_filebuffer (void)
+{
+	if(coopMapFileBuffer)
+	{
+		free(coopMapFileBuffer);
+		coopMapFileBuffer = NULL;
+	}
+}
+
 void votemenu_loadmaplist (void)
 {
 	char fileName[MAX_OSPATH];
@@ -756,11 +781,7 @@ void votemenu_loadmaplist (void)
 	fileSize = ftell (f);
 	fseek (f, 0, SEEK_SET);
 
-	if(coopMapFileBuffer)
-	{
-		free(coopMapFileBuffer);
-		coopMapFileBuffer = NULL;
-	}
+	votemenu_cleanup_filebuffer();
 
 	coopMapFileBuffer = (char *)malloc(sizeof(char)*(fileSize+2)); // FS: In case we have to add a newline terminator
 	if(!coopMapFileBuffer)
@@ -774,6 +795,7 @@ void votemenu_loadmaplist (void)
 	if(toEOF <= 0)
 	{
 		gi.cprintf(NULL, PRINT_CHAT, "votemenu_loadmaplist: cannot read file '%s' into memory!\n", sv_coop_maplist->string);
+		votemenu_cleanup_filebuffer();
 		return;
 	}
 
