@@ -1,11 +1,3 @@
-/*
- * =======================================================================
- *
- * Prototypes for every function in the game.so.
- *
- * =======================================================================
- */
-
 extern char * Q_strupr ( char * string ) ;
 extern char * Q_strlwr ( char * string ) ;
 extern void Q_strncatz ( char * dst , const char * src , int dstSize ) ;
@@ -1013,6 +1005,15 @@ extern void actor_pain ( edict_t * self , edict_t * other , float kick , int dam
 extern void actor_run ( edict_t * self ) ;
 extern void actor_walk ( edict_t * self ) ;
 extern void actor_stand ( edict_t * self ) ;
+extern void PMenu_Do_Scrolling_Update ( edict_t * ent ) ;
+extern void PMenu_Select ( edict_t * ent ) ;
+extern void PMenu_Prev ( edict_t * ent ) ;
+extern void PMenu_Next ( edict_t * ent ) ;
+extern void PMenu_Update ( edict_t * ent ) ;
+extern void PMenu_Do_Update ( edict_t * ent ) ;
+extern void PMenu_UpdateEntry ( pmenu_t * entry , const char * text , int align , SelectFunc_t SelectFunc ) ;
+extern void PMenu_Close ( edict_t * ent ) ;
+extern pmenuhnd_t * PMenu_Open ( edict_t * ent , pmenu_t * entries , int cur , int num , void * arg , int menutype ) ;
 extern void fire_trap ( edict_t * self , vec3_t start , vec3_t aimdir , int damage , int speed , float timer , float damage_radius , qboolean held ) ;
 extern void Trap_Think ( edict_t * ent ) ;
 extern void fire_plasma ( edict_t * self , vec3_t start , vec3_t dir , int damage , int speed , float damage_radius , int radius_damage ) ;
@@ -1059,7 +1060,7 @@ extern void vote_yes ( edict_t * ent , qboolean bAssume ) ;
 extern void vote_stop ( edict_t * ent ) ;
 extern void vote_restartmap ( edict_t * ent ) ;
 extern void vote_random ( edict_t * ent ) ;
-extern void vote_coopskill ( edict_t * ent , int skill ) ;
+extern void vote_coopskill ( edict_t * ent , int skillVote ) ;
 extern void vote_gamemode ( edict_t * ent , const char * gamemode ) ;
 extern void vote_warp ( edict_t * ent , const char * mapName ) ;
 extern void vote_map ( edict_t * ent , const char * mapName ) ;
@@ -1692,6 +1693,31 @@ extern void Move_Calc ( edict_t * ent , vec3_t dest , void ( * func ) ( edict_t 
 extern void Move_Begin ( edict_t * ent ) ;
 extern void Move_Final ( edict_t * ent ) ;
 extern void Move_Done ( edict_t * ent ) ;
+extern void votemenu_loadmaplist ( void ) ;
+extern void votemenu_cleanup_filebuffer ( void ) ;
+extern void votemenu_cleanup_all ( void ) ;
+extern void CoopCheckDifficulty ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopCheckGamemode ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopVoteChangeMap ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopVoteRestartMap ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopVoteMap ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopUpdateVoteMapMenu ( edict_t * ent ) ;
+extern void CoopVoteDifficulty ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopUpdateDifficultyMenu ( edict_t * ent ) ;
+extern void CoopVoteGamemode ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopUpdateGamemodeMenu ( edict_t * ent ) ;
+extern void CoopVoteMenu ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopMotd ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopUpdateMotdMenu ( void ) ;
+extern void CoopJoinGame ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopChaseCam ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopCredits ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopOpenVoteMenu ( edict_t * ent ) ;
+extern void CoopOpenJoinMenu ( edict_t * ent ) ;
+extern void CoopUpdateJoinMenu ( edict_t * ent ) ;
+extern void CoopReturnToVoteMenu ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopReturnToMain ( edict_t * ent , pmenuhnd_t * p ) ;
+extern char * GetSkillString ( void ) ;
 extern void T_RadiusClassDamage ( edict_t * inflictor , edict_t * attacker , float damage , char * ignoreClass , float radius , int mod ) ;
 extern void T_RadiusNukeDamage ( edict_t * inflictor , edict_t * attacker , float damage , edict_t * ignore , float radius , int mod ) ;
 extern void T_RadiusDamage ( edict_t * inflictor , edict_t * attacker , float damage , edict_t * ignore , float radius , int mod ) ;
@@ -1702,6 +1728,7 @@ extern int CheckArmor ( edict_t * ent , vec3_t point , vec3_t normal , int damag
 extern int CheckPowerArmor ( edict_t * ent , vec3_t point , vec3_t normal , int damage , int dflags ) ;
 extern void SpawnDamage ( int type , vec3_t origin , vec3_t normal ) ;
 extern void Killed ( edict_t * targ , edict_t * inflictor , edict_t * attacker , int damage , vec3_t point ) ;
+extern void GetCoopMeansOfDeath ( char * monsterName , char * playerName ) ;
 extern char * GetCoopInsult ( void ) ;
 extern char * GetProperMonsterName ( char * monsterName ) ;
 extern qboolean CanDamage ( edict_t * targ , edict_t * inflictor ) ;
@@ -1736,6 +1763,7 @@ extern void Cmd_Noclip_f ( edict_t * ent ) ;
 extern void Cmd_Notarget_f ( edict_t * ent ) ;
 extern void Cmd_God_f ( edict_t * ent ) ;
 extern void Cmd_Give_f ( edict_t * ent ) ;
+extern qboolean Check_Coop_Item_Flags ( gitem_t * it ) ;
 extern void ValidateSelectedItem ( edict_t * ent ) ;
 extern void SelectPrevItem ( edict_t * ent , int itflags ) ;
 extern void SelectNextItem ( edict_t * ent , int itflags ) ;

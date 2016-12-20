@@ -1,11 +1,3 @@
-/*
- * =======================================================================
- *
- * Prototypes for every mmove_t in the game.so.
- *
- * =======================================================================
- */
-
 extern mmove_t widow2_move_really_dead ;
 extern mmove_t widow2_move_dead ;
 extern mmove_t widow2_move_death ;

@@ -1,11 +1,3 @@
-/*
- * =======================================================================
- *
- * Pointers to every mmove_t in the game.so.
- *
- * =======================================================================
- */
-
 {"widow2_move_really_dead", &widow2_move_really_dead},
 {"widow2_move_dead", &widow2_move_dead},
 {"widow2_move_death", &widow2_move_death},
