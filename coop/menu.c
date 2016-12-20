@@ -58,31 +58,12 @@ PMenu_Open(edict_t *ent, pmenu_t *entries, int cur, int num, void *arg, int menu
 	hnd->menutype = menutype;
 	memcpy(hnd->entries, entries, sizeof(pmenu_t) * num);
 
-	if(hnd->menutype == PMENU_SCROLLING)
+	/* duplicate the strings since they may be from static memory */
+	for (i = 0; i < num; i++)
 	{
-		i = 0;
-		while(entries)
+		if (entries[i].text)
 		{
-			if(i >= num)
-				break;
-
-			if(entries->text)
-			{
-				hnd->entries[i].text = strdup(entries->text);
-			}
-			i++;
-			entries++;
-		}
-	}
-	else
-	{
-		/* duplicate the strings since they may be from static memory */
-		for (i = 0; i < num; i++)
-		{
-			if (entries[i].text)
-			{
-				hnd->entries[i].text = strdup(entries[i].text);
-			}
+			hnd->entries[i].text = strdup(entries[i].text);
 		}
 	}
 

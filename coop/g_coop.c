@@ -561,39 +561,37 @@ void CoopUpdateVoteMapMenu(edict_t *ent)
 		return;
 	}
 
-	coopMapTokenBuffer = (char *)malloc(sizeof(char)*(strlen(coopMapFileBuffer)));
-	if(!coopMapTokenBuffer)
-	{
-		gi.cprintf(NULL, PRINT_CHAT, "votemenu_loadmaplist: can't allocate memory for coopMapTokenBuffer!\n");
-		return;
-	}
-	strcpy(coopMapTokenBuffer, coopMapFileBuffer);
+	coopMapTokenBuffer = strdup(coopMapFileBuffer);
 
 	mapToken = strtok_r(coopMapTokenBuffer, separators, &listPtr);
 	if(!mapToken)
 	{
+		if(coopMapTokenBuffer)
+		{
+			free(coopMapTokenBuffer);
+		}
+
 		return;
 	}
 
 	while(mapToken)
 	{
-		votemapmenu->text = mapToken;
-		votemapmenu->align = PMENU_ALIGN_LEFT;
-		votemapmenu->SelectFunc = CoopVoteChangeMap;
+		votemapmenu[i].text = strdup(mapToken);
+		votemapmenu[i].align = PMENU_ALIGN_LEFT;
+		votemapmenu[i].SelectFunc = CoopVoteChangeMap;
 		mapToken = strtok_r(NULL, separators, &listPtr);
 		i++;
-		votemapmenu++;
 	}
 
-	while(i)
+	if(coopMapTokenBuffer)
 	{
-		i--;
-		votemapmenu--;
+		free(coopMapTokenBuffer);
 	}
 }
 
 void CoopVoteMap(edict_t *ent, pmenuhnd_t *p)
 {
+	int i;
 	size_t size;
 
 	if(!ent || !ent->client)
@@ -603,16 +601,23 @@ void CoopVoteMap(edict_t *ent, pmenuhnd_t *p)
 
 	PMenu_Close(ent);
 
-	if(!votemapmenu)
-	{
-		votemenu_loadmaplist();
-		size = sizeof(pmenu_t) * mapCount;
-		votemapmenu = malloc(size);
-		memset((pmenu_t *)votemapmenu, 0, size);
-		CoopUpdateVoteMapMenu(ent);
-	}
+	votemenu_loadmaplist();
+	size = sizeof(pmenu_t) * mapCount;
+	votemapmenu = malloc(size);
+	memset((pmenu_t *)votemapmenu, 0, size);
+	CoopUpdateVoteMapMenu(ent);
 
 	PMenu_Open(ent, votemapmenu, 0, mapCount, NULL, PMENU_SCROLLING);
+
+	for(i = 0; i < mapCount; i++)
+	{
+		if(votemapmenu[i].text)
+		{
+			free(votemapmenu[i].text);
+		}
+	}
+
+	free(votemapmenu);
 }
 
 void CoopVoteRestartMap(edict_t *ent, pmenuhnd_t *p)
@@ -776,17 +781,15 @@ void votemenu_loadmaplist (void)
 	coopMapFileBuffer[toEOF] = '\n';
 	coopMapFileBuffer[toEOF+1] = '\0';
 
-	coopMapTokenBuffer = (char *)malloc(sizeof(char)*(fileSize+2));
-	if(!coopMapTokenBuffer)
-	{
-		gi.cprintf(NULL, PRINT_CHAT, "votemenu_loadmaplist: can't allocate memory for coopMapTokenBuffer!\n");
-		return;
-	}
-	strcpy(coopMapTokenBuffer, coopMapFileBuffer);
+	coopMapTokenBuffer = strdup(coopMapFileBuffer);
 
 	mapToken = strtok_r(coopMapTokenBuffer, separators, &listPtr);
 	if(!mapToken)
 	{
+		if(coopMapTokenBuffer)
+		{
+			free(coopMapTokenBuffer);
+		}
 		return;
 	}
 
@@ -795,6 +798,11 @@ void votemenu_loadmaplist (void)
 	{
 		mapCount++;
 		mapToken = strtok_r(NULL, separators, &listPtr);
+	}
+
+	if(coopMapTokenBuffer)
+	{
+		free(coopMapTokenBuffer);
 	}
 
 	return;

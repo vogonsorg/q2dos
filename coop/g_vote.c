@@ -185,12 +185,18 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 	char mapCheck[MAX_QPATH];
 	char fileName[MAX_OSPATH];
 	char *mapToken = NULL;
+	char *mapToken2 = NULL;
 	char *fileBuffer = NULL;
+	char *fileBuffer2 = NULL;
 	char *listPtr = NULL;
+	char *listPtr2 = NULL;
 	char separators[] = ",\n";
+	char separators2[] = ",";
 	long fileSize;
+	int mapCount = 0;
 	FILE *f = NULL;
 	size_t toEOF = 0;
+	qboolean retval = false;
 
 	if(!ent || !mapName)
 	{
@@ -236,10 +242,13 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 	fileBuffer[toEOF] = '\n';
 	fileBuffer[toEOF+1] = '\0';
 
+	fileBuffer2 = strdup(fileBuffer);
+
 	mapToken = strtok_r(fileBuffer, separators, &listPtr);
-	if(!mapToken)
+	mapToken2 = strtok_r(fileBuffer2, "\n", &listPtr2);
+	if(!mapToken || !mapToken2)
 	{
-		return false;
+		retval = false;
 	}
 
 	Com_sprintf(mapCheck, sizeof(mapCheck), "%s.bsp", mapName);
@@ -248,22 +257,38 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 	{
 		if(!Q_stricmp(mapToken, mapCheck))
 		{
-			mapToken = strtok_r(NULL, separators, &listPtr);
-			if(mapToken)
+			size_t mapTokenSize = strlen(mapToken);
+			while(mapToken2)
 			{
-				Com_sprintf(voteGamemode, sizeof(voteGamemode), "%s", mapToken);
-				return true;
-			}
-			else
-			{
-				gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: %s with no gamemode in '%s'!\n", mapCheck, sv_coop_maplist->string);
-				return false;
+				if(!strncmp(mapToken, mapToken2, mapTokenSize))
+				{
+					mapToken2 = strtok_r(mapToken2, ",", &listPtr2);
+					mapToken2 = strtok_r(NULL, "\n", &listPtr2);
+					if(mapToken2)
+					{
+						Com_sprintf(voteGamemode, sizeof(voteGamemode), "%s", mapToken2);
+						retval = true;
+						goto cleanup;
+					}
+					else
+					{
+						gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: %s with no gamemode in '%s'!\n", mapCheck, sv_coop_maplist->string);
+						retval = false;
+						goto cleanup;
+					}
+				}
+				mapToken2 = strtok_r(NULL, "\n", &listPtr2);
 			}
 		}
 		mapToken = strtok_r(NULL, separators, &listPtr);
 	}
+cleanup:
+	if(fileBuffer)
+		free(fileBuffer);
+	if(fileBuffer2)
+		free(fileBuffer2);
 
-	return false;
+	return retval;
 }
 
 void vote_map (edict_t *ent, const char *mapName)
