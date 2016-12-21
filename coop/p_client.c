@@ -2200,6 +2200,7 @@ PutClientInServer(edict_t *ent)
 		memcpy(userinfo, client->pers.userinfo, sizeof(userinfo));
 		resp.coop_respawn.game_helpchanged = client->pers.game_helpchanged;
 		resp.coop_respawn.helpchanged = client->pers.helpchanged;
+		resp.coop_respawn.didMotd = client->pers.didMotd; /* FS */
 		client->pers = resp.coop_respawn;
 		ClientUserinfoChanged(ent, userinfo);
 
