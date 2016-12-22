@@ -658,6 +658,7 @@ extern	cvar_t	*sv_spawn_protection; /* FS: Coop: Spawn protection */
 extern	cvar_t	*sv_spawn_protection_time; /* FS: Coop: Spawn protection */
 extern	cvar_t	*motd; /* FS: Coop: Added */
 extern	cvar_t	*adminpass; /* FS: Coop: Admin goodies */
+extern	cvar_t	*vippass; /* FS: Coop: VIP goodies */
 extern	cvar_t	*gamedir; /* FS: Coop: Added */
 extern	cvar_t	*nextserver; /* FS: Coop: Added */
 extern	cvar_t	*dmflags;
@@ -698,7 +699,6 @@ extern	cvar_t	*sv_maplist;
 extern	cvar_t	*sv_stopspeed;		// PGM - this was a define in g_phys.c
 
 //ROGUE
-extern	cvar_t	*g_showlogic;
 extern	cvar_t	*gamerules;
 extern	cvar_t	*huntercam;
 extern	cvar_t	*strong_mines;
@@ -1222,6 +1222,7 @@ typedef struct
 
 	qboolean	spectator;			// client is a spectator
 	qboolean	isAdmin; /* FS: Coop: Admin goodies */
+	qboolean	isVIP; /* FS: Coop: VIP goodies */
 	qboolean	didMotd; /* FS: Coop: MOTD */
 
 //=========
@@ -1245,6 +1246,7 @@ typedef struct
 
 	qboolean	spectator;			// client is a spectator
 	qboolean	isAdmin; /* FS: Coop: Admin goodies */
+	qboolean	isVIP; /* FS: Coop: VIP goodies */
 	qboolean	didMotd; /* FS: Coop: MOTD */
 } client_respawn_t;
 

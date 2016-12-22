@@ -36,6 +36,7 @@ cvar_t *sv_spawn_protection; /* FS: Coop: Spawn protection */
 cvar_t *sv_spawn_protection_time; /* FS: Coop: Spawn protection */
 cvar_t *motd; /* FS: Coop: Added */
 cvar_t *adminpass; /* FS: Coop: Admin goodies */
+cvar_t *vippass; /* FS: Coop: VIP goodies */
 cvar_t *gamedir; /* FS: Coop: Added */
 cvar_t *nextserver; /* FS: Coop: Added */
 cvar_t *dmflags;
@@ -77,7 +78,6 @@ cvar_t *flood_waitdelay;
 cvar_t *sv_maplist;
 cvar_t *sv_stopspeed; /* FS: Coop: Rogue specific */
 
-cvar_t *g_showlogic; /* FS: Coop: Rogue specific */
 cvar_t *gamerules; /* FS: Coop: Rogue specific */
 cvar_t *huntercam; /* FS: Coop: Rogue specific */
 cvar_t *strong_mines; /* FS: Coop: Rogue specific */

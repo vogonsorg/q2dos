@@ -213,7 +213,6 @@ InitGame(void)
 	sv_maxvelocity = gi.cvar ("sv_maxvelocity", "2000", 0);
 	sv_gravity = gi.cvar ("sv_gravity", "800", 0);
 	sv_stopspeed = gi.cvar ("sv_stopspeed", "100", 0); /* FS: Coop: Rogue specific */
-	g_showlogic = gi.cvar ("g_showlogic", "0", 0); /* FS: Coop: Rogue specific */
 	huntercam = gi.cvar ("huntercam", "1", CVAR_SERVERINFO|CVAR_LATCH); /* FS: Coop: Rogue specific */
 	strong_mines = gi.cvar ("strong_mines", "0", 0); /* FS: Coop: Rogue specific */
 	randomrespawn = gi.cvar ("randomrespawn", "0", 0); /* FS: Coop: Rogue specific */
@@ -245,6 +244,8 @@ InitGame(void)
 	sv_spawn_protection_time->description = "Time set in seconds for spawn protection.  Requires sv_spawn_protection to be enabled.";
 	adminpass = gi.cvar("adminpass", "", 0);
 	adminpass->description = "Administator password for special commands.  Not related to RCON.";
+	vippass = gi.cvar("vippass", "", 0);
+	vippass->description = "VIP password for cheating and special commands.  Not related to RCON.";
 	gamedir = gi.cvar("gamedir", "", 0); /* FS: Coop: Added */
 	nextserver = gi.cvar("nextserver", "", 0); /* FS: Coop: Added */
 

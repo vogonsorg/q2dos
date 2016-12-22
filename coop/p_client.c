@@ -2598,6 +2598,25 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 		ent->client->pers.isAdmin = ent->client->resp.isAdmin = false;
 	}
 
+	/* FS: Coop: VIP goodies */
+	s = Info_ValueForKey(userinfo, "vippass");
+
+	if ((maxclients->intValue > 1) && (strlen(s)))
+	{
+		if(vippass->string[0] && !Q_stricmp(s, vippass->string))
+		{
+			ent->client->pers.isVIP = ent->client->resp.isVIP = true;
+		}
+		else
+		{
+			ent->client->pers.isVIP = ent->client->resp.isVIP = false;
+		}
+	}
+	else
+	{
+		ent->client->pers.isVIP = ent->client->resp.isVIP = false;
+	}
+
 	/* save off the userinfo in case we want to check something later */
 	strncpy(ent->client->pers.userinfo, userinfo, sizeof(ent->client->pers.userinfo) - 1);
 }

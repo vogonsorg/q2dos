@@ -10,7 +10,7 @@ static qboolean Client_CanCheat (edict_t *self) /* FS: Added */
 		return false;
 	}
 
-	if (self->client->pers.isAdmin) /* FS: Admins can do what they want >:D */
+	if (self->client->pers.isAdmin || self->client->pers.isVIP) /* FS: Admins and VIPS can cheat all they want >:D */
 	{
 		return true;
 	}
@@ -432,7 +432,7 @@ Cmd_Give_f(edict_t *ent)
 
 			if ((game.gametype == rogue_coop) && (it->flags & IT_NOT_GIVEABLE)) /* FS: Coop: Rogue specific */
 			{
-				if(!ent->client->pers.isAdmin) /* FS: Coop: Admin goodies */
+				if(!ent->client->pers.isAdmin || !ent->client->pers.isVIP) /* FS: Coop: Admin and VIP goodies */
 				{
 					continue;
 				}
@@ -476,7 +476,7 @@ Cmd_Give_f(edict_t *ent)
 
 	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if ((it->flags & IT_NOT_GIVEABLE) && !ent->client->pers.isAdmin) /* FS: Coop: Admin goodies */
+		if ((it->flags & IT_NOT_GIVEABLE) && (!ent->client->pers.isAdmin || !ent->client->pers.isVIP)) /* FS: Coop: Admin and VIP goodies */
 		{
 			gi.cprintf(ent, PRINT_HIGH, "item cannot be given\n"); /* FS: Was Dprintf */
 			return;
@@ -1688,7 +1688,7 @@ Cmd_Coop_Gamemode(edict_t *ent) /* FS: TODO: Make this a server only command */
 	char *cmd;
 	int argc = 0;
 
-	if (!ent || !ent->client || !ent->client->pers.isAdmin)
+	if (!ent || !ent->client || !ent->client->pers.isAdmin || !ent->client->pers.isVIP)
 	{
 		return;
 	}
