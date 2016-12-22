@@ -354,8 +354,10 @@ void SV_InitGame (void)
 	}
 	else if (Cvar_VariableValue ("coop"))
 	{
-		if (maxclients->value <= 1 || maxclients->value > 4)
+		if (maxclients->value <= 1) /* FS: Hard limit was 4. */
 			Cvar_FullSet ("maxclients", "4", CVAR_SERVERINFO | CVAR_LATCH);
+		else if (maxclients->value > MAX_CLIENTS)
+			Cvar_FullSet ("maxclients", va("%i", MAX_CLIENTS), CVAR_SERVERINFO | CVAR_LATCH);
 #ifdef COPYPROTECT
 		if (!sv.attractloop && !dedicated->value)
 			Sys_CopyProtect ();
