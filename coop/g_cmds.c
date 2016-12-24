@@ -2,6 +2,7 @@
 #include "m_player.h"
 
 extern void SP_info_coop_checkpoint (edict_t * self );
+extern void stopCamera(edict_t *self); /* FS: Zaero specific game dll changes */
 
 static qboolean Client_CanCheat (edict_t *self) /* FS: Added */
 {
@@ -129,6 +130,11 @@ SelectNextItem(edict_t *ent, int itflags)
 
 		it = &itemlist[index];
 
+		if ((game.gametype == zaero_coop) && (it->hideFlags & HIDE_FROM_INVENTORY)) // don't show this /* FS: Zaero specific game dll changes */
+		{
+			continue;
+		}
+
 		if (!it->use)
 		{
 			continue;
@@ -182,6 +188,11 @@ SelectPrevItem(edict_t *ent, int itflags)
 		}
 
 		it = &itemlist[index];
+
+		if ((game.gametype == zaero_coop) && (it->hideFlags & HIDE_FROM_INVENTORY)) /* FS: Zaero specific game dll changes */
+		{
+			continue;
+		}
 
 		if (!it->use)
 		{
@@ -393,6 +404,25 @@ Cmd_Give_f(edict_t *ent)
 		it = FindItem("Body Armor");
 		info = (gitem_armor_t *)it->info;
 		ent->client->pers.inventory[ITEM_INDEX(it)] = info->max_count;
+
+		if (!give_all)
+		{
+			return;
+		}
+	}
+
+	if ((game.gametype == zaero_coop) && (give_all || Q_stricmp(name, "Visor") == 0)) /* FS: Zaero specific game dll changes */
+	{
+		it = FindItem("Visor");
+		it_ent = G_Spawn();
+		it_ent->classname = it->classname;
+		SpawnItem (it_ent, it);
+		Touch_Item (it_ent, ent, NULL, NULL);
+
+		if (it_ent->inuse)
+		{
+			G_FreeEdict(it_ent);
+		}
 
 		if (!give_all)
 		{
@@ -641,6 +671,108 @@ Cmd_Noclip_f(edict_t *ent)
 	}
 
 	gi.cprintf(ent, PRINT_HIGH, msg);
+}
+
+ /* FS: Zaero specific game dll changes */
+#define MAX_ALT 2
+struct altsel_s
+{
+	int num;
+	char *weapon[MAX_ALT];
+} alternates[] = 
+{
+	{0}, // filler
+	{2,{"Blaster", "Flare Gun"}},
+	{1,{"Shotgun"}},
+	{1,{"Super Shotgun"}},
+	{1,{"Machinegun"}},
+	{1,{"Chaingun"}},
+	{1,{"Grenade Launcher"}},
+	{1,{"Rocket Launcher"}},
+	{1,{"HyperBlaster"}},
+	{2,{"Railgun", "Sniper Rifle"}},
+	{2,{"BFG10K", "Sonic Cannon"}}
+};
+
+qboolean tryUse(edict_t *ent, char *s) /* FS: Zaero specific game dll changes */
+{
+	int index = 0;
+	gitem_t *it = FindItem(s);
+	if (!it)
+	{
+		gi.cprintf (ent, PRINT_HIGH, "unknown item: %s\n", s);
+		return false;
+	}
+	if (!it->use)
+	{
+		gi.cprintf (ent, PRINT_HIGH, "Item is not usable.\n");
+		return false;
+	}
+	index = ITEM_INDEX(it);
+	if (!ent->client->pers.inventory[index])
+	{
+		gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", s);
+		return false;
+	}
+	it->use (ent, it);
+	return true;
+}
+
+void findNext(edict_t *ent, struct altsel_s *ptr, int offset) /* FS: Zaero specific game dll changes */
+{
+	int start = offset;
+
+	while (1)
+	{
+		if (tryUse(ent, ptr->weapon[offset]))
+			break;
+		
+		offset++;
+		// wrap around
+		if (offset >= ptr->num)
+			offset = 0;
+		// back where we began?
+		if (offset == start)
+			break;
+	}
+}
+
+void altSelect(edict_t *ent, int num) /* FS: Zaero specific game dll changes */
+{
+	int offset = -1;
+	int i = 0;
+	struct altsel_s *ptr = NULL;
+	gitem_t *it = NULL;
+	
+	// within range?
+	if (num < 1 || num > 10)
+	{
+		gi.cprintf (ent, PRINT_HIGH, "Invalid weapon index: %i\n", num);
+		return;
+	}
+
+	ptr = &alternates[num];
+
+	// is our current weapon in this list?
+	for (i = 0; i < ptr->num; i++)
+	{
+		it = FindItem(ptr->weapon[i]);
+		if (it == ent->client->pers.weapon)
+		{
+			offset = i;
+			break;
+		}
+	}
+
+	if (offset == -1)
+		offset = 0;
+	else
+	{
+		offset = ((offset + 1) % (ptr->num));
+	}
+	
+	// now select this offset
+	findNext(ent, ptr, offset);
 }
 
 /*
@@ -1088,6 +1220,11 @@ Cmd_WeapPrev_f(edict_t *ent)
 
 		it = &itemlist[index];
 
+		if ((game.gametype == zaero_coop) && (it->hideFlags & HIDE_FROM_SELECTION)) /* FS: Zaero specific game dll changes */
+		{
+			continue;
+		}
+
 		if (!it->use)
 		{
 			continue;
@@ -1142,6 +1279,11 @@ Cmd_WeapNext_f(edict_t *ent)
 		}
 
 		it = &itemlist[index];
+
+		if ((game.gametype == zaero_coop) && (it->hideFlags & HIDE_FROM_SELECTION)) /* FS: Zaero specific game dll changes */
+		{
+			continue;
+		}
 
 		if (!it->use)
 		{
@@ -1267,6 +1409,13 @@ Cmd_Kill_f(edict_t *ent)
 	}
 
 	player_die(ent, ent, ent, 100000, vec3_origin);
+
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		/* don't even bother waiting for death frames */
+		ent->deadflag = DEAD_DEAD;
+		respawn (ent);
+	}
 }
 
 void
@@ -1280,6 +1429,11 @@ Cmd_PutAway_f(edict_t *ent)
 	ent->client->showscores = false;
 	ent->client->showhelp = false;
 	ent->client->showinventory = false;
+
+	if ((game.gametype == zaero_coop) && (ent->client->zCameraTrack)) /* FS: Zaero specific game dll changes */
+	{
+		stopCamera(ent);
+	}
 }
 
 int
@@ -1948,6 +2102,40 @@ ClientCommand(edict_t *ent)
 
 	cmd = gi.argv(0);
 
+	if ((game.gametype == zaero_coop) && (ent->client->zCameraTrack && !level.intermissiontime)) /* FS: Zaero specific game dll changes */
+	{
+		// if we're viewing thru the camera, only allow some things to happen
+		if (Q_stricmp (cmd, "putaway") == 0)
+		{
+			Cmd_PutAway_f(ent);
+		}
+		else if (Q_stricmp(cmd, "use") == 0)
+		{
+			if (Q_stricmp(gi.args(), "Visor") == 0)
+			{
+				Cmd_Use_f(ent);
+			}
+		}
+		else if (Q_stricmp (cmd, "invuse") == 0)
+		{
+			// only use the visor
+			if (ent->client->pers.selected_item == ITEM_INDEX(FindItem("Visor")))
+			{
+				Cmd_InvUse_f (ent);
+			}
+		}
+		else if (Q_stricmp (cmd, "invnext") == 0)
+		{
+			SelectNextItem (ent, -1);
+		}
+		else if (Q_stricmp (cmd, "invprev") == 0)
+		{
+			SelectPrevItem (ent, -1);
+		}
+	
+		return;
+	}
+
 	if (Q_stricmp(cmd, "vote") == 0) /* FS: Coop: Voting */
 	{
 		vote_command(ent);
@@ -2118,6 +2306,14 @@ ClientCommand(edict_t *ent)
 	else if (Q_stricmp(cmd, "deletecheckpoints") == 0) /* FS: Coop: Added checkpoints */
 	{
 		Cmd_DeleteCheckpoints_f(ent);
+	}
+	else if (Q_stricmp(cmd, "showorigin") == 0) /* FS: Zaero specific game dll changes */
+	{
+		ent->client->showOrigin = !ent->client->showOrigin;
+		if (ent->client->showOrigin)
+			gi.cprintf(ent, PRINT_HIGH, "Show origin ON\n");
+		else
+			gi.cprintf(ent, PRINT_HIGH, "Show origin OFF\n");
 	}
 	else /* anything that doesn't match a command will be a chat */
 	{

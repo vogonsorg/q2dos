@@ -399,7 +399,18 @@ InventoryMessage(edict_t *ent)
 
 	for (i = 0; i < MAX_ITEMS; i++)
 	{
-		gi.WriteShort(ent->client->pers.inventory[i]);
+		gitem_t *it = &itemlist[i]; /* FS: Zaero specific game dll changes */
+
+		if ((game.gametype == zaero_coop) && (it->hideFlags & HIDE_FROM_INVENTORY))
+		{
+			gi.WriteShort(0);	// this is a hack and will work as long as
+								// the client continues to hide items that
+								// the user has none of
+		}
+		else
+		{
+			gi.WriteShort(ent->client->pers.inventory[i]);
+		}
 	}
 }
 
