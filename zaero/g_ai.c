@@ -200,7 +200,7 @@ void ai_charge (edict_t *self, float dist)
 		return;
 	}
 
-	if(self->monsterinfo.aiflags & AI_ONESHOTTARGET)
+	if(self->monsterinfo.aiflags & AI_ONESHOTTARGET) /* FS: Zaero specific */
 	{
 		VectorSubtract (self->monsterinfo.shottarget, self->s.origin, v);
 	}
@@ -389,7 +389,7 @@ inweaponLineOfSight
 returns 1 if the entity is in weapon line of sight (in sight) of self
 =============
 */
-qboolean inweaponLineOfSight (edict_t *self, edict_t *other)
+qboolean inweaponLineOfSight (edict_t *self, edict_t *other) /* FS: Zaero specific */
 {
 	vec3_t	vec;
 	float	dot;
@@ -962,9 +962,14 @@ ai_fly_strafe
 Strafing for flying creatures
 */
 int SV_FlyMove (edict_t *ent, float time, int mask);
-void ai_fly_strafe(edict_t *self, float dist)
+void ai_fly_strafe(edict_t *self, float dist) /* FS: Zaero specific */
 {
 	vec3_t forward, right, vel;
+
+	if (!self)
+	{
+		return;
+	}
 
 	// face the enemy
 	self->ideal_yaw = enemy_yaw;
