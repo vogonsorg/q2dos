@@ -1939,7 +1939,7 @@ ai_run(edict_t *self, float dist)
 	float		left, center, right;
 	vec3_t		left_target, right_target;
 
-	if (!self || !self->enemy || !self->enemy->inuse) /* FS: Need self->enemy check */
+	if (!self || !self->inuse || !self->enemy || !self->enemy->inuse) /* FS: Need self->inuse and self->enemy check */
 	{
 		return;
 	}
@@ -1992,7 +1992,10 @@ ai_run(edict_t *self, float dist)
 //			dprint("regained sight\n");
 		M_MoveToGoal (self, dist);
 		self->monsterinfo.aiflags &= ~AI_LOST_SIGHT;
-		VectorCopy(self->enemy->s.origin, self->monsterinfo.last_sighting);
+		if(self->enemy)
+		{
+			VectorCopy(self->enemy->s.origin, self->monsterinfo.last_sighting);
+		}
 		self->monsterinfo.trail_time = level.time;
 		return;
 	}
