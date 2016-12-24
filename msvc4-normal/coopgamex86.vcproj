@@ -1545,6 +1545,70 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath="..\coop\z_acannon.c"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_ai.c"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_anim.c"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_boss.c"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_camera.c"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_debug.c"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_frames.c"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_handler.c"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_hound.c"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_item.c"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_list.c"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_mtest.c"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_sentien.c"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_spawn.c"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_trigger.c"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_weapon.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -1712,6 +1776,38 @@
 			</File>
 			<File
 				RelativePath="..\coop\q_shared.h"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_anim.h"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_boss.h"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_debug.h"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_frames.h"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_handler.h"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_hound.h"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_list.h"
+				>
+			</File>
+			<File
+				RelativePath="..\coop\z_sentien.h"
 				>
 			</File>
 		</Filter>

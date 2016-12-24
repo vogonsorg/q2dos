@@ -3,6 +3,7 @@
 #ifndef COOP_LOCAL_H
 #define COOP_LOCAL_H
 #include "q_shared.h"
+#include "z_anim.h" /* FS: Zaero specific */
 
 // define GAME_INCLUDE so that game.h does not define the
 // short, server-visible gclient_t and edict_t structures,
@@ -10,6 +11,21 @@
 #define	GAME_INCLUDE
 #include "game.h"
 #include "menu.h"
+
+
+/* FS: Coop: Zaero specific defines */
+#ifdef Z_MAX
+#undef Z_MAX
+#endif // Z_MAX
+#define Z_MAX(a,b)	((a) > (b) ? (a) : (b))
+
+#ifdef Z_MIN
+#undef Z_MIN
+#endif // Z_MIN
+#define Z_MIN(a,b)	((a) < (b) ? (a) : (b))
+
+#define Z_MALLOC(size)	gi.TagMalloc(size, TAG_GAME)
+#define Z_FREE(block)	gi.TagFree(block)
 
 // the "gameversion" client command will print this plus compile date
 #define GAMEVERSION "maracoop"
@@ -40,6 +56,12 @@
 #define	SPAWNFLAG_NOT_DEATHMATCH	0x00000800
 #define	SPAWNFLAG_NOT_COOP			0x00001000
 
+// edict->spawnflags2
+// these are set with checkboxes on each entity in the map editor
+#define	SPAWNFLAG2_MIRRORLEVEL	0x0001 /* FS: Zaero specific game dll changes */
+#define	SPAWNFLAG2_NOT_COOP		0x0002
+#define SPAWNFLAG2_NOT_SINGLE	0x0004
+
 // edict->flags
 #define	FL_FLY					0x00000001
 #define	FL_SWIM					0x00000002	// implied immunity to drowining
@@ -54,6 +76,8 @@
 #define	FL_TEAMSLAVE			0x00000400	// not the first on the team
 #define FL_NO_KNOCKBACK			0x00000800
 #define FL_POWER_ARMOR			0x00001000	// power armor (if any) is active
+#define FL_DONTSETOLDORIGIN		0x00002000  // Don't set the old_origin for this entity  /* FS: Zaero specific game dll changes */
+#define FL_BFGMISSFIRE			0x00004000  // BFG Miss Fire /* FS: Zaero specific game dll changes */
 #define FL_RESPAWN				0x80000000	// used for item respawning
 
 //ROGUE
@@ -78,7 +102,8 @@ typedef enum
 {
 	DAMAGE_NO,
 	DAMAGE_YES,			// will take damage if hit
-	DAMAGE_AIM			// auto targeting recognizes this
+	DAMAGE_AIM,			// auto targeting recognizes this
+	DAMAGE_IMMORTAL		// similar to DAMAGE_YES, but health is not deducted /* FS: Zaero specific game dll changes */
 } damage_t;
 
 typedef enum 
@@ -105,7 +130,14 @@ typedef enum
 	/* FS: Coop: Rogue specific */
 	AMMO_FLECHETTES,
 	AMMO_TESLA,
-	AMMO_PROX
+	AMMO_PROX,
+
+	/* FS: Coop: Zaero specific */
+	AMMO_FLARES, /* FS: Zaero specific game dll changes */
+	AMMO_LASERTRIPBOMB, /* FS: Zaero specific game dll changes */
+	AMMO_EMPNUKE, /* FS: Zaero specific game dll changes */
+	AMMO_A2K, /* FS: Zaero specific game dll changes */
+	AMMO_PLASMASHIELD /* FS: Zaero specific game dll changes */
 } ammo_t;
 
 typedef enum /* FS: Coop: Voting */
@@ -167,12 +199,24 @@ typedef enum /* FS: Coop: Voting */
 											// (prevents run-attacks)
 //ROGUE
 
+/* FS: FIXME ZAERO: WATCH THIS WILL CLASH */
+#define AI_SCHOOLING			0x00008000
+#define AI_REDUCEDDAMAGE		0x00010000
+#define AI_SCHOOLINGTURNING		0x00020000
+#define AI_SCHOOLINGTURNINGFAST	0x00040000
+#define AI_DODGETIMEOUT			0x00080000
+#define AI_JUMPING				0x00100000
+#define AI_MONREDUCEDDAMAGE		0x00200000
+#define AI_ONESHOTTARGET		0x00400000
+
 //monster attack state
 #define AS_STRAIGHT				1
 #define AS_SLIDING				2
 #define	AS_MELEE				3
 #define	AS_MISSILE				4
 #define	AS_BLIND				5	// PMM - used by boss code to do nasty things even if it can't see you
+
+#define AS_FLY_STRAFE			5	/* FS: FIXME ZAERO: WATCH THIS */
 
 // armor types
 #define ARMOR_NONE				0
@@ -224,8 +268,16 @@ MOVETYPE_FLY,
 MOVETYPE_TOSS,			// gravity
 MOVETYPE_FLYMISSILE,	// extra size to monsters
 MOVETYPE_BOUNCE,
+
 MOVETYPE_WALLBOUNCE,	/* FS: Coop: Xatrix specific */
-MOVETYPE_NEWTOSS		/* FS: Coop: Rogue specific */
+
+MOVETYPE_NEWTOSS,		/* FS: Coop: Rogue specific */
+
+/* FS: Zaero specific game dll changes */
+MOVETYPE_BOUNCEFLY,
+MOVETYPE_FREEZE,       // player freeze, used for Zaero Camera
+MOVETYPE_FALLFLOAT,		// falls down slopes and floats in water
+MOVETYPE_RIDE			// basically won't move unless it rides on a MOVETYPE_PUSH entity
 } movetype_t;
 
 
@@ -277,6 +329,14 @@ typedef struct
 #define WEAP_PHALANX			17 /* FS: Coop: Xatrix specific */
 #define WEAP_BOOMER				18 /* FS: Coop: Xatrix specific */
 
+#define WEAP_NONE				19 /* FS: Coop: Zaero specifc */
+
+/* FS: Zaero specific game dll changes */
+// hide flags
+#define HIDE_FROM_INVENTORY	1	// don't list this item in the inventory
+#define HIDE_DONT_KEEP		2	// don't keep in the lastweapon variable
+#define HIDE_FROM_SELECTION	4	// don't autoselect or weapnext thru
+
 typedef struct gitem_s
 {
 	char		*classname;	// spawning name
@@ -304,6 +364,9 @@ typedef struct gitem_s
 	int			tag;
 
 	char		*precaches;		// string of all models, sounds, and images this item will use
+	int		hideFlags; /* FS: Zaero specific game dll changes */
+	char    *weapon;        // weapon used by ammo  /* FS: Zaero specific game dll changes */
+	
 } gitem_t;
 
 /* FS: Coop: Hint for which rule sets we apply */
@@ -311,7 +374,8 @@ typedef enum
 {
 	vanilla_coop,
 	xatrix_coop,
-	rogue_coop
+	rogue_coop,
+	zaero_coop
 } gametype_t;
 
 //
@@ -365,6 +429,7 @@ typedef struct
 	float		intermissiontime;		// time the intermission was started
 	char		*changemap;
 	int			exitintermission;
+	int			fadeFrames; /* FS: Zaero specific game dll changes */
 	vec3_t		intermission_origin;
 	vec3_t		intermission_angle;
 
@@ -490,6 +555,9 @@ typedef struct
 	void		(*melee)(edict_t *self);
 	void		(*sight)(edict_t *self, edict_t *other);
 	qboolean	(*checkattack)(edict_t *self);
+	void		(*backwalk)(edict_t *self); /* FS: Zaero specific game dll changes */
+	void		(*sidestepright)(edict_t *self); /* FS: Zaero specific game dll changes */
+	void		(*sidestepleft)(edict_t *self); /* FS: Zaero specific game dll changes */
 
 	float		pausetime;
 	float		attack_finished;
@@ -538,6 +606,26 @@ typedef struct
 	float		invincible_framenum;
 	float		double_framenum;
 //ROGUE
+
+	int flashTime; /* FS: Zaero specific game dll changes */
+	int flashBase; /* FS: Zaero specific game dll changes */
+
+	// strafing
+	float flyStrafePitch; /* FS: Zaero specific game dll changes */
+	float flyStrafeTimeout; /* FS: Zaero specific game dll changes */
+
+  //schooling info
+  float zSchoolSightRadius; /* FS: Zaero specific game dll changes */
+  float zSchoolMaxSpeed, zSchoolMinSpeed; /* FS: Zaero specific game dll changes */
+  float zSpeedStandMax, zSpeedWalkMax; /* FS: Zaero specific game dll changes */
+  float zSchoolDecayRate, zSchoolMinimumDistance; /* FS: Zaero specific game dll changes */
+  int   zSchoolFlags; /* FS: Zaero specific game dll changes */
+
+	float reducedDamageAmount; /* FS: Zaero specific game dll changes */
+
+	float dodgetimeout; /* FS: Zaero specific game dll changes */
+
+	vec3_t shottarget; /* FS: Zaero specific game dll changes */
 } monsterinfo_t;
 
 // ROGUE
@@ -558,6 +646,18 @@ extern	int	snd_fry;
 extern	int	jacket_armor_index;
 extern	int	combat_armor_index;
 extern	int	body_armor_index;
+
+/* FS: Zaero specific changes */
+extern	int	shells_index;
+extern	int	bullets_index;
+extern	int	grenades_index;
+extern	int	rockets_index;
+extern	int	cells_index;
+extern	int	slugs_index;
+extern	int	flares_index;
+extern	int	tbombs_index;
+extern	int	empnuke_index;
+extern	int	plasmashield_index;
 
 extern	int gibsthisframe;
 extern	int lastgibframe;
@@ -628,6 +728,14 @@ extern	int lastgibframe;
 //ROGUE
 //========
 
+#define MOD_SNIPERRIFLE		  56 /* FS: Zaero specific changes */
+#define MOD_TRIPBOMB		    57 /* FS: Zaero specific changes */
+#define MOD_FLARE			      58 /* FS: Zaero specific changes */
+#define MOD_A2K				      59 /* FS: Zaero specific changes */
+#define MOD_SONICCANNON		  60 /* FS: Zaero specific changes */
+#define MOD_AUTOCANNON		  61 /* FS: Zaero specific changes */
+#define MOD_GL_POLYBLEND	62 /* FS: Zaero specific changes */
+
 extern	int	meansOfDeath;
 
 
@@ -662,6 +770,7 @@ extern	cvar_t	*vippass; /* FS: Coop: VIP goodies */
 extern	cvar_t	*gamedir; /* FS: Coop: Added */
 extern	cvar_t	*nextserver; /* FS: Coop: Added */
 extern	cvar_t	*dmflags;
+extern	cvar_t	*zdmflags; /* FS: Zaero specific game dll changes */
 extern	cvar_t	*skill;
 extern	cvar_t	*fraglimit;
 extern	cvar_t	*timelimit;
@@ -703,6 +812,10 @@ extern	cvar_t	*gamerules;
 extern	cvar_t	*huntercam;
 extern	cvar_t	*strong_mines;
 extern	cvar_t	*randomrespawn;
+
+extern	cvar_t	*grenadeammotype; /* FS: Zaero specific game dll changes */
+extern	cvar_t	*grenadeammo; /* FS: Zaero specific game dll changes */
+extern	cvar_t	*bettyammo; /* FS: Zaero specific game dll changes */
 
 // this is for the count of monsters
 #define ENT_SLOTS_LEFT		(ent->monsterinfo.monster_slots - ent->monsterinfo.monster_used)
@@ -781,12 +894,15 @@ gitem_t	*GetItemByIndex (int index);
 qboolean Add_Ammo (edict_t *ent, gitem_t *item, int count);
 void Touch_Item(edict_t *ent, edict_t *other, cplane_t *plane,
 		csurface_t *surf);
+void precacheAllItems(); /* FS: Zaero specific game dll changes */
 void Spawn_CoopBackpack(edict_t *ent); /* FS: Coop: Spawn a backpack with our stuff */
 
 //
 // g_utils.c
 //
 qboolean	KillBox (edict_t *ent);
+qboolean MonsterKillBox (edict_t *ent); /* FS: Zaero specific game dll changes */
+qboolean MonsterPlayerKillBox (edict_t *ent); /* FS: Zaero specific game dll changes */
 void G_ProjectSource(vec3_t point, vec3_t distance, vec3_t forward,
 		vec3_t right, vec3_t result);
 edict_t *G_Find (edict_t *from, int fieldofs, char *match);
@@ -838,6 +954,8 @@ void T_RadiusClassDamage(edict_t *inflictor, edict_t *attacker, float damage,
 void cleanupHealTarget (edict_t *ent);
 //ROGUE
 
+void T_RadiusDamagePosition (vec3_t origin, edict_t *inflictor, edict_t *attacker, float damage, edict_t *ignore, float radius, int mod); /* FS: Zaero specific game dll changes */
+
 // damage flags
 #define DAMAGE_RADIUS			0x00000001	// damage was indirect
 #define DAMAGE_NO_ARMOR			0x00000002	// armour does not protect from this damage
@@ -850,6 +968,9 @@ void cleanupHealTarget (edict_t *ent);
 #define DAMAGE_NO_REG_ARMOR		0x00000080	// damage skips regular armor
 #define DAMAGE_NO_POWER_ARMOR	0x00000100	// damage skips power armor
 //ROGUE
+
+/* FS: FIXME ZAERO: WATCH THIS */
+#define DAMAGE_ARMORMOSTLY		0x00000040  // reduces the armor more than the health /* FS: Zaero specific game dll changes */
 
 
 #define DEFAULT_BULLET_HSPREAD	300
@@ -935,6 +1056,7 @@ void FoundTarget (edict_t *self);
 qboolean infront (edict_t *self, edict_t *other);
 qboolean visible (edict_t *self, edict_t *other);
 qboolean FacingIdeal(edict_t *self);
+qboolean inweaponLineOfSight (edict_t *self, edict_t *other); /* FS: Zaero specific game dll changes */
 
 //
 // g_weapon.c
@@ -1046,6 +1168,21 @@ void ChaseNext(edict_t *ent);
 void ChasePrev(edict_t *ent);
 void GetChaseTarget(edict_t *ent);
 
+//
+// p_client.c
+//
+void RemoveAttackingPainDaemons (edict_t *self);
+int P_Clients_Connected (qboolean spectators); /* FS: Coop: Find out how many players are in the game */
+
+//
+// g_vote.c
+//
+void vote_Think (void);
+void vote_Reset (void);
+void vote_command (edict_t *ent);
+void vote_connect (edict_t *ent);
+void vote_disconnect_recalc(edict_t *ent);
+void vote_stop (edict_t *ent);
 
 //====================
 // ROGUE PROTOTYPES
@@ -1146,24 +1283,31 @@ void DetermineBBox (char *classname, vec3_t mins, vec3_t maxs);
 void SpawnGrow_Spawn (vec3_t startpos, int size);
 void Widowlegs_Spawn (vec3_t startpos, vec3_t angles);
 
-//
-// p_client.c
-//
-void RemoveAttackingPainDaemons (edict_t *self);
-int P_Clients_Connected (qboolean spectators); /* FS: Coop: Find out how many players are in the game */
-
-//
-// g_vote.c
-//
-void vote_Think (void);
-void vote_Reset (void);
-void vote_command (edict_t *ent);
-void vote_connect (edict_t *ent);
-void vote_disconnect_recalc(edict_t *ent);
-void vote_stop (edict_t *ent);
-
 // ROGUE PROTOTYPES
 //====================
+
+//
+// z_item.c
+//
+qboolean EMPNukeCheck(edict_t	*ent, vec3_t pos); /* FS: Zaero specific game dll changes */
+
+//
+// z_weapon.c
+//
+void fire_bb (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius); /* FS: Zaero specific game dll changes */
+void fire_flare (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage); /* FS: Zaero specific game dll changes */
+
+//
+// z_ai.c
+//
+void ai_schoolStand (edict_t *self, float dist); /* FS: Zaero specific game dll changes */
+void ai_schoolRun (edict_t *self, float dist); /* FS: Zaero specific game dll changes */
+void ai_schoolWalk (edict_t *self, float dist); /* FS: Zaero specific game dll changes */
+void ai_schoolCharge (edict_t *self, float dist); /* FS: Zaero specific game dll changes */
+void ai_schoolBackWalk (edict_t *self, float dist); /* FS: Zaero specific game dll changes */
+void ai_schoolSideStepRight (edict_t *self, float dist); /* FS: Zaero specific game dll changes */
+void ai_schoolSideStepLeft (edict_t *self, float dist); /* FS: Zaero specific game dll changes */
+
 
 //============================================================================
 
@@ -1201,6 +1345,7 @@ typedef struct
 	int			max_bullets;
 	int			max_shells;
 	int			max_rockets;
+	int			max_flares; /* FS: Zaero specific game dll changes */
 	int			max_grenades;
 	int			max_cells;
 	int			max_slugs;
@@ -1209,8 +1354,14 @@ typedef struct
 	int			max_magslug;
 	int			max_trap;
 
+	int			max_tbombs; /* FS: Zaero specific game dll changes */
+	int			max_a2k; /* FS: Zaero specific game dll changes */
+	int			max_empnuke; /* FS: Zaero specific game dll changes */
+	int			max_plasmashield; /* FS: Zaero specific game dll changes */
+
 	gitem_t		*weapon;
 	gitem_t		*lastweapon;
+	gitem_t		*lastweapon2; // this if for inventory hiding items /* FS: Zaero specific game dll changes */
 
 	int			power_cubes;	// used for tracking the cubes in coop games
 	int			score;			// for calculating total unit score in coop games
@@ -1234,6 +1385,8 @@ typedef struct
 	int			max_rounds;
 //ROGUE
 //=========
+
+	float visorFrames; /* FS: Zaero specific game dll changes */
 } client_persistant_t;
 
 // client data that stays across deathmatch respawns
@@ -1320,6 +1473,7 @@ struct gclient_s
 	float		invincible_framenum;
 	float		breather_framenum;
 	float		enviro_framenum;
+	float		a2kFramenum; /* FS: Zaero specific game dll changes */
 
 	qboolean	grenade_blew_up;
 	float		grenade_time;
@@ -1358,8 +1512,24 @@ struct gclient_s
 
 	qboolean	spawn_protection; /* FS: Coop: Spawn protection */
 	qboolean	spawn_protection_msg; /* FS: Coop: Spawn protection */
-};
 
+	// used for blinding
+	int flashTime; /* FS: Zaero specific game dll changes */
+	int flashBase; /* FS: Zaero specific game dll changes */
+
+	edict_t		*zCameraTrack;    // the entity to see through /* FS: Zaero specific game dll changes */
+	vec3_t     zCameraOffset;   // offset from camera origin /* FS: Zaero specific game dll changes */
+	edict_t		*zCameraLocalEntity; /* FS: Zaero specific game dll changes */
+	float zCameraStaticFramenum; /* FS: Zaero specific game dll changes */
+
+	qboolean showOrigin; /* FS: Zaero specific game dll changes */
+
+	// for sniper rifle
+	int sniperFramenum; /* FS: Zaero specific game dll changes */
+
+	// for sonic cannon
+	float startFireTime; /* FS: Zaero specific game dll changes */
+};
 
 struct edict_s
 {
@@ -1398,6 +1568,9 @@ struct edict_s
 	int			flags;
 
 	char		*model;
+	char		*model2; /* FS: Zaero specific game dll changes */
+	char		*model3; /* FS: Zaero specific game dll changes */
+	char		*model4; /* FS: Zaero specific game dll changes */
 	float		freetime;			// sv.time when the object was freed
 	
 	//
@@ -1419,7 +1592,7 @@ struct edict_s
 	char		*combattarget;
 	edict_t		*target_ent;
 
-	float		speed, accel, decel;
+	float		speed, accel, decel, aspeed; /* FS: Zaero specific game dll changes: aspeed added */
 	vec3_t		movedir;
 	vec3_t		pos1, pos2;
 
@@ -1534,7 +1707,57 @@ struct edict_s
 
 	qboolean	voteInitiator; /* FS: Coop: Voting */
 	vote_t		hasVoted; /* FS: Coop: Voting */
+
+/* FS: Zaero specific game dll changes */
+	// can use this for misc. timeouts
+	float timeout;
+
+	// for func_door, also used by monster_autocannon, and misc_securitycamera
+	int active;
+	int seq;
+	
+	// between level saves/loads
+	int spawnflags2;
+	int oldentnum;
+	
+	// titan laser
+	edict_t *laser;
+
+	float weaponsound_time;
+
+	// schooling info
+	edict_t *zRaduisList, *zSchoolChain;
+	float zDistance;
+
+	// this is for MOVETYPE_RIDE
+	edict_t *rideWith[2];
+	vec3_t rideWithOffset[2];
+
+	// camera number
+	vec3_t mangle;
+	
+	// time left for the visor (stored if a visor is dropped)
+	int visorFrames;
+
+	// monster team
+	char *mteam;
+
+	// for random func_timer targets
+	char targets[16][MAX_QPATH];
+	int numTargets;
+
+	// used by floor-mounted autocannon
+	int onFloor;
+
+	float bossFireTimeout;
+	int bossFireCount;
 };
+
+//zaero debug includes (need type info)
+
+// Zaero dmflags
+#define ZDM_NO_GL_POLYBLEND_DAMAGE	1
+#define ZDM_ZAERO_ITEMS				2
 
 //=============
 //ROGUE
