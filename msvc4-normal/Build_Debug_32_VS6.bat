@@ -10,6 +10,7 @@ call "%Q2DOSDEVBASE%\clean.bat"
 cd /D "%Q2DOSDEVBASE%\msvc4-normal"
 
 :startcopy
+msdev "%Q2DOSDEVBASE%\msvc4-normal\quake2.dsw" /MAKE "q2ded - Win32 Debug" /BUILD
 msdev "%Q2DOSDEVBASE%\msvc4-normal\quake2.dsw" /MAKE "gamex86 - Win32 Debug" /BUILD
 msdev "%Q2DOSDEVBASE%\msvc4-normal\quake2.dsw" /MAKE "ref_soft - Win32 Debug" /BUILD
 msdev "%Q2DOSDEVBASE%\msvc4-normal\quake2.dsw" /MAKE "ref_gl - Win32 Debug" /BUILD

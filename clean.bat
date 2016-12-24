@@ -19,6 +19,8 @@ del /q q2*.exe
 cd msvc4-normal
 rmdir /s /q Release
 rmdir /s /q Debug
+rmdir /s /q Dedicated_Release
+rmdir /s /q Dedicated_Debug
 
 cd 3zb2
 rmdir /s /q Release

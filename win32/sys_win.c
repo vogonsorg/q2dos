@@ -452,8 +452,10 @@ Sys_AppActivate
 */
 void Sys_AppActivate (void)
 {
+#ifndef DEDICATED_ONLY
 	ShowWindow ( cl_hwnd, SW_RESTORE);
 	SetForegroundWindow ( cl_hwnd );
+#endif
 }
 
 /*
@@ -674,7 +676,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 // Knightmare added- new dedicated console
 #ifdef NEW_DED_CONSOLE
 	Sys_InitDedConsole ();
-//	Com_Printf ("Q2DOS for Windows %s %s %s-%s %s\n", VERSION_EXT, CPUSTRING, OS_STRING, COMPILETYPE_STRING, __DATE__);
+	Com_Printf ("Q2DOS for Windows %4.2f %s %s %s\n", VERSION, CPUSTRING, __DATE__, BUILDSTRING);
 #endif
 // end Knightmare
 

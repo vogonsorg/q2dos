@@ -1980,6 +1980,10 @@
 				RelativePath="..\client\vid.h"
 				>
 			</File>
+			<File
+				RelativePath="..\win32\winquake.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

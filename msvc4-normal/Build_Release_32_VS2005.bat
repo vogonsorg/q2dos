@@ -10,6 +10,8 @@ call "%VS80COMNTOOLS%vsvars32.bat"
 cd /D "%Q2DOSDEVBASE%\msvc4-normal"
 
 :startcopy
+devenv "%Q2DOSDEVBASE%\msvc4-normal\quake2.sln" /Build "%Q2DOSBINDIR%" /Project "q2ded"
+
 devenv "%Q2DOSDEVBASE%\msvc4-normal\quake2.sln" /Build "%Q2DOSBINDIR%" /Project "gamex86"
 
 devenv "%Q2DOSDEVBASE%\msvc4-normal\quake2.sln" /Build "%Q2DOSBINDIR%" /Project "ref_soft"

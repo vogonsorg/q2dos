@@ -46,8 +46,13 @@ cvar_t *sv_airaccelerate;
 
 cvar_t  *sv_noreload;                   // don't reload level state when reentering
 
+#ifndef DEDICATED_ONLY
 extern cvar_t  *maxclients;                    // FIXME: rename sv_maxclients
                                         //made extern from a collision in watcom
+#else
+cvar_t	*maxclients;
+#endif
+
 cvar_t  *sv_showclamp;
 
 cvar_t  *hostname;
@@ -1123,8 +1128,13 @@ void SV_Init (void)
 	Cvar_Get ("fraglimit", "0", CVAR_SERVERINFO);
 	Cvar_Get ("timelimit", "0", CVAR_SERVERINFO);
 	Cvar_Get ("cheats", "0", CVAR_SERVERINFO|CVAR_LATCH);
-	Cvar_Get ("protocol", va("%i", PROTOCOL_VERSION), CVAR_SERVERINFO|CVAR_NOSET);;
+	Cvar_Get ("protocol", va("%i", PROTOCOL_VERSION), CVAR_SERVERINFO|CVAR_NOSET);
+
+#ifdef DEDICATED_ONLY
+	maxclients = Cvar_Get ("maxclients", "8", CVAR_SERVERINFO | CVAR_LATCH);
+#else
 	maxclients = Cvar_Get ("maxclients", "1", CVAR_SERVERINFO | CVAR_LATCH);
+#endif
 	hostname = Cvar_Get ("hostname", "noname", CVAR_SERVERINFO | CVAR_ARCHIVE);
 	timeout = Cvar_Get ("timeout", "125", 0);
 	zombietime = Cvar_Get ("zombietime", "2", 0);

@@ -135,7 +135,9 @@ void	VID_Init (void)
     ri.Cvar_SetValue = Cvar_SetValue;
     ri.Vid_GetModeInfo = VID_GetModeInfo;
 
+#ifndef DEDICATED_ONLY
     re = GetRefAPI(ri);
+#endif
 
     if (re.api_version != API_VERSION)
         Com_Error (ERR_FATAL, "Re has incompatible api_version");

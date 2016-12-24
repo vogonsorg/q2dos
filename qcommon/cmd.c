@@ -21,7 +21,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "qcommon.h"
 
+#ifndef DEDICATED_ONLY
 void Cmd_ForwardToServer (void);
+#endif
 
 #define	MAX_ALIAS_NAME	32
 
@@ -890,7 +892,10 @@ void	Cmd_ExecuteString (char *text)
 		return;
 
 	// send it as a server command if we are connected
-	Cmd_ForwardToServer ();
+	if (dedicated && !dedicated->intValue) /* FS: Don't send this crud through dedicated servers */
+	{
+		Cmd_ForwardToServer ();
+	}
 }
 
 /*
