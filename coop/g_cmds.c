@@ -999,7 +999,7 @@ Cmd_Inven_f(edict_t *ent)
 	}
 	else
 	{
-		if(!cl->showinventory)
+		if(!cl->showinventory && maxclients->intValue > 1)
 		{
 			CoopOpenJoinMenu(ent);
 			return;

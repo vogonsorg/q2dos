@@ -2475,9 +2475,16 @@ ClientBegin(edict_t *ent)
 		ent->classname = "player";
 		InitClientResp(ent->client);
 		PutClientInServer(ent);
-		if(!ent->client->pers.didMotd)
+		if(!ent->client->pers.didMotd) /* FS: Added */
 		{
-			CoopOpenJoinMenu(ent); /* FS: Added */
+			if(maxclients->intValue <= 1)
+			{
+				ent->client->pers.didMotd = ent->client->resp.didMotd = true;
+			}
+			else
+			{
+				CoopOpenJoinMenu(ent);
+			}
 		}
 	}
 
