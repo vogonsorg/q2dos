@@ -1290,6 +1290,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\win32\win_dedconsole.c"
+				>
+			</File>
+			<File
 				RelativePath="..\CLIENT\x86.c"
 				>
 				<FileConfiguration
@@ -1945,6 +1949,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\win32\resource.h"
+				>
+			</File>
+			<File
 				RelativePath="..\client\screen.h"
 				>
 			</File>
@@ -2002,6 +2010,10 @@
 						AdditionalIncludeDirectories="\PROJ\q2dos\win32"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\win32\startup.bmp"
+				>
 			</File>
 		</Filter>
 		<File

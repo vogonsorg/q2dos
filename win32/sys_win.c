@@ -62,6 +62,9 @@ SYSTEM IO
 */
 
 
+
+// Knightmare- replaced by new dedicated console
+#ifndef NEW_DED_CONSOLE
 void Sys_Error (char *error, ...)
 {
 	va_list		argptr;
@@ -82,6 +85,7 @@ void Sys_Error (char *error, ...)
 
 	exit (1);
 }
+#endif	// NEW_DED_CONSOLE
 
 void Sys_Quit (void)
 {
@@ -92,6 +96,12 @@ void Sys_Quit (void)
 	CloseHandle (qwclsemaphore);
 	if (dedicated && dedicated->value)
 		FreeConsole ();
+
+
+// Knightmare added- new dedicated console
+#ifdef NEW_DED_CONSOLE
+	Sys_ShutdownConsole ();
+#endif
 
 	exit (0);
 }
@@ -234,6 +244,8 @@ void Sys_Init (void)
 	else if ( vinfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
 		s_win95 = true;
 
+// Knightmare- removed for new dedicated console
+#ifndef NEW_DED_CONSOLE
 	if (dedicated->value)
 	{
 		if (!AllocConsole ())
@@ -241,9 +253,12 @@ void Sys_Init (void)
 		hinput = GetStdHandle (STD_INPUT_HANDLE);
 		houtput = GetStdHandle (STD_OUTPUT_HANDLE);
 	}
+#endif	// NEW_DED_CONSOLE
+// end Knightmare
 }
 
-
+// Knightmare- removed for new dedicated console
+#ifndef NEW_DED_CONSOLE
 static char	console_text[256];
 static int	console_textlen;
 
@@ -352,7 +367,8 @@ void Sys_ConsoleOutput (char *string)
 	if (console_textlen)
 		WriteFile(houtput, console_text, console_textlen, &dummy, NULL);
 }
-
+#endif	// NEW_DED_CONSOLE
+// end Knightmare
 
 /*
 ================
@@ -655,6 +671,12 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	global_hInstance = hInstance;
 
 	ParseCommandLine (lpCmdLine);
+// Knightmare added- new dedicated console
+#ifdef NEW_DED_CONSOLE
+	Sys_InitDedConsole ();
+//	Com_Printf ("Q2DOS for Windows %s %s %s-%s %s\n", VERSION_EXT, CPUSTRING, OS_STRING, COMPILETYPE_STRING, __DATE__);
+#endif
+// end Knightmare
 
 	// if we find the CD, add a +set cddir xxx command line
 	cddir = Sys_ScanForCD ();

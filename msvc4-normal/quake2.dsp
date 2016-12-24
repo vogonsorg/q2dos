@@ -411,6 +411,10 @@ SOURCE=..\WIN32\vid_menu.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\win32\win_dedconsole.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\CLIENT\x86.c
 # End Source File
 # End Group
