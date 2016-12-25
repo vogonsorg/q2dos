@@ -370,6 +370,102 @@ SOURCE=..\coop\p_weapon.c
 
 SOURCE=..\coop\q_shared.c
 # End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_acannon.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_ai.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_anim.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_anim.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_boss.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_boss.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_camera.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_debug.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_debug.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_frames.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_frames.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_handler.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_handler.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_hound.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_hound.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_item.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_list.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_list.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_mtest.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_sentien.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_sentien.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_spawn.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_trigger.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_weapon.c
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
