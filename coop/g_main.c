@@ -40,6 +40,7 @@ cvar_t *vippass; /* FS: Coop: VIP goodies */
 cvar_t *gamedir; /* FS: Coop: Added */
 cvar_t *nextserver; /* FS: Coop: Added */
 cvar_t *dmflags;
+cvar_t *zdmflags; /* FS: Zaero specific game dll changes */
 cvar_t *skill;
 cvar_t *fraglimit;
 cvar_t *timelimit;
@@ -435,6 +436,7 @@ ExitLevel(void)
 	level.changemap = NULL;
 	level.exitintermission = 0;
 	level.intermissiontime = 0;
+	level.fadeFrames = 0; /* FS: Zaero specific game dll changes */
 	level.current_coop_checkpoint = NULL;
 
 	vote_Reset(); /* FS: Coop: Voting */
@@ -497,7 +499,11 @@ G_RunFrame(void)
 	AI_SetSightClient();
 
 	/* exit intermissions */
-	if (level.exitintermission)
+	if ((game.gametype == zaero_coop) && (level.fadeFrames > 1)) /* FS: Zaero specific game dll changes */
+	{
+		level.fadeFrames--;
+	}
+	else if (level.exitintermission)
 	{
 		ExitLevel();
 		return;
@@ -516,7 +522,17 @@ G_RunFrame(void)
 
 		level.current_entity = ent;
 
-		VectorCopy(ent->s.origin, ent->s.old_origin);
+		if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+		{
+		    if(!(ent->flags & FL_DONTSETOLDORIGIN))
+			{
+				VectorCopy (ent->s.origin, ent->s.old_origin);
+			}
+		}
+		else
+		{
+			VectorCopy(ent->s.origin, ent->s.old_origin);
+		}
 
 		/* if the ground entity moved, make sure we are still on it */
 		if ((ent->groundentity) &&
