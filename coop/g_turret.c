@@ -111,6 +111,12 @@ turret_breach_fire(edict_t *self)
 	VectorMA(start, self->move_origin[1], r, start);
 	VectorMA(start, self->move_origin[2], u, start);
 
+	if((game.gametype == zaero_coop) && (EMPNukeCheck(self, start))) /* FS: Zaero specific game dll changes */
+	{
+		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
+		return;
+	}
+
 	damage = 100 + random() * 50;
 	speed = 550 + 50 * skill->value;
 	fire_rocket(self->teammaster->owner, start, f, damage, speed, 150, damage);
@@ -545,7 +551,7 @@ SP_turret_driver(edict_t *self)
 	self->movetype = MOVETYPE_PUSH;
 	self->solid = SOLID_BBOX;
 
-	if(game.gametype == vanilla_coop) /* FS: Coop: New animations, make sure download gets them. */
+	if(game.gametype == vanilla_coop || game.gametype == zaero_coop) /* FS: Coop: New animations, make sure download gets them. */
 	{
 		self->s.modelindex = gi.modelindex("models/monsters/infantry/tris.md2");
 	}
@@ -567,7 +573,10 @@ SP_turret_driver(edict_t *self)
 
 	self->flags |= FL_NO_KNOCKBACK;
 
-	level.total_monsters++;
+	if((game.gametype != zaero_coop) || ( (game.gametype == zaero_coop) && (!(self->spawnflags & 16))) ) /* FS: Zaero specific game dll changes */
+	{
+		level.total_monsters++;
+	}
 
 	self->svflags |= SVF_MONSTER;
 	self->s.renderfx |= RF_FRAMELERP;
