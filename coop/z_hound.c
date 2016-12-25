@@ -330,7 +330,6 @@ void hound_jump_takeoff (edict_t *self)
 	VectorScale (forward, 400, self->velocity);
 	self->velocity[2] = 200;
 	self->groundentity = NULL;
-	self->monsterinfo.aiflags |= AI_JUMPING;
 	self->monsterinfo.attack_finished = level.time + 3;
 	self->touch = hound_jump_touch;
 }
@@ -341,7 +340,6 @@ void hound_check_landing (edict_t *self)
 	{
 		gi.sound (self, CHAN_WEAPON, sound_impact, 1, ATTN_NORM, 0);
 		self->monsterinfo.attack_finished = 0;
-		self->monsterinfo.aiflags &= ~AI_JUMPING;
 		return;
 	}
 
@@ -359,7 +357,6 @@ void hound_check_landing2 (edict_t *self)
 	{
 		gi.sound (self, CHAN_WEAPON, sound_impact, 1, ATTN_NORM, 0);
 		self->monsterinfo.attack_finished = 0;
-		self->monsterinfo.aiflags &= ~AI_JUMPING;
 		return;
 	}
 

@@ -202,11 +202,7 @@ typedef enum /* FS: Coop: Voting */
 /* FS: FIXME ZAERO: WATCH THIS WILL CLASH */
 #define AI_SCHOOLING			0x00008000
 #define AI_REDUCEDDAMAGE		0x00010000
-#define AI_SCHOOLINGTURNING		0x00020000
-#define AI_SCHOOLINGTURNINGFAST	0x00040000
 #define AI_DODGETIMEOUT			0x00080000
-#define AI_JUMPING				0x00100000
-#define AI_MONREDUCEDDAMAGE		0x00200000
 #define AI_ONESHOTTARGET		0x00400000
 
 //monster attack state
@@ -970,7 +966,6 @@ void T_RadiusDamagePosition (vec3_t origin, edict_t *inflictor, edict_t *attacke
 #define DAMAGE_NO_POWER_ARMOR	0x00000100	// damage skips power armor
 //ROGUE
 
-/* FS: FIXME ZAERO: WATCH THIS */
 #define DAMAGE_ARMORMOSTLY		0x00000040  // reduces the armor more than the health /* FS: Zaero specific game dll changes */
 
 

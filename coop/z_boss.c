@@ -1655,7 +1655,6 @@ void SP_monster_zboss (edict_t *self)
 	VectorSet (self->maxs, 32, 50, 74);
 	self->movetype = MOVETYPE_STEP;
 	self->solid = SOLID_BBOX;
-	self->monsterinfo.aiflags = AI_MONREDUCEDDAMAGE;
 	self->monsterinfo.reducedDamageAmount = 0.25;
 
 	if(skill->value == 0)
