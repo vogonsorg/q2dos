@@ -2025,7 +2025,10 @@ Drop_Item(edict_t *ent, gitem_t *item)
 
 	dropped->classname = item->classname;
 	dropped->item = item;
-	dropped->spawnflags = DROPPED_ITEM;
+	if(!coop->intValue || (!(item->flags & IT_STAY_COOP) && !(item->flags & IT_KEY))) /* FS: Zaero stupidly sets it so some enemies drop the key.  So they will drop it once killed and you only get one chance to pick it up. */
+	{
+		dropped->spawnflags = DROPPED_ITEM;
+	}
 	dropped->s.effects = item->world_model_flags;
 	dropped->s.renderfx = RF_GLOW | RF_IR_VISIBLE; /* FS: Coop: Rogue specific add of RF_IR_VISIBLE.  Probably OK as-is. */
 
