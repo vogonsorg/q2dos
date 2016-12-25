@@ -6,6 +6,8 @@ edict_t *pm_passent;
 void ClientUserinfoChanged(edict_t *ent, char *userinfo);
 void SP_misc_teleporter_dest(edict_t *ent);
 void Touch_Item(edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf);
+void zCam_SetLocalCopy(struct edict_s *player, char *s);  /* FS: Zaero specific game dll changes */
+void stopCamera(edict_t *ent); /* FS: Zaero specific game dll changes */
 
 /*
  * The ugly as hell coop spawnpoint fixup function.
@@ -474,6 +476,11 @@ player_pain(edict_t *self /* unsued */, edict_t *other /* unused */,
 	 * This function is still here since
 	 * the player is an entity and needs
 	 * a pain callback */
+
+	if ((game.gametype == zaero_coop) && (self->client->zCameraTrack)) /* FS: Zaero specific game dll changes */
+	{
+		stopCamera(self);
+	}
 }
 
 qboolean
@@ -598,6 +605,7 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker
 			case MOD_BOMB:
 			case MOD_SPLASH:
 			case MOD_TRIGGER_HURT:
+			case MOD_AUTOCANNON:  /* FS: Zaero specific game dll changes */
 				message = "was in the wrong place";
 				break;
 			case MOD_GEKK: /* FS: Coop: Xatrix specific */
@@ -669,6 +677,12 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker
 					break;
 				case MOD_TRAP: /* FS: Coop: Xatrix specific */
 					message = "sucked into his own trap";
+					break;
+				case MOD_A2K:  /* FS: Zaero specific game dll changes */
+					message = "realized he was expendable";
+					break;
+				case MOD_SONICCANNON:  /* FS: Zaero specific game dll changes */
+					message = "got carried away";
 					break;
 				default:
 
@@ -840,6 +854,30 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker
 					break;
 				case MOD_TRAP: /* FS: Coop: Xatrix specific */
 					message = "caught in trap by";
+					break;
+				case MOD_SNIPERRIFLE:  /* FS: Zaero specific game dll changes */
+					message = "was ventilated by";
+					message2 = "'s bullet";
+					break;
+				case MOD_TRIPBOMB:  /* FS: Zaero specific game dll changes */
+					message = "tripped over";
+					message2 = "'s trip bomb";
+					break;
+				case MOD_FLARE:  /* FS: Zaero specific game dll changes */
+					message = "didn't see";
+					message2 = "'s flare";
+					break;
+				case MOD_GL_POLYBLEND:  /* FS: Zaero specific game dll changes */
+					message = "turned off gl_polyblend and was damaged by";
+					message2 = "'s flare";
+					break;
+				case MOD_A2K:  /* FS: Zaero specific game dll changes */
+					message = "got dissassembled by";
+					message2 = "";
+					break;
+				case MOD_SONICCANNON:  /* FS: Zaero specific game dll changes */
+					message = "got microwaved by";
+					message2 = "";
 					break;
 				default:
 					break;
@@ -1088,6 +1126,12 @@ player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 		return;
 	}
 
+	// if we're in a camera, get out
+	if ((game.gametype == zaero_coop) && (self->client->zCameraTrack)) /* FS: Zaero specific game dll changes */
+	{
+		stopCamera(self);
+	}
+
 	VectorClear(self->avelocity);
 
 	self->takedamage = DAMAGE_YES;
@@ -1158,6 +1202,7 @@ player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 
 	self->client->double_framenum = 0; /* FS: Coop: Rogue specific */
 	self->client->quadfire_framenum = 0; /* FS: Coop: Xatrix specific */
+	self->client->a2kFramenum = 0; /* FS: Zaero specific game dll changes */
 
 	if (self->client->owned_sphere) /* FS: Coop: Rogue specific */
 	{
@@ -1287,11 +1332,25 @@ InitClientPersistant(gclient_t *client)
 
 	memset(&client->pers, 0, sizeof(client->pers));
 
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		item = FindItem("Push");
+		client->pers.inventory[ITEM_INDEX(item)] = 1;
+	}
+
 	item = FindItem("Blaster");
 	client->pers.selected_item = ITEM_INDEX(item);
 	client->pers.inventory[client->pers.selected_item] = 1;
 
 	client->pers.weapon = item;
+
+	if ((game.gametype == zaero_coop) && (!deathmatch->value)) /* FS: Zaero specific game dll changes */
+	{
+		item = FindItem("Flare Gun");
+		client->pers.inventory[ITEM_INDEX(item)] = 1;
+		item = FindItem("Flares");
+		client->pers.inventory[ITEM_INDEX(item)] = 3;
+	}
 
 	client->pers.health = 100;
 	client->pers.max_health = 100;
@@ -1311,6 +1370,13 @@ InitClientPersistant(gclient_t *client)
 	/* FS: Coop: Xatrix specific */
 	client->pers.max_magslug = 50;
 	client->pers.max_trap = 5;
+
+	/* FS: Coop: Zaero specific */
+	client->pers.max_tbombs		    = 30;
+	client->pers.max_flares       = 30;
+	client->pers.max_a2k          = 1;
+	client->pers.max_empnuke      = 50;
+	client->pers.max_plasmashield = 20;
 
 	client->pers.connected = true;
 }
@@ -2225,6 +2291,17 @@ PutClientInServer(edict_t *ent)
 	{
 		InitClientPersistant(client);
 	}
+	else if ((game.gametype == zaero_coop) && (Q_stricmp(level.mapname, "zboss") == 0)) /* FS: Zaero specific game dll changes */
+	{
+		char		userinfo[MAX_INFO_STRING];
+
+		int health = client->pers.health;
+		
+		memcpy (userinfo, client->pers.userinfo, sizeof(userinfo));
+		InitClientPersistant(client);
+		ClientUserinfoChanged (ent, userinfo);
+		client->pers.health = health;
+	}
 
 	client->resp = resp;
 
@@ -2553,6 +2630,11 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 
 	/* set skin */
 	s = Info_ValueForKey(userinfo, "skin");
+
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		zCam_SetLocalCopy(ent, s);
+	}
 
 	playernum = ent - g_edicts - 1;
 
@@ -2885,6 +2967,12 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 			level.exitintermission = true;
 		}
 
+		return;
+	}
+
+	if((game.gametype == zaero_coop) && (ent->movetype == MOVETYPE_FREEZE))  /* FS: Zaero specific game dll changes */
+	{
+		client->ps.pmove.pm_type = PM_FREEZE;
 		return;
 	}
 
