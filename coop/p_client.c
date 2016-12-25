@@ -1405,6 +1405,17 @@ InitClientCoopPersistant(edict_t *ent) /* FS: Coop: Give back some goodies on re
 	client->pers.max_cells = 200;
 	client->pers.max_slugs = 50;
 
+	if ((game.gametype == zaero_coop)) /* FS: Always have at least 3 flares in Zaero coop */
+	{
+		item = FindItem("Flare Gun");
+		ammo_item = FindItem(item->ammo);
+		ammo_index = ITEM_INDEX(ammo_item);
+		if(client->pers.inventory[ammo_index] < 3)
+		{
+			client->pers.inventory[ammo_index] = client->resp.coop_respawn.inventory[ammo_index] = 3;
+		}
+	}
+
 	/* FS: Make sure they always have a shotgun */
 	item = FindItem("Shotgun");
 

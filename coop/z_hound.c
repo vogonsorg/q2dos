@@ -554,7 +554,7 @@ void SP_monster_hound (edict_t *self)
 		return;
 	}
 
-  SP_monster_hound_precache();
+	SP_monster_hound_precache();
 
 	self->s.modelindex = gi.modelindex ("models/monsters/guard/hound/tris.md2");
 	VectorSet (self->mins, -16, -16, -24);

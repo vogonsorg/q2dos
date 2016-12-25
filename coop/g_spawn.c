@@ -1396,6 +1396,10 @@ SP_worldspawn(edict_t *ent)
 	gi.soundindex("infantry/inflies1.wav");
 
 	/* FS: Coop: Zaero */
+	gi.imageindex ("a_flares");
+	gi.imageindex ("w_flare");
+	gi.modelindex ("models/weapons/v_flare/tris.md2");
+	gi.modelindex ("models/objects/flare/tris.md2");
 	gi.soundindex ("weapons/flare/flarehis.wav");
 	gi.soundindex ("weapons/flare/shoot.wav");
 
