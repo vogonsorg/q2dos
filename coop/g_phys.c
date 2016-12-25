@@ -8,6 +8,7 @@
 #define sv_waterfriction 1
 
 void SV_Physics_NewToss(edict_t *ent);
+void adjustRiders(edict_t *ent); /* FS: Zaero specific game dll changes */
 
 typedef struct
 {
@@ -62,7 +63,7 @@ SV_TestEntityPosition(edict_t *ent)
 
 	if (trace.startsolid)
 	{
-		if (game.gametype == vanilla_coop) /* FS: Coop: Vanilla specific */
+		if (game.gametype == vanilla_coop || game.gametype == zaero_coop) /* FS: Coop: Vanilla and Zaero specific */
 		{
 			if ((ent->svflags & SVF_DEADMONSTER) && (trace.ent->client || (trace.ent->svflags & SVF_MONSTER)))
 			{
@@ -86,7 +87,7 @@ SV_CheckVelocity(edict_t *ent)
 		return;
 	}
 
-	if (game.gametype == vanilla_coop) /* FS: Coop: Vanilla specific */
+	if (game.gametype == vanilla_coop || game.gametype == zaero_coop) /* FS: Coop: Vanilla and Zaero specific */
 	{
 		if (VectorLength(ent->velocity) > sv_maxvelocity->value)
 		{
@@ -546,7 +547,7 @@ retry:
 
 	trace = gi.trace(start, ent->mins, ent->maxs, end, ent, mask);
 
-	if (game.gametype == vanilla_coop) /* FS: Coop: Vanilla specific */
+	if (game.gametype == vanilla_coop || game.gametype == zaero_coop) /* FS: Coop: Vanilla and Zaero specific */
 	{
 		if (trace.startsolid || trace.allsolid)
 		{
@@ -745,6 +746,10 @@ SV_Push(edict_t *pusher, vec3_t move, vec3_t amove)
 			{
 				/* pushed ok */
 				gi.linkentity(check);
+				if (game.gametype == zaero_coop)
+				{
+					adjustRiders(check);
+				}
 
 				/* impact? */
 				continue;
@@ -925,6 +930,7 @@ SV_Physics_Toss(edict_t *ent)
 	qboolean wasinwater;
 	qboolean isinwater;
 	vec3_t old_origin;
+	float speed = 0.0f; /* FS: Zaero specific */
 
 	if (!ent)
 	{
@@ -975,8 +981,9 @@ SV_Physics_Toss(edict_t *ent)
 
 	/* add gravity */
 	if ((ent->movetype != MOVETYPE_FLY) &&
-		(ent->movetype != MOVETYPE_FLYMISSILE)
-		&& (ent->movetype != MOVETYPE_WALLBOUNCE)) /* FS: Coop: Xatrix specific -- MOVETYPE_WALLBOUNCE */
+		(ent->movetype != MOVETYPE_FLYMISSILE) &&
+		(ent->movetype != MOVETYPE_WALLBOUNCE) && /* FS: Coop: Xatrix specific -- MOVETYPE_WALLBOUNCE */
+		(ent->movetype != MOVETYPE_BOUNCEFLY)) /* FS: Coop: Xatrix specific -- MOVETYPE_BOUNCEFLY */	
 	{
 		SV_AddGravity(ent);
 	}
@@ -999,6 +1006,10 @@ SV_Physics_Toss(edict_t *ent)
 		{
 			backoff = 2.0;
 		}
+		else if(ent->movetype == MOVETYPE_BOUNCEFLY) /* FS: Zaero specific game dll changes */
+		{
+			backoff = 2;
+		}
 		else if (ent->movetype == MOVETYPE_BOUNCE)
 		{
 			backoff = 1.5;
@@ -1008,6 +1019,11 @@ SV_Physics_Toss(edict_t *ent)
 			backoff = 1;
 		}
 
+		if(ent->movetype == MOVETYPE_BOUNCEFLY) /* FS: Zaero specific game dll changes */
+		{
+			speed = VectorLength(ent->velocity);
+		}
+
 		ClipVelocity(ent->velocity, trace.plane.normal, ent->velocity, backoff);
 
 		if (ent->movetype == MOVETYPE_WALLBOUNCE) /* FS: Coop: Xatrix specific */
@@ -1015,9 +1031,16 @@ SV_Physics_Toss(edict_t *ent)
 			vectoangles(ent->velocity, ent->s.angles);
 		}
 
+		if(ent->movetype == MOVETYPE_BOUNCEFLY) /* FS: Zaero specific game dll changes */
+		{
+			VectorNormalize (ent->velocity);
+			VectorScale (ent->velocity, speed, ent->velocity);
+		}
+
 		/* stop if on ground */
 		if ((trace.plane.normal[2] > 0.7) &&
-			(ent->movetype != MOVETYPE_WALLBOUNCE)) /* FS: Coop: Xatrix specific -- MOVETYPE_WALLBOUNCE */
+			(ent->movetype != MOVETYPE_WALLBOUNCE) && /* FS: Coop: Xatrix specific -- MOVETYPE_WALLBOUNCE */
+			(ent->movetype != MOVETYPE_BOUNCEFLY)) /* FS: Coop: Zaero specific -- MOVETYPE_BOUNCEFLY */
 		{
 			if ((ent->velocity[2] < 60) || (ent->movetype != MOVETYPE_BOUNCE))
 			{
@@ -1275,6 +1298,163 @@ SV_Physics_Step(edict_t *ent)
 	SV_RunThink(ent);
 }
 
+void SV_Physics_FallFloat (edict_t *ent) /* FS: Zaero specific game dll changes */
+{
+	float gravVal = ent->gravity * sv_gravity->value * FRAMETIME;
+	qboolean wasonground = false;
+	qboolean hitsound = false;
+	
+	// check velocity
+	SV_CheckVelocity (ent);
+
+	wasonground = (ent->groundentity == NULL);
+	if (ent->velocity[2] < sv_gravity->value*-0.1)
+		hitsound = true;
+
+	if (!ent->waterlevel)
+	{
+		vec3_t min, max;
+		trace_t tr;
+		vec3_t end;
+		vec3_t normal;
+		vec3_t gravity;
+
+		VectorCopy(ent->mins, min);
+		VectorCopy(ent->maxs, max);
+		
+		VectorCopy(ent->s.origin, end);
+		end[2] -= 0.25; // down 4
+
+		tr = gi.trace(ent->s.origin, min, max, end, ent, MASK_SHOT);
+		if (tr.plane.normal[2] > 0.7) // on solid ground
+		{
+			ent->groundentity = tr.ent;
+			VectorCopy(tr.endpos, ent->s.origin);
+			VectorSet(ent->velocity, 0, 0, 0);
+		}
+		else if (tr.fraction < 1.0 && tr.plane.normal[2] <= 0.7) // on steep slope
+		{
+			VectorCopy(tr.plane.normal, normal);
+			VectorSet(gravity, 0, 0, -gravVal);
+			VectorMA(gravity, gravVal, normal, ent->velocity);
+			ent->groundentity = NULL;
+		}
+		else // in freefall
+		{
+			ent->velocity[2] -= gravVal;
+			ent->groundentity = NULL;
+		}
+	}
+	else
+	{
+		// where's the midpoint? above or below the water?
+		const double WATER_MASS = 500.0;
+		vec3_t accel;
+		double percentBelow = 0.0;
+		double massOfObject = 0.0;
+		double massOfVolumeWater = 0.0;
+		double massOfWater = 0.0;
+		double massDiff = 0.0;
+		double i = 0.0;
+		vec3_t volume;
+
+		// TODO if we're not grounded on the bottom of the lake...
+
+		// calculate massPerCubicMetre
+		VectorScale(ent->size, 1.0/32.0, volume);
+		massOfObject = ent->mass;
+		massOfVolumeWater = WATER_MASS * (volume[0] * volume[1] * volume[2]);
+
+		// how much of ourself is actually in the water?
+		percentBelow = 1.0;
+		for (i = 0.0; i <= 1.0; i += 0.05)
+		{
+			vec3_t midpoint;
+			int watertype;
+		
+			VectorAdd(ent->s.origin, ent->mins, midpoint);
+			VectorMA(midpoint, i, ent->maxs, midpoint);
+			watertype = gi.pointcontents (midpoint);
+
+			if (!(watertype & MASK_WATER))
+			{
+				percentBelow = i - 0.05;
+				break;
+			}
+		}
+		if (percentBelow < 0.05) // safety net
+			percentBelow = 0.0;
+		massOfWater = percentBelow * massOfVolumeWater;
+		massDiff = massOfWater - massOfObject; // difference between
+		VectorClear(accel);
+		VectorSet(accel, 0, 0, gravVal * (massDiff / massOfVolumeWater));
+		VectorScale(ent->velocity, 0.7, ent->velocity);
+		if (VectorLength(accel) > 4)
+			VectorAdd(ent->velocity, accel, ent->velocity);
+	}
+
+	if (ent->velocity[0] || ent->velocity[1] || ent->velocity[2])
+	{
+		qboolean isinwater = false;
+		qboolean wasinwater = false;
+		vec3_t old_origin;
+		VectorCopy (ent->s.origin, old_origin);
+	
+		SV_FlyMove (ent, FRAMETIME, MASK_SHOT);
+
+		gi.linkentity (ent);
+		G_TouchTriggers (ent);
+
+		if (ent->groundentity)
+			if (!wasonground)
+				if (hitsound)
+					gi.sound (ent, 0, gi.soundindex("world/land.wav"), 1, 1, 0);
+
+		// check for water transition
+		wasinwater = (ent->watertype & MASK_WATER);
+		ent->watertype = gi.pointcontents (ent->s.origin);
+		isinwater = ent->watertype & MASK_WATER;
+
+		if (isinwater)
+			ent->waterlevel = 1;
+		else
+			ent->waterlevel = 0;
+
+		if (!wasinwater && isinwater)
+			gi.positioned_sound (old_origin, g_edicts, CHAN_AUTO, gi.soundindex("misc/h2ohit1.wav"), 1, 1, 0);
+		else if (wasinwater && !isinwater)
+			gi.positioned_sound (ent->s.origin, g_edicts, CHAN_AUTO, gi.soundindex("misc/h2ohit1.wav"), 1, 1, 0);
+
+	}
+
+	// relink
+	gi.linkentity(ent);
+
+	// regular thinking
+	SV_RunThink (ent);
+}
+
+void adjustRiders(edict_t *ent) /* FS: Zaero specific game dll changes */
+{
+	int i = 0;
+
+	// make sure the offsets are constant
+	for (i = 0; i < 2; i++)
+	{
+		if (ent->rideWith[i] != NULL)
+			VectorAdd(ent->s.origin, ent->rideWithOffset[i], ent->rideWith[i]->s.origin);
+	}
+}
+
+void SV_Physics_Ride (edict_t *ent) /* FS: Zaero specific game dll changes */
+{
+	// base ourself on the step
+	SV_Physics_Step(ent);
+
+	adjustRiders(ent);
+}
+
+
 void
 G_RunEntity(edict_t *ent)
 {
@@ -1314,6 +1494,7 @@ G_RunEntity(edict_t *ent)
 		case MOVETYPE_TOSS:
 		case MOVETYPE_BOUNCE:
 		case MOVETYPE_FLY:
+		case MOVETYPE_BOUNCEFLY: /* FS: Zaero specific game dll changes */
 		case MOVETYPE_FLYMISSILE:
 			SV_Physics_Toss(ent);
 			break;
@@ -1322,6 +1503,12 @@ G_RunEntity(edict_t *ent)
 			break;
 		case MOVETYPE_WALLBOUNCE: /* FS: Coop: Xatrix specific */
 			SV_Physics_Toss(ent);
+			break;
+		case MOVETYPE_FALLFLOAT: /* FS: Zaero specific game dll changes */
+			SV_Physics_FallFloat(ent);
+			break;
+		case MOVETYPE_RIDE: /* FS: Zaero specific game dll changes */
+			SV_Physics_Ride(ent);
 			break;
 		default:
 			gi.error("SV_Physics: bad movetype %i", (int)ent->movetype);

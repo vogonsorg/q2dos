@@ -15,6 +15,11 @@ monster_fire_bullet(edict_t *self, vec3_t start, vec3_t dir, int damage,
 		return;
 	}
 
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		ANIM_AIM(self, dir);
+	}
+
 	fire_bullet(self, start, dir, damage, kick, hspread, vspread, MOD_UNKNOWN);
 
 	gi.WriteByte(svc_muzzleflash2);
@@ -30,6 +35,11 @@ monster_fire_shotgun(edict_t *self, vec3_t start, vec3_t aimdir, int damage,
 	if (!self)
 	{
 		return;
+	}
+
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		ANIM_AIM(self, aimdir);
 	}
 
 	fire_shotgun(self, start, aimdir, damage, kick, hspread, vspread,
@@ -48,6 +58,16 @@ monster_fire_blaster(edict_t *self, vec3_t start, vec3_t dir, int damage, int sp
 	if (!self)
 	{
 		return;
+	}
+
+	if(game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		if(EMPNukeCheck(self, start))
+		{
+			gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
+			return;
+		}
+		ANIM_AIM(self, dir);
 	}
 
 	fire_blaster(self, start, dir, damage, speed, effect, false);
@@ -305,6 +325,11 @@ monster_fire_grenade(edict_t *self, vec3_t start, vec3_t aimdir,
 		return;
 	}
 
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		ANIM_AIM(self, aimdir);
+	}
+
 	fire_grenade(self, start, aimdir, damage, speed, 2.5, damage + 40);
 
 	gi.WriteByte(svc_muzzleflash2);
@@ -322,6 +347,16 @@ monster_fire_rocket(edict_t *self, vec3_t start, vec3_t dir,
 		return;
 	}
 
+	if(game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		if(EMPNukeCheck(self, start))
+		{
+			gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
+			return;
+		}
+		ANIM_AIM(self, dir);
+	}
+
 	fire_rocket(self, start, dir, damage, speed, damage + 20, damage);
 
 	gi.WriteByte(svc_muzzleflash2);
@@ -337,6 +372,16 @@ monster_fire_railgun(edict_t *self, vec3_t start, vec3_t aimdir,
 	if (!self)
 	{
 		return;
+	}
+
+	if(game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		if(EMPNukeCheck(self, start))
+		{
+			gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
+			return;
+		}
+		ANIM_AIM(self, aimdir);
 	}
 
 	if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
@@ -365,6 +410,16 @@ monster_fire_bfg(edict_t *self, vec3_t start, vec3_t aimdir,
 	if (!self)
 	{
 		return;
+	}
+
+	if(game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		if(EMPNukeCheck(self, start))
+		{
+			gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
+			return;
+		}
+		ANIM_AIM(self, aimdir);
 	}
 
 	fire_bfg(self, start, aimdir, damage, speed, damage_radius);
@@ -920,6 +975,15 @@ monster_think(edict_t *self)
 	M_CatagorizePosition(self);
 	M_WorldEffects(self);
 	M_SetEffects(self);
+
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		// decrease blindness
+		if (self->monsterinfo.flashTime > 0)
+		{
+			self->monsterinfo.flashTime--;
+		}
+	}
 }
 
 /*
@@ -1016,6 +1080,12 @@ monster_triggered_spawn(edict_t *self)
 	{
 		self->enemy = NULL;
 	}
+
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		self->s.event = EV_PLAYER_TELEPORT;
+		MonsterPlayerKillBox(self);
+	}
 }
 
 void
@@ -1110,10 +1180,23 @@ monster_start(edict_t *self)
 		self->spawnflags |= 1;
 	}
 
-	if ((!(self->monsterinfo.aiflags & AI_GOOD_GUY)) &&
-		(!(self->monsterinfo.aiflags & AI_DO_NOT_COUNT))) /* FS: Coop: Rogue specific flag */
+	if(game.gametype == zaero_coop)
 	{
-		level.total_monsters++;
+		if (!(self->monsterinfo.aiflags & AI_GOOD_GUY))
+		{
+			if(!(self->spawnflags & 16)) /* FS: Zaero specific game dll changes */
+			{
+				level.total_monsters++;
+			}
+		}
+	}
+	else
+	{
+		if ((!(self->monsterinfo.aiflags & AI_GOOD_GUY)) &&
+			(!(self->monsterinfo.aiflags & AI_DO_NOT_COUNT))) /* FS: Coop: Rogue specific flag */
+		{
+			level.total_monsters++;
+		}
 	}
 
 	self->nextthink = level.time + FRAMETIME;

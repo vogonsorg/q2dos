@@ -61,8 +61,8 @@ monster_fire_shotgun(edict_t *self, vec3_t start, vec3_t aimdir, int damage,
 }
 
 void
-monster_fire_blaster(edict_t *self, vec3_t start, vec3_t dir, int damage,
-		int speed, int flashtype, int effect)
+monster_fire_blaster(edict_t *self, vec3_t start, vec3_t dir, int damage, int speed,
+		int flashtype, int effect)
 {
 	if (!self)
 	{
@@ -556,7 +556,7 @@ M_MoveFrame(edict_t *self)
 		{
 			if (move->endfunc)
 			{
-				move->endfunc (self);
+				move->endfunc(self);
 
 				/* regrab move, endfunc is very likely to change it */
 				move = self->monsterinfo.currentmove;
@@ -595,8 +595,7 @@ M_MoveFrame(edict_t *self)
 	{
 		if (!(self->monsterinfo.aiflags & AI_HOLD_FRAME))
 		{
-			move->frame[index].aifunc(self,
-					move->frame[index].dist * self->monsterinfo.scale);
+			move->frame[index].aifunc(self, move->frame[index].dist * self->monsterinfo.scale);
 		}
 		else
 		{
@@ -922,8 +921,7 @@ monster_start_go(edict_t *self)
 				gi.dprintf(DEVELOPER_MSG_GAME, "%s at (%i %i %i) has a bad combattarget %s : %s at (%i %i %i)\n",
 						self->classname, (int)self->s.origin[0], (int)self->s.origin[1],
 						(int)self->s.origin[2], self->combattarget, target->classname,
-						(int)target->s.origin[0], (int)target->s.origin[1],
-						(int)target->s.origin[2]);
+						(int)target->s.origin[0], (int)target->s.origin[1], (int)target->s.origin[2]);
 			}
 		}
 	}
