@@ -47,6 +47,11 @@ G_Find(edict_t *from, int fieldofs, char *match)
 {
 	char *s;
 
+	if (!match)
+	{
+		return NULL;
+	}
+
 	if (!from)
 	{
 		from = g_edicts;
@@ -54,11 +59,6 @@ G_Find(edict_t *from, int fieldofs, char *match)
 	else
 	{
 		from++;
-	}
-
-	if (!match)
-	{
-		return NULL;
 	}
 
 	for ( ; from < &g_edicts[globals.num_edicts]; from++)
@@ -539,6 +539,12 @@ G_Spawn(void)
 void
 G_FreeEdict(edict_t *ed)
 {
+
+	if (!ed)
+	{
+		return;
+	}
+
 	gi.unlinkentity(ed); /* unlink from world */
 
 	if (deathmatch->value || coop->value)

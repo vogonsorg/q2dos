@@ -805,6 +805,7 @@ G_FreeEdict(edict_t *ed)
 	ed->classname = "freed";
 	ed->freetime = level.time;
 	ed->inuse = false;
+	ed->nextthink = 0;    // just in case freed before a nextthink... /* FS: Zaero specific game dll changes */
 }
 
 void
