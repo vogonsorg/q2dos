@@ -9,6 +9,8 @@
 #define LASER_FAT 0x0040 /* FS: Coop: Rogue specific */
 #define LASER_STOPWINDOW 0x0080 /* FS: Coop: Rogue specific */
 
+#define EMP_STYLE	1 /* FS: Zaero specific game dll changes */
+
 void ED_CallSpawn(edict_t *ent);
 
 /*
@@ -329,6 +331,27 @@ SP_target_goal(edict_t *ent)
  * "delay"		wait this long before going off
  * "dmg"		how much radius damage should be done, defaults to 0
  */
+
+void target_explosion_explode_think(edict_t *self) /* FS: Zaero specific game dll changes */
+{
+	if (!self)
+	{
+		return;
+	}
+
+	if(self->s.frame >= 5)
+	{
+		self->svflags |= SVF_NOCLIENT;
+		return;
+	}
+	else
+		self->nextthink = level.time + FRAMETIME;
+
+	// advance the frame/skin
+	self->s.frame++;
+	self->s.skinnum++;
+}
+
 void
 target_explosion_explode(edict_t *self)
 {
@@ -339,10 +362,29 @@ target_explosion_explode(edict_t *self)
 		return;
 	}
 
-	gi.WriteByte(svc_temp_entity);
-	gi.WriteByte(TE_EXPLOSION1);
-	gi.WritePosition(self->s.origin);
-	gi.multicast(self->s.origin, MULTICAST_PHS);
+	if ((game.gametype == zaero_coop) && (self->spawnflags & EMP_STYLE)) /* FS: Zaero specific game dll changes */
+	{
+		// play the sound
+		gi.positioned_sound(self->s.origin, self, CHAN_AUTO, gi.soundindex("weapons/a2k/ak_exp01.wav"), 1, ATTN_NORM, 0);
+
+		// setup the model
+		self->movetype = MOVETYPE_NONE;
+		self->solid = SOLID_NOT;
+		self->s.modelindex = gi.modelindex("models/objects/b_explode/tris.md2");
+		self->s.skinnum = 6;
+		self->s.frame = 0;
+		self->svflags &= ~SVF_NOCLIENT;
+		self->think = target_explosion_explode_think;
+		self->nextthink = level.time + FRAMETIME;
+		gi.linkentity(self);
+	}
+	else
+	{
+		gi.WriteByte (svc_temp_entity);
+		gi.WriteByte (TE_EXPLOSION1);
+		gi.WritePosition (self->s.origin);
+		gi.multicast (self->s.origin, MULTICAST_PHS);
+	}
 
 	T_RadiusDamage(self, self->activator, self->dmg,
 			NULL, self->dmg + 40, MOD_EXPLOSIVE);
@@ -560,12 +602,24 @@ use_target_spawner(edict_t *self, edict_t *other /* unused */, edict_t *activato
 	VectorCopy(self->s.angles, ent->s.angles);
 	ED_CallSpawn(ent);
 	gi.unlinkentity(ent);
-	KillBox(ent);
+	if(game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		MonsterKillBox (ent);
+	}
+	else
+	{
+		KillBox(ent);
+	}
 	gi.linkentity(ent);
 
 	if (self->speed)
 	{
 		VectorCopy(self->movedir, ent->velocity);
+	}
+
+	if(game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		MonsterPlayerKillBox (ent);
 	}
 
 	ent->s.renderfx |= RF_IR_VISIBLE; /* FS: Coop: Rogue specific */
@@ -616,6 +670,12 @@ use_target_blaster(edict_t *self, edict_t *other /* unused */, edict_t *activato
 {
 	if (!self)
 	{
+		return;
+	}
+
+	if((game.gametype == zaero_coop) && (EMPNukeCheck(self, self->s.origin))) /* FS: Zaero specific game dll changes */
+	{
+		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
 		return;
 	}
 

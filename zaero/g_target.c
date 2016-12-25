@@ -408,12 +408,12 @@ target_explosion_explode (edict_t *self)
 void
 use_target_explosion(edict_t *self, edict_t *other /* unused */, edict_t *activator)
 {
-	self->activator = activator;
-
 	if (!self || !activator)
 	{
 		return;
 	}
+
+	self->activator = activator;
 
 	if (!self->delay)
 	{
