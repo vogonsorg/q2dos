@@ -12,6 +12,10 @@ float bobmove;
 int bobcycle;
 float bobfracsin;
 
+void updateVisorHud(edict_t *ent); /* FS: Zaero specific game dll changes */
+void startVisorStatic(edict_t *ent); /* FS: Zaero specific game dll changes */
+void stopCamera(edict_t *self); /* FS: Zaero specific game dll changes */
+
 float
 SV_CalcRoll(vec3_t angles, vec3_t velocity)
 {
@@ -365,34 +369,82 @@ SV_CalcViewOffset(edict_t *ent)
 	/* absolutely bound offsets so the view can
 	   never be outside the player box */
 
-	if (v[0] < -14)
+	if(ent->client->zCameraTrack) /* FS: Zaero specific game dll changes */
 	{
-		v[0] = -14;
-	}
-	else if (v[0] > 14)
-	{
-		v[0] = 14;
-	}
+		int i;
 
-	if (v[1] < -14)
-	{
-		v[1] = -14;
-	}
-	else if (v[1] > 14)
-	{
-		v[1] = 14;
-	}
+		VectorAdd(ent->client->zCameraTrack->s.origin, ent->client->zCameraOffset, v);
 
-	if (v[2] < -22)
-	{
-		v[2] = -22;
-	}
-	else if (v[2] > 30)
-	{
-		v[2] = 30;
-	}
+		if(ent->client->zCameraTrack->client)
+		{
+			vec3_t f;
 
-	VectorCopy(v, ent->client->ps.viewoffset);
+			VectorAdd(ent->client->zCameraTrack->client->ps.viewoffset, v, v);
+			AngleVectors (ent->client->zCameraTrack->s.angles, f, NULL, NULL);
+			VectorMA(v, 10, f, v);
+		}
+		else if (Q_stricmp(ent->client->zCameraTrack->classname, "misc_securitycamera") == 0)
+		{
+			float framepercent = sin(((float)(level.framenum & 63) / 64.0) * M_PI * 2);
+			VectorCopy(ent->client->zCameraTrack->move_origin, v);
+			VectorCopy(ent->client->zCameraTrack->move_angles, ent->client->ps.viewangles);
+
+			// adjust yaw a bit due to sway
+			ent->client->ps.viewangles[YAW] += framepercent * 15;
+		}
+		else
+		{
+			VectorCopy (ent->client->zCameraTrack->s.angles, ent->client->ps.viewangles);  
+		}
+
+		for(i = 0; i < 3; i++)
+		{
+			ent->client->ps.pmove.origin[i] = v[i] * 8;
+		}
+
+		VectorSet (ent->client->ps.viewoffset, 0, 0, 0);
+		// make our "double" do what we're doing
+		if (ent->client->zCameraLocalEntity)
+		{
+			edict_t *e = ent->client->zCameraLocalEntity;
+			VectorCopy(ent->s.origin, e->s.origin);
+			e->s.frame = ent->s.frame;
+			e->s.modelindex = ent->s.modelindex;
+			e->s.modelindex2 = ent->s.modelindex2;
+			e->s.skinnum = ent->s.skinnum;
+		}
+	}
+	else
+	{
+		if (v[0] < -14)
+		{
+			v[0] = -14;
+		}
+		else if (v[0] > 14)
+		{
+			v[0] = 14;
+		}
+
+		if (v[1] < -14)
+		{
+			v[1] = -14;
+		}
+		else if (v[1] > 14)
+		{
+			v[1] = 14;
+		}
+
+		if (v[2] < -22)
+		{
+			v[2] = -22;
+		}
+		else if (v[2] > 30)
+		{
+			v[2] = 30;
+		}
+
+		VectorCopy(v, ent->client->ps.viewoffset);
+	}
 }
 
 void
@@ -401,6 +453,7 @@ SV_CalcGunOffset(edict_t *ent)
 	int i;
 	float delta;
 	static gitem_t *heatbeam;
+	static gitem_t *sniper;
 
 	if (!ent)
 	{
@@ -412,8 +465,13 @@ SV_CalcGunOffset(edict_t *ent)
 		heatbeam = FindItemByClassname("weapon_plasmabeam");
 	}
 
-	/* heatbeam shouldn't bob so the beam looks right */
-	if (ent->client->pers.weapon != heatbeam)
+	if (!sniper) /* FS: Zaero specific */
+	{
+		sniper = FindItemByClassname("weapon_snipperrifle");
+	}
+
+	/* heatbeam and sniper shouldn't bob. */
+	if ((ent->client->pers.weapon) && (ent->client->pers.weapon != heatbeam) && (ent->client->pers.weapon != sniper))
 	{
 		/* gun angles from bobbing */
 		ent->client->ps.gunangles[ROLL] = xyspeed * bobfracsin * 0.005;
@@ -697,6 +755,24 @@ SV_CalcBlend(edict_t *ent)
 	if (ent->client->bonus_alpha > 0)
 	{
 		SV_AddBlend(0.85, 0.7, 0.3, ent->client->bonus_alpha, ent->client->ps.blend);
+	}
+
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		/* for blinding */
+		if (ent->client->flashTime > 0)
+		{
+			float alpha = (float)ent->client->flashTime / (float)ent->client->flashBase;
+			if (alpha > 1)
+				alpha = 1;
+			SV_AddBlend(1, 1, 1, alpha, ent->client->ps.blend);
+			ent->client->flashTime--;
+		}
+
+		if (ent->client->zCameraStaticFramenum > level.time)
+		{
+			SV_AddBlend(1,1,1,1, ent->client->ps.blend);
+		}
 	}
 
 	/* drop the damage value */
@@ -1123,6 +1199,15 @@ G_SetClientEffects(edict_t *ent)
 		ent->s.effects |= EF_COLOR_SHELL;
 		ent->s.renderfx |= (RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE);
 	}
+
+	if(ent->client->zCameraLocalEntity) /* FS: Zaero specific game dll changes */
+	{
+		VectorCopy (ent->s.origin, ent->client->zCameraLocalEntity->s.origin);
+		VectorCopy (ent->s.angles, ent->client->zCameraLocalEntity->s.angles);
+		VectorCopy (ent->s.old_origin, ent->client->zCameraLocalEntity->s.old_origin);
+
+		ent->client->zCameraLocalEntity->s.effects = ent->s.effects;
+	}
 }
 
 void
@@ -1194,6 +1279,10 @@ G_SetClientSound(edict_t *ent)
 	else if (strcmp(weap, "weapon_phalanx") == 0) /* FS: Coop: Xatrix specific */
 	{
 		ent->s.sound = gi.soundindex("weapons/phaloop.wav");
+	}
+	else if (strcmp(weap, "weapon_soniccannon") == 0) /* FS: Zaero specific game dll changes */
+	{
+		ent->s.sound = gi.soundindex("weapons/sonic/sc_idle.wav");
 	}
 	else if (ent->client->weapon_sound)
 	{
@@ -1374,6 +1463,13 @@ ClientEndServerFrame(edict_t *ent)
 		current_client->ps.blend[3] = 0;
 		current_client->ps.fov = 90;
 		G_SetStats(ent);
+
+		if ((game.gametype == zaero_coop) && (level.fadeFrames > 0)) /* FS: Zaero specific game dll changes */
+		{
+			float ratio = (float)(50 - level.fadeFrames) / 50.0;
+			SV_AddBlend (1, 1, 1, ratio, current_client->ps.blend);
+		}
+
 		return;
 	}
 
@@ -1489,11 +1585,28 @@ ClientEndServerFrame(edict_t *ent)
 			ent->client->pers.helpchanged = 0;
 			HelpComputerMessage(ent);
 		}
+		else if (ent->client->zCameraTrack) /* FS: Zaero specific game dll changes */
+		{
+			updateVisorHud(ent);
+		}
 		else
 		{
 			DeathmatchScoreboardMessage(ent, ent->enemy);
 		}
 		gi.unicast(ent, false);
+	}
+
+	/* this we want to do regardless */
+	if (ent->client->zCameraTrack)  /* FS: Zaero specific game dll changes */
+	{
+		// decrease the visor frame time
+		ent->client->pers.visorFrames--;
+		if (ent->client->pers.visorFrames == 0)
+		{
+			stopCamera(ent);
+			ent->client->pers.inventory[ITEM_INDEX(FindItem("Visor"))]--;
+			ValidateSelectedItem (ent);
+		}
 	}
 
 	/* if the inventory is up, update it */

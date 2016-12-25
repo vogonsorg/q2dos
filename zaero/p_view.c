@@ -445,7 +445,7 @@ SV_CalcViewOffset(edict_t *ent)
 			v[2] = 30;
 		}
 
-		VectorCopy (v, ent->client->ps.viewoffset);
+		VectorCopy(v, ent->client->ps.viewoffset);
 	}
 }
 
