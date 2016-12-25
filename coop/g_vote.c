@@ -6,10 +6,11 @@
 #define	VOTE_NOVANILLA			0x00000002
 #define	VOTE_NOXATRIX			0x00000004
 #define	VOTE_NOROGUE			0x00000008
-#define	VOTE_NOCOOPSKILL		0x00000010
-#define	VOTE_NOMAP				0x00000020
-#define	VOTE_NORANDOMMAPS		0x00000040
-#define VOTE_NORESETMAP			0x00000080
+#define	VOTE_NOZAERO			0x00000010
+#define	VOTE_NOCOOPSKILL		0x00000020
+#define	VOTE_NOMAP				0x00000040
+#define	VOTE_NORANDOMMAPS		0x00000080
+#define VOTE_NORESETMAP			0x00000100
 
 /* Globals */
 int bVoteInProgress;
@@ -460,6 +461,16 @@ void vote_gamemode(edict_t *ent, const char *gamemode)
 
 		Com_sprintf(voteGamemode, 16, "rogue");
 	}
+	else if (!Q_stricmp((char *)gamemode, "zaero"))
+	{
+		if(sv_vote_disallow_flags->intValue & VOTE_NOZAERO)
+		{
+			gi.cprintf(ent, PRINT_HIGH, "Voting for Rogue gamemode change is not allowed on this server.  Vote cancelled.\n");
+			return;
+		}
+
+		Com_sprintf(voteGamemode, 16, "zaero");
+	}
 	else
 	{
 		gi.cprintf(ent, PRINT_HIGH, "error: invalid gamemode!  valid options are: vanilla, xatrix, and rogue.\n");
@@ -773,6 +784,11 @@ void vote_Passed (void)
 		{
 			gi.cvar_forceset("sv_coop_gamemode", "rogue");
 			Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "deathmatch 0; coop 1; wait;wait;wait;wait;wait;map rmine1\n");
+		}
+		else if(!Q_stricmp(voteGamemode, "zaero"))
+		{
+			gi.cvar_forceset("sv_coop_gamemode", "zaero");
+			Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "deathmatch 0; coop 1; wait;wait;wait;wait;wait;map zbase1\n");
 		}
 	}
 	else if(!Q_stricmp(voteType, "coop difficulty"))

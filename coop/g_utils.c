@@ -295,7 +295,7 @@ G_UseTargets(edict_t *ent, edict_t *activator)
 	}
 
 	/* print the message */
-	if ((ent->message) && !(activator->svflags & SVF_MONSTER))
+	if ((activator) && (ent->message) && !(activator->svflags & SVF_MONSTER))
 	{
 		if(coop->intValue && activator->client && activator->client->pers.netname && strcmp("This item must be activated to use it.", ent->message)) /* FS: Coop: Print any use target stuff as global map message to all players */
 		{
@@ -930,3 +930,72 @@ KillBox(edict_t *ent)
 	return true; /* all clear */
 }
 
+/*
+=================
+MonsterKillBox
+
+Kills all entities except players that would touch the proposed new 
+positioning of ent.  Ent should be unlinked before calling this!
+=================
+*/
+qboolean MonsterKillBox (edict_t *ent) /* FS: Zaero specific game dll changes */
+{
+	trace_t		tr;
+
+	while (1)
+	{
+		tr = gi.trace (ent->s.origin, ent->mins, ent->maxs, ent->s.origin, NULL, MASK_PLAYERSOLID);
+		if (!tr.ent)
+			break;
+
+    if(!((ent->svflags & SVF_MONSTER) && tr.ent->client && tr.ent->health))
+    {
+		  // nail it
+		  T_Damage (tr.ent, ent, ent, vec3_origin, ent->s.origin, vec3_origin, 100000, 0, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
+    }
+
+		// if we didn't kill it, fail
+		if (tr.ent->solid)
+			return false;
+	}
+
+	return true;		// all clear
+}
+
+/*
+=================
+MonsterPlayerKillBox
+
+Kills all entities except players that would touch the proposed new 
+positioning of ent.  Ent should be unlinked before calling this!
+=================
+*/
+qboolean MonsterPlayerKillBox (edict_t *ent) /* FS: Zaero specific game dll changes */
+{
+	trace_t		tr;
+
+	while (1)
+	{
+		tr = gi.trace (ent->s.origin, ent->mins, ent->maxs, ent->s.origin, ent, MASK_PLAYERSOLID);
+		if (!tr.ent)
+			break;
+
+    if((ent->svflags & SVF_MONSTER) && tr.ent->client && tr.ent->health)
+    {
+		  // nail myself
+		  T_Damage (ent, ent, ent, vec3_origin, ent->s.origin, vec3_origin, 100000, 0, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
+      return true;
+    }
+    else
+    {
+		  // nail it
+		  T_Damage (tr.ent, ent, ent, vec3_origin, ent->s.origin, vec3_origin, 100000, 0, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
+    }
+
+		// if we didn't kill it, fail
+		if (tr.ent->solid)
+			return false;
+	}
+
+	return true;		// all clear
+}

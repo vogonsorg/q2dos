@@ -211,7 +211,7 @@ G_UseTargets(edict_t *ent, edict_t *activator)
 {
 	edict_t *t;
 
-	if (!ent || !activator)
+	if (!ent)
 	{
 		return;
 	}
@@ -487,6 +487,11 @@ G_CopyString(char *in)
 void
 G_InitEdict(edict_t *e)
 {
+	if (!e)
+	{
+		return;
+	}
+
 	e->inuse = true;
 	e->classname = "noclass";
 	e->gravity = 1.0;

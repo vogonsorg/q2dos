@@ -44,6 +44,22 @@ int combat_armor_index;
 int body_armor_index;
 static int power_screen_index;
 static int power_shield_index;
+// Knightmare-- added indexes
+int	jacket_armor_index;
+int	combat_armor_index;
+int	body_armor_index;
+int	shells_index;
+int	bullets_index;
+int	grenades_index;
+int	rockets_index;
+int	cells_index;
+int	slugs_index;
+int	flares_index;
+int	tbombs_index;
+int	empnuke_index;
+int	plasmashield_index;
+int	a2k_index;
+// Knightmare-- end
 
 void Use_Quad(edict_t *ent, gitem_t *item);
 void Use_QuadFire(edict_t *ent, gitem_t *item); /* FS: Coop: Xatrix specific */
@@ -52,6 +68,18 @@ static int quad_drop_timeout_hack;
 static int quad_fire_drop_timeout_hack; /* FS: Coop: Xatrix specific */
 
 extern void ED_CallSpawn(edict_t *ent); /* FS: Coop: For SP_Xatrix_item */
+
+// *** Zaero prototypes ***
+void Weapon_FlareGun (edict_t *ent); /* FS: Zaero specific game dll changes */
+void Weapon_SniperRifle(edict_t *ent); /* FS: Zaero specific game dll changes */
+void Weapon_LaserTripBomb(edict_t *ent); /* FS: Zaero specific game dll changes */
+void Weapon_SonicCannon (edict_t *ent); /* FS: Zaero specific game dll changes */
+void Weapon_EMPNuke (edict_t *ent); /* FS: Zaero specific game dll changes */
+void Weapon_A2k (edict_t *ent); /* FS: Zaero specific game dll changes */
+void Use_Visor (edict_t *ent, gitem_t *item); /* FS: Zaero specific game dll changes */
+void Action_Push(edict_t *ent); /* FS: Zaero specific game dll changes */
+void Use_PlasmaShield (edict_t *ent, gitem_t *item); /* FS: Zaero specific game dll changes */
+
 
 /* ====================================================================== */
 
@@ -122,6 +150,20 @@ FindItem(char *pickup_name)
 	}
 
 	return NULL;
+}
+
+void precacheAllItems() /* FS: Zaero specific game dll changes */
+{
+	int		i;
+	gitem_t	*it;
+
+	it = itemlist;
+	for (i=0 ; i<game.num_items ; i++, it++)
+	{
+		if (!it->pickup_name)
+			continue;
+		PrecacheItem(it);
+	}
 }
 
 /* ====================================================================== */
@@ -472,6 +514,26 @@ Pickup_Pack(edict_t *ent /* may be null */, edict_t *other)
 		other->client->pers.max_magslug = 100;
 	}
 
+	if (other->client->pers.max_tbombs < 100) /* FS: Zaero specific game dll changes */
+	{
+		other->client->pers.max_tbombs = 100;
+	}
+
+	if (other->client->pers.max_a2k < 1) /* FS: Zaero specific game dll changes */
+	{
+		other->client->pers.max_a2k = 1;
+	}
+
+	if (other->client->pers.max_empnuke < 100) /* FS: Zaero specific game dll changes */
+	{
+		other->client->pers.max_empnuke = 100;
+	}
+
+	if (other->client->pers.max_plasmashield < 40) /* FS: Zaero specific game dll changes */
+	{
+		other->client->pers.max_plasmashield =40;
+	}
+
 	item = FindItem("Bullets");
 
 	if (item)
@@ -590,6 +652,46 @@ Pickup_Pack(edict_t *ent /* may be null */, edict_t *other)
 			other->client->pers.inventory[index] =
 				other->client->pers.max_magslug;
 		}
+	}
+
+	item = FindItem("IRED"); /* FS: Zaero specific game dll changes */
+	if (item)
+	{
+		index = ITEM_INDEX(item);
+		other->client->pers.inventory[index] += item->quantity;
+		if (other->client->pers.inventory[index] > 
+			other->client->pers.max_tbombs)
+		{
+			other->client->pers.inventory[index] = 
+				other->client->pers.max_tbombs;
+		}
+	}
+
+	item = FindItem("A2k"); /* FS: Zaero specific game dll changes */
+	if (item)
+	{
+		index = ITEM_INDEX(item);
+		other->client->pers.inventory[index] += item->quantity;
+		if (other->client->pers.inventory[index] > other->client->pers.max_a2k)
+			other->client->pers.inventory[index] = other->client->pers.max_a2k;
+	}
+
+	item = FindItem("EMPNuke"); /* FS: Zaero specific game dll changes */
+	if (item)
+	{
+		index = ITEM_INDEX(item);
+		other->client->pers.inventory[index] += item->quantity;
+		if (other->client->pers.inventory[index] > other->client->pers.max_empnuke)
+			other->client->pers.inventory[index] = other->client->pers.max_empnuke;
+	}
+
+	item = FindItem("Plasma Shield"); /* FS: Zaero specific game dll changes */
+	if (item)
+	{
+		index = ITEM_INDEX(item);
+		other->client->pers.inventory[index] += item->quantity;
+		if (other->client->pers.inventory[index] > other->client->pers.max_plasmashield)
+			other->client->pers.inventory[index] = other->client->pers.max_plasmashield;
 	}
 
 	if ((ent) && (!(ent->spawnflags & DROPPED_ITEM)) && (deathmatch->value || Coop_Respawn()) ) /* FS: Coop: Added */
@@ -1213,6 +1315,28 @@ Add_Ammo(edict_t *ent, gitem_t *item, int count)
 	{
 		max = ent->client->pers.max_trap;
 	}
+// [evolve
+	else if (item->tag == AMMO_LASERTRIPBOMB) /* FS: Zaero specific game dll changes */
+	{
+		max = ent->client->pers.max_tbombs;
+	}
+	else if (item->tag == AMMO_FLARES) /* FS: Zaero specific game dll changes */
+	{
+		max = ent->client->pers.max_flares;
+	}
+	else if (item->tag == AMMO_EMPNUKE) /* FS: Zaero specific game dll changes */
+	{
+		max = ent->client->pers.max_empnuke;
+	}
+	else if (item->tag == AMMO_A2K) /* FS: Zaero specific game dll changes */
+	{
+		max = ent->client->pers.max_a2k;
+	}
+	else if (item->tag == AMMO_PLASMASHIELD) /* FS: Zaero specific game dll changes */
+	{
+		max = ent->client->pers.max_plasmashield;
+	}
+// evolve]
 	else
 	{
 		gi.dprintf(DEVELOPER_MSG_GAME, "undefined ammo type\n");
@@ -1265,6 +1389,16 @@ Pickup_Ammo(edict_t *ent, edict_t *other)
 
 	oldcount = other->client->pers.inventory[ITEM_INDEX(ent->item)];
 
+	if((game.gametype == zaero_coop) && (ent->spawnflags & 0x08)) /* FS: Zaero specific game dll changes */
+	{
+		if(oldcount >= count)
+		{
+			return false;
+		}
+
+		count -= oldcount;
+	}
+
 	if (!Add_Ammo(other, ent->item, count))
 	{
 		return false;
@@ -1285,6 +1419,10 @@ Pickup_Ammo(edict_t *ent, edict_t *other)
 		(deathmatch->value || Coop_Respawn()) ) /* FS: Coop: Added */
 	{
 		SetRespawn(ent, 30);
+	}
+	else if ((game.gametype == zaero_coop) && (ent->spawnflags & 0x04)) /* FS: Zaero specific game dll changes */
+	{
+		SetRespawn (ent, 15);
 	}
 
 	return true;
@@ -1325,6 +1463,25 @@ Drop_Ammo(edict_t *ent, gitem_t *item)
 
 	ent->client->pers.inventory[index] -= dropped->count;
 	ValidateSelectedItem(ent);
+}
+
+
+qboolean Pickup_A2k (edict_t *ent, edict_t *other) /* FS: Zaero specific game dll changes */
+{
+	// do we already have an a2k?
+	if (other->client->pers.inventory[ITEM_INDEX(ent->item)] == 1)
+	{
+		return false;
+	}
+
+	other->client->pers.inventory[ITEM_INDEX(ent->item)] = 1;
+	if (deathmatch->value)
+	{
+		if (!(ent->spawnflags & DROPPED_ITEM) )
+			SetRespawn (ent, 30);
+	}
+
+	return true;
 }
 
 /* ====================================================================== */
@@ -1660,6 +1817,61 @@ Drop_PowerArmor(edict_t *ent, gitem_t *item)
 	}
 
 	Drop_General(ent, item);
+}
+
+//======================================================================
+
+qboolean Pickup_PlasmaShield(edict_t *ent, edict_t *other) /* FS: Zaero specific game dll changes */
+{
+  if(other->client->pers.inventory[ITEM_INDEX(ent->item)])
+  {
+    return false;
+  }
+
+	other->client->pers.inventory[ITEM_INDEX(ent->item)] = 1;
+
+	if (deathmatch->value)
+	{
+		if (!(ent->spawnflags & DROPPED_ITEM) )
+			SetRespawn (ent, ent->item->quantity);
+	}
+
+	return true;
+}
+
+
+qboolean Pickup_Visor(edict_t *ent, edict_t *other) /* FS: Zaero specific game dll changes */
+{
+	// do we already have a visor?
+	if (other->client->pers.inventory[ITEM_INDEX(ent->item)] == 1 &&
+		other->client->pers.visorFrames == 300)
+	{
+		return false;
+	}
+
+	other->client->pers.inventory[ITEM_INDEX(ent->item)] = 1;
+
+	if (ent->spawnflags & DROPPED_ITEM)
+		other->client->pers.visorFrames += ent->visorFrames;
+	else
+		other->client->pers.visorFrames = 300;
+
+	if (deathmatch->value)
+	{
+		if (!(ent->spawnflags & DROPPED_ITEM) )
+			SetRespawn (ent, 30);
+	}
+
+	return true;
+}
+
+void Drop_Visor(edict_t *ent, gitem_t *item) /* FS: Zaero specific game dll changes */
+{
+	edict_t *visor = Drop_Item (ent, item);
+	ent->client->pers.inventory[ITEM_INDEX(item)] = 0;
+	ValidateSelectedItem (ent);
+	visor->visorFrames = ent->client->pers.visorFrames;
+	ent->client->pers.visorFrames = 0;
 }
 
 /* ====================================================================== */
@@ -2148,14 +2360,30 @@ SpawnItem(edict_t *ent, gitem_t *item)
 		return;
 	}
 
-	if ( ((game.gametype == rogue_coop) && (ent->spawnflags > 1)) || /* FS: Coop: Rogue specific */
-		((game.gametype != rogue_coop) && (ent->spawnflags)) )
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
 	{
-		if (strcmp(ent->classname, "key_power_cube") != 0)
+		PrecacheItem (item);
+
+		if (ent->spawnflags)
 		{
-			ent->spawnflags = 0;
-			gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s has invalid spawnflags set\n",
-					ent->classname, vtos(ent->s.origin));
+			if (!(item->flags & IT_KEY) && !(item->flags & IT_AMMO))
+			{
+				ent->spawnflags = 0;
+				gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s has invalid spawnflags set\n", ent->classname, vtos(ent->s.origin));
+			}
+		}
+	}
+	else
+	{
+		if ( ((game.gametype == rogue_coop) && (ent->spawnflags > 1)) || /* FS: Coop: Rogue specific */
+			((game.gametype != rogue_coop) && (ent->spawnflags)) )
+		{
+			if (strcmp(ent->classname, "key_power_cube") != 0)
+			{
+				ent->spawnflags = 0;
+				gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s has invalid spawnflags set\n",
+						ent->classname, vtos(ent->s.origin));
+			}
 		}
 	}
 
@@ -2446,6 +2674,53 @@ gitem_t itemlist[] = {
 	// WEAPONS 
 	//
 
+/*QUAKED weapon_hand (.3 .3 1) (-16 -16 -16) (16 16 16)
+*/
+	{
+		"weapon_push", /* FS: Zaero specific game dll changes */
+		NULL,
+		Use_Weapon,
+		NULL,
+		Action_Push,
+/* pickup sound */	NULL,
+		NULL, 0,
+		"models/weapons/v_hand/tris.md2",
+/* icon */		NULL,
+/* pickup */	"Push",
+		0,
+		0,
+		NULL,
+		IT_WEAPON|IT_ZAERO|IT_STAY_COOP,
+		WEAP_NONE,
+		NULL,
+		0,
+/* precache */ "weapons/push/contact.wav",// weapons/push/grunt.wav",
+/* hide flags */ HIDE_FROM_INVENTORY | HIDE_DONT_KEEP | HIDE_FROM_SELECTION
+	},
+
+/*QUAKED weapon_flaregun (.3 .3 1) (-16 -16 -16) (16 16 16)
+*/
+	{
+		"weapon_flaregun", /* FS: Zaero specific game dll changes */
+		Pickup_Weapon,
+		Use_Weapon,
+		Drop_Weapon,
+		Weapon_FlareGun,
+		"misc/w_pkup.wav",
+		"models/weapons/g_flare/tris.md2", EF_ROTATE,
+		"models/weapons/v_flare/tris.md2",
+/* icon */		"w_flare",
+/* pickup */	"Flare Gun",
+		0,
+		1,
+		"Flares",
+		IT_WEAPON|IT_ZAERO|IT_STAY_COOP,
+		WEAP_BLASTER,
+		NULL,
+		0,
+/* precache */ "models/objects/flare/tris.md2 weapons/flare/shoot.wav weapons/flare/flarehis.wav"
+	},
+
 /* weapon_blaster (.3 .3 1) (-16 -16 -16) (16 16 16)
 always owned, never in the world
 */
@@ -2605,6 +2880,32 @@ always owned, never in the world
 		NULL,
 		AMMO_GRENADES,
 /* precache */ "weapons/hgrent1a.wav weapons/hgrena1b.wav weapons/hgrenc1b.wav weapons/hgrenb1a.wav weapons/hgrenb2a.wav "
+	},
+
+/*QUAKED ammo_ired (.3 .3 1) (-16 -16 -16) (16 16 16)
+*/
+	{
+		"ammo_ired", /* FS: Zaero specific game dll changes */
+		Pickup_Ammo,
+		Use_Weapon,
+		Drop_Ammo,
+		Weapon_LaserTripBomb,
+		"misc/am_pkup.wav",
+		"models/items/ammo/ireds/tris.md2", 0,
+		"models/weapons/v_ired/tris.md2",
+/* icon */		"w_ired",
+/* pickup */	"IRED",
+/* width */		3,
+		3,
+		"IRED",
+		IT_AMMO|IT_ZAERO|IT_WEAPON,
+		WEAP_GRENADES,
+		NULL,
+		AMMO_LASERTRIPBOMB,
+/* precache */ "models/weapons/v_ired/hand.md2 models/objects/ired/tris.md2 modes/objects models/objects/shrapnel/tris.md2 "
+	"weapons/ired/las_set.wav weapons/ired/las_arm.wav "
+	/*"weapons/ired/las_tink.wav "weapons/ired/las_trig.wav "*/
+	/*"weapons/ired/las_glow.wav"*/,
 	},
 
 /*QUAKED ammo_trap (.3 .3 1) (-16 -16 -16) (16 16 16)
@@ -2818,6 +3119,30 @@ always owned, never in the world
 /* precache */ "weapons/plasshot.wav"
 	},
 
+/*QUAKED weapon_sniperrifle (.3 .3 1) (-16 -16 -16) (16 16 16)
+*/
+	{
+		"weapon_sniperrifle",  /* FS: Zaero specific game dll changes */
+		Pickup_Weapon,
+		Use_Weapon,
+		Drop_Weapon,
+		Weapon_SniperRifle,
+		"misc/w_pkup.wav",
+		"models/weapons/g_sniper/tris.md2", EF_ROTATE,
+		"models/weapons/v_sniper/tris.md2",
+/* icon */		"w_sniper",
+/* pickup */	"Sniper Rifle",
+		0,
+		3,
+		"Slugs",
+		IT_WEAPON|IT_ZAERO|IT_STAY_COOP,
+		WEAP_RAILGUN,
+		NULL,
+		0,
+/* precache */ "models/weapons/v_sniper/scope/tris.md2 models/weapons/v_sniper/dmscope/tris.md2 weapons/sniper/beep.wav weapons/sniper/fire.wav "
+		/*"weapons/sniper/snip_act.wav weapons/sniper/snip_bye.wav"*/,
+		HIDE_FROM_SELECTION
+	},
 
 
 /*QUAKED weapon_bfg (.3 .3 1) (-16 -16 -16) (16 16 16)
@@ -2887,9 +3212,79 @@ always owned, never in the world
 		"models/items/spawngro/tris.md2 models/proj/disintegrator/tris.md2 weapons/disrupt.wav weapons/disint2.wav weapons/disrupthit.wav",
 	},
 
+/*QUAKED weapon_soniccannon  (.3 .3 1) (-16 -16 -16) (16 16 16)
+*/
+	{
+		"weapon_soniccannon",
+		Pickup_Weapon,
+		Use_Weapon,
+		Drop_Weapon,
+		Weapon_SonicCannon,
+		"misc/w_pkup.wav",
+		"models/weapons/g_sonic/tris.md2", EF_ROTATE,
+		"models/weapons/v_sonic/tris.md2",
+/* icon */		"w_sonic",
+/* pickup */	"Sonic Cannon",
+		0,
+		1,
+		"Cells",
+		IT_WEAPON|IT_ZAERO|IT_STAY_COOP,
+		WEAP_HYPERBLASTER,
+		NULL,
+		0,
+/* precache */ "weapons/sonic/sc_warm.wav weapons/sonic/sc_cool.wav weapons/sonic/sc_fire.wav" // weapons/sonic/sc_act.wav weapons/sonic/sc_dact.wav  
+	},
+
+/*QUAKED ammo_a2k (.3 .3 1) (-16 -16 -16) (16 16 16)
+*/
+	{
+		"ammo_a2k", /* FS: Zaero specific game dll changes */
+		Pickup_A2k,
+		Use_Weapon,
+		Drop_Ammo,
+		Weapon_A2k,
+		"misc/am_pkup.wav",
+		"models/weapons/g_a2k/tris.md2", 0,
+		"models/weapons/v_a2k/tris.md2",
+/* icon */		"w_a2k",
+/* pickup */	"A2K",
+/* width */		1,
+		1,
+		"A2k",
+		IT_POWERUP|IT_ZAERO,
+		WEAP_NONE,
+		NULL,
+		AMMO_A2K,
+/* precache */ "weapons/a2k/countdn.wav weapons/a2k/ak_exp01.wav",
+		HIDE_FROM_SELECTION
+	},
+
 	//
 	// AMMO ITEMS
 	//
+
+/*QUAKED ammo_flares (.3 .3 1) (-16 -16 -16) (16 16 16)
+*/
+	{
+		"ammo_flares", /* FS: Zaero specific game dll changes */
+		Pickup_Ammo,
+		NULL,
+		Drop_Ammo,
+		NULL,
+		"misc/am_pkup.wav",
+		"models/items/ammo/flares/tris.md2", 0,
+		NULL,
+/* icon */		"a_flares",
+/* pickup */	"Flares",
+/* width */		3,
+		3,
+		NULL,
+		IT_AMMO|IT_ZAERO,
+		0,
+		NULL,
+		AMMO_FLARES,
+/* precache */ ""
+	},
 
 /*QUAKED ammo_shells (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
@@ -3004,6 +3399,29 @@ always owned, never in the world
 		NULL,
 		AMMO_SLUGS,
 /* precache */ ""
+	},
+
+/*QUAKED ammo_empnuke (.3 .3 1) (-16 -16 -16) (16 16 16)
+*/
+	{
+		"ammo_empnuke", /* FS: Zaero specific game dll changes */
+		Pickup_Ammo,
+		Use_Weapon,
+		Drop_Ammo,
+		Weapon_EMPNuke,
+		"misc/am_pkup.wav",
+		"models/weapons/g_enuke/tris.md2", EF_ROTATE,
+		"models/weapons/v_enuke/tris.md2",
+/* icon */		"w_enuke",
+/* pickup */	"EMPNuke",
+/* width */		3,
+		1,
+		"EMPNuke",
+		IT_AMMO|IT_ZAERO,
+		0,
+		NULL,
+		AMMO_EMPNUKE,
+/* precache */ "items/empnuke/emp_trg.wav"  //items/empnuke/emp_act.wav items/empnuke/emp_spin.wav items/empnuke/emp_idle.wav 
 	},
 
 	/* QUAKED ammo_flechettes (.3 .3 1) (-16 -16 -16) (16 16 16) TRIGGER_SPAWN */
@@ -3279,6 +3697,54 @@ always owned, never in the world
 		NULL,
 		0,
 /* precache */ "items/airout.wav"
+	},
+
+/*QUAKED item_visor (.3 .3 1) (-16 -16 -16) (16 16 16)
+*/
+	{
+		"item_visor", /* FS: Zaero specific game dll changes */
+		Pickup_Visor,
+		Use_Visor,
+		Drop_Visor,
+		NULL,
+		"items/pkup.wav",
+		"models/items/visor/tris.md2", EF_ROTATE,
+		NULL,
+/* icon */		"i_visor",
+/* pickup */	"Visor",
+/* width */		1,
+		30,
+		"Cells",
+		IT_STAY_COOP|IT_POWERUP|IT_ZAERO,
+		0,
+		NULL,
+		0,
+/* precache */ "items/visor/act.wav items/visor/deact.wav"// items/visor/next.wav"
+	},
+
+  
+/*QUAKED ammo_plasmashield (.3 .3 1) (-16 -16 -16) (16 16 16)
+*/
+	{
+		"ammo_plasmashield", /* FS: Zaero specific game dll changes */
+		Pickup_Ammo,
+		Use_PlasmaShield,
+		Drop_Ammo,
+		NULL,
+		"misc/ar3_pkup.wav",
+		"models/items/plasma/tris.md2", EF_ROTATE,
+		NULL,
+/* icon */		"i_plasma",
+/* pickup */	"Plasma Shield",
+/* width */		1,
+		5,
+		"",
+		IT_AMMO|IT_ZAERO,
+		0,
+		NULL,
+		AMMO_PLASMASHIELD,
+/* precache */ "items/plasmashield/psactive.wav sprites/plasmashield.sp2"
+///* precache */ "items/plasmashield/psfire.wav items/plasmashield/psactive.wav items/plasmashield/psdie.wav sprites/plasmashield.sp2"
 	},
 
 /*QUAKED item_ancient_head (.3 .3 1) (-16 -16 -16) (16 16 16)
@@ -3841,6 +4307,149 @@ tank commander's head
 		NULL,
 	},
 
+// extra zaero keys
+/*QUAKED key_landing_arena (0 .5 .8) (-16 -16 -16) (16 16 16)
+landing arena key - blue
+*/
+	{
+		"key_landing_area", /* FS: Zaero specific game dll changes */
+		Pickup_Key,
+		NULL,
+		Drop_General,
+		NULL,
+		"items/pkup.wav",
+		"models/items/keys/key/tris.md2", EF_ROTATE,
+		NULL,
+		"k_bluekey",
+		"Airfield Pass",
+		2,
+		0,
+		NULL,
+		IT_STAY_COOP|IT_KEY|IT_ZAERO,
+		0,
+		NULL,
+		0,
+/* precache */ ""
+	},
+
+/*QUAKED key_lab (0 .5 .8) (-16 -16 -16) (16 16 16)
+security pass for the laboratory
+*/
+	{
+		"key_lab", /* FS: Zaero specific game dll changes */
+		Pickup_Key,
+		NULL,
+		Drop_General,
+		NULL,
+		"items/pkup.wav",
+		"models/items/keys/pass/tris.md2", EF_ROTATE,
+		NULL,
+		"k_security",
+		"Laboratory Key",
+		2,
+		0,
+		NULL,
+		IT_STAY_COOP|IT_KEY|IT_ZAERO,
+		0,
+		NULL,
+		0,
+/* precache */ ""
+	},
+
+/*QUAKED key_clearancepass (0 .5 .8) (-16 -16 -16) (16 16 16)
+security pass for the security level
+*/
+	{
+		"key_clearancepass", /* FS: Zaero specific game dll changes */
+		Pickup_Key,
+		NULL,
+		Drop_General,
+		NULL,
+		"items/pkup.wav",
+		"models/items/keys/pass/tris.md2", EF_ROTATE,
+		NULL,
+		"k_security",
+		"Clearance Pass",
+		2,
+		0,
+		NULL,
+		IT_STAY_COOP|IT_KEY|IT_ZAERO,
+		0,
+		NULL,
+		0,
+/* precache */ ""
+	},
+
+/*QUAKED key_energy (0 .5 .8) (-16 -16 -16) (16 16 16)
+security pass for the security level
+*/
+	{
+		"key_energy", /* FS: Zaero specific game dll changes */
+		Pickup_Key,
+		NULL,
+		Drop_General,
+		NULL,
+		"items/pkup.wav",
+		"models/items/keys/energy/tris.md2", EF_ROTATE,
+		NULL,
+		"k_energy",
+		"Energy Key",
+		2,
+		0,
+		NULL,
+		IT_STAY_COOP|IT_KEY|IT_ZAERO,
+		0,
+		NULL,
+		0,
+/* precache */ ""
+	},
+
+/*QUAKED key_lava (0 .5 .8) (-16 -16 -16) (16 16 16)
+*/
+	{
+		"key_lava", /* FS: Zaero specific game dll changes */
+		Pickup_Key,
+		NULL,
+		Drop_General,
+		NULL,
+		"items/pkup.wav",
+		"models/items/keys/lava/tris.md2", EF_ROTATE,
+		NULL,
+		"k_lava",
+		"Lava Key",
+		2,
+		0,
+		NULL,
+		IT_STAY_COOP|IT_KEY|IT_ZAERO,
+		0,
+		NULL,
+		0,
+/* precache */ ""
+	},
+
+/*QUAKED key_slime (0 .5 .8) (-16 -16 -16) (16 16 16)
+*/
+	{
+		"key_slime", /* FS: Zaero specific game dll changes */
+		Pickup_Key,
+		NULL,
+		Drop_General,
+		NULL,
+		"items/pkup.wav",
+		"models/items/keys/slime/tris.md2", EF_ROTATE,
+		NULL,
+		"k_slime",
+		"Slime Key",
+		2,
+		0,
+		NULL,
+		IT_STAY_COOP|IT_KEY|IT_ZAERO,
+		0,
+		NULL,
+		0,
+/* precache */ ""
+	},
+
 	{
 		NULL,
 		Pickup_Health,
@@ -4028,6 +4637,17 @@ SetItemNames(void)
 	body_armor_index = ITEM_INDEX(FindItem("Body Armor"));
 	power_screen_index = ITEM_INDEX(FindItem("Power Screen"));
 	power_shield_index = ITEM_INDEX(FindItem("Power Shield"));
+	shells_index = ITEM_INDEX(FindItem("Shells"));
+	bullets_index = ITEM_INDEX(FindItem("Bullets"));
+	grenades_index = ITEM_INDEX(FindItem("Grenades"));
+	rockets_index = ITEM_INDEX(FindItem("Rockets"));
+	cells_index = ITEM_INDEX(FindItem("Cells"));
+	slugs_index = ITEM_INDEX(FindItem("Slugs"));
+	flares_index = ITEM_INDEX(FindItem("Flares"));
+	tbombs_index = ITEM_INDEX(FindItem("IRED"));
+	empnuke_index = ITEM_INDEX(FindItem("EMPNuke"));
+	plasmashield_index = ITEM_INDEX(FindItem("Plasma Shield"));
+	a2k_index = ITEM_INDEX(FindItem("A2K"));
 }
 
 void

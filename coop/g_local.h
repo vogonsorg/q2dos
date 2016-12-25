@@ -301,6 +301,7 @@ typedef struct
 #define IT_POWERUP			0x00000020
 #define IT_XATRIX			0x00000040 /* FS: Coop: Xatrix specific */
 #define IT_ROGUE			0x00000080 /* FS: Coop: Rogue specific */
+#define IT_ZAERO			0x00000100 /* FS: Coop: Zaero specific */
 
 // ROGUE
 #define IT_MELEE			0x00000040

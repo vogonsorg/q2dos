@@ -124,6 +124,7 @@ pmenu_t votemenu[] = {
 #define VGAMEMODEMENU_VANILLA 8
 #define VGAMEMODEMENU_XATRIX 9
 #define VGAMEMODEMENU_ROGUE 10
+#define VGAMEMODEMENU_ZAERO 11
 
 pmenu_t votegamemodemenu[] = {
 	{"*Quake II", PMENU_ALIGN_CENTER, NULL},
@@ -137,6 +138,7 @@ pmenu_t votegamemodemenu[] = {
 	{"Vanilla", PMENU_ALIGN_LEFT, CoopCheckGamemode}, /* 8 */
 	{"Xatrix Mission Pack", PMENU_ALIGN_LEFT, CoopCheckGamemode},
 	{"Rogue Mission Pack", PMENU_ALIGN_LEFT, CoopCheckGamemode}, /* 10 */
+	{"Zaero Mission Pack", PMENU_ALIGN_LEFT, CoopCheckGamemode}, /* 10 */
 	{NULL, PMENU_ALIGN_CENTER, NULL},
 	{"Return to Voting Menu", PMENU_ALIGN_LEFT, CoopReturnToVoteMenu}
 };
@@ -479,6 +481,11 @@ void CoopUpdateGamemodeMenu(edict_t *ent)
 			votegamemodemenu[VGAMEMODEMENU_ROGUE].text = NULL;
 			votegamemodemenu[VGAMEMODEMENU_ROGUE].SelectFunc = NULL;
 			break;
+		case zaero_coop:
+			Com_sprintf(gamemode, sizeof(gamemode), "Zaero");
+			votegamemodemenu[VGAMEMODEMENU_ZAERO].text = NULL;
+			votegamemodemenu[VGAMEMODEMENU_ZAERO].SelectFunc = NULL;
+			break;
 		default:
 			break;
 	}
@@ -674,6 +681,9 @@ void CoopCheckGamemode(edict_t *ent, pmenuhnd_t *p)
 			break;
 		case VGAMEMODEMENU_ROGUE:
 			Com_sprintf(votestring, sizeof(votestring), "cmd vote gamemode rogue\n");
+			break;
+		case VGAMEMODEMENU_ZAERO:
+			Com_sprintf(votestring, sizeof(votestring), "cmd vote gamemode zaero\n");
 			break;
 		default:
 			break;

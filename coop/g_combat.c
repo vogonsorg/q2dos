@@ -824,7 +824,7 @@ M_ReactToDamage(edict_t *targ, edict_t *attacker, edict_t *inflictor)
 		return;
 	}
 
-	if ((game.gametype == zaero_coop) && (strcmp(attacker->classname, "monster_autocannon") != 0)) /* FS: Zaero specific game dll changes */
+	if ((game.gametype == zaero_coop) && ( !(attacker->client) && !(attacker->svflags & SVF_MONSTER) && (strcmp(attacker->classname, "monster_autocannon") != 0))) /* FS: Zaero specific game dll changes */
 	{
 		return;
 	}
@@ -1133,6 +1133,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 			vec3_t kvel;
 			float mass;
 
+#if 0 /* FS: FIXME ZAERO COOP */
 			if (game.gametype == zaero_coop) /* FS: Zaero specific */
 			{
 				if((dflags & DAMAGE_ARMORMOSTLY) && damage > take)
@@ -1140,6 +1141,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 					knockback = (int)((float)knockback * (((float)(damage - take) / (float)damage) + 1.0));
 				}
 			}
+#endif
 
 			if (targ->mass < 50)
 			{

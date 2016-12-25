@@ -101,6 +101,7 @@
 {"sight", FOFS(monsterinfo.sight), F_FUNCTION, FFL_NOSPAWN},
 {"checkattack", FOFS(monsterinfo.checkattack), F_FUNCTION, FFL_NOSPAWN},
 {"currentmove", FOFS(monsterinfo.currentmove), F_MMOVE, FFL_NOSPAWN},
+
 // zaero-specific stuff, several fields added, especially edicts
 // timeout?
 {"active", FOFS(active), F_INT},

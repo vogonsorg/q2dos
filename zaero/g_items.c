@@ -274,6 +274,10 @@ Pickup_Powerup(edict_t *ent, edict_t *other)
 void
 Drop_General(edict_t *ent, gitem_t *item)
 {
+	if (!ent || !item)
+	{
+		return;
+	}
 	Drop_Item(ent, item);
 	ent->client->pers.inventory[ITEM_INDEX(item)]--;
 	ValidateSelectedItem(ent);
@@ -871,7 +875,7 @@ Pickup_Ammo(edict_t *ent, edict_t *other)
 	}
 
 	oldcount = other->client->pers.inventory[ITEM_INDEX(ent->item)];
-  
+
 	if(ent->spawnflags & 0x08) /* FS: Zaero specific game dll changes */
 	{
 		if(oldcount >= count)

@@ -251,15 +251,37 @@ Check_Coop_Item_Flags (gitem_t *it)
 			{
 				return false;
 			}
+			if (it->flags & IT_ZAERO)
+			{
+				return false;
+			}
 			break;
 		case xatrix_coop:
 			if (it->flags & IT_ROGUE)
 			{
 				return false;
 			}
+			if (it->flags & IT_ZAERO)
+			{
+				return false;
+			}
 			break;
 		case rogue_coop:
 			if (it->flags & IT_XATRIX)
+			{
+				return false;
+			}
+			if (it->flags & IT_ZAERO)
+			{
+				return false;
+			}
+			break;
+		case zaero_coop:
+			if (it->flags & IT_XATRIX)
+			{
+				return false;
+			}
+			if (it->flags & IT_ROGUE)
 			{
 				return false;
 			}
@@ -1876,7 +1898,13 @@ Cmd_Coop_Gamemode(edict_t *ent) /* FS: TODO: Make this a server only command */
 		Com_sprintf(command, sizeof(command), "map xswamp\n");
 		gi.AddCommandString(command);
 	}
-	else
+	else if(!Q_stricmp(cmd, "zaero"))
+	{
+		gi.bprintf(PRINT_HIGH, "Changing gamemode to Zaero coop!\n");
+		gi.cvar_forceset("sv_coop_gamemode", "zaero");
+		Com_sprintf(command, sizeof(command), "map zbase1\n");
+		gi.AddCommandString(command);
+	}	else
 	{
 		gi.cprintf(ent, PRINT_CHAT, "Unknown gamemode: %s\n", cmd);
 	}
