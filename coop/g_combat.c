@@ -948,7 +948,8 @@ M_ReactToDamage(edict_t *targ, edict_t *attacker, edict_t *inflictor)
 		(strcmp(attacker->classname, "monster_makron") != 0) &&
 		(strcmp(attacker->classname, "monster_jorg") != 0) && 
 		!(attacker->monsterinfo.aiflags & AI_IGNORE_SHOTS) && /* FS: Coop: Rogue specific */
-		!(targ->monsterinfo.aiflags & AI_IGNORE_SHOTS)) /* FS: Coop: Rogue specific */
+		!(targ->monsterinfo.aiflags & AI_IGNORE_SHOTS) && /* FS: Coop: Rogue specific */
+		(!(attacker->mteam && targ->mteam && strcmp(attacker->mteam, targ->mteam) == 0))) /* FS: Zaero specific: Added monster team edict */
 	{
 		if (targ->enemy && targ->enemy->client)
 		{
@@ -1099,6 +1100,19 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		}
 	}
 
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		if ((targ->svflags & SVF_MONSTER) && ((targ->monsterinfo.aiflags & AI_REDUCEDDAMAGE) ||
+					((targ->monsterinfo.aiflags & AI_MONREDUCEDDAMAGE) && (inflictor->svflags & SVF_MONSTER))))
+		{
+			damage *= targ->monsterinfo.reducedDamageAmount;
+			if (!damage)
+			{
+				damage = 1;
+			}
+		}
+	}
+
 	if (dflags & DAMAGE_BULLET)
 	{
 		te_sparks = TE_BULLET_SPARKS;
@@ -1121,50 +1135,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	{
 		knockback = 0;
 	}
-
-	/* figure momentum add */
-	if (!(dflags & DAMAGE_NO_KNOCKBACK))
-	{
-		if ((knockback) && (targ->movetype != MOVETYPE_NONE) &&
-			(targ->movetype != MOVETYPE_BOUNCE) &&
-			(targ->movetype != MOVETYPE_PUSH) &&
-			(targ->movetype != MOVETYPE_STOP))
-		{
-			vec3_t kvel;
-			float mass;
-
-#if 0 /* FS: FIXME ZAERO COOP */
-			if (game.gametype == zaero_coop) /* FS: Zaero specific */
-			{
-				if((dflags & DAMAGE_ARMORMOSTLY) && damage > take)
-				{
-					knockback = (int)((float)knockback * (((float)(damage - take) / (float)damage) + 1.0));
-				}
-			}
-#endif
-
-			if (targ->mass < 50)
-			{
-				mass = 50;
-			}
-			else
-			{
-				mass = targ->mass;
-			}
-
-			if (targ->client && (attacker == targ))
-			{
-				/* This allows rocket jumps */
-				VectorScale(dir, 1600.0 * (float)knockback / mass, kvel);
-			}
-			else
-			{
-				VectorScale(dir, 500.0 * (float)knockback / mass, kvel);
-			}
-
-			VectorAdd(targ->velocity, kvel, targ->velocity);
-		}
-	}
+	/* FS: Zaero specific: Knockback code moved foreward to take into account for DAMAGE_ARMORMOSTLY now */
 
 	take = damage;
 	save = 0;
@@ -1232,6 +1203,49 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 
 	/* treat cheat/powerup savings the same as armor */
 	asave += save;
+
+	/* figure momentum add */
+	if (!(dflags & DAMAGE_NO_KNOCKBACK))
+	{
+		if ((knockback) && (targ->movetype != MOVETYPE_NONE) &&
+			(targ->movetype != MOVETYPE_BOUNCE) &&
+			(targ->movetype != MOVETYPE_BOUNCEFLY) && /* FS: Zaero specific */
+			(targ->movetype != MOVETYPE_PUSH) &&
+			(targ->movetype != MOVETYPE_STOP))
+		{
+			vec3_t kvel;
+			float mass;
+
+			if (game.gametype == zaero_coop) /* FS: Zaero specific */
+			{
+				if((dflags & DAMAGE_ARMORMOSTLY) && damage > take)
+				{
+					knockback = (int)((float)knockback * (((float)(damage - take) / (float)damage) + 1.0));
+				}
+			}
+
+			if (targ->mass < 50)
+			{
+				mass = 50;
+			}
+			else
+			{
+				mass = targ->mass;
+			}
+
+			if (targ->client && (attacker == targ))
+			{
+				/* This allows rocket jumps */
+				VectorScale(dir, 1600.0 * (float)knockback / mass, kvel);
+			}
+			else
+			{
+				VectorScale(dir, 500.0 * (float)knockback / mass, kvel);
+			}
+
+			VectorAdd(targ->velocity, kvel, targ->velocity);
+		}
+	}
 
 	/* team damage avoidance */
 	if (!(dflags & DAMAGE_NO_PROTECTION) && CheckTeamDamage(targ, attacker))
@@ -1307,6 +1321,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 			}
 		}
 
+		/* kill the entity */
 		if (targ->health <= 0)
 		{
 			if ((targ->svflags & SVF_MONSTER) || (client))

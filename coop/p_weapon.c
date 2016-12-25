@@ -3,23 +3,23 @@
 #include "g_local.h"
 #include "m_player.h"
 
-#define FRAME_FIRE_FIRST (FRAME_ACTIVATE_LAST + 1)
-#define FRAME_IDLE_FIRST (FRAME_FIRE_LAST + 1)
-#define FRAME_DEACTIVATE_FIRST (FRAME_IDLE_LAST + 1)
+#define FRAME_FIRE_FIRST		(FRAME_ACTIVATE_LAST + 1)
+#define FRAME_IDLE_FIRST		(FRAME_FIRE_LAST + 1)
+#define FRAME_DEACTIVATE_FIRST	(FRAME_IDLE_LAST + 1)
 
-#define GRENADE_TIMER 3.0
-#define GRENADE_MINSPEED 400
-#define GRENADE_MAXSPEED 800
+#define GRENADE_TIMER		3.0
+#define GRENADE_MINSPEED	400
+#define GRENADE_MAXSPEED	800
 
-#define CHAINFIST_REACH 64 /* FS: Coop: Rogue specific */
+#define CHAINFIST_REACH	64 /* FS: Coop: Rogue specific */
 
-#define HEATBEAM_DM_DMG 15 /* FS: Coop: Rogue specific */
-#define HEATBEAM_SP_DMG 15 /* FS: Coop: Rogue specific */
+#define HEATBEAM_DM_DMG	15 /* FS: Coop: Rogue specific */
+#define HEATBEAM_SP_DMG	15 /* FS: Coop: Rogue specific */
 
-qboolean is_quad;
-qboolean is_quadfire; /* FS: Coop: Xatrix specific */
-byte damage_multiplier; /* FS: Coop: Rogue specific */
-byte is_silenced;
+qboolean	is_quad;
+qboolean	is_quadfire; /* FS: Coop: Xatrix specific */
+byte		damage_multiplier; /* FS: Coop: Rogue specific */
+byte		is_silenced;
 
 void weapon_grenade_fire(edict_t *ent, qboolean held);
 void weapon_trap_fire (edict_t *ent, qboolean held); /* FS: Coop: Xatrix specific */
@@ -283,6 +283,7 @@ Pickup_Weapon(edict_t *ent, edict_t *other)
 	}
 
 	if ((other->client->pers.weapon != ent->item) &&
+		(!(ent->item->hideFlags & HIDE_FROM_SELECTION)) &&  /* FS: Zaero specific */
 		(other->client->pers.inventory[index] == 1) &&
 		(!deathmatch->value || (other->client->pers.weapon == FindItem("blaster"))))
 	{
@@ -314,13 +315,26 @@ ChangeWeapon(edict_t *ent)
 		ent->client->grenade_time = 0;
 	}
 
-	ent->client->pers.lastweapon = ent->client->pers.weapon;
-	ent->client->pers.weapon = ent->client->newweapon;
+	/* FS: Zaero specific: Added HIDE_DONT_KEEP and lastweapon2 */
+	if (ent->client->pers.weapon &&
+		(ent->client->pers.weapon->hideFlags & HIDE_DONT_KEEP))
+	{
+		ent->client->pers.lastweapon = ent->client->pers.lastweapon2;
+		ent->client->pers.lastweapon2 = NULL;
+		ent->client->pers.weapon = ent->client->newweapon;
+	}
+	else
+	{
+		ent->client->pers.lastweapon2 = ent->client->pers.lastweapon;
+		ent->client->pers.lastweapon = ent->client->pers.weapon;
+		ent->client->pers.weapon = ent->client->newweapon;
+	}
+
 	ent->client->newweapon = NULL;
 	ent->client->machinegun_shots = 0;
 
 	/* set visible model */
-	if (ent->s.modelindex == 255)
+	if (ent->s.modelindex == MAX_MODELS-1)
 	{
 		if (ent->client->pers.weapon)
 		{
@@ -511,19 +525,26 @@ Use_Weapon(edict_t *ent, gitem_t *item)
 	if (item->ammo && !g_select_empty->value && !(item->flags & IT_AMMO))
 	{
 		ammo_item = FindItem(item->ammo);
-		ammo_index = ITEM_INDEX(ammo_item);
-
-		if (!ent->client->pers.inventory[ammo_index])
+		if (ammo_item != NULL) /* FS: Zaero specific check ammo_item.  Probably OK as-is */
 		{
-			gi.cprintf(ent, PRINT_HIGH, "No %s for %s.\n", ammo_item->pickup_name, item->pickup_name);
-			return;
+			ammo_index = ITEM_INDEX(ammo_item);
+
+			if (!ent->client->pers.inventory[ammo_index])
+			{
+				gi.cprintf(ent, PRINT_HIGH, "No %s for %s.\n", ammo_item->pickup_name, item->pickup_name);
+				return;
+			}
+
+			if (ent->client->pers.inventory[ammo_index] < item->quantity)
+			{
+				gi.cprintf(ent, PRINT_HIGH, "Not enough %s for %s.\n",
+						ammo_item->pickup_name, item->pickup_name);
+				return;
+			}
 		}
-
-		if (ent->client->pers.inventory[ammo_index] < item->quantity)
+		else
 		{
-			gi.cprintf(ent, PRINT_HIGH, "Not enough %s for %s.\n",
-					ammo_item->pickup_name, item->pickup_name);
-			return;
+			ammo_index = 0;
 		}
 	}
 
@@ -1546,6 +1567,8 @@ Weapon_RocketLauncher_Fire(edict_t *ent)
 		radius_damage *= damage_multiplier;
 	}
 
+	ent->client->ps.gunframe++; /* FS: Zaero specific: Moved earlier for EMP stuff */
+
 	AngleVectors(ent->client->v_angle, forward, right, NULL);
 
 	VectorScale(forward, -2, ent->client->kick_origin);
@@ -1553,21 +1576,27 @@ Weapon_RocketLauncher_Fire(edict_t *ent)
 
 	VectorSet(offset, 8, 8, ent->viewheight - 8);
 	P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
-	fire_rocket(ent, start, forward, damage, 650, damage_radius, radius_damage);
 
-	/* send muzzle flash */
-	gi.WriteByte(svc_muzzleflash);
-	gi.WriteShort(ent - g_edicts);
-	gi.WriteByte(MZ_ROCKET | is_silenced);
-	gi.multicast(ent->s.origin, MULTICAST_PVS);
-
-	ent->client->ps.gunframe++;
-
-	PlayerNoise(ent, start, PNOISE_WEAPON);
-
-	if (!((int)dmflags->value & DF_INFINITE_AMMO))
+	if((game.gametype == zaero_coop) && (EMPNukeCheck(ent, start))) /* FS: Zaero specific */
 	{
-		ent->client->pers.inventory[ent->client->ammo_index]--;
+		gi.sound (ent, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
+	}
+	else
+	{
+		fire_rocket(ent, start, forward, damage, 650, damage_radius, radius_damage);
+
+		/* send muzzle flash */
+		gi.WriteByte(svc_muzzleflash);
+		gi.WriteShort(ent - g_edicts);
+		gi.WriteByte(MZ_ROCKET | is_silenced);
+		gi.multicast(ent->s.origin, MULTICAST_PVS);
+
+		PlayerNoise(ent, start, PNOISE_WEAPON);
+
+		if (!((int)dmflags->value & DF_INFINITE_AMMO))
+		{
+			ent->client->pers.inventory[ent->client->ammo_index]--;
+		}
 	}
 }
 
@@ -1598,17 +1627,18 @@ Weapon_RocketLauncher(edict_t *ent)
  * ======================================================================
  */
 
-void
-Blaster_Fire(edict_t *ent, vec3_t g_offset, int damage,
+int
+Blaster_Fire(edict_t *ent, vec3_t g_offset, int damage, /* FS: Zaero specific changed from void to int */
 		qboolean hyper, int effect)
 {
 	vec3_t forward, right;
 	vec3_t start;
 	vec3_t offset;
+	int ret = 1; /* FS: Zaero specific */
 
 	if (!ent)
 	{
-		return;
+		return 0;
 	}
 
 	if (is_quad)
@@ -1624,24 +1654,34 @@ Blaster_Fire(edict_t *ent, vec3_t g_offset, int damage,
 	VectorScale(forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
 
-	fire_blaster(ent, start, forward, damage, 1000, effect, hyper);
-
-	/* send muzzle flash */
-	gi.WriteByte(svc_muzzleflash);
-	gi.WriteShort(ent - g_edicts);
-
-	if (hyper)
+	if((game.gametype == zaero_coop) && (EMPNukeCheck(ent, start))) /* FS: Zaero specific */
 	{
-		gi.WriteByte(MZ_HYPERBLASTER | is_silenced);
+		gi.sound (ent, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
+		ret = 0;
 	}
 	else
 	{
-		gi.WriteByte(MZ_BLASTER | is_silenced);
+		fire_blaster(ent, start, forward, damage, 1000, effect, hyper);
+
+		/* send muzzle flash */
+		gi.WriteByte(svc_muzzleflash);
+		gi.WriteShort(ent - g_edicts);
+
+		if (hyper)
+		{
+			gi.WriteByte(MZ_HYPERBLASTER | is_silenced);
+		}
+		else
+		{
+			gi.WriteByte(MZ_BLASTER | is_silenced);
+		}
+
+		gi.multicast(ent->s.origin, MULTICAST_PVS);
+
+		PlayerNoise(ent, start, PNOISE_WEAPON);
 	}
 
-	gi.multicast(ent->s.origin, MULTICAST_PVS);
-
-	PlayerNoise(ent, start, PNOISE_WEAPON);
+	return ret;
 }
 
 void
@@ -1743,11 +1783,12 @@ Weapon_HyperBlaster_Fire(edict_t *ent)
 				damage = 20;
 			}
 
-			Blaster_Fire(ent, offset, damage, true, effect);
-
-			if (!((int)dmflags->value & DF_INFINITE_AMMO))
+			if(Blaster_Fire(ent, offset, damage, true, effect)) /* FS: Zaero specific */
 			{
-				ent->client->pers.inventory[ent->client->ammo_index]--;
+				if (!((int)dmflags->value & DF_INFINITE_AMMO))
+				{
+					ent->client->pers.inventory[ent->client->ammo_index]--;
+				}
 			}
 
 			ent->client->anim_priority = ANIM_ATTACK;
@@ -2053,6 +2094,12 @@ Chaingun_Fire(edict_t *ent)
 		ent->client->kick_angles[i] = crandom() * 0.7;
 	}
 
+	if((game.gametype == zaero_coop) && (EMPNukeCheck(ent, ent->s.origin))) /* FS: Zaero specific */
+	{
+		gi.sound (ent, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
+		return;
+	}
+
 	for (i = 0; i < shots; i++)
 	{
 		/* get start / end positions */
@@ -2306,6 +2353,15 @@ weapon_railgun_fire(edict_t *ent)
 
 	VectorSet(offset, 0, 7, ent->viewheight - 8);
 	P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+
+	ent->client->ps.gunframe++;
+
+	if((game.gametype == zaero_coop) && (EMPNukeCheck(ent, start))) /* FS: Zaero specific */
+	{
+		gi.sound (ent, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
+		return;
+	}
+
 	fire_rail(ent, start, forward, damage, kick);
 
 	/* send muzzle flash */
@@ -2314,7 +2370,6 @@ weapon_railgun_fire(edict_t *ent)
 	gi.WriteByte(MZ_RAILGUN | is_silenced);
 	gi.multicast(ent->s.origin, MULTICAST_PVS);
 
-	ent->client->ps.gunframe++;
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
 	if (!((int)dmflags->value & DF_INFINITE_AMMO))
@@ -2363,6 +2418,33 @@ weapon_bfg_fire(edict_t *ent)
 		return;
 	}
 
+	/* FS: Zaero specific, moved earlier for EMP */
+	AngleVectors (ent->client->v_angle, forward, right, NULL);
+	VectorScale (forward, -2, ent->client->kick_origin);
+
+	VectorSet(offset, 8, 8, ent->viewheight-8);
+	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
+
+	if(game.gametype == zaero_coop) /* FS: Zaero specific EMP stuff */
+	{
+		if(ent->client->ps.gunframe == 9)
+		{
+			ent->flags &= ~FL_BFGMISSFIRE;
+		}
+
+		if(!(ent->flags & FL_BFGMISSFIRE) && EMPNukeCheck(ent, start))
+		{
+			ent->flags |= FL_BFGMISSFIRE;
+			gi.sound (ent, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
+		}
+
+		if(ent->flags & FL_BFGMISSFIRE)
+		{
+			ent->client->ps.gunframe++;
+			return;
+		}
+	}
+
 	if (deathmatch->value)
 	{
 		damage = 200;
@@ -2399,17 +2481,12 @@ weapon_bfg_fire(edict_t *ent)
 		damage *= damage_multiplier;
 	}
 
-	AngleVectors(ent->client->v_angle, forward, right, NULL);
-
-	VectorScale(forward, -2, ent->client->kick_origin);
 
 	/* make a big pitch kick with an inverse fall */
 	ent->client->v_dmg_pitch = -40;
 	ent->client->v_dmg_roll = crandom() * 8;
 	ent->client->v_dmg_time = level.time + DAMAGE_TIME;
 
-	VectorSet(offset, 8, 8, ent->viewheight - 8);
-	P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
 	fire_bfg(ent, start, forward, damage, 400, damage_radius);
 
 	ent->client->ps.gunframe++;

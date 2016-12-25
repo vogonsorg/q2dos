@@ -2718,7 +2718,7 @@ gitem_t itemlist[] = {
 		WEAP_BLASTER,
 		NULL,
 		0,
-/* precache */ "models/objects/flare/tris.md2 weapons/flare/shoot.wav weapons/flare/flarehis.wav"
+/* precache */ "models/weapons/v_flare/tris.md2 models/objects/flare/tris.md2 weapons/flare/shoot.wav weapons/flare/flarehis.wav"
 	},
 
 /* weapon_blaster (.3 .3 1) (-16 -16 -16) (16 16 16)

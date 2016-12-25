@@ -518,9 +518,8 @@ M_ReactToDamage(edict_t *targ, edict_t *attacker)
 			FoundTarget(targ);
 		}
 	}
-	/* otherwise get mad at whoever they are mad
-	   at (help our buddy) unless it is us! */
-	else if (attacker->enemy && (attacker->enemy != targ)) /* FS: Zaero specific game dll changes */
+	/* otherwise get mad at whoever they are mad at (help our buddy) unless it is us! */
+	else if (attacker->enemy && (attacker->enemy != targ))
 	{
 		if (targ->enemy && targ->enemy->client)
 		{
@@ -531,7 +530,7 @@ M_ReactToDamage(edict_t *targ, edict_t *attacker)
 
 		if (!(targ->monsterinfo.aiflags & AI_DUCKED))
 		{
-			FoundTarget (targ);
+			FoundTarget(targ);
 		}
 	}
 }
@@ -673,22 +672,26 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 		save = damage;
 	}
 
-	psave = CheckPowerArmor (targ, point, normal, take, dflags);
+	psave = CheckPowerArmor(targ, point, normal, take, dflags);
 	take -= psave;
 
-	asave = CheckArmor (targ, point, normal, take, te_sparks, dflags);
+	asave = CheckArmor(targ, point, normal, take, te_sparks, dflags);
 	take -= asave;
 
-	//treat cheat/powerup savings the same as armor
+	/* treat cheat/powerup savings the same as armor */
 	asave += save;
 
-// figure momentum add
-	if (!(dflags & DAMAGE_NO_KNOCKBACK)) /* FS: Zaero specific game dll changes */
+	/* figure momentum add */
+	if (!(dflags & DAMAGE_NO_KNOCKBACK))
 	{
-		if ((knockback) && (targ->movetype != MOVETYPE_NONE) && (targ->movetype != MOVETYPE_BOUNCE) && (targ->movetype != MOVETYPE_BOUNCEFLY) && (targ->movetype != MOVETYPE_PUSH) && (targ->movetype != MOVETYPE_STOP))
+		if ((knockback) && (targ->movetype != MOVETYPE_NONE) &&
+			(targ->movetype != MOVETYPE_BOUNCE) &&
+			(targ->movetype != MOVETYPE_BOUNCEFLY) && /* FS: Zaero specific */
+			(targ->movetype != MOVETYPE_PUSH) &&
+			(targ->movetype != MOVETYPE_STOP))
 		{
-			vec3_t	kvel;
-			float	mass;
+			vec3_t kvel;
+			float mass;
 
       if((dflags & DAMAGE_ARMORMOSTLY) && damage > take)
       {
@@ -696,21 +699,30 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker,
       }
 
 			if (targ->mass < 50)
+			{
 				mass = 50;
+			}
 			else
+			{
 				mass = targ->mass;
+			}
 
-			if (targ->client  && attacker == targ)
-				VectorScale (dir, 1600.0 * (float)knockback / mass, kvel);	// the rocket jump hack...
+			if (targ->client && (attacker == targ))
+			{
+				/* This allows rocket jumps */
+				VectorScale(dir, 1600.0 * (float)knockback / mass, kvel);
+			}
 			else
-				VectorScale (dir, 500.0 * (float)knockback / mass, kvel);
+			{
+				VectorScale(dir, 500.0 * (float)knockback / mass, kvel);
+			}
 
-			VectorAdd (targ->velocity, kvel, targ->velocity);
+			VectorAdd(targ->velocity, kvel, targ->velocity);
 		}
 	}
 
 	/* team damage avoidance */
-	if (!(dflags & DAMAGE_NO_PROTECTION) && CheckTeamDamage (targ, attacker))
+	if (!(dflags & DAMAGE_NO_PROTECTION) && CheckTeamDamage(targ, attacker))
 	{
 		return;
 	}
@@ -732,7 +744,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 			targ->health = targ->health - take;
 		}
 
-		// kill the entity
+		/* kill the entity */
 		if (targ->health <= 0)
 		{
 			if ((targ->svflags & SVF_MONSTER) || (client))
@@ -740,7 +752,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 				targ->flags |= FL_NO_KNOCKBACK;
 			}
 
-			Killed (targ, inflictor, attacker, take, point);
+			Killed(targ, inflictor, attacker, take, point);
 			return;
 		}
 	}

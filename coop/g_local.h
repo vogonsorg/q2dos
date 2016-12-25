@@ -203,6 +203,7 @@ typedef enum /* FS: Coop: Voting */
 #define AI_SCHOOLING			0x00008000
 #define AI_REDUCEDDAMAGE		0x00010000
 #define AI_DODGETIMEOUT			0x00080000
+#define AI_MONREDUCEDDAMAGE		0x00200000
 #define AI_ONESHOTTARGET		0x00400000
 
 //monster attack state
@@ -361,9 +362,8 @@ typedef struct gitem_s
 	int			tag;
 
 	char		*precaches;		// string of all models, sounds, and images this item will use
-	int		hideFlags; /* FS: Zaero specific game dll changes */
-	char    *weapon;        // weapon used by ammo  /* FS: Zaero specific game dll changes */
-	
+	int			hideFlags; /* FS: Zaero specific game dll changes */
+	char		*weapon;        // weapon used by ammo  /* FS: Zaero specific game dll changes */
 } gitem_t;
 
 /* FS: Coop: Hint for which rule sets we apply */
@@ -611,12 +611,12 @@ typedef struct
 	float flyStrafePitch; /* FS: Zaero specific game dll changes */
 	float flyStrafeTimeout; /* FS: Zaero specific game dll changes */
 
-  //schooling info
-  float zSchoolSightRadius; /* FS: Zaero specific game dll changes */
-  float zSchoolMaxSpeed, zSchoolMinSpeed; /* FS: Zaero specific game dll changes */
-  float zSpeedStandMax, zSpeedWalkMax; /* FS: Zaero specific game dll changes */
-  float zSchoolDecayRate, zSchoolMinimumDistance; /* FS: Zaero specific game dll changes */
-  int   zSchoolFlags; /* FS: Zaero specific game dll changes */
+	//schooling info
+	float zSchoolSightRadius; /* FS: Zaero specific game dll changes */
+	float zSchoolMaxSpeed, zSchoolMinSpeed; /* FS: Zaero specific game dll changes */
+	float zSpeedStandMax, zSpeedWalkMax; /* FS: Zaero specific game dll changes */
+	float zSchoolDecayRate, zSchoolMinimumDistance; /* FS: Zaero specific game dll changes */
+	int   zSchoolFlags; /* FS: Zaero specific game dll changes */
 
 	float reducedDamageAmount; /* FS: Zaero specific game dll changes */
 

@@ -321,7 +321,7 @@ extern void Weapon_HyperBlaster ( edict_t * ent ) ;
 extern void Weapon_HyperBlaster_Fire ( edict_t * ent ) ;
 extern void Weapon_Blaster ( edict_t * ent ) ;
 extern void Weapon_Blaster_Fire ( edict_t * ent ) ;
-extern void Blaster_Fire ( edict_t * ent , vec3_t g_offset , int damage , qboolean hyper , int effect ) ;
+extern int Blaster_Fire ( edict_t * ent , vec3_t g_offset , int damage , qboolean hyper , int effect ) ;
 extern void Weapon_RocketLauncher ( edict_t * ent ) ;
 extern void Weapon_RocketLauncher_Fire ( edict_t * ent ) ;
 extern void Weapon_ProxLauncher ( edict_t * ent ) ;
