@@ -7,6 +7,8 @@
 #define SPAWNGROW_LIFESPAN 0.3 /* FS: Coop: Rogue specific */
 #define STEPSIZE 18 /* FS: Coop: Rogue specific */
 
+void Z_SpawnDMItems(); /* FS: Zaero specific game dll changes */
+
 typedef struct
 {
 	char *name;
@@ -186,6 +188,26 @@ void SP_target_mal_laser (edict_t *ent); /* FS: Coop: Xatrix specific */
 void SP_misc_transport (edict_t *ent); /* FS: Coop: Xatrix specific */
 
 void SP_misc_nuke (edict_t *ent); /* FS: Coop: Xatrix specific */
+
+void SP_sound_echo (edict_t *self); /* FS: Zaero specific game dll changes */
+
+void SP_misc_lasertripbomb (edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_load_mirrorlevel (edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_trigger_laser(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_monster_autocannon(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_monster_autocannon_floor(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_monster_sentien(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_misc_securitycamera(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_monster_hound (edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_monster_handler (edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_misc_commdish (edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_misc_crate(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_misc_crate_medium(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_misc_crate_small(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_monster_zboss (edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_target_zboss_target(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_func_barrier(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_misc_seat(edict_t *self); /* FS: Zaero specific game dll changes */
 
 void SP_SetCDTrack(int track); /* FS: Coop: Added */
 void SP_info_coop_checkpoint (edict_t * self ); /* FS: Coop: Added */
@@ -371,6 +393,30 @@ spawn_t spawns[] = {
 	{"item_quadfire", SP_xatrix_item}, /* FS: Coop: Rogue specific */
 	{"weapon_boomer", SP_xatrix_item}, /* FS: Coop: Rogue specific */
 	{"weapon_phalanx", SP_xatrix_item}, /* FS: Coop: Rogue specific */
+
+// evolve map entities
+	{"sound_echo", SP_sound_echo}, /* FS: Zaero specific game dll changes */
+	{"misc_ired", SP_misc_lasertripbomb}, /* FS: Zaero specific game dll changes */
+	{"trigger_laser", SP_trigger_laser}, /* FS: Zaero specific game dll changes */
+	{"monster_autocannon", SP_monster_autocannon}, /* FS: Zaero specific game dll changes */
+	{"monster_autocannon_floor", SP_monster_autocannon_floor}, /* FS: Zaero specific game dll changes */
+	{"monster_sentien", SP_monster_sentien}, /* FS: Zaero specific game dll changes */
+	{"misc_securitycamera", SP_misc_securitycamera}, /* FS: Zaero specific game dll changes */
+	{"monster_hound", SP_monster_hound}, /* FS: Zaero specific game dll changes */
+	{"monster_handler", SP_monster_handler}, /* FS: Zaero specific game dll changes */
+	{"misc_commdish", SP_misc_commdish}, /* FS: Zaero specific game dll changes */
+
+// mirror level's 
+	{"load_mirrorlevel", SP_load_mirrorlevel}, /* FS: Zaero specific game dll changes */
+
+	{"misc_crate", SP_misc_crate}, /* FS: Zaero specific game dll changes */
+	{"misc_crate_medium", SP_misc_crate_medium}, /* FS: Zaero specific game dll changes */
+	{"misc_crate_small", SP_misc_crate_small}, /* FS: Zaero specific game dll changes */
+
+	{"monster_zboss", SP_monster_zboss}, /* FS: Zaero specific game dll changes */
+	{"func_barrier", SP_func_barrier}, /* FS: Zaero specific game dll changes */
+	{"misc_seat", SP_misc_seat}, /* FS: Zaero specific game dll changes */
+	{"target_zboss_target", SP_target_zboss_target}, /* FS: Zaero specific game dll changes */
 
 	{"info_coop_checkpoint", SP_info_coop_checkpoint}, /* FS: Coop: Added */
 	{NULL, NULL}
@@ -851,6 +897,7 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 		else
 		{
 			ent = G_Spawn();
+			ent->spawnflags2 = 0; /* FS: Zaero specific game dll changes */
 		}
 
 		entities = ED_ParseEdict(entities, ent);
@@ -1005,6 +1052,11 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 		}
 	}
 
+	if (game.gametype == zaero_coop)
+	{
+		Z_SpawnDMItems(); /* FS: Zaero specific game dll changes */
+	}
+
 	if(coop->intValue) /* FS: Coop: Check if victory.pcx is the current map, workaround the "gamemap" crap in sv_init.c */
 	{
 		G_CheckCoopVictory();
@@ -1068,6 +1120,17 @@ char *single_statusbar =
 "if 11 "
 "	xv	148 "
 "	pic	11 "
+"endif "
+
+// player origin /* FS: Zaero specific game dll changes */
+"if 18 " /* FS: Must mirror STAT_SHOW_ORIGIN! */
+"	xl 0 "
+"	yb -120 "
+"	num 5 19 " /* FS: Must mirror STAT_ORIGIN_X! */
+"	yb -96 "
+"	num 5 20 " /* FS: Must mirror STAT_ORIGIN_Y! */
+"	yb -72 "
+"	num 5 21 " /* FS: Must mirror STAT_ORIGIN_Z! */
 "endif "
 ;
 
@@ -1133,6 +1196,17 @@ char *dm_statusbar =
 "yt 2 "
 "num 3 14 "
 
+// player origin /* FS: Zaero specific game dll changes */
+"if 18 " /* FS: Must mirror STAT_SHOW_ORIGIN! */
+"	xl 0 "
+"	yb -120 "
+"	num 5 19 " /* FS: Must mirror STAT_ORIGIN_X! */
+"	yb -96 "
+"	num 5 20 " /* FS: Must mirror STAT_ORIGIN_Y! */
+"	yb -72 "
+"	num 5 21 " /* FS: Must mirror STAT_ORIGIN_Z! */
+"endif "
+
 /* spectator */
 "if 17 "
   "xv 0 "
@@ -1173,6 +1247,7 @@ SP_worldspawn(edict_t *ent)
 	ent->solid = SOLID_BSP;
 	ent->inuse = true; /* since the world doesn't use G_Spawn() */
 	ent->s.modelindex = 1; /* world model is always index 1 */
+	ent->spawnflags2 = 0; /* FS: Zaero specific game dll changes */
 
 	/* reserve some spots for dead player
 	   bodies for coop / deathmatch */
