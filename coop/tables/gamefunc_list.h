@@ -838,6 +838,7 @@
 {"infantry_stand", (byte *)infantry_stand},
 {"SP_monster_hover", (byte *)SP_monster_hover},
 {"hover_blocked", (byte *)hover_blocked},
+{"hover_dodge", (byte *)hover_dodge},
 {"hover_die", (byte *)hover_die},
 {"hover_dead", (byte *)hover_dead},
 {"hover_deadthink", (byte *)hover_deadthink},

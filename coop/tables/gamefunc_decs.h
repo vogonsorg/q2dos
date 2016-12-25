@@ -838,6 +838,7 @@ extern void infantry_fidget ( edict_t * self ) ;
 extern void infantry_stand ( edict_t * self ) ;
 extern void SP_monster_hover ( edict_t * self ) ;
 extern qboolean hover_blocked ( edict_t * self , float dist ) ;
+extern void hover_dodge ( edict_t * self , edict_t * attacker , float eta , trace_t * fake ) ;
 extern void hover_die ( edict_t * self , edict_t * inflictor , edict_t * attacker , int damage , vec3_t point ) ;
 extern void hover_dead ( edict_t * self ) ;
 extern void hover_deadthink ( edict_t * self ) ;

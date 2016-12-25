@@ -521,6 +521,13 @@ WriteField1(FILE *f, field_t *field, byte *base)
 
 				if (!func)
 				{
+#if 0 /* FS: Debug to find missing functions */
+#ifdef _DEBUG
+					int i = 0;
+					int z;
+					z = 5/i;
+#endif
+#endif
 					gi.error ("WriteField1: function not in list, can't save game");
 				}
 				
