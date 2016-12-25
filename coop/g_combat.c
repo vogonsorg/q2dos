@@ -196,6 +196,13 @@ char *GetProperMonsterName (char *monsterName) /* FS: Coop: Get proper name for 
 		return "Black Widow Guardian";
 	else if(!strcmp("monster_kamikaze", monsterName))
 		return "Kamikaze Flyer";
+	/* FS: Zaero specific stuff */
+	else if(!strcmp("monster_handler", monsterName))
+		return "Enforcer Hound Handler";
+	else if(!strcmp("monster_hound", monsterName))
+		return "Hound Dog";
+	else if(!strcmp("monster_sentien", monsterName))
+		return "Sentien";
 	else
 		return monsterName;
 }

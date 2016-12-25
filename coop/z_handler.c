@@ -414,6 +414,7 @@ Z = -24  to 8
 
 	self->pain = handler_pain;
 	self->die = handler_die;
+	self->classname = "monster_handler"; /* FS: Added */
 
 	self->monsterinfo.stand = handler_stand;
 	self->monsterinfo.walk = handler_stand;

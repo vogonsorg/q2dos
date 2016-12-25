@@ -627,6 +627,7 @@ void hound_createHound(edict_t *self, float healthPercent)
 	hound->yaw_speed = 30;
 	hound->enemy = self->enemy;
 	hound->ideal_yaw = self->ideal_yaw;
+	hound->classname = "monster_hound"; /* FS: Added */
 
 	hound->health = 175.0 * healthPercent;
 	hound->gib_health = -50;
