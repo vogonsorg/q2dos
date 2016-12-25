@@ -16,10 +16,10 @@
 #define HEATBEAM_DM_DMG 15 /* FS: Coop: Rogue specific */
 #define HEATBEAM_SP_DMG 15 /* FS: Coop: Rogue specific */
 
-static qboolean is_quad;
-static qboolean is_quadfire; /* FS: Coop: Xatrix specific */
-static byte damage_multiplier; /* FS: Coop: Rogue specific */
-static byte is_silenced;
+qboolean is_quad;
+qboolean is_quadfire; /* FS: Coop: Xatrix specific */
+byte damage_multiplier; /* FS: Coop: Rogue specific */
+byte is_silenced;
 
 void weapon_grenade_fire(edict_t *ent, qboolean held);
 void weapon_trap_fire (edict_t *ent, qboolean held); /* FS: Coop: Xatrix specific */
@@ -57,6 +57,12 @@ P_DamageModifier(edict_t *ent) /* FS: Coop: Rogue addition.  Set damage_multipli
 	}
 
 	return damage_multiplier;
+}
+
+void playQuadSound(edict_t *ent) /* FS: Zaero specific */
+{
+	if (ent->client->quad_framenum > level.framenum)
+		gi.sound(ent, CHAN_ITEM, gi.soundindex("items/damage3.wav"), 1, ATTN_NORM, 0);
 }
 
 void

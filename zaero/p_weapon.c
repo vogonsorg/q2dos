@@ -7,7 +7,7 @@
 qboolean	is_quad;
 byte		is_silenced;
 
-void playQuadSound(edict_t *ent)
+void playQuadSound(edict_t *ent) /* FS: Zaero specific */
 {
 	if (ent->client->quad_framenum > level.framenum)
 		gi.sound(ent, CHAN_ITEM, gi.soundindex("items/damage3.wav"), 1, ATTN_NORM, 0);

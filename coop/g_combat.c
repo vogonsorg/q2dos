@@ -759,7 +759,7 @@ CheckArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 		return 0;
 	}
 
-	if (dflags & (DAMAGE_NO_ARMOR | DAMAGE_NO_REG_ARMOR)) /* FS: Coop: Rogue specific -- Added DAMAGE_NO_REG_ARMOR */
+	if (((game.gametype == zaero_coop) && (dflags & DAMAGE_NO_ARMOR)) || ((game.gametype != zaero_coop) && (dflags & (DAMAGE_NO_ARMOR | DAMAGE_NO_REG_ARMOR)))) /* FS: Coop: Rogue specific -- Added DAMAGE_NO_REG_ARMOR */
 	{
 		return 0;
 	}
