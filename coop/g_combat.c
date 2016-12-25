@@ -586,6 +586,11 @@ CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 		return 0;
 	}
 
+	if((game.gametype == zaero_coop) && (EMPNukeCheck(ent, point))) /* FS: Zaero specific game dll changes */
+	{
+		return 0;
+	}
+  
 	if (client)
 	{
 		power_armor_type = PowerArmorType(ent);
@@ -601,6 +606,11 @@ CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 		power_armor_type = ent->monsterinfo.power_armor_type;
 		power = ent->monsterinfo.power_armor_power;
 		index = 0;
+	}
+	else if((game.gametype == zaero_coop) && (strcmp(ent->classname, "PlasmaShield") == 0)) /* FS: Zaero specific game dll changes */
+	{
+		power_armor_type = POWER_ARMOR_SHIELD;
+		power = ent->health;
 	}
 	else
 	{
@@ -636,13 +646,35 @@ CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 
 		damagePerCell = 1;
 		pa_te_type = TE_SCREEN_SPARKS;
-		damage = damage / 3;
+
+		if(game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+		{
+			if(!(dflags & DAMAGE_ARMORMOSTLY))
+			{
+				damage = damage / 3;
+			}
+		}
+		else
+		{
+			damage = damage / 3;
+		}
 	}
 	else
 	{
 		damagePerCell = 2;
 		pa_te_type = TE_SHIELD_SPARKS;
-		damage = (2 * damage) / 3;
+
+		if(game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+		{
+			if(!(dflags & DAMAGE_ARMORMOSTLY))
+			{
+	 	 		damage = (2 * damage) / 3;
+			}
+		}
+		else
+		{
+			damage = (2 * damage) / 3;
+		}
 	}
 
 	/* etf rifle */
@@ -658,6 +690,11 @@ CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 	if (!save)
 	{
 		return 0;
+	}
+
+    if((game.gametype == zaero_coop) && (!(dflags & DAMAGE_ARMORMOSTLY))) /* FS: Zaero specific game dll changes */
+	{
+		save *= 2;
 	}
 
 	if (save > damage)
@@ -680,6 +717,13 @@ CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 	if (client)
 	{
 		client->pers.inventory[index] -= power_used;
+	}
+	else if(game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		if(ent->svflags & SVF_MONSTER)
+		{
+			ent->monsterinfo.power_armor_power -= power_used;
+		}
 	}
 	else
 	{
@@ -749,7 +793,13 @@ CheckArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 	}
 
 	client->pers.inventory[index] -= save;
-	SpawnDamage(te_sparks, point, normal);
+
+	if((game.gametype == zaero_coop) && (dflags & DAMAGE_ARMORMOSTLY)) /* FS: Zaero specific game dll changes */
+	{
+		save *= 2;
+	}
+
+	SpawnDamage (te_sparks, point, normal);
 
 	return save;
 }
@@ -770,6 +820,11 @@ M_ReactToDamage(edict_t *targ, edict_t *attacker, edict_t *inflictor)
 	}
 
 	if (!(attacker->client) && !(attacker->svflags & SVF_MONSTER))
+	{
+		return;
+	}
+
+	if ((game.gametype == zaero_coop) && (strcmp(attacker->classname, "monster_autocannon") != 0)) /* FS: Zaero specific game dll changes */
 	{
 		return;
 	}
@@ -1078,6 +1133,14 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 			vec3_t kvel;
 			float mass;
 
+			if (game.gametype == zaero_coop) /* FS: Zaero specific */
+			{
+				if((dflags & DAMAGE_ARMORMOSTLY) && damage > take)
+				{
+					knockback = (int)((float)knockback * (((float)(damage - take) / (float)damage) + 1.0));
+				}
+			}
+
 			if (targ->mass < 50)
 			{
 				mass = 50;
@@ -1110,6 +1173,21 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		take = 0;
 		save = damage;
 		SpawnDamage(te_sparks, point, normal);
+	}
+
+	/* check for a2k invincibility */
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		if (client && client->a2kFramenum > level.framenum)
+		{
+			if (targ->pain_debounce_time < level.time)
+			{
+				gi.sound(targ, CHAN_ITEM, gi.soundindex("items/protect4.wav"), 1, ATTN_NORM, 0);
+				targ->pain_debounce_time = level.time + 2;
+			}
+			take = 0;
+			save = damage;
+		}
 	}
 
 	/* check for invincibility */
@@ -1201,7 +1279,17 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 			SpawnDamage(te_sparks, point, normal);
 		}
 
-		targ->health = targ->health - take;
+		if(game.gametype == zaero_coop)
+		{
+			if(targ->takedamage != DAMAGE_IMMORTAL)
+			{
+				targ->health = targ->health - take;
+			}
+		}
+		else
+		{
+			targ->health = targ->health - take;
+		}
 
 		if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 		{
@@ -1508,6 +1596,43 @@ T_RadiusClassDamage(edict_t *inflictor, edict_t *attacker, float damage, /* FS: 
 				T_Damage(ent, inflictor, attacker, dir, inflictor->s.origin,
 						vec3_origin, (int)points, (int)points, DAMAGE_RADIUS,
 						mod);
+			}
+		}
+	}
+}
+
+
+/*
+============
+T_RadiusDamagePosition
+============
+*/
+void T_RadiusDamagePosition (vec3_t origin, edict_t *inflictor, edict_t *attacker, float damage, edict_t *ignore, float radius, int mod) /* FS: Zaero specific game dll changes */
+{
+	float	points;
+	edict_t	*ent = NULL;
+	vec3_t	v;
+	vec3_t	dir;
+
+	while ((ent = findradius(ent, origin, radius)) != NULL)
+	{
+		if (ent == ignore)
+			continue;
+		if (!ent->takedamage)
+			continue;
+
+		VectorAdd (ent->mins, ent->maxs, v);
+		VectorMA (ent->s.origin, 0.5, v, v);
+		VectorSubtract (origin, v, v);
+		points = damage - 0.5 * VectorLength (v);
+		if (ent == attacker)
+			points = points * 0.5;
+		if (points > 0)
+		{
+			if (CanDamage (ent, inflictor))
+			{
+				VectorSubtract (ent->s.origin, origin, dir);
+				T_Damage (ent, inflictor, attacker, dir, origin, vec3_origin, (int)points, (int)points, DAMAGE_RADIUS, mod);
 			}
 		}
 	}

@@ -34,41 +34,56 @@
 =========================================================
 */
 
+#define PLAT_LOW_TRIGGER		1
+#define PLAT_LOW_TRIGGER_2		2 /* FS: Zaero specific game dll changes */
+#define PLAT2_TOGGLE			2
+#define PLAT2_TOP				4
+#define PLAT2_TRIGGER_TOP		8
+#define PLAT2_TRIGGER_BOTTOM	16
+#define PLAT2_BOX_LIFT			32
 
-#define PLAT_LOW_TRIGGER 1
-#define PLAT2_TOGGLE 2
-#define PLAT2_TOP 4
-#define PLAT2_TRIGGER_TOP 8
-#define PLAT2_TRIGGER_BOTTOM 16
-#define PLAT2_BOX_LIFT 32
+#define	STATE_TOP				0
+#define	STATE_BOTTOM			1
+#define STATE_UP				2
+#define STATE_DOWN				3
 
-#define STATE_TOP 0
-#define STATE_BOTTOM 1
-#define STATE_UP 2
-#define STATE_DOWN 3
+#define STATE_STOPPED			0 /* FS: Zaero specific game dll changes */
+#define STATE_ACCEL				1 /* FS: Zaero specific game dll changes */
+#define STATE_TOPSPEED			2 /* FS: Zaero specific game dll changes */
+#define STATE_DECEL				3 /* FS: Zaero specific game dll changes */
 
-#define DOOR_START_OPEN 1
-#define DOOR_REVERSE 2
-#define DOOR_CRUSHER 4
-#define DOOR_NOMONSTER 8
-#define DOOR_TOGGLE 32
-#define DOOR_X_AXIS 64
-#define DOOR_Y_AXIS 128
-#define DOOR_INACTIVE 8192
+#define DOOR_START_OPEN			1
+#define DOOR_REVERSE			2
+#define DOOR_CRUSHER			4
+#define DOOR_NOMONSTER			8
+#define DOOR_TOGGLE				32
+#define DOOR_X_AXIS				64
+#define DOOR_Y_AXIS				128
+#define DOOR_INACTIVE			8192
+#define DOOR_ACTIVE_TOGGLE		1 /* FS: Zaero specific game dll changes */
+#define DOOR_ACTIVE_ON			2 /* FS: Zaero specific game dll changes */
 
 #define AccelerationDistance(target, rate) (target * ((target / rate) + 1) / 2)
 
-#define PLAT2_CALLED 1
-#define PLAT2_MOVING 2
-#define PLAT2_WAITING 4
+#define PLAT2_CALLED			1
+#define PLAT2_MOVING			2
+#define PLAT2_WAITING			4
 
-#define TRAIN_START_ON 1
-#define TRAIN_TOGGLE 2
-#define TRAIN_BLOCK_STOPS 4
+#define TRAIN_START_ON			1
+#define TRAIN_TOGGLE			2
+#define TRAIN_BLOCK_STOPS		4
+#define TRAIN_REVERSE			8 /* FS: Zaero specific game dll changes */
+#define TRAIN_X_AXIS			16 /* FS: Zaero specific game dll changes */
+#define TRAIN_Y_AXIS			32 /* FS: Zaero specific game dll changes */
+#define TRAIN_Z_AXIS			64 /* FS: Zaero specific game dll changes */
 
-#define SECRET_ALWAYS_SHOOT 1
-#define SECRET_1ST_LEFT 2
-#define SECRET_1ST_DOWN 4
+#define SECRET_ALWAYS_SHOOT		1
+#define SECRET_1ST_LEFT			2
+#define SECRET_1ST_DOWN			4
+
+void Think_SmoothAccelMove (edict_t *ent); /* FS: Zaero specific game dll changes */
+
+void door_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */, csurface_t *surf /* unused */);
 
 void door_secret_move1(edict_t *self);
 void door_secret_move2(edict_t *self);
@@ -132,6 +147,10 @@ Move_Done(edict_t *ent)
 	}
 
 	VectorClear(ent->velocity);
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		VectorClear(ent->avelocity);
+	}
 	ent->moveinfo.endfunc(ent);
 }
 
@@ -179,14 +198,99 @@ Move_Begin(edict_t *ent)
 	ent->moveinfo.remaining_distance -= frames * ent->moveinfo.speed * FRAMETIME;
 	ent->nextthink = level.time + (frames * FRAMETIME);
 	ent->think = Move_Final;
+
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		/* set the angle velocity */
+		VectorScale(ent->movedir, ent->aspeed, ent->avelocity);
+	}
 }
 
-void
-Move_Calc(edict_t *ent, vec3_t dest, void (*func)(edict_t *))
+void Move_Calc_Zaero (edict_t *ent, vec3_t dest, void(*func)(edict_t*), int smoothSpeedChange) /* FS: Zaero specific game dll changes: added smoothSpeedChange */
 {
  	if (!ent || !func)
 	{
 		return;
+	}
+
+	VectorClear (ent->velocity);
+	VectorSubtract (dest, ent->s.origin, ent->moveinfo.dir);
+	ent->moveinfo.remaining_distance = VectorNormalize (ent->moveinfo.dir);
+	ent->moveinfo.endfunc = func;
+
+	if(smoothSpeedChange & 0x6)
+	{
+		if(!ent->moveinfo.current_speed)
+		{
+			ent->moveinfo.current_speed = ent->moveinfo.speed;
+		}
+
+		if(ent->moveinfo.speed > ent->moveinfo.remaining_distance)
+		{
+			ent->moveinfo.current_speed = ent->moveinfo.speed;
+			ent->moveinfo.decel = 0;
+		}
+		else if(smoothSpeedChange & 0x2)
+		{
+			float steps = (ent->moveinfo.remaining_distance / ((ent->moveinfo.speed + ent->moveinfo.current_speed) / 2));
+			ent->moveinfo.decel = (ent->moveinfo.speed - ent->moveinfo.current_speed) / steps;
+
+			ent->moveinfo.accel = (ent->moveinfo.speed > ent->moveinfo.current_speed);
+		}
+		else if(smoothSpeedChange & 0x4)
+		{
+			if(ent->decel < 0) // if negative
+			{ // make positive
+				ent->moveinfo.decel = -ent->moveinfo.decel;
+			}
+
+			// if going down, make negative.
+			if(!(ent->moveinfo.accel = (ent->moveinfo.speed > ent->moveinfo.current_speed)))
+			{
+				ent->moveinfo.decel = -ent->moveinfo.decel;
+			}
+		}
+
+		// smooth speed change
+		Think_SmoothAccelMove(ent);
+	}
+	else if (ent->moveinfo.speed == ent->moveinfo.accel && ent->moveinfo.speed == ent->moveinfo.decel)
+	{
+		ent->moveinfo.current_speed = ent->moveinfo.speed;
+		if (level.current_entity == ((ent->flags & FL_TEAMSLAVE) ? ent->teammaster : ent))
+		{
+			Move_Begin (ent);
+		}
+		else
+		{
+			ent->nextthink = level.time + FRAMETIME;
+			ent->think = Move_Begin;
+		}
+	}
+	else
+	{
+		// accelerative
+		ent->moveinfo.current_speed = 0;
+		ent->think = Think_AccelMove;
+		ent->nextthink = level.time + FRAMETIME;
+	}
+}
+
+void
+Move_Calc(edict_t *ent, vec3_t dest, void (*func)(edict_t *), int smoothSpeedChange)
+{
+ 	if (!ent || !func)
+	{
+		return;
+	}
+
+	if (game.gametype != zaero_coop) /* FS: Zaero specific */
+	{
+		smoothSpeedChange = 0;
+	}
+	else
+	{
+		Move_Calc_Zaero(ent, dest, func, smoothSpeedChange);
 	}
 
 	VectorClear(ent->velocity);
@@ -537,6 +641,48 @@ Think_AccelMove(edict_t *ent)
 	ent->think = Think_AccelMove;
 }
 
+/*
+==============
+Think_SmoothAccelMove
+
+The team has completed a frame of movement, so
+change the speed for the next frame
+==============
+*/
+
+void Think_SmoothAccelMove (edict_t *ent) /* FS: Zaero specific game dll changes */
+{
+	if (ent->moveinfo.remaining_distance >= ent->moveinfo.current_speed)
+	{
+		ent->moveinfo.remaining_distance -= ent->moveinfo.current_speed;
+	}
+
+	ent->moveinfo.current_speed += ent->moveinfo.decel;
+	
+	if(ent->moveinfo.accel)
+	{
+		if(ent->moveinfo.current_speed > ent->moveinfo.speed)
+		{
+			ent->moveinfo.current_speed = ent->moveinfo.speed;
+		}
+	} 
+	else if(ent->moveinfo.current_speed < ent->moveinfo.speed)
+	{
+		ent->moveinfo.current_speed = ent->moveinfo.speed;
+	}
+
+	// will the entire move complete on next frame?
+	if (ent->moveinfo.remaining_distance <= ent->moveinfo.current_speed)
+	{
+		Move_Final (ent);
+		return;
+	}
+
+	VectorScale (ent->moveinfo.dir, ent->moveinfo.current_speed*10, ent->velocity);
+	ent->nextthink = level.time + FRAMETIME;
+	ent->think = Think_SmoothAccelMove;
+}
+
 void
 plat_hit_top(edict_t *ent)
 {
@@ -610,7 +756,7 @@ plat_go_down(edict_t *ent)
 	}
 
 	ent->moveinfo.state = STATE_DOWN;
-	Move_Calc(ent, ent->moveinfo.end_origin, plat_hit_bottom);
+	Move_Calc(ent, ent->moveinfo.end_origin, plat_hit_bottom, false); /* FS: Zaero specific game dll changes :added false */
 }
 
 void
@@ -634,7 +780,7 @@ plat_go_up(edict_t *ent)
 	}
 
 	ent->moveinfo.state = STATE_UP;
-	Move_Calc(ent, ent->moveinfo.start_origin, plat_hit_top);
+	Move_Calc(ent, ent->moveinfo.start_origin, plat_hit_top, false); /* FS: Zaero specific game dll changes: added false */
 
 	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
@@ -752,9 +898,15 @@ Touch_Plat_Center(edict_t *ent, edict_t *other, cplane_t *plane /* unsed */,
 
 	if (ent->moveinfo.state == STATE_BOTTOM)
 	{
+		if ((game.gametype == zaero_coop) && (ent->spawnflags & PLAT_LOW_TRIGGER_2)) /* FS: Zaero specific game dll changes */
+		{
+			if (other->s.origin[2] + other->mins[2] > 
+				ent->moveinfo.end_origin[2] + ent->maxs[2] /*+ ent->size[2] */+ 8)
+				return;
+		}
 		plat_go_up(ent);
 	}
-	else if (ent->moveinfo.state == STATE_TOP)
+	else if (ent->think && ent->moveinfo.state == STATE_TOP) /* FS: Zaero adds ent->think check.  Probably should have it */
 	{
 		ent->nextthink = level.time + 1; /* the player is still on the plat, so delay going down */
 	}
@@ -1109,7 +1261,7 @@ plat2_go_down(edict_t *ent) /* FS: Coop: Rogue specific */
 	ent->moveinfo.state = STATE_DOWN;
 	ent->plat2flags |= PLAT2_MOVING;
 
-	Move_Calc(ent, ent->moveinfo.end_origin, plat2_hit_bottom);
+	Move_Calc(ent, ent->moveinfo.end_origin, plat2_hit_bottom, false); /* FS: Zaero specific game dll changes */
 }
 
 void
@@ -1137,7 +1289,7 @@ plat2_go_up(edict_t *ent) /* FS: Coop: Rogue specific */
 
 	plat2_spawn_danger_area(ent);
 
-	Move_Calc(ent, ent->moveinfo.start_origin, plat2_hit_top);
+	Move_Calc(ent, ent->moveinfo.start_origin, plat2_hit_top, false); /* FS: Zaero specific game dll changes */
 }
 
 void
@@ -1589,10 +1741,104 @@ rotating_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */,
 		return;
 	}
 
-	if (self->avelocity[0] || self->avelocity[1] || self->avelocity[2])
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes: changed to check flag */
 	{
-		T_Damage(other, self, self, vec3_origin, other->s.origin,
+		if (self->moveinfo.state != STATE_STOPPED)
+		{
+			T_Damage (other, self, self, vec3_origin, other->s.origin,
 				vec3_origin, self->dmg, 1, 0, MOD_CRUSH);
+		}
+	}
+	else
+	{
+		if (self->avelocity[0] || self->avelocity[1] || self->avelocity[2])
+		{
+			T_Damage(other, self, self, vec3_origin, other->s.origin,
+					vec3_origin, self->dmg, 1, 0, MOD_CRUSH);
+		}
+	}
+}
+
+void rotating_think(edict_t *self) /* FS: Zaero specific */
+{
+	self->nextthink = level.time + FRAMETIME;
+	if (self->moveinfo.state == STATE_DECEL)
+	{
+		// decelerate
+		if (self->moveinfo.current_speed <= 0)
+		{
+			self->moveinfo.current_speed = 0;
+			self->moveinfo.state = STATE_STOPPED;
+			self->s.sound = 0;
+			self->think = NULL;
+			self->nextthink = 0;
+		}
+		else
+			self->moveinfo.current_speed -= self->decel * 0.1;
+	}
+	else if (self->moveinfo.state == STATE_ACCEL)
+	{
+		// accelerate
+		if (self->moveinfo.current_speed >= self->speed)
+		{
+			self->moveinfo.current_speed = self->speed;
+			self->moveinfo.state = STATE_TOPSPEED;
+			self->think = NULL;
+			self->nextthink = 0;
+		}
+		else
+			self->moveinfo.current_speed += self->accel * 0.1;
+	}
+
+	VectorScale(self->movedir, self->moveinfo.current_speed, self->avelocity);
+}
+
+void
+rotating_use_zaero (edict_t *self, edict_t *other, edict_t *activator) /* FS: Zaero specific game dll changes: redone */
+{
+	if (!self)
+	{
+		return;
+	}
+
+	// if we're at full speed or we're accelerating
+	if (self->moveinfo.state == STATE_TOPSPEED || self->moveinfo.state == STATE_ACCEL) 
+	{
+		// we need to slow down
+		if (self->decel <= 0)
+		{
+			self->s.sound = 0;
+			VectorClear (self->avelocity);
+			self->touch = NULL;
+			self->moveinfo.current_speed = 0;
+			self->moveinfo.state = STATE_STOPPED;
+		}
+		else /* self->decel > 0 */
+		{
+			self->think = rotating_think;
+			self->nextthink = level.time + FRAMETIME;
+			self->moveinfo.state = STATE_DECEL;
+		}
+	}
+	else
+	{
+		if (self->accel <= 0)
+		{
+			VectorScale (self->movedir, self->speed, self->avelocity);
+			self->moveinfo.current_speed = self->speed;
+			self->moveinfo.state = STATE_TOPSPEED;	
+		}
+		else
+		{
+			self->think = rotating_think;
+			self->nextthink = level.time + FRAMETIME;
+			self->moveinfo.state = STATE_ACCEL;
+		}
+		self->s.sound = self->moveinfo.sound_middle;
+		if (self->spawnflags & 16)
+		{
+			self->touch = rotating_touch;
+		}
 	}
 }
 
@@ -1602,6 +1848,12 @@ rotating_use(edict_t *self, edict_t *other /* unused */,
 {
 	if (!self)
 	{
+		return;
+	}
+
+	if (game.gametype == zaero_coop) /* FS: Zaero specific */
+	{
+		rotating_use_zaero(self, other, activator);
 		return;
 	}
 
@@ -1754,6 +2006,13 @@ SP_func_rotating(edict_t *ent)
 	}
 
 	gi.setmodel(ent, ent->model);
+
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		ent->moveinfo.state = STATE_STOPPED;
+		ent->moveinfo.current_speed = 0;
+	}
+
 	gi.linkentity(ent);
 }
 
@@ -1805,7 +2064,7 @@ button_return(edict_t *self)
 
 	self->moveinfo.state = STATE_DOWN;
 
-	Move_Calc(self, self->moveinfo.start_origin, button_done);
+	Move_Calc(self, self->moveinfo.start_origin, button_done, false); /* FS: Zaero specific game dll changes */
 
 	self->s.frame = 0;
 
@@ -1860,7 +2119,7 @@ button_fire(edict_t *self)
 				1, ATTN_STATIC, 0);
 	}
 
-	Move_Calc(self, self->moveinfo.end_origin, button_wait);
+	Move_Calc(self, self->moveinfo.end_origin, button_wait, false); /* FS: Zaero specific game dll changes */
 }
 
 void
@@ -2142,7 +2401,7 @@ door_go_down(edict_t *self)
 
 	if (strcmp(self->classname, "func_door") == 0)
 	{
-		Move_Calc(self, self->moveinfo.start_origin, door_hit_bottom);
+		Move_Calc(self, self->moveinfo.start_origin, door_hit_bottom, false); /* FS: Zaero specific game dll changes */
 	}
 	else if (strcmp(self->classname, "func_door_rotating") == 0)
 	{
@@ -2190,7 +2449,7 @@ door_go_up(edict_t *self, edict_t *activator)
 
 	if (strcmp(self->classname, "func_door") == 0)
 	{
-		Move_Calc(self, self->moveinfo.end_origin, door_hit_top);
+		Move_Calc(self, self->moveinfo.end_origin, door_hit_top, false); /* FS: Zaero specific game dll changes */
 	}
 	else if (strcmp(self->classname, "func_door_rotating") == 0)
 	{
@@ -2312,6 +2571,42 @@ smart_water_go_up(edict_t *self) /* FS: Coop: Rogue Specific */
 	self->nextthink = level.time + FRAMETIME;
 }
 
+
+void door_openclose (edict_t *self, edict_t *other, edict_t *activator) /* FS: Zaero specific game dll changes */
+{
+	edict_t	*ent;
+
+	if (self->flags & FL_TEAMSLAVE)
+		return;
+
+	if (self->spawnflags & DOOR_TOGGLE)
+	{
+		if (self->moveinfo.state == STATE_UP || self->moveinfo.state == STATE_TOP)
+		{
+			// trigger all paired doors
+			for (ent = self ; ent ; ent = ent->teamchain)
+			{
+				char *m = ent->message; /* FS: Zaero specific game dll changes */
+				ent->message = NULL;
+				ent->touch = NULL;
+				door_go_down (ent);
+				ent->message = m; /* FS: Zaero specific game dll changes */
+			}
+			return;
+		}
+	}
+	
+	// trigger all paired doors
+	for (ent = self ; ent ; ent = ent->teamchain)
+	{
+		char *m = ent->message; /* FS: Zaero specific game dll changes */
+		ent->message = NULL;
+		ent->touch = NULL;
+		door_go_up (ent, activator);
+		ent->message = m; /* FS: Zaero specific game dll changes */
+	}
+}
+
 void
 door_use(edict_t *self, edict_t *other /* unused */, edict_t *activator)
 {
@@ -2320,6 +2615,29 @@ door_use(edict_t *self, edict_t *other /* unused */, edict_t *activator)
 
 	if (!self || !activator)
 	{
+		return;
+	}
+
+	if(game.gametype == zaero_coop) /* FS: Zaero specific */
+	{
+		if (self->active & DOOR_ACTIVE_TOGGLE)
+		{
+			for (ent = self ; ent ; ent = ent->teamchain)
+			{
+				if (ent->active & DOOR_ACTIVE_ON)
+				{
+					ent->touch = door_touch;
+					ent->active &= ~DOOR_ACTIVE_ON;
+				}
+				else
+				{
+					ent->touch = NULL;
+					ent->active |= DOOR_ACTIVE_ON;
+				}
+			}
+			return;
+		}
+		door_openclose(self, other, activator);
 		return;
 	}
 
@@ -2400,9 +2718,25 @@ Touch_DoorTrigger(edict_t *self, edict_t *other, cplane_t *plane /* unused */,
 		return;
 	}
 
+	if (game.gametype == zaero_coop) /* FS: Zaero specific */
+	{
+		if (self->owner->active & DOOR_ACTIVE_TOGGLE &&
+			!(self->owner->active & DOOR_ACTIVE_ON))
+		{
+			return;
+		}
+	}
+
 	self->touch_debounce_time = level.time + 1.0;
 
-	door_use(self->owner, other, other);
+	if(game.gametype == zaero_coop) /* FS: Zaero specific */
+	{
+		door_openclose (self->owner, other, other);
+	}
+	else
+	{
+		door_use(self->owner, other, other);
+	}
 }
 
 void
@@ -2503,6 +2837,10 @@ Think_SpawnDoorTrigger(edict_t *ent)
 	VectorCopy(mins, other->mins);
 	VectorCopy(maxs, other->maxs);
 	other->owner = ent;
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		other->spawnflags2 = ent->spawnflags2 & SPAWNFLAG2_MIRRORLEVEL;
+	}
 	other->solid = SOLID_TRIGGER;
 	other->movetype = MOVETYPE_NONE;
 	other->touch = Touch_DoorTrigger;
@@ -2543,8 +2881,20 @@ door_blocked(edict_t *self, edict_t *other)
 		return;
 	}
 
-	T_Damage(other, self, self, vec3_origin, other->s.origin,
-			vec3_origin, self->dmg, 1, 0, MOD_CRUSH);
+
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		if (self->dmg > 0)
+		{
+			T_Damage(other, self, self, vec3_origin, other->s.origin,
+					vec3_origin, self->dmg, 1, 0, MOD_CRUSH);
+		}
+	}
+	else
+	{
+		T_Damage(other, self, self, vec3_origin, other->s.origin,
+				vec3_origin, self->dmg, 1, 0, MOD_CRUSH);
+	}
 
 	if (self->spawnflags & DOOR_CRUSHER)
 	{
@@ -2604,6 +2954,11 @@ door_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */,
 	}
 
 	if (!other->client)
+	{
+		return;
+	}
+
+	if ((game.gametype == zaero_coop) && (!self->message)) /* FS: Zaero specific */
 	{
 		return;
 	}
@@ -2745,15 +3100,35 @@ SP_func_door(edict_t *ent)
 
 	gi.linkentity(ent);
 
+	// toggle active
+	if ((game.gametype == zaero_coop) && (!(ent->active & DOOR_ACTIVE_TOGGLE))) /* FS: Zaero specific game dll changes */
+	{
+		ent->active = 0;
+	}
+
 	ent->nextthink = level.time + FRAMETIME;
 
-	if (ent->health || ent->targetname)
+	if (game.gametype == zaero_coop)
 	{
-		ent->think = Think_CalcMoveSpeed;
+		if ((ent->health || ent->targetname) && !(ent->active & DOOR_ACTIVE_TOGGLE)) /* FS: Zaero specific game dll changes */
+		{
+			ent->think = Think_CalcMoveSpeed;
+		}
+		else
+		{
+			ent->think = Think_SpawnDoorTrigger;
+		}
 	}
 	else
 	{
-		ent->think = Think_SpawnDoorTrigger;
+		if (ent->health || ent->targetname)
+		{
+			ent->think = Think_CalcMoveSpeed;
+		}
+		else
+		{
+			ent->think = Think_SpawnDoorTrigger;
+		}
 	}
 }
 
@@ -2887,7 +3262,7 @@ SP_func_door_rotating(edict_t *ent)
 		ent->wait = 3;
 	}
 
-	if (!ent->dmg)
+	if ((game.gametype != zaero_coop) && (!ent->dmg)) /* FS: Zaero specific -- Removed in Zaero */
 	{
 		ent->dmg = 2;
 	}
@@ -3283,11 +3658,14 @@ again:
 		goto again;
 	}
 
-	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
+	if (game.gametype == rogue_coop || game.gametype == zaero_coop) /* FS: Coop: Rogue and Zaero specific */
 	{
 		if (ent->speed)
 		{
-			self->speed = ent->speed;
+			if (game.gametype == rogue_coop)
+			{
+				self->speed = ent->speed;
+			}
 			self->moveinfo.speed = ent->speed;
 
 			if (ent->accel)
@@ -3308,7 +3686,10 @@ again:
 				self->moveinfo.decel = ent->speed;
 			}
 
-			self->moveinfo.current_speed = 0;
+			if (game.gametype == rogue_coop)
+			{
+				self->moveinfo.current_speed = 0;
+			}
 		}
 	}
 
@@ -3327,11 +3708,18 @@ again:
 		self->s.sound = self->moveinfo.sound_middle;
 	}
 
-	VectorSubtract(ent->s.origin, self->mins, dest);
+	if (self->classname != NULL && Q_stricmp(self->classname, "misc_viper") == 0) /* FS: Zaero specific game dll changes */
+	{
+		VectorCopy(ent->s.origin, dest);
+	}
+	else
+	{
+		VectorSubtract(ent->s.origin, self->mins, dest);
+	}
 	self->moveinfo.state = STATE_TOP;
 	VectorCopy(self->s.origin, self->moveinfo.start_origin);
 	VectorCopy(dest, self->moveinfo.end_origin);
-	Move_Calc(self, dest, train_wait);
+	Move_Calc(self, dest, train_wait, ent->spawnflags); /* FS: Zaero specific */
 	self->spawnflags |= TRAIN_START_ON;
 
 	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
@@ -3355,7 +3743,7 @@ again:
 				e->moveinfo.accel = self->moveinfo.accel;
 				e->moveinfo.decel = self->moveinfo.decel;
 				e->movetype = MOVETYPE_PUSH;
-				Move_Calc(e, dst, train_piece_wait);
+				Move_Calc(e, dst, train_piece_wait, false); /* FS: Zaero specific game dll changes */
 			}
 		}
 	}
@@ -3378,7 +3766,7 @@ train_resume(edict_t *self)
 	self->moveinfo.state = STATE_TOP;
 	VectorCopy(self->s.origin, self->moveinfo.start_origin);
 	VectorCopy(dest, self->moveinfo.end_origin);
-	Move_Calc(self, dest, train_wait);
+	Move_Calc(self, dest, train_wait, false); /* FS: Zaero specific game dll changes */
 	self->spawnflags |= TRAIN_START_ON;
 }
 
@@ -3501,6 +3889,33 @@ SP_func_train(edict_t *self)
 	self->moveinfo.speed = self->speed;
 	self->moveinfo.accel = self->moveinfo.decel = self->moveinfo.speed;
 
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		/* set the axis of rotation */
+		VectorClear(self->movedir);
+
+		if (self->spawnflags & TRAIN_X_AXIS)
+		{
+			self->movedir[2] = 1.0;
+		}
+
+		else if (self->spawnflags & TRAIN_Y_AXIS)
+		{
+			self->movedir[0] = 1.0;
+		}
+
+		else if (self->spawnflags & TRAIN_Z_AXIS)
+		{
+			self->movedir[1] = 1.0;
+		}
+
+		/* check for reverse rotation */
+		if (self->spawnflags & TRAIN_REVERSE)
+		{
+			VectorNegate (self->movedir, self->movedir);
+		}
+	}
+
 	self->use = train_use;
 
 	gi.linkentity(self);
@@ -3617,6 +4032,51 @@ SP_trigger_elevator(edict_t *self)
  *
  * These can used but not touched.
  */
+
+void parseTargets(edict_t *self) /* FS: Zaero specific */
+{
+	int numTargets = 0;
+
+	if (!self)
+	{
+		return;
+	}
+
+	self->numTargets = 0;
+	if (self->target)
+	{
+		char *targets[16];
+		char *targPtr, *str;
+		static const char *seperators = ";";
+		int i;
+
+		// do we have a series of targets to choose from randomly?
+		str = Z_MALLOC(strlen(self->target)+1);
+		strcpy(str, self->target);
+
+		// split up the targets
+		targets[0] = strtok_r(str, seperators, &targPtr);
+		numTargets = 1;
+		while(numTargets < 16)
+		{
+			targets[numTargets] = strtok_r(NULL, seperators, &targPtr);
+			if (targets[numTargets] == NULL)
+				break;
+			numTargets++;
+		}
+
+		// copy over the strings
+		for (i = 0; i < numTargets; i++)
+		{
+			strcpy(self->targets[i], targets[i]);
+		}
+		self->target = NULL;
+		Z_FREE(str);
+	}
+
+	self->numTargets = numTargets;
+}
+
 void
 func_timer_think(edict_t *self)
 {
@@ -3625,8 +4085,21 @@ func_timer_think(edict_t *self)
 		return;
 	}
 
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		if (self->numTargets <= 0)
+			return;
+
+		self->target = self->targets[rand() % self->numTargets];
+	}
+
 	G_UseTargets(self, self->activator);
 	self->nextthink = level.time + self->wait + crandom() * self->random;
+
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		self->target = NULL;
+	}
 }
 
 void
@@ -3668,6 +4141,11 @@ SP_func_timer(edict_t *self)
 	if (!self->wait)
 	{
 		self->wait = 1.0;
+	}
+
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		parseTargets(self);
 	}
 
 	self->use = func_timer_use;
@@ -3783,7 +4261,7 @@ door_secret_use(edict_t *self, edict_t *other /* unused */,
 		return;
 	}
 
-	Move_Calc(self, self->pos1, door_secret_move1);
+	Move_Calc(self, self->pos1, door_secret_move1, false); /* FS: Zaero specific game dll changes */
 	door_use_areaportals(self, true);
 }
 
@@ -3807,7 +4285,7 @@ door_secret_move2(edict_t *self)
 		return;
 	}
 
-	Move_Calc(self, self->pos2, door_secret_move3);
+	Move_Calc(self, self->pos2, door_secret_move3, false); /* FS: Zaero specific game dll changes */
 }
 
 void
@@ -3835,7 +4313,7 @@ door_secret_move4(edict_t *self)
 		return;
 	}
 
-	Move_Calc(self, self->pos1, door_secret_move5);
+	Move_Calc(self, self->pos1, door_secret_move5, false); /* FS: Zaero specific game dll changes */
 }
 
 void
@@ -3858,7 +4336,7 @@ door_secret_move6(edict_t *self)
 		return;
 	}
 
-	Move_Calc(self, vec3_origin, door_secret_done);
+	Move_Calc(self, vec3_origin, door_secret_done, false); /* FS: Zaero specific game dll changes */
 }
 
 void
