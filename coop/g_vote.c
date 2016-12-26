@@ -25,6 +25,7 @@ char voteType[16];
 char whatAreWeVotingFor[MAX_OSPATH];
 char voteGamemode[16];
 float voteTimer;
+int lastUpdate;
 
 #define MAX_RANDOM_HISTORY 6 /* FS: Remember the last 6 random maps chosen */
 char random_map_array[MAX_RANDOM_HISTORY][MAX_OSPATH];
@@ -770,6 +771,7 @@ void vote_Reset(void)
 
 	voteClients = voteNo = voteYes = voteCoopSkill = 0;
 	voteTimer = level.time + sv_vote_timer->value;
+	lastUpdate = (int)(level.time);
 	bVoteInProgress = 0;
 	printOnce = 0;
 	whatAreWeVotingFor[0] = voteMap[0] = voteGamemode[0] = voteType[0] = '\0';
@@ -935,24 +937,31 @@ void vote_Decide(void)
 
 void vote_updateMenu(void) /* FS: Gotta force the menu to be "dirty" so it updates continously for the timer and progress */
 {
-	int z;
+	int z, currentTime;
 	edict_t *pClient;
 
-	for(z = 0; z < game.maxclients; z++ )
-	{
-		pClient = &g_edicts[z + 1];
-		if( !pClient->inuse )
-		{
-			continue;
-		}
+	currentTime = (int)(level.time);
 
-		if( pClient->client )
+	if(currentTime > lastUpdate) /* FS: Don't do this all the time, floods too many packets */
+	{
+		for(z = 0; z < game.maxclients; z++ )
 		{
-			if ((pClient->client->menu) && (pClient->client->menu->menutype == PMENU_VOTE))
+			pClient = &g_edicts[z + 1];
+			if( !pClient->inuse )
 			{
-				pClient->client->menudirty = true;
+				continue;
+			}
+
+			if( pClient->client )
+			{
+				if ((pClient->client->menu) && (pClient->client->menu->menutype == PMENU_VOTE))
+				{
+					pClient->client->menudirty = true;
+				}
 			}
 		}
+
+		lastUpdate = currentTime;
 	}
 }
 
