@@ -262,7 +262,7 @@ SetLevelName(pmenu_t *p)
 }
 
 void
-CoopUpdateJoinMenu(edict_t *ent)
+CoopUpdateJoinMenu(edict_t *ent) /* FS: FIXME: Make this dynamically updating for players/spectators */
 {
 	static char players[32];
 	static char spectators[32];

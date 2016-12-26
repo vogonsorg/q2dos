@@ -1414,6 +1414,7 @@ struct gclient_s
 	qboolean	showscores;			// set layout stat
 	qboolean inmenu;                /* in menu */
 	pmenuhnd_t *menu;               /* current menu */
+	void		(*menu_update)(edict_t *ent); /* FS: Added */
 	qboolean	showinventory;		// set layout stat
 	qboolean	showhelp;
 	qboolean	showhelpicon;

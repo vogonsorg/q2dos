@@ -37,7 +37,8 @@ enum
 enum
 {
 	PMENU_NORMAL = 0,
-	PMENU_SCROLLING
+	PMENU_SCROLLING,
+	PMENU_VOTE
 };
 
 typedef struct pmenuhnd_s

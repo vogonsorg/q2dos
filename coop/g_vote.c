@@ -53,6 +53,34 @@ void vote_DefaultNoVotes (void);
 void vote_progress (edict_t *ent);
 qboolean vote_mapcheck (edict_t *ent, const char *mapName);
 void vote_warp (edict_t *ent, const char *mapName);
+void VoteMenuChoice(edict_t *ent, pmenuhnd_t *p);
+void vote_menu_broadcast (void);
+
+#define VOTEMENU_TYPE 6
+#define VOTEMENU_PROGYES 8
+#define VOTEMENU_PROGNO 9
+#define VOTEMENU_PROGTIMER 10
+#define VOTEMENU_YES 12
+#define VOTEMENU_NO 13
+
+pmenu_t voteyesnomenu[] = {
+	{"*Quake II", PMENU_ALIGN_CENTER, NULL},
+	{"*Mara'akate and Freewill", PMENU_ALIGN_CENTER, NULL},
+	{"*Custom Coop", PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"*Vote in progress for:", PMENU_ALIGN_CENTER, NULL}, /* 4 */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL}, /* 6: TYPE */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL}, /* 8: YES */
+	{NULL, PMENU_ALIGN_LEFT, NULL}, /* 9: NO */
+	{NULL, PMENU_ALIGN_LEFT, NULL}, /* 10: TIMER */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"Vote Yes", PMENU_ALIGN_LEFT, VoteMenuChoice}, /* 12 */
+	{"Vote No", PMENU_ALIGN_LEFT, VoteMenuChoice}, /* 13*/
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"Exit", PMENU_ALIGN_LEFT, VoteMenuChoice} /* 14 */
+};
 
 void vote_command(edict_t *ent)
 {
@@ -344,7 +372,7 @@ void vote_map (edict_t *ent, const char *mapName)
 		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
 	}
 
-	return;
+	vote_menu_broadcast();
 }
 
 void vote_warp (edict_t *ent, const char *mapName)
@@ -407,7 +435,7 @@ void vote_warp (edict_t *ent, const char *mapName)
 		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
 	}
 
-	return;
+	vote_menu_broadcast();
 }
 
 void vote_gamemode(edict_t *ent, const char *gamemode)
@@ -487,6 +515,8 @@ void vote_gamemode(edict_t *ent, const char *gamemode)
 	if(sv_vote_assume_yes->intValue)
 		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
 
+	vote_menu_broadcast();
+
 	ent->voteInitiator = true;
 }
 
@@ -558,6 +588,8 @@ void vote_coopskill(edict_t *ent, int skillVote)
 		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
 	}
 
+	vote_menu_broadcast();
+
 	ent->voteInitiator = true;
 }
 
@@ -600,6 +632,8 @@ void vote_restartmap (edict_t *ent)
 	{
 		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
 	}
+
+	vote_menu_broadcast();
 }
 
 void vote_stop(edict_t *ent)
@@ -759,6 +793,10 @@ void vote_Reset(void)
 		{
 			pClient->hasVoted = NOT_VOTED;
 			pClient->voteInitiator = false;
+			if((pClient->client->menu) && (pClient->client->menu->menutype == PMENU_VOTE)) /* FS: Close the voting booth */
+			{
+				PMenu_Close(pClient);
+			}
 		}
 	}
 
@@ -895,12 +933,37 @@ void vote_Decide(void)
 	return;
 }
 
+void vote_updateMenu(void) /* FS: Gotta force the menu to be "dirty" so it updates continously for the timer and progress */
+{
+	int z;
+	edict_t *pClient;
+
+	for(z = 0; z < game.maxclients; z++ )
+	{
+		pClient = &g_edicts[z + 1];
+		if( !pClient->inuse )
+		{
+			continue;
+		}
+
+		if( pClient->client )
+		{
+			if ((pClient->client->menu) && (pClient->client->menu->menutype == PMENU_VOTE))
+			{
+				pClient->client->menudirty = true;
+			}
+		}
+	}
+}
+
 void vote_Think(void)
 {
 	if(!bVoteInProgress || !sv_vote_enabled->intValue)
 		return;
 
 	voteClients = P_Clients_Connected(false);
+
+	vote_updateMenu(); /* FS: Gotta force the menu to be "dirty" so it updates continously for the timer and progress */
 
 	if(voteNo + voteYes >= voteClients)
 	{
@@ -1074,5 +1137,121 @@ void vote_progress (edict_t *ent)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "No vote in progress, ");
 		gi.cprintf(ent, PRINT_HIGH, "use vote map <mapname>, vote gamemode <gamemode>, vote skill <coopskill>, vote fraglimit <fraglimit>, or vote timelimit <timelimit> to start a vote!\n");
+	}
+}
+
+void VoteMenuUpdate(edict_t *ent)
+{
+	static char progressYes[32];
+	static char progressNo[32];
+	static char timeRemaining[32];
+	pmenuhnd_t *p;
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	p = ent->client->menu;
+	if(!p)
+	{
+		return;
+	}
+
+	Com_sprintf(progressYes, sizeof(progressYes), "Yes: %d\n", voteYes);
+	Com_sprintf(progressNo, sizeof(progressNo), "No: %d\n", voteNo);
+	Com_sprintf(timeRemaining, sizeof(timeRemaining), "Vote Time: %d\n", (int)(voteTimer-level.time));
+
+	PMenu_UpdateEntry(p->entries + VOTEMENU_PROGYES, progressYes, PMENU_ALIGN_LEFT, NULL);
+	PMenu_UpdateEntry(p->entries + VOTEMENU_PROGNO, progressNo, PMENU_ALIGN_LEFT, NULL);
+	PMenu_UpdateEntry(p->entries + VOTEMENU_PROGTIMER, timeRemaining, PMENU_ALIGN_LEFT, NULL);
+
+}
+
+void VoteMenuInit(edict_t *ent)
+{
+	static char votestring[32];
+	static char progressYes[32];
+	static char progressNo[32];
+	static char timeRemaining[32];
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	Com_sprintf(votestring, sizeof(votestring), "%s: %s", voteType, whatAreWeVotingFor);
+	Com_sprintf(progressYes, sizeof(progressYes), "Yes: %d\n", voteYes);
+	Com_sprintf(progressNo, sizeof(progressNo), "No: %d\n", voteNo);
+	Com_sprintf(timeRemaining, sizeof(timeRemaining), "Vote Time: %d\n", (int)(voteTimer-level.time));
+
+	voteyesnomenu[VOTEMENU_TYPE].text = votestring;
+	voteyesnomenu[VOTEMENU_PROGYES].text = progressYes;
+	voteyesnomenu[VOTEMENU_PROGNO].text = progressNo;
+	voteyesnomenu[VOTEMENU_PROGTIMER].text = timeRemaining;
+}
+
+void VoteMenuOpen(edict_t *ent)
+{
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	PMenu_Close(ent);
+	VoteMenuInit(ent);
+	PMenu_Open(ent, voteyesnomenu, 0, sizeof(voteyesnomenu) / sizeof(pmenu_t), NULL, PMENU_VOTE);
+	ent->client->menu_update = VoteMenuUpdate;
+}
+
+void VoteMenuChoice(edict_t *ent, pmenuhnd_t *p)
+{
+	if(!ent || !ent->client || !p)
+	{
+		return;
+	}
+
+	switch (p->cur)
+	{
+	case VOTEMENU_YES:
+		vote_yes(ent, false);
+		break;
+	case VOTEMENU_NO:
+		vote_no(ent);
+		break;
+	default:
+		break;
+	}
+
+	PMenu_Close(ent);
+}
+
+void vote_menu_broadcast (void)
+{
+	int z;
+	edict_t *pClient;
+
+	for(z = 0; z < game.maxclients; z++ )
+	{
+		pClient = &g_edicts[z + 1];
+		if( !pClient->inuse )
+		{
+			continue;
+		}
+
+		if( pClient->client )
+		{
+			if (pClient->client->pers.spectator) /* FS: Don't count spectators */
+			{
+				continue;
+			}
+
+			if(pClient->hasVoted)
+			{
+				continue;
+			}
+
+			VoteMenuOpen(pClient);
+		}
 	}
 }

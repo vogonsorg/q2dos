@@ -96,6 +96,7 @@ PMenu_Open(edict_t *ent, pmenu_t *entries, int cur, int num, void *arg, int menu
 	ent->client->showscores = true;
 	ent->client->inmenu = true;
 	ent->client->menu = hnd;
+	ent->client->menu_update = NULL; /* FS: Added */
 
 	PMenu_Do_Update(ent);
 	gi.unicast(ent, true);
@@ -133,6 +134,7 @@ PMenu_Close(edict_t *ent)
 
 	free(hnd);
 	ent->client->menu = NULL;
+	ent->client->menu_update = NULL; /* FS: Added */
 	ent->client->showscores = false;
 }
 
@@ -168,6 +170,11 @@ PMenu_Do_Update(edict_t *ent)
 	{
 		gi.dprintf(DEVELOPER_MSG_GAME, "warning:  ent has no menu\n");
 		return;
+	}
+
+	if(ent->client->menu_update) /* FS: Added for dynamically updating menus */
+	{
+		ent->client->menu_update(ent);
 	}
 
 	hnd = ent->client->menu;
