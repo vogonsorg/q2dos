@@ -9,7 +9,7 @@ qboolean ai_checkattack(edict_t *self, float dist);
 qboolean enemy_infront;
 qboolean enemy_vis; /* FS: FIXME: This looks like it's to save some time on having to call visible(self,self->enemy).  But this seems kind of dangerous? */
 qboolean FindTarget(edict_t *self);
-void ai_run_rogue(self, dist);
+void ai_run_rogue(edict_t *self, float dist); /* FS: Coop: Rogue specific */
 
 qboolean M_MoveAwayFromFlare(edict_t *self, float dist); /* FS: Zaero specific game dll changes */
 
