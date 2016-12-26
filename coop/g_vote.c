@@ -56,6 +56,7 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName);
 void vote_warp (edict_t *ent, const char *mapName);
 void VoteMenuChoice(edict_t *ent, pmenuhnd_t *p);
 void vote_menu_broadcast (void);
+void VoteMenuOpen(edict_t *ent);
 
 #define VOTEMENU_TYPE 6
 #define VOTEMENU_PROGYES 8
@@ -1042,9 +1043,10 @@ void vote_connect (edict_t *ent)
 		return;
 	}
 
-	if(bVoteInProgress && !ent->hasVoted)
+	if(bVoteInProgress && !ent->hasVoted && !ent->client->pers.spectator)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "A vote is in progress for %s: %s. Use vote yes or vote no to submit your vote!\n", voteType, whatAreWeVotingFor);
+		VoteMenuOpen(ent);
 	}
 }
 

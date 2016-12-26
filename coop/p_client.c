@@ -2468,8 +2468,6 @@ PutClientInServer(edict_t *ent)
 	/* force the current weapon up */
 	client->newweapon = client->pers.weapon;
 	ChangeWeapon(ent);
-
-	vote_connect(ent); /* FS: Coop: Voting */
 }
 
 /*
@@ -2538,6 +2536,7 @@ ClientBegin(edict_t *ent)
 		{
 			CoopOpenJoinMenu(ent); /* FS: Added */
 		}
+		vote_connect(ent); /* FS: Added */
 		return;
 	}
 
@@ -2574,6 +2573,7 @@ ClientBegin(edict_t *ent)
 				CoopOpenJoinMenu(ent);
 			}
 		}
+		vote_connect(ent); /* FS: Added */
 	}
 
 	if (level.intermissiontime)
