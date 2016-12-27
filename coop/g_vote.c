@@ -254,7 +254,7 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 	fseek (f, 0, SEEK_END);
 	fileSize = ftell (f);
 	fseek (f, 0, SEEK_SET);
-	fileBuffer = (char *)malloc(sizeof(char)*(fileSize+2)); // FS: In case we have to add a newline terminator
+	fileBuffer = (char *)malloc(sizeof(char)*(fileSize+2)); /* FS: In case we have to add a newline terminator */
 	if(!fileBuffer)
 	{
 		gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: can't allocate memory for fileBuffer!\n");

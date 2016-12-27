@@ -2073,7 +2073,7 @@ int G_SpawnCheckpoints (edict_t *ent)
 	fseek (f, 0, SEEK_END);
 	fileSize = ftell (f);
 	fseek (f, 0, SEEK_SET);
-	fileBuffer = (char *)gi.TagMalloc((sizeof(char)*(fileSize+2)), TAG_LEVEL); // FS: In case we have to add a newline terminator
+	fileBuffer = (char *)gi.TagMalloc((sizeof(char)*(fileSize+2)), TAG_LEVEL); /* FS: In case we have to add a newline terminator */
 	if(!fileBuffer)
 	{
 		gi.cprintf(NULL, PRINT_CHAT, "G_SpawnCheckpoints: can't allocate memory for fileBuffer!\n");

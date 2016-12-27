@@ -9,7 +9,7 @@ stalker
 #include "g_local.h"
 #include "m_stalker.h"
 #include <float.h>
-#ifdef __DJGPP__ // FS: From IEEEFP.H  Not sure if this is proper, but there it is...
+#ifdef __DJGPP__ /* FS: From IEEEFP.H  Not sure if this is proper, but there it is... */
 #define _isnan(x) (((*(long *)&(x) & 0x7f800000L)==0x7f800000L) && \
 		   ((*(long *)&(x) & 0x007fffffL)!=0000000000L))
 #endif

@@ -841,7 +841,7 @@ void votemenu_loadmaplist (void)
 
 	votemenu_cleanup_filebuffer();
 
-	coopMapFileBuffer = (char *)malloc(sizeof(char)*(fileSize+2)); // FS: In case we have to add a newline terminator
+	coopMapFileBuffer = (char *)malloc(sizeof(char)*(fileSize+2)); /* FS: In case we have to add a newline terminator */
 	if(!coopMapFileBuffer)
 	{
 		gi.cprintf(NULL, PRINT_CHAT, "votemenu_loadmaplist: can't allocate memory for coopMapFileBuffer!\n");
