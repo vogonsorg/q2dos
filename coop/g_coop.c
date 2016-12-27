@@ -261,8 +261,57 @@ SetLevelName(pmenu_t *p)
 	p->text = levelname;
 }
 
+void CoopUpdateJoinMenu(edict_t *ent)
+{
+	static char players[32];
+	static char spectators[32];
+	int numplayers, numspectators, i;
+	pmenuhnd_t *p;
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	p = ent->client->menu;
+	if(!p)
+	{
+		return;
+	}
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	numplayers = numspectators = 0;
+
+	for (i = 0; i < maxclients->value; i++)
+	{
+		if (!g_edicts[i + 1].inuse)
+		{
+			continue;
+		}
+
+		if (game.clients[i].resp.spectator)
+		{
+			numspectators++;
+		}
+		else
+		{
+			numplayers++;
+		}
+	}
+
+	Com_sprintf(players, sizeof(players), "  (%d players)", numplayers);
+	Com_sprintf(spectators, sizeof(spectators), "  (%d spectators)", numspectators);
+
+	PMenu_UpdateEntry(p->entries + jmenu_players, players, PMENU_ALIGN_CENTER, NULL);
+	PMenu_UpdateEntry(p->entries + jmenu_spectators, spectators, PMENU_ALIGN_CENTER, NULL);
+}
+
 void
-CoopUpdateJoinMenu(edict_t *ent) /* FS: FIXME: Make this dynamically updating for players/spectators */
+CoopInitJoinMenu(edict_t *ent)
 {
 	static char players[32];
 	static char spectators[32];
@@ -311,8 +360,6 @@ CoopUpdateJoinMenu(edict_t *ent) /* FS: FIXME: Make this dynamically updating fo
 		joinmenu[jmenu_motd].text = NULL;
 		joinmenu[jmenu_motd].SelectFunc = NULL;
 	}
-
-	return;
 }
 
 void
@@ -324,8 +371,9 @@ CoopOpenJoinMenu(edict_t *ent)
 	}
 
 	ent->client->pers.didMotd = ent->client->resp.didMotd = true;
-	CoopUpdateJoinMenu(ent);
+	CoopInitJoinMenu(ent);
 	PMenu_Open(ent, joinmenu, 0, sizeof(joinmenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
+	ent->client->menu_update = CoopUpdateJoinMenu;
 }
 
 void

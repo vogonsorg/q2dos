@@ -1176,7 +1176,6 @@ void VoteMenuUpdate(edict_t *ent)
 	PMenu_UpdateEntry(p->entries + VOTEMENU_PROGYES, progressYes, PMENU_ALIGN_LEFT, NULL);
 	PMenu_UpdateEntry(p->entries + VOTEMENU_PROGNO, progressNo, PMENU_ALIGN_LEFT, NULL);
 	PMenu_UpdateEntry(p->entries + VOTEMENU_PROGTIMER, timeRemaining, PMENU_ALIGN_LEFT, NULL);
-
 }
 
 void VoteMenuInit(edict_t *ent)

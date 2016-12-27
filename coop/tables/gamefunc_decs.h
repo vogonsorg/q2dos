@@ -1973,6 +1973,7 @@ extern void CoopChaseCam ( edict_t * ent , pmenuhnd_t * p ) ;
 extern void CoopCredits ( edict_t * ent , pmenuhnd_t * p ) ;
 extern void CoopOpenVoteMenu ( edict_t * ent ) ;
 extern void CoopOpenJoinMenu ( edict_t * ent ) ;
+extern void CoopInitJoinMenu ( edict_t * ent ) ;
 extern void CoopUpdateJoinMenu ( edict_t * ent ) ;
 extern void CoopReturnToVoteMenu ( edict_t * ent , pmenuhnd_t * p ) ;
 extern void CoopReturnToMain ( edict_t * ent , pmenuhnd_t * p ) ;

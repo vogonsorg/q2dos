@@ -1973,6 +1973,7 @@
 {"CoopCredits", (byte *)CoopCredits},
 {"CoopOpenVoteMenu", (byte *)CoopOpenVoteMenu},
 {"CoopOpenJoinMenu", (byte *)CoopOpenJoinMenu},
+{"CoopInitJoinMenu", (byte *)CoopInitJoinMenu},
 {"CoopUpdateJoinMenu", (byte *)CoopUpdateJoinMenu},
 {"CoopReturnToVoteMenu", (byte *)CoopReturnToVoteMenu},
 {"CoopReturnToMain", (byte *)CoopReturnToMain},
