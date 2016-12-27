@@ -394,7 +394,8 @@ blaster_touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
 
 			gi.WritePosition(self->s.origin);
 
-			if (!plane) /* FS: I think this is wrong, but R1Q2 wants this or bombs */
+			/* FS: R1Q2 expects it to be WritePos, look very carefully at the commented out stuff in cl_tent.c!  Public servers we host sending WritePos will bomb R1Q2 clients (and possibly Q2PRO) */
+			if (!plane)
 			{
 				gi.WritePosition(vec3_origin);
 			}
