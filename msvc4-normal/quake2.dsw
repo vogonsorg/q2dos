@@ -177,6 +177,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "tsmodgamex86"=".\tsmod.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "xatrixgamex86"=".\xatrixgamex86.dsp" - Package Owner=<4>
 
 Package=<5>

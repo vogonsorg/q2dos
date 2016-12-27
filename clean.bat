@@ -62,6 +62,11 @@ rmdir /s /q Release
 rmdir /s /q Debug
 cd ..
 
+cd tsmod
+rmdir /s /q Release
+rmdir /s /q Debug
+cd ..
+
 cd Xatrix
 rmdir /s /q Release
 rmdir /s /q Debug

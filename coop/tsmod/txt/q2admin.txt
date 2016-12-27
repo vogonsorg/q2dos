@@ -7,10 +7,12 @@
 ;
 
 
+serverip "67.228.69.114"
+
 ;
 ; Enable/disable main zbot detection.
 ;
-zbotdetect  "Yes"
+zbotdetect  "No"
 
 ;
 ; Quake2 Client Admin password.
@@ -35,7 +37,7 @@ zbotdetect  "Yes"
 ; If you want to use a mod motd you must supply the directory 
 ; name. e.g. sv !setmotd "ctf/mymotd.txt"
 ;
-setmotd ""
+setmotd "tasty-motd.txt"
 
 ;
 ; Once a zbot is detected, how long to wait before actioning it.
@@ -59,7 +61,7 @@ clientsidetimeout "30"
 ;
 ; Disconnect a zbot user when detected.
 ;
-disconnectuser "Yes"
+disconnectuser "No"
 
 
 ;
@@ -176,7 +178,7 @@ play_person_enable "No"
 ; Enable say_person command.
 ; Send a message to 1 person in the game.
 ;
-say_person_enable "No"
+say_person_enable "Yes"
 
 
 ;
@@ -215,18 +217,18 @@ defaultchatbanmsg "[Q2Admin] Message banned."
 ;
 ; Enable ip banning.  For bans that use both IP and Name, it then just uses the name.
 ;
-ipbanning_enable "No"
+ipbanning_enable "Yes"
 
 ;
 ; Enable nick banning.  For bans that use both IP and Name, it then just uses the IP.
 ;
-nickbanning_enable "No"
+nickbanning_enable "Yes"
 
 
 ;
 ; Enable chat banning.
 ;
-chatbanning_enable "No"
+chatbanning_enable "Yes"
 
 
 ;
@@ -340,7 +342,7 @@ clientvotetimeout "60"
 ;
 ; Count non vote's in the percent calculation.
 ;
-votecountnovotes "Yes"
+votecountnovotes "No"
 
 ;
 ; Percent required for the vote to pass. (1 - 99)
@@ -387,7 +389,7 @@ soloadlazy "No"
 ; Three variables that control zbotcheck code (zbot movement checking code by
 ; WhiteFang)
 ;
-zbc_enable "Yes"
+zbc_enable "No"
 zbc_jittermax "4"
 zbc_jittertime "10"
 zbc_jittermove " 500"
@@ -404,8 +406,8 @@ zbc_jittermove " 500"
 ;     Also settings either proxy_bwproxy or proxy_nitro2 to '2' will 
 ;     automatically set the other one to '2' as well.
 ;
-proxy_bwproxy "1"
-proxy_nitro2 "1"
+proxy_bwproxy "0"
+proxy_nitro2 "0"
 
 ;
 ; Determines whether Q2Admin will send a "p_version"-string to a player
@@ -450,7 +452,7 @@ framesperprocess "0"
 ;
 ; Detects if the client has a hacked timescale quake2.exe
 ;
-timescaledetect "Yes"
+timescaledetect "No"
 
 ;
 ;	Message that is displayed if the user is detected with a
@@ -478,13 +480,13 @@ skinchangefloodprotectmsg "[Q2Admin] %s changes skins too many times!"
 ; Message to display when a player gets kicked for trying to change
 ; his skin to a very large value which would crash the server.
 ;
-skincrashmsg "[Q2Admin] %s tried to crash the server!!!"
+skincrashmsg "[Q2Admin] %s tried to crash the server (bad skin)!!!"
 
 
 ;
 ; Enable the disable client commands. (q2admindisable.txt)
 ;
-disablecmds_enable "No"
+disablecmds_enable "Yes"
 
 
 ;
@@ -670,7 +672,7 @@ printmessageonplaycmds "Yes"
 ;
 ; Max client msg level to be allowed on the server.
 ;
-maxmsglevel "3"
+maxmsglevel "2147483647"
 
 
 ;
