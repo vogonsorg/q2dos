@@ -389,18 +389,34 @@ blaster_touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
 		gi.WriteByte (svc_temp_entity);
 		/* FS: Coop: Xatrix specific */
 		if ((game.gametype == xatrix_coop) && (self->s.effects & EF_BLUEHYPERBLASTER))	// Knightmare- this was checking bit TE_BLUEHYPERBLASTER
-			gi.WriteByte (TE_BLUEHYPERBLASTER);			// Knightmare- TE_BLUEHYPERBLASTER is broken (parse error) in most Q2 engines
-		else
-			gi.WriteByte (TE_BLASTER);
-		gi.WritePosition(self->s.origin);
-
-		if (!plane)
 		{
-			gi.WriteDir(vec3_origin);
+			gi.WriteByte (TE_BLUEHYPERBLASTER);			// Knightmare- TE_BLUEHYPERBLASTER is broken (parse error) in most Q2 engines
+
+			gi.WritePosition(self->s.origin);
+
+			if (!plane) /* FS: I think this is wrong, but R1Q2 wants this or bombs */
+			{
+				gi.WritePosition(vec3_origin);
+			}
+			else
+			{
+				gi.WritePosition(plane->normal);
+			}
 		}
 		else
 		{
-			gi.WriteDir(plane->normal);
+			gi.WriteByte (TE_BLASTER);
+
+			gi.WritePosition(self->s.origin);
+
+			if (!plane)
+			{
+				gi.WriteDir(vec3_origin);
+			}
+			else
+			{
+				gi.WriteDir(plane->normal);
+			}
 		}
 
 		gi.multicast(self->s.origin, MULTICAST_PVS);

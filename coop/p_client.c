@@ -3344,7 +3344,7 @@ int P_Clients_Connected (qboolean spectators) /* FS: Coop: Find out how many pla
 		ent = &g_edicts [i + 1];
 		if (ent->inuse && ent->client)
 		{
-			if(ent->client->pers.netname && !Q_stricmp(ent->client->pers.netname, "WallFly[BZZZ]") /* FS: TODO FIXME: Waiting on tastyspleen for additional details to reliably detect WallFly */
+			if(ent->client->pers.netname && !Q_stricmp(ent->client->pers.netname, "WallFly[BZZZ]")) /* FS: TODO FIXME: Waiting on tastyspleen for additional details to reliably detect WallFly */
 			{
 				continue;
 			}
