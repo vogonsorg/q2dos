@@ -13,7 +13,7 @@
 #define VOTE_NORESETMAP			0x00000100
 
 /* Globals */
-int bVoteInProgress;
+qboolean bVoteInProgress;
 int voteNo;
 int voteYes;
 int voteClients;
@@ -363,7 +363,7 @@ void vote_map (edict_t *ent, const char *mapName)
 	Com_sprintf(voteMap, MAX_OSPATH, "%s", mapName);
 	vote_Broadcast("%s votes for %s! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname, voteMap);
 	voteClients = P_Clients_Connected(false);
-	bVoteInProgress = 1;
+	bVoteInProgress = true;
 	Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "%s", voteMap);
 	Com_sprintf(voteType, 16, "map");
 
@@ -426,7 +426,7 @@ void vote_warp (edict_t *ent, const char *mapName)
 	Com_sprintf(voteMap, MAX_OSPATH, "%s", mapName);
 	vote_Broadcast("%s votes for warping to %s! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname, voteMap);
 	voteClients = P_Clients_Connected(false);
-	bVoteInProgress = 1;
+	bVoteInProgress = true;
 	Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "%s", voteMap);
 	Com_sprintf(voteType, 16, "warp");
 
@@ -508,8 +508,7 @@ void vote_gamemode(edict_t *ent, const char *gamemode)
 	}
 
 	voteClients = P_Clients_Connected(false);
-	bVoteInProgress = 1;
-	voteClients = P_Clients_Connected(false);
+	bVoteInProgress = true;
 	Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "%s", voteGamemode);
 	Com_sprintf(voteType, 16, "gamemode");
 	vote_Broadcast("%s votes for %s: %s! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname, voteType, whatAreWeVotingFor);
@@ -580,8 +579,7 @@ void vote_coopskill(edict_t *ent, int skillVote)
 	}
 
 	voteClients = P_Clients_Connected(false);
-	bVoteInProgress = 1;
-	voteClients = P_Clients_Connected(false);
+	bVoteInProgress = true;
 	Com_sprintf(voteType, 16, "coop difficulty");
 	vote_Broadcast("%s votes for %s: %s! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname, voteType, whatAreWeVotingFor);
 
@@ -624,7 +622,7 @@ void vote_restartmap (edict_t *ent)
 	Com_sprintf(voteMap, MAX_OSPATH, "%s", level.mapname);
 	vote_Broadcast("%s votes for restarting the map! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname);
 	voteClients = P_Clients_Connected(false);
-	bVoteInProgress = 1;
+	bVoteInProgress = true;
 	Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "%s", voteMap);
 	Com_sprintf(voteType, 16, "restartmap");
 
@@ -773,7 +771,7 @@ void vote_Reset(void)
 	voteClients = voteNo = voteYes = voteCoopSkill = 0;
 	voteTimer = level.time + sv_vote_timer->value;
 	lastUpdate = (int)(level.time);
-	bVoteInProgress = 0;
+	bVoteInProgress = false;
 	printOnce = 0;
 	whatAreWeVotingFor[0] = voteMap[0] = voteGamemode[0] = voteType[0] = '\0';
 

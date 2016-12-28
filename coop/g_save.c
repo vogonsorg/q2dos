@@ -291,6 +291,8 @@ InitGame(void)
 	sv_vote_assume_yes->description = "sv_vote_assume_yes", "Assume yes for the vote initiator (except for vote random).";
 	sv_vote_disallow_flags = gi.cvar("sv_vote_disallow_flags", "0", 0);
 	sv_vote_disallow_flags->description = "sv_vote_disallow_flags", "Disallow flags for voting options by players.  \nAvailable flags: \n  * No gamemode changes - 1\n  * No Vanilla gamemode - 2\n  * No Xatrix gamemode - 4\n  * No Rogue gamemode - 8\n  * No Coop difficult - 16\n  * No map changes - 32\n  * No random maps - 64\n  * No map restarting - 128\n";
+	sv_vote_chat_commands = gi.cvar("sv_vote_chat_commands", "1", 0);
+	sv_vote_chat_commands->description = "Allow \"yes\" and \"no\" chat messages to send \"vote yes\" and \"vote no\" commands if a vote is in progress.";
 
 	if(!strcmp(sv_coop_gamemode->string, "rogue")) /* FS: Coop: Set the proper coop gamemode */
 	{

@@ -1660,6 +1660,26 @@ void sayCmd_CheckVote(edict_t *ent, char *voteChat)
 		gi.WriteString("vote progress\n");
 		gi.unicast(ent, true);
 	}
+	else if (sv_vote_chat_commands->intValue) /* FS: Too many people assuming "yes" and "no" as chat messages are appropriate */
+	{
+		extern qboolean bVoteInProgress;
+
+		if(bVoteInProgress && !ent->hasVoted)
+		{
+			if(!stricmp(voteChat, "yes"))
+			{
+				gi.WriteByte(svc_stufftext);
+				gi.WriteString("vote yes\n");
+				gi.unicast(ent, true);
+			}
+			else if (!stricmp(voteChat, "no"))
+			{
+				gi.WriteByte(svc_stufftext);
+				gi.WriteString("vote no\n");
+				gi.unicast(ent, true);
+			}
+		}
+	}
 }
 
 void
