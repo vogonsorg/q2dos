@@ -410,14 +410,20 @@ Pickup_Bandolier(edict_t *ent /* may be null */, edict_t *other)
 		other->client->pers.max_slugs = 75;
 	}
 
-	if (other->client->pers.max_flechettes < 250) /* FS: Coop: Rogue specific */
+	if (game.gametype == rogue_coop)
 	{
-		other->client->pers.max_flechettes = 250;
+		if (other->client->pers.max_flechettes < 250) /* FS: Coop: Rogue specific */
+		{
+			other->client->pers.max_flechettes = 250;
+		}
 	}
 
-	if (other->client->pers.max_magslug < 75) /* FS: Coop: Xatrix specific */
+	if (game.gametype == xatrix_coop)
 	{
-		other->client->pers.max_magslug = 75;
+		if (other->client->pers.max_magslug < 75) /* FS: Coop: Xatrix specific */
+		{
+			other->client->pers.max_magslug = 75;
+		}
 	}
 
 	item = FindItem("Bullets");
@@ -504,34 +510,43 @@ Pickup_Pack(edict_t *ent /* may be null */, edict_t *other)
 		other->client->pers.max_slugs = 100;
 	}
 
-	if (other->client->pers.max_flechettes < 200) /* FS: Coop: Rogue specific */
+	if (game.gametype == rogue_coop)
 	{
-		other->client->pers.max_flechettes = 200;
+		if (other->client->pers.max_flechettes < 200) /* FS: Coop: Rogue specific */
+		{
+			other->client->pers.max_flechettes = 200;
+		}
 	}
 
-	if (other->client->pers.max_magslug < 100) /* FS: Coop: Xatrix specific */
+	if (game.gametype == xatrix_coop)
 	{
-		other->client->pers.max_magslug = 100;
+		if (other->client->pers.max_magslug < 100) /* FS: Coop: Xatrix specific */
+		{
+			other->client->pers.max_magslug = 100;
+		}
 	}
 
-	if (other->client->pers.max_tbombs < 100) /* FS: Zaero specific game dll changes */
+	if (game.gametype == zaero_coop)
 	{
-		other->client->pers.max_tbombs = 100;
-	}
+		if (other->client->pers.max_tbombs < 100) /* FS: Zaero specific game dll changes */
+		{
+			other->client->pers.max_tbombs = 100;
+		}
 
-	if (other->client->pers.max_a2k < 1) /* FS: Zaero specific game dll changes */
-	{
-		other->client->pers.max_a2k = 1;
-	}
+		if (other->client->pers.max_a2k < 1) /* FS: Zaero specific game dll changes */
+		{
+			other->client->pers.max_a2k = 1;
+		}
 
-	if (other->client->pers.max_empnuke < 100) /* FS: Zaero specific game dll changes */
-	{
-		other->client->pers.max_empnuke = 100;
-	}
+		if (other->client->pers.max_empnuke < 100) /* FS: Zaero specific game dll changes */
+		{
+			other->client->pers.max_empnuke = 100;
+		}
 
-	if (other->client->pers.max_plasmashield < 40) /* FS: Zaero specific game dll changes */
-	{
-		other->client->pers.max_plasmashield =40;
+		if (other->client->pers.max_plasmashield < 40) /* FS: Zaero specific game dll changes */
+		{
+			other->client->pers.max_plasmashield =40;
+		}
 	}
 
 	item = FindItem("Bullets");
@@ -624,74 +639,83 @@ Pickup_Pack(edict_t *ent /* may be null */, edict_t *other)
 		}
 	}
 
-	item = FindItem("Flechettes"); /* FS: Coop: Rogue specific */
-
-	if (item)
+	if (game.gametype == rogue_coop)
 	{
-		index = ITEM_INDEX(item);
-		other->client->pers.inventory[index] += item->quantity;
+		item = FindItem("Flechettes"); /* FS: Coop: Rogue specific */
 
-		if (other->client->pers.inventory[index] >
-			other->client->pers.max_flechettes)
+		if (item)
 		{
-			other->client->pers.inventory[index] =
-				other->client->pers.max_flechettes;
+			index = ITEM_INDEX(item);
+			other->client->pers.inventory[index] += item->quantity;
+
+			if (other->client->pers.inventory[index] >
+				other->client->pers.max_flechettes)
+			{
+				other->client->pers.inventory[index] =
+					other->client->pers.max_flechettes;
+			}
 		}
 	}
 
-	item = FindItem("Mag Slug"); /* FS: Coop: Xatrix specific */
-
-	if (item)
+	if (game.gametype == xatrix_coop)
 	{
-		index = ITEM_INDEX(item);
-		other->client->pers.inventory[index] += item->quantity;
+		item = FindItem("Mag Slug"); /* FS: Coop: Xatrix specific */
 
-		if (other->client->pers.inventory[index] >
-			other->client->pers.max_magslug)
+		if (item)
 		{
-			other->client->pers.inventory[index] =
-				other->client->pers.max_magslug;
+			index = ITEM_INDEX(item);
+			other->client->pers.inventory[index] += item->quantity;
+
+			if (other->client->pers.inventory[index] >
+				other->client->pers.max_magslug)
+			{
+				other->client->pers.inventory[index] =
+					other->client->pers.max_magslug;
+			}
 		}
 	}
 
-	item = FindItem("IRED"); /* FS: Zaero specific game dll changes */
-	if (item)
+	if(game.gametype == zaero_coop)
 	{
-		index = ITEM_INDEX(item);
-		other->client->pers.inventory[index] += item->quantity;
-		if (other->client->pers.inventory[index] > 
-			other->client->pers.max_tbombs)
+		item = FindItem("IRED"); /* FS: Zaero specific game dll changes */
+		if (item)
 		{
-			other->client->pers.inventory[index] = 
-				other->client->pers.max_tbombs;
+			index = ITEM_INDEX(item);
+			other->client->pers.inventory[index] += item->quantity;
+			if (other->client->pers.inventory[index] > 
+				other->client->pers.max_tbombs)
+			{
+				other->client->pers.inventory[index] = 
+					other->client->pers.max_tbombs;
+			}
 		}
-	}
 
-	item = FindItem("A2k"); /* FS: Zaero specific game dll changes */
-	if (item)
-	{
-		index = ITEM_INDEX(item);
-		other->client->pers.inventory[index] += item->quantity;
-		if (other->client->pers.inventory[index] > other->client->pers.max_a2k)
-			other->client->pers.inventory[index] = other->client->pers.max_a2k;
-	}
+		item = FindItem("A2k"); /* FS: Zaero specific game dll changes */
+		if (item)
+		{
+			index = ITEM_INDEX(item);
+			other->client->pers.inventory[index] += item->quantity;
+			if (other->client->pers.inventory[index] > other->client->pers.max_a2k)
+				other->client->pers.inventory[index] = other->client->pers.max_a2k;
+		}
 
-	item = FindItem("EMPNuke"); /* FS: Zaero specific game dll changes */
-	if (item)
-	{
-		index = ITEM_INDEX(item);
-		other->client->pers.inventory[index] += item->quantity;
-		if (other->client->pers.inventory[index] > other->client->pers.max_empnuke)
-			other->client->pers.inventory[index] = other->client->pers.max_empnuke;
-	}
+		item = FindItem("EMPNuke"); /* FS: Zaero specific game dll changes */
+		if (item)
+		{
+			index = ITEM_INDEX(item);
+			other->client->pers.inventory[index] += item->quantity;
+			if (other->client->pers.inventory[index] > other->client->pers.max_empnuke)
+				other->client->pers.inventory[index] = other->client->pers.max_empnuke;
+		}
 
-	item = FindItem("Plasma Shield"); /* FS: Zaero specific game dll changes */
-	if (item)
-	{
-		index = ITEM_INDEX(item);
-		other->client->pers.inventory[index] += item->quantity;
-		if (other->client->pers.inventory[index] > other->client->pers.max_plasmashield)
-			other->client->pers.inventory[index] = other->client->pers.max_plasmashield;
+		item = FindItem("Plasma Shield"); /* FS: Zaero specific game dll changes */
+		if (item)
+		{
+			index = ITEM_INDEX(item);
+			other->client->pers.inventory[index] += item->quantity;
+			if (other->client->pers.inventory[index] > other->client->pers.max_plasmashield)
+				other->client->pers.inventory[index] = other->client->pers.max_plasmashield;
+		}
 	}
 
 	if ((ent) && (!(ent->spawnflags & DROPPED_ITEM)) && (deathmatch->value || Coop_Respawn()) ) /* FS: Coop: Added */
