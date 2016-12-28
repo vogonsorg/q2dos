@@ -525,9 +525,12 @@ void CoopUpdateGamemodeMenu(edict_t *ent)
 	switch(game.gametype)
 	{
 		case vanilla_coop:
-			Com_sprintf(gamemode, sizeof(gamemode), "Vanilla");
-			votegamemodemenu[VGAMEMODEMENU_VANILLA].text = NULL;
-			votegamemodemenu[VGAMEMODEMENU_VANILLA].SelectFunc = NULL;
+			if(!Q_stricmp(sv_coop_gamemode->string, "vanilla")) /* FS: If in a "custom" mode show Vanilla as an option */
+			{
+				Com_sprintf(gamemode, sizeof(gamemode), "Vanilla");
+				votegamemodemenu[VGAMEMODEMENU_VANILLA].text = NULL;
+				votegamemodemenu[VGAMEMODEMENU_VANILLA].SelectFunc = NULL;
+			}
 			break;
 		case xatrix_coop:
 			Com_sprintf(gamemode, sizeof(gamemode), "Xatrix");
