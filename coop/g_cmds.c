@@ -3,6 +3,7 @@
 
 extern void SP_info_coop_checkpoint (edict_t * self );
 extern void stopCamera(edict_t *self); /* FS: Zaero specific game dll changes */
+extern qboolean bVoteInProgress;
 
 static qboolean Client_CanCheat (edict_t *self) /* FS: Added */
 {
@@ -1662,8 +1663,6 @@ void sayCmd_CheckVote(edict_t *ent, char *voteChat)
 	}
 	else if (sv_vote_chat_commands->intValue) /* FS: Too many people assuming "yes" and "no" as chat messages are appropriate */
 	{
-		extern qboolean bVoteInProgress;
-
 		if(bVoteInProgress && !ent->hasVoted)
 		{
 			if(!stricmp(voteChat, "yes"))
@@ -2362,6 +2361,21 @@ ClientCommand(edict_t *ent)
 			gi.cprintf(ent, PRINT_HIGH, "Show origin ON\n");
 		else
 			gi.cprintf(ent, PRINT_HIGH, "Show origin OFF\n");
+	}
+	else if (bVoteInProgress && !ent->hasVoted)
+	{
+		if (!Q_stricmp(cmd, "yes") || !Q_stricmp(cmd,"agree"))
+		{
+			gi.WriteByte(svc_stufftext);
+			gi.WriteString("vote yes\n");
+			gi.unicast(ent, true);
+		}
+		else if (!Q_stricmp(cmd, "no"))
+		{
+			gi.WriteByte(svc_stufftext);
+			gi.WriteString("vote no\n");
+			gi.unicast(ent, true);
+		}
 	}
 	else /* anything that doesn't match a command will be a chat */
 	{

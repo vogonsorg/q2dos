@@ -52,6 +52,7 @@ void CoopVoteChangeMap(edict_t *ent, pmenuhnd_t *p);
 void votemenu_cleanup_all (void);
 void votemenu_cleanup_filebuffer (void);
 
+extern void VoteMenuOpen(edict_t *ent);
 /*-----------------------------------------------------------------------*/
 
 pmenu_t creditsmenu[] = {
@@ -365,12 +366,21 @@ CoopInitJoinMenu(edict_t *ent)
 void
 CoopOpenJoinMenu(edict_t *ent)
 {
+	extern qboolean bVoteInProgress;
+
 	if(!ent || !ent->client)
 	{
 		return;
 	}
 
 	ent->client->pers.didMotd = ent->client->resp.didMotd = true;
+
+	if(bVoteInProgress) /* FS: If a vote is happening don't show the other fun options... */
+	{
+		VoteMenuOpen(ent);
+		return;
+	}
+
 	CoopInitJoinMenu(ent);
 	PMenu_Open(ent, joinmenu, 0, sizeof(joinmenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
 	ent->client->menu_update = CoopUpdateJoinMenu;
