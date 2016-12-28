@@ -500,7 +500,7 @@ void Use_PlasmaShield (edict_t *ent, gitem_t *item)
 	PlasmaShield->classname = "PlasmaShield";
 	PlasmaShield->movetype = MOVETYPE_PUSH;
 	PlasmaShield->solid = SOLID_BBOX;
-	PlasmaShield->s.modelindex = gi.modelindex("sprites/plasmashield.sp2");
+	PlasmaShield->s.modelindex = gi.modelindex("sprites/plasmashield_fixed.sp2"); /* FS: Coop: Original is broken with bad backslashes */
 	PlasmaShield->s.effects |= EF_POWERSCREEN;
 	PlasmaShield->s.sound = gi.soundindex ("items/plasmashield/psactive.wav");
 

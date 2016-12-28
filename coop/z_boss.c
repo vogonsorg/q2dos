@@ -988,7 +988,7 @@ void fire_plasmaCannon (edict_t *self, vec3_t start, vec3_t aimdir, int damage, 
 	plasmaball->solid = SOLID_BBOX;
 	VectorClear (plasmaball->mins);
 	VectorClear (plasmaball->maxs);
-	plasmaball->s.modelindex = gi.modelindex ("sprites/plasma1.sp2");
+	plasmaball->s.modelindex = gi.modelindex ("sprites/plasma1_fixed.sp2"); /* FS: Coop: Original is broken with bad backslashes. */
 	plasmaball->s.effects = EF_BFG | EF_ANIM_ALLFAST;
 	plasmaball->owner = self;
 	plasmaball->touch = Plasmaball_Touch;
@@ -1644,7 +1644,7 @@ void SP_monster_zboss (edict_t *self)
 	SP_monster_zboss_precache();
 
 	// precache some models and sounds
-	gi.modelindex("sprites/plasma1.sp2");
+	gi.modelindex("sprites/plasma1_fixed.sp2"); /* FS: Coop: Original is broken with bad backslashes. */
 	gi.modelindex("models/objects/b_explode/tris.md2");
 	gi.soundindex("items/empnuke/emp_trg.wav");
 

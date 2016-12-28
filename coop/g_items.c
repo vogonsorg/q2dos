@@ -3770,8 +3770,7 @@ always owned, never in the world
 		0,
 		NULL,
 		AMMO_PLASMASHIELD,
-/* precache */ "items/plasmashield/psactive.wav sprites/plasmashield.sp2"
-///* precache */ "items/plasmashield/psfire.wav items/plasmashield/psactive.wav items/plasmashield/psdie.wav sprites/plasmashield.sp2"
+/* precache */ "items/plasmashield/psactive.wav sprites/plasmashield_fixed.sp2"
 	},
 
 /*QUAKED item_ancient_head (.3 .3 1) (-16 -16 -16) (16 16 16)
