@@ -387,6 +387,7 @@ blaster_touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
 	else
 	{
 		gi.WriteByte (svc_temp_entity);
+#if 0 /* FS: Unneeded since it uses it's own model "blaser/tris.md2"! */
 		/* FS: Coop: Xatrix specific */
 		if ((game.gametype == xatrix_coop) && (self->s.effects & EF_BLUEHYPERBLASTER))	// Knightmare- this was checking bit TE_BLUEHYPERBLASTER
 		{
@@ -405,6 +406,7 @@ blaster_touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
 			}
 		}
 		else
+#endif
 		{
 			gi.WriteByte (TE_BLASTER);
 

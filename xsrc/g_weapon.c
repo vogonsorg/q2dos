@@ -400,6 +400,7 @@ void blaster_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *
 	{
 		gi.WriteByte (svc_temp_entity);
 		// RAFAEL
+#if 0 /* FS: Unneeded since it uses it's own model "blaser/tris.md2"! */
 		if (self->s.effects & EF_BLUEHYPERBLASTER)	// Knightmare- this was checking bit TE_BLUEHYPERBLASTER
 		{
 			gi.WriteByte (TE_BLUEHYPERBLASTER);			// Knightmare- TE_BLUEHYPERBLASTER is broken (parse error) in most Q2 engines
@@ -417,6 +418,7 @@ void blaster_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *
 			}
 		}
 		else
+#endif
 		{
 			gi.WriteByte (TE_BLASTER);
 
