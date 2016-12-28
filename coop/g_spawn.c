@@ -865,6 +865,8 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 	strncpy(level.mapname, mapname, sizeof(level.mapname) - 1);
 	strncpy(game.spawnpoint, spawnpoint, sizeof(game.spawnpoint) - 1);
 
+	gi.cprintf(NULL, PRINT_HIGH, "Map: %s\n", level.mapname); /* FS: Catch potentially bad maps in console logs */
+
 	/* set client fields on player ents */
 	for (i = 0; i < game.maxclients; i++)
 	{
