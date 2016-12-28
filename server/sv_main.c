@@ -69,6 +69,10 @@ cvar_t	*sv_auto_save; /* FS: Auto save toggling. */
 cvar_t		*sv_override_spawn_points; /* FS: Override spawn points for debug testing. */
 #endif /* _DEBUG */
 
+/* FS: Added these to filter out wallfly's spammy rcon status request every 30 seconds */
+cvar_t		*sv_filter_wallfly_rcon_request;
+cvar_t		*sv_filter_wallfly_ip;
+
 void Master_Shutdown (void);
 
 
@@ -588,6 +592,61 @@ int Rcon_Validate (void)
 	return 1;
 }
 
+void SVC_FilterRconRequest(int i, char *ip, char* data) /* FS: Filter out spammy wallfly rcon status requests from tastyspleen connected servers :/ */
+{
+	qboolean bDoDPrintf = false;
+
+	if(!ip)
+	{
+		Com_Printf("No IP address for RCON request!\n");
+		return;
+	}
+
+	if(!data)
+	{
+		Com_Printf("No data for RCON request from: %s\n", ip);
+	}
+
+	if(sv_filter_wallfly_rcon_request->intValue)
+	{
+		if(!Q_stricmp(ip, sv_filter_wallfly_ip->string))
+		{
+			bDoDPrintf = true;
+		}
+		else
+		{
+			bDoDPrintf = false;
+		}
+	}
+	else
+	{
+		bDoDPrintf = false;
+	}
+
+	if(bDoDPrintf)
+	{
+		if (i == 0)
+		{
+			Com_DPrintf (DEVELOPER_MSG_SERVER, "Bad rcon from %s:\n%s\n", ip, net_message.data+4);
+		}
+		else
+		{
+			Com_DPrintf (DEVELOPER_MSG_SERVER, "Rcon from %s:\n%s\n", ip, net_message.data+4);
+		}
+	}
+	else
+	{
+		if (i == 0)
+		{
+			Com_Printf ("Bad rcon from %s:\n%s\n", ip, net_message.data+4);
+		}
+		else
+		{
+			Com_Printf ("Rcon from %s:\n%s\n", ip, net_message.data+4);
+		}
+	}
+}
+
 /*
 ===============
 SVC_RemoteCommand
@@ -604,10 +663,7 @@ void SVC_RemoteCommand (void)
 
 	i = Rcon_Validate ();
 
-	if (i == 0)
-		Com_Printf ("Bad rcon from %s:\n%s\n", NET_AdrToString (net_from), net_message.data+4);
-	else
-		Com_Printf ("Rcon from %s:\n%s\n", NET_AdrToString (net_from), net_message.data+4);
+	SVC_FilterRconRequest(i, NET_AdrToString(net_from), net_message.data+4);
 
 	Com_BeginRedirect (RD_PACKET, sv_outputbuf, SV_OUTPUTBUF_LENGTH, SV_FlushRedirect);
 
@@ -1168,6 +1224,11 @@ void SV_Init (void)
 	/* FS: From R1Q2: HTTP Downloading */
 	sv_downloadserver = Cvar_Get ("sv_downloadserver", "", 0);
 	sv_downloadserver->description = "URL to a location where clients can download game content over HTTP. Default empty.  Path leads to game dir name.  i.e. quake2.com/baseq2/maps\n";
+
+	/* FS: Added these to filter out wallfly's spammy rcon status request every 30 seconds */	sv_filter_wallfly_rcon_request = Cvar_Get ("sv_filter_wallfly_rcon_request", "0", 0); /* FS: Override spawn points for debug testing. */
+	sv_filter_wallfly_rcon_request->description = "Filter rcon requests from WallFly[BZZZ]/Tastyspleen linked servers.  If set, sv_filter_wallfly_ip is needed and DEVELOPER_MSG_SERVER will be required to see WallFly RCONs.";
+	sv_filter_wallfly_ip = Cvar_Get ("sv_filter_wallfly_ip", "74.86.102.74", 0); /* FS: Override spawn points for debug testing. */
+	sv_filter_wallfly_ip->description = "WallFly/Tastyspleen IP for filtering rcon requests.  Requires sv_filter_wallfly_rcon_request CVAR to be enabled.";
 
 	sv_noreload = Cvar_Get ("sv_noreload", "0", 0);
 

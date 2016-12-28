@@ -204,6 +204,10 @@ extern	cvar_t		*sv_auto_save; /* FS: Auto save toggling. */
 extern	cvar_t		*sv_override_spawn_points; /* FS: Override spawn points for debug testing. */
 #endif /* _DEBUG */
 
+/* FS: Added these to filter out wallfly's spammy rcon status request every 30 seconds */
+extern	cvar_t		*sv_filter_wallfly_rcon_request;
+extern	cvar_t		*sv_filter_wallfly_ip;
+
 extern	client_t	*sv_client;
 extern	edict_t		*sv_player;
 
