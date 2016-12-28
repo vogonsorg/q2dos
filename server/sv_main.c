@@ -594,6 +594,11 @@ int Rcon_Validate (void)
 
 void SVC_FilterRconRequest(int i, char *ip, char* data) /* FS: Filter out spammy wallfly rcon status requests from tastyspleen connected servers :/ */
 {
+	char *ipNoPort = NULL;
+	char *ipToken = NULL;
+	char *ipPtr = NULL;
+	static const char seperators[] = ":\n";
+
 	qboolean bDoDPrintf = false;
 
 	if(!ip)
@@ -607,9 +612,18 @@ void SVC_FilterRconRequest(int i, char *ip, char* data) /* FS: Filter out spammy
 		Com_Printf("No data for RCON request from: %s\n", ip);
 	}
 
+	ipNoPort = strdup(ip);
+
+	ipToken = strtok_r(ipNoPort, seperators, &ipPtr);
+	if(!ipToken)
+	{
+		Com_Printf("ipToken is NULL!\n");
+		return;
+	}
+
 	if(sv_filter_wallfly_rcon_request->intValue)
 	{
-		if(!Q_stricmp(ip, sv_filter_wallfly_ip->string))
+		if(!Q_stricmp(ipToken, sv_filter_wallfly_ip->string))
 		{
 			bDoDPrintf = true;
 		}
@@ -1225,9 +1239,10 @@ void SV_Init (void)
 	sv_downloadserver = Cvar_Get ("sv_downloadserver", "", 0);
 	sv_downloadserver->description = "URL to a location where clients can download game content over HTTP. Default empty.  Path leads to game dir name.  i.e. quake2.com/baseq2/maps\n";
 
-	/* FS: Added these to filter out wallfly's spammy rcon status request every 30 seconds */	sv_filter_wallfly_rcon_request = Cvar_Get ("sv_filter_wallfly_rcon_request", "0", 0); /* FS: Override spawn points for debug testing. */
+	/* FS: Added these to filter out wallfly's spammy rcon status request every 30 seconds */
+	sv_filter_wallfly_rcon_request = Cvar_Get ("sv_filter_wallfly_rcon_request", "0", 0);
 	sv_filter_wallfly_rcon_request->description = "Filter rcon requests from WallFly[BZZZ]/Tastyspleen linked servers.  If set, sv_filter_wallfly_ip is needed and DEVELOPER_MSG_SERVER will be required to see WallFly RCONs.";
-	sv_filter_wallfly_ip = Cvar_Get ("sv_filter_wallfly_ip", "74.86.102.74", 0); /* FS: Override spawn points for debug testing. */
+	sv_filter_wallfly_ip = Cvar_Get ("sv_filter_wallfly_ip", "74.86.102.74", 0);
 	sv_filter_wallfly_ip->description = "WallFly/Tastyspleen IP for filtering rcon requests.  Requires sv_filter_wallfly_rcon_request CVAR to be enabled.";
 
 	sv_noreload = Cvar_Get ("sv_noreload", "0", 0);
