@@ -2278,6 +2278,10 @@ PutClientInServer(edict_t *ent)
 		resp.coop_respawn.game_helpchanged = client->pers.game_helpchanged;
 		resp.coop_respawn.helpchanged = client->pers.helpchanged;
 		resp.coop_respawn.didMotd = client->pers.didMotd; /* FS */
+		if (game.gametype == zaero_coop)
+		{
+			resp.coop_respawn.visorFrames = client->pers.visorFrames; /* FS: Zaero visor */
+		}
 		client->pers = resp.coop_respawn;
 		ClientUserinfoChanged(ent, userinfo);
 
