@@ -1422,6 +1422,8 @@
 {"SP_target_temp_entity", (byte *)SP_target_temp_entity},
 {"Use_Target_Tent", (byte *)Use_Target_Tent},
 {"ServerCommand", (byte *)ServerCommand},
+{"SVCmd_StuffCmd_f", (byte *)SVCmd_StuffCmd_f},
+{"SVCmd_SayPerson_f", (byte *)SVCmd_SayPerson_f},
 {"SVCmd_WriteIP_f", (byte *)SVCmd_WriteIP_f},
 {"SVCmd_ListIP_f", (byte *)SVCmd_ListIP_f},
 {"SVCmd_RemoveIP_f", (byte *)SVCmd_RemoveIP_f},

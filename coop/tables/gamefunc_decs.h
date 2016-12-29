@@ -1422,6 +1422,8 @@ extern void Use_Target_Speaker ( edict_t * ent , edict_t * other , edict_t * act
 extern void SP_target_temp_entity ( edict_t * ent ) ;
 extern void Use_Target_Tent ( edict_t * ent , edict_t * other , edict_t * activator ) ;
 extern void ServerCommand ( void ) ;
+extern void SVCmd_StuffCmd_f ( void ) ;
+extern void SVCmd_SayPerson_f ( void ) ;
 extern void SVCmd_WriteIP_f ( void ) ;
 extern void SVCmd_ListIP_f ( void ) ;
 extern void SVCmd_RemoveIP_f ( void ) ;
