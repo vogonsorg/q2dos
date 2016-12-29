@@ -3509,8 +3509,7 @@ void ClientCommand (edict_t *ent)
 	INITPERFORMANCE(2);
 	
 	if(!dllloaded) return;
-	
-	
+
 	if(q2adminrunmode == 0)
 		{
 			dllglobals->ClientCommand(ent);

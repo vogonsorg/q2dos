@@ -294,10 +294,18 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 				if(!strncmp(mapToken, mapToken2, mapTokenSize))
 				{
 					mapToken2 = strtok_r(mapToken2, ",", &listPtr2);
-					mapToken2 = strtok_r(NULL, "\n", &listPtr2);
+					mapToken2 = strtok_r(NULL, ",\n", &listPtr2);
 					if(mapToken2)
 					{
 						Com_sprintf(voteGamemode, sizeof(voteGamemode), "%s", mapToken2);
+						if(Q_stricmp(mapToken2, "xatrix") && Q_stricmp(mapToken2, "vanilla") && Q_stricmp(mapToken, "rogue") && Q_stricmp(mapToken, "zaero")) /* FS: We got another one, custom game mode with specific codebase we need i.e. 1492 map needs xatrix code */
+						{
+							mapToken2 = strtok_r(NULL, ",\n", &listPtr2);
+							if(mapToken2)
+							{
+								Com_sprintf(voteGamemode, sizeof(voteGamemode), "%s", mapToken2);
+							}
+						}
 						retval = true;
 						goto cleanup;
 					}
