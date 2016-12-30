@@ -2598,6 +2598,8 @@ ClientBegin(edict_t *ent)
 		}
 	}
 
+	ent->client->pers.connected = true; /* FS: Fix for players command and q2admin commands */
+
 	/* make sure all view stuff is valid */
 	ClientEndServerFrame(ent);
 }

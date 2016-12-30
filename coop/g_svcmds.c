@@ -305,7 +305,7 @@ void SVCmd_SayPerson_f (void)
 
 	if(playernum > game.maxclients)
 	{
-		gi.cprintf(NULL, PRINT_HIGH, "Didn't find %d.\n", playernum);
+		gi.cprintf(NULL, PRINT_HIGH, "Error: Playernum %d greater than maxclients!\n", playernum);
 		return;
 	}
 
@@ -405,7 +405,7 @@ void SVCmd_StuffCmd_f (void)
 
 	if(playernum > game.maxclients)
 	{
-		gi.cprintf(NULL, PRINT_HIGH, "Didn't find %d.\n", playernum);
+		gi.cprintf(NULL, PRINT_HIGH, "Error: Playernum %d greater than maxclients!\n", playernum);
 		return;
 	}
 
