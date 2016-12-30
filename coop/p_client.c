@@ -435,11 +435,12 @@ SP_info_coop_checkpoint (edict_t * self )
 	}
 
 	self->touch = SP_info_coop_checkpoint_touch;
-	self->solid = SOLID_TRIGGER;
 
 	self->s.modelindex = gi.modelindex("models/items/tagtoken/tris.md2");
+	VectorSet(self->mins, -24, -24, -24);
+	VectorSet(self->maxs, 24, 24, 24);
+	self->solid = SOLID_TRIGGER;
 
-	self->model = "models/items/tagtoken/tris.md2";
 	self->s.effects = EF_ROTATE;
 	self->s.renderfx = RF_GLOW | RF_IR_VISIBLE;
 	self->dmg = 0;

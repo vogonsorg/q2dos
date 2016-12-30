@@ -1440,6 +1440,8 @@ SP_worldspawn(edict_t *ent)
 	gi.modelindex("models/objects/gibs/skull/tris.md2");
 	gi.modelindex("models/objects/gibs/head2/tris.md2");
 
+	gi.modelindex("models/items/tagtoken/tris.md2"); /* FS: info_coop_checkpoint */
+
 	/* Setup light animation tables. 'a' is total darkness, 'z' is doublebright. */
 
 	/* 0 normal */
