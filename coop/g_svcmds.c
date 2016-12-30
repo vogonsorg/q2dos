@@ -346,16 +346,62 @@ void SVCmd_StuffCmd_f (void)
 	edict_t	*client = NULL;
 	int playernum;
 	size_t messageLen;
+	qboolean bIsCL = false;
 
 	memset(cmd, 0, sizeof(cmd));
 
-	if (gi.argc() < 5)
+	if (gi.argc() < 4)
 	{
-		gi.cprintf(NULL, PRINT_HIGH, "Usage:  sv !stuff CL <playernum> <cmd>\n");
+		gi.cprintf(NULL, PRINT_HIGH, "Usage:  sv !stuff CL <playernum> <cmd> OR sv !stuff <player_name> <cmd>\n");
 		return;
 	}
 
-	playernum = atoi(gi.argv(3));
+	if(!Q_stricmp(gi.argv(2), "CL"))
+	{
+		playernum = atoi(gi.argv(3));
+		bIsCL = true;
+	}
+	else
+	{
+		int i = 0;
+		int hits = 0;
+
+		bIsCL = false;
+
+		for (i = 1; i <= game.maxclients; i++)
+		{
+			client = &g_edicts[i];
+
+			if(!client || !client->inuse || !client->client || !client->client->pers.connected || !client->client->pers.netname)
+			{
+				continue;
+			}
+			else
+			{
+				if(!Q_stricmp(gi.argv(2), client->client->pers.netname))
+				{
+					hits++;
+					playernum = i;
+				}
+			}
+		}
+
+		if (hits > 1)
+		{
+			gi.cprintf(NULL, PRINT_HIGH, "2 or more player name matches.\n");
+			return;
+		}
+
+		if(hits == 0)
+		{
+			gi.cprintf(NULL, PRINT_HIGH, "Didn't find %s.\n", gi.argv(2));
+			return;
+		}
+		else
+		{
+			client = &g_edicts[playernum];
+		}
+	}
 
 	if(playernum > game.maxclients)
 	{
@@ -363,15 +409,23 @@ void SVCmd_StuffCmd_f (void)
 		return;
 	}
 
-	client = &g_edicts[playernum + 1];
-
-	if (!client || !client->inuse || !client->client || !client->client->pers.connected)
+	if(bIsCL)
 	{
-		gi.cprintf(NULL, PRINT_HIGH, "Didn't find %d.\n", playernum);
-		return;
+		client = &g_edicts[playernum + 1];
+
+		if (!client || !client->inuse || !client->client || !client->client->pers.connected)
+		{
+			gi.cprintf(NULL, PRINT_HIGH, "Didn't find %d.\n", playernum);
+			return;
+		}
+
+		Com_sprintf(cmd, sizeof(cmd), "!stuff CL %s ", gi.argv(3));
+	}
+	else
+	{
+		Com_sprintf(cmd, sizeof(cmd), "!stuff %s ", gi.argv(2));
 	}
 
-	Com_sprintf(cmd, sizeof(cmd), "!stuff CL %s ", gi.argv(3));
 	messageLen = strlen(cmd);
 	p = gi.args() + messageLen;
 	if(!p)
