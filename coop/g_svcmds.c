@@ -311,7 +311,7 @@ void SVCmd_SayPerson_f (void)
 
 	client = &g_edicts[playernum + 1];
 
-	if (!client || !client->inuse || !client->client || !client->client->pers.connected)
+	if (!client || !client->inuse || !client->client /* || !client->client->pers.connected */) /* FS: FIXME: Unreliable check */
 	{
 		gi.cprintf(NULL, PRINT_HIGH, "Didn't find %d.\n", playernum);
 		return;
@@ -372,7 +372,7 @@ void SVCmd_StuffCmd_f (void)
 		{
 			client = &g_edicts[i];
 
-			if(!client || !client->inuse || !client->client || !client->client->pers.connected || !client->client->pers.netname)
+			if(!client || !client->inuse || !client->client /* || !client->client->pers.connected */ || !client->client->pers.netname) /* FS: FIXME: Unreliable check */
 			{
 				continue;
 			}
@@ -413,7 +413,7 @@ void SVCmd_StuffCmd_f (void)
 	{
 		client = &g_edicts[playernum + 1];
 
-		if (!client || !client->inuse || !client->client || !client->client->pers.connected)
+		if (!client || !client->inuse || !client->client /* || !client->client->pers.connected */) /* FS: FIXME: Unreliable check */
 		{
 			gi.cprintf(NULL, PRINT_HIGH, "Didn't find %d.\n", playernum);
 			return;
