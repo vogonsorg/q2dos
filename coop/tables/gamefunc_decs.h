@@ -1422,6 +1422,7 @@ extern void Use_Target_Speaker ( edict_t * ent , edict_t * other , edict_t * act
 extern void SP_target_temp_entity ( edict_t * ent ) ;
 extern void Use_Target_Tent ( edict_t * ent , edict_t * other , edict_t * activator ) ;
 extern void ServerCommand ( void ) ;
+extern void SVCmd_Coop_Gamemode_f ( void ) ;
 extern void SVCmd_StuffCmd_f ( void ) ;
 extern void SVCmd_SayPerson_f ( void ) ;
 extern void SVCmd_WriteIP_f ( void ) ;
@@ -2001,7 +2002,6 @@ extern void Cmd_SaveCheckpoint_f ( edict_t * ent ) ;
 extern void Cmd_PlaceCheckpoint_f ( edict_t * ent ) ;
 extern void Cmd_Beam_f ( edict_t * ent ) ;
 extern void Cmd_EdictCount_f ( edict_t * ent ) ;
-extern void Cmd_Coop_Gamemode ( edict_t * ent ) ;
 extern void Cmd_PlayerList_f ( edict_t * ent ) ;
 extern void Cmd_Ent_Count_f ( edict_t * ent ) ;
 extern void Cmd_Say_f ( edict_t * ent , qboolean team , qboolean arg0 ) ;

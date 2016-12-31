@@ -440,6 +440,55 @@ void SVCmd_StuffCmd_f (void)
 	gi.unicast(client, true);
 }
 
+void
+SVCmd_Coop_Gamemode_f(void)
+{
+	char command[1024];
+	char *cmd;
+	int argc = 0;
+
+	argc = gi.argc();
+	cmd = gi.argv(2);
+	if (argc != 3 || !cmd)
+	{
+		gi.cprintf(NULL, PRINT_HIGH, "Valid gamemodes: vanilla, rogue, xatrix, and zaero\n");
+		return;
+	}
+
+	if(!Q_stricmp(cmd, "vanilla"))
+	{
+		gi.bprintf(PRINT_HIGH, "Changing gamemode to iD coop!\n");
+		gi.cvar_forceset("sv_coop_gamemode", "vanilla");
+		Com_sprintf(command, sizeof(command), "map base1\n");
+		gi.AddCommandString(command);
+	}
+	else if(!Q_stricmp(cmd, "rogue"))
+	{
+		gi.bprintf(PRINT_HIGH, "Changing gamemode to Rogue coop!\n");
+		gi.cvar_forceset("sv_coop_gamemode", "rogue");
+		Com_sprintf(command, sizeof(command), "map rmine1\n");
+		gi.AddCommandString(command);
+	}
+	else if(!Q_stricmp(cmd, "xatrix"))
+	{
+		gi.bprintf(PRINT_HIGH, "Changing gamemode to Xatrix coop!\n");
+		gi.cvar_forceset("sv_coop_gamemode", "xatrix");
+		Com_sprintf(command, sizeof(command), "map xswamp\n");
+		gi.AddCommandString(command);
+	}
+	else if(!Q_stricmp(cmd, "zaero"))
+	{
+		gi.bprintf(PRINT_HIGH, "Changing gamemode to Zaero coop!\n");
+		gi.cvar_forceset("sv_coop_gamemode", "zaero");
+		Com_sprintf(command, sizeof(command), "map zbase1\n");
+		gi.AddCommandString(command);
+	}
+	else
+	{
+		gi.cprintf(NULL, PRINT_HIGH, "Unknown gamemode: %s\n", cmd);
+	}
+}
+
 /*
  * ServerCommand will be called when an "sv" command is issued.
  * The game can issue gi.argc() / gi.argv() commands to get the
@@ -479,6 +528,10 @@ ServerCommand(void)
 	else if (Q_stricmp(cmd, "!stuff") == 0) /* FS: Tastyspleen q2admin additions */
 	{
 		SVCmd_StuffCmd_f();
+	}
+	else if (Q_stricmp(cmd, "gamemode") == 0) /* FS: Coop: Added */
+	{
+		SVCmd_Coop_Gamemode_f();
 	}
 	else
 	{

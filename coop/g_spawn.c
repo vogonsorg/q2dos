@@ -1371,7 +1371,7 @@ SP_worldspawn(edict_t *ent)
 			gi.modelindex("#w_plauncher.md2"); /* FS: Coop: Rogue specific */
 			gi.modelindex("#w_chainfist.md2"); /* FS: Coop: Rogue specific */
 		}
-		if (game.gametype == zaero_coop)
+		if (game.gametype == xatrix_coop)
 		{
 			gi.modelindex("#w_phalanx.md2"); /* FS: Coop: Xatrix specific */
 			gi.modelindex("#w_ripper.md2"); /* FS: Coop: Xatrix specific */

@@ -1877,59 +1877,6 @@ Cmd_PlayerList_f(edict_t *ent)
 }
 
 void
-Cmd_Coop_Gamemode(edict_t *ent) /* FS: TODO: Make this a server only command */
-{
-	char command[1024];
-	char *cmd;
-	int argc = 0;
-
-	if (!ent || !ent->client || !ent->client->pers.isAdmin || !ent->client->pers.isVIP)
-	{
-		return;
-	}
-
-	argc = gi.argc();
-	cmd = gi.argv(1);
-	if (argc != 2 || !cmd)
-	{
-		gi.cprintf(ent, PRINT_CHAT, "Valid gamemodes: vanilla, rogue, xatrix\n");
-		return;
-	}
-
-	if(!Q_stricmp(cmd, "vanilla"))
-	{
-		gi.bprintf(PRINT_HIGH, "Changing gamemode to iD coop!\n");
-		gi.cvar_forceset("sv_coop_gamemode", "vanilla");
-		Com_sprintf(command, sizeof(command), "map base1\n");
-		gi.AddCommandString(command);
-	}
-	else if(!Q_stricmp(cmd, "rogue"))
-	{
-		gi.bprintf(PRINT_HIGH, "Changing gamemode to Rogue coop!\n");
-		gi.cvar_forceset("sv_coop_gamemode", "rogue");
-		Com_sprintf(command, sizeof(command), "map rmine1\n");
-		gi.AddCommandString(command);
-	}
-	else if(!Q_stricmp(cmd, "xatrix"))
-	{
-		gi.bprintf(PRINT_HIGH, "Changing gamemode to Xatrix coop!\n");
-		gi.cvar_forceset("sv_coop_gamemode", "xatrix");
-		Com_sprintf(command, sizeof(command), "map xswamp\n");
-		gi.AddCommandString(command);
-	}
-	else if(!Q_stricmp(cmd, "zaero"))
-	{
-		gi.bprintf(PRINT_HIGH, "Changing gamemode to Zaero coop!\n");
-		gi.cvar_forceset("sv_coop_gamemode", "zaero");
-		Com_sprintf(command, sizeof(command), "map zbase1\n");
-		gi.AddCommandString(command);
-	}	else
-	{
-		gi.cprintf(ent, PRINT_CHAT, "Unknown gamemode: %s\n", cmd);
-	}
-}
-
-void
 Cmd_EdictCount_f (edict_t *ent) /* FS: Coop: Added for debugging */
 {
 	int i = 0, edictCount = 0, freeCount = 0, badFreeCount = 0;
@@ -2333,10 +2280,6 @@ ClientCommand(edict_t *ent)
 	else if (Q_stricmp(cmd, "edictcount") == 0) /* FS: Coop: Added for debugging */
 	{
 		Cmd_EdictCount_f(ent);
-	}
-	else if (Q_stricmp(cmd, "gamemode") == 0) /* FS: Coop */
-	{
-		Cmd_Coop_Gamemode(ent);
 	}
 	else if (Q_stricmp(cmd, "beam") == 0) /* FS: From YamagiQ2 */
 	{
