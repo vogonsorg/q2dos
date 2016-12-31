@@ -336,6 +336,7 @@
 {"Weapon_Generic", (byte *)Weapon_Generic},
 {"Drop_Weapon", (byte *)Drop_Weapon},
 {"Use_Weapon2", (byte *)Use_Weapon2},
+{"Use_Weapon2_Zaero", (byte *)Use_Weapon2_Xatrix},
 {"Use_Weapon2_Xatrix", (byte *)Use_Weapon2_Xatrix},
 {"Use_Weapon2_Rogue", (byte *)Use_Weapon2_Rogue},
 {"Use_Weapon", (byte *)Use_Weapon},

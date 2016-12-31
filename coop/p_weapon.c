@@ -705,6 +705,73 @@ void Use_Weapon2_Xatrix (edict_t *ent, gitem_t *item) /* FS: Coop: Xatrix specif
 	ent->client->newweapon = item;
 }
 
+void Use_Weapon2_Zaero (edict_t *ent, gitem_t *item) /* FS: Coop: Zaero specific */
+{
+	int			ammo_index;
+	gitem_t		*ammo_item;
+	int			index;
+
+	if (!ent || !item)
+	{
+		return;
+	}
+
+	if (strcmp (item->pickup_name, "Blaster") == 0)
+	{
+		if (item == ent->client->pers.weapon)
+		{
+			item = FindItem ("Flare Gun");
+			index = ITEM_INDEX (item);
+			if (!ent->client->pers.inventory[index])
+			{
+				item = FindItem ("Blaster");
+			}
+		}
+	}
+	else if (strcmp (item->pickup_name, "Railgun") == 0)
+	{
+		if (item == ent->client->pers.weapon)
+		{
+			item = FindItem ("Sniper Rifle");
+			index = ITEM_INDEX (item);
+			if (!ent->client->pers.inventory[index])
+			{
+				item = FindItem ("Railgun");
+			}
+		}
+	}
+	else if (strcmp (item->pickup_name, "HyperBlaster") == 0)
+	{
+		if (item == ent->client->pers.weapon)
+		{
+			item = FindItem ("Sonic Cannon");
+			index = ITEM_INDEX (item);
+			if (!ent->client->pers.inventory[index])
+			{
+				item = FindItem ("HyperBlaster");
+			}
+		}
+	}
+
+	// see if we're already using it
+	if (item == ent->client->pers.weapon)
+		return;
+
+	if (item->ammo)
+	{
+		ammo_item = FindItem(item->ammo);
+		ammo_index = ITEM_INDEX(ammo_item);
+		if (!ent->client->pers.inventory[ammo_index] && !g_select_empty->value)
+		{
+			gi.cprintf (ent, PRINT_HIGH, "No %s for %s.\n", ammo_item->pickup_name, item->pickup_name);
+			return;
+		}
+	}
+
+	// change to this weapon when down
+	ent->client->newweapon = item;
+}
+
 void Use_Weapon2 (edict_t *ent, gitem_t *item) /* FS */
 {
 	if (game.gametype == rogue_coop)
@@ -715,6 +782,11 @@ void Use_Weapon2 (edict_t *ent, gitem_t *item) /* FS */
 	else if (game.gametype == xatrix_coop)
 	{
 		Use_Weapon2_Xatrix(ent, item);
+		return;
+	}
+	else if (game.gametype == zaero_coop)
+	{
+		Use_Weapon2_Zaero(ent, item);
 		return;
 	}
 	else
