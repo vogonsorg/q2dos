@@ -1128,9 +1128,14 @@ player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 	}
 
 	// if we're in a camera, get out
-	if ((game.gametype == zaero_coop) && (self->client->zCameraTrack)) /* FS: Zaero specific game dll changes */
+	if ((game.gametype == zaero_coop) && (self->client && self->client->zCameraTrack)) /* FS: Zaero specific game dll changes */
 	{
 		stopCamera(self);
+	}
+
+	if (self->client && self->client->blinky_client.cam_target) /* FS: Added */
+	{
+		stopBlinkyCam(self);
 	}
 
 	VectorClear(self->avelocity);
@@ -2190,6 +2195,11 @@ spectator_respawn(edict_t *ent)
 			gi.unicast(ent, true);
 			return;
 		}
+	}
+
+	if (ent->client->blinky_client.cam_target) /* FS: Added */
+	{
+		stopBlinkyCam(ent);
 	}
 
 	/* clear score on respawn */

@@ -2104,7 +2104,7 @@
 {"Cmd_Cam_f", (byte *)Cmd_Cam_f},
 {"Cmd_Stats_f", (byte *)Cmd_Stats_f},
 {"StartCam", (byte *)StartCam},
-{"StopCam", (byte *)StopCam},
+{"stopBlinkyCam", (byte *)stopBlinkyCam},
 {"MoveToAngles", (byte *)MoveToAngles},
 {"Blinky_ClientEndServerFrame", (byte *)Blinky_ClientEndServerFrame},
 {"Blinky_BeginRunFrame", (byte *)Blinky_BeginRunFrame},

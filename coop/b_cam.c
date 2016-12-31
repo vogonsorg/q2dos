@@ -6,6 +6,18 @@
 
 #include "g_local.h"
 
+#define SCANNER_UNIT 10
+
+static qboolean IsSpectator(edict_t * ent)
+{
+	if (!ent || !ent->inuse || !ent->client)
+	{
+		return false;
+	}
+
+	return ent->client->pers.spectator;
+}
+
 void Blinky_BeginClientThink(edict_t *ent, usercmd_t *ucmd)
 {
 	gclient_t * client = ent->client;
@@ -50,6 +62,7 @@ void Blinky_BeginClientThink(edict_t *ent, usercmd_t *ucmd)
 						bdata->cam_target->client->v_angle[i] - ent->client->resp.cmd_angles[i]);
 			}
 
+			/* FS: FIXME: Interpolate this for ultimate smoothness */
 			VectorCopy(bdata->cam_target->client->v_angle, ent->client->ps.viewangles);
 			VectorCopy(bdata->cam_target->client->v_angle, ent->client->v_angle);
 		}
@@ -57,9 +70,12 @@ void Blinky_BeginClientThink(edict_t *ent, usercmd_t *ucmd)
 
 	if (bdata->cam_target && bdata->cam_target->inuse)
 	{
-		ent->client->ps.stats[STAT_SPECTATOR] = 1;
 		ent->client->ps.stats[STAT_CHASE] = CS_PLAYERSKINS +
 								   (bdata->cam_target - g_edicts) - 1;
+	}
+	else
+	{
+		ent->client->ps.stats[STAT_CHASE] = 0;
 	}
 }
 
@@ -110,9 +126,6 @@ void Blinky_ClientEndServerFrame(edict_t * ent)
 //	gclient_t * client = ent->client;
 }
 
-static int IsSpectator(edict_t * ent) { return  ent->client->pers.spectator; }
-
-#define SCANNER_UNIT 10
 static void
 ShowStats(edict_t *ent, edict_t *player)
 {
@@ -179,7 +192,7 @@ void MoveToAngles(edict_t * ent, vec3_t pv1)
 	}
 }
 
-void StopCam(edict_t * ent)
+void stopBlinkyCam(edict_t * ent)
 {
 	BlinkyClient_t *bdata = NULL;
 		
@@ -194,7 +207,7 @@ void StopCam(edict_t * ent)
 
 	bdata->cam_target = 0;
 	ent->svflags &= ~SVF_NOCLIENT;
-//	ent->client->ps.pmove.pm_flags &= ~PMF_NO_PREDICTION;
+	ent->client->ps.pmove.pm_flags &= ~PMF_NO_PREDICTION;
 	bdata->cam_decoy->svflags |= SVF_NOCLIENT;
 	VectorCopy(bdata->cam_decoy->s.origin, ent->s.origin);
 	MoveToAngles(ent, bdata->cam_decoy->s.angles);
@@ -202,7 +215,12 @@ void StopCam(edict_t * ent)
 	ent->client->pers.hand = bdata->save_hand;
 	ent->client->ps.gunindex = bdata->save_weapon;
 
-	gi.linkentity(ent); gi.linkentity(bdata->cam_decoy);
+	gi.linkentity(ent);
+
+	/* FS: Get rid of the decoy, free up some edicts */
+	G_FreeEdict(bdata->cam_decoy);
+	bdata->cam_decoy = NULL;
+//	gi.linkentity(bdata->cam_decoy);
 }
 
 void StartCam(edict_t * ent, edict_t * target)
@@ -219,10 +237,6 @@ void StartCam(edict_t * ent, edict_t * target)
 		decoy = bdata->cam_decoy;
 		decoy->client = ent->client;
 		decoy->s = ent->s;
-//		VectorCopy(ent->mins, decoy->mins);
-//		VectorCopy(ent->maxs, decoy->maxs);
-//		decoy->solid = ent->solid;
-//		decoy->health = ent->health;
 	}
 	bdata->cam_decoy->svflags &= ~SVF_NOCLIENT;
 	VectorCopy(ent->s.origin, bdata->cam_decoy->s.origin);
@@ -275,7 +289,7 @@ void Cmd_Cam_f(edict_t *ent)
 	edict_t * target;
 	BlinkyClient_t * bdata;
 
-	if (!ent || !ent->client)
+	if (!ent || !ent->client || ent->client->pers.spectator)
 	{
 		return;
 	}
@@ -309,7 +323,7 @@ void Cmd_Cam_f(edict_t *ent)
 		// found cam target
 		if (target == ent)
 		{
-			StopCam(ent);
+			stopBlinkyCam(ent);
 		}
 		else
 		{
@@ -383,7 +397,7 @@ void Cmd_NoSummon_f(edict_t *ent)
 {
 	BlinkyClient_t *bdata = NULL;
 
-	if (!ent || !ent->client)
+	if (!ent || !ent->client || ent->client->pers.spectator)
 	{
 		return;
 	}
@@ -396,7 +410,7 @@ void Cmd_Runrun_f(edict_t *ent)
 {
 	int runrun;
 
-	if (!ent || !ent->client)
+	if (!ent || !ent->client || ent->client->pers.spectator)
 	{
 		return;
 	}
@@ -411,7 +425,7 @@ void Cmd_Summon_f(edict_t *ent)
 	edict_t * target;
 	int i;
 
-	if (!ent)
+	if (!ent || !ent->client || ent->client->pers.spectator)
 	{
 		return;
 	}
@@ -451,7 +465,7 @@ void Blinky_OnClientTerminate(edict_t *self)
 			continue;
 		bdata = &player->client->blinky_client;
 		if (bdata->cam_target == self)
-			StopCam(player);
+			stopBlinkyCam(player);
 	}
 }
 

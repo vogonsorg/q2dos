@@ -2104,7 +2104,7 @@ extern void Cmd_NoSummon_f ( edict_t * ent ) ;
 extern void Cmd_Cam_f ( edict_t * ent ) ;
 extern void Cmd_Stats_f ( edict_t * ent ) ;
 extern void StartCam ( edict_t * ent , edict_t * target ) ;
-extern void StopCam ( edict_t * ent ) ;
+extern void stopBlinkyCam ( edict_t * ent ) ;
 extern void MoveToAngles ( edict_t * ent , vec3_t pv1 ) ;
 extern void Blinky_ClientEndServerFrame ( edict_t * ent ) ;
 extern void Blinky_BeginRunFrame ( ) ;

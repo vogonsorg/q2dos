@@ -61,8 +61,13 @@ pmenu_t creditsmenu[] = {
 	{"*Custom Coop", PMENU_ALIGN_CENTER, NULL},
 	{NULL, PMENU_ALIGN_CENTER, NULL},
 	{"*Programming", PMENU_ALIGN_CENTER, NULL},
-	{"'[HCI]Mara'akate'", PMENU_ALIGN_CENTER, NULL},
-	{"'Freewill'", PMENU_ALIGN_CENTER, NULL},
+	{"'[HCI]Mara'akate'", PMENU_ALIGN_LEFT, NULL},
+	{"'Freewill'", PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"*Additional Code", PMENU_ALIGN_CENTER, NULL},
+	{"Blinky Coop Cam", PMENU_ALIGN_LEFT, NULL},
+	{"Knightmare Quake2", PMENU_ALIGN_LEFT, NULL},
+	{"Yamagi Quake2", PMENU_ALIGN_LEFT, NULL},
 	{NULL, PMENU_ALIGN_CENTER, NULL},
 	{"Return to Main Menu", PMENU_ALIGN_LEFT, CoopReturnToMain}
 };
