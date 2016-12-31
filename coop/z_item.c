@@ -207,14 +207,9 @@ void stopCamera(edict_t *self)
 	gi.sound(self, CHAN_AUTO, gi.soundindex("items/visor/deact.wav"), 1, ATTN_NORM, 0);
 }
 
-edict_t *findNextCamera(edict_t *old)
+edict_t *findNextCamera(edict_t *old /* May be NULL */)
 {
 	edict_t *e = NULL;
-
-	if(!old)
-	{
-		return NULL;
-	}
 
 	// first of all, are there *any* cameras?
 	e = G_Find(NULL, FOFS(classname), "misc_securitycamera");
