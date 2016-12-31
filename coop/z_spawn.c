@@ -44,7 +44,7 @@ qboolean SpawnZ(gitem_t *item, edict_t *spot)
 
 	if (!item || !spot)
 	{
-		return;
+		return false;
 	}
 
 	ent = G_Spawn();
