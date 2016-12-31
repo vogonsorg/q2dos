@@ -92,6 +92,10 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;for;f90"
 # Begin Source File
 
+SOURCE=..\coop\b_cam.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\coop\dm_ball.c
 # End Source File
 # Begin Source File
@@ -470,6 +474,10 @@ SOURCE=..\coop\z_weapon.c
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
+# Begin Source File
+
+SOURCE=..\coop\b_cam.h
+# End Source File
 # Begin Source File
 
 SOURCE=..\coop\tables\clientfields.h

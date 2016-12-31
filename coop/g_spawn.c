@@ -1124,6 +1124,22 @@ char *single_statusbar =
 "	pic	11 "
 "endif "
 
+/* spectator */
+"if 17 "
+  "xv 0 "
+  "yb -58 "
+  "string2 \"SPECTATOR MODE\" "
+"endif "
+
+/* chase camera */
+"if 16 "
+  "xv 0 "
+  "yb -68 "
+  "string \"Chasing\" "
+  "xv 64 "
+  "stat_string 16 "
+"endif "
+
 // player origin /* FS: Zaero specific game dll changes */
 "if 18 " /* FS: Must mirror STAT_SHOW_ORIGIN! */
 "	xl 0 "

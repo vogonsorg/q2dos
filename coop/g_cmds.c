@@ -2305,6 +2305,22 @@ ClientCommand(edict_t *ent)
 		else
 			gi.cprintf(ent, PRINT_HIGH, "Show origin OFF\n");
 	}
+	else if (Q_stricmp(cmd, "cam") == 0) /* FS: Blinyk's Coop Camera */
+	{
+		Cmd_Cam_f(ent);
+	}
+	else if (Q_stricmp(cmd, "stats") == 0) /* FS: Blinyk's Coop Camera */
+	{
+		Cmd_Stats_f(ent);
+	}
+	else if (Q_stricmp(cmd, "summon") == 0) /* FS: Blinyk's Coop Camera */
+	{
+		Cmd_Summon_f(ent);
+	}
+	else if (Q_stricmp(cmd, "runrun") == 0) /* FS: Blinyk's Coop Camera */
+	{
+		Cmd_Runrun_f(ent);
+	}
 	else if (bVoteInProgress && !ent->hasVoted)
 	{
 		if (!Q_stricmp(cmd, "yes") || !Q_stricmp(cmd,"agree"))

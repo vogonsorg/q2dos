@@ -248,7 +248,8 @@ InitGame(void)
 	vippass->description = "VIP password for cheating and special commands.  Not related to RCON.";
 	gamedir = gi.cvar("gamedir", "", 0); /* FS: Coop: Added */
 	nextserver = gi.cvar("nextserver", "", 0); /* FS: Coop: Added */
-
+	coop_cameraoffset = gi.cvar("coop_cameraoffset", "10", 0); /* FS: Blinky's coop camera */
+	coop_cameraoffset->description = "Camera offset for Blinky's Coop Camera";
 	motd = gi.cvar ("motd", "", 0); /* FS: Coop: Added */
 	skill = gi.cvar ("skill", "1", CVAR_LATCH);
 	maxentities = gi.cvar ("maxentities", "1024", CVAR_LATCH);

@@ -2845,6 +2845,8 @@ ClientDisconnect(edict_t *ent)
 		return;
 	}
 
+	Blinky_OnClientTerminate(ent); /* FS: Blinky's Coop Camera */
+
 	if (coop->intValue) /* FS: Coop: Spawn a backpack with our stuff */
 	{
 		Spawn_CoopBackpack(ent);
@@ -2973,6 +2975,8 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 
 	level.current_entity = ent;
 	client = ent->client;
+
+	Blinky_BeginClientThink(ent, ucmd); /* FS: Blinky's Coop Camera */
 
 	if (level.intermissiontime)
 	{

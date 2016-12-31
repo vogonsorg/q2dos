@@ -40,6 +40,7 @@ cvar_t *adminpass; /* FS: Coop: Admin goodies */
 cvar_t *vippass; /* FS: Coop: VIP goodies */
 cvar_t *gamedir; /* FS: Coop: Added */
 cvar_t *nextserver; /* FS: Coop: Added */
+cvar_t *coop_cameraoffset; /* FS: Blinyk's Coop Camera */
 cvar_t *dmflags;
 cvar_t *zdmflags; /* FS: Zaero specific game dll changes */
 cvar_t *skill;
@@ -471,6 +472,8 @@ G_RunFrame(void)
 {
 	int i;
 	edict_t *ent;
+
+	Blinky_BeginRunFrame(); /* FS: Blinky's Coop Camera */
 
 #ifdef FRAMENUM_TIMER_TEST /* FS: Force framenum overflow and reset testing */
 #ifdef _DEBUG

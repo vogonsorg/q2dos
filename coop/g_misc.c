@@ -456,6 +456,8 @@ ThrowClientHead(edict_t *self, int damage)
 		self->nextthink = 0;
 	}
 
+	Blinky_OnClientTerminate(self); /* FS: Blinky's coop camera */
+
 	gi.linkentity(self);
 }
 

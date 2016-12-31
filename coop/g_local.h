@@ -11,7 +11,7 @@
 #define	GAME_INCLUDE
 #include "game.h"
 #include "menu.h"
-
+#include "b_cam.h" /* FS: Blinky's Coop camera */
 
 /* FS: Coop: Zaero specific defines */
 #ifdef Z_MAX
@@ -766,6 +766,7 @@ extern	cvar_t	*adminpass; /* FS: Coop: Admin goodies */
 extern	cvar_t	*vippass; /* FS: Coop: VIP goodies */
 extern	cvar_t	*gamedir; /* FS: Coop: Added */
 extern	cvar_t	*nextserver; /* FS: Coop: Added */
+extern	cvar_t	*coop_cameraoffset; /* FS: Blinky's Coop Camera */
 extern	cvar_t	*dmflags;
 extern	cvar_t	*zdmflags; /* FS: Zaero specific game dll changes */
 extern	cvar_t	*skill;
@@ -1491,6 +1492,7 @@ struct gclient_s
 
 	edict_t		*chase_target;		// player we are chasing
 	qboolean	update_chase;		// need to update chase info?
+	BlinkyClient_t blinky_client; /* FS: Blinky's Coop camera */
 	float menutime;                 /* time to update menu */
 	qboolean menudirty;
 

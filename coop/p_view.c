@@ -369,81 +369,89 @@ SV_CalcViewOffset(edict_t *ent)
 	/* absolutely bound offsets so the view can
 	   never be outside the player box */
 
-	if(ent->client->zCameraTrack) /* FS: Zaero specific game dll changes */
+	if (ent->client->blinky_client.cam_target)
 	{
-		int i;
-
-		VectorAdd(ent->client->zCameraTrack->s.origin, ent->client->zCameraOffset, v);
-
-		if(ent->client->zCameraTrack->client)
-		{
-			vec3_t f;
-
-			VectorAdd(ent->client->zCameraTrack->client->ps.viewoffset, v, v);
-			AngleVectors (ent->client->zCameraTrack->s.angles, f, NULL, NULL);
-			VectorMA(v, 10, f, v);
-		}
-		else if (Q_stricmp(ent->client->zCameraTrack->classname, "misc_securitycamera") == 0)
-		{
-			float framepercent = sin(((float)(level.framenum & 63) / 64.0) * M_PI * 2);
-			VectorCopy(ent->client->zCameraTrack->move_origin, v);
-			VectorCopy(ent->client->zCameraTrack->move_angles, ent->client->ps.viewangles);
-
-			// adjust yaw a bit due to sway
-			ent->client->ps.viewangles[YAW] += framepercent * 15;
-		}
-		else
-		{
-			VectorCopy (ent->client->zCameraTrack->s.angles, ent->client->ps.viewangles);  
-		}
-
-		for(i = 0; i < 3; i++)
-		{
-			ent->client->ps.pmove.origin[i] = v[i] * 8;
-		}
-
-		VectorSet (ent->client->ps.viewoffset, 0, 0, 0);
-		// make our "double" do what we're doing
-		if (ent->client->zCameraLocalEntity)
-		{
-			edict_t *e = ent->client->zCameraLocalEntity;
-			VectorCopy(ent->s.origin, e->s.origin);
-			e->s.frame = ent->s.frame;
-			e->s.modelindex = ent->s.modelindex;
-			e->s.modelindex2 = ent->s.modelindex2;
-			e->s.skinnum = ent->s.skinnum;
-		}
+		Blinky_CalcViewOffsets(ent, v); /* FS: Blinky's Coop Camera */
+		VectorCopy(v, ent->client->ps.viewoffset);
 	}
 	else
 	{
-		if (v[0] < -14)
+		if(ent->client->zCameraTrack) /* FS: Zaero specific game dll changes */
 		{
-			v[0] = -14;
-		}
-		else if (v[0] > 14)
-		{
-			v[0] = 14;
-		}
+			int i;
 
-		if (v[1] < -14)
-		{
-			v[1] = -14;
-		}
-		else if (v[1] > 14)
-		{
-			v[1] = 14;
-		}
+			VectorAdd(ent->client->zCameraTrack->s.origin, ent->client->zCameraOffset, v);
 
-		if (v[2] < -22)
-		{
-			v[2] = -22;
-		}
-		else if (v[2] > 30)
-		{
-			v[2] = 30;
-		}
+			if(ent->client->zCameraTrack->client)
+			{
+				vec3_t f;
 
-		VectorCopy(v, ent->client->ps.viewoffset);
+				VectorAdd(ent->client->zCameraTrack->client->ps.viewoffset, v, v);
+				AngleVectors (ent->client->zCameraTrack->s.angles, f, NULL, NULL);
+				VectorMA(v, 10, f, v);
+			}
+			else if (Q_stricmp(ent->client->zCameraTrack->classname, "misc_securitycamera") == 0)
+			{
+				float framepercent = sin(((float)(level.framenum & 63) / 64.0) * M_PI * 2);
+				VectorCopy(ent->client->zCameraTrack->move_origin, v);
+				VectorCopy(ent->client->zCameraTrack->move_angles, ent->client->ps.viewangles);
+
+				// adjust yaw a bit due to sway
+				ent->client->ps.viewangles[YAW] += framepercent * 15;
+			}
+			else
+			{
+				VectorCopy (ent->client->zCameraTrack->s.angles, ent->client->ps.viewangles);  
+			}
+
+			for(i = 0; i < 3; i++)
+			{
+				ent->client->ps.pmove.origin[i] = v[i] * 8;
+			}
+
+			VectorSet (ent->client->ps.viewoffset, 0, 0, 0);
+			// make our "double" do what we're doing
+			if (ent->client->zCameraLocalEntity)
+			{
+				edict_t *e = ent->client->zCameraLocalEntity;
+				VectorCopy(ent->s.origin, e->s.origin);
+				e->s.frame = ent->s.frame;
+				e->s.modelindex = ent->s.modelindex;
+				e->s.modelindex2 = ent->s.modelindex2;
+				e->s.skinnum = ent->s.skinnum;
+			}
+		}
+		else
+		{
+			if (v[0] < -14)
+			{
+				v[0] = -14;
+			}
+			else if (v[0] > 14)
+			{
+				v[0] = 14;
+			}
+
+			if (v[1] < -14)
+			{
+				v[1] = -14;
+			}
+			else if (v[1] > 14)
+			{
+				v[1] = 14;
+			}
+
+			if (v[2] < -22)
+			{
+				v[2] = -22;
+			}
+			else if (v[2] > 30)
+			{
+				v[2] = 30;
+			}
+
+			VectorCopy(v, ent->client->ps.viewoffset);
+		}
 	}
 }
 

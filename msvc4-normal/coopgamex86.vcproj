@@ -210,6 +210,10 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;for;f90"
 			>
 			<File
+				RelativePath="..\coop\b_cam.c"
+				>
+			</File>
+			<File
 				RelativePath="..\coop\dm_ball.c"
 				>
 				<FileConfiguration
@@ -1614,6 +1618,10 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;fi;fd"
 			>
+			<File
+				RelativePath="..\coop\b_cam.h"
+				>
+			</File>
 			<File
 				RelativePath="..\coop\tables\clientfields.h"
 				>
