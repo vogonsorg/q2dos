@@ -434,7 +434,7 @@ FindMmoveByName(char *name)
  * below this block into files.
  */
 void
-WriteField1(FILE *f, field_t *field, byte *base)
+WriteField1(FILE *f /* unused */, field_t *field, byte *base)
 {
 	void *p;
 	int len;

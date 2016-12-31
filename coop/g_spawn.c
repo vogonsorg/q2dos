@@ -1363,13 +1363,19 @@ SP_worldspawn(edict_t *ent)
 		gi.modelindex("#w_hyperblaster.md2");
 		gi.modelindex("#w_railgun.md2");
 		gi.modelindex("#w_bfg.md2");
-		gi.modelindex("#w_disrupt.md2"); /* FS: Coop: Rogue specific */
-		gi.modelindex("#w_etfrifle.md2"); /* FS: Coop: Rogue specific */
-		gi.modelindex("#w_plasma.md2"); /* FS: Coop: Rogue specific */
-		gi.modelindex("#w_plauncher.md2"); /* FS: Coop: Rogue specific */
-		gi.modelindex("#w_chainfist.md2"); /* FS: Coop: Rogue specific */
-		gi.modelindex("#w_phalanx.md2"); /* FS: Coop: Xatrix specific */
-		gi.modelindex("#w_ripper.md2"); /* FS: Coop: Xatrix specific */
+		if (game.gametype == rogue_coop)
+		{
+			gi.modelindex("#w_disrupt.md2"); /* FS: Coop: Rogue specific */
+			gi.modelindex("#w_etfrifle.md2"); /* FS: Coop: Rogue specific */
+			gi.modelindex("#w_plasma.md2"); /* FS: Coop: Rogue specific */
+			gi.modelindex("#w_plauncher.md2"); /* FS: Coop: Rogue specific */
+			gi.modelindex("#w_chainfist.md2"); /* FS: Coop: Rogue specific */
+		}
+		if (game.gametype == zaero_coop)
+		{
+			gi.modelindex("#w_phalanx.md2"); /* FS: Coop: Xatrix specific */
+			gi.modelindex("#w_ripper.md2"); /* FS: Coop: Xatrix specific */
+		}
 	}
 
 	/* ------------------- */
@@ -1390,47 +1396,53 @@ SP_worldspawn(edict_t *ent)
 	gi.soundindex("misc/h2ohit1.wav");      /* landing splash */
 
 	gi.soundindex("items/damage.wav");
-	gi.soundindex("misc/ddamage1.wav"); /* FS: Coop: Rogue specific */
+	if (game.gametype == rogue_coop)
+	{
+		gi.soundindex("misc/ddamage1.wav"); /* FS: Coop: Rogue specific */
+	}
 	gi.soundindex("items/protect.wav");
 	gi.soundindex("items/protect4.wav");
 	gi.soundindex("weapons/noammo.wav");
 
 	gi.soundindex("infantry/inflies1.wav");
 
-	/* FS: Coop: Zaero */
-	gi.imageindex ("a_flares");
-	gi.imageindex ("w_flare");
-	gi.modelindex ("models/weapons/v_flare/tris.md2");
-	gi.modelindex ("models/objects/flare/tris.md2");
-	gi.soundindex ("weapons/flare/flarehis.wav");
-	gi.soundindex ("weapons/flare/shoot.wav");
-	gi.modelindex ("models/items/plasma/tris.md2");
-	gi.imageindex ("i_plasma");
-	gi.modelindex ("sprites/plasmashield_fixed.sp2");
-	gi.modelindex ("sprites/plasma1_fixed.sp2");
-	gi.soundindex ("items/plasmashield/psactive.wav");
-	gi.imageindex ("w_enuke");
-	gi.modelindex ("models/weapons/g_enuke/tris.md2");
-	gi.modelindex ("models/weapons/v_enuke/tris.md2");
-	gi.soundindex ("items/empnuke/emp_trg.wav");
-	gi.imageindex ("w_a2k");
-	gi.modelindex ("models/weapons/g_a2k/tris.md2");
-	gi.modelindex ("models/weapons/v_a2k/tris.md2");
-	gi.soundindex ("weapons/a2k/countdn.wav");
-	gi.soundindex ("weapons/a2k/ak_exp01.wav");
-	gi.imageindex ("w_sonic");
-	gi.modelindex ("models/weapons/g_sonic/tris.md2");
-	gi.modelindex ("models/weapons/v_sonic/tris.md2");
-	gi.soundindex ("weapons/sonic/sc_warm.wav"); 
-	gi.soundindex ("weapons/sonic/sc_cool.wav"); 
-	gi.soundindex ("weapons/sonic/sc_fire.wav");
-	gi.imageindex ("w_sniper");
-	gi.modelindex ("models/weapons/g_sniper/tris.md2");
-	gi.modelindex ("models/weapons/v_sniper/tris.md2");
-	gi.modelindex ("models/weapons/v_sniper/scope/tris.md2"); 
-	gi.modelindex ("models/weapons/v_sniper/dmscope/tris.md2"); 
-	gi.soundindex ("weapons/sniper/beep.wav"); 
-	gi.soundindex ("weapons/sniper/fire.wav");
+	if (game.gametype == zaero_coop)
+	{
+		/* FS: Coop: Zaero */
+		gi.imageindex ("a_flares");
+		gi.imageindex ("w_flare");
+		gi.modelindex ("models/weapons/v_flare/tris.md2");
+		gi.modelindex ("models/objects/flare/tris.md2");
+		gi.soundindex ("weapons/flare/flarehis.wav");
+		gi.soundindex ("weapons/flare/shoot.wav");
+		gi.modelindex ("models/items/plasma/tris.md2");
+		gi.imageindex ("i_plasma");
+		gi.modelindex ("sprites/plasmashield_fixed.sp2");
+		gi.modelindex ("sprites/plasma1_fixed.sp2");
+		gi.soundindex ("items/plasmashield/psactive.wav");
+		gi.imageindex ("w_enuke");
+		gi.modelindex ("models/weapons/g_enuke/tris.md2");
+		gi.modelindex ("models/weapons/v_enuke/tris.md2");
+		gi.soundindex ("items/empnuke/emp_trg.wav");
+		gi.imageindex ("w_a2k");
+		gi.modelindex ("models/weapons/g_a2k/tris.md2");
+		gi.modelindex ("models/weapons/v_a2k/tris.md2");
+		gi.soundindex ("weapons/a2k/countdn.wav");
+		gi.soundindex ("weapons/a2k/ak_exp01.wav");
+		gi.imageindex ("w_sonic");
+		gi.modelindex ("models/weapons/g_sonic/tris.md2");
+		gi.modelindex ("models/weapons/v_sonic/tris.md2");
+		gi.soundindex ("weapons/sonic/sc_warm.wav"); 
+		gi.soundindex ("weapons/sonic/sc_cool.wav"); 
+		gi.soundindex ("weapons/sonic/sc_fire.wav");
+		gi.imageindex ("w_sniper");
+		gi.modelindex ("models/weapons/g_sniper/tris.md2");
+		gi.modelindex ("models/weapons/v_sniper/tris.md2");
+		gi.modelindex ("models/weapons/v_sniper/scope/tris.md2"); 
+		gi.modelindex ("models/weapons/v_sniper/dmscope/tris.md2"); 
+		gi.soundindex ("weapons/sniper/beep.wav"); 
+		gi.soundindex ("weapons/sniper/fire.wav");
+	}
 
 	sm_meat_index = gi.modelindex("models/objects/gibs/sm_meat/tris.md2");
 	gi.modelindex("models/objects/gibs/arm/tris.md2");

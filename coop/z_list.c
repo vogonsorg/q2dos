@@ -1,4 +1,4 @@
-#if 0 //*FS: Yamagi q2 removed */
+#if 0 /*FS: Yamagi q2 removed */
 #include "g_local.h"
 #include "z_list.h"
 #include <stdlib.h>

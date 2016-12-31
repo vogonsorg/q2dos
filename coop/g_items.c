@@ -152,20 +152,6 @@ FindItem(char *pickup_name)
 	return NULL;
 }
 
-void precacheAllItems() /* FS: Zaero specific game dll changes */
-{
-	int		i;
-	gitem_t	*it;
-
-	it = itemlist;
-	for (i=0 ; i<game.num_items ; i++, it++)
-	{
-		if (!it->pickup_name)
-			continue;
-		PrecacheItem(it);
-	}
-}
-
 /* ====================================================================== */
 
 qboolean Coop_Respawn (void) /* FS: Coop */

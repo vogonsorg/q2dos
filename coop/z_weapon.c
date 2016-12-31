@@ -25,6 +25,8 @@ void P_ProjectSource (gclient_t *client, vec3_t point, vec3_t distance, vec3_t f
 void fire_sconnan (edict_t *self);
 void fire_sconnanEffects (edict_t *self);
 
+void SpawnDamage (int type, vec3_t origin, vec3_t normal, int damage);
+
 const int SC_MAXFIRETIME    = 5;         // in seconds...
 const int SC_BASEDAMAGE     = 10;        // minimum damage
 const int SC_DAMGERANGE     = 990;       // maximum damaged range (max damage possible is SC_BASEDAMAGE + SC_DAMGERANGE)
@@ -35,7 +37,7 @@ vec_t VectorLengthSquared(vec3_t v)
 {
 	int		i;
 	float	length = 0.0f;
-	
+
 	for (i=0 ; i< 3 ; i++)
 	{
 		length += v[i]*v[i];
@@ -93,9 +95,9 @@ void angleToward(edict_t *self, vec3_t point, float speed)
 #define TBOMB_SHRAPNEL_DMG	15
 #define TBOMB_MAX_EXIST	25
 
-void shrapnel_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
+void shrapnel_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf /* unused */)
 {
-	if(!ent || !other)
+	if(!ent || !other || !surf)
 	{
 		return;
 	}
@@ -297,7 +299,7 @@ void create_tripbomb_laser(edict_t *bomb)
 	gi.linkentity (laser);
 }
 
-void use_tripbomb(edict_t *self, edict_t *other, edict_t *activator)
+void use_tripbomb(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */)
 {
 	if(!self)
 	{
@@ -330,7 +332,7 @@ void turnOffGlow(edict_t *self)
 	self->nextthink = 0;
 }
 
-void tripbomb_pain(edict_t *self, edict_t *other, float kick, int damage)
+void tripbomb_pain(edict_t *self, edict_t *other /* unused */, float kick /* unused */, int damage /* unused */)
 {
 	if(!self)
 	{
@@ -667,6 +669,11 @@ void Weapon_LaserTripBomb(edict_t *ent)
 
 void SP_misc_lasertripbomb(edict_t *bomb)
 {
+	if (!bomb)
+	{
+		return;
+	}
+
 	// precache
 	gi.soundindex("weapons/ired/las_set.wav");
 	gi.soundindex("weapons/ired/las_arm.wav");
@@ -887,8 +894,6 @@ void Weapon_SonicCannon (edict_t *ent)
 
 	Weapon_Generic (ent, 6, 22, 52, 57, pause_frames, fire_frames, weapon_sc_fire);
 }
-
-void SpawnDamage (int type, vec3_t origin, vec3_t normal, int damage);
 
 void fire_sconnanEffects (edict_t *self)
 {

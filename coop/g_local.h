@@ -891,7 +891,6 @@ gitem_t	*GetItemByIndex (int index);
 qboolean Add_Ammo (edict_t *ent, gitem_t *item, int count);
 void Touch_Item(edict_t *ent, edict_t *other, cplane_t *plane,
 		csurface_t *surf);
-void precacheAllItems(); /* FS: Zaero specific game dll changes */
 void Spawn_CoopBackpack(edict_t *ent); /* FS: Coop: Spawn a backpack with our stuff */
 
 //

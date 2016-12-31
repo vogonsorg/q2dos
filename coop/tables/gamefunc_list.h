@@ -1843,7 +1843,6 @@
 {"SetRespawn", (byte *)SetRespawn},
 {"DoRespawn", (byte *)DoRespawn},
 {"Coop_Respawn", (byte *)Coop_Respawn},
-{"precacheAllItems", (byte *)precacheAllItems},
 {"FindItem", (byte *)FindItem},
 {"FindItemByClassname", (byte *)FindItemByClassname},
 {"GetItemByIndex", (byte *)GetItemByIndex},
