@@ -2305,19 +2305,23 @@ ClientCommand(edict_t *ent)
 		else
 			gi.cprintf(ent, PRINT_HIGH, "Show origin OFF\n");
 	}
-	else if (Q_stricmp(cmd, "cam") == 0) /* FS: Blinyk's Coop Camera */
+	else if (Q_stricmp(cmd, "cam") == 0) /* FS: Blinkys's Coop Camera */
 	{
 		Cmd_Cam_f(ent);
 	}
-	else if (Q_stricmp(cmd, "stats") == 0) /* FS: Blinyk's Coop Camera */
+	else if (Q_stricmp(cmd, "stats") == 0) /* FS: Blinkys's Coop Camera */
 	{
 		Cmd_Stats_f(ent);
 	}
-	else if (Q_stricmp(cmd, "summon") == 0) /* FS: Blinyk's Coop Camera */
+	else if (Q_stricmp(cmd, "summon") == 0) /* FS: Blinkys's Coop Camera */
 	{
 		Cmd_Summon_f(ent);
 	}
-	else if (Q_stricmp(cmd, "runrun") == 0) /* FS: Blinyk's Coop Camera */
+	else if (Q_stricmp(cmd, "nosummon") == 0) /* FS: Blinkys's Coop Camera */
+	{
+		Cmd_NoSummon_f(ent);
+	}
+	else if (Q_stricmp(cmd, "runrun") == 0) /* FS: Blinkys's Coop Camera */
 	{
 		Cmd_Runrun_f(ent);
 	}

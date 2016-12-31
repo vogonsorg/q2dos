@@ -347,6 +347,13 @@ static void Summon(edict_t *ent, edict_t *other)
 
 	if (other->client->blinky_client.nosummon)
 	{
+		gi.cprintf(ent, PRINT_HIGH, "Player \"%s\" has summon disabled!\n", other->client->pers.netname);
+		return;
+	}
+
+	if (other->deadflag == DEAD_DEAD)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Player \"%s\" is dead, aborting summon!\n", other->client->pers.netname);
 		return;
 	}
 
@@ -362,10 +369,10 @@ static void Summon(edict_t *ent, edict_t *other)
 	tr = gi.trace (start, other->mins, other->maxs, start, NULL, MASK_PLAYERSOLID);
 	if (tr.fraction < 1.0)
 	{
+		gi.cprintf(ent, PRINT_HIGH, "Collision issue.  Can not summon \"%s\".  Try from a different location.\n", other->client->pers.netname);
 		gi.linkentity (other);
 		return;
 	}
-
 
 	VectorCopy (start, other->s.origin);
 	VectorCopy (start, other->s.old_origin);
@@ -385,11 +392,23 @@ static void Summon(edict_t *ent, edict_t *other)
 	VectorClear (other->s.angles);
 	VectorClear (other->client->ps.viewangles);
 	VectorClear (other->client->v_angle);
+	VectorClear (other->client->kick_angles);
+	VectorClear (other->client->kick_origin);
 
 	// kill anything at the destination
 	KillBox (other);
 
+	gi.cprintf(ent, PRINT_HIGH, "Summoned \"%s\"!\n", other->client->pers.netname);
+	gi.cprintf(other, PRINT_HIGH, "Player \"%s\" has summoned you!  To disable this feature use /nosummon in console.\n", ent->client->pers.netname);
+
 	gi.linkentity (other);
+
+	/* FS: FIXME: Is this right? -- Do this again, view angles got jacked permanently a couple of times during live play? */
+	VectorClear (other->s.angles);
+	VectorClear (other->client->ps.viewangles);
+	VectorClear (other->client->v_angle);
+	VectorClear (other->client->kick_angles);
+	VectorClear (other->client->kick_origin);
 }
 
 
@@ -403,6 +422,15 @@ void Cmd_NoSummon_f(edict_t *ent)
 	}
 
 	bdata = &ent->client->blinky_client;
+
+	if (!bdata->nosummon)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Summon: Disabled!\n");
+	}
+	else
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Summon: Enabled!\n");
+	}
 	bdata->nosummon = !bdata->nosummon;
 }
 
@@ -413,6 +441,15 @@ void Cmd_Runrun_f(edict_t *ent)
 	if (!ent || !ent->client || ent->client->pers.spectator)
 	{
 		return;
+	}
+
+	if (ent->client->blinky_client.runrun)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Auto-run: Disabled!\n");
+	}
+	else
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Auto-run: Enabled!\n");
 	}
 
 	runrun = !ent->client->blinky_client.runrun;
@@ -444,6 +481,15 @@ void Cmd_Summon_f(edict_t *ent)
 
 		Summon(ent, target);
 		return;
+	}
+
+	if(name[0])
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Couldn't find player \"%s\" to summon!\n", name);
+	}
+	else
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Couldn't find a player to summon!\n");
 	}
 }
 
