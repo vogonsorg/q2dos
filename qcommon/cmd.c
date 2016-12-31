@@ -42,6 +42,7 @@ qboolean	cmd_wait;
 int		alias_count;		// for detecting runaway loops
 
 qboolean	Sort_Possible_Strtolower (char *partial, char *complete); /* FS: Added */
+void Cmd_Flushlog_f (void); /* FS: Added: clear the logfile */
 
 //=============================================================================
 
@@ -953,6 +954,7 @@ void Cmd_Init (void)
 	Cmd_AddCommand ("echo",Cmd_Echo_f);
 	Cmd_AddCommand ("alias",Cmd_Alias_f);
 	Cmd_AddCommand ("wait", Cmd_Wait_f);
+	Cmd_AddCommand ("flushlog", Cmd_Flushlog_f); /* FS: Added */
 }
 
 
@@ -1088,3 +1090,49 @@ qboolean	Sort_Possible_Strtolower (char *partial, char *complete)
 	return true;
 }
 
+void Cmd_Flushlog_f (void) /* FS: clear the logfile */
+{
+	char name[MAX_OSPATH];
+	extern cvar_t	*logfile_name;
+	extern cvar_t	*logfile_active;
+	extern FILE		*logfile;
+
+	if(!logfile_name->string[0])
+	{
+		Com_Printf("Error: logfile_name not set.  Aborting flushlog.\n");
+		return;
+	}
+
+	if(!logfile_active->value)
+	{
+		Com_Printf("Warning: logfile disabled but logfile_name set; continuing with flushlog.\n");
+	}
+
+	Com_sprintf(name,sizeof(name), "%s/%s", FS_Gamedir(), logfile_name->string);
+
+	if (logfile)
+	{
+		fclose (logfile);
+	}
+
+	if (!logfile)
+	{
+		FS_CreatePath(name);
+	}
+
+	logfile = fopen (name, "w");
+
+	if(logfile)
+	{
+		Com_Printf("log cleared\n");
+		fputs("log cleared\n", logfile);
+		fflush(logfile);
+		fclose(logfile);
+	}
+	else
+	{
+		Com_Printf("Unable to open logfile for clearing: %s\n", name);
+	}
+
+	logfile = NULL;
+}
