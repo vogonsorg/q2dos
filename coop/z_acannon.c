@@ -199,6 +199,11 @@ void monster_autocannon_fire(edict_t *self)
 {
 	vec3_t forward, right, start;
 
+	if (!self)
+	{
+		return;
+	}
+
 	// fire straight ahead
 	AngleVectors (self->s.angles, forward, right, NULL);
 	if (self->onFloor)
@@ -215,29 +220,29 @@ void monster_autocannon_fire(edict_t *self)
 	// what to fire?
 	switch(self->style)
 	{
-	case 1:
-	default:
-		fire_bullet(self, start, forward, AC_BULLET_DMG, AC_BULLET_KICK, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD, MOD_AUTOCANNON);
-		gi.WriteByte (svc_muzzleflash);
-		gi.WriteShort (self - g_edicts);
-		gi.WriteByte (MZ_CHAINGUN2);
-		gi.multicast (self->s.origin, MULTICAST_PVS);
-		break;
-	case 2:
-		fire_rocket(self, start, forward, AC_ROCKET_DMG, AC_ROCKET_SPEED, AC_ROCKET_RADIUS_DMG, AC_ROCKET_DMG_RADIUS);
-		gi.WriteByte (svc_muzzleflash);
-		gi.WriteShort (self - g_edicts);
-		gi.WriteByte (MZ_ROCKET);
-		gi.multicast (self->s.origin, MULTICAST_PVS);
-		break;
-	case 3:
-	case 4:
-		fire_blaster (self, start, forward, AC_BLASTER_DMG, AC_BLASTER_SPEED, EF_HYPERBLASTER, true);
-		gi.WriteByte (svc_muzzleflash);
-		gi.WriteShort (self - g_edicts);
-		gi.WriteByte (MZ_HYPERBLASTER);
-		gi.multicast (self->s.origin, MULTICAST_PVS);
-		break;
+		case 1:
+		default:
+			fire_bullet(self, start, forward, AC_BULLET_DMG, AC_BULLET_KICK, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD, MOD_AUTOCANNON);
+			gi.WriteByte (svc_muzzleflash);
+			gi.WriteShort (self - g_edicts);
+			gi.WriteByte (MZ_CHAINGUN2);
+			gi.multicast (self->s.origin, MULTICAST_PVS);
+			break;
+		case 2:
+			fire_rocket(self, start, forward, AC_ROCKET_DMG, AC_ROCKET_SPEED, AC_ROCKET_RADIUS_DMG, AC_ROCKET_DMG_RADIUS);
+			gi.WriteByte (svc_muzzleflash);
+			gi.WriteShort (self - g_edicts);
+			gi.WriteByte (MZ_ROCKET);
+			gi.multicast (self->s.origin, MULTICAST_PVS);
+			break;
+		case 3:
+		case 4:
+			fire_blaster (self, start, forward, AC_BLASTER_DMG, AC_BLASTER_SPEED, EF_HYPERBLASTER, true);
+			gi.WriteByte (svc_muzzleflash);
+			gi.WriteShort (self - g_edicts);
+			gi.WriteByte (MZ_HYPERBLASTER);
+			gi.multicast (self->s.origin, MULTICAST_PVS);
+			break;
 	}
 }
 
@@ -274,6 +279,11 @@ qboolean canShoot(edict_t *self, edict_t *e)
 {
 	vec3_t delta;
 	vec3_t dangles;
+
+	if (!self || !e)
+	{
+		return false;
+	}
 
 	VectorSubtract(e->s.origin, self->s.origin, delta);
 	vectoangles(delta, dangles);
@@ -318,6 +328,11 @@ qboolean autocannonInfront (edict_t *self, edict_t *other)
 void monster_autocannon_findenemy(edict_t *self)
 {
 	edict_t *e = NULL;
+
+	if (!self)
+	{
+		return;
+	}
 
 	// can we still use our enemy?
 	if (self->enemy)
@@ -406,6 +421,12 @@ void monster_autocannon_findenemy(edict_t *self)
 void monster_autocannon_turn(edict_t *self)
 {
 	vec3_t old_angles;
+
+	if (!self)
+	{
+		return;
+	}
+
 	VectorCopy(self->s.angles, old_angles);
 	if (!self->enemy)
 	{
@@ -518,6 +539,11 @@ void monster_autocannon_think(edict_t *self)
 	int lefty = 0;
 	edict_t *old_enemy;
 
+	if (!self)
+	{
+		return;
+	}
+
 	self->nextthink = level.time + FRAMETIME;
 
 	// get an enemy
@@ -599,6 +625,11 @@ void monster_autocannon_explode (edict_t *ent)
 {
 	vec3_t origin;
 
+	if (!ent)
+	{
+		return;
+	}
+
 	T_RadiusDamage(ent, ent, AC_EXPLODE_DMG, ent->enemy, AC_EXPLODE_RADIUS, MOD_TRIPBOMB);
 
 	VectorMA (ent->s.origin, -0.02, ent->velocity, origin);
@@ -631,6 +662,11 @@ void monster_autocannon_explode (edict_t *ent)
 
 void monster_autocannon_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point)
 {
+	if (!self)
+	{
+		return;
+	}
+
 	// explode
 	self->takedamage = DAMAGE_NO;
 	self->think = monster_autocannon_explode;
@@ -639,6 +675,11 @@ void monster_autocannon_die (edict_t *self, edict_t *inflictor, edict_t *attacke
 
 void monster_autocannon_pain (edict_t *self, edict_t *other, float kick, int damage)
 {
+	if (!self || !other)
+	{
+		return;
+	}
+
 	// keep the enemy
 	if (other->client || other->svflags & SVF_MONSTER)
 		self->enemy = other;
@@ -646,6 +687,11 @@ void monster_autocannon_pain (edict_t *self, edict_t *other, float kick, int dam
 
 void monster_autocannon_activate(edict_t *self)
 {
+	if (!self)
+	{
+		return;
+	}
+
 	self->active = AC_S_ACTIVATING;
 	self->nextthink = level.time + FRAMETIME;
 
@@ -677,6 +723,11 @@ void monster_autocannon_activate(edict_t *self)
 
 void monster_autocannon_deactivate(edict_t *self)
 {
+	if (!self)
+	{
+		return;
+	}
+
 	self->active = AC_S_DEACTIVATING;
 	self->nextthink = level.time + FRAMETIME;
 	
@@ -758,6 +809,11 @@ void monster_autocannon_act(edict_t *self)
 
 void monster_autocannon_use(edict_t *self, edict_t *other, edict_t *activator)
 {
+	if (!self)
+	{
+		return;
+	}
+
 	// on/off or berserk toggle?
 	if (self->spawnflags & AC_SF_BERSERK_TOGGLE)
 	{
@@ -780,6 +836,11 @@ void SP_monster_autocannon(edict_t *self)
 {
 	edict_t *base, *turret;
 	vec3_t offset;
+
+	if (!self)
+	{
+		return;
+	}
 
 	if (deathmatch->value)
 	{
@@ -900,6 +961,11 @@ void SP_monster_autocannon(edict_t *self)
 
 void SP_monster_autocannon_floor(edict_t *self)
 {
+	if (!self)
+	{
+		return;
+	}
+
 	if (self->style == 1)
 	{
 		gi.error("monster_autocannon_floor does not permit bullet style");
@@ -908,7 +974,10 @@ void SP_monster_autocannon_floor(edict_t *self)
 	}
 
 	if (self->style < 1 || self->style > 4)
+	{
 		self->style = 2;
+	}
+
 	self->onFloor = 1; // signify floor mounted
 	// call the other one
 	SP_monster_autocannon(self);

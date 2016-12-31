@@ -9,8 +9,15 @@ void zCam_SetLocalCopy(struct edict_s *player, char *s);
 
 void zCam_TrackEntity(struct edict_s *player, struct edict_s *track, qboolean playerVisiable, qboolean playerOffset)
 {
+	if (!player || !track)
+	{
+		return;
+	}
+
 	if(player->client == NULL)
+	{
 		return;  // not a true player
+	}
 	
 	player->client->zCameraTrack = track;
 	
@@ -54,6 +61,11 @@ void zCam_TrackEntity(struct edict_s *player, struct edict_s *track, qboolean pl
 
 void zCam_Stop(struct edict_s *player)
 {
+	if (!player)
+	{
+		return;
+	}
+
 	if(player->client == NULL)
 	{
 		return;  // not a true player
@@ -81,6 +93,11 @@ void zCam_Stop(struct edict_s *player)
 
 void zCam_SetLocalCopy(struct edict_s *player, char *s)
 {
+	if (!player)
+	{
+		return;
+	}
+
 	if(player->client->zCameraLocalEntity)
 	{
 		player->client->zCameraLocalEntity->s.modelindex = gi.modelindex("models/objects/gibs/head2/tris.md2");

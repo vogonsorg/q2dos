@@ -76,6 +76,11 @@ void SP_misc_securitycamera(edict_t *self)
 {
 	vec3_t offset, forward, up;
 
+	if (!self)
+	{
+		return;
+	}
+
 	// no message? error
 	if (!self->message)
 	{
@@ -205,6 +210,11 @@ void stopCamera(edict_t *self)
 edict_t *findNextCamera(edict_t *old)
 {
 	edict_t *e = NULL;
+
+	if(!old)
+	{
+		return NULL;
+	}
 
 	// first of all, are there *any* cameras?
 	e = G_Find(NULL, FOFS(classname), "misc_securitycamera");

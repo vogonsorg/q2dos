@@ -648,7 +648,7 @@ void sentien_do_blast(edict_t *self)
 	vec3_t   end;
 	int      idx;
 
-	if (!self)
+	if (!self || !self->enemy)
 	{
 		return;
 	}

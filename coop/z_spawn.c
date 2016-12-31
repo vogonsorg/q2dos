@@ -24,7 +24,10 @@ edict_t *FindZSpawn(int i)
 
 	// make 1 last ditch effor
 	if (!spot)
+	{
 		spot = G_Find(NULL, FOFS(classname), "info_player_deathmatch");
+	}
+
 	return spot;
 }
 
@@ -38,6 +41,11 @@ qboolean SpawnZ(gitem_t *item, edict_t *spot)
 	trace_t tr;
 	int ang = 0;
 	int startAng = 0;
+
+	if (!item || !spot)
+	{
+		return;
+	}
 
 	ent = G_Spawn();
 
@@ -98,15 +106,20 @@ void Z_SpawnDMItems()
 
 	// only with the flag set
 	if ((int)zdmflags->value & ZDM_ZAERO_ITEMS)
+	{
 		return;
+	}
 
 	// scan thru all the items looking for our items
 	ptr = items;
 	while (*ptr != NULL)
 	{
 		edict_t *e = G_Find(NULL, FOFS(classname), *ptr);
+
 		if (e != NULL)
+		{
 			return;
+		}
 
 		ptr++;
 	}
@@ -122,13 +135,18 @@ void Z_SpawnDMItems()
 		i = FindItemByClassname(*ptr);
 		ptr++;
 		if (i == NULL)
+		{
 			continue;
+		}
 
 		for (j = 0; j < 4; j++)
 		{
 			spot = FindZSpawn(count++);
+
 			if (spot == NULL)
+			{
 				break;
+			}
 
 			if (SpawnZ(i, spot))
 			{
@@ -139,4 +157,3 @@ void Z_SpawnDMItems()
 	}
 	gi.dprintf(DEVELOPER_MSG_GAME, "%i Zaero entities added\n", added);
 }
-

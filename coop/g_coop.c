@@ -214,7 +214,7 @@ char *GetSkillString (void)
 }
 
 void
-CoopReturnToMain(edict_t *ent, pmenuhnd_t *p)
+CoopReturnToMain(edict_t *ent, pmenuhnd_t *p /* unused */)
 {
 	if(!ent || !ent->client)
 	{
@@ -226,7 +226,7 @@ CoopReturnToMain(edict_t *ent, pmenuhnd_t *p)
 }
 
 void
-CoopReturnToVoteMenu(edict_t *ent, pmenuhnd_t *p)
+CoopReturnToVoteMenu(edict_t *ent, pmenuhnd_t *p /* unused */)
 {
 	if(!ent || !ent->client)
 	{
@@ -399,7 +399,7 @@ CoopOpenVoteMenu(edict_t *ent)
 }
 
 void
-CoopCredits(edict_t *ent, pmenuhnd_t *p)
+CoopCredits(edict_t *ent, pmenuhnd_t *p /* unused */)
 {
 	if(!ent || !ent->client)
 	{
@@ -412,7 +412,7 @@ CoopCredits(edict_t *ent, pmenuhnd_t *p)
 			NULL, PMENU_NORMAL);
 }
 
-void CoopChaseCam(edict_t *ent, pmenuhnd_t *p)
+void CoopChaseCam(edict_t *ent, pmenuhnd_t *p /* unused */)
 {
 	if(!ent || !ent->client)
 	{
@@ -425,7 +425,7 @@ void CoopChaseCam(edict_t *ent, pmenuhnd_t *p)
 	gi.unicast(ent, true);
 }
 
-void CoopJoinGame(edict_t *ent, pmenuhnd_t *p)
+void CoopJoinGame(edict_t *ent, pmenuhnd_t *p /* unused */)
 {
 	if(!ent || !ent->client)
 	{
@@ -488,7 +488,7 @@ void CoopUpdateMotdMenu (void)
 	}
 }
 
-void CoopMotd(edict_t *ent, pmenuhnd_t *p)
+void CoopMotd(edict_t *ent, pmenuhnd_t *p /* unused */)
 {
 	if(!ent || !ent->client)
 	{
@@ -501,7 +501,7 @@ void CoopMotd(edict_t *ent, pmenuhnd_t *p)
 	PMenu_Open(ent, motdmenu, 0, sizeof(motdmenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
 }
 
-void CoopVoteMenu(edict_t *ent, pmenuhnd_t *p)
+void CoopVoteMenu(edict_t *ent, pmenuhnd_t *p /* unused */)
 {
 	if(!ent || !ent->client)
 	{
@@ -556,7 +556,7 @@ void CoopUpdateGamemodeMenu(edict_t *ent)
 	votegamemodemenu[VGAMEMODEMENU_GAMEMODE].text = gamemodestring;
 }
 
-void CoopVoteGamemode(edict_t *ent, pmenuhnd_t *p)
+void CoopVoteGamemode(edict_t *ent, pmenuhnd_t *p /* unused */)
 {
 	if(!ent || !ent->client)
 	{
@@ -606,7 +606,7 @@ void CoopUpdateDifficultyMenu(edict_t *ent)
 	voteskillmenu[VSKILLMENU_SKILL].text = skillstring;
 }
 
-void CoopVoteDifficulty(edict_t *ent, pmenuhnd_t *p)
+void CoopVoteDifficulty(edict_t *ent, pmenuhnd_t *p /* unused */)
 {
 	if(!ent || !ent->client)
 	{
@@ -659,7 +659,7 @@ void CoopUpdateVoteMapMenu(edict_t *ent)
 	}
 }
 
-void CoopVoteMap(edict_t *ent, pmenuhnd_t *p)
+void CoopVoteMap(edict_t *ent, pmenuhnd_t *p /* unused */)
 {
 	size_t size;
 
@@ -702,12 +702,12 @@ void CoopVoteRestartMap(edict_t *ent, pmenuhnd_t *p)
 	gi.unicast(ent, true);
 }
 
-void CoopVoteChangeMap(edict_t *ent, pmenuhnd_t *p)
+void CoopVoteChangeMap(edict_t *ent, pmenuhnd_t *p /* unused */)
 {
 	char mapVote[64];
 	char votestring[64];
 
-	if(!ent || !ent->client)
+	if(!ent || !ent->client || !p)
 	{
 		return;
 	}
@@ -723,7 +723,7 @@ void CoopVoteChangeMap(edict_t *ent, pmenuhnd_t *p)
 	gi.unicast(ent, true);
 }
 
-void CoopCheckGamemode(edict_t *ent, pmenuhnd_t *p)
+void CoopCheckGamemode(edict_t *ent, pmenuhnd_t *p /* unused */)
 {
 	char votestring[64];
 
@@ -759,7 +759,7 @@ void CoopCheckGamemode(edict_t *ent, pmenuhnd_t *p)
 	}
 }
 
-void CoopCheckDifficulty(edict_t *ent, pmenuhnd_t *p)
+void CoopCheckDifficulty(edict_t *ent, pmenuhnd_t *p /* unused */)
 {
 	char votestring[64];
 
