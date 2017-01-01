@@ -447,6 +447,11 @@ float Coop_Players_In_Range(edict_t *activator) /* FS: Get player distance so we
 	float dist, closePercentage;
 	edict_t *ent;
 
+	if (!activator)
+	{
+		return 0.0f;
+	}
+
 	playersInGame = playersClose = 0;
 	for (i = 0; i < game.maxclients; i ++)
 	{
