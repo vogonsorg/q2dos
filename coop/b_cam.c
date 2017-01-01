@@ -166,12 +166,18 @@ ShowStats(edict_t *ent, edict_t *player)
 	health = player->health;
 
 	armorpow = 0;
-	if (PowerArmorType(ent))
-		armorpow = ent->client->pers.inventory[CellsIndex];
+	if (PowerArmorType(player))
+		armorpow = player->client->pers.inventory[CellsIndex];
 
-	index = ArmorIndex (ent);
+	index = ArmorIndex (player);
 	if (index)
-		armor = ent->client->pers.inventory[index];
+		armor = player->client->pers.inventory[index];
+
+	/* FS: See cl_scrn.c.  Values for armor can be negative and are ignored */
+	if(armor < 1)
+		armor = 0;
+	if (armorpow < 1)
+		armorpow = 0;
 
 	if (armorpow)
 		sprintf(stats+j, "%s: armor=%3d(%3d), health=%3d (f=%+5d,r=%+5d,u=%+5d)\n"
@@ -200,7 +206,7 @@ void stopBlinkyCam(edict_t * ent)
 		return;
 
 	bdata = &ent->client->blinky_client;
-	if(!bdata)
+	if(!bdata || !bdata->cam_decoy)
 	{
 		return;
 	}
@@ -218,15 +224,26 @@ void stopBlinkyCam(edict_t * ent)
 	gi.linkentity(ent);
 
 	/* FS: Get rid of the decoy, free up some edicts */
-	G_FreeEdict(bdata->cam_decoy);
-	bdata->cam_decoy = NULL;
+	if(bdata->cam_decoy)
+	{
+		G_FreeEdict(bdata->cam_decoy);
+		bdata->cam_decoy = NULL;
+	}
 //	gi.linkentity(bdata->cam_decoy);
 }
 
 void StartCam(edict_t * ent, edict_t * target)
 {
-	BlinkyClient_t * bdata = &ent->client->blinky_client;
-	edict_t * decoy = bdata->cam_decoy;
+	BlinkyClient_t *bdata = NULL;
+	edict_t *decoy = NULL;
+
+	if (!ent || !ent->client || !target || !target->client)
+	{
+		return;
+	}
+
+	bdata = &ent->client->blinky_client;
+	decoy = bdata->cam_decoy;
 
 	bdata->cam_target = target;
 	ent->svflags |= SVF_NOCLIENT;
@@ -268,8 +285,6 @@ void Cmd_Stats_f(edict_t *ent)
 	{
 		if (!player->inuse || !player->client || player->client->pers.spectator)
 			continue;
-//		if (player == ent)
-//			continue;
 		// if a specific name requested & doesn't match, skip
 		if (name[0])
 		{
@@ -284,6 +299,7 @@ void Cmd_Stats_f(edict_t *ent)
 void Cmd_Cam_f(edict_t *ent)
 {
 	char * name = gi.args();
+	qboolean bFindFailed = true;
  // obj1 is how to tell when we've looped
 	edict_t * obj1;
 	edict_t * target;
@@ -298,11 +314,33 @@ void Cmd_Cam_f(edict_t *ent)
 	obj1 = bdata->cam_target;
 
 	if (!coop->value || IsSpectator(ent))
+	{
 		return;
+	}
+
+	if (name[0] && !Q_stricmp(name, ent->client->pers.netname))
+	{
+		gi.cprintf(ent, PRINT_HIGH, "You can't spectate yourself!\n");
+		return;
+	}
+
+	if (obj1 && obj1->client && name[0] && !Q_stricmp(name, obj1->client->pers.netname)) /* FS: If we ask for it twice and we're already viewing them then bust out */
+	{
+		stopBlinkyCam(ent);
+		return;
+	}
 
 	if (!obj1)
+	{
 		obj1 = ent;
+	}
+	else
+	{
+		stopBlinkyCam(ent); /* FS: Stop the camera or else it gets all flabbergasted when cycling */
+	}
+
 	target = obj1;
+
 	while(1)
 	{
 		// advance loop thru edicts
@@ -323,16 +361,29 @@ void Cmd_Cam_f(edict_t *ent)
 		// found cam target
 		if (target == ent)
 		{
+			bFindFailed = false;
 			stopBlinkyCam(ent);
 		}
 		else
 		{
+			bFindFailed = false;
 			StartCam(ent, target);
 			ShowStats(ent, target);
 		}
 		break;
 	}
 
+	if(bFindFailed)
+	{
+		if(name[0])
+		{
+			gi.cprintf(ent, PRINT_HIGH, "Can't find player \"%s\" to chase!\n", name);
+		}
+		else
+		{
+			gi.cprintf(ent, PRINT_HIGH, "Can't find a player to chase!\n");
+		}
+	}
 }
 
 static void Summon(edict_t *ent, edict_t *other)

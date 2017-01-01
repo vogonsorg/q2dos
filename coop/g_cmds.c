@@ -1521,7 +1521,8 @@ Cmd_Players_f(edict_t *ent)
 
 	for (i = 0; i < count; i++)
 	{
-		Com_sprintf(small, sizeof(small), "%3i %s\n",
+		Com_sprintf(small, sizeof(small), "[%2d] %3i %s\n",
+				index[i],
 				game.clients[index[i]].ps.stats[STAT_FRAGS],
 				game.clients[index[i]].pers.netname);
 
