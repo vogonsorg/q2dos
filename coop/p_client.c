@@ -2290,6 +2290,9 @@ PutClientInServer(edict_t *ent)
 		resp.coop_respawn.helpchanged = client->pers.helpchanged;
 		resp.coop_respawn.didMotd = client->pers.didMotd; /* FS */
 		resp.coop_respawn.noSummon = client->pers.noSummon; /* FS */
+		resp.coop_respawn.name_timeout = client->pers.name_timeout; /* FS */
+		strcpy(resp.coop_respawn.netname, client->pers.netname); /* FS */
+
 		if (game.gametype == zaero_coop)
 		{
 			resp.coop_respawn.visorFrames = client->pers.visorFrames; /* FS: Zaero visor */
@@ -2626,6 +2629,7 @@ void
 ClientUserinfoChanged(edict_t *ent, char *userinfo)
 {
 	char *s;
+	qboolean bAllowNameChange = true;
 	int playernum;
 
 	if (!ent || !userinfo)
@@ -2641,8 +2645,39 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 
 	/* set name */
 	s = Info_ValueForKey(userinfo, "name");
-	strncpy(ent->client->pers.netname, s, sizeof(ent->client->pers.netname) -
-			1);
+	if(!s[0] || s[0] == ' ') /* FS: Catch trouble makers */
+	{
+		Info_SetValueForKey(userinfo, "name", "unnamed");
+		strncpy(ent->client->pers.netname, "unnamed", sizeof(ent->client->pers.netname) -
+				1);
+		ent->client->pers.name_timeout = level.time + sv_coop_name_timeout->value;
+	}
+	else
+	{
+		if(sv_coop_announce_name_change->intValue && ent->client && ent->client->pers.netname[0] && s[0] && Q_stricmp(ent->client->pers.netname, s)) /* FS: Catch trouble makers */
+		{
+			if(ent->client && ent->client->pers.name_timeout > level.time)
+			{
+				gi.cprintf(ent, PRINT_HIGH, "You are changing names too quickly!  Please wait another %d second(s).\n", (int)ent->client->pers.name_timeout-(int)level.time);
+				Info_SetValueForKey(userinfo, "name", ent->client->pers.netname);
+				bAllowNameChange = false;
+			}
+			else
+			{
+				gi.bprintf(PRINT_HIGH, "%s changes name to %s.\n", ent->client->pers.netname, s);
+			}
+		}
+
+		if(bAllowNameChange)
+		{
+			if(ent->client->pers.netname[0] && Q_stricmp(ent->client->pers.netname, s)) /* FS: If the netname has been set, and it doesn't match what we got then set the timeout.  On initial connect sequence the username is blank so we can't count that one. */
+			{
+				ent->client->pers.name_timeout = level.time + sv_coop_name_timeout->value;
+			}
+			strncpy(ent->client->pers.netname, s, sizeof(ent->client->pers.netname) -
+					1);
+		}
+	}
 
 	/* set spectator */
 	s = Info_ValueForKey(userinfo, "spectator");
@@ -2735,6 +2770,19 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 		ent->client->pers.isVIP = ent->client->resp.isVIP = false;
 	}
 
+	/* FS: Explicitly allow it to be disabled all the time */
+	s = Info_ValueForKey(userinfo, "nosummon");
+	if (strlen(s))
+	{
+		if(atoi(s))
+		{
+			ent->client->pers.noSummon = ent->client->resp.noSummon = ent->client->resp.coop_respawn.noSummon = true;
+		}
+		else
+		{
+			ent->client->pers.noSummon = ent->client->resp.noSummon = ent->client->resp.coop_respawn.noSummon = false;
+		}
+	}
 	/* save off the userinfo in case we want to check something later */
 	strncpy(ent->client->pers.userinfo, userinfo, sizeof(ent->client->pers.userinfo) - 1);
 }

@@ -760,6 +760,10 @@ extern	cvar_t	*sv_coop_gamemode; /* FS: Coop: Added */
 extern	cvar_t	*sv_coop_reset_hack; /* FS: Coop: Gross reset frametime hack shit */
 extern	cvar_t	*sv_coop_maplist; /* FS: External file we need for the map voting */
 extern	cvar_t	*sv_coop_check_player_exit; /* FS: Check player distance to exit a level */
+extern	cvar_t	*sv_coop_summon_time; /* FS: Added */
+extern	cvar_t	*sv_coop_announce_name_change; /* FS: Added */
+extern	cvar_t	*sv_coop_name_timeout; /* FS: Added */
+extern	cvar_t	*sv_coop_blinky_cam_disallowflags; /* FS: Added */
 extern	cvar_t	*sv_spawn_protection; /* FS: Coop: Spawn protection */
 extern	cvar_t	*sv_spawn_protection_time; /* FS: Coop: Spawn protection */
 extern	cvar_t	*motd; /* FS: Coop: Added */
@@ -1385,6 +1389,7 @@ typedef struct
 //=========
 
 	float visorFrames; /* FS: Zaero specific game dll changes */
+	float name_timeout; /* FS: Added */
 } client_persistant_t;
 
 // client data that stays across deathmatch respawns
