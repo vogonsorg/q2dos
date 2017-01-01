@@ -7,6 +7,13 @@
 #ifndef B_CAM_H
 #define B_CAM_H
 
+/* FS: Flags for sv_vote_disallow_flags */
+#define	BCAM_NOSUMMON			0x00000002 /* 2 */
+#define	BCAM_NOTELEPORT			0x00000004 /* 4 */
+#define	BCAM_NOSTATS			0x00000008 /* 8 */
+#define	BCAM_NORUNRUN			0x00000010 /* 16 */
+#define	BCAM_NOCHASE			0x00000020 /* 32 */
+
 struct BlinkyClient_s
 {
 	edict_t	*cam_target;

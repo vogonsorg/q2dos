@@ -281,6 +281,12 @@ void Cmd_Stats_f(edict_t *ent)
 		return;
 	}
 
+	if (sv_coop_blinky_cam_disallowflags->intValue & BCAM_NOSTATS)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Summon command disabled on this server!\n");
+		return;
+	}
+
 	for (player = &g_edicts[0]+1; player< &g_edicts[0]+(int)(maxclients->value)+1; player++)
 	{
 		if (!player->inuse || !player->client || player->client->pers.spectator)
@@ -307,6 +313,12 @@ void Cmd_Cam_f(edict_t *ent)
 
 	if (!ent || !ent->client || ent->client->pers.spectator)
 	{
+		return;
+	}
+
+	if (sv_coop_blinky_cam_disallowflags->intValue & BCAM_NOCHASE)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Chase camera command disabled on this server!\n");
 		return;
 	}
 
@@ -466,7 +478,7 @@ static void Summon(edict_t *ent, edict_t *other)
 	VectorClear (other->client->v_angle);
 	VectorClear (other->client->kick_angles);
 	VectorClear (other->client->kick_origin);
-	ent->client->summon_time = level.time + 10.0f;
+	ent->client->summon_time = level.time + sv_coop_summon_time->value;
 }
 
 static void Teleport(edict_t *ent, edict_t *other)
@@ -542,13 +554,19 @@ static void Teleport(edict_t *ent, edict_t *other)
 	VectorClear (other->client->v_angle);
 	VectorClear (other->client->kick_angles);
 	VectorClear (other->client->kick_origin);
-	other->client->summon_time = level.time + 10.0f;
+	other->client->summon_time = level.time + sv_coop_summon_time->value;
 }
 
 void Cmd_NoSummon_f(edict_t *ent)
 {
 	if (!ent || !ent->client || ent->client->pers.spectator)
 	{
+		return;
+	}
+
+	if (sv_coop_blinky_cam_disallowflags->intValue & BCAM_NOSUMMON)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Summon command disabled on this server!\n");
 		return;
 	}
 
@@ -569,6 +587,12 @@ void Cmd_Runrun_f(edict_t *ent)
 
 	if (!ent || !ent->client || ent->client->pers.spectator)
 	{
+		return;
+	}
+
+	if (sv_coop_blinky_cam_disallowflags->intValue & BCAM_NORUNRUN)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Auto-run command disabled on this server!\n");
 		return;
 	}
 
@@ -593,6 +617,12 @@ void Cmd_Summon_f(edict_t *ent)
 
 	if (!ent || !ent->client || ent->client->pers.spectator)
 	{
+		return;
+	}
+
+	if (sv_coop_blinky_cam_disallowflags->intValue & BCAM_NOSUMMON)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Summon command disabled on this server!\n");
 		return;
 	}
 
@@ -636,6 +666,12 @@ void Cmd_Teleport_f(edict_t *ent)
 
 	if (!ent || !ent->client || ent->client->pers.spectator)
 	{
+		return;
+	}
+
+	if (sv_coop_blinky_cam_disallowflags->intValue & BCAM_NOTELEPORT)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Teleport command disabled on this server!\n");
 		return;
 	}
 

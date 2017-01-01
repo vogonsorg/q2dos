@@ -2,16 +2,16 @@
 #include "m_player.h"
 
 /* FS: Flags for sv_vote_disallow_flags */
-#define	VOTE_NOGAMEMODE			0x00000001
-#define	VOTE_NOVANILLA			0x00000002
-#define	VOTE_NOXATRIX			0x00000004
-#define	VOTE_NOROGUE			0x00000008
-#define	VOTE_NOZAERO			0x00000010
-#define	VOTE_NOCOOPSKILL		0x00000020
-#define	VOTE_NOMAP				0x00000040
-#define	VOTE_NORANDOMMAPS		0x00000080
-#define VOTE_NORESETMAP			0x00000100
-#define VOTE_NOPLAYEREXIT		0x00000200
+#define	VOTE_NOGAMEMODE			0x00000002 /* 2 */
+#define	VOTE_NOVANILLA			0x00000004 /* 4 */
+#define	VOTE_NOXATRIX			0x00000008 /* 8 */
+#define	VOTE_NOROGUE			0x00000010 /* 16 */
+#define	VOTE_NOZAERO			0x00000020 /* 32 */
+#define	VOTE_NOCOOPSKILL		0x00000040 /* 64 */
+#define	VOTE_NOMAP				0x00000080 /* 128 */
+#define	VOTE_NORANDOMMAPS		0x00000100 /* 256 */
+#define VOTE_NORESETMAP			0x00000200 /* 512 */
+#define VOTE_NOPLAYEREXIT		0x00000400 /* 1024 */
 
 /* Globals */
 qboolean bVoteInProgress;
