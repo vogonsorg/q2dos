@@ -759,6 +759,7 @@ extern	cvar_t	*sv_vote_chat_commands; /* FS: Coop: Voting */
 extern	cvar_t	*sv_coop_gamemode; /* FS: Coop: Added */
 extern	cvar_t	*sv_coop_reset_hack; /* FS: Coop: Gross reset frametime hack shit */
 extern	cvar_t	*sv_coop_maplist; /* FS: External file we need for the map voting */
+extern	cvar_t	*sv_coop_check_player_exit; /* FS: Check player distance to exit a level */
 extern	cvar_t	*sv_spawn_protection; /* FS: Coop: Spawn protection */
 extern	cvar_t	*sv_spawn_protection_time; /* FS: Coop: Spawn protection */
 extern	cvar_t	*motd; /* FS: Coop: Added */
@@ -1371,6 +1372,7 @@ typedef struct
 	qboolean	isAdmin; /* FS: Coop: Admin goodies */
 	qboolean	isVIP; /* FS: Coop: VIP goodies */
 	qboolean	didMotd; /* FS: Coop: MOTD */
+	qboolean	noSummon; /* FS: Blinky Cam */
 
 //=========
 //ROGUE
@@ -1397,6 +1399,7 @@ typedef struct
 	qboolean	isAdmin; /* FS: Coop: Admin goodies */
 	qboolean	isVIP; /* FS: Coop: VIP goodies */
 	qboolean	didMotd; /* FS: Coop: MOTD */
+	qboolean	noSummon; /* FS: Blinky Cam */
 } client_respawn_t;
 
 // this structure is cleared on each PutClientInServer(),

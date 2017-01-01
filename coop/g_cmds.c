@@ -1626,6 +1626,12 @@ void sayCmd_CheckVote(edict_t *ent, char *voteChat)
 		gi.WriteString("vote restartmap\n");
 		gi.unicast(ent, true);
 	}
+	else if(!stricmp(voteChat, "vote playerexit"))
+	{
+		gi.WriteByte(svc_stufftext);
+		gi.WriteString("vote playerexit\n");
+		gi.unicast(ent, true);
+	}
 	else if(!strncmp(voteChat, "vote map ", 9))
 	{
 		gi.WriteByte(svc_stufftext);

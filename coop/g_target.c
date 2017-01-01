@@ -433,12 +433,73 @@ SP_target_explosion(edict_t *ent)
  * QUAKED target_changelevel (1 0 0) (-8 -8 -8) (8 8 8)
  * Changes level to "map" when fired
  */
+
+void changelevel_dummy(edict_t *self)
+{
+	/* FS: Purposely does nothing */
+}
+
+#define VectorDistance(v1, v2) (sqrt( (((v2)[0] - (v1)[0]) * ((v2)[0] - (v1)[0])) + (((v2)[1] - (v1)[1]) * ((v2)[1] - (v1)[1])) + (((v2)[2] - (v1)[2]) * ((v2)[2] - (v1)[2])) ) )
+
+float Coop_Players_In_Range(edict_t *activator) /* FS: Get player distance so we can't get morons who keep backpedalling to fuck the game up */
+{
+	int i, playersInGame, playersClose;
+	float dist, closePercentage;
+	edict_t *ent;
+
+	playersInGame = playersClose = 0;
+	for (i = 0; i < game.maxclients; i ++)
+	{
+		ent = &g_edicts[i + 1];
+
+		if (!ent || !ent->inuse || !ent->client || ent->client->pers.spectator)
+		{
+			continue;
+		}
+
+		playersInGame++;
+
+		dist = VectorDistance(activator->s.origin, ent->s.origin);
+		if (dist <= 200.0f)
+		{
+			playersClose++;
+		}
+	}
+
+	if(!playersClose || !playersInGame)
+	{
+		return 0.0f;
+	}
+
+	closePercentage = (float)playersClose / (float)playersInGame;
+
+	return closePercentage;
+}
+
 void
 use_target_changelevel(edict_t *self, edict_t *other, edict_t *activator)
 {
 	if (!self || !other  || !activator)
 	{
 		return;
+	}
+
+	if (coop->intValue && sv_coop_check_player_exit->intValue)
+	{
+		if(self->nextthink < level.time)
+		{
+			if(Coop_Players_In_Range(activator) <= 0.50f) /* FS: Need at least 51% of players at the exit to continue on */
+			{
+				self->think = changelevel_dummy;
+				self->nextthink = level.time + 1.0f;
+				gi.bprintf(PRINT_HIGH, "%s is at the exit.\n", activator->client->pers.netname);
+				return;
+			}
+		}
+		else
+		{
+			return;
+		}
 	}
 
 	if (level.intermissiontime)
@@ -465,7 +526,7 @@ use_target_changelevel(edict_t *self, edict_t *other, edict_t *activator)
 	}
 
 	/* if multiplayer, let everyone know who hit the exit */
-	if (deathmatch->value)
+	if (maxclients->intValue > 1) /* FS: Show it in Coop too */
 	{
 		if (activator && activator->client)
 		{

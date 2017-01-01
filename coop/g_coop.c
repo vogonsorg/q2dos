@@ -45,6 +45,7 @@ void CoopVoteGamemode(edict_t *ent, pmenuhnd_t *p);
 void CoopVoteDifficulty(edict_t *ent, pmenuhnd_t *p);
 void CoopVoteMap(edict_t *ent, pmenuhnd_t *p);
 void CoopVoteRestartMap(edict_t *ent, pmenuhnd_t *p);
+void CoopVotePlayerReq(edict_t *ent, pmenuhnd_t *p);
 void CoopCheckGamemode(edict_t *ent, pmenuhnd_t *p);
 void CoopCheckDifficulty(edict_t *ent, pmenuhnd_t *p);
 void votemenu_loadmaplist (void);
@@ -122,6 +123,7 @@ pmenu_t votemenu[] = {
 	{"Difficulty", PMENU_ALIGN_LEFT, CoopVoteDifficulty},
 	{"Change Map", PMENU_ALIGN_LEFT, CoopVoteMap},
 	{"Restart Map", PMENU_ALIGN_LEFT, CoopVoteRestartMap},
+	{"Exit Requirements", PMENU_ALIGN_LEFT, CoopVotePlayerReq},
 	{NULL, PMENU_ALIGN_CENTER, NULL},
 	{"Return to Main Menu", PMENU_ALIGN_LEFT, CoopReturnToMain}
 };
@@ -704,6 +706,20 @@ void CoopVoteRestartMap(edict_t *ent, pmenuhnd_t *p)
 
 	gi.WriteByte (svc_stufftext);
 	gi.WriteString ("cmd vote restartmap\n");
+	gi.unicast(ent, true);
+}
+
+void CoopVotePlayerReq(edict_t *ent, pmenuhnd_t *p)
+{
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	PMenu_Close(ent);
+
+	gi.WriteByte (svc_stufftext);
+	gi.WriteString ("cmd vote playerexit\n");
 	gi.unicast(ent, true);
 }
 

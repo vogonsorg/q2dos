@@ -396,7 +396,7 @@ static void Summon(edict_t *ent, edict_t *other)
 		return;
 	}
 
-	if (other->client->blinky_client.nosummon)
+	if (other->client->pers.noSummon)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Player \"%s\" has summon disabled!\n", other->client->pers.netname);
 		return;
@@ -465,16 +465,12 @@ static void Summon(edict_t *ent, edict_t *other)
 
 void Cmd_NoSummon_f(edict_t *ent)
 {
-	BlinkyClient_t *bdata = NULL;
-
 	if (!ent || !ent->client || ent->client->pers.spectator)
 	{
 		return;
 	}
 
-	bdata = &ent->client->blinky_client;
-
-	if (!bdata->nosummon)
+	if (!ent->client->pers.noSummon)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Summon: Disabled!\n");
 	}
@@ -482,7 +478,7 @@ void Cmd_NoSummon_f(edict_t *ent)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Summon: Enabled!\n");
 	}
-	bdata->nosummon = !bdata->nosummon;
+	ent->client->pers.noSummon = !ent->client->pers.noSummon;
 }
 
 void Cmd_Runrun_f(edict_t *ent)

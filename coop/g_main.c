@@ -32,6 +32,7 @@ cvar_t *sv_vote_timer; /* FS: Coop: Voting */
 cvar_t *sv_vote_private; /* FS: Coop: Voting */
 cvar_t *sv_vote_chat_commands; /* FS: Coop: Voting */
 cvar_t *sv_coop_reset_hack; /* FS: Coop: Long uptime reset hack :( */
+cvar_t *sv_coop_check_player_exit; /* FS: Added */
 cvar_t *sv_coop_maplist;
 cvar_t *sv_spawn_protection; /* FS: Coop: Spawn protection */
 cvar_t *sv_spawn_protection_time; /* FS: Coop: Spawn protection */

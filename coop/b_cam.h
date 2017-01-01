@@ -17,7 +17,6 @@ struct BlinkyClient_s
 	int save_hand;
 	int save_weapon;
 
-	int nosummon; // disallow summons
 	int nopickup;
 };
 

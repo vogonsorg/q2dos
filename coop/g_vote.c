@@ -11,6 +11,7 @@
 #define	VOTE_NOMAP				0x00000040
 #define	VOTE_NORANDOMMAPS		0x00000080
 #define VOTE_NORESETMAP			0x00000100
+#define VOTE_NOPLAYEREXIT		0x00000200
 
 /* Globals */
 qboolean bVoteInProgress;
@@ -57,6 +58,7 @@ void vote_warp (edict_t *ent, const char *mapName);
 void VoteMenuChoice(edict_t *ent, pmenuhnd_t *p);
 void vote_menu_broadcast (void);
 void VoteMenuOpen(edict_t *ent);
+void vote_playerexit (edict_t *ent);
 
 #define VOTEMENU_TYPE 6
 #define VOTEMENU_PROGYES 8
@@ -117,7 +119,7 @@ void vote_command(edict_t *ent)
 	if (argc <= 1 ||
 	    (argc >= 2 && (!Q_stricmp(gi.argv(1), "help") || !Q_stricmp(gi.argv(1), "list") || !Q_stricmp(gi.argv(1), "cmds") || !Q_stricmp(gi.argv(1), "commands"))) )
 	{
-		gi.cprintf(ent, PRINT_HIGH, "usage: vote map <mapname>, vote gamemode <gamemode>, vote skill <coopskill>, vote restartmap, vote yes, vote no, vote stop, and vote progress.\n");
+		gi.cprintf(ent, PRINT_HIGH, "usage: vote map <mapname>, vote gamemode <gamemode>, vote skill <coopskill>, vote restartmap, vote playerexit, vote yes, vote no, vote stop, and vote progress.\n");
 		return;
 	}
 	if(!Q_stricmp(gi.argv(1), "map"))
@@ -198,6 +200,10 @@ void vote_command(edict_t *ent)
 			return;
 		}
 	}
+	else if (!Q_stricmp(gi.argv(1), "playerexit"))
+	{
+		vote_playerexit(ent);
+	}
 	else if (!Q_stricmp(gi.argv(1), "progress"))
 	{
 		vote_progress(ent);
@@ -206,7 +212,7 @@ void vote_command(edict_t *ent)
 	else
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Unknown vote command: %s.  ", gi.argv(1));
-		gi.cprintf(ent, PRINT_HIGH, "valid options are: vote map <mapname>, vote gamemode <gamemode>, vote skill <coopskill>, vote restartmap, vote yes, vote no, vote stop, and vote progress.\n");
+		gi.cprintf(ent, PRINT_HIGH, "valid options are: vote map <mapname>, vote gamemode <gamemode>, vote skill <coopskill>, vote restartmap, vote playerexit, vote yes, vote no, vote stop, and vote progress.\n");
 		return;
 	}
 }
@@ -850,6 +856,11 @@ void vote_Passed (void)
 	{
 		Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "wait;wait;wait;wait;wait;gamemap %s\n", voteMap);
 	}
+	else if(!Q_stricmp(voteType, "playerexit"))
+	{
+		gi.cvar_forceset("sv_coop_check_player_exit", voteGamemode); /* FS: Hacky, just reuse voteGamemode */
+		Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "\n");
+	}
 	else
 	{
 		gi.cvar_forceset("sv_coop_gamemode", voteGamemode);
@@ -1270,4 +1281,52 @@ void vote_menu_broadcast (void)
 			VoteMenuOpen(pClient);
 		}
 	}
+}
+
+void vote_playerexit (edict_t *ent)
+{
+	if(!ent || !ent->client)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_playerexit from a non-player!\n");
+	}
+
+	if (bVoteInProgress)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "A vote is already in progress for %s: %s!\n", voteType, whatAreWeVotingFor);
+		return;
+	}
+
+	vote_Reset();
+
+	if(sv_vote_disallow_flags->intValue & VOTE_NOPLAYEREXIT)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Voting for changing player exit requirements are not allowed on this server.  Vote cancelled.\n");
+		return;
+	}
+
+	if (sv_coop_check_player_exit->intValue)
+	{
+		vote_Broadcast("%s votes for changing player exit requirements to disabled! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname);
+		Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "Req. Disabled");
+		Com_sprintf(voteGamemode, sizeof(voteGamemode), "0");
+	}
+	else
+	{
+		vote_Broadcast("%s votes for changing player exit requirements to enabled! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname);
+		Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "Req. Enabled");
+		Com_sprintf(voteGamemode, sizeof(voteGamemode), "1");
+	}
+
+	voteClients = P_Clients_Connected(false);
+	bVoteInProgress = true;
+	Com_sprintf(voteType, 16, "playerexit");
+
+	ent->voteInitiator = true;
+
+	if(sv_vote_assume_yes->intValue)
+	{
+		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
+	}
+
+	vote_menu_broadcast();
 }
