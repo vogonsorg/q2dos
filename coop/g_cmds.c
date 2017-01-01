@@ -2324,6 +2324,10 @@ ClientCommand(edict_t *ent)
 	{
 		Cmd_Summon_f(ent);
 	}
+	else if (Q_stricmp(cmd, "teleport") == 0) /* FS: Added */
+	{
+		Cmd_Teleport_f(ent);
+	}
 	else if (Q_stricmp(cmd, "nosummon") == 0) /* FS: Blinkys's Coop Camera */
 	{
 		Cmd_NoSummon_f(ent);

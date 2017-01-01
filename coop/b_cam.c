@@ -396,6 +396,12 @@ static void Summon(edict_t *ent, edict_t *other)
 		return;
 	}
 
+	if (ent->client->summon_time > level.time)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "You must wait at least %d second(s) before you can summon another player.\n", (int)ent->client->summon_time-(int)level.time);
+		return;
+	}
+
 	if (other->client->pers.noSummon)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Player \"%s\" has summon disabled!\n", other->client->pers.netname);
@@ -411,7 +417,7 @@ static void Summon(edict_t *ent, edict_t *other)
 	VectorSet(offset, 40, 0, ent->viewheight-8);
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
-	
+
 	// code mostly copied from KillBox
 
 	// unlink to make sure it can't possibly interfere with KillBox
@@ -460,8 +466,84 @@ static void Summon(edict_t *ent, edict_t *other)
 	VectorClear (other->client->v_angle);
 	VectorClear (other->client->kick_angles);
 	VectorClear (other->client->kick_origin);
+	ent->client->summon_time = level.time + 10.0f;
 }
 
+static void Teleport(edict_t *ent, edict_t *other)
+{
+	vec3_t offset, forward, right, start;
+	trace_t		tr;
+
+	if (!ent || !ent->client || !other || !other->client)
+	{
+		return;
+	}
+
+	if (other->client->summon_time > level.time)
+	{
+		gi.cprintf(other, PRINT_HIGH, "You must wait at least %d second(s) before you can teleport to another player.\n", (int)other->client->summon_time-(int)level.time);
+		return;
+	}
+
+	if (ent->deadflag == DEAD_DEAD)
+	{
+		gi.cprintf(other, PRINT_HIGH, "Player \"%s\" is dead, aborting teleport!\n", ent->client->pers.netname);
+		return;
+	}
+
+	VectorSet(offset, 40, 0, ent->viewheight-8);
+	AngleVectors (ent->client->v_angle, forward, right, NULL);
+	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
+
+	// code mostly copied from KillBox
+
+	// unlink to make sure it can't possibly interfere with KillBox
+	gi.unlinkentity (other);
+
+	tr = gi.trace (start, other->mins, other->maxs, start, NULL, MASK_PLAYERSOLID);
+	if (tr.fraction < 1.0)
+	{
+		gi.cprintf(other, PRINT_HIGH, "Collision issue.  Can not teleport to \"%s\".\n", ent->client->pers.netname);
+		gi.linkentity (other);
+		return;
+	}
+
+	VectorCopy (start, other->s.origin);
+	VectorCopy (start, other->s.old_origin);
+	other->s.origin[2] += 10;
+
+	// clear the velocity and hold them in place briefly
+	VectorClear (other->velocity);
+	other->client->ps.pmove.pm_time = 160>>3;		// hold time
+	other->client->ps.pmove.pm_flags |= PMF_TIME_TELEPORT;
+
+	// draw the teleport splash at source and on the player
+	other->s.event = EV_PLAYER_TELEPORT;
+
+	// set angles
+	MoveToAngles(other, ent->s.angles);
+
+	VectorClear (other->s.angles);
+	VectorClear (other->client->ps.viewangles);
+	VectorClear (other->client->v_angle);
+	VectorClear (other->client->kick_angles);
+	VectorClear (other->client->kick_origin);
+
+	// kill anything at the destination
+	KillBox (other);
+
+	gi.cprintf(other, PRINT_HIGH, "Teleported to \"%s\"!\n", ent->client->pers.netname);
+
+	gi.linkentity (other);
+
+	/* FS: FIXME: Is this right? -- Do this again, view angles got jacked permanently a couple of times during live play? */
+	VectorClear (other->s.angles);
+	VectorClear (other->client->ps.viewangles);
+	VectorClear (other->client->v_angle);
+	VectorClear (other->client->kick_angles);
+	VectorClear (other->client->kick_origin);
+	other->client->summon_time = level.time + 10.0f;
+}
 
 void Cmd_NoSummon_f(edict_t *ent)
 {
@@ -514,6 +596,12 @@ void Cmd_Summon_f(edict_t *ent)
 		return;
 	}
 
+	if(name[0] && !Q_stricmp(name, ent->client->pers.netname))
+	{
+		gi.cprintf(ent, PRINT_HIGH, "You can't summon yourself!\n");
+		return;
+	}
+
 	for (i = 1; i < (int)(maxclients->value)+1; i++)
 	{
 		target = &g_edicts[i];
@@ -540,6 +628,45 @@ void Cmd_Summon_f(edict_t *ent)
 	}
 }
 
+void Cmd_Teleport_f(edict_t *ent)
+{
+	char *name = gi.args();
+	int i = 0;
+	edict_t *player;
+
+	if (!ent || !ent->client || ent->client->pers.spectator)
+	{
+		return;
+	}
+
+	if(!name[0])
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Usage: teleport <playername>\n");
+		return;
+	}
+
+	if(!Q_stricmp(name, ent->client->pers.netname))
+	{
+		gi.cprintf(ent, PRINT_HIGH, "You can't teleport to yourself!\n");
+		return;
+	}
+
+	for (i = 0; i < game.maxclients; i++)
+	{
+		player = &g_edicts[i+1];
+
+		if(!player || !player->inuse || !player->client || player->client->pers.spectator)
+			continue;
+
+		if(!Q_stricmp(name, player->client->pers.netname))
+		{
+			Teleport(player, ent);
+			return;
+		}
+	}
+
+	gi.cprintf(ent, PRINT_HIGH, "Couldn't find player \"%s\" to teleport to!\n", name);
+}
 
 void Blinky_OnClientTerminate(edict_t *self)
 {

@@ -2102,6 +2102,7 @@ extern int DBall_CheckDMRules ( void ) ;
 extern void Blinky_SpawnEntities ( ) ;
 extern void Blinky_CalcViewOffsets ( edict_t * ent , vec3_t v ) ;
 extern void Blinky_OnClientTerminate ( edict_t * self ) ;
+extern void Cmd_Teleport_f ( edict_t * ent ) ;
 extern void Cmd_Summon_f ( edict_t * ent ) ;
 extern void Cmd_Runrun_f ( edict_t * ent ) ;
 extern void Cmd_NoSummon_f ( edict_t * ent ) ;

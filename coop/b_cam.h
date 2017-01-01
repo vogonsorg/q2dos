@@ -30,6 +30,7 @@ void Blinky_ClientEndServerFrame(edict_t * ent);
 void Cmd_Cam_f(edict_t *ent);
 void Cmd_Stats_f(edict_t *ent);
 void Cmd_Summon_f(edict_t *ent);
+void Cmd_Teleport_f(edict_t *ent);
 void Cmd_NoSummon_f(edict_t *ent);
 void Cmd_Runrun_f(edict_t *ent);
 void Blinky_OnClientTerminate(edict_t *self);

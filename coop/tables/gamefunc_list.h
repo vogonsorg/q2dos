@@ -2102,6 +2102,7 @@
 {"Blinky_SpawnEntities", (byte *)Blinky_SpawnEntities},
 {"Blinky_CalcViewOffsets", (byte *)Blinky_CalcViewOffsets},
 {"Blinky_OnClientTerminate", (byte *)Blinky_OnClientTerminate},
+{"Cmd_Teleport_f", (byte *)Cmd_Teleport_f},
 {"Cmd_Summon_f", (byte *)Cmd_Summon_f},
 {"Cmd_Runrun_f", (byte *)Cmd_Runrun_f},
 {"Cmd_NoSummon_f", (byte *)Cmd_NoSummon_f},

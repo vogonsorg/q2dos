@@ -1530,6 +1530,8 @@ struct gclient_s
 
 	// for sonic cannon
 	float startFireTime; /* FS: Zaero specific game dll changes */
+
+	float summon_time; /* FS: Added */
 };
 
 struct edict_s
