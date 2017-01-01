@@ -1200,7 +1200,7 @@ Pickup_Key(edict_t *ent, edict_t *other)
 				continue;
 			}
 
-			if (strcmp(ent->classname, "key_power_cube") == 0)
+			if ((ent->classname) && (!strcmp(ent->classname, "key_power_cube")))
 			{
 				if (client->client->pers.power_cubes &
 					((ent->spawnflags & 0x0000ff00) >> 8))
@@ -1419,7 +1419,7 @@ Pickup_Ammo(edict_t *ent, edict_t *other)
 		/* don't switch to tesla */
 		if ((other->client->pers.weapon != ent->item) &&
 			(!deathmatch->value || (other->client->pers.weapon == FindItem("blaster"))) &&
-			(strcmp(ent->classname, "ammo_tesla"))) /* FS: Coop: Rogue specific -- ammo_tesla */
+			(ent->classname && strcmp(ent->classname, "ammo_tesla"))) /* FS: Coop: Rogue specific -- ammo_tesla */
 		{
 			other->client->newweapon = ent->item;
 		}
@@ -2162,7 +2162,7 @@ droptofloor(edict_t *ent)
 
 	if (tr.startsolid)
 	{
-		if (strcmp(ent->classname, "foodcube") == 0) /* FS: Coop: Xatrix specific */
+		if ((game.gametype == xatrix_coop) && (ent->classname) && (!strcmp(ent->classname, "foodcube"))) /* FS: Coop: Xatrix specific */
 		{
 			VectorCopy(ent->s.origin, tr.endpos);
 			ent->velocity[2] = 0;
@@ -2320,10 +2320,15 @@ PrecacheItem(gitem_t *it)
 void
 Item_TriggeredSpawn(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unused */) /* FS: Coop: Rogue specific */
 {
+	if (!self)
+	{
+		return;
+	}
+
 	self->svflags &= ~SVF_NOCLIENT;
 	self->use = NULL;
 
-	if (strcmp(self->classname, "key_power_cube"))
+	if ((self->classname) && (strcmp(self->classname, "key_power_cube")))
 	{
 		self->spawnflags = 0;
 	}
@@ -2343,7 +2348,7 @@ SetTriggeredSpawn(edict_t *ent) /* FS: Coop: Rogue specific */
 	}
 
 	/* don't do anything on key_power_cubes. */
-	if (!strcmp(ent->classname, "key_power_cube"))
+	if ((ent->classname) && (!strcmp(ent->classname, "key_power_cube")))
 	{
 		return;
 	}
@@ -2391,7 +2396,7 @@ SpawnItem(edict_t *ent, gitem_t *item)
 		if ( ((game.gametype == rogue_coop) && (ent->spawnflags > 1)) || /* FS: Coop: Rogue specific */
 			((game.gametype != rogue_coop) && (ent->spawnflags)) )
 		{
-			if (strcmp(ent->classname, "key_power_cube") != 0)
+			if ((ent->classname) && (strcmp(ent->classname, "key_power_cube") != 0))
 			{
 				ent->spawnflags = 0;
 				gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s has invalid spawnflags set\n",
@@ -2448,7 +2453,7 @@ SpawnItem(edict_t *ent, gitem_t *item)
 		if ((int)dmflags->value & DF_INFINITE_AMMO)
 		{
 			if ((item->flags == IT_AMMO) ||
-				(strcmp(ent->classname, "weapon_bfg") == 0))
+				(ent->classname && strcmp(ent->classname, "weapon_bfg") == 0))
 			{
 				G_FreeEdict(ent);
 				return;
@@ -2457,8 +2462,8 @@ SpawnItem(edict_t *ent, gitem_t *item)
 
 		if ((int)dmflags->value & DF_NO_MINES) /* FS: Coop: Rogue specific */
 		{
-			if (!strcmp(ent->classname, "ammo_prox") ||
-				!strcmp(ent->classname, "ammo_tesla"))
+			if (ent->classname && (!strcmp(ent->classname, "ammo_prox") ||
+				!strcmp(ent->classname, "ammo_tesla")))
 			{
 				G_FreeEdict(ent);
 				return;
@@ -2467,7 +2472,7 @@ SpawnItem(edict_t *ent, gitem_t *item)
 
 		if ((int)dmflags->value & DF_NO_NUKES) /* FS: Coop: Rogue specific */
 		{
-			if (!strcmp(ent->classname, "ammo_nuke"))
+			if (ent->classname && !strcmp(ent->classname, "ammo_nuke"))
 			{
 				G_FreeEdict(ent);
 				return;
@@ -2503,7 +2508,7 @@ SpawnItem(edict_t *ent, gitem_t *item)
 
 	PrecacheItem(item);
 
-	if (coop->value && (strcmp(ent->classname, "key_power_cube") == 0))
+	if ((coop->value) && (ent->classname) && (strcmp(ent->classname, "key_power_cube") == 0))
 	{
 		ent->spawnflags |= (1 << (8 + level.power_cubes));
 		level.power_cubes++;
@@ -4680,15 +4685,15 @@ SP_xatrix_item(edict_t *self) /* FS: Coop: Rogue specific */
 		return;
 	}
 
-	if (!strcmp(self->classname, "ammo_magslug"))
+	if (self->classname && !strcmp(self->classname, "ammo_magslug"))
 	{
 		spawnClass = "ammo_flechettes";
 	}
-	else if (!strcmp(self->classname, "ammo_trap"))
+	else if (self->classname && !strcmp(self->classname, "ammo_trap"))
 	{
 		spawnClass = "weapon_proxlauncher";
 	}
-	else if (!strcmp(self->classname, "item_quadfire"))
+	else if (self->classname && !strcmp(self->classname, "item_quadfire"))
 	{
 		float chance;
 
@@ -4707,11 +4712,11 @@ SP_xatrix_item(edict_t *self) /* FS: Coop: Rogue specific */
 			spawnClass = "item_sphere_defender";
 		}
 	}
-	else if (!strcmp(self->classname, "weapon_boomer"))
+	else if (self->classname && !strcmp(self->classname, "weapon_boomer"))
 	{
 		spawnClass = "weapon_etf_rifle";
 	}
-	else if (!strcmp(self->classname, "weapon_phalanx"))
+	else if (self->classname && !strcmp(self->classname, "weapon_phalanx"))
 	{
 		spawnClass = "weapon_plasmabeam";
 	}

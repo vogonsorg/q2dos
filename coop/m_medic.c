@@ -129,6 +129,7 @@ abortHeal(edict_t *self, qboolean change_frame, qboolean gib, qboolean mark) /* 
 	{
 		if ((self->enemy->monsterinfo.badMedic1) &&
 			(self->enemy->monsterinfo.badMedic1->inuse) &&
+			(self->enemy->monsterinfo.badMedic1->classname) &&
 			(!strncmp(self->enemy->monsterinfo.badMedic1->classname, "monster_medic", 13)))
 		{
 			self->enemy->monsterinfo.badMedic2 = self;
@@ -268,7 +269,7 @@ medic_FindDeadMonster_rogue(edict_t *self) /* FS: Coop: Rogue specific */
 			continue;
 		}
 
-		if (!strncmp(ent->classname, "player", 6)) /* stop it from trying to heal player_noise entities */
+		if ((ent->classname) && (!strncmp(ent->classname, "player", 6))) /* stop it from trying to heal player_noise entities */
 		{
 			continue;
 		}
@@ -948,7 +949,7 @@ medic_fire_blaster(edict_t *self)
 	end[2] += self->enemy->viewheight;
 	VectorSubtract(end, start, dir);
 
-	if ((game.gametype == rogue_coop) && (!strcmp(self->enemy->classname, "tesla"))) /* FS: Coop: Rogue specific */
+	if ((game.gametype == rogue_coop) && (self->enemy) && (self->enemy->classname) && (!strcmp(self->enemy->classname, "tesla"))) /* FS: Coop: Rogue specific */
 	{
 		damage = 3;
 	}
@@ -2399,7 +2400,7 @@ SP_monster_medic_rogue(edict_t *self)
 	VectorSet(self->mins, -24, -24, -24);
 	VectorSet(self->maxs, 24, 24, 32);
 
-	if (strcmp(self->classname, "monster_medic_commander") == 0)
+	if ((self->classname) && (strcmp(self->classname, "monster_medic_commander") == 0))
 	{
 		self->health = 600;
 		self->gib_health = -130;

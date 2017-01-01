@@ -341,6 +341,12 @@ void vote_map (edict_t *ent, const char *mapName)
 	if(!ent || !ent->client)
 	{
 		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_map from a non-player!\n");
+		return;
+	}
+
+	if (!mapName)
+	{
+		return;
 	}
 
 	if (bVoteInProgress)

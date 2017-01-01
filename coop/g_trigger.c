@@ -346,7 +346,7 @@ trigger_key_use(edict_t *self, edict_t *other /* unused */, edict_t *activator)
 		int player;
 		edict_t *ent;
 
-		if (strcmp(self->item->classname, "key_power_cube") == 0)
+		if (self->item && self->item->classname && strcmp(self->item->classname, "key_power_cube") == 0)
 		{
 			int cube;
 
@@ -568,7 +568,7 @@ trigger_push_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */, 
 		return;
 	}
 
-	if (strcmp(other->classname, "grenade") == 0)
+	if (other->classname && strcmp(other->classname, "grenade") == 0)
 	{
 		VectorScale(self->movedir, self->speed * 10, other->velocity);
 	}

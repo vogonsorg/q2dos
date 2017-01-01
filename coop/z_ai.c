@@ -73,7 +73,7 @@ int zSchoolAllVisiable(edict_t *self)
 
 	while (head)
 	{
-		if(strcmp(head->classname, self->classname) == 0 && (self->monsterinfo.aiflags & AI_SCHOOLING) && (head->health > 0) && 
+		if(head->classname && self->classname && strcmp(head->classname, self->classname) == 0 && (self->monsterinfo.aiflags & AI_SCHOOLING) && (head->health > 0) && 
 			(head->zDistance <= self->monsterinfo.zSchoolSightRadius) && (visible(self, head)) && (infront(self, head)))
 		{
 			list->zSchoolChain = head;
@@ -236,7 +236,7 @@ int zSchoolMonsters(edict_t *self, float dist, int runStyle, float *currentSpeed
 
 		while (head)
 		{
-			if(strcmp(head->classname, self->classname) == 0 && (head->health > 0) && 
+			if(head->classname && self->classname && strcmp(head->classname, self->classname) == 0 && (head->health > 0) && 
 				(head->zDistance <= self->monsterinfo.zSchoolSightRadius) && (visible(self, head)))
   
 			{

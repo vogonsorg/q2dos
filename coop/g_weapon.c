@@ -1151,7 +1151,7 @@ bfg_think(edict_t *self)
 		}
 
 		if (!(ent->svflags & SVF_MONSTER) && !(ent->svflags & SVF_DAMAGEABLE) &&
-			(!ent->client) && (strcmp(ent->classname, "misc_explobox") != 0))
+			(!ent->client) && ent->classname && (strcmp(ent->classname, "misc_explobox") != 0))
 		{
 			continue;
 		}
@@ -1635,7 +1635,7 @@ void Trap_Think (edict_t *ent) /* FS: Coop: Xatrix specific */
 			{
 				best = G_Spawn();
 
-				if (strcmp(ent->enemy->classname, "monster_gekk") == 0)
+				if (ent->enemy && ent->enemy->classname && strcmp(ent->enemy->classname, "monster_gekk") == 0)
 				{
 					best->s.modelindex = gi.modelindex("models/objects/gekkgib/torso/tris.md2");
 					best->s.effects |= TE_GREENBLOOD;

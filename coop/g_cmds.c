@@ -2011,7 +2011,7 @@ void Cmd_SaveCheckpoint_f (edict_t *ent) /* FS: Added */
 
 	for (e = g_edicts; e < &g_edicts[globals.num_edicts]; e++)
 	{
-		if (!e->inuse)
+		if (!e->inuse || !e->classname)
 		{
 			continue;
 		}

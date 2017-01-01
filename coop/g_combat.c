@@ -446,6 +446,7 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 			{
 				if (targ->monsterinfo.commander &&
 					targ->monsterinfo.commander->inuse &&
+					targ->monsterinfo.commander->classname &&
 					!strcmp(targ->monsterinfo.commander->classname, "monster_carrier"))
 				{
 					targ->monsterinfo.commander->monsterinfo.monster_slots++;
@@ -457,6 +458,7 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 				if (targ->monsterinfo.commander)
 				{
 					if (targ->monsterinfo.commander->inuse &&
+						targ->monsterinfo.commander->classname &&
 						!strcmp(targ->monsterinfo.commander->classname, "monster_medic_commander"))
 					{
 						targ->monsterinfo.commander->monsterinfo.monster_slots++;
@@ -470,6 +472,7 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 				   have variable numbers of coop players */
 				if (targ->monsterinfo.commander &&
 					targ->monsterinfo.commander->inuse &&
+					targ->monsterinfo.commander->classname &&
 					!strncmp(targ->monsterinfo.commander->classname, "monster_widow", 13))
 				{
 					if (targ->monsterinfo.commander->monsterinfo.monster_used > 0)
@@ -508,7 +511,12 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 		/* doors, triggers, etc */
 		if(game.gametype == rogue_coop)
 		{
-			if((targ->svflags & SVF_MONSTER) && attacker && attacker->client && attacker->client->pers.netname && targ->classname && !stricmp(targ->classname, "monster_turret")) /* FS: Coop: monster_turrets have MOVETYPE_NONE so they stop here. */
+			if((targ->svflags & SVF_MONSTER) &&
+				attacker &&
+				attacker->client &&
+				attacker->client->pers.netname &&
+				targ->classname &&
+				!stricmp(targ->classname, "monster_turret")) /* FS: Coop: monster_turrets have MOVETYPE_NONE so they stop here. */
 			{
 				GetCoopMeansOfDeath(targ->classname, attacker->client->pers.netname);
 			}
@@ -520,7 +528,7 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 	if ((targ->svflags & SVF_MONSTER) && (targ->deadflag != DEAD_DEAD))
 	{
 		targ->touch = NULL;
-		if(attacker && attacker->client && attacker->client->pers.netname) /* FS: Coop: Announce who we killed */
+		if(attacker && attacker->client && attacker->client->pers.netname && targ && targ->classname) /* FS: Coop: Announce who we killed */
 		{
 			GetCoopMeansOfDeath(targ->classname, attacker->client->pers.netname);
 		}
@@ -614,7 +622,7 @@ CheckPowerArmor(edict_t *ent, vec3_t point, vec3_t normal, int damage,
 		power = ent->monsterinfo.power_armor_power;
 		index = 0;
 	}
-	else if((game.gametype == zaero_coop) && (strcmp(ent->classname, "PlasmaShield") == 0)) /* FS: Zaero specific game dll changes */
+	else if((game.gametype == zaero_coop) && (ent->classname) && (strcmp(ent->classname, "PlasmaShield") == 0)) /* FS: Zaero specific game dll changes */
 	{
 		power_armor_type = POWER_ARMOR_SHIELD;
 		power = ent->health;
@@ -831,7 +839,7 @@ M_ReactToDamage(edict_t *targ, edict_t *attacker, edict_t *inflictor)
 		return;
 	}
 
-	if ((game.gametype == zaero_coop) && ( !(attacker->client) && !(attacker->svflags & SVF_MONSTER) && (strcmp(attacker->classname, "monster_autocannon") != 0))) /* FS: Zaero specific game dll changes */
+	if ((game.gametype == zaero_coop) && ( !(attacker->client) && !(attacker->svflags & SVF_MONSTER) && (attacker->classname) && (strcmp(attacker->classname, "monster_autocannon") != 0))) /* FS: Zaero specific game dll changes */
 	{
 		return;
 	}
@@ -842,7 +850,7 @@ M_ReactToDamage(edict_t *targ, edict_t *attacker, edict_t *inflictor)
 		   and can't see who you should be mad at (attacker)
 		   attack the tesla also, target the tesla if it's
 		   a "new" tesla */
-		if ((inflictor) && (!strcmp(inflictor->classname, "tesla")))
+		if ((inflictor) && (inflictor->classname) && (!strcmp(inflictor->classname, "tesla")))
 		{
 			new_tesla = MarkTeslaArea(targ, inflictor);
 
@@ -948,7 +956,9 @@ M_ReactToDamage(edict_t *targ, edict_t *attacker, edict_t *inflictor)
 	   different classname and it's not a tank
 	   (they spray too much), get mad at them */
 	if (((targ->flags & (FL_FLY | FL_SWIM)) ==
-		 (attacker->flags & (FL_FLY | FL_SWIM))) &&
+		(attacker->flags & (FL_FLY | FL_SWIM))) &&
+		(targ->classname) &&
+		(attacker->classname) &&
 		(strcmp(targ->classname, attacker->classname) != 0) &&
 		(strcmp(attacker->classname, "monster_tank") != 0) &&
 		(strcmp(attacker->classname, "monster_supertank") != 0) &&
@@ -1288,7 +1298,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 			{
 				SpawnDamage(TE_MOREBLOOD, point, normal);
 			}
-			else if ((game.gametype == xatrix_coop) && (strcmp(targ->classname, "monster_gekk") == 0)) /* FS: Coop: Xatrix specific */
+			else if ((game.gametype == xatrix_coop) && (targ->classname) && (strcmp(targ->classname, "monster_gekk") == 0)) /* FS: Coop: Xatrix specific */
 			{
 				SpawnDamage(TE_GREENBLOOD, point, normal);
 			}

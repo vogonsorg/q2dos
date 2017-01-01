@@ -2306,7 +2306,7 @@ door_use_areaportals(edict_t *self, qboolean open)
 
 	while ((t = G_Find(t, FOFS(targetname), self->target)))
 	{
-		if (Q_stricmp(t->classname, "func_areaportal") == 0)
+		if ((t->classname) && (Q_stricmp(t->classname, "func_areaportal") == 0))
 		{
 			gi.SetAreaPortalState(t->style, open);
 		}
@@ -2399,7 +2399,11 @@ door_go_down(edict_t *self)
 
 	self->moveinfo.state = STATE_DOWN;
 
-	if (strcmp(self->classname, "func_door") == 0)
+	if (!self->classname)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "Door does not have a classname!\n");
+	}
+	else if (strcmp(self->classname, "func_door") == 0)
 	{
 		Move_Calc(self, self->moveinfo.start_origin, door_hit_bottom, false); /* FS: Zaero specific game dll changes */
 	}
@@ -2447,7 +2451,11 @@ door_go_up(edict_t *self, edict_t *activator)
 
 	self->moveinfo.state = STATE_UP;
 
-	if (strcmp(self->classname, "func_door") == 0)
+	if (!self->classname)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "Door does not have a classname!\n");
+	}
+	else if (strcmp(self->classname, "func_door") == 0)
 	{
 		Move_Calc(self, self->moveinfo.end_origin, door_hit_top, false); /* FS: Zaero specific game dll changes */
 	}
@@ -3708,7 +3716,7 @@ again:
 		self->s.sound = self->moveinfo.sound_middle;
 	}
 
-	if (self->classname != NULL && Q_stricmp(self->classname, "misc_viper") == 0) /* FS: Zaero specific game dll changes */
+	if ((game.gametype == zaero_coop) && (self->classname) && (!Q_stricmp(self->classname, "misc_viper"))) /* FS: Zaero specific game dll changes */
 	{
 		VectorCopy(ent->s.origin, dest);
 	}
@@ -3993,7 +4001,7 @@ trigger_elevator_init(edict_t *self)
 		return;
 	}
 
-	if (strcmp(self->movetarget->classname, "func_train") != 0)
+	if ((!self->movetarget->classname) || (strcmp(self->movetarget->classname, "func_train") != 0))
 	{
 		gi.dprintf(DEVELOPER_MSG_GAME, "trigger_elevator target %s is not a train\n", self->target);
 		return;

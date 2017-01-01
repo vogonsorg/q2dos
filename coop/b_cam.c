@@ -130,7 +130,6 @@ static void
 ShowStats(edict_t *ent, edict_t *player)
 {
 	vec3_t v;
-	int j;
 	char stats[500];
 	BlinkyClient_t * bdata;
 	char pname[11];
@@ -145,9 +144,10 @@ ShowStats(edict_t *ent, edict_t *player)
 		return;
 	}
 
-	j = 0;
 	if (-1 == CellsIndex)
+	{
 		CellsIndex = ITEM_INDEX(FindItem("cells"));
+	}
 
 	bdata = &ent->client->blinky_client;
 
@@ -158,43 +158,71 @@ ShowStats(edict_t *ent, edict_t *player)
 	RotatePointAroundVector(dp, normal, v, ent->s.angles[1]);
 	xd = -dp[0]/SCANNER_UNIT;
 	yd = dp[1]/SCANNER_UNIT;
+
 	if (player->client)
+	{
 		strncpy(pname, player->client->pers.netname, sizeof(pname)-1);
-	else
+	}
+	else if (player->classname)
+	{
 		strncpy(pname, player->classname, sizeof(pname)-1);
+	}
+	else
+	{
+		Com_sprintf(pname, sizeof(pname), "unnamed");
+	}
+
 	pname[sizeof(pname)-1] = 0;
 	health = player->health;
 
 	armorpow = 0;
 	if (PowerArmorType(player))
+	{
 		armorpow = player->client->pers.inventory[CellsIndex];
+	}
 
 	index = ArmorIndex (player);
 	if (index)
+	{
 		armor = player->client->pers.inventory[index];
+	}
 
 	/* FS: See cl_scrn.c.  Values for armor can be negative and are ignored */
 	if(armor < 1)
+	{
 		armor = 0;
+	}
 	if (armorpow < 1)
+	{
 		armorpow = 0;
+	}
 
 	if (armorpow)
-		sprintf(stats+j, "%s: armor=%3d(%3d), health=%3d (f=%+5d,r=%+5d,u=%+5d)\n"
+	{
+		Com_sprintf(stats, sizeof(stats), "%s: armor=%3d(%3d), health=%3d (f=%+5d,r=%+5d,u=%+5d)\n"
 			, pname, armor,armorpow,health,xd, yd, zd);
+	}
 	else
-		sprintf(stats+j, "%s: armor=%3d, health=%3d (f=%+5d,r=%+5d,u=%+5d)\n"
+	{
+		Com_sprintf(stats, sizeof(stats), "%s: armor=%3d, health=%3d (f=%+5d,r=%+5d,u=%+5d)\n"
 			, pname, armor,health,xd, yd, zd);
+	}
+
 	gi.cprintf(ent, PRINT_CHAT, "%s", stats);
 }
 
 void MoveToAngles(edict_t * ent, vec3_t pv1)
 {
 	int i;
+
+	if (!ent || !ent->client)
+	{
+		return;
+	}
+
 	for (i=0 ; i<3 ; i++)
 	{
 		ent->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(pv1[i] - ent->client->resp.cmd_angles[i]);
-//		ent->client->ps.viewangles[i] = pv1[i];
 	}
 }
 
@@ -203,7 +231,9 @@ void stopBlinkyCam(edict_t * ent)
 	BlinkyClient_t *bdata = NULL;
 		
 	if (!ent || !ent->client)
+	{
 		return;
+	}
 
 	bdata = &ent->client->blinky_client;
 	if(!bdata || !bdata->cam_decoy)

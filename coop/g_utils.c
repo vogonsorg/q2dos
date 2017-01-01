@@ -346,19 +346,22 @@ G_UseTargets(edict_t *ent, edict_t *activator)
 				}
 			}
 
-			/* decrement secret count if target_secret is removed */
-			if (!Q_stricmp(t->classname,"target_secret"))
+			if(t->classname)
 			{
-				level.total_secrets--;
-			}
-			/* same deal with target_goal, but also turn off CD music if applicable */
-			else if (!Q_stricmp(t->classname,"target_goal"))
-			{
-				level.total_goals--;
-
-				if (level.found_goals >= level.total_goals)
+				/* decrement secret count if target_secret is removed */
+				if (!Q_stricmp(t->classname,"target_secret"))
 				{
-					gi.configstring (CS_CDTRACK, "0");
+					level.total_secrets--;
+				}
+				/* same deal with target_goal, but also turn off CD music if applicable */
+				else if (!Q_stricmp(t->classname,"target_goal"))
+				{
+					level.total_goals--;
+
+					if (level.found_goals >= level.total_goals)
+					{
+						gi.configstring (CS_CDTRACK, "0");
+					}
 				}
 			}
 
@@ -380,9 +383,9 @@ G_UseTargets(edict_t *ent, edict_t *activator)
 		while ((t = G_Find(t, FOFS(targetname), ent->target)))
 		{
 			/* doors fire area portals in a specific way */
-			if (!Q_stricmp(t->classname, "func_areaportal") &&
-				(!Q_stricmp(ent->classname, "func_door") ||
-				 !Q_stricmp(ent->classname, "func_door_rotating")))
+			if ((t->classname && !Q_stricmp(t->classname, "func_areaportal")) &&
+				(ent->classname && (!Q_stricmp(ent->classname, "func_door") ||
+				 !Q_stricmp(ent->classname, "func_door_rotating"))))
 			{
 				continue;
 			}

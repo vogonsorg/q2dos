@@ -703,6 +703,11 @@ G_FixTeams(void) /* FS: Coop: Rogue specific */
 			continue;
 		}
 
+		if(!e->classname)
+		{
+			continue;
+		}
+
 		if (!strcmp(e->classname, "func_train"))
 		{
 			if (e->flags & FL_TEAMSLAVE)
@@ -904,34 +909,40 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 
 		entities = ED_ParseEdict(entities, ent);
 
-		/* yet another map hack */
-		if (!Q_stricmp(level.mapname, "command") &&
-			!Q_stricmp(ent->classname, "trigger_once") && !Q_stricmp(ent->model, "*27"))
+		if (ent->classname)
 		{
-			ent->spawnflags &= ~SPAWNFLAG_NOT_HARD;
-		}
+			/* yet another map hack */
+			if (!Q_stricmp(level.mapname, "command") &&
+				!Q_stricmp(ent->classname, "trigger_once") &&
+				ent->model &&
+				!Q_stricmp(ent->model, "*27"))
+			{
+				ent->spawnflags &= ~SPAWNFLAG_NOT_HARD;
+			}
 
-		/* ahh, the joys of map hacks .. */
-		/* FS: Coop: Rogue specific map hacks */
-		if (!Q_stricmp(level.mapname, "rhangar2") &&
-			!Q_stricmp(ent->classname, "func_door_rotating") &&
-			ent->targetname && !Q_stricmp(ent->targetname, "t265"))
-		{
-			ent->spawnflags &= ~SPAWNFLAG_NOT_COOP;
-		}
+			/* ahh, the joys of map hacks .. */
+			/* FS: Coop: Rogue specific map hacks */
+			if (!Q_stricmp(level.mapname, "rhangar2") &&
+				!Q_stricmp(ent->classname, "func_door_rotating") &&
+				ent->targetname && !Q_stricmp(ent->targetname, "t265"))
+			{
+				ent->spawnflags &= ~SPAWNFLAG_NOT_COOP;
+			}
 
-		if (!Q_stricmp(level.mapname, "rhangar2") &&
-			!Q_stricmp(ent->classname, "trigger_always") &&
-		   	ent->target && !Q_stricmp(ent->target, "t265"))
-		{
-			ent->spawnflags |= SPAWNFLAG_NOT_COOP;
-		}
+			if (!Q_stricmp(level.mapname, "rhangar2") &&
+				!Q_stricmp(ent->classname, "trigger_always") &&
+		   		ent->target && !Q_stricmp(ent->target, "t265"))
+			{
+				ent->spawnflags |= SPAWNFLAG_NOT_COOP;
+			}
 
-		if (!Q_stricmp(level.mapname, "rhangar2") &&
-			!Q_stricmp(ent->classname, "func_wall") &&
-		   	!Q_stricmp(ent->model, "*15"))
-		{
-			ent->spawnflags |= SPAWNFLAG_NOT_COOP;
+			if (!Q_stricmp(level.mapname, "rhangar2") &&
+				!Q_stricmp(ent->classname, "func_wall") &&
+				ent->model &&
+		   		!Q_stricmp(ent->model, "*15"))
+			{
+				ent->spawnflags |= SPAWNFLAG_NOT_COOP;
+			}
 		}
 
 		/* remove things (except the world) from
@@ -2181,7 +2192,7 @@ int G_SpawnCheckpoints (edict_t *ent)
 
 		if (ent != g_edicts)
 		{
-			if(Q_stricmp(ent->classname,"info_coop_checkpoint")) /* FS: No funky stuff in these special overrides please, use ent files for that. */
+			if(!ent->classname || Q_stricmp(ent->classname,"info_coop_checkpoint")) /* FS: No funky stuff in these special overrides please, use ent files for that. */
 			{
 				gi.cprintf(NULL, PRINT_CHAT, "WARNING: Not an info_coop_checkpoint: %s.  Removing...\n", ent->classname);
 				G_FreeEdict(ent);

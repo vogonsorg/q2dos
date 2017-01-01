@@ -390,7 +390,7 @@ SV_CalcViewOffset(edict_t *ent)
 				AngleVectors (ent->client->zCameraTrack->s.angles, f, NULL, NULL);
 				VectorMA(v, 10, f, v);
 			}
-			else if (Q_stricmp(ent->client->zCameraTrack->classname, "misc_securitycamera") == 0)
+			else if (ent->client->zCameraTrack->classname && Q_stricmp(ent->client->zCameraTrack->classname, "misc_securitycamera") == 0)
 			{
 				float framepercent = sin(((float)(level.framenum & 63) / 64.0) * M_PI * 2);
 				VectorCopy(ent->client->zCameraTrack->move_origin, v);

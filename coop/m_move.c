@@ -479,7 +479,7 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 			{
 				ent->bad_area = current_bad;
 
-				if (ent->enemy && !strcmp(ent->enemy->classname, "tesla"))
+				if ((ent->enemy) && (ent->enemy->classname) && (!strcmp(ent->enemy->classname, "tesla")))
 				{
 					/* if the tesla is in front of us, back up... */
 					if (IsBadAhead(ent, current_bad, move))
@@ -529,7 +529,7 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 				{
 					/* we want the carrier to stay a certain distance off the ground,
 					   to help prevent him from shooting his fliers, who spawn in below him */
-					if ((game.gametype == rogue_coop) && (!strcmp(ent->classname, "monster_carrier"))) /* FS: Coop: Rogue specific */
+					if ((game.gametype == rogue_coop) && (ent->classname) && (!strcmp(ent->classname, "monster_carrier"))) /* FS: Coop: Rogue specific */
 					{
 						minheight = 104;
 					}
@@ -553,7 +553,7 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 				}
 				else
 				{
-					if ((game.gametype == xatrix_coop) && (strcmp(ent->classname, "monster_fixbot") == 0)) /* FS: Coop: Xatrix specific */
+					if ((game.gametype == xatrix_coop) && (ent->classname) && (strcmp(ent->classname, "monster_fixbot") == 0)) /* FS: Coop: Xatrix specific */
 					{
 						if ((ent->s.frame >= 105) && (ent->s.frame <= 120))
 						{
@@ -791,14 +791,14 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 			{
 				if (new_bad->owner)
 				{
-					if (!strcmp(new_bad->owner->classname, "tesla"))
+					if (new_bad->owner->classname && !strcmp(new_bad->owner->classname, "tesla"))
 					{
 						if ((!(ent->enemy)) || (!(ent->enemy->inuse)))
 						{
 							TargetTesla(ent, new_bad->owner);
 							ent->monsterinfo.aiflags |= AI_BLOCKED;
 						}
-						else if (!strcmp(ent->enemy->classname, "telsa"))
+						else if (ent->enemy->classname && !strcmp(ent->enemy->classname, "telsa"))
 						{
 						}
 						else if ((ent->enemy) && (ent->enemy->client))
@@ -970,7 +970,7 @@ SV_StepDirection(edict_t *ent, float yaw, float dist)
 
 		delta = ent->s.angles[YAW] - ent->ideal_yaw;
 
-		if (strncmp(ent->classname, "monster_widow", 13)) /* FS: Coop: Rogue specific: Added check for monster_widow */
+		if ((game.gametype == rogue_coop) && (ent->classname) && (strncmp(ent->classname, "monster_widow", 13))) /* FS: Coop: Rogue specific: Added check for monster_widow */
 		{
 			if ((delta > 45) && (delta < 315))
 			{
@@ -1268,7 +1268,7 @@ qboolean M_MoveAwayFromFlare(edict_t *self, float dist) /* FS: Zaero specific ga
 		if (e == NULL)
 			break;
 
-		if (Q_stricmp(e->classname, "flare") == 0)
+		if (e->classname && Q_stricmp(e->classname, "flare") == 0)
 			break;
 	}
 	

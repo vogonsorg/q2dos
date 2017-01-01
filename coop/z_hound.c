@@ -285,13 +285,18 @@ void hound_attack (edict_t *self)
 //
 void hound_jump_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
+	if (!self || !other)
+	{
+		return;
+	}
+
 	if (self->health <= 0)
 	{
 		self->touch = NULL;
 		return;
 	}
 
-	if (other->takedamage && strcmp(self->classname, other->classname) != 0)
+	if (other->takedamage && self->classname && other->classname && strcmp(self->classname, other->classname) != 0)
 	{
 		if (VectorLength(self->velocity) > 400)
 		{

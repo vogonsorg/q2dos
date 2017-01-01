@@ -114,7 +114,7 @@ BeginIntermission(edict_t *targ)
 		}
 	}
 
-	if (strstr(level.changemap, "*"))
+	if (level.changemap && strstr(level.changemap, "*"))
 	{
 		if (coop->value)
 		{

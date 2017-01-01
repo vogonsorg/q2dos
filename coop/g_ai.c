@@ -686,7 +686,9 @@ FindTarget(edict_t *self)
 			if (self->goalentity && self->goalentity->inuse && self->goalentity->classname)
 			{
 				if (strcmp(self->goalentity->classname, "target_actor") == 0)
+				{
 					return false;
+				}
 			}
 		}
 
@@ -826,7 +828,7 @@ FindTarget(edict_t *self)
 
 		self->enemy = client;
 
-		if (strcmp(self->enemy->classname, "player_noise") != 0)
+		if ((self->enemy) && (self->enemy->classname) && (strcmp(self->enemy->classname, "player_noise") != 0))
 		{
 			self->monsterinfo.aiflags &= ~AI_SOUND_TARGET;
 
@@ -1117,7 +1119,7 @@ M_CheckAttack(edict_t *self)
 			/* originally, just 0.3 */
 			float strafe_chance;
 
-			if (!(strcmp(self->classname, "monster_daedalus")))
+			if ((self->classname) && (!(strcmp(self->classname, "monster_daedalus"))))
 			{
 				strafe_chance = 0.8;
 			}
@@ -1923,7 +1925,7 @@ ai_run_rogue(edict_t *self, float dist) /* FS: Coop: Rogue specific */
 		{
 			if (self->enemy->inuse)
 			{
-				if (strcmp(self->enemy->classname, "player_noise") != 0)
+				if ((self->enemy->classname) && (strcmp(self->enemy->classname, "player_noise") != 0))
 				{
 					realEnemy = self->enemy;
 				}

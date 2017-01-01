@@ -384,10 +384,6 @@ SOURCE=..\coop\z_ai.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\coop\z_anim.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\coop\z_anim.h
 # End Source File
 # Begin Source File
@@ -401,22 +397,6 @@ SOURCE=..\coop\z_boss.h
 # Begin Source File
 
 SOURCE=..\coop\z_camera.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\coop\z_debug.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\coop\z_debug.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\coop\z_frames.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\coop\z_frames.h
 # End Source File
 # Begin Source File
 
@@ -437,18 +417,6 @@ SOURCE=..\coop\z_hound.h
 # Begin Source File
 
 SOURCE=..\coop\z_item.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\coop\z_list.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\coop\z_list.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\coop\z_mtest.c
 # End Source File
 # Begin Source File
 

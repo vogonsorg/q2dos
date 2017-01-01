@@ -1558,23 +1558,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\coop\z_anim.c"
-				>
-			</File>
-			<File
 				RelativePath="..\coop\z_boss.c"
 				>
 			</File>
 			<File
 				RelativePath="..\coop\z_camera.c"
-				>
-			</File>
-			<File
-				RelativePath="..\coop\z_debug.c"
-				>
-			</File>
-			<File
-				RelativePath="..\coop\z_frames.c"
 				>
 			</File>
 			<File
@@ -1587,14 +1575,6 @@
 			</File>
 			<File
 				RelativePath="..\coop\z_item.c"
-				>
-			</File>
-			<File
-				RelativePath="..\coop\z_list.c"
-				>
-			</File>
-			<File
-				RelativePath="..\coop\z_mtest.c"
 				>
 			</File>
 			<File
@@ -1787,19 +1767,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\coop\z_anim.h"
-				>
-			</File>
-			<File
 				RelativePath="..\coop\z_boss.h"
-				>
-			</File>
-			<File
-				RelativePath="..\coop\z_debug.h"
-				>
-			</File>
-			<File
-				RelativePath="..\coop\z_frames.h"
 				>
 			</File>
 			<File
@@ -1808,10 +1776,6 @@
 			</File>
 			<File
 				RelativePath="..\coop\z_hound.h"
-				>
-			</File>
-			<File
-				RelativePath="..\coop\z_list.h"
 				>
 			</File>
 			<File

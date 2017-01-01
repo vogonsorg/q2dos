@@ -1070,7 +1070,7 @@ SP_monster_tank(edict_t *self)
 	gi.soundindex("tank/tnkatk2e.wav");
 	gi.soundindex("tank/tnkatck3.wav");
 
-	if (strcmp(self->classname, "monster_tank_commander") == 0)
+	if (self->classname && strcmp(self->classname, "monster_tank_commander") == 0)
 	{
 		self->health = 1000;
 		self->gib_health = -225;
@@ -1101,7 +1101,7 @@ SP_monster_tank(edict_t *self)
 
 	walkmonster_start(self);
 
-	if (strcmp(self->classname, "monster_tank_commander") == 0)
+	if (self->classname && strcmp(self->classname, "monster_tank_commander") == 0)
 	{
 		self->s.skinnum = 2;
 	}

@@ -399,7 +399,7 @@ void monster_autocannon_findenemy(edict_t *self)
 			continue;
 
 		// don't target other autocannons
-		if (Q_stricmp(e->classname, "monster_autocannon") == 0)
+		if (e->classname && Q_stricmp(e->classname, "monster_autocannon") == 0)
 			continue;
 		
 		// don't target self

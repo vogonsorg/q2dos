@@ -318,7 +318,9 @@ flyer_kamikaze_explode(edict_t *self) /* FS: Coop: Rogue specific */
 		return;
 	}
 
-	if (self->monsterinfo.commander && self->monsterinfo.commander->inuse &&
+	if (self->monsterinfo.commander &&
+		self->monsterinfo.commander->inuse &&
+		self->monsterinfo.commander->classname &&
 		!strcmp(self->monsterinfo.commander->classname, "monster_carrier"))
 	{
 		self->monsterinfo.commander->monsterinfo.monster_slots++;
@@ -1000,6 +1002,7 @@ flyer_blocked(edict_t *self, float dist) /* FS: Coop: Rogue specific */
 		{
 			if (self->monsterinfo.commander &&
 				self->monsterinfo.commander->inuse &&
+				self->monsterinfo.commander->classname &&
 				!strcmp(self->monsterinfo.commander->classname, "monster_carrier"))
 			{
 				self->monsterinfo.commander->monsterinfo.monster_slots++;

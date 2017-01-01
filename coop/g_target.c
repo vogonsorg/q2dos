@@ -541,7 +541,7 @@ use_target_changelevel(edict_t *self, edict_t *other, edict_t *activator)
 	}
 
 	/* if going to a new unit, clear cross triggers */
-	if (strstr(self->map, "*"))
+	if (self->map && strstr(self->map, "*"))
 	{
 		game.serverflags &= ~(SFL_CROSS_TRIGGER_MASK);
 	}
@@ -1320,7 +1320,7 @@ target_lightramp_use(edict_t *self, edict_t *other /* unused */, edict_t *activa
 				break;
 			}
 
-			if (strcmp(e->classname, "light") != 0)
+			if (!e->classname || strcmp(e->classname, "light") != 0)
 			{
 				gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s ", self->classname, vtos(self->s.origin));
 				gi.dprintf(DEVELOPER_MSG_GAME, "target %s (%s at %s) is not a light\n", self->target,

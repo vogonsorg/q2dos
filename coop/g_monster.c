@@ -1047,7 +1047,7 @@ monster_triggered_spawn(edict_t *self)
 
 	monster_start_go(self);
 
-	if ((game.gametype == xatrix_coop) && (strcmp(self->classname, "monster_fixbot") == 0)) /* FS: Coop: Xatrix specific */
+	if ((game.gametype == xatrix_coop) && (self->classname) && (strcmp(self->classname, "monster_fixbot") == 0)) /* FS: Coop: Xatrix specific */
 	{
 		if (self->spawnflags & 16 || self->spawnflags & 8 || self->spawnflags &
 			4)
@@ -1282,7 +1282,7 @@ monster_start_go(edict_t *self)
 
 		while ((target = G_Find(target, FOFS(targetname), self->target)) != NULL)
 		{
-			if (strcmp(target->classname, "point_combat") == 0)
+			if (target->classname && strcmp(target->classname, "point_combat") == 0)
 			{
 				self->combattarget = self->target;
 				fixup = true;
@@ -1315,7 +1315,7 @@ monster_start_go(edict_t *self)
 		while ((target = G_Find(target, FOFS(targetname),
 						self->combattarget)) != NULL)
 		{
-			if (strcmp(target->classname, "point_combat") != 0)
+			if (target->classname && strcmp(target->classname, "point_combat") != 0)
 			{
 				gi.dprintf(DEVELOPER_MSG_GAME, "%s at (%i %i %i) has a bad combattarget %s : %s at (%i %i %i)\n",
 						self->classname, (int)self->s.origin[0], (int)self->s.origin[1],
@@ -1337,7 +1337,7 @@ monster_start_go(edict_t *self)
 			self->monsterinfo.pausetime = 100000000;
 			self->monsterinfo.stand(self);
 		}
-		else if (strcmp(self->movetarget->classname, "path_corner") == 0)
+		else if (self->movetarget->classname && strcmp(self->movetarget->classname, "path_corner") == 0)
 		{
 			VectorSubtract(self->goalentity->s.origin, self->s.origin, v);
 			self->ideal_yaw = self->s.angles[YAW] = vectoyaw(v);
@@ -1388,7 +1388,7 @@ walkmonster_start_go(edict_t *self)
 		self->yaw_speed = 20;
 	}
 
-	if ((game.gametype == rogue_coop) && !(strcmp(self->classname, "monster_stalker"))) /* FS: Coop: Rogue specific */
+	if ((game.gametype == rogue_coop) && (self->classname) && (!(strcmp(self->classname, "monster_stalker")))) /* FS: Coop: Rogue specific */
 	{
 		self->viewheight = 15;
 	}

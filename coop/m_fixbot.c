@@ -335,12 +335,12 @@ use_scanner(edict_t *self)
 	{
 		if (ent->health >= 100)
 		{
-			if (strcmp(ent->classname, "object_repair") == 0)
+			if (ent->classname && strcmp(ent->classname, "object_repair") == 0)
 			{
 				if (visible(self, ent))
 				{
 					/* remove the old one */
-					if (strcmp(self->goalentity->classname, "bot_goal") == 0)
+					if (self->goalentity && self->goalentity->classname && strcmp(self->goalentity->classname, "bot_goal") == 0)
 					{
 						self->goalentity->nextthink = level.time + 0.1;
 						self->goalentity->think = G_FreeEdict;
@@ -368,14 +368,22 @@ use_scanner(edict_t *self)
 
 	if (len < 32)
 	{
-		if (strcmp(self->goalentity->classname, "object_repair") == 0)
+		if(self->goalentity && self->goalentity->classname)
 		{
-			self->monsterinfo.currentmove = &fixbot_move_weld_start;
+			if (strcmp(self->goalentity->classname, "object_repair") == 0)
+			{
+				self->monsterinfo.currentmove = &fixbot_move_weld_start;
+			}
+			else
+			{
+				self->goalentity->nextthink = level.time + 0.1;
+				self->goalentity->think = G_FreeEdict;
+				self->goalentity = self->enemy = NULL;
+				self->monsterinfo.currentmove = &fixbot_move_stand;
+			}
 		}
 		else
 		{
-			self->goalentity->nextthink = level.time + 0.1;
-			self->goalentity->think = G_FreeEdict;
 			self->goalentity = self->enemy = NULL;
 			self->monsterinfo.currentmove = &fixbot_move_stand;
 		}
@@ -389,14 +397,22 @@ use_scanner(edict_t *self)
 	/* bot is stuck get new goalentity */
 	if (len == 0)
 	{
-		if (strcmp(self->goalentity->classname, "object_repair") == 0)
+		if(self->goalentity && self->goalentity->classname)
 		{
-			self->monsterinfo.currentmove = &fixbot_move_stand;
+			if (strcmp(self->goalentity->classname, "object_repair") == 0)
+			{
+				self->monsterinfo.currentmove = &fixbot_move_stand;
+			}
+			else
+			{
+				self->goalentity->nextthink = level.time + 0.1;
+				self->goalentity->think = G_FreeEdict;
+				self->goalentity = self->enemy = NULL;
+				self->monsterinfo.currentmove = &fixbot_move_stand;
+			}
 		}
 		else
 		{
-			self->goalentity->nextthink = level.time + 0.1;
-			self->goalentity->think = G_FreeEdict;
 			self->goalentity = self->enemy = NULL;
 			self->monsterinfo.currentmove = &fixbot_move_stand;
 		}
@@ -1451,15 +1467,18 @@ fixbot_walk(edict_t *self)
 		return;
 	}
 
-	if (strcmp(self->goalentity->classname, "object_repair") == 0)
+	if (self->goalentity && self->goalentity->classname)
 	{
-		VectorSubtract(self->s.origin, self->goalentity->s.origin, vec);
-		len = VectorLength(vec);
-
-		if (len < 32)
+		if (strcmp(self->goalentity->classname, "object_repair") == 0)
 		{
-			self->monsterinfo.currentmove = &fixbot_move_weld_start;
-			return;
+			VectorSubtract(self->s.origin, self->goalentity->s.origin, vec);
+			len = VectorLength(vec);
+
+			if (len < 32)
+			{
+				self->monsterinfo.currentmove = &fixbot_move_weld_start;
+				return;
+			}
 		}
 	}
 

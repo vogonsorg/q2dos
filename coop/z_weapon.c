@@ -462,7 +462,7 @@ qboolean fire_lasertripbomb(edict_t *self, vec3_t start, vec3_t dir, float timer
 		return false;
 	}
 
-	if (Q_stricmp(tr.ent->classname, "worldspawn") != 0)
+	if (!tr.ent || !tr.ent->classname || Q_stricmp(tr.ent->classname, "worldspawn") != 0)
 	{
 		return false;
 	}
@@ -1037,7 +1037,7 @@ void flare_flash(edict_t *ent)
 		// get the next entity near us
 		target = findradius(target, ent->s.origin, FLASH_RANGE);
 
-		if (target == NULL)
+		if (!target)
 		{
 			break;
 		}
@@ -1091,13 +1091,13 @@ void flare_flash(edict_t *ent)
 				T_Damage(target, ent, ent->owner, vec3_origin, target->s.origin, vec3_origin, (int)(10.0*ratio), 0, 0, MOD_GL_POLYBLEND);
 			}
 		}
-		else if ((target->svflags & SVF_MONSTER) && strcmp(target->classname, "monster_zboss") != 0)
+		else if ((target->svflags & SVF_MONSTER) && (target->classname) && (strcmp(target->classname, "monster_zboss") != 0))
 		{
 			target->monsterinfo.flashTime =
 				Z_MAX(target->monsterinfo.flashTime, ratio*150); // a little bit more advantageous
 			target->monsterinfo.flashBase = 50;
 
-			if (target->enemy == NULL)
+			if (!target->enemy)
 			{
 				target->enemy = ent->owner;
 				FoundTarget(target);
@@ -1266,7 +1266,7 @@ void fire_sniper_bullet (edict_t *self, vec3_t start, vec3_t aimdir, int damage,
 		}
 
 		// if we hit a plasmashield, then pass thru it
-		if (Q_stricmp(tr.ent->classname, "PlasmaShield") == 0)
+		if (tr.ent && tr.ent->classname && Q_stricmp(tr.ent->classname, "PlasmaShield") == 0)
 		{
 			ignore = tr.ent;
 			VectorCopy(tr.endpos, s);

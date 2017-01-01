@@ -1953,7 +1953,7 @@ SelectSpawnPoint(edict_t *ent, vec3_t origin, vec3_t angles)
 	{
 		index = ent->client - game.clients;
 
-		if (Q_stricmp(spot->classname, "info_player_start") == 0 && index != 0)
+		if (spot->classname && Q_stricmp(spot->classname, "info_player_start") == 0 && index != 0)
 		{
 			while(counter < 3)
 			{

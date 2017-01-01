@@ -1112,7 +1112,7 @@ SP_monster_hover(edict_t *self)
 	{
 		self->monsterinfo.blocked = hover_blocked;
 
-		if (strcmp(self->classname, "monster_daedalus") == 0)
+		if ((self->classname) && (strcmp(self->classname, "monster_daedalus") == 0))
 		{
 			self->health = 450;
 			self->mass = 225;
@@ -1153,7 +1153,7 @@ SP_monster_hover(edict_t *self)
 
 	flymonster_start(self);
 
-	if ((game.gametype == rogue_coop) && (strcmp(self->classname, "monster_daedalus") == 0)) /* FS: Coop: Rogue specific */
+	if ((game.gametype == rogue_coop) && (self->classname) && (strcmp(self->classname, "monster_daedalus") == 0)) /* FS: Coop: Rogue specific */
 	{
 		self->s.skinnum = 2;
 	}

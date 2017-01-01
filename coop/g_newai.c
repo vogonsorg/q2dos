@@ -64,7 +64,7 @@ blocked_checkshot(edict_t *self, float shotChance)
 		return false;
 	}
 
-	if (!strcmp(self->classname, "monster_parasite"))
+	if (self->classname && !strcmp(self->classname, "monster_parasite"))
 	{
 		vec3_t f, r, offset, start, end;
 		trace_t tr;
@@ -112,7 +112,7 @@ blocked_checkshot(edict_t *self, float shotChance)
 	/* always shoot at teslas */
 	if (playerVisible)
 	{
-		if (!strcmp(self->enemy->classname, "tesla"))
+		if (self->classname && !strcmp(self->enemy->classname, "tesla"))
 		{
 			/* turn on AI_BLOCKED to let the monster know the attack
 			   is being called by the blocked functions... */
@@ -175,7 +175,7 @@ blocked_checkplat(edict_t *self, float dist)
 	/* see if we're already standing on a plat. */
 	if (self->groundentity && (self->groundentity != world))
 	{
-		if (!strncmp(self->groundentity->classname, "func_plat", 8))
+		if (self->groundentity->classname && !strncmp(self->groundentity->classname, "func_plat", 8))
 		{
 			plat = self->groundentity;
 		}
@@ -194,7 +194,7 @@ blocked_checkplat(edict_t *self, float dist)
 
 		if ((trace.fraction < 1) && !trace.allsolid && !trace.startsolid)
 		{
-			if (!strncmp(trace.ent->classname, "func_plat", 8))
+			if (trace.ent->classname && !strncmp(trace.ent->classname, "func_plat", 8))
 			{
 				plat = trace.ent;
 			}
@@ -552,7 +552,7 @@ monsterlost_checkhint(edict_t *self)
 		return false;
 	}
 
-	if (!strcmp(self->classname, "monster_turret"))
+	if (self->classname && !strcmp(self->classname, "monster_turret"))
 	{
 		return false;
 	}
@@ -1297,7 +1297,7 @@ MarkTeslaArea(edict_t *self, edict_t *tesla)
 	{
 		tail = tail->teamchain;
 
-		if (!strcmp(e->classname, "bad_area"))
+		if (e->classname && !strcmp(e->classname, "bad_area"))
 		{
 			return false;
 		}
