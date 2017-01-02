@@ -1309,6 +1309,7 @@
 {"vote_map", (byte *)vote_map},
 {"vote_mapcheck", (byte *)vote_mapcheck},
 {"vote_command", (byte *)vote_command},
+{"Find_LikePlayer", (byte *)Find_LikePlayer},
 {"MonsterPlayerKillBox", (byte *)MonsterPlayerKillBox},
 {"MonsterKillBox", (byte *)MonsterKillBox},
 {"KillBox", (byte *)KillBox},

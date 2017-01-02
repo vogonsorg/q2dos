@@ -927,6 +927,7 @@ char	*vtos (vec3_t v);
 
 float vectoyaw (vec3_t vec);
 void vectoangles (vec3_t vec, vec3_t angles);
+edict_t *Find_LikePlayer (edict_t *ent, char *name); /* FS: People want this for various Tastyspleen-like commands */
 
 //ROGUE
 void G_ProjectSource2(vec3_t point, vec3_t distance, vec3_t forward, vec3_t right,

@@ -1002,3 +1002,62 @@ qboolean MonsterPlayerKillBox (edict_t *ent) /* FS: Zaero specific game dll chan
 
 	return true;		// all clear
 }
+
+edict_t *Find_LikePlayer (edict_t *ent, char *name) /* FS: People want this for various Tastyspleen-like commands */
+{
+	int i, count;
+	edict_t *player = NULL;
+	edict_t *foundPlayer = NULL;
+
+	if (!ent || !ent->client || !name || !name[0])
+	{
+		return NULL;
+	}
+
+	if(!strncmp(name, "LIKE ", 5))
+	{
+		name+=5;
+		if(!name || !name[0])
+		{
+			gi.cprintf(ent, PRINT_HIGH, "No name specified after LIKE.  Aborting search!\n");
+			return NULL;
+		}
+	}
+
+	i = count = 0;
+
+	name = Q_strlwr(name);
+
+	for (i = 0; i < maxclients->intValue; i++)
+	{
+		char *netName;
+		player = &g_edicts[i+1];
+
+		if(!player || !player->inuse || !player->client)
+		{
+			continue;
+		}
+
+		netName = Q_strlwr(player->client->pers.netname);
+
+		if(strstr(netName, name))
+		{
+			foundPlayer = player;
+			count++;
+		}
+	}
+
+	if (count > 1)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "2 or more player name matches.\n");
+		return NULL;
+	}
+
+	if (count)
+	{
+		return foundPlayer;
+	}
+
+	gi.cprintf(ent, PRINT_HIGH, "no player name matches found.\n");
+	return NULL;
+}

@@ -641,8 +641,8 @@ void Cmd_Runrun_f(edict_t *ent)
 
 void Cmd_Summon_f(edict_t *ent)
 {
-	char * name = gi.args();
-	edict_t * target;
+	char *name = gi.args();
+	edict_t *target = NULL;
 	int i;
 
 	if (!ent || !ent->client || ent->client->pers.spectator)
@@ -662,18 +662,67 @@ void Cmd_Summon_f(edict_t *ent)
 		return;
 	}
 
-	for (i = 1; i < (int)(maxclients->value)+1; i++)
+	if(name[0])
 	{
-		target = &g_edicts[i];
+		if(!strncmp(name, "CL ", 3))
+		{
+			int playernum;
 
-		if (!target->inuse || !target->client || IsSpectator(target))
-			continue;
-		if (target == ent)
-			continue;
-		// if a specific name requested & doesn't match, skip
-		if (name[0] && Q_stricmp(name, target->client->pers.netname))
-			continue;
+			name+=3;
+			playernum = atoi(name);
+			if(playernum > game.maxclients)
+			{
+				gi.cprintf(ent, PRINT_HIGH, "Couldn't find a player to summon!\n");
+				return;
+			}
 
+			target = &g_edicts[playernum+1];
+			if(!target || !target->inuse || !target->client)
+			{
+				gi.cprintf(ent, PRINT_HIGH, "Couldn't find a player to summon!\n");
+				return;
+			}
+
+			if(IsSpectator(target))
+			{
+				gi.cprintf(ent, PRINT_HIGH, "You can't teleport to spectators!\n");
+				return;
+			}
+
+			if(target == ent)
+			{
+				gi.cprintf(ent, PRINT_HIGH, "You can't teleport to yourself!\n");
+				return;
+			}
+
+			Summon(ent, target);
+			return;
+		}
+
+		if(!strncmp(name, "LIKE ", 5))
+		{
+			name+=5;
+		}
+		target = Find_LikePlayer(ent, name);
+	}
+	else
+	{
+		for (i = 0; i < game.maxclients; i++)
+		{
+			target = &g_edicts[i+1];
+
+			if (!target->inuse || !target->client || IsSpectator(target))
+				continue;
+			if (target == ent)
+				continue;
+
+			Summon(ent, target);
+			return;
+		}
+	}
+
+	if(target && !IsSpectator(target) && target != ent)
+	{
 		Summon(ent, target);
 		return;
 	}
@@ -707,7 +756,7 @@ void Cmd_Teleport_f(edict_t *ent)
 
 	if(!name[0])
 	{
-		gi.cprintf(ent, PRINT_HIGH, "Usage: teleport <playername>\n");
+		gi.cprintf(ent, PRINT_HIGH, "Usage: teleport [LIKE/CL] <playername>\n");
 		return;
 	}
 
@@ -717,20 +766,53 @@ void Cmd_Teleport_f(edict_t *ent)
 		return;
 	}
 
-	for (i = 0; i < game.maxclients; i++)
+	if(!strncmp(name, "LIKE ", 5))
 	{
-		player = &g_edicts[i+1];
-
-		if(!player || !player->inuse || !player->client || player->client->pers.spectator)
-			continue;
-
-		if(!Q_stricmp(name, player->client->pers.netname))
-		{
-			Teleport(player, ent);
-			return;
-		}
+		name+=5;
 	}
 
+	if(!strncmp(name, "CL ", 3))
+	{
+		int playernum;
+
+		name+=3;
+		playernum = atoi(name);
+		if(playernum > game.maxclients)
+		{
+			goto bail;
+		}
+
+		player = &g_edicts[playernum+1];
+		if(!player || !player->inuse || !player->client)
+		{
+			goto bail;
+		}
+
+		if(IsSpectator(player))
+		{
+			gi.cprintf(ent, PRINT_HIGH, "You can't teleport to spectators!\n");
+			return;
+		}
+
+		if(player == ent)
+		{
+			gi.cprintf(ent, PRINT_HIGH, "You can't teleport to yourself!\n");
+			return;
+		}
+
+		Teleport(player, ent);
+		return;
+	}
+
+	player = Find_LikePlayer(ent, name);
+
+	if(player && !IsSpectator(player) && player != ent)
+	{
+		Teleport(player, ent);
+		return;
+	}
+
+bail:
 	gi.cprintf(ent, PRINT_HIGH, "Couldn't find player \"%s\" to teleport to!\n", name);
 }
 
