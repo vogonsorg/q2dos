@@ -1117,7 +1117,7 @@ static void CoopBlinkyChaseCamExec(edict_t *ent, pmenuhnd_t *p)
 		return;
 	}
 
-	Com_sprintf(cmd, sizeof(cmd), "cam %s\n", other->client->pers.netname);
+	Com_sprintf(cmd, sizeof(cmd), "cam CL %d\n", playernum);
 
 	gi.WriteByte(svc_stufftext);
 	gi.WriteString(cmd);

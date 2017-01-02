@@ -334,7 +334,7 @@ void Cmd_Stats_f(edict_t *ent)
 
 void Cmd_Cam_f(edict_t *ent)
 {
-	char * name = gi.args();
+	char *name = gi.args();
 	qboolean bFindFailed = true;
  // obj1 is how to tell when we've looped
 	edict_t * obj1;
@@ -366,64 +366,148 @@ void Cmd_Cam_f(edict_t *ent)
 		return;
 	}
 
-	if (obj1 && obj1->client && name[0] && !Q_stricmp(name, obj1->client->pers.netname)) /* FS: If we ask for it twice and we're already viewing them then bust out */
+	if(name[0])
 	{
-		stopBlinkyCam(ent);
-		return;
-	}
+		if(!strncmp(name, "CL ", 3))
+		{
+			int playernum;
 
-	if (!obj1)
-	{
-		obj1 = ent;
+			name+=3;
+			playernum = atoi(name);
+			if(playernum > game.maxclients)
+			{
+				gi.cprintf(ent, PRINT_HIGH, "Player #%d greater than maxclients.  Aborting search!\n", playernum);
+				return;
+			}
+
+			target = &g_edicts[playernum+1];
+			if(!target || !target->inuse || !target->client)
+			{
+				gi.cprintf(ent, PRINT_HIGH, "Couldn't find player #%d to chase!\n", playernum);
+				return;
+			}
+
+			if ((target) && (ent->client->blinky_client.cam_target) && (ent->client->blinky_client.cam_target == target)) /* FS: If we ask for it twice and we're already viewing them then bust out */
+			{
+				stopBlinkyCam(ent);
+				return;
+			}
+
+			if(IsSpectator(target))
+			{
+				gi.cprintf(ent, PRINT_HIGH, "You can't chase a spectator!\n");
+				return;
+			}
+
+			if(target == ent)
+			{
+				gi.cprintf(ent, PRINT_HIGH, "You can't chase yourself!\n");
+				return;
+			}
+
+			StartCam(ent, target);
+			ShowStats(ent, target);
+			return;
+		}
+
+		if(!strncmp(name, "LIKE ", 5))
+		{
+			name+=5;
+			target = Find_LikePlayer(ent, name, false);
+		}
+		else
+		{
+			target = Find_LikePlayer(ent, name, true);
+		}
+
+		if(!target || !target->inuse || !target->client)
+		{
+			gi.cprintf(ent, PRINT_HIGH, "Couldn't find player %s to chase!\n", name);
+			return;
+		}
+
+		if ((target) && (ent->client->blinky_client.cam_target) && (ent->client->blinky_client.cam_target == target)) /* FS: If we ask for it twice and we're already viewing them then bust out */
+		{
+			stopBlinkyCam(ent);
+			return;
+		}
+
+		if(IsSpectator(target))
+		{
+			gi.cprintf(ent, PRINT_HIGH, "You can't chase a spectator!\n");
+			return;
+		}
+
+		if(target == ent)
+		{
+			gi.cprintf(ent, PRINT_HIGH, "You can't chase yourself!\n");
+			return;
+		}
+
+		StartCam(ent, target);
+		ShowStats(ent, target);
+		return;
 	}
 	else
 	{
-		stopBlinkyCam(ent); /* FS: Stop the camera or else it gets all flabbergasted when cycling */
-	}
-
-	target = obj1;
-
-	while(1)
-	{
-		// advance loop thru edicts
-		// to do - this ought to cycle at maxclients instead of num_edicts
-		if (target < &g_edicts[0]+(int)(maxclients->value)+1)
-			target++;
-		else
-			target = g_edicts+1;
-		if (target == obj1)
-			break;
-		// only look at (in use) players
-		if (!target->inuse || !target->client || IsSpectator(target))
-			continue;
-		// if a specific name requested & doesn't match, skip
-		if (name[0] && Q_stricmp(name, target->client->pers.netname))
-			continue;
-
-		// found cam target
-		if (target == ent)
+		if (obj1 && obj1->client && name[0] && !Q_stricmp(name, obj1->client->pers.netname)) /* FS: If we ask for it twice and we're already viewing them then bust out */
 		{
-			bFindFailed = false;
 			stopBlinkyCam(ent);
+			return;
 		}
-		else
-		{
-			bFindFailed = false;
-			StartCam(ent, target);
-			ShowStats(ent, target);
-		}
-		break;
-	}
 
-	if(bFindFailed)
-	{
-		if(name[0])
+		if (!obj1)
 		{
-			gi.cprintf(ent, PRINT_HIGH, "Can't find player \"%s\" to chase!\n", name);
+			gi.cprintf(ent, PRINT_HIGH, "Blinky cam setup\n");
+			obj1 = ent;
 		}
 		else
 		{
-			gi.cprintf(ent, PRINT_HIGH, "Can't find a player to chase!\n");
+			gi.cprintf(ent, PRINT_HIGH, "Blinky cam stop\n");
+			stopBlinkyCam(ent); /* FS: Stop the camera or else it gets all flabbergasted when cycling */
+		}
+
+		target = obj1;
+
+		while(1)
+		{
+			// advance loop thru edicts
+			// to do - this ought to cycle at maxclients instead of num_edicts
+			if (target < &g_edicts[0]+(int)(maxclients->value)+1)
+				target++;
+			else
+				target = g_edicts+1;
+			if (target == obj1)
+				break;
+			// only look at (in use) players
+			if (!target->inuse || !target->client || IsSpectator(target))
+				continue;
+
+			// found cam target
+			if (target == ent)
+			{
+				bFindFailed = false;
+				stopBlinkyCam(ent);
+			}
+			else
+			{
+				bFindFailed = false;
+				StartCam(ent, target);
+				ShowStats(ent, target);
+			}
+			break;
+		}
+
+		if(bFindFailed)
+		{
+			if(name[0])
+			{
+				gi.cprintf(ent, PRINT_HIGH, "Can't find player \"%s\" to chase!\n", name);
+			}
+			else
+			{
+				gi.cprintf(ent, PRINT_HIGH, "Can't find a player to chase!\n");
+			}
 		}
 	}
 }
@@ -702,8 +786,12 @@ void Cmd_Summon_f(edict_t *ent)
 		if(!strncmp(name, "LIKE ", 5))
 		{
 			name+=5;
+			target = Find_LikePlayer(ent, name, false);
 		}
-		target = Find_LikePlayer(ent, name);
+		else
+		{
+			target = Find_LikePlayer(ent, name, true);
+		}
 	}
 	else
 	{
@@ -742,6 +830,7 @@ void Cmd_Teleport_f(edict_t *ent)
 	char *name = gi.args();
 	int i = 0;
 	edict_t *player;
+	qboolean exactMatch = true;
 
 	if (!ent || !ent->client || ent->client->pers.spectator)
 	{
@@ -769,6 +858,7 @@ void Cmd_Teleport_f(edict_t *ent)
 	if(!strncmp(name, "LIKE ", 5))
 	{
 		name+=5;
+		exactMatch = false;
 	}
 
 	if(!strncmp(name, "CL ", 3))
@@ -804,7 +894,7 @@ void Cmd_Teleport_f(edict_t *ent)
 		return;
 	}
 
-	player = Find_LikePlayer(ent, name);
+	player = Find_LikePlayer(ent, name, exactMatch);
 
 	if(player && !IsSpectator(player) && player != ent)
 	{

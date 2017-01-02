@@ -2143,7 +2143,7 @@ Cmd_SayPerson_f(edict_t *ent) /* FS: Tastyspleen/Q2Admin stuff.  By request. */
 		name = gi.argv(2);
 		p+=5;
 
-		other = Find_LikePlayer(ent, name);
+		other = Find_LikePlayer(ent, name, false);
 		if(!other)
 		{
 			return;
@@ -2161,7 +2161,7 @@ Cmd_SayPerson_f(edict_t *ent) /* FS: Tastyspleen/Q2Admin stuff.  By request. */
 
 		name = gi.argv(1);
 
-		other = Find_LikePlayer(ent, name);
+		other = Find_LikePlayer(ent, name, true);
 		if(!other)
 		{
 			return;

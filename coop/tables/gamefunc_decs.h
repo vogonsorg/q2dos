@@ -1309,7 +1309,7 @@ extern void vote_warp ( edict_t * ent , const char * mapName ) ;
 extern void vote_map ( edict_t * ent , const char * mapName ) ;
 extern qboolean vote_mapcheck ( edict_t * ent , const char * mapName ) ;
 extern void vote_command ( edict_t * ent ) ;
-extern edict_t * Find_LikePlayer ( edict_t * ent , char * name ) ;
+extern edict_t * Find_LikePlayer ( edict_t * ent , char * name , qboolean exactMatch ) ;
 extern qboolean MonsterPlayerKillBox ( edict_t * ent ) ;
 extern qboolean MonsterKillBox ( edict_t * ent ) ;
 extern qboolean KillBox ( edict_t * ent ) ;

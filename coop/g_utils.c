@@ -1003,7 +1003,7 @@ qboolean MonsterPlayerKillBox (edict_t *ent) /* FS: Zaero specific game dll chan
 	return true;		// all clear
 }
 
-edict_t *Find_LikePlayer (edict_t *ent, char *name) /* FS: People want this for various Tastyspleen-like commands */
+edict_t *Find_LikePlayer (edict_t *ent, char *name, qboolean exactMatch) /* FS: People want this for various Tastyspleen-like commands */
 {
 	int i, count;
 	edict_t *player = NULL;
@@ -1040,10 +1040,21 @@ edict_t *Find_LikePlayer (edict_t *ent, char *name) /* FS: People want this for 
 
 		netName = Q_strlwr(player->client->pers.netname);
 
-		if(strstr(netName, name))
+		if(exactMatch)
 		{
-			foundPlayer = player;
-			count++;
+			if(!Q_stricmp(netName, name))
+			{
+				foundPlayer = player;
+				count++;
+			}
+		}
+		else
+		{
+			if(strstr(netName, name))
+			{
+				foundPlayer = player;
+				count++;
+			}
 		}
 	}
 
