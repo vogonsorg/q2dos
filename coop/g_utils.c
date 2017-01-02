@@ -1008,6 +1008,7 @@ edict_t *Find_LikePlayer (edict_t *ent, char *name, qboolean exactMatch) /* FS: 
 	int i, count;
 	edict_t *player = NULL;
 	edict_t *foundPlayer = NULL;
+	char *nameLwrd = NULL;
 
 	if (!ent || !ent->client || !name || !name[0])
 	{
@@ -1026,7 +1027,7 @@ edict_t *Find_LikePlayer (edict_t *ent, char *name, qboolean exactMatch) /* FS: 
 
 	i = count = 0;
 
-	name = Q_strlwr(name);
+	nameLwrd = Q_strlwr(name);
 
 	for (i = 0; i < maxclients->intValue; i++)
 	{
@@ -1038,11 +1039,12 @@ edict_t *Find_LikePlayer (edict_t *ent, char *name, qboolean exactMatch) /* FS: 
 			continue;
 		}
 
-		netName = Q_strlwr(player->client->pers.netname);
+		netName = strdup(player->client->pers.netname);
+		netName = Q_strlwr(netName);
 
 		if(exactMatch)
 		{
-			if(!Q_stricmp(netName, name))
+			if(!Q_stricmp(netName, nameLwrd))
 			{
 				foundPlayer = player;
 				count++;
@@ -1050,11 +1052,17 @@ edict_t *Find_LikePlayer (edict_t *ent, char *name, qboolean exactMatch) /* FS: 
 		}
 		else
 		{
-			if(strstr(netName, name))
+			if(strstr(netName, nameLwrd))
 			{
 				foundPlayer = player;
 				count++;
 			}
+		}
+
+		if(netName)
+		{
+			free(netName);
+			netName = NULL;
 		}
 	}
 

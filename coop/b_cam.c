@@ -756,7 +756,7 @@ void Cmd_Summon_f(edict_t *ent)
 			playernum = atoi(name);
 			if(playernum > game.maxclients)
 			{
-				gi.cprintf(ent, PRINT_HIGH, "Couldn't find a player to summon!\n");
+				gi.cprintf(ent, PRINT_HIGH, "Player #%d greater than maxclients.  Aborting search!\n", playernum);
 				return;
 			}
 
@@ -791,6 +791,18 @@ void Cmd_Summon_f(edict_t *ent)
 		else
 		{
 			target = Find_LikePlayer(ent, name, true);
+		}
+
+		if ((target) && (target == ent))
+		{
+			gi.cprintf(ent, PRINT_HIGH, "You can't summon yourself!\n");
+			return;
+		}
+
+		if ((target) && (IsSpectator(target)))
+		{
+			gi.cprintf(ent, PRINT_HIGH, "You can't summon a spectator!\n");
+			return;
 		}
 	}
 	else
@@ -869,13 +881,13 @@ void Cmd_Teleport_f(edict_t *ent)
 		playernum = atoi(name);
 		if(playernum > game.maxclients)
 		{
-			goto bail;
+			gi.cprintf(ent, PRINT_HIGH, "Player #%d greater than maxclients.  Aborting search!\n", playernum);
 		}
 
 		player = &g_edicts[playernum+1];
 		if(!player || !player->inuse || !player->client)
 		{
-			goto bail;
+			gi.cprintf(ent, PRINT_HIGH, "Couldn't find player \"%s\" to teleport to!\n", name);
 		}
 
 		if(IsSpectator(player))
@@ -902,7 +914,18 @@ void Cmd_Teleport_f(edict_t *ent)
 		return;
 	}
 
-bail:
+	if((player) && (IsSpectator(player)))
+	{
+		gi.cprintf(ent, PRINT_HIGH, "You can't teleport to spectators!\n");
+		return;
+	}
+
+	if((player) && (player == ent))
+	{
+		gi.cprintf(ent, PRINT_HIGH, "You can't teleport to yourself!\n");
+		return;
+	}
+
 	gi.cprintf(ent, PRINT_HIGH, "Couldn't find player \"%s\" to teleport to!\n", name);
 }
 
