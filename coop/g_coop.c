@@ -38,6 +38,7 @@ void CoopReturnToVoteMenu(edict_t *ent, pmenuhnd_t *p);
 void CoopCredits(edict_t *ent, pmenuhnd_t *p);
 void CoopChaseCam(edict_t *ent, pmenuhnd_t *p);
 void CoopJoinGame(edict_t *ent, pmenuhnd_t *p);
+void CoopBlinkyCam(edict_t *ent, pmenuhnd_t *p);
 void CoopMotd(edict_t *ent, pmenuhnd_t *p);
 
 void CoopVoteMenu(edict_t *ent, pmenuhnd_t *p);
@@ -52,6 +53,11 @@ void votemenu_loadmaplist (void);
 void CoopVoteChangeMap(edict_t *ent, pmenuhnd_t *p);
 void votemenu_cleanup_all (void);
 void votemenu_cleanup_filebuffer (void);
+void CoopUpdateBlinkyMenu(edict_t *ent);
+void CoopBlinkyChaseMenu(edict_t *ent, pmenuhnd_t *p);
+void CoopBlinkySummonMenu(edict_t *ent, pmenuhnd_t *p);
+void CoopBlinkyTeleportMenu(edict_t *ent, pmenuhnd_t *p);
+void CoopBlinkyToggleSummon(edict_t *ent, pmenuhnd_t *p);
 
 extern void VoteMenuOpen(edict_t *ent);
 /*-----------------------------------------------------------------------*/
@@ -78,7 +84,9 @@ static const int jmenu_gamemode = 5;
 static const int jmenu_skill = 7;
 static const int jmenu_players = 8;
 static const int jmenu_spectators = 9;
-static const int jmenu_motd = 14;
+static const int jmenu_blinky = 13;
+static const int jmenu_vote = 14;
+static const int jmenu_motd = 15;
 
 pmenu_t joinmenu[] = {
 	{"*Quake II", PMENU_ALIGN_CENTER, NULL},
@@ -94,10 +102,10 @@ pmenu_t joinmenu[] = {
 	{NULL, PMENU_ALIGN_CENTER, NULL}, /* 10 */
 	{"Join The Game", PMENU_ALIGN_LEFT, CoopJoinGame},
 	{"Become a Spectator", PMENU_ALIGN_LEFT, CoopChaseCam},
-	{"Credits", PMENU_ALIGN_LEFT, CoopCredits},
-	{"Message of The Day", PMENU_ALIGN_LEFT, CoopMotd},
+	{"Blinky Camera", PMENU_ALIGN_LEFT, CoopBlinkyCam},
 	{"Voting Menu", PMENU_ALIGN_LEFT, CoopVoteMenu},
-	{NULL, PMENU_ALIGN_LEFT, NULL}, /* 16 */
+	{"Message of The Day", PMENU_ALIGN_LEFT, CoopMotd},
+	{"Credits", PMENU_ALIGN_LEFT, CoopCredits}, /* 16 */
 	{NULL, PMENU_ALIGN_LEFT, NULL},
 	{"v" COOP_STRING_VERSION, PMENU_ALIGN_RIGHT, NULL},
 };
@@ -199,6 +207,97 @@ pmenu_t motdmenu[] = {
 	{"Return to Main Menu", PMENU_ALIGN_LEFT, CoopReturnToMain}
 };
 
+#define BLINKYMENU_SUMMON 10
+pmenu_t blinkymenu[] = {
+	{"*Quake II", PMENU_ALIGN_CENTER, NULL},
+	{"*Mara'akate and Freewill", PMENU_ALIGN_CENTER, NULL},
+	{"*Custom Coop", PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"*Blinky Camera", PMENU_ALIGN_CENTER, NULL}, /* 4 */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"Chase Player", PMENU_ALIGN_LEFT, CoopBlinkyChaseMenu}, /* 6 */
+	{"Summon Player", PMENU_ALIGN_LEFT, CoopBlinkySummonMenu},
+	{"Teleport Player", PMENU_ALIGN_LEFT, CoopBlinkyTeleportMenu},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{"Summon: ", PMENU_ALIGN_LEFT, CoopBlinkyToggleSummon}, /* 10 */
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL}, /* 16 */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"Return to Main Menu", PMENU_ALIGN_LEFT, CoopReturnToMain}
+};
+
+#define SUMMONMENU_START 6
+pmenu_t summonmenu[] = {
+	{"*Quake II", PMENU_ALIGN_CENTER, NULL},
+	{"*Mara'akate and Freewill", PMENU_ALIGN_CENTER, NULL},
+	{"*Custom Coop", PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"*Summon Player", PMENU_ALIGN_CENTER, NULL}, /* 4 */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL}, /* 6 */
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL}, /* 16 */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"Return to Main Menu", PMENU_ALIGN_LEFT, CoopReturnToMain}
+};
+
+#define TELEPORTMENU_START 6
+pmenu_t teleportmenu[] = {
+	{"*Quake II", PMENU_ALIGN_CENTER, NULL},
+	{"*Mara'akate and Freewill", PMENU_ALIGN_CENTER, NULL},
+	{"*Custom Coop", PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"*Teleport to Player", PMENU_ALIGN_CENTER, NULL}, /* 4 */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL}, /* 6 */
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL}, /* 16 */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"Return to Main Menu", PMENU_ALIGN_LEFT, CoopReturnToMain}
+};
+
+#define CHASEMENU_START 6
+pmenu_t chasemenu[] = {
+	{"*Quake II", PMENU_ALIGN_CENTER, NULL},
+	{"*Mara'akate and Freewill", PMENU_ALIGN_CENTER, NULL},
+	{"*Custom Coop", PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"*Chase Cam Player", PMENU_ALIGN_CENTER, NULL}, /* 4 */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL}, /* 6 */
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL}, /* 16 */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"Return to Main Menu", PMENU_ALIGN_LEFT, CoopReturnToMain}
+};
 char *coopMapFileBuffer = NULL;
 int mapCount = 0;
 pmenu_t *votemapmenu = NULL;
@@ -921,3 +1020,370 @@ void votemenu_loadmaplist (void)
 
 	return;
 }
+
+void CoopInitBlinkyMenu(edict_t *ent)
+{
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+}
+
+void CoopBlinkyToggleSummon(edict_t *ent, pmenuhnd_t *p /* unused */)
+{
+	static char summon[32];
+	static char cmd[32];
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	if(ent->client->pers.noSummon)
+	{
+		Com_sprintf(summon, sizeof(summon), "Summon: enabled");
+		Com_sprintf(cmd, sizeof(cmd), "nosummon 0");
+	}
+	else
+	{
+		Com_sprintf(summon, sizeof(summon), "Summon: disabled");
+		Com_sprintf(cmd, sizeof(cmd), "nosummon 1");
+	}
+
+	gi.WriteByte(svc_stufftext);
+	gi.WriteString(cmd);
+	gi.unicast(ent, true);
+
+	ent->client->menudirty = true;
+}
+
+void CoopUpdateBlinkyMenu(edict_t *ent)
+{
+	static char summon[32];
+	pmenuhnd_t *p;
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	p = ent->client->menu;
+	if(!p)
+	{
+		return;
+	}
+
+	if(ent->client->pers.noSummon)
+	{
+		Com_sprintf(summon, sizeof(summon), "Summon: disabled");
+	}
+	else
+	{
+		Com_sprintf(summon, sizeof(summon), "Summon: enabled");
+	}
+
+	PMenu_UpdateEntry(p->entries + BLINKYMENU_SUMMON, summon, PMENU_ALIGN_LEFT, CoopBlinkyToggleSummon);
+}
+
+void CoopBlinkyCam(edict_t *ent, pmenuhnd_t *p /* unused */)
+{
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	PMenu_Close(ent);
+
+	CoopInitBlinkyMenu(ent);
+	PMenu_Open(ent, blinkymenu, 0, sizeof(blinkymenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
+	ent->client->menu_update = CoopUpdateBlinkyMenu;
+}
+
+static void CoopBlinkyChaseCamExec(edict_t *ent, pmenuhnd_t *p)
+{
+	static char cmd[32];
+	int playernum;
+	edict_t *other = NULL;
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	playernum = p->cur - CHASEMENU_START;
+	other = &g_edicts[playernum+1];
+	if(!other || !other->client)
+	{
+		return;
+	}
+
+	Com_sprintf(cmd, sizeof(cmd), "cam %s\n", other->client->pers.netname);
+
+	gi.WriteByte(svc_stufftext);
+	gi.WriteString(cmd);
+	gi.unicast(ent, true);
+
+	PMenu_Close(ent);
+}
+
+static void CoopInitBlinkyChaseMenu(edict_t *ent)
+{
+	int i;
+	edict_t *other = NULL;
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	for (i = 0; i < game.maxclients; i++)
+	{
+		other = &g_edicts[i + 1];
+		if(!other || !other->inuse || !other->client || other->client->pers.spectator)
+		{
+			chasemenu[i + CHASEMENU_START].text = NULL;
+			chasemenu[i + CHASEMENU_START].SelectFunc = NULL;
+			continue;
+		}
+
+		chasemenu[i + CHASEMENU_START].text = other->client->pers.netname;
+		chasemenu[i + CHASEMENU_START].SelectFunc = CoopBlinkyChaseCamExec;
+	}
+}
+
+static void CoopUpdateBlinkyChaseMenu(edict_t *ent)
+{
+	int i;
+	edict_t *other = NULL;
+	pmenuhnd_t *p;
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	p = ent->client->menu;
+	if(!p)
+	{
+		return;
+	}
+
+	for (i = 0; i < game.maxclients; i++)
+	{
+		other = &g_edicts[i + 1];
+		if(!other || !other->inuse || !other->client || other->client->pers.spectator)
+		{
+			PMenu_UpdateEntry(p->entries + i + CHASEMENU_START, NULL, PMENU_ALIGN_LEFT, NULL);
+			continue;
+		}
+
+		PMenu_UpdateEntry(p->entries + i + CHASEMENU_START, other->client->pers.netname, PMENU_ALIGN_LEFT, CoopBlinkyChaseCamExec);
+	}
+}
+
+void CoopBlinkyChaseMenu(edict_t *ent, pmenuhnd_t *p /* unused */)
+{
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	PMenu_Close(ent);
+
+	CoopInitBlinkyChaseMenu(ent);
+	PMenu_Open(ent, chasemenu, 0, sizeof(chasemenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
+	ent->client->menu_update = CoopUpdateBlinkyChaseMenu;
+}
+
+static void CoopBlinkySummonExec(edict_t *ent, pmenuhnd_t *p)
+{
+	static char cmd[32];
+	int playernum;
+	edict_t *other = NULL;
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	playernum = p->cur - SUMMONMENU_START;
+	other = &g_edicts[playernum+1];
+	if(!other || !other->client)
+	{
+		return;
+	}
+
+	Com_sprintf(cmd, sizeof(cmd), "summon CL %d\n", playernum);
+
+	gi.WriteByte(svc_stufftext);
+	gi.WriteString(cmd);
+	gi.unicast(ent, true);
+
+	PMenu_Close(ent);
+}
+
+static void CoopInitBlinkySummonMenu(edict_t *ent)
+{
+	int i;
+	edict_t *other = NULL;
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	for (i = 0; i < game.maxclients; i++)
+	{
+		other = &g_edicts[i + 1];
+		if(!other || !other->inuse || !other->client || other->client->pers.spectator)
+		{
+			summonmenu[i + SUMMONMENU_START].text = NULL;
+			summonmenu[i + SUMMONMENU_START].SelectFunc = NULL;
+			continue;
+		}
+
+		summonmenu[i + SUMMONMENU_START].text = other->client->pers.netname;
+		summonmenu[i + SUMMONMENU_START].SelectFunc = CoopBlinkySummonExec;
+	}
+}
+
+static void CoopUpdateBlinkySummonMenu(edict_t *ent)
+{
+	int i;
+	edict_t *other = NULL;
+	pmenuhnd_t *p;
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	p = ent->client->menu;
+	if(!p)
+	{
+		return;
+	}
+
+	for (i = 0; i < game.maxclients; i++)
+	{
+		other = &g_edicts[i + 1];
+		if(!other || !other->inuse || !other->client || other->client->pers.spectator)
+		{
+			PMenu_UpdateEntry(p->entries + i + SUMMONMENU_START, NULL, PMENU_ALIGN_LEFT, NULL);
+			continue;
+		}
+
+		PMenu_UpdateEntry(p->entries + i + SUMMONMENU_START, other->client->pers.netname, PMENU_ALIGN_LEFT, CoopBlinkySummonExec);
+	}
+}
+
+void CoopBlinkySummonMenu(edict_t *ent, pmenuhnd_t *p /* unused */)
+{
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	PMenu_Close(ent);
+
+	CoopInitBlinkySummonMenu(ent);
+	PMenu_Open(ent, summonmenu, 0, sizeof(summonmenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
+	ent->client->menu_update = CoopUpdateBlinkySummonMenu;
+}
+
+static void CoopBlinkyTeleportExec(edict_t *ent, pmenuhnd_t *p)
+{
+	static char cmd[32];
+	int playernum;
+	edict_t *other = NULL;
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	playernum = p->cur - TELEPORTMENU_START;
+	other = &g_edicts[playernum+1];
+	if(!other || !other->client)
+	{
+		return;
+	}
+
+	Com_sprintf(cmd, sizeof(cmd), "teleport CL %d\n", playernum);
+
+	gi.WriteByte(svc_stufftext);
+	gi.WriteString(cmd);
+	gi.unicast(ent, true);
+
+	PMenu_Close(ent);
+}
+
+static void CoopInitBlinkyTeleportMenu(edict_t *ent)
+{
+	int i;
+	edict_t *other = NULL;
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	for (i = 0; i < game.maxclients; i++)
+	{
+		other = &g_edicts[i + 1];
+		if(!other || !other->inuse || !other->client || other->client->pers.spectator)
+		{
+			teleportmenu[i + TELEPORTMENU_START].text = NULL;
+			teleportmenu[i + TELEPORTMENU_START].SelectFunc = NULL;
+			continue;
+		}
+
+		teleportmenu[i + TELEPORTMENU_START].text = other->client->pers.netname;
+		teleportmenu[i + TELEPORTMENU_START].SelectFunc = CoopBlinkyTeleportExec;
+	}
+}
+
+static void CoopUpdateBlinkyTeleportMenu(edict_t *ent)
+{
+	int i;
+	edict_t *other = NULL;
+	pmenuhnd_t *p;
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	p = ent->client->menu;
+	if(!p)
+	{
+		return;
+	}
+
+	for (i = 0; i < game.maxclients; i++)
+	{
+		other = &g_edicts[i + 1];
+		if(!other || !other->inuse || !other->client || other->client->pers.spectator)
+		{
+			PMenu_UpdateEntry(p->entries + i + TELEPORTMENU_START, NULL, PMENU_ALIGN_LEFT, NULL);
+			continue;
+		}
+
+		PMenu_UpdateEntry(p->entries + i + TELEPORTMENU_START, other->client->pers.netname, PMENU_ALIGN_LEFT, CoopBlinkyTeleportExec);
+	}
+}
+
+void CoopBlinkyTeleportMenu(edict_t *ent, pmenuhnd_t *p /* unused */)
+{
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	PMenu_Close(ent);
+
+	CoopInitBlinkyTeleportMenu(ent);
+	PMenu_Open(ent, teleportmenu, 0, sizeof(teleportmenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
+	ent->client->menu_update = CoopUpdateBlinkyTeleportMenu;
+}
+

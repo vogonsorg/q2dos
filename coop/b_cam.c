@@ -685,13 +685,13 @@ void Cmd_Summon_f(edict_t *ent)
 
 			if(IsSpectator(target))
 			{
-				gi.cprintf(ent, PRINT_HIGH, "You can't teleport to spectators!\n");
+				gi.cprintf(ent, PRINT_HIGH, "You can't summon a spectator!\n");
 				return;
 			}
 
 			if(target == ent)
 			{
-				gi.cprintf(ent, PRINT_HIGH, "You can't teleport to yourself!\n");
+				gi.cprintf(ent, PRINT_HIGH, "You can't summon yourself!\n");
 				return;
 			}
 

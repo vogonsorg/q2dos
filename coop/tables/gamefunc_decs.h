@@ -1959,6 +1959,13 @@ extern void Move_Calc_Zaero ( edict_t * ent , vec3_t dest , void ( * func ) ( ed
 extern void Move_Begin ( edict_t * ent ) ;
 extern void Move_Final ( edict_t * ent ) ;
 extern void Move_Done ( edict_t * ent ) ;
+extern void CoopBlinkyTeleportMenu ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopBlinkySummonMenu ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopBlinkyChaseMenu ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopBlinkyCam ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopUpdateBlinkyMenu ( edict_t * ent ) ;
+extern void CoopBlinkyToggleSummon ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopInitBlinkyMenu ( edict_t * ent ) ;
 extern void votemenu_loadmaplist ( void ) ;
 extern void votemenu_cleanup_filebuffer ( void ) ;
 extern void votemenu_cleanup_all ( void ) ;
