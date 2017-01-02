@@ -1028,6 +1028,11 @@ edict_t *Find_LikePlayer (edict_t *ent, char *name, qboolean exactMatch) /* FS: 
 	i = count = 0;
 
 	nameLwrd = Q_strlwr(name);
+	if(!nameLwrd)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Name is NULL.  Aborting search!\n");
+		return NULL;
+	}
 
 	for (i = 0; i < maxclients->intValue; i++)
 	{
@@ -1040,6 +1045,7 @@ edict_t *Find_LikePlayer (edict_t *ent, char *name, qboolean exactMatch) /* FS: 
 		}
 
 		netName = strdup(player->client->pers.netname);
+
 		netName = Q_strlwr(netName);
 
 		if(exactMatch)
