@@ -2003,6 +2003,7 @@ extern char * GetProperMonsterName ( char * monsterName ) ;
 extern qboolean CanDamage ( edict_t * targ , edict_t * inflictor ) ;
 extern void cleanupHealTarget ( edict_t * ent ) ;
 extern void ClientCommand ( edict_t * ent ) ;
+extern void Cmd_SayPerson_f ( edict_t * ent ) ;
 extern void Cmd_DeleteCheckpoints_f ( edict_t * ent ) ;
 extern void Cmd_SaveCheckpoint_f ( edict_t * ent ) ;
 extern void Cmd_PlaceCheckpoint_f ( edict_t * ent ) ;

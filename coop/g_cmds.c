@@ -2087,6 +2087,161 @@ void Cmd_DeleteCheckpoints_f (edict_t *ent) /* FS: Added */
 }
 
 void
+Cmd_SayPerson_f(edict_t *ent) /* FS: Tastyspleen/Q2Admin stuff.  By request. */
+{
+	int i;
+	edict_t *other;
+	char *p;
+	char text[2048], entHeader[2048];
+	gclient_t *cl;
+	qboolean bIsPlayerNum = false;
+	qboolean bIsSearch = false;
+
+	if (!ent)
+	{
+		return;
+	}
+
+	if ((gi.argc() < 2))
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Usage: say_person [LIKE/CL] <player_name> <message>\n");
+		return;
+	}
+
+	Com_sprintf(text, sizeof(text), "(%s)(private message) ", ent->client->pers.netname);
+	Com_sprintf(entHeader, sizeof(entHeader), "(%s)(private message to: ", ent->client->pers.netname);
+
+	p = gi.args();
+
+	if(!strncmp(p, "CL ", 3))
+	{
+		int playernum;
+
+		playernum = atoi(gi.argv(2));
+		p+=3;
+		if(playernum > game.maxclients)
+		{
+			return;
+		}
+
+		other = &g_edicts[playernum + 1];
+		if(!other || !other->inuse || !other->client)
+		{
+			return;
+		}
+
+		p+=strlen(gi.argv(2))+1;
+		if(!strncmp(p, "\" ", 2))
+		{
+			p+=2;
+		}
+	}
+	else if(!strncmp(p, "LIKE ", 5))
+	{
+		char *name;
+
+		name = gi.argv(2);
+		p+=5;
+
+		other = Find_LikePlayer(ent, name);
+		if(!other)
+		{
+			return;
+		}
+
+		p+=strlen(gi.argv(2))+1;
+		if(!strncmp(p, "\" ", 2))
+		{
+			p+=2;
+		}
+	}
+	else
+	{
+		char *name;
+
+		name = gi.argv(1);
+
+		other = Find_LikePlayer(ent, name);
+		if(!other)
+		{
+			return;
+		}
+
+		p+=strlen(gi.argv(1))+1;
+		if(!strncmp(p, "\" ", 2))
+		{
+			p+=2;
+		}
+	}
+
+	if (*p == '"')
+	{
+		p++;
+		p[strlen(p) - 1] = 0;
+	}
+
+	strcat(text, p);
+
+	/* don't let text be too long for malicious reasons */
+	if (strlen(text) > 150)
+	{
+		text[150] = 0;
+	}
+
+	strcat(text, "\n");
+
+	strcat(entHeader, other->client->pers.netname);
+	strcat(entHeader, ") ");
+	strcat(entHeader, p);
+	if(strlen(entHeader) > 150)
+	{
+		entHeader[150] = 0;
+	}
+	strcat(entHeader, "\n");
+
+	if (flood_msgs->value)
+	{
+		cl = ent->client;
+
+		if (level.time < cl->flood_locktill)
+		{
+			gi.cprintf(ent, PRINT_HIGH, "You can't talk for %d more seconds\n",
+					(int)(cl->flood_locktill - level.time));
+			return;
+		}
+
+		i = cl->flood_whenhead - flood_msgs->value + 1;
+
+		if (i < 0)
+		{
+			i = (sizeof(cl->flood_when) / sizeof(cl->flood_when[0])) + i;
+		}
+
+		if (cl->flood_when[i] &&
+			(level.time - cl->flood_when[i] < flood_persecond->value))
+		{
+			cl->flood_locktill = level.time + flood_waitdelay->value;
+			gi.cprintf(ent, PRINT_CHAT,
+					"Flood protection:  You can't talk for %d seconds.\n",
+					(int)flood_waitdelay->value);
+			return;
+		}
+
+		cl->flood_whenhead = (cl->flood_whenhead + 1) % (sizeof(cl->flood_when) /
+							  sizeof(cl->flood_when[0]));
+		cl->flood_when[cl->flood_whenhead] = level.time;
+	}
+
+	if (dedicated->value)
+	{
+		gi.cprintf(NULL, PRINT_CHAT, "%s", text);
+	}
+
+	gi.cprintf(other, PRINT_CHAT, "%s", text);
+	gi.cprintf(ent, PRINT_CHAT, "%s", entHeader);
+}
+
+void
 ClientCommand(edict_t *ent)
 {
 	char *cmd;
@@ -2335,6 +2490,10 @@ ClientCommand(edict_t *ent)
 	else if (Q_stricmp(cmd, "runrun") == 0) /* FS: Blinkys's Coop Camera */
 	{
 		Cmd_Runrun_f(ent);
+	}
+	else if (Q_stricmp(cmd, "say_person") == 0) /* FS: Tastyspleen/Q2Admin stuff.  By request. */
+	{
+		Cmd_SayPerson_f(ent);
 	}
 	else if (bVoteInProgress && !ent->hasVoted)
 	{

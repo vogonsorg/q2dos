@@ -2003,6 +2003,7 @@
 {"CanDamage", (byte *)CanDamage},
 {"cleanupHealTarget", (byte *)cleanupHealTarget},
 {"ClientCommand", (byte *)ClientCommand},
+{"Cmd_SayPerson_f", (byte *)Cmd_SayPerson_f},
 {"Cmd_DeleteCheckpoints_f", (byte *)Cmd_DeleteCheckpoints_f},
 {"Cmd_SaveCheckpoint_f", (byte *)Cmd_SaveCheckpoint_f},
 {"Cmd_PlaceCheckpoint_f", (byte *)Cmd_PlaceCheckpoint_f},
