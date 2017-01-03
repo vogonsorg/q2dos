@@ -2906,7 +2906,7 @@ ClientDisconnect(edict_t *ent)
 
 	Blinky_OnClientTerminate(ent); /* FS: Blinky's Coop Camera */
 
-	if (coop->intValue) /* FS: Coop: Spawn a backpack with our stuff */
+	if (coop->intValue && !ent->client->pers.spectator) /* FS: Coop: Spawn a backpack with our stuff */
 	{
 		Spawn_CoopBackpack(ent);
 	}
@@ -3035,7 +3035,7 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 	level.current_entity = ent;
 	client = ent->client;
 
-	Blinky_BeginClientThink(ent, ucmd); /* FS: Blinky's Coop Camera */
+	Blinky_RunRun(ent, ucmd);
 
 	if (level.intermissiontime)
 	{
@@ -3059,7 +3059,7 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 
 	pm_passent = ent;
 
-	if (ent->client->chase_target)
+	if (ent->client->chase_target || ent->client->blinky_client.cam_target)
 	{
 		client->resp.cmd_angles[0] = SHORT2ANGLE(ucmd->angles[0]);
 		client->resp.cmd_angles[1] = SHORT2ANGLE(ucmd->angles[1]);
@@ -3239,6 +3239,11 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 				GetChaseTarget(ent);
 			}
 		}
+		else if (client->blinky_client.cam_target) /* FS: Added */
+		{
+			client->buttons = 0;
+			client->latched_buttons = 0;
+		}
 		else if (!client->weapon_thunk)
 		{
 			client->weapon_thunk = true;
@@ -3278,6 +3283,10 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 		if (other->inuse && (other->client->chase_target == ent))
 		{
 			UpdateChaseCam(other);
+		}
+		else if(other->inuse && (other->client->blinky_client.cam_target == ent))
+		{
+			Blinky_UpdateCameraThink(other); /* FS: Blinky's Coop Camera */
 		}
 	}
 

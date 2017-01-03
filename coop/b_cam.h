@@ -29,10 +29,9 @@ struct BlinkyClient_s
 
 typedef struct BlinkyClient_s BlinkyClient_t;
 
-void Blinky_BeginClientThink(edict_t *ent, usercmd_t *ucmd);
-void Blinky_EndClientThink(edict_t *ent, usercmd_t *ucmd);
+void Blinky_UpdateCameraThink(edict_t *ent);
 void Blinky_BeginRunFrame();
-void Blinky_ClientEndServerFrame(edict_t * ent);
+void Blinky_RunRun(edict_t *ent, usercmd_t *ucmd);
 
 void Cmd_Cam_f(edict_t *ent);
 void Cmd_Stats_f(edict_t *ent);

@@ -2120,8 +2120,7 @@
 {"StartCam", (byte *)StartCam},
 {"stopBlinkyCam", (byte *)stopBlinkyCam},
 {"MoveToAngles", (byte *)MoveToAngles},
-{"Blinky_ClientEndServerFrame", (byte *)Blinky_ClientEndServerFrame},
 {"Blinky_BeginRunFrame", (byte *)Blinky_BeginRunFrame},
-{"Blinky_EndClientThink", (byte *)Blinky_EndClientThink},
-{"Blinky_BeginClientThink", (byte *)Blinky_BeginClientThink},
+{"Blinky_UpdateCameraThink", (byte *)Blinky_UpdateCameraThink},
+{"Blinky_RunRun", (byte *)Blinky_RunRun},
 {0, 0}

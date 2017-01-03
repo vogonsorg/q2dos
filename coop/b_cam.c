@@ -18,15 +18,18 @@ static qboolean IsSpectator(edict_t * ent)
 	return ent->client->pers.spectator;
 }
 
-void Blinky_BeginClientThink(edict_t *ent, usercmd_t *ucmd)
+void Blinky_RunRun(edict_t *ent, usercmd_t *ucmd)
 {
-	gclient_t * client = ent->client;
-	BlinkyClient_t * bdata = &client->blinky_client;
+	gclient_t *client = NULL;
+	BlinkyClient_t *bdata = NULL;
 
-	if (!ent || !ucmd)
+	if(!ent || !ent->client || !ucmd)
 	{
 		return;
 	}
+
+	client = ent->client;
+	bdata = &client->blinky_client;
 
 	/* the runrun code - continuous running	 */
 	if (bdata->runrun)
@@ -47,22 +50,48 @@ void Blinky_BeginClientThink(edict_t *ent, usercmd_t *ucmd)
 			case 4: ucmd->sidemove = -400; break;
 		}
 	}
-	else
+}
+
+void Blinky_UpdateCameraThink(edict_t *ent)
+{
+	gclient_t *client = NULL;
+	BlinkyClient_t *bdata = NULL;
+
+	if (!ent || !ent->client)
 	{
-		if(bdata->cam_target) /* FS: Follow the player and ignore input */
+		return;
+	}
+
+	client = ent->client;
+	bdata = &client->blinky_client;
+
+	if(bdata->cam_target) /* FS: Follow the player and ignore input */
+	{
+		int i = 0;
+
+		if (bdata->cam_target->deadflag)
 		{
-			int i = 0;
+			ent->client->ps.pmove.pm_type = PM_DEAD;
+		}
+		else
+		{
+			ent->client->ps.pmove.pm_type = PM_FREEZE;
+		}
 
-			ucmd->forwardmove = ucmd->sidemove = ucmd->upmove = 0;
-			ucmd->buttons = 0;
+		for (i = 0; i < 3; i++)
+		{
+			ent->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(
+					bdata->cam_target->client->v_angle[i] - ent->client->resp.cmd_angles[i]);
+		}
 
-			for (i = 0; i < 3; i++)
-			{
-				ent->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(
-						bdata->cam_target->client->v_angle[i] - ent->client->resp.cmd_angles[i]);
-			}
-
-			/* FS: FIXME: Interpolate this for ultimate smoothness */
+		if (bdata->cam_target->deadflag)
+		{
+			ent->client->ps.viewangles[ROLL] = 40;
+			ent->client->ps.viewangles[PITCH] = -15;
+			ent->client->ps.viewangles[YAW] = bdata->cam_target->client->killer_yaw;
+		}
+		else
+		{
 			VectorCopy(bdata->cam_target->client->v_angle, ent->client->ps.viewangles);
 			VectorCopy(bdata->cam_target->client->v_angle, ent->client->v_angle);
 		}
@@ -77,11 +106,6 @@ void Blinky_BeginClientThink(edict_t *ent, usercmd_t *ucmd)
 	{
 		ent->client->ps.stats[STAT_CHASE] = 0;
 	}
-}
-
-void Blinky_EndClientThink(edict_t *ent, usercmd_t *ucmd)
-{
-//	gclient_t * client = ent->client;
 }
 
 static void Blinky_BeginServerFrameClient(edict_t * ent)
@@ -119,11 +143,6 @@ void Blinky_BeginRunFrame()
 
 		Blinky_BeginServerFrameClient(ent);
 	}
-}
-
-void Blinky_ClientEndServerFrame(edict_t * ent)
-{
-//	gclient_t * client = ent->client;
 }
 
 static void
@@ -250,6 +269,7 @@ void stopBlinkyCam(edict_t * ent)
 	ent->client->ps.fov = bdata->save_fov;
 	ent->client->pers.hand = bdata->save_hand;
 	ent->client->ps.gunindex = bdata->save_weapon;
+	ent->client->ps.stats[STAT_CHASE] = 0;
 
 	gi.linkentity(ent);
 
@@ -963,7 +983,7 @@ void Blinky_CalcViewOffsets(edict_t * ent, vec3_t v)
 	{
 		ent->client->ps.pmove.origin[i] = target->s.origin[i]*8;
 	}
-	VectorCopy(target->s.angles, ent->client->ps.viewangles);
+
 	v[2] += target->viewheight;
 
 	// move cam forward

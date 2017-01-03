@@ -319,7 +319,7 @@ Cmd_Give_f(edict_t *ent)
 		return;
 	}
 
-	if(ent->client->pers.spectator) /* FS: Coop: No spectators and cheats, please */
+	if(ent->client->pers.spectator || ent->client->blinky_client.cam_target) /* FS: Coop: No spectators and cheats, please */
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"Spectators can't use this command.\n");
@@ -596,7 +596,7 @@ Cmd_God_f(edict_t *ent)
 		return;
 	}
 
-	if(ent->client->pers.spectator) /* FS: Coop: No spectators and cheats, please */
+	if(ent->client->pers.spectator || ent->client->blinky_client.cam_target) /* FS: Coop: No spectators and cheats, please */
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"Spectators can't use this command.\n");
@@ -637,7 +637,7 @@ Cmd_Notarget_f(edict_t *ent)
 		return;
 	}
 
-	if(ent->client->pers.spectator) /* FS: Coop: No spectators and cheats, please */
+	if(ent->client->pers.spectator || ent->client->blinky_client.cam_target) /* FS: Coop: No spectators and cheats, please */
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"Spectators can't use this command.\n");
@@ -675,7 +675,7 @@ Cmd_Noclip_f(edict_t *ent)
 		return;
 	}
 
-	if(ent->client->pers.spectator) /* FS: Coop: No spectators and cheats, please */
+	if(ent->client->pers.spectator || ent->client->blinky_client.cam_target) /* FS: Coop: No spectators and cheats, please */
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"Spectators can't use this command.\n");
@@ -813,7 +813,7 @@ Cmd_Use_f(edict_t *ent)
 		return;
 	}
 
-	if(ent->client->pers.spectator) /* FS: Coop: No spectators and cheats, please */
+	if(ent->client->pers.spectator || ent->client->blinky_client.cam_target) /* FS: Coop: No spectators and cheats, please */
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"Spectators can't use this command.\n");
@@ -942,7 +942,7 @@ Cmd_Drop_f(edict_t *ent)
 		return;
 	}
 
-	if(ent->client->pers.spectator) /* FS: Coop: No spectators and cheats, please */
+	if(ent->client->pers.spectator || ent->client->blinky_client.cam_target) /* FS: Coop: No spectators and cheats, please */
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"Spectators can't use this command.\n");
@@ -1186,6 +1186,12 @@ Cmd_InvUse_f(edict_t *ent)
 	if (ent->client->menu)
 	{
 		PMenu_Select(ent);
+		return;
+	}
+
+	if (ent->client->blinky_client.cam_target)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Can't use this command in chase mode!\n");
 		return;
 	}
 
