@@ -64,6 +64,11 @@ typedef struct
 	// demo server information
 	FILE		*demofile;
 	qboolean	timedemo;		// don't time sync
+
+	/* FS: FIXMEL: Debugging for overflows in Coop -- Remove this when done. */
+	int			modelindexcount;
+	int			soundindexcount;
+	int			imageindexcount;
 } server_t;
 
 #define EDICT_NUM(n) ((edict_t *)((byte *)ge->edicts + ge->edict_size*(n)))

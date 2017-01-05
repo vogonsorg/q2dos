@@ -51,11 +51,11 @@ int SV_FindIndex (char *name, int start, int max, qboolean create)
 	//	Com_Error (ERR_DROP, "*Index: overflow");
 	{
 		if (start == CS_MODELS)
-			Com_Printf ("Warning: Index overflow for models\n");
+			Com_Printf ("Warning: Index overflow for models: %s\n", name);
 		else if (start == CS_SOUNDS)
-			Com_Printf ("Warning: Index overflow for sounds\n");
+			Com_Printf ("Warning: Index overflow for sounds: %s\n", name);
 		else if (start == CS_IMAGES)
-			Com_Printf ("Warning: Index overflow for images\n");
+			Com_Printf ("Warning: Index overflow for images: %s\n", name);
 		return (max-1);	// return the last possible index
 	}
 	// end Knightmare
@@ -77,17 +77,47 @@ int SV_FindIndex (char *name, int start, int max, qboolean create)
 
 int SV_ModelIndex (char *name)
 {
-	return SV_FindIndex (name, CS_MODELS, MAX_MODELS, true);
+	int i;
+
+	i = SV_FindIndex (name, CS_MODELS, MAX_MODELS, true);
+
+	if (i > sv.modelindexcount) /* FS: Very verbose shit that I need */
+	{
+		Com_DPrintf(DEVELOPER_MSG_VERBOSE, "ModelIndex: [%d] %s\n", i, name);
+		sv.modelindexcount = i;
+	}
+
+	return i;
 }
 
 int SV_SoundIndex (char *name)
 {
-	return SV_FindIndex (name, CS_SOUNDS, MAX_SOUNDS, true);
+	int i;
+
+	i = SV_FindIndex (name, CS_SOUNDS, MAX_SOUNDS, true);
+
+	if (i > sv.soundindexcount) /* FS: Very verbose shit that I need */
+	{
+		Com_DPrintf(DEVELOPER_MSG_VERBOSE, "SoundIndex: [%d] %s\n", i, name);
+		sv.soundindexcount = i;
+	}
+
+	return i;
 }
 
 int SV_ImageIndex (char *name)
 {
-	return SV_FindIndex (name, CS_IMAGES, MAX_IMAGES, true);
+	int i;
+
+	i = SV_FindIndex (name, CS_IMAGES, MAX_IMAGES, true);
+
+	if (i > sv.imageindexcount) /* FS: Very verbose shit that I need */
+	{
+		Com_DPrintf(DEVELOPER_MSG_VERBOSE, "ImageIndex: [%d] %s\n", i, name);
+		sv.imageindexcount = i;
+	}
+
+	return i;
 }
 
 

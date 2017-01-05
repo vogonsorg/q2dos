@@ -837,6 +837,7 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 	const char *com_token;
 	int i;
 	float skill_level;
+	int checkpoint_index; /* FS: Added */
 
 	if (!mapname || !entities || !spawnpoint)
 	{
@@ -1073,6 +1074,41 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 	if(coop->intValue) /* FS: Coop: Check if victory.pcx is the current map, workaround the "gamemap" crap in sv_init.c */
 	{
 		G_CheckCoopVictory();
+	}
+
+	checkpoint_index = gi.modelindex("models/items/tagtoken/tris.md2"); /* FS: info_coop_checkpoint */
+	if(checkpoint_index < 220) /* FS: Moved this because of MAX_MODELS overflows in city3.bsp and probably others */
+	{
+		/* sexed models: THIS ORDER MUST MATCH THE DEFINES IN g_local.h
+		   you can add more, max 19 (pete change)these models are only
+		   loaded in coop or deathmatch. not singleplayer. */
+		if ((coop->value) || deathmatch->value)
+		{
+			gi.modelindex("#w_blaster.md2");
+			gi.modelindex("#w_shotgun.md2");
+			gi.modelindex("#w_sshotgun.md2");
+			gi.modelindex("#w_machinegun.md2");
+			gi.modelindex("#w_chaingun.md2");
+			gi.modelindex("#a_grenades.md2");
+			gi.modelindex("#w_glauncher.md2");
+			gi.modelindex("#w_rlauncher.md2");
+			gi.modelindex("#w_hyperblaster.md2");
+			gi.modelindex("#w_railgun.md2");
+			gi.modelindex("#w_bfg.md2");
+			if (game.gametype == rogue_coop)
+			{
+				gi.modelindex("#w_disrupt.md2"); /* FS: Coop: Rogue specific */
+				gi.modelindex("#w_etfrifle.md2"); /* FS: Coop: Rogue specific */
+				gi.modelindex("#w_plasma.md2"); /* FS: Coop: Rogue specific */
+				gi.modelindex("#w_plauncher.md2"); /* FS: Coop: Rogue specific */
+				gi.modelindex("#w_chainfist.md2"); /* FS: Coop: Rogue specific */
+			}
+			if (game.gametype == xatrix_coop)
+			{
+				gi.modelindex("#w_phalanx.md2"); /* FS: Coop: Xatrix specific */
+				gi.modelindex("#w_ripper.md2"); /* FS: Coop: Xatrix specific */
+			}
+		}
 	}
 }
 
@@ -1374,36 +1410,7 @@ SP_worldspawn(edict_t *ent)
 	gi.soundindex("*pain100_1.wav");
 	gi.soundindex("*pain100_2.wav");
 
-	/* sexed models: THIS ORDER MUST MATCH THE DEFINES IN g_local.h
-	   you can add more, max 19 (pete change)these models are only
-	   loaded in coop or deathmatch. not singleplayer. */
-	if (coop->value || deathmatch->value)
-	{
-		gi.modelindex("#w_blaster.md2");
-		gi.modelindex("#w_shotgun.md2");
-		gi.modelindex("#w_sshotgun.md2");
-		gi.modelindex("#w_machinegun.md2");
-		gi.modelindex("#w_chaingun.md2");
-		gi.modelindex("#a_grenades.md2");
-		gi.modelindex("#w_glauncher.md2");
-		gi.modelindex("#w_rlauncher.md2");
-		gi.modelindex("#w_hyperblaster.md2");
-		gi.modelindex("#w_railgun.md2");
-		gi.modelindex("#w_bfg.md2");
-		if (game.gametype == rogue_coop)
-		{
-			gi.modelindex("#w_disrupt.md2"); /* FS: Coop: Rogue specific */
-			gi.modelindex("#w_etfrifle.md2"); /* FS: Coop: Rogue specific */
-			gi.modelindex("#w_plasma.md2"); /* FS: Coop: Rogue specific */
-			gi.modelindex("#w_plauncher.md2"); /* FS: Coop: Rogue specific */
-			gi.modelindex("#w_chainfist.md2"); /* FS: Coop: Rogue specific */
-		}
-		if (game.gametype == xatrix_coop)
-		{
-			gi.modelindex("#w_phalanx.md2"); /* FS: Coop: Xatrix specific */
-			gi.modelindex("#w_ripper.md2"); /* FS: Coop: Xatrix specific */
-		}
-	}
+	/* FS: Sexed models moved to avoid MAX_MODELS overflows */
 
 	/* ------------------- */
 
@@ -1478,8 +1485,6 @@ SP_worldspawn(edict_t *ent)
 	gi.modelindex("models/objects/gibs/chest/tris.md2");
 	gi.modelindex("models/objects/gibs/skull/tris.md2");
 	gi.modelindex("models/objects/gibs/head2/tris.md2");
-
-	gi.modelindex("models/items/tagtoken/tris.md2"); /* FS: info_coop_checkpoint */
 
 	/* Setup light animation tables. 'a' is total darkness, 'z' is doublebright. */
 
