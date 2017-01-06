@@ -936,7 +936,14 @@ void *SZ_GetSpace (sizebuf_t *buf, int length)
 	if (buf->cursize + length > buf->maxsize)
 	{
 		if (!buf->allowoverflow)
+		{
+#ifdef _WIN32
+#ifdef _DEBUG /* FS: FIXME TODO: Got something greater than 1400 bytes here in coop game dll, probably a svc_frame.  Need to verify where and what to do */
+			assert(false);
+#endif // _DEBUG
+#endif // _WIN32
 			Com_Error (ERR_FATAL, "SZ_GetSpace: overflow without allowoverflow set");
+		}
 		
 		if (length > buf->maxsize)
 		{

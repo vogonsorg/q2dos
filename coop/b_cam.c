@@ -841,7 +841,7 @@ void Cmd_Summon_f(edict_t *ent)
 		}
 	}
 
-	if(target && !IsSpectator(target) && target != ent)
+	if(target && target->inuse && !IsSpectator(target) && target != ent)
 	{
 		Summon(ent, target);
 		return;
@@ -928,7 +928,7 @@ void Cmd_Teleport_f(edict_t *ent)
 
 	player = Find_LikePlayer(ent, name, exactMatch);
 
-	if(player && !IsSpectator(player) && player != ent)
+	if(player && player->inuse && !IsSpectator(player) && player != ent)
 	{
 		Teleport(player, ent);
 		return;
