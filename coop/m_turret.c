@@ -983,7 +983,7 @@ turret_checkattack(edict_t *self)
 	trace_t tr;
 	int enemy_range;
 
-	if (!self)
+	if (!self || !self->enemy)
 	{
 		return false;
 	}
