@@ -669,11 +669,17 @@ static void Teleport(edict_t *ent, edict_t *other)
 	// set angles
 	MoveToAngles(other, ent->s.angles);
 
+	/* FS: FIXME: This isn't working. */
+#if 0
 	VectorClear (other->s.angles);
 	VectorClear (other->client->ps.viewangles);
 	VectorClear (other->client->v_angle);
 	VectorClear (other->client->kick_angles);
 	VectorClear (other->client->kick_origin);
+#else
+	other->s.angles[PITCH] = other->client->ps.viewangles[PITCH] = 0;
+	other->s.angles[ROLL] = other->client->ps.viewangles[ROLL] = 0;
+#endif
 
 	// kill anything at the destination
 	KillBox (other);
@@ -682,12 +688,10 @@ static void Teleport(edict_t *ent, edict_t *other)
 
 	gi.linkentity (other);
 
-	/* FS: FIXME: Is this right? -- Do this again, view angles got jacked permanently a couple of times during live play? */
-	VectorClear (other->s.angles);
-	VectorClear (other->client->ps.viewangles);
-	VectorClear (other->client->v_angle);
-	VectorClear (other->client->kick_angles);
-	VectorClear (other->client->kick_origin);
+	/* FS: FIXME: This isn't working. */
+	other->client->v_dmg_pitch = other->client->v_dmg_roll = 0;
+	other->client->v_dmg_time = 0.0f;
+
 	other->client->summon_time = level.time + sv_coop_summon_time->value;
 }
 

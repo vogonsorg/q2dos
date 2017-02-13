@@ -411,7 +411,7 @@ void
 Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 		int damage, vec3_t point)
 {
-	if (!targ || !inflictor || !attacker)
+	if (!targ || !targ->die || !inflictor || !attacker) /* FS: Need to check targ->die.  Got a crash from a player_noise classname. */
 	{
 		return;
 	}

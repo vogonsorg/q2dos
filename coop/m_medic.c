@@ -1453,7 +1453,10 @@ medic_cable_attack_rogue(edict_t *self) /* FS: Coop: Rogue specific */
 				{
 					/* no valid enemy, so stop acting */
 					self->enemy->monsterinfo.pausetime = level.time + 100000000;
-					self->enemy->monsterinfo.stand(self->enemy);
+					if(self->enemy->monsterinfo.stand) /* FS: player_noise fudging this up */
+					{
+						self->enemy->monsterinfo.stand(self->enemy);
+					}
 				}
 
 				self->enemy = NULL;

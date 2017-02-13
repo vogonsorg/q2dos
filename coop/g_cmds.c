@@ -2516,6 +2516,10 @@ ClientCommand(edict_t *ent)
 			gi.unicast(ent, true);
 		}
 	}
+	else if ((Q_stricmp(cmd, "push") == 0) || (Q_stricmp(cmd,"pull") == 0))
+	{
+		/* FS: Purposely do nothing.  This somehow got in my cfgs, and some other users.  I see this happen to people during vid_restarts and vid_restarts are firing off mwheelup and mwheeldown for some reason... */
+	}
 	else /* anything that doesn't match a command will be a chat */
 	{
 		Cmd_Say_f(ent, false, true);
