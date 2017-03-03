@@ -604,6 +604,8 @@ static void Summon(edict_t *ent, edict_t *other)
 	gi.cprintf(ent, PRINT_HIGH, "Summoned \"%s\"!\n", other->client->pers.netname);
 	gi.cprintf(other, PRINT_HIGH, "Player \"%s\" has summoned you!  To disable this feature use /nosummon in console.\n", ent->client->pers.netname);
 
+	other->s.event = EV_OTHER_TELEPORT;
+
 	gi.linkentity (other);
 
 	/* FS: FIXME: Is this right? -- Do this again, view angles got jacked permanently a couple of times during live play? */
@@ -670,13 +672,12 @@ static void Teleport(edict_t *ent, edict_t *other)
 	MoveToAngles(other, ent->s.angles);
 
 	/* FS: FIXME: This isn't working. */
-#if 0
+#if 1
 	VectorClear (other->s.angles);
 	VectorClear (other->client->ps.viewangles);
 	VectorClear (other->client->v_angle);
 	VectorClear (other->client->kick_angles);
 	VectorClear (other->client->kick_origin);
-#else
 	other->s.angles[PITCH] = other->client->ps.viewangles[PITCH] = 0;
 	other->s.angles[ROLL] = other->client->ps.viewangles[ROLL] = 0;
 #endif
@@ -686,6 +687,7 @@ static void Teleport(edict_t *ent, edict_t *other)
 
 	gi.cprintf(other, PRINT_HIGH, "Teleported to \"%s\"!\n", ent->client->pers.netname);
 
+	other->s.event = EV_OTHER_TELEPORT;
 	gi.linkentity (other);
 
 	/* FS: FIXME: This isn't working. */

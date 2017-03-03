@@ -44,7 +44,7 @@ extern RECT		window_rect;
 
 
 // win_dedconsole.c
-#define NEW_DED_CONSOLE // enable new dedicated console
+//#define NEW_DED_CONSOLE // enable new dedicated console
 #ifdef NEW_DED_CONSOLE
 void Sys_ShowConsole (qboolean show);
 void Sys_ShutdownConsole (void);

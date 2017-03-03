@@ -75,7 +75,14 @@ void zCam_Stop(struct edict_s *player)
 
 	// set the player view stuff...
 	player->movetype = MOVETYPE_WALK;
-	player->client->ps.gunindex = gi.modelindex(player->client->pers.weapon->view_model);
+	if(player->client->pers.weapon && player->client->pers.weapon->view_model)
+	{
+		player->client->ps.gunindex = gi.modelindex(player->client->pers.weapon->view_model);
+	}
+	else /* FS: FIXME: Weapon was NULL?  Disconnecting? */
+	{
+		player->client->ps.gunindex = 0;
+	}
 	player->client->ps.fov = atoi(Info_ValueForKey(player->client->pers.userinfo, "fov")); /* FS: Give back original FOV instead of 90 */
 
 	// if invisible, turn on model, etc
