@@ -225,6 +225,11 @@ Widow2Spawn(edict_t *self)
 			{
 				designated_enemy = PickCoopTarget(ent);
 
+				if(!ent || !self || !self->enemy) /* FS: Again more bullshit with this :( */
+				{
+					return;
+				}
+
 				if (designated_enemy && self && self->enemy) /* FS: Apparently coop crashes here with large amounts of players */
 				{
 					/* try to avoid using my enemy */

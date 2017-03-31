@@ -69,7 +69,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../win32/include" /D "_DEBUG" /D id386=1 /D "WIN32" /D "_WINDOWS" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "USE_CURL" /D "USE_JOYSTICK" /YX /FD /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /I "../win32/include" /D "_DEBUG" /D id386=1 /D "WIN32" /D "_WINDOWS" /D "CLIENT_SPLIT_NETFRAME" /D "GAMESPY" /D "USE_CURL" /D "USE_JOYSTICK" /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x1009 /d "_DEBUG"

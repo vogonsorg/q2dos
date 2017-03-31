@@ -55,7 +55,7 @@
 				ProgramDataBaseFileName=".\action\Debug/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1175,11 +1175,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\action\acesrc\acebot.h"
+				RelativePath="..\action\acebot.h"
 				>
 			</File>
 			<File
-				RelativePath="..\action\acebot.h"
+				RelativePath="..\action\acesrc\acebot.h"
 				>
 			</File>
 			<File
