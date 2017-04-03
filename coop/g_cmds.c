@@ -670,15 +670,19 @@ Cmd_Noclip_f(edict_t *ent)
 
 	if ((deathmatch->value || coop->value) && !Client_CanCheat(ent))
 	{
-		gi.cprintf(ent, PRINT_HIGH,
-				"You must run the server with '+set cheats 1' to enable this command.\n");
+		gi.cprintf(ent, PRINT_HIGH, "You must run the server with '+set cheats 1' to enable this command.\n");
 		return;
 	}
 
 	if(ent->client->pers.spectator || ent->client->blinky_client.cam_target) /* FS: Coop: No spectators and cheats, please */
 	{
-		gi.cprintf(ent, PRINT_HIGH,
-				"Spectators can't use this command.\n");
+		gi.cprintf(ent, PRINT_HIGH, "Spectators can't use this command.\n");
+		return;
+	}
+
+	if (ent->deadflag) /* FS: Apparently this can screw up movetype occasionally if you do this */
+	{
+		gi.cprintf(ent, PRINT_HIGH, "You can't use this command when dead!\n");
 		return;
 	}
 
