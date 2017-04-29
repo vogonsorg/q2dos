@@ -188,6 +188,7 @@ void SWimp_Shutdown(void)
 	vid.rowbytes = 0;
 
 	/* JASON: return to text mode */
+	r.h.ah = 0;
 	r.x.ax = 3;
 	__dpmi_int(0x10, &r);
 }
@@ -218,24 +219,35 @@ rserr_t SWimp_SetMode(int *pwidth, int *pheight, int mode, qboolean fullscreen)
 	/* FS: Make sure mode 13 is set again because if we go to
 	 * high res mode and back it gets funky with banked modes.
 	 * Also, Win9x wants this to happen before going to LFB. */
+	r.h.ah = 0;
 	r.x.ax = 0x13;
 	__dpmi_int(0x10, &r);
 
 	switch (vga_modes[mode].type) {
 	case VGA_PLANAR:
 		ri.Con_Printf(PRINT_DEVELOPER, "\x02Setting VGA-X mode!\n");
-		r.x.ax = 0x4F02;
-		r.x.bx = vga_modes[mode].vesa_mode;
+
+		if (VGA_pagebase)
+		{
+			/* enable all planes for writing */
+			outportb (SC_INDEX, MAP_MASK);
+			outportb (SC_DATA, 0x0F);
+			memset (VGA_pagebase, 0, VGA_rowbytes * VGA_height);
+		}
+
+		VGA_pagebase = vga_modes[mode].address;
+
+		VideoRegisterSet(vrs320x240x256planar); /* FS: 320x240x8 only. */
+
+		VGA_width = vid.width;
+		VGA_height = vid.height;
+		VGA_rowbytes = vga_modes[mode].width / 4;
+		VGA_bufferrowbytes = vid.rowbytes;
+
 		/* enable all planes for writing */
 		outportb (SC_INDEX, MAP_MASK);
 		outportb (SC_DATA, 0x0F);
-		VideoRegisterSet(vrs320x240x256planar); /* FS: 320x240x8 only. */
-		VGA_pagebase = vga_modes[mode].address;
-		VGA_rowbytes = vga_modes[mode].width / 4;
-		VGA_bufferrowbytes = vid.rowbytes;
-		VGA_width = vid.width;
-		VGA_height = vid.height;
-		__dpmi_int(0x10, &r);
+		memset (VGA_pagebase, 0, VGA_rowbytes * VGA_height);
 		break;
 
 	case VGA_VESALFB:
