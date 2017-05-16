@@ -362,13 +362,13 @@ int R_Init( void *hInstance, void *wndProc )
 
 	R_Register ();
 	Draw_GetPalette ();
-	if (SWimp_Init(hInstance, wndProc) != 0)
+	if (!SWimp_Init(hInstance, wndProc))
 		return -1;
 
 	// create the window
 	R_BeginFrame( 0 );
 
-	ri.Con_Printf (PRINT_ALL, "ref_soft version: "REF_VERSION"\n");
+	ri.Con_Printf (PRINT_ALL, "ref_soft version: " REF_VERSION "\n");
 
 	return 0;
 }
