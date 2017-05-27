@@ -745,8 +745,8 @@ void	FS_CreatePath (char *path);
 
 // Knightmare added
 int			FS_FRead (void *buffer, int size, int count, FILE *f);
-void		FS_Seek (FILE *f, int offset, fsOrigin_t origin);
-int			FS_Tell (FILE *f);
+int			FS_Seek (FILE *f, int offset, fsOrigin_t origin);
+long		FS_Tell (FILE *f);
 char		**FS_ListPak (char *find, int *num);
 char		**FS_ListFiles (char *findname, int *numfiles, unsigned musthave, unsigned canthave);
 void		FS_FreeFileList (char **list, int n);

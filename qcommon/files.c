@@ -95,7 +95,7 @@ The "game directory" is the first tree on the search path and directory that all
 */
 
 // Knightmare added
-char *type_extensions[] =
+static char *type_extensions[] =
 {
 	"bsp",
 	"md2",
@@ -122,15 +122,16 @@ FS_TypeFlagForPakItem
 Returns bit flag based on pak item's extension.
 =================
 */
-unsigned int FS_TypeFlagForPakItem (char *itemName)
+static unsigned int FS_TypeFlagForPakItem (char *itemName)
 {
 	int		i;	
-	char	*tmp, extension[8];
+	const char	*tmp;
+	char	extension[8];
 
 	tmp = COM_FileExtension (itemName);
 	strncpy(extension, tmp, sizeof(extension));
-	for (i=0; type_extensions[i]; i++) {
-		if ( !Q_stricmp(extension, type_extensions[i]) )
+	for (i = 0; type_extensions[i]; i++) {
+		if (!Q_stricmp(extension, type_extensions[i]))
 			return (1<<i);
 	}
 	return 0;
@@ -243,8 +244,7 @@ int	Developer_searchpath (int who)
 
 }
 
-// Knightmare added
-#ifdef BINARY_PACK_SEARCH
+#ifdef BINARY_PACK_SEARCH /* Knightmare added */
 /*
 =================
 FS_FindPackItem
@@ -253,17 +253,18 @@ Performs a binary search by hashed filename
 to find pack items in a sorted pack
 =================
 */
-int FS_FindPackItem (pack_t *pack, char *itemName, long itemHash)
+static int FS_FindPackItem (pack_t *pack, char *itemName, long itemHash)
 {
 	int		smax, smin, smidpt;	//, counter = 0;
 	int		i;
 
 	// catch null pointers
-	if ( !pack || !itemName )
+	if (!pack || !itemName)
 		return -1;
 
-	smin = 0;	smax = pack->numfiles;
-	while ( (smax - smin) > 5 )	//&& counter < pack->numFiles )
+	smin = 0;
+	smax = pack->numfiles;
+	while (smax - smin > 5) //&& counter < pack->numFiles)
 	{
 		smidpt = (smax + smin) / 2;
 		if (pack->files[smidpt].hash > itemHash)	// before midpoint
@@ -274,16 +275,15 @@ int FS_FindPackItem (pack_t *pack, char *itemName, long itemHash)
 			break;
 	//	counter++;
 	}
-	for (i=smin; i<smax; i++)
+	for (i = smin; i < smax; i++)
 	{	// make sure this entry is not blacklisted & compare filenames
-		if ( pack->files[i].hash == itemHash && !pack->files[i].ignore
-			&& !Q_stricmp(pack->files[i].name, itemName) )
+		if (pack->files[i].hash == itemHash && !pack->files[i].ignore
+				&& !Q_stricmp(pack->files[i].name, itemName))
 			return i;
 	}
 	return -1;
 }
-#endif	// BINARY_PACK_SEARCH
-
+#endif /* BINARY_PACK_SEARCH */
 
 /*
 ===========
@@ -307,20 +307,26 @@ int FS_FOpenFile (char *filename, FILE **file)
 	long			hash;
 	unsigned int	typeFlag;
 
+	if (!filename || !*filename) /* nul name */
+	{
+		*file = NULL;
+		return -1;
+	}
+
 	file_from_pak = 0;
 	// Knightmare added
 	hash = Com_HashFileName(filename, 0, false);
 	typeFlag = FS_TypeFlagForPakItem(filename);
 
 	// check for links first
-	for (link = fs_links ; link ; link=link->next)
+	for (link = fs_links; link; link = link->next)
 	{
-		if (!strncmp (filename, link->from, link->fromlength))
+		if (!strncmp(filename, link->from, link->fromlength))
 		{
 			Com_sprintf (netpath, sizeof(netpath), "%s%s",link->to, filename+link->fromlength);
 			*file = fopen (netpath, "rb");
 			if (*file)
-			{		
+			{
 				Com_DPrintf(DEVELOPER_MSG_IO, "link file: %s\n",netpath);
 				return FS_filelength (*file);
 			}
@@ -340,43 +346,47 @@ int FS_FOpenFile (char *filename, FILE **file)
 			pak = search->pack;
 
 			// Knightmare- skip if pack doesn't contain this type of file
-			if ((typeFlag != 0)) {
-				if (!(pak->contentFlags & typeFlag))
-					continue;
-			}
-#ifdef BINARY_PACK_SEARCH	// Knightmare- use new binary algorithm
-			// find index of pack item
+			if (typeFlag != 0 && !(pak->contentFlags & typeFlag))
+				continue;
+
+#ifdef BINARY_PACK_SEARCH /* Knightmare- use new binary algorithm */
+			/* find index of pack item */
 			i = FS_FindPackItem (pak, filename, hash);
-			// found it!
-			if ( i != -1 && i >= 0 && i < pak->numfiles )
+			if (i >= 0) /* found it! */
 			{
+				file_from_pak = 1;
+			// open a new file on the pakfile
+				*file = fopen (pak->filename, "rb");
+				if (!*file)
+					Com_Error (ERR_FATAL, "Couldn't reopen %s", pak->filename);
+				fseek (*file, pak->files[i].filepos, SEEK_SET);
+				return pak->files[i].filelen;
+			}
 #else
-			for (i=0 ; i<pak->numfiles ; i++)
+			for (i = 0; i < pak->numfiles; i++)
 			{
 				if (pak->files[i].ignore)	// Knightmare- skip blacklisted files
 					continue;
 				if (hash != pak->files[i].hash)	// Knightmare- compare hash first
 					continue;
-#endif	// 	BINARY_PACK_SEARCH
 				if (!Q_strcasecmp (pak->files[i].name, filename))
 				{	// found it!
 					file_from_pak = 1;
-					Com_DPrintf(DEVELOPER_MSG_IO, "PackFile: %s : %s\n",pak->filename, filename);
 				// open a new file on the pakfile
 					*file = fopen (pak->filename, "rb");
 					if (!*file)
-						Com_Error (ERR_FATAL, "Couldn't reopen %s", pak->filename);	
+						Com_Error (ERR_FATAL, "Couldn't reopen %s", pak->filename);
 					fseek (*file, pak->files[i].filepos, SEEK_SET);
 					return pak->files[i].filelen;
 				}
 			}
+#endif /* BINARY_PACK_SEARCH */
 		}
 		else
-		{		
-	// check a file in the directory tree
-			
+		{
+		// check a file in the directory tree
 			Com_sprintf (netpath, sizeof(netpath), "%s/%s",search->filename, filename);
-			
+
 			*file = fopen (netpath, "rb");
 			if (!*file)
 				continue;
@@ -385,9 +395,8 @@ int FS_FOpenFile (char *filename, FILE **file)
 
 			return FS_filelength (*file);
 		}
-		
 	}
-	
+
 	Com_DPrintf(DEVELOPER_MSG_IO, "FindFile: can't find %s\n", filename);
 	
 	*file = NULL;
@@ -430,9 +439,6 @@ void FS_Read (void *buffer, int len, FILE *f)
 			else
 				Com_Error (ERR_FATAL, "FS_Read: 0 bytes read");
 		}
-
-		if (read == -1)
-			Com_Error (ERR_FATAL, "FS_Read: -1 bytes read");
 
 		// do some progress bar thing here...
 
@@ -481,8 +487,6 @@ int FS_FRead (void *buffer, int size, int count, FILE *f)
 					return size - remaining;
 				}
 			}
-			else if (r == -1)
-				Com_Error(ERR_FATAL, "FS_FRead: -1 bytes read");
 
 			remaining -= r;
 			buf += r;
@@ -498,22 +502,21 @@ int FS_FRead (void *buffer, int size, int count, FILE *f)
 FS_Seek
 =================
 */
-void FS_Seek (FILE *f, int offset, fsOrigin_t origin)
+int FS_Seek (FILE *f, int offset, fsOrigin_t origin)
 {
 	switch (origin)
 	{
 	case FS_SEEK_SET:
-		fseek(f, offset, SEEK_SET);
-		break;
+		return fseek(f, offset, SEEK_SET);
+
 	case FS_SEEK_CUR:
-		fseek(f, offset, SEEK_CUR);
-		break;
+		return fseek(f, offset, SEEK_CUR);
+
 	case FS_SEEK_END:
-		fseek(f, offset, SEEK_END);
-		break;
-	default:
-		Com_Error(ERR_FATAL, "FS_Seek: bad origin (%i)", origin);
+		return fseek(f, offset, SEEK_END);
 	}
+	Com_Error(ERR_FATAL, "FS_Seek: bad origin (%i)", origin);
+	return -1;
 }
 
 
@@ -524,7 +527,7 @@ FS_Tell
 Returns -1 if an error occurs
 =================
 */
-int FS_Tell (FILE *f)
+long FS_Tell (FILE *f)
 {
 	return ftell(f);
 }
@@ -541,23 +544,22 @@ a null buffer will just return the file length without loading
 */
 int FS_LoadFile (char *path, void **buffer)
 {
-	FILE	*h;
-	byte	*buf;
-	int		len;
+	FILE *h;
+	byte *buf;
+	int len;
 
 	buf = NULL;	// quiet compiler warning
 
-// look for it in the filesystem or pack files
-	len = FS_FOpenFile (path, &h);
-	if (!h)
-	{
-		if (buffer)
+	// look for it in the filesystem or pack files
+	len = FS_FOpenFile(path, &h);
+	if (!h) {
+		if (buffer) {
 			*buffer = NULL;
+		}
 		return -1;
 	}
-	
-	if (!buffer)
-	{
+
+	if (!buffer) {
 		fclose (h);
 		return len;
 	}
@@ -565,7 +567,7 @@ int FS_LoadFile (char *path, void **buffer)
 	buf = Z_Malloc(len);
 	*buffer = buf;
 
-	FS_Read (buf, len, h);
+	FS_Read(buf, len, h);
 
 	fclose (h);
 
@@ -580,12 +582,13 @@ FS_FreeFile
 */
 void FS_FreeFile (void *buffer)
 {
-	Z_Free (buffer);
+	if(buffer)
+		Z_Free (buffer);
 }
 
 
 // Some incompetently packaged mods have these files in their paks!
-char *pakfile_ignore_names[] =
+static char *pakfile_ignore_names[] =
 {
 	"save/",
 	"scrnshot/",
@@ -603,7 +606,7 @@ Checks against a blacklist to see if a file
 should not be loaded from a pak.
 =================
 */
-qboolean FS_FileInPakBlacklist (char *filename)
+static qboolean FS_FileInPakBlacklist (char *filename)
 {
 	int			i;
 	char		*compare;
@@ -620,7 +623,7 @@ qboolean FS_FileInPakBlacklist (char *filename)
 
 //	if (ignore)
 //		Com_Printf ("FS_LoadPackFile: file %s blacklisted!\n", filename);
-//	else if ( !strncmp (filename, "save/", 5) )
+//	else if (!strncmp (filename, "save/", 5))
 //		Com_Printf ("FS_LoadPackFile: file %s not blacklisted.\n", filename);
 	return ignore;
 }
@@ -633,15 +636,15 @@ FS_PakFileCompare
 Used for sorting pak entries by hash
 =================
 */
-long *nameHashes = NULL;
-int FS_PakFileCompare (const void *f1, const void *f2)
+static long *nameHashes = NULL;
+static int FS_PakFileCompare (const void *f1, const void *f2)
 {
 	if (!nameHashes)
 		return 1;
 
 	return (nameHashes[*((int *)(f1))] - nameHashes[*((int *)(f2))]);
 }
-#endif	// BINARY_PACK_SEARCH
+#endif /* BINARY_PACK_SEARCH */
 
 /*
 =================
@@ -655,10 +658,7 @@ of the list so they override previous pack files.
 Knightmare- added checks for corrupt/malicious paks by Skuller
 =================
 */
-#ifndef LONG_MAX
-#define LONG_MAX	0x7FFFFFFF
-#endif
-pack_t *FS_LoadPackFile (char *packfile)
+static pack_t *FS_LoadPackFile (const char *packfile)
 {
 	dpackheader_t	header;
 	int				i;
@@ -668,7 +668,6 @@ pack_t *FS_LoadPackFile (char *packfile)
 	FILE			*packhandle;
 	dpackfile_t		info[MAX_FILES_IN_PACK];
 	unsigned		contentFlags = 0;	// Knightmare added
-	int				tmpPos, tmpLen;		// Knightmare added
 #ifdef BINARY_PACK_SEARCH	//  Knightmare added
 	int				*sortIndices;
 	long			*sortHashes;
@@ -678,35 +677,33 @@ pack_t *FS_LoadPackFile (char *packfile)
 	if (!packhandle)
 		return NULL;
 
-	if ( fread (&header, 1, sizeof(header), packhandle) != sizeof(header) ) {	// Knightmare- catch bad header
+	if (fread(&header, 1, sizeof(header), packhandle) != sizeof(header)) {	// Knightmare- catch bad header
 		Com_Printf ("Failed to read header on %s\n", packfile);
 		fclose(packhandle);
 		return NULL;
 	}
 	if (LittleLong(header.ident) != IDPAKHEADER) {	// Knightmare- made this not fatal
-	//	Com_Error (ERR_F/*ATAL, "%s is not a packfile", packfile);
+	//	Com_Error (ERR_FATAL, "%s is not a packfile", packfile);
 		Com_Printf ("%s is not a pak file\n", packfile);
 		fclose(packhandle);
 		return NULL;
 	}
 	header.dirofs = LittleLong (header.dirofs);
 	header.dirlen = LittleLong (header.dirlen);
-	if ( header.dirlen > LONG_MAX )	// || (header.dirlen % sizeof(packfile_t)) != 0 )	// Knightmare- catch bad dirlen
+	if (header.dirlen < 0 || header.dirofs < 0)
 	{
-		Com_Printf ("%s has a bad directory length\n", packfile);
-		fclose(packhandle);
-		return NULL;
-	}
-	if ( header.dirofs > (LONG_MAX - header.dirlen) )	// Knightmare- catch bad dirofs
-	{
-		Com_Printf ("%s has a bad directory offset\n", packfile);
+		Com_Printf ("%s has a bad directory length/offset\n", packfile);
 		fclose(packhandle);
 		return NULL;
 	}
 
 	numpackfiles = header.dirlen / sizeof(dpackfile_t);
-
-	if (numpackfiles > MAX_FILES_IN_PACK) {	// Knightmare- made this not fatal
+	if (!numpackfiles) {
+		Com_Printf ("%s has no files\n", packfile);
+		fclose(packhandle);
+		return NULL;
+	}
+	if (numpackfiles > MAX_FILES_IN_PACK) { // Knightmare- made this not fatal
 	//	Com_Error (ERR_FATAL, "%s has %i files", packfile, numpackfiles);
 		Com_Printf ("%s has too many files: %i > %i\n", packfile, numpackfiles, MAX_FILES_IN_PACK);
 		fclose(packhandle);
@@ -715,37 +712,25 @@ pack_t *FS_LoadPackFile (char *packfile)
 
 //	newfiles = Z_Malloc (numpackfiles * sizeof(packfile_t));
 
-	if ( fseek (packhandle, header.dirofs, SEEK_SET) )	// Knightmare- catch seek failure
+	if (fseek (packhandle, header.dirofs, SEEK_SET) < 0) // Knightmare- catch seek failure
 	{
 		Com_Printf ("Seeking to directory failed on %s\n", packfile);
 		fclose(packhandle);
 		return NULL;
 	}
-	if ( fread (info, 1, header.dirlen, packhandle) != header.dirlen )	// Knightmare- catch dir read failure
+	if (fread(info, 1, header.dirlen, packhandle) != header.dirlen)	// Knightmare- catch dir read failure
 	{
 		Com_Printf ("Reading directory failed on %s\n", packfile);
 		fclose(packhandle);
 		return NULL;
 	}
 
-	for (i = 0; i < numpackfiles; i++)	// Knightmare- catch bad filelen / filepos
-	{
-		tmpPos = LittleLong(info[i].filepos);
-		tmpLen = LittleLong(info[i].filelen);
-		if ( tmpLen > LONG_MAX || tmpPos > (LONG_MAX - tmpLen) )
-		{
-			Com_Printf ("%s has a bad directory structure\n", packfile);
-			fclose(packhandle);
-			return NULL;
-		}
-	}
-
 	newfiles = Z_Malloc (numpackfiles * sizeof(packfile_t));	// Knightmare- moved newfiles alloc here
 
-#ifdef BINARY_PACK_SEARCH	// Knightmare- sorting of pak contents for binary search
+#ifdef BINARY_PACK_SEARCH	/* Knightmare- sorting of pak contents for binary search */
 	// create sort table
 	sortIndices = Z_Malloc(numpackfiles * sizeof(int));
-	sortHashes = Z_Malloc(numpackfiles * sizeof(unsigned));
+	sortHashes = Z_Malloc(numpackfiles * sizeof(long));
 	nameHashes = sortHashes;
 	for (i = 0; i < numpackfiles; i++)
 	{
@@ -790,7 +775,7 @@ pack_t *FS_LoadPackFile (char *packfile)
 	pack->numfiles = numpackfiles;
 	pack->files = newfiles;
 	pack->contentFlags = contentFlags;	// Knightmare added
-	
+
 	Com_Printf ("Added packfile %s (%i files)\n", packfile, numpackfiles);
 	return pack;
 }
@@ -842,10 +827,10 @@ void FS_AddPAKFile (const char *packPath)
 FS_AddGameDirectory
 
 Sets fs_gamedir, adds the directory to the head of the path,
-then loads and adds pak1.pak pak2.pak ... 
+then loads and adds pak1.pak pak2.pak ...
 ================
 */
-void FS_AddGameDirectory (char *dir)
+static void FS_AddGameDirectory (const char *dir)
 {
 	int				i;
 	searchpath_t	*search;
@@ -928,7 +913,7 @@ void FS_SetGamedir (char *dir)
 	searchpath_t	*next;
 
 	if (!*dir || !strcmp(dir, ".") || strstr(dir, "..") || strstr(dir, "/")
-		|| strstr(dir, "\\") || strstr(dir, ":") )
+		|| strstr(dir, "\\") || strstr(dir, ":"))
 	{
 		Com_Printf ("Gamedir should be a single filename, not a path\n");
 		return;
@@ -970,8 +955,8 @@ void FS_SetGamedir (char *dir)
 	{
 		Cvar_FullSet ("gamedir", dir, CVAR_SERVERINFO|CVAR_NOSET);
 		if (fs_cddir->string[0])
-			FS_AddGameDirectory (va("%s/%s", fs_cddir->string, dir) );
-		FS_AddGameDirectory (va("%s/%s", fs_basedir->string, dir) );
+			FS_AddGameDirectory (va("%s/%s", fs_cddir->string, dir));
+		FS_AddGameDirectory (va("%s/%s", fs_basedir->string, dir));
 	}
 }
 
@@ -986,7 +971,7 @@ Creates a filelink_t
 void FS_Link_f (void)
 {
 	filelink_t	*l, **prev;
-	char		*to;
+	const char	*to;
 
 	if (Cmd_Argc() != 3)
 	{
@@ -1007,7 +992,7 @@ void FS_Link_f (void)
 
 	// see if the link already exists
 	prev = &fs_links;
-	for (l=fs_links ; l ; l=l->next)
+	for (l = fs_links; l; l = l->next)
 	{
 		if (!strcmp (l->from, Cmd_Argv(1)))
 		{
@@ -1043,16 +1028,16 @@ char **FS_ListFiles( char *findname, int *numfiles, unsigned musthave, unsigned 
 	int nfiles = 0;
 	char **list = NULL;
 
-	s = Sys_FindFirst( findname, musthave, canthave );
-	while ( s )
+	s = Sys_FindFirst(findname, musthave, canthave);
+	while (s)
 	{
-		if ( s[strlen(s)-1] != '.' )
+		if (s[strlen(s)-1] != '.')
 			nfiles++;
-		s = Sys_FindNext( musthave, canthave );
+		s = Sys_FindNext(musthave, canthave);
 	}
 	Sys_FindClose ();
 
-	if ( !nfiles ) {
+	if (!nfiles) {
 		*numfiles = 0;
 		return NULL;
 	}
@@ -1061,21 +1046,21 @@ char **FS_ListFiles( char *findname, int *numfiles, unsigned musthave, unsigned 
 	*numfiles = nfiles;
 
 	list = malloc( sizeof( char * ) * nfiles );
-	memset( list, 0, sizeof( char * ) * nfiles );
+	memset(list, 0, sizeof(char *) * nfiles);
 
-	s = Sys_FindFirst( findname, musthave, canthave );
+	s = Sys_FindFirst(findname, musthave, canthave);
 	nfiles = 0;
-	while ( s )
+	while (s)
 	{
-		if ( s[strlen(s)-1] != '.' )
+		if (s[strlen(s)-1] != '.')
 		{
-			list[nfiles] = strdup( s );
+			list[nfiles] = strdup(s);
 #if defined(_WIN32) || defined(__MSDOS__)
-			Q_strlwr( list[nfiles] );
+			Q_strlwr(list[nfiles]);
 #endif
 			nfiles++;
 		}
-		s = Sys_FindNext( musthave, canthave );
+		s = Sys_FindNext(musthave, canthave);
 	}
 	Sys_FindClose ();
 
@@ -1085,7 +1070,7 @@ char **FS_ListFiles( char *findname, int *numfiles, unsigned musthave, unsigned 
 /*
 ** FS_Dir_f
 */
-void FS_Dir_f( void )
+void FS_Dir_f (void)
 {
 	char	*path = NULL;
 	char	findname[1024];
@@ -1093,42 +1078,42 @@ void FS_Dir_f( void )
 	char	**dirnames;
 	int		ndirs;
 
-	if ( Cmd_Argc() != 1 )
+	if (Cmd_Argc() != 1)
 	{
-		strcpy( wildcard, Cmd_Argv( 1 ) );
+		strcpy(wildcard, Cmd_Argv(1));
 	}
 
-	while ( ( path = FS_NextPath( path ) ) != NULL )
+	while ((path = FS_NextPath(path)) != NULL)
 	{
 		char *tmp = findname;
 
-		Com_sprintf( findname, sizeof(findname), "%s/%s", path, wildcard );
+		Com_sprintf(findname, sizeof(findname), "%s/%s", path, wildcard);
 
-		while ( *tmp != 0 )
+		while (*tmp != 0)
 		{
-			if ( *tmp == '\\' ) 
+			if (*tmp == '\\')
 				*tmp = '/';
 			tmp++;
 		}
-		Com_Printf( "Directory of %s\n", findname );
-		Com_Printf( "----\n" );
+		Com_Printf("Directory of %s\n", findname);
+		Com_Printf("----\n");
 
 		if ( ( dirnames = FS_ListFiles( findname, &ndirs, 0, 0 ) ) != 0 )
 		{
 			int i;
 
-			for ( i = 0; i < ndirs-1; i++ )
+			for (i = 0; i < ndirs-1; i++)
 			{
-				if ( strrchr( dirnames[i], '/' ) )
-					Com_Printf( "%s\n", strrchr( dirnames[i], '/' ) + 1 );
+				if (strrchr(dirnames[i], '/'))
+					Com_Printf("%s\n", strrchr(dirnames[i], '/') + 1);
 				else
-					Com_Printf( "%s\n", dirnames[i] );
+					Com_Printf("%s\n", dirnames[i]);
 
-				free( dirnames[i] );
+				free(dirnames[i]);
 			}
-			free( dirnames );
+			free(dirnames);
 		}
-		Com_Printf( "\n" );
+		Com_Printf("\n");
 	};
 }
 
@@ -1144,7 +1129,7 @@ void FS_Path_f (void)
 	filelink_t		*l;
 
 	Com_Printf ("Current search path:\n");
-	for (s=fs_searchpaths ; s ; s=s->next)
+	for (s = fs_searchpaths; s; s = s->next)
 	{
 		if (s == fs_base_searchpaths)
 			Com_Printf ("----------\n");
@@ -1156,7 +1141,7 @@ void FS_Path_f (void)
 	}
 
 	Com_Printf ("\nLinks:\n");
-	for (l=fs_links ; l ; l=l->next)
+	for (l = fs_links; l; l = l->next)
 		Com_Printf ("%s : %s\n", l->from, l->to);
 }
 
@@ -1176,7 +1161,7 @@ char *FS_NextPath (char *prevpath)
 		return fs_gamedir;
 
 	prev = fs_gamedir;
-	for (s=fs_searchpaths ; s ; s=s->next)
+	for (s = fs_searchpaths; s; s = s->next)
 	{
 		if (s->pack)
 			continue;
@@ -1198,7 +1183,7 @@ void FS_InitFilesystem (void)
 {
 	Cmd_AddCommand ("path", FS_Path_f);
 	Cmd_AddCommand ("link", FS_Link_f);
-	Cmd_AddCommand ("dir", FS_Dir_f );
+	Cmd_AddCommand ("dir", FS_Dir_f);
 
 	//
 	// basedir <path>
@@ -1213,12 +1198,12 @@ void FS_InitFilesystem (void)
 	//
 	fs_cddir = Cvar_Get ("cddir", "", CVAR_NOSET);
 	if (fs_cddir->string[0])
-		FS_AddGameDirectory (va("%s/"BASEDIRNAME, fs_cddir->string) );
+		FS_AddGameDirectory (va("%s/"BASEDIRNAME, fs_cddir->string));
 
 	//
 	// start up with baseq2 by default
 	//
-	FS_AddGameDirectory (va("%s/"BASEDIRNAME, fs_basedir->string) );
+	FS_AddGameDirectory (va("%s/"BASEDIRNAME, fs_basedir->string));
 
 	// any set gamedirs will be freed up to here
 	fs_base_searchpaths = fs_searchpaths;

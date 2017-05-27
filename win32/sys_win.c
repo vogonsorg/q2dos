@@ -46,11 +46,8 @@ static HANDLE		hinput, houtput;
 unsigned int	sys_msg_time;
 unsigned int	sys_frame_time;
 
-
-static HANDLE		qwclsemaphore;
-
-int			argc;
-char		*argv[MAX_NUM_ARGVS];
+int		argc;
+char	*argv[MAX_NUM_ARGVS];
 
 
 /*
@@ -80,9 +77,6 @@ void Sys_Error (char *error, ...)
 
 	MessageBox(NULL, text, "Error", 0 /* MB_OK */ );
 
-	if (qwclsemaphore)
-		CloseHandle (qwclsemaphore);
-
 	exit (1);
 }
 #endif	// NEW_DED_CONSOLE
@@ -93,7 +87,6 @@ void Sys_Quit (void)
 
 	CL_Shutdown();
 	Qcommon_Shutdown ();
-	CloseHandle (qwclsemaphore);
 	if (dedicated && dedicated->value)
 		FreeConsole ();
 
@@ -111,25 +104,22 @@ void WinError (void)
 {
 	LPVOID lpMsgBuf;
 
-	FormatMessage( 
+	FormatMessage(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
 		NULL,
 		GetLastError(),
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
 		(LPTSTR) &lpMsgBuf,
 		0,
-		NULL 
+		NULL
 	);
 
 	// Display the string.
 	MessageBox( NULL, lpMsgBuf, "GetLastError", MB_OK|MB_ICONINFORMATION );
 
 	// Free the buffer.
-	LocalFree( lpMsgBuf );
+	LocalFree(lpMsgBuf);
 }
-
-//================================================================
-
 
 /*
 ================
@@ -186,7 +176,7 @@ Sys_CopyProtect
 
 ================
 */
-void	Sys_CopyProtect (void)
+void Sys_CopyProtect (void)
 {
 #ifndef DEMO
 	char	*cddir;
@@ -198,9 +188,6 @@ void	Sys_CopyProtect (void)
 }
 
 
-//================================================================
-
-
 /*
 ================
 Sys_Init
@@ -210,27 +197,7 @@ void Sys_Init (void)
 {
 	OSVERSIONINFO	vinfo;
 
-#if 0
-	// allocate a named semaphore on the client so the
-	// front end can tell if it is alive
-
-	// mutex will fail if semephore already exists
-    qwclsemaphore = CreateMutex(
-        NULL,         /* Security attributes */
-        0,            /* owner       */
-        "qwcl"); /* Semaphore name      */
-	if (!qwclsemaphore)
-		Sys_Error ("QWCL is already running on this system");
-	CloseHandle (qwclsemaphore);
-
-    qwclsemaphore = CreateSemaphore(
-        NULL,         /* Security attributes */
-        0,            /* Initial count       */
-        1,            /* Maximum count       */
-        "qwcl"); /* Semaphore name      */
-#endif
-
-	timeBeginPeriod( 1 );
+	timeBeginPeriod(1);
 
 	vinfo.dwOSVersionInfoSize = sizeof(vinfo);
 
@@ -241,7 +208,7 @@ void Sys_Init (void)
 		Sys_Error ("Quake2 requires windows version 4 or greater");
 	if (vinfo.dwPlatformId == VER_PLATFORM_WIN32s)
 		Sys_Error ("Quake2 doesn't run on Win32s");
-	else if ( vinfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
+	else if (vinfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
 		s_win95 = true;
 
 // Knightmare- removed for new dedicated console
@@ -299,7 +266,7 @@ char *Sys_ConsoleInput (void)
 				switch (ch)
 				{
 					case '\r':
-						WriteFile(houtput, "\r\n", 2, &dummy, NULL);	
+						WriteFile(houtput, "\r\n", 2, &dummy, NULL);
 
 						if (console_textlen)
 						{
@@ -313,7 +280,7 @@ char *Sys_ConsoleInput (void)
 						if (console_textlen)
 						{
 							console_textlen--;
-							WriteFile(houtput, "\b \b", 3, &dummy, NULL);	
+							WriteFile(houtput, "\b \b", 3, &dummy, NULL);
 						}
 						break;
 
@@ -322,7 +289,7 @@ char *Sys_ConsoleInput (void)
 						{
 							if (console_textlen < sizeof(console_text)-2)
 							{
-								WriteFile(houtput, &ch, 1, &dummy, NULL);	
+								WriteFile(houtput, &ch, 1, &dummy, NULL);
 								console_text[console_textlen] = ch;
 								console_textlen++;
 							}
@@ -347,8 +314,8 @@ Print text to the dedicated console
 */
 void Sys_ConsoleOutput (char *string)
 {
-	DWORD		dummy;
-	char	text[256];
+	DWORD dummy;
+	char text[256];
 
 	if (!dedicated || !dedicated->value)
 		return;
@@ -382,7 +349,6 @@ void Sys_Sleep (unsigned msec)
 	Sleep (msec);
 }
 
-
 /*
 ================
 Sys_SendKeyEvents
@@ -392,21 +358,20 @@ Send Key_Event calls
 */
 void Sys_SendKeyEvents (void)
 {
-    MSG        msg;
+	MSG		msg;
 
 	while (PeekMessage (&msg, NULL, 0, 0, PM_NOREMOVE))
 	{
 		if (!GetMessage (&msg, NULL, 0, 0))
 			Sys_Quit ();
 		sys_msg_time = msg.time;
-      	TranslateMessage (&msg);
-      	DispatchMessage (&msg);
+		TranslateMessage (&msg);
+		DispatchMessage (&msg);
 	}
 
-	// grab frame time 
+	// grab frame time
 	sys_frame_time = timeGetTime();	// FIXME: should this be at start?
 }
-
 
 /*
 ================
@@ -414,22 +379,22 @@ Sys_GetClipboardData
 
 ================
 */
-char *Sys_GetClipboardData( void )
+char *Sys_GetClipboardData (void)
 {
 	char *data = NULL;
 	char *cliptext;
 
-	if ( OpenClipboard( NULL ) != 0 )
+	if (OpenClipboard(NULL) != 0)
 	{
 		HANDLE hClipboardData;
 
-		if ( ( hClipboardData = GetClipboardData( CF_TEXT ) ) != 0 )
+		if ( (hClipboardData = GetClipboardData(CF_TEXT)) != 0)
 		{
-			if ( ( cliptext = GlobalLock( hClipboardData ) ) != 0 ) 
+			if ( (cliptext = GlobalLock(hClipboardData)) != 0) 
 			{
-				data = malloc( GlobalSize( hClipboardData ) + 1 );
-				strcpy( data, cliptext );
-				GlobalUnlock( hClipboardData );
+				data = malloc(GlobalSize(hClipboardData) + 1);
+				strcpy(data, cliptext);
+				GlobalUnlock(hClipboardData);
 			}
 		}
 		CloseClipboard();
@@ -453,8 +418,8 @@ Sys_AppActivate
 void Sys_AppActivate (void)
 {
 #ifndef DEDICATED_ONLY
-	ShowWindow ( cl_hwnd, SW_RESTORE);
-	SetForegroundWindow ( cl_hwnd );
+	ShowWindow (cl_hwnd, SW_RESTORE);
+	SetForegroundWindow (cl_hwnd);
 #endif
 }
 
@@ -613,7 +578,6 @@ void ParseCommandLine (LPSTR lpCmdLine)
 			}
 		}
 	}
-
 }
 
 void Detect_WinNT() /* FS: Detect if we're using Windows XP for alt+tab appcompat */
@@ -655,11 +619,9 @@ void Detect_WinNT() /* FS: Detect if we're using Windows XP for alt+tab appcompa
 /*
 ==================
 WinMain
-
 ==================
 */
 HINSTANCE	global_hInstance;
-
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	MSG			msg;
@@ -684,12 +646,13 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	cddir = Sys_ScanForCD ();
 	if (cddir && argc < MAX_NUM_ARGVS - 3)
 	{
-		int		i;
+		int i;
 
 		// don't override a cddir on the command line
 		for (i=0 ; i<argc ; i++)
 			if (!strcmp(argv[i], "cddir"))
 				break;
+
 		if (i == argc)
 		{
 			argv[argc++] = "+set";
@@ -698,15 +661,16 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		}
 	}
 
-	Detect_WinNT();
 	Qcommon_Init (argc, argv);
+	Detect_WinNT(); /* FS */
+
 	oldtime = Sys_Milliseconds ();
 
     /* main window message loop */
 	while (1)
 	{
 		// if at a full screen console, don't update unless needed
-		if (Minimized || (dedicated && dedicated->value) )
+		if (Minimized || (dedicated && dedicated->value))
 		{
 			Sleep (1);
 		}
@@ -726,11 +690,10 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 			time = newtime - oldtime;
 		} while (time < 1);
 //			Con_Printf ("time:%5.2f - %5.2f = %5.2f\n", newtime, oldtime, time);
-
-		//	_controlfp( ~( _EM_ZERODIVIDE /*| _EM_INVALID*/ ), _MCW_EM );
-		_controlfp( _PC_24, _MCW_PC );
+#if defined(_M_IX86) || defined(__i386__)
+		_controlfp(_PC_24, _MCW_PC);
+#endif
 		Qcommon_Frame (time);
-
 		oldtime = newtime;
 	}
 

@@ -45,6 +45,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
 				Optimization="0"
 				PreprocessorDefinitions="WIN32;id386=1;_DEBUG;_WINDOWS;WITH_ACEBOT"
 				MinimalRebuild="true"
@@ -139,6 +140,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				PreprocessorDefinitions="WIN32;id386=1;NDEBUG;_WINDOWS;WITH_ACEBOT"
@@ -1175,11 +1177,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\action\acebot.h"
+				RelativePath="..\action\acesrc\acebot.h"
 				>
 			</File>
 			<File
-				RelativePath="..\action\acesrc\acebot.h"
+				RelativePath="..\action\acebot.h"
 				>
 			</File>
 			<File
