@@ -912,7 +912,12 @@ void FS_SetGamedir (char *dir)
 {
 	searchpath_t	*next;
 
-	if (!*dir || !strcmp(dir, ".") || strstr(dir, "..") || strstr(dir, "/")
+	if (!*dir) /* FS: set to basedir if a blank name is passed */
+	{
+		dir = BASEDIRNAME;
+	}
+
+	if (!strcmp(dir, ".") || strstr(dir, "..") || strstr(dir, "/")
 		|| strstr(dir, "\\") || strstr(dir, ":"))
 	{
 		Com_Printf ("Gamedir should be a single filename, not a path\n");
@@ -941,10 +946,7 @@ void FS_SetGamedir (char *dir)
 	if (dedicated && !dedicated->value)
 		Cbuf_AddText ("vid_restart\nsnd_restart\n");
 
-	if (*dir == 0)	// Knightmare- set to basedir if a blank dir is passed
-		Com_sprintf (fs_gamedir, sizeof(fs_gamedir), "%s/"BASEDIRNAME, fs_basedir->string);
-	else
-		Com_sprintf (fs_gamedir, sizeof(fs_gamedir), "%s/%s", fs_basedir->string, dir);
+	Com_sprintf (fs_gamedir, sizeof(fs_gamedir), "%s/%s", fs_basedir->string, dir);
 
 	if (!strcmp(dir,BASEDIRNAME) || (*dir == 0))
 	{
