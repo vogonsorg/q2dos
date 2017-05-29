@@ -745,7 +745,7 @@ pack_t *FS_LoadPackFile (char *packfile)
 #ifdef BINARY_PACK_SEARCH	// Knightmare- sorting of pak contents for binary search
 	// create sort table
 	sortIndices = Z_Malloc(numpackfiles * sizeof(int));
-	sortHashes = Z_Malloc(numpackfiles * sizeof(unsigned));
+	sortHashes = Z_Malloc(numpackfiles * sizeof(long));
 	nameHashes = sortHashes;
 	for (i = 0; i < numpackfiles; i++)
 	{

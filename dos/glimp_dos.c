@@ -195,10 +195,9 @@ void GLimp_Shutdown( void )
 ** GLimp_Init
 **
 ** This routine is responsible for initializing the OS specific portions
-** of OpenGL.  
+** of OpenGL.
 */
-
-int GLimp_Init( void *nummodes, void *modeinfos )
+qboolean GLimp_Init(void *nummodes, void *modeinfos)
 {
 	vmodeinfo_t *vi;
 	int	i;

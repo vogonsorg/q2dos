@@ -406,7 +406,7 @@ void GLimp_Shutdown( void )
 ** of OpenGL.  Under Win32 this means dealing with the pixelformats and
 ** doing the wgl interface stuff.
 */
-int GLimp_Init( void *hinstance, void *wndproc )
+qboolean GLimp_Init( void *hinstance, void *wndproc )
 {
 #define OSR2_BUILD_NUMBER 1111
 

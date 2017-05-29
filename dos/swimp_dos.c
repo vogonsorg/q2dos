@@ -128,7 +128,7 @@ void SWimp_EndFrame (void)
 }
 
 /* Windows style hook */
-int SWimp_Init(void *nummodes, void *modeinfos)
+qboolean SWimp_Init(void *nummodes, void *modeinfos)
 {
 	vmodeinfo_t *vi;
 	int i;
@@ -137,7 +137,7 @@ int SWimp_Init(void *nummodes, void *modeinfos)
 
 	VID_InitExtra(); /* probe VESA */
 	if (vga_nummodes == 0)
-		return -1;
+		return false;
 
 	/* HACK HACK HACK: sending the video mode infos to vid_dos.c
 	 * by exploiting our params. See: vid_dos.c:VID_LoadRefresh() */
@@ -151,7 +151,7 @@ int SWimp_Init(void *nummodes, void *modeinfos)
 	*(int *) nummodes = vga_nummodes;
 	*(vmodeinfo_t **) modeinfos = vi;
 
-	return 0;
+	return true;
 }
 
 /*
