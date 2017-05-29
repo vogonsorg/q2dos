@@ -97,7 +97,7 @@ typedef struct
 	pixel_t                 *alphamap;              // 256 * 256 translucency map
 	int                             rowbytes;               // may be > width if displayed in a window
 									// can be negative for stupid dibs
-	int						width;          
+	int						width;
 	int						height;
 } viddef_t;
 
@@ -339,7 +339,6 @@ typedef struct
 } drawsurf_t;
 
 
-
 typedef struct {
 	int                     ambientlight;
 	int                     shadelight;
@@ -479,8 +478,6 @@ void R_DrawSurface (void);
 extern int              c_surf;
 
 extern byte             r_warpbuffer[WARP_WIDTH * WARP_HEIGHT];
-
-
 
 
 extern float    scale_for_mip;
@@ -863,7 +860,7 @@ IMPLEMENTATION FUNCTIONS
 
 void		SWimp_BeginFrame( float camera_separation );
 void		SWimp_EndFrame (void);
-int			SWimp_Init( void *hInstance, void *wndProc );
+qboolean	SWimp_Init( void *hInstance, void *wndProc );
 void		SWimp_SetPalette( const unsigned char *palette);
 void		SWimp_Shutdown( void );
 rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen );

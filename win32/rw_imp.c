@@ -115,12 +115,12 @@ void VID_CreateWindow( int width, int height, int stylebits )
 ** This routine is responsible for initializing the implementation
 ** specific stuff in a software rendering subsystem.
 */
-int SWimp_Init( void *hInstance, void *wndProc )
+qboolean SWimp_Init(void *hInstance, void *wndProc)
 {
-	sww_state.hInstance = ( HINSTANCE ) hInstance;
+	sww_state.hInstance = (HINSTANCE) hInstance;
 	sww_state.wndproc = wndProc;
 
-	return 0;
+	return true;
 }
 
 /*
