@@ -381,9 +381,9 @@ extern  void ( APIENTRY * qglViewport )(GLint x, GLint y, GLsizei width, GLsizei
 
 extern	void ( APIENTRY * qglPointParameterfEXT)( GLenum param, GLfloat value );
 extern	void ( APIENTRY * qglPointParameterfvEXT)( GLenum param, const GLfloat *value );
-extern	void ( APIENTRY * qglColorTableEXT)( int, int, int, int, int, const void * );
+extern	void ( APIENTRY * qglColorTableEXT)( GLenum, GLenum, GLsizei, GLenum, GLenum, const GLvoid * );
 
-extern	void ( APIENTRY * qglLockArraysEXT) (int , int);
+extern	void ( APIENTRY * qglLockArraysEXT) (GLint,GLsizei);
 extern	void ( APIENTRY * qglUnlockArraysEXT) (void);
 
 //extern	void ( APIENTRY * qglMTexCoord2fSGIS)( GLenum, GLfloat, GLfloat );
@@ -429,6 +429,8 @@ extern BOOL ( WINAPI * qwglSwapIntervalEXT)( int interval );
 extern BOOL ( WINAPI * qwglGetDeviceGammaRampEXT ) ( unsigned char *pRed, unsigned char *pGreen, unsigned char *pBlue );
 extern BOOL ( WINAPI * qwglSetDeviceGammaRampEXT ) ( const unsigned char *pRed, const unsigned char *pGreen, const unsigned char *pBlue );
 
+extern BOOL ( WINAPI * qwglGetDeviceGammaRamp3DFX ) ( HDC, LPVOID );
+extern BOOL ( WINAPI * qwglSetDeviceGammaRamp3DFX ) ( HDC, LPVOID );
 #endif
 
 #ifndef _WIN32
