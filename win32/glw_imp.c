@@ -36,7 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "glw_win.h"
 #include "winquake.h"
 
-/*static qboolean GLimp_SwitchFullscreen( int width, int height );*/
+/*static qboolean GLimp_SwitchFullscreen(int width, int height);*/
 qboolean GLimp_InitGL (void);
 
 glwstate_t glw_state;
@@ -48,51 +48,105 @@ extern cvar_t *vid_ref;
 WORD original_ramp[3][256];	// Knightmare- hardware gamma 
 WORD gamma_ramp[3][256];
 
+static void HWGamma_Check3dfxGamma (void)
+{
+	const char *extensions = (const char *) qglGetString(GL_EXTENSIONS);
+	if (strstr(extensions, "WGL_3DFX_gamma_control")) {
+		if (!r_ignorehwgamma->value) {
+			qwglGetDeviceGammaRamp3DFX = (BOOL (WINAPI *)(HDC, LPVOID)) qwglGetProcAddress("wglGetDeviceGammaRamp3DFX");
+			qwglSetDeviceGammaRamp3DFX = (BOOL (WINAPI *)(HDC, LPVOID)) qwglGetProcAddress("wglSetDeviceGammaRamp3DFX");
+			if (qwglGetDeviceGammaRamp3DFX && qwglSetDeviceGammaRamp3DFX)
+				ri.Con_Printf (PRINT_ALL, "Found WGL_3DFX_gamma_control\n");
+			else {
+				qwglGetDeviceGammaRamp3DFX = NULL;
+				qwglSetDeviceGammaRamp3DFX = NULL;
+				ri.Con_Printf(PRINT_ALL, "Failed loading WGL_3DFX_gamma_control\n");
+			}
+		}
+		else
+			ri.Con_Printf(PRINT_ALL, "Ignoring WGL_3DFX_gamma_control\n");
+	}
+	else
+		ri.Con_Printf (PRINT_ALL, "WGL_3DFX_gamma_control not found\n");
+}
+
 void InitGammaRamp (void)
 {
+	HWGamma_Check3dfxGamma ();
+
 	if (!r_ignorehwgamma->value)
-		gl_state.gammaRamp = GetDeviceGammaRamp ( glw_state.hDC, original_ramp );
+	{
+		if (qwglGetDeviceGammaRamp3DFX)
+			gl_state.gammaRamp = qwglGetDeviceGammaRamp3DFX (glw_state.hDC, original_ramp);
+		else
+			gl_state.gammaRamp = GetDeviceGammaRamp ( glw_state.hDC, original_ramp );
+		if (gl_state.gammaRamp)
+			vid_gamma->modified = true;
+	}
 	else
 		gl_state.gammaRamp = false;
-
-	if (gl_state.gammaRamp)
-		vid_gamma->modified = true;
 }
 
 void ShutdownGammaRamp (void)
 {
-//	if (r_ignorehwgamma->value)
 	if (!gl_state.gammaRamp)
 		return;
 
-	SetDeviceGammaRamp (glw_state.hDC, original_ramp);
+	if (qwglSetDeviceGammaRamp3DFX)
+		qwglSetDeviceGammaRamp3DFX (glw_state.hDC, original_ramp);
+	else
+		SetDeviceGammaRamp (glw_state.hDC, original_ramp);
 }
 
 void UpdateGammaRamp (void)
 {
-	int i, o;
+	int	i, j, p;
+	float	g;
 
 	if (!gl_state.gammaRamp)
 		return;
-	
+	g = vid_gamma->value + 0.3f;/* 0.6f */
 	memcpy (gamma_ramp, original_ramp, sizeof(original_ramp));
-
-	for (o = 0; o < 3; o++) 
+	for (i = 0; i < 3; i++)
 	{
-		for (i = 0; i < 256; i++) 
+		for (j = 0; j < 256; j++)
 		{
-			signed int v;
-
-			v = 255 * pow ((i+0.5)/255.5, vid_gamma->value ) + 0.5;
-			if (v > 255) v = 255;
-			if (v < 0) v = 0;
-			gamma_ramp[o][i] = ((WORD)v) << 8;
+			p = 255 * pow(((float)j + 0.5f) / 255.5f, g) + 0.5f;
+			if (p < 0) p = 0;
+			else if (p > 255)
+				p = 255;
+			gamma_ramp[i][j] = ((WORD) p) << 8;
 		}
 	}
-
-	SetDeviceGammaRamp ( glw_state.hDC, gamma_ramp );
+	if (qwglSetDeviceGammaRamp3DFX)
+		qwglSetDeviceGammaRamp3DFX (glw_state.hDC, gamma_ramp);
+	else
+		SetDeviceGammaRamp ( glw_state.hDC, gamma_ramp );
 }
 // end Vic's hardware gammaramp
+
+// Knightmare
+void HWGamma_Toggle (qboolean enable)
+{
+	if (!gl_state.gammaRamp)
+		return;
+
+	if (enable)
+	{
+		if (qwglSetDeviceGammaRamp3DFX)
+			qwglSetDeviceGammaRamp3DFX (glw_state.hDC, gamma_ramp);
+		else
+			SetDeviceGammaRamp (glw_state.hDC, gamma_ramp);
+	}
+	else
+	{
+		if (qwglSetDeviceGammaRamp3DFX)
+			qwglSetDeviceGammaRamp3DFX (glw_state.hDC, original_ramp);
+		else
+			SetDeviceGammaRamp (glw_state.hDC, original_ramp);
+	}
+}
+// end Knightmare
 
 static qboolean VerifyDriver( void )
 {
@@ -379,6 +433,7 @@ void GLimp_Shutdown( void )
 	}
 	if (glw_state.hWnd)
 	{
+		ShowWindow( glw_state.hWnd, SW_HIDE );
 		DestroyWindow (	glw_state.hWnd );
 		glw_state.hWnd = NULL;
 	}
@@ -460,7 +515,7 @@ qboolean GLimp_InitGL (void)
 		PFD_DOUBLEBUFFER,				// double buffered
 		PFD_TYPE_RGBA,					// RGBA type
 		// Knightmare- was 24-bit, changed for stencil buffer
-		32,								// 32-bit color depth 
+		32,								// 32-bit color depth
 		0, 0, 0, 0, 0, 0,				// color bits ignored
 		0,								// no alpha buffer
 		0,								// shift bit ignored
@@ -609,9 +664,6 @@ qboolean GLimp_InitGL (void)
 		else
 			ri.Con_Printf( PRINT_ALL, "... Stencil buffer not found\n" );
 	}
-	// if (pfd.cStencilBits)
-	//	gl_config.have_stencil = true;
-	// end Knightmare
 
 	return true;
 
@@ -693,11 +745,13 @@ void GLimp_AppActivate( qboolean active )
 {
 	if ( active )
 	{
+		HWGamma_Toggle (true);	// Knightmare
 		SetForegroundWindow( glw_state.hWnd );
 		ShowWindow( glw_state.hWnd, SW_RESTORE );
 	}
 	else
 	{
+		HWGamma_Toggle (false);	// Knightmare
 		if ( vid_fullscreen->value )
 			ShowWindow( glw_state.hWnd, SW_MINIMIZE );
 	}

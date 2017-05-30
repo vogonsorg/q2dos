@@ -1164,13 +1164,15 @@ qboolean R_SetMode (void)
 	rserr_t err;
 	qboolean fullscreen;
 
+	/* cds check only needed with WIN32 to deal with a broken driver */
+	#ifdef _WIN32
 	if ( vid_fullscreen->modified && !gl_config.allow_cds )
 	{
 		ri.Con_Printf( PRINT_ALL, "R_SetMode() - CDS not allowed with this driver\n" );
 		ri.Cvar_SetValue( "vid_fullscreen", !vid_fullscreen->value );
 		vid_fullscreen->modified = false;
 	}
-
+	#endif
 	fullscreen = vid_fullscreen->value;
 	r_skydistance->modified = true; /* Knightmare- skybox size variable */
 
@@ -1414,6 +1416,8 @@ int R_Init ( void *hinstance, void *hWnd )
 	ri.Cvar_SetValue( "gl_finish", 1 );
 #endif
 
+	/* windows-only stuff to deal with broken drivers */
+	#ifdef _WIN32
 	// MCD has buffering issues
 	if ( gl_config.renderer == GL_RENDERER_MCD )
 	{
@@ -1433,9 +1437,16 @@ int R_Init ( void *hinstance, void *hWnd )
 	}
 
 	if ( gl_config.allow_cds )
+	{
 		ri.Con_Printf( PRINT_ALL, "...allowing CDS\n" );
+	}
 	else
+	{
 		ri.Con_Printf( PRINT_ALL, "...disabling CDS\n" );
+	}
+	#else
+	gl_config.allow_cds = true;
+	#endif
 
 	/* Knightmare- whether to use GL_RGBA textures & GL_BGRA lightmaps
 	 * If using one of the mini-drivers, a Voodoo w/ WickedGL, or pre-1.2 driver,
@@ -1465,8 +1476,8 @@ int R_Init ( void *hinstance, void *hWnd )
 	if ( StringContainsToken( gl_config.extensions_string, "GL_EXT_compiled_vertex_array" ) || 
 		 StringContainsToken( gl_config.extensions_string, "GL_SGI_compiled_vertex_array" ) )
 	{
-		qglLockArraysEXT = ( void * ) qwglGetProcAddress( "glLockArraysEXT" );
-		qglUnlockArraysEXT = ( void * ) qwglGetProcAddress( "glUnlockArraysEXT" );
+		qglLockArraysEXT = ( void (APIENTRY *) ( GLint, GLsizei ) ) qwglGetProcAddress( "glLockArraysEXT" );
+		qglUnlockArraysEXT = ( void (APIENTRY *) ( void ) ) qwglGetProcAddress( "glUnlockArraysEXT" );
 		if (qglUnlockArraysEXT && qglLockArraysEXT)
 			ri.Con_Printf( PRINT_ALL, "...enabling GL_EXT_compiled_vertex_array\n" );
 		else {
@@ -1553,7 +1564,7 @@ int R_Init ( void *hinstance, void *hWnd )
 	{
 		if ( gl_ext_palettedtexture->value )
 		{
-			qglColorTableEXT = ( void ( APIENTRY * ) ( int, int, int, int, int, const void * ) ) qwglGetProcAddress( "glColorTableEXT" );
+			qglColorTableEXT = ( void ( APIENTRY * ) ( GLenum, GLenum, GLsizei, GLenum, GLenum, const GLvoid * ) ) qwglGetProcAddress( "glColorTableEXT" );
 			if (qglColorTableEXT)
 				ri.Con_Printf( PRINT_ALL, "...using GL_EXT_shared_texture_palette\n" );
 			else	ri.Con_Printf( PRINT_ALL, "...failed loading GL_EXT_shared_texture_palette\n" );
