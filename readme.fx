@@ -150,6 +150,7 @@
   gl_ext_multitexture defaults to 0.  If you would like to try it anyways
   set it to 1 and do a vid_restart.
 * 2xAA (With or without SLI) locks if LFB WC is set.  4xAA is OK.
+  A workaround for 2xAA is to SET FX_GLIDE_FORCE_OLD_AA=1.
 
 8 - Known Mesa Issues
 ---------------------------------------------------------
