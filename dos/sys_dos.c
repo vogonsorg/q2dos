@@ -39,6 +39,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <crt0.h> /* FS: Fake Mem Fix for Win9x (QIP) */
 #include <sys/nearptr.h>
 #include <conio.h>
+#include <float.h>
 
 int _crt0_startup_flags = _CRT0_FLAG_UNIX_SBRK; /* FS: Fake Mem Fix for Win9x (QIP) */
 
@@ -527,7 +528,7 @@ int main (int argc, char **argv)
 			time = newtime - oldtime;
 		}
 		while (time < 1);
-
+		_control87(PC_24, MCW_PC); /* FS: Win32 is doing this. */
 		Qcommon_Frame (time);
 		oldtime = newtime;
 	}

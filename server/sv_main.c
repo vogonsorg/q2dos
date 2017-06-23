@@ -677,7 +677,7 @@ void SVC_RemoteCommand (void)
 
 	i = Rcon_Validate ();
 
-	SVC_FilterRconRequest(i, NET_AdrToString(net_from), net_message.data+4);
+	SVC_FilterRconRequest(i, NET_AdrToString(net_from), (char *)net_message.data+4);
 
 	Com_BeginRedirect (RD_PACKET, sv_outputbuf, SV_OUTPUTBUF_LENGTH, SV_FlushRedirect);
 
