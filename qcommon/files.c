@@ -595,7 +595,7 @@ static char *pakfile_ignore_names[] =
 	"autoexec.cfg",
 	"config.cfg",
 	"q2dos.cfg", /* FS: Added */
-	0
+	NULL
 };
 
 /*
@@ -912,11 +912,6 @@ void FS_SetGamedir (char *dir)
 {
 	searchpath_t	*next;
 
-	if (!*dir) /* FS: set to basedir if a blank name is passed */
-	{
-		dir = BASEDIRNAME;
-	}
-
 	if (!strcmp(dir, ".") || strstr(dir, "..") || strstr(dir, "/")
 		|| strstr(dir, "\\") || strstr(dir, ":"))
 	{
@@ -946,18 +941,18 @@ void FS_SetGamedir (char *dir)
 	if (dedicated && !dedicated->value)
 		Cbuf_AddText ("vid_restart\nsnd_restart\n");
 
-	Com_sprintf (fs_gamedir, sizeof(fs_gamedir), "%s/%s", fs_basedir->string, dir);
-
 	if (!strcmp(dir,BASEDIRNAME) || (*dir == 0))
 	{
 		Cvar_FullSet ("gamedir", "", CVAR_SERVERINFO|CVAR_NOSET);
 		Cvar_FullSet ("game", "", CVAR_LATCH|CVAR_SERVERINFO);
+		Com_sprintf (fs_gamedir, sizeof(fs_gamedir), "%s/%s", fs_basedir->string, BASEDIRNAME);
 	}
 	else
 	{
 		Cvar_FullSet ("gamedir", dir, CVAR_SERVERINFO|CVAR_NOSET);
 		if (fs_cddir->string[0])
 			FS_AddGameDirectory (va("%s/%s", fs_cddir->string, dir));
+		/* FS_AddGameDirectory() also sets fs_basedir */
 		FS_AddGameDirectory (va("%s/%s", fs_basedir->string, dir));
 	}
 }
@@ -1100,7 +1095,7 @@ void FS_Dir_f (void)
 		Com_Printf("Directory of %s\n", findname);
 		Com_Printf("----\n");
 
-		if ( ( dirnames = FS_ListFiles( findname, &ndirs, 0, 0 ) ) != 0 )
+		if ((dirnames = FS_ListFiles(findname, &ndirs, 0, 0)) != NULL)
 		{
 			int i;
 
@@ -1183,6 +1178,9 @@ FS_InitFilesystem
 */
 void FS_InitFilesystem (void)
 {
+	size_t sz;
+	char *str;
+
 	Cmd_AddCommand ("path", FS_Path_f);
 	Cmd_AddCommand ("link", FS_Link_f);
 	Cmd_AddCommand ("dir", FS_Dir_f);
@@ -1192,6 +1190,19 @@ void FS_InitFilesystem (void)
 	// allows the game to run from outside the data tree
 	//
 	fs_basedir = Cvar_Get ("basedir", ".", CVAR_NOSET);
+	sz = strlen(fs_basedir->string);
+	if (!sz) { /* no empty basedir name */
+		Cvar_ForceSet ("basedir", ".");
+	}
+	else { /* remove trailing dirsep */
+		str = fs_basedir->string + (sz - 1);
+		if (*str == '/' || *str == '\\') {
+			str = strdup(fs_basedir->string);
+			str[sz-1] = '\0';
+			Cvar_ForceSet ("basedir", str);
+			free(str);
+		}
+	}
 
 	//
 	// cddir <path>
@@ -1199,8 +1210,18 @@ void FS_InitFilesystem (void)
 	// allows the game to run from outside the data tree
 	//
 	fs_cddir = Cvar_Get ("cddir", "", CVAR_NOSET);
+	if ((sz = strlen(fs_cddir->string)) != 0) {
+		/* remove trailing dirsep */
+		str = fs_cddir->string + (sz - 1);
+		if (*str == '/' || *str == '\\') {
+			str = strdup(fs_cddir->string);
+			str[sz-1] = '\0';
+			Cvar_ForceSet ("cddir", str);
+			free(str);
+		}
+	}
 	if (fs_cddir->string[0])
-		FS_AddGameDirectory (va("%s/"BASEDIRNAME, fs_cddir->string));
+		FS_AddGameDirectory (va("%s/" BASEDIRNAME, fs_cddir->string));
 
 	//
 	// start up with baseq2 by default
