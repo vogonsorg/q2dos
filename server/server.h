@@ -64,11 +64,6 @@ typedef struct
 	// demo server information
 	FILE		*demofile;
 	qboolean	timedemo;		// don't time sync
-
-	/* FS: FIXMEL: Debugging for overflows in Coop -- Remove this when done. */
-	int			modelindexcount;
-	int			soundindexcount;
-	int			imageindexcount;
 } server_t;
 
 #define EDICT_NUM(n) ((edict_t *)((byte *)ge->edicts + ge->edict_size*(n)))
@@ -204,10 +199,6 @@ extern	cvar_t		*sv_enforcetime;
 
 extern	cvar_t		*sv_skipcinematics; /* FS: skip cinematics if we want to. */
 extern	cvar_t		*sv_allow_download_maps_in_paks; /* FS: Allow bsp downloads from a pak file if we want to. */
-extern	cvar_t		*sv_auto_save; /* FS: Auto save toggling. */
-#ifdef _DEBUG
-extern	cvar_t		*sv_override_spawn_points; /* FS: Override spawn points for debug testing. */
-#endif /* _DEBUG */
 
 /* FS: Added these to filter out wallfly's spammy rcon status request every 30 seconds */
 extern	cvar_t		*sv_filter_wallfly_rcon_request;

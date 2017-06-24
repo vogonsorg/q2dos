@@ -77,47 +77,17 @@ int SV_FindIndex (char *name, int start, int max, qboolean create)
 
 int SV_ModelIndex (char *name)
 {
-	int i;
-
-	i = SV_FindIndex (name, CS_MODELS, MAX_MODELS, true);
-
-	if (i > sv.modelindexcount) /* FS: Very verbose shit that I need */
-	{
-		Com_DPrintf(DEVELOPER_MSG_VERBOSE, "ModelIndex: [%d] %s\n", i, name);
-		sv.modelindexcount = i;
-	}
-
-	return i;
+	return SV_FindIndex (name, CS_MODELS, MAX_MODELS, true);
 }
 
 int SV_SoundIndex (char *name)
 {
-	int i;
-
-	i = SV_FindIndex (name, CS_SOUNDS, MAX_SOUNDS, true);
-
-	if (i > sv.soundindexcount) /* FS: Very verbose shit that I need */
-	{
-		Com_DPrintf(DEVELOPER_MSG_VERBOSE, "SoundIndex: [%d] %s\n", i, name);
-		sv.soundindexcount = i;
-	}
-
-	return i;
+	return SV_FindIndex (name, CS_SOUNDS, MAX_SOUNDS, true);
 }
 
 int SV_ImageIndex (char *name)
 {
-	int i;
-
-	i = SV_FindIndex (name, CS_IMAGES, MAX_IMAGES, true);
-
-	if (i > sv.imageindexcount) /* FS: Very verbose shit that I need */
-	{
-		Com_DPrintf(DEVELOPER_MSG_VERBOSE, "ImageIndex: [%d] %s\n", i, name);
-		sv.imageindexcount = i;
-	}
-
-	return i;
+	return SV_FindIndex (name, CS_IMAGES, MAX_IMAGES, true);
 }
 
 
@@ -487,22 +457,6 @@ void SV_Map (qboolean attractloop, char *levelstring, qboolean loadgame)
 	}
 	else
 		spawnpoint[0] = 0;
-
-#ifdef _DEBUG
-	if(sv_override_spawn_points->intValue) /* FS: Override spawn points for debugging. */
-	{
-		ch = strstr(level, ">");
-		if (ch)
-		{
-			*ch = 0;
-		//	strncpy (spawnpoint, ch+1);
-			Q_strncpyz (spawnpoint, ch+1, sizeof(spawnpoint));
-			Com_Printf("Looking for spawnpoint %s\n", spawnpoint);
-		}
-		else
-			spawnpoint[0] = 0;
-	}
-#endif /* _DEBUG */
 
 	l = strlen(level);
 	// skip the end-of-unit flag if necessary
