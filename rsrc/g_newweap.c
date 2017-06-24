@@ -418,12 +418,6 @@ prox_land(edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
 		float backoff, change;
 		int i;
 
-		if (!plane->normal) /* this happens if you hit a point object, maybe other cases */
-		{
-			Prox_Explode(ent);
-			return;
-		}
-
 		if ((other->movetype == MOVETYPE_PUSH) && (plane->normal[2] > 0.7))
 		{
 			stick_ok = 1;

@@ -6,9 +6,8 @@ edict_t *pm_passent;
 void ClientUserinfoChanged(edict_t *ent, char *userinfo);
 void SP_misc_teleporter_dest(edict_t *ent);
 void Touch_Item(edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf);
-
-extern char *GetCoopInsult (void); /* FS: Coop: Pick a random insult */
-extern char *GetProperMonsterName (char *monsterName); /* FS: Coop: Get proper name for classname */
+void zCam_SetLocalCopy(struct edict_s *player, char *s);  /* FS: Zaero specific game dll changes */
+void stopCamera(edict_t *ent); /* FS: Zaero specific game dll changes */
 
 /*
  * The ugly as hell coop spawnpoint fixup function.
@@ -436,11 +435,12 @@ SP_info_coop_checkpoint (edict_t * self )
 	}
 
 	self->touch = SP_info_coop_checkpoint_touch;
-	self->solid = SOLID_TRIGGER;
 
 	self->s.modelindex = gi.modelindex("models/items/tagtoken/tris.md2");
+	VectorSet(self->mins, -24, -24, -24);
+	VectorSet(self->maxs, 24, 24, 24);
+	self->solid = SOLID_TRIGGER;
 
-	self->model = "models/items/tagtoken/tris.md2";
 	self->s.effects = EF_ROTATE;
 	self->s.renderfx = RF_GLOW | RF_IR_VISIBLE;
 	self->dmg = 0;
@@ -477,6 +477,11 @@ player_pain(edict_t *self /* unsued */, edict_t *other /* unused */,
 	 * This function is still here since
 	 * the player is an entity and needs
 	 * a pain callback */
+
+	if ((game.gametype == zaero_coop) && (self->client->zCameraTrack)) /* FS: Zaero specific game dll changes */
+	{
+		stopCamera(self);
+	}
 }
 
 qboolean
@@ -601,6 +606,7 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker
 			case MOD_BOMB:
 			case MOD_SPLASH:
 			case MOD_TRIGGER_HURT:
+			case MOD_AUTOCANNON:  /* FS: Zaero specific game dll changes */
 				message = "was in the wrong place";
 				break;
 			case MOD_GEKK: /* FS: Coop: Xatrix specific */
@@ -672,6 +678,12 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker
 					break;
 				case MOD_TRAP: /* FS: Coop: Xatrix specific */
 					message = "sucked into his own trap";
+					break;
+				case MOD_A2K:  /* FS: Zaero specific game dll changes */
+					message = "realized he was expendable";
+					break;
+				case MOD_SONICCANNON:  /* FS: Zaero specific game dll changes */
+					message = "got carried away";
 					break;
 				default:
 
@@ -843,6 +855,30 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker
 					break;
 				case MOD_TRAP: /* FS: Coop: Xatrix specific */
 					message = "caught in trap by";
+					break;
+				case MOD_SNIPERRIFLE:  /* FS: Zaero specific game dll changes */
+					message = "was ventilated by";
+					message2 = "'s bullet";
+					break;
+				case MOD_TRIPBOMB:  /* FS: Zaero specific game dll changes */
+					message = "tripped over";
+					message2 = "'s trip bomb";
+					break;
+				case MOD_FLARE:  /* FS: Zaero specific game dll changes */
+					message = "didn't see";
+					message2 = "'s flare";
+					break;
+				case MOD_GL_POLYBLEND:  /* FS: Zaero specific game dll changes */
+					message = "turned off gl_polyblend and was damaged by";
+					message2 = "'s flare";
+					break;
+				case MOD_A2K:  /* FS: Zaero specific game dll changes */
+					message = "got dissassembled by";
+					message2 = "";
+					break;
+				case MOD_SONICCANNON:  /* FS: Zaero specific game dll changes */
+					message = "got microwaved by";
+					message2 = "";
 					break;
 				default:
 					break;
@@ -1091,6 +1127,17 @@ player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 		return;
 	}
 
+	// if we're in a camera, get out
+	if ((game.gametype == zaero_coop) && (self->client && self->client->zCameraTrack)) /* FS: Zaero specific game dll changes */
+	{
+		stopCamera(self);
+	}
+
+	if (self->client && self->client->blinky_client.cam_target) /* FS: Added */
+	{
+		stopBlinkyCam(self);
+	}
+
 	VectorClear(self->avelocity);
 
 	self->takedamage = DAMAGE_YES;
@@ -1161,6 +1208,7 @@ player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 
 	self->client->double_framenum = 0; /* FS: Coop: Rogue specific */
 	self->client->quadfire_framenum = 0; /* FS: Coop: Xatrix specific */
+	self->client->a2kFramenum = 0; /* FS: Zaero specific game dll changes */
 
 	if (self->client->owned_sphere) /* FS: Coop: Rogue specific */
 	{
@@ -1290,11 +1338,25 @@ InitClientPersistant(gclient_t *client)
 
 	memset(&client->pers, 0, sizeof(client->pers));
 
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		item = FindItem("Push");
+		client->pers.inventory[ITEM_INDEX(item)] = 1;
+	}
+
 	item = FindItem("Blaster");
 	client->pers.selected_item = ITEM_INDEX(item);
 	client->pers.inventory[client->pers.selected_item] = 1;
 
 	client->pers.weapon = item;
+
+	if ((game.gametype == zaero_coop) && (!deathmatch->value)) /* FS: Zaero specific game dll changes */
+	{
+		item = FindItem("Flare Gun");
+		client->pers.inventory[ITEM_INDEX(item)] = 1;
+		item = FindItem("Flares");
+		client->pers.inventory[ITEM_INDEX(item)] = 3;
+	}
 
 	client->pers.health = 100;
 	client->pers.max_health = 100;
@@ -1314,6 +1376,13 @@ InitClientPersistant(gclient_t *client)
 	/* FS: Coop: Xatrix specific */
 	client->pers.max_magslug = 50;
 	client->pers.max_trap = 5;
+
+	/* FS: Coop: Zaero specific */
+	client->pers.max_tbombs		    = 30;
+	client->pers.max_flares       = 30;
+	client->pers.max_a2k          = 1;
+	client->pers.max_empnuke      = 50;
+	client->pers.max_plasmashield = 20;
 
 	client->pers.connected = true;
 }
@@ -1341,6 +1410,17 @@ InitClientCoopPersistant(edict_t *ent) /* FS: Coop: Give back some goodies on re
 	client->pers.max_grenades = 50;
 	client->pers.max_cells = 200;
 	client->pers.max_slugs = 50;
+
+	if ((game.gametype == zaero_coop)) /* FS: Always have at least 3 flares in Zaero coop */
+	{
+		item = FindItem("Flare Gun");
+		ammo_item = FindItem(item->ammo);
+		ammo_index = ITEM_INDEX(ammo_item);
+		if(client->pers.inventory[ammo_index] < 3)
+		{
+			client->pers.inventory[ammo_index] = client->resp.coop_respawn.inventory[ammo_index] = 3;
+		}
+	}
 
 	/* FS: Make sure they always have a shotgun */
 	item = FindItem("Shotgun");
@@ -1873,7 +1953,7 @@ SelectSpawnPoint(edict_t *ent, vec3_t origin, vec3_t angles)
 	{
 		index = ent->client - game.clients;
 
-		if (Q_stricmp(spot->classname, "info_player_start") == 0 && index != 0)
+		if (spot->classname && Q_stricmp(spot->classname, "info_player_start") == 0 && index != 0)
 		{
 			while(counter < 3)
 			{
@@ -2117,6 +2197,11 @@ spectator_respawn(edict_t *ent)
 		}
 	}
 
+	if (ent->client->blinky_client.cam_target) /* FS: Added */
+	{
+		stopBlinkyCam(ent);
+	}
+
 	/* clear score on respawn */
 	ent->client->resp.score = ent->client->pers.score = 0;
 
@@ -2203,6 +2288,15 @@ PutClientInServer(edict_t *ent)
 		memcpy(userinfo, client->pers.userinfo, sizeof(userinfo));
 		resp.coop_respawn.game_helpchanged = client->pers.game_helpchanged;
 		resp.coop_respawn.helpchanged = client->pers.helpchanged;
+		resp.coop_respawn.didMotd = client->pers.didMotd; /* FS */
+		resp.coop_respawn.noSummon = client->pers.noSummon; /* FS */
+		resp.coop_respawn.name_timeout = client->pers.name_timeout; /* FS */
+		strcpy(resp.coop_respawn.netname, client->pers.netname); /* FS */
+
+		if (game.gametype == zaero_coop)
+		{
+			resp.coop_respawn.visorFrames = client->pers.visorFrames; /* FS: Zaero visor */
+		}
 		client->pers = resp.coop_respawn;
 		ClientUserinfoChanged(ent, userinfo);
 
@@ -2226,6 +2320,17 @@ PutClientInServer(edict_t *ent)
 	if (client->pers.health <= 0)
 	{
 		InitClientPersistant(client);
+	}
+	else if ((game.gametype == zaero_coop) && (Q_stricmp(level.mapname, "zboss") == 0)) /* FS: Zaero specific game dll changes */
+	{
+		char		userinfo[MAX_INFO_STRING];
+
+		int health = client->pers.health;
+		
+		memcpy (userinfo, client->pers.userinfo, sizeof(userinfo));
+		InitClientPersistant(client);
+		ClientUserinfoChanged (ent, userinfo);
+		client->pers.health = health;
 	}
 
 	client->resp = resp;
@@ -2382,27 +2487,6 @@ PutClientInServer(edict_t *ent)
 	/* force the current weapon up */
 	client->newweapon = client->pers.weapon;
 	ChangeWeapon(ent);
-
-	vote_connect(ent); /* FS: Coop: Voting */
-}
-
-void Client_PrintMOTD (edict_t *client) /* FS: MOTD */
-{
-	char string[256];
-	char *ptr = NULL;
-
-	if(!motd || !motd->string[0] || !client || !client->client || client->client->pers.didMotd)
-		return;
-
-	Com_sprintf(string,sizeof(string),motd->string);
-	ptr = string;
-	while( (ptr = strchr(ptr,'|')) )
-	{
-		*ptr = '\n';
-	}
-	gi.centerprintf(client, string);
-
-	client->client->pers.didMotd = client->client->resp.didMotd = true;
 }
 
 /*
@@ -2444,8 +2528,6 @@ ClientBeginDeathmatch(edict_t *ent)
 
 	gi.bprintf(PRINT_HIGH, "%s entered the game\n", ent->client->pers.netname);
 
-	Client_PrintMOTD(ent); /* FS: Coop: Added */
-
 	/* make sure all view stuff is valid */
 	ClientEndServerFrame(ent);
 }
@@ -2469,6 +2551,11 @@ ClientBegin(edict_t *ent)
 	if (deathmatch->value)
 	{
 		ClientBeginDeathmatch(ent);
+		if(!ent->client->pers.didMotd)
+		{
+			CoopOpenJoinMenu(ent); /* FS: Added */
+		}
+		vote_connect(ent); /* FS: Added */
 		return;
 	}
 
@@ -2494,6 +2581,18 @@ ClientBegin(edict_t *ent)
 		ent->classname = "player";
 		InitClientResp(ent->client);
 		PutClientInServer(ent);
+		if(!ent->client->pers.didMotd) /* FS: Added */
+		{
+			if(maxclients->intValue <= 1)
+			{
+				ent->client->pers.didMotd = ent->client->resp.didMotd = true;
+			}
+			else
+			{
+				CoopOpenJoinMenu(ent);
+			}
+		}
+		vote_connect(ent); /* FS: Added */
 	}
 
 	if (level.intermissiontime)
@@ -2511,10 +2610,10 @@ ClientBegin(edict_t *ent)
 			gi.multicast(ent->s.origin, MULTICAST_PVS);
 
 			gi.bprintf(PRINT_HIGH, "%s entered the game\n", ent->client->pers.netname);
-
-			Client_PrintMOTD(ent); /* FS: Coop: Added */
 		}
 	}
+
+	ent->client->pers.connected = true; /* FS: Fix for players command and q2admin commands */
 
 	/* make sure all view stuff is valid */
 	ClientEndServerFrame(ent);
@@ -2530,6 +2629,7 @@ void
 ClientUserinfoChanged(edict_t *ent, char *userinfo)
 {
 	char *s;
+	qboolean bAllowNameChange = true;
 	int playernum;
 
 	if (!ent || !userinfo)
@@ -2545,8 +2645,39 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 
 	/* set name */
 	s = Info_ValueForKey(userinfo, "name");
-	strncpy(ent->client->pers.netname, s, sizeof(ent->client->pers.netname) -
-			1);
+	if(!s[0] || s[0] == ' ') /* FS: Catch trouble makers */
+	{
+		Info_SetValueForKey(userinfo, "name", "unnamed");
+		strncpy(ent->client->pers.netname, "unnamed", sizeof(ent->client->pers.netname) -
+				1);
+		ent->client->pers.name_timeout = level.time + sv_coop_name_timeout->value;
+	}
+	else
+	{
+		if(sv_coop_announce_name_change->intValue && ent->client && ent->client->pers.netname[0] && s[0] && Q_stricmp(ent->client->pers.netname, s)) /* FS: Catch trouble makers */
+		{
+			if(ent->client && ent->client->pers.name_timeout > level.time)
+			{
+				gi.cprintf(ent, PRINT_HIGH, "You are changing names too quickly!  Please wait another %d second(s).\n", (int)ent->client->pers.name_timeout-(int)level.time);
+				Info_SetValueForKey(userinfo, "name", ent->client->pers.netname);
+				bAllowNameChange = false;
+			}
+			else
+			{
+				gi.bprintf(PRINT_HIGH, "%s changes name to %s.\n", ent->client->pers.netname, s);
+			}
+		}
+
+		if(bAllowNameChange)
+		{
+			if(ent->client->pers.netname[0] && Q_stricmp(ent->client->pers.netname, s)) /* FS: If the netname has been set, and it doesn't match what we got then set the timeout.  On initial connect sequence the username is blank so we can't count that one. */
+			{
+				ent->client->pers.name_timeout = level.time + sv_coop_name_timeout->value;
+			}
+			strncpy(ent->client->pers.netname, s, sizeof(ent->client->pers.netname) -
+					1);
+		}
+	}
 
 	/* set spectator */
 	s = Info_ValueForKey(userinfo, "spectator");
@@ -2563,6 +2694,11 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 
 	/* set skin */
 	s = Info_ValueForKey(userinfo, "skin");
+
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		zCam_SetLocalCopy(ent, s);
+	}
 
 	playernum = ent - g_edicts - 1;
 
@@ -2615,6 +2751,38 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 		ent->client->pers.isAdmin = ent->client->resp.isAdmin = false;
 	}
 
+	/* FS: Coop: VIP goodies */
+	s = Info_ValueForKey(userinfo, "vippass");
+
+	if ((maxclients->intValue > 1) && (strlen(s)))
+	{
+		if(vippass->string[0] && !Q_stricmp(s, vippass->string))
+		{
+			ent->client->pers.isVIP = ent->client->resp.isVIP = true;
+		}
+		else
+		{
+			ent->client->pers.isVIP = ent->client->resp.isVIP = false;
+		}
+	}
+	else
+	{
+		ent->client->pers.isVIP = ent->client->resp.isVIP = false;
+	}
+
+	/* FS: Explicitly allow it to be disabled all the time */
+	s = Info_ValueForKey(userinfo, "nosummon");
+	if (strlen(s))
+	{
+		if(atoi(s))
+		{
+			ent->client->pers.noSummon = ent->client->resp.noSummon = ent->client->resp.coop_respawn.noSummon = true;
+		}
+		else
+		{
+			ent->client->pers.noSummon = ent->client->resp.noSummon = ent->client->resp.coop_respawn.noSummon = false;
+		}
+	}
 	/* save off the userinfo in case we want to check something later */
 	strncpy(ent->client->pers.userinfo, userinfo, sizeof(ent->client->pers.userinfo) - 1);
 }
@@ -2736,7 +2904,9 @@ ClientDisconnect(edict_t *ent)
 		return;
 	}
 
-	if (coop->intValue) /* FS: Coop: Spawn a backpack with our stuff */
+	Blinky_OnClientTerminate(ent); /* FS: Blinky's Coop Camera */
+
+	if (coop->intValue && !ent->client->pers.spectator) /* FS: Coop: Spawn a backpack with our stuff */
 	{
 		Spawn_CoopBackpack(ent);
 	}
@@ -2865,6 +3035,8 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 	level.current_entity = ent;
 	client = ent->client;
 
+	Blinky_RunRun(ent, ucmd);
+
 	if (level.intermissiontime)
 	{
 		client->ps.pmove.pm_type = PM_FREEZE;
@@ -2879,9 +3051,15 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 		return;
 	}
 
+	if((game.gametype == zaero_coop) && (ent->movetype == MOVETYPE_FREEZE))  /* FS: Zaero specific game dll changes */
+	{
+		client->ps.pmove.pm_type = PM_FREEZE;
+		return;
+	}
+
 	pm_passent = ent;
 
-	if (ent->client->chase_target)
+	if (ent->client->chase_target || ent->client->blinky_client.cam_target)
 	{
 		client->resp.cmd_angles[0] = SHORT2ANGLE(ucmd->angles[0]);
 		client->resp.cmd_angles[1] = SHORT2ANGLE(ucmd->angles[1]);
@@ -3061,6 +3239,11 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 				GetChaseTarget(ent);
 			}
 		}
+		else if (client->blinky_client.cam_target) /* FS: Added */
+		{
+			client->buttons = 0;
+			client->latched_buttons = 0;
+		}
 		else if (!client->weapon_thunk)
 		{
 			client->weapon_thunk = true;
@@ -3101,9 +3284,21 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 		{
 			UpdateChaseCam(other);
 		}
+		else if(other->inuse && (other->client->blinky_client.cam_target == ent))
+		{
+			Blinky_UpdateCameraThink(other); /* FS: Blinky's Coop Camera */
+		}
 	}
 
 	vote_Think(); /* FS: Coop: Voting */
+
+	if (client->menudirty && (client->menutime <= level.time))
+	{
+		PMenu_Do_Update(ent);
+		gi.unicast(ent, true);
+		client->menutime = level.time;
+		client->menudirty = false;
+	}
 }
 
 /*
@@ -3228,7 +3423,11 @@ int P_Clients_Connected (qboolean spectators) /* FS: Coop: Find out how many pla
 		ent = &g_edicts [i + 1];
 		if (ent->inuse && ent->client)
 		{
-			if (!spectators && ent->client->pers.spectator) // FS: Don't count spectators
+			if(ent->client->pers.netname && !Q_stricmp(ent->client->pers.netname, "WallFly[BZZZ]")) /* FS: TODO FIXME: Waiting on tastyspleen for additional details to reliably detect WallFly */
+			{
+				continue;
+			}
+			else if (!spectators && ent->client->pers.spectator) /* FS: Don't count spectators */
 			{
 				continue;
 			}

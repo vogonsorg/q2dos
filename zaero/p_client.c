@@ -1054,7 +1054,7 @@ InitClientPersistant(gclient_t *client)
 
 	item = FindItem("Push"); /* FS: Zaero specific game dll changes */
 	client->pers.inventory[ITEM_INDEX(item)] = 1;
-	
+
 	item = FindItem("Blaster");
 	client->pers.selected_item = ITEM_INDEX(item);
 	client->pers.inventory[client->pers.selected_item] = 1;
@@ -1069,7 +1069,6 @@ InitClientPersistant(gclient_t *client)
 		client->pers.inventory[ITEM_INDEX(item)] = 3;
 	}
 
-	
 	client->pers.health			      = 100;
 	client->pers.max_health		    = 100;
 

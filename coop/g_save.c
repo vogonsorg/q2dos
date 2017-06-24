@@ -94,7 +94,7 @@
  #define OS "Linux"
 #elif defined(_WIN32)
  #define OS "Windows"
-#elif defined(__DJGPP__) // FS: Added
+#elif defined(__DJGPP__) /* FS: Added */
  #define OS "MS-DOS"
 #else
  #define OS "Unknown"
@@ -213,7 +213,6 @@ InitGame(void)
 	sv_maxvelocity = gi.cvar ("sv_maxvelocity", "2000", 0);
 	sv_gravity = gi.cvar ("sv_gravity", "800", 0);
 	sv_stopspeed = gi.cvar ("sv_stopspeed", "100", 0); /* FS: Coop: Rogue specific */
-	g_showlogic = gi.cvar ("g_showlogic", "0", 0); /* FS: Coop: Rogue specific */
 	huntercam = gi.cvar ("huntercam", "1", CVAR_SERVERINFO|CVAR_LATCH); /* FS: Coop: Rogue specific */
 	strong_mines = gi.cvar ("strong_mines", "0", 0); /* FS: Coop: Rogue specific */
 	randomrespawn = gi.cvar ("randomrespawn", "0", 0); /* FS: Coop: Rogue specific */
@@ -237,15 +236,30 @@ InitGame(void)
 	sv_coop_gamemode->description = "Internal CVAR used to keep track of current gamemode during DLL resets.";
 	sv_coop_reset_hack = gi.cvar("sv_coop_reset_hack", "1", 0);
 	sv_coop_reset_hack->description = "Reset the internal timers every 3 hours if no clients are connected.  Works around frametime overflow errors.  Experimental.";
+	sv_coop_maplist = gi.cvar("sv_coop_maplist", "mapcoop.txt", 0);
+	sv_coop_maplist->description = "Map list for voting.";
+	sv_coop_announce_name_change = gi.cvar("sv_coop_announce_name_change", "1", 0);
+	sv_coop_announce_name_change->description = "Announce name changes from players.";
+	sv_coop_name_timeout = gi.cvar("sv_coop_name_timeout", "30", 0);
+	sv_coop_name_timeout->description = "Timeout (in secnods) before a player can change their name.";
+	sv_coop_summon_time = gi.cvar("sv_coop_summon_time", "10", 0);
+	sv_coop_summon_time->description = "Timeout (in secnods) before a player can execute a summon or teleport command.";
+	sv_coop_check_player_exit = gi.cvar("sv_coop_check_player_exit", "0", 0); /* FS: Experimental right now */
+	sv_coop_check_player_exit->description = "Require at least 51% of players to be near the exit to end the level.  Experimental.";
+	sv_coop_blinky_cam_disallowflags = gi.cvar("sv_coop_blinky_cam_disallowflags", "0", 0); /* FS: Blinky cam flags */
+	sv_coop_blinky_cam_disallowflags->description = "Flags for disabling certain Blinky Camera features.";
 	sv_spawn_protection = gi.cvar("sv_spawn_protection", "1", 0); /* FS: Coop: Spawn protection */
 	sv_spawn_protection->description = "Enable spawn protection by enabling temporary invincibility and immunity from telefragging.  Time set in seconds with sv_spawn_protection_time.";
 	sv_spawn_protection_time = gi.cvar("sv_spawn_protection_time", "3", 0); /* FS: Coop: Spawn protection */
 	sv_spawn_protection_time->description = "Time set in seconds for spawn protection.  Requires sv_spawn_protection to be enabled.";
 	adminpass = gi.cvar("adminpass", "", 0);
 	adminpass->description = "Administator password for special commands.  Not related to RCON.";
+	vippass = gi.cvar("vippass", "", 0);
+	vippass->description = "VIP password for cheating and special commands.  Not related to RCON.";
 	gamedir = gi.cvar("gamedir", "", 0); /* FS: Coop: Added */
 	nextserver = gi.cvar("nextserver", "", 0); /* FS: Coop: Added */
-
+	coop_cameraoffset = gi.cvar("coop_cameraoffset", "10", 0); /* FS: Blinky's coop camera */
+	coop_cameraoffset->description = "Camera offset for Blinky's Coop Camera";
 	motd = gi.cvar ("motd", "", 0); /* FS: Coop: Added */
 	skill = gi.cvar ("skill", "1", CVAR_LATCH);
 	maxentities = gi.cvar ("maxentities", "1024", CVAR_LATCH);
@@ -253,6 +267,7 @@ InitGame(void)
 
 	/* change anytime vars */
 	dmflags = gi.cvar ("dmflags", "0", CVAR_SERVERINFO);
+	zdmflags = gi.cvar ("zdmflags", "0", CVAR_SERVERINFO); /* FS: Zaero specific game dll changes */
 	fraglimit = gi.cvar ("fraglimit", "0", CVAR_SERVERINFO);
 	timelimit = gi.cvar ("timelimit", "0", CVAR_SERVERINFO);
 	password = gi.cvar ("password", "", CVAR_USERINFO);
@@ -287,6 +302,8 @@ InitGame(void)
 	sv_vote_assume_yes->description = "sv_vote_assume_yes", "Assume yes for the vote initiator (except for vote random).";
 	sv_vote_disallow_flags = gi.cvar("sv_vote_disallow_flags", "0", 0);
 	sv_vote_disallow_flags->description = "sv_vote_disallow_flags", "Disallow flags for voting options by players.  \nAvailable flags: \n  * No gamemode changes - 1\n  * No Vanilla gamemode - 2\n  * No Xatrix gamemode - 4\n  * No Rogue gamemode - 8\n  * No Coop difficult - 16\n  * No map changes - 32\n  * No random maps - 64\n  * No map restarting - 128\n";
+	sv_vote_chat_commands = gi.cvar("sv_vote_chat_commands", "1", 0);
+	sv_vote_chat_commands->description = "Allow \"yes\" and \"no\" chat messages to send \"vote yes\" and \"vote no\" commands if a vote is in progress.";
 
 	if(!strcmp(sv_coop_gamemode->string, "rogue")) /* FS: Coop: Set the proper coop gamemode */
 	{
@@ -295,6 +312,10 @@ InitGame(void)
 	else if (!strcmp(sv_coop_gamemode->string, "xatrix"))
 	{
 		game.gametype = xatrix_coop;
+	}
+	else if (!strcmp(sv_coop_gamemode->string, "zaero"))
+	{
+		game.gametype = zaero_coop;
 	}
 	else
 	{
@@ -321,11 +342,6 @@ InitGame(void)
 	if (gamerules) /* FS: Coop: Rogue specific */
 	{
 		InitGameRules();
-	}
-
-	if(maxclients->intValue > 1)
-	{
-		G_Verify_MOTD_Length();
 	}
 }
 
@@ -429,7 +445,7 @@ FindMmoveByName(char *name)
  * below this block into files.
  */
 void
-WriteField1(FILE *f, field_t *field, byte *base)
+WriteField1(FILE *f /* unused */, field_t *field, byte *base)
 {
 	void *p;
 	int len;
@@ -518,6 +534,13 @@ WriteField1(FILE *f, field_t *field, byte *base)
 
 				if (!func)
 				{
+#if 0 /* FS: Debug to find missing functions */
+#ifdef _DEBUG
+					int i = 0;
+					int z;
+					z = 5/i;
+#endif
+#endif
 					gi.error ("WriteField1: function not in list, can't save game");
 				}
 				
@@ -1181,40 +1204,5 @@ ReadLevel(const char *filename)
 				ent->nextthink = level.time + ent->delay;
 			}
 		}
-	}
-}
-
-void
-G_Verify_MOTD_Length (void) /* FS: Coop: Verify MOTD length for clients */
-{
-	char separators[] = "|\n";
-	char *motdString;
-	char *listPtr = NULL;
-	char *motdToken = NULL;
-	int lineLength = 0;
-	int currentLine = 0;
-
-	if(!motd || !motd->string || !motd->string[0])
-	{
-		return;
-	}
-
-	motdString = strdup(motd->string);
-
-	motdToken = strtok_r(motdString, separators, &listPtr);
-	if(!motdToken)
-	{
-		return;
-	}
-
-	while(motdToken)
-	{
-		currentLine++;
-		lineLength = strlen(motdToken);
-		if(lineLength >= 40)
-		{
-			gi.cprintf(NULL, PRINT_CHAT, "Warning: MOTD string on line %i greater than 39 chars, current length is %i.  This will truncate on clients!\n", currentLine, lineLength);
-		}
-		motdToken = strtok_r(NULL, separators, &listPtr);
 	}
 }

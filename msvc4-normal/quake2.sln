@@ -35,6 +35,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xatrixgamex86", "xatrixgame
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zaerogamex86", "zaerogamex86.vcproj", "{1BC87A8E-93A6-4183-8E60-B197D2E4E32E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "q2ded", "q2ded.vcproj", "{D704AE55-55FE-4B87-B6C2-BB13999B7DEA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tsmodgamex86", "tsmod.vcproj", "{28D83DCF-0891-422A-8087-5FA0241333AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -101,6 +105,14 @@ Global
 		{1BC87A8E-93A6-4183-8E60-B197D2E4E32E}.Debug|Win32.Build.0 = Debug|Win32
 		{1BC87A8E-93A6-4183-8E60-B197D2E4E32E}.Release|Win32.ActiveCfg = Release|Win32
 		{1BC87A8E-93A6-4183-8E60-B197D2E4E32E}.Release|Win32.Build.0 = Release|Win32
+		{D704AE55-55FE-4B87-B6C2-BB13999B7DEA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D704AE55-55FE-4B87-B6C2-BB13999B7DEA}.Debug|Win32.Build.0 = Debug|Win32
+		{D704AE55-55FE-4B87-B6C2-BB13999B7DEA}.Release|Win32.ActiveCfg = Release|Win32
+		{D704AE55-55FE-4B87-B6C2-BB13999B7DEA}.Release|Win32.Build.0 = Release|Win32
+		{28D83DCF-0891-422A-8087-5FA0241333AD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{28D83DCF-0891-422A-8087-5FA0241333AD}.Debug|Win32.Build.0 = Debug|Win32
+		{28D83DCF-0891-422A-8087-5FA0241333AD}.Release|Win32.ActiveCfg = Release|Win32
+		{28D83DCF-0891-422A-8087-5FA0241333AD}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

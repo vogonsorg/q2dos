@@ -8,6 +8,8 @@
 #define PUSH_ONCE 0x01
 #define PUSH_START_OFF 0x02
 #define PUSH_SILENT 0x04
+#define START_OFF		2 /* FS: Zaero specific game dll changes */
+#define NO_SOUND		4 /* FS: Zaero specific game dll changes */
 
 static int windsound;
 
@@ -344,7 +346,7 @@ trigger_key_use(edict_t *self, edict_t *other /* unused */, edict_t *activator)
 		int player;
 		edict_t *ent;
 
-		if (strcmp(self->item->classname, "key_power_cube") == 0)
+		if (self->item && self->item->classname && strcmp(self->item->classname, "key_power_cube") == 0)
 		{
 			int cube;
 
@@ -556,7 +558,17 @@ trigger_push_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */, 
 		return;
 	}
 
-	if (strcmp(other->classname, "grenade") == 0)
+	if ((game.gametype == zaero_coop) && (self->spawnflags & START_OFF)) /* FS: Zaero specific game dll changes */
+	{
+		if (self->message && self->touch_debounce_time < level.time)
+		{
+			gi.centerprintf (other, "%s", self->message);
+			self->touch_debounce_time = level.time + 5.0;
+		}
+		return;
+	}
+
+	if (other->classname && strcmp(other->classname, "grenade") == 0)
 	{
 		VectorScale(self->movedir, self->speed * 10, other->velocity);
 	}
@@ -569,11 +581,16 @@ trigger_push_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */, 
 			/* don't take falling damage immediately from this */
 			VectorCopy(other->velocity, other->client->oldvelocity);
 
-			if (!(self->spawnflags & PUSH_SILENT) && /* FS: Coop: Rogue specific.  Probably OK as-is. */
-				(other->fly_sound_debounce_time < level.time))
+			if ( ((game.gametype == rogue_coop) && !(self->spawnflags & PUSH_SILENT) && /* FS: Coop: Rogue specific. */
+				(other->fly_sound_debounce_time < level.time)) ||
+				((game.gametype != rogue_coop) && (other->fly_sound_debounce_time < level.time))
+				)
 			{
 				other->fly_sound_debounce_time = level.time + 1.5;
-				gi.sound(other, CHAN_AUTO, windsound, 1, ATTN_NORM, 0);
+				if ((game.gametype != zaero_coop) || (game.gametype == zaero_coop && !(self->spawnflags & NO_SOUND))) /* FS: Zaero specific game dll changes */
+				{
+					gi.sound(other, CHAN_AUTO, windsound, 1, ATTN_NORM, 0);
+				}
 			}
 		}
 	}
@@ -592,6 +609,19 @@ trigger_push_use(edict_t *self, edict_t *other /* unused */, edict_t *activator 
 		return;
 	}
 
+	if (game.gametype == zaero_coop) /* FS: Zaero specific */
+	{
+		if (self->spawnflags & START_OFF)
+		{
+			self->spawnflags &= ~START_OFF;
+		}
+		else
+		{
+			self->spawnflags |= START_OFF;
+		}
+
+		return;
+	}
 	if (self->solid == SOLID_NOT)
 	{
 		self->solid = SOLID_TRIGGER;
@@ -730,6 +760,11 @@ SP_trigger_push(edict_t *self)
 			self->solid = SOLID_BSP;
 			self->movetype = MOVETYPE_PUSH;
 		}
+	}
+
+	if (game.gametype == zaero_coop && self->targetname) /* FS: Zaero specific */
+	{
+		self->use = trigger_push_use;
 	}
 
 	gi.linkentity(self);

@@ -264,7 +264,6 @@
 {"Weapon_Generic", (byte *)Weapon_Generic},
 {"Drop_Weapon", (byte *)Drop_Weapon},
 {"Use_Weapon", (byte *)Use_Weapon},
-{"stuffcmd", (byte *)stuffcmd},
 {"Think_Weapon", (byte *)Think_Weapon},
 {"NoAmmoWeaponChange", (byte *)NoAmmoWeaponChange},
 {"ChangeWeapon", (byte *)ChangeWeapon},

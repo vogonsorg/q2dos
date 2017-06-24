@@ -3,7 +3,7 @@
 // g_local.h -- local definitions for game module
 
 #include "q_shared.h"
-#include "z_anim.h"
+#include "z_anim.h" /* FS: Zaero specific */
 
 // define GAME_INCLUDE so that game.h does not define the
 // short, server-visible gclient_t and edict_t structures,
@@ -24,8 +24,6 @@
 
 #define Z_MALLOC(size)	gi.TagMalloc(size, TAG_GAME)
 #define Z_FREE(block)	gi.TagFree(block)
-
-// Zaero includes
 
 // the "gamename" client command will print this plus compile date
 #define	GAMEVERSION	"Zaero 1.1"
@@ -55,9 +53,9 @@
 
 // edict->spawnflags2
 // these are set with checkboxes on each entity in the map editor
-#define	SPAWNFLAG2_MIRRORLEVEL  0x0001 /* FS: Zaero specific game dll changes */
-#define	SPAWNFLAG2_NOT_COOP			0x0002
-#define SPAWNFLAG2_NOT_SINGLE   0x0004
+#define	SPAWNFLAG2_MIRRORLEVEL	0x0001 /* FS: Zaero specific game dll changes */
+#define	SPAWNFLAG2_NOT_COOP		0x0002
+#define SPAWNFLAG2_NOT_SINGLE	0x0004
 
 // edict->flags
 #define	FL_FLY					0x00000001
@@ -71,11 +69,11 @@
 #define	FL_PARTIALGROUND		0x00000100	// not all corners are valid
 #define	FL_WATERJUMP			0x00000200	// player jumping out of water
 #define	FL_TEAMSLAVE			0x00000400	// not the first on the team
-#define FL_NO_KNOCKBACK				0x00000800
-#define FL_POWER_ARMOR				0x00001000	// power armor (if any) is active
+#define FL_NO_KNOCKBACK			0x00000800
+#define FL_POWER_ARMOR			0x00001000	// power armor (if any) is active
 #define FL_DONTSETOLDORIGIN		0x00002000  // Don't set the old_origin for this entity  /* FS: Zaero specific game dll changes */
-#define FL_BFGMISSFIRE				0x00004000  // BFG Miss Fire /* FS: Zaero specific game dll changes */
-#define FL_RESPAWN						0x80000000	// used for item respawning
+#define FL_BFGMISSFIRE			0x00004000  // BFG Miss Fire /* FS: Zaero specific game dll changes */
+#define FL_RESPAWN				0x80000000	// used for item respawning
 
 
 
@@ -123,52 +121,52 @@ typedef enum
 
 
 //deadflag
-#define DEAD_NO					  0
+#define DEAD_NO					0
 #define DEAD_DYING				1
-#define DEAD_DEAD				  2
-#define DEAD_RESPAWNABLE	3
+#define DEAD_DEAD				2
+#define DEAD_RESPAWNABLE		3
 
 //range
 #define RANGE_MELEE				0
 #define RANGE_NEAR				1
-#define RANGE_MID				  2
-#define RANGE_FAR				  3
+#define RANGE_MID				2
+#define RANGE_FAR				3
 
 //gib types
 #define GIB_ORGANIC				0
 #define GIB_METALLIC			1
 
 //monster ai flags
-#define AI_STAND_GROUND					0x00000001
-#define AI_TEMP_STAND_GROUND		0x00000002
-#define AI_SOUND_TARGET					0x00000004
-#define AI_LOST_SIGHT						0x00000008
-#define AI_PURSUIT_LAST_SEEN		0x00000010
-#define AI_PURSUE_NEXT					0x00000020
-#define AI_PURSUE_TEMP					0x00000040
-#define AI_HOLD_FRAME						0x00000080
-#define AI_GOOD_GUY							0x00000100
-#define AI_BRUTAL								0x00000200
-#define AI_NOSTEP								0x00000400
-#define AI_DUCKED								0x00000800
-#define AI_COMBAT_POINT					0x00001000
-#define AI_MEDIC								0x00002000
-#define AI_RESURRECTING					0x00004000
- /* FS: Zaero specific game dll changes */
-#define AI_SCHOOLING  					0x00008000
-#define AI_REDUCEDDAMAGE				0x00010000
-#define AI_SCHOOLINGTURNING			0x00020000
-#define AI_SCHOOLINGTURNINGFAST 0x00040000
-#define AI_DODGETIMEOUT					0x00080000
-#define AI_JUMPING							0x00100000
-#define AI_MONREDUCEDDAMAGE			0x00200000
-#define AI_ONESHOTTARGET				0x00400000
+#define AI_STAND_GROUND			0x00000001
+#define AI_TEMP_STAND_GROUND	0x00000002
+#define AI_SOUND_TARGET			0x00000004
+#define AI_LOST_SIGHT			0x00000008
+#define AI_PURSUIT_LAST_SEEN	0x00000010
+#define AI_PURSUE_NEXT			0x00000020
+#define AI_PURSUE_TEMP			0x00000040
+#define AI_HOLD_FRAME			0x00000080
+#define AI_GOOD_GUY				0x00000100
+#define AI_BRUTAL				0x00000200
+#define AI_NOSTEP				0x00000400
+#define AI_DUCKED				0x00000800
+#define AI_COMBAT_POINT			0x00001000
+#define AI_MEDIC				0x00002000
+#define AI_RESURRECTING			0x00004000
 
+/* FS: Zaero specific game dll changes */
+#define AI_SCHOOLING			0x00008000
+#define AI_REDUCEDDAMAGE		0x00010000
+#define AI_SCHOOLINGTURNING		0x00020000
+#define AI_SCHOOLINGTURNINGFAST	0x00040000
+#define AI_DODGETIMEOUT			0x00080000
+#define AI_JUMPING				0x00100000
+#define AI_MONREDUCEDDAMAGE		0x00200000
+#define AI_ONESHOTTARGET		0x00400000
 
 //monster attack state
 #define AS_STRAIGHT				1
 #define AS_SLIDING				2
-#define	AS_MELEE				  3
+#define	AS_MELEE				3
 #define	AS_MISSILE				4
  /* FS: Zaero specific game dll changes */
 #define AS_FLY_STRAFE			5
@@ -223,13 +221,13 @@ MOVETYPE_FLY,
 MOVETYPE_TOSS,			// gravity
 MOVETYPE_FLYMISSILE,	// extra size to monsters
 MOVETYPE_BOUNCE,
- /* FS: Zaero specific game dll changes */
+
+/* FS: Zaero specific game dll changes */
 MOVETYPE_BOUNCEFLY,
 MOVETYPE_FREEZE,       // player freeze, used for Zaero Camera
 MOVETYPE_FALLFLOAT,		// falls down slopes and floats in water
 MOVETYPE_RIDE			// basically won't move unless it rides on a MOVETYPE_PUSH entity
 } movetype_t;
-
 
 
 
@@ -265,7 +263,7 @@ typedef struct
 #define WEAP_BFG				11
 #define WEAP_NONE               12
 
- /* FS: Zaero specific game dll changes */
+/* FS: Zaero specific game dll changes */
 // hide flags
 #define HIDE_FROM_INVENTORY	1	// don't list this item in the inventory
 #define HIDE_DONT_KEEP		2	// don't keep in the lastweapon variable
@@ -528,6 +526,8 @@ extern	int	snd_fry;
 extern	int	jacket_armor_index;
 extern	int	combat_armor_index;
 extern	int	body_armor_index;
+
+/* FS: Zaero specific changes */
 extern	int	shells_index;
 extern	int	bullets_index;
 extern	int	grenades_index;
@@ -577,13 +577,13 @@ extern	int lastgibframe;
 #define MOD_TRIGGER_HURT	  31
 #define MOD_HIT				      32
 #define MOD_TARGET_BLASTER	33
-#define MOD_SNIPERRIFLE		  34
-#define MOD_TRIPBOMB		    35
-#define MOD_FLARE			      36
-#define MOD_A2K				      37
-#define MOD_SONICCANNON		  38
-#define MOD_AUTOCANNON		  39
-#define MOD_GL_POLYBLEND	40
+#define MOD_SNIPERRIFLE		  34 /* FS: Zaero specific changes */
+#define MOD_TRIPBOMB		    35 /* FS: Zaero specific changes */
+#define MOD_FLARE			      36 /* FS: Zaero specific changes */
+#define MOD_A2K				      37 /* FS: Zaero specific changes */
+#define MOD_SONICCANNON		  38 /* FS: Zaero specific changes */
+#define MOD_AUTOCANNON		  39 /* FS: Zaero specific changes */
+#define MOD_GL_POLYBLEND	40 /* FS: Zaero specific changes */
 #define MOD_FRIENDLY_FIRE	  0x8000000
 
 extern	int	meansOfDeath;
@@ -753,13 +753,13 @@ void T_RadiusDamage (edict_t *inflictor, edict_t *attacker, float damage, edict_
 void T_RadiusDamagePosition (vec3_t origin, edict_t *inflictor, edict_t *attacker, float damage, edict_t *ignore, float radius, int mod); /* FS: Zaero specific game dll changes */
 
 // damage flags
-#define DAMAGE_RADIUS			    0x00000001	// damage was indirect
-#define DAMAGE_NO_ARMOR			  0x00000002	// armour does not protect from this damage
-#define DAMAGE_ENERGY			    0x00000004	// damage is from an energy based weapon
+#define DAMAGE_RADIUS			0x00000001	// damage was indirect
+#define DAMAGE_NO_ARMOR			0x00000002	// armour does not protect from this damage
+#define DAMAGE_ENERGY			0x00000004	// damage is from an energy based weapon
 #define DAMAGE_NO_KNOCKBACK		0x00000008	// do not affect velocity, just view angles
-#define DAMAGE_BULLET			    0x00000010  // damage is from a bullet (used for ricochets)
+#define DAMAGE_BULLET			0x00000010  // damage is from a bullet (used for ricochets)
 #define DAMAGE_NO_PROTECTION	0x00000020  // armor, shields, invulnerability, and godmode have no effect
-#define DAMAGE_ARMORMOSTLY    0x00000040  // reduces the armor more than the health /* FS: Zaero specific game dll changes */
+#define DAMAGE_ARMORMOSTLY		0x00000040  // reduces the armor more than the health /* FS: Zaero specific game dll changes */
 
 #define DEFAULT_BULLET_HSPREAD	300
 #define DEFAULT_BULLET_VSPREAD	500
@@ -842,7 +842,6 @@ edict_t *PlayerTrail_PickFirst (edict_t *self);
 edict_t *PlayerTrail_PickNext (edict_t *self);
 edict_t	*PlayerTrail_LastSpot (void);
 
-
 //
 // g_client.c
 //
@@ -858,7 +857,8 @@ void ClientBeginServerFrame (edict_t *ent);
 // g_player.c
 //
 void player_pain (edict_t *self, edict_t *other, float kick, int damage);
-void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point);
+void player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
+		int damage, vec3_t point);
 
 //
 // g_svcmds.c
@@ -936,7 +936,6 @@ void ai_schoolCharge (edict_t *self, float dist); /* FS: Zaero specific game dll
 void ai_schoolBackWalk (edict_t *self, float dist); /* FS: Zaero specific game dll changes */
 void ai_schoolSideStepRight (edict_t *self, float dist); /* FS: Zaero specific game dll changes */
 void ai_schoolSideStepLeft (edict_t *self, float dist); /* FS: Zaero specific game dll changes */
-
 
 
 //============================================================================
@@ -1207,7 +1206,7 @@ struct edict_s
 	int			max_health;
 	int			gib_health;
 	int			deadflag;
-	qboolean	show_hostile;
+	int			show_hostile;
 
 	float		powerarmor_time;
 
@@ -1243,7 +1242,7 @@ struct edict_s
 	float		delay;			// before firing targets
 	float		random;
 
-	float		teleport_time;
+	float		last_sound_time;
 
 	int			watertype;
 	int			waterlevel;
@@ -1261,6 +1260,8 @@ struct edict_s
 	// common data blocks
 	moveinfo_t		moveinfo;
 	monsterinfo_t	monsterinfo;
+
+	char		*musictrack;	// Knightmare- for specifying OGG or CD track
 
 /* FS: Zaero specific game dll changes */
 	// can use this for misc. timeouts
@@ -1305,8 +1306,6 @@ struct edict_s
 
 	float bossFireTimeout;
 	int bossFireCount;
-
-	char		*musictrack;	// Knightmare- for specifying OGG or CD track
 };
 
 //zaero debug includes (need type info)

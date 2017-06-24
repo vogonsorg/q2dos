@@ -1003,8 +1003,16 @@ void CL_ParseTEnt (void)
 	case TE_BLUEHYPERBLASTER:	// blue blaster hitting wall
 	case TE_FLECHETTE:			// flechette
 		MSG_ReadPos (&net_message, pos);
-		MSG_ReadDir (&net_message, dir);
-		
+
+		if(type == TE_BLUEHYPERBLASTER) /* FS: R1Q2 expects it to be ReadPos, look very carefully at the commented out stuff above!  Public servers we host sending WritePos will bomb R1Q2 clients (and possibly Q2PRO) */
+		{
+			MSG_ReadPos (&net_message, dir);
+		}
+		else
+		{
+			MSG_ReadDir (&net_message, dir);
+		}
+
 		// PMM
 		if (type == TE_BLASTER2)
 			CL_BlasterParticles (pos, dir, 0xd0);

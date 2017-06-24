@@ -105,6 +105,7 @@ realcheck:
  * returned, and pr_global_struct->trace_normal
  * is set to the normal of the blocking wall
  */
+
 qboolean
 SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 {
@@ -377,11 +378,6 @@ M_ChangeYaw(edict_t *ent)
 		return;
 	}
 
-	if (!ent)
-	{
-		return;
-	}
-
 	current = anglemod(ent->s.angles[YAW]);
 	ideal = ent->ideal_yaw;
 
@@ -490,11 +486,6 @@ SV_NewChaseDir(edict_t *actor, edict_t *enemy, float dist)
 	float tdir, olddir, turnaround;
 
 	if (!actor || !enemy)
-	{
-		return;
-	}
-
-	if (!enemy)
 	{
 		return;
 	}

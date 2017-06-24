@@ -1380,6 +1380,11 @@ void Info_RemoveKey (char *s, char *key)
 	char	value[512];
 	char	*o;
 
+	if (!s || !key)
+	{
+		return;
+	}
+
 	if (strstr (key, "\\"))
 	{
 //		Com_Printf ("Can't use a key with a \\\n");
@@ -1432,6 +1437,11 @@ can mess up the server's parsing
 */
 qboolean Info_Validate (char *s)
 {
+	if(!s)
+	{
+		return false;
+	}
+
 	if (strstr (s, "\""))
 		return false;
 	if (strstr (s, ";"))
@@ -1444,6 +1454,24 @@ void Info_SetValueForKey (char *s, char *key, char *value)
 	char	newi[MAX_INFO_STRING], *v;
 	int		c;
 	int		maxsize = MAX_INFO_STRING;
+
+	if (!s)
+	{
+		Com_Printf("Info_SetValueForKey: String is NULL\n");
+		return;
+	}
+
+	if (!key)
+	{
+		Com_Printf("Info_SetValueForKey: Key is NULL\n");
+		return;
+	}
+
+	if (!value)
+	{
+		Com_Printf("Info_SetValueForKey: Value is NULL\n");
+		return;
+	}
 
 	if (strstr (key, "\\") || strstr (value, "\\") )
 	{

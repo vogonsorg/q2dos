@@ -30,14 +30,24 @@ cvar_t *sv_vote_disallow_flags; /* FS: Coop: Voting */
 cvar_t *sv_vote_assume_yes; /* FS: Coop: Voting */
 cvar_t *sv_vote_timer; /* FS: Coop: Voting */
 cvar_t *sv_vote_private; /* FS: Coop: Voting */
+cvar_t *sv_vote_chat_commands; /* FS: Coop: Voting */
 cvar_t *sv_coop_reset_hack; /* FS: Coop: Long uptime reset hack :( */
+cvar_t *sv_coop_check_player_exit; /* FS: Added */
+cvar_t *sv_coop_maplist; /* FS: Added */
+cvar_t *sv_coop_summon_time; /* FS: Added */
+cvar_t *sv_coop_announce_name_change; /* FS: Added */
+cvar_t *sv_coop_name_timeout; /* FS: Added */
+cvar_t *sv_coop_blinky_cam_disallowflags; /* FS: Added */
 cvar_t *sv_spawn_protection; /* FS: Coop: Spawn protection */
 cvar_t *sv_spawn_protection_time; /* FS: Coop: Spawn protection */
 cvar_t *motd; /* FS: Coop: Added */
 cvar_t *adminpass; /* FS: Coop: Admin goodies */
+cvar_t *vippass; /* FS: Coop: VIP goodies */
 cvar_t *gamedir; /* FS: Coop: Added */
 cvar_t *nextserver; /* FS: Coop: Added */
+cvar_t *coop_cameraoffset; /* FS: Blinyk's Coop Camera */
 cvar_t *dmflags;
+cvar_t *zdmflags; /* FS: Zaero specific game dll changes */
 cvar_t *skill;
 cvar_t *fraglimit;
 cvar_t *timelimit;
@@ -76,7 +86,6 @@ cvar_t *flood_waitdelay;
 cvar_t *sv_maplist;
 cvar_t *sv_stopspeed; /* FS: Coop: Rogue specific */
 
-cvar_t *g_showlogic; /* FS: Coop: Rogue specific */
 cvar_t *gamerules; /* FS: Coop: Rogue specific */
 cvar_t *huntercam; /* FS: Coop: Rogue specific */
 cvar_t *strong_mines; /* FS: Coop: Rogue specific */
@@ -434,6 +443,7 @@ ExitLevel(void)
 	level.changemap = NULL;
 	level.exitintermission = 0;
 	level.intermissiontime = 0;
+	level.fadeFrames = 0; /* FS: Zaero specific game dll changes */
 	level.current_coop_checkpoint = NULL;
 
 	vote_Reset(); /* FS: Coop: Voting */
@@ -468,6 +478,8 @@ G_RunFrame(void)
 	int i;
 	edict_t *ent;
 
+	Blinky_BeginRunFrame(); /* FS: Blinky's Coop Camera */
+
 #ifdef FRAMENUM_TIMER_TEST /* FS: Force framenum overflow and reset testing */
 #ifdef _DEBUG
 	if(firstStart && level.framenum > 15) /* FS: Need a few frames for physics to settle down and activate before you can fudge it forward */
@@ -496,7 +508,11 @@ G_RunFrame(void)
 	AI_SetSightClient();
 
 	/* exit intermissions */
-	if (level.exitintermission)
+	if ((game.gametype == zaero_coop) && (level.fadeFrames > 1)) /* FS: Zaero specific game dll changes */
+	{
+		level.fadeFrames--;
+	}
+	else if (level.exitintermission)
 	{
 		ExitLevel();
 		return;
@@ -515,7 +531,17 @@ G_RunFrame(void)
 
 		level.current_entity = ent;
 
-		VectorCopy(ent->s.origin, ent->s.old_origin);
+		if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+		{
+		    if(!(ent->flags & FL_DONTSETOLDORIGIN))
+			{
+				VectorCopy (ent->s.origin, ent->s.old_origin);
+			}
+		}
+		else
+		{
+			VectorCopy(ent->s.origin, ent->s.old_origin);
+		}
 
 		/* if the ground entity moved, make sure we are still on it */
 		if ((ent->groundentity) &&
@@ -669,10 +695,10 @@ void G_ResetTimer_Hack (void) /* FS: Some of the grossest shit of all time.  Res
 
 			/* FS: TODO: Check ent->wait and ent->delay and re-apply per situation since a few rely on level.time */
 
-			if(ent->teleport_time)
+			if(ent->last_sound_time)
 			{
-				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set teleport_time for %s: %f\n", className, ent->teleport_time);
-				ent->teleport_time = level.time;
+				gi.dprintf(DEVELOPER_MSG_VERBOSE, "Set last_sound_time for %s: %f\n", className, ent->last_sound_time);
+				ent->last_sound_time = level.time;
 			}
 
 			if(ent->touch_debounce_time)

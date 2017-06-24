@@ -78,7 +78,7 @@
 {"wait", FOFS(wait), F_FLOAT},
 {"delay", FOFS(delay), F_FLOAT},
 {"random", FOFS(random), F_FLOAT},
-// teleport_time?
+// last_sound_time?
 // watertype, waterlevel?
 {"move_origin", FOFS(move_origin), F_VECTOR},
 {"move_angles", FOFS(move_angles), F_VECTOR},
@@ -101,6 +101,7 @@
 {"sight", FOFS(monsterinfo.sight), F_FUNCTION, FFL_NOSPAWN},
 {"checkattack", FOFS(monsterinfo.checkattack), F_FUNCTION, FFL_NOSPAWN},
 {"currentmove", FOFS(monsterinfo.currentmove), F_MMOVE, FFL_NOSPAWN},
+
 // zaero-specific stuff, several fields added, especially edicts
 // timeout?
 {"active", FOFS(active), F_INT},

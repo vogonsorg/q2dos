@@ -285,6 +285,210 @@ SVCmd_WriteIP_f(void)
 	fclose(f);
 }
 
+void SVCmd_SayPerson_f (void)
+{
+	char msg[2000]; /* FS: Q2Admin magic limit */
+	char *p = NULL;
+	edict_t	*client;
+	int playernum;
+	size_t messageLen;
+
+	memset(msg, 0, sizeof(msg));
+
+	if (gi.argc() < 5)
+	{
+		gi.cprintf(NULL, PRINT_HIGH, "Usage:  sv !say_person CL <playernum> <message>\n");
+		return;
+	}
+
+	playernum = atoi(gi.argv(3));
+
+	if(playernum > game.maxclients)
+	{
+		gi.cprintf(NULL, PRINT_HIGH, "Error: Playernum %d greater than maxclients!\n", playernum);
+		return;
+	}
+
+	client = &g_edicts[playernum + 1];
+
+	if (!client || !client->inuse || !client->client /* || !client->client->pers.connected */) /* FS: FIXME: Unreliable check */
+	{
+		gi.cprintf(NULL, PRINT_HIGH, "Didn't find %d.\n", playernum);
+		return;
+	}
+
+	Com_sprintf(msg, sizeof(msg), "!say_person CL %s ", gi.argv(3));
+	messageLen = strlen(msg);
+	p = gi.args() + messageLen;
+	if(!p)
+	{
+		return;
+	}
+
+	Com_sprintf (msg, sizeof(msg), "(private message) ");
+	Com_strcat (msg, sizeof(msg), p);
+
+	/* don't let text be too long for malicious reasons */
+	if (strlen(msg) > 150)
+	{
+		msg[150] = 0;
+	}
+
+	Com_strcat (msg, sizeof(msg), "\n");
+
+	gi.cprintf(client, PRINT_CHAT, "%s", msg);
+}
+
+void SVCmd_StuffCmd_f (void)
+{
+	char cmd[2000]; /* FS: Q2Admin magic limit */
+	char *p = NULL;
+	edict_t	*client = NULL;
+	int playernum;
+	size_t messageLen;
+	qboolean bIsCL = false;
+
+	memset(cmd, 0, sizeof(cmd));
+
+	if (gi.argc() < 4)
+	{
+		gi.cprintf(NULL, PRINT_HIGH, "Usage:  sv !stuff CL <playernum> <cmd> OR sv !stuff <player_name> <cmd>\n");
+		return;
+	}
+
+	if(!Q_stricmp(gi.argv(2), "CL"))
+	{
+		playernum = atoi(gi.argv(3));
+		bIsCL = true;
+	}
+	else
+	{
+		int i = 0;
+		int hits = 0;
+
+		bIsCL = false;
+
+		for (i = 1; i <= game.maxclients; i++)
+		{
+			client = &g_edicts[i];
+
+			if(!client || !client->inuse || !client->client /* || !client->client->pers.connected */ || !client->client->pers.netname) /* FS: FIXME: Unreliable check */
+			{
+				continue;
+			}
+			else
+			{
+				if(!Q_stricmp(gi.argv(2), client->client->pers.netname))
+				{
+					hits++;
+					playernum = i;
+				}
+			}
+		}
+
+		if (hits > 1)
+		{
+			gi.cprintf(NULL, PRINT_HIGH, "2 or more player name matches.\n");
+			return;
+		}
+
+		if(hits == 0)
+		{
+			gi.cprintf(NULL, PRINT_HIGH, "Didn't find %s.\n", gi.argv(2));
+			return;
+		}
+		else
+		{
+			client = &g_edicts[playernum];
+		}
+	}
+
+	if(playernum > game.maxclients)
+	{
+		gi.cprintf(NULL, PRINT_HIGH, "Error: Playernum %d greater than maxclients!\n", playernum);
+		return;
+	}
+
+	if(bIsCL)
+	{
+		client = &g_edicts[playernum + 1];
+
+		if (!client || !client->inuse || !client->client /* || !client->client->pers.connected */) /* FS: FIXME: Unreliable check */
+		{
+			gi.cprintf(NULL, PRINT_HIGH, "Didn't find %d.\n", playernum);
+			return;
+		}
+
+		Com_sprintf(cmd, sizeof(cmd), "!stuff CL %s ", gi.argv(3));
+	}
+	else
+	{
+		Com_sprintf(cmd, sizeof(cmd), "!stuff %s ", gi.argv(2));
+	}
+
+	messageLen = strlen(cmd);
+	p = gi.args() + messageLen;
+	if(!p)
+	{
+		return;
+	}
+
+	Com_sprintf (cmd, sizeof(cmd), "%s\n", p);
+
+	gi.WriteByte(svc_stufftext);
+	gi.WriteString(cmd);
+	gi.unicast(client, true);
+}
+
+void
+SVCmd_Coop_Gamemode_f(void)
+{
+	char command[1024];
+	char *cmd;
+	int argc = 0;
+
+	argc = gi.argc();
+	cmd = gi.argv(2);
+	if (argc != 3 || !cmd)
+	{
+		gi.cprintf(NULL, PRINT_HIGH, "Valid gamemodes: vanilla, rogue, xatrix, and zaero\n");
+		return;
+	}
+
+	if(!Q_stricmp(cmd, "vanilla"))
+	{
+		gi.bprintf(PRINT_HIGH, "Changing gamemode to iD coop!\n");
+		gi.cvar_forceset("sv_coop_gamemode", "vanilla");
+		Com_sprintf(command, sizeof(command), "map base1\n");
+		gi.AddCommandString(command);
+	}
+	else if(!Q_stricmp(cmd, "rogue"))
+	{
+		gi.bprintf(PRINT_HIGH, "Changing gamemode to Rogue coop!\n");
+		gi.cvar_forceset("sv_coop_gamemode", "rogue");
+		Com_sprintf(command, sizeof(command), "map rmine1\n");
+		gi.AddCommandString(command);
+	}
+	else if(!Q_stricmp(cmd, "xatrix"))
+	{
+		gi.bprintf(PRINT_HIGH, "Changing gamemode to Xatrix coop!\n");
+		gi.cvar_forceset("sv_coop_gamemode", "xatrix");
+		Com_sprintf(command, sizeof(command), "map xswamp\n");
+		gi.AddCommandString(command);
+	}
+	else if(!Q_stricmp(cmd, "zaero"))
+	{
+		gi.bprintf(PRINT_HIGH, "Changing gamemode to Zaero coop!\n");
+		gi.cvar_forceset("sv_coop_gamemode", "zaero");
+		Com_sprintf(command, sizeof(command), "map zbase1\n");
+		gi.AddCommandString(command);
+	}
+	else
+	{
+		gi.cprintf(NULL, PRINT_HIGH, "Unknown gamemode: %s\n", cmd);
+	}
+}
+
 /*
  * ServerCommand will be called when an "sv" command is issued.
  * The game can issue gi.argc() / gi.argv() commands to get the
@@ -316,6 +520,18 @@ ServerCommand(void)
 	else if (Q_stricmp(cmd, "writeip") == 0)
 	{
 		SVCmd_WriteIP_f();
+	}
+	else if (Q_stricmp(cmd, "!say_person") == 0) /* FS: Tastyspleen q2admin additions */
+	{
+		SVCmd_SayPerson_f();
+	}
+	else if (Q_stricmp(cmd, "!stuff") == 0) /* FS: Tastyspleen q2admin additions */
+	{
+		SVCmd_StuffCmd_f();
+	}
+	else if (Q_stricmp(cmd, "gamemode") == 0) /* FS: Coop: Added */
+	{
+		SVCmd_Coop_Gamemode_f();
 	}
 	else
 	{

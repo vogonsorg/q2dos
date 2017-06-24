@@ -414,6 +414,12 @@ InfantryMachineGun(edict_t *self)
 		AngleVectors(vec, forward, NULL, NULL);
 	}
 
+	if((game.gametype == zaero_coop) && (EMPNukeCheck(self, start))) /* FS: Zaero specific game dll changes */
+	{
+		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
+		return;
+	}
+
 	monster_fire_bullet(self, start, forward, 3, 4,
 			DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD,
 			flash_number);
@@ -1189,7 +1195,7 @@ SP_monster_infantry(edict_t *self)
 	self->movetype = MOVETYPE_STEP;
 	self->solid = SOLID_BBOX;
 
-	if (game.gametype == vanilla_coop) /* FS: Coop: New animations, make sure download gets them. */
+	if (game.gametype == vanilla_coop || game.gametype == zaero_coop) /* FS: Coop: New animations, make sure download gets them. */
 	{
 		self->s.modelindex = gi.modelindex("models/monsters/infantry/tris.md2");
 	}
@@ -1237,4 +1243,34 @@ SP_monster_infantry(edict_t *self)
 	self->monsterinfo.scale = MODEL_SCALE;
 
 	walkmonster_start(self);
+}
+
+void handler_ConvertToInfantry(edict_t *self) /* FS: Zaero specific game dll changes */
+{
+	if (!self)
+	{
+		return;
+	}
+
+	self->s.modelindex = gi.modelindex("models/monsters/infantry/tris.md2");
+	VectorSet (self->mins, -16, -16, -24);
+	VectorSet (self->maxs, 16, 16, 32);
+	self->pain = infantry_pain;
+	self->die = infantry_die;
+
+	self->s.origin[0] -= 18;
+	self->s.origin[1] -= 9;
+
+	self->monsterinfo.stand = infantry_stand;
+	self->monsterinfo.walk = infantry_walk;
+	self->monsterinfo.run = infantry_run;
+	self->monsterinfo.dodge = infantry_dodge;
+	self->monsterinfo.attack = infantry_attack;
+	self->monsterinfo.melee = NULL;
+	self->monsterinfo.sight = infantry_sight;
+	self->monsterinfo.idle = infantry_fidget;
+
+	self->s.frame = FRAME_run01;
+
+	infantry_run (self);
 }

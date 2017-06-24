@@ -264,7 +264,6 @@ extern void weapon_grenade_fire ( edict_t * ent , qboolean held ) ;
 extern void Weapon_Generic ( edict_t * ent , int FRAME_ACTIVATE_LAST , int FRAME_FIRE_LAST , int FRAME_IDLE_LAST , int FRAME_DEACTIVATE_LAST , int * pause_frames , int * fire_frames , void ( * fire ) ( edict_t * ent ) ) ;
 extern void Drop_Weapon ( edict_t * ent , gitem_t * item ) ;
 extern void Use_Weapon ( edict_t * ent , gitem_t * item ) ;
-extern void stuffcmd ( edict_t * e , char * s ) ;
 extern void Think_Weapon ( edict_t * ent ) ;
 extern void NoAmmoWeaponChange ( edict_t * ent ) ;
 extern void ChangeWeapon ( edict_t * ent ) ;

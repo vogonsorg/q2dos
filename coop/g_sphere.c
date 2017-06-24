@@ -251,7 +251,7 @@ sphere_touch(edict_t *self, edict_t *other, cplane_t *plane,
 		}
 
 		/* Don't blow up on bodies */
-		if (!strcmp(other->classname, "bodyque"))
+		if (other->classname && !strcmp(other->classname, "bodyque"))
 		{
 			return;
 		}

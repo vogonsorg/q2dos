@@ -7,6 +7,8 @@
 #define SPAWNGROW_LIFESPAN 0.3 /* FS: Coop: Rogue specific */
 #define STEPSIZE 18 /* FS: Coop: Rogue specific */
 
+void Z_SpawnDMItems(); /* FS: Zaero specific game dll changes */
+
 typedef struct
 {
 	char *name;
@@ -186,6 +188,26 @@ void SP_target_mal_laser (edict_t *ent); /* FS: Coop: Xatrix specific */
 void SP_misc_transport (edict_t *ent); /* FS: Coop: Xatrix specific */
 
 void SP_misc_nuke (edict_t *ent); /* FS: Coop: Xatrix specific */
+
+void SP_sound_echo (edict_t *self); /* FS: Zaero specific game dll changes */
+
+void SP_misc_lasertripbomb (edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_load_mirrorlevel (edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_trigger_laser(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_monster_autocannon(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_monster_autocannon_floor(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_monster_sentien(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_misc_securitycamera(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_monster_hound (edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_monster_handler (edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_misc_commdish (edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_misc_crate(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_misc_crate_medium(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_misc_crate_small(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_monster_zboss (edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_target_zboss_target(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_func_barrier(edict_t *self); /* FS: Zaero specific game dll changes */
+void SP_misc_seat(edict_t *self); /* FS: Zaero specific game dll changes */
 
 void SP_SetCDTrack(int track); /* FS: Coop: Added */
 void SP_info_coop_checkpoint (edict_t * self ); /* FS: Coop: Added */
@@ -371,6 +393,30 @@ spawn_t spawns[] = {
 	{"item_quadfire", SP_xatrix_item}, /* FS: Coop: Rogue specific */
 	{"weapon_boomer", SP_xatrix_item}, /* FS: Coop: Rogue specific */
 	{"weapon_phalanx", SP_xatrix_item}, /* FS: Coop: Rogue specific */
+
+// evolve map entities
+	{"sound_echo", SP_sound_echo}, /* FS: Zaero specific game dll changes */
+	{"misc_ired", SP_misc_lasertripbomb}, /* FS: Zaero specific game dll changes */
+	{"trigger_laser", SP_trigger_laser}, /* FS: Zaero specific game dll changes */
+	{"monster_autocannon", SP_monster_autocannon}, /* FS: Zaero specific game dll changes */
+	{"monster_autocannon_floor", SP_monster_autocannon_floor}, /* FS: Zaero specific game dll changes */
+	{"monster_sentien", SP_monster_sentien}, /* FS: Zaero specific game dll changes */
+	{"misc_securitycamera", SP_misc_securitycamera}, /* FS: Zaero specific game dll changes */
+	{"monster_hound", SP_monster_hound}, /* FS: Zaero specific game dll changes */
+	{"monster_handler", SP_monster_handler}, /* FS: Zaero specific game dll changes */
+	{"misc_commdish", SP_misc_commdish}, /* FS: Zaero specific game dll changes */
+
+// mirror level's 
+	{"load_mirrorlevel", SP_load_mirrorlevel}, /* FS: Zaero specific game dll changes */
+
+	{"misc_crate", SP_misc_crate}, /* FS: Zaero specific game dll changes */
+	{"misc_crate_medium", SP_misc_crate_medium}, /* FS: Zaero specific game dll changes */
+	{"misc_crate_small", SP_misc_crate_small}, /* FS: Zaero specific game dll changes */
+
+	{"monster_zboss", SP_monster_zboss}, /* FS: Zaero specific game dll changes */
+	{"func_barrier", SP_func_barrier}, /* FS: Zaero specific game dll changes */
+	{"misc_seat", SP_misc_seat}, /* FS: Zaero specific game dll changes */
+	{"target_zboss_target", SP_target_zboss_target}, /* FS: Zaero specific game dll changes */
 
 	{"info_coop_checkpoint", SP_info_coop_checkpoint}, /* FS: Coop: Added */
 	{NULL, NULL}
@@ -657,6 +703,11 @@ G_FixTeams(void) /* FS: Coop: Rogue specific */
 			continue;
 		}
 
+		if(!e->classname)
+		{
+			continue;
+		}
+
 		if (!strcmp(e->classname, "func_train"))
 		{
 			if (e->flags & FL_TEAMSLAVE)
@@ -786,6 +837,7 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 	const char *com_token;
 	int i;
 	float skill_level;
+	int checkpoint_index; /* FS: Added */
 
 	if (!mapname || !entities || !spawnpoint)
 	{
@@ -819,6 +871,8 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 	strncpy(level.mapname, mapname, sizeof(level.mapname) - 1);
 	strncpy(game.spawnpoint, spawnpoint, sizeof(game.spawnpoint) - 1);
 
+	gi.cprintf(NULL, PRINT_HIGH, "Map: %s\n", level.mapname); /* FS: Catch potentially bad maps in console logs */
+
 	/* set client fields on player ents */
 	for (i = 0; i < game.maxclients; i++)
 	{
@@ -851,38 +905,45 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 		else
 		{
 			ent = G_Spawn();
+			ent->spawnflags2 = 0; /* FS: Zaero specific game dll changes */
 		}
 
 		entities = ED_ParseEdict(entities, ent);
 
-		/* yet another map hack */
-		if (!Q_stricmp(level.mapname, "command") &&
-			!Q_stricmp(ent->classname, "trigger_once") && !Q_stricmp(ent->model, "*27"))
+		if (ent->classname)
 		{
-			ent->spawnflags &= ~SPAWNFLAG_NOT_HARD;
-		}
+			/* yet another map hack */
+			if (!Q_stricmp(level.mapname, "command") &&
+				!Q_stricmp(ent->classname, "trigger_once") &&
+				ent->model &&
+				!Q_stricmp(ent->model, "*27"))
+			{
+				ent->spawnflags &= ~SPAWNFLAG_NOT_HARD;
+			}
 
-		/* ahh, the joys of map hacks .. */
-		/* FS: Coop: Rogue specific map hacks */
-		if (!Q_stricmp(level.mapname, "rhangar2") &&
-			!Q_stricmp(ent->classname, "func_door_rotating") &&
-			ent->targetname && !Q_stricmp(ent->targetname, "t265"))
-		{
-			ent->spawnflags &= ~SPAWNFLAG_NOT_COOP;
-		}
+			/* ahh, the joys of map hacks .. */
+			/* FS: Coop: Rogue specific map hacks */
+			if (!Q_stricmp(level.mapname, "rhangar2") &&
+				!Q_stricmp(ent->classname, "func_door_rotating") &&
+				ent->targetname && !Q_stricmp(ent->targetname, "t265"))
+			{
+				ent->spawnflags &= ~SPAWNFLAG_NOT_COOP;
+			}
 
-		if (!Q_stricmp(level.mapname, "rhangar2") &&
-			!Q_stricmp(ent->classname, "trigger_always") &&
-		   	ent->target && !Q_stricmp(ent->target, "t265"))
-		{
-			ent->spawnflags |= SPAWNFLAG_NOT_COOP;
-		}
+			if (!Q_stricmp(level.mapname, "rhangar2") &&
+				!Q_stricmp(ent->classname, "trigger_always") &&
+		   		ent->target && !Q_stricmp(ent->target, "t265"))
+			{
+				ent->spawnflags |= SPAWNFLAG_NOT_COOP;
+			}
 
-		if (!Q_stricmp(level.mapname, "rhangar2") &&
-			!Q_stricmp(ent->classname, "func_wall") &&
-		   	!Q_stricmp(ent->model, "*15"))
-		{
-			ent->spawnflags |= SPAWNFLAG_NOT_COOP;
+			if (!Q_stricmp(level.mapname, "rhangar2") &&
+				!Q_stricmp(ent->classname, "func_wall") &&
+				ent->model &&
+		   		!Q_stricmp(ent->model, "*15"))
+			{
+				ent->spawnflags |= SPAWNFLAG_NOT_COOP;
+			}
 		}
 
 		/* remove things (except the world) from
@@ -1005,9 +1066,49 @@ SpawnEntities(const char *mapname, char *entities, const char *spawnpoint)
 		}
 	}
 
+	if (game.gametype == zaero_coop)
+	{
+		Z_SpawnDMItems(); /* FS: Zaero specific game dll changes */
+	}
+
 	if(coop->intValue) /* FS: Coop: Check if victory.pcx is the current map, workaround the "gamemap" crap in sv_init.c */
 	{
 		G_CheckCoopVictory();
+	}
+
+	checkpoint_index = gi.modelindex("models/items/tagtoken/tris.md2"); /* FS: info_coop_checkpoint */
+	if(checkpoint_index < 220) /* FS: Moved this because of MAX_MODELS overflows in city3.bsp and probably others */
+	{
+		/* sexed models: THIS ORDER MUST MATCH THE DEFINES IN g_local.h
+		   you can add more, max 19 (pete change)these models are only
+		   loaded in coop or deathmatch. not singleplayer. */
+		if ((coop->value) || deathmatch->value)
+		{
+			gi.modelindex("#w_blaster.md2");
+			gi.modelindex("#w_shotgun.md2");
+			gi.modelindex("#w_sshotgun.md2");
+			gi.modelindex("#w_machinegun.md2");
+			gi.modelindex("#w_chaingun.md2");
+			gi.modelindex("#a_grenades.md2");
+			gi.modelindex("#w_glauncher.md2");
+			gi.modelindex("#w_rlauncher.md2");
+			gi.modelindex("#w_hyperblaster.md2");
+			gi.modelindex("#w_railgun.md2");
+			gi.modelindex("#w_bfg.md2");
+			if (game.gametype == rogue_coop)
+			{
+				gi.modelindex("#w_disrupt.md2"); /* FS: Coop: Rogue specific */
+				gi.modelindex("#w_etfrifle.md2"); /* FS: Coop: Rogue specific */
+				gi.modelindex("#w_plasma.md2"); /* FS: Coop: Rogue specific */
+				gi.modelindex("#w_plauncher.md2"); /* FS: Coop: Rogue specific */
+				gi.modelindex("#w_chainfist.md2"); /* FS: Coop: Rogue specific */
+			}
+			if (game.gametype == xatrix_coop)
+			{
+				gi.modelindex("#w_phalanx.md2"); /* FS: Coop: Xatrix specific */
+				gi.modelindex("#w_ripper.md2"); /* FS: Coop: Xatrix specific */
+			}
+		}
 	}
 }
 
@@ -1068,6 +1169,33 @@ char *single_statusbar =
 "if 11 "
 "	xv	148 "
 "	pic	11 "
+"endif "
+
+/* spectator */
+"if 17 "
+  "xv 0 "
+  "yb -58 "
+  "string2 \"SPECTATOR MODE\" "
+"endif "
+
+/* chase camera */
+"if 16 "
+  "xv 0 "
+  "yb -68 "
+  "string \"Chasing\" "
+  "xv 64 "
+  "stat_string 16 "
+"endif "
+
+// player origin /* FS: Zaero specific game dll changes */
+"if 18 " /* FS: Must mirror STAT_SHOW_ORIGIN! */
+"	xl 0 "
+"	yb -120 "
+"	num 5 19 " /* FS: Must mirror STAT_ORIGIN_X! */
+"	yb -96 "
+"	num 5 20 " /* FS: Must mirror STAT_ORIGIN_Y! */
+"	yb -72 "
+"	num 5 21 " /* FS: Must mirror STAT_ORIGIN_Z! */
 "endif "
 ;
 
@@ -1133,6 +1261,17 @@ char *dm_statusbar =
 "yt 2 "
 "num 3 14 "
 
+// player origin /* FS: Zaero specific game dll changes */
+"if 18 " /* FS: Must mirror STAT_SHOW_ORIGIN! */
+"	xl 0 "
+"	yb -120 "
+"	num 5 19 " /* FS: Must mirror STAT_ORIGIN_X! */
+"	yb -96 "
+"	num 5 20 " /* FS: Must mirror STAT_ORIGIN_Y! */
+"	yb -72 "
+"	num 5 21 " /* FS: Must mirror STAT_ORIGIN_Z! */
+"endif "
+
 /* spectator */
 "if 17 "
   "xv 0 "
@@ -1173,6 +1312,7 @@ SP_worldspawn(edict_t *ent)
 	ent->solid = SOLID_BSP;
 	ent->inuse = true; /* since the world doesn't use G_Spawn() */
 	ent->s.modelindex = 1; /* world model is always index 1 */
+	ent->spawnflags2 = 0; /* FS: Zaero specific game dll changes */
 
 	/* reserve some spots for dead player
 	   bodies for coop / deathmatch */
@@ -1270,30 +1410,7 @@ SP_worldspawn(edict_t *ent)
 	gi.soundindex("*pain100_1.wav");
 	gi.soundindex("*pain100_2.wav");
 
-	/* sexed models: THIS ORDER MUST MATCH THE DEFINES IN g_local.h
-	   you can add more, max 19 (pete change)these models are only
-	   loaded in coop or deathmatch. not singleplayer. */
-	if (coop->value || deathmatch->value)
-	{
-		gi.modelindex("#w_blaster.md2");
-		gi.modelindex("#w_shotgun.md2");
-		gi.modelindex("#w_sshotgun.md2");
-		gi.modelindex("#w_machinegun.md2");
-		gi.modelindex("#w_chaingun.md2");
-		gi.modelindex("#a_grenades.md2");
-		gi.modelindex("#w_glauncher.md2");
-		gi.modelindex("#w_rlauncher.md2");
-		gi.modelindex("#w_hyperblaster.md2");
-		gi.modelindex("#w_railgun.md2");
-		gi.modelindex("#w_bfg.md2");
-		gi.modelindex("#w_disrupt.md2"); /* FS: Coop: Rogue specific */
-		gi.modelindex("#w_etfrifle.md2"); /* FS: Coop: Rogue specific */
-		gi.modelindex("#w_plasma.md2"); /* FS: Coop: Rogue specific */
-		gi.modelindex("#w_plauncher.md2"); /* FS: Coop: Rogue specific */
-		gi.modelindex("#w_chainfist.md2"); /* FS: Coop: Rogue specific */
-		gi.modelindex("#w_phalanx.md2"); /* FS: Coop: Xatrix specific */
-		gi.modelindex("#w_ripper.md2"); /* FS: Coop: Xatrix specific */
-	}
+	/* FS: Sexed models moved to avoid MAX_MODELS overflows */
 
 	/* ------------------- */
 
@@ -1313,12 +1430,53 @@ SP_worldspawn(edict_t *ent)
 	gi.soundindex("misc/h2ohit1.wav");      /* landing splash */
 
 	gi.soundindex("items/damage.wav");
-	gi.soundindex("misc/ddamage1.wav"); /* FS: Coop: Rogue specific */
+	if (game.gametype == rogue_coop)
+	{
+		gi.soundindex("misc/ddamage1.wav"); /* FS: Coop: Rogue specific */
+	}
 	gi.soundindex("items/protect.wav");
 	gi.soundindex("items/protect4.wav");
 	gi.soundindex("weapons/noammo.wav");
 
 	gi.soundindex("infantry/inflies1.wav");
+
+	if (game.gametype == zaero_coop)
+	{
+		/* FS: Coop: Zaero */
+		gi.imageindex ("a_flares");
+		gi.imageindex ("w_flare");
+		gi.modelindex ("models/weapons/v_flare/tris.md2");
+		gi.modelindex ("models/objects/flare/tris.md2");
+		gi.soundindex ("weapons/flare/flarehis.wav");
+		gi.soundindex ("weapons/flare/shoot.wav");
+		gi.modelindex ("models/items/plasma/tris.md2");
+		gi.imageindex ("i_plasma");
+		gi.modelindex ("sprites/plasmashield_fixed.sp2");
+		gi.modelindex ("sprites/plasma1_fixed.sp2");
+		gi.soundindex ("items/plasmashield/psactive.wav");
+		gi.imageindex ("w_enuke");
+		gi.modelindex ("models/weapons/g_enuke/tris.md2");
+		gi.modelindex ("models/weapons/v_enuke/tris.md2");
+		gi.soundindex ("items/empnuke/emp_trg.wav");
+		gi.imageindex ("w_a2k");
+		gi.modelindex ("models/weapons/g_a2k/tris.md2");
+		gi.modelindex ("models/weapons/v_a2k/tris.md2");
+		gi.soundindex ("weapons/a2k/countdn.wav");
+		gi.soundindex ("weapons/a2k/ak_exp01.wav");
+		gi.imageindex ("w_sonic");
+		gi.modelindex ("models/weapons/g_sonic/tris.md2");
+		gi.modelindex ("models/weapons/v_sonic/tris.md2");
+		gi.soundindex ("weapons/sonic/sc_warm.wav"); 
+		gi.soundindex ("weapons/sonic/sc_cool.wav"); 
+		gi.soundindex ("weapons/sonic/sc_fire.wav");
+		gi.imageindex ("w_sniper");
+		gi.modelindex ("models/weapons/g_sniper/tris.md2");
+		gi.modelindex ("models/weapons/v_sniper/tris.md2");
+		gi.modelindex ("models/weapons/v_sniper/scope/tris.md2"); 
+		gi.modelindex ("models/weapons/v_sniper/dmscope/tris.md2"); 
+		gi.soundindex ("weapons/sniper/beep.wav"); 
+		gi.soundindex ("weapons/sniper/fire.wav");
+	}
 
 	sm_meat_index = gi.modelindex("models/objects/gibs/sm_meat/tris.md2");
 	gi.modelindex("models/objects/gibs/arm/tris.md2");
@@ -1990,7 +2148,7 @@ int G_SpawnCheckpoints (edict_t *ent)
 	fseek (f, 0, SEEK_END);
 	fileSize = ftell (f);
 	fseek (f, 0, SEEK_SET);
-	fileBuffer = (char *)malloc(sizeof(char)*(fileSize+2)); // FS: In case we have to add a newline terminator
+	fileBuffer = (char *)gi.TagMalloc((sizeof(char)*(fileSize+2)), TAG_LEVEL); /* FS: In case we have to add a newline terminator */
 	if(!fileBuffer)
 	{
 		gi.cprintf(NULL, PRINT_CHAT, "G_SpawnCheckpoints: can't allocate memory for fileBuffer!\n");
@@ -2039,7 +2197,7 @@ int G_SpawnCheckpoints (edict_t *ent)
 
 		if (ent != g_edicts)
 		{
-			if(Q_stricmp(ent->classname,"info_coop_checkpoint")) /* FS: No funky stuff in these special overrides please, use ent files for that. */
+			if(!ent->classname || Q_stricmp(ent->classname,"info_coop_checkpoint")) /* FS: No funky stuff in these special overrides please, use ent files for that. */
 			{
 				gi.cprintf(NULL, PRINT_CHAT, "WARNING: Not an info_coop_checkpoint: %s.  Removing...\n", ent->classname);
 				G_FreeEdict(ent);
@@ -2088,6 +2246,7 @@ void G_CheckCoopVictory (void) /* FS: Coop: Check if victory.pcx is the current 
 				gi.cvar_forceset("nextserver", "map \"rmine1\"\n");
 				break;
 			case rogue_coop:
+			case zaero_coop:
 				gi.cvar_forceset("sv_coop_gamemode", "vanilla");
 				gi.cvar_forceset("nextserver", "map \"base1\"\n");
 				break;

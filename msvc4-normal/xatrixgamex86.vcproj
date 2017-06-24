@@ -45,6 +45,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				PreprocessorDefinitions="WIN32;id386=1;NDEBUG;_WINDOWS"
@@ -139,6 +140,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
 				Optimization="0"
 				PreprocessorDefinitions="WIN32;id386=1;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
@@ -149,7 +151,7 @@
 				ProgramDataBaseFileName=".\Xatrix\Debug/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1279,7 +1281,151 @@
 			Filter="h;hpp;hxx;hm;inl;fi;fd"
 			>
 			<File
+				RelativePath="..\xsrc\tables\clientfields.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\tables\fields.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\g_local.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\game.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\tables\gamefunc_decs.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\tables\gamefunc_list.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\tables\gamemmove_decs.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\tables\gamemmove_list.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\tables\levelfields.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_actor.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_berserk.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_boss2.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_boss31.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_boss32.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_brain.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_chick.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_fixbot.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_flipper.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_float.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_flyer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_gekk.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_gladiator.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_gunner.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_hover.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_infantry.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_insane.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_medic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_mutant.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_parasite.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_player.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_rider.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_soldier.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_soldierh.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_supertank.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\m_tank.h"
+				>
+			</File>
+			<File
 				RelativePath="..\xsrc\q_shared.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xsrc\stdint.h"
 				>
 			</File>
 		</Filter>

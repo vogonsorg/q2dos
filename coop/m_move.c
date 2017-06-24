@@ -188,6 +188,264 @@ IsBadAhead(edict_t *self, edict_t *bad, vec3_t move) /* FS: Coop: Rogue specific
  * returned, and pr_global_struct->trace_normal
  * is set to the normal of the blocking wall
  */
+
+qboolean
+SV_movestep_zaero(edict_t *ent, vec3_t move, qboolean relink)
+{
+	float dz;
+	vec3_t oldorg, neworg, end;
+	trace_t trace;
+	int i;
+	float stepsize;
+	vec3_t test;
+	int contents;
+
+	if (!ent)
+	{
+		return false;
+	}
+
+	/* try the move */
+	VectorCopy(ent->s.origin, oldorg);
+	VectorAdd(ent->s.origin, move, neworg);
+
+	/* flying monsters don't step up */
+	if (ent->flags & (FL_SWIM | FL_FLY))
+	{
+		/* try one move with vertical motion, then one without */
+		for (i = 0; i < 2; i++)
+		{
+			VectorAdd(ent->s.origin, move, neworg);
+
+			if ((i == 0) && ent->enemy)
+			{
+				if (!ent->goalentity)
+				{
+					ent->goalentity = ent->enemy;
+				}
+
+				dz = ent->s.origin[2] - ent->goalentity->s.origin[2];
+
+				if (ent->goalentity->client)
+				{
+					if (dz > 40)
+					{
+						neworg[2] -= 8;
+					}
+
+					if (!((ent->flags & FL_SWIM) && (ent->waterlevel < 2)))
+					{
+						if (dz < 30)
+						{
+							neworg[2] += 8;
+						}
+					}
+				}
+				else
+				{
+					if (dz > 8)
+					{
+						neworg[2] -= 8;
+					}
+					else if (dz > 0)
+					{
+						neworg[2] -= dz;
+					}
+					else if (dz < -8)
+					{
+						neworg[2] += 8;
+					}
+					else
+					{
+						neworg[2] += dz;
+					}
+				}
+			}
+
+			trace = gi.trace(ent->s.origin, ent->mins, ent->maxs,
+					neworg, ent, MASK_MONSTERSOLID);
+
+			/* fly monsters don't enter water voluntarily */
+			if (ent->flags & FL_FLY)
+			{
+				if (!ent->waterlevel)
+				{
+					test[0] = trace.endpos[0];
+					test[1] = trace.endpos[1];
+					test[2] = trace.endpos[2] + ent->mins[2] + 1;
+					contents = gi.pointcontents(test);
+
+					if (contents & MASK_WATER)
+					{
+						return false;
+					}
+				}
+			}
+
+			/* swim monsters don't exit water voluntarily */
+			if (ent->flags & FL_SWIM)
+			{
+				if (ent->waterlevel < 2)
+				{
+					test[0] = trace.endpos[0];
+					test[1] = trace.endpos[1];
+					test[2] = trace.endpos[2] + ent->mins[2] + 1;
+					contents = gi.pointcontents(test);
+
+					if (!(contents & MASK_WATER))
+					{
+						return false;
+					}
+				}
+			}
+
+			if (trace.fraction == 1)
+			{
+				VectorCopy(trace.endpos, ent->s.origin);
+
+				if (relink)
+				{
+					gi.linkentity(ent);
+					G_TouchTriggers(ent);
+				}
+
+				return true;
+			}
+
+			if (!ent->enemy)
+			{
+				break;
+			}
+		}
+
+		return false;
+	}
+
+	/* push down from a step height above the wished position */
+	if (!(ent->monsterinfo.aiflags & AI_NOSTEP))
+	{
+		stepsize = STEPSIZE;
+	}
+	else
+	{
+		stepsize = 1;
+	}
+
+	neworg[2] += stepsize;
+	VectorCopy(neworg, end);
+	end[2] -= stepsize * 2;
+
+	trace = gi.trace(neworg, ent->mins, ent->maxs, end, ent, MASK_MONSTERSOLID);
+
+	if (trace.allsolid)
+	{
+		return false;
+	}
+
+	if (trace.startsolid)
+	{
+		neworg[2] -= stepsize;
+		trace = gi.trace(neworg, ent->mins, ent->maxs,
+				end, ent, MASK_MONSTERSOLID);
+
+		if (trace.allsolid || trace.startsolid)
+		{
+			return false;
+		}
+	}
+
+	/* don't go in to water */
+	if (ent->waterlevel == 0)
+	{
+		test[0] = trace.endpos[0];
+		test[1] = trace.endpos[1];
+		test[2] = trace.endpos[2] + ent->mins[2] + 1;
+		contents = gi.pointcontents(test);
+
+		if (contents & MASK_WATER && ent->movetype != MOVETYPE_FALLFLOAT) /* FS: Zaero specific game dll changes */
+		{
+			return false;
+		}
+	}
+
+	if (trace.fraction == 1)
+	{
+		/* if monster had the ground pulled out, go ahead and fall */
+		if ( ent->flags & FL_PARTIALGROUND )
+		{
+			VectorAdd (ent->s.origin, move, ent->s.origin);
+			if (relink)
+			{
+				gi.linkentity (ent);
+				G_TouchTriggers (ent);
+			}
+			ent->groundentity = NULL;
+			return true;
+		}
+		else if (ent->movetype == MOVETYPE_FALLFLOAT) /* FS: Zaero specific game dll changes */
+		{
+			// can fall over the edge
+			VectorAdd (ent->s.origin, move, ent->s.origin);
+			if (relink)
+			{
+				gi.linkentity (ent);
+				G_TouchTriggers (ent);
+			}
+			ent->groundentity = NULL;
+			return true;
+		}
+
+		return false; /* walked off an edge */
+	}
+
+	/* check point traces down for dangling corners */
+	VectorCopy(trace.endpos, ent->s.origin);
+
+	if (!M_CheckBottom (ent))
+	{
+		if ( ent->flags & FL_PARTIALGROUND )
+		{	// entity had floor mostly pulled out from underneath it
+			// and is trying to correct
+			if (relink) /* FS: Zaero specific game dll changes */
+			{
+				gi.linkentity (ent);
+				G_TouchTriggers (ent);
+			}
+			return true;
+		}
+		else if (ent->movetype == MOVETYPE_FALLFLOAT)
+		{
+			// can fall over the edge
+			if (relink)
+			{
+				gi.linkentity (ent);
+				G_TouchTriggers (ent);
+			}
+			return true;
+		}
+
+		VectorCopy(oldorg, ent->s.origin);
+		return false;
+	}
+
+	if (ent->flags & FL_PARTIALGROUND)
+	{
+		ent->flags &= ~FL_PARTIALGROUND;
+	}
+
+	ent->groundentity = trace.ent;
+	ent->groundentity_linkcount = trace.ent->linkcount;
+
+	/* the move is ok */
+	if (relink)
+	{
+		gi.linkentity(ent);
+		G_TouchTriggers(ent);
+	}
+
+	return true;
+}
+
 qboolean
 SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 {
@@ -206,6 +464,11 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 		return false;
 	}
 
+	if (game.gametype == zaero_coop)
+	{
+		return SV_movestep_zaero(ent, move, relink);
+	}
+
 	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
 		if (ent->health > 0)
@@ -216,7 +479,7 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 			{
 				ent->bad_area = current_bad;
 
-				if (ent->enemy && !strcmp(ent->enemy->classname, "tesla"))
+				if ((ent->enemy) && (ent->enemy->classname) && (!strcmp(ent->enemy->classname, "tesla")))
 				{
 					/* if the tesla is in front of us, back up... */
 					if (IsBadAhead(ent, current_bad, move))
@@ -266,7 +529,7 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 				{
 					/* we want the carrier to stay a certain distance off the ground,
 					   to help prevent him from shooting his fliers, who spawn in below him */
-					if ((game.gametype == rogue_coop) && (!strcmp(ent->classname, "monster_carrier"))) /* FS: Coop: Rogue specific */
+					if ((game.gametype == rogue_coop) && (ent->classname) && (!strcmp(ent->classname, "monster_carrier"))) /* FS: Coop: Rogue specific */
 					{
 						minheight = 104;
 					}
@@ -290,7 +553,7 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 				}
 				else
 				{
-					if ((game.gametype == xatrix_coop) && (strcmp(ent->classname, "monster_fixbot") == 0)) /* FS: Coop: Xatrix specific */
+					if ((game.gametype == xatrix_coop) && (ent->classname) && (strcmp(ent->classname, "monster_fixbot") == 0)) /* FS: Coop: Xatrix specific */
 					{
 						if ((ent->s.frame >= 105) && (ent->s.frame <= 120))
 						{
@@ -528,14 +791,14 @@ SV_movestep(edict_t *ent, vec3_t move, qboolean relink)
 			{
 				if (new_bad->owner)
 				{
-					if (!strcmp(new_bad->owner->classname, "tesla"))
+					if (new_bad->owner->classname && !strcmp(new_bad->owner->classname, "tesla"))
 					{
 						if ((!(ent->enemy)) || (!(ent->enemy->inuse)))
 						{
 							TargetTesla(ent, new_bad->owner);
 							ent->monsterinfo.aiflags |= AI_BLOCKED;
 						}
-						else if (!strcmp(ent->enemy->classname, "telsa"))
+						else if (ent->enemy->classname && !strcmp(ent->enemy->classname, "telsa"))
 						{
 						}
 						else if ((ent->enemy) && (ent->enemy->client))
@@ -707,7 +970,7 @@ SV_StepDirection(edict_t *ent, float yaw, float dist)
 
 		delta = ent->s.angles[YAW] - ent->ideal_yaw;
 
-		if (strncmp(ent->classname, "monster_widow", 13)) /* FS: Coop: Rogue specific: Added check for monster_widow */
+		if ((game.gametype == rogue_coop) && (ent->classname) && (strncmp(ent->classname, "monster_widow", 13))) /* FS: Coop: Rogue specific: Added check for monster_widow */
 		{
 			if ((delta > 45) && (delta < 315))
 			{
@@ -984,4 +1247,60 @@ M_walkmove(edict_t *ent, float yaw, float dist)
 		ent->monsterinfo.aiflags &= ~AI_BLOCKED;
 	}
 	return retval;
+}
+
+/*
+====================
+M_MoveAwayFromFlare
+====================
+*/
+qboolean M_MoveAwayFromFlare(edict_t *self, float dist) /* FS: Zaero specific game dll changes */
+{
+	edict_t *e = NULL;
+	edict_t *goal = NULL;
+	vec3_t delta;
+	vec3_t forward;
+
+	// find the closest flare
+	while(1)
+	{
+		e = findradius(e, self->s.origin, 256);
+		if (e == NULL)
+			break;
+
+		if (e->classname && Q_stricmp(e->classname, "flare") == 0)
+			break;
+	}
+	
+	goal = G_Spawn();
+	self->goalentity = goal;
+	if (e == NULL)
+	{
+		// just move forward
+		AngleVectors(self->s.angles, forward, NULL, NULL);
+		VectorMA(self->s.origin, 128, forward, goal->s.origin);
+	}
+	else /* e != NULL */
+	{
+		VectorSubtract(self->s.origin, e->s.origin, delta);
+		VectorNormalize(delta);
+		VectorMA(self->s.origin, 128, delta, goal->s.origin);
+	}
+
+	if ((rand() & 7) == 1)
+	{
+		// set the ideal_yaw
+		VectorSubtract(goal->s.origin, self->s.origin, delta);
+		self->ideal_yaw = vectoyaw(delta);
+	}
+
+	if ( (rand()&3)==1 || !SV_StepDirection (self, self->ideal_yaw, dist))
+	{
+		SV_NewChaseDir (self, goal, dist);
+	}
+
+	self->goalentity = NULL;
+	G_FreeEdict(goal);
+
+	return true;
 }

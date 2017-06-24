@@ -15,6 +15,11 @@ monster_fire_bullet(edict_t *self, vec3_t start, vec3_t dir, int damage,
 		return;
 	}
 
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		ANIM_AIM(self, dir);
+	}
+
 	fire_bullet(self, start, dir, damage, kick, hspread, vspread, MOD_UNKNOWN);
 
 	gi.WriteByte(svc_muzzleflash2);
@@ -30,6 +35,11 @@ monster_fire_shotgun(edict_t *self, vec3_t start, vec3_t aimdir, int damage,
 	if (!self)
 	{
 		return;
+	}
+
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		ANIM_AIM(self, aimdir);
 	}
 
 	fire_shotgun(self, start, aimdir, damage, kick, hspread, vspread,
@@ -48,6 +58,16 @@ monster_fire_blaster(edict_t *self, vec3_t start, vec3_t dir, int damage, int sp
 	if (!self)
 	{
 		return;
+	}
+
+	if(game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		if(EMPNukeCheck(self, start))
+		{
+			gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
+			return;
+		}
+		ANIM_AIM(self, dir);
 	}
 
 	fire_blaster(self, start, dir, damage, speed, effect, false);
@@ -305,6 +325,11 @@ monster_fire_grenade(edict_t *self, vec3_t start, vec3_t aimdir,
 		return;
 	}
 
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		ANIM_AIM(self, aimdir);
+	}
+
 	fire_grenade(self, start, aimdir, damage, speed, 2.5, damage + 40);
 
 	gi.WriteByte(svc_muzzleflash2);
@@ -322,6 +347,16 @@ monster_fire_rocket(edict_t *self, vec3_t start, vec3_t dir,
 		return;
 	}
 
+	if(game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		if(EMPNukeCheck(self, start))
+		{
+			gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
+			return;
+		}
+		ANIM_AIM(self, dir);
+	}
+
 	fire_rocket(self, start, dir, damage, speed, damage + 20, damage);
 
 	gi.WriteByte(svc_muzzleflash2);
@@ -337,6 +372,16 @@ monster_fire_railgun(edict_t *self, vec3_t start, vec3_t aimdir,
 	if (!self)
 	{
 		return;
+	}
+
+	if(game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		if(EMPNukeCheck(self, start))
+		{
+			gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
+			return;
+		}
+		ANIM_AIM(self, aimdir);
 	}
 
 	if(game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
@@ -365,6 +410,16 @@ monster_fire_bfg(edict_t *self, vec3_t start, vec3_t aimdir,
 	if (!self)
 	{
 		return;
+	}
+
+	if(game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		if(EMPNukeCheck(self, start))
+		{
+			gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
+			return;
+		}
+		ANIM_AIM(self, aimdir);
 	}
 
 	fire_bfg(self, start, aimdir, damage, speed, damage_radius);
@@ -920,6 +975,15 @@ monster_think(edict_t *self)
 	M_CatagorizePosition(self);
 	M_WorldEffects(self);
 	M_SetEffects(self);
+
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		// decrease blindness
+		if (self->monsterinfo.flashTime > 0)
+		{
+			self->monsterinfo.flashTime--;
+		}
+	}
 }
 
 /*
@@ -983,7 +1047,7 @@ monster_triggered_spawn(edict_t *self)
 
 	monster_start_go(self);
 
-	if ((game.gametype == xatrix_coop) && (strcmp(self->classname, "monster_fixbot") == 0)) /* FS: Coop: Xatrix specific */
+	if ((game.gametype == xatrix_coop) && (self->classname) && (strcmp(self->classname, "monster_fixbot") == 0)) /* FS: Coop: Xatrix specific */
 	{
 		if (self->spawnflags & 16 || self->spawnflags & 8 || self->spawnflags &
 			4)
@@ -1015,6 +1079,12 @@ monster_triggered_spawn(edict_t *self)
 	else
 	{
 		self->enemy = NULL;
+	}
+
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		self->s.event = EV_PLAYER_TELEPORT;
+		MonsterPlayerKillBox(self);
 	}
 }
 
@@ -1110,10 +1180,23 @@ monster_start(edict_t *self)
 		self->spawnflags |= 1;
 	}
 
-	if ((!(self->monsterinfo.aiflags & AI_GOOD_GUY)) &&
-		(!(self->monsterinfo.aiflags & AI_DO_NOT_COUNT))) /* FS: Coop: Rogue specific flag */
+	if(game.gametype == zaero_coop)
 	{
-		level.total_monsters++;
+		if (!(self->monsterinfo.aiflags & AI_GOOD_GUY))
+		{
+			if(!(self->spawnflags & 16)) /* FS: Zaero specific game dll changes */
+			{
+				level.total_monsters++;
+			}
+		}
+	}
+	else
+	{
+		if ((!(self->monsterinfo.aiflags & AI_GOOD_GUY)) &&
+			(!(self->monsterinfo.aiflags & AI_DO_NOT_COUNT))) /* FS: Coop: Rogue specific flag */
+		{
+			level.total_monsters++;
+		}
 	}
 
 	self->nextthink = level.time + FRAMETIME;
@@ -1199,7 +1282,7 @@ monster_start_go(edict_t *self)
 
 		while ((target = G_Find(target, FOFS(targetname), self->target)) != NULL)
 		{
-			if (strcmp(target->classname, "point_combat") == 0)
+			if (target->classname && strcmp(target->classname, "point_combat") == 0)
 			{
 				self->combattarget = self->target;
 				fixup = true;
@@ -1232,7 +1315,7 @@ monster_start_go(edict_t *self)
 		while ((target = G_Find(target, FOFS(targetname),
 						self->combattarget)) != NULL)
 		{
-			if (strcmp(target->classname, "point_combat") != 0)
+			if (target->classname && strcmp(target->classname, "point_combat") != 0)
 			{
 				gi.dprintf(DEVELOPER_MSG_GAME, "%s at (%i %i %i) has a bad combattarget %s : %s at (%i %i %i)\n",
 						self->classname, (int)self->s.origin[0], (int)self->s.origin[1],
@@ -1254,7 +1337,7 @@ monster_start_go(edict_t *self)
 			self->monsterinfo.pausetime = 100000000;
 			self->monsterinfo.stand(self);
 		}
-		else if (strcmp(self->movetarget->classname, "path_corner") == 0)
+		else if (self->movetarget->classname && strcmp(self->movetarget->classname, "path_corner") == 0)
 		{
 			VectorSubtract(self->goalentity->s.origin, self->s.origin, v);
 			self->ideal_yaw = self->s.angles[YAW] = vectoyaw(v);
@@ -1305,7 +1388,7 @@ walkmonster_start_go(edict_t *self)
 		self->yaw_speed = 20;
 	}
 
-	if ((game.gametype == rogue_coop) && !(strcmp(self->classname, "monster_stalker"))) /* FS: Coop: Rogue specific */
+	if ((game.gametype == rogue_coop) && (self->classname) && (!(strcmp(self->classname, "monster_stalker")))) /* FS: Coop: Rogue specific */
 	{
 		self->viewheight = 15;
 	}

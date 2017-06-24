@@ -106,7 +106,15 @@ BeginIntermission(edict_t *targ)
 	level.intermissiontime = level.time;
 	level.changemap = targ->map;
 
-	if (strstr(level.changemap, "*"))
+	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		if (Q_stricmp(level.mapname, "zboss") == 0 && !deathmatch->value)
+		{
+			level.fadeFrames = 50;
+		}
+	}
+
+	if (level.changemap && strstr(level.changemap, "*"))
 	{
 		if (coop->value)
 		{
@@ -399,7 +407,18 @@ InventoryMessage(edict_t *ent)
 
 	for (i = 0; i < MAX_ITEMS; i++)
 	{
-		gi.WriteShort(ent->client->pers.inventory[i]);
+		gitem_t *it = &itemlist[i]; /* FS: Zaero specific game dll changes */
+
+		if ((game.gametype == zaero_coop) && (it->hideFlags & HIDE_FROM_INVENTORY))
+		{
+			gi.WriteShort(0);	// this is a hack and will work as long as
+								// the client continues to hide items that
+								// the user has none of
+		}
+		else
+		{
+			gi.WriteShort(ent->client->pers.inventory[i]);
+		}
 	}
 }
 
@@ -479,7 +498,17 @@ G_SetStats(edict_t *ent)
 	}
 
 	/* timers */
-	if (ent->client->quad_framenum > level.framenum)
+	if (ent->client->a2kFramenum > level.framenum) /* FS: Zaero specific game dll changes */
+	{
+		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("w_a2k");
+		ent->client->ps.stats[STAT_TIMER] = (ent->client->a2kFramenum - level.framenum)/10;
+	}
+	else if (ent->client->sniperFramenum >= level.framenum) /* FS: Zaero specific game dll changes */
+	{
+		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("w_sniper");
+		ent->client->ps.stats[STAT_TIMER] = (ent->client->sniperFramenum - level.framenum)/10;
+	}
+	else if (ent->client->quad_framenum > level.framenum)
 	{
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex("p_quad");
 		ent->client->ps.stats[STAT_TIMER] = (ent->client->quad_framenum - level.framenum) / 10;
@@ -612,6 +641,29 @@ G_SetStats(edict_t *ent)
 	else
 	{
 		ent->client->ps.stats[STAT_HELPICON] = 0;
+	}
+
+	// origin
+	if (ent->client->showOrigin) /* FS: Zaero specific game dll changes: special debug command */
+	{
+		ent->client->ps.stats[STAT_SHOW_ORIGIN] = 1;
+		ent->client->ps.stats[STAT_ORIGIN_X] = (int)ent->s.origin[0];
+		ent->client->ps.stats[STAT_ORIGIN_Y] = (int)ent->s.origin[1];
+		ent->client->ps.stats[STAT_ORIGIN_Z] = (int)ent->s.origin[2];
+	}
+	else
+	{
+		ent->client->ps.stats[STAT_SHOW_ORIGIN] = 0;
+	}
+
+	if (ent->client->zCameraTrack)  /* FS: Zaero specific game dll changes */
+	{
+		ent->client->ps.stats[STAT_CAMERA_ICON] = gi.imageindex("i_visor");
+		ent->client->ps.stats[STAT_CAMERA_TIMER] = ent->client->pers.visorFrames/10;
+	}
+	else
+	{
+		ent->client->ps.stats[STAT_CAMERA_ICON] = 0;
 	}
 
 	ent->client->ps.stats[STAT_SPECTATOR] = 0;

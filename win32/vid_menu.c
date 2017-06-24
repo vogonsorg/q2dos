@@ -176,6 +176,10 @@ static void ApplyChanges( void *unused )
 	temp = s_mode_list[SOFTWARE_MENU].curvalue;
 	Cvar_SetValue ("sw_mode", temp);
 	temp = s_mode_list[OPENGL_MENU].curvalue;
+#ifdef _WIN32 /* FS: For custom modes */
+	if(temp == s_mode_list[OPENGL_MENU].maxvalue)
+		temp = -1;
+#endif
 	Cvar_SetValue ("gl_mode", temp);
 
 	// Knightmare- refesh rate option
@@ -442,6 +446,9 @@ void VID_MenuInit( void )
 		"[1280 960 ]",
 		"[1280 1024]",
 		"[1600 1200]",
+#ifdef _WIN32 /* FS: For custom modes */
+		"[Custom   ]",
+#endif
 		0
 	};
 	static const char *refreshrate_names[] = 
@@ -488,6 +495,11 @@ void VID_MenuInit( void )
 	temp = Cvar_VariableValue("sw_mode");
 	s_mode_list[SOFTWARE_MENU].curvalue = temp;
 	temp = Cvar_VariableValue("gl_mode");
+#ifdef _WIN32 /* FS: For custom modes */
+	s_mode_list[OPENGL_MENU].maxvalue = (sizeof(resolutions)/sizeof(char *))-2;
+	if(temp < 0)
+		temp = s_mode_list[OPENGL_MENU].maxvalue;
+#endif
 	s_mode_list[OPENGL_MENU].curvalue = temp;
 
 	if ( !scr_viewsize )

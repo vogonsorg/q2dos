@@ -483,8 +483,8 @@ void SP_info_team_start(edict_t *ent)
 	if (ent->groundentity_linkcount == true)
 		level.fullbright = true;
 
-	if (ent->teleport_time)
-		level.fog = ent->teleport_time;
+	if (ent->last_sound_time)
+		level.fog = ent->last_sound_time;
 
 	//fix for mappers who use capital letters for teamid
 	Q_strlwr (ent->pathtarget);

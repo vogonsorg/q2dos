@@ -765,12 +765,18 @@ hover_die(edict_t *self, edict_t *inflictor /* unused */,
 	self->monsterinfo.currentmove = &hover_move_death1;
 }
 
-void hover_dodge (edict_t *self, edict_t *attacker, float eta) /* FS: Zaero specific game dll changes */
+void hover_dodge (edict_t *self, edict_t *attacker /* unused */, float eta /* unused */) /* FS: Zaero specific game dll changes */
 {
 	int delta = 0;
 	vec3_t forward, right;
 	vec3_t dir;
 	int count  = 0;
+
+	if (!self)
+	{
+		return;
+	}
+
 	if (self->monsterinfo.currentmove == &hover_move_attack1)
 		if (random() < 0.75) // if we're attacking, stop attacking and dodge 1/4 the time
 			return;

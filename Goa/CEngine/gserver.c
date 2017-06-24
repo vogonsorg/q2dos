@@ -93,18 +93,18 @@ void ServerParseKeyVals(GServer server, char *keyvals)
 	if(!keyvals || strlen(keyvals) < 11) /* FS: Some kind of bad status packet, forget it. */
 		return;
 
-	/*
-	*keyvals = *keyvals++; // FS: Skip past the OOB_SEQ
+#if 0
+	*keyvals = *keyvals++; /* FS: Skip past the OOB_SEQ */
 	*keyvals = *keyvals++;
 	*keyvals = *keyvals++;
 	*keyvals = *keyvals++;
-	*keyvals = *keyvals++; // P
-	*keyvals = *keyvals++; // R
-	*keyvals = *keyvals++; // I
-	*keyvals = *keyvals++; // N
-	*keyvals = *keyvals++; // T
-	*keyvals = *keyvals++; // newline
-	*/
+	*keyvals = *keyvals++; /* P */
+	*keyvals = *keyvals++; /* R */
+	*keyvals = *keyvals++; /* I */
+	*keyvals = *keyvals++; /* N */
+	*keyvals = *keyvals++; /* T */
+	*keyvals = *keyvals++; /* newline */
+#endif
 	keyvals += 10;
 
 	strncpy(savedkeyvals, keyvals, sizeof(savedkeyvals));

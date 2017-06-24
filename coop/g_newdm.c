@@ -79,7 +79,7 @@ FindSubstituteItem(edict_t *ent)
 		(ent->item->pickup == Pickup_Adrenaline))
 	{
 		/* health pellets stay health pellets */
-		if (!strcmp(ent->classname, "item_health_small"))
+		if (ent->classname && !strcmp(ent->classname, "item_health_small"))
 		{
 			return NULL;
 		}
@@ -159,21 +159,24 @@ FindSubstituteItem(edict_t *ent)
 		/* don't respawn spheres if they're dmflag disabled. */
 		if ((int)dmflags->value & DF_NO_SPHERES)
 		{
-			if (!strcmp(ent->classname, "item_sphere_vengeance") ||
+			if (ent->classname &&
+				(!strcmp(ent->classname, "item_sphere_vengeance") ||
 				!strcmp(ent->classname, "item_sphere_hunter") ||
-				!strcmp(ent->classname, "item_spehre_defender"))
+				!strcmp(ent->classname, "item_spehre_defender")))
 			{
 				continue;
 			}
 		}
 
 		if (((int)dmflags->value & DF_NO_NUKES) &&
+			ent->classname &&
 			!strcmp(ent->classname, "ammo_nuke"))
 		{
 			continue;
 		}
 
 		if (((int)dmflags->value & DF_NO_MINES) &&
+			ent->classname &&
 			(!strcmp(ent->classname, "ammo_prox") || !strcmp(ent->classname, "ammo_tesla")))
 		{
 			continue;
@@ -212,12 +215,14 @@ FindSubstituteItem(edict_t *ent)
 		}
 
 		if (((int)dmflags->value & DF_NO_NUKES) &&
+			ent->classname &&
 			!strcmp(ent->classname, "ammo_nuke"))
 		{
 			continue;
 		}
 
 		if (((int)dmflags->value & DF_NO_MINES) &&
+			ent->classname &&
 			(!strcmp(ent->classname, "ammo_prox") || !strcmp(ent->classname, "ammo_tesla")))
 		{
 			continue;

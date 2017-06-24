@@ -2,29 +2,31 @@
 #include "m_player.h"
 
 /* FS: Flags for sv_vote_disallow_flags */
-#define	VOTE_NOGAMEMODE			0x00000001
-#define	VOTE_NOVANILLA			0x00000002
-#define	VOTE_NOXATRIX			0x00000004
-#define	VOTE_NOROGUE			0x00000008
-#define	VOTE_NOCOOPSKILL		0x00000010
-#define	VOTE_NOMAP				0x00000020
-#define	VOTE_NORANDOMMAPS		0x00000040
-#define VOTE_NORESETMAP			0x00000080
+#define	VOTE_NOGAMEMODE			0x00000002 /* 2 */
+#define	VOTE_NOVANILLA			0x00000004 /* 4 */
+#define	VOTE_NOXATRIX			0x00000008 /* 8 */
+#define	VOTE_NOROGUE			0x00000010 /* 16 */
+#define	VOTE_NOZAERO			0x00000020 /* 32 */
+#define	VOTE_NOCOOPSKILL		0x00000040 /* 64 */
+#define	VOTE_NOMAP				0x00000080 /* 128 */
+#define	VOTE_NORANDOMMAPS		0x00000100 /* 256 */
+#define VOTE_NORESETMAP			0x00000200 /* 512 */
+#define VOTE_NOPLAYEREXIT		0x00000400 /* 1024 */
 
 /* Globals */
-int bVoteInProgress;
+qboolean bVoteInProgress;
 int voteNo;
 int voteYes;
 int voteClients;
 int printOnce;
 int voteCoopSkill;
-const char coopMapFile[] = "mapcoop.txt";
 char voteCbufCmdExecute[MAX_OSPATH];
 char voteMap[MAX_OSPATH];
 char voteType[16];
 char whatAreWeVotingFor[MAX_OSPATH];
 char voteGamemode[16];
 float voteTimer;
+int lastUpdate;
 
 #define MAX_RANDOM_HISTORY 6 /* FS: Remember the last 6 random maps chosen */
 char random_map_array[MAX_RANDOM_HISTORY][MAX_OSPATH];
@@ -53,6 +55,36 @@ void vote_DefaultNoVotes (void);
 void vote_progress (edict_t *ent);
 qboolean vote_mapcheck (edict_t *ent, const char *mapName);
 void vote_warp (edict_t *ent, const char *mapName);
+void VoteMenuChoice(edict_t *ent, pmenuhnd_t *p);
+void vote_menu_broadcast (void);
+void VoteMenuOpen(edict_t *ent);
+void vote_playerexit (edict_t *ent);
+
+#define VOTEMENU_TYPE 6
+#define VOTEMENU_PROGYES 8
+#define VOTEMENU_PROGNO 9
+#define VOTEMENU_PROGTIMER 10
+#define VOTEMENU_YES 12
+#define VOTEMENU_NO 13
+
+pmenu_t voteyesnomenu[] = {
+	{"*Quake II", PMENU_ALIGN_CENTER, NULL},
+	{"*Mara'akate and Freewill", PMENU_ALIGN_CENTER, NULL},
+	{"*Custom Coop", PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"*Vote in progress for:", PMENU_ALIGN_CENTER, NULL}, /* 4 */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL}, /* 6: TYPE */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_LEFT, NULL}, /* 8: YES */
+	{NULL, PMENU_ALIGN_LEFT, NULL}, /* 9: NO */
+	{NULL, PMENU_ALIGN_LEFT, NULL}, /* 10: TIMER */
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"Vote Yes", PMENU_ALIGN_LEFT, VoteMenuChoice}, /* 12 */
+	{"Vote No", PMENU_ALIGN_LEFT, VoteMenuChoice}, /* 13*/
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"Exit", PMENU_ALIGN_LEFT, VoteMenuChoice} /* 14 */
+};
 
 void vote_command(edict_t *ent)
 {
@@ -87,7 +119,7 @@ void vote_command(edict_t *ent)
 	if (argc <= 1 ||
 	    (argc >= 2 && (!Q_stricmp(gi.argv(1), "help") || !Q_stricmp(gi.argv(1), "list") || !Q_stricmp(gi.argv(1), "cmds") || !Q_stricmp(gi.argv(1), "commands"))) )
 	{
-		gi.cprintf(ent, PRINT_HIGH, "usage: vote map <mapname>, vote gamemode <gamemode>, vote skill <coopskill>, vote fraglimit <fraglimit>, vote timelimit <timelimit>, vote tourney <options>, vote restartmap, vote yes, vote no, vote stop, and vote progress.\n");
+		gi.cprintf(ent, PRINT_HIGH, "usage: vote map <mapname>, vote gamemode <gamemode>, vote skill <coopskill>, vote restartmap, vote playerexit, vote yes, vote no, vote stop, and vote progress.\n");
 		return;
 	}
 	if(!Q_stricmp(gi.argv(1), "map"))
@@ -168,6 +200,10 @@ void vote_command(edict_t *ent)
 			return;
 		}
 	}
+	else if (!Q_stricmp(gi.argv(1), "playerexit"))
+	{
+		vote_playerexit(ent);
+	}
 	else if (!Q_stricmp(gi.argv(1), "progress"))
 	{
 		vote_progress(ent);
@@ -176,7 +212,7 @@ void vote_command(edict_t *ent)
 	else
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Unknown vote command: %s.  ", gi.argv(1));
-		gi.cprintf(ent, PRINT_HIGH, "valid options are: vote map <mapname>, vote gamemode <gamemode>, vote skill <coopskill>, vote restartmap, vote yes, vote no, vote stop, and vote progress.\n");
+		gi.cprintf(ent, PRINT_HIGH, "valid options are: vote map <mapname>, vote gamemode <gamemode>, vote skill <coopskill>, vote restartmap, vote playerexit, vote yes, vote no, vote stop, and vote progress.\n");
 		return;
 	}
 }
@@ -186,25 +222,37 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 	char mapCheck[MAX_QPATH];
 	char fileName[MAX_OSPATH];
 	char *mapToken = NULL;
+	char *mapToken2 = NULL;
 	char *fileBuffer = NULL;
+	char *fileBuffer2 = NULL;
 	char *listPtr = NULL;
+	char *listPtr2 = NULL;
 	char separators[] = ",\n";
+	char separators2[] = ",";
 	long fileSize;
+	int mapCount = 0;
 	FILE *f = NULL;
 	size_t toEOF = 0;
+	qboolean retval = false;
 
 	if(!ent || !mapName)
 	{
 		return false;
 	}
 
+	if(sv_coop_maplist->string[0] == 0)
+	{
+		gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: sv_coop_maplist CVAR empty!\n");
+		return false;
+	}
+
 	Sys_Mkdir(va("%s/maps", gamedir->string));
-	Com_sprintf(fileName, sizeof(fileName), "%s/%s", gamedir->string, coopMapFile);
+	Com_sprintf(fileName, sizeof(fileName), "%s/%s", gamedir->string, sv_coop_maplist->string);
 
 	f = fopen(fileName, "r");
 	if(!f)
 	{
-		gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: couldn't find '%s'!\n", coopMapFile);
+		gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: couldn't find '%s'!\n", sv_coop_maplist->string);
 		return false;
 	}
 
@@ -212,7 +260,7 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 	fseek (f, 0, SEEK_END);
 	fileSize = ftell (f);
 	fseek (f, 0, SEEK_SET);
-	fileBuffer = (char *)malloc(sizeof(char)*(fileSize+2)); // FS: In case we have to add a newline terminator
+	fileBuffer = (char *)malloc(sizeof(char)*(fileSize+2)); /* FS: In case we have to add a newline terminator */
 	if(!fileBuffer)
 	{
 		gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: can't allocate memory for fileBuffer!\n");
@@ -223,7 +271,7 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 	fclose(f);
 	if(toEOF <= 0)
 	{
-		gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: cannot read file '%s' into memory!\n", coopMapFile);
+		gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: cannot read file '%s' into memory!\n", sv_coop_maplist->string);
 		return false;
 	}
 
@@ -231,10 +279,13 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 	fileBuffer[toEOF] = '\n';
 	fileBuffer[toEOF+1] = '\0';
 
+	fileBuffer2 = strdup(fileBuffer);
+
 	mapToken = strtok_r(fileBuffer, separators, &listPtr);
-	if(!mapToken)
+	mapToken2 = strtok_r(fileBuffer2, "\n", &listPtr2);
+	if(!mapToken || !mapToken2)
 	{
-		return false;
+		retval = false;
 	}
 
 	Com_sprintf(mapCheck, sizeof(mapCheck), "%s.bsp", mapName);
@@ -243,22 +294,46 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 	{
 		if(!Q_stricmp(mapToken, mapCheck))
 		{
-			mapToken = strtok_r(NULL, separators, &listPtr);
-			if(mapToken)
+			size_t mapTokenSize = strlen(mapToken);
+			while(mapToken2)
 			{
-				Com_sprintf(voteGamemode, sizeof(voteGamemode), "%s", mapToken);
-				return true;
-			}
-			else
-			{
-				gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: %s with no gamemode in '%s'!\n", mapCheck, coopMapFile);
-				return false;
+				if(!strncmp(mapToken, mapToken2, mapTokenSize))
+				{
+					mapToken2 = strtok_r(mapToken2, ",", &listPtr2);
+					mapToken2 = strtok_r(NULL, ",\n", &listPtr2);
+					if(mapToken2)
+					{
+						Com_sprintf(voteGamemode, sizeof(voteGamemode), "%s", mapToken2);
+						if(Q_stricmp(mapToken2, "xatrix") && Q_stricmp(mapToken2, "vanilla") && Q_stricmp(mapToken, "rogue") && Q_stricmp(mapToken, "zaero")) /* FS: We got another one, custom game mode with specific codebase we need i.e. 1492 map needs xatrix code */
+						{
+							mapToken2 = strtok_r(NULL, ",\n", &listPtr2);
+							if(mapToken2)
+							{
+								Com_sprintf(voteGamemode, sizeof(voteGamemode), "%s", mapToken2);
+							}
+						}
+						retval = true;
+						goto cleanup;
+					}
+					else
+					{
+						gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: %s with no gamemode in '%s'!\n", mapCheck, sv_coop_maplist->string);
+						retval = false;
+						goto cleanup;
+					}
+				}
+				mapToken2 = strtok_r(NULL, "\n", &listPtr2);
 			}
 		}
 		mapToken = strtok_r(NULL, separators, &listPtr);
 	}
+cleanup:
+	if(fileBuffer)
+		free(fileBuffer);
+	if(fileBuffer2)
+		free(fileBuffer2);
 
-	return false;
+	return retval;
 }
 
 void vote_map (edict_t *ent, const char *mapName)
@@ -266,6 +341,12 @@ void vote_map (edict_t *ent, const char *mapName)
 	if(!ent || !ent->client)
 	{
 		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_map from a non-player!\n");
+		return;
+	}
+
+	if (!mapName)
+	{
+		return;
 	}
 
 	if (bVoteInProgress)
@@ -302,7 +383,7 @@ void vote_map (edict_t *ent, const char *mapName)
 	Com_sprintf(voteMap, MAX_OSPATH, "%s", mapName);
 	vote_Broadcast("%s votes for %s! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname, voteMap);
 	voteClients = P_Clients_Connected(false);
-	bVoteInProgress = 1;
+	bVoteInProgress = true;
 	Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "%s", voteMap);
 	Com_sprintf(voteType, 16, "map");
 
@@ -313,7 +394,7 @@ void vote_map (edict_t *ent, const char *mapName)
 		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
 	}
 
-	return;
+	vote_menu_broadcast();
 }
 
 void vote_warp (edict_t *ent, const char *mapName)
@@ -365,7 +446,7 @@ void vote_warp (edict_t *ent, const char *mapName)
 	Com_sprintf(voteMap, MAX_OSPATH, "%s", mapName);
 	vote_Broadcast("%s votes for warping to %s! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname, voteMap);
 	voteClients = P_Clients_Connected(false);
-	bVoteInProgress = 1;
+	bVoteInProgress = true;
 	Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "%s", voteMap);
 	Com_sprintf(voteType, 16, "warp");
 
@@ -376,7 +457,7 @@ void vote_warp (edict_t *ent, const char *mapName)
 		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
 	}
 
-	return;
+	vote_menu_broadcast();
 }
 
 void vote_gamemode(edict_t *ent, const char *gamemode)
@@ -430,6 +511,16 @@ void vote_gamemode(edict_t *ent, const char *gamemode)
 
 		Com_sprintf(voteGamemode, 16, "rogue");
 	}
+	else if (!Q_stricmp((char *)gamemode, "zaero"))
+	{
+		if(sv_vote_disallow_flags->intValue & VOTE_NOZAERO)
+		{
+			gi.cprintf(ent, PRINT_HIGH, "Voting for Rogue gamemode change is not allowed on this server.  Vote cancelled.\n");
+			return;
+		}
+
+		Com_sprintf(voteGamemode, 16, "zaero");
+	}
 	else
 	{
 		gi.cprintf(ent, PRINT_HIGH, "error: invalid gamemode!  valid options are: vanilla, xatrix, and rogue.\n");
@@ -437,14 +528,15 @@ void vote_gamemode(edict_t *ent, const char *gamemode)
 	}
 
 	voteClients = P_Clients_Connected(false);
-	bVoteInProgress = 1;
-	voteClients = P_Clients_Connected(false);
+	bVoteInProgress = true;
 	Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "%s", voteGamemode);
 	Com_sprintf(voteType, 16, "gamemode");
 	vote_Broadcast("%s votes for %s: %s! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname, voteType, whatAreWeVotingFor);
 
 	if(sv_vote_assume_yes->intValue)
 		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
+
+	vote_menu_broadcast();
 
 	ent->voteInitiator = true;
 }
@@ -507,8 +599,7 @@ void vote_coopskill(edict_t *ent, int skillVote)
 	}
 
 	voteClients = P_Clients_Connected(false);
-	bVoteInProgress = 1;
-	voteClients = P_Clients_Connected(false);
+	bVoteInProgress = true;
 	Com_sprintf(voteType, 16, "coop difficulty");
 	vote_Broadcast("%s votes for %s: %s! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname, voteType, whatAreWeVotingFor);
 
@@ -516,6 +607,8 @@ void vote_coopskill(edict_t *ent, int skillVote)
 	{
 		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
 	}
+
+	vote_menu_broadcast();
 
 	ent->voteInitiator = true;
 }
@@ -549,7 +642,7 @@ void vote_restartmap (edict_t *ent)
 	Com_sprintf(voteMap, MAX_OSPATH, "%s", level.mapname);
 	vote_Broadcast("%s votes for restarting the map! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname);
 	voteClients = P_Clients_Connected(false);
-	bVoteInProgress = 1;
+	bVoteInProgress = true;
 	Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "%s", voteMap);
 	Com_sprintf(voteType, 16, "restartmap");
 
@@ -559,6 +652,8 @@ void vote_restartmap (edict_t *ent)
 	{
 		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
 	}
+
+	vote_menu_broadcast();
 }
 
 void vote_stop(edict_t *ent)
@@ -695,7 +790,8 @@ void vote_Reset(void)
 
 	voteClients = voteNo = voteYes = voteCoopSkill = 0;
 	voteTimer = level.time + sv_vote_timer->value;
-	bVoteInProgress = 0;
+	lastUpdate = (int)(level.time);
+	bVoteInProgress = false;
 	printOnce = 0;
 	whatAreWeVotingFor[0] = voteMap[0] = voteGamemode[0] = voteType[0] = '\0';
 
@@ -718,6 +814,10 @@ void vote_Reset(void)
 		{
 			pClient->hasVoted = NOT_VOTED;
 			pClient->voteInitiator = false;
+			if((pClient->client->menu) && (pClient->client->menu->menutype == PMENU_VOTE)) /* FS: Close the voting booth */
+			{
+				PMenu_Close(pClient);
+			}
 		}
 	}
 
@@ -744,6 +844,11 @@ void vote_Passed (void)
 			gi.cvar_forceset("sv_coop_gamemode", "rogue");
 			Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "deathmatch 0; coop 1; wait;wait;wait;wait;wait;map rmine1\n");
 		}
+		else if(!Q_stricmp(voteGamemode, "zaero"))
+		{
+			gi.cvar_forceset("sv_coop_gamemode", "zaero");
+			Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "deathmatch 0; coop 1; wait;wait;wait;wait;wait;map zbase1\n");
+		}
 	}
 	else if(!Q_stricmp(voteType, "coop difficulty"))
 	{
@@ -756,6 +861,11 @@ void vote_Passed (void)
 	else if(!Q_stricmp(voteType, "warp"))
 	{
 		Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "wait;wait;wait;wait;wait;gamemap %s\n", voteMap);
+	}
+	else if(!Q_stricmp(voteType, "playerexit"))
+	{
+		gi.cvar_forceset("sv_coop_check_player_exit", voteGamemode); /* FS: Hacky, just reuse voteGamemode */
+		Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "\n");
 	}
 	else
 	{
@@ -849,12 +959,44 @@ void vote_Decide(void)
 	return;
 }
 
+void vote_updateMenu(void) /* FS: Gotta force the menu to be "dirty" so it updates continously for the timer and progress */
+{
+	int z, currentTime;
+	edict_t *pClient;
+
+	currentTime = (int)(level.time);
+
+	if(currentTime > lastUpdate) /* FS: Don't do this all the time, floods too many packets */
+	{
+		for(z = 0; z < game.maxclients; z++ )
+		{
+			pClient = &g_edicts[z + 1];
+			if( !pClient->inuse )
+			{
+				continue;
+			}
+
+			if( pClient->client )
+			{
+				if ((pClient->client->menu) && (pClient->client->menu->menutype == PMENU_VOTE))
+				{
+					pClient->client->menudirty = true;
+				}
+			}
+		}
+
+		lastUpdate = currentTime;
+	}
+}
+
 void vote_Think(void)
 {
 	if(!bVoteInProgress || !sv_vote_enabled->intValue)
 		return;
 
 	voteClients = P_Clients_Connected(false);
+
+	vote_updateMenu(); /* FS: Gotta force the menu to be "dirty" so it updates continously for the timer and progress */
 
 	if(voteNo + voteYes >= voteClients)
 	{
@@ -924,9 +1066,10 @@ void vote_connect (edict_t *ent)
 		return;
 	}
 
-	if(bVoteInProgress && !ent->hasVoted)
+	if(bVoteInProgress && !ent->hasVoted && !ent->client->pers.spectator)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "A vote is in progress for %s: %s. Use vote yes or vote no to submit your vote!\n", voteType, whatAreWeVotingFor);
+		VoteMenuOpen(ent);
 	}
 }
 
@@ -1029,4 +1172,167 @@ void vote_progress (edict_t *ent)
 		gi.cprintf(ent, PRINT_HIGH, "No vote in progress, ");
 		gi.cprintf(ent, PRINT_HIGH, "use vote map <mapname>, vote gamemode <gamemode>, vote skill <coopskill>, vote fraglimit <fraglimit>, or vote timelimit <timelimit> to start a vote!\n");
 	}
+}
+
+void VoteMenuUpdate(edict_t *ent)
+{
+	static char progressYes[32];
+	static char progressNo[32];
+	static char timeRemaining[32];
+	pmenuhnd_t *p;
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	p = ent->client->menu;
+	if(!p)
+	{
+		return;
+	}
+
+	Com_sprintf(progressYes, sizeof(progressYes), "Yes: %d\n", voteYes);
+	Com_sprintf(progressNo, sizeof(progressNo), "No: %d\n", voteNo);
+	Com_sprintf(timeRemaining, sizeof(timeRemaining), "Vote Time: %d\n", (int)(voteTimer-level.time));
+
+	PMenu_UpdateEntry(p->entries + VOTEMENU_PROGYES, progressYes, PMENU_ALIGN_LEFT, NULL);
+	PMenu_UpdateEntry(p->entries + VOTEMENU_PROGNO, progressNo, PMENU_ALIGN_LEFT, NULL);
+	PMenu_UpdateEntry(p->entries + VOTEMENU_PROGTIMER, timeRemaining, PMENU_ALIGN_LEFT, NULL);
+}
+
+void VoteMenuInit(edict_t *ent)
+{
+	static char votestring[32];
+	static char progressYes[32];
+	static char progressNo[32];
+	static char timeRemaining[32];
+
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	Com_sprintf(votestring, sizeof(votestring), "%s: %s", voteType, whatAreWeVotingFor);
+	Com_sprintf(progressYes, sizeof(progressYes), "Yes: %d\n", voteYes);
+	Com_sprintf(progressNo, sizeof(progressNo), "No: %d\n", voteNo);
+	Com_sprintf(timeRemaining, sizeof(timeRemaining), "Vote Time: %d\n", (int)(voteTimer-level.time));
+
+	voteyesnomenu[VOTEMENU_TYPE].text = votestring;
+	voteyesnomenu[VOTEMENU_PROGYES].text = progressYes;
+	voteyesnomenu[VOTEMENU_PROGNO].text = progressNo;
+	voteyesnomenu[VOTEMENU_PROGTIMER].text = timeRemaining;
+}
+
+void VoteMenuOpen(edict_t *ent)
+{
+	if(!ent || !ent->client)
+	{
+		return;
+	}
+
+	PMenu_Close(ent);
+	VoteMenuInit(ent);
+	PMenu_Open(ent, voteyesnomenu, 0, sizeof(voteyesnomenu) / sizeof(pmenu_t), NULL, PMENU_VOTE);
+	ent->client->menu_update = VoteMenuUpdate;
+}
+
+void VoteMenuChoice(edict_t *ent, pmenuhnd_t *p)
+{
+	if(!ent || !ent->client || !p)
+	{
+		return;
+	}
+
+	switch (p->cur)
+	{
+	case VOTEMENU_YES:
+		vote_yes(ent, false);
+		break;
+	case VOTEMENU_NO:
+		vote_no(ent);
+		break;
+	default:
+		break;
+	}
+
+	PMenu_Close(ent);
+}
+
+void vote_menu_broadcast (void)
+{
+	int z;
+	edict_t *pClient;
+
+	for(z = 0; z < game.maxclients; z++ )
+	{
+		pClient = &g_edicts[z + 1];
+		if( !pClient->inuse )
+		{
+			continue;
+		}
+
+		if( pClient->client )
+		{
+			if (pClient->client->pers.spectator) /* FS: Don't count spectators */
+			{
+				continue;
+			}
+
+			if(pClient->hasVoted)
+			{
+				continue;
+			}
+
+			VoteMenuOpen(pClient);
+		}
+	}
+}
+
+void vote_playerexit (edict_t *ent)
+{
+	if(!ent || !ent->client)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_playerexit from a non-player!\n");
+	}
+
+	if (bVoteInProgress)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "A vote is already in progress for %s: %s!\n", voteType, whatAreWeVotingFor);
+		return;
+	}
+
+	vote_Reset();
+
+	if(sv_vote_disallow_flags->intValue & VOTE_NOPLAYEREXIT)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Voting for changing player exit requirements are not allowed on this server.  Vote cancelled.\n");
+		return;
+	}
+
+	if (sv_coop_check_player_exit->intValue)
+	{
+		vote_Broadcast("%s votes for changing player exit requirements to disabled! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname);
+		Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "Req. Disabled");
+		Com_sprintf(voteGamemode, sizeof(voteGamemode), "0");
+	}
+	else
+	{
+		vote_Broadcast("%s votes for changing player exit requirements to enabled! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname);
+		Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "Req. Enabled");
+		Com_sprintf(voteGamemode, sizeof(voteGamemode), "1");
+	}
+
+	voteClients = P_Clients_Connected(false);
+	bVoteInProgress = true;
+	Com_sprintf(voteType, 16, "playerexit");
+
+	ent->voteInitiator = true;
+
+	if(sv_vote_assume_yes->intValue)
+	{
+		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
+	}
+
+	vote_menu_broadcast();
 }

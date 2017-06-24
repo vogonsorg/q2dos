@@ -46,8 +46,13 @@ cvar_t *sv_airaccelerate;
 
 cvar_t  *sv_noreload;                   // don't reload level state when reentering
 
+#ifndef DEDICATED_ONLY
 extern cvar_t  *maxclients;                    // FIXME: rename sv_maxclients
                                         //made extern from a collision in watcom
+#else
+cvar_t	*maxclients;
+#endif
+
 cvar_t  *sv_showclamp;
 
 cvar_t  *hostname;
@@ -59,10 +64,10 @@ cvar_t	*sv_entfile;	// Knightmare 6/25/12- cvar to control use of .ent files
 cvar_t	*sv_skipcinematics; /* FS: Skip cinematics if we want to. */
 cvar_t	*sv_allow_download_maps_in_paks; /* FS: Allow bsp downloads from a pak file if we want to. */
 cvar_t	*sv_downloadserver; /* FS: From R1Q2: HTTP Downloading */
-cvar_t	*sv_auto_save; /* FS: Auto save toggling. */
-#ifdef _DEBUG
-cvar_t		*sv_override_spawn_points; /* FS: Override spawn points for debug testing. */
-#endif /* _DEBUG */
+
+/* FS: Added these to filter out wallfly's spammy rcon status request every 30 seconds */
+cvar_t		*sv_filter_wallfly_rcon_request;
+cvar_t		*sv_filter_wallfly_ip;
 
 void Master_Shutdown (void);
 
@@ -561,8 +566,12 @@ gotnewcl:
 	Netchan_Setup (NS_SERVER, &newcl->netchan , adr, qport);
 
 	newcl->state = cs_connected;
-	
+
 	SZ_Init (&newcl->datagram, newcl->datagram_buf, sizeof(newcl->datagram_buf) );
+	if ((maxclients->intValue > 1) && !(newcl->netchan.remote_address.type == NA_LOOPBACK)) /* FS: Enforce a 1400 MTU size for datagram packets. */
+	{
+		newcl->datagram.maxsize = MAX_MSGLEN_MP; /* FS: MAX_MSGLEN is now for single player */
+	}
 	newcl->datagram.allowoverflow = true;
 	newcl->lastmessage = svs.realtime;	// don't timeout
 	newcl->lastconnect = svs.realtime;
@@ -577,6 +586,75 @@ int Rcon_Validate (void)
 		return 0;
 
 	return 1;
+}
+
+void SVC_FilterRconRequest(int i, char *ip, char* data) /* FS: Filter out spammy wallfly rcon status requests from tastyspleen connected servers :/ */
+{
+	char *ipNoPort = NULL;
+	char *ipToken = NULL;
+	char *ipPtr = NULL;
+	static const char seperators[] = ":\n";
+
+	qboolean bDoDPrintf = false;
+
+	if(!ip)
+	{
+		Com_Printf("No IP address for RCON request!\n");
+		return;
+	}
+
+	if(!data)
+	{
+		Com_Printf("No data for RCON request from: %s\n", ip);
+	}
+
+	ipNoPort = strdup(ip);
+
+	ipToken = strtok_r(ipNoPort, seperators, &ipPtr);
+	if(!ipToken)
+	{
+		Com_Printf("ipToken is NULL!\n");
+		return;
+	}
+
+	if(sv_filter_wallfly_rcon_request->intValue)
+	{
+		if(!Q_stricmp(ipToken, sv_filter_wallfly_ip->string))
+		{
+			bDoDPrintf = true;
+		}
+		else
+		{
+			bDoDPrintf = false;
+		}
+	}
+	else
+	{
+		bDoDPrintf = false;
+	}
+
+	if(bDoDPrintf)
+	{
+		if (i == 0)
+		{
+			Com_DPrintf (DEVELOPER_MSG_SERVER, "Bad rcon from %s:\n%s\n", ip, net_message.data+4);
+		}
+		else
+		{
+			Com_DPrintf (DEVELOPER_MSG_SERVER, "Rcon from %s:\n%s\n", ip, net_message.data+4);
+		}
+	}
+	else
+	{
+		if (i == 0)
+		{
+			Com_Printf ("Bad rcon from %s:\n%s\n", ip, net_message.data+4);
+		}
+		else
+		{
+			Com_Printf ("Rcon from %s:\n%s\n", ip, net_message.data+4);
+		}
+	}
 }
 
 /*
@@ -595,10 +673,7 @@ void SVC_RemoteCommand (void)
 
 	i = Rcon_Validate ();
 
-	if (i == 0)
-		Com_Printf ("Bad rcon from %s:\n%s\n", NET_AdrToString (net_from), net_message.data+4);
-	else
-		Com_Printf ("Rcon from %s:\n%s\n", NET_AdrToString (net_from), net_message.data+4);
+	SVC_FilterRconRequest(i, NET_AdrToString(net_from), (char *)net_message.data+4);
 
 	Com_BeginRedirect (RD_PACKET, sv_outputbuf, SV_OUTPUTBUF_LENGTH, SV_FlushRedirect);
 
@@ -1119,8 +1194,13 @@ void SV_Init (void)
 	Cvar_Get ("fraglimit", "0", CVAR_SERVERINFO);
 	Cvar_Get ("timelimit", "0", CVAR_SERVERINFO);
 	Cvar_Get ("cheats", "0", CVAR_SERVERINFO|CVAR_LATCH);
-	Cvar_Get ("protocol", va("%i", PROTOCOL_VERSION), CVAR_SERVERINFO|CVAR_NOSET);;
+	Cvar_Get ("protocol", va("%i", PROTOCOL_VERSION), CVAR_SERVERINFO|CVAR_NOSET);
+
+#ifdef DEDICATED_ONLY
+	maxclients = Cvar_Get ("maxclients", "8", CVAR_SERVERINFO | CVAR_LATCH);
+#else
 	maxclients = Cvar_Get ("maxclients", "1", CVAR_SERVERINFO | CVAR_LATCH);
+#endif
 	hostname = Cvar_Get ("hostname", "noname", CVAR_SERVERINFO | CVAR_ARCHIVE);
 	timeout = Cvar_Get ("timeout", "125", 0);
 	zombietime = Cvar_Get ("zombietime", "2", 0);
@@ -1140,12 +1220,6 @@ void SV_Init (void)
 	/* FS: Added */
 	sv_skipcinematics = Cvar_Get ("sv_skipcinematics", "0", CVAR_ARCHIVE);
 	sv_skipcinematics->description = "Skip the loading of *.cin cinematics";
-	sv_auto_save = Cvar_Get("sv_auto_save", "1", CVAR_ARCHIVE);
-	sv_auto_save->description = "Toggles auto saving between level transitions.";
-#ifdef _DEBUG
-	sv_override_spawn_points = Cvar_Get ("sv_override_spawn_points", "0", 0); /* FS: Override spawn points for debug testing. */
-	sv_override_spawn_points->description = "Override spawn points for debug testing.  Only available in debug builds.";
-#endif /* _DEBUG */
 
 	/* FS: Allow bsp downloads from a pak file if we want to. */
 	sv_allow_download_maps_in_paks = Cvar_Get ("sv_allow_download_maps_in_paks", "1", 0);
@@ -1154,6 +1228,12 @@ void SV_Init (void)
 	/* FS: From R1Q2: HTTP Downloading */
 	sv_downloadserver = Cvar_Get ("sv_downloadserver", "", 0);
 	sv_downloadserver->description = "URL to a location where clients can download game content over HTTP. Default empty.  Path leads to game dir name.  i.e. quake2.com/baseq2/maps\n";
+
+	/* FS: Added these to filter out wallfly's spammy rcon status request every 30 seconds */
+	sv_filter_wallfly_rcon_request = Cvar_Get ("sv_filter_wallfly_rcon_request", "0", 0);
+	sv_filter_wallfly_rcon_request->description = "Filter rcon requests from WallFly[BZZZ]/Tastyspleen linked servers.  If set, sv_filter_wallfly_ip is needed and DEVELOPER_MSG_SERVER will be required to see WallFly RCONs.";
+	sv_filter_wallfly_ip = Cvar_Get ("sv_filter_wallfly_ip", "74.86.102.74", 0);
+	sv_filter_wallfly_ip->description = "WallFly/Tastyspleen IP for filtering rcon requests.  Requires sv_filter_wallfly_rcon_request CVAR to be enabled.";
 
 	sv_noreload = Cvar_Get ("sv_noreload", "0", 0);
 

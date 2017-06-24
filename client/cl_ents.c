@@ -807,56 +807,6 @@ INTERPOLATE BETWEEN FRAMES TO GET RENDERING PARMS
 ==========================================================================
 */
 
-struct model_s *S_RegisterSexedModel (entity_state_t *ent, char *base)
-{
-	int				n;
-	char			*p;
-	struct model_s	*mdl;
-	char			model[MAX_QPATH];
-	char			buffer[MAX_QPATH];
-
-	// determine what model the client is using
-	model[0] = 0;
-	n = CS_PLAYERSKINS + ent->number - 1;
-	if (cl.configstrings[n][0])
-	{
-		p = strchr(cl.configstrings[n], '\\');
-		if (p)
-		{
-			p += 1;
-		//	strncpy(model, p);
-			Q_strncpyz(model, p, sizeof(model));
-			p = strchr(model, '/');
-			if (p)
-				*p = 0;
-		}
-	}
-	// if we can't figure it out, they're male
-	if (!model[0])
-	//	strncpy(model, "male");
-		Q_strncpyz(model, "male", sizeof(model));
-
-	Com_sprintf (buffer, sizeof(buffer), "players/%s/%s", model, base+1);
-	mdl = re.RegisterModel(buffer);
-	if (!mdl) {
-		// not found, try default weapon model
-		Com_sprintf (buffer, sizeof(buffer), "players/%s/weapon.md2", model);
-		mdl = re.RegisterModel(buffer);
-		if (!mdl) {
-			// no, revert to the male model
-			Com_sprintf (buffer, sizeof(buffer), "players/%s/%s", "male", base+1);
-			mdl = re.RegisterModel(buffer);
-			if (!mdl) {
-				// last try, default male weapon.md2
-				Com_sprintf (buffer, sizeof(buffer), "players/male/weapon.md2");
-				mdl = re.RegisterModel(buffer);
-			}
-		} 
-	}
-
-	return mdl;
-}
-
 // PMM - used in shell code 
 extern int Developer_searchpath (int who);
 // pmm

@@ -9,6 +9,8 @@
 #define LASER_FAT 0x0040 /* FS: Coop: Rogue specific */
 #define LASER_STOPWINDOW 0x0080 /* FS: Coop: Rogue specific */
 
+#define EMP_STYLE	1 /* FS: Zaero specific game dll changes */
+
 void ED_CallSpawn(edict_t *ent);
 
 /*
@@ -329,6 +331,27 @@ SP_target_goal(edict_t *ent)
  * "delay"		wait this long before going off
  * "dmg"		how much radius damage should be done, defaults to 0
  */
+
+void target_explosion_explode_think(edict_t *self) /* FS: Zaero specific game dll changes */
+{
+	if (!self)
+	{
+		return;
+	}
+
+	if(self->s.frame >= 5)
+	{
+		self->svflags |= SVF_NOCLIENT;
+		return;
+	}
+	else
+		self->nextthink = level.time + FRAMETIME;
+
+	// advance the frame/skin
+	self->s.frame++;
+	self->s.skinnum++;
+}
+
 void
 target_explosion_explode(edict_t *self)
 {
@@ -339,10 +362,29 @@ target_explosion_explode(edict_t *self)
 		return;
 	}
 
-	gi.WriteByte(svc_temp_entity);
-	gi.WriteByte(TE_EXPLOSION1);
-	gi.WritePosition(self->s.origin);
-	gi.multicast(self->s.origin, MULTICAST_PHS);
+	if ((game.gametype == zaero_coop) && (self->spawnflags & EMP_STYLE)) /* FS: Zaero specific game dll changes */
+	{
+		// play the sound
+		gi.positioned_sound(self->s.origin, self, CHAN_AUTO, gi.soundindex("weapons/a2k/ak_exp01.wav"), 1, ATTN_NORM, 0);
+
+		// setup the model
+		self->movetype = MOVETYPE_NONE;
+		self->solid = SOLID_NOT;
+		self->s.modelindex = gi.modelindex("models/objects/b_explode/tris.md2");
+		self->s.skinnum = 6;
+		self->s.frame = 0;
+		self->svflags &= ~SVF_NOCLIENT;
+		self->think = target_explosion_explode_think;
+		self->nextthink = level.time + FRAMETIME;
+		gi.linkentity(self);
+	}
+	else
+	{
+		gi.WriteByte (svc_temp_entity);
+		gi.WriteByte (TE_EXPLOSION1);
+		gi.WritePosition (self->s.origin);
+		gi.multicast (self->s.origin, MULTICAST_PHS);
+	}
 
 	T_RadiusDamage(self, self->activator, self->dmg,
 			NULL, self->dmg + 40, MOD_EXPLOSIVE);
@@ -391,12 +433,78 @@ SP_target_explosion(edict_t *ent)
  * QUAKED target_changelevel (1 0 0) (-8 -8 -8) (8 8 8)
  * Changes level to "map" when fired
  */
+
+void changelevel_dummy(edict_t *self)
+{
+	/* FS: Purposely does nothing */
+}
+
+#define VectorDistance(v1, v2) (sqrt( (((v2)[0] - (v1)[0]) * ((v2)[0] - (v1)[0])) + (((v2)[1] - (v1)[1]) * ((v2)[1] - (v1)[1])) + (((v2)[2] - (v1)[2]) * ((v2)[2] - (v1)[2])) ) )
+
+float Coop_Players_In_Range(edict_t *activator) /* FS: Get player distance so we can't get morons who keep backpedalling to fuck the game up */
+{
+	int i, playersInGame, playersClose;
+	float dist, closePercentage;
+	edict_t *ent;
+
+	if (!activator)
+	{
+		return 0.0f;
+	}
+
+	playersInGame = playersClose = 0;
+	for (i = 0; i < game.maxclients; i ++)
+	{
+		ent = &g_edicts[i + 1];
+
+		if (!ent || !ent->inuse || !ent->client || ent->client->pers.spectator)
+		{
+			continue;
+		}
+
+		playersInGame++;
+
+		dist = VectorDistance(activator->s.origin, ent->s.origin);
+		if (dist <= 200.0f)
+		{
+			playersClose++;
+		}
+	}
+
+	if(!playersClose || !playersInGame)
+	{
+		return 0.0f;
+	}
+
+	closePercentage = (float)playersClose / (float)playersInGame;
+
+	return closePercentage;
+}
+
 void
 use_target_changelevel(edict_t *self, edict_t *other, edict_t *activator)
 {
 	if (!self || !other  || !activator)
 	{
 		return;
+	}
+
+	if (coop->intValue && sv_coop_check_player_exit->intValue)
+	{
+		if(self->nextthink < level.time)
+		{
+			if(Coop_Players_In_Range(activator) <= 0.50f) /* FS: Need at least 51% of players at the exit to continue on */
+			{
+				self->think = changelevel_dummy;
+				self->nextthink = level.time + 1.0f;
+				gi.bprintf(PRINT_HIGH, "%s is at the exit.\n", activator->client->pers.netname);
+				return;
+			}
+		}
+		else
+		{
+			return;
+		}
 	}
 
 	if (level.intermissiontime)
@@ -423,7 +531,7 @@ use_target_changelevel(edict_t *self, edict_t *other, edict_t *activator)
 	}
 
 	/* if multiplayer, let everyone know who hit the exit */
-	if (deathmatch->value)
+	if (maxclients->intValue > 1) /* FS: Show it in Coop too */
 	{
 		if (activator && activator->client)
 		{
@@ -433,7 +541,7 @@ use_target_changelevel(edict_t *self, edict_t *other, edict_t *activator)
 	}
 
 	/* if going to a new unit, clear cross triggers */
-	if (strstr(self->map, "*"))
+	if (self->map && strstr(self->map, "*"))
 	{
 		game.serverflags &= ~(SFL_CROSS_TRIGGER_MASK);
 	}
@@ -560,12 +668,24 @@ use_target_spawner(edict_t *self, edict_t *other /* unused */, edict_t *activato
 	VectorCopy(self->s.angles, ent->s.angles);
 	ED_CallSpawn(ent);
 	gi.unlinkentity(ent);
-	KillBox(ent);
+	if(game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		MonsterKillBox (ent);
+	}
+	else
+	{
+		KillBox(ent);
+	}
 	gi.linkentity(ent);
 
 	if (self->speed)
 	{
 		VectorCopy(self->movedir, ent->velocity);
+	}
+
+	if(game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		MonsterPlayerKillBox (ent);
 	}
 
 	ent->s.renderfx |= RF_IR_VISIBLE; /* FS: Coop: Rogue specific */
@@ -616,6 +736,12 @@ use_target_blaster(edict_t *self, edict_t *other /* unused */, edict_t *activato
 {
 	if (!self)
 	{
+		return;
+	}
+
+	if((game.gametype == zaero_coop) && (EMPNukeCheck(self, self->s.origin))) /* FS: Zaero specific game dll changes */
+	{
+		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
 		return;
 	}
 
@@ -1194,7 +1320,7 @@ target_lightramp_use(edict_t *self, edict_t *other /* unused */, edict_t *activa
 				break;
 			}
 
-			if (strcmp(e->classname, "light") != 0)
+			if (!e->classname || strcmp(e->classname, "light") != 0)
 			{
 				gi.dprintf(DEVELOPER_MSG_GAME, "%s at %s ", self->classname, vtos(self->s.origin));
 				gi.dprintf(DEVELOPER_MSG_GAME, "target %s (%s at %s) is not a light\n", self->target,

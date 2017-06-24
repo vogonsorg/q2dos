@@ -295,7 +295,7 @@ G_UseTargets(edict_t *ent, edict_t *activator)
 	}
 
 	/* print the message */
-	if ((ent->message) && !(activator->svflags & SVF_MONSTER))
+	if ((activator) && (ent->message) && !(activator->svflags & SVF_MONSTER))
 	{
 		if(coop->intValue && activator->client && activator->client->pers.netname && strcmp("This item must be activated to use it.", ent->message)) /* FS: Coop: Print any use target stuff as global map message to all players */
 		{
@@ -346,19 +346,22 @@ G_UseTargets(edict_t *ent, edict_t *activator)
 				}
 			}
 
-			/* decrement secret count if target_secret is removed */
-			if (!Q_stricmp(t->classname,"target_secret"))
+			if(t->classname)
 			{
-				level.total_secrets--;
-			}
-			/* same deal with target_goal, but also turn off CD music if applicable */
-			else if (!Q_stricmp(t->classname,"target_goal"))
-			{
-				level.total_goals--;
-
-				if (level.found_goals >= level.total_goals)
+				/* decrement secret count if target_secret is removed */
+				if (!Q_stricmp(t->classname,"target_secret"))
 				{
-					gi.configstring (CS_CDTRACK, "0");
+					level.total_secrets--;
+				}
+				/* same deal with target_goal, but also turn off CD music if applicable */
+				else if (!Q_stricmp(t->classname,"target_goal"))
+				{
+					level.total_goals--;
+
+					if (level.found_goals >= level.total_goals)
+					{
+						gi.configstring (CS_CDTRACK, "0");
+					}
 				}
 			}
 
@@ -380,9 +383,9 @@ G_UseTargets(edict_t *ent, edict_t *activator)
 		while ((t = G_Find(t, FOFS(targetname), ent->target)))
 		{
 			/* doors fire area portals in a specific way */
-			if (!Q_stricmp(t->classname, "func_areaportal") &&
-				(!Q_stricmp(ent->classname, "func_door") ||
-				 !Q_stricmp(ent->classname, "func_door_rotating")))
+			if ((t->classname && !Q_stricmp(t->classname, "func_areaportal")) &&
+				(ent->classname && (!Q_stricmp(ent->classname, "func_door") ||
+				 !Q_stricmp(ent->classname, "func_door_rotating"))))
 			{
 				continue;
 			}
@@ -805,6 +808,7 @@ G_FreeEdict(edict_t *ed)
 	ed->classname = "freed";
 	ed->freetime = level.time;
 	ed->inuse = false;
+	ed->nextthink = 0;    // just in case freed before a nextthink... /* FS: Zaero specific game dll changes */
 }
 
 void
@@ -929,3 +933,156 @@ KillBox(edict_t *ent)
 	return true; /* all clear */
 }
 
+/*
+=================
+MonsterKillBox
+
+Kills all entities except players that would touch the proposed new 
+positioning of ent.  Ent should be unlinked before calling this!
+=================
+*/
+qboolean MonsterKillBox (edict_t *ent) /* FS: Zaero specific game dll changes */
+{
+	trace_t		tr;
+
+	while (1)
+	{
+		tr = gi.trace (ent->s.origin, ent->mins, ent->maxs, ent->s.origin, NULL, MASK_PLAYERSOLID);
+		if (!tr.ent)
+			break;
+
+    if(!((ent->svflags & SVF_MONSTER) && tr.ent->client && tr.ent->health))
+    {
+		  // nail it
+		  T_Damage (tr.ent, ent, ent, vec3_origin, ent->s.origin, vec3_origin, 100000, 0, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
+    }
+
+		// if we didn't kill it, fail
+		if (tr.ent->solid)
+			return false;
+	}
+
+	return true;		// all clear
+}
+
+/*
+=================
+MonsterPlayerKillBox
+
+Kills all entities except players that would touch the proposed new 
+positioning of ent.  Ent should be unlinked before calling this!
+=================
+*/
+qboolean MonsterPlayerKillBox (edict_t *ent) /* FS: Zaero specific game dll changes */
+{
+	trace_t		tr;
+
+	while (1)
+	{
+		tr = gi.trace (ent->s.origin, ent->mins, ent->maxs, ent->s.origin, ent, MASK_PLAYERSOLID);
+		if (!tr.ent)
+			break;
+
+    if((ent->svflags & SVF_MONSTER) && tr.ent->client && tr.ent->health)
+    {
+		  // nail myself
+		  T_Damage (ent, ent, ent, vec3_origin, ent->s.origin, vec3_origin, 100000, 0, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
+      return true;
+    }
+    else
+    {
+		  // nail it
+		  T_Damage (tr.ent, ent, ent, vec3_origin, ent->s.origin, vec3_origin, 100000, 0, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
+    }
+
+		// if we didn't kill it, fail
+		if (tr.ent->solid)
+			return false;
+	}
+
+	return true;		// all clear
+}
+
+edict_t *Find_LikePlayer (edict_t *ent, char *name, qboolean exactMatch) /* FS: People want this for various Tastyspleen-like commands */
+{
+	int i, count;
+	edict_t *player = NULL;
+	edict_t *foundPlayer = NULL;
+	char *nameLwrd = NULL;
+
+	if (!ent || !ent->client || !name || !name[0])
+	{
+		return NULL;
+	}
+
+	if(!strncmp(name, "LIKE ", 5))
+	{
+		name+=5;
+		if(!name || !name[0])
+		{
+			gi.cprintf(ent, PRINT_HIGH, "No name specified after LIKE.  Aborting search!\n");
+			return NULL;
+		}
+	}
+
+	i = count = 0;
+
+	nameLwrd = Q_strlwr(name);
+	if(!nameLwrd)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Name is NULL.  Aborting search!\n");
+		return NULL;
+	}
+
+	for (i = 0; i < maxclients->intValue; i++)
+	{
+		char *netName;
+		player = &g_edicts[i+1];
+
+		if(!player || !player->inuse || !player->client)
+		{
+			continue;
+		}
+
+		netName = strdup(player->client->pers.netname);
+
+		netName = Q_strlwr(netName);
+
+		if(exactMatch)
+		{
+			if(!Q_stricmp(netName, nameLwrd))
+			{
+				foundPlayer = player;
+				count++;
+			}
+		}
+		else
+		{
+			if(strstr(netName, nameLwrd))
+			{
+				foundPlayer = player;
+				count++;
+			}
+		}
+
+		if(netName)
+		{
+			free(netName);
+			netName = NULL;
+		}
+	}
+
+	if (count > 1)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "2 or more player name matches.\n");
+		return NULL;
+	}
+
+	if (count)
+	{
+		return foundPlayer;
+	}
+
+	gi.cprintf(ent, PRINT_HIGH, "no player name matches found.\n");
+	return NULL;
+}

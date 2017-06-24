@@ -78,7 +78,12 @@ This replaces the QC functions: ai_forward, ai_back, ai_pain, and ai_painforward
 */
 void ai_move (edict_t *self, float dist)
 {
-	M_walkmove (self, self->s.angles[YAW], dist);
+	if (!self)
+	{
+		return;
+	}
+
+	M_walkmove(self, self->s.angles[YAW], dist);
 }
 
 
@@ -203,7 +208,11 @@ void ai_charge (edict_t *self, float dist)
 		return;
 	}
 
-	VectorSubtract(self->enemy->s.origin, self->s.origin, v);
+
+	if(self->enemy)
+	{
+		VectorSubtract(self->enemy->s.origin, self->s.origin, v);
+	}
 	self->ideal_yaw = vectoyaw(v);
 	M_ChangeYaw(self);
 
@@ -388,7 +397,11 @@ void HuntTarget (edict_t *self)
 	{
 		self->monsterinfo.run (self);
 	}
-	VectorSubtract (self->enemy->s.origin, self->s.origin, vec);
+
+	if(visible(self, self->enemy))
+	{
+		VectorSubtract(self->enemy->s.origin, self->s.origin, vec);
+	}
 	self->ideal_yaw = vectoyaw(vec);
 	// wait a while before first attack
 	if (!(self->monsterinfo.aiflags & AI_STAND_GROUND))
@@ -399,7 +412,7 @@ void HuntTarget (edict_t *self)
 
 void FoundTarget (edict_t *self)
 {
-	if (!self)
+	if (!self || !self->enemy || !self->enemy->inuse) /* FS: Need self->enemy check */
 	{
 		return;
 	}
@@ -411,7 +424,7 @@ void FoundTarget (edict_t *self)
 		level.sight_entity->light_level = 128;
 	}
 
-	self->show_hostile = level.time + 1;		// wake up other monsters
+	self->show_hostile = (int)level.time + 1;		// wake up other monsters
 
 	VectorCopy(self->enemy->s.origin, self->monsterinfo.last_sighting);
 	self->monsterinfo.trail_time = level.time;
@@ -583,7 +596,7 @@ qboolean FindTarget (edict_t *self)
 
 		if (r == RANGE_NEAR)
 		{
-			if ((client->show_hostile < level.time) && !infront(self, client))
+			if ((client->show_hostile < (int)level.time) && !infront(self, client))
 			{
 				return false;
 			}
@@ -704,7 +717,7 @@ qboolean M_CheckAttack (edict_t *self)
 	float	chance;
 	trace_t	tr;
 
-	if (!self)
+	if (!self || !self->enemy || !self->enemy->inuse) /* FS: Need self->enemy check */
 	{
 		return false;
 	}
@@ -911,8 +924,9 @@ qboolean ai_checkattack (edict_t *self, float dist)
 	vec3_t		temp;
 	qboolean	hesDeadJim;
 
-	if (!self)
+	if (!self || !self->enemy || !self->enemy->inuse) /* FS: Need self->enemy check */
 	{
+		enemy_vis = false;
 		return false;
 	}
 
@@ -925,9 +939,10 @@ qboolean ai_checkattack (edict_t *self, float dist)
 			return false;
 		}
 
-		if (self->monsterinfo.aiflags & AI_SOUND_TARGET)
+		/* only check sound if it's not visible anyway (=> attack if visible) */
+		if ((self->monsterinfo.aiflags & AI_SOUND_TARGET) && !visible(self, self->goalentity))
 		{
-			if ((level.time - self->enemy->teleport_time) > 5.0)
+			if ((level.time - self->enemy->last_sound_time) > 5.0)
 			{
 				if (self->goalentity == self->enemy)
 				{
@@ -950,7 +965,7 @@ qboolean ai_checkattack (edict_t *self, float dist)
 			}
 			else
 			{
-				self->show_hostile = level.time + 1;
+				self->show_hostile = (int)level.time + 1;
 				return false;
 			}
 		}
@@ -1021,7 +1036,7 @@ qboolean ai_checkattack (edict_t *self, float dist)
 		}
 	}
 
-	self->show_hostile = level.time + 1;		// wake up other monsters
+	self->show_hostile = (int)level.time + 1;		// wake up other monsters
 
 // check knowledge of enemy
 	enemy_vis = visible(self, self->enemy);
@@ -1031,7 +1046,8 @@ qboolean ai_checkattack (edict_t *self, float dist)
 		VectorCopy (self->enemy->s.origin, self->monsterinfo.last_sighting);
 	}
 
-	if (coop && coop->value && (self->monsterinfo.search_time < level.time))
+	/* look for other coop players here */
+	if (coop->value && (self->monsterinfo.search_time < level.time))
 	{
 		if (FindTarget (self))
 		{
@@ -1039,12 +1055,13 @@ qboolean ai_checkattack (edict_t *self, float dist)
 		}
 	}
 
-	enemy_infront = infront(self, self->enemy);
-	enemy_range = range(self, self->enemy);
-	VectorSubtract (self->enemy->s.origin, self->s.origin, temp);
-	enemy_yaw = vectoyaw(temp);
-
-	// JDC self->ideal_yaw = enemy_yaw;
+	if(self->enemy)
+	{
+		enemy_infront = infront(self, self->enemy);
+		enemy_range = range(self, self->enemy);
+		VectorSubtract(self->enemy->s.origin, self->s.origin, temp);
+		enemy_yaw = vectoyaw(temp);
+	}
 
 	if (self->monsterinfo.attack_state == AS_MISSILE)
 	{
@@ -1088,7 +1105,7 @@ void ai_run (edict_t *self, float dist)
 	float		left, center, right;
 	vec3_t		left_target, right_target;
 
-	if (!self)
+	if (!self || !self->enemy || !self->enemy->inuse) /* FS: Need self->enemy check */
 	{
 		return;
 	}
@@ -1274,6 +1291,11 @@ void ai_run (edict_t *self, float dist)
 	}
 
 	M_MoveToGoal (self, dist);
+
+	if (!self->inuse)
+	{
+		return;
+	}
 
 	G_FreeEdict(tempgoal);
 

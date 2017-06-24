@@ -1104,6 +1104,11 @@ func_explosive_use(edict_t *self, edict_t *other, edict_t *activator)
 void
 func_explosive_spawn(edict_t *self, edict_t *other, edict_t *activator)
 {
+	if (!self)
+	{
+		return;
+	}
+
 	self->solid = SOLID_BSP;
 	self->svflags &= ~SVF_NOCLIENT;
 	self->use = NULL;
@@ -1888,6 +1893,11 @@ SP_misc_viper(edict_t *ent)
 void
 SP_misc_bigviper(edict_t *ent)
 {
+	if (!ent)
+	{
+		return;
+	}
+
 	ent->movetype = MOVETYPE_NONE;
 	ent->solid = SOLID_BBOX;
 	VectorSet(ent->mins, -176, -120, -24);
@@ -2316,6 +2326,11 @@ target_string_use(edict_t *self, edict_t *other /* unused */, edict_t *activator
 void
 SP_target_string(edict_t *self)
 {
+	if (!self)
+	{
+		return;
+	}
+
 	if (!self->message)
 	{
 		self->message = "";

@@ -45,6 +45,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				PreprocessorDefinitions="WIN32;id386=1;NDEBUG;_WINDOWS;WITH_ACEBOT"
@@ -139,6 +140,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
 				Optimization="0"
 				PreprocessorDefinitions="WIN32;id386=1;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
@@ -149,7 +151,7 @@
 				ProgramDataBaseFileName=".\dday\Debug/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -2115,7 +2117,183 @@
 			Filter="h;hpp;hxx;hm;inl;fi;fd"
 			>
 			<File
+				RelativePath="..\dday\ai\ai.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\ai\ai_local.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\ai\ai_nodes_local.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\ai\ai_nodes_shared.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\ai\ai_weapons.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\ai\AStar.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\g_cmds.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\g_defines.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\g_local.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\g_maps.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\game.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\gbr\gbr_classes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\gbr\gbr_defines.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\gbr\gbr_main.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\grm\grm_classes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\grm\grm_defines.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\grm\grm_main.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\ita\ita_classes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\ita\ita_defines.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\ita\ita_main.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\jpn\jpn_classes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\jpn\jpn_defines.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\jpn\jpn_main.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\m_actor.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\m_insane.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\m_player.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\p_classes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\p_menu.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\p_menus.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\p_observer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\pol\pol_classes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\pol\pol_defines.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\pol\pol_main.h"
+				>
+			</File>
+			<File
 				RelativePath="..\dday\q_shared.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\rus\rus_classes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\rus\rus_defines.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\rus\rus_main.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\usa\usa_classes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\usa\usa_defines.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\usa\usa_main.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\usm\usm_classes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\usm\usm_defines.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\usm\usm_main.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\x_fbomb.h"
+				>
+			</File>
+			<File
+				RelativePath="..\dday\x_fire.h"
 				>
 			</File>
 		</Filter>

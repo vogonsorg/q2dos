@@ -107,6 +107,12 @@ boss2_firebullet_right(edict_t *self)
 	VectorSubtract(target, start, forward);
 	VectorNormalize(forward);
 
+	if((game.gametype == zaero_coop) && (EMPNukeCheck(self, start))) /* FS: Zaero specific game dll changes */
+	{
+		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
+		return;
+	}
+
 	monster_fire_bullet(self, start, forward, 6, 4, DEFAULT_BULLET_HSPREAD,
 			DEFAULT_BULLET_VSPREAD, MZ2_BOSS2_MACHINEGUN_R1);
 }
@@ -131,6 +137,12 @@ boss2_firebullet_left(edict_t *self)
 	target[2] += self->enemy->viewheight;
 	VectorSubtract(target, start, forward);
 	VectorNormalize(forward);
+
+	if((game.gametype == zaero_coop) && (EMPNukeCheck(self, start))) /* FS: Zaero specific game dll changes */
+	{
+		gi.sound (self, CHAN_AUTO, gi.soundindex("items/empnuke/emp_missfire.wav"), 1, ATTN_NORM, 0);
+		return;
+	}
 
 	monster_fire_bullet(self, start, forward, 6, 4, DEFAULT_BULLET_HSPREAD,
 			DEFAULT_BULLET_VSPREAD, MZ2_BOSS2_MACHINEGUN_L1);

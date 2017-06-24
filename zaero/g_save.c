@@ -74,7 +74,7 @@
  * in tables/ are changed, otherwise
  * strange things may happen.
  */
-#define SAVEGAMEVER "YQ2-1"
+#define SAVEGAMEVER "YQ2-2"
 
 /*
  * This macros are used to
@@ -94,7 +94,7 @@
  #define OS "Linux"
 #elif defined(_WIN32)
  #define OS "Windows"
-#elif defined(__DJGPP__) /* FS: Added */
+#elif defined(__DJGPP__) // FS: Added
  #define OS "MS-DOS"
 #else
  #define OS "Unknown"
@@ -104,10 +104,10 @@
  #define ARCH "i386"
 #elif defined(__x86_64__)
  #define ARCH "amd64"
-#elif defined(__ia64__)
- #define ARCH "ia64"
 #elif defined(__sparc__)
  #define ARCH "sparc64"
+#elif defined(__ia64__)
+ #define ARCH "ia64"
 #else
  #define ARCH "unknown"
 #endif
@@ -117,7 +117,7 @@
  * function signature with
  * the corresponding pointer
  */
-typedef struct 
+typedef struct
 {
 	char *funcStr;
 	byte *funcPtr;
@@ -128,7 +128,7 @@ typedef struct
  * mmove_t string with the
  * correspondig pointer
  * */
-typedef struct 
+typedef struct
 {
 	char	*mmoveStr;
 	mmove_t *mmovePtr;
@@ -177,7 +177,7 @@ field_t fields[] = {
 };
 
 /*
- * Level fields to 
+ * Level fields to
  * be saved
  */
 field_t levelfields[] = {
@@ -196,14 +196,14 @@ field_t clientfields[] = {
 
 /*
  * This will be called when the dll is first loaded,
- * which only happens when a new game is started or 
+ * which only happens when a new game is started or
  * a save game is loaded.
  */
 void
 InitGame(void)
 {
-	gi.dprintf(DEVELOPER_MSG_SAVE, "Game is starting up.\n");
-	gi.dprintf(DEVELOPER_MSG_SAVE, "Game is %s built on %s.\n", GAMEVERSION, __DATE__);
+	gi.dprintf(DEVELOPER_MSG_GAME, "Game is starting up.\n");
+	gi.dprintf(DEVELOPER_MSG_GAME, "Game is %s built on %s.\n", GAMEVERSION, __DATE__);
 
 	gun_x = gi.cvar ("gun_x", "0", 0);
 	gun_y = gi.cvar ("gun_y", "0", 0);
@@ -213,15 +213,15 @@ InitGame(void)
 	sv_maxvelocity = gi.cvar ("sv_maxvelocity", "2000", 0);
 	sv_gravity = gi.cvar ("sv_gravity", "800", 0);
 
-	// noset vars
+	/* noset vars */
 	dedicated = gi.cvar ("dedicated", "0", CVAR_NOSET);
 
-	// latched vars
+	/* latched vars */
 	sv_cheats = gi.cvar ("cheats", "0", CVAR_SERVERINFO|CVAR_LATCH);
 	gi.cvar ("gamename", GAMEVERSION , CVAR_SERVERINFO | CVAR_LATCH);
 	gi.cvar ("gamedate", __DATE__ , CVAR_SERVERINFO | CVAR_LATCH);
 	maxclients = gi.cvar ("maxclients", "4", CVAR_SERVERINFO | CVAR_LATCH);
-	maxspectators = gi.cvar("maxspectators", "4", CVAR_SERVERINFO);
+	maxspectators = gi.cvar ("maxspectators", "4", CVAR_SERVERINFO);
 	deathmatch = gi.cvar ("deathmatch", "0", CVAR_LATCH);
 	coop = gi.cvar ("coop", "0", CVAR_LATCH);
 	skill = gi.cvar ("skill", "1", CVAR_LATCH);
@@ -233,10 +233,12 @@ InitGame(void)
 	fraglimit = gi.cvar ("fraglimit", "0", CVAR_SERVERINFO);
 	timelimit = gi.cvar ("timelimit", "0", CVAR_SERVERINFO);
 	password = gi.cvar ("password", "", CVAR_USERINFO);
-	spectator_password = gi.cvar("spectator_password", "", CVAR_USERINFO);
-	needpass = gi.cvar("needpass", "0", CVAR_SERVERINFO);
-	filterban = gi.cvar("filterban", "1", 0);
+	spectator_password = gi.cvar ("spectator_password", "", CVAR_USERINFO);
+	needpass = gi.cvar ("needpass", "0", CVAR_SERVERINFO);
+	filterban = gi.cvar ("filterban", "1", 0);
+
 	g_select_empty = gi.cvar ("g_select_empty", "0", CVAR_ARCHIVE);
+
 	run_pitch = gi.cvar ("run_pitch", "0.002", 0);
 	run_roll = gi.cvar ("run_roll", "0.005", 0);
 	bob_up  = gi.cvar ("bob_up", "0.005", 0);
@@ -244,23 +246,23 @@ InitGame(void)
 	bob_roll = gi.cvar ("bob_roll", "0.002", 0);
 
 	/* flood control */
-	flood_msgs = gi.cvar("flood_msgs", "4", 0);
-	flood_persecond = gi.cvar("flood_persecond", "4", 0);
-	flood_waitdelay = gi.cvar("flood_waitdelay", "10", 0);
+	flood_msgs = gi.cvar ("flood_msgs", "4", 0);
+	flood_persecond = gi.cvar ("flood_persecond", "4", 0);
+	flood_waitdelay = gi.cvar ("flood_waitdelay", "10", 0);
 
-	// items
+	/* items */
 	InitItems ();
 
 	game.helpmessage1[0] = 0;
 	game.helpmessage2[0] = 0;
 
-	// initialize all entities for this game
+	/* initialize all entities for this game */
 	game.maxentities = maxentities->value;
 	g_edicts =  gi.TagMalloc (game.maxentities * sizeof(g_edicts[0]), TAG_GAME);
 	globals.edicts = g_edicts;
 	globals.max_edicts = game.maxentities;
 
-	// initialize all clients for this game
+	/* initialize all clients for this game */
 	game.maxclients = maxclients->value;
 	game.clients = gi.TagMalloc (game.maxclients * sizeof(game.clients[0]), TAG_GAME);
 	globals.num_edicts = game.maxclients+1;
@@ -553,7 +555,7 @@ WriteField2(FILE *f, field_t *field, byte *base)
 
 /* ========================================================= */
 
-/* 
+/*
  * This function does the dirty
  * work to read the data from a
  * file. The processing of the
@@ -693,7 +695,7 @@ ReadField(FILE *f, field_t *field, byte *base)
 /* ========================================================= */
 
 /*
- * Write the client struct into a file. 
+ * Write the client struct into a file.
  */
 void
 WriteClient(FILE *f, gclient_t *client)
@@ -776,10 +778,10 @@ WriteGame(const char *filename, qboolean autosave)
 	memset(str_os, 0, sizeof(str_os));
 	memset(str_arch, 0, sizeof(str_arch));
 
-	strncpy(str_ver, SAVEGAMEVER, sizeof(str_ver));
-	strncpy(str_game, GAMEVERSION, sizeof(str_game));
-	strncpy(str_os, OS, sizeof(str_os));
-    strncpy(str_arch, ARCH, sizeof(str_arch));
+	strncpy(str_ver, SAVEGAMEVER, sizeof(str_ver) - 1);
+	strncpy(str_game, GAMEVERSION, sizeof(str_game) - 1);
+	strncpy(str_os, OS, sizeof(str_os) - 1);
+	strncpy(str_arch, ARCH, sizeof(str_arch) - 1);
 
 	fwrite(str_ver, sizeof(str_ver), 1, f);
 	fwrite(str_game, sizeof(str_game), 1, f);

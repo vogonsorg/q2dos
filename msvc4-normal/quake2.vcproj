@@ -57,7 +57,7 @@
 				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -141,6 +141,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="../win32/include"
@@ -1290,6 +1291,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\win32\win_dedconsole.c"
+				>
+			</File>
+			<File
 				RelativePath="..\CLIENT\x86.c"
 				>
 				<FileConfiguration
@@ -1945,6 +1950,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\win32\resource.h"
+				>
+			</File>
+			<File
 				RelativePath="..\client\screen.h"
 				>
 			</File>
@@ -1970,6 +1979,10 @@
 			</File>
 			<File
 				RelativePath="..\client\vid.h"
+				>
+			</File>
+			<File
+				RelativePath="..\win32\winquake.h"
 				>
 			</File>
 		</Filter>
@@ -2002,6 +2015,10 @@
 						AdditionalIncludeDirectories="\PROJ\q2dos\win32"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\win32\startup.bmp"
+				>
 			</File>
 		</Filter>
 		<File

@@ -51,11 +51,11 @@ int SV_FindIndex (char *name, int start, int max, qboolean create)
 	//	Com_Error (ERR_DROP, "*Index: overflow");
 	{
 		if (start == CS_MODELS)
-			Com_Printf ("Warning: Index overflow for models\n");
+			Com_Printf ("Warning: Index overflow for models: %s\n", name);
 		else if (start == CS_SOUNDS)
-			Com_Printf ("Warning: Index overflow for sounds\n");
+			Com_Printf ("Warning: Index overflow for sounds: %s\n", name);
 		else if (start == CS_IMAGES)
-			Com_Printf ("Warning: Index overflow for images\n");
+			Com_Printf ("Warning: Index overflow for images: %s\n", name);
 		return (max-1);	// return the last possible index
 	}
 	// end Knightmare
@@ -354,8 +354,10 @@ void SV_InitGame (void)
 	}
 	else if (Cvar_VariableValue ("coop"))
 	{
-		if (maxclients->value <= 1 || maxclients->value > 4)
+		if (maxclients->value <= 1) /* FS: Hard limit was 4. */
 			Cvar_FullSet ("maxclients", "4", CVAR_SERVERINFO | CVAR_LATCH);
+		else if (maxclients->value > MAX_CLIENTS)
+			Cvar_FullSet ("maxclients", va("%i", MAX_CLIENTS), CVAR_SERVERINFO | CVAR_LATCH);
 #ifdef COPYPROTECT
 		if (!sv.attractloop && !dedicated->value)
 			Sys_CopyProtect ();
@@ -455,22 +457,6 @@ void SV_Map (qboolean attractloop, char *levelstring, qboolean loadgame)
 	}
 	else
 		spawnpoint[0] = 0;
-
-#ifdef _DEBUG
-	if(sv_override_spawn_points->intValue) /* FS: Override spawn points for debugging. */
-	{
-		ch = strstr(level, ">");
-		if (ch)
-		{
-			*ch = 0;
-		//	strncpy (spawnpoint, ch+1);
-			Q_strncpyz (spawnpoint, ch+1, sizeof(spawnpoint));
-			Com_Printf("Looking for spawnpoint %s\n", spawnpoint);
-		}
-		else
-			spawnpoint[0] = 0;
-	}
-#endif /* _DEBUG */
 
 	l = strlen(level);
 	// skip the end-of-unit flag if necessary

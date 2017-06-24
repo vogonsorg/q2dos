@@ -335,7 +335,7 @@ void FoundTarget (edict_t *self)
                 level.sight_entity->light_level = 128;
         }
 
-        self->show_hostile = level.time + 1;            // wake up other monsters
+        self->show_hostile = (int)level.time + 1;            // wake up other monsters
 
         VectorCopy(self->enemy->s.origin, self->monsterinfo.last_sighting);
         self->monsterinfo.trail_time = level.time;
@@ -487,7 +487,7 @@ qboolean FindTarget (edict_t *self)
 
                 if (r == RANGE_NEAR)
                 {
-                        if (client->show_hostile < level.time && !infront (self, client))
+                        if (client->show_hostile < (int)level.time && !infront (self, client))
                         {
                                 return false;
                         }
@@ -760,9 +760,10 @@ qboolean ai_checkattack (edict_t *self, float dist)
                 if (self->monsterinfo.aiflags & AI_COMBAT_POINT)
                         return false;
 
-                if (self->monsterinfo.aiflags & AI_SOUND_TARGET)
-                {
-                        if ((level.time - self->enemy->teleport_time) > 5.0)
+				/* only check sound if it's not visible anyway (=> attack if visible) */
+				if ((self->monsterinfo.aiflags & AI_SOUND_TARGET) && !visible(self, self->goalentity))
+				{
+                        if ((level.time - self->enemy->last_sound_time) > 5.0)
                         {
                                 if (self->goalentity == self->enemy)
                                 {
@@ -777,7 +778,7 @@ qboolean ai_checkattack (edict_t *self, float dist)
                         }
                         else
                         {
-                                self->show_hostile = level.time + 1;
+                                self->show_hostile = (int)level.time + 1;
                                 return false;
                         }
                 }
@@ -843,7 +844,7 @@ qboolean ai_checkattack (edict_t *self, float dist)
                 }
         }
 
-        self->show_hostile = level.time + 1;            // wake up other monsters
+        self->show_hostile = (int)level.time + 1;            // wake up other monsters
 
 // check knowledge of enemy
         enemy_vis = visible(self, self->enemy);

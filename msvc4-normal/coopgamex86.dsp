@@ -69,7 +69,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir "."
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D id386=1 /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D id386=1 /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x1009 /d "_DEBUG"
@@ -90,6 +90,10 @@ LINK32=link.exe
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;for;f90"
+# Begin Source File
+
+SOURCE=..\coop\b_cam.c
+# End Source File
 # Begin Source File
 
 SOURCE=..\coop\dm_ball.c
@@ -113,6 +117,10 @@ SOURCE=..\coop\g_cmds.c
 # Begin Source File
 
 SOURCE=..\coop\g_combat.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\g_coop.c
 # End Source File
 # Begin Source File
 
@@ -340,6 +348,10 @@ SOURCE=..\coop\m_widow2.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\coop\menu.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\coop\p_client.c
 # End Source File
 # Begin Source File
@@ -362,10 +374,78 @@ SOURCE=..\coop\p_weapon.c
 
 SOURCE=..\coop\q_shared.c
 # End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_acannon.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_ai.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_anim.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_boss.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_boss.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_camera.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_handler.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_handler.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_hound.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_hound.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_item.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_sentien.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_sentien.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_spawn.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_trigger.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\z_weapon.c
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
+# Begin Source File
+
+SOURCE=..\coop\b_cam.h
+# End Source File
 # Begin Source File
 
 SOURCE=..\coop\tables\clientfields.h
@@ -521,6 +601,10 @@ SOURCE=..\coop\m_widow.h
 # Begin Source File
 
 SOURCE=..\coop\m_widow2.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\coop\menu.h
 # End Source File
 # Begin Source File
 

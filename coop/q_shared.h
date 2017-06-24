@@ -462,6 +462,7 @@ COLLISION DETECTION
 #define	MASK_OPAQUE				(CONTENTS_SOLID|CONTENTS_SLIME|CONTENTS_LAVA)
 #define	MASK_SHOT				(CONTENTS_SOLID|CONTENTS_MONSTER|CONTENTS_WINDOW|CONTENTS_DEADMONSTER)
 #define MASK_CURRENT			(CONTENTS_CURRENT_0|CONTENTS_CURRENT_90|CONTENTS_CURRENT_180|CONTENTS_CURRENT_270|CONTENTS_CURRENT_UP|CONTENTS_CURRENT_DOWN)
+#define MASK_SHOT_NO_WINDOW		(CONTENTS_SOLID|CONTENTS_MONSTER|CONTENTS_DEADMONSTER) /* FS: Zaero specific */
 
 
 // gi.BoxEdicts() can return a list of either solid or trigger entities
@@ -671,6 +672,7 @@ typedef struct
 #define RF_SHELL_RED		1024
 #define	RF_SHELL_GREEN		2048
 #define RF_SHELL_BLUE		4096
+#define RF_NOSHADOW			8192		// don't draw a shadow /* FS: Zaero specific */
 
 //ROGUE
 #define RF_IR_VISIBLE		0x00008000		// 32768
@@ -1047,6 +1049,7 @@ typedef enum
 #define	CHAN_VOICE              2
 #define	CHAN_ITEM               3
 #define	CHAN_BODY               4
+#define CHAN_WEAPON2			5 /* FS: Zaero specific */
 // modifier flags
 #define	CHAN_NO_PHS_ADD			8	// send to all clients, not just ones in PHS (ATTN 0 will also do this)
 #define	CHAN_RELIABLE			16	// send by reliable message, not datagram
@@ -1078,6 +1081,12 @@ typedef enum
 #define	STAT_FLASHES			15		// cleared each frame, 1 = health, 2 = armor
 #define STAT_CHASE				16
 #define STAT_SPECTATOR			17
+#define STAT_SHOW_ORIGIN		18	/* FS: Zaero specific */
+#define STAT_ORIGIN_X			19	/* FS: Zaero specific */
+#define STAT_ORIGIN_Y			20	/* FS: Zaero specific */
+#define STAT_ORIGIN_Z			21	/* FS: Zaero specific */
+#define STAT_CAMERA_ICON		22	/* FS: Zaero specific */
+#define STAT_CAMERA_TIMER		23	/* FS: Zaero specific */
 
 #define	MAX_STATS				32
 
@@ -1110,39 +1119,6 @@ typedef enum
 #define DF_NO_SPHERES		0x00100000
 //ROGUE
 
-/*
-ROGUE - VERSIONS
-1234	08/13/1998		Activision
-1235	08/14/1998		Id Software
-1236	08/15/1998		Steve Tietze
-1237	08/15/1998		Phil Dobranski
-1238	08/15/1998		John Sheley
-1239	08/17/1998		Barrett Alexander
-1230	08/17/1998		Brandon Fish
-1245	08/17/1998		Don MacAskill
-1246	08/17/1998		David "Zoid" Kirsch
-1247	08/17/1998		Manu Smith
-1248	08/17/1998		Geoff Scully
-1249	08/17/1998		Andy Van Fossen
-1240	08/20/1998		Activision Build 2
-1256	08/20/1998		Ranger Clan
-1257	08/20/1998		Ensemble Studios
-1258	08/21/1998		Robert Duffy
-1259	08/21/1998		Stephen Seachord
-1250	08/21/1998		Stephen Heaslip
-1267	08/21/1998		Samir Sandesara
-1268	08/21/1998		Oliver Wyman
-1269	08/21/1998		Steven Marchegiano
-1260	08/21/1998		Build #2 for Nihilistic
-1278	08/21/1998		Build #2 for Ensemble
-
-9999	08/20/1998		Internal Use
-*/
-#define ROGUE_VERSION_ID		1278
-
-#define ROGUE_VERSION_STRING	"08/21/1998 Beta 2 for Ensemble"
-
-// ROGUE
 /*
 ==========================================================
 

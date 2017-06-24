@@ -387,20 +387,39 @@ blaster_touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
 	else
 	{
 		gi.WriteByte (svc_temp_entity);
+#if 0 /* FS: Unneeded since it uses it's own model "blaser/tris.md2"! */
 		/* FS: Coop: Xatrix specific */
 		if ((game.gametype == xatrix_coop) && (self->s.effects & EF_BLUEHYPERBLASTER))	// Knightmare- this was checking bit TE_BLUEHYPERBLASTER
-			gi.WriteByte (TE_BLUEHYPERBLASTER);			// Knightmare- TE_BLUEHYPERBLASTER is broken (parse error) in most Q2 engines
-		else
-			gi.WriteByte (TE_BLASTER);
-		gi.WritePosition(self->s.origin);
-
-		if (!plane)
 		{
-			gi.WriteDir(vec3_origin);
+			gi.WriteByte (TE_BLUEHYPERBLASTER);			// Knightmare- TE_BLUEHYPERBLASTER is broken (parse error) in most Q2 engines
+
+			gi.WritePosition(self->s.origin);
+
+			/* FS: R1Q2 expects it to be WritePos, look very carefully at the commented out stuff in cl_tent.c!  Public servers we host sending WritePos will bomb R1Q2 clients (and possibly Q2PRO) */
+			if (!plane)
+			{
+				gi.WritePosition(vec3_origin);
+			}
+			else
+			{
+				gi.WritePosition(plane->normal);
+			}
 		}
 		else
+#endif
 		{
-			gi.WriteDir(plane->normal);
+			gi.WriteByte (TE_BLASTER);
+
+			gi.WritePosition(self->s.origin);
+
+			if (!plane)
+			{
+				gi.WriteDir(vec3_origin);
+			}
+			else
+			{
+				gi.WriteDir(plane->normal);
+			}
 		}
 
 		gi.multicast(self->s.origin, MULTICAST_PVS);
@@ -1132,7 +1151,7 @@ bfg_think(edict_t *self)
 		}
 
 		if (!(ent->svflags & SVF_MONSTER) && !(ent->svflags & SVF_DAMAGEABLE) &&
-			(!ent->client) && (strcmp(ent->classname, "misc_explobox") != 0))
+			(!ent->client) && ent->classname && (strcmp(ent->classname, "misc_explobox") != 0))
 		{
 			continue;
 		}
@@ -1616,7 +1635,7 @@ void Trap_Think (edict_t *ent) /* FS: Coop: Xatrix specific */
 			{
 				best = G_Spawn();
 
-				if (strcmp(ent->enemy->classname, "monster_gekk") == 0)
+				if (ent->enemy && ent->enemy->classname && strcmp(ent->enemy->classname, "monster_gekk") == 0)
 				{
 					best->s.modelindex = gi.modelindex("models/objects/gekkgib/torso/tris.md2");
 					best->s.effects |= TE_GREENBLOOD;

@@ -190,7 +190,7 @@ prox_die(edict_t *self, edict_t *inflictor, edict_t *attacker /* unused */,
 		return;
 	}
 
-	if (strcmp(inflictor->classname, "prox"))
+	if (inflictor->classname && strcmp(inflictor->classname, "prox"))
 	{
 		self->takedamage = DAMAGE_NO;
 		Prox_Explode(self);
@@ -307,10 +307,10 @@ prox_open(edict_t *ent)
 			   blow up */
 			if (((((search->svflags & SVF_MONSTER) ||
 				   (search->client)) && (search->health > 0)) ||
-				   ((deathmatch->value) &&((!strcmp(search->classname, "info_player_deathmatch")) ||
-				   (!strcmp(search->classname, "info_player_start")) ||
-				   (!strcmp(search->classname, "info_player_coop")) ||
-				   (!strcmp(search->classname, "misc_teleporter_dest"))))) &&
+				   ((deathmatch->value) &&(((search->classname) && (!strcmp(search->classname, "info_player_deathmatch"))) ||
+				   ((search->classname) && (!strcmp(search->classname, "info_player_start"))) ||
+				   ((search->classname) && (!strcmp(search->classname, "info_player_coop"))) ||
+				   ((search->classname) && (!strcmp(search->classname, "misc_teleporter_dest")))))) &&
 				   (visible(search, ent)))
 			{
 				gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/proxwarn.wav"), 1, ATTN_NORM, 0);
@@ -752,7 +752,7 @@ nuke_die(edict_t *self, edict_t *inflictor /* unused */,
 
 	self->takedamage = DAMAGE_NO;
 
-	if ((attacker) && !(strcmp(attacker->classname, "nuke")))
+	if ((attacker) && (attacker->classname) && !(strcmp(attacker->classname, "nuke")))
 	{
 		G_FreeEdict(self);
 		return;

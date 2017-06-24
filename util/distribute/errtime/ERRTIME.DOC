@@ -1,0 +1,453 @@
+
+                         ***********************
+                         * ErrTime version 1.4 *
+                         ***********************
+
+Released to public domain by Phil Money, Advantig LLC, on 4 July 2004
+
+There are seperate versions of ErrTime for DOS, OS/2, Windows-NT/2000/XP/2003
+and Novell NetWare.  It was written and compiled in Watcom C++
+
+  ErrTime.exe = MS-Dos/PC-Dos/DR-Dos/Free-DOS version
+ ErrTime2.exe = OS/2 version
+ ErrTimeT.exe = Windows 95/98/ME/NT/2000/XP/2003 version
+ ErrTime3.exe = Novel Netware version
+
+If any of these files are missing, they can be downloaded from:
+
+        http://www.advantig.com
+
+No warranty of any kind is offered.
+
+    USAGE: ErrTime -h | -H | -d | -D | -w | -W | -m | -M | -s | -y
+
+       Valid options are:
+               -h   Return Hour as an errorlevel 0-23
+               -H   Return Hour as an errorlevel 1-12
+               -d   Return Day of month as an errorlevel 1-31
+               -D   Return Day of week as an errorlevel 0-6 (Sunday is 0)
+               -w   Return Week as an errorlevel 0-52 starting Sunday
+               -W   Return Week as an errorlevel 0-52 starting Monday
+               -m   Return Month as an errorlevel 1-12
+               -M   Return Minute as an errorlevel 0-59
+               -s   Return Second as an errorlevel 0-59
+               -y   Return Year as an errorlevel 0-99
+
+
+ErrTime exits with errorlevel 255 if invalid arguments are given.
+
+You can only enter one argument on the command line.  If more than one argument
+is given, ErrTime will use only the first argument.
+
+This is a simple utility to assist scheduling events at specified times.
+ErrTime returns an errorlevel equal to the time of day hour in 24 hour or 12
+hour format, minute, second, day of month or day of week, week of year or month
+of year, or year of century.  For example, if it's 2am it will return an
+errorlevel of 2 or if it's 2pm (14:00) it will return an errorlevel of 14, etc.
+The error level can then be used by a batch, CMD or NCF file to execute the
+appropriate commands to run programs or just do nothing.
+
+Of course, you can also schedule a block of time larger than just one hour, one
+day or one month or even combine them all by running ErrTime more than once.
+See the sample batch file below.
+
+Errtime differs from some other errorlevel programs in that it doesn't evaluate
+anything or require any complex command line parameters.  It simply returns the
+errorlevel and lets your batch file do the rest.  This means you won't have to
+run ErrTime 24 times to test for the hour of the day, or 12 times for the month
+or 100 times for the year, etc.  You only need to run it once and let the batch
+file do the testing.  This is much more practical than running a program
+multiple times.  This might not be what your application needs though. If you
+need a program that does complex "what-if" calculations look elsewhere.
+
+ErrTime writes nothing to your drive, opens no files, requires no input or
+changes anything about your computer except to return an errorlevel to the
+operating system after it checks the time and date and exits.  All programs
+return an errorlevel of some form.  ErrTime just returns them with the same
+number as the hour of the day, day of month or month of year etc.  Pretty
+simple stuff eh?  If you're not familiar with using errorlevels in batch,
+CMD or NCF files, read your manual.  One of the sample files should be
+enough to get you up and running even if you don't know anything about
+errorlevels.
+
+
+Note:
+
+Batch files examine all errorlevels using a greater-than-or-equal-to operation.
+In other words, the statement 'If ErrorLevel 1 echo Happy new year!' will
+display the sentence 'Happy new year!' if the errorlevel was set to 1, but will
+ALSO display 'Happy new year!' if the errorlevel was set to 2, 3, or above.
+For this reason, if you have more than one errorlevel to check for, you should
+always arrange the group of errorlevel statements in a DESCENDING order.  For
+example, to check for errorlevels 0, 9 and 12, this would be the proper way to
+place the statements in your batch file:
+
+               ErrTime -h
+
+               If ErrorLevel 12 Email.Exe
+               If ErrorLevel  9 CashReg.Exe
+               If ErrorLevel  0 BackUp.Bat
+
+One other point to remember is that ALL programs modify the DOS errorlevel.  In
+the example given above, if you were to run a program called ABC123.EXE for the
+'If ErrorLevel 12' statement, ABC123 would RESET the DOS errorlevel after
+ABC123.EXE terminated.  Since the batch file is executed one line at a time,
+the errorlevel statements which follow would use the errorlevel set by the
+ABC123 program, rather than the value set by ErrTime.  To get around this DOS
+limitation, you must instead use a GOTO statement for the 'action' portion of
+the errorlevel statement.
+
+The GOTO command allows your batch file to jump to a completely different
+location within the same batch file, and start executing commands from that
+point.  This is accomplished by using a statement in the form of 'GOTO <l>',
+where <l> is a LABEL.  A label is a unique, alphanumeric, ONE-WORD name, which
+indicates where in the batch file you wish to jump to.  Some valid labels could
+be called 'DoTape', 'Run_The_Cash_Register', and 'Shutdown'.  However, a GOTO
+statement alone is not enough to complete the GOTO operation.  You must also
+place the same label somewhere else within the batch file, which lets DOS know
+where the GOTO statement should end up.  You can do this simply by placing a
+colon (':') at the beginning of a line, simply followed by the label name.
+
+For example, the following sample batch file:
+
+          :Loop
+          echo This will be shown over and over
+          goto Loop
+
+...would cause the line 'This will be shown over and over' to continuously
+display on the screen, until the user hits control-C to abort.  When DOS starts
+the batch file, it will process each line in sequence.  When DOS reads line 1,
+it will recognize that 'Loop' is simply a label definition, and will ignore it.
+Next, DOS will read line 2, and process the ECHO command, by displaying
+'This will be shown over and over' on the screen.  Once DOS encounters line 3,
+it will realize that it contains a GOTO statement, and look for the ':Loop'
+label, and jump back to line 1, continuing the cycle.
+
+However, the GOTO command does have practical applications.  The above example
+could be re-written like this:
+
+               ErrTime -h
+
+               If ErrorLevel 12 Goto Email
+               If ErrorLevel  9 Goto CashReg
+               If ErrorLevel  0 Goto BackUp
+
+
+               :Email
+               REM * Run Email.
+               Email.Exe
+               goto End
+
+               :CashReg
+               REM * Run CashReg.
+               CashReg.Exe
+               goto End
+
+               :BackUp
+               REM * Run Tape Backup.
+               Backup.Bat
+               goto End
+
+               :End
+
+
+In this situation, DOS would first compare the errorlevel returned by ErrTime
+to those listed in the 'If ErrorLevel' portion of the batch file, and then jump
+down to the corresponding label.
+
+For example, if ErrTime exited using errorlevel 10, DOS would jump down to
+':CashReg', and process the statements which followed.  The REM statement is
+simply a remark, and is ignored by DOS.  After skipping the REM command, DOS
+then reads the next line of the batch file, and processes it.  The 'goto End'
+statement is necessary, to make sure that DOS does not keep going, and execute
+the commands for 'BackUp' as well.  (Remember that DOS just ignores LABEL
+DEFINITIONS, such as ':BackUp'.  Without the extra 'goto End', the batch file
+would just 'fall through' to the statements under Email, Backup, etc.  The
+extra goto specifically instructs DOS to jump to the ':End' label, which is
+located at the end of the batch file.
+
+Some times you may WANT the batch file to 'fall through', since it allows one
+to have several similar commands to be processed, when using the same
+errorlevel.
+
+Arranging the batch file like this allows for more than one command to be
+executed for a certain errorlevel, and in addition, gets around the
+above-mentioned problem of other programs changing the errorlevel.
+
+A generic batch or .cmd file for ErrTime might look something like this:
+
+------------------------------------------------------------------------------
+
+@Echo Off
+
+cd \Bink
+ Rem Check day of week
+ errtime2 -D
+   if errorlevel 1 goto monthday
+   Rem The above line catches any fall-through errorlevels above errorlevel 0
+   if errorlevel 0 goto sunday
+ goto monthday
+
+:sunday
+ cd \max
+msgpostp -Te:\bink\weekly.Rpt -Cmpsqrwk.cfg
+if exist \bink\weekly.dat del \bink\weekly.dat
+
+Rem The batch/CMD file automatically falls through to chkmonth after
+Rem sunday since no goto statment sends it anywhere else.
+
+:monthday
+cd \Bink
+ Rem Check day of month
+ errtime2 -d
+   if errorlevel 2 goto daily
+   Rem The above line catches any fall-through errorlevels above errorlevel 1
+   if errorlevel 1 goto day1
+ goto daily
+
+:day1
+ cd \max
+ msgpostp -T\bink\Monthly.Rpt -Cmpsqrmth.cfg
+ if exist \bink\monthly.dat del \bink\monthly.dat
+ cd \bink
+ call notify
+ cd \bink
+ Rem Check month
+ errtime2 -m
+   if errorlevel 2 goto daily
+   Rem The above line catches any fall-through errorlevels above errorlevel 1
+   if errorlevel 1 goto january1
+ goto daily
+
+:january1
+ msgpostp -T\bink\Yearly.Rpt -Cmpsqryr.cfg
+ if exist \bink\yearly.dat del \bink\yearly.dat
+
+:daily
+ cd \max
+ msgpostp -T\bink\daily.Rpt -Cmpsqrday.cfg
+ if exist \bink\daily.dat del \bink\daily.dat
+
+:end
+ cd \bink
+ REM * Re-Run BinkleyTerm
+ Bink
+
+------------------------------------------------------------------------------
+
+The included files are only examples of how one might use this program.
+
+If you have any questions, comments or suggestions you can contact me at the
+following addresses:
+
+phil.money@advantig.com
+pgmoney@yahoo.com
+
+or you can write to:
+
+Phil Money
+Advantig, LLC
+3112 Van Buren Dr.
+Tampa, FL 33611-5231
+
+
+More batch file examples follow:
+-----------------------------------------------------------------------------
+@echo off
+
+REM An easy way to schedule an BBS door access and maintenance...
+
+errtime -d
+
+if errorlevel 2 goto daily
+Rem The above line catches any fall-through errorlevels above errorlevel 1
+if errorlevel 1 goto monthly
+goto daily
+
+:monthly
+errtime -h
+if errorlevel 1 goto endbat
+Rem The above line catches any fall-through errorlevels above errorlevel 0
+if errorlevel 0 call purge.bat
+
+:daily
+errtime -h
+if errorlevel 23 goto closed
+if errorlevel 22 goto open
+if errorlevel 21 goto closed
+if errorlevel 20 goto open
+if errorlevel 19 goto closed
+if errorlevel 18 goto closed
+if errorlevel 17 goto closed
+if errorlevel 16 goto open
+if errorlevel 15 goto closed
+if errorlevel 14 goto open
+if errorlevel 13 goto open
+if errorlevel 12 goto closed
+if errorlevel 11 goto closed
+if errorlevel 10 goto open
+if errorlevel 9 goto open
+if errorlevel 8 goto closed
+if errorlevel 7 goto closed
+if errorlevel 6 goto open
+if errorlevel 5 goto open
+if errorlevel 4 goto open
+if errorlevel 3 goto open
+if errorlevel 2 goto open
+if errorlevel 1 goto open
+if errorlevel 0 goto open
+goto endbat
+
+:open
+c:
+cd \bbs\doors\mydoor
+mydoor.exe
+goto endbat
+
+:closed
+display closed.bbs
+
+:endbat
+c:
+cd \bbs
+call cleanup.bat
+bbs.bat
+
+-----------------------------------------------------------------------------
+@echo off
+
+REM A different program for every hour?...
+
+errtime.exe -h
+
+if errorlevel 23 goto hour23
+if errorlevel 22 goto hour22
+if errorlevel 21 goto hour21
+if errorlevel 20 goto hour20
+if errorlevel 19 goto hour19
+if errorlevel 18 goto hour18
+if errorlevel 17 goto hour17
+if errorlevel 16 goto hour16
+if errorlevel 15 goto hour15
+if errorlevel 14 goto hour14
+if errorlevel 13 goto hour13
+if errorlevel 12 goto hour12
+if errorlevel 11 goto hour11
+if errorlevel 10 goto hour10
+if errorlevel 9 goto hour9
+if errorlevel 8 goto hour8
+if errorlevel 7 goto hour7
+if errorlevel 6 goto hour6
+if errorlevel 5 goto hour5
+if errorlevel 4 goto hour4
+if errorlevel 3 goto hour3
+if errorlevel 2 goto hour2
+if errorlevel 1 goto hour1
+if errorlevel 0 goto hour0
+goto endbat
+
+:hour23
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour22
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour21
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour20
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour19
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour18
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour17
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour16
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour15
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour14
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour13
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour12
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour11
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour10
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour9
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour8
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour7
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour6
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour5
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour4
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour3
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour2
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour1
+ REM put command here if you want it to run during this hour
+ goto endbat
+
+:hour0
+ REM put command here if you want it to run during this hour
+ errtime -d
+ if errorlevel 1 call monthly.bat
+
+:endbat
+ REM Put your cleanup routines here.
+ call daily.bat
+ echo.
+ echo Done!
+ echo.
+
+

@@ -74,8 +74,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define DOOR_X_AXIS			64
 #define DOOR_Y_AXIS			128
 
-#define DOOR_ACTIVE_TOGGLE	1
-#define DOOR_ACTIVE_ON		2
+#define DOOR_ACTIVE_TOGGLE	1 /* FS: Zaero specific game dll changes */
+#define DOOR_ACTIVE_ON		2 /* FS: Zaero specific game dll changes */
+
+#define TRAIN_START_ON		1
+#define TRAIN_TOGGLE		2
+#define TRAIN_BLOCK_STOPS	4
+#define TRAIN_REVERSE		8 /* FS: Zaero specific game dll changes */
+#define TRAIN_X_AXIS		16 /* FS: Zaero specific game dll changes */
+#define TRAIN_Y_AXIS		32 /* FS: Zaero specific game dll changes */
+#define TRAIN_Z_AXIS		64 /* FS: Zaero specific game dll changes */
 
 /* Support routines for movement (changes in origin using velocity) */
 
@@ -458,10 +466,8 @@ plat_Accelerate(moveinfo_t *moveinfo)
 		p1_speed = (old_speed + moveinfo->move_speed) / 2.0;
 		p2_distance = moveinfo->move_speed * (1.0 - (p1_distance / p1_speed));
 		distance = p1_distance + p2_distance;
-		moveinfo->current_speed =
-			(p1_speed *
-			 (p1_distance /
-		 distance)) + (moveinfo->move_speed * (p2_distance / distance));
+		moveinfo->current_speed = (p1_speed * (p1_distance /
+		  distance)) + (moveinfo->move_speed * (p2_distance / distance));
 		moveinfo->next_speed = moveinfo->move_speed - moveinfo->decel *
 							   (p2_distance / distance);
 		return;
@@ -471,10 +477,6 @@ plat_Accelerate(moveinfo_t *moveinfo)
 	return;
 }
 
-/*
- * The team has completed a frame of movement,
- * so change the speed for the next frame
- */
 void
 Think_AccelMove(edict_t *ent)
 {
@@ -505,8 +507,6 @@ Think_AccelMove(edict_t *ent)
 	ent->think = Think_AccelMove;
 }
 
-
-
 /*
 ==============
 Think_SmoothAccelMove
@@ -515,7 +515,6 @@ The team has completed a frame of movement, so
 change the speed for the next frame
 ==============
 */
-
 
 void Think_SmoothAccelMove (edict_t *ent) /* FS: Zaero specific game dll changes */
 {
@@ -958,7 +957,7 @@ rotating_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */, csur
 */
 }
 
-void rotating_think(edict_t *self)
+void rotating_think(edict_t *self) /* FS: Zaero specific */
 {
 	self->nextthink = level.time + FRAMETIME;
 	if (self->moveinfo.state == STATE_DECEL)
@@ -1166,6 +1165,7 @@ button_return(edict_t *self)
 	{
 		return;
 	}
+
 	self->moveinfo.state = STATE_DOWN;
 
 	Move_Calc (self, self->moveinfo.start_origin, button_done, false); /* FS: Zaero specific game dll changes */
@@ -1793,7 +1793,7 @@ door_blocked(edict_t *self, edict_t *other)
 		if (other)
 		{
 			/* Hack for entitiy without their origin near the model */
-			VectorMA (other->absmin, 0.5, other->size, other->s.origin);
+			VectorMA(other->absmin, 0.5, other->size, other->s.origin);
 			BecomeExplosion1(other);
 		}
 
@@ -1811,8 +1811,9 @@ door_blocked(edict_t *self, edict_t *other)
 		return;
 	}
 
-	/* if a door has a negative wait, it would never come back if blocked,
-	   so let it just squash the object to death real fast */
+	/* if a door has a negative wait, it would never come
+	   back if blocked, so let it just squash the object
+	   to death real fast */
 	if (self->moveinfo.wait >= 0)
 	{
 		if (self->moveinfo.state == STATE_DOWN)
@@ -2270,8 +2271,7 @@ SP_func_water(edict_t *self)
 		self->speed = 25;
 	}
 
-	self->moveinfo.accel = self->moveinfo.decel =
-	   	self->moveinfo.speed = self->speed;
+	self->moveinfo.accel = self->moveinfo.decel = self->moveinfo.speed = self->speed;
 
 	if (!self->wait)
 	{
@@ -2291,15 +2291,6 @@ SP_func_water(edict_t *self)
 
 	gi.linkentity(self);
 }
-
-
-#define TRAIN_START_ON		1
-#define TRAIN_TOGGLE		2
-#define TRAIN_BLOCK_STOPS	4
-#define TRAIN_REVERSE		8 /* FS: Zaero specific game dll changes */
-#define TRAIN_X_AXIS		16 /* FS: Zaero specific game dll changes */
-#define TRAIN_Y_AXIS		32 /* FS: Zaero specific game dll changes */
-#define TRAIN_Z_AXIS		64 /* FS: Zaero specific game dll changes */
 
 /*
  * QUAKED func_train (0 .5 .8) ? START_ON TOGGLE BLOCK_STOPS
@@ -2784,9 +2775,15 @@ so, the basic time between firing is a random time between
 
 These can used but not touched.
 */
-void parseTargets(edict_t *self)
+
+void parseTargets(edict_t *self) /* FS: Zaero specific */
 {
 	int numTargets = 0;
+
+	if (!self)
+	{
+		return;
+	}
 
 	self->numTargets = 0;
 	if (self->target)
@@ -2836,7 +2833,7 @@ func_timer_think (edict_t *self)
 
 	self->target = self->targets[rand() % self->numTargets]; /* FS: Zaero specific game dll changes */
 
-	G_UseTargets (self, self->activator);
+	G_UseTargets(self, self->activator);
 	self->nextthink = level.time + self->wait + crandom() * self->random;
 	self->target = NULL; /* FS: Zaero specific game dll changes */
 }

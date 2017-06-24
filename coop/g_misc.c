@@ -5,6 +5,7 @@
 int gibsthisframe;
 int lastgibframe;
 
+qboolean SV_movestep (edict_t *ent, vec3_t move, qboolean relink); /* FS: Zaero specific game dll changes */
 extern void M_WorldEffects(edict_t *ent); /* FS: Coop: Rogue specific */
 
 /* ===================================================== */
@@ -455,6 +456,8 @@ ThrowClientHead(edict_t *self, int damage)
 		self->nextthink = 0;
 	}
 
+	Blinky_OnClientTerminate(self); /* FS: Blinky's coop camera */
+
 	gi.linkentity(self);
 }
 
@@ -608,6 +611,12 @@ path_corner_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */, c
 
 	if (self->wait)
 	{
+		if((game.gametype == zaero_coop) && (other->goalentity)) /* FS: Zaero specific game dll changes */
+		{
+			VectorSubtract (other->goalentity->s.origin, other->s.origin, v);
+			other->ideal_yaw = vectoyaw (v);
+		}
+
 		other->monsterinfo.pausetime = level.time + self->wait;
 		other->monsterinfo.stand(other);
 		return;
@@ -1436,6 +1445,39 @@ SP_func_explosive(edict_t *self)
  */
 
 void
+barrel_touch_zaero(edict_t *self, edict_t *other, cplane_t *plane /* unused */, csurface_t *surf /*unused */) /* FS: Zaero specific game dll changes */
+{
+	float ratio;
+	vec3_t v;
+	vec3_t	move;
+	float yaw, dist;
+
+	if (!self || !other)
+	{
+		return;
+	}
+
+	if (other->groundentity == self || !other->client)
+	{
+		return;
+	}
+
+	ratio = (float)other->mass / (float)self->mass;
+	VectorSubtract (self->s.origin, other->s.origin, v);
+
+	yaw = vectoyaw(v);
+	dist = 20 * ratio * FRAMETIME;
+
+	yaw = yaw*M_PI*2 / 360;
+	
+	move[0] = cos(yaw)*dist;
+	move[1] = sin(yaw)*dist;
+	move[2] = 0;
+
+	SV_movestep(self, move, true);
+}
+
+void
 barrel_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */, csurface_t *surf /* unused */)
 
 {
@@ -1444,6 +1486,12 @@ barrel_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */, csurfa
 
 	if (!self || !other)
 	{
+		return;
+	}
+
+	if(game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		barrel_touch_zaero(self, other, plane, surf);
 		return;
 	}
 
@@ -1614,7 +1662,15 @@ SP_misc_explobox(edict_t *self)
 	gi.modelindex("models/objects/debris3/tris.md2");
 
 	self->solid = SOLID_BBOX;
-	self->movetype = MOVETYPE_STEP;
+
+	if(game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
+	{
+		self->movetype = MOVETYPE_FALLFLOAT;
+	}
+	else
+	{
+		self->movetype = MOVETYPE_STEP;
+	}
 
 	self->model = "models/objects/barrels/tris.md2";
 	self->s.modelindex = gi.modelindex(self->model);
@@ -2103,16 +2159,58 @@ SP_misc_viper(edict_t *ent)
 		return;
 	}
 
+	if ((game.gametype == zaero_coop) && (ent->spawnflags & 1)) /* FS: Zaero specific game dll changes */
+	{
+		ent->s.effects |= EF_ROCKET;
+		ent->spawnflags &= ~1; // turn this off so that it doesn't mess up the trains
+	}
+
 	if (!ent->speed)
 	{
 		ent->speed = 300;
 	}
 
 	ent->movetype = MOVETYPE_PUSH;
-	ent->solid = SOLID_NOT;
-	ent->s.modelindex = gi.modelindex("models/ships/viper/tris.md2");
-	VectorSet(ent->mins, -16, -16, 0);
-	VectorSet(ent->maxs, 16, 16, 32);
+
+	if ((game.gametype == zaero_coop) && (ent->spawnflags & 2)) /* FS: Zaero specific game dll changes */
+	{
+		ent->solid = SOLID_BBOX;
+	}
+	else
+	{
+		ent->solid = SOLID_NOT;
+	}
+
+	if((game.gametype == zaero_coop)) /* FS: Zaero specific game dll changes */
+	{
+		if(ent->model)
+		{
+			ent->s.modelindex = gi.modelindex (ent->model);
+		}
+		if(ent->model2)
+		{
+			ent->s.modelindex2 = gi.modelindex (ent->model2);
+		}
+		if(ent->model3)
+		{
+			ent->s.modelindex3 = gi.modelindex (ent->model3);
+		}
+
+		if(ent->model4)
+		{
+			ent->s.modelindex4 = gi.modelindex (ent->model4);
+		}
+	}
+	else
+	{
+		ent->s.modelindex = gi.modelindex("models/ships/viper/tris.md2");
+	}
+
+	if ((game.gametype != zaero_coop) || ( (game.gametype == zaero_coop) && (!(ent->spawnflags & 4)))) /* FS: Zaero specific game dll changes */
+	{
+		VectorSet(ent->mins, -16, -16, 0);
+		VectorSet(ent->maxs, 16, 16, 32);
+	}
 
 	ent->think = func_train_find;
 	ent->nextthink = level.time + FRAMETIME;

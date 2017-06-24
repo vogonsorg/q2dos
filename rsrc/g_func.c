@@ -184,7 +184,7 @@ Move_Begin(edict_t *ent)
 void
 Move_Calc(edict_t *ent, vec3_t dest, void (*func)(edict_t *))
 {
-	if (!ent)
+	if (!ent || !func)
 	{
 		return;
 	}
@@ -330,7 +330,7 @@ AngleMove_Begin(edict_t *ent)
 void
 AngleMove_Calc(edict_t *ent, void (*func)(edict_t *))
 {
-	if (!ent)
+	if (!ent || !func)
 	{
 		return;
 	}
@@ -3059,6 +3059,11 @@ SP_func_water(edict_t *self)
 void
 train_blocked(edict_t *self, edict_t *other)
 {
+	if (!self || !other)
+	{
+		return;
+	}
+
 	if (!(other->svflags & SVF_MONSTER) && (!other->client))
 	{
 		/* give it a chance to go away on it's own terms (like gibs) */
@@ -3343,7 +3348,7 @@ void
 train_use(edict_t *self, edict_t *other /* unused */,
 	   	edict_t *activator)
 {
-	if (!self || !other)
+	if (!self || !activator)
 	{
 		return;
 	}
@@ -3767,6 +3772,11 @@ door_secret_move5(edict_t *self)
 void
 door_secret_move6(edict_t *self)
 {
+	if (!self)
+	{
+		return;
+	}
+
 	Move_Calc(self, vec3_origin, door_secret_done);
 }
 
@@ -3828,7 +3838,7 @@ door_secret_die(edict_t *self, edict_t *inflictor /* unused */,
 		edict_t *attacker, int damage /* unused */,
 		vec3_t point /* unused */)
 {
-	if (!self)
+	if (!self || !attacker)
 	{
 		return;
 	}

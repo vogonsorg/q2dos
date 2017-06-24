@@ -180,12 +180,12 @@ ai_stand(edict_t *self, float dist)
 void
 ai_walk(edict_t *self, float dist)
 {
-	M_MoveToGoal(self, dist);
-
 	if (!self)
 	{
 		return;
 	}
+
+	M_MoveToGoal(self, dist);
 
 	/* check for noticing a player */
 	if (FindTarget(self))
@@ -420,17 +420,12 @@ infront(edict_t *self, edict_t *other)
 	float dot;
 	vec3_t forward;
 
-	if ((self == NULL) || (other == NULL))
+	if (!self || !other)
 	{
 		return false;
 	}
 
 	AngleVectors(self->s.angles, forward, NULL, NULL);
-
-	if ((self == NULL) || (other == NULL))
-	{
-		return false;
-	}
 
 	VectorSubtract(other->s.origin, self->s.origin, vec);
 	VectorNormalize(vec);
@@ -443,6 +438,7 @@ infront(edict_t *self, edict_t *other)
 
 	return false;
 }
+
 
 /* ============================================================================ */
 
@@ -468,7 +464,10 @@ HuntTarget(edict_t *self)
 		self->monsterinfo.run(self);
 	}
 
-	VectorSubtract(self->enemy->s.origin, self->s.origin, vec);
+	if(visible(self, self->enemy))
+	{
+		VectorSubtract(self->enemy->s.origin, self->s.origin, vec);
+	}
 	self->ideal_yaw = vectoyaw(vec);
 
 	/* wait a while before first attack */
@@ -481,7 +480,7 @@ HuntTarget(edict_t *self)
 void
 FoundTarget(edict_t *self)
 {
-	if (!self)
+	if (!self || !self->enemy || !self->enemy->inuse) /* FS: Need self->enemy check */
 	{
 		return;
 	}
@@ -499,7 +498,7 @@ FoundTarget(edict_t *self)
 		level.sight_entity->light_level = 128;
 	}
 
-	self->show_hostile = level.time + 1; /* wake up other monsters */
+	self->show_hostile = (int)level.time + 1; /* wake up other monsters */
 
 	VectorCopy(self->enemy->s.origin, self->monsterinfo.last_sighting);
 	self->monsterinfo.trail_time = level.time;
@@ -688,7 +687,7 @@ FindTarget(edict_t *self)
 
 		if (r == RANGE_NEAR)
 		{
-			if ((client->show_hostile < level.time) && !infront(self, client))
+			if ((client->show_hostile < (int)level.time) && !infront(self, client))
 			{
 				return false;
 			}
@@ -819,7 +818,7 @@ M_CheckAttack(edict_t *self)
 	float chance;
 	trace_t tr;
 
-	if (!self)
+	if (!self || !self->enemy || !self->enemy->inuse) /* FS: Need self->enemy check */
 	{
 		return false;
 	}
@@ -1153,8 +1152,9 @@ ai_checkattack(edict_t *self, float dist)
 	qboolean hesDeadJim;
 	qboolean retval;
 
-	if (!self)
+	if (!self || !self->enemy || !self->enemy->inuse) /* FS: Need self->enemy check */
 	{
+		enemy_vis = false;
 		return false;
 	}
 
@@ -1167,9 +1167,10 @@ ai_checkattack(edict_t *self, float dist)
 			return false;
 		}
 
-		if (self->monsterinfo.aiflags & AI_SOUND_TARGET)
+		/* only check sound if it's not visible anyway (=> attack if visible) */
+		if ((self->monsterinfo.aiflags & AI_SOUND_TARGET) && !visible(self, self->goalentity))
 		{
-			if ((level.time - self->enemy->teleport_time) > 5.0)
+			if ((level.time - self->enemy->last_sound_time) > 5.0)
 			{
 				if (self->goalentity == self->enemy)
 				{
@@ -1192,7 +1193,7 @@ ai_checkattack(edict_t *self, float dist)
 			}
 			else
 			{
-				self->show_hostile = level.time + 1;
+				self->show_hostile = (int)level.time + 1;
 				return false;
 			}
 		}
@@ -1272,7 +1273,7 @@ ai_checkattack(edict_t *self, float dist)
 		}
 	}
 
-	self->show_hostile = level.time + 1; /* wake up other monsters */
+	self->show_hostile = (int)level.time + 1; /* wake up other monsters */
 
 	/* check knowledge of enemy */
 	enemy_vis = visible(self, self->enemy);
@@ -1295,10 +1296,14 @@ ai_checkattack(edict_t *self, float dist)
 		}
 	}
 
-	enemy_infront = infront(self, self->enemy);
-	enemy_range = range(self, self->enemy);
-	VectorSubtract(self->enemy->s.origin, self->s.origin, temp);
-	enemy_yaw = vectoyaw(temp);
+	if(self->enemy)
+	{
+		enemy_infront = infront(self, self->enemy);
+		enemy_range = range(self, self->enemy);
+		VectorSubtract(self->enemy->s.origin, self->s.origin, temp);
+		enemy_yaw = vectoyaw(temp);
+	}
+
 	retval = self->monsterinfo.checkattack(self);
 
 	if (retval)
@@ -1355,7 +1360,7 @@ ai_run(edict_t *self, float dist)
 	qboolean gotcha = false;
 	edict_t *realEnemy;
 
-	if (!self)
+	if (!self || !self->enemy || !self->enemy->inuse) /* FS: Need self->enemy check */
 	{
 		return;
 	}

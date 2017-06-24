@@ -54,7 +54,6 @@ cvar_t *flood_waitdelay;
 cvar_t *sv_maplist;
 cvar_t *sv_stopspeed;
 
-cvar_t *g_showlogic;
 cvar_t *gamerules;
 cvar_t *huntercam;
 cvar_t *strong_mines;

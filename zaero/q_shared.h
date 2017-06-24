@@ -442,7 +442,7 @@ COLLISION DETECTION
 #define	MASK_OPAQUE				(CONTENTS_SOLID|CONTENTS_SLIME|CONTENTS_LAVA)
 #define	MASK_SHOT				(CONTENTS_SOLID|CONTENTS_MONSTER|CONTENTS_WINDOW|CONTENTS_DEADMONSTER)
 #define MASK_CURRENT			(CONTENTS_CURRENT_0|CONTENTS_CURRENT_90|CONTENTS_CURRENT_180|CONTENTS_CURRENT_270|CONTENTS_CURRENT_UP|CONTENTS_CURRENT_DOWN)
-#define MASK_SHOT_NO_WINDOW		(CONTENTS_SOLID|CONTENTS_MONSTER|CONTENTS_DEADMONSTER)
+#define MASK_SHOT_NO_WINDOW		(CONTENTS_SOLID|CONTENTS_MONSTER|CONTENTS_DEADMONSTER) /* FS: Zaero specific */
 
 
 // gi.BoxEdicts() can return a list of either solid or trigger entities
@@ -652,7 +652,7 @@ typedef struct
 #define RF_SHELL_RED		1024
 #define	RF_SHELL_GREEN		2048
 #define RF_SHELL_BLUE		4096
-#define RF_NOSHADOW		8192		// don't draw a shadow
+#define RF_NOSHADOW			8192		// don't draw a shadow /* FS: Zaero specific */
 
 //ROGUE
 #define RF_IR_VISIBLE		0x00008000		// 32768
@@ -1029,7 +1029,7 @@ typedef enum
 #define	CHAN_VOICE              2
 #define	CHAN_ITEM               3
 #define	CHAN_BODY               4
-#define CHAN_WEAPON2			5
+#define CHAN_WEAPON2			5 /* FS: Zaero specific */
 // modifier flags
 #define	CHAN_NO_PHS_ADD			8	// send to all clients, not just ones in PHS (ATTN 0 will also do this)
 #define	CHAN_RELIABLE			16	// send by reliable message, not datagram
@@ -1061,12 +1061,12 @@ typedef enum
 #define	STAT_FLASHES			15		// cleared each frame, 1 = health, 2 = armor
 #define STAT_CHASE				16
 #define STAT_SPECTATOR			17
-#define STAT_SHOW_ORIGIN 18
-#define STAT_ORIGIN_X 19
-#define STAT_ORIGIN_Y 20
-#define STAT_ORIGIN_Z 21
-#define STAT_CAMERA_ICON 22
-#define STAT_CAMERA_TIMER 23
+#define STAT_SHOW_ORIGIN		18	/* FS: Zaero specific */
+#define STAT_ORIGIN_X			19	/* FS: Zaero specific */
+#define STAT_ORIGIN_Y			20	/* FS: Zaero specific */
+#define STAT_ORIGIN_Z			21	/* FS: Zaero specific */
+#define STAT_CAMERA_ICON		22	/* FS: Zaero specific */
+#define STAT_CAMERA_TIMER		23	/* FS: Zaero specific */
 
 #define	MAX_STATS				32
 

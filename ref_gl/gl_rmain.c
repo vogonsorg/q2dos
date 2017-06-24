@@ -1077,10 +1077,13 @@ void R_Register ( void )
 	gl_mode = ri.Cvar_Get( "gl_mode", "3", CVAR_ARCHIVE );
 	gl_lightmap = ri.Cvar_Get ("gl_lightmap", "0", 0);
 	gl_shadows = ri.Cvar_Get ("gl_shadows", "0", CVAR_ARCHIVE );
+	gl_shadows->description = "Enable blob-rendering shadows.";
 	gl_shadowalpha = ri.Cvar_Get ("gl_shadowalpha", "0.4", 0); /* Knightmare- added shadow alpha */
 	gl_dynamic = ri.Cvar_Get ("gl_dynamic", "1", 0);
+	gl_dynamic->description = "Enable dynamic lighting effects.";
 	gl_nobind = ri.Cvar_Get ("gl_nobind", "0", 0);
 	gl_round_down = ri.Cvar_Get ("gl_round_down", "1", 0);
+	gl_round_down->description = "Round down textures.  Only active active on 3DFX Voodoo cards.";
 	gl_picmip = ri.Cvar_Get ("gl_picmip", "0", 0);
 	gl_skymip = ri.Cvar_Get ("gl_skymip", "0", 0);
 	gl_showtris = ri.Cvar_Get ("gl_showtris", "0", 0);
@@ -1090,11 +1093,17 @@ void R_Register ( void )
 #else
 	gl_ztrick = ri.Cvar_Get ("gl_ztrick", "0", 0);
 #endif
+	gl_ztrick->description = "Toggles the use of a trick to prevent the clearing of the z-buffer between frames. When this variable is set to 1 the game will not clear the z-buffer between frames. This will result in increased performance but might cause problems for some display hardware.";
 	gl_finish = ri.Cvar_Get ("gl_finish", "0", CVAR_ARCHIVE);
+	gl_finish->description = "Send a gl_finish at the end of every frame.  Some old video cards may require this.";
 	gl_clear = ri.Cvar_Get ("gl_clear", "0", 0);
+	gl_clear->description = "Use a clear colour to avoid Hall of Mirror (HOM) effects.  Useful for noclipping, spectating, and finding leaks in maps.";
 	gl_cull = ri.Cvar_Get ("gl_cull", "1", 0);
+	gl_cull->description = "Cull (i.e. skip) rendering of objects not in the viewport.";
 	gl_polyblend = ri.Cvar_Get ("gl_polyblend", "1", 0);
+	gl_polyblend->description = "Show palette blends i.e. screen turning red from damage.";
 	gl_flashblend = ri.Cvar_Get ("gl_flashblend", "0", 0);
+	gl_flashblend->description = "Set to 0 to use fake dynamic lights that have a mushroom cloud effect.  Can improve performance on old hardware.";
 	gl_playermip = ri.Cvar_Get ("gl_playermip", "0", 0);
 	gl_monolightmap = ri.Cvar_Get( "gl_monolightmap", "0", 0 );
 #ifdef __DJGPP__ /* FS: Don't clash with win32's usage of opengl32 and mini drivers */
@@ -1119,15 +1128,18 @@ void R_Register ( void )
 #else
 	gl_ext_multitexture = ri.Cvar_Get( "gl_ext_multitexture", "1", CVAR_ARCHIVE );
 #endif
+	gl_ext_multitexture->description = "Enables multitexturing.  Typically decreases performance in most situations.  Useful for 1280x1024 (and higher) and 32bpp modes.";
 #ifdef __DJGPP__
 	gl_ext_pointparameters = ri.Cvar_Get( "gl_ext_pointparameters", "0", CVAR_ARCHIVE ); /* FS: Hardlocks when it's time to draw a particle */
 #else
 	gl_ext_pointparameters = ri.Cvar_Get( "gl_ext_pointparameters", "1", CVAR_ARCHIVE );
 #endif
+	gl_ext_pointparameters->description = "Draws rounded particle effects instead of blocky particle effects.  Can decrease performance or cause hard-locks on some configurations.  Particle size is controlled with gl_particle_size.";
 	gl_ext_compiled_vertex_array = ri.Cvar_Get( "gl_ext_compiled_vertex_array", "1", CVAR_ARCHIVE );
 	/* Knightmare- non-power-of-two texture support */
 	gl_arb_texturenonpoweroftwo = ri.Cvar_Get( "gl_arb_texturenonpoweroftwo", "1", CVAR_ARCHIVE );
 	gl_nonpoweroftwo_mipmaps = ri.Cvar_Get( "gl_nonpoweroftwo_mipmaps", "1", CVAR_ARCHIVE );
+	gl_nonpoweroftwo_mipmaps->description = "Allow non-power-of-two textures if hardware supports it.";
 
 	gl_newtextureformat = ri.Cvar_Get("gl_newtextureformat", "1", CVAR_ARCHIVE);	/* Knightmare- whether to use RGBA textures / BGRA lightmaps */
 
@@ -1137,6 +1149,7 @@ void R_Register ( void )
 	gl_saturatelighting = ri.Cvar_Get( "gl_saturatelighting", "0", 0 );
 
 	gl_3dlabs_broken = ri.Cvar_Get( "gl_3dlabs_broken", "1", CVAR_ARCHIVE );
+	gl_3dlabs_broken->description = "Prevent the toggling of fullscreen/windowed mode when running on a broken 3Dlabs driver.";
 
 	vid_fullscreen = ri.Cvar_Get( "vid_fullscreen", "1", CVAR_ARCHIVE );
 	vid_gamma = ri.Cvar_Get( "vid_gamma", "1.0", CVAR_ARCHIVE );
@@ -1144,6 +1157,7 @@ void R_Register ( void )
 
 	r_skydistance = ri.Cvar_Get("r_skydistance", "4600", 0); /* Knightmare- variable sky range */
 	r_entity_fliproll = ri.Cvar_Get( "r_entity_fliproll", "0", 0);	/* Knightmare- allow disabling of backwards alias model roll */
+	r_entity_fliproll->description = "Allow disabling of backwards alias model roll.";
 	r_lightcutoff = ri.Cvar_Get("r_lightcutoff", "64", 0);	// DMP: dynamic light cutoff now variable
 	developer = ri.Cvar_Get ("developer", "0", 0);	/* Knightmare added */
 

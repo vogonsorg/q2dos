@@ -351,7 +351,7 @@ chick_pain(edict_t *self, edict_t *other /* other */, float kick /* other */, in
 	if (self->health < (self->max_health / 2))
 	{
 		// Knightmare- show right pain skin for beta class
-		if ( (game.gametype == xatrix_coop) && !strcmp(self->classname, "monster_chick_heat") ) /* FS: Coop: Xatrix specific */
+		if ((game.gametype == xatrix_coop) && (self->classname) && (!strcmp(self->classname, "monster_chick_heat"))) /* FS: Coop: Xatrix specific */
 		{
 			self->s.skinnum = 2;
 		}

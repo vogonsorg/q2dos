@@ -200,7 +200,7 @@ void ai_charge (edict_t *self, float dist)
 		return;
 	}
 
-	if(self->monsterinfo.aiflags & AI_ONESHOTTARGET)
+	if(self->monsterinfo.aiflags & AI_ONESHOTTARGET) /* FS: Zaero specific */
 	{
 		VectorSubtract (self->monsterinfo.shottarget, self->s.origin, v);
 	}
@@ -389,7 +389,7 @@ inweaponLineOfSight
 returns 1 if the entity is in weapon line of sight (in sight) of self
 =============
 */
-qboolean inweaponLineOfSight (edict_t *self, edict_t *other)
+qboolean inweaponLineOfSight (edict_t *self, edict_t *other) /* FS: Zaero specific */
 {
 	vec3_t	vec;
 	float	dot;
@@ -457,7 +457,7 @@ FoundTarget(edict_t *self)
 		level.sight_entity->light_level = 128;
 	}
 
-	self->show_hostile = level.time + 1;		// wake up other monsters
+	self->show_hostile = (int)level.time + 1;		// wake up other monsters
 
 	VectorCopy(self->enemy->s.origin, self->monsterinfo.last_sighting);
 	self->monsterinfo.trail_time = level.time;
@@ -647,7 +647,7 @@ FindTarget(edict_t *self)
 
 		if (r == RANGE_NEAR)
 		{
-			if ((client->show_hostile < level.time) && !infront(self, client))
+			if ((client->show_hostile < (int)level.time) && !infront(self, client))
 			{
 				return false;
 			}
@@ -962,9 +962,14 @@ ai_fly_strafe
 Strafing for flying creatures
 */
 int SV_FlyMove (edict_t *ent, float time, int mask);
-void ai_fly_strafe(edict_t *self, float dist)
+void ai_fly_strafe(edict_t *self, float dist) /* FS: Zaero specific */
 {
 	vec3_t forward, right, vel;
+
+	if (!self)
+	{
+		return;
+	}
 
 	// face the enemy
 	self->ideal_yaw = enemy_yaw;
@@ -1007,9 +1012,10 @@ ai_checkattack (edict_t *self, float dist)
 			return false;
 		}
 
-		if (self->monsterinfo.aiflags & AI_SOUND_TARGET)
+		/* only check sound if it's not visible anyway (=> attack if visible) */
+		if ((self->monsterinfo.aiflags & AI_SOUND_TARGET) && !visible(self, self->goalentity))
 		{
-			if ((level.time - self->enemy->teleport_time) > 5.0)
+			if ((level.time - self->enemy->last_sound_time) > 5.0)
 			{
 				if (self->goalentity == self->enemy)
 				{
@@ -1033,7 +1039,7 @@ ai_checkattack (edict_t *self, float dist)
 			}
 			else
 			{
-				self->show_hostile = level.time + 1;
+				self->show_hostile = (int)level.time + 1;
 				return false;
 			}
 		}
@@ -1106,7 +1112,7 @@ ai_checkattack (edict_t *self, float dist)
 	}
 
 	/* wake up other monsters */
-	self->show_hostile = level.time + 1;
+	self->show_hostile = (int)level.time + 1;
 
 	/* check knowledge of enemy */
 	enemy_vis = visible(self, self->enemy);

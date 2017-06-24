@@ -54,6 +54,7 @@ cvar_t	*developer;
 cvar_t	*timescale;
 cvar_t	*fixedtime;
 cvar_t	*logfile_active;	// 1 = buffer log, 2 = flush after each print
+cvar_t	*logfile_name; /* FS: Added */
 cvar_t	*showtrace;
 cvar_t	*dedicated;
 cvar_t	*cfg_default; /* FS: Added */
@@ -143,18 +144,26 @@ void Com_Printf (char *fmt, ...)
 	if (logfile_active && logfile_active->value)
 	{
 		char	name[MAX_QPATH];
-		
+
+		if(!logfile_name->string[0]) /* FS: If it's emtpy, set to default */
+		{
+			Cvar_Set("logfile_name", logfile_name->defaultValue);
+		}
+
 		if (!logfile)
 		{
-			Com_sprintf (name, sizeof(name), "%s/qconsole.log", FS_Gamedir ());
+			Com_sprintf (name, sizeof(name), "%s/%s", FS_Gamedir (), logfile_name->string);
+
+			FS_CreatePath(name);
+
 			if (logfile_active->value > 2)
 				logfile = fopen (name, "a");
 			else
-			logfile = fopen (name, "w");
+				logfile = fopen (name, "w");
 		}
 		if (logfile)
 			fprintf (logfile, "%s", msg);
-		if (logfile_active->value > 1)
+		if (logfile && logfile_active->value > 1)
 			fflush (logfile);		// force it to save every time
 	}
 }
@@ -927,7 +936,14 @@ void *SZ_GetSpace (sizebuf_t *buf, int length)
 	if (buf->cursize + length > buf->maxsize)
 	{
 		if (!buf->allowoverflow)
+		{
+#ifdef _WIN32
+#ifdef _DEBUG /* FS: FIXME TODO: Got something greater than 1400 bytes here in coop game dll, probably a svc_frame.  Need to verify where and what to do */
+			assert(false);
+#endif // _DEBUG
+#endif // _WIN32
 			Com_Error (ERR_FATAL, "SZ_GetSpace: overflow without allowoverflow set");
+		}
 		
 		if (length > buf->maxsize)
 		{
@@ -1450,6 +1466,9 @@ void Qcommon_Init (int argc, char **argv)
 	timescale = Cvar_Get ("timescale", "1", 0);
 	fixedtime = Cvar_Get ("fixedtime", "0", 0);
 	logfile_active = Cvar_Get ("logfile", "0", 0);
+	logfile_active->description = "Log console output.  1 -- Overwrite previous existing file.  2 or higher -- Append previous existing file.  Control the name with logfile_name CVAR.";
+	logfile_name = Cvar_Get ("logfile_name", "qconsole.log", 0);
+	logfile_name->description = "File name to create/append for logfile CVAR.";
 	showtrace = Cvar_Get ("showtrace", "0", 0);
 #ifdef DEDICATED_ONLY
 	dedicated = Cvar_Get ("dedicated", "1", CVAR_NOSET);

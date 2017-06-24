@@ -313,7 +313,7 @@ int Bot_SearchEnemy (edict_t *ent)
 					{
 						if(Bot[ent->client->zc.botindex].param[BOP_NOISECHK])
 						{
-							if(trent->mynoise->teleport_time >= (level.time - FRAMETIME))
+							if(trent->mynoise->last_sound_time >= (level.time - FRAMETIME))
 							{
 								VectorSubtract (trent->mynoise->s.origin, ent->s.origin, trmin);
 								if(VectorLength(trmin) < 300)
@@ -322,7 +322,7 @@ int Bot_SearchEnemy (edict_t *ent)
 									if((9 * random()) < pitch) target = trent;
 								}
 							}
-							if(target == NULL && trent->mynoise2->teleport_time >= (level.time - FRAMETIME))
+							if(target == NULL && trent->mynoise2->last_sound_time >= (level.time - FRAMETIME))
 							{
 								VectorSubtract (trent->mynoise->s.origin, ent->s.origin, trmin);
 								if(VectorLength(trmin) < 100)
@@ -343,7 +343,7 @@ int Bot_SearchEnemy (edict_t *ent)
 					&& !tmpflg && trent->mynoise)
 				{
 
-					if(trent->mynoise->teleport_time >= (level.time - FRAMETIME))
+					if(trent->mynoise->last_sound_time >= (level.time - FRAMETIME))
 					{
 						AngleVectors (trent->client->v_angle, trmin, NULL, NULL);
 						VectorScale(trmin,200,trmin);

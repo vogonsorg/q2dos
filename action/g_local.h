@@ -1219,30 +1219,30 @@ struct edict_s
         float           fly_sound_debounce_time;        //move to clientinfo
         float           last_move_time;
 
-        int                     health;
-        int                     max_health;
-        int                     gib_health;
-        int                     deadflag;
-        qboolean        show_hostile;
+        int				health;
+        int				max_health;
+        int				gib_health;
+        int				deadflag;
+        int		        show_hostile;
 
         float           powerarmor_time;
 
         char            *map;                   // target_changelevel
 
-        int                     viewheight;             // height above origin where eyesight is determined
-        int                     takedamage;
-        int                     dmg;
-        int                     radius_dmg;
+        int				viewheight;             // height above origin where eyesight is determined
+        int				takedamage;
+        int				dmg;
+        int				radius_dmg;
         float           dmg_radius;
-        int                     sounds;                 //make this a spawntemp var?
-        int                     count;
+        int				sounds;                 //make this a spawntemp var?
+        int				count;
 
         edict_t         *chain;
         edict_t         *enemy;
         edict_t         *oldenemy;
         edict_t         *activator;
         edict_t         *groundentity;
-        int                     groundentity_linkcount;
+        int				groundentity_linkcount;
         edict_t         *teamchain;
         edict_t         *teammaster;
 
@@ -1259,7 +1259,7 @@ struct edict_s
         float           delay;                  // before firing targets
         float           random;
 
-        float           teleport_time;
+        float           last_sound_time;
 
         int                     watertype;
         int                     waterlevel;

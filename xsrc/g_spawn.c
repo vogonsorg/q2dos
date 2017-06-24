@@ -362,6 +362,11 @@ char *ED_NewString (char *string)
 	char *newb, *new_p;
 	int i, l;
 
+	if (!string)
+	{
+		return NULL;
+	}
+
 	l = strlen(string) + 1;
 
 	newb = gi.TagMalloc(l, TAG_LEVEL);
@@ -417,7 +422,7 @@ void ED_ParseField (char *key, char *value, edict_t *ent)
 
 	for (f = fields; f->name; f++)
 	{
-		if (!(f->flags & FFL_NOSPAWN) && !Q_stricmp(f->name, key))
+		if (!(f->flags & FFL_NOSPAWN) && !Q_strcasecmp(f->name, (char *)key))
 		{
 			/* found it */
 			if (f->flags & FFL_SPAWNTEMP)
@@ -441,7 +446,7 @@ void ED_ParseField (char *key, char *value, edict_t *ent)
 					((float *)(b + f->ofs))[2] = vec[2];
 					break;
 				case F_INT:
-					*(int *)(b + f->ofs) = atoi(value);
+					*(int *)(b + f->ofs) = (int)strtol(value, (char **)NULL, 10);
 					break;
 				case F_FLOAT:
 					*(float *)(b + f->ofs) = atof(value);
@@ -478,6 +483,11 @@ char *ED_ParseEdict (char *data, edict_t *ent)
 	qboolean	init;
 	char		keyname[256];
 	char		*com_token;
+
+	if (!ent)
+	{
+		return NULL;
+	}
 
 	init = false;
 	memset(&st, 0, sizeof(st));

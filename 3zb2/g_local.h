@@ -1194,7 +1194,7 @@ struct edict_s
 	int			max_health;
 	int			gib_health;
 	int			deadflag;
-	qboolean	show_hostile;
+	int	show_hostile;
 
 	float		powerarmor_time;
 
@@ -1230,7 +1230,7 @@ struct edict_s
 	float		delay;			// before firing targets
 	float		random;
 
-	float		teleport_time;
+	float		last_sound_time;
 
 	int			watertype;
 	int			waterlevel;
