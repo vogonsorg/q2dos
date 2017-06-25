@@ -793,7 +793,7 @@ void R_DrawTextureChains (void)
 
 	c_visible_textures = 0;
 
-	if (!gl_config.multitexture)
+	if (!gl_config.multitexture || r_fullbright->intValue)
 	{
 		for ( i = 0, image=gltextures ; i<numgltextures ; i++,image++)
 		{
@@ -939,6 +939,9 @@ void R_RebuildLightmaps (void)
 {
 	int			i;
 	qboolean	storeSet = false;
+
+	if (r_fullbright->intValue)
+		return;
 
 	for (i=1; i<gl_lms.current_lightmap_texture; i++)
 	{
