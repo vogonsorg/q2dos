@@ -266,7 +266,11 @@ sfx_t *S_FindName (char *name, qboolean create)
 	if (i == num_sfx)
 	{
 		if (num_sfx == MAX_SFX)
-			Com_Error (ERR_FATAL, "S_FindName: out of sfx_t");
+		{
+			Com_DPrintf(DEVELOPER_MSG_SOUND, "WARNING: MAX_SFX limit reached: %d\n", num_sfx); /* FS: FIXME: Silently fail out.  Got this during the big 80+ players match in city64.bsp */
+			return;
+//			Com_Error (ERR_FATAL, "S_FindName: out of sfx_t");
+		}
 		num_sfx++;
 	}
 	
