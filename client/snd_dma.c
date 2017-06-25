@@ -268,7 +268,7 @@ sfx_t *S_FindName (char *name, qboolean create)
 		if (num_sfx == MAX_SFX)
 		{
 			Com_DPrintf(DEVELOPER_MSG_SOUND, "WARNING: MAX_SFX limit reached: %d\n", num_sfx); /* FS: FIXME: Silently fail out.  Got this during the big 80+ players match in city64.bsp */
-			return;
+			return NULL;
 //			Com_Error (ERR_FATAL, "S_FindName: out of sfx_t");
 		}
 		num_sfx++;
@@ -349,6 +349,9 @@ sfx_t *S_RegisterSound (char *name)
 		return NULL;
 
 	sfx = S_FindName (name, true);
+	if (!sfx) /* FS: Don't bomb out if we reach the limit here, just silently fail */
+		return NULL;
+
 	sfx->registration_sequence = s_registration_sequence;
 
 	if (!s_registering)
