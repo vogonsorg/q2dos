@@ -592,6 +592,11 @@ void CoopUpdateMotdMenu (void)
 		motdToken = strtok_r(NULL, separators, &listPtr);
 		i++;
 	}
+
+	if(motdString)
+	{
+		free(motdString);
+	}
 }
 
 void CoopMotd(edict_t *ent, pmenuhnd_t *p /* unused */)
