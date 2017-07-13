@@ -298,9 +298,23 @@ pmenu_t chasemenu[] = {
 	{NULL, PMENU_ALIGN_CENTER, NULL},
 	{"Return to Main Menu", PMENU_ALIGN_LEFT, CoopReturnToMain}
 };
+
 char *coopMapFileBuffer = NULL;
 int mapCount = 0;
 pmenu_t *votemapmenu = NULL;
+
+#define MAX_GAMEMODES		128
+#define GAMEMODE_ERROR		-1
+#define GAMEMODE_AVAILABLE	0
+#define GAMEMODE_EXISTS		1
+
+typedef struct gamemode_s
+{
+	char mapname[64];
+	char gamemode[64];
+}gamemode_t;
+
+gamemode_t gamemode_array[MAX_GAMEMODES];
 
 char *GetSkillString (void)
 {
@@ -1392,3 +1406,34 @@ void CoopBlinkyTeleportMenu(edict_t *ent, pmenuhnd_t *p /* unused */)
 	ent->client->menu_update = CoopUpdateBlinkyTeleportMenu;
 }
 
+int CoopGamemodeExists (const char *gamemode)
+{
+	int i;
+
+	if (!gamemode || !strlen(gamemode))
+		return GAMEMODE_ERROR;
+
+	for (i = 0; i < MAX_GAMEMODES; i++)
+	{
+		if (!strcmp(gamemode_array[i].gamemode, gamemode))
+			return GAMEMODE_EXISTS;
+	}
+
+	return GAMEMODE_AVAILABLE;
+}
+
+void CoopGamemodeAdd (const char *gamemode, const char *mapname)
+{
+	static int gamemode_index;
+
+	if (!gamemode || !strlen(gamemode) || !mapname || !strlen(mapname))
+		return;
+
+	if (gamemode_index > MAX_GAMEMODES-1)
+		gi.error("Can't add gamemode %s to voting list.  Limit %d reached.");
+
+	Com_sprintf(gamemode_array[gamemode_index].gamemode, sizeof(gamemode_array[gamemode_index].gamemode), "%s", gamemode);
+	Com_sprintf(gamemode_array[gamemode_index].mapname, sizeof(gamemode_array[gamemode_index].mapname), "%s", mapname);
+
+	gamemode_index++;
+}
