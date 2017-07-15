@@ -137,7 +137,7 @@
   #define HAVE_VARIADIC_MACROS_GCC 1
 
   #if (DJGPP_MINOR >= 4)
-    #define HAVE_STRLCAT  1
+  /*#define HAVE_STRLCAT  1*/
   #endif
 
   /* Because djgpp <= 2.03 doesn't have snprintf() etc. */
