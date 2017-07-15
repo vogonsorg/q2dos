@@ -1186,6 +1186,11 @@ void vote_connect (edict_t *ent);
 void vote_disconnect_recalc(edict_t *ent);
 void vote_stop (edict_t *ent);
 
+//
+// g_coop.c
+//
+void CoopGamemodeInit (void);
+
 //====================
 // ROGUE PROTOTYPES
 //

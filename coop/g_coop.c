@@ -59,6 +59,10 @@ void CoopBlinkySummonMenu(edict_t *ent, pmenuhnd_t *p);
 void CoopBlinkyTeleportMenu(edict_t *ent, pmenuhnd_t *p);
 void CoopBlinkyToggleSummon(edict_t *ent, pmenuhnd_t *p);
 
+void CoopGamemodeInit (void);
+int CoopGamemodeExists (const char *gamemode);
+void CoopGamemodeAdd (const char *gamemode, const char *mapname);
+
 extern void VoteMenuOpen(edict_t *ent);
 /*-----------------------------------------------------------------------*/
 
@@ -1036,8 +1040,6 @@ void votemenu_loadmaplist (void)
 	{
 		free(coopMapTokenBuffer);
 	}
-
-	return;
 }
 
 void CoopInitBlinkyMenu(edict_t *ent)
@@ -1406,6 +1408,92 @@ void CoopBlinkyTeleportMenu(edict_t *ent, pmenuhnd_t *p /* unused */)
 	ent->client->menu_update = CoopUpdateBlinkyTeleportMenu;
 }
 
+void CoopGamemodeInit (void)
+{
+	char fileName[MAX_OSPATH];
+	char *mapToken = NULL;
+	char *gamemodeToken = NULL;
+	char *fileBuffer = NULL;
+	char *listPtr = NULL;
+	char *listPtr2 = NULL;
+	char separators[] = "\n";
+	long fileSize;
+	FILE *f = NULL;
+	size_t toEOF = 0;
+
+	memset(gamemode_array, 0, sizeof(gamemode_t)*MAX_GAMEMODES);
+
+	CoopGamemodeAdd("vanilla", "base1.bsp");
+	CoopGamemodeAdd("xatrix", "xswamp.bsp");
+	CoopGamemodeAdd("rogue", "rmine1.bsp");
+	CoopGamemodeAdd("zaero", "zbase1.bsp");
+
+	if(sv_coop_maplist->string[0] == 0)
+	{
+		gi.cprintf(NULL, PRINT_CHAT, "CoopGamemodeInit: sv_coop_maplist CVAR empty!\n");
+		return;
+	}
+
+	Sys_Mkdir(va("%s/maps", gamedir->string));
+	Com_sprintf(fileName, sizeof(fileName), "%s/%s", gamedir->string, sv_coop_maplist->string);
+
+	f = fopen(fileName, "r");
+	if(!f)
+	{
+		gi.cprintf(NULL, PRINT_CHAT, "CoopGamemodeInit: couldn't find '%s'!\n", sv_coop_maplist->string);
+		return;
+	}
+
+	/* obtain file size */
+	fseek (f, 0, SEEK_END);
+	fileSize = ftell (f);
+	fseek (f, 0, SEEK_SET);
+
+	fileBuffer = (char *)malloc(sizeof(char)*(fileSize+2)); /* FS: In case we have to add a newline terminator */
+	if(!fileBuffer)
+	{
+		gi.cprintf(NULL, PRINT_CHAT, "CoopGamemodeInit: can't allocate memory for coopGamemodeBuffer!\n");
+		fclose(f);
+		return;
+	}
+	toEOF = fread(fileBuffer, sizeof(char), fileSize, f);
+	fclose(f);
+	if(toEOF <= 0)
+	{
+		gi.cprintf(NULL, PRINT_CHAT, "CoopGamemodeInit: cannot read file '%s' into memory!\n", sv_coop_maplist->string);
+		if(fileBuffer)
+		{
+			free(fileBuffer);
+		}
+		return;
+	}
+
+	/* FS: Add newline terminator for some paranoia */
+	fileBuffer[toEOF] = '\n';
+	fileBuffer[toEOF+1] = '\0';
+
+	mapToken = strtok_r(fileBuffer, separators, &listPtr);
+
+	while(mapToken)
+	{
+		char mapname[256];
+
+		Com_sprintf(mapname, sizeof(mapname), "%s", mapToken);
+		gamemodeToken = strtok_r(mapname, ",", &listPtr2);
+		gamemodeToken = strtok_r(NULL, ",\n", &listPtr2);
+		if(gamemodeToken && CoopGamemodeExists(gamemodeToken) == GAMEMODE_AVAILABLE)
+		{
+			gi.cprintf(NULL, PRINT_CHAT, "CoopGamemodeInit: Adding %s %s\n", mapname, gamemodeToken);
+			CoopGamemodeAdd(gamemodeToken, mapname);
+		}
+		mapToken = strtok_r(NULL, separators, &listPtr);
+	}
+
+	if(fileBuffer)
+	{
+		free(fileBuffer);
+	}
+}
 int CoopGamemodeExists (const char *gamemode)
 {
 	int i;

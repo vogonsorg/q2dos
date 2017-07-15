@@ -343,6 +343,8 @@ InitGame(void)
 	{
 		InitGameRules();
 	}
+
+	CoopGamemodeInit(); /* FS */
 }
 
 /* ========================================================= */
