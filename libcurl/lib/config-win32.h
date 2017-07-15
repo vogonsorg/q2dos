@@ -447,6 +447,7 @@
 #undef HAVE_LDAP_URL_PARSE
 #define CURL_LDAP_WIN 1
 #endif
+#define HTTP_ONLY 1 /* quake2 needs no other */
 
 /* ---------------------------------------------------------------- */
 /*                       ADDITIONAL DEFINITIONS                     */
