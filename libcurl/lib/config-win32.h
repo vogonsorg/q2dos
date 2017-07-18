@@ -308,8 +308,9 @@
 #define RETSIGTYPE void
 
 #ifndef _SSIZE_T_DEFINED
-#if (defined(__WATCOMC__) && (__WATCOMC__ >= 1240)) || defined(__POCC__) || \
-    defined(__MINGW32__)
+#if (defined(__WATCOMC__) && (__WATCOMC__ >= 1240)) || defined(__POCC__)
+#elif defined __MINGW32__
+#include <sys/types.h>
 #elif defined(_WIN64)
 #define ssize_t __int64
 #else
@@ -374,6 +375,10 @@
 #  else
 #    define SIZEOF_TIME_T 4
 #  endif
+#endif
+
+#if defined(__MINGW64__)
+#  define SIZEOF_TIME_T 8
 #endif
 
 /* VS2008 does not support Windows build targets prior to WinXP, */
@@ -442,6 +447,7 @@
 #undef HAVE_LDAP_URL_PARSE
 #define CURL_LDAP_WIN 1
 #endif
+#define HTTP_ONLY 1 /* quake2 needs no other */
 
 /* ---------------------------------------------------------------- */
 /*                       ADDITIONAL DEFINITIONS                     */
@@ -453,7 +459,7 @@
 #define OS "i386-pc-win32"
 #elif defined(_M_IA64) /* Itanium */
 #define OS "ia64-pc-win32"
-#elif defined(_M_X64) /* AMD64/EM64T - Not defined until MSVC 2005 */
+#elif defined(_M_X64) || defined(__x86_64__) /* AMD64/EM64T - Not defined until MSVC 2005 */
 #define OS "amd64-pc-win32"
 #else
 #define OS "unknown-pc-win32"
