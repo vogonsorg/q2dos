@@ -523,7 +523,7 @@ void vote_gamemode(edict_t *ent, const char *gamemode)
 	}
 	else
 	{
-		gi.cprintf(ent, PRINT_HIGH, "error: invalid gamemode!  valid options are: vanilla, xatrix, and rogue.\n");
+		gi.cprintf(ent, PRINT_HIGH, "error: invalid gamemode %s.  Vote cancelled.\n", gamemode);
 		return;
 	}
 
