@@ -41,7 +41,9 @@ int			starttime;
 qboolean	ActiveApp;
 qboolean	Minimized;
 
+#ifndef NEW_DED_CONSOLE
 static HANDLE		hinput, houtput;
+#endif
 
 unsigned int	sys_msg_time;
 unsigned int	sys_frame_time;
@@ -57,8 +59,6 @@ SYSTEM IO
 
 ===============================================================================
 */
-
-
 
 // Knightmare- replaced by new dedicated console
 #ifndef NEW_DED_CONSOLE
@@ -87,13 +87,12 @@ void Sys_Quit (void)
 
 	CL_Shutdown();
 	Qcommon_Shutdown ();
-	if (dedicated && dedicated->value)
-		FreeConsole ();
-
-
 // Knightmare added- new dedicated console
 #ifdef NEW_DED_CONSOLE
 	Sys_ShutdownConsole ();
+#else
+	if (dedicated && dedicated->value)
+		FreeConsole ();
 #endif
 
 	exit (0);

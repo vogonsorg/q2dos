@@ -10,6 +10,8 @@ USE_CURL=1
 USE_OGG=1
 # use tremor library for ogg/vorbis:
 USE_TREMOR=0
+# new q3 style dedicated server console
+NEW_DED_CONSOLE=0
 
 CC = gcc
 RC = windres
@@ -48,14 +50,19 @@ CURL_CFLAGS = -Iwin32/include
 CURL_LIBS = -Lwin32/lib64 -lcurl
 endif
 
+ifeq ($(NEW_DED_CONSOLE),1)
+CPPFLAGS+= -DNEW_DED_CONSOLE
+endif
+
 WIN32 = win32/cd_win.o \
 	win32/in_win.o \
 	win32/net_wins.o \
 	win32/q_shwin.o \
 	win32/snd_win.o \
-	win32/sys_win.o \
 	win32/vid_dll.o \
-	win32/vid_menu.o
+	win32/vid_menu.o \
+	win32/win_dedconsole.o \
+	win32/sys_win.o
 
 WIN32RES = win32/q2.res
 
