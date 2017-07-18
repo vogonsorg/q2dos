@@ -310,7 +310,7 @@ static LRESULT WINAPI Sys_ConsoleProc (HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 Sys_ConsoleEditProc
 =================
 */
-static LONG WINAPI Sys_ConsoleEditProc (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+static LRESULT WINAPI Sys_ConsoleEditProc (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
