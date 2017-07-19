@@ -382,6 +382,7 @@ typedef struct gamemode_s
 {
 	char mapname[64];
 	char gamemode[64];
+	char realgamemode[64];
 }gamemode_t;
 
 //
@@ -768,6 +769,7 @@ extern	cvar_t	*sv_vote_timer; /* FS: Coop: Voting */
 extern	cvar_t	*sv_vote_private; /* FS: Coop: Voting */
 extern	cvar_t	*sv_vote_chat_commands; /* FS: Coop: Voting */
 extern	cvar_t	*sv_coop_gamemode; /* FS: Coop: Added */
+extern	cvar_t	*sv_coop_gamemode_vote; /* FS: Coop: Added */
 extern	cvar_t	*sv_coop_reset_hack; /* FS: Coop: Gross reset frametime hack shit */
 extern	cvar_t	*sv_coop_maplist; /* FS: External file we need for the map voting */
 extern	cvar_t	*sv_coop_check_player_exit; /* FS: Check player distance to exit a level */

@@ -60,7 +60,7 @@ void CoopBlinkyToggleSummon(edict_t *ent, pmenuhnd_t *p);
 
 void CoopGamemodeInit (void);
 int CoopGamemodeExists (const char *gamemode);
-void CoopGamemodeAdd (const char *gamemode, const char *mapname);
+void CoopGamemodeAdd (const char *gamemode, const char *realgamemode, const char *mapname);
 void CoopVoteGamemodeDynamic(edict_t *ent, pmenuhnd_t *p /* unused */);
 
 extern void VoteMenuOpen(edict_t *ent);
@@ -620,6 +620,7 @@ void CoopUpdateGamemodeMenu(edict_t *ent)
 {
 	static char gamemodestring[32];
 	static char gamemode[32];
+	int i;
 
 	if(!ent || !ent->client)
 	{
@@ -642,34 +643,95 @@ void CoopUpdateGamemodeMenu(edict_t *ent)
 			else
 			{
 				Com_sprintf(gamemode, sizeof(gamemode), "%s", sv_coop_gamemode->string);
+				i = CoopGamemodeExists(gamemode);
+				if (i >= 0)
+				{
+					if(votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text)
+					{
+						free(votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text);
+					}
+				}
+				votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text = NULL;
+				votegamemodemenu[VGAMEMODEMENU_VANILLA+i].SelectFunc = NULL;
 			}
 			break;
 		case xatrix_coop:
-			Com_sprintf(gamemode, sizeof(gamemode), "Xatrix");
-			if(votegamemodemenu[VGAMEMODEMENU_XATRIX].text)
+			if(!Q_stricmp(sv_coop_gamemode->string, "xatrix")) /* FS: If in a "custom" mode show Xatrix as an option */
 			{
-				free(votegamemodemenu[VGAMEMODEMENU_XATRIX].text);
+				Com_sprintf(gamemode, sizeof(gamemode), "Xatrix");
+				if(votegamemodemenu[VGAMEMODEMENU_XATRIX].text)
+				{
+					free(votegamemodemenu[VGAMEMODEMENU_XATRIX].text);
+				}
+				votegamemodemenu[VGAMEMODEMENU_XATRIX].text = NULL;
+				votegamemodemenu[VGAMEMODEMENU_XATRIX].SelectFunc = NULL;
 			}
-			votegamemodemenu[VGAMEMODEMENU_XATRIX].text = NULL;
-			votegamemodemenu[VGAMEMODEMENU_XATRIX].SelectFunc = NULL;
+			else
+			{
+				Com_sprintf(gamemode, sizeof(gamemode), "%s", sv_coop_gamemode->string);
+				i = CoopGamemodeExists(gamemode);
+				if (i >= 0)
+				{
+					if(votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text)
+					{
+						free(votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text);
+					}
+				}
+				votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text = NULL;
+				votegamemodemenu[VGAMEMODEMENU_VANILLA+i].SelectFunc = NULL;
+			}
 			break;
 		case rogue_coop:
-			Com_sprintf(gamemode, sizeof(gamemode), "Rogue");
-			if(votegamemodemenu[VGAMEMODEMENU_ROGUE].text)
+			if(!Q_stricmp(sv_coop_gamemode->string, "rogue")) /* FS: If in a "custom" mode show Rogue as an option */
 			{
-				free(votegamemodemenu[VGAMEMODEMENU_ROGUE].text);
+				Com_sprintf(gamemode, sizeof(gamemode), "Rogue");
+				if(votegamemodemenu[VGAMEMODEMENU_ROGUE].text)
+				{
+					free(votegamemodemenu[VGAMEMODEMENU_ROGUE].text);
+				}
+				votegamemodemenu[VGAMEMODEMENU_ROGUE].text = NULL;
+				votegamemodemenu[VGAMEMODEMENU_ROGUE].SelectFunc = NULL;
 			}
-			votegamemodemenu[VGAMEMODEMENU_ROGUE].text = NULL;
-			votegamemodemenu[VGAMEMODEMENU_ROGUE].SelectFunc = NULL;
+			else
+			{
+				Com_sprintf(gamemode, sizeof(gamemode), "%s", sv_coop_gamemode->string);
+				i = CoopGamemodeExists(gamemode);
+				if (i >= 0)
+				{
+					if(votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text)
+					{
+						free(votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text);
+					}
+				}
+				votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text = NULL;
+				votegamemodemenu[VGAMEMODEMENU_VANILLA+i].SelectFunc = NULL;
+			}
 			break;
 		case zaero_coop:
-			Com_sprintf(gamemode, sizeof(gamemode), "Zaero");
-			if(votegamemodemenu[VGAMEMODEMENU_ZAERO].text)
+			if(!Q_stricmp(sv_coop_gamemode->string, "zaero")) /* FS: If in a "custom" mode show Zaero as an option */
 			{
-				free(votegamemodemenu[VGAMEMODEMENU_ZAERO].text);
+				Com_sprintf(gamemode, sizeof(gamemode), "Zaero");
+				if(votegamemodemenu[VGAMEMODEMENU_ZAERO].text)
+				{
+					free(votegamemodemenu[VGAMEMODEMENU_ZAERO].text);
+				}
+				votegamemodemenu[VGAMEMODEMENU_ZAERO].text = NULL;
+				votegamemodemenu[VGAMEMODEMENU_ZAERO].SelectFunc = NULL;
 			}
-			votegamemodemenu[VGAMEMODEMENU_ZAERO].text = NULL;
-			votegamemodemenu[VGAMEMODEMENU_ZAERO].SelectFunc = NULL;
+			else
+			{
+				Com_sprintf(gamemode, sizeof(gamemode), "%s", sv_coop_gamemode->string);
+				i = CoopGamemodeExists(gamemode);
+				if (i >= 0)
+				{
+					if(votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text)
+					{
+						free(votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text);
+					}
+				}
+				votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text = NULL;
+				votegamemodemenu[VGAMEMODEMENU_VANILLA+i].SelectFunc = NULL;
+			}
 			break;
 		default:
 			Com_sprintf(gamemode, sizeof(gamemode), "Custom");
@@ -1413,10 +1475,10 @@ void CoopGamemodeInit (void)
 
 	memset(gamemode_array, 0, sizeof(gamemode_t)*MAX_GAMEMODES);
 
-	CoopGamemodeAdd("vanilla", "base1.bsp");
-	CoopGamemodeAdd("xatrix", "xswamp.bsp");
-	CoopGamemodeAdd("rogue", "rmine1.bsp");
-	CoopGamemodeAdd("zaero", "zbase1.bsp");
+	CoopGamemodeAdd("vanilla", "vanilla", "base1.bsp");
+	CoopGamemodeAdd("xatrix", "xatrix", "xswamp.bsp");
+	CoopGamemodeAdd("rogue", "rogue", "rmine1.bsp");
+	CoopGamemodeAdd("zaero", "zaero", "zbase1.bsp");
 
 	if(sv_coop_maplist->string[0] == 0)
 	{
@@ -1466,15 +1528,29 @@ void CoopGamemodeInit (void)
 
 	while(mapToken)
 	{
-		char mapname[256];
+		char mapname[64];
 
 		Com_sprintf(mapname, sizeof(mapname), "%s", mapToken);
 		gamemodeToken = strtok_r(mapname, ",", &listPtr2);
 		gamemodeToken = strtok_r(NULL, ",\n", &listPtr2);
-		if(gamemodeToken && CoopGamemodeExists(gamemodeToken) == GAMEMODE_AVAILABLE)
+		if (gamemodeToken)
 		{
-			gi.dprintf(DEVELOPER_MSG_GAME, "CoopGamemodeInit: Adding %s %s\n", mapname, gamemodeToken);
-			CoopGamemodeAdd(gamemodeToken, mapname);
+			char gamemode[64];
+			char realgamemode[64] = "vanilla";
+
+			Com_sprintf(gamemode, sizeof(gamemode), "%s", gamemodeToken);
+
+			gamemodeToken = strtok_r(NULL, ",\n", &listPtr2);
+			if (gamemodeToken)
+			{
+				Com_sprintf(realgamemode, sizeof(realgamemode), "%s", gamemodeToken);
+			}
+
+			if((gamemode[0]) && (CoopGamemodeExists(gamemode) == GAMEMODE_AVAILABLE))
+			{
+				gi.dprintf(DEVELOPER_MSG_GAME, "CoopGamemodeInit: Adding %s %s %s\n", mapname, gamemode, realgamemode);
+				CoopGamemodeAdd(gamemode, realgamemode, mapname);
+			}
 		}
 		mapToken = strtok_r(NULL, separators, &listPtr);
 	}
@@ -1500,11 +1576,11 @@ int CoopGamemodeExists (const char *gamemode)
 	return GAMEMODE_AVAILABLE;
 }
 
-void CoopGamemodeAdd (const char *gamemode, const char *mapname)
+void CoopGamemodeAdd (const char *gamemode, const char *realgamemode, const char *mapname)
 {
 	static int gamemode_index;
 
-	if (!gamemode || !strlen(gamemode) || !mapname || !strlen(mapname))
+	if (!gamemode || !strlen(gamemode) || !mapname || !strlen(mapname) || !realgamemode || !strlen(realgamemode))
 		return;
 
 	if (gamemode_index > MAX_GAMEMODES-1)
@@ -1512,6 +1588,7 @@ void CoopGamemodeAdd (const char *gamemode, const char *mapname)
 
 	Com_sprintf(gamemode_array[gamemode_index].gamemode, sizeof(gamemode_array[gamemode_index].gamemode), "%s", gamemode);
 	Com_sprintf(gamemode_array[gamemode_index].mapname, sizeof(gamemode_array[gamemode_index].mapname), "%s", mapname);
+	Com_sprintf(gamemode_array[gamemode_index].realgamemode, sizeof(gamemode_array[gamemode_index].realgamemode), "%s", realgamemode);
 
 	gamemode_index++;
 	gamemodeCount++;

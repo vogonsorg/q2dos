@@ -25,6 +25,7 @@ cvar_t *coop;
 cvar_t *coop_item_respawn; /* FS: Coop: Added */
 cvar_t *coop_checkpoints; /* FS: Coop: Added */
 cvar_t *sv_coop_gamemode; /* FS: Coop: Added */
+cvar_t *sv_coop_gamemode_vote; /* FS: Coop: Added */
 cvar_t *sv_vote_enabled; /* FS: Coop: Voting */
 cvar_t *sv_vote_disallow_flags; /* FS: Coop: Voting */
 cvar_t *sv_vote_assume_yes; /* FS: Coop: Voting */

@@ -234,6 +234,8 @@ InitGame(void)
 	coop_checkpoints->description = "Coop checkpoints.  Uses cmds createcheckpoint, savecheckpoints, and deletecheckpoints.  Requires uses of adminpass to be set.  See source code for additional details.";
 	sv_coop_gamemode = gi.cvar("sv_coop_gamemode", "vanilla", CVAR_NOSET|CVAR_SERVERINFO); /* FS: Coop: Added */
 	sv_coop_gamemode->description = "Internal CVAR used to keep track of current gamemode during DLL resets.";
+	sv_coop_gamemode_vote = gi.cvar("sv_coop_gamemode_vote", "vanilla", CVAR_NOSET); /* FS: Coop: Added */
+	sv_coop_gamemode_vote->description = "Internal CVAR used to keep track of current gamemode during DLL resets.";
 	sv_coop_reset_hack = gi.cvar("sv_coop_reset_hack", "1", 0);
 	sv_coop_reset_hack->description = "Reset the internal timers every 3 hours if no clients are connected.  Works around frametime overflow errors.  Experimental.";
 	sv_coop_maplist = gi.cvar("sv_coop_maplist", "mapcoop.txt", 0);
@@ -307,20 +309,27 @@ InitGame(void)
 
 	if(!strcmp(sv_coop_gamemode->string, "rogue")) /* FS: Coop: Set the proper coop gamemode */
 	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "Game code is rogue\n");
 		game.gametype = rogue_coop;
 	}
 	else if (!strcmp(sv_coop_gamemode->string, "xatrix"))
 	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "Game code is xatrix\n");
 		game.gametype = xatrix_coop;
 	}
 	else if (!strcmp(sv_coop_gamemode->string, "zaero"))
 	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "Game code is zaero\n");
 		game.gametype = zaero_coop;
 	}
 	else
 	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "Game code is vanilla\n");
 		game.gametype = vanilla_coop;
 	}
+
+	gi.dprintf(DEVELOPER_MSG_GAME, "Gamemode is %s\n", sv_coop_gamemode_vote->string);
+	gi.cvar_forceset("sv_coop_gamemode", sv_coop_gamemode_vote->string);
 
 	/* items */
 	InitItems ();

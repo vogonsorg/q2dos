@@ -847,7 +847,19 @@ void vote_Passed (void)
 
 	if (!Q_stricmp(voteType, "gamemode"))
 	{
-		gi.cvar_forceset("sv_coop_gamemode", voteGamemode);
+		int i;
+
+		i = CoopGamemodeExists(voteGamemode);
+		if (i >= 0)
+		{
+			gi.cvar_forceset("sv_coop_gamemode", gamemode_array[i].realgamemode);
+			gi.cvar_forceset("sv_coop_gamemode_vote", gamemode_array[i].gamemode);
+		}
+		else
+		{
+			gi.cvar_forceset("sv_coop_gamemode", voteGamemode);
+		}
+
 		Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "deathmatch 0; coop 1; wait;wait;wait;wait;wait;map %s\n", voteGamemodeStartMap);
 	}
 	else if(!Q_stricmp(voteType, "coop difficulty"))
