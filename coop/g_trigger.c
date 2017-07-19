@@ -844,16 +844,16 @@ hurt_use(edict_t *self, edict_t *other /* unused */, edict_t *activator /* unuse
 
 	if (self->solid == SOLID_NOT)
 	{
-		int	i, num; /* FS: FIXME: Watch this.  I believe this is YQ2 game.dll specific addition, but I think it's OK to add */
-		edict_t	*touch[MAX_EDICTS], *hurtme; /* FS: FIXME: Watch this.  I believe this is YQ2 game.dll specific addition, but I think it's OK to add */
+		int	i, num;
+		edict_t	*touch[MAX_EDICTS], *hurtme;
 
 		self->solid = SOLID_TRIGGER;
-		num = gi.BoxEdicts (self->absmin, self->absmax, /* FS: FIXME: Watch this.  I believe this is YQ2 game.dll specific addition, but I think it's OK to add */
+		num = gi.BoxEdicts (self->absmin, self->absmax,
 			   	touch, MAX_EDICTS, AREA_SOLID);
 
 		/* Check for idle monsters in
 		   trigger hurt */
-		for (i = 0 ; i < num ; i++) /* FS: FIXME: Watch this.  I believe this is YQ2 game.dll specific addition, but I think it's OK to add */
+		for (i = 0 ; i < num ; i++)
 		{
 			hurtme = touch[i];
 			hurt_touch (self, hurtme, NULL, NULL);

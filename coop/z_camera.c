@@ -79,7 +79,7 @@ void zCam_Stop(struct edict_s *player)
 	{
 		player->client->ps.gunindex = gi.modelindex(player->client->pers.weapon->view_model);
 	}
-	else /* FS: FIXME: Weapon was NULL?  Disconnecting? */
+	else
 	{
 		player->client->ps.gunindex = 0;
 	}

@@ -199,7 +199,6 @@ typedef enum /* FS: Coop: Voting */
 											// (prevents run-attacks)
 //ROGUE
 
-/* FS: FIXME ZAERO: WATCH THIS WILL CLASH */
 #define AI_SCHOOLING			0x00008000
 #define AI_REDUCEDDAMAGE		0x00010000
 #define AI_MONREDUCEDDAMAGE		0x00200000
@@ -212,7 +211,7 @@ typedef enum /* FS: Coop: Voting */
 #define	AS_MISSILE				4
 #define	AS_BLIND				5	// PMM - used by boss code to do nasty things even if it can't see you
 
-#define AS_FLY_STRAFE			5	/* FS: FIXME ZAERO: WATCH THIS */
+#define AS_FLY_STRAFE			5
 
 // armor types
 #define ARMOR_NONE				0
