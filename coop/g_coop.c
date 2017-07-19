@@ -293,17 +293,6 @@ int mapCount = 0;
 int gamemodeCount = 0;
 pmenu_t *votemapmenu = NULL;
 
-#define MAX_GAMEMODES		128
-#define GAMEMODE_ERROR		-1
-#define GAMEMODE_AVAILABLE	0
-#define GAMEMODE_EXISTS		1
-
-typedef struct gamemode_s
-{
-	char mapname[64];
-	char gamemode[64];
-}gamemode_t;
-
 gamemode_t gamemode_array[MAX_GAMEMODES];
 
 char *GetSkillString (void)
@@ -649,6 +638,10 @@ void CoopUpdateGamemodeMenu(edict_t *ent)
 				}
 				votegamemodemenu[VGAMEMODEMENU_VANILLA].text = NULL;
 				votegamemodemenu[VGAMEMODEMENU_VANILLA].SelectFunc = NULL;
+			}
+			else
+			{
+				Com_sprintf(gamemode, sizeof(gamemode), "%s", sv_coop_gamemode->string);
 			}
 			break;
 		case xatrix_coop:
@@ -1501,7 +1494,7 @@ int CoopGamemodeExists (const char *gamemode)
 	for (i = 0; i < MAX_GAMEMODES; i++)
 	{
 		if (!strcmp(gamemode_array[i].gamemode, gamemode))
-			return GAMEMODE_EXISTS;
+			return i;
 	}
 
 	return GAMEMODE_AVAILABLE;
@@ -1580,8 +1573,6 @@ void CoopVoteGamemodeDynamic(edict_t *ent, pmenuhnd_t *p /* unused */)
 	votegamemodemenu[5].align = PMENU_ALIGN_CENTER;
 	votegamemodemenu[5].SelectFunc = NULL;
 
-	CoopUpdateGamemodeMenu(ent); /* FS: For current gamemode */
-
 	votegamemodemenu[7].text = NULL;
 	votegamemodemenu[7].align = PMENU_ALIGN_CENTER;
 	votegamemodemenu[7].SelectFunc = NULL;
@@ -1603,6 +1594,8 @@ void CoopVoteGamemodeDynamic(edict_t *ent, pmenuhnd_t *p /* unused */)
 	votegamemodemenu[gamemodeCount+9].text = strdup("Return to Voting Menu");
 	votegamemodemenu[gamemodeCount+9].align = PMENU_ALIGN_LEFT;
 	votegamemodemenu[gamemodeCount+9].SelectFunc = CoopReturnToVoteMenu;
+
+	CoopUpdateGamemodeMenu(ent); /* FS: For current gamemode */
 
 	PMenu_Open(ent, votegamemodemenu, 0, gamemodeCount + 10, NULL, PMENU_SCROLLING);
 	CoopVoteGamemodeDynamic_Cleanup();

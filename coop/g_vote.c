@@ -24,7 +24,8 @@ char voteCbufCmdExecute[MAX_OSPATH];
 char voteMap[MAX_OSPATH];
 char voteType[16];
 char whatAreWeVotingFor[MAX_OSPATH];
-char voteGamemode[16];
+char voteGamemode[32];
+char voteGamemodeStartMap[MAX_QPATH];
 float voteTimer;
 int lastUpdate;
 
@@ -144,7 +145,7 @@ void vote_command(edict_t *ent)
 	{
 		if(argc <= 2)
 		{
-			gi.cprintf(ent, PRINT_HIGH, "error: you must supply a gamemode!  valid options are: dm, tdm, ctf, ra, dt, instagib, and coop.\n");
+			gi.cprintf(ent, PRINT_HIGH, "error: you must supply a gamemode!\n");
 			return;
 		}
 		else
@@ -489,7 +490,8 @@ void vote_gamemode(edict_t *ent, const char *gamemode)
 			return;
 		}
 
-		Com_sprintf(voteGamemode, 16, "vanilla");
+		Com_sprintf(voteGamemode, sizeof(voteGamemode), "vanilla");
+		Com_sprintf(voteGamemodeStartMap, sizeof(voteGamemodeStartMap), "%s", gamemode_array[0].mapname);
 	}
 	else if (!Q_stricmp((char *)gamemode, "xatrix"))
 	{
@@ -499,7 +501,8 @@ void vote_gamemode(edict_t *ent, const char *gamemode)
 			return;
 		}
 
-		Com_sprintf(voteGamemode, 16, "xatrix");
+		Com_sprintf(voteGamemode, sizeof(voteGamemode), "xatrix");
+		Com_sprintf(voteGamemodeStartMap, sizeof(voteGamemodeStartMap), "%s", gamemode_array[1].mapname);
 	}
 	else if (!Q_stricmp((char *)gamemode, "rogue"))
 	{
@@ -509,7 +512,8 @@ void vote_gamemode(edict_t *ent, const char *gamemode)
 			return;
 		}
 
-		Com_sprintf(voteGamemode, 16, "rogue");
+		Com_sprintf(voteGamemode, sizeof(voteGamemode), "rogue");
+		Com_sprintf(voteGamemodeStartMap, sizeof(voteGamemodeStartMap), "%s", gamemode_array[2].mapname);
 	}
 	else if (!Q_stricmp((char *)gamemode, "zaero"))
 	{
@@ -519,13 +523,22 @@ void vote_gamemode(edict_t *ent, const char *gamemode)
 			return;
 		}
 
-		Com_sprintf(voteGamemode, 16, "zaero");
+		Com_sprintf(voteGamemode, sizeof(voteGamemode), "zaero");
+		Com_sprintf(voteGamemodeStartMap, sizeof(voteGamemodeStartMap), "%s", gamemode_array[3].mapname);
 	}
 	else
 	{
-		gi.cprintf(ent, PRINT_HIGH, "error: invalid gamemode %s.  Vote cancelled.\n", gamemode);
-		return;
+		int i;
+
+		i = CoopGamemodeExists(gamemode);
+		if (i >= 0)
+		{
+			Com_sprintf(voteGamemode, sizeof(voteGamemode), "%s", gamemode);
+			Com_sprintf(voteGamemodeStartMap, sizeof(voteGamemodeStartMap), "%s", gamemode_array[i].mapname);
+		}
 	}
+
+	COM_StripExtension(voteGamemodeStartMap, voteGamemodeStartMap);
 
 	voteClients = P_Clients_Connected(false);
 	bVoteInProgress = true;
@@ -793,7 +806,7 @@ void vote_Reset(void)
 	lastUpdate = (int)(level.time);
 	bVoteInProgress = false;
 	printOnce = 0;
-	whatAreWeVotingFor[0] = voteMap[0] = voteGamemode[0] = voteType[0] = '\0';
+	whatAreWeVotingFor[0] = voteMap[0] = voteGamemode[0] = voteGamemodeStartMap[0] = voteType[0] = '\0';
 
 	/* FS: Don't do this in single player */
 	if (game.maxclients <= 1)
@@ -829,26 +842,8 @@ void vote_Passed (void)
 
 	if (!Q_stricmp(voteType, "gamemode"))
 	{
-		if (!Q_stricmp(voteGamemode, "vanilla"))
-		{
-			gi.cvar_forceset("sv_coop_gamemode", "vanilla");
-			Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "deathmatch 0; coop 1; wait;wait;wait;wait;wait;map base1\n");
-		}
-		else if(!Q_stricmp(voteGamemode, "xatrix"))
-		{
-			gi.cvar_forceset("sv_coop_gamemode", "xatrix");
-			Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "deathmatch 0; coop 1; wait;wait;wait;wait;wait;map xswamp\n");
-		}
-		else if(!Q_stricmp(voteGamemode, "rogue"))
-		{
-			gi.cvar_forceset("sv_coop_gamemode", "rogue");
-			Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "deathmatch 0; coop 1; wait;wait;wait;wait;wait;map rmine1\n");
-		}
-		else if(!Q_stricmp(voteGamemode, "zaero"))
-		{
-			gi.cvar_forceset("sv_coop_gamemode", "zaero");
-			Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "deathmatch 0; coop 1; wait;wait;wait;wait;wait;map zbase1\n");
-		}
+		gi.cvar_forceset("sv_coop_gamemode", voteGamemode);
+		Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "deathmatch 0; coop 1; wait;wait;wait;wait;wait;map %s\n", voteGamemodeStartMap);
 	}
 	else if(!Q_stricmp(voteType, "coop difficulty"))
 	{

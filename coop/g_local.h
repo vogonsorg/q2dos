@@ -374,6 +374,17 @@ typedef enum
 	zaero_coop
 } gametype_t;
 
+#define MAX_GAMEMODES		128
+#define GAMEMODE_ERROR		-2
+#define GAMEMODE_AVAILABLE	-1
+
+/* FS: Coop: Dynamic gamemode voting menu */
+typedef struct gamemode_s
+{
+	char mapname[64];
+	char gamemode[64];
+}gamemode_t;
+
 //
 // this structure is left intact through an entire game
 // it should be initialized at dll load time, and read/written to
@@ -635,6 +646,7 @@ extern	level_locals_t	level;
 extern	game_import_t	gi;
 extern	game_export_t	globals;
 extern	spawn_temp_t	st;
+extern	gamemode_t gamemode_array[MAX_GAMEMODES]; /* FS */
 
 extern	int	sm_meat_index;
 extern	int	snd_fry;
@@ -1190,6 +1202,7 @@ void vote_stop (edict_t *ent);
 // g_coop.c
 //
 void CoopGamemodeInit (void);
+int CoopGamemodeExists (const char *gamemode);
 
 //====================
 // ROGUE PROTOTYPES
