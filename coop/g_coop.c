@@ -1473,7 +1473,7 @@ void CoopGamemodeInit (void)
 		gamemodeToken = strtok_r(NULL, ",\n", &listPtr2);
 		if(gamemodeToken && CoopGamemodeExists(gamemodeToken) == GAMEMODE_AVAILABLE)
 		{
-			gi.cprintf(NULL, PRINT_CHAT, "CoopGamemodeInit: Adding %s %s\n", mapname, gamemodeToken);
+			gi.dprintf(DEVELOPER_MSG_GAME, "CoopGamemodeInit: Adding %s %s\n", mapname, gamemodeToken);
 			CoopGamemodeAdd(gamemodeToken, mapname);
 		}
 		mapToken = strtok_r(NULL, separators, &listPtr);

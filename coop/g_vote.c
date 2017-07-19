@@ -536,6 +536,11 @@ void vote_gamemode(edict_t *ent, const char *gamemode)
 			Com_sprintf(voteGamemode, sizeof(voteGamemode), "%s", gamemode);
 			Com_sprintf(voteGamemodeStartMap, sizeof(voteGamemodeStartMap), "%s", gamemode_array[i].mapname);
 		}
+		else
+		{
+			gi.cprintf(ent, PRINT_HIGH, "error: invalid gamemode %s.  Vote cancelled.\n", gamemode);
+			return;
+		}
 	}
 
 	COM_StripExtension(voteGamemodeStartMap, voteGamemodeStartMap);
