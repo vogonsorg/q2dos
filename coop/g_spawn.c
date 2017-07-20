@@ -2239,15 +2239,18 @@ void G_CheckCoopVictory (void) /* FS: Coop: Check if victory.pcx is the current 
 			default:
 			case vanilla_coop:
 				gi.cvar_forceset("sv_coop_gamemode", "xatrix");
+				gi.cvar_forceset("sv_coop_gamemode_vote", "xatrix");
 				gi.cvar_forceset("nextserver", "map \"xswamp\"\n");
 				break;
 			case xatrix_coop:
 				gi.cvar_forceset("sv_coop_gamemode", "rogue");
+				gi.cvar_forceset("sv_coop_gamemode_vote", "rogue");
 				gi.cvar_forceset("nextserver", "map \"rmine1\"\n");
 				break;
 			case rogue_coop:
 			case zaero_coop:
 				gi.cvar_forceset("sv_coop_gamemode", "vanilla");
+				gi.cvar_forceset("sv_coop_gamemode_vote", "vanilla");
 				gi.cvar_forceset("nextserver", "map \"base1\"\n");
 				break;
 		}
