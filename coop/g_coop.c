@@ -26,7 +26,7 @@
 
 #include "g_local.h"
 
-#define COOP_VERSION			0.01a
+#define COOP_VERSION			0.01b
 #define COOP_VSTRING2(x) #x
 #define COOP_VSTRING(x) COOP_VSTRING2(x)
 #define COOP_STRING_VERSION  COOP_VSTRING(COOP_VERSION)
