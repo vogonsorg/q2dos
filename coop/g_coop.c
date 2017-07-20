@@ -576,7 +576,7 @@ void CoopUpdateMotdMenu (void)
 
 		currentLine++;
 		lineLength = strlen(motdToken);
-		motdmenu[i].text = motdToken;
+		motdmenu[i].text = strdup(motdToken);
 		if(lineLength > 27)
 		{
 			gi.cprintf(NULL, PRINT_CHAT, "Warning: MOTD string on line %i greater than 27 chars, current length is %i.  Truncating.\n", currentLine, lineLength);
