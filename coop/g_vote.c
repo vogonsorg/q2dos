@@ -305,14 +305,6 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 					if(mapToken2)
 					{
 						Com_sprintf(voteGamemode, sizeof(voteGamemode), "%s", mapToken2);
-						if(Q_stricmp(mapToken2, "xatrix") && Q_stricmp(mapToken2, "vanilla") && Q_stricmp(mapToken, "rogue") && Q_stricmp(mapToken, "zaero")) /* FS: We got another one, custom game mode with specific codebase we need i.e. 1492 map needs xatrix code */
-						{
-							mapToken2 = strtok_r(NULL, ",\n", &listPtr2);
-							if(mapToken2)
-							{
-								Com_sprintf(voteGamemode, sizeof(voteGamemode), "%s", mapToken2);
-							}
-						}
 						retval = true;
 						goto cleanup;
 					}
@@ -841,33 +833,44 @@ void vote_Reset(void)
 
 }
 
+static void vote_SetGamemodeCVAR (char *gamemode)
+{
+	int i;
+
+	if (!gamemode || !strlen(gamemode))
+	{
+		return;
+	}
+
+	i = CoopGamemodeExists(gamemode);
+	if (i >= 0)
+	{
+		gi.cvar_forceset("sv_coop_gamemode", gamemode_array[i].realgamemode);
+		gi.cvar_forceset("sv_coop_gamemode_vote", gamemode_array[i].gamemode);
+	}
+	else
+	{
+		gi.cvar_forceset("sv_coop_gamemode", gamemode);
+		gi.cvar_forceset("sv_coop_gamemode_vote", gamemode);
+	}
+}
 void vote_Passed (void)
 {
 	vote_Broadcast("Vote passed for %s: %s! Yes: %i, No: %i\n", voteType, whatAreWeVotingFor, voteYes, voteNo);
 
 	if (!Q_stricmp(voteType, "gamemode"))
 	{
-		int i;
-
-		i = CoopGamemodeExists(voteGamemode);
-		if (i >= 0)
-		{
-			gi.cvar_forceset("sv_coop_gamemode", gamemode_array[i].realgamemode);
-			gi.cvar_forceset("sv_coop_gamemode_vote", gamemode_array[i].gamemode);
-		}
-		else
-		{
-			gi.cvar_forceset("sv_coop_gamemode", voteGamemode);
-		}
-
+		vote_SetGamemodeCVAR(voteGamemode);
 		Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "deathmatch 0; coop 1; wait;wait;wait;wait;wait;map %s\n", voteGamemodeStartMap);
 	}
 	else if(!Q_stricmp(voteType, "coop difficulty"))
 	{
+		vote_SetGamemodeCVAR(sv_coop_gamemode->string);
 		Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "skill %i; wait;wait;wait;wait;wait;map %s", voteCoopSkill, level.mapname);
 	}
 	else if(!Q_stricmp(voteType, "restartmap"))
 	{
+		vote_SetGamemodeCVAR(sv_coop_gamemode->string);
 		Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "wait;wait;wait;wait;wait;map %s\n", voteMap); /* FS: Might want to force a DLL unload for coop overflow fuckery */
 	}
 	else if(!Q_stricmp(voteType, "warp"))
@@ -881,7 +884,7 @@ void vote_Passed (void)
 	}
 	else
 	{
-		gi.cvar_forceset("sv_coop_gamemode", voteGamemode);
+		vote_SetGamemodeCVAR(voteGamemode);
 		Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "wait;wait;wait;wait;wait;map %s\n", voteMap);
 	}
 
