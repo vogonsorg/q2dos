@@ -1960,7 +1960,6 @@
 {"Move_Final", (byte *)Move_Final},
 {"Move_Done", (byte *)Move_Done},
 {"CoopVoteGamemodeDynamic", (byte *)CoopVoteGamemodeDynamic},
-{"CoopVoteGamemodeDynamic_Cleanup", (byte *)CoopVoteGamemodeDynamic_Cleanup},
 {"CoopGamemodeAdd", (byte *)CoopGamemodeAdd},
 {"CoopGamemodeExists", (byte *)CoopGamemodeExists},
 {"CoopGamemodeInit", (byte *)CoopGamemodeInit},

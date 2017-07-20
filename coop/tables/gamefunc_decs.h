@@ -1960,7 +1960,6 @@ extern void Move_Begin ( edict_t * ent ) ;
 extern void Move_Final ( edict_t * ent ) ;
 extern void Move_Done ( edict_t * ent ) ;
 extern void CoopVoteGamemodeDynamic ( edict_t * ent , pmenuhnd_t * p ) ;
-extern void CoopVoteGamemodeDynamic_Cleanup ( void ) ;
 extern void CoopGamemodeAdd ( const char * gamemode , const char * realgamemode , const char * mapname ) ;
 extern int CoopGamemodeExists ( const char * gamemode ) ;
 extern void CoopGamemodeInit ( void ) ;
