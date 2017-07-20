@@ -644,10 +644,6 @@ void CoopUpdateGamemodeMenu(edict_t *ent)
 			if(!Q_stricmp(sv_coop_gamemode->string, "vanilla")) /* FS: If in a "custom" mode show Vanilla as an option */
 			{
 				Com_sprintf(gamemode, sizeof(gamemode), "Vanilla");
-				if(votegamemodemenu[VGAMEMODEMENU_VANILLA].text)
-				{
-					free(votegamemodemenu[VGAMEMODEMENU_VANILLA].text);
-				}
 				votegamemodemenu[VGAMEMODEMENU_VANILLA].text = NULL;
 				votegamemodemenu[VGAMEMODEMENU_VANILLA].SelectFunc = NULL;
 			}
@@ -655,13 +651,6 @@ void CoopUpdateGamemodeMenu(edict_t *ent)
 			{
 				Com_sprintf(gamemode, sizeof(gamemode), "%s", sv_coop_gamemode->string);
 				i = CoopGamemodeExists(gamemode);
-				if (i >= 0)
-				{
-					if(votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text)
-					{
-						free(votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text);
-					}
-				}
 				votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text = NULL;
 				votegamemodemenu[VGAMEMODEMENU_VANILLA+i].SelectFunc = NULL;
 			}
@@ -670,10 +659,6 @@ void CoopUpdateGamemodeMenu(edict_t *ent)
 			if(!Q_stricmp(sv_coop_gamemode->string, "xatrix")) /* FS: If in a "custom" mode show Xatrix as an option */
 			{
 				Com_sprintf(gamemode, sizeof(gamemode), "Xatrix");
-				if(votegamemodemenu[VGAMEMODEMENU_XATRIX].text)
-				{
-					free(votegamemodemenu[VGAMEMODEMENU_XATRIX].text);
-				}
 				votegamemodemenu[VGAMEMODEMENU_XATRIX].text = NULL;
 				votegamemodemenu[VGAMEMODEMENU_XATRIX].SelectFunc = NULL;
 			}
@@ -681,13 +666,6 @@ void CoopUpdateGamemodeMenu(edict_t *ent)
 			{
 				Com_sprintf(gamemode, sizeof(gamemode), "%s", sv_coop_gamemode->string);
 				i = CoopGamemodeExists(gamemode);
-				if (i >= 0)
-				{
-					if(votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text)
-					{
-						free(votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text);
-					}
-				}
 				votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text = NULL;
 				votegamemodemenu[VGAMEMODEMENU_VANILLA+i].SelectFunc = NULL;
 			}
@@ -696,10 +674,6 @@ void CoopUpdateGamemodeMenu(edict_t *ent)
 			if(!Q_stricmp(sv_coop_gamemode->string, "rogue")) /* FS: If in a "custom" mode show Rogue as an option */
 			{
 				Com_sprintf(gamemode, sizeof(gamemode), "Rogue");
-				if(votegamemodemenu[VGAMEMODEMENU_ROGUE].text)
-				{
-					free(votegamemodemenu[VGAMEMODEMENU_ROGUE].text);
-				}
 				votegamemodemenu[VGAMEMODEMENU_ROGUE].text = NULL;
 				votegamemodemenu[VGAMEMODEMENU_ROGUE].SelectFunc = NULL;
 			}
@@ -707,13 +681,6 @@ void CoopUpdateGamemodeMenu(edict_t *ent)
 			{
 				Com_sprintf(gamemode, sizeof(gamemode), "%s", sv_coop_gamemode->string);
 				i = CoopGamemodeExists(gamemode);
-				if (i >= 0)
-				{
-					if(votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text)
-					{
-						free(votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text);
-					}
-				}
 				votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text = NULL;
 				votegamemodemenu[VGAMEMODEMENU_VANILLA+i].SelectFunc = NULL;
 			}
@@ -722,10 +689,6 @@ void CoopUpdateGamemodeMenu(edict_t *ent)
 			if(!Q_stricmp(sv_coop_gamemode->string, "zaero")) /* FS: If in a "custom" mode show Zaero as an option */
 			{
 				Com_sprintf(gamemode, sizeof(gamemode), "Zaero");
-				if(votegamemodemenu[VGAMEMODEMENU_ZAERO].text)
-				{
-					free(votegamemodemenu[VGAMEMODEMENU_ZAERO].text);
-				}
 				votegamemodemenu[VGAMEMODEMENU_ZAERO].text = NULL;
 				votegamemodemenu[VGAMEMODEMENU_ZAERO].SelectFunc = NULL;
 			}
@@ -733,13 +696,6 @@ void CoopUpdateGamemodeMenu(edict_t *ent)
 			{
 				Com_sprintf(gamemode, sizeof(gamemode), "%s", sv_coop_gamemode->string);
 				i = CoopGamemodeExists(gamemode);
-				if (i >= 0)
-				{
-					if(votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text)
-					{
-						free(votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text);
-					}
-				}
 				votegamemodemenu[VGAMEMODEMENU_VANILLA+i].text = NULL;
 				votegamemodemenu[VGAMEMODEMENU_VANILLA+i].SelectFunc = NULL;
 			}
