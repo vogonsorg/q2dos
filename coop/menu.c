@@ -382,7 +382,7 @@ void
 PMenu_Do_Scrolling_Update(edict_t *ent)
 {
 	char string[1400];
-	int i, z, pos;
+	int i, z, pos, fixed_lines = 0;
 	pmenu_t *p;
 	int x;
 	pmenuhnd_t *hnd;
@@ -398,15 +398,13 @@ PMenu_Do_Scrolling_Update(edict_t *ent)
 	hnd = ent->client->menu;
 
 	pos = hnd->cur % 18;
-
 	strcpy(string, "xv 32 yv 8 picn inventory ");
 
-	for (z = 0, p = hnd->entries; z < hnd->cur - pos; z++)
-	{
-		p++;
-	}
-
-	for (i = 0; i < hnd->num; i++, p++)
+	/* FS: !!! This is dangerous, assumes a header for scrolling menus.
+	 *     So anyone out there who mods this, take note.
+	 *     Make your header first all with PMENU_ALIGN_XXX_FIXED
+	 */
+	for (i = 0, p = hnd->entries; i < hnd->num; i++, p++)
 	{
 		if (i >= 18)
 			break;
@@ -421,7 +419,90 @@ PMenu_Do_Scrolling_Update(edict_t *ent)
 			break;
 		}
 
-		if (!p->text || !*(p->text))
+		if (p->align >= PMENU_ALIGN_LEFT_FIXED)
+			fixed_lines++;
+
+		if (!p->text || !*(p->text) || (p->align <= PMENU_ALIGN_LEFT_FIXED))
+		{
+			continue; /* blank line */
+		}
+
+		t = p->text;
+
+		if (*t == '*')
+		{
+			alt = true;
+			t++;
+		}
+
+		sprintf(string + strlen(string), "yv %d ", 32 + i * 8);
+
+		if (p->align == PMENU_ALIGN_CENTER_FIXED)
+		{
+			x = 196 / 2 - strlen(t) * 4 + 64;
+		}
+		else if (p->align == PMENU_ALIGN_RIGHT_FIXED)
+		{
+			x = 64 + (196 - strlen(t) * 8);
+		}
+		else
+		{
+			x = 64;
+		}
+
+		sprintf(string + strlen(string), "xv %d ", x);
+
+		if (alt)
+		{
+			sprintf(string + strlen(string), "string2 \"%s\" ", t);
+		}
+		else
+		{
+			sprintf(string + strlen(string), "string \"%s\" ", t);
+		}
+
+		alt = false;
+	}
+
+	if (hnd->cur >= 18)
+	{
+		pos = hnd->cur % 18;
+		pos+= fixed_lines;
+		while(pos >= 18)
+		{
+			pos = pos % 18;
+			pos+= fixed_lines;
+		}
+	}
+
+	for (z = 0, p = hnd->entries; z < hnd->cur - pos; z++)
+	{
+		p++;
+	}
+
+	for (i = 0; i < hnd->num; i++, p++)
+	{
+		if (i >= 18)
+		{
+			break;
+		}
+
+		if(i < fixed_lines)
+		{
+			continue;
+		}
+
+		if(hnd->cur >= hnd->num)
+		{
+			break;
+		}
+
+		if(i + (hnd->cur-pos) >= hnd->num)
+		{
+			break;
+		}
+
+		if (!p->text || !*(p->text) || (p->align >= PMENU_ALIGN_LEFT_FIXED))
 		{
 			continue; /* blank line */
 		}

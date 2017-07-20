@@ -746,6 +746,8 @@ void CoopUpdateGamemodeMenu(edict_t *ent)
 	}
 
 	votegamemodemenu[VGAMEMODEMENU_GAMEMODE].text = strdup(gamemodestring);
+	votegamemodemenu[VGAMEMODEMENU_GAMEMODE].align = PMENU_ALIGN_CENTER_FIXED;
+	votegamemodemenu[VGAMEMODEMENU_GAMEMODE].SelectFunc = NULL;
 }
 
 void CoopUpdateDifficultyMenu(edict_t *ent)
@@ -1627,31 +1629,31 @@ void CoopVoteGamemodeDynamic(edict_t *ent, pmenuhnd_t *p /* unused */)
 	memset((pmenu_t *)votegamemodemenu, 0, size);
 
 	votegamemodemenu[0].text = strdup("*Quake II");
-	votegamemodemenu[0].align = PMENU_ALIGN_CENTER;
+	votegamemodemenu[0].align = PMENU_ALIGN_CENTER_FIXED;
 	votegamemodemenu[0].SelectFunc = NULL;
 
 	votegamemodemenu[1].text = strdup("*Mara'akate and Freewill");
-	votegamemodemenu[1].align = PMENU_ALIGN_CENTER;
+	votegamemodemenu[1].align = PMENU_ALIGN_CENTER_FIXED;
 	votegamemodemenu[1].SelectFunc = NULL;
 
 	votegamemodemenu[2].text = strdup("*Custom Coop");
-	votegamemodemenu[2].align = PMENU_ALIGN_CENTER;
+	votegamemodemenu[2].align = PMENU_ALIGN_CENTER_FIXED;
 	votegamemodemenu[2].SelectFunc = NULL;
 
 	votegamemodemenu[3].text = NULL;
-	votegamemodemenu[3].align = PMENU_ALIGN_CENTER;
+	votegamemodemenu[3].align = PMENU_ALIGN_CENTER_FIXED;
 	votegamemodemenu[3].SelectFunc = NULL;
 
 	votegamemodemenu[4].text = strdup("*Gamemode");
-	votegamemodemenu[4].align = PMENU_ALIGN_CENTER;
+	votegamemodemenu[4].align = PMENU_ALIGN_CENTER_FIXED;
 	votegamemodemenu[4].SelectFunc = NULL;
 
 	votegamemodemenu[5].text = NULL;
-	votegamemodemenu[5].align = PMENU_ALIGN_CENTER;
+	votegamemodemenu[5].align = PMENU_ALIGN_CENTER_FIXED;
 	votegamemodemenu[5].SelectFunc = NULL;
 
 	votegamemodemenu[7].text = NULL;
-	votegamemodemenu[7].align = PMENU_ALIGN_CENTER;
+	votegamemodemenu[7].align = PMENU_ALIGN_CENTER_FIXED;
 	votegamemodemenu[7].SelectFunc = NULL;
 
 	for (i = 0; i < gamemodeCount; i++)
