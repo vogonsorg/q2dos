@@ -146,6 +146,17 @@ pmenu_t votemenu[] = {
 #define VGAMEMODEMENU_ROGUE 2
 #define VGAMEMODEMENU_ZAERO 3
 
+pmenu_t votegamemodemenuheader[] = {
+	{"*Quake II", PMENU_ALIGN_CENTER, NULL},
+	{"*Mara'akate and Freewill", PMENU_ALIGN_CENTER, NULL},
+	{"*Custom Coop", PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"*Gamemode", PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"*Current Gamemode: ", PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+};
+
 pmenu_t *votegamemodemenu = NULL;
 
 #define VSKILLMENU_SKILL 6
@@ -288,11 +299,19 @@ pmenu_t chasemenu[] = {
 	{"Return to Main Menu", PMENU_ALIGN_LEFT, CoopReturnToMain}
 };
 
+pmenu_t votemapheadermenu[] = {
+	{"*Quake II", PMENU_ALIGN_CENTER, NULL},
+	{"*Mara'akate and Freewill", PMENU_ALIGN_CENTER, NULL},
+	{"*Custom Coop", PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+	{"*Maps", PMENU_ALIGN_CENTER, NULL},
+	{NULL, PMENU_ALIGN_CENTER, NULL},
+};
+
 char *coopMapFileBuffer = NULL;
 int mapCount = 0;
 int gamemodeCount = 0;
 pmenu_t *votemapmenu = NULL;
-pmenu_t *votegamemodemenuheader = NULL;
 
 gamemode_t gamemode_array[MAX_GAMEMODES];
 
@@ -829,7 +848,7 @@ void CoopVoteMap(edict_t *ent, pmenuhnd_t *p /* unused */)
 	votemapmenu[mapCount+1].align = PMENU_ALIGN_LEFT;
 	votemapmenu[mapCount+1].SelectFunc = CoopReturnToVoteMenu;
 
-	PMenu_Open(ent, votemapmenu, NULL, 0, mapCount + 2, 0, NULL, PMENU_SCROLLING);
+	PMenu_Open(ent, votemapmenu, votemapheadermenu, 0, mapCount + 2, sizeof(votemapheadermenu) / sizeof(pmenu_t), NULL, PMENU_SCROLLING);
 	votemenu_cleanup_all();
 }
 
@@ -1582,38 +1601,6 @@ void CoopVoteGamemodeDynamic(edict_t *ent, pmenuhnd_t *p /* unused */)
 	votegamemodemenu = malloc(size);
 	memset((pmenu_t *)votegamemodemenu, 0, size);
 
-	size = sizeof(pmenu_t) * (8);
-	votegamemodemenuheader = malloc(size);
-	memset((pmenu_t *)votegamemodemenuheader, 0, size);
-
-	votegamemodemenuheader[0].text = "*Quake II";
-	votegamemodemenuheader[0].align = PMENU_ALIGN_CENTER;
-	votegamemodemenuheader[0].SelectFunc = NULL;
-
-	votegamemodemenuheader[1].text = "*Mara'akate and Freewill";
-	votegamemodemenuheader[1].align = PMENU_ALIGN_CENTER;
-	votegamemodemenuheader[1].SelectFunc = NULL;
-
-	votegamemodemenuheader[2].text = "*Custom Coop";
-	votegamemodemenuheader[2].align = PMENU_ALIGN_CENTER;
-	votegamemodemenuheader[2].SelectFunc = NULL;
-
-	votegamemodemenuheader[3].text = NULL;
-	votegamemodemenuheader[3].align = PMENU_ALIGN_CENTER;
-	votegamemodemenuheader[3].SelectFunc = NULL;
-
-	votegamemodemenuheader[4].text = "*Gamemode";
-	votegamemodemenuheader[4].align = PMENU_ALIGN_CENTER;
-	votegamemodemenuheader[4].SelectFunc = NULL;
-
-	votegamemodemenuheader[5].text = NULL;
-	votegamemodemenuheader[5].align = PMENU_ALIGN_CENTER;
-	votegamemodemenuheader[5].SelectFunc = NULL;
-
-	votegamemodemenuheader[7].text = NULL;
-	votegamemodemenuheader[7].align = PMENU_ALIGN_CENTER;
-	votegamemodemenuheader[7].SelectFunc = NULL;
-
 	for (i = 0; i < gamemodeCount; i++)
 	{
 		if(i < MAX_GAMEMODES && gamemode_array[i].gamemode && strlen(gamemode_array[i].gamemode))
@@ -1634,17 +1621,11 @@ void CoopVoteGamemodeDynamic(edict_t *ent, pmenuhnd_t *p /* unused */)
 
 	CoopUpdateGamemodeMenu(ent); /* FS: For current gamemode */
 
-	PMenu_Open(ent, votegamemodemenu, votegamemodemenuheader, 0, gamemodeCount + 2, 8, NULL, PMENU_SCROLLING);
+	PMenu_Open(ent, votegamemodemenu, votegamemodemenuheader, 0, gamemodeCount + 2, sizeof(votegamemodemenuheader) / sizeof(pmenu_t), NULL, PMENU_SCROLLING);
 
 	if (votegamemodemenu)
 	{
 		free(votegamemodemenu);
 	}
 	votegamemodemenu = NULL;
-
-	if (votegamemodemenuheader)
-	{
-		free(votegamemodemenuheader);
-	}
-	votegamemodemenuheader = NULL;
 }
