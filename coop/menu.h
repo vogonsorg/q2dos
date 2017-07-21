@@ -32,9 +32,6 @@ enum
 	PMENU_ALIGN_LEFT,
 	PMENU_ALIGN_CENTER,
 	PMENU_ALIGN_RIGHT,
-	PMENU_ALIGN_LEFT_FIXED,
-	PMENU_ALIGN_CENTER_FIXED,
-	PMENU_ALIGN_RIGHT_FIXED
 };
 
 enum
@@ -46,9 +43,11 @@ enum
 
 typedef struct pmenuhnd_s
 {
+	struct pmenu_s *header; /* FS */
 	struct pmenu_s *entries;
 	int cur;
 	int num;
+	int numheader; /* FS */
 	void *arg;
 	int menutype;
 } pmenuhnd_t;
@@ -64,8 +63,10 @@ typedef struct pmenu_s
 
 pmenuhnd_t *PMenu_Open(edict_t *ent,
 		pmenu_t *entries,
+		pmenu_t *header,
 		int cur,
 		int num,
+		int numheader,
 		void *arg,
 		int menutype);
 void PMenu_Close(edict_t *ent);

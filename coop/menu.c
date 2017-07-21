@@ -34,7 +34,7 @@ void PMenu_Do_Scrolling_Update(edict_t *ent);
    note that arg will be freed when the menu is closed, it
     must be allocated memory */
 pmenuhnd_t *
-PMenu_Open(edict_t *ent, pmenu_t *entries, int cur, int num, void *arg, int menutype)
+PMenu_Open(edict_t *ent, pmenu_t *entries, pmenu_t *header, int cur, int num, int numheader, void *arg, int menutype)
 {
 	pmenuhnd_t *hnd;
 	pmenu_t *p;
@@ -58,6 +58,24 @@ PMenu_Open(edict_t *ent, pmenu_t *entries, int cur, int num, void *arg, int menu
 	hnd->menutype = menutype;
 	memcpy(hnd->entries, entries, sizeof(pmenu_t) * num);
 
+	if (header && numheader) /* FS */
+	{
+		hnd->header = malloc(sizeof(pmenu_t) * numheader);
+		memcpy(hnd->header, header, sizeof(pmenu_t) * numheader);
+
+		for (i = 0; i < numheader; i++)
+		{
+			if (header[i].text)
+			{
+				hnd->header[i].text = strdup(header[i].text);
+			}
+		}
+	}
+	else
+	{
+		hnd->header = NULL;
+	}
+
 	/* duplicate the strings since they may be from static memory */
 	for (i = 0; i < num; i++)
 	{
@@ -68,6 +86,7 @@ PMenu_Open(edict_t *ent, pmenu_t *entries, int cur, int num, void *arg, int menu
 	}
 
 	hnd->num = num;
+	hnd->numheader = numheader; /* FS */
 
 	if ((cur < 0) || !entries[cur].SelectFunc)
 	{
@@ -126,6 +145,19 @@ PMenu_Close(edict_t *ent)
 	}
 
 	free(hnd->entries);
+
+	if (hnd->header) /* FS */
+	{
+		for (i = 0; i < hnd->numheader; i++)
+		{
+			if (hnd->header[i].text)
+			{
+				free(hnd->header[i].text);
+			}
+		}
+
+		free(hnd->header);
+	}
 
 	if (hnd->arg)
 	{
@@ -379,10 +411,10 @@ PMenu_Select(edict_t *ent)
 }
 
 void
-PMenu_Do_Scrolling_Update(edict_t *ent)
+PMenu_Do_Scrolling_Update(edict_t *ent) /* FS */
 {
 	char string[1400];
-	int i, z, pos, fixed_lines = 0;
+	int i, z, pos, scroll_lines, fixed_lines = 0;
 	pmenu_t *p;
 	int x;
 	pmenuhnd_t *hnd;
@@ -397,83 +429,61 @@ PMenu_Do_Scrolling_Update(edict_t *ent)
 
 	hnd = ent->client->menu;
 
-	pos = hnd->cur % 18;
 	strcpy(string, "xv 32 yv 8 picn inventory ");
 
-	/* FS: !!! This is dangerous, assumes a header for scrolling menus.
-	 *     So anyone out there who mods this, take note.
-	 *     Make your header first all with PMENU_ALIGN_XXX_FIXED
-	 */
-	for (i = 0, p = hnd->entries; i < hnd->num; i++, p++)
+	if (hnd->header && hnd->numheader)
 	{
-		if (i >= 18)
-			break;
-
-		if(hnd->cur >= hnd->num)
+		for (i = 0, p = hnd->header; i < hnd->numheader; i++, p++)
 		{
-			break;
+			if (!p->text || !*(p->text))
+			{
+				continue; /* blank line */
+			}
+
+			t = p->text;
+
+			if (*t == '*')
+			{
+				alt = true;
+				t++;
+			}
+
+			sprintf(string + strlen(string), "yv %d ", 32 + i * 8);
+
+			if (p->align == PMENU_ALIGN_CENTER)
+			{
+				x = 196 / 2 - strlen(t) * 4 + 64;
+			}
+			else if (p->align == PMENU_ALIGN_RIGHT)
+			{
+				x = 64 + (196 - strlen(t) * 8);
+			}
+			else
+			{
+				x = 64;
+			}
+
+			sprintf(string + strlen(string), "xv %d ", x);
+
+			if (alt)
+			{
+				sprintf(string + strlen(string), "string2 \"%s\" ", t);
+			}
+			else
+			{
+				sprintf(string + strlen(string), "string \"%s\" ", t);
+			}
+
+			alt = false;
 		}
-
-		if(i + (hnd->cur-pos) >= hnd->num)
-		{
-			break;
-		}
-
-		if (p->align >= PMENU_ALIGN_LEFT_FIXED)
-			fixed_lines++;
-
-		if (!p->text || !*(p->text) || (p->align <= PMENU_ALIGN_LEFT_FIXED))
-		{
-			continue; /* blank line */
-		}
-
-		t = p->text;
-
-		if (*t == '*')
-		{
-			alt = true;
-			t++;
-		}
-
-		sprintf(string + strlen(string), "yv %d ", 32 + i * 8);
-
-		if (p->align == PMENU_ALIGN_CENTER_FIXED)
-		{
-			x = 196 / 2 - strlen(t) * 4 + 64;
-		}
-		else if (p->align == PMENU_ALIGN_RIGHT_FIXED)
-		{
-			x = 64 + (196 - strlen(t) * 8);
-		}
-		else
-		{
-			x = 64;
-		}
-
-		sprintf(string + strlen(string), "xv %d ", x);
-
-		if (alt)
-		{
-			sprintf(string + strlen(string), "string2 \"%s\" ", t);
-		}
-		else
-		{
-			sprintf(string + strlen(string), "string \"%s\" ", t);
-		}
-
-		alt = false;
 	}
 
-	if (hnd->cur >= 18)
+	scroll_lines = 18;
+	if (hnd->numheader)
 	{
-		pos = hnd->cur % 18;
-		pos+= fixed_lines;
-		while(pos >= 18)
-		{
-			pos = pos % 18;
-			pos+= fixed_lines;
-		}
+		scroll_lines = 18-hnd->numheader;
 	}
+	pos = hnd->cur % scroll_lines;
 
 	for (z = 0, p = hnd->entries; z < hnd->cur - pos; z++)
 	{
@@ -482,14 +492,9 @@ PMenu_Do_Scrolling_Update(edict_t *ent)
 
 	for (i = 0; i < hnd->num; i++, p++)
 	{
-		if (i >= 18)
+		if (i >= scroll_lines)
 		{
 			break;
-		}
-
-		if(i < fixed_lines)
-		{
-			continue;
 		}
 
 		if(hnd->cur >= hnd->num)
@@ -502,7 +507,7 @@ PMenu_Do_Scrolling_Update(edict_t *ent)
 			break;
 		}
 
-		if (!p->text || !*(p->text) || (p->align >= PMENU_ALIGN_LEFT_FIXED))
+		if (!p->text || !*(p->text))
 		{
 			continue; /* blank line */
 		}
@@ -515,7 +520,7 @@ PMenu_Do_Scrolling_Update(edict_t *ent)
 			t++;
 		}
 
-		sprintf(string + strlen(string), "yv %d ", 32 + i * 8);
+		sprintf(string + strlen(string), "yv %d ", 32 + (i+hnd->numheader) * 8);
 
 		if (p->align == PMENU_ALIGN_CENTER)
 		{

@@ -141,10 +141,10 @@ pmenu_t votemenu[] = {
 };
 
 #define VGAMEMODEMENU_GAMEMODE 6
-#define VGAMEMODEMENU_VANILLA 8
-#define VGAMEMODEMENU_XATRIX 9
-#define VGAMEMODEMENU_ROGUE 10
-#define VGAMEMODEMENU_ZAERO 11
+#define VGAMEMODEMENU_VANILLA 0
+#define VGAMEMODEMENU_XATRIX 1
+#define VGAMEMODEMENU_ROGUE 2
+#define VGAMEMODEMENU_ZAERO 3
 
 pmenu_t *votegamemodemenu = NULL;
 
@@ -292,6 +292,7 @@ char *coopMapFileBuffer = NULL;
 int mapCount = 0;
 int gamemodeCount = 0;
 pmenu_t *votemapmenu = NULL;
+pmenu_t *votegamemodemenuheader = NULL;
 
 gamemode_t gamemode_array[MAX_GAMEMODES];
 
@@ -481,7 +482,7 @@ CoopOpenJoinMenu(edict_t *ent)
 	}
 
 	CoopInitJoinMenu(ent);
-	PMenu_Open(ent, joinmenu, 0, sizeof(joinmenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
+	PMenu_Open(ent, joinmenu, NULL, 0, sizeof(joinmenu) / sizeof(pmenu_t), 0, NULL, PMENU_NORMAL);
 	ent->client->menu_update = CoopUpdateJoinMenu;
 }
 
@@ -494,7 +495,7 @@ CoopOpenVoteMenu(edict_t *ent)
 	}
 
 	ent->client->pers.didMotd = ent->client->resp.didMotd = true;
-	PMenu_Open(ent, votemenu, 0, sizeof(votemenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
+	PMenu_Open(ent, votemenu, NULL, 0, sizeof(votemenu) / sizeof(pmenu_t), 0, NULL, PMENU_NORMAL);
 }
 
 void
@@ -506,8 +507,8 @@ CoopCredits(edict_t *ent, pmenuhnd_t *p /* unused */)
 	}
 
 	PMenu_Close(ent);
-	PMenu_Open(ent, creditsmenu, -1,
-			sizeof(creditsmenu) / sizeof(pmenu_t),
+	PMenu_Open(ent, creditsmenu, NULL, -1,
+			sizeof(creditsmenu) / sizeof(pmenu_t), 0,
 			NULL, PMENU_NORMAL);
 }
 
@@ -604,7 +605,7 @@ void CoopMotd(edict_t *ent, pmenuhnd_t *p /* unused */)
 	PMenu_Close(ent);
 
 	CoopUpdateMotdMenu();
-	PMenu_Open(ent, motdmenu, 0, sizeof(motdmenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
+	PMenu_Open(ent, motdmenu, NULL, 0, sizeof(motdmenu) / sizeof(pmenu_t), 0, NULL, PMENU_NORMAL);
 
 	for (i = MOTDMENU_START; i < MOTDMENU_MAXLINES; i++) /* FS: Clear it out first in case if we change it later */
 	{
@@ -624,7 +625,7 @@ void CoopVoteMenu(edict_t *ent, pmenuhnd_t *p /* unused */)
 	}
 
 	PMenu_Close(ent);
-	PMenu_Open(ent, votemenu, 0, sizeof(votemenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
+	PMenu_Open(ent, votemenu, NULL, 0, sizeof(votemenu) / sizeof(pmenu_t), 0, NULL, PMENU_NORMAL);
 }
 
 void CoopUpdateGamemodeMenu(edict_t *ent)
@@ -707,14 +708,9 @@ void CoopUpdateGamemodeMenu(edict_t *ent)
 
 	Com_sprintf(gamemodestring, sizeof(gamemodestring), "*Current Gamemode: %s", gamemode);
 
-	if(votegamemodemenu[VGAMEMODEMENU_GAMEMODE].text)
-	{
-		free(votegamemodemenu[VGAMEMODEMENU_GAMEMODE].text);
-	}
-
-	votegamemodemenu[VGAMEMODEMENU_GAMEMODE].text = gamemodestring;
-	votegamemodemenu[VGAMEMODEMENU_GAMEMODE].align = PMENU_ALIGN_CENTER_FIXED;
-	votegamemodemenu[VGAMEMODEMENU_GAMEMODE].SelectFunc = NULL;
+	votegamemodemenuheader[VGAMEMODEMENU_GAMEMODE].text = gamemodestring;
+	votegamemodemenuheader[VGAMEMODEMENU_GAMEMODE].align = PMENU_ALIGN_CENTER;
+	votegamemodemenuheader[VGAMEMODEMENU_GAMEMODE].SelectFunc = NULL;
 }
 
 void CoopUpdateDifficultyMenu(edict_t *ent)
@@ -764,7 +760,7 @@ void CoopVoteDifficulty(edict_t *ent, pmenuhnd_t *p /* unused */)
 
 	PMenu_Close(ent);
 	CoopUpdateDifficultyMenu(ent);
-	PMenu_Open(ent, voteskillmenu, 0, sizeof(voteskillmenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
+	PMenu_Open(ent, voteskillmenu, NULL, 0, sizeof(voteskillmenu) / sizeof(pmenu_t), 0, NULL, PMENU_NORMAL);
 }
 
 void CoopUpdateVoteMapMenu(edict_t *ent)
@@ -833,7 +829,7 @@ void CoopVoteMap(edict_t *ent, pmenuhnd_t *p /* unused */)
 	votemapmenu[mapCount+1].align = PMENU_ALIGN_LEFT;
 	votemapmenu[mapCount+1].SelectFunc = CoopReturnToVoteMenu;
 
-	PMenu_Open(ent, votemapmenu, 0, mapCount + 2, NULL, PMENU_SCROLLING);
+	PMenu_Open(ent, votemapmenu, NULL, 0, mapCount + 2, 0, NULL, PMENU_SCROLLING);
 	votemenu_cleanup_all();
 }
 
@@ -1143,7 +1139,7 @@ void CoopBlinkyCam(edict_t *ent, pmenuhnd_t *p /* unused */)
 	PMenu_Close(ent);
 
 	CoopInitBlinkyMenu(ent);
-	PMenu_Open(ent, blinkymenu, 0, sizeof(blinkymenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
+	PMenu_Open(ent, blinkymenu, NULL, 0, sizeof(blinkymenu) / sizeof(pmenu_t), 0, NULL, PMENU_NORMAL);
 	ent->client->menu_update = CoopUpdateBlinkyMenu;
 }
 
@@ -1239,7 +1235,7 @@ void CoopBlinkyChaseMenu(edict_t *ent, pmenuhnd_t *p /* unused */)
 	PMenu_Close(ent);
 
 	CoopInitBlinkyChaseMenu(ent);
-	PMenu_Open(ent, chasemenu, 0, sizeof(chasemenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
+	PMenu_Open(ent, chasemenu, NULL, 0, sizeof(chasemenu) / sizeof(pmenu_t), 0, NULL, PMENU_NORMAL);
 	ent->client->menu_update = CoopUpdateBlinkyChaseMenu;
 }
 
@@ -1335,7 +1331,7 @@ void CoopBlinkySummonMenu(edict_t *ent, pmenuhnd_t *p /* unused */)
 	PMenu_Close(ent);
 
 	CoopInitBlinkySummonMenu(ent);
-	PMenu_Open(ent, summonmenu, 0, sizeof(summonmenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
+	PMenu_Open(ent, summonmenu, NULL, 0, sizeof(summonmenu) / sizeof(pmenu_t), 0, NULL, PMENU_NORMAL);
 	ent->client->menu_update = CoopUpdateBlinkySummonMenu;
 }
 
@@ -1431,7 +1427,7 @@ void CoopBlinkyTeleportMenu(edict_t *ent, pmenuhnd_t *p /* unused */)
 	PMenu_Close(ent);
 
 	CoopInitBlinkyTeleportMenu(ent);
-	PMenu_Open(ent, teleportmenu, 0, sizeof(teleportmenu) / sizeof(pmenu_t), NULL, PMENU_NORMAL);
+	PMenu_Open(ent, teleportmenu, NULL, 0, sizeof(teleportmenu) / sizeof(pmenu_t), 0, NULL, PMENU_NORMAL);
 	ent->client->menu_update = CoopUpdateBlinkyTeleportMenu;
 }
 
@@ -1582,63 +1578,73 @@ void CoopVoteGamemodeDynamic(edict_t *ent, pmenuhnd_t *p /* unused */)
 	PMenu_Close(ent);
 
 	votemenu_loadmaplist();
-	size = sizeof(pmenu_t) * (gamemodeCount + 10);
+	size = sizeof(pmenu_t) * (gamemodeCount + 2);
 	votegamemodemenu = malloc(size);
 	memset((pmenu_t *)votegamemodemenu, 0, size);
 
-	votegamemodemenu[0].text = "*Quake II";
-	votegamemodemenu[0].align = PMENU_ALIGN_CENTER_FIXED;
-	votegamemodemenu[0].SelectFunc = NULL;
+	size = sizeof(pmenu_t) * (8);
+	votegamemodemenuheader = malloc(size);
+	memset((pmenu_t *)votegamemodemenuheader, 0, size);
 
-	votegamemodemenu[1].text = "*Mara'akate and Freewill";
-	votegamemodemenu[1].align = PMENU_ALIGN_CENTER_FIXED;
-	votegamemodemenu[1].SelectFunc = NULL;
+	votegamemodemenuheader[0].text = "*Quake II";
+	votegamemodemenuheader[0].align = PMENU_ALIGN_CENTER;
+	votegamemodemenuheader[0].SelectFunc = NULL;
 
-	votegamemodemenu[2].text = "*Custom Coop";
-	votegamemodemenu[2].align = PMENU_ALIGN_CENTER_FIXED;
-	votegamemodemenu[2].SelectFunc = NULL;
+	votegamemodemenuheader[1].text = "*Mara'akate and Freewill";
+	votegamemodemenuheader[1].align = PMENU_ALIGN_CENTER;
+	votegamemodemenuheader[1].SelectFunc = NULL;
 
-	votegamemodemenu[3].text = NULL;
-	votegamemodemenu[3].align = PMENU_ALIGN_CENTER_FIXED;
-	votegamemodemenu[3].SelectFunc = NULL;
+	votegamemodemenuheader[2].text = "*Custom Coop";
+	votegamemodemenuheader[2].align = PMENU_ALIGN_CENTER;
+	votegamemodemenuheader[2].SelectFunc = NULL;
 
-	votegamemodemenu[4].text = "*Gamemode";
-	votegamemodemenu[4].align = PMENU_ALIGN_CENTER_FIXED;
-	votegamemodemenu[4].SelectFunc = NULL;
+	votegamemodemenuheader[3].text = NULL;
+	votegamemodemenuheader[3].align = PMENU_ALIGN_CENTER;
+	votegamemodemenuheader[3].SelectFunc = NULL;
 
-	votegamemodemenu[5].text = NULL;
-	votegamemodemenu[5].align = PMENU_ALIGN_CENTER_FIXED;
-	votegamemodemenu[5].SelectFunc = NULL;
+	votegamemodemenuheader[4].text = "*Gamemode";
+	votegamemodemenuheader[4].align = PMENU_ALIGN_CENTER;
+	votegamemodemenuheader[4].SelectFunc = NULL;
 
-	votegamemodemenu[7].text = NULL;
-	votegamemodemenu[7].align = PMENU_ALIGN_CENTER_FIXED;
-	votegamemodemenu[7].SelectFunc = NULL;
+	votegamemodemenuheader[5].text = NULL;
+	votegamemodemenuheader[5].align = PMENU_ALIGN_CENTER;
+	votegamemodemenuheader[5].SelectFunc = NULL;
+
+	votegamemodemenuheader[7].text = NULL;
+	votegamemodemenuheader[7].align = PMENU_ALIGN_CENTER;
+	votegamemodemenuheader[7].SelectFunc = NULL;
 
 	for (i = 0; i < gamemodeCount; i++)
 	{
 		if(i < MAX_GAMEMODES && gamemode_array[i].gamemode && strlen(gamemode_array[i].gamemode))
 		{
-			votegamemodemenu[i+8].text = gamemode_array[i].gamemode;
-			votegamemodemenu[i+8].align = PMENU_ALIGN_LEFT;
-			votegamemodemenu[i+8].SelectFunc = CoopCheckGamemode;
+			votegamemodemenu[i].text = gamemode_array[i].gamemode;
+			votegamemodemenu[i].align = PMENU_ALIGN_LEFT;
+			votegamemodemenu[i].SelectFunc = CoopCheckGamemode;
 		}
 	}
 
-	votegamemodemenu[gamemodeCount+8].text = NULL;
-	votegamemodemenu[gamemodeCount+8].align = PMENU_ALIGN_CENTER;
-	votegamemodemenu[gamemodeCount+8].SelectFunc = NULL;
+	votegamemodemenu[i].text = NULL;
+	votegamemodemenu[i].align = PMENU_ALIGN_CENTER;
+	votegamemodemenu[i].SelectFunc = NULL;
 
-	votegamemodemenu[gamemodeCount+9].text = "Return to Voting Menu";
-	votegamemodemenu[gamemodeCount+9].align = PMENU_ALIGN_LEFT;
-	votegamemodemenu[gamemodeCount+9].SelectFunc = CoopReturnToVoteMenu;
+	votegamemodemenu[i+1].text = "Return to Voting Menu";
+	votegamemodemenu[i+1].align = PMENU_ALIGN_LEFT;
+	votegamemodemenu[i+1].SelectFunc = CoopReturnToVoteMenu;
 
 	CoopUpdateGamemodeMenu(ent); /* FS: For current gamemode */
 
-	PMenu_Open(ent, votegamemodemenu, 0, gamemodeCount + 10, NULL, PMENU_SCROLLING);
+	PMenu_Open(ent, votegamemodemenu, votegamemodemenuheader, 0, gamemodeCount + 2, 8, NULL, PMENU_SCROLLING);
 
 	if (votegamemodemenu)
 	{
 		free(votegamemodemenu);
 	}
 	votegamemodemenu = NULL;
+
+	if (votegamemodemenuheader)
+	{
+		free(votegamemodemenuheader);
+	}
+	votegamemodemenuheader = NULL;
 }

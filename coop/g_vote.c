@@ -1248,7 +1248,7 @@ void VoteMenuOpen(edict_t *ent)
 
 	PMenu_Close(ent);
 	VoteMenuInit(ent);
-	PMenu_Open(ent, voteyesnomenu, 0, sizeof(voteyesnomenu) / sizeof(pmenu_t), NULL, PMENU_VOTE);
+	PMenu_Open(ent, voteyesnomenu, NULL, 0, sizeof(voteyesnomenu) / sizeof(pmenu_t), 0, NULL, PMENU_VOTE);
 	ent->client->menu_update = VoteMenuUpdate;
 }
 

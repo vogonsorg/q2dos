@@ -1249,7 +1249,7 @@ extern void PMenu_Update ( edict_t * ent ) ;
 extern void PMenu_Do_Update ( edict_t * ent ) ;
 extern void PMenu_UpdateEntry ( pmenu_t * entry , const char * text , int align , SelectFunc_t SelectFunc ) ;
 extern void PMenu_Close ( edict_t * ent ) ;
-extern pmenuhnd_t * PMenu_Open ( edict_t * ent , pmenu_t * entries , int cur , int num , void * arg , int menutype ) ;
+extern pmenuhnd_t * PMenu_Open ( edict_t * ent , pmenu_t * entries , pmenu_t * header , int cur , int num , int numheader , void * arg , int menutype ) ;
 extern void fire_trap ( edict_t * self , vec3_t start , vec3_t aimdir , int damage , int speed , float timer , float damage_radius , qboolean held ) ;
 extern void Trap_Think ( edict_t * ent ) ;
 extern void fire_plasma ( edict_t * self , vec3_t start , vec3_t dir , int damage , int speed , float damage_radius , int radius_damage ) ;
