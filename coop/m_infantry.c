@@ -734,7 +734,7 @@ infantry_cock_gun(edict_t *self)
 
 	gi.sound(self, CHAN_WEAPON, sound_weapon_cock, 1, ATTN_NORM, 0);
 
-	if (game.gametype == vanilla_coop) /* FS: Coop: Vanilla specific */
+	if (game.gametype == vanilla_coop || game.gametype == zaero_coop) /* FS: Coop: Vanilla and Zaero specific */
 	{
 		n = (rand() & 15) + 3 + 7;
 		self->monsterinfo.pausetime = level.time + n * FRAMETIME;

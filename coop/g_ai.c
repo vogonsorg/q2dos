@@ -284,6 +284,8 @@ ai_charge(edict_t *self, float dist)
 		{
 			VectorSubtract (self->enemy->s.origin, self->s.origin, v);
 		}
+
+		self->ideal_yaw = vectoyaw(v);
 	}
 	else
 	{
