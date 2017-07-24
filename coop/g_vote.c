@@ -273,6 +273,10 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 	if(toEOF <= 0)
 	{
 		gi.cprintf(NULL, PRINT_CHAT, "vote_mapcheck: cannot read file '%s' into memory!\n", sv_coop_maplist->string);
+		if(fileBuffer)
+		{
+			free(fileBuffer);
+		}
 		return false;
 	}
 
@@ -1198,6 +1202,12 @@ void VoteMenuUpdate(edict_t *ent)
 
 	if(!ent || !ent->client)
 	{
+		return;
+	}
+
+	if (!bVoteInProgress)
+	{
+		PMenu_Close(ent);
 		return;
 	}
 

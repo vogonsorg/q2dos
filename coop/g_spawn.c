@@ -2161,6 +2161,10 @@ int G_SpawnCheckpoints (edict_t *ent)
 	if(toEOF <= 0)
 	{
 		gi.cprintf(NULL, PRINT_CHAT, "G_SpawnCheckpoints: cannot read file '%s' into memory!\n", fileName);
+		if(fileBuffer)
+		{
+			free(fileBuffer);
+		}
 		return false;
 	}
 

@@ -207,6 +207,10 @@ PMenu_Do_Update(edict_t *ent)
 	if(ent->client->menu_update) /* FS: Added for dynamically updating menus */
 	{
 		ent->client->menu_update(ent);
+		if(!ent->client->menu) /* FS: Forced close in the update function.  Done here. */
+		{
+			return;
+		}
 	}
 
 	hnd = ent->client->menu;
