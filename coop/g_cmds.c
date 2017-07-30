@@ -2193,9 +2193,9 @@ Cmd_SayPerson_f(edict_t *ent) /* FS: Tastyspleen/Q2Admin stuff.  By request. */
 	strcat(text, p);
 
 	/* don't let text be too long for malicious reasons */
-	if (strlen(text) > 150)
+	if (strlen(text) > 2000) /* FS: This is unfortunate, but this is what TSAdmin uses and wallfly can hit about 512 sometimes... */
 	{
-		text[150] = 0;
+		text[2000] = 0;
 	}
 
 	strcat(text, "\n");
@@ -2203,9 +2203,9 @@ Cmd_SayPerson_f(edict_t *ent) /* FS: Tastyspleen/Q2Admin stuff.  By request. */
 	strcat(entHeader, other->client->pers.netname);
 	strcat(entHeader, ") ");
 	strcat(entHeader, p);
-	if(strlen(entHeader) > 150)
+	if(strlen(entHeader) > 2000) /* FS: This is unfortunate, but this is what TSAdmin uses and wallfly can hit about 512 sometimes... */
 	{
-		entHeader[150] = 0;
+		entHeader[2000] = 0;
 	}
 	strcat(entHeader, "\n");
 

@@ -669,7 +669,7 @@ Redirect all printfs
 void SVC_RemoteCommand (void)
 {
 	int		i;
-	char	remaining[1024];
+	char	remaining[2048]; /* FS: From R1Q2: Was 1024 */
 
 	i = Rcon_Validate ();
 

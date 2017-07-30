@@ -329,9 +329,9 @@ void SVCmd_SayPerson_f (void)
 	Com_strcat (msg, sizeof(msg), p);
 
 	/* don't let text be too long for malicious reasons */
-	if (strlen(msg) > 150)
+	if (strlen(msg) > 2000) /* FS: This is unfortunate, but this is what TSAdmin uses and wallfly can hit about 512 sometimes... */
 	{
-		msg[150] = 0;
+		msg[2000] = 0;
 	}
 
 	Com_strcat (msg, sizeof(msg), "\n");
