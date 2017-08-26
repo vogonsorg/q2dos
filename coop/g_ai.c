@@ -1237,7 +1237,10 @@ ai_run_missile(edict_t *self)
 
 	if (FacingIdeal(self))
 	{
-		self->monsterinfo.attack(self);
+		if (self->monsterinfo.attack) /* FS: Coop: Crash from m_insane when hit by another enemy.  Problem on SGC11-3.BSP */
+		{
+			self->monsterinfo.attack(self);
+		}
 
 		if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 		{
