@@ -33,6 +33,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <ctype.h>
 #include "qcommon.h"
 
+#ifdef _WIN32
+#include "../win32/winquake.h"
+#endif
+
 #define	MAXPRINTMSG	8192 // was 4096
 
 //#define MAX_NUM_ARGVS	50
@@ -1482,6 +1486,13 @@ void Qcommon_Init (int argc, char **argv)
 
 	SV_Init ();
 	CL_Init ();
+
+#ifdef _WIN32
+#ifdef NEW_DED_CONSOLE
+	if (!dedicated->value)
+		Sys_ShowConsole(false);
+#endif // NEW_DED_CONSOLE
+#endif // _WIN32
 
 	// add + commands from command line
 	if (!Cbuf_AddLateCommands ())
