@@ -592,11 +592,16 @@ static void Summon(edict_t *ent, edict_t *other)
 	// set angles
 	MoveToAngles(other, ent->s.angles);
 
+	/* FS: FIXME: Is this right? -- Do this again, view angles got jacked permanently a couple of times during live play? */
 	VectorClear (other->s.angles);
 	VectorClear (other->client->ps.viewangles);
 	VectorClear (other->client->v_angle);
 	VectorClear (other->client->kick_angles);
 	VectorClear (other->client->kick_origin);
+	VectorClear (other->client->oldviewangles);
+	VectorClear (other->client->ps.gunangles);
+	VectorClear (other->client->ps.kick_angles);
+	other->client->ps.pmove.delta_angles[0] = other->client->ps.pmove.delta_angles[1] = other->client->ps.pmove.delta_angles[2] = 0;
 
 	// kill anything at the destination
 	KillBox (other);
@@ -614,6 +619,11 @@ static void Summon(edict_t *ent, edict_t *other)
 	VectorClear (other->client->v_angle);
 	VectorClear (other->client->kick_angles);
 	VectorClear (other->client->kick_origin);
+	VectorClear (other->client->oldviewangles);
+	VectorClear (other->client->ps.gunangles);
+	VectorClear (other->client->ps.kick_angles);
+	other->client->ps.pmove.delta_angles[0] = other->client->ps.pmove.delta_angles[1] = other->client->ps.pmove.delta_angles[2] = 0;
+
 	ent->client->summon_time = level.time + sv_coop_summon_time->value;
 }
 
@@ -678,8 +688,15 @@ static void Teleport(edict_t *ent, edict_t *other)
 	VectorClear (other->client->v_angle);
 	VectorClear (other->client->kick_angles);
 	VectorClear (other->client->kick_origin);
+	VectorClear (other->client->oldviewangles);
+	VectorClear (other->client->ps.gunangles);
+	VectorClear (other->client->ps.kick_angles);
 	other->s.angles[PITCH] = other->client->ps.viewangles[PITCH] = 0;
 	other->s.angles[ROLL] = other->client->ps.viewangles[ROLL] = 0;
+
+	other->client->v_dmg_pitch = other->client->v_dmg_roll = 0;
+	other->client->v_dmg_time = 0.0f;
+	other->client->ps.pmove.delta_angles[0] = other->client->ps.pmove.delta_angles[1] = other->client->ps.pmove.delta_angles[2] = 0;
 #endif
 
 	// kill anything at the destination
@@ -689,10 +706,6 @@ static void Teleport(edict_t *ent, edict_t *other)
 
 	other->s.event = EV_OTHER_TELEPORT;
 	gi.linkentity (other);
-
-	/* FS: FIXME: This isn't working. */
-	other->client->v_dmg_pitch = other->client->v_dmg_roll = 0;
-	other->client->v_dmg_time = 0.0f;
 
 	other->client->summon_time = level.time + sv_coop_summon_time->value;
 }
@@ -998,6 +1011,29 @@ void Blinky_CalcViewOffsets(edict_t * ent, vec3_t v)
 		AngleVectors (target->client->v_angle, forward, NULL, NULL);
 		VectorMA (v, offset, forward, v);
 	}
+}
+
+void Cmd_Angles_Verbose_f(edict_t *self) /* FS: Debug test */
+{
+	vec3_t angles;
+	VectorCopy(self->s.angles, angles);
+	gi.cprintf(self, PRINT_HIGH, "self->s.angles: %f %f %f\n", angles[0], angles[1], angles[2]);
+
+	VectorCopy(self->client->ps.viewangles, angles);
+	gi.cprintf(self, PRINT_HIGH, "self->client->ps.viewangles: %f %f %f\n", angles[0], angles[1], angles[2]);
+
+	VectorCopy(self->client->v_angle, angles);
+	gi.cprintf(self, PRINT_HIGH, "self->client->v_angle: %f %f %f\n", angles[0], angles[1], angles[2]);
+
+	VectorCopy(self->client->kick_angles, angles);
+	gi.cprintf(self, PRINT_HIGH, "self->client->kick_angles: %f %f %f\n", angles[0], angles[1], angles[2]);
+
+	VectorCopy(self->client->kick_origin, angles);
+	gi.cprintf(self, PRINT_HIGH, "self->client->kick_origin: %f %f %f\n", angles[0], angles[1], angles[2]);
+
+	gi.cprintf(self, PRINT_HIGH, "self->client->v_dmg_pitch: %f\n", self->client->v_dmg_pitch);
+	gi.cprintf(self, PRINT_HIGH, "self->client->v_dmg_roll: %f\n", self->client->v_dmg_roll);
+	gi.cprintf(self, PRINT_HIGH, "self->client->v_dmg_time: %f\n", self->client->v_dmg_time);
 }
 
 void Blinky_SpawnEntities()

@@ -2120,6 +2120,7 @@
 {"Cmd_NoSummon_f", (byte *)Cmd_NoSummon_f},
 {"Cmd_Cam_f", (byte *)Cmd_Cam_f},
 {"Cmd_Stats_f", (byte *)Cmd_Stats_f},
+{"Cmd_Angles_Verbose_f", (byte *)Cmd_Angles_Verbose_f},
 {"StartCam", (byte *)StartCam},
 {"stopBlinkyCam", (byte *)stopBlinkyCam},
 {"MoveToAngles", (byte *)MoveToAngles},

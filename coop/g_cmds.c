@@ -2501,6 +2501,10 @@ ClientCommand(edict_t *ent)
 	{
 		Cmd_Runrun_f(ent);
 	}
+	else if (Q_stricmp(cmd, "anglesverbose") == 0) /* FS: Debug test */
+	{
+		Cmd_Angles_Verbose_f(ent);
+	}
 	else if (Q_stricmp(cmd, "say_person") == 0) /* FS: Tastyspleen/Q2Admin stuff.  By request. */
 	{
 		Cmd_SayPerson_f(ent);
