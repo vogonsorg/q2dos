@@ -20,15 +20,18 @@ Fax(714)549-0757
 #include "goaceng.h"
 #include "hashtable.h"
 
+#ifndef _GSERVER_H_
+#define _GSERVER_H_
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 struct GServerImplementation
 {
-	char ip[16];
-	int port;
-	int ping;
+	unsigned long ip;
+	unsigned short port;
+	unsigned short ping;
 	HashTable keyvals;
 };
 
@@ -44,9 +47,11 @@ typedef struct
 } GEnumData;
 
 void ServerFree(void *elem);
-GServer ServerNew(char *ip, int port);
+GServer ServerNew(unsigned long ip, unsigned short port);
 void ServerParseKeyVals(GServer server, char *keyvals);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

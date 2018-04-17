@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 /* FS: IF THIS FILE IS CHANGED IT MUST BE CHANGED IN CLIENT/GSPY.H ! */
 
-#define	GAMESPY_API_VERSION		2
+#define	GAMESPY_API_VERSION		3
 
 #define GS_MSGLEN	1500
 
@@ -57,7 +57,7 @@ typedef struct
 	int (*ServerGetPing)(GServer server);
 	char *(*ServerGetStringValue)(GServer server, char *key, char *sdefault);
 	int (*ServerGetIntValue)(GServer server, char *key, int idefault);
-	int (*ServerGetQueryPort)(GServer server);
+	unsigned short (*ServerGetQueryPort)(GServer server);
 
 } gspyexport_t;
 

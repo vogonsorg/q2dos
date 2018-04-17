@@ -380,7 +380,7 @@ retryRecv:
 	}
 
 	//send the list request
-	sprintf(data, "\\list\\gamename\\%s\\final\\", serverlist->gamename);
+	sprintf(data, "\\list\\cmp\\gamename\\%s\\final\\", serverlist->gamename);
 	len = send ( serverlist->slsocket, data, strlen(data), 0 );
 	if (len == SOCKET_ERROR || len == 0)
 	{
@@ -481,7 +481,7 @@ GError ServerListLANUpdate(GServerList serverlist, gbool async, int startsearchp
 
 
 //add the server to the list with the given ip, port
-static void ServerListAddServer(GServerList serverlist, char *ip, int port)
+static void ServerListAddServer(GServerList serverlist, unsigned long ip, unsigned short port)
 {
 	GServer server;
 	server =  ServerNew(ip, port);
@@ -496,7 +496,7 @@ static GError ServerListLANList(GServerList serverlist)
 	fd_set set;
 	char indata[GS_MSGLEN];
 	struct   sockaddr_in saddr;
-	int saddrlen = sizeof(saddr);
+	socklen_t saddrlen = sizeof(saddr);
 	int error;
 
 	while (1) //we break if the select fails
@@ -511,7 +511,7 @@ static GError ServerListLANList(GServerList serverlist)
 			continue;
 		//we got data, add the server to the list to update
 		if (strstr(indata,"\\final\\") != NULL)
-			ServerListAddServer(serverlist, inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
+			ServerListAddServer(serverlist, saddr.sin_addr.s_addr, ntohs(saddr.sin_port));
 	}
 	if (current_time() - serverlist->lanstarttime > LAN_SEARCH_TIME) //done waiting for replies
 	{
@@ -525,9 +525,12 @@ static GError ServerListLANList(GServerList serverlist)
 //reads the server list from the socket and parses it
 static GError ServerListReadList(GServerList serverlist)
 {
-	static char data[4096]; //static input buffer
-	int len, oldlen;
-	char *p, ip[32], port[16],*q, *lastip;
+	static char data[2048]; //static input buffer
+	static int oldlen = 0;
+	int len;
+	char *p;
+	unsigned long ip;
+	unsigned short port;
 	int retry = 0;
 	int error = 0;
 	int sleepMs = 50;
@@ -536,9 +539,6 @@ static GError ServerListReadList(GServerList serverlist)
 	{
 		goto abort;
 	}
-
-	//append to data
-	oldlen = strlen(data);
 
 retryRecv:
 	len = recv(serverlist->slsocket, data + oldlen, sizeof(data) - oldlen - 1, 0);
@@ -561,47 +561,42 @@ retryRecv:
 			gspyi.dprint(DEVELOPER_MSG_GAMESPY,"Error during TCP List RECV: %s\n", gspyi.net_strerror());
 abort:
 			Close_TCP_Socket(&serverlist->slsocket);
-			data[0] = 0;
-			ServerListModeChange(serverlist, sl_idle);
+			serverlist->slsocket = INVALID_SOCKET;
+			oldlen = 0; //clear data so it can be used again
+			ServerListHalt(serverlist);
+			ServerListModeChange(serverlist, sl_querying);
 			return GE_NOCONNECT;
 		}
 	}
 
-	data[len + oldlen] = 0; //null terminate it
-	// data is in the form of '\ip\1.2.3.4:1234\ip\1.2.3.4:1234\final\'
+	// data is in the form of '<unsigned long>ip<unsigned short>port<unsigned long>ip<unsigned short>port\final\'
+	oldlen += len;
+
 	gspyi.dprint(DEVELOPER_MSG_GAMESPY, "List xfer data: %s\n", data);
 
-	lastip = data;
-	while (*lastip != '\0')
+	p = data;
+	while (p - data <= oldlen - 6)
 	{
-		p = lastip;
-		if (*(p+1) == 'f' || serverlist->abortupdate) //\final\!!
+		if (strncmp(p,"\\final\\",7) == 0 || serverlist->abortupdate)
 		{
 			closesocket(serverlist->slsocket);
 			serverlist->slsocket = INVALID_SOCKET;
-			data[0] = 0; //clear data so it can be used again
+			oldlen = 0; //clear data so it can be used again
 			ServerListModeChange(serverlist, sl_querying);
 			return 0; //get out!!
 		}
-		if (strlen(p) < 14) //no way it could be a full IP, quit
+		if (oldlen < 6) //no way it could be a full IP, quit
 			break;
-		p += 4; //skip the '\ip\'
-		if (strchr(p,':') == NULL || strchr(p,'\\') == NULL)
-			break; //it's not the full ip:port
-		q = ip; //fill the ip buffer
-		while (*p != 0 && *p != ':')
-			*q++ = *p++;
-		
-		*q = '\0'; //null terminate the ip
-		p++; //skip the :
-		q = port;
-		while (*p != 0 && *p != '\\')
-		*q++ = *p++;
-		*q = '\0';
-		lastip = p; //store the new position
-		ServerListAddServer(serverlist, ip, atoi(port));
+
+		memcpy(&ip,p,4);
+		p += 4;
+		memcpy(&port,p,2);
+		p += 2;
+
+		ServerListAddServer(serverlist, ip, ntohs(port));
 	}
-	memmove(data,lastip,strlen(lastip) + 1); //shift it over
+	oldlen = oldlen - (p - data);
+	memmove(data,p,oldlen); //shift it over
 	return 0;
 }
 
@@ -616,7 +611,7 @@ static GError ServerListQueryLoop(GServerList serverlist)
 	struct timeval timeout = {0,0};
 	char indata[GS_MSGLEN];
 	struct sockaddr_in saddr;
-	int saddrlen = sizeof(saddr);
+	socklen_t saddrlen = sizeof(saddr);
 	int server_timeout = bound(100, cl_master_server_timeout->intValue, 9000); /* FS: Now a CVAR */
 	int scount = 0;
 	static qboolean firsttime = true;

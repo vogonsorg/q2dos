@@ -194,7 +194,7 @@ char *ServerGetAddress(GServer server);
 ----------------
 Returns the "query" port for the specified server. If the game uses a seperate
 "game" port, it can be retrieved via: ServerGetIntValue(server,"hostport",0) */
-int ServerGetQueryPort(GServer server);
+unsigned short ServerGetQueryPort(GServer server);
 
 /* ServerGet[]Value
 ------------------

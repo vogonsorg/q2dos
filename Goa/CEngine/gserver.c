@@ -35,13 +35,12 @@ void ServerFree(void *elem)
 	free(server);
 }
 
-GServer ServerNew(char *ip, int port)
+GServer ServerNew(unsigned long ip, unsigned short port)
 {
 	GServer server;
 
 	server = malloc(sizeof(struct GServerImplementation));
-	strncpy(server->ip,ip, 16);
-	server->ip[15] = 0; //make sure it's terminated
+	server->ip = ip;
 	server->port = port;
 	server->ping = 9999;
 	server->keyvals = TableNew(sizeof(GKeyValuePair),16, KeyValHash, KeyValCompare, KeyValFree);
@@ -152,13 +151,13 @@ int ServerGetPing(GServer server)
 Returns the string, dotted IP address for the specified server */
 char *ServerGetAddress(GServer server)
 {
-	return server->ip;
+	return inet_ntoa(*(struct in_addr*)&server->ip);
 }
 
 /* ServerGetPort
 ----------------
 Returns the "query" port for the specified server. */
-int ServerGetQueryPort(GServer server)
+unsigned short ServerGetQueryPort(GServer server)
 {
 	return server->port;
 }
@@ -288,7 +287,7 @@ static int KeyValHash(const void *elem, int numbuckets)
  */
 static int KeyValCompare(const void *entry1, const void *entry2)
 {
-	return CaseInsensitiveCompare(&((GKeyValuePair *)entry1)->key, 
+	return CaseInsensitiveCompare(&((GKeyValuePair *)entry1)->key,
 					  &((GKeyValuePair *)entry2)->key);
 }
 

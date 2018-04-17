@@ -12,6 +12,9 @@ Fax(714)549-0757
 
 ******/
 
+#ifndef _NONPORT_H_
+#define _NONPORT_H_
+
 #ifdef _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -94,3 +97,5 @@ char *strtok_r(char *s, const char *delim, char **last);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* _NONPORT_H_ */
