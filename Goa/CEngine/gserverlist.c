@@ -481,7 +481,7 @@ GError ServerListLANUpdate(GServerList serverlist, gbool async, int startsearchp
 
 
 //add the server to the list with the given ip, port
-static void ServerListAddServer(GServerList serverlist, unsigned long ip, unsigned short port)
+static void ServerListAddServer(GServerList serverlist, unsigned int ip, unsigned short port)
 {
 	GServer server;
 	server =  ServerNew(ip, port);
@@ -529,7 +529,7 @@ static GError ServerListReadList(GServerList serverlist)
 	static int oldlen = 0;
 	int len;
 	char *p;
-	unsigned long ip;
+	unsigned int ip;
 	unsigned short port;
 	int retry = 0;
 	int error = 0;
@@ -569,7 +569,7 @@ abort:
 		}
 	}
 
-	// data is in the form of '<unsigned long>ip<unsigned short>port<unsigned long>ip<unsigned short>port\final\'
+	// data is in the form of '<unsigned int>ip<unsigned short>port<unsigned int>ip<unsigned short>port\final\'
 	oldlen += len;
 
 	gspyi.dprint(DEVELOPER_MSG_GAMESPY, "List xfer data: %s\n", data);
