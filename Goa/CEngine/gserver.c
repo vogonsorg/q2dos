@@ -35,7 +35,7 @@ void ServerFree(void *elem)
 	free(server);
 }
 
-GServer ServerNew(unsigned long ip, unsigned short port)
+GServer ServerNew(unsigned int ip, unsigned short port)
 {
 	GServer server;
 
