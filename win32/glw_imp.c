@@ -238,6 +238,9 @@ void HWGamma_Toggle (qboolean enable)
 	if (!gl_state.gammaRamp)
 		return;
 
+	if(!glw_state.hDC) /* FS: This can actually happen with the 3DFX OpenGL ICD on Win98 during a vid_restart */
+		return;
+
 	if (enable)
 	{
 		if (qwglSetDeviceGammaRamp3DFX)
