@@ -406,6 +406,7 @@ BOOL ( WINAPI * qwglGetDeviceGammaRampEXT)( unsigned char *, unsigned char *, un
 BOOL ( WINAPI * qwglSetDeviceGammaRampEXT)( const unsigned char *, const unsigned char *, const unsigned char * );
 BOOL ( WINAPI * qwglGetDeviceGammaRamp3DFX)( HDC hDC, LPVOID arrays );
 BOOL ( WINAPI * qwglSetDeviceGammaRamp3DFX)( HDC hDC, LPVOID arrays );
+BOOL ( WINAPI * qwglChoosePixelFormatARB ) (HDC, CONST int*, CONST FLOAT*, UINT, int*, UINT*);
 void ( APIENTRY * qglPointParameterfEXT)( GLenum param, GLfloat value );
 void ( APIENTRY * qglPointParameterfvEXT)( GLenum param, const GLfloat *value );
 void ( APIENTRY * qglColorTableEXT)( GLenum, GLenum, GLsizei, GLenum, GLenum, const GLvoid * );
@@ -3018,6 +3019,7 @@ void QGL_Shutdown( void )
 	qwglSetDeviceGammaRampEXT = NULL;
 	qwglGetDeviceGammaRamp3DFX	 = NULL;
 	qwglSetDeviceGammaRamp3DFX	 = NULL;
+	qwglChoosePixelFormatARB = NULL;
 }
 
 #ifdef _MSC_VER

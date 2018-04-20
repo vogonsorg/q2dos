@@ -48,6 +48,112 @@ extern cvar_t *vid_ref;
 WORD original_ramp[3][256];	// Knightmare- hardware gamma 
 WORD gamma_ramp[3][256];
 
+/* FS: Control Anti-Aliasing */
+cvar_t *gl_multisample;
+cvar_t *gl_multisample_softrestart;
+static int glPixelFormatMSAA;
+static int glMultisample = GL_MULTISAMPLE;
+static qboolean s_win95 = false;
+
+static int Get_MultiSample (void)
+{
+	if (gl_multisample->intValue)
+	{
+		ri.Con_Printf (PRINT_ALL, "wglChoosePixelFormatARB");
+		qwglChoosePixelFormatARB = (BOOL (WINAPI *)(HDC, const int*, const float*, unsigned int, int*, unsigned int*)) qwglGetProcAddress("wglChoosePixelFormatARB");
+		if(qwglChoosePixelFormatARB)
+		{
+			int pixelFormat = 0;
+			int msaaMode = 0;
+			UINT numFormats = 0;
+			BOOL bSuccess = false;
+
+			int pAttribListi[] =
+			{
+				WGL_SAMPLE_BUFFERS_ARB, GL_TRUE,
+				WGL_SAMPLES_ARB, 2,
+				WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
+				WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
+				WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
+				WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
+				WGL_COLOR_BITS_ARB, 32,
+				WGL_DEPTH_BITS_ARB, 24,
+				WGL_STENCIL_BITS_ARB, 8,
+				0, 0
+			};
+
+			if (strstr((const char *)qglGetString(GL_RENDERER), "Voodoo")
+				&& strstr((const char *)qglGetString(GL_VENDOR), "3Dfx Interactive Inc."))
+			{
+				pAttribListi[0] = WGL_SAMPLE_BUFFERS_3DFX;
+				pAttribListi[2] = WGL_SAMPLES_3DFX;
+				/* FS: Don't change the Pixel Type or Color Bits for 3DFX */
+				pAttribListi[10] = pAttribListi[11] = pAttribListi[12] = pAttribListi[13] = 0;
+				glMultisample = GL_MULTISAMPLE_3DFX;
+
+				switch(gl_multisample->intValue)
+				{
+				case 2:
+					pAttribListi[3] = 2;
+					msaaMode = 2;
+					break;
+				case 4:
+					pAttribListi[3] = 4;
+					msaaMode = 4;
+					break;
+				case 8: /* FS: Voodoo 5 6000 and maybe AAlchemy */
+					pAttribListi[3] = 8;
+					break;
+				default:
+					goto failed;
+					break;
+				}
+			}
+			else
+			{
+				switch(gl_multisample->intValue)
+				{
+				case 2:
+					pAttribListi[3] = 2;
+					msaaMode = 2;
+					break;
+				case 4:
+					pAttribListi[3] = 4;
+					msaaMode = 4;
+					break;
+				case 8:
+					pAttribListi[3] = 8;
+					msaaMode = 8;
+					break;
+				case 16:
+					pAttribListi[3] = 16;
+					msaaMode = 16;
+					break;
+				default:
+					goto failed;
+					break;
+				}
+			}
+
+			bSuccess = qwglChoosePixelFormatARB(glw_state.hDC, pAttribListi, NULL, 1, &pixelFormat, &numFormats);
+			if(bSuccess)
+			{
+				if (pixelFormat)
+				{
+					ri.Con_Printf (PRINT_ALL, " ...using multisamples %dxAA.\n", msaaMode);
+					return pixelFormat;
+				}
+			}
+		}
+failed:
+		ri.Cvar_Set("gl_multisample", "0");
+		gl_multisample->modified = false;
+		ri.Con_Printf (PRINT_ALL, " ...Failed.\n");
+	}
+
+	return 0;
+}
+
 static void HWGamma_Check3dfxGamma (void)
 {
 	const char *extensions = (const char *) qglGetString(GL_EXTENSIONS);
@@ -279,6 +385,147 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 	return true;
 }
 
+/* FS: Yes this is basically VID_CreateWindow and GLimp_Shutdown, except we don't completely destroy the window.
+ *     This works around re-init twice on WinNT.
+ */
+static void VID_SoftRestart (void)
+{
+    PIXELFORMATDESCRIPTOR pfd =
+	{
+		sizeof(PIXELFORMATDESCRIPTOR),	// size of this pfd
+		1,								// version number
+		PFD_DRAW_TO_WINDOW |			// support window
+		PFD_SUPPORT_OPENGL |			// support OpenGL
+		PFD_DOUBLEBUFFER,				// double buffered
+		PFD_TYPE_RGBA,					// RGBA type
+		// Knightmare- was 24-bit, changed for stencil buffer
+		32,								// 32-bit color depth
+		0, 0, 0, 0, 0, 0,				// color bits ignored
+		0,								// no alpha buffer
+		0,								// shift bit ignored
+		0,								// no accumulation buffer
+		0, 0, 0, 0, 					// accum bits ignored
+		// Knightmare- stencil buffer, was 32-bit z-buffer, no stencil buffer
+		24,								// 24-bit z-buffer
+		8,								// 8-bit stencil buffer
+		0,								// no auxiliary buffer
+		PFD_MAIN_PLANE,					// main layer
+		0,								// reserved
+		0, 0, 0							// layer masks ignored
+    };
+	cvar_t *vid_xpos, *vid_ypos;
+	unsigned long exstyle;
+	unsigned long stylebits;
+	int x, y;
+
+	if (qwglMakeCurrent && !qwglMakeCurrent(NULL, NULL))
+		ri.Con_Printf( PRINT_ALL, "ref_gl::R_Shutdown() - wglMakeCurrent failed\n");
+
+	if (glw_state.hGLRC)
+	{
+		if ( qwglDeleteContext && !qwglDeleteContext( glw_state.hGLRC ) )
+			ri.Con_Printf( PRINT_ALL, "ref_gl::R_Shutdown() - wglDeleteContext failed\n");
+		glw_state.hGLRC = NULL;
+	}
+
+	if (glw_state.hDC)
+	{
+		if (!ReleaseDC(glw_state.hWnd, glw_state.hDC))
+			ri.Con_Printf( PRINT_ALL, "ref_gl::R_Shutdown() - ReleaseDC failed\n" );
+		glw_state.hDC = NULL;
+	}
+
+	if (glw_state.hWnd)
+	{
+		DestroyWindow ( glw_state.hWnd );
+		glw_state.hWnd = NULL;
+	}
+
+	if (vid_fullscreen->value)
+	{
+		if (vid_fullscreen->intValue >= 2) /* FS: Borderless windows */
+			exstyle = 0;
+		else
+			exstyle = WS_EX_TOPMOST;
+		stylebits = WS_POPUP|WS_VISIBLE;
+	}
+	else
+	{
+		exstyle = 0;
+		stylebits = WINDOW_STYLE;
+	}
+
+	if (vid_fullscreen->intValue == 1)
+	{
+		x = 0;
+		y = 0;
+	}
+	else if(vid_fullscreen->intValue >= 2) /* FS: Borderless windows */
+	{
+		HDC hDC = GetDC( NULL );
+		int nHorzRes = GetDeviceCaps( hDC, HORZRES );
+		int nVertRes = GetDeviceCaps( hDC, VERTRES );
+		int nBPP = GetDeviceCaps( hDC, BITSPIXEL );
+		ReleaseDC( 0, hDC );
+
+		if (nHorzRes <= vid.width || nVertRes <= vid.height)
+		{
+			x = y = 0;
+		}
+		else
+		{
+			x = ( nHorzRes - vid.width ) / 2;
+			y = ( nVertRes - vid.height ) / 2;
+		}
+	}
+	else
+	{
+		vid_xpos = ri.Cvar_Get ("vid_xpos", "0", 0);
+		vid_ypos = ri.Cvar_Get ("vid_ypos", "0", 0);
+		x = vid_xpos->value;
+		y = vid_ypos->value;
+	}
+
+	glw_state.hWnd = CreateWindowEx (
+		 exstyle,
+		 WINDOW_CLASS_NAME,
+		 "Quake 2",
+		 stylebits,
+		 x, y, vid.width, vid.height,
+		 NULL,
+		 NULL,
+		 glw_state.hInstance,
+		 NULL);
+
+	if (!glw_state.hWnd)
+		ri.Sys_Error (ERR_FATAL, "Couldn't create window");
+
+	ShowWindow( glw_state.hWnd, SW_SHOW );
+	UpdateWindow( glw_state.hWnd );
+
+	if ((glw_state.hDC = GetDC(glw_state.hWnd)) == NULL)
+	{
+		ri.Sys_Error( ERR_FATAL, "RImp_Init() - GetDC failed\n" );
+	}
+
+	SetPixelFormat(glw_state.hDC, glPixelFormatMSAA, &pfd);
+	DescribePixelFormat(glw_state.hDC, glPixelFormatMSAA, sizeof(pfd), &pfd);
+	if ((glw_state.hGLRC = qwglCreateContext(glw_state.hDC)) == 0)
+	{
+		ri.Sys_Error (ERR_FATAL, "RImp_Init() - qwglCreateContext failed\n");
+	}
+
+	if (!qwglMakeCurrent(glw_state.hDC, glw_state.hGLRC))
+	{
+		ri.Sys_Error (ERR_FATAL, "RImp_Init() - qwglMakeCurrent failed\n");
+	}
+
+	SetForegroundWindow( glw_state.hWnd );
+	SetFocus( glw_state.hWnd );
+
+	// let the sound and input subsystems know about the new window
+	ri.Vid_NewWindow (vid.width, vid.height);
+}
 
 /*
 ** GLimp_SetMode
@@ -508,6 +755,7 @@ qboolean GLimp_Init( void *hinstance, void *wndproc )
 			}
 			else if ( vinfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
 			{
+				s_win95 = true;
 				if ( LOWORD( vinfo.dwBuildNumber ) >= OSR2_BUILD_NUMBER )
 				{
 					glw_state.allowdisplaydepthchange = true;
@@ -529,7 +777,7 @@ qboolean GLimp_Init( void *hinstance, void *wndproc )
 
 qboolean GLimp_InitGL (void)
 {
-    PIXELFORMATDESCRIPTOR pfd = 
+    PIXELFORMATDESCRIPTOR pfd =
 	{
 		sizeof(PIXELFORMATDESCRIPTOR),	// size of this pfd
 		1,								// version number
@@ -556,6 +804,9 @@ qboolean GLimp_InitGL (void)
 	cvar_t *stereo;
 	
 	stereo = ri.Cvar_Get( "cl_stereo", "0", 0 );
+	gl_multisample = ri.Cvar_Get( "gl_multisample", "0", CVAR_ARCHIVE );
+	gl_multisample->modified = false; /* FS: Eat it so we don't restart twice */
+	gl_multisample_softrestart = ri.Cvar_Get( "gl_multisample_softrestart", "1", CVAR_ARCHIVE );
 
 	/*
 	** set PFD_STEREO if necessary
@@ -598,6 +849,11 @@ qboolean GLimp_InitGL (void)
 			ri.Con_Printf (PRINT_ALL, "GLimp_Init() - qwglChoosePixelFormat failed\n");
 			return false;
 		}
+		if (glPixelFormatMSAA) /* FS: Control Anti-Aliasing */
+		{
+			pixelformat = glPixelFormatMSAA;
+		}
+
 		if ( qwglSetPixelFormat( glw_state.hDC, pixelformat, &pfd) == FALSE )
 		{
 			ri.Con_Printf (PRINT_ALL, "GLimp_Init() - qwglSetPixelFormat failed\n");
@@ -611,6 +867,10 @@ qboolean GLimp_InitGL (void)
 		{
 			ri.Con_Printf (PRINT_ALL, "GLimp_Init() - ChoosePixelFormat failed\n");
 			return false;
+		}
+		if (glPixelFormatMSAA) /* FS: Control Anti-Aliasing */
+		{
+			pixelformat = glPixelFormatMSAA;
 		}
 		if ( SetPixelFormat( glw_state.hDC, pixelformat, &pfd) == FALSE )
 		{
@@ -668,6 +928,27 @@ qboolean GLimp_InitGL (void)
 		goto fail;
 	}
 
+	/* FS: Control Anti-Aliasing */
+	if (!glPixelFormatMSAA)
+	{
+		glPixelFormatMSAA = Get_MultiSample();
+		if (glPixelFormatMSAA)
+		{
+			if (s_win95 || !gl_multisample_softrestart->intValue)
+			{
+				/* FS: wglChoosePixelFormatARB will be unavailable until the context is created which is stupid but true: https://www.khronos.org/opengl/wiki/Multisampling */
+				GLimp_SetMode((int*)&vid.width, (int*)&vid.height, gl_mode->value, vid_fullscreen->intValue ? true : false);
+				qglEnable(glMultisample);
+				return true;
+			}
+			else
+			{
+				VID_SoftRestart(); /* FS: This hack works on WinNT to avoid destroying the entire window.  Win9x won't let us get away with it. */
+				qglEnable(glMultisample);
+			}
+		}
+	}
+
 	/*
 	** print out PFD specifics 
 	*/
@@ -719,6 +1000,20 @@ void GLimp_BeginFrame( float camera_separation )
 			ri.Con_Printf( PRINT_ALL, "gl_bitdepth requires Win95 OSR2.x or WinNT 4.x\n" );
 		}
 		gl_bitdepth->modified = false;
+	}
+
+	/* FS: Control Anti-Aliasing */
+	if (gl_multisample->modified)
+	{
+		if((gl_config.renderer & GL_RENDERER_VOODOO && strstr(gl_config.vendor_string, "3Dfx Interactive Inc."))
+			|| gl_config.renderer & GL_RENDERER_DEFAULT)
+		{
+			cvar_t *ref = ri.Cvar_Get ("vid_ref", "gl", 0);
+			qglDisable(glMultisample);
+			ref->modified = true;
+		}
+		glPixelFormatMSAA = 0;
+		gl_multisample->modified = false;
 	}
 
 	if ( camera_separation < 0 && gl_state.stereo_enabled )

@@ -431,6 +431,7 @@ extern BOOL ( WINAPI * qwglSetDeviceGammaRampEXT ) ( const unsigned char *pRed, 
 
 extern BOOL ( WINAPI * qwglGetDeviceGammaRamp3DFX ) ( HDC, LPVOID );
 extern BOOL ( WINAPI * qwglSetDeviceGammaRamp3DFX ) ( HDC, LPVOID );
+extern BOOL ( WINAPI * qwglChoosePixelFormatARB ) (HDC, CONST int*, CONST FLOAT*, UINT, int*, UINT*);
 #endif
 
 #ifndef _WIN32

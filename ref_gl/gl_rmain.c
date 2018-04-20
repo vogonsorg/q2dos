@@ -1368,32 +1368,16 @@ int R_Init ( void *hinstance, void *hWnd )
 	strlwr( vendor_buffer );
 
 	/* Knightmare- replaced the vendor detection  */
-	if (strstr(vendor_buffer, "nvidia")) {
-		gl_config.renderer = GL_RENDERER_NVIDIA;
-		if (strstr(renderer_buffer, "geforce"))	gl_config.renderer |= GL_RENDERER_GEFORCE;
-	}
-	else if (strstr(vendor_buffer, "ati")) {
-		gl_config.renderer = GL_RENDERER_ATI;
-		if (strstr(vendor_buffer, "radeon"))		gl_config.renderer |= GL_RENDERER_RADEON;
-	}
-	else if (!Q_strncasecmp(renderer_buffer, "3dfx", 4)	  ||
+	if (!Q_strncasecmp(renderer_buffer, "3dfx", 4)	  ||
 		 !Q_strncasecmp(renderer_buffer, "SAGE Glide", 10) ||
 		 !Q_strncasecmp(renderer_buffer, "Glide ", 6)	  || /* possible with Mesa 3.x/4.x/5.0.x */
 		 !Q_strncasecmp(renderer_buffer, "Mesa Glide", 10))
 	{
 		gl_config.renderer = GL_RENDERER_VOODOO;
 	}
-	else if (strstr(vendor_buffer, "matrox"))		gl_config.renderer = GL_RENDERER_MATROX;
-	else if (strstr(vendor_buffer, "intel"))		gl_config.renderer = GL_RENDERER_INTEL;
-	else if (strstr	(vendor_buffer, "sgi"))			gl_config.renderer = GL_RENDERER_SGI;
 	else if (strstr	(renderer_buffer, "permedia"))	gl_config.renderer = GL_RENDERER_PERMEDIA2;
-	else if (strstr	(renderer_buffer, "glint"))		gl_config.renderer = GL_RENDERER_GLINT_MX;
 	else if (strstr	(renderer_buffer, "glzicd"))	gl_config.renderer = GL_RENDERER_REALIZM;
-	else if (strstr	(renderer_buffer, "pcx1"))		gl_config.renderer = GL_RENDERER_PCX1;
-	else if (strstr	(renderer_buffer, "pcx2"))		gl_config.renderer = GL_RENDERER_PCX2;
-	else if (strstr	(renderer_buffer, "pmx"))		gl_config.renderer = GL_RENDERER_PMX;
 	else if (strstr	(renderer_buffer, "verite"))	gl_config.renderer = GL_RENDERER_RENDITION;
-	else if (strstr	(vendor_buffer, "sis"))			gl_config.renderer = GL_RENDERER_SIS;
 	else if (strstr (renderer_buffer, "voodoo"))	gl_config.renderer = GL_RENDERER_VOODOO;
 	else if (strstr	(renderer_buffer, "gdi generic")) gl_config.renderer = GL_RENDERER_MCD;
 	else											gl_config.renderer = GL_RENDERER_DEFAULT;
