@@ -105,7 +105,7 @@ void UpdateGammaRamp (void)
 
 	if (!gl_state.gammaRamp)
 		return;
-	g = vid_gamma->value + 0.3f;/* 0.6f */
+	g = vid_gamma->value/* + 0.3f*/; /* FS: Just use the direct gamma value, this is fucking up hardware gamma and non-hardware gamma being unbalanced. */
 	memcpy (gamma_ramp, original_ramp, sizeof(original_ramp));
 	for (i = 0; i < 3; i++)
 	{
