@@ -194,6 +194,11 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 		exstyle = WS_EX_TOPMOST;
 		stylebits = WS_POPUP|WS_VISIBLE;
 	}
+	else if (vid_fullscreen->intValue > 1) /* FS: Borderless windows */
+	{
+		exstyle = 0;
+		stylebits = WS_POPUP|WS_VISIBLE;
+	}
 	else
 	{
 		exstyle = 0;
@@ -214,6 +219,24 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 	{
 		x = 0;
 		y = 0;
+	}
+	else if(vid_fullscreen->intValue >= 2) /* FS: Borderless windows */
+	{
+		HDC hDC = GetDC( NULL );
+		int nHorzRes = GetDeviceCaps( hDC, HORZRES );
+		int nVertRes = GetDeviceCaps( hDC, VERTRES );
+		int nBPP = GetDeviceCaps( hDC, BITSPIXEL );
+		ReleaseDC( 0, hDC );
+
+		if (nHorzRes <= vid.width || nVertRes <= vid.height)
+		{
+			x = y = 0;
+		}
+		else
+		{
+			x = ( nHorzRes - vid.width ) / 2;
+			y = ( nVertRes - vid.height ) / 2;
+		}
 	}
 	else
 	{
@@ -263,7 +286,7 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
 {
 	int width, height;
-	const char *win_fs[] = { "W", "FS" };
+	const char *win_fs[] = { "W", "FS", "BL" };
 
 	ri.Con_Printf( PRINT_ALL, "Initializing OpenGL display\n");
 
@@ -284,7 +307,7 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 	}
 
 	// do a CDS if needed
-	if ( fullscreen )
+	if ( fullscreen && vid_fullscreen->intValue == 1) /* FS: Borderless windows */
 	{
 		DEVMODE dm;
 
