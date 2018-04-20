@@ -1470,17 +1470,6 @@ extern "C" {
 #endif
 
 #ifndef GL_ARB_multisample
-#define WGL_DRAW_TO_WINDOW_ARB            0x2001
-#define WGL_SUPPORT_OPENGL_ARB            0x2010
-#define WGL_DOUBLE_BUFFER_ARB             0x2011
-#define WGL_PIXEL_TYPE_ARB                0x2013
-#define WGL_COLOR_BITS_ARB                0x2014
-#define WGL_TYPE_RGBA_ARB                 0x202B
-#define WGL_DEPTH_BITS_ARB                0x2022
-#define WGL_STENCIL_BITS_ARB              0x2023
-#define WGL_SAMPLE_BUFFERS_ARB            0x2041
-#define WGL_SAMPLES_ARB                   0x2042
-
 #define GL_MULTISAMPLE_ARB                0x809D
 #define GL_SAMPLE_ALPHA_TO_COVERAGE_ARB   0x809E
 #define GL_SAMPLE_ALPHA_TO_ONE_ARB        0x809F
@@ -4172,10 +4161,6 @@ extern "C" {
 #endif
 
 #ifndef GL_3DFX_multisample
-#define GLX_SAMPLE_BUFFERS_3DFX           0x8050
-#define GLX_SAMPLES_3DFX                  0x8051
-#define WGL_SAMPLE_BUFFERS_3DFX           0x2060
-#define WGL_SAMPLES_3DFX                  0x2061
 #define GL_MULTISAMPLE_3DFX               0x86B2
 #define GL_SAMPLE_BUFFERS_3DFX            0x86B3
 #define GL_SAMPLES_3DFX                   0x86B4

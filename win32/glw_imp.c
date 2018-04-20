@@ -331,7 +331,6 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 		HDC hDC = GetDC( NULL );
 		int nHorzRes = GetDeviceCaps( hDC, HORZRES );
 		int nVertRes = GetDeviceCaps( hDC, VERTRES );
-		int nBPP = GetDeviceCaps( hDC, BITSPIXEL );
 		ReleaseDC( 0, hDC );
 
 		if (nHorzRes <= vid.width || nVertRes <= vid.height)
@@ -465,7 +464,6 @@ static void VID_SoftRestart (void)
 		HDC hDC = GetDC( NULL );
 		int nHorzRes = GetDeviceCaps( hDC, HORZRES );
 		int nVertRes = GetDeviceCaps( hDC, VERTRES );
-		int nBPP = GetDeviceCaps( hDC, BITSPIXEL );
 		ReleaseDC( 0, hDC );
 
 		if (nHorzRes <= vid.width || nVertRes <= vid.height)
