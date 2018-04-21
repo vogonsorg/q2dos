@@ -957,6 +957,33 @@ void Cmd_Init (void)
 	Cmd_AddCommand ("flushlog", Cmd_Flushlog_f); /* FS: Added */
 }
 
+void Cmd_Shutdown(void)
+{
+	cmdalias_t *alias, *aNext;
+	cmd_function_t	*cmd, *next;
+
+	for (alias=cmd_alias; alias; alias = aNext)
+	{
+		aNext = alias->next;
+
+		if (alias->value)
+		{
+			Z_Free(alias->value);
+			alias->value = NULL;
+		}
+
+		Z_Free(alias);
+		alias = NULL;
+	}
+
+	for (cmd = cmd_functions; cmd; cmd = next)
+	{
+		next = cmd->next;
+
+		Z_Free(cmd);
+		cmd = NULL;
+	}
+}
 
 #define RETRY_INITIAL	0
 #define RETRY_ONCE		1

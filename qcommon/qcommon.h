@@ -422,6 +422,7 @@ then searches for a command or variable that matches the first token.
 typedef void (*xcommand_t) (void);
 
 void	Cmd_Init (void);
+void	Cmd_Shutdown(void);
 
 void	Cmd_AddCommand (char *cmd_name, xcommand_t function);
 // called by the init functions of other parts of the program to

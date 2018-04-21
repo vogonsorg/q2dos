@@ -271,6 +271,7 @@ void Com_Quit (void)
 {
 	SV_Shutdown ("Server quit\n", false);
 	CL_Shutdown ();
+	Cmd_Shutdown(); /* FS: Has to come later because CL_Shutdown may run Cmd_RemoveCommand() for some things */
 
 	if (logfile)
 	{
