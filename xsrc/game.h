@@ -1,7 +1,7 @@
 
 // game.h -- game dll information visible to server
 
-#define	GAME_API_VERSION	3
+#define	GAME_API_VERSION	4
 
 // edict->svflags
 

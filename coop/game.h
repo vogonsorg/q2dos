@@ -3,7 +3,7 @@
 
 #ifndef MARACOOP_GAME_H
 #define MARACOOP_GAME_H
-#define	GAME_API_VERSION	3
+#define	GAME_API_VERSION	4
 
 // edict->svflags
 

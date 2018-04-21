@@ -607,9 +607,9 @@ Reads in all archived cvars
 void Cvar_Init (void)
 {
 	con_show_description = Cvar_Get("con_show_description", "1", CVAR_ARCHIVE); /* FS */
-	con_show_description->description = "Toggle descriptions for CVARs.";
+	Cvar_SetDescription("con_show_description", "Toggle descriptions for CVARs.");
 	con_show_dev_flags = Cvar_Get ("con_show_dev_flags", "1", CVAR_ARCHIVE); /* FS */
-	con_show_dev_flags->description = "Show toggled developer flags when using the developer CVAR.";
+	Cvar_SetDescription("con_show_dev_flags", "Show toggled developer flags when using the developer CVAR.");
 
 	Cmd_AddCommand ("set", Cvar_Set_f);
 	Cmd_AddCommand ("cvarlist", Cvar_List_f);

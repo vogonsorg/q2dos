@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifndef TSMOD_H
 #define TSMOD_H
-#define GAME_API_VERSION 3
+#define GAME_API_VERSION 4
 
 // edict->svflags
 
