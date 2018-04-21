@@ -24,10 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "qmenu.h"
 #include "snd_loc.h"
 
-#ifndef GAME_HARD_LINKED
-int maxclients;
-#endif
-
 #ifdef __DJGPP__
 extern int	havegus; /* FS: DOS GUS */
 #else
