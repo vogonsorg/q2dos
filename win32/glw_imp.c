@@ -196,9 +196,10 @@ void InitGammaRamp (void)
 
 void ShutdownGammaRamp (void)
 {
+	if (!glw_state.hDC)
+		return;
 	if (!gl_state.gammaRamp)
 		return;
-
 	if (qwglSetDeviceGammaRamp3DFX)
 		qwglSetDeviceGammaRamp3DFX (glw_state.hDC, original_ramp);
 	else
