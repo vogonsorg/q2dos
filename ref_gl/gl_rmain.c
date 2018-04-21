@@ -151,6 +151,7 @@ cvar_t	*vid_ref;
 
 cvar_t	*r_skydistance; /* Knightmare- variable sky range */
 cvar_t	*developer;		/* Knightmare added */
+cvar_t	*r_gunfov;		/* FS */
 
 /*
 =================
@@ -1159,6 +1160,7 @@ void R_Register ( void )
 	r_entity_fliproll = ri.Cvar_Get( "r_entity_fliproll", "0", 0);	/* Knightmare- allow disabling of backwards alias model roll */
 	r_entity_fliproll->description = "Allow disabling of backwards alias model roll.";
 	r_lightcutoff = ri.Cvar_Get("r_lightcutoff", "64", 0);	// DMP: dynamic light cutoff now variable
+	r_gunfov = ri.Cvar_Get("r_gunfov", "80", CVAR_ARCHIVE); /* FS */
 	developer = ri.Cvar_Get ("developer", "0", 0);	/* Knightmare added */
 
 	ri.Cmd_AddCommand( "imagelist", GL_ImageList_f );

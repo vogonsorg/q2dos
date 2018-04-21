@@ -301,6 +301,7 @@ extern	cvar_t	*vid_gamma;
 extern	cvar_t	*intensity;
 
 extern	cvar_t	*r_skydistance; /* Knightmare- variable sky range */
+extern	cvar_t	*r_gunfov; /* FS */
 
 extern	int		gl_lightmap_format;
 extern	int		gl_solid_format;
