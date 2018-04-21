@@ -84,7 +84,7 @@ typedef struct
 {
 	// special messages
 	void	(*bprintf) (int printlevel, char *fmt, ...) __fp_attribute__((__format__(__printf__,2,3)));
-	void	(*dprintf) (unsigned long developerFlags, char *fmt, ...) __fp_attribute__((__format__(__printf__,2,3))); /* FS: Added developer flags */
+	void	(*dprintf) (unsigned int developerFlags, char *fmt, ...) __fp_attribute__((__format__(__printf__,2,3))); /* FS: Added developer flags */
 	void	(*cprintf) (edict_t *ent, int printlevel, char *fmt, ...) __fp_attribute__((__format__(__printf__,3,4)));
 	void	(*centerprintf) (edict_t *ent, char *fmt, ...) __fp_attribute__((__format__(__printf__,2,3)));
 	void	(*sound) (edict_t *ent, int channel, int soundindex, float volume, float attenuation, float timeofs);

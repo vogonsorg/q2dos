@@ -180,16 +180,16 @@ Com_DPrintf
 A Com_Printf that only shows up if the "developer" cvar is set
 ================
 */
-void Com_DPrintf (unsigned long developerFlags, char *fmt, ...) /* FS: Added developer flags */
+void Com_DPrintf (unsigned int developerFlags, char *fmt, ...) /* FS: Added developer flags */
 {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
-	unsigned long			devValue = 0;
+	unsigned int			devValue = 0;
 		
 	if (!developer || !developer->value)
 		return;			// don't confuse non-developers with techie stuff...
 
-	devValue = (unsigned long)developer->value;
+	devValue = (unsigned int)developer->value;
 
 	if (developer->value == 1) /* FS: Show all except extremely verbose shit */
 		devValue = 65534;

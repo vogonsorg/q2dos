@@ -1292,7 +1292,7 @@ zbotcmd_t zbotCommands[] =
 //===================================================================
 char mutedText[8192] = "";
 
-void dprintf_internal (unsigned long flags, char *fmt, ...)
+void dprintf_internal (unsigned int flags, char *fmt, ...)
 {
 	char cbuffer[8192];
 	va_list arglist;

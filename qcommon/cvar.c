@@ -804,11 +804,11 @@ void Cvar_ParseDeveloperFlags (void) /* FS: Special stuff for showing all the de
 
 	if(developer->value > 0)
 	{
-		unsigned long devFlags = 0;
+		unsigned int devFlags = 0;
 		if(developer->value == 1)
 			devFlags = 65534;
 		else
-			devFlags = (unsigned long)developer->value;
+			devFlags = (unsigned int)developer->value;
 		Com_Printf("Toggled flags:\n");
 		if(devFlags & DEVELOPER_MSG_STANDARD)
 			Com_Printf(" * Standard messages - 2\n");

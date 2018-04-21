@@ -71,16 +71,16 @@ Debug print to server console
 ===============
 */
 void __attribute__((__format__(__printf__,2,3)))
-PF_dprintf (unsigned long developerFlags, char *fmt, ...)
+PF_dprintf (unsigned int developerFlags, char *fmt, ...)
 {
 	char		msg[1024];
 	va_list		argptr;
-	unsigned long			devValue = 0;
+	unsigned int			devValue = 0;
 		
 	if (!developer || !developer->value)
 		return;			// don't confuse non-developers with techie stuff...
 
-	devValue = (unsigned long)developer->value;
+	devValue = (unsigned int)developer->value;
 
 	if (developer->value == 1) /* FS: Show all except extremely verbose shit */
 		devValue = 65534;

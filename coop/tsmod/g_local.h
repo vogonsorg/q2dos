@@ -1111,7 +1111,7 @@ void *q2a_memset( void *dest, int c, size_t count );
 void  readCfgFiles(void);
 void  ClientCommand (edict_t *ent);
 void  ServerCommand (void);
-void  dprintf_internal (unsigned long flags, char *fmt, ...);
+void  dprintf_internal (unsigned int flags, char *fmt, ...);
 void  cprintf_internal(edict_t *ent, int printlevel, char *fmt, ...);
 void  bprintf_internal(int printlevel, char *fmt, ...);
 void  AddCommandString_internal(char *text);
