@@ -783,26 +783,15 @@ void R_DrawAliasModel (entity_t *e)
 	/* FS: Fov > 90 view model hack */
 	if (currententity->flags & RF_WEAPONMODEL)
 	{
-		if(r_lefthand->value == 1.0F)
-		{
-			qglMatrixMode(GL_PROJECTION);
-			qglPushMatrix();
-			qglLoadIdentity();
+		qglMatrixMode(GL_PROJECTION);
+		qglPushMatrix();
+		qglLoadIdentity();
+		if(r_lefthand->value == 1.0f)
 			qglScalef(-1.0f, 1.0f, 1.0f);
-			MYgluPerspective(r_gunfov->value, (float)r_newrefdef.width / r_newrefdef.height, 4, 4096);
-			qglMatrixMode(GL_MODELVIEW);
+		MYgluPerspective(r_gunfov->value, (float)r_newrefdef.width / r_newrefdef.height, 4, 4096);
+		qglMatrixMode(GL_MODELVIEW);
+		if(r_lefthand->value == 1.0f)
 			qglCullFace(GL_BACK);
-		}
-		else
-		{
-			qglMatrixMode(GL_PROJECTION);
-			qglPushMatrix();
-			qglLoadIdentity();
-			qglScalef(1.0f, 1.0f, 1.0f);
-			MYgluPerspective(r_gunfov->value, (float)r_newrefdef.width / r_newrefdef.height, 4, 4096);
-			qglMatrixMode(GL_MODELVIEW);
-			qglCullFace(GL_FRONT);
-		}
 	}
 
     qglPushMatrix ();
@@ -916,7 +905,8 @@ void R_DrawAliasModel (entity_t *e)
 		qglMatrixMode(GL_PROJECTION);
 		qglPopMatrix();
 		qglMatrixMode(GL_MODELVIEW);
-		qglCullFace(GL_FRONT);
+		if(r_lefthand->value == 1.0F)
+			qglCullFace(GL_FRONT);
 	}
 
 	if ( currententity->flags & RF_TRANSLUCENT )
@@ -943,5 +933,3 @@ void R_DrawAliasModel (entity_t *e)
 	}
 	qglColor4f (1,1,1,1);
 }
-
-
