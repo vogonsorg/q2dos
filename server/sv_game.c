@@ -450,6 +450,7 @@ void SV_InitGameProgs (void)
 	import.cvar = Cvar_Get;
 	import.cvar_set = Cvar_Set;
 	import.cvar_forceset = Cvar_ForceSet;
+	import.cvar_setdescription = Cvar_SetDescription;
 
 	import.argc = Cmd_Argc;
 	import.argv = Cmd_Argv;

@@ -1215,25 +1215,25 @@ void SV_Init (void)
 	allow_download_maps = Cvar_Get ("allow_download_maps", "1", CVAR_ARCHIVE);
 // Knightmare 6/25/12- cvar to control use of .ent files
 	sv_entfile = Cvar_Get ("sv_entfile", "1", CVAR_ARCHIVE);
-	sv_entfile->description = "Toggle the use of .ent files.";
+	Cvar_SetDescription("sv_entfile", "Toggle the use of .ent files.");
 
 	/* FS: Added */
 	sv_skipcinematics = Cvar_Get ("sv_skipcinematics", "0", CVAR_ARCHIVE);
-	sv_skipcinematics->description = "Skip the loading of *.cin cinematics";
+	Cvar_SetDescription("sv_skipcinematics", "Skip the loading of *.cin cinematics");
 
 	/* FS: Allow bsp downloads from a pak file if we want to. */
 	sv_allow_download_maps_in_paks = Cvar_Get ("sv_allow_download_maps_in_paks", "1", 0);
-	sv_allow_download_maps_in_paks->description = "Allow BSP downloads accessed from a PAK file.";
+	Cvar_SetDescription("sv_allow_download_maps_in_paks", "Allow BSP downloads accessed from a PAK file.");
 
 	/* FS: From R1Q2: HTTP Downloading */
 	sv_downloadserver = Cvar_Get ("sv_downloadserver", "", 0);
-	sv_downloadserver->description = "URL to a location where clients can download game content over HTTP. Default empty.  Path leads to game dir name.  i.e. quake2.com/baseq2/maps\n";
+	Cvar_SetDescription("sv_downloadserver", "URL to a location where clients can download game content over HTTP. Default empty.  Path leads to game dir name.  i.e. quake2.com/baseq2/maps\n");
 
 	/* FS: Added these to filter out wallfly's spammy rcon status request every 30 seconds */
 	sv_filter_wallfly_rcon_request = Cvar_Get ("sv_filter_wallfly_rcon_request", "0", 0);
-	sv_filter_wallfly_rcon_request->description = "Filter rcon requests from WallFly[BZZZ]/Tastyspleen linked servers.  If set, sv_filter_wallfly_ip is needed and DEVELOPER_MSG_SERVER will be required to see WallFly RCONs.";
+	Cvar_SetDescription("sv_filter_wallfly_rcon_request", "Filter rcon requests from WallFly[BZZZ]/Tastyspleen linked servers.  If set, sv_filter_wallfly_ip is needed and DEVELOPER_MSG_SERVER will be required to see WallFly RCONs.");
 	sv_filter_wallfly_ip = Cvar_Get ("sv_filter_wallfly_ip", "74.86.102.74", 0);
-	sv_filter_wallfly_ip->description = "WallFly/Tastyspleen IP for filtering rcon requests.  Requires sv_filter_wallfly_rcon_request CVAR to be enabled.";
+	Cvar_SetDescription("sv_filter_wallfly_ip", "WallFly/Tastyspleen IP for filtering rcon requests.  Requires sv_filter_wallfly_rcon_request CVAR to be enabled.");
 
 	sv_noreload = Cvar_Get ("sv_noreload", "0", 0);
 
@@ -1242,7 +1242,7 @@ void SV_Init (void)
 	public_server = Cvar_Get ("public", "0", 0);
 
 	sv_iplimit = Cvar_Get ("sv_iplimit", "3", 0);	/* r1ch: limit connections per ip address (stop zombie dos/flood) */
-	sv_iplimit->description = "Limit connections per IP address.  Stops zombie DoS/Flood.";
+	Cvar_SetDescription("sv_iplimit", "Limit connections per IP address.  Stops zombie DoS/Flood.");
 
 	sv_reconnect_limit = Cvar_Get ("sv_reconnect_limit", "3", CVAR_ARCHIVE);
 

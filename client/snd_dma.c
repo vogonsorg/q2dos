@@ -135,7 +135,7 @@ void S_Init (void)
 		s_testsound = Cvar_Get ("s_testsound", "0", 0);
 		s_primary = Cvar_Get ("s_primary", "0", CVAR_ARCHIVE);	// win32 specific
 		s_musicvolume = Cvar_Get ("s_musicvolume", "1.0", CVAR_ARCHIVE); // Knightmare added
-		s_musicvolume->description = "Volume for music played from WAV and OGG files.";
+		Cvar_SetDescription("s_musicvolume", "Volume for music played from WAV and OGG files.");
 
 		if (s_khz->value < 7000) /* FS: Old config, fix it up */
 			Cvar_SetValue("s_khz", 11025);

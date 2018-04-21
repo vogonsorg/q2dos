@@ -300,6 +300,7 @@ static qboolean VID_LoadRefresh (const char *name)
 	ri.Cvar_Get = Cvar_Get;
 	ri.Cvar_Set = Cvar_Set;
 	ri.Cvar_SetValue = Cvar_SetValue;
+	ri.Cvar_SetDescription = Cvar_SetDescription; /* FS */
 	ri.Vid_GetModeInfo = VID_GetModeInfo;
 	ri.Vid_MenuInit = VID_MenuInit;
 	ri.Vid_NewWindow = VID_NewWindow;
@@ -352,11 +353,11 @@ void	VID_Init (void)
 	viddef.height = 240;
 
 	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
-	vid_ref->description = "Video renderer to use.";
+	Cvar_SetDescription("vid_ref", "Video renderer to use.");
 	vid_fullscreen = Cvar_Get ("vid_fullscreen", "1", CVAR_ARCHIVE);
-	vid_fullscreen->description = "Enable fullscreen video.  Locked to fullscreen in Q2DOS.";
+	Cvar_SetDescription("vid_fullscreen", "Enable fullscreen video.  Locked to fullscreen in Q2DOS.");
 	vid_gamma = Cvar_Get("vid_gamma", "1", CVAR_ARCHIVE);
-	vid_gamma->description = "Video gamma.  Use lower values for a brighter screen display.";
+	Cvar_SetDescription("vid_gamma", "Video gamma.  Use lower values for a brighter screen display.");
 
 	/* cvars for vga/vesa code */
 	Cvar_Get("vid_vgaonly", (COM_CheckParm("-vgaonly"))? "1" : "0", 0);

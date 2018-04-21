@@ -133,6 +133,7 @@ void	VID_Init (void)
     ri.Cvar_Get = Cvar_Get;
     ri.Cvar_Set = Cvar_Set;
     ri.Cvar_SetValue = Cvar_SetValue;
+	ri.Cvar_SetDescription = Cvar_SetDescription; /* FS */
     ri.Vid_GetModeInfo = VID_GetModeInfo;
 
 #ifndef DEDICATED_ONLY

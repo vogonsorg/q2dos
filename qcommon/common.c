@@ -1430,7 +1430,7 @@ void Qcommon_Init (int argc, char **argv)
 
 	/* FS: New default config stuff so we can keep some sanity between DOS and Win32 */
 	cfg_default = Cvar_Get("cfg_default", "q2dos.cfg", CVAR_NOSET);
-	cfg_default->description = "Default cfg file to use for this gaming session.  Must be set at run time.";
+	Cvar_SetDescription("cfg_default", "Default cfg file to use for this gaming session.  Must be set at run time.");
 	Cbuf_AddText ("exec default.cfg\n");
 
 	/* FS: If it's NULL or not even at least "a.cfg" length then enforce default values */
@@ -1456,13 +1456,13 @@ void Qcommon_Init (int argc, char **argv)
 	host_speeds = Cvar_Get ("host_speeds", "0", 0);
 	log_stats = Cvar_Get ("log_stats", "0", 0);
 	developer = Cvar_Get ("developer", "0", 0);
-	developer->description = "Enable the use of developer messages. \nAvailable flags:\n  * All flags except verbose messages - 1\n  * Standard msgs - 2\n  * Sound msgs - 4\n  * Network msgs - 8\n  * File IO msgs - 16\n  * Graphics renderer msgs - 32\n  * Game DLL msgs - 64\n  * Memory management msgs - 128\n  * Server msgs - 256\n  * CD Audio msgs - 512\n  * OGG Vorbis msgs - 1024\n  * Physics msgs - 2048\n  * Entity msgs - 4096\n  * Save/Restore msgs - 8192\n  * Currently unused - 16384\n  * Currently unused - 32768\n  * Extremely verbose msgs - 65536\n  * Extremely verbose Gamespy msgs - 131072";
+	Cvar_SetDescription("developer", "Enable the use of developer messages. \nAvailable flags:\n  * All flags except verbose messages - 1\n  * Standard msgs - 2\n  * Sound msgs - 4\n  * Network msgs - 8\n  * File IO msgs - 16\n  * Graphics renderer msgs - 32\n  * Game DLL msgs - 64\n  * Memory management msgs - 128\n  * Server msgs - 256\n  * CD Audio msgs - 512\n  * OGG Vorbis msgs - 1024\n  * Physics msgs - 2048\n  * Entity msgs - 4096\n  * Save/Restore msgs - 8192\n  * Currently unused - 16384\n  * Currently unused - 32768\n  * Extremely verbose msgs - 65536\n  * Extremely verbose Gamespy msgs - 131072");
 	timescale = Cvar_Get ("timescale", "1", 0);
 	fixedtime = Cvar_Get ("fixedtime", "0", 0);
 	logfile_active = Cvar_Get ("logfile", "0", 0);
-	logfile_active->description = "Log console output.  1 -- Overwrite previous existing file.  2 or higher -- Append previous existing file.  Control the name with logfile_name CVAR.";
+	Cvar_SetDescription("logfile", "Log console output.  1 -- Overwrite previous existing file.  2 or higher -- Append previous existing file.  Control the name with logfile_name CVAR.");
 	logfile_name = Cvar_Get ("logfile_name", "qconsole.log", 0);
-	logfile_name->description = "File name to create/append for logfile CVAR.";
+	Cvar_SetDescription("logfile_name", "File name to create/append for logfile CVAR.");
 	showtrace = Cvar_Get ("showtrace", "0", 0);
 #ifdef DEDICATED_ONLY
 	dedicated = Cvar_Get ("dedicated", "1", CVAR_NOSET);
@@ -1658,6 +1658,7 @@ Qcommon_Shutdown
 */
 void Qcommon_Shutdown (void)
 {
+	Cvar_Shutdown();
 }
 
 /*

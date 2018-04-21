@@ -592,15 +592,15 @@ void SCR_Init (void)
 
 	 /* FS: cl_draw* friends */
 	cl_drawfps = Cvar_Get ("cl_drawfps", "0", CVAR_ARCHIVE);	// Knightmare
-	cl_drawfps->description = "Draw FPS counter on the screen.";
+	Cvar_SetDescription("cl_drawfps", "Draw FPS counter on the screen.");
 	cl_drawtime = Cvar_Get ("cl_drawtime", "0", CVAR_ARCHIVE);
-	cl_drawtime->description = "Draw current time on the screen.  1 -  Military time.  2 - AM/PM.";
+	Cvar_SetDescription("cl_drawtime", "Draw current time on the screen.  1 -  Military time.  2 - AM/PM.");
 	cl_drawuptime = Cvar_Get ("cl_drawuptime", "0", CVAR_ARCHIVE);
-	cl_drawuptime->description = "Draw current uptime on the screen.  1 - Current level time.  2 - Total uptime of Quake 2.";
+	Cvar_SetDescription("cl_drawuptime", "Draw current uptime on the screen.  1 - Current level time.  2 - Total uptime of Quake 2.");
 	cl_drawaltcolours = Cvar_Get ("cl_drawaltcolours", "0", CVAR_ARCHIVE);
-	cl_drawaltcolours->description = "Draw green text instead of white for the cl_draw*** cvars.";
+	Cvar_SetDescription("cl_drawaltcolours", "Draw green text instead of white for the cl_draw*** cvars.");
 	cl_hide_gun_icon = Cvar_Get ("cl_hide_gun_icon", "0", CVAR_ARCHIVE);
-	cl_hide_gun_icon->description = "Hide the gun/help computer icon.";
+	Cvar_SetDescription("cl_hide_gun_icon", "Hide the gun/help computer icon.");
 
 //
 // register our commands

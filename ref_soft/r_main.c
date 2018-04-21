@@ -256,56 +256,56 @@ void R_Register (void)
 	sw_allow_modex = ri.Cvar_Get( "sw_allow_modex", "1", CVAR_ARCHIVE );
 #endif
 	sw_clearcolor = ri.Cvar_Get ("sw_clearcolor", "2", 0);
-	sw_clearcolor->description = "The (by default) grey background filler seen when there is a hole in the map.";
+	ri.Cvar_SetDescription("sw_clearcolor", "The (by default) grey background filler seen when there is a hole in the map.");
 	sw_drawflat = ri.Cvar_Get ("sw_drawflat", "0", 0);
-	sw_drawflat->description = "Draw flat single colour textures instead of the textures themselves.";
+	ri.Cvar_SetDescription("sw_drawflat", "Draw flat single colour textures instead of the textures themselves.");
 	sw_draworder = ri.Cvar_Get ("sw_draworder", "0", 0);
-	sw_draworder->description = "Generates edge spans backwards";
+	ri.Cvar_SetDescription("sw_draworder", "Generates edge spans backwards");
 	sw_maxedges = ri.Cvar_Get ("sw_maxedges", STRINGER(MAXSTACKSURFACES), 0);
-	sw_maxedges->description = "Maximum number of edges to draw.  This value may need to be raised if you see disappearing geometry.";
+	ri.Cvar_SetDescription("sw_maxedges", "Maximum number of edges to draw.  This value may need to be raised if you see disappearing geometry.");
 	sw_maxsurfs = ri.Cvar_Get ("sw_maxsurfs", "0", 0);
-	sw_maxsurfs->description = "Maximum number of surfaces to draw.  This value may need to be raised if you see disappearing textures.";
+	ri.Cvar_SetDescription("sw_maxsurfs", "Maximum number of surfaces to draw.  This value may need to be raised if you see disappearing textures.");
 	sw_mipcap = ri.Cvar_Get ("sw_mipcap", "0", 0);
 	sw_mipscale = ri.Cvar_Get ("sw_mipscale", "1", 0);
 	sw_reportedgeout = ri.Cvar_Get ("sw_reportedgeout", "0", 0);
-	sw_reportedgeout->description = "Report running out of edges.";
+	ri.Cvar_SetDescription("sw_reportedgeout", "Report running out of edges.");
 	sw_reportsurfout = ri.Cvar_Get ("sw_reportsurfout", "0", 0);
-	sw_reportsurfout->description = "Report running out of surfaces.";
+	ri.Cvar_SetDescription("sw_reportsurfout", "Report running out of surfaces.");
 	sw_stipplealpha = ri.Cvar_Get( "sw_stipplealpha", "0", CVAR_ARCHIVE );
 	sw_surfcacheoverride = ri.Cvar_Get ("sw_surfcacheoverride", "0", 0);
-	sw_surfcacheoverride->description = "Surface cache size (in bytes).  Standard formula is 1024x768 + ((width*height)-64000)*3";
+	ri.Cvar_SetDescription("sw_surfcacheoverride", "Surface cache size (in bytes).  Standard formula is 1024x768 + ((width*height)-64000)*3");
 	sw_waterwarp = ri.Cvar_Get ("sw_waterwarp", "1", CVAR_ARCHIVE);
-	sw_waterwarp->description = "Enables water warping effect when swimming.";
+	ri.Cvar_SetDescription("sw_waterwarp", "Enables water warping effect when swimming.");
 	sw_mode = ri.Cvar_Get( "sw_mode", "0", CVAR_ARCHIVE );
 
 	r_lefthand = ri.Cvar_Get( "hand", "0", CVAR_USERINFO | CVAR_ARCHIVE );
 	r_speeds = ri.Cvar_Get ("r_speeds", "0", 0);
 	r_fullbright = ri.Cvar_Get ("r_fullbright", "0", 0);
-	r_fullbright->description = "Enables full bright lights.  Disabled in multiplayer.";
+	ri.Cvar_SetDescription("r_fullbright", "Enables full bright lights.  Disabled in multiplayer.");
 	r_drawentities = ri.Cvar_Get ("r_drawentities", "1", 0);
 	r_drawworld = ri.Cvar_Get ("r_drawworld", "1", 0);
-	r_drawworld->description = "Set to 0 to disable drawing of the world.  Disabled in multiplayer.";
+	ri.Cvar_SetDescription("r_drawworld", "Set to 0 to disable drawing of the world.  Disabled in multiplayer.");
 	r_dspeeds = ri.Cvar_Get ("r_dspeeds", "0", 0);
 	r_lightlevel = ri.Cvar_Get ("r_lightlevel", "0", 0);
-	r_lightlevel->description = "The saved off light value for server to look at (BIG HACK!).";
+	ri.Cvar_SetDescription("r_lightlevel", "The saved off light value for server to look at (BIG HACK!).");
 	r_lerpmodels = ri.Cvar_Get( "r_lerpmodels", "1", 0 );
-	r_lerpmodels->description = "Set to 0 to disable lerping of model animations.";
+	ri.Cvar_SetDescription("r_lerpmodels", "Set to 0 to disable lerping of model animations.");
 	r_novis = ri.Cvar_Get( "r_novis", "0", 0 );
-	r_novis->description = "Disables loading of VIS data for development purposes.";
+	ri.Cvar_SetDescription("r_novis", "Disables loading of VIS data for development purposes.");
 
 	vid_fullscreen = ri.Cvar_Get( "vid_fullscreen", "0", CVAR_ARCHIVE );
 	vid_gamma = ri.Cvar_Get( "vid_gamma", "1.0", CVAR_ARCHIVE );
 
 	sw_particle_size_override = ri.Cvar_Get ("sw_particle_size_override", "0", CVAR_ARCHIVE);
-	sw_particle_size_override->description = "Enable this to override particle size scaling with sw_particle_size, sw_particle_size_min, and sw_particle_size_max.";
+	ri.Cvar_SetDescription("sw_particle_size_override", "Enable this to override particle size scaling with sw_particle_size, sw_particle_size_min, and sw_particle_size_max.");
 	sw_particle_size = ri.Cvar_Get ("sw_particle_size", "8", CVAR_ARCHIVE);
-	sw_particle_size->description = "How many bits to shift for particle sizes.  Higher numbers are smaller particles.  Use sw_particle_size_override to enable.";
+	ri.Cvar_SetDescription("sw_particle_size", "How many bits to shift for particle sizes.  Higher numbers are smaller particles.  Use sw_particle_size_override to enable.");
 	sw_particle_size_min = ri.Cvar_Get ("sw_particle_size_min", "1", CVAR_ARCHIVE); // FS
-	sw_particle_size_min->description = "Minimum particle size.  Standard formula is resolution width divided by 320.  Use sw_particle_size_override to enable.";
+	ri.Cvar_SetDescription("sw_particle_size_min", "Minimum particle size.  Standard formula is resolution width divided by 320.  Use sw_particle_size_override to enable.");
 	sw_particle_size_max = ri.Cvar_Get ("sw_particle_size_max", "8.5", CVAR_ARCHIVE); // FS
-	sw_particle_size_max->description = "Maximum particle size.  Standard formula is resolution width divided by 80 plus 0.5.  Use sw_particle_size_override to enable.";
+	ri.Cvar_SetDescription("sw_particle_size_max", "Maximum particle size.  Standard formula is resolution width divided by 80 plus 0.5.  Use sw_particle_size_override to enable.");
 	sw_load_tga_sky = ri.Cvar_Get ("sw_load_tga_sky", "0", CVAR_ARCHIVE); // FS
-	sw_load_tga_sky->description = "Attempt to load TGA skyboxes.  Experimental.";
+	ri.Cvar_SetDescription("sw_load_tga_sky", "Attempt to load TGA skyboxes.  Experimental.");
 
 	ri.Cmd_AddCommand ("modellist", Mod_Modellist_f);
 	ri.Cmd_AddCommand( "screenshot", R_ScreenShot_f );
@@ -316,7 +316,7 @@ void R_Register (void)
 
 //PGM
 	sw_lockpvs = ri.Cvar_Get ("sw_lockpvs", "0", 0);
-	sw_lockpvs->description = "Development aid to let you run around and see exactly where the Potentially Visble Set ends.";
+	ri.Cvar_SetDescription("sw_lockpvs", "Development aid to let you run around and see exactly where the Potentially Visble Set ends.");
 //PGM
 }
 

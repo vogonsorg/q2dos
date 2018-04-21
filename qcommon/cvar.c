@@ -618,6 +618,42 @@ void Cvar_Init (void)
 	Cmd_AddCommand ("resetcvar", Cvar_Reset_f); /* FS */
 }
 
+void Cvar_Shutdown (void)
+{
+	cvar_t *var, *next;
+
+	for (var = cvar_vars; var; var = next)
+	{
+		next = var->next;
+
+		if (var->description)
+		{
+			free(var->description);
+			var->description = NULL;
+		}
+
+		if (var->defaultValue)
+		{
+			Z_Free(var->defaultValue);
+			var->defaultValue = NULL;
+		}
+
+		if (var->string)
+		{
+			Z_Free(var->string);
+			var->string = NULL;
+		}
+
+		if (var->name)
+		{
+			Z_Free(var->name);
+			var->name = NULL;
+		}
+
+		var = NULL;
+	}
+}
+
 static cvar_t *Cvar_IsNoset (const char *var_name) /* FS: Make sure this isn't a NOSET CVAR! */
 {
 	cvar_t	*var;
@@ -826,5 +862,9 @@ void Cvar_SetDescription (char *var_name, const char *description) /* FS: Set de
 	if (!description) {
 		Com_DPrintf(DEVELOPER_MSG_STANDARD, "NULL description for %s\n", var_name);
 	}
-	var->description = description;
+
+	if (var->description)
+		free(var->description);
+
+	var->description = strdup(description);
 }
