@@ -7,7 +7,7 @@ if not defined Q2DOSDIR ( goto failed )
 echo Copying %Q2DOSBINDIR% Build.
 
 move /Y %Q2DOSBINDIR%\q2.exe "%Q2DOSDIR%"
-move /y %Q2DOSBINDIR%\q2ded.exe "%Q2DOSDIR%"
+move /y Dedicated_%Q2DOSBINDIR%\q2ded.exe "%Q2DOSDIR%"
 move /Y %Q2DOSBINDIR%\ref_soft.dll "%Q2DOSDIR%"
 move /Y %Q2DOSBINDIR%\ref_gl.dll "%Q2DOSDIR%"
 move /Y %Q2DOSBINDIR%\gamespy.dll "%Q2DOSDIR%"
