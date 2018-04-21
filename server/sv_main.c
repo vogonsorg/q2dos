@@ -46,12 +46,7 @@ cvar_t *sv_airaccelerate;
 
 cvar_t  *sv_noreload;                   // don't reload level state when reentering
 
-#ifndef DEDICATED_ONLY
-extern cvar_t  *maxclients;                    // FIXME: rename sv_maxclients
-                                        //made extern from a collision in watcom
-#else
-cvar_t	*maxclients;
-#endif
+cvar_t	*maxclients;                    // FIXME: rename sv_maxclients
 
 cvar_t  *sv_showclamp;
 
