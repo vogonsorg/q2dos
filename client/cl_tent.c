@@ -1450,7 +1450,6 @@ void CL_AddPlayerBeams (void)
 				VectorCopy (cl.v_right, r);
 				VectorCopy (cl.v_forward, f);
 				VectorCopy (cl.v_up, u);
-
 			}
 			else
 				VectorCopy (b->start, org);
@@ -1595,7 +1594,7 @@ void CL_AddPlayerBeams (void)
 			{
 //				ent.flags = RF_FULLBRIGHT|RF_TRANSLUCENT;
 //				ent.alpha = 0.3;
-				ent.flags = RF_FULLBRIGHT;
+				ent.flags = RF_FULLBRIGHT|RF_WEAPONMODEL; /* FS: For fov > 90 viewmodel hack */
 				ent.angles[0] = -pitch;
 				ent.angles[1] = yaw + 180.0;
 				ent.angles[2] = (cl.time) % 360;

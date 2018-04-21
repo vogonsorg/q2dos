@@ -51,6 +51,8 @@ float	r_avertexnormal_dots[SHADEDOT_QUANT][256] =
 
 float	*shadedots = r_avertexnormal_dots[0];
 
+extern void MYgluPerspective( GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar );
+
 void GL_LerpVerts( int nverts, dtrivertx_t *v, dtrivertx_t *ov, dtrivertx_t *verts, float *lerp, float move[3], float frontv[3], float backv[3] )
 {
 	int i;
@@ -778,18 +780,29 @@ void R_DrawAliasModel (entity_t *e)
 	if (currententity->flags & RF_DEPTHHACK) // hack the depth range to prevent view model from poking into walls
 		qglDepthRange (gldepthmin, gldepthmin + 0.3*(gldepthmax-gldepthmin));
 
-	if ( ( currententity->flags & RF_WEAPONMODEL ) && ( r_lefthand->value == 1.0F ) )
+	/* FS: Fov > 90 view model hack */
+	if (currententity->flags & RF_WEAPONMODEL)
 	{
-		extern void MYgluPerspective( GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar );
-
-		qglMatrixMode( GL_PROJECTION );
-		qglPushMatrix();
-		qglLoadIdentity();
-		qglScalef( -1, 1, 1 );
-	    MYgluPerspective( r_newrefdef.fov_y, ( float ) r_newrefdef.width / r_newrefdef.height,  4,  4096);
-		qglMatrixMode( GL_MODELVIEW );
-
-		qglCullFace( GL_BACK );
+		if(r_lefthand->value == 1.0F)
+		{
+			qglMatrixMode(GL_PROJECTION);
+			qglPushMatrix();
+			qglLoadIdentity();
+			qglScalef(-1.0f, 1.0f, 1.0f);
+			MYgluPerspective(75.0f, (float)r_newrefdef.width / r_newrefdef.height, 4, 4096);
+			qglMatrixMode(GL_MODELVIEW);
+			qglCullFace(GL_BACK);
+		}
+		else
+		{
+			qglMatrixMode(GL_PROJECTION);
+			qglPushMatrix();
+			qglLoadIdentity();
+			qglScalef(1.0f, 1.0f, 1.0f);
+			MYgluPerspective(75.0f, (float)r_newrefdef.width / r_newrefdef.height, 4, 4096);
+			qglMatrixMode(GL_MODELVIEW);
+			qglCullFace(GL_FRONT);
+		}
 	}
 
     qglPushMatrix ();
@@ -898,12 +911,12 @@ void R_DrawAliasModel (entity_t *e)
 	}
 //#endif
 
-	if ( ( currententity->flags & RF_WEAPONMODEL ) && ( r_lefthand->value == 1.0F ) )
+	if ((currententity->flags & RF_WEAPONMODEL))
 	{
-		qglMatrixMode( GL_PROJECTION );
+		qglMatrixMode(GL_PROJECTION);
 		qglPopMatrix();
-		qglMatrixMode( GL_MODELVIEW );
-		qglCullFace( GL_FRONT );
+		qglMatrixMode(GL_MODELVIEW);
+		qglCullFace(GL_FRONT);
 	}
 
 	if ( currententity->flags & RF_TRANSLUCENT )
