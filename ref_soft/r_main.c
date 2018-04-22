@@ -147,6 +147,8 @@ cvar_t	*sw_load_tga_sky; // FS
 cvar_t	*sw_lockpvs;
 //PGM
 
+cvar_t	*r_gunfov;		/* FS */
+
 #define	STRINGER(x) "x"
 
 
@@ -318,6 +320,9 @@ void R_Register (void)
 	sw_lockpvs = ri.Cvar_Get ("sw_lockpvs", "0", 0);
 	ri.Cvar_SetDescription("sw_lockpvs", "Development aid to let you run around and see exactly where the Potentially Visble Set ends.");
 //PGM
+
+	r_gunfov = ri.Cvar_Get ("r_gunfov", "80", CVAR_ARCHIVE); /* FS */
+
 }
 
 void R_UnRegister (void)

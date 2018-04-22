@@ -71,6 +71,8 @@ void R_AliasTransformFinalVerts( int numpoints, finalvert_t *fv, dtrivertx_t *ol
 
 void R_AliasLerpFrames( dmdl_t *paliashdr, float backlerp );
 
+extern void R_ViewChanged (vrect_t *vr, float aspect);
+
 /*
 ================
 R_AliasCheckBBox
@@ -1043,6 +1045,94 @@ void R_AliasSetUpLerpData( dmdl_t *pmdl, float backlerp )
 	}
 }
 
+static float CalcFov (float fov_x, float width, float height)
+{
+	float	a;
+	float	x;
+
+	if (fov_x < 1 || fov_x > 179)
+		ri.Sys_Error (ERR_DROP, "Bad fov: %f", fov_x);
+
+	x = width/tan(fov_x/360*M_PI);
+
+	a = atan (height/x);
+
+	a = a*360/M_PI;
+
+	return a;
+}
+
+static void R_SetGunFov (qboolean bFinish) /* FS */
+{
+	static vrect_t vrect;
+	static float aspect, fov_x, fov_y;
+	qboolean r_dowarp;
+
+	if (bFinish)
+	{
+		r_newrefdef.fov_x = fov_x;
+		r_newrefdef.fov_y = fov_y;
+		R_ViewChanged(&vrect, aspect);
+		return;
+	}
+
+	if (sw_waterwarp->value && (r_newrefdef.rdflags & RDF_UNDERWATER) )
+		r_dowarp = true;
+	else
+		r_dowarp = false;
+
+	aspect = ((float)r_newrefdef.height/(float)r_newrefdef.width)*(320.0f/240.0f);
+	if (r_dowarp)
+	{
+		if (r_newrefdef.width <= WARP_WIDTH && r_newrefdef.height <= WARP_HEIGHT)
+		{
+			/* shortcut for 320x240 and lower -- from Q1 */
+			vrect.x = 0;
+			vrect.y = 0;
+			vrect.width = r_newrefdef.width;
+			vrect.height = r_newrefdef.height;
+		}
+		else
+		{
+			/* the following adapted from Q1 */
+			float w = r_newrefdef.width;
+			float h = r_newrefdef.height;
+
+			if (w > WARP_WIDTH)
+			{
+				h *= (float)WARP_WIDTH / w;
+				w = WARP_WIDTH;
+			}
+			if (h > WARP_HEIGHT)
+			{
+				h = WARP_HEIGHT;
+				w *= (float)WARP_HEIGHT / h;
+			}
+
+			vrect.x = 0;
+			vrect.y = 0;
+			vrect.width = (int)w;
+			vrect.height = (int)h;
+			aspect *= (h / w);
+			aspect *= ((float)r_newrefdef.width / (float)r_newrefdef.height);
+		}
+	}
+	else
+	{
+		vrect.x = r_newrefdef.x;
+		vrect.y = r_newrefdef.y;
+		vrect.width = r_newrefdef.width;
+		vrect.height = r_newrefdef.height;
+	}
+
+	fov_x = r_newrefdef.fov_x;
+	fov_y = r_newrefdef.fov_y;
+	r_newrefdef.fov_x = r_gunfov->value;
+	r_newrefdef.fov_y = CalcFov(r_newrefdef.fov_x, r_newrefdef.width, r_newrefdef.height);
+
+	R_ViewChanged(&vrect, aspect);
+}
+
 /*
 ================
 R_AliasDrawModel
@@ -1050,6 +1140,7 @@ R_AliasDrawModel
 */
 void R_AliasDrawModel (void)
 {
+	qboolean bDoGunFov = false;
 	extern void	(*d_pdrawspans)(void *);
 	extern void R_PolysetDrawSpans8_Opaque( void * );
 	extern void R_PolysetDrawSpans8_33( void * );
@@ -1064,6 +1155,10 @@ void R_AliasDrawModel (void)
 
 	if ( currententity->flags & RF_WEAPONMODEL )
 	{
+		bDoGunFov = r_newrefdef.fov_x != r_gunfov->value ? true : false;
+		if (bDoGunFov)
+			R_SetGunFov(false);
+
 		if ( r_lefthand->value == 1.0F )
 			aliasxscale = -aliasxscale;
 		else if ( r_lefthand->value == 2.0F )
@@ -1188,9 +1283,13 @@ void R_AliasDrawModel (void)
 
 	R_AliasPreparePoints ();
 
-	if ( ( currententity->flags & RF_WEAPONMODEL ) && ( r_lefthand->value == 1.0F ) )
+	if (currententity->flags & RF_WEAPONMODEL)
 	{
-		aliasxscale = -aliasxscale;
+		if (bDoGunFov)
+			R_SetGunFov(true);
+
+		if(r_lefthand->value == 1.0F)
+			aliasxscale = -aliasxscale;
 	}
 }
 

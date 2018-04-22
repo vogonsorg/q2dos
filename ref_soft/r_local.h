@@ -592,6 +592,7 @@ extern	cvar_t	*sw_particle_size_override; // FS
 extern	cvar_t	*sw_particle_size; // FS
 extern	cvar_t	*sw_particle_size_min; // FS
 extern	cvar_t	*sw_particle_size_max; // FS
+extern	cvar_t	*r_gunfov; /* FS */
 
 extern  clipplane_t     view_clipplanes[4];
 extern int              *pfrustum_indexes[4];
