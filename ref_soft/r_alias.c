@@ -1045,43 +1045,6 @@ void R_AliasSetUpLerpData( dmdl_t *pmdl, float backlerp )
 	}
 }
 
-static float CalcFov (float fov_x, float width, float height)
-{
-	float	a;
-	float	x;
-
-	if (fov_x < 1 || fov_x > 179)
-		ri.Sys_Error (ERR_DROP, "Bad fov: %f", fov_x);
-
-	x = width/tan(fov_x/360*M_PI);
-
-	a = atan (height/x);
-
-	a = a*360/M_PI;
-
-	return a;
-}
-
-static void R_SetGunFov (qboolean bFinish) /* FS */
-{
-	static float fov_x, fov_y;
-
-	if (bFinish)
-	{
-		r_newrefdef.fov_x = fov_x;
-		r_newrefdef.fov_y = fov_y;
-		R_SetupFrame();
-		return;
-	}
-
-	fov_x = r_newrefdef.fov_x;
-	fov_y = r_newrefdef.fov_y;
-	r_newrefdef.fov_x = r_gunfov->value;
-	r_newrefdef.fov_y = CalcFov(r_newrefdef.fov_x, r_newrefdef.width, r_newrefdef.height);
-
-	R_SetupFrame();
-}
-
 /*
 ================
 R_AliasDrawModel
@@ -1089,7 +1052,8 @@ R_AliasDrawModel
 */
 void R_AliasDrawModel (void)
 {
-	qboolean bDoGunFov = false;
+	float oldAliasxscale = aliasxscale;
+	float oldAliasyscale = aliasyscale;
 	extern void	(*d_pdrawspans)(void *);
 	extern void R_PolysetDrawSpans8_Opaque( void * );
 	extern void R_PolysetDrawSpans8_33( void * );
@@ -1104,14 +1068,16 @@ void R_AliasDrawModel (void)
 
 	if ( currententity->flags & RF_WEAPONMODEL )
 	{
-		bDoGunFov = r_newrefdef.fov_x != r_gunfov->value ? true : false;
-		if (bDoGunFov)
-			R_SetGunFov(false);
+		float fov = 0.0f;
+		if ( r_lefthand->value == 2.0F )
+			return;
+
+		fov = 2.0*tan((r_gunfov->value*(4.0/3.0))/360.0*M_PI);
+		aliasxscale = ((float)r_refdef.vrect.width / fov) * r_aliasuvscale;
+		aliasyscale = aliasxscale;
 
 		if ( r_lefthand->value == 1.0F )
 			aliasxscale = -aliasxscale;
-		else if ( r_lefthand->value == 2.0F )
-			return;
 	}
 
 	/*
@@ -1234,11 +1200,8 @@ void R_AliasDrawModel (void)
 
 	if (currententity->flags & RF_WEAPONMODEL)
 	{
-		if (bDoGunFov)
-			R_SetGunFov(true);
-
-		if(r_lefthand->value == 1.0F)
-			aliasxscale = -aliasxscale;
+		aliasxscale = oldAliasxscale;
+		aliasyscale = oldAliasyscale;
 	}
 }
 
