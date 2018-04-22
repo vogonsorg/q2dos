@@ -1064,65 +1064,14 @@ static float CalcFov (float fov_x, float width, float height)
 
 static void R_SetGunFov (qboolean bFinish) /* FS */
 {
-	static vrect_t vrect;
-	static float aspect, fov_x, fov_y;
-	qboolean r_dowarp;
+	static float fov_x, fov_y;
 
 	if (bFinish)
 	{
 		r_newrefdef.fov_x = fov_x;
 		r_newrefdef.fov_y = fov_y;
-		R_ViewChanged(&vrect, aspect);
+		R_SetupFrame();
 		return;
-	}
-
-	if (sw_waterwarp->value && (r_newrefdef.rdflags & RDF_UNDERWATER) )
-		r_dowarp = true;
-	else
-		r_dowarp = false;
-
-	aspect = ((float)r_newrefdef.height/(float)r_newrefdef.width)*(320.0f/240.0f);
-	if (r_dowarp)
-	{
-		if (r_newrefdef.width <= WARP_WIDTH && r_newrefdef.height <= WARP_HEIGHT)
-		{
-			/* shortcut for 320x240 and lower -- from Q1 */
-			vrect.x = 0;
-			vrect.y = 0;
-			vrect.width = r_newrefdef.width;
-			vrect.height = r_newrefdef.height;
-		}
-		else
-		{
-			/* the following adapted from Q1 */
-			float w = r_newrefdef.width;
-			float h = r_newrefdef.height;
-
-			if (w > WARP_WIDTH)
-			{
-				h *= (float)WARP_WIDTH / w;
-				w = WARP_WIDTH;
-			}
-			if (h > WARP_HEIGHT)
-			{
-				h = WARP_HEIGHT;
-				w *= (float)WARP_HEIGHT / h;
-			}
-
-			vrect.x = 0;
-			vrect.y = 0;
-			vrect.width = (int)w;
-			vrect.height = (int)h;
-			aspect *= (h / w);
-			aspect *= ((float)r_newrefdef.width / (float)r_newrefdef.height);
-		}
-	}
-	else
-	{
-		vrect.x = r_newrefdef.x;
-		vrect.y = r_newrefdef.y;
-		vrect.width = r_newrefdef.width;
-		vrect.height = r_newrefdef.height;
 	}
 
 	fov_x = r_newrefdef.fov_x;
@@ -1130,7 +1079,7 @@ static void R_SetGunFov (qboolean bFinish) /* FS */
 	r_newrefdef.fov_x = r_gunfov->value;
 	r_newrefdef.fov_y = CalcFov(r_newrefdef.fov_x, r_newrefdef.width, r_newrefdef.height);
 
-	R_ViewChanged(&vrect, aspect);
+	R_SetupFrame();
 }
 
 /*
