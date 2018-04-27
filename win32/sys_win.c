@@ -742,6 +742,9 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 #endif
 		Qcommon_Frame (time);
 		oldtime = newtime;
+#ifdef DEDICATED_ONLY
+		Sys_DedConsoleCheckHostname();
+#endif
 	}
 
 	// never gets here

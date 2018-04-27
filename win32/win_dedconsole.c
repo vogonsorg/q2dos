@@ -74,6 +74,8 @@ typedef struct {
 
 static sysConsole_t	sys_console;
 
+static char dedWindowName[255];
+extern cvar_t *hostname;
 
 /*
 =================
@@ -482,4 +484,13 @@ void Sys_InitDedConsole (void)
 	Sys_ShowConsole(true);
 }
 
+void Sys_DedConsoleCheckHostname (void)
+{
+	if (hostname && hostname->modified && hostname->string[0])
+	{
+		Com_sprintf(dedWindowName, sizeof(dedWindowName), "%s - %s", CONSOLE_WINDOW_NAME, hostname->string);
+		SetWindowText(sys_console.hWnd, dedWindowName);
+		hostname->modified = false;
+	}
+}
 #endif // NEW_DED_CONSOLE

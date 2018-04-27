@@ -42,4 +42,5 @@ extern RECT		window_rect;
 void Sys_ShowConsole (qboolean show);
 void Sys_ShutdownConsole (void);
 void Sys_InitDedConsole (void);
+void Sys_DedConsoleCheckHostname (void);
 #endif // NEW_DED_CONSOLE
