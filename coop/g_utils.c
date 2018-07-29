@@ -1086,3 +1086,41 @@ edict_t *Find_LikePlayer (edict_t *ent, char *name, qboolean exactMatch) /* FS: 
 	gi.cprintf(ent, PRINT_HIGH, "no player name matches found.\n");
 	return NULL;
 }
+
+/* FS: This is needed so trouble makers can't spam dropping ammo on respawn.
+ *     If that happens nobody can connect.
+ *     So make sure we have at least 256 free entities.  Should be enough room
+ *     and not too many people use this in coop anyways because of the shared
+ *     inventory.
+ */
+qboolean G_SpawnCheck(int cap)
+{
+	int i;
+	edict_t *e;
+
+	e = &g_edicts[(int)maxclients->value + 1];
+
+	if (!cap)
+		cap = 1;
+
+	for (i = maxclients->value + 1; i < globals.num_edicts; i++, e++)
+	{
+		/* the first couple seconds of server time can involve a lot of
+		   freeing and allocating, so relax the replacement policy */
+		if (!e->inuse &&
+			((e->freetime < 2) || (level.time - e->freetime > 0.5))
+			&& (i <= game.maxentities - cap))
+		{
+//			Com_Printf("%d / %d / %d\n", i, game.maxentities-cap, game.maxentities);
+			return true;
+		}
+	}
+
+//	Com_Printf("%d / %d / %d\n", i, game.maxentities-cap, game.maxentities);
+	if (i >= game.maxentities - cap)
+	{
+		return false;
+	}
+
+	return true;
+}

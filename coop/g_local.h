@@ -777,6 +777,7 @@ extern	cvar_t	*sv_coop_summon_time; /* FS: Added */
 extern	cvar_t	*sv_coop_announce_name_change; /* FS: Added */
 extern	cvar_t	*sv_coop_name_timeout; /* FS: Added */
 extern	cvar_t	*sv_coop_blinky_cam_disallowflags; /* FS: Added */
+extern	cvar_t	*sv_drop_timeout; /* FS: Added */
 extern	cvar_t	*sv_spawn_protection; /* FS: Coop: Spawn protection */
 extern	cvar_t	*sv_spawn_protection_time; /* FS: Coop: Spawn protection */
 extern	cvar_t	*motd; /* FS: Coop: Added */
@@ -941,6 +942,7 @@ char	*vtos (vec3_t v);
 float vectoyaw (vec3_t vec);
 void vectoangles (vec3_t vec, vec3_t angles);
 edict_t *Find_LikePlayer (edict_t *ent, char *name, qboolean exact); /* FS: People want this for various Tastyspleen-like commands */
+qboolean G_SpawnCheck (int cap); /* FS: Added */
 
 //ROGUE
 void G_ProjectSource2(vec3_t point, vec3_t distance, vec3_t forward, vec3_t right,
@@ -1557,6 +1559,7 @@ struct gclient_s
 	float startFireTime; /* FS: Zaero specific game dll changes */
 
 	float summon_time; /* FS: Added */
+	float dropTimeout; /* FS: Added */
 };
 
 struct edict_s

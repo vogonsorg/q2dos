@@ -39,6 +39,7 @@ cvar_t *sv_coop_summon_time; /* FS: Added */
 cvar_t *sv_coop_announce_name_change; /* FS: Added */
 cvar_t *sv_coop_name_timeout; /* FS: Added */
 cvar_t *sv_coop_blinky_cam_disallowflags; /* FS: Added */
+cvar_t *sv_drop_timeout; /* FS: Added */
 cvar_t *sv_spawn_protection; /* FS: Coop: Spawn protection */
 cvar_t *sv_spawn_protection_time; /* FS: Coop: Spawn protection */
 cvar_t *motd; /* FS: Coop: Added */

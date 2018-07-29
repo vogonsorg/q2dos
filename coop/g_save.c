@@ -250,6 +250,8 @@ InitGame(void)
 	gi.cvar_setdescription("sv_coop_check_player_exit", "Require at least 51% of players to be near the exit to end the level.  Experimental.");
 	sv_coop_blinky_cam_disallowflags = gi.cvar("sv_coop_blinky_cam_disallowflags", "0", 0); /* FS: Blinky cam flags */
 	gi.cvar_setdescription("sv_coop_blinky_cam_disallowflags", "Flags for disabling certain Blinky Camera features.");
+	sv_drop_timeout = gi.cvar("sv_drop_timeout", "10", 0); /* FS: Added */
+	gi.cvar_setdescription("sv_drop_timeout", "Timeout (in seconds) before a player can drop items.");
 	sv_spawn_protection = gi.cvar("sv_spawn_protection", "1", 0); /* FS: Coop: Spawn protection */
 	gi.cvar_setdescription("sv_spawn_protection", "Enable spawn protection by enabling temporary invincibility and immunity from telefragging.  Time set in seconds with sv_spawn_protection_time.");
 	sv_spawn_protection_time = gi.cvar("sv_spawn_protection_time", "3", 0); /* FS: Coop: Spawn protection */

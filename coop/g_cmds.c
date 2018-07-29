@@ -937,6 +937,7 @@ Cmd_Use_f(edict_t *ent)
 void
 Cmd_Drop_f(edict_t *ent)
 {
+	int dropTimer; /* FS */
 	int index;
 	gitem_t *it;
 	char *s;
@@ -953,6 +954,16 @@ Cmd_Drop_f(edict_t *ent)
 		return;
 	}
 
+	if (sv_drop_timeout->value) /* FS: Stop trouble makers */
+	{
+		dropTimer = (ent->client->dropTimeout + sv_drop_timeout->value) - level.time;
+		if (dropTimer > 0)
+		{
+			gi.cprintf(ent, PRINT_HIGH, "You must wait at least %d second(s) before you can use this command.\n", dropTimer);
+			return;
+		}
+	}
+
 	s = gi.args();
 	it = FindItem(s);
 
@@ -965,6 +976,12 @@ Cmd_Drop_f(edict_t *ent)
 	if (!it->drop)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Item is not dropable.\n");
+		return;
+	}
+
+	if (!G_SpawnCheck(256))
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Too many items in world.  Cannot drop right now.\n");
 		return;
 	}
 
@@ -1059,6 +1076,7 @@ Cmd_Drop_f(edict_t *ent)
 	}
 
 	it->drop(ent, it);
+	ent->client->dropTimeout = level.time; /* FS */
 }
 
 void
