@@ -2112,8 +2112,6 @@
 {"DBall_SelectSpawnPoint", (byte *)DBall_SelectSpawnPoint},
 {"DBall_ClientBegin", (byte *)DBall_ClientBegin},
 {"DBall_CheckDMRules", (byte *)DBall_CheckDMRules},
-{"Blinky_SpawnEntities", (byte *)Blinky_SpawnEntities},
-{"Cmd_Angles_Verbose_f", (byte *)Cmd_Angles_Verbose_f},
 {"Blinky_CalcViewOffsets", (byte *)Blinky_CalcViewOffsets},
 {"Blinky_OnClientTerminate", (byte *)Blinky_OnClientTerminate},
 {"Cmd_Teleport_f", (byte *)Cmd_Teleport_f},

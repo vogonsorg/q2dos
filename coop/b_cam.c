@@ -8,6 +8,23 @@
 
 #define SCANNER_UNIT 10
 
+static void Blinky_ResetView(edict_t *ent) /* FS */
+{
+	if (!ent || !ent->inuse || !ent->client)
+		return;
+
+	VectorClear(ent->s.angles);
+	VectorClear(ent->client->ps.viewangles);
+	VectorClear(ent->client->v_angle);
+	VectorClear(ent->client->kick_angles);
+	VectorClear(ent->client->kick_origin);
+	VectorClear(ent->client->oldviewangles);
+	VectorClear(ent->client->ps.gunangles);
+	VectorClear(ent->client->ps.kick_angles);
+	ent->client->v_dmg_pitch = ent->client->v_dmg_roll = ent->client->v_dmg_time = 0.0f;
+	ent->client->ps.pmove.delta_angles[0] = ent->client->ps.pmove.delta_angles[1] = ent->client->ps.pmove.delta_angles[2] = 0;
+}
+
 static qboolean IsSpectator(edict_t * ent)
 {
 	if (!ent || !ent->inuse || !ent->client)
@@ -23,7 +40,7 @@ void Blinky_RunRun(edict_t *ent, usercmd_t *ucmd)
 	gclient_t *client = NULL;
 	BlinkyClient_t *bdata = NULL;
 
-	if(!ent || !ent->client || !ucmd)
+	if(!ent || !ent->inuse || !ent->client || !ucmd)
 	{
 		return;
 	}
@@ -57,7 +74,7 @@ void Blinky_UpdateCameraThink(edict_t *ent)
 	gclient_t *client = NULL;
 	BlinkyClient_t *bdata = NULL;
 
-	if (!ent || !ent->client)
+	if (!ent || !ent->inuse || !ent->client)
 	{
 		return;
 	}
@@ -113,7 +130,7 @@ static void Blinky_BeginServerFrameClient(edict_t * ent)
 	edict_t *target = NULL;
 	edict_t *decoy = NULL;
 
-	if (!ent || !ent->client)
+	if (!ent || !ent->inuse || !ent->client)
 	{
 		return;
 	}
@@ -127,12 +144,12 @@ static void Blinky_BeginServerFrameClient(edict_t * ent)
 	}
 }
 
-void Blinky_BeginRunFrame()
+void Blinky_BeginRunFrame(void)
 {
-	int		i;
+	int i;
 	edict_t	*ent;
 
-	for (i=0 ; i<maxclients->value ; i++)
+	for (i=0; i<maxclients->value; i++)
 	{
 		ent = g_edicts + 1 + i;
 
@@ -145,12 +162,11 @@ void Blinky_BeginRunFrame()
 	}
 }
 
-static void
-ShowStats(edict_t *ent, edict_t *player)
+static void ShowStats(edict_t *ent, edict_t *player)
 {
 	vec3_t v;
 	char stats[500];
-	BlinkyClient_t * bdata;
+	BlinkyClient_t *bdata;
 	char pname[11];
 	int health, armor, armorpow;
 	int xd,yd,zd;
@@ -163,7 +179,7 @@ ShowStats(edict_t *ent, edict_t *player)
 		return;
 	}
 
-	if (-1 == CellsIndex)
+	if (CellsIndex == -1)
 	{
 		CellsIndex = ITEM_INDEX(FindItem("cells"));
 	}
@@ -234,12 +250,12 @@ void MoveToAngles(edict_t * ent, vec3_t pv1)
 {
 	int i;
 
-	if (!ent || !ent->client)
+	if (!ent || !ent->inuse || !ent->client)
 	{
 		return;
 	}
 
-	for (i=0 ; i<3 ; i++)
+	for (i=0; i<3; i++)
 	{
 		ent->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(pv1[i] - ent->client->resp.cmd_angles[i]);
 	}
@@ -249,7 +265,7 @@ void stopBlinkyCam(edict_t * ent)
 {
 	BlinkyClient_t *bdata = NULL;
 		
-	if (!ent || !ent->client)
+	if (!ent || !ent->inuse || !ent->client)
 	{
 		return;
 	}
@@ -287,7 +303,7 @@ void StartCam(edict_t * ent, edict_t * target)
 	BlinkyClient_t *bdata = NULL;
 	edict_t *decoy = NULL;
 
-	if (!ent || !ent->client || !target || !target->client)
+	if (!ent || !ent->inuse || !ent->client || !target || !target->inuse || !target->client)
 	{
 		return;
 	}
@@ -320,7 +336,6 @@ void StartCam(edict_t * ent, edict_t * target)
 	gi.linkentity(bdata->cam_decoy);
 }
 
-
 void Cmd_Stats_f(edict_t *ent)
 {
 	char * name = gi.args();
@@ -351,17 +366,16 @@ void Cmd_Stats_f(edict_t *ent)
 	}
 }
 
-
 void Cmd_Cam_f(edict_t *ent)
 {
 	char *name = gi.args();
 	qboolean bFindFailed = true;
  // obj1 is how to tell when we've looped
-	edict_t * obj1;
-	edict_t * target;
-	BlinkyClient_t * bdata;
+	edict_t *obj1;
+	edict_t *target;
+	BlinkyClient_t *bdata;
 
-	if (!ent || !ent->client || ent->client->pers.spectator)
+	if (!ent || !ent->inuse || !ent->client || ent->client->pers.spectator)
 	{
 		return;
 	}
@@ -535,9 +549,9 @@ void Cmd_Cam_f(edict_t *ent)
 static void Summon(edict_t *ent, edict_t *other)
 {
 	vec3_t offset, forward, right, start;
-	trace_t		tr;
+	trace_t tr;
 
-	if (!ent || !ent->client || !other || !other->client)
+	if (!ent || !ent->inuse || !ent->client || !other || !other->inuse || !other->client)
 	{
 		return;
 	}
@@ -570,7 +584,7 @@ static void Summon(edict_t *ent, edict_t *other)
 	gi.unlinkentity (other);
 
 	tr = gi.trace (start, other->mins, other->maxs, start, NULL, MASK_PLAYERSOLID);
-	if (tr.fraction < 1.0)
+	if (tr.fraction < 1.0f)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Collision issue.  Can not summon \"%s\".  Try from a different location.\n", other->client->pers.netname);
 		gi.linkentity (other);
@@ -592,16 +606,7 @@ static void Summon(edict_t *ent, edict_t *other)
 	// set angles
 	MoveToAngles(other, ent->s.angles);
 
-	/* FS: FIXME: Is this right? -- Do this again, view angles got jacked permanently a couple of times during live play? */
-	VectorClear (other->s.angles);
-	VectorClear (other->client->ps.viewangles);
-	VectorClear (other->client->v_angle);
-	VectorClear (other->client->kick_angles);
-	VectorClear (other->client->kick_origin);
-	VectorClear (other->client->oldviewangles);
-	VectorClear (other->client->ps.gunangles);
-	VectorClear (other->client->ps.kick_angles);
-	other->client->ps.pmove.delta_angles[0] = other->client->ps.pmove.delta_angles[1] = other->client->ps.pmove.delta_angles[2] = 0;
+	Blinky_ResetView(other); /* FS */
 
 	// kill anything at the destination
 	KillBox (other);
@@ -613,16 +618,7 @@ static void Summon(edict_t *ent, edict_t *other)
 
 	gi.linkentity (other);
 
-	/* FS: FIXME: Is this right? -- Do this again, view angles got jacked permanently a couple of times during live play? */
-	VectorClear (other->s.angles);
-	VectorClear (other->client->ps.viewangles);
-	VectorClear (other->client->v_angle);
-	VectorClear (other->client->kick_angles);
-	VectorClear (other->client->kick_origin);
-	VectorClear (other->client->oldviewangles);
-	VectorClear (other->client->ps.gunangles);
-	VectorClear (other->client->ps.kick_angles);
-	other->client->ps.pmove.delta_angles[0] = other->client->ps.pmove.delta_angles[1] = other->client->ps.pmove.delta_angles[2] = 0;
+	Blinky_ResetView(other); /* FS */
 
 	ent->client->summon_time = level.time + sv_coop_summon_time->value;
 }
@@ -630,9 +626,9 @@ static void Summon(edict_t *ent, edict_t *other)
 static void Teleport(edict_t *ent, edict_t *other)
 {
 	vec3_t offset, forward, right, start;
-	trace_t		tr;
+	trace_t tr;
 
-	if (!ent || !ent->client || !other || !other->client)
+	if (!ent || !ent->inuse || !ent->client || !other || !other->inuse || !other->client)
 	{
 		return;
 	}
@@ -681,23 +677,7 @@ static void Teleport(edict_t *ent, edict_t *other)
 	// set angles
 	MoveToAngles(other, ent->s.angles);
 
-	/* FS: FIXME: This isn't working. */
-#if 1
-	VectorClear (other->s.angles);
-	VectorClear (other->client->ps.viewangles);
-	VectorClear (other->client->v_angle);
-	VectorClear (other->client->kick_angles);
-	VectorClear (other->client->kick_origin);
-	VectorClear (other->client->oldviewangles);
-	VectorClear (other->client->ps.gunangles);
-	VectorClear (other->client->ps.kick_angles);
-	other->s.angles[PITCH] = other->client->ps.viewangles[PITCH] = 0;
-	other->s.angles[ROLL] = other->client->ps.viewangles[ROLL] = 0;
-
-	other->client->v_dmg_pitch = other->client->v_dmg_roll = 0;
-	other->client->v_dmg_time = 0.0f;
-	other->client->ps.pmove.delta_angles[0] = other->client->ps.pmove.delta_angles[1] = other->client->ps.pmove.delta_angles[2] = 0;
-#endif
+	Blinky_ResetView(other); /* FS */
 
 	// kill anything at the destination
 	KillBox (other);
@@ -712,7 +692,7 @@ static void Teleport(edict_t *ent, edict_t *other)
 
 void Cmd_NoSummon_f(edict_t *ent)
 {
-	if (!ent || !ent->client || ent->client->pers.spectator)
+	if (!ent || !ent->inuse || !ent->client || ent->client->pers.spectator)
 	{
 		return;
 	}
@@ -970,8 +950,8 @@ void Cmd_Teleport_f(edict_t *ent)
 
 void Blinky_OnClientTerminate(edict_t *self)
 {
-	edict_t * player;
-	BlinkyClient_t * bdata;
+	edict_t *player;
+	BlinkyClient_t *bdata;
 
 	if (!self)
 	{
@@ -992,13 +972,21 @@ void Blinky_OnClientTerminate(edict_t *self)
 void Blinky_CalcViewOffsets(edict_t * ent, vec3_t v)
 {
 	int i;
-	BlinkyClient_t * bdata = &ent->client->blinky_client;
+	BlinkyClient_t *bdata = NULL;
 	vec3_t forward;
-	edict_t * target = bdata->cam_target;
-	int offset = coop_cameraoffset->value;
+	edict_t *target = NULL;
 
-	VectorSet(v,0,0,0);
-	for (i=0; i<3; i++)
+	if (!ent || !ent->inuse || !ent->client)
+		return;
+
+	bdata = &ent->client->blinky_client;
+	target = bdata->cam_target;
+	if (!target || !target->inuse || !target->client)
+		return;
+
+	VectorSet(v, 0.0f, 0.0f, 0.0f);
+
+	for (i = 0; i < 3; i++)
 	{
 		ent->client->ps.pmove.origin[i] = target->s.origin[i]*8;
 	}
@@ -1006,41 +994,9 @@ void Blinky_CalcViewOffsets(edict_t * ent, vec3_t v)
 	v[2] += target->viewheight;
 
 	// move cam forward
-	if (offset)
+	if (coop_cameraoffset->intValue)
 	{
 		AngleVectors (target->client->v_angle, forward, NULL, NULL);
-		VectorMA (v, offset, forward, v);
+		VectorMA (v, coop_cameraoffset->intValue, forward, v);
 	}
-}
-
-void Cmd_Angles_Verbose_f(edict_t *self) /* FS: Debug test */
-{
-	vec3_t angles;
-	VectorCopy(self->s.angles, angles);
-	gi.cprintf(self, PRINT_HIGH, "self->s.angles: %f %f %f\n", angles[0], angles[1], angles[2]);
-
-	VectorCopy(self->client->ps.viewangles, angles);
-	gi.cprintf(self, PRINT_HIGH, "self->client->ps.viewangles: %f %f %f\n", angles[0], angles[1], angles[2]);
-
-	VectorCopy(self->client->v_angle, angles);
-	gi.cprintf(self, PRINT_HIGH, "self->client->v_angle: %f %f %f\n", angles[0], angles[1], angles[2]);
-
-	VectorCopy(self->client->kick_angles, angles);
-	gi.cprintf(self, PRINT_HIGH, "self->client->kick_angles: %f %f %f\n", angles[0], angles[1], angles[2]);
-
-	VectorCopy(self->client->kick_origin, angles);
-	gi.cprintf(self, PRINT_HIGH, "self->client->kick_origin: %f %f %f\n", angles[0], angles[1], angles[2]);
-
-	gi.cprintf(self, PRINT_HIGH, "self->client->v_dmg_pitch: %f\n", self->client->v_dmg_pitch);
-	gi.cprintf(self, PRINT_HIGH, "self->client->v_dmg_roll: %f\n", self->client->v_dmg_roll);
-	gi.cprintf(self, PRINT_HIGH, "self->client->v_dmg_time: %f\n", self->client->v_dmg_time);
-}
-
-void Blinky_SpawnEntities()
-{
-	
-	gi.dprintf (DEVELOPER_MSG_GAME, "Blinky - CoopCam version of 3.20, 2000/08/23\n");
-	gi.dprintf (DEVELOPER_MSG_GAME, "\x02""Use cam <name> to see through your buddy eyes, cam to turn back\n");
-	
-	srand( (unsigned)time( NULL ) );
 }
