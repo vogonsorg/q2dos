@@ -1684,6 +1684,18 @@ void sayCmd_CheckVote(edict_t *ent, char *voteChat)
 		gi.WriteString(va("%s\n", voteChat));
 		gi.unicast(ent, true);
 	}
+	else if(!strncmp(voteChat, "vote kick ", 10))
+	{
+		gi.WriteByte(svc_stufftext);
+		gi.WriteString(va("%s\n", voteChat));
+		gi.unicast(ent, true);
+	}
+	else if(!strncmp(voteChat, "vote ban ", 9))
+	{
+		gi.WriteByte(svc_stufftext);
+		gi.WriteString(va("%s\n", voteChat));
+		gi.unicast(ent, true);
+	}
 	else if ( !stricmp(voteChat, "vote help")	|| !stricmp(voteChat, "vote list") || !stricmp(voteChat, "vote cmds")	|| !stricmp(voteChat, "vote commands") )
 	{
 		gi.WriteByte(svc_stufftext);

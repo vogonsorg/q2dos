@@ -1278,6 +1278,8 @@ extern void fire_bullet ( edict_t * self , vec3_t start , vec3_t aimdir , int da
 extern void fire_lead ( edict_t * self , vec3_t start , vec3_t aimdir , int damage , int kick , int te_impact , int hspread , int vspread , int mod ) ;
 extern qboolean fire_hit ( edict_t * self , vec3_t aim , int damage , int kick ) ;
 extern void check_dodge ( edict_t * self , vec3_t start , vec3_t dir , int speed ) ;
+extern void vote_kickban_menu ( edict_t * ent , int entNum , qboolean banPlayer ) ;
+extern void vote_kickban ( edict_t * ent , char * playerName , qboolean banPlayer ) ;
 extern void vote_playerexit ( edict_t * ent ) ;
 extern void vote_menu_broadcast ( void ) ;
 extern void VoteMenuChoice ( edict_t * ent , pmenuhnd_t * p ) ;
@@ -1960,6 +1962,8 @@ extern void Move_Calc_Zaero ( edict_t * ent , vec3_t dest , void ( * func ) ( ed
 extern void Move_Begin ( edict_t * ent ) ;
 extern void Move_Final ( edict_t * ent ) ;
 extern void Move_Done ( edict_t * ent ) ;
+extern void CoopVotePlayerBan ( edict_t * ent , pmenuhnd_t * p ) ;
+extern void CoopVotePlayerKick ( edict_t * ent , pmenuhnd_t * p ) ;
 extern void CoopVoteGamemodeDynamic ( edict_t * ent , pmenuhnd_t * p ) ;
 extern void CoopGamemodeAdd ( const char * gamemode , const char * realgamemode , const char * mapname ) ;
 extern int CoopGamemodeExists ( const char * gamemode ) ;

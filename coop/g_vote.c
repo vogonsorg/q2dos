@@ -12,6 +12,8 @@
 #define	VOTE_NORANDOMMAPS		0x00000100 /* 256 */
 #define VOTE_NORESETMAP			0x00000200 /* 512 */
 #define VOTE_NOPLAYEREXIT		0x00000400 /* 1024 */
+#define VOTE_NOPLAYERKICK		0x00000800 /* 2048 */
+#define VOTE_NOPLAYERBAN		0x00001000 /* 4096 */
 
 /* Globals */
 qboolean bVoteInProgress;
@@ -26,6 +28,8 @@ char voteType[16];
 char whatAreWeVotingFor[MAX_OSPATH];
 char voteGamemode[32];
 char voteGamemodeStartMap[MAX_QPATH];
+char votePlayerBanIP[32];
+int votePlayerBanEntNum;
 float voteTimer;
 int lastUpdate;
 
@@ -60,6 +64,8 @@ void VoteMenuChoice(edict_t *ent, pmenuhnd_t *p);
 void vote_menu_broadcast (void);
 void VoteMenuOpen(edict_t *ent);
 void vote_playerexit (edict_t *ent);
+void vote_kickban (edict_t *ent, char *playerName, qboolean banPlayer);
+void vote_kickban_menu (edict_t *ent, int entNum, qboolean banPlayer);
 
 #define VOTEMENU_TYPE 6
 #define VOTEMENU_PROGYES 8
@@ -120,9 +126,10 @@ void vote_command(edict_t *ent)
 	if (argc <= 1 ||
 	    (argc >= 2 && (!Q_stricmp(gi.argv(1), "help") || !Q_stricmp(gi.argv(1), "list") || !Q_stricmp(gi.argv(1), "cmds") || !Q_stricmp(gi.argv(1), "commands"))) )
 	{
-		gi.cprintf(ent, PRINT_HIGH, "usage: vote map <mapname>, vote gamemode <gamemode>, vote skill <coopskill>, vote restartmap, vote playerexit, vote yes, vote no, vote stop, and vote progress.\n");
+		gi.cprintf(ent, PRINT_HIGH, "usage: vote map <mapname>, vote gamemode <gamemode>, vote skill <coopskill>, vote kick <playername>, vote ban <playername>, vote restartmap, vote playerexit, vote yes, vote no, vote stop, and vote progress.\n");
 		return;
 	}
+
 	if(!Q_stricmp(gi.argv(1), "map"))
 	{
 		if(argc <= 2)
@@ -204,16 +211,65 @@ void vote_command(edict_t *ent)
 	else if (!Q_stricmp(gi.argv(1), "playerexit"))
 	{
 		vote_playerexit(ent);
+		return;
 	}
 	else if (!Q_stricmp(gi.argv(1), "progress"))
 	{
 		vote_progress(ent);
 		return;
 	}
+	else if (!Q_stricmp(gi.argv(1), "kick"))
+	{
+		if(argc <= 2)
+		{
+			gi.cprintf(ent, PRINT_HIGH, "error: you must supply a player name! i.e. vote kick quakekiller\n");
+			return;
+		}
+		else
+		{
+			vote_kickban(ent, gi.argv(2), false);
+			return;
+		}
+	}
+	else if (!Q_stricmp(gi.argv(1), "ban"))
+	{
+		if(argc <= 2)
+		{
+			gi.cprintf(ent, PRINT_HIGH, "error: you must supply a player name! i.e. vote ban quakekiller\n");
+			return;
+		}
+		else
+		{
+			vote_kickban(ent, gi.argv(2), true);
+			return;
+		}
+	}
+	else if (!Q_stricmp(gi.argv(1), "kick_menu")) /* FS: Internal menu commands */
+	{
+		if(argc <= 2)
+		{
+			return;
+		}
+		else
+		{
+			vote_kickban_menu(ent, atoi(gi.argv(2)), false);
+		}
+	}
+	else if (!Q_stricmp(gi.argv(1), "ban_menu")) /* FS: Internal menu commands */
+	{
+		if(argc <= 2)
+		{
+			return;
+		}
+		else
+		{
+			vote_kickban_menu(ent, atoi(gi.argv(2)), true);
+		}
+	}
 	else
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Unknown vote command: %s.  ", gi.argv(1));
-		gi.cprintf(ent, PRINT_HIGH, "valid options are: vote map <mapname>, vote gamemode <gamemode>, vote skill <coopskill>, vote restartmap, vote playerexit, vote yes, vote no, vote stop, and vote progress.\n");
+		gi.cprintf(ent, PRINT_HIGH, "valid options are: vote map <mapname>, vote gamemode <gamemode>, vote skill <coopskill>, vote kick <playername>, vote ban <playername>, vote restartmap, vote playerexit, vote yes, vote no, vote stop, and vote progress.\n");
 		return;
 	}
 }
@@ -377,12 +433,12 @@ void vote_map (edict_t *ent, const char *mapName)
 		return;
 	}
 
-	Com_sprintf(voteMap, MAX_OSPATH, "%s", mapName);
+	Com_sprintf(voteMap, sizeof(voteMap), "%s", mapName);
 	vote_Broadcast("%s votes for %s! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname, voteMap);
 	voteClients = P_Clients_Connected(false);
 	bVoteInProgress = true;
-	Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "%s", voteMap);
-	Com_sprintf(voteType, 16, "map");
+	Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "%s", voteMap);
+	Com_sprintf(voteType, sizeof(voteType), "map");
 
 	ent->voteInitiator = true;
 
@@ -440,12 +496,12 @@ void vote_warp (edict_t *ent, const char *mapName)
 		}
 	}
 
-	Com_sprintf(voteMap, MAX_OSPATH, "%s", mapName);
+	Com_sprintf(voteMap, sizeof(voteMap), "%s", mapName);
 	vote_Broadcast("%s votes for warping to %s! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname, voteMap);
 	voteClients = P_Clients_Connected(false);
 	bVoteInProgress = true;
-	Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "%s", voteMap);
-	Com_sprintf(voteType, 16, "warp");
+	Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "%s", voteMap);
+	Com_sprintf(voteType, sizeof(voteType), "warp");
 
 	ent->voteInitiator = true;
 
@@ -543,8 +599,8 @@ void vote_gamemode(edict_t *ent, const char *gamemode)
 
 	voteClients = P_Clients_Connected(false);
 	bVoteInProgress = true;
-	Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "%s", voteGamemode);
-	Com_sprintf(voteType, 16, "gamemode");
+	Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "%s", voteGamemode);
+	Com_sprintf(voteType, sizeof(voteType), "gamemode");
 	vote_Broadcast("%s votes for %s: %s! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname, voteType, whatAreWeVotingFor);
 
 	if(sv_vote_assume_yes->intValue)
@@ -587,19 +643,19 @@ void vote_coopskill(edict_t *ent, int skillVote)
 	{
 		case 0:
 			voteCoopSkill = 0;
-			Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "easy");
+			Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "easy");
 			break;
 		case 1:
 			voteCoopSkill = 1;
-			Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "medium");
+			Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "medium");
 			break;
 		case 2:
 			voteCoopSkill = 2;
-			Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "hard");
+			Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "hard");
 			break;
 		case 3:
 			voteCoopSkill = 3;
-			Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "nightmare");
+			Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "nightmare");
 			break;
 		default:
 			gi.cprintf(ent, PRINT_HIGH, "error: invalid coop difficulty level!  valid options are: 0 (easy), 1 (medium), 2 (hard), and 3 (nightmare).\n");
@@ -614,7 +670,7 @@ void vote_coopskill(edict_t *ent, int skillVote)
 
 	voteClients = P_Clients_Connected(false);
 	bVoteInProgress = true;
-	Com_sprintf(voteType, 16, "coop difficulty");
+	Com_sprintf(voteType, sizeof(voteType), "coop difficulty");
 	vote_Broadcast("%s votes for %s: %s! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname, voteType, whatAreWeVotingFor);
 
 	if(sv_vote_assume_yes->intValue)
@@ -653,12 +709,12 @@ void vote_restartmap (edict_t *ent)
 		return;
 	}
 
-	Com_sprintf(voteMap, MAX_OSPATH, "%s", level.mapname);
+	Com_sprintf(voteMap, sizeof(voteMap), "%s", level.mapname);
 	vote_Broadcast("%s votes for restarting the map! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname);
 	voteClients = P_Clients_Connected(false);
 	bVoteInProgress = true;
-	Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "%s", voteMap);
-	Com_sprintf(voteType, 16, "restartmap");
+	Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "%s", voteMap);
+	Com_sprintf(voteType, sizeof(voteType), "restartmap");
 
 	ent->voteInitiator = true;
 
@@ -807,7 +863,8 @@ void vote_Reset(void)
 	lastUpdate = (int)(level.time);
 	bVoteInProgress = false;
 	printOnce = 0;
-	whatAreWeVotingFor[0] = voteMap[0] = voteGamemode[0] = voteGamemodeStartMap[0] = voteType[0] = '\0';
+	votePlayerBanEntNum = 0;
+	whatAreWeVotingFor[0] = voteMap[0] = voteGamemode[0] = voteGamemodeStartMap[0] = voteType[0] = votePlayerBanIP[0] = '\0';
 
 	/* FS: Don't do this in single player */
 	if (game.maxclients <= 1)
@@ -865,31 +922,39 @@ void vote_Passed (void)
 	if (!Q_stricmp(voteType, "gamemode"))
 	{
 		vote_SetGamemodeCVAR(voteGamemode);
-		Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "deathmatch 0; coop 1; wait;wait;wait;wait;wait;map %s\n", voteGamemodeStartMap);
+		Com_sprintf(voteCbufCmdExecute, sizeof(voteCbufCmdExecute), "deathmatch 0; coop 1; wait;wait;wait;wait;wait;map %s\n", voteGamemodeStartMap);
 	}
 	else if(!Q_stricmp(voteType, "coop difficulty"))
 	{
 		vote_SetGamemodeCVAR(sv_coop_gamemode->string);
-		Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "skill %i; wait;wait;wait;wait;wait;map %s", voteCoopSkill, level.mapname);
+		Com_sprintf(voteCbufCmdExecute, sizeof(voteCbufCmdExecute), "skill %i; wait;wait;wait;wait;wait;map %s", voteCoopSkill, level.mapname);
 	}
 	else if(!Q_stricmp(voteType, "restartmap"))
 	{
 		vote_SetGamemodeCVAR(sv_coop_gamemode->string);
-		Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "wait;wait;wait;wait;wait;map %s\n", voteMap); /* FS: Might want to force a DLL unload for coop overflow fuckery */
+		Com_sprintf(voteCbufCmdExecute, sizeof(voteCbufCmdExecute), "wait;wait;wait;wait;wait;map %s\n", voteMap); /* FS: Might want to force a DLL unload for coop overflow fuckery */
 	}
 	else if(!Q_stricmp(voteType, "warp"))
 	{
-		Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "wait;wait;wait;wait;wait;gamemap %s\n", voteMap);
+		Com_sprintf(voteCbufCmdExecute, sizeof(voteCbufCmdExecute), "wait;wait;wait;wait;wait;gamemap %s\n", voteMap);
 	}
 	else if(!Q_stricmp(voteType, "playerexit"))
 	{
 		gi.cvar_forceset("sv_coop_check_player_exit", voteGamemode); /* FS: Hacky, just reuse voteGamemode */
-		Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "\n");
+		Com_sprintf(voteCbufCmdExecute, sizeof(voteCbufCmdExecute), "\n");
+	}
+	else if(!Q_stricmp(voteType, "kick player"))
+	{
+		Com_sprintf(voteCbufCmdExecute, sizeof(voteCbufCmdExecute), "kick %d\n", votePlayerBanEntNum);
+	}
+	else if(!Q_stricmp(voteType, "ban player"))
+	{
+		Com_sprintf(voteCbufCmdExecute, sizeof(voteCbufCmdExecute), "sv addip %s;sv writeip;kick %d\n", votePlayerBanIP, votePlayerBanEntNum);
 	}
 	else
 	{
 		vote_SetGamemodeCVAR(voteGamemode);
-		Com_sprintf(voteCbufCmdExecute, MAX_OSPATH, "wait;wait;wait;wait;wait;map %s\n", voteMap);
+		Com_sprintf(voteCbufCmdExecute, sizeof(voteCbufCmdExecute), "wait;wait;wait;wait;wait;map %s\n", voteMap);
 	}
 
 	vote_Reset();
@@ -1074,7 +1139,6 @@ void vote_Think(void)
 		printOnce = 0;
 		return;
 	}
-
 }
 
 void vote_connect (edict_t *ent)
@@ -1319,6 +1383,7 @@ void vote_playerexit (edict_t *ent)
 	if(!ent || !ent->client)
 	{
 		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_playerexit from a non-player!\n");
+		return;
 	}
 
 	if (bVoteInProgress)
@@ -1338,19 +1403,151 @@ void vote_playerexit (edict_t *ent)
 	if (sv_coop_check_player_exit->intValue)
 	{
 		vote_Broadcast("%s votes for changing player exit requirements to disabled! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname);
-		Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "Req. Disabled");
+		Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "Req. Disabled");
 		Com_sprintf(voteGamemode, sizeof(voteGamemode), "0");
 	}
 	else
 	{
 		vote_Broadcast("%s votes for changing player exit requirements to enabled! Use vote yes or vote no to submit your vote!\n", ent->client->pers.netname);
-		Com_sprintf(whatAreWeVotingFor, MAX_OSPATH, "Req. Enabled");
+		Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "Req. Enabled");
 		Com_sprintf(voteGamemode, sizeof(voteGamemode), "1");
 	}
 
 	voteClients = P_Clients_Connected(false);
 	bVoteInProgress = true;
-	Com_sprintf(voteType, 16, "playerexit");
+	Com_sprintf(voteType, sizeof(voteType), "playerexit");
+
+	ent->voteInitiator = true;
+
+	if(sv_vote_assume_yes->intValue)
+	{
+		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
+	}
+
+	vote_menu_broadcast();
+}
+
+void vote_kickban (edict_t *ent, char *playerName, qboolean banPlayer)
+{
+	edict_t *badPlayer = NULL;
+	char *ipInfoKey = NULL;
+	char userinfo[MAX_INFO_STRING];
+
+	if(!ent || !ent->client)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_kickban from a non-player!\n");
+		return;
+	}
+
+	if (bVoteInProgress)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "A vote is already in progress for %s: %s!\n", voteType, whatAreWeVotingFor);
+		return;
+	}
+
+	vote_Reset();
+
+	if (!banPlayer && (sv_vote_disallow_flags->intValue & VOTE_NOPLAYERKICK))
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Voting for kicking players are not allowed on this server.  Vote cancelled.\n");
+		return;
+	}
+
+	if (banPlayer && (sv_vote_disallow_flags->intValue & VOTE_NOPLAYERBAN))
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Voting for banning players are not allowed on this server.  Vote cancelled.\n");
+		return;
+	}
+
+	if (!playerName)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Error: You must provide a player name!\n");
+		return;
+	}
+
+	badPlayer = Find_LikePlayer(ent, playerName, true);
+	if (!badPlayer)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Vote cancelled.\n");
+		return;
+	}
+
+	memcpy(userinfo, badPlayer->client->pers.userinfo, sizeof(userinfo));
+	ipInfoKey = Info_ValueForKey(userinfo, "ip");
+	votePlayerBanEntNum = badPlayer - g_edicts - 1;
+
+	Com_sprintf(votePlayerBanIP, sizeof(votePlayerBanIP), "%s", ipInfoKey);
+	Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "%s", playerName);
+
+	voteClients = P_Clients_Connected(false);
+	bVoteInProgress = true;
+	if (!banPlayer)
+		Com_sprintf(voteType, sizeof(voteType), "kick player");
+	else
+		Com_sprintf(voteType, sizeof(voteType), "ban player");
+
+	ent->voteInitiator = true;
+
+	if(sv_vote_assume_yes->intValue)
+	{
+		vote_yes(ent, true); /* FS: I assume you would want to vote yes if you initiated the vote. */
+	}
+
+	vote_menu_broadcast();
+}
+
+void vote_kickban_menu (edict_t *ent, int entNum, qboolean banPlayer)
+{
+	edict_t *badPlayer = NULL;
+	char *ipInfoKey = NULL;
+	char userinfo[MAX_INFO_STRING];
+
+	if(!ent || !ent->client)
+	{
+		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_kickban from a non-player!\n");
+		return;
+	}
+
+	if (bVoteInProgress)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "A vote is already in progress for %s: %s!\n", voteType, whatAreWeVotingFor);
+		return;
+	}
+
+	vote_Reset();
+
+	if (!banPlayer && (sv_vote_disallow_flags->intValue & VOTE_NOPLAYERKICK))
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Voting for kicking players are not allowed on this server.  Vote cancelled.\n");
+		return;
+	}
+
+	if (banPlayer && (sv_vote_disallow_flags->intValue & VOTE_NOPLAYERBAN))
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Voting for banning players are not allowed on this server.  Vote cancelled.\n");
+		return;
+	}
+
+	badPlayer = g_edicts + entNum + 1;
+	if (!badPlayer)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Vote cancelled.\n");
+		return;
+	}
+
+	memcpy(userinfo, badPlayer->client->pers.userinfo, sizeof(userinfo));
+	ipInfoKey = Info_ValueForKey(userinfo, "ip");
+	votePlayerBanEntNum = badPlayer - g_edicts - 1;
+
+	Com_sprintf(votePlayerBanIP, sizeof(votePlayerBanIP), "%s", ipInfoKey);
+	Com_sprintf(whatAreWeVotingFor, sizeof(whatAreWeVotingFor), "%s", badPlayer->client->pers.netname);
+
+	voteClients = P_Clients_Connected(false);
+	bVoteInProgress = true;
+	if (!banPlayer)
+		Com_sprintf(voteType, sizeof(voteType), "kick player");
+	else
+		Com_sprintf(voteType, sizeof(voteType), "ban player");
 
 	ent->voteInitiator = true;
 
