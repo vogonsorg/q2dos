@@ -110,7 +110,7 @@
 
 #include "fxglide.h"
 
-#if 0
+#if 0 /* unused */
 static const FxU32 _gr_aspect_index_table[] =
 {
    3,

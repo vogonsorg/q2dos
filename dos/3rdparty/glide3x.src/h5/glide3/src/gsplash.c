@@ -172,10 +172,7 @@ GR_DIENTRY(grSplash,void,(float x, float y,
 /* nothing */
 }
 
-#elif !defined(_WIN32)
-#include "gsplash0.c"
-
-#else /* win32 version */
+#elif defined(_WIN32)
 #include <math.h>
 
 #include <3dfx.h>
@@ -233,4 +230,15 @@ GR_DIENTRY(grSplash,void,(float x, float y,
 #undef FN_NAME
 }
 
+#else /* others */
+#include <3dfx.h>
+#define FX_DLL_DEFINITION
+#include <fxdll.h>
+#include <glide.h>
+#include "fxglide.h"
+GR_DIENTRY(grSplash,void,(float x, float y,
+                          float w, float h,
+                          FxU32 frameNumber)) {
+/* nothing */
+}
 #endif

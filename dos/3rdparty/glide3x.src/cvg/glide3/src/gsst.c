@@ -1531,15 +1531,51 @@ __errSliExit:
     HMODULE newSplash;
 
     if (newSplash = LoadLibrary("3dfxspl3.dll")) {
-      FARPROC fxSplash;
+      GrState glideState;
+      FxBool didLoad;
+      GrSplashProc fxSplash;
+      GrSplashInitProc fxSplashInit;
+      GrSplashPlugProc fxSplashPlug;
+      GrSplashShutdownProc fxSplashShutdown;
 
-      if (fxSplash = GetProcAddress(newSplash, "_fxSplash@16")) {
-        GrState glideState;
+      fxSplash = (GrSplashProc)GetProcAddress(newSplash, "_fxSplash@20");
+      fxSplashInit = (GrSplashInitProc)GetProcAddress(newSplash, "_fxSplashInit@24");
+      fxSplashPlug = (GrSplashPlugProc)GetProcAddress(newSplash, "_fxSplashPlug@16");
+      fxSplashShutdown = (GrSplashShutdownProc)GetProcAddress(newSplash, "_fxSplashShutdown@0");
+
+      didLoad = ((fxSplash != NULL) &&
+                 (fxSplashInit != NULL) &&
+                 (fxSplashPlug != NULL) &&
+                 (fxSplashShutdown != NULL));
+
+      if (didLoad & 0/* [dBorca] i am evil! harr-harr */) {
+        /* new style DLL */
         grGlideGetState(&glideState);
-        fxSplash(hWnd, gc->state.screen_width, gc->state.screen_height, nAuxBuffers);
-        _GlideRoot.environment.noSplash = 1;        
-        grGlideSetState(&glideState);
-      } 
+        didLoad = fxSplashInit(hWnd,
+                               gc->state.screen_width, gc->state.screen_height,
+                               nColBuffers, nAuxBuffers,
+                               format);
+        if (didLoad) {
+          fxSplash(0.0f, 0.0f, 
+                   (float)gc->state.screen_width,
+                   (float)gc->state.screen_height,
+                   0);
+          fxSplashShutdown();
+          _GlideRoot.environment.noSplash = 1;
+        }
+        grGlideSetState((const void*)&glideState);
+      } else {
+        /* old style DLL */
+        typedef int (FX_CALL *GrSplashOld) (FxU32 hWind, FxU32 scrWidth, FxU32 scrHeight, FxU32 nAuxBuffers);
+        GrSplashOld fxSplashOld = (GrSplashOld)GetProcAddress(newSplash, "_fxSplash@16");
+        if (fxSplashOld) {
+            grGlideGetState(&glideState);
+            fxSplashOld(hWnd, gc->state.screen_width, gc->state.screen_height, nAuxBuffers);
+            _GlideRoot.environment.noSplash = 1;
+	    grGlideSetState((const void*)&glideState);
+	}
+      }
+      
       FreeLibrary(newSplash);
     }
   }
