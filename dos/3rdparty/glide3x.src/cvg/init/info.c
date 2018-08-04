@@ -17,10 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.2.8.2 $ 
-** $Date: 2005/06/09 18:32:27 $ 
-**
 ** Routines to detect memory size, strapping pin, and other initialization
 ** configuration information.
 **

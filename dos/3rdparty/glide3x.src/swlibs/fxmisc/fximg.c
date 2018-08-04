@@ -16,12 +16,7 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Revision: 1.3.4.1 $
-** $Date: 2005/05/25 08:56:28 $
-**
 */
-
 
 #include <stdlib.h>
 #include <stdio.h>

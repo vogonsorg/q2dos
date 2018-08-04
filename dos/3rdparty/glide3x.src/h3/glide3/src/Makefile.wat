@@ -5,9 +5,6 @@
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
-# $Header: /cvsroot/glide/glide3x/h3/glide3/src/Attic/Makefile.wat,v 1.1.2.2 2005/05/25 08:49:25 jwrdegoede Exp $
-#
-
 
 #
 #  Available options:
@@ -36,7 +33,6 @@
 #	clean:		remove object files
 #	realclean:	remove all generated files
 #
-
 
 
 .PHONY: all glide3x clean realclean

@@ -17,9 +17,6 @@
 # 
 # COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 #
-# $Revision: 1.1.2.1 $
-# $Date: 2004/03/02 07:55:27 $
-#
 
 
 include $(BUILD_ROOT_SWLIBS)/include/make/3dfx.mak

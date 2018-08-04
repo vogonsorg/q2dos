@@ -17,8 +17,6 @@
 ;; 
 ;; COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 ;;
-;; $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/cpudtect.asm,v 1.1.2.1 2004/03/02 07:55:29 dborca Exp $
-;; $Log: cpudtect.asm,v $
 ;; Revision 1.1.2.1  2004/03/02 07:55:29  dborca
 ;; Bastardised Glide3x for SST1
 ;;

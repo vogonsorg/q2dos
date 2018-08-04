@@ -17,9 +17,6 @@
 # 
 # COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 #
-# $Revision: 1.1.8.3 $
-# $Date: 2004/10/04 08:25:56 $
-#
 
 LDIRT = *.lib
 

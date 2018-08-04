@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h3/minihwc/dos_mode.c,v 1.1.1.1.8.6 2004/10/05 14:43:19 dborca Exp $
-** $Log: dos_mode.c,v $
 ** Revision 1.1.1.1.8.6  2004/10/05 14:43:19  dborca
 ** removed detritus
 **

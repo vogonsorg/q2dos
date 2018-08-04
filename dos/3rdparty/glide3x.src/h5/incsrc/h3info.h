@@ -19,9 +19,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Revision: 1.3.4.3 $
-** $Date: 2005/06/09 18:32:34 $
 */
 
 #if defined(__unix__) && ! defined(__H3REGS_H__)

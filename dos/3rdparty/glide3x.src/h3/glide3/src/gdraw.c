@@ -17,8 +17,6 @@
  ** 
  ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  **
- ** $Header: /cvsroot/glide/glide3x/h3/glide3/src/gdraw.c,v 1.2.6.9 2006/01/16 21:22:43 jwrdegoede Exp $
- ** $Log: gdraw.c,v $
  ** Revision 1.2.6.9  2006/01/16 21:22:43  jwrdegoede
  ** Fix gcc 4.1 new type-punned ptr breaks antialias. warnings
  **

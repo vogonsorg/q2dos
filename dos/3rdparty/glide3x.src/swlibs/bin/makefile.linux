@@ -17,9 +17,6 @@
 # 
 # COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 #
-# $Revision: 1.4.8.1 $
-# $Date: 2003/06/29 18:25:27 $
-#
 
 LDIRT = $(patsubst CVS,,$(patsubst makefile%,,$(wildcard *)))
 

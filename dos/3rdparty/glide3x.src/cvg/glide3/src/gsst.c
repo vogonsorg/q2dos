@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/gsst.c,v 1.1.1.1.8.8 2005/08/13 21:06:57 jwrdegoede Exp $
-** $Log: gsst.c,v $
 ** Revision 1.1.1.1.8.8  2005/08/13 21:06:57  jwrdegoede
 ** Last needed 64 bit fixes for h5/h3, complete 64 bit support for cvg
 **
@@ -1227,7 +1225,7 @@ __errSliExit:
         
         /* Place fifo in hw. Taking all of the remainging memory up to the
          * byte swizzling bit in the cmd fifo address.
-         */          
+         */
         gc->cmdTransportInfo.fifoOffset = memEnd - fifoSize;
 
 #if (GLIDE_PLATFORM & GLIDE_HW_H3)

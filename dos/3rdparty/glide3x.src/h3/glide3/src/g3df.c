@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h3/glide3/src/g3df.c,v 1.1.1.1.6.5 2005/08/13 21:07:02 jwrdegoede Exp $
-** $Log: g3df.c,v $
 ** Revision 1.1.1.1.6.5  2005/08/13 21:07:02  jwrdegoede
 ** Last needed 64 bit fixes for h5/h3, complete 64 bit support for cvg
 **
@@ -112,9 +110,9 @@ static FxBool Read8Bit(FxU8 *dst, FILE *image, int small_lod, int large_lod, GrA
 static FxBool Read16Bit(FxU16 *dst, FILE *image, int small_lod, int large_lod, GrAspectRatio_t aspect);
 
 #if ((GLIDE_PLATFORM & (GLIDE_OS_DOS32 | GLIDE_OS_WIN32 | GLIDE_OS_MACOS)) != 0)
-const char *openmode = "rb";
+static const char *openmode = "rb";
 #else
-const char *openmode = "r";
+static const char *openmode = "r";
 #endif
 
 typedef struct

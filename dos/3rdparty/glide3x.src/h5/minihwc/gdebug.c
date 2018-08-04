@@ -1,4 +1,3 @@
-/*-*-c++-*-*/
 #include "vxd.h"
 
 /*
@@ -19,12 +18,6 @@
 ** THE UNITED STATES. 
 **
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
-**
-** $Revision: 1.3.4.7 $
-** $Date: 2005/06/09 18:32:34 $
-**
-**
-** $Log: 
 **
 */
 

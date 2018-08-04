@@ -16,12 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Header: /cvsroot/glide/glide3x/h3/glide3/src/gsfc.c,v 1.1.1.1 1999/11/24 21:44:57 joseph Exp $
-** $Log: gsfc.c,v $
-** Revision 1.1.1.1  1999/11/24 21:44:57  joseph
-** Initial checkin for SourceForge
-**
 ** 
 ** 11    6/24/99 1:46a Stb_mmcclure
 ** Modifications to fix PRS 6627. Added hwcUnmapMemory9x for revised 9x

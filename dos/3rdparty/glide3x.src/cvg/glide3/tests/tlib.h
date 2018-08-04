@@ -2,9 +2,6 @@
 ** Insert new header here
 **
 **
-** $Revision: 1.1.1.1 $ 
-** $Date: 1999/12/07 21:42:43 $ 
-**
 */
 
 

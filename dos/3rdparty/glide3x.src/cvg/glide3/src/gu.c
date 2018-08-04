@@ -16,12 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/gu.c,v 1.1.1.1 1999/12/07 21:42:34 joseph Exp $
-** $Log: gu.c,v $
-** Revision 1.1.1.1  1999/12/07 21:42:34  joseph
-** Initial checkin into SourceForge.
-**
 ** 
 ** 1     10/08/98 11:30a Brent
 ** 
@@ -78,7 +72,7 @@
 #include "fxinline.h"
 
 
-const FxU32 _grResolutionXY[16][2] = 
+static const FxU32 _grResolutionXY[16][2] = 
 {
   { 320, 200 },                 /* 320x200 */
   { 320, 240 },                 /* 320x240 */
@@ -212,9 +206,3 @@ GR_DDFUNC(guQueryResolutionXY, void, (GrScreenResolution_t res, FxU32 *x, FxU32 
   
 #undef FN_NAME
 } /* guQueryResolutionXYExt */
-
-
-
-
-
-

@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/gglide.c,v 1.1.1.1.8.7 2007/09/29 13:59:34 koolsmoky Exp $
-** $Log: gglide.c,v $
 ** Revision 1.1.1.1.8.7  2007/09/29 13:59:34  koolsmoky
 ** completed grStippleMode and grStipplePattern
 **
@@ -349,9 +347,6 @@
 #include "fxglide.h"
 #include "fxinline.h"
 
-#include "rcver.h"
-static char glideIdent[] = "@#%" VERSIONSTR ;
-
 #if GLIDE_HW_TRI_SETUP
 static void
 _grUpdateTriPacketHdr(FxU32 paramMask, 
@@ -374,9 +369,6 @@ GR_STATE_ENTRY(grAlphaBlendFunction, void,
   GR_BEGIN_NOFIFOCHECK("_grAlphaBlendFunction", 85);
   GDBG_INFO_MORE(gc->myLevel, "(%d,%d,%d,%d)\n",
                  rgb_sf, rgb_df, alpha_sf, alpha_df);
-
-  /* Watcom warning suppressor */
-  glideIdent[0] = glideIdent[0];
 
   alphamode = gc->state.fbi_config.alphaMode;
   if (alpha_sf != GR_BLEND_ONE && alpha_sf != GR_BLEND_ZERO) {

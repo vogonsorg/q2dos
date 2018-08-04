@@ -14,12 +14,7 @@
 ** successor clauses in the FAR, DOD or NASA FAR Supplement. Unpublished  -
 ** rights reserved under the Copyright Laws of the United States.
 **
-**
-** $Revision: 1.1.2.1 $ 
-** $Date: 2006/07/24 06:52:23 $ 
-**
 */
-static char revString[] = "@#%$Workfile: initat3d.c $ $Revision: 1.1.2.1 $";
 #define INIT_AT3D_LIB
 
 #include <3dfx.h>
@@ -741,7 +736,6 @@ INITAT3DENTRY(initAT3DSetVideo, FxBool, (GrScreenResolution_t res, GrScreenRefre
     CRTC_SET(CC_VSYNC_START, vSyncStart);
   }
   
-
   GDBG_INFO((80, "%s: returning %s\n", FN_NAME, rv?"FXTRUE":"FXFALSE"));  
   return rv;
 #undef FN_NAME  
@@ -772,9 +766,6 @@ INITAT3DENTRY(initAT3DEnableRegs,FxBool,(InitRegisterDesc *rd))
   FxU8 tmp;
 
   GDBG_INFO((80, "%s:\n", FN_NAME));
-
-  /* Watcom warning suppression */
-  revString[0] = revString[0];
 
   GDBG_INFO((80, "%s:  Enabling writes to AT3D registers\n", FN_NAME)); 
   GDBG_INFO((80, "%s:  Setting VGA sequencer to point at flat model control\n", FN_NAME)); 
@@ -1353,9 +1344,6 @@ INITAT3DENTRY(initAT3DGetInfo,FxBool,(VG96Info *info))
     FxU32 bytes;
 
     GDBG_INFO((80, "%s:\n", FN_NAME));
-
-    /* Watcom warning suppression */
-    revString[0] = revString[0];
 
     info->vgaChip = 0;
     info->vg96Rev = 0;

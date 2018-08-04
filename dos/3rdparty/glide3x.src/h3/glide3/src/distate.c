@@ -17,8 +17,6 @@
  ** 
  ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  **
- ** $Header: /cvsroot/glide/glide3x/h3/glide3/src/distate.c,v 1.2.4.3 2004/10/04 09:26:30 dborca Exp $
- ** $Log: distate.c,v $
  ** Revision 1.2.4.3  2004/10/04 09:26:30  dborca
  ** DOS/OpenWatcom support
  **

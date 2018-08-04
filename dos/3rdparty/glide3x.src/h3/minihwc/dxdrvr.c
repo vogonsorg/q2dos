@@ -16,11 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Log: dxdrvr.c,v $
-** Revision 1.1.1.1  1999/11/24 21:45:03  joseph
-** Initial checkin for SourceForge
-**
 ** 
 ** 3     4/06/99 3:36p Dow
 ** Alt tab stuff
@@ -66,9 +61,6 @@
  * 
  * 28    8/21/97 4:24p Dow
  * Fixed @#$%! C++ Comments, Added Debugging info
-**
-** $Revision: 1.1.1.1 $ 
-** $Date: 1999/11/24 21:45:03 $ 
 **
 */
 

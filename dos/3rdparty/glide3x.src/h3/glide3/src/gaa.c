@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h3/glide3/src/gaa.c,v 1.1.1.1.6.7 2006/01/16 21:22:42 jwrdegoede Exp $
-** $Log: gaa.c,v $
 ** Revision 1.1.1.1.6.7  2006/01/16 21:22:42  jwrdegoede
 ** Fix gcc 4.1 new type-punned ptr breaks antialias. warnings
 **

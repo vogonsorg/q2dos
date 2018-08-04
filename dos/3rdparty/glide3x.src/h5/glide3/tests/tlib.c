@@ -17,10 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.1.8.3 $ 
-** $Date: 2004/10/05 14:39:57 $ 
-**
 */
 
 #include <ctype.h>

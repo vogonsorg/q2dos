@@ -5,9 +5,6 @@
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
-# $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/Makefile.win32,v 1.1.2.4 2005/05/25 08:49:29 jwrdegoede Exp $
-#
-
 
 #
 #  Available options:
@@ -30,8 +27,6 @@
 #	clean:		remove object files
 #	realclean:	remove all generated files
 #
-
-
 
 .PHONY: all glide3x clean realclean
 .INTERMEDIATE: fxgasm.exe
@@ -84,7 +79,8 @@ ifeq ($(FX_GLIDE_HW),sst96)
 CDEFS += -DSST96
 CDEFS += -DSST96_FIFO
 #CDEFS += -DSST96_ALT_FIFO_WRAP
-#CDEFS += -DINIT96VGASWAP -DINIT_ACCESS_DIRECT
+#CDEFS += -DINIT96VGASWAP
+#CDEFS += -DINIT_ACCESS_DIRECT
 CDEFS += -DGLIDE_USE_ALT_REGMAP
 endif
 endif

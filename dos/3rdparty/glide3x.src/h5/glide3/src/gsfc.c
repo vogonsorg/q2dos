@@ -17,7 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gsfc.c,v 1.3.4.7 2007/05/13 09:11:11 koolsmoky Exp $
 ** $Log: 
 **  20   3dfx      1.17.1.0.1.010/11/00 Brent           Forced check in to enforce
 **       branching.

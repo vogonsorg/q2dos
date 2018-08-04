@@ -17,7 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/minihwc/minihwc.c,v 1.4.4.39 2007/06/23 09:23:56 koolsmoky Exp $
 ** $Log:
 **  92   3dfx      1.71.1.6.1.4.1.711/08/00 Drew McMinn     Added
 **       FX_GLIDE_BRIGHTNESS and FX_GLIDE_CONTRAST modifiers

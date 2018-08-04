@@ -16,12 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Header: /cvsroot/glide/glide3x/h3/minihwc/hwcio.c,v 1.1.1.1 1999/11/24 21:45:04 joseph Exp $
-** $Log: hwcio.c,v $
-** Revision 1.1.1.1  1999/11/24 21:45:04  joseph
-** Initial checkin for SourceForge
-**
 ** 
 ** 3     4/06/99 3:36p Dow
 ** Alt tab stuff
@@ -32,7 +26,7 @@
 */
 
 
-char * ioRegNames[] = {     
+char * ioRegNames[] = {
   "status",
   "pciInit0",
   "sipMonitor",
@@ -780,7 +774,7 @@ char *sstRegNames[] = {
   "texBaseAddr38",
   "trexInit0",
   "trexInit1",
-   
+
   "nccTable000",
   "nccTable001",
   "nccTable002",

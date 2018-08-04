@@ -1,11 +1,8 @@
 ;
 ; compulsory header for glide3/xdraw* assembly specializations (NASM)
 ;
-; $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/xos.inc,v 1.1.2.2 2004/10/04 08:57:52 dborca Exp $
-; $Log: xos.inc,v $
 ; Revision 1.1.2.2  2004/10/04 08:57:52  dborca
 ; supporting DOS/OpenWatcom in Assembly files
-;
 ;
 ; Revision 1.1.2.1  2003/06/07 09:53:25  dborca
 ; initial checkin for NASM sources
@@ -74,7 +71,7 @@
 
 %macro		endp	0
 	%ifnctx	proc
-		%error	Mismatched `endp'/`proc'
+		%error	Mismatched ENDP/PROC
 	%else
 		%pop
 	%endif

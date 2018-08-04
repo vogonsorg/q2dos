@@ -16,9 +16,6 @@
 ;; 
 ;; COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 ;;
-;; $Header: /cvsroot/glide/glide3x/h5/glide3/src/xdraw2.asm,v 1.1.8.11 2007/05/13 09:21:06 koolsmoky Exp $
-;; $Revision: 1.1.8.11 $
-;; $Log: xdraw2.asm,v $
 ;; Revision 1.1.8.11  2007/05/13 09:21:06  koolsmoky
 ;; removed problematic context checks
 ;;

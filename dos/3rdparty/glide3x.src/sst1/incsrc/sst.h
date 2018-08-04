@@ -21,11 +21,6 @@
 #ifndef __SST_H__
 #define __SST_H__
 
-/*
-** $Revision: 1.1.2.2 $
-** $Date: 2006/01/16 21:22:46 $
-*/
-
 #include <ncc.h>
 #include "fx64.h"
 

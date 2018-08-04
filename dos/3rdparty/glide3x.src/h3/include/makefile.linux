@@ -17,9 +17,6 @@
 # 
 # COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 #
-# $Revision: 1.2 $
-# $Date: 2000/07/12 21:33:32 $
-#
 
 LDIRT = $(wildcard *.h)
 

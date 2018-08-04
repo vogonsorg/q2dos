@@ -16,8 +16,6 @@
 ** THE UNITED STATES. 
 **
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
-**
-** $Header: /cvsroot/glide/glide3x/h5/minihwc/Attic/lin_mode.c,v 1.1.2.4 2004/04/28 17:54:05 koolsmoky Exp $
 */
 
 #include <stdio.h>

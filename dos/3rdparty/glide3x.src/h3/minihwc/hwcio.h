@@ -16,12 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Header: /cvsroot/glide/glide3x/h3/minihwc/hwcio.h,v 1.1.1.1 1999/11/24 21:45:04 joseph Exp $
-** $Log: hwcio.h,v $
-** Revision 1.1.1.1  1999/11/24 21:45:04  joseph
-** Initial checkin for SourceForge
-**
 ** 
 ** 3     4/06/99 3:36p Dow
 ** Alt tab stuff

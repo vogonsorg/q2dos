@@ -17,8 +17,6 @@
  ** 
  ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  **
- ** $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/gpci.c,v 1.1.2.4 2005/05/25 08:51:52 jwrdegoede Exp $
- ** $Log: gpci.c,v $
  ** Revision 1.1.2.4  2005/05/25 08:51:52  jwrdegoede
  ** Add #ifdef GL_X86 around x86 specific code
  **
@@ -901,7 +899,7 @@ _GR_SET16(void *addr, unsigned short data)
 
 #if defined( GLIDE_DEBUG ) && ( GLIDE_PLATFORM & GLIDE_HW_SST96 ) 
 
-extern char *regNames[];
+extern const char *regNames[];
 
 static FxU32 thisMask;
 static FxU32 thisWrite;

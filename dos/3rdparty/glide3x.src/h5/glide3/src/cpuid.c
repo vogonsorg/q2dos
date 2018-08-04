@@ -1,8 +1,6 @@
 /*
  * CPU detection code
  *
- * $Header: /cvsroot/glide/glide3x/h5/glide3/src/Attic/cpuid.c,v 1.1.2.11 2005/05/07 08:26:35 jwrdegoede Exp $
- * $Log: cpuid.c,v $
  * Revision 1.1.2.11  2005/05/07 08:26:35  jwrdegoede
  * gcc4 cpuid fix
  *

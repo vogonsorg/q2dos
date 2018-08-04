@@ -17,10 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.1.2.4 $ 
-** $Date: 2005/05/10 11:27:23 $ 
-**
 */
 
 

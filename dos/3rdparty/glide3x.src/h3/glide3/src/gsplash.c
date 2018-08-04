@@ -17,8 +17,6 @@
  ** 
  ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  **
- ** $Header: /cvsroot/glide/glide3x/h3/glide3/src/gsplash.c,v 1.1.1.1.8.1 2003/06/29 18:43:27 guillemj Exp $
- ** $Log: gsplash.c,v $
  ** Revision 1.1.1.1.8.1  2003/06/29 18:43:27  guillemj
  ** Fix compilation warnings.
  **

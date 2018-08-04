@@ -17,10 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.1.2.2 $ 
-** $Date: 2005/06/09 18:32:38 $ 
-**
 ** Initialization code for loading SST-1 gamma tables
 **
 */

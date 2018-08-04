@@ -1,10 +1,6 @@
 /*
 ** Insert new header here
 **
-**
-** $Revision: 1.1.2.1 $ 
-** $Date: 2004/03/02 07:55:35 $ 
-**
 */
 
 #include <stdlib.h>

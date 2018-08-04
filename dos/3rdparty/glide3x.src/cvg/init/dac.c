@@ -17,10 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.2.8.2 $ 
-** $Date: 2005/06/09 18:32:26 $ 
-**
 ** Initialization code for initializing supported SST-1 DACs
 **
 */

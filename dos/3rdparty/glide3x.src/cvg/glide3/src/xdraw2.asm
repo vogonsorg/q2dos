@@ -16,9 +16,6 @@
 ;; 
 ;; COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 ;;
-;; $Header: /cvsroot/glide/glide3x/cvg/glide3/src/xdraw2.asm,v 1.1.1.1.8.3 2004/11/25 19:11:02 koolsmoky Exp $
-;; $Revision: 1.1.1.1.8.3 $
-;; $Log: xdraw2.asm,v $
 ;; Revision 1.1.1.1.8.3  2004/11/25 19:11:02  koolsmoky
 ;; set up 3dnow! triangle/vertex list routines
 ;;

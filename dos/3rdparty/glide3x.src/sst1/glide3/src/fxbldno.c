@@ -17,8 +17,6 @@
  * 
  * COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  *
- * $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/fxbldno.c,v 1.1.2.1 2004/03/02 07:55:29 dborca Exp $
- * $Log: fxbldno.c,v $
  * Revision 1.1.2.1  2004/03/02 07:55:29  dborca
  * Bastardised Glide3x for SST1
  *

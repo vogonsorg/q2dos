@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h3/glide3/src/glidesys.h,v 1.2 2000/02/15 22:35:59 joseph Exp $
-** $Log: glidesys.h,v $
 ** Revision 1.2  2000/02/15 22:35:59  joseph
 ** Changes to support FreeBSD (patch submitted by Doug Rabson)
 **

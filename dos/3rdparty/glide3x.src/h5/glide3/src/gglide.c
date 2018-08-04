@@ -18,7 +18,6 @@
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
 **
 ** 
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gglide.c,v 1.7.4.21 2007/06/23 09:22:41 koolsmoky Exp $
 ** $Log:
 **  51   3dfx      1.41.1.6.1.110/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -655,9 +654,6 @@
 #include <lindri.h>
 #endif
 
-#include "rcver.h"
-static char glideIdent[] = "@#%" VERSIONSTR ;
-
 #if GLIDE_HW_TRI_SETUP
 static void
 _grUpdateTriPacketHdr(FxU32 paramMask, 
@@ -681,9 +677,6 @@ GR_STATE_ENTRY(grAlphaBlendFunction, void,
   GR_BEGIN_NOFIFOCHECK("_grAlphaBlendFunction", 85);
   GDBG_INFO_MORE(gc->myLevel, "(%d,%d,%d,%d)\n",
                  rgb_sf, rgb_df, alpha_sf, alpha_df);
-
-  /* Watcom warning suppressor */
-  glideIdent[0] = glideIdent[0];
 
   alphamode = gc->state.shadow.alphaMode;
   if (gc->grPixelSize == 4) {

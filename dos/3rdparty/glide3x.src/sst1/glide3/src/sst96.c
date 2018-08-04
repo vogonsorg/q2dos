@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/sst96.c,v 1.1.2.1 2004/03/02 07:55:30 dborca Exp $
-** $Log: sst96.c,v $
 ** Revision 1.1.2.1  2004/03/02 07:55:30  dborca
 ** Bastardised Glide3x for SST1
 **
@@ -106,7 +104,7 @@
 
 #define GEN_INDEX(a) ((((FxU32) a) - ((FxU32) gc->reg_ptr)) >> 2)
 
-char
+const char
 *regNames[] = {
   "status",             /* 0x00 */
   "reserved001",        /* 0x01 */

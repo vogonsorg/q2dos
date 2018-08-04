@@ -16,8 +16,6 @@
 ;; 
 ;; COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 ;;
-;; $Header: /cvsroot/glide/glide3x/sst1/glide3/src/Attic/xdraw.asm,v 1.1.2.3 2004/10/08 06:30:19 dborca Exp $
-;; $Log: xdraw.asm,v $
 ;; Revision 1.1.2.3  2004/10/08 06:30:19  dborca
 ;; save a round-trip with grDrawTriangle in SST1
 ;;

@@ -21,9 +21,6 @@
 **
 ** Description: HW-specific initialization routines for Banshee/Avenger.
 **
-** $Revision: 1.1.2.1 $
-** $Date: 2003/08/21 08:32:12 $
-**
 ** $History: h3cinit.c $
 ** 
 ** *****************  Version 1  *****************

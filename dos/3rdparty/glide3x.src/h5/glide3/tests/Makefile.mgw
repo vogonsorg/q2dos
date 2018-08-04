@@ -4,9 +4,6 @@
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
-# $Header: /cvsroot/glide/glide3x/h5/glide3/tests/Attic/Makefile.mgw,v 1.1.2.7 2003/08/21 08:39:38 dborca Exp $
-#
-
 
 #
 #  Available options:
@@ -18,7 +15,6 @@
 #    Targets:
 #	<file.exe>	build a specific file
 #
-
 
 .PHONY: all
 .SUFFIXES: .c .o .exe

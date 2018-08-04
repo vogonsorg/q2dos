@@ -16,9 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Revision: 1.2.8.3 $
-** $Date: 2004/07/12 17:41:24 $
 */
 /* preprocessor defines for libraries to support DLL creation */
 
@@ -130,4 +127,3 @@
   #undef FX_CALL
   #define FX_CALL
 #endif
-

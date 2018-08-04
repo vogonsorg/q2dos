@@ -1,9 +1,6 @@
 /*
  * GPIO code
- *
- * $Header: /cvsroot/glide/glide3x/h5/minihwc/Attic/gpio.c,v 1.1.2.5 2004/10/05 14:54:44 dborca Exp $
  */
-
 
 #include <unistd.h> /*usleep*/
 
@@ -15,7 +12,6 @@
 #else
 #include "h3cinitdd.h"
 #endif
-
 
 
 #define USEC (1000)
@@ -41,7 +37,7 @@ typedef struct {
         unsigned long dInShift; /* Data Shift */
         unsigned long dOutShift;/* Data Shift */
 } PCI_BIT;
-   
+
 typedef struct {
         PCI_BIT Data;
         PCI_BIT Clk;

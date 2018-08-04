@@ -68,9 +68,6 @@
  * 28    8/21/97 4:24p Dow
  * Fixed @#$%! C++ Comments, Added Debugging info
 **
-** $Revision: 1.3.4.2 $ 
-** $Date: 2003/06/05 08:23:58 $ 
-**
 */
 
 /* 3Dfx Headers */

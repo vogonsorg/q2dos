@@ -4,9 +4,6 @@
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
-# $Header: /cvsroot/glide/glide3x/h5/glide3/tests/makefile.linux,v 1.1.8.4 2004/03/17 08:17:12 dborca Exp $
-#
-
 
 #
 #  Available options:
@@ -22,7 +19,6 @@
 #    Targets:
 #	<file.exe>	build a specific file
 #
-
 
 .PHONY: all
 .SUFFIXES: .c .o .exe

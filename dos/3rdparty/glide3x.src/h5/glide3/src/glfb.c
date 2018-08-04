@@ -17,8 +17,6 @@
 **
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/glfb.c,v 1.7.4.24 2005/08/13 21:07:03 jwrdegoede Exp $
-** $Log: glfb.c,v $
 ** Revision 1.7.4.24  2005/08/13 21:07:03  jwrdegoede
 ** Last needed 64 bit fixes for h5/h3, complete 64 bit support for cvg
 **

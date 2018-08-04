@@ -17,10 +17,6 @@
  ** 
  ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
  **
- **
- ** $Revision: 1.9.4.8 $ 
- ** $Date: 2005/08/13 21:07:03 $ 
- **
  */
 
 #include <assert.h>

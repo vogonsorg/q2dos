@@ -4,9 +4,6 @@
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
-# $Header: /cvsroot/glide/glide3x/cvg/glide3/src/Attic/Makefile.DJ,v 1.1.2.5 2005/11/29 22:03:39 dborca Exp $
-#
-
 
 #
 #  Available options:
@@ -37,7 +34,6 @@
 #	clean:		remove object files
 #	realclean:	remove all generated files
 #
-
 
 
 .PHONY: all glide3x clean realclean

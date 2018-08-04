@@ -16,11 +16,8 @@
  ** THE UNITED STATES.  
  ** 
  ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
- ** $Revision: 1.1.2.5 $ 
- ** $Date: 2005/06/09 18:32:37 $ 
  **
  */
-static char revString[] = "@#%$Workfile: INIT96.C $ $Revision: 1.1.2.5 $";
 
 /* ANSI Headers */
 #include <stdlib.h>
@@ -702,10 +699,7 @@ INITVG96ENTRY(init96MapBoard, FxBool , (void *rd, void *info, FxU16 vID, FxU16 d
     vendorID = vID,
     deviceID = dID;
   
-  GDBG_INFO((80, "SST-96 Initialization code %s\n", revString));
-  
-  /* Watcom warning suppression */
-  revString[0] = revString[0];
+  GDBG_INFO((80, "SST-96 Initialization code\n"));
 
   /* !!! FIXME hack for vxd bug */
   putenv( "SST_DUALHEAD=1" );

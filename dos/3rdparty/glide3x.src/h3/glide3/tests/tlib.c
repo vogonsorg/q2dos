@@ -1,10 +1,6 @@
 /*
 ** Insert new header here
 **
-**
-** $Revision: 1.1.8.4 $ 
-** $Date: 2004/10/05 14:39:56 $ 
-**
 */
 
 #include <ctype.h>

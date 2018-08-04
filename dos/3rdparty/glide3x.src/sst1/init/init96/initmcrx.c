@@ -17,12 +17,7 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-**
-** $Revision: 1.1.2.3 $ 
-** $Date: 2005/06/09 18:32:37 $ 
-**
 */
-static char revString[] = "@#%$Workfile: initmcrx.c $ $Revision: 1.1.2.3 $";
 
 #include <3dfx.h>
 
@@ -158,13 +153,13 @@ INITMCRXENTRY(initMCRXSetVideo, FxBool, (GrScreenResolution_t res, GrScreenRefre
 {
 #define FN_NAME "initMCRXSetVideo"
   FxBool rv = FXTRUE;
-#if /*defined(INIT_ACCESS_DIRECT) &&*/ defined(__DOS32__)
+#if defined(INIT_ACCESS_DIRECT) && defined(__DOS32__)
   union REGS r0, r1;
 #endif
   
   GDBG_INFO((80, "%s: \n", FN_NAME));
 
-#if /*defined(INIT_ACCESS_DIRECT) &&*/ defined(__DOS32__)
+#if defined(INIT_ACCESS_DIRECT) && defined(__DOS32__)
   switch( res ) {
   case GR_RESOLUTION_320x200:
     /* Set up VESA Mode 0x136 - 320x200x16 */
@@ -602,9 +597,6 @@ INITMCRXENTRY(initMCRXGetInfo,FxBool,(VG96Info *info))
 
   /* We care about bit 5 & 6 */
   mBytesPow = ((res >> 5) & 3);
-
-  /* Watcom warning suppression */
-  revString[0] = revString[0];
   
   info->vgaChip = 0;
   info->vg96Rev = 0;

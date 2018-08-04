@@ -17,7 +17,6 @@
  ** 
  ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
  **
- ** $Header: /cvsroot/glide/glide3x/h5/glide3/src/gdraw.c,v 1.3.4.17 2007/05/13 09:04:01 koolsmoky Exp $
  ** $Log:
  **  11   3dfx      1.5.1.2.1.1 10/11/00 Brent           Forced check in to enforce
  **       branching.

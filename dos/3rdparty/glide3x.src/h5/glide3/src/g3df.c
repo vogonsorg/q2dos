@@ -17,7 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/h5/glide3/src/g3df.c,v 1.3.4.12 2005/08/13 21:07:03 jwrdegoede Exp $
 ** $Log:
 **  3    3dfx      1.0.1.0.1.0 10/11/00 Brent           Forced check in to enforce
 **       branching.
@@ -133,9 +132,9 @@ static FxBool Read16Bit(FxU16 *dst, FILE *image, int small_lod, int large_lod, G
 static FxBool Read32Bit(FxU32 *dst, FILE *image, int small_lod, int large_lod, GrAspectRatio_t aspect);
 
 #if ((GLIDE_PLATFORM & (GLIDE_OS_DOS32 | GLIDE_OS_WIN32 | GLIDE_OS_MACOS)) != 0)
-const char *openmode = "rb";
+static const char *openmode = "rb";
 #else
-const char *openmode = "r";
+static const char *openmode = "r";
 #endif
 
 typedef struct

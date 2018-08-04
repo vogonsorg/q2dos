@@ -17,8 +17,6 @@
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 **
-** $Header: /cvsroot/glide/glide3x/cvg/glide3/src/diget.c,v 1.1.1.1.8.4 2004/10/04 09:13:33 dborca Exp $
-** $Log: diget.c,v $
 ** Revision 1.1.1.1.8.4  2004/10/04 09:13:33  dborca
 ** make sure SLI boards are correctly counted
 **
@@ -165,7 +163,7 @@
 
 #include "fxinline.h"
 
-const FxU32 _grMemOffset[16] = 
+static const FxU32 _grMemOffset[16] = 
 {
   35,                           /* 320x200 */
   40,                           /* 320x240 */
@@ -185,7 +183,7 @@ const FxU32 _grMemOffset[16] =
   70                            /* 400x300 */
 };
 
-const FxU32 _grResolutionRefresh[16][9] = 
+static const FxU32 _grResolutionRefresh[16][9] = 
 {
   {                             /* 320x200 */
     0,                          /* 60 Hz */

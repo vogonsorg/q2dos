@@ -5,9 +5,6 @@
 #  Email : dborca@users.sourceforge.net
 #  Web   : http://www.geocities.com/dborca
 #
-# $Header: /cvsroot/glide/glide3x/sst1/glide3/tests/Attic/Makefile.wat,v 1.1.2.1 2004/10/04 08:55:20 dborca Exp $
-#
-
 
 #
 #  Available options:

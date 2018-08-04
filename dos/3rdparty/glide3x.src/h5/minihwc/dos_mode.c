@@ -17,7 +17,6 @@
 **
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVE
 **
-** $Header: /cvsroot/glide/glide3x/h5/minihwc/dos_mode.c,v 1.3.4.12 2004/10/05 14:54:44 dborca Exp $
 ** $Log: 
 **  9    3dfx      1.4.1.2.1.0 10/11/00 Brent           Forced check in to enforce
 **       branching.

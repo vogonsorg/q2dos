@@ -16,9 +16,6 @@
 ;; 
 ;; COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
 ;;
-;; $Header: /cvsroot/glide/glide3x/h3/glide3/src/xdraw2.asm,v 1.1.1.1.8.1 2003/11/07 13:38:39 dborca Exp $
-;; $Revision: 1.1.1.1.8.1 $
-;; $Log: xdraw2.asm,v $
 ;; Revision 1.1.1.1.8.1  2003/11/07 13:38:39  dborca
 ;; unite the clans
 ;;
