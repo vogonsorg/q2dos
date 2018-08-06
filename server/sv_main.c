@@ -1227,7 +1227,7 @@ void SV_Init (void)
 	/* FS: Added these to filter out wallfly's spammy rcon status request every 30 seconds */
 	sv_filter_wallfly_rcon_request = Cvar_Get ("sv_filter_wallfly_rcon_request", "0", 0);
 	Cvar_SetDescription("sv_filter_wallfly_rcon_request", "Filter rcon requests from WallFly[BZZZ]/Tastyspleen linked servers.  If set, sv_filter_wallfly_ip is needed and DEVELOPER_MSG_SERVER will be required to see WallFly RCONs.");
-	sv_filter_wallfly_ip = Cvar_Get ("sv_filter_wallfly_ip", "74.86.102.74", 0);
+	sv_filter_wallfly_ip = Cvar_Get ("sv_filter_wallfly_ip", "23.227.170.221", 0);
 	Cvar_SetDescription("sv_filter_wallfly_ip", "WallFly/Tastyspleen IP for filtering rcon requests.  Requires sv_filter_wallfly_rcon_request CVAR to be enabled.");
 
 	sv_noreload = Cvar_Get ("sv_noreload", "0", 0);
