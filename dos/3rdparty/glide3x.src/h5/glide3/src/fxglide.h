@@ -279,7 +279,6 @@
 ** to complete the extension, I've added a "tbext" comment
 ** everywhere I made a modification. These should go away
 ** once the API is frozen.
-**  
 ** 
 ** 111   5/07/99 12:53p Dow
 ** My mods to Matts TexAddress fixes
@@ -486,10 +485,10 @@
 ** restoration.
 **
 */
-            
-/*                                               
+
+/*
 ** fxglide.h
-**  
+**
 ** Internal declarations for use inside Glide.
 **
 ** GLIDE_LIB:        Defined if building the Glide Library.  This macro
@@ -551,21 +550,10 @@
 #define HWC_BASE_ADDR_MASK 0x03UL
 #endif /* defined ( GLIDE_INIT_HAL ) */
 
-#include "fxsplash.h"
-
 #if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
 #define WIN32_LEANER_AND_MEANER
 #include <windows.h>
-#else
-FxBool FX_CALL fxSplashInit (FxU32 hWnd,
-                             FxU32 screenWidth, FxU32 screenHeight,
-                             FxU32 numColBuf, FxU32 numAuxBuf,
-                             GrColorFormat_t colorFormat);
-void FX_CALL fxSplashShutdown (void);
-void FX_CALL fxSplash (float x, float y, float w, float h, FxU32 frameNumber);
-const void * FX_CALL fxSplashPlug (FxU32* w, FxU32* h,
-                                   FxI32* strideInBytes,
-                                   GrLfbWriteMode_t* format);
+#include "fxsplash.h"
 #endif /* (GLIDE_PLATFORM & GLIDE_OS_WIN32) */
 
 /* -----------------------------------------------------------------------
@@ -1380,12 +1368,7 @@ void FX_CSTYLE _grDrawVertexList_SSE_Window(FxU32 pktype, FxU32 type, FxI32 mode
 void FX_CSTYLE _grDrawVertexList_SSE_Clip(FxU32 pktype, FxU32 type, FxI32 mode, FxI32 count, void *pointers);
 #endif /* GL_SSE */
 
-#ifdef __GNUC__
-/* Define this structure otherwise it assumes the structure only exists
-   within the function */
 struct GrGC_s;
-#endif	/* __GNUC__ */
-
 /* _GlideRoot.curTexProcs is an array of (possibly specialized)
  * function pointers indexed by texture format size (8/16 bits for
  * pre-Napalm, 4/8/16/32 for Napalm) and texture line width (1/2/4/>4).
@@ -2002,12 +1985,11 @@ typedef struct GrGC_s
     texSurface[GLIDE_NUM_TMU];  /* Current texture surface */
 #endif /* GLIDE_INIT_HWC */
 
+#if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
   /* Splash screen/shameless plug crap */
   struct {
-#if (GLIDE_PLATFORM & GLIDE_OS_WIN32)
     HMODULE
       moduleHandle;
-#endif /* (GLIDE_PLATFORM & GLIDE_OS_WIN32) */
     GrSplashInitProc
       initProc;
     GrSplashShutdownProc
@@ -2017,6 +1999,7 @@ typedef struct GrGC_s
     GrSplashPlugProc
       plugProc;
   } pluginInfo;
+#endif /* (GLIDE_PLATFORM & GLIDE_OS_WIN32) */
 } GrGC;
 
 
@@ -2216,8 +2199,7 @@ p6Fence(void);
    type FX_CSTYLE name args
 
 #define GR_ENTRY(name, type, args) \
-   type FX_CSTYLE name args
-   //FX_EXPORT type FX_CSTYLE name args
+   FX_EXPORT type FX_CSTYLE name args
 
 #define GR_FAST_ENTRY(name, type, args) \
    __declspec naked FX_EXPORT type FX_CSTYLE name args
@@ -2330,16 +2312,15 @@ _trisetup_noclip_valid(const void *va, const void *vb, const void *vc );
 
 #define TRISETUP_RGB(__cullMode)   TRISETUP_NORGB(__cullMode)
 #define TRISETUP_ARGB(__cullMode)  TRISETUP_NORGB(__cullMode)
-#if defined( __MSC__ ) 
-#if (_MSC_VER < 1200)
-// TRISETUP Macro for pre-msvc 6.0
+
+#if defined(_MSC_VER)
+#if (_MSC_VER < 1200) /* TRISETUP Macro for pre-msvc 6.0 */
 #define TRISETUP \
   __asm { mov edx, gc }; \
   (*gc->triSetupProc)
-#else  // _MSC_VER
-// TRISETUP Macro for msvc 6 or later 
+#else  /* TRISETUP Macro for msvc 6 or later */
 #if defined(GLIDE_DEBUG) || GLIDE_USE_C_TRISETUP
-// MSVC6 Debug does funny stuff, so push our parms inline
+/* MSVC6 Debug does funny stuff, so push our parms inline */
 #define TRISETUP(_a, _b, _c) \
   __asm { \
     __asm mov  edx, gc \
@@ -2351,20 +2332,22 @@ _trisetup_noclip_valid(const void *va, const void *vb, const void *vc );
     __asm push ecx \
   } \
   ((FxI32 (*)(void))*gc->triSetupProc)()
-#else // GLIDE_DEBUG
-// MSVC6 Retail does funny stuff too, but Larry figured it out:
+#else /* MSVC6 Retail does funny stuff too, but Larry figured it out: */
 #define TRISETUP(_a, _b, _c) \
   __asm { mov edx, gc }; \
   ((FxI32 (*)(const void *va, const void *vb, const void *vc, GrGC *gc))*gc->triSetupProc)(_a, _b, _c, gc)
-#endif // GLIDE_DEBUG
-#endif // _MSC_VER
+#endif
+#endif /* _MSC_VER */
+
 #elif defined(__POWERPC__)
 #define TRISETUP(_a, _b, _c) \
   ((FxI32 (*)(const void *va, const void *vb, const void *vc, GrGC *gc))*gc->triSetupProc)(_a, _b, _c, gc)
-#elif (GLIDE_PLATFORM & GLIDE_OS_UNIX) || defined(__DJGPP__)
+
+#elif ((GLIDE_PLATFORM & GLIDE_OS_UNIX) && (defined(__i386__)||defined(__x86_64__))) || defined(__DJGPP__)
 #define TRISETUP \
   __asm(""::"d"(gc)); \
   (*gc->triSetupProc)
+
 #elif defined(__WATCOMC__)
 extern void wat_trisetup (void *gc, const void *a, const void *b, const void *c);
 #pragma aux wat_trisetup = \
@@ -2377,10 +2360,12 @@ extern void wat_trisetup (void *gc, const void *a, const void *b, const void *c)
            wat_trisetup(gc, _a, _b, _c); \
            ((FxI32 (*)(void))*gc->triSetupProc)(); \
         } while (0)
+
 #else
 #define TRISETUP \
   (*gc->triSetupProc)
 #endif
+
 void GR_CDECL
 _grValidateState();
 
@@ -2747,6 +2732,9 @@ _grSstVRetraceOn(void);
 
 #if USE_STANDARD_TLS_FUNC
 
+#ifdef __GNUC__
+extern
+#endif
 __inline FxU32
 getThreadValueFast() {
   /* According to Microsoft, TlsGetValue is implemented with speed as the

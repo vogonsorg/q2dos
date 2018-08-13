@@ -118,8 +118,8 @@
 ** VOODOO_PATH                 path    Path used to locate "voodoo.ini" file
 **
 */
-
-#ifndef __GNUC__
+#undef FX_DLL_ENABLE /* so that we don't dllexport the symbols */
+#ifdef _MSC_VER
 #pragma optimize ("",off)
 #endif
 #include <stdio.h>
@@ -900,6 +900,6 @@ sst1InitCachingOn(void)
 
 } /* sst1InitSetCacheType */
 
-#ifndef __GNUC__
+#ifdef _MSC_VER
 #pragma optimize ("",on)
 #endif

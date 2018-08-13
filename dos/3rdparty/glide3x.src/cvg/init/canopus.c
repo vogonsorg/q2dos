@@ -22,7 +22,7 @@
 **
 */
 
-#ifdef __WIN32__
+#ifdef _MSC_VER
 #pragma optimize ("",off)
 #endif
 #include <stdio.h>
@@ -69,7 +69,7 @@ sst1InitComputeClkParamsATT_Int(FFLOAT dwFreq, sst1ClkTimingStruct *clkTiming)
   FxU32   lError, lActual;
   FxU32   lBestErr, lBestFreq;
 
-  // first check range of Frequ                                                   
+  // first check range of Frequ
   if ((dwFreq < 15000000) || (dwFreq > 240000000)) return FXFALSE;
 
   // get the best P divider for the given Frequency 
@@ -91,12 +91,12 @@ sst1InitComputeClkParamsATT_Int(FFLOAT dwFreq, sst1ClkTimingStruct *clkTiming)
   lBestErr = 99999999;
   sNBest = 0;
   sMBest = 0;
-  lRatio = (unsigned int)((dwFreq*10l)/(FI/100l)) * lPDiv; // lRatio in [1/1000]
+  lRatio = (FxU32)((dwFreq*10l)/(FI/100l)) * lPDiv; // lRatio in [1/1000]
   for ( sN= (NMID-NDELTA); sN <= (NMID+NDELTA); sN++ ) {
     sM = (unsigned short)((lRatio * sN + 500) / 1000l);
     if (sM > MMAX) sM = MMAX;
     
-    lActual = (unsigned int)((FI * sM) / (sN * lPDiv));
+    lActual = (FxU32)((FI * sM) / (sN * lPDiv));
     lError = (lActual > dwFreq) ? (lActual - dwFreq) : (dwFreq - lActual);
     if ( lError < lBestErr ) {
       sNBest    = sN;
@@ -109,7 +109,7 @@ sst1InitComputeClkParamsATT_Int(FFLOAT dwFreq, sst1ClkTimingStruct *clkTiming)
     sM++;
     if (sM > MMAX) sM = MMAX;
 
-    lActual = (unsigned int)((FI * sM) / (sN * lPDiv));
+    lActual = (FxU32)((FI * sM) / (sN * lPDiv));
     lError = (lActual > dwFreq) ? (lActual - dwFreq) : (dwFreq - lActual);
     if ( lError < lBestErr) {
       sNBest    = sN;
@@ -176,6 +176,6 @@ sst1SetGrxClk_Canopus(FxU32* sstbase, FFLOAT grxclk)
   return(RetVal);
 }
 
-#ifdef __WIN32__
+#ifdef _MSC_VER
 #pragma optimize ("",on)
 #endif

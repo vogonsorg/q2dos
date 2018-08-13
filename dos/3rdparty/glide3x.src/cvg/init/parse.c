@@ -20,7 +20,8 @@
 ** Parsing code for grabbing information from "voodoo2.ini" initialization file
 **
 */
-#ifdef __WIN32__
+#undef FX_DLL_ENABLE /* so that we don't dllexport the symbols */
+#ifdef _MSC_VER
 #pragma optimize ("",off)
 #endif
 #include <stdio.h>
@@ -1023,6 +1024,7 @@ static void sst1InitToLower(char *string)
 }
 
 #if __WIN32__
+static
 FxBool GetRegistryKey(HKEY hKey, const char* keyName, 
                       char* regValBuf, FxU32 bufSize)
 {
@@ -1036,7 +1038,7 @@ FxBool GetRegistryKey(HKEY hKey, const char* keyName,
     case REG_DWORD:
     {
       DWORD dValue = *(DWORD*)regValBuf;
-      sprintf(regValBuf, "%d", dValue);
+      sprintf(regValBuf, "%lu", dValue);
     }
     /* Fall through */
 
@@ -1160,6 +1162,6 @@ FX_ENTRY char* FX_CALL sst1InitGetenv(char *string)
 }
 #endif  /* INIT_DOS */
 
-#ifdef __WIN32__
+#ifdef _MSC_VER
 #pragma optimize ("",on)
 #endif

@@ -10,7 +10,7 @@
 #  Available options:
 #
 #    Environment variables:
-#	FX_GLIDE_HW	build for the given ASIC (sst1, sst96).
+#	FX_GLIDE_HW	build for the given ASIC (either sst1, or sst96).
 #			default = sst1
 #	OPTFLAGS	pass given optimization flags to compiler
 #			default = -ox -5s (Pentium, stack)
@@ -79,6 +79,9 @@ CDEFS += -DSST96_FIFO
 #CDEFS += -DINIT96VGASWAP
 CDEFS += -DINIT_ACCESS_DIRECT
 CDEFS += -DGLIDE_USE_ALT_REGMAP
+GLIDE_LIBDIR = ../../lib/sst96
+else
+$(error Invalid FX_GLIDE_HW setting)
 endif
 endif
 
@@ -152,7 +155,7 @@ GLIDE_OBJECTS = \
 
 ifeq ($(USE_X86),1)
 GLIDE_OBJECTS += \
-	cpuid.o
+	cpuid.obj
 ifeq ($(FX_GLIDE_HW),sst1)
 GLIDE_OBJECTS += \
 	xdraw.obj

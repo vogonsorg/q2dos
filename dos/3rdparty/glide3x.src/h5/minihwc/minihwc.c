@@ -732,15 +732,7 @@
 ** WinGlide
 ** 
 ** 1     3/04/98 4:13p Dow
-**
 */
-
-#if !defined(GDBG_INFO_ON) || (GDBG_INFO_ON == 0)
-#if defined(GDBG_INFO_ON)
-#undef GDBG_INFO_ON
-#endif /* defined(GDBG_INFO_ON) */
-#define GDBG_INFO_ON
-#endif /* !defined(GDBG_INFO_ON) || (GDBG_INFO_ON == 0) */
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -873,11 +865,28 @@ typedef struct sli_aa_request {
 #define _aligned_free free
 /* don't like macros, because of side-effects */
 #ifndef __WATCOMC__
-static __inline int min (int x, int y)
-{
+static __inline int min(int x, int y) {
  return (x > y) ? y : x;
 }
 #endif
+#endif
+
+#if defined(__MINGW32__) || (defined(_MSC_VER) && (_MSC_VER < 1300))
+/* code here only uses 8 byte alignment */
+#define _aligned_malloc(a,b) _aligned_malloc8(a)
+#define _aligned_free _aligned_free8
+static void *_aligned_malloc8(size_t sz) {
+    const size_t align = 7;
+    void *got, **ret;
+    if (!(got = malloc(sizeof(void*) + align + sz))) return NULL;
+    ret = (void **) (((long)got + sizeof(void*) + align) & ~align);
+    ret[-1] = got;
+    return ret;
+}
+static void _aligned_free8(void *ptr) {
+    if (!ptr) return;
+    free (((void**)ptr) [-1]);
+}
 #endif
 
 #ifdef __GNUC__
@@ -998,31 +1007,24 @@ static _p_info *CPUInfo = NULL;
 static char errorString[MAX_ERROR_SIZE];
 static FxU32 __attribute_used fenceVar;
 
-FxU32 hwc_errncpy(char *dst,const char *src);
-
+#if (GLIDE_PLATFORM & GLIDE_OS_WIN32)||(GLIDE_PLATFORM & GLIDE_OS_MACOS)
 /* like strncpy, for the error string except it always null terminates */
-FxU32 hwc_errncpy(char *dst,const char *src)
+static void hwc_errncpy(char *dst,const char *src)
 {
-   FxU32 i,size=MAX_ERROR_SIZE;
-
-   if (size==0)
-      return 0;
-
-   for(i=0;i<size;i++)
+   int i=0;
+   for(;i<MAX_ERROR_SIZE;i++)
    {
       *dst++=*src++;
       if (src[-1]==0)
-         return i;
+         return;
    }
    dst[-1]=0;
-
-   return (i-1);
 }
+#endif
 
-#if defined(__WATCOMC__)
 /*
  *  P6 Fence
- * 
+ *
  *  Here's the stuff to do P6 Fencing.  This is required for the
  *  certain things on the P6
  *
@@ -1030,13 +1032,11 @@ FxU32 hwc_errncpy(char *dst,const char *src)
  * This was yoinked from sst1/include/sst1init.h, and should be
  * merged back into something if we decide that we need it later.
  */
-void 
-p6Fence(void);
+#if defined(__WATCOMC__)
+void p6Fence(void);
 #pragma aux p6Fence = \
-"xchg eax, fenceVar" \
-modify [eax];
-
-
+ "xchg eax, fenceVar" \
+ modify [eax];
 #define P6FENCE p6Fence()
 #elif defined(__MSC__)
 #define P6FENCE {_asm xchg eax, fenceVar}
@@ -1104,17 +1104,16 @@ initSlave(hwcBoardInfo *bInfo, FxU32 chipNum);
 //static hwcBoardInfo *curBI = NULL;
 
 #ifdef HWC_EXT_INIT
-//#ifndef HMONITOR_DECLARED // AJB- Make def compatible w/ vc6 headers
-//typedef void *HMONITOR;
-//#define HMONITOR_DECLARED
-//#endif
+#if (WINVER < 0x0500) && !defined(HMONITOR_DECLARED) /* <--- HACK */
+DECLARE_HANDLE(HMONITOR);
+#define HMONITOR_DECLARED
+#endif
 typedef BOOL (CALLBACK* MONITORENUMPROC)(HMONITOR, HDC, LPRECT, LPARAM);
-typedef WINUSERAPI BOOL WINAPI
-EnumDisplayMonitors_func( HDC             hdc,
+typedef BOOL (WINAPI *EnumDisplayMonitors_func)
+                        ( HDC             hdc,
                           LPCRECT         lprcClip,
                           MONITORENUMPROC lpfnEnum,
                           LPARAM          dwData);
-
 
 typedef struct {
   HDC dc;
@@ -1373,35 +1372,34 @@ hwcInit(FxU32 vID, FxU32 dID)
   DevEnumRec
     data[HWC_MAX_BOARDS*2];
   int monitor;
-  
+
   GDBG_INFO(80, "%s\n", FN_NAME);
   errorString[0] = '\0';
-  
+
   /* find glide compatible devices */
   GDBG_INFO(80, "%s:  Finding Glide compatible devices\n", FN_NAME);
   {
     /* Grab the DC of the Desktop. */
     HDC hdc = GetDC(NULL);
     HMODULE user32 = GetModuleHandle( "user32" );
-    
+
     for (monitor = 0; monitor < HWC_MAX_BOARDS; monitor++) {
       data[monitor].dc  = NULL;
       data[monitor].mon = NULL;
       data[monitor].devName[0] = '\0';
     }
     num_monitor = 0;
-    
+
     if ( user32 ) {
-      EnumDisplayMonitors_func*
-        enumDisplayMonitors = (void*)GetProcAddress( user32, "EnumDisplayMonitors" );
-      
+      EnumDisplayMonitors_func enumDisplayMonitors =
+        (EnumDisplayMonitors_func)GetProcAddress( user32, "EnumDisplayMonitors" );
+
       if ( enumDisplayMonitors ) { 
-        /*HWND
-          curWindow = GetActiveWindow();*/
-        
+        /*HWND curWindow = GetActiveWindow();*/
+
         GDBG_INFO(80, "%s:  multi-monitor capable OS ( NT5/W98 )\n", FN_NAME);
         enumDisplayMonitors( hdc, 0, monitorEnum, (LPARAM)data );
-        
+
         /*
         ** use the active window display (if there is one yet
         ** associated w/ the current thread) as sst 0 
@@ -1409,7 +1407,7 @@ hwcInit(FxU32 vID, FxU32 dID)
         /* removed because this really does nothing
         if (curWindow != NULL) {
           HDC curWindowDC = GetDC(curWindow);
-          
+
           if (curWindowDC != NULL) {
             enumDisplayMonitors( curWindowDC, 0, displayMonitor, (LPARAM)data );
             ReleaseDC(curWindow, curWindowDC);
@@ -1419,10 +1417,10 @@ hwcInit(FxU32 vID, FxU32 dID)
         monitorEnum(NULL, hdc, NULL, (LPARAM)&data);
       }
     }
-    
+
     ReleaseDC(NULL, hdc);
   }
-  
+
   if (num_monitor == 0) {
     GDBG_INFO(80, "%s: 3Dfx device not found!\n", FN_NAME);
     sprintf(errorString, "%s: 3Dfx device not found!\n", FN_NAME);
@@ -2864,7 +2862,7 @@ hwcGetSurfaceInfo(const hwcBoardInfo* bInfo,
   retVal = (ddErr == DD_OK);
   if (!retVal) {
     sprintf(errorString, "%s: IDirectDrawSurface2_Lock (0x%X)\n", 
-            FN_NAME, ddErr);
+            FN_NAME,(unsigned)ddErr);
     GDBG_INFO(80, "%s", errorString);
     goto __errExit;
   }
@@ -2892,7 +2890,7 @@ hwcGetSurfaceInfo(const hwcBoardInfo* bInfo,
   retVal = (ret->bitdepth != 0x00UL);
   if (!retVal) {
     sprintf(errorString, "%s: Invalid surface pixel format (0x%X)\n", 
-            FN_NAME, desc.ddpfPixelFormat.dwFlags);
+            FN_NAME, (unsigned)desc.ddpfPixelFormat.dwFlags);
     GDBG_INFO(80, "%s", errorString);
     goto __errExit;    
   }
@@ -5819,7 +5817,7 @@ void hwcSLIReadDisable(hwcBoardInfo *bInfo)
 }
 #endif
 
-char *
+const char *
 hwcGetErrorString()
 {
 #define FN_NAME "hwcGetErrorString"
@@ -6479,7 +6477,9 @@ static void hwcReadRegion1555(hwcBoardInfo *bInfo, FxU32 src, FxU32 src_x, FxU32
     }
 }
 
+#ifdef _MSC_VER
 //#pragma optimize("g", off)
+#endif
 static void hwcReadRegion8888(hwcBoardInfo *bInfo, FxU32 src, FxU32 src_x, FxU32 src_y, FxU32 src_width, FxU32 src_height, FxU32 strideInBytes, FxU16 *dst, FxU32 renderMask, FxU32 compareMask)
 {
   FxU32 end_x, end_y;
@@ -7366,7 +7366,7 @@ static void hwcCopyBuffer8888FlippedDithered(hwcBoardInfo *bInfo, FxU16 *source,
 
         /* Clamp to max */
 	/* c = min(c,val_max) */
-	pMinSW		mm0,	mm3
+	_asm _emit 0x0f _asm _emit 0xea  _asm _emit 0xc3	/* pMinSW mm0,mm3 */
 
 	/* Find error */
 	/* er = c & dither_mask; */
@@ -8580,6 +8580,7 @@ FxBool
 hwcResolutionSupported(hwcBoardInfo *bInfo, GrScreenResolution_t res, GrScreenRefresh_t ref)
 {
 #define FN_NAME "hwcResolutionSupported"
+#if GDBG_INFO_ON
   static char *resNames[] = {
     "GR_RESOLUTION_320x200",
     "GR_RESOLUTION_320x240",
@@ -8606,7 +8607,7 @@ hwcResolutionSupported(hwcBoardInfo *bInfo, GrScreenResolution_t res, GrScreenRe
     "GR_RESOLUTION_2048x1536",
     "GR_RESOLUTION_2048x2048"
   };
-
+#endif
 #if 0
   struct WidthHeight_s {
     FxU32 width; 
@@ -8637,8 +8638,8 @@ hwcResolutionSupported(hwcBoardInfo *bInfo, GrScreenResolution_t res, GrScreenRe
     {2048, 1536},               /* GR_RESOLUTION_2048x1536 */
     {2048, 2048}                /* GR_RESOLUTION_2048x2048 */
   };
-#endif  
-
+#endif
+#if GDBG_INFO_ON
   static char *refresh[] = {
     "GR_REFRESH_60Hz",
     "GR_REFRESH_70Hz",
@@ -8648,15 +8649,16 @@ hwcResolutionSupported(hwcBoardInfo *bInfo, GrScreenResolution_t res, GrScreenRe
     "GR_REFRESH_90Hz",
     "GR_REFRESH_100Hz",
     "GR_REFRESH_85Hz",
-    "GR_REFRESH_120Hz"    
+    "GR_REFRESH_120Hz"
   };
+#endif
 
-
+#if GDBG_INFO_ON
   GDBG_INFO(80, FN_NAME ":  res == %s (0x%x) ref == %s, supported == %s\n",
             resNames[res], resolutionSupported[bInfo->boardNum][res][ref], refresh[ref],
             resolutionSupported[bInfo->boardNum][res][ref] ? "FXTRUE" : "FXFALSE");
+#endif
   
-
   /* Glide has very good checking to see if the memory required is
   available, so we'll just return whether the driver can do it. */
   return resolutionSupported[bInfo->boardNum][res][ref];
@@ -8679,7 +8681,7 @@ hwcGetenv(const char *a)
   static char strval[255];
 
   /* favor system env vars over reg settings */
-  if (retVal = getenv(a))
+  if ((retVal = getenv(a)) != NULL)
     return retVal;
   
   szData = sizeof(strval);

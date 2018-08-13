@@ -20,7 +20,10 @@
 ** Utility routines for SST-1 Initialization code
 **
 */
-#ifdef __WIN32__
+
+#undef FX_DLL_ENABLE /* so that we don't dllexport the symbols */
+
+#ifdef _MSC_VER
 #pragma optimize ("",off)
 #endif
 #include <stdio.h>
@@ -474,7 +477,7 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitResetTmus(FxU32 *sstbase)
 
    // Fix problem where first Texture downloads to TMU weren't being
    //  received properly
-   ISET(*(int *) (0xf00000 + (long) sstbase), 0xdeadbeef);
+   ISET(*(FxI32 *) (0xf00000 + (long) sstbase), 0xdeadbeef);
    sst1InitIdle(sstbase);
 
    return(FXTRUE);
@@ -1177,6 +1180,6 @@ void sst1InitDrawRectUsingTris(FxU32 *sstbase, FxU32 x, FxU32 y, FxU32 tSize)
    ISET(sst->triangleCMD, 0xFFFFFFFF);
 }
 
-#ifdef __WIN32__
+#ifdef _MSC_VER
 #pragma optimize ("",on)
 #endif

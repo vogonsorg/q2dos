@@ -109,8 +109,13 @@ static char *bufTypeNames[] = {
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
-#include <windows.h> 
-#include <ddraw.h> 
+#include <windows.h>
+
+#if (WINVER < 0x0500) && !defined(HMONITOR_DECLARED) /* <--- HACK */
+DECLARE_HANDLE(HMONITOR);
+#define HMONITOR_DECLARED
+#endif
+#include <ddraw.h>
 
 #define NUM_BUFS 6
 
@@ -249,22 +254,18 @@ _dxDDrawToGlideDesc(hwcBufferDesc *pDesc)
 } /* _dxDDrawToGlideDesc */
 
 
-/* XXXTACOHACK -- The required header file isn't shipping yet - decls will be removed at some 
-   future time */
-typedef void *HMONITOR;
-typedef BOOL (FAR PASCAL * LPDDENUMCALLBACKEXA)(GUID FAR *, LPSTR, LPSTR, LPVOID, HMONITOR); 
-extern HRESULT WINAPI DirectDrawEnumerateExA( LPDDENUMCALLBACKEXA lpCallback, 
-                                              LPVOID lpContext, DWORD dwFlags); 
-typedef HRESULT (WINAPI * LPDIRECTDRAWENUMERATEEXA)( LPDDENUMCALLBACKEXA lpCallback, 
-                                                     LPVOID lpContext, 
-                                                     DWORD dwFlags); 
-#define DDENUM_ATTACHEDSECONDARYDEVICES     0x00000001L 
-/* XXXTACOHACK -- The required header file isn't shipping yet - decls will be removed at some 
-   future time */
+#ifndef IDirectDraw7_CreateSurface /* ddraw.h not from dx7 sdk */
+typedef BOOL (FAR PASCAL * LPDDENUMCALLBACKEXA)(GUID FAR *, LPSTR, LPSTR, LPVOID, HMONITOR);
+typedef HRESULT (WINAPI * LPDIRECTDRAWENUMERATEEXA)(LPDDENUMCALLBACKEXA, LPVOID, DWORD);
+#ifndef DDENUM_ATTACHEDSECONDARYDEVICES
+#define DDENUM_ATTACHEDSECONDARYDEVICES 0x00000001L
+#endif
+#endif
 
 static GUID fooGuid;
 
-BOOL FAR PASCAL ddEnumCbEx( GUID FAR *guid, LPSTR desc, LPSTR name, LPVOID ctx, HMONITOR hmon ) {
+static BOOL FAR PASCAL
+ddEnumCbEx( GUID FAR *guid, LPSTR desc, LPSTR name, LPVOID ctx, HMONITOR hmon ) {
     DWORD    *data  = (DWORD*)ctx;
     HMONITOR target = (HMONITOR)data[0];
     BOOL     rv     = DDENUMRET_OK;
@@ -296,7 +297,7 @@ _dxAllocSurfaces(int xRes, int yRes, int vRefresh, hwcBufferDesc *pDesc, void *h
       
       if ( ddraw ) {
           LPDIRECTDRAWENUMERATEEXA ddEnumEx;
-          ddEnumEx = (void*)GetProcAddress( ddraw, "DirectDrawEnumerateExA" );
+          ddEnumEx = (LPDIRECTDRAWENUMERATEEXA)GetProcAddress( ddraw, "DirectDrawEnumerateExA" );
           if ( ddEnumEx ) {
               DWORD   data[2];
               data[0] = (DWORD)hmon;
@@ -772,7 +773,7 @@ dxControl(FxU32 code, hwcBufferDesc *pBufDesc, int *width, int *height)
 } /* dxControl */
 
 FxBool
-dxClose()
+dxClose(void)
 {
   GDBG_INFO(80, "dxClose:\n");
 /*
@@ -1037,5 +1038,3 @@ dxSwap(FxU32 code)
 {
 } /* dxSwap */
 #endif  /* __DOS32__ || (defined(__WIN32__)  && !defined(HWC_ACCESS_DDRAW) */
-
-

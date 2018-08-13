@@ -108,9 +108,9 @@ static FxU32                FifoOffset  = 0;
 static FxU32                Width       = 0; 
 static FxU32                Height      = 0;
 static FxBool               IsFullScreen = 0;
-static InitBufDesc_t        BufDesc[NUM_BUFS]  = {0};
+static InitBufDesc_t        BufDesc[NUM_BUFS]  = { {0} };
 #ifdef H3D
-static int                                      pageFlip        = 0;
+static int                  pageFlip    = 0;
 #endif
 
 /* Direct Draw stuff */
@@ -746,7 +746,7 @@ dxControl(FxU32 code, InitBufDesc_t *pBufDesc, int *width, int *height)
 } /* dxControl */
 
 FxBool
-dxClose()
+dxClose(void)
 {
   GDBG_INFO((80, "dxClose:\n"));
 
@@ -1002,7 +1002,7 @@ dxControl(FxU32 code, InitBufDesc_t *pBufDesc, int *width, int *height)
   return FXTRUE;
 } /* dxControl */
 FxBool
-dxClose()
+dxClose(void)
 {
 #define FN_NAME "dxClose"
   GDBG_INFO((80, "%s:  Setting up VESA mode 640*480*\n", FN_NAME));

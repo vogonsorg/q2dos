@@ -20,7 +20,8 @@
 ** Initialization code for initializing SST-1 video unit
 **
 */
-#ifndef __GNUC__
+#undef FX_DLL_ENABLE /* so that we don't dllexport the symbols */
+#ifdef _MSC_VER
 #pragma optimize ("",off)
 #endif
 #include <stdio.h>
@@ -57,7 +58,9 @@ FX_EXPORT FxBool FX_CSTYLE sst1InitVideo(FxU32 *sstbase,
     FxU32 vInClkDel, vOutClkDel;
     FxU32 tf0_clk_del, tf1_clk_del, tf2_clk_del;
     FxU32 ft_clk_del;
+#ifndef DIRECTX
     float vidClkFreq;
+#endif
 
     if(!sst)
         return(FXFALSE);
@@ -1110,6 +1113,6 @@ FX_ENTRY FxBool FX_CALL sst1InitSetTripleBuffering(FxU32 *sstbase,
     return(FXTRUE);
 }
 
-#ifndef __GNUC__
+#ifdef _MSC_VER
 #pragma optimize ("",on)
 #endif

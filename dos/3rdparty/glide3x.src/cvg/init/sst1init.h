@@ -74,7 +74,9 @@
 
 #else /* DIRECTX */
 #include "ddglobal.h"
+#ifdef _MSC_VER
 #pragma optimize ("",off)   /* ddglobal.h tuns this on for retail builds */
+#endif
 #undef INIT_PRINTF
 #undef INIT_INFO
 #undef GETENV
@@ -88,7 +90,7 @@
 #ifdef FXTRACE
   #define INIT_PRINTF DDPRINTF
 #else
-  #define INIT_PRINTF 1 ? (void) 0 : (void)
+  #define INIT_PRINTF(a) (void)0
 #endif
 #define INIT_INFO(A)
 /* #define GETENV(A)  ddgetenv(A) */
@@ -147,7 +149,7 @@ p6Fence(void);
 # define P6FENCE asm volatile("mb" ::: "memory");
 #else
 #  error "P6 Fencing in-line assembler code needs to be added for this compiler"
-#endif  
+#endif
 
 #ifdef __cplusplus
 }

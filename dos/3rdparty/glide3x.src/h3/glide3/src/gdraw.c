@@ -185,9 +185,8 @@
  * 77    11/15/97 7:43p Peter
  * more comdex silliness
  * 
- **
  */
- 
+
 #if SET_BSWAP
 #define SLOW_SETF 1
 #endif
@@ -225,9 +224,18 @@ GR_ENTRY(grDrawPoint, void, (const void *p))
   GR_BEGIN_NOFIFOCHECK(FN_NAME, 90);
   GDBG_INFO_MORE(gc->myLevel, "(p = 0x%x)\n", p);
 
-  (gc->state.grEnableArgs.primitive_smooth_mode & GR_AA_ORDERED_POINTS_MASK
-   ? _grAADrawPoints
-   : _grDrawPoints)(GR_VTX_PTR_ARRAY, 1, (void *)&p);
+#ifdef __GNUC__
+  if (gc->state.grEnableArgs.primitive_smooth_mode & GR_AA_ORDERED_POINTS_MASK)
+	  _grAADrawPoints(GR_VTX_PTR_ARRAY, 1, (void *)&p);
+  else
+	  _grDrawPoints(GR_VTX_PTR_ARRAY, 1, (void *)&p);
+#else
+  if (gc->state.grEnableArgs.primitive_smooth_mode & GR_AA_ORDERED_POINTS_MASK)
+	  _grAADrawPoints(GR_VTX_PTR_ARRAY, 1, &(void *)p);
+  else
+	  _grDrawPoints(GR_VTX_PTR_ARRAY, 1, &(void *)p);
+#endif
+
 #undef FN_NAME
 } /* grDrawPoint */
 
@@ -258,10 +266,12 @@ GR_ENTRY(grDrawPoint, void, (const void *p))
 GR_ENTRY(grDrawLine, void, (const void *a, const void *b))
 {
 #define FN_NAME "grDrawLine"
-  const void *vertices[2] = {a, b};
+  void *vertices[2]; /**** FIXME: this needs to be const! ****/
 
   GR_BEGIN_NOFIFOCHECK(FN_NAME, 91);
   GDBG_INFO_MORE(gc->myLevel, "(a = 0x%x, b = 0x%x)\n", a, b);
+
+  vertices[0] = (void *)a; vertices[1] = (void *)b; /* FIXME! */
 
   if (gc->state.grEnableArgs.primitive_smooth_mode & GR_AA_ORDERED_LINES_MASK)
     _grAADrawLineStrip(GR_VTX_PTR_ARRAY, GR_LINES, 2, vertices);
@@ -273,11 +283,10 @@ GR_ENTRY(grDrawLine, void, (const void *a, const void *b))
 /*---------------------------------------------------------------------------
  ** grDrawTriangle
  */
-#if !defined(GLIDE_DEBUG) && !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !(GLIDE_PLATFORM & GLIDE_OS_DOS32)
-#if !(GLIDE_USE_C_TRISETUP)
+#ifndef HAVE_XDRAWTRI_ASM	/* grDrawTriangle() not in asm */
+#if defined(_MSC_VER) && !defined(GLIDE_DEBUG) && !(GLIDE_USE_C_TRISETUP)
 __declspec( naked )
 #endif
-#endif	/* !defined(GLIDE_DEBUG) && !(GLIDE_PLATFORM & GLIDE_OS_UNIX) && !(GLIDE_PLATFORM & GLIDE_OS_DOS32) */
 GR_ENTRY(grDrawTriangle, void, (const void *a, const void *b, const void *c))
 {
 #define FN_NAME "grDrawTriangle"
@@ -288,28 +297,27 @@ GR_ENTRY(grDrawTriangle, void, (const void *a, const void *b, const void *c))
   {
     GR_BEGIN_NOFIFOCHECK("grDrawTriangle",92);
     GDBG_INFO_MORE(gc->myLevel,"(0x%x,0x%x,0x%x)\n",a,b,c);
-
-    TRISETUP(a, b, c );
-    
-#if GLIDE_DEBUG 
+    TRISETUP(a, b, c);
+#if GLIDE_DEBUG
     /* HackAlert: Nuke the fifo ptr checking stuff here if we're just
-     * debugging teh asm tri code.
-     */    
+     * debugging the asm tri code.
+     */
     gc->checkPtr = (FxU32)gc->cmdTransportInfo.fifoPtr;
     gc->checkCounter = 0;
-#endif /* GLIDE_DEBUG */   
+#endif /* GLIDE_DEBUG */
     GR_END();
   }
-#elif defined(__MSC__)
+
+#elif defined(_MSC_VER)
   {
-    _asm {
-      mov eax, DWORD PTR fs:[WNT_TEB_PTR] ;
+    __asm {
+      mov eax, DWORD PTR fs:[WNT_TEB_PTR];
       add eax, DWORD PTR _GlideRoot.tlsOffset;
       mov edx, [eax];
       test edx, edx;
       je   lostContext;
       mov eax, [edx + kLostContextOffset];
-      test eax, eax
+      test eax, eax;
       je   lostContext;
       mov eax, [eax];
       test eax, 1;
@@ -319,17 +327,20 @@ GR_ENTRY(grDrawTriangle, void, (const void *a, const void *b, const void *c))
     }
     lostContext: ; /* <-- my, that's odd, but MSVC was insistent  */
   }
+
 #elif defined( __linux__ ) || defined(__FreeBSD__) || (GLIDE_PLATFORM & GLIDE_OS_DOS32)
   {
     GR_BEGIN_NOFIFOCHECK("grDrawTriangle",92);
     TRISETUP(a, b, c);
     GR_END();
   }
+
 #else
 #error "Write triangle proc dispatch for this compiler"
 #endif /* Triangle proc dispatch routine */
 #undef FN_NAME
 } /* grDrawTriangle */
+#endif /* HAVE_XDRAWTRI_ASM */
 
 
 #define DA_BEGIN \
@@ -441,14 +452,14 @@ _grDrawPoints(FxI32 mode, FxI32 count, void *pointers)
         {
           FxU32 x, y;
           FxU32 dataElem;
-          
+
           DA_CONT(kSetupStrip | kSetupCullDisable, 0x00,
                   0x02, sizeof(FxU32) << 1, SSTCP_PKT3_BDDDDD);
 
           /* Convert to 32-bit representation */
           gc->pool.temp1.f = FARRAY(vPtr, gc->state.vData.vertexInfo.offset) + bias;
           gc->pool.temp2.f = FARRAY(vPtr, gc->state.vData.vertexInfo.offset + 4) + bias;
-        
+
           /* draw a little triangle, with the lower left corner at pixel center. */
           
           /* The approach here is to split the triangle into two packets, one
@@ -466,8 +477,8 @@ _grDrawPoints(FxI32 mode, FxI32 count, void *pointers)
                (0x01UL << (22UL - kNumMantissaBits)));
           y = ((gc->pool.temp2.u & (0xFFFFFFFFUL << (22UL - kNumMantissaBits))) +
                (0x01UL << (22UL - kNumMantissaBits)));
-          
-          /* Lower right corner */          
+
+          /* Lower right corner */
           DA_SET(x);
           DA_SET(y);
 
@@ -479,11 +490,11 @@ _grDrawPoints(FxI32 mode, FxI32 count, void *pointers)
 
           /* Upper Left corner */
           x -= (0x01UL << (21UL - kNumMantissaBits));
-          
+
           /* Packet w/ actual point coordinate and parameter data */
           DA_CONT(kSetupStrip | kSetupCullDisable, gc->cmdTransportInfo.paramMask, 
                          1, gc->state.vData.vSize, SSTCP_PKT3_DDDDDD);
-          
+
           i = gc->tsuDataList[dataElem];
           DA_SET(x);
           DA_SET(y);
@@ -497,16 +508,15 @@ _grDrawPoints(FxI32 mode, FxI32 count, void *pointers)
       DA_END;
       GR_CHECK_SIZE();
       /* end points routine */
-      
+
       count -= POINTS_BUFFER;
     }
   } else {
     /*
      * first cut of clip space coordinate code.
      */
-    
     float oow;
-    
+
     while (count > 0) {
       float *vPtr;
       FxI32 k;
@@ -515,15 +525,15 @@ _grDrawPoints(FxI32 mode, FxI32 count, void *pointers)
 
       /* begin points routine */
       DA_BEGIN;
-      
+
       for (k = 0; k < vcount; k++) {
-        
+
         vPtr = pointers;
         if (mode)
           vPtr = *(float **)vPtr;
-        oow = 1.0f / FARRAY(vPtr, gc->state.vData.wInfo.offset);        
+        oow = 1.0f / FARRAY(vPtr, gc->state.vData.wInfo.offset);
         pointers = (float *)pointers + stride;
-        
+
         {
           FxU32 x, y;
 
@@ -547,7 +557,7 @@ _grDrawPoints(FxI32 mode, FxI32 count, void *pointers)
                (0x01UL << (22UL - kNumMantissaBits)));
           y = ((gc->pool.temp2.u & (0xFFFFFFFFUL << (22UL - kNumMantissaBits))) +
                (0x01UL << (22UL - kNumMantissaBits)));
-          
+
           /* Lower right cornder */
           DA_SET(x);
           DA_SET(y);
@@ -559,11 +569,11 @@ _grDrawPoints(FxI32 mode, FxI32 count, void *pointers)
 
           /* Upper Left corner */
           x -= (0x01UL << (21UL - kNumMantissaBits));
-          
+
           /* Packet w/ actual point coordinate and parameter data */
           DA_CONT(kSetupStrip | kSetupCullDisable, gc->cmdTransportInfo.paramMask, 
                          1, gc->state.vData.vSize, SSTCP_PKT3_DDDDDD);
-          
+
           DA_SET(x);
           DA_SET(y);
           DA_VP_SETFS(vPtr, oow);
@@ -572,7 +582,7 @@ _grDrawPoints(FxI32 mode, FxI32 count, void *pointers)
       DA_END;
       GR_CHECK_SIZE();
       /* end points routine */
-      
+
       count -= POINTS_BUFFER;
     }
   }
@@ -791,7 +801,7 @@ _grDrawLineStrip(FxI32 mode, FxI32 ltype, FxI32 count, void *pointers)
         if (mode) {
           a = *(float **)a;
         }
-        oowb = 1.0f / FARRAY(a, gc->state.vData.wInfo.offset);        
+        oowb = 1.0f / FARRAY(a, gc->state.vData.wInfo.offset);
       }
       for (k = 0; k < vcount; k++) {
         a = (float *)pointers;
@@ -802,7 +812,7 @@ _grDrawLineStrip(FxI32 mode, FxI32 ltype, FxI32 count, void *pointers)
         }
         pointers = (float *)pointers + stride;
         if (ltype == GR_LINES) {
-          owa = oowa = 1.0f / FARRAY(a, gc->state.vData.wInfo.offset);        
+          owa = oowa = 1.0f / FARRAY(a, gc->state.vData.wInfo.offset);
           pointers = (float *)pointers + stride;
         }
         else
@@ -812,14 +822,14 @@ _grDrawLineStrip(FxI32 mode, FxI32 ltype, FxI32 count, void *pointers)
         fay = tmp1 = FARRAY(a, gc->state.vData.vertexInfo.offset+4)
           *oowa*gc->state.Viewport.hheight+gc->state.Viewport.oy;
         fby = tmp2 = FARRAY(b, gc->state.vData.vertexInfo.offset+4)
-          *oowb*gc->state.Viewport.hheight+gc->state.Viewport.oy;        
+          *oowb*gc->state.Viewport.hheight+gc->state.Viewport.oy;
         
         /*
         ** compute absolute deltas and draw from low Y to high Y
         */
         ADY.f = tmp2 - tmp1;
         if (ADY.i < 0) {
-          float *tv;          
+          float *tv;
           owa = oowb; owb = oowa;
           fay = tmp2;
           fby = tmp1;
@@ -832,14 +842,14 @@ _grDrawLineStrip(FxI32 mode, FxI32 ltype, FxI32 count, void *pointers)
           *owb*gc->state.Viewport.hwidth+gc->state.Viewport.ox;
         
         DX.f = fbx - fax;
-        DX.i &= 0x7fffffff;               /* abs(adx) */        
+        DX.i &= 0x7fffffff;               /* abs(adx) */
         
         /* check for zero-length lines */
         if ((DX.i >= ADY.i) && (DX.i == 0)) goto all_done_vp;
-    
+
         DA_CONT(kSetupCullDisable | kSetupStrip, gc->cmdTransportInfo.paramMask,
                 0x04UL, vertexParamOffset, SSTCP_PKT3_BDDDDD);
-        {        
+        {
           /* x major */
           if (DX.i >= ADY.i) {
             DA_SETF(fbx);
@@ -999,8 +1009,6 @@ _grDrawTriangles_Default(FxI32 mode, FxI32 count, void *pointers)
       count -= 15;
     }
   }
-  
 
 #undef FN_NAME
 } /* _grDrawTriangles */
-
