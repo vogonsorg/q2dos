@@ -224,17 +224,10 @@ GR_ENTRY(grDrawPoint, void, (const void *p))
   GR_BEGIN_NOFIFOCHECK(FN_NAME, 90);
   GDBG_INFO_MORE(gc->myLevel, "(p = 0x%x)\n", p);
 
-#ifdef __GNUC__
   if (gc->state.grEnableArgs.primitive_smooth_mode & GR_AA_ORDERED_POINTS_MASK)
 	  _grAADrawPoints(GR_VTX_PTR_ARRAY, 1, (void *)&p);
   else
 	  _grDrawPoints(GR_VTX_PTR_ARRAY, 1, (void *)&p);
-#else
-  if (gc->state.grEnableArgs.primitive_smooth_mode & GR_AA_ORDERED_POINTS_MASK)
-	  _grAADrawPoints(GR_VTX_PTR_ARRAY, 1, &(void *)p);
-  else
-	  _grDrawPoints(GR_VTX_PTR_ARRAY, 1, &(void *)p);
-#endif
 
 #undef FN_NAME
 } /* grDrawPoint */
@@ -283,6 +276,9 @@ GR_ENTRY(grDrawLine, void, (const void *a, const void *b))
 /*---------------------------------------------------------------------------
  ** grDrawTriangle
  */
+#if defined(__MINGW32__) && !(GLIDE_USE_C_TRISETUP || GLIDE_DEBUG)
+#define HAVE_XDRAWTRI_ASM
+#endif
 #ifndef HAVE_XDRAWTRI_ASM	/* grDrawTriangle() not in asm */
 #if defined(_MSC_VER) && !defined(GLIDE_DEBUG) && !(GLIDE_USE_C_TRISETUP)
 __declspec( naked )

@@ -767,11 +767,17 @@
 
 #include <ddraw.h>
 #include "qmodes.h"
+#if 0 /* moved to asm so we don't need w9x ddk headers. */
 #define IS_32
 #define Not_VxD
 #include <minivdd.h>
 #include <vmm.h>
 #include <configmg.h>
+#else
+extern DWORD __cdecl CM_Get_DevNode_Key(DWORD,PCHAR,PVOID,ULONG,ULONG);
+#define CM_REGISTRY_HARDWARE 0
+#define CM_REGISTRY_SOFTWARE 1
+#endif
 
 #endif
 
@@ -1909,18 +1915,17 @@ hwcMapBoard(hwcBoardInfo *bInfo, FxU32 bAddrMask)
 #else
   {
     FxU32
-      bAddr, length;
+      bAddr;
+    FxI32
+     length;
 
     bInfo->isMapped = FXTRUE;
     /* [dBorca] Hack alert:
     bInfo->procHandle = getpid();
     */
 
-    if (IS_NAPALM(bInfo->pciInfo.deviceID))
-      length = 32*1024*1024;
-    else
-      length = 16*1024*1024;
-    
+    length = (IS_NAPALM(bInfo->pciInfo.deviceID))?  0x2000000 : 0x1000000;
+
     /* memory mapped register spaces */
     for (bAddr = 0; bAddr < 2; bAddr++) {
       if ((bAddrMask & (0x01UL << bAddr)) != 0x00UL) {
@@ -1947,25 +1952,20 @@ hwcMapBoard(hwcBoardInfo *bInfo, FxU32 bAddrMask)
     /* Map in slaves too */
     if(bInfo->pciInfo.numChips > 1) {
       FxU32 chip;
-      FxBool success;
-      FxU32 length = 32*1024*1024;
-        
+      FxU32 len = 0x2000000;
+
       for(chip = 1 ; chip < bInfo->pciInfo.numChips; chip++) {
         /* The PCI library seemed a bit whacked for mapping in multi-function
          * devices, so I use the more low-level routines to map in the two 
          * physical memory chunks I need. */
-        success = pciMapPhysicalToLinear(&bInfo->linearInfo.linearAddress[(chip << 2) + 0],
-                                         bInfo->pciInfo.pciBaseAddr[(chip << 2) + 0],
-                                         &length);
-        if(!success) {
+        if (!pciMapPhysicalToLinear(&bInfo->linearInfo.linearAddress[(chip << 2) + 0],
+                                    bInfo->pciInfo.pciBaseAddr[(chip << 2) + 0], &len)) {
             /* We failed to map.  Punt. */
             bInfo->pciInfo.numChips = 1;
             break;
         }
-        success = pciMapPhysicalToLinear(&bInfo->linearInfo.linearAddress[(chip << 2) + 1],
-                                         bInfo->pciInfo.pciBaseAddr[(chip << 2) + 1],
-                                         &length);
-        if(!success) {
+        if (!pciMapPhysicalToLinear(&bInfo->linearInfo.linearAddress[(chip << 2) + 1],
+                                    bInfo->pciInfo.pciBaseAddr[(chip << 2) + 1], &len)) {
             /* We failed to map.  Punt. */
             bInfo->pciInfo.numChips = 1;
             break;
@@ -1973,25 +1973,25 @@ hwcMapBoard(hwcBoardInfo *bInfo, FxU32 bAddrMask)
       }
     }
   }
-#endif  
+#endif
   
   return FXTRUE;
 #undef FN_NAME
 } /* hwcMapBoard */
 
 FxBool
-hwcInitRegisters(hwcBoardInfo *bInfo) 
+hwcInitRegisters(hwcBoardInfo *bInfo)
 {
 #define FN_NAME "hwcInitRegisters"
   FxU32
     grxSpeedInMHz, memSpeedInMHz,
     sgramMode, sgramMask, sgramColor;
-  
+
   if (bInfo->linearInfo.initialized == FXFALSE) {
     sprintf(errorString, "%s:  Called before hwcMapBoard\n", FN_NAME);
     return FXFALSE;
   }
-      
+
   bInfo->regInfo.initialized = FXTRUE;
 
   bInfo->regInfo.ioMemBase =
@@ -2028,7 +2028,7 @@ hwcInitRegisters(hwcBoardInfo *bInfo)
       bInfo->regInfo.slaveIOBase[chip - 1]  = bInfo->linearInfo.linearAddress[(chip << 2) + 0] ;
     }
   }
-#else 
+#else
   /* DOS is a bit weirder. In this case we have both memBase0 and memBase1's linear
    * addresses stored in linearAddress[0] and linearAddress[1], which is not what
    * the Windows and Mac code expect.  However, the important thing is really just
@@ -2053,7 +2053,7 @@ hwcInitRegisters(hwcBoardInfo *bInfo)
 
   bInfo->regInfo.rawLfbBase =
     bInfo->linearInfo.linearAddress[1];
-#if __POWERPC__    
+#if __POWERPC__
   bInfo->regInfo.ioPortBase = bInfo->pciInfo.pciBaseAddr[2] & ~0x1;
 #else
   bInfo->regInfo.ioPortBase = (FxU16) bInfo->pciInfo.pciBaseAddr[2] & ~0x1;
@@ -7536,7 +7536,7 @@ void hwcAAScreenShot(hwcBoardInfo *bInfo, FxU32 colBufNum, FxBool dither)
 #ifdef _WIN32
   SYSTEMTIME curtime;
 #else
-  static FxU32 fileNameNum;
+  static unsigned int fileNameNum;
 #endif
   char fileName[256];
   
@@ -7576,7 +7576,7 @@ void hwcAAScreenShot(hwcBoardInfo *bInfo, FxU32 colBufNum, FxBool dither)
   GetLocalTime(&curtime);
   sprintf(fileName,"glide_%04d%02d%02d_%02d%02d%02d.tga",curtime.wYear, curtime.wMonth, curtime.wDay, curtime.wHour, curtime.wMinute, curtime.wSecond);
 #else
-  sprintf(fileName,"glide%04ld.tga",fileNameNum++);
+  sprintf(fileName,"glide%04u.tga",fileNameNum++);
 #endif
   memset (header, 0, 18);
   header[2] = 2;    /* Uncompressed targa */

@@ -65,7 +65,7 @@ extrn   _trisetup, 12
 %define fsubs   fsub DWORD
 %define fmuls   fmul DWORD
 
-segment		DATA
+segment		SEG_DATA
     One         DD  1.0
     Area        DD  0
     dxAB        DD  0
@@ -81,7 +81,7 @@ segment		DATA
     snap_xc     DD  0
     snap_yc     DD  0
 
-segment		CONST
+segment		SEG_CONST
     SNAP_BIAS   DD  786432.0
 
 ; Ugly, but seems to workaround the problem with locally defined
@@ -151,7 +151,6 @@ extrn   sstStore32f
 %endmacro
 
 %macro GR_SETF_P 3
-   
     push    eax
     push    ecx
     push    edx
@@ -240,7 +239,7 @@ Y       equ 4
 %define i       edx       ; i = dlp->i
 %define tmpy    ebp       ; temp Y storage
 
-segment		TEXT
+segment		SEG_TEXT
 
 ;--------------------------------------------------------------------------        
 
@@ -264,7 +263,7 @@ export _grDrawTriangle@12
 ;;
 ;;  USAGE:
 ;;
-;;  
+;;
             align 4
 proc _trisetup_asm, 12
 ; 28
@@ -305,7 +304,6 @@ proc _trisetup_asm, 12
 ;       with lowest y value on the stack, this will be used later for 
 ;       loading parameter values into the SST regs.
 ;
-;;;;;;;;;;;;;;
 
     GET_GC
     mov     tmpy, [gc + coord_space]     ; load gc->state.invalid
@@ -334,8 +332,8 @@ packed_color:
     pop     esi
     pop     ebx
     ret
-        
-validate_state: 
+
+validate_state:
     GET_GC
     mov     tmpy, [gc + invalid]     ; load gc->state.invalid
     test    tmpy, tmpy
@@ -343,7 +341,7 @@ validate_state:
     call    _grValidateState
 
     align 4
-cull_test:      
+cull_test:
 
 ;--------------------------------------------------------------------------        
     mov     fa, [esp + _va$]    ; 1
@@ -352,8 +350,7 @@ cull_test:
      mov     tmpy, [_GlideRoot + trisProcessed]    ; _GlideRoot.stats.trisProcessed++;
 ; 36-3
 vertex_y_load:
-
-;;; snap y coordinate to sort vertices
+ ;; snap y coordinate to sort vertices
     flds    [fa + Y]            ;
     fadds   [SNAP_BIAS]         ;
     fstp    dword [zsnap_ya]    ;
@@ -775,7 +772,7 @@ endp
 ; we may not write to the PCI buffer without stalling.  This causes
 ; the amount of clocks the workaround adds to the loop to vary in the
 ; following way++:
-; 
+;
 ;    CPU          Bus/CPU Clock     Total Bus       Total Penalty
 ;                     Ratio*      Clocks Since   (add to later clocks)
 ;======================================================================  
