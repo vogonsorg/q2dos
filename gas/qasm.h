@@ -203,6 +203,9 @@
 	.extern C(alphamap) /* FS: For r_part.s TODO: from vid.alpha */
 	.extern C(irtable)
 	.extern C(iractive)
+	.extern C(vright)
+	.extern C(vup)
+	.extern C(vpn)
 
 	.extern float_point5
 	.extern Float2ToThe31nd
@@ -217,7 +220,7 @@
 	.extern fp_64k
 	.extern fp_1m
 	.extern fp_1m_minus_1
-	.extern fp_8 
+	.extern fp_8
 	.extern entryvec_table
 	.extern advancetable
 	.extern sstep
@@ -370,7 +373,7 @@
 #define spanpackage_t_tfrac				20
 #define spanpackage_t_light				24
 #define spanpackage_t_zi				28
-#define spanpackage_t_size				32 
+#define spanpackage_t_size				32
 
 // edge_t structure
 // !!! if this is changed, it must be changed in r_shared.h too !!!

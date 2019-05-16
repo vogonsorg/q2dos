@@ -2,7 +2,7 @@
  .model FLAT
 ;
 ; r_miscas.s
-; x86 assembly-language Transform Vector code
+; x86 assembly-language transform vector code
 ;
 
 include qasm.inc
@@ -19,8 +19,8 @@ _TEXT SEGMENT
 ; transform vector code
 ;----------------------------------------------------------------------
 
-vin		equ		4
-vout	equ		8
+vin		equ		0+4
+vout	equ		4+4
 
  align 4
  public _TransformVector
