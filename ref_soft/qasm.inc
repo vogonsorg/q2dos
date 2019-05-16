@@ -236,6 +236,9 @@ ifndef GLQUAKE
 	externdef fp_64kx64k:dword
 	externdef pz:dword
 	externdef spr8entryvec_table:dword
+	externdef _vright:dword
+	externdef _vup:dword
+	externdef _vpn:dword
 endif
 
 	externdef _fpu_ceil_cw:dword
