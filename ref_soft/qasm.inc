@@ -43,7 +43,6 @@ ifndef GLQUAKE
 	externdef	_cacheblock:dword
 	externdef	_d_viewbuffer:dword
 	externdef	_cachewidth:dword
-	externdef	_d_pzbuffer:dword
 	externdef	_d_zrowbytes:dword
 	externdef	_d_zwidth:dword
 	externdef _d_scantable:dword
@@ -239,6 +238,10 @@ ifndef GLQUAKE
 	externdef _vright:dword
 	externdef _vup:dword
 	externdef _vpn:dword
+	externdef _partparms:dword
+	externdef _s_prefetch_address:dword
+	externdef _r_screenwidth:dword
+	externdef _vid:dword
 endif
 
 	externdef _fpu_ceil_cw:dword
@@ -436,3 +439,15 @@ mtri_size			equ		16	; !!! if this changes, array indexing in !!!
 								; !!! d_polysa.s must be changed to match !!!
 mtri_shift			equ		4
 
+; partparms_t structure
+partparms_particle	equ		0
+partparms_level		equ		4
+partparms_color		equ		8
+
+; vid_t structure
+vid_buffer			equ		0
+vid_colormap		equ		4
+vid_alphamap		equ		8
+vid_rowbytes		equ		12
+vid_width			equ		16
+vid_height			equ		20

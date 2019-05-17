@@ -11,6 +11,8 @@ include d_if.inc
 if	id386
 
 _DATA SEGMENT
+vin		equ		4
+vout	equ		8
 _DATA ENDS
 
 _TEXT SEGMENT
@@ -18,10 +20,6 @@ _TEXT SEGMENT
 ;----------------------------------------------------------------------
 ; transform vector code
 ;----------------------------------------------------------------------
-
-vin		equ		0+4
-vout	equ		4+4
-
  align 4
  public _TransformVector
 _TransformVector:
