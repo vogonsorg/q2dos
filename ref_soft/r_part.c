@@ -39,64 +39,6 @@ static partparms_t partparms;
 static unsigned s_prefetch_address;
 
 /*
-** BlendParticleXX
-**
-** Inputs:
-** EAX = color
-** EDI = pdest
-**
-** Scratch:
-** EBX = scratch (dstcolor)
-** EBP = scratch
-**
-** Outputs:
-** none
-*/
-__declspec(naked) void BlendParticle33( void )
-{
-	//	return vid.alphamap[color + dstcolor*256];
-	__asm mov ebp, vid.alphamap
-	__asm xor ebx, ebx
-
-	__asm mov bl,  byte ptr [edi]
-	__asm shl ebx, 8
-
-	__asm add ebp, ebx
-	__asm add ebp, eax
-
-	__asm mov al,  byte ptr [ebp]
-
-	__asm mov byte ptr [edi], al
-
-	__asm ret
-}
-
-__declspec(naked) void BlendParticle66( void )
-{
-	//	return vid.alphamap[pcolor*256 + dstcolor];
-	__asm mov ebp, vid.alphamap
-	__asm xor ebx, ebx
-
-	__asm shl eax,  8
-	__asm mov bl,   byte ptr [edi]
-
-	__asm add ebp, ebx
-	__asm add ebp, eax
-
-	__asm mov al,  byte ptr [ebp]
-
-	__asm mov byte ptr [edi], al
-
-	__asm ret
-}
-
-__declspec(naked) void BlendParticle100( void )
-{
-	__asm mov byte ptr [edi], al
-	__asm ret
-}
-
-/*
 ** R_DrawParticle (asm version)
 **
 ** Since we use __declspec( naked ) we don't have a stack frame
@@ -113,8 +55,6 @@ __declspec(naked) void R_DrawParticle( void )
 	static int      u, v, tmp;
 	static short    izi;
 	static int      ebpsave;
-
-	static byte (*blendfunc)(void);
 
 	/*
 	** must be memvars since x86 can't load constants
@@ -206,30 +146,6 @@ __declspec(naked) void R_DrawParticle( void )
 	//	zi = 1.0 / transformed[2];
 	__asm fld   one
 	__asm fdiv  dword ptr [transformed+8]
-
-	/*
-	** bind the blend function pointer to the appropriate blender
-	** while we're dividing
-	*/
-	//if ( level == PARTICLE_33 )
-	//	blendparticle = BlendParticle33;
-	//else if ( level == PARTICLE_66 )
-	//	blendparticle = BlendParticle66;
-	//else 
-	//	blendparticle = BlendParticle100;
-
-	__asm cmp partparms.level, PARTICLE_66
-	__asm je  blendfunc_66
-	__asm jl  blendfunc_33
-	__asm lea ebx, BlendParticle100
-	__asm jmp done_selecting_blend_func
-blendfunc_33:
-	__asm lea ebx, BlendParticle33
-	__asm jmp done_selecting_blend_func
-blendfunc_66:
-	__asm lea ebx, BlendParticle66
-done_selecting_blend_func:
-	__asm mov blendfunc, ebx
 
 	// prefetch the next particle
 	__asm mov ebp, s_prefetch_address
@@ -394,7 +310,40 @@ top_of_pix_horiz_loop:
 
 	__asm mov   eax, partparms.color
 
-	__asm call  [blendfunc]
+	__asm cmp partparms.level, PARTICLE_66
+	__asm je  blendfunc_66
+	__asm jl  blendfunc_33
+	// BlendParticle100
+	__asm mov byte ptr [edi], al
+	__asm jmp done_blending
+blendfunc_33:
+	__asm mov ebp, vid.alphamap
+	__asm xor ebx, ebx
+
+	__asm mov bl,  byte ptr [edi]
+	__asm shl ebx, 8
+
+	__asm add ebp, ebx
+	__asm add ebp, eax
+
+	__asm mov al,  byte ptr [ebp]
+
+	__asm mov byte ptr [edi], al
+	__asm jmp done_blending
+blendfunc_66:
+	__asm mov ebp, vid.alphamap
+	__asm xor ebx, ebx
+
+	__asm shl eax,  8
+	__asm mov bl,   byte ptr [edi]
+
+	__asm add ebp, ebx
+	__asm add ebp, eax
+
+	__asm mov al,  byte ptr [ebp]
+
+	__asm mov byte ptr [edi], al
+done_blending:
 
 	__asm add   edi, 1
 	__asm add   esi, 2
@@ -435,24 +384,6 @@ end:
 
 #else
 
-#if 0 /* not used -- all inlined in R_DrawParticle() */
-static byte BlendParticle33( int pcolor, int dstcolor )
-{
-	return vid.alphamap[pcolor + dstcolor*256];
-}
-
-static byte BlendParticle66( int pcolor, int dstcolor )
-{
-	return vid.alphamap[pcolor*256+dstcolor];
-}
-
-static byte BlendParticle100( int pcolor, int dstcolor )
-{
-	dstcolor = dstcolor;
-	return pcolor;
-}
-#endif /* #if 0 */
-
 /*
 ** R_DrawParticle
 **
@@ -477,9 +408,6 @@ void R_DrawParticle( void )
 	short	*pz;
 	int      color = pparticle->color;
 	int		i, izi, pix, count, u, v;
-#if 0 /* not used -- blend functions are inlined */
-	byte  (*blendparticle)( int, int );
-#endif
 
 	/*
 	** transform the particle
@@ -492,18 +420,6 @@ void R_DrawParticle( void )
 
 	if (transformed[2] < PARTICLE_Z_CLIP)
 		return;
-
-#if 0 /* not used -- blenders are inlined below */
-	/*
-	** bind the blend function pointer to the appropriate blender
-	*/
-	if ( level == PARTICLE_33 )
-		blendparticle = BlendParticle33;
-	else if ( level == PARTICLE_66 )
-		blendparticle = BlendParticle66;
-	else 
-		blendparticle = BlendParticle100;
-#endif
 
 	/*
 	** project the point
@@ -643,4 +559,3 @@ void R_DrawParticles (void)
 	__asm fldcw word ptr [fpu_chop_cw]
 #endif
 }
-
