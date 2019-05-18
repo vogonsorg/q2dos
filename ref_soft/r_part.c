@@ -197,7 +197,7 @@ void R_DrawParticles (void)
 		partparms.particle = p;
 		partparms.color    = p->color;
 
-#if (id386) && defined(_MSC_VER)
+#ifdef id386
 		if ( i < r_newrefdef.num_particles-1 )
 			s_prefetch_address = ( unsigned int ) ( p + 1 );
 		else

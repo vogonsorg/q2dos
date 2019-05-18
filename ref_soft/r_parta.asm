@@ -276,8 +276,8 @@ top_of_pix_horiz_loop:
  mov   eax, ds:dword ptr [_partparms+partparms_color]
 
  cmp ds:dword ptr [_partparms+partparms_level], PARTICLE_66
-; je  blendfunc_66
-; jl  blendfunc_33
+ je  blendfunc_66
+ jl  blendfunc_33
 ; BlendParticle100
  mov byte ptr [edi], al
  jmp done_blending

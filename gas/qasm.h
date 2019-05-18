@@ -206,6 +206,10 @@
 	.extern C(vright)
 	.extern C(vup)
 	.extern C(vpn)
+	.extern C(partparms)
+	.extern C(s_prefetch_address)
+	.extern C(r_screenwidth)
+	.extern C(vid)
 
 	.extern float_point5
 	.extern Float2ToThe31nd
@@ -462,5 +466,18 @@
 #define mtri_size			16	// !!! if this changes, array indexing in !!!
 								// !!! d_polysa.s must be changed to match !!!
 #define mtri_shift			4
+
+// partparms_t structure
+#define partparms_particle		0
+#define partparms_level			4
+#define partparms_color			8
+
+// vid_t structure
+#define vid_buffer				0
+#define vid_colormap			4
+#define vid_alphamap			8
+#define vid_rowbytes			12
+#define vid_width				16
+#define vid_height				20
 
 #endif
