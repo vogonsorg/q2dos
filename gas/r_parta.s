@@ -9,17 +9,17 @@
 
 	.data
 eight_thousand_hex: .single	32768.0
-short_izi: .word 0
-v: .long 0
-u: .long 0
-tmp: .long 0
-zi: .long 0
-ebpsave: .long 0
 
 	.bss
+.lcomm  short_izi 1
 	.align 4
-.lcomm	transformed_vec, 12
-.lcomm	local_vec, 12
+.lcomm	transformed_vec, 12, 4
+.lcomm	local_vec, 12, 4
+.lcomm	ebpsave, 1, 4
+.lcomm	v, 1, 4
+.lcomm	u, 1, 4
+.lcomm	tmp, 1, 4
+.lcomm	zi, 1, 4
 
 	.text
 #define PARTICLE_33	0
@@ -126,7 +126,7 @@ C(R_DrawParticle):
 	fadds C(xcenter)                      // xcenter + zi * transformed[0] | zi * transformed[1]
 	fxch %st(1)                        // zi * transformed[1] | xcenter + zi * transformed[0]
 	flds C(ycenter)                      // ycenter | zi * transformed[1] | xcenter + zi * transformed[0]
-	fsubrp %st(0), %st(1)                // ycenter - zi * transformed[1] | xcenter + zi * transformed[0]
+	fsubp %st(0), %st(1)                // ycenter - zi * transformed[1] | xcenter + zi * transformed[0]
 	fxch  %st(1)                        // xcenter + zi * transformed[0] | ycenter + zi * transformed[1]
 	fadds  float_point5                   // xcenter + zi * transformed[0] + 0.5 | ycenter - zi * transformed[1]
 	fxch  %st(1)                        // ycenter - zi * transformed[1] | xcenter + zi * transformed[0] + 0.5 

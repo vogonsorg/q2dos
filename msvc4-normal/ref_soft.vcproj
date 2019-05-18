@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="ref_soft"
 	ProjectGUID="{60170F3B-98AE-4E41-BF2F-A4B908EDA5FF}"
+	RootNamespace="ref_soft"
 	>
 	<Platforms>
 		<Platform
@@ -1496,7 +1497,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)"
+							CommandLine="ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(OUTDIR)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -1513,7 +1514,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)"
+							CommandLine="ml /c /Cp /coff /Fo$(OUTDIR)\$(InputName).obj /Zm /Zi $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(OUTDIR)\$(InputName).obj"
 						/>
 					</FileConfiguration>
