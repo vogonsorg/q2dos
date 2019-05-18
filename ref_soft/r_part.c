@@ -35,7 +35,7 @@ typedef struct
 /*static */partparms_t partparms;
 /*static */unsigned int s_prefetch_address;
 
-#ifndef id386
+#if !(id386)
 /*
 ** R_DrawParticle
 **
@@ -197,7 +197,7 @@ void R_DrawParticles (void)
 		partparms.particle = p;
 		partparms.color    = p->color;
 
-#ifdef id386
+#if (id386)
 		if ( i < r_newrefdef.num_particles-1 )
 			s_prefetch_address = ( unsigned int ) ( p + 1 );
 		else
