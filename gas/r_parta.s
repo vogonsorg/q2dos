@@ -8,18 +8,18 @@
 #if	id386
 
 	.data
-eight_thousand_hex: .int 32768
-	
+eight_thousand_hex: .long	32768
+
 	.bss
 .lcomm	short_izi, 1
 	.align 4
-.lcomm	zi, 1
-.lcomm	u, 1
-.lcomm	v, 1
-.lcomm	tmp, 1
-.lcomm	transformed_vec, 12
-.lcomm	local_vec, 12
-.lcomm	ebpsave, 1
+.lcomm	zi, 1, 4
+.lcomm	u, 1, 4
+.lcomm	v, 1, 4
+.lcomm	tmp, 1, 4
+.lcomm	transformed_vec, 12, 4
+.lcomm	local_vec, 12, 4
+.lcomm	ebpsave, 1, 4
 
 	.text
 #define PARTICLE_33	0
@@ -107,8 +107,8 @@ C(R_DrawParticle):
 // project the point by initiating the 1/z calc
 //
 //	zi = 1.0 / transformed[2];
-	flds   (float_1)
-	fdiv  (transformed_vec)+8
+	flds   float_1
+	fdiv  transformed_vec+8
 
 // prefetch the next particle
 	movl C(s_prefetch_address), %ebp
@@ -120,11 +120,11 @@ C(R_DrawParticle):
 // u = (int)(xcenter + zi * transformed[0] + 0.5)
 // v = (int)(ycenter - zi * transformed[1] + 0.5)
 	flds zi                           // zi
-	fmul transformed_vec+0    // zi * transformed[0]
+	fmuls transformed_vec+0    // zi * transformed[0]
 	flds zi                           // zi | zi * transformed[0]
-	fmul transformed_vec+4    // zi * transformed[1] | zi * transformed[0]
+	fmuls transformed_vec+4    // zi * transformed[1] | zi * transformed[0]
 	fxch %st(1)                        // zi * transformed[0] | zi * transformed[1]
-	fadd C(xcenter)                      // xcenter + zi * transformed[0] | zi * transformed[1]
+	fadds C(xcenter)                      // xcenter + zi * transformed[0] | zi * transformed[1]
 	fxch %st(1)                        // zi * transformed[1] | xcenter + zi * transformed[0]
 	flds C(ycenter)                      // ycenter | zi * transformed[1] | xcenter + zi * transformed[0]
 	fsubrp %st(0), %st(1)                // ycenter - zi * transformed[1] | xcenter + zi * transformed[0]
@@ -181,7 +181,7 @@ C(R_DrawParticle):
 // initiate
 // izi = (int)(zi * 0x8000);
 	flds zi
-	fmuls eight_thousand_hex
+	fimuls eight_thousand_hex
 
 // EDI = pdest = d_viewbuffer + d_scantable[v] + u;
 	leal C(d_scantable)(,%ecx,4),%edi
@@ -193,7 +193,7 @@ C(R_DrawParticle):
 // izi = (int)(zi * 0x8000);
 	fistps tmp
 	movl tmp, %eax
-	movw %ax, short_izi
+	movw %ax, (short_izi)
 
 //
 // determine the screen area covered by the particle,
@@ -201,7 +201,7 @@ C(R_DrawParticle):
 //
 //	pix = izi >> d_pix_shift;
 	xorl %edx, %edx
-	movw short_izi, %dx
+	movw (short_izi), %dx
 	movl C(d_pix_shift), %ecx
 	shrw %cl, %dx
 
@@ -263,7 +263,7 @@ top_of_pix_horiz_loop:
 
 	movw  (%esi), %ax
 
-	cmpw  short_izi, %ax
+	cmpw  (short_izi), %ax
 	jg    end_of_horiz_loop
 
 	movl  C(partparms)+partparms_color, %eax
