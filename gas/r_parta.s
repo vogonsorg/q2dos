@@ -8,18 +8,18 @@
 #if	id386
 
 	.data
-eight_thousand_hex: .long	32768
+eight_thousand_hex: .single	32768.0
+short_izi: .word 0
+v: .long 0
+u: .long 0
+tmp: .long 0
+zi: .long 0
+ebpsave: .long 0
 
 	.bss
-.lcomm	short_izi, 1
 	.align 4
-.lcomm	zi, 1, 4
-.lcomm	u, 1, 4
-.lcomm	v, 1, 4
-.lcomm	tmp, 1, 4
-.lcomm	transformed_vec, 12, 4
-.lcomm	local_vec, 12, 4
-.lcomm	ebpsave, 1, 4
+.lcomm	transformed_vec, 12
+.lcomm	local_vec, 12
 
 	.text
 #define PARTICLE_33	0
@@ -35,7 +35,6 @@ C(R_DrawParticle):
 	movl %ebp, ebpsave
 	pushl %esi
 	pushl %edi
-
 //
 // transform the particle
 //
@@ -108,7 +107,7 @@ C(R_DrawParticle):
 //
 //	zi = 1.0 / transformed[2];
 	flds   float_1
-	fdiv  transformed_vec+8
+	fdivs  transformed_vec+8
 
 // prefetch the next particle
 	movl C(s_prefetch_address), %ebp
@@ -133,8 +132,8 @@ C(R_DrawParticle):
 	fxch  %st(1)                        // ycenter - zi * transformed[1] | xcenter + zi * transformed[0] + 0.5 
 	fadds  float_point5                   // ycenter - zi * transformed[1] + 0.5 | xcenter + zi * transformed[0] + 0.5 
 	fxch  %st(1)                        // u | v
-	fistps u                // v
-	fistps v                // (empty)
+	fistpl u                // v
+	fistpl v                // (empty)
 
 //
 // clip out the particle
@@ -181,7 +180,7 @@ C(R_DrawParticle):
 // initiate
 // izi = (int)(zi * 0x8000);
 	flds zi
-	fimuls eight_thousand_hex
+	fmuls eight_thousand_hex
 
 // EDI = pdest = d_viewbuffer + d_scantable[v] + u;
 	leal C(d_scantable)(,%ecx,4),%edi
@@ -191,7 +190,7 @@ C(R_DrawParticle):
 
 // complete
 // izi = (int)(zi * 0x8000);
-	fistps tmp
+	fistpl tmp
 	movl tmp, %eax
 	movw %ax, (short_izi)
 
