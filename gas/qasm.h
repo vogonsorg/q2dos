@@ -256,8 +256,10 @@
 	.extern tdivz8stepu
 	.extern reciprocal_table_16
 	.extern entryvec_table_16
-	.extern ceil_cw
-	.extern single_cw
+	.extern fpu_ceil_cw
+	.extern fpu_sp24_ceil_cw
+	.extern fpu_single_cw
+	.extern fpu_chop_cw
 	.extern fp_64kx64k
 	.extern pz
 	.extern spr8entryvec_table

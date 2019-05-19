@@ -811,6 +811,8 @@ extern unsigned d_8to24table[256]; // base
 
 void    Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length);
 void    Sys_SetFPCW (void);
+void	Sys_SetSP24_FPPrecision (void); /* FS */
+void	Sys_SetChopCW_FPPrecision (void); /* FS */
 
 void LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *height);
 

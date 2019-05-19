@@ -415,8 +415,7 @@ R_PolysetCalcGradients
 */
 #if (id386) && defined(_MSC_VER)
 #else
-/* GAS version in d_polysa.s is if 0'ed out */
-
+/* FIXME: GAS version in d_polysa.s is if 0'ed out */
 void R_PolysetCalcGradients (int skinwidth)
 {
 	float	xstepdenominv, ystepdenominv, t0, t1;

@@ -175,16 +175,12 @@ void R_DrawParticles (void)
 	particle_t *p;
 	int         i;
 
-#if (id386) && defined(_MSC_VER)
-	extern unsigned long fpu_sp24_cw, fpu_chop_cw;
-#endif
-
 	VectorScale( vright, xscaleshrink, r_pright );
 	VectorScale( vup, yscaleshrink, r_pup );
 	VectorCopy( vpn, r_ppn );
 
-#if (id386) && defined(_MSC_VER)
-	__asm fldcw word ptr [fpu_sp24_cw]
+#if (id386)
+	Sys_SetSP24_FPPrecision();
 #endif
 
 	for (p=r_newrefdef.particles, i=0 ; i<r_newrefdef.num_particles ; i++,p++)
@@ -209,8 +205,8 @@ void R_DrawParticles (void)
 		R_DrawParticle();
 	}
 
-#if (id386) && defined(_MSC_VER)
-	__asm fldcw word ptr [fpu_chop_cw]
+#if (id386)
+	Sys_SetChopCW_FPPrecision();
 #endif
 }
 #pragma GCC pop_options

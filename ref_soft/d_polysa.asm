@@ -27,7 +27,7 @@ p00_minus_p20 DD 01H DUP (?)
 
 _BSS	ENDS
 _TEXT	SEGMENT
-_skinwidth$ = 8 ; size = 4
+_skinwidth = 8 ; size = 4
 _R_PolysetCalcGradients PROC
 
 	push	ebp
@@ -250,7 +250,7 @@ _R_PolysetCalcGradients PROC
 ; #endif
 ;
 	mov	eax, DWORD PTR _d_pdrawspans
-	cmp	eax, OFFSET _R_PolysetDrawSpans8_Opaque
+	cmp	eax, _R_PolysetDrawSpans8_Opaque
 	mov	eax, DWORD PTR _r_sstepx
 	mov	ebx, DWORD PTR _r_tstepx
 	jne	translucent
@@ -260,8 +260,8 @@ _R_PolysetCalcGradients PROC
 	jmp	done_with_steps
 ; #else
 translucent:
-	and	eax, 65535				; 0000ffffH
-	and	ebx, 65535				; 0000ffffH
+	and	eax, 0000ffffH				; 0000ffffH
+	and	ebx, 0000ffffH				; 0000ffffH
 ; #endif
 done_with_steps:
 	mov	DWORD PTR _a_sstepxfrac, eax
@@ -273,7 +273,7 @@ done_with_steps:
 	mov	ebx, DWORD PTR _r_tstepx
 	mov	ecx, DWORD PTR _r_sstepx
 	sar	ebx, 16					; 00000010H
-	mov	eax, DWORD PTR _skinwidth$[ebp]
+	mov	eax, DWORD PTR _skinwidth[ebp]
 	mul	ebx
 	sar	ecx, 16					; 00000010H
 	add	eax, ecx
@@ -281,7 +281,7 @@ done_with_steps:
 
 	pop	ebx
 	pop	ebp
-	ret	0
+	ret
 _R_PolysetCalcGradients ENDP
 _TEXT	ENDS
 endif	;id386

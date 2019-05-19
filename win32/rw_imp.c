@@ -469,6 +469,16 @@ void Sys_SetFPCW( void )
 	__asm or  ah, 008h          ; 
 	__asm mov fpu_sp24_ceil_cw, eax
 }
+
+void Sys_SetSP24_FPPrecision (void)
+{
+	__asm fldcw	fpu_sp24_cw
+}
+
+void Sys_SetChopCW_FPPrecision (void)
+{
+	__asm fldcw	fpu_chop_cw
+}
 #else
 /* GAS version is in sys_dosa.s */
 #endif
