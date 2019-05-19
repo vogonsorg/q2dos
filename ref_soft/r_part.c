@@ -168,10 +168,13 @@ void R_DrawParticle( void )
 ** if we're using the asm path, it simply assigns a function pointer
 ** and goes.
 */
+#pragma GCC push_options
+#pragma GCC optimize ("O0") /* FS: FIXME: Switching on all O1 and O2 flags manually does not trigger this segfault */
 void R_DrawParticles (void)
 {
 	particle_t *p;
 	int         i;
+
 #if (id386) && defined(_MSC_VER)
 	extern unsigned long fpu_sp24_cw, fpu_chop_cw;
 #endif
@@ -186,7 +189,6 @@ void R_DrawParticles (void)
 
 	for (p=r_newrefdef.particles, i=0 ; i<r_newrefdef.num_particles ; i++,p++)
 	{
-
 		if ( p->alpha > 0.66 )
 			partparms.level = PARTICLE_OPAQUE;
 		else if ( p->alpha > 0.33 )
@@ -211,3 +213,4 @@ void R_DrawParticles (void)
 	__asm fldcw word ptr [fpu_chop_cw]
 #endif
 }
+#pragma GCC pop_options
