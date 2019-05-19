@@ -1,5 +1,5 @@
 //
-// d_polysa.s
+// r_polysa.s
 // x86 assembly-language polygon model drawing code
 //
 
