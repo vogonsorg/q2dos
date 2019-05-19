@@ -242,10 +242,13 @@ ifndef GLQUAKE
 	externdef _s_prefetch_address:dword
 	externdef _r_screenwidth:dword
 	externdef _vid:dword
+	externdef _R_PolysetDrawSpans8_Opaque:PROC
+	externdef _d_pdrawspans:dword
 endif
 
 	externdef _fpu_ceil_cw:dword
 	externdef _fpu_chop_cw:dword
+	externdef _fpu_sp24_ceil_cw:dword
 	externdef _snd_scaletable:dword
 	externdef _paintbuffer:dword
 	externdef _snd_linear_count:dword
