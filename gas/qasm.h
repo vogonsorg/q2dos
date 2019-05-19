@@ -199,6 +199,7 @@
 	.extern C(r_zistepy)
 	.extern C(D_PolysetSetEdgeTable)
 	.extern C(D_RasterizeAliasPolySmooth)
+	.extern C(R_PolysetDrawSpans8_Opaque)
 	.extern C(d_pdrawspans) /* FS: For R_PolysetCalcGradients */
 	.extern C(alphamap) /* FS: For r_part.s TODO: from vid.alpha */
 	.extern C(irtable)

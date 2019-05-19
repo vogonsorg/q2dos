@@ -9,11 +9,11 @@
 #if	id386
 
 // !!! if this is changed, it must be changed in d_polyse.c too !!!
-#define DPS_MAXSPANS			MAXHEIGHT+1	
-									// 1 extra for spanpackage that marks end
+//#define DPS_MAXSPANS			MAXHEIGHT+1	
+// 1 extra for spanpackage that marks end
 
 //#define	SPAN_SIZE	(((DPS_MAXSPANS + 1 + ((CACHE_SIZE - 1) / spanpackage_t_size)) + 1) * spanpackage_t_size)
-#define SPAN_SIZE (1024+1+1+1)*32
+//#define SPAN_SIZE (1024+1+1+1)*32
 
 
 
@@ -30,33 +30,27 @@ t1:		.single		0
 t1_int:		.long		0
 xstepdenominv:	.single		0
 ystepdenominv:	.single		0
-temp0:			.single		0
-temp1:			.single		0
-Ltemp:			.single		0
+//temp0:			.single		0
+//temp1:			.single		0
+//Ltemp:			.single		0
 
 aff8entryvec_table:	.long	LDraw8, LDraw7, LDraw6, LDraw5
-				.long	LDraw4, LDraw3, LDraw2, LDraw1
-				.long LDraw8IR, LDraw7IR, LDraw6IR, LDraw5IR
-				.long LDraw4IR, LDraw3IR, LDraw2IR, LDraw1IR
+ .long	LDraw4, LDraw3, LDraw2, LDraw1,	LDraw8IR, LDraw7IR, LDraw6IR, LDraw5IR, LDraw4IR, LDraw3IR, LDraw2IR, LDraw1IR
 
 lzistepx:		.long	0
 
+.extern C(alias_colormap)
 
 	.text
-
-	.extern C(D_PolysetSetEdgeTable)
-	.extern C(D_RasterizeAliasPolySmooth)
 
 //----------------------------------------------------------------------
 // affine triangle gradient calculation code
 //----------------------------------------------------------------------
 
-#if 0
+#if 1
 #define skinwidth	8+0
-
 .globl C(R_PolysetCalcGradients)
 C(R_PolysetCalcGradients):
-
 	pushl	%ebp
 	movl	%esp, %ebp
 	pushl	%ebx
@@ -97,12 +91,13 @@ C(R_PolysetCalcGradients):
 //
 // put FPU in single precision ceil mode
 //
+
 	fldcw	fpu_sp24_ceil_cw
 
-	fildl	C(d_xdenom)
-	fdivr	float_1
-	fsts	xstepdenominv
-	fmuls	float_minus_1
+	fildl	C(d_xdenom)         // d_xdenom
+	fdivrs	float_1             // 1 / d_xdenom
+	fsts	xstepdenominv       // 
+	fmuls	float_minus_1       // -( 1 / d_xdenom )
 
 // ceil () for light so positive steps are exaggerated, negative steps
 // diminished,  pushing us away from underflow toward overflow. Underflow is
@@ -120,30 +115,30 @@ C(R_PolysetCalcGradients):
 	subl	C(r_p2)+16, %eax
 	subl	C(r_p2)+16, %ebx
 
-	fstps	ystepdenominv
+	fstps	ystepdenominv       // (empty)
 
 	movl	%eax, t0_int
 	movl	%ebx, t1_int
-	fildl	t0_int
-	fildl	t1_int
+	fildl	t0_int              // t0
+	fildl	t1_int              // t1 | t0
+	fxch	%st(1)              // t0 | t1
+	fstps	t0                  // t1
+	fsts	t1                  // t1
+	fmuls	p01_minus_p21       // t1 * p01_minus_p21
+	flds	t0                  // t0 | t1 * p01_minus_p21
+	fmuls	p11_minus_p21       // t0 * p11_minus_p21 | t1 * p01_minus_p21
+	flds	t1                  // t1 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	fmuls	p00_minus_p20       // t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	flds	t0                  // t0 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	fmuls	p10_minus_p20       // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	fxch	%st(2)              // t0 * p11_minus_p21 | t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21
+	fsubp	%st(0), %st(3)      // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	fsubrp	%st(0), %st(1)      // t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	fxch	%st(1)              // t1 * p01_minus_p21 - t0 * p11_minus_p21 | t1 * p00_minus_p20 - t0 * p10_minus_p20
+	fmuls	xstepdenominv       // r_lstepx | t1 * p00_minus_p20 - t0 * p10_minus_p20
 	fxch	%st(1)
-	fstps	t0
-	fst	t1
-	fmuls	p01_minus_p21
-	flds	t0
-	fmuls	p11_minus_p21
-	flds	t1
-	fmuls	p00_minus_p20
-	flds	t0
-	fmuls	p10_minus_p20
-	fxch	%st(2)
-	fsubrp	%st(0), %st(3)
-	fsubp	%st(0), %st(1)
-	fxch	%st(1)
-	fmuls	xstepdenominv
-	fxch	%st(1)
-	fmuls	ystepdenominv
-	fxch	%st(1)
+	fmuls	ystepdenominv       // r_lstepy | r_lstepx
+	fxch	%st(1)              // r_lstepx | r_lstepy
 	fistpl	C(r_lstepx)
 	fistpl	C(r_lstepy)
 
@@ -166,27 +161,27 @@ C(R_PolysetCalcGradients):
 	subl	C(r_p2)+8, %ebx
 	movl	%eax, t0_int
 	movl	%ebx, t1_int
-	fildl	t0_int
-	fildl	t1_int
-	fxch	%st(1)
-	fstps	t0
-	fsts	t1
+	fildl	t0_int              // t0
+	fildl	t1_int              // t1 | t0
+	fxch	%st(1)              // t0 | t1
+	fstps	t0                  // t1
+	fsts	t1                  // (empty)
 
-	fmuls	p01_minus_p21
-	flds	t0
-	fmuls	p11_minus_p21
-	flds	t1
-	fmuls	p00_minus_p20
-	flds	t0
-	fmuls	p10_minus_p20
-	fxch	%st(2)
-	fsubrp	%st(0), %st(3)
-	fsubp	%st(0), %st(1)
+	fmuls	p01_minus_p21       // t1 * p01_minus_p21
+	flds	t0                  // t0 | t1 * p01_minus_p21
+	fmuls	p11_minus_p21       // t0 * p11_minus_p21 | t1 * p01_minus_p21
+	flds	t1                  // t1 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	fmuls	p00_minus_p20       // t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	flds	t0                  // t0 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	fmuls	p10_minus_p20       // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	fxch	%st(2)              // t0 * p11_minus_p21 | t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21
+	fsubp	%st(0), %st(3)      // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	fsubrp	%st(0), %st(1)      // t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	fxch	%st(1)              // t1 * p01_minus_p21 - t0 * p11_minus_p21 | t1 * p00_minus_p20 - t0 * p10_minus_p20
+	fmuls	xstepdenominv       // r_lstepx | t1 * p00_minus_p20 - t0 * p10_minus_p20
 	fxch	%st(1)
-	fmuls	xstepdenominv
-	fxch	%st(1)
-	fmuls	ystepdenominv
-	fxch	%st(1)
+	fmuls	ystepdenominv       // r_lstepy | r_lstepx
+	fxch	%st(1)              // r_lstepx | r_lstepy
 	fistpl	C(r_sstepx)
 	fistpl	C(r_sstepy)
 
@@ -202,28 +197,30 @@ C(R_PolysetCalcGradients):
 	movl	C(r_p1)+12, %ebx
 	subl	C(r_p2)+12, %eax
 	subl	C(r_p2)+12, %ebx
+
 	movl	%eax, t0_int
 	movl	%ebx, t1_int
-	fildl	t0_int
-	fildl	t1_int
+	fildl	t0_int             // t0
+	fildl	t1_int             // t1 | t0
+	fxch	%st(1)             // t0 | t1
+	fstps	t0                 // t1
+	fsts	t1                 // (empty)
+
+	fmuls	p01_minus_p21      // t1 * p01_minus_p21
+	flds	t0                 // t0 | t1 * p01_minus_p21
+	fmuls	p11_minus_p21      // t0 * p11_minus_p21 | t1 * p01_minus_p21
+	flds	t1                 // t1 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	fmuls	p00_minus_p20      // t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	flds	t0                 // t0 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	fmuls	p10_minus_p20      // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	fxch	%st(2)             // t0 * p11_minus_p21 | t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21
+	fsubp	%st(0), %st(3)     // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	fsubrp	%st(0), %st(1)     // t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	fxch	%st(1)             // t1 * p01_minus_p21 - t0 * p11_minus_p21 | t1 * p00_minus_p20 - t0 * p10_minus_p20
+	fmuls	xstepdenominv      // r_lstepx | t1 * p00_minus_p20 - t0 * p10_minus_p20
 	fxch	%st(1)
-	fstps	t0
-	fsts	t1
-	fmuls	p01_minus_p21
-	flds	t0
-	fmuls	p11_minus_p21
-	flds	t1
-	fmuls	p00_minus_p20
-	flds	t0
-	fmuls	p10_minus_p20
-	fxch	%st(2)
-	fsubrp	%st(0), %st(3)
-	fsubp	%st(0), %st(1)
-	fxch	%st(1)
-	fmuls	xstepdenominv
-	fxch	%st(1)
-	fmuls	ystepdenominv
-	fxch	%st(1)
+	fmuls	ystepdenominv      // r_lstepy | r_lstepx
+	fxch	%st(1)             // r_lstepx | r_lstepy
 	fistpl	C(r_tstepx)
 	fistpl	C(r_tstepy)
 
@@ -242,27 +239,27 @@ C(R_PolysetCalcGradients):
 
 	movl	%eax, t0_int
 	movl	%ebx, t1_int
-	fildl	t0_int
-	fildl	t1_int
-	fxch	%st(1)
-	fstps	t0
+	fildl	t0_int             // t0
+	fildl	t1_int             // t1 | t0
+	fxch	%st(1)             // t0 | t1
+	fstps	t0                 // t1
+	fsts	t1                 // (empty)
 
-	fsts	t1
-	fmuls	p01_minus_p21
-	flds	t0
-	fmuls	p11_minus_p21
-	flds	t1
-	fmuls	p00_minus_p20
-	flds	t0
-	fmuls	p10_minus_p20
-	fxch	%st(2)
-	fsubrp	%st(0), %st(3)
-	fsubp	%st(0), %st(1)
+	fmuls	p01_minus_p21      // t1 * p01_minus_p21
+	flds	t0                 // t0 | t1 * p01_minus_p21
+	fmuls	p11_minus_p21      // t0 * p11_minus_p21 | t1 * p01_minus_p21
+	flds	t1                 // t1 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	fmuls	p00_minus_p20      // t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	flds	t0                 // t0 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	fmuls	p10_minus_p20      // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	fxch	%st(2)             // t0 * p11_minus_p21 | t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21
+	fsubp	%st(0), %st(3)     // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	fsubrp	%st(0), %st(1)     // t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	fxch	%st(1)             // t1 * p01_minus_p21 - t0 * p11_minus_p21 | t1 * p00_minus_p20 - t0 * p10_minus_p20
+	fmuls	xstepdenominv      // r_lstepx | t1 * p00_minus_p20 - t0 * p10_minus_p20
 	fxch	%st(1)
-	fmuls	xstepdenominv
-	fxch	%st(1)
-	fmuls	ystepdenominv
-	fxch	%st(1)
+	fmuls	ystepdenominv      // r_lstepy | r_lstepx
+	fxch	%st(1)             // r_lstepx | r_lstepy
 	fistpl	C(r_zistepx)
 	fistpl	C(r_zistepy)
 
@@ -311,275 +308,12 @@ done_with_steps:
 #endif
 
 //----------------------------------------------------------------------
-// recursive subdivision affine triangle drawing code
-//
-// not C-callable because of stdcall return
-//----------------------------------------------------------------------
-
-#define lp1	4+16
-#define lp2	8+16
-#define lp3	12+16
-
-.globl C(D_PolysetRecursiveTriangle)
-C(D_PolysetRecursiveTriangle):
-	pushl	%ebp				// preserve caller stack frame pointer
-	pushl	%esi				// preserve register variables
-	pushl	%edi
-	pushl	%ebx
-
-//	int		*temp;
-//	int		d;
-//	int		new[6];
-//	int		i;
-//	int		z;
-//	short	*zbuf;
-	movl	lp2(%esp),%esi
-	movl	lp1(%esp),%ebx
-	movl	lp3(%esp),%edi
-
-//	d = lp2[0] - lp1[0];
-//	if (d < -1 || d > 1)
-//		goto split;
-	movl	0(%esi),%eax
-
-	movl	0(%ebx),%edx
-	movl	4(%esi),%ebp
-
-	subl	%edx,%eax
-	movl	4(%ebx),%ecx
-
-	subl	%ecx,%ebp
-	incl	%eax
-
-	cmpl	$2,%eax
-	ja		LSplit
-
-//	d = lp2[1] - lp1[1];
-//	if (d < -1 || d > 1)
-//		goto split;
-	movl	0(%edi),%eax
-	incl	%ebp
-
-	cmpl	$2,%ebp
-	ja		LSplit
-
-//	d = lp3[0] - lp2[0];
-//	if (d < -1 || d > 1)
-//		goto split2;
-	movl	0(%esi),%edx
-	movl	4(%edi),%ebp
-
-	subl	%edx,%eax
-	movl	4(%esi),%ecx
-
-	subl	%ecx,%ebp
-	incl	%eax
-
-	cmpl	$2,%eax
-	ja		LSplit2
-
-//	d = lp3[1] - lp2[1];
-//	if (d < -1 || d > 1)
-//		goto split2;
-	movl	0(%ebx),%eax
-	incl	%ebp
-
-	cmpl	$2,%ebp
-	ja		LSplit2
-
-//	d = lp1[0] - lp3[0];
-//	if (d < -1 || d > 1)
-//		goto split3;
-	movl	0(%edi),%edx
-	movl	4(%ebx),%ebp
-
-	subl	%edx,%eax
-	movl	4(%edi),%ecx
-
-	subl	%ecx,%ebp
-	incl	%eax
-
-	incl	%ebp
-	movl	%ebx,%edx
-
-	cmpl	$2,%eax
-	ja		LSplit3
-
-//	d = lp1[1] - lp3[1];
-//	if (d < -1 || d > 1)
-//	{
-//split3:
-//		temp = lp1;
-//		lp3 = lp2;
-//		lp1 = lp3;
-//		lp2 = temp;
-//		goto split;
-//	}
-//
-//	return;			// entire tri is filled
-//
-	cmpl	$2,%ebp
-	jna		LDone
-
-LSplit3:
-	movl	%edi,%ebx
-	movl	%esi,%edi
-	movl	%edx,%esi
-	jmp		LSplit
-
-//split2:
-LSplit2:
-
-//	temp = lp1;
-//	lp1 = lp2;
-//	lp2 = lp3;
-//	lp3 = temp;
-	movl	%ebx,%eax
-	movl	%esi,%ebx
-	movl	%edi,%esi
-	movl	%eax,%edi
-
-//split:
-LSplit:
-
-	subl	$24,%esp		// allocate space for a new vertex
-
-//// split this edge
-//	new[0] = (lp1[0] + lp2[0]) >> 1;
-//	new[1] = (lp1[1] + lp2[1]) >> 1;
-//	new[2] = (lp1[2] + lp2[2]) >> 1;
-//	new[3] = (lp1[3] + lp2[3]) >> 1;
-//	new[5] = (lp1[5] + lp2[5]) >> 1;
-	movl	8(%ebx),%eax
-
-	movl	8(%esi),%edx
-	movl	12(%ebx),%ecx
-
-	addl	%edx,%eax
-	movl	12(%esi),%edx
-
-	sarl	$1,%eax
-	addl	%edx,%ecx
-
-	movl	%eax,8(%esp)
-	movl	20(%ebx),%eax
-
-	sarl	$1,%ecx
-	movl	20(%esi),%edx
-
-	movl	%ecx,12(%esp)
-	addl	%edx,%eax
-
-	movl	0(%ebx),%ecx
-	movl	0(%esi),%edx
-
-	sarl	$1,%eax
-	addl	%ecx,%edx
-
-	movl	%eax,20(%esp)
-	movl	4(%ebx),%eax
-
-	sarl	$1,%edx
-	movl	4(%esi),%ebp
-
-	movl	%edx,0(%esp)
-	addl	%eax,%ebp
-
-	sarl	$1,%ebp
-	movl	%ebp,4(%esp)
-
-//// draw the point if splitting a leading edge
-//	if (lp2[1] > lp1[1])
-//		goto nodraw;
-	cmpl	%eax,4(%esi)
-	jg		LNoDraw
-
-//	if ((lp2[1] == lp1[1]) && (lp2[0] < lp1[0]))
-//		goto nodraw;
-	movl	0(%esi),%edx
-	jnz		LDraw
-
-	cmpl	%ecx,%edx
-	jl		LNoDraw
-
-LDraw:
-
-// z = new[5] >> 16;
-	movl	20(%esp),%edx
-	movl	4(%esp),%ecx
-
-	sarl	$16,%edx
-	movl	0(%esp),%ebp
-
-//	zbuf = zspantable[new[1]] + new[0];
-	movl	C(zspantable)(,%ecx,4),%eax
-
-//	if (z >= *zbuf)
-//	{
-	cmpw	(%eax,%ebp,2),%dx
-	jnge	LNoDraw
-
-//		int		pix;
-//		
-//		*zbuf = z;
-	movw	%dx,(%eax,%ebp,2)
-
-//		pix = d_pcolormap[skintable[new[3]>>16][new[2]>>16]];
-	movl	12(%esp),%eax
-
-	sarl	$16,%eax
-	movl	8(%esp),%edx
-
-	sarl	$16,%edx
-	subl	%ecx,%ecx
-
-	movl	C(skintable)(,%eax,4),%eax
-	movl	4(%esp),%ebp
-
-	movb	(%eax,%edx,),%cl
-	movl	C(d_pcolormap),%edx
-
-	movb	(%edx,%ecx,),%dl
-	movl	0(%esp),%ecx
-
-//		d_viewbuffer[d_scantable[new[1]] + new[0]] = pix;
-	movl	C(d_scantable)(,%ebp,4),%eax
-	addl	%eax,%ecx
-	movl	C(d_viewbuffer),%eax
-	movb	%dl,(%eax,%ecx,1)
-
-//	}
-//
-//nodraw:
-LNoDraw:
-
-//// recursively continue
-//	D_PolysetRecursiveTriangle (lp3, lp1, new);
-	pushl	%esp
-	pushl	%ebx
-	pushl	%edi
-	call	C(D_PolysetRecursiveTriangle)
-
-//	D_PolysetRecursiveTriangle (lp3, new, lp2);
-	movl	%esp,%ebx
-	pushl	%esi
-	pushl	%ebx
-	pushl	%edi
-	call	C(D_PolysetRecursiveTriangle)
-	addl	$24,%esp
-
-LDone:
-	popl	%ebx				// restore register variables
-	popl	%edi
-	popl	%esi
-	popl	%ebp				// restore caller stack frame pointer
-	ret		$12
-
-
-//----------------------------------------------------------------------
 // 8-bpp horizontal span drawing code for affine polygons, with smooth
 // shading and no transparency
 //----------------------------------------------------------------------
+
+//===================================
+//===================================
 
 #define pspans	4+8
 
@@ -588,6 +322,7 @@ C(D_PolysetAff8Start):
 
 .globl C(R_PolysetDrawSpans8_Opaque)
 C(R_PolysetDrawSpans8_Opaque):
+
 	pushl	%esi				// preserve register variables
 	pushl	%ebx
 
@@ -616,6 +351,7 @@ LSpanLoop:
 //		{
 //			d_aspancount += ubasestep;
 //		}
+
 	movl	C(d_aspancount),%eax
 	subl	%edx,%eax
 
@@ -714,7 +450,11 @@ IRInsert:
 // C(a_sstepxfrac) low word = 0
 // C(a_sstepxfrac) high word = C(a_sstepxfrac)
 
+//===
+//Standard Draw Loop
+//===
 LDrawLoop:
+
 	movb C(iractive), %al
 	cmpb $0, %al
 	jne LDrawLoopIR
@@ -886,7 +626,9 @@ LNextSpanESISet:
 	popl	%esi
 	ret
 
-
+//=======
+// IR active draw loop
+//=======
 LDrawLoopIR:
 
 // FIXME: do we need to clamp light? We may need at least a buffer bit to
@@ -1056,7 +798,9 @@ LNextSpanESISetIR:
 	popl	%esi
 	ret
 
-
+//=======
+// Standard One-Long Draw
+//=======
 // draw a one-long span
 
 LExactlyOneLong:
@@ -1084,7 +828,13 @@ LPatch9:
 
 	jmp		LNextSpanESISet
 
+
+//========
+//========
+// draw a one-long span
+
 LExactlyOneLongIR:
+
 	movl	spanpackage_t_pz(%esi),%ecx
 	movl	spanpackage_t_zi(%esi),%ebp
 
@@ -1102,15 +852,11 @@ LExactlyOneLongIR:
 	movb	0x12345678(%eax),%al
 LPatch9IR:
 	movb	%al,(%edi)
+
 	jmp	LNextSpanESISetIR
 
-.globl C(D_PolysetAff8End)
-C(D_PolysetAff8End):
-
-
-.extern C(alias_colormap)
-// #define pcolormap		4
-
+//===================================
+//===================================
 .globl C(D_Aff8Patch)
 C(D_Aff8Patch):
 	movl	C(alias_colormap),%eax
@@ -1135,9 +881,10 @@ C(D_Aff8Patch):
 
 	ret
 
-//----------------------------------------------------------------------
-// Alias model triangle left-edge scanning code
-//----------------------------------------------------------------------
+
+
+//===================================
+//===================================
 
 #define height	4+16
 
@@ -1150,6 +897,7 @@ C(R_PolysetScanLeftEdge):
 
 	movl	height(%esp),%eax
 	movl	C(d_sfrac),%ecx
+
 	andl	$0xFFFF,%eax
 	movl	C(d_ptex),%ebx
 	orl		%eax,%ecx
