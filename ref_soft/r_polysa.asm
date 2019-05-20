@@ -277,7 +277,7 @@ _R_PolysetCalcGradients:
 ; #endif
 ;
  mov eax, dword ptr _d_pdrawspans
- cmp eax, _R_PolysetDrawSpans8_Opaque
+ cmp eax, offset _R_PolysetDrawSpans8_Opaque
  mov eax, dword ptr _r_sstepx
  mov ebx, dword ptr _r_tstepx
  jne translucent

@@ -47,7 +47,6 @@ lzistepx:		.long	0
 // affine triangle gradient calculation code
 //----------------------------------------------------------------------
 
-#if 1
 #define skinwidth	8+0
 .globl C(R_PolysetCalcGradients)
 C(R_PolysetCalcGradients):
@@ -132,8 +131,9 @@ C(R_PolysetCalcGradients):
 	flds	t0                  // t0 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
 	fmuls	p10_minus_p20       // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
 	fxch	%st(2)              // t0 * p11_minus_p21 | t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21
-	fsubp	%st(0), %st(3)      // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
-	fsubrp	%st(0), %st(1)      // t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	// FS: The two lines below are swapped.  GAS generates the wrong opcode for this.
+	fsubrp	%st(0), %st(3)      // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	fsubp	%st(0), %st(1)      // t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
 	fxch	%st(1)              // t1 * p01_minus_p21 - t0 * p11_minus_p21 | t1 * p00_minus_p20 - t0 * p10_minus_p20
 	fmuls	xstepdenominv       // r_lstepx | t1 * p00_minus_p20 - t0 * p10_minus_p20
 	fxch	%st(1)
@@ -175,8 +175,9 @@ C(R_PolysetCalcGradients):
 	flds	t0                  // t0 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
 	fmuls	p10_minus_p20       // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
 	fxch	%st(2)              // t0 * p11_minus_p21 | t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21
-	fsubp	%st(0), %st(3)      // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
-	fsubrp	%st(0), %st(1)      // t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	// FS: The two lines below are swapped.  GAS generates the wrong opcode for this.
+	fsubrp	%st(0), %st(3)      // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	fsubp	%st(0), %st(1)      // t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
 	fxch	%st(1)              // t1 * p01_minus_p21 - t0 * p11_minus_p21 | t1 * p00_minus_p20 - t0 * p10_minus_p20
 	fmuls	xstepdenominv       // r_lstepx | t1 * p00_minus_p20 - t0 * p10_minus_p20
 	fxch	%st(1)
@@ -214,8 +215,9 @@ C(R_PolysetCalcGradients):
 	flds	t0                 // t0 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
 	fmuls	p10_minus_p20      // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
 	fxch	%st(2)             // t0 * p11_minus_p21 | t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21
-	fsubp	%st(0), %st(3)     // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
-	fsubrp	%st(0), %st(1)     // t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	// FS: The two lines below are swapped.  GAS generates the wrong opcode for this.
+	fsubrp	%st(0), %st(3)     // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	fsubp	%st(0), %st(1)     // t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
 	fxch	%st(1)             // t1 * p01_minus_p21 - t0 * p11_minus_p21 | t1 * p00_minus_p20 - t0 * p10_minus_p20
 	fmuls	xstepdenominv      // r_lstepx | t1 * p00_minus_p20 - t0 * p10_minus_p20
 	fxch	%st(1)
@@ -253,8 +255,9 @@ C(R_PolysetCalcGradients):
 	flds	t0                 // t0 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
 	fmuls	p10_minus_p20      // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
 	fxch	%st(2)             // t0 * p11_minus_p21 | t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21
-	fsubp	%st(0), %st(3)     // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
-	fsubrp	%st(0), %st(1)     // t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	// FS: The two lines below are swapped.  GAS generates the wrong opcode for this.
+	fsubrp	%st(0), %st(3)     // t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	fsubp	%st(0), %st(1)     // t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
 	fxch	%st(1)             // t1 * p01_minus_p21 - t0 * p11_minus_p21 | t1 * p00_minus_p20 - t0 * p10_minus_p20
 	fmuls	xstepdenominv      // r_lstepx | t1 * p00_minus_p20 - t0 * p10_minus_p20
 	fxch	%st(1)
@@ -273,7 +276,7 @@ C(R_PolysetCalcGradients):
 // #endif
 //
 	movl	C(d_pdrawspans), %eax
-	cmpl	C(R_PolysetDrawSpans8_Opaque), %eax
+	cmpl	$(C(R_PolysetDrawSpans8_Opaque)), %eax
 	movl	C(r_sstepx), %eax
 	movl	C(r_tstepx), %ebx
 	jne	translucent
@@ -305,7 +308,6 @@ done_with_steps:
 	popl	%ebx
 	popl	%ebp
 	ret
-#endif
 
 //----------------------------------------------------------------------
 // 8-bpp horizontal span drawing code for affine polygons, with smooth
