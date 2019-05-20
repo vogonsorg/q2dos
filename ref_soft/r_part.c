@@ -168,8 +168,10 @@ void R_DrawParticle( void )
 ** if we're using the asm path, it simply assigns a function pointer
 ** and goes.
 */
+#if !defined(_MSC_VER) && (id386)
 #pragma GCC push_options
 #pragma GCC optimize ("O0") /* FS: FIXME: Switching on all O1 and O2 flags manually does not trigger this segfault */
+#endif
 void R_DrawParticles (void)
 {
 	particle_t *p;
@@ -209,4 +211,6 @@ void R_DrawParticles (void)
 	Sys_SetChopCW_FPPrecision();
 #endif
 }
+#if !defined(_MSC_VER) && (id386)
 #pragma GCC pop_options
+#endif

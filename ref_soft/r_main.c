@@ -1029,6 +1029,10 @@ R_RenderFrame
 
 @@@@@@@@@@@@@@@@
 */
+#if !defined(_MSC_VER) && (id386)
+#pragma GCC push_options
+#pragma GCC optimize ("O0") /* FS: FIXME: Switching on all O1 and O2 flags manually does not trigger this segfault */
+#endif
 void R_RenderFrame (refdef_t *fd)
 {
 	r_newrefdef = *fd;
@@ -1102,6 +1106,9 @@ void R_RenderFrame (refdef_t *fd)
 	if (sw_reportedgeout->value && r_outofedges)
 		ri.Con_Printf (PRINT_ALL,"Short roughly %d edges\n", r_outofedges * 2 / 3);
 }
+#if !defined(_MSC_VER) && (id386)
+#pragma GCC pop_options
+#endif
 
 /*
 ** R_InitGraphics
