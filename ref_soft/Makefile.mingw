@@ -45,7 +45,6 @@ ifeq ($(USE_ASM),1)
 REFASM = ../gas/math_ref.o \
 	../gas/math.o \
 	../gas/r_aclipa.o \
-	../gas/r_aliasa.o \
 	../gas/r_draw16.o \
 	../gas/r_drawa.o \
 	../gas/r_edgea.o \
