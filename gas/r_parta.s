@@ -35,6 +35,8 @@ C(R_DrawParticle):
 	movl %ebp, ebpsave
 	pushl %esi
 	pushl %edi
+	pushl %ebx
+
 //
 // transform the particle
 //
@@ -333,6 +335,7 @@ end_of_horiz_loop:
 	popl   %ecx
 
 endpartfunc:
+	popl %ebx
 	popl %edi
 	popl %esi
 	movl ebpsave, %ebp

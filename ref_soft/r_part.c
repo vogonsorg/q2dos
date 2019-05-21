@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -45,7 +45,7 @@ typedef struct
 ** executed is if we're debugging on x86 or if we're
 ** recompiling and deploying on a non-x86 platform.
 **
-** To minimize error and improve readability I went the 
+** To minimize error and improve readability I went the
 ** function pointer route.  This exacts some overhead, but
 ** it pays off in clean and easy to understand code.
 */
@@ -81,7 +81,7 @@ void R_DrawParticle( void )
 	u = (int)(xcenter + zi * transformed[0] + 0.5);
 	v = (int)(ycenter - zi * transformed[1] + 0.5);
 
-	if ((v > d_vrectbottom_particle) || 
+	if ((v > d_vrectbottom_particle) ||
 		(u > d_vrectright_particle) ||
 		(v < d_vrecty) ||
 		(u < d_vrectx))
@@ -90,7 +90,7 @@ void R_DrawParticle( void )
 	}
 
 	/*
-	** compute addresses of zbuffer, framebuffer, and 
+	** compute addresses of zbuffer, framebuffer, and
 	** compute the Z-buffer reference value.
 	*/
 	pz = d_pzbuffer + (d_zwidth * v) + u;
@@ -168,10 +168,6 @@ void R_DrawParticle( void )
 ** if we're using the asm path, it simply assigns a function pointer
 ** and goes.
 */
-#if !defined(_MSC_VER) && (id386)
-#pragma GCC push_options
-#pragma GCC optimize ("O0") /* FS: FIXME: Switching on all O1 and O2 flags manually does not trigger this segfault */
-#endif
 void R_DrawParticles (void)
 {
 	particle_t *p;
@@ -211,6 +207,3 @@ void R_DrawParticles (void)
 	Sys_SetChopCW_FPPrecision();
 #endif
 }
-#if !defined(_MSC_VER) && (id386)
-#pragma GCC pop_options
-#endif
