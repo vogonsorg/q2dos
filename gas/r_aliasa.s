@@ -256,7 +256,7 @@ store_fv4:
 	movl	FINALVERT_Z(%edi), %eax
 	andl	%eax, %eax
 	js	alias_z_clip
-	cmpl	$FALIAS_Z_CLIP_PLANE, %eax 
+	cmpl	FALIAS_Z_CLIP_PLANE, %eax
 	jl	alias_z_clip
 
 //	/*
