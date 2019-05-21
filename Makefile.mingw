@@ -26,7 +26,7 @@ ifeq ($(DEBUG),1)
 CFLAGS = -m32 -Wall -g -fno-strict-aliasing
 CPPFLAGS =
 else
-CFLAGS = -m32 -Wall -g -O2 -fno-strict-aliasing #-fomit-frame-pointer
+CFLAGS = -m32 -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
 CPPFLAGS = -DNDEBUG
 endif
 CPPFLAGS+= -DCLIENT_SPLIT_NETFRAME
@@ -171,6 +171,7 @@ COMMONREFASM = gas/math_ref.o \
 	gas/sys_dosa.o
 ifeq ($(REF_STATIC_SOFT),1)
 REFASM = gas/r_aclipa.o \
+	gas/r_aliasa.o \
 	gas/r_draw16.o \
 	gas/r_drawa.o \
 	gas/r_edgea.o \
