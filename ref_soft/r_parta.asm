@@ -42,6 +42,7 @@ _R_DrawParticle:
  mov  dword ptr [ebpsave], ebp
  push esi
  push edi
+ push ebx
 
 ;
 ; transform the particle
@@ -341,6 +342,7 @@ end_of_horiz_loop:
  pop   ecx
 
 endpartfunc:
+ pop ebx
  pop edi
  pop esi
  mov ebp, dword ptr[ebpsave]
