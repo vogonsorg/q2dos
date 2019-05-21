@@ -45,6 +45,7 @@ REFASM = ../gas/math_ref.o \
 	../gas/math.o \
 	../gas/d_copy.o \
 	../gas/r_aclipa.o \
+	../gas/r_aliasa.o \
 	../gas/r_draw16.o \
 	../gas/r_drawa.o \
 	../gas/r_edgea.o \

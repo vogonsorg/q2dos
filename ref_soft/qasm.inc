@@ -15,6 +15,37 @@ id386	equ		1
 ; !!! must be kept the same as in d_iface.h !!!
 TRANSPARENT_COLOR	equ		255
 
+; !!! must be kept the same as in qfiles.h !!!
+DTRIVERTX_V0		equ		0
+DTRIVERTX_V1		equ		1
+DTRIVERTX_V2		equ		2
+DTRIVERTX_LNI		equ		3
+DTRIVERTX_SIZE		equ		4
+
+; !!! must be kept the same as in r_local.h !!!
+FINALVERT_V0		equ		0
+FINALVERT_V1		equ		4
+FINALVERT_V2		equ		8
+FINALVERT_V3		equ		12
+FINALVERT_V4		equ		16
+FINALVERT_V5		equ		20
+FINALVERT_FLAGS		equ		24
+FINALVERT_X			equ		28
+FINALVERT_Y			equ		32
+FINALVERT_Z			equ		36
+FINALVERT_SIZE		equ		40
+
+; !!! must be kept the same as in r_local.h !!!
+ALIAS_LEFT_CLIP		equ		0001h
+ALIAS_TOP_CLIP		equ		0002h
+ALIAS_RIGHT_CLIP	equ		0004h
+ALIAS_BOTTOM_CLIP	equ		0008h
+ALIAS_Z_CLIP		equ		0010h
+ALIAS_XY_CLIP_MASK	equ		000Fh
+
+; !!! must be kept the same as in ref.h !!!
+ENTITY_FLAGS		equ		68
+
 ifndef GLQUAKE
 	externdef _d_zistepu:dword
 	externdef _d_pzbuffer:dword
@@ -186,6 +217,22 @@ ifndef GLQUAKE
 	externdef _r_zistepy:dword
 	externdef _D_PolysetSetEdgeTable:dword
 	externdef _D_RasterizeAliasPolySmooth:dword
+	externdef _R_PolysetDrawSpans8_Opaque:PROC
+	externdef _d_pdrawspans:dword
+	externdef _vright:dword
+	externdef _vup:dword
+	externdef _vpn:dword
+	externdef _partparms:dword
+	externdef _s_prefetch_address:dword
+	externdef _r_screenwidth:dword
+	externdef _vid:dword
+	externdef _r_lerp_backv:dword
+	externdef _r_lerp_frontv:dword
+	externdef _r_lerp_move:dword
+	externdef _currententity:dword
+	externdef _s_ziscale:dword
+	externdef _aliasxscale:dword
+	externdef _aliasyscale:dword
 
 	externdef float_point5:dword
 	externdef Float2ToThe31nd:dword
@@ -235,15 +282,6 @@ ifndef GLQUAKE
 	externdef fp_64kx64k:dword
 	externdef pz:dword
 	externdef spr8entryvec_table:dword
-	externdef _vright:dword
-	externdef _vup:dword
-	externdef _vpn:dword
-	externdef _partparms:dword
-	externdef _s_prefetch_address:dword
-	externdef _r_screenwidth:dword
-	externdef _vid:dword
-	externdef _R_PolysetDrawSpans8_Opaque:PROC
-	externdef _d_pdrawspans:dword
 endif
 
 	externdef _fpu_ceil_cw:dword
