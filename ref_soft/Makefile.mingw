@@ -5,7 +5,7 @@ USE_ASM=1
 #
 USE_SSE=0
 
-CFLAGS = -m32 -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
+CFLAGS = -m32 -Wall -g -O2 -fno-strict-aliasing #-fomit-frame-pointer
 CPPFLAGS = -DNDEBUG
 LDFLAGS = -m32 -shared -Wl,--enable-auto-image-base -Wl,--no-undefined
 LDLIBS = -lwinmm -lgdi32

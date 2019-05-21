@@ -32,6 +32,7 @@ C(R_DrawParticle):
 //
 // save trashed variables
 //
+	pushl %ebx			// FS: Need to save this or it will get stomped in GCC with optimizations
 	movl %ebp, ebpsave
 	pushl %esi
 	pushl %edi
@@ -336,6 +337,7 @@ endpartfunc:
 	popl %edi
 	popl %esi
 	movl ebpsave, %ebp
+	popl %ebx			// FS: Need to restore this or it will get stomped in GCC with optimizations
 	ret
 
 #endif	// id386

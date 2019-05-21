@@ -26,7 +26,7 @@ ifeq ($(DEBUG),1)
 CFLAGS = -m32 -Wall -g -fno-strict-aliasing
 CPPFLAGS =
 else
-CFLAGS = -m32 -Wall -O2 -fno-strict-aliasing -fomit-frame-pointer
+CFLAGS = -m32 -Wall -g -O2 -fno-strict-aliasing #-fomit-frame-pointer
 CPPFLAGS = -DNDEBUG
 endif
 CPPFLAGS+= -DCLIENT_SPLIT_NETFRAME
