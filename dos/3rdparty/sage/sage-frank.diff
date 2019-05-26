@@ -1,0 +1,99 @@
+diff --git a/drivers/glide/drv_api.c b/drivers/glide/drv_api.c
+index ef6adc4..dc6d914 100644
+--- a/drivers/glide/drv_api.c
++++ b/drivers/glide/drv_api.c
+@@ -560,17 +560,15 @@ sage_open (int db_flag,
+     /* Finish driver setup */
+     tex_bound_mask = (hardware < GR_SSTTYPE_Banshee) ? 0x1fffff : -1U;
+ 
+-    if (tm_init() != 0) {
+-	goto exit_error2;
+-    }
++    /** FS: moved tm_init() to sage_bind(), see comments in there. **/
+ 
+     if (vb_init() != 0) {
+-	goto exit_error3;
++	goto exit_error2;
+     }
+ 
+     fogtable = malloc(getInteger(GR_FOG_TABLE_ENTRIES) * sizeof(GrFog_t));
+     if (fogtable == NULL) {
+-	goto exit_error4;
++	goto exit_error3;
+     }
+ 
+     /* XXX getInteger(GR_GLIDE_STATE_SIZE) */
+@@ -615,10 +613,8 @@ sage_open (int db_flag,
+ 
+     return ctx;
+ 
+-  exit_error4:
+-    free_a(vb);
+   exit_error3:
+-    tm_fini();
++    free_a(vb);
+   exit_error2:
+     ctx_fini();
+   exit_error1:
+@@ -676,6 +672,13 @@ sage_bind (sageContext *ctx, void *win, int width, int height)
+     if (ctx->gr_ctx == 0) {
+ 	return -1;
+     }
++
++    /* FS: This has to be moved here, otherwise grTexMaxAddress() will fail
++     * on Windows, because context needs creating from grSstWinOpen() first.
++     * See GLIDE_CHECK_CONTEXT in glide3x. */
++    if (tm_init() != 0) {
++	return -1;
++    }
+     ctx->drawable = win;
+     current = ctx;
+ 
+diff --git a/drivers/glide/drv_texman.c b/drivers/glide/drv_texman.c
+index 1740fc5..b549c72 100644
+--- a/drivers/glide/drv_texman.c
++++ b/drivers/glide/drv_texman.c
+@@ -301,7 +301,7 @@ tmu_movein (TEX_OBJ *obj, GLuint where)
+  *
+  * \param tmu texture unit
+  */
+-static void
++static int
+ tmu_init (GLuint tmu)
+ {
+     MEM_RANGE *range, *last;
+@@ -309,6 +309,9 @@ tmu_init (GLuint tmu)
+ 
+     start = grTexMinAddress(tmu);
+     end = grTexMaxAddress(tmu);
++    if (end == 0) {
++	return -1; /* FS: This is bad, so let's early out. */
++    }
+ 
+     chunk = tex_bound_mask + 1;
+     if (chunk == 0) {
+@@ -336,6 +339,8 @@ tmu_init (GLuint tmu)
+ 
+ 	blockstart += chunk;
+     }
++
++    return 0;
+ }
+ 
+ 
+@@ -403,9 +408,13 @@ tm_init (void)
+ 	grEnable(GR_TEXTURE_UMA_EXT);
+     }
+ 
+-    tmu_init(GR_TMU0);
++    if (tmu_init(GR_TMU0) < 0) {
++	return -1;
++    }
+     if (!allow_texuma && allow_multitex) {
+-	tmu_init(GR_TMU1);
++	if (tmu_init(GR_TMU1) < 0) {
++	    return -1;
++	}
+     }
+ 
+     return 0;
