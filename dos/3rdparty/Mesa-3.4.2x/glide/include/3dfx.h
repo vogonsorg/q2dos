@@ -16,9 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Revision: 1.3 $
-** $Date: 2000/09/11 18:51:51 $
 */
 #ifndef __3DFX_H__
 #define __3DFX_H__
@@ -30,12 +27,12 @@ typedef unsigned char   FxU8;
 typedef signed   char   FxI8;
 typedef unsigned short  FxU16;
 typedef signed   short  FxI16;
-#if defined(__alpha__) || defined (__LP64__)
-typedef signed   int    FxI32;
-typedef unsigned int    FxU32;
-#else
+#if defined(__DOS__) || defined(__MSDOS__) || defined(_WIN32) || defined(macintosh)
 typedef signed   long   FxI32;
 typedef unsigned long   FxU32;
+#else
+typedef signed   int    FxI32;
+typedef unsigned int    FxU32;
 #endif
 typedef unsigned long   AnyPtr;
 typedef int             FxBool;
@@ -58,7 +55,7 @@ typedef struct { float r, g, b, a; } FxColor4;
 ** helper macros
 */
 #define FXUNUSED( a ) ((void)(a))
-#define FXBIT( i )    ( 1L << (i) )
+#define FXBIT( i )    ( 1 << (i) )
 
 /*
 ** export macros

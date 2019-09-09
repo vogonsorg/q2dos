@@ -16,12 +16,6 @@
 ** THE UNITED STATES.  
 ** 
 ** COPYRIGHT 3DFX INTERACTIVE, INC. 1999, ALL RIGHTS RESERVED
-**
-** $Header: /cvsroot/glide/glide2x/cvg/glide/src/glidesys.h,v 1.1.1.1 1999/12/07 21:49:10 joseph Exp $
-** $Log: glidesys.h,v $
-** Revision 1.1.1.1  1999/12/07 21:49:10  joseph
-** Initial checkin into SourceForge.
-**
  * 
  * 10    12/09/97 12:20p Peter
  * mac glide port
@@ -93,7 +87,7 @@ n** -----------------------------------------------------------------------
 /* Check for OS */
 #if defined(__IRIX__) || defined(__sparc__) || defined(__linux__)
 #  define GLIDE_OS        GLIDE_OS_UNIX
-#elif defined(__DOS__)
+#elif defined(__DOS__) || defined(__MSDOS__)
 #  define GLIDE_OS        GLIDE_OS_DOS32
 #elif defined(__WIN32__)
 #  define GLIDE_OS        GLIDE_OS_WIN32
