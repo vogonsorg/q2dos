@@ -186,12 +186,12 @@ void Com_DPrintf (unsigned int developerFlags, char *fmt, ...) /* FS: Added deve
 	char		msg[MAXPRINTMSG];
 	unsigned int			devValue = 0;
 		
-	if (!developer || !developer->value)
+	if (!developer || !developer->intValue)
 		return;			// don't confuse non-developers with techie stuff...
 
-	devValue = (unsigned int)developer->value;
+	devValue = (unsigned int)developer->intValue;
 
-	if (developer->value == 1) /* FS: Show all except extremely verbose shit */
+	if (developer->intValue == 1) /* FS: Show all except extremely verbose shit */
 		devValue = 65534;
 
 	if (!(devValue & developerFlags))
@@ -1475,7 +1475,7 @@ void Qcommon_Init (int argc, char **argv)
 	Cvar_Get ("version", s, CVAR_SERVERINFO|CVAR_NOSET);
 
 
-	if (dedicated->value)
+	if (dedicated->intValue)
 	{
 		Cmd_AddCommand ("quit", Com_Quit);
 	}
@@ -1490,7 +1490,7 @@ void Qcommon_Init (int argc, char **argv)
 
 #ifdef _WIN32
 #ifdef NEW_DED_CONSOLE
-	if (!dedicated->value)
+	if (!dedicated->intValue)
 		Sys_ShowConsole(false);
 #endif // NEW_DED_CONSOLE
 #endif // _WIN32
@@ -1498,7 +1498,7 @@ void Qcommon_Init (int argc, char **argv)
 	// add + commands from command line
 	if (!Cbuf_AddLateCommands ())
 	{	// if the user didn't give any commands, run default action
-		if (!dedicated->value)
+		if (!dedicated->intValue)
 		{
 			Cbuf_AddText ("d1\n");
 		}
@@ -1539,7 +1539,7 @@ void Qcommon_Frame (int msec)
 	{
 		log_stats->modified = false;
 
-		if ( log_stats->value )
+		if (log_stats->intValue)
 		{
 			if ( log_stats_file )
 			{
@@ -1564,13 +1564,13 @@ void Qcommon_Frame (int msec)
 		}
 	}
 
-	if (fixedtime->value)
+	if (fixedtime->intValue)
 	{
-		msec = fixedtime->value;
+		msec = fixedtime->intValue;
 	}
-	else if (timescale->value)
+	else if (timescale->intValue)
 	{
-		msec = (int)(msec * timescale->value);
+		msec = msec * timescale->intValue;
 
 		if (msec < 1)
 		{
@@ -1578,7 +1578,7 @@ void Qcommon_Frame (int msec)
 		}
 	}
 
-	if (showtrace->value)
+	if (showtrace->intValue)
 	{
 		extern	int c_traces, c_brush_traces;
 		extern	int	c_pointcontents;
@@ -1602,26 +1602,26 @@ void Qcommon_Frame (int msec)
 
 	Cbuf_Execute ();
 
-	if (host_speeds->value)
+	if (host_speeds->intValue)
 	{
 		time_before = Sys_Milliseconds ();
 	}
 
 	SV_Frame (msec);
 
-	if (host_speeds->value)
+	if (host_speeds->intValue)
 	{
 		time_between = Sys_Milliseconds ();
 	}
 
 	CL_Frame (msec);
 
-	if (host_speeds->value)
+	if (host_speeds->intValue)
 	{
 		time_after = Sys_Milliseconds ();
 	}
 
-	if (host_speeds->value)
+	if (host_speeds->intValue)
 	{
 		int			all, sv, gm, cl, rf;
 

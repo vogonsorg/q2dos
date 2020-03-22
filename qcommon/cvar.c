@@ -37,11 +37,11 @@ Cvar_InfoValidate
 */
 static qboolean Cvar_InfoValidate (char *s)
 {
-	if (strstr (s, "\\"))
+	if (strchr(s, '\\'))
 		return false;
-	if (strstr (s, "\""))
+	if (strchr(s, '\"'))
 		return false;
-	if (strstr (s, ";"))
+	if (strchr(s, ';'))
 		return false;
 	return true;
 }
@@ -77,6 +77,20 @@ float Cvar_VariableValue (char *var_name)
 	return atof (var->string);
 }
 
+/*
+============
+Cvar_VariableValue
+============
+*/
+int Cvar_VariableValueInt (char *var_name) /* FS */
+{
+	cvar_t	*var;
+
+	var = Cvar_FindVar (var_name);
+	if (!var)
+		return 0;
+	return var->intValue;
+}
 
 /*
 ============
@@ -398,7 +412,7 @@ qboolean Cvar_Command (void)
 
 	if (!strcmp(v->name, "developer") && con_show_dev_flags->intValue) /* FS: Special case for showing enabled flags */
 	{
-		if(strlen(Cmd_Argv(1)) > 0)
+		if (Cmd_Argv(1)[0] != '\0')
 			Cvar_Set(developer->name, Cmd_Argv(1));
 		Cvar_ParseDeveloperFlags();
 		return true;
@@ -478,7 +492,19 @@ void Cvar_WriteVariables (char *path)
 	char	buffer[1024];
 	FILE	*f;
 
+	if (!path)
+	{
+		Com_Error(ERR_DROP, "Cvar_WriteVariables(): Null or empty path.  Aborting.\n");
+		return;
+	}
+
 	f = fopen (path, "a");
+	if (!f)
+	{
+		Com_Error(ERR_DROP, "Cvar_WriteVariables(): Failed to open %s for writing.\n", path);
+		return;
+	}
+
 	for (var = cvar_vars ; var ; var = var->next)
 	{
 		if (var->flags & CVAR_ARCHIVE)
@@ -802,13 +828,13 @@ void Cvar_ParseDeveloperFlags (void) /* FS: Special stuff for showing all the de
 
 	Com_Printf("\"%s\" is \"%s\", Default: \"%s\"\n", developer->name, developer->string, developer->defaultValue);
 
-	if(developer->value > 0)
+	if (developer->intValue)
 	{
 		unsigned int devFlags = 0;
-		if(developer->value == 1)
+		if(developer->intValue == 1)
 			devFlags = 65534;
 		else
-			devFlags = (unsigned int)developer->value;
+			devFlags = (unsigned int)developer->intValue;
 		Com_Printf("Toggled flags:\n");
 		if(devFlags & DEVELOPER_MSG_STANDARD)
 			Com_Printf(" * Standard messages - 2\n");
@@ -859,8 +885,10 @@ void Cvar_SetDescription (char *var_name, const char *description) /* FS: Set de
 		Com_DPrintf(DEVELOPER_MSG_STANDARD, "Error: Can't set description for %s!\n", var_name);
 		return;
 	}
+
 	if (!description) {
 		Com_DPrintf(DEVELOPER_MSG_STANDARD, "NULL description for %s\n", var_name);
+		return;
 	}
 
 	if (var->description)

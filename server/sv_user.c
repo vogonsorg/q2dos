@@ -411,7 +411,7 @@ void SV_BeginDownload_f (void)
 			// r1ch: \ is bad in general, client won't even write properly if we do sent it
 			|| strchr (name, '\\')
 			// MUST be in a subdirectory, unless a pk3	
-			|| (!strstr (name, "/") )
+			|| (!strchr(name, '/'))
 			// r1ch: another bug, maps/. will fopen(".") -> crash
 			|| !IsValidChar(name[length-1]) )
 /*	if (strstr (name, "..") || !allow_download->value
@@ -773,7 +773,7 @@ void SV_ExecuteClientMessage (client_t *cl)
 				return;
 			}
 
-			if (!sv_paused->value)
+			if (!sv_paused->intValue)
 			{
 				net_drop = cl->netchan.dropped;
 				if (net_drop < 20)

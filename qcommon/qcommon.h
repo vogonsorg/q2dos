@@ -502,6 +502,8 @@ void	Cvar_SetValue (char *var_name, float value);
 float	Cvar_VariableValue (char *var_name);
 // returns 0 if not defined or non numeric
 
+int		Cvar_VariableValueInt (char *var_name); /* FS */
+
 char	*Cvar_VariableString (char *var_name);
 // returns an empty string if not defined
 

@@ -370,7 +370,7 @@ qboolean	NET_GetPacket (netsrc_t sock, netadr_t *net_from, sizebuf_t *net_messag
 				continue;
 			}
 
-			if (dedicated->value)	// let dedicated servers continue after errors
+			if (dedicated->intValue)	// let dedicated servers continue after errors
 			{
 				if(err == WSAECONNRESET) /* FS: Don't need to see this spam from connecting to ourselves */
 				{
@@ -463,7 +463,7 @@ void NET_SendPacket (netsrc_t sock, int length, void *data, netadr_t to)
 		if ((err == WSAEADDRNOTAVAIL) && ((to.type == NA_BROADCAST) || (to.type == NA_BROADCAST_IPX)))
 			return;
 
-		if (dedicated->value)	// let dedicated servers continue after errors
+		if (dedicated->intValue)	// let dedicated servers continue after errors
 		{
 			Com_Printf ("NET_SendPacket ERROR: %s to %s\n", NET_ErrorString(),
 				NET_AdrToString (to));
@@ -732,9 +732,9 @@ void	NET_Config (qboolean multiplayer)
 	}
 	else
 	{	// open sockets
-		if (! noudp->value)
+		if (!noudp->intValue)
 			NET_OpenIP ();
-		if (! noipx->value)
+		if (!noipx->intValue)
 			NET_OpenIPX ();
 	}
 }

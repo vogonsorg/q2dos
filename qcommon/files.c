@@ -912,8 +912,8 @@ void FS_SetGamedir (char *dir)
 {
 	searchpath_t	*next;
 
-	if (!strcmp(dir, ".") || strstr(dir, "..") || strstr(dir, "/")
-		|| strstr(dir, "\\") || strstr(dir, ":"))
+	if (!strcmp(dir, ".") || strstr(dir, "..") || strchr(dir, '/')
+		|| strchr(dir, '\\') || strchr(dir, ':'))
 	{
 		Com_Printf ("Gamedir should be a single filename, not a path\n");
 		return;
@@ -969,6 +969,7 @@ void FS_Link_f (void)
 {
 	filelink_t	*l, **prev;
 	const char	*to;
+	int toLen = 0;
 
 	if (Cmd_Argc() != 3)
 	{
@@ -985,6 +986,8 @@ void FS_Link_f (void)
 			Com_Printf ("Illegal destination path.\n");
 			return;
 		}
+
+		toLen = strlen(to);
 	}
 
 	// see if the link already exists
@@ -994,7 +997,7 @@ void FS_Link_f (void)
 		if (!strcmp (l->from, Cmd_Argv(1)))
 		{
 			Z_Free (l->to);
-			if (!strlen(Cmd_Argv(2)))
+			if (!toLen)
 			{	// delete it
 				*prev = l->next;
 				Z_Free (l->from);

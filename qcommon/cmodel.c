@@ -538,7 +538,7 @@ void CMod_LoadEntityString (lump_t *l, char *name)
 	entBSP[l->filelen]=0; /* FS: Paranoia null terminator */
 
 	// Knightmare 6/25/12- optional .ent file loading
-	if (sv_entfile->value)
+	if (sv_entfile->intValue)
 	{
 		char		en[MAX_QPATH];
 		char		*buffer = NULL;
@@ -606,16 +606,16 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 
 	map_noareas = Cvar_Get ("map_noareas", "0", 0);
 	/* FS: Check to see if entfile changed.  ->modified isn't working right, so I'll half ass this. */
-	if ((sv_entfile->value >= 1 && entToggle == false) || (sv_entfile->value == 0 && entToggle == true)) // Knightmare:  Logic adjustment
+	if ((sv_entfile->intValue >= 1 && entToggle == false) || (sv_entfile->intValue == 0 && entToggle == true)) // Knightmare:  Logic adjustment
 		map_name[0] = 0;
 
 	/* FS: For checkin' later */
-	if (sv_entfile->value)
+	if (sv_entfile->intValue)
 		entToggle = true;
 	else
 		entToggle = false;
 
-	if (  !strcmp (map_name, name) && (clientload || !Cvar_VariableValue ("flushmap")) )
+	if ((name && !strcmp (map_name, name)) && (clientload || !Cvar_VariableValueInt("flushmap")))
 	{
 		*checksum = last_checksum;
 		if (!clientload)
@@ -1719,7 +1719,7 @@ void	CM_SetAreaPortalState (int portalnum, qboolean open)
 
 qboolean	CM_AreasConnected (int area1, int area2)
 {
-	if (map_noareas->value)
+	if (map_noareas->intValue)
 		return true;
 
 	if (area1 > numareas || area2 > numareas)
@@ -1749,7 +1749,7 @@ int CM_WriteAreaBits (byte *buffer, int area)
 
 	bytes = (numareas+7)>>3;
 
-	if (map_noareas->value)
+	if (map_noareas->intValue)
 	{	// for debugging, send everything
 		memset (buffer, 255, bytes);
 	}
