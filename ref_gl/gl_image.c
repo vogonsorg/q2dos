@@ -429,9 +429,9 @@ int Scrap_AllocBlock (int w, int h, int *x, int *y)
 {
 	int		i, j;
 	int		best, best2;
-	int		texnum;
+	int		texnum = 0;
 
-	for (texnum=0 ; texnum<MAX_SCRAPS ; texnum++)
+//	for (texnum=0 ; texnum<MAX_SCRAPS ; texnum++) /* FS: MAX_SCRAPS is 1. */
 	{
 		best = BLOCK_HEIGHT;
 
@@ -454,7 +454,10 @@ int Scrap_AllocBlock (int w, int h, int *x, int *y)
 		}
 
 		if (best + h > BLOCK_HEIGHT)
-			continue;
+		{
+			// continue;
+			return -1;
+		}
 
 		for (i=0 ; i<w ; i++)
 			scrap_allocated[texnum][*x + i] = best + h;

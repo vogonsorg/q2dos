@@ -138,9 +138,9 @@ static void GL_DrawAliasFrameLerp (dmdl_t *paliashdr, float backlerp)
 
 	GL_LerpVerts( paliashdr->num_xyz, v, ov, verts, lerp, move, frontv, backv );
 
-	if ( gl_vertex_arrays->value )
+	if (gl_vertex_arrays->intValue)
 	{
-		float colorArray[MAX_VERTS*4];
+		float colorArray[MAX_VERTS * 4] = { 0 };
 
 		qglEnableClientState( GL_VERTEX_ARRAY );
 		qglVertexPointer( 3, GL_FLOAT, 16, s_lerped );	/* padded for SIMD */
@@ -474,7 +474,7 @@ void R_DrawAliasModel (entity_t *e)
 
 	if ( e->flags & RF_WEAPONMODEL )
 	{
-		if ( r_lefthand->value == 2 )
+		if (r_lefthand->intValue == 2)
 			return;
 	}
 
@@ -616,7 +616,7 @@ void R_DrawAliasModel (entity_t *e)
 			qglLoadIdentity();
 		}
 
-		if(r_lefthand->value == 1.0f)
+		if (r_lefthand->intValue == 1)
 			qglScalef(-1.0f, 1.0f, 1.0f);
 
 		if (bDoGunFov)
@@ -625,7 +625,7 @@ void R_DrawAliasModel (entity_t *e)
 			qglMatrixMode(GL_MODELVIEW);
 		}
 
-		if(r_lefthand->value == 1.0f)
+		if (r_lefthand->intValue == 1)
 			qglCullFace(GL_BACK);
 	}
 
@@ -682,7 +682,7 @@ void R_DrawAliasModel (entity_t *e)
 		currententity->oldframe = 0;
 	}
 
-	if ( !r_lerpmodels->value )
+	if (!r_lerpmodels->intValue)
 		currententity->backlerp = 0;
 	GL_DrawAliasFrameLerp (paliashdr, currententity->backlerp);
 
@@ -691,7 +691,7 @@ void R_DrawAliasModel (entity_t *e)
 
 	qglPopMatrix ();
 
-	if (gl_showbbox->value)	/* Knightmare- show bbox option */
+	if (gl_showbbox->intValue)	/* Knightmare- show bbox option */
 	{
 		qglColor4f (1.0f, 1.0f, 1.0f, 1.0f);
 		qglDisable( GL_CULL_FACE );
@@ -735,7 +735,7 @@ void R_DrawAliasModel (entity_t *e)
 			qglPopMatrix();
 			qglMatrixMode(GL_MODELVIEW);
 		}
-		if(r_lefthand->value == 1.0F)
+		if(r_lefthand->intValue == 1)
 			qglCullFace(GL_FRONT);
 	}
 
