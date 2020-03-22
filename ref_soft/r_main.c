@@ -243,8 +243,8 @@ void R_InitTurb (void)
 
 	for (i=0 ; i<TABLESIZE ; i++) // FS: Changed from 1280
 	{
-		sintable[i] = AMP + sin(i*3.14159*2/CYCLE)*AMP;
-		intsintable[i] = AMP2 + sin(i*3.14159*2/CYCLE)*AMP2;	// AMP2, not 20
+		sintable[i] = AMP + sin(i*M_PI*2/CYCLE)*AMP;
+		intsintable[i] = AMP2 + sin(i*M_PI*2/CYCLE)*AMP2;	// AMP2, not 20
 		blanktable[i] = 0;			//PGM
 	}
 }
@@ -477,12 +477,12 @@ void R_MarkLeaves (void)
 	mleaf_t	*leaf;
 	int		cluster;
 
-	if (r_oldviewcluster == r_viewcluster && !r_novis->value && r_viewcluster != -1)
+	if (r_oldviewcluster == r_viewcluster && !r_novis->intValue && r_viewcluster != -1)
 		return;
 
 	// development aid to let you run around and see exactly where
 	// the pvs ends
-	if (sw_lockpvs->value)
+	if (sw_lockpvs->intValue)
 		return;
 
 	r_visframecount++;
@@ -555,7 +555,7 @@ void R_DrawEntitiesOnList (void)
 	int			i;
 	qboolean	translucent_entities = false;
 
-	if (!r_drawentities->value)
+	if (!r_drawentities->intValue)
 		return;
 
 	// all bmodels have already been drawn by the edge list
@@ -813,7 +813,7 @@ void R_DrawBEntitiesOnList (void)
 	float		minmaxs[6];
 	mnode_t		*topnode;
 
-	if (!r_drawentities->value)
+	if (!r_drawentities->intValue)
 		return;
 
 	VectorCopy (modelorg, oldorigin);
@@ -923,14 +923,14 @@ void R_EdgeDrawing (void)
 
 	R_BeginEdgeFrame ();
 
-	if (r_dspeeds->value)
+	if (r_dspeeds->intValue)
 	{
 		rw_time1 = Sys_Milliseconds ();
 	}
 
 	R_RenderWorld ();
 
-	if (r_dspeeds->value)
+	if (r_dspeeds->intValue)
 	{
 		rw_time2 = Sys_Milliseconds ();
 		db_time1 = rw_time2;
@@ -938,7 +938,7 @@ void R_EdgeDrawing (void)
 
 	R_DrawBEntitiesOnList ();
 
-	if (r_dspeeds->value)
+	if (r_dspeeds->intValue)
 	{
 		db_time2 = Sys_Milliseconds ();
 		se_time1 = db_time2;
@@ -1039,7 +1039,7 @@ void R_RenderFrame (refdef_t *fd)
 	VectorCopy (fd->vieworg, r_refdef.vieworg);
 	VectorCopy (fd->viewangles, r_refdef.viewangles);
 
-	if (r_speeds->value || r_dspeeds->value)
+	if (r_speeds->intValue || r_dspeeds->intValue)
 		r_time1 = Sys_Milliseconds ();
 
 	R_SetupFrame ();
@@ -1050,7 +1050,7 @@ void R_RenderFrame (refdef_t *fd)
 
 	R_EdgeDrawing ();
 
-	if (r_dspeeds->value)
+	if (r_dspeeds->intValue)
 	{
 		se_time2 = Sys_Milliseconds ();
 		de_time1 = se_time2;
@@ -1058,7 +1058,7 @@ void R_RenderFrame (refdef_t *fd)
 
 	R_DrawEntitiesOnList ();
 
-	if (r_dspeeds->value)
+	if (r_dspeeds->intValue)
 	{
 		de_time2 = Sys_Milliseconds ();
 		dp_time1 = Sys_Milliseconds ();
@@ -1066,7 +1066,7 @@ void R_RenderFrame (refdef_t *fd)
 
 	R_DrawParticles ();
 
-	if (r_dspeeds->value)
+	if (r_dspeeds->intValue)
 		dp_time2 = Sys_Milliseconds ();
 
 	currententity = &r_worldentity; // FS: Dr Jack Whitham ref_soft fix
@@ -1079,27 +1079,27 @@ void R_RenderFrame (refdef_t *fd)
 	if (r_dowarp)
 		D_WarpScreen ();
 
-	if (r_dspeeds->value)
+	if (r_dspeeds->intValue)
 		da_time1 = Sys_Milliseconds ();
 
-	if (r_dspeeds->value)
+	if (r_dspeeds->intValue)
 		da_time2 = Sys_Milliseconds ();
 
 	R_CalcPalette ();
 
-	if (sw_aliasstats->value)
+	if (sw_aliasstats->intValue)
 		R_PrintAliasStats ();
 
-	if (r_speeds->value)
+	if (r_speeds->intValue)
 		R_PrintTimes ();
 
-	if (r_dspeeds->value)
+	if (r_dspeeds->intValue)
 		R_PrintDSpeeds ();
 
-	if (sw_reportsurfout->value && r_outofsurfaces)
+	if (sw_reportsurfout->intValue && r_outofsurfaces)
 		ri.Con_Printf (PRINT_ALL,"Short %d surfaces\n", r_outofsurfaces);
 
-	if (sw_reportedgeout->value && r_outofedges)
+	if (sw_reportedgeout->intValue && r_outofedges)
 		ri.Con_Printf (PRINT_ALL,"Short roughly %d edges\n", r_outofedges * 2 / 3);
 }
 

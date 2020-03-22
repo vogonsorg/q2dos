@@ -577,7 +577,7 @@ int Rcon_Validate (void)
 	if (!strlen (rcon_password->string))
 		return 0;
 
-	if (strcmp (Cmd_Argv(1), rcon_password->string) == 0)
+	if (strcmp (Cmd_Argv(1), rcon_password->string) != 0)
 		return 0;
 
 	return 1;

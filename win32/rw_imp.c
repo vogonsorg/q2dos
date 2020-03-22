@@ -54,7 +54,7 @@ void VID_CreateWindow( int width, int height, int stylebits )
 	vid_ypos = ri.Cvar_Get ("vid_ypos", "0", 0);
 	vid_fullscreen = ri.Cvar_Get ("vid_fullscreen", "0", CVAR_ARCHIVE );
 
-	if ( vid_fullscreen->value )
+	if ( vid_fullscreen->intValue)
 		exstyle = WS_EX_TOPMOST;
 	else
 		exstyle = 0;
@@ -391,7 +391,7 @@ void SWimp_AppActivate( qboolean active )
 		{
 			if ( sww_state.initializing )
 				return;
-			if ( vid_fullscreen->value )
+			if ( vid_fullscreen->intValue)
 				ShowWindow( sww_state.hWnd, SW_MINIMIZE );
 		}
 	}

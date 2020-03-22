@@ -224,7 +224,7 @@ R_LightPoint
 void R_LightPoint (vec3_t p, vec3_t color)
 {
 	vec3_t		end;
-	float		r;
+	int			r;
 	int			lnum;
 	dlight_t	*dl;
 //	float		light; // FS: Unused

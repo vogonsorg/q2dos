@@ -105,9 +105,9 @@ static unsigned long R_AliasCheckFrameBBox (daliasframe_t *frame, float worldxf[
 	{
 		return BBOX_TRIVIAL_REJECT;
 	}
-	if ( zclipped )
+//	if ( zclipped ) /* FS: This does nothing. */
 	{
-		return ( BBOX_MUST_CLIP_XY | BBOX_MUST_CLIP_Z );
+//		return ( BBOX_MUST_CLIP_XY | BBOX_MUST_CLIP_Z );
 	}
 
 	/*
@@ -219,7 +219,7 @@ static void R_AliasPreparePoints (void)
 						((CACHE_SIZE - 1) / sizeof(finalvert_t)) + 3];
 	finalvert_t	*pfinalverts;
 
-	iractive = (r_newrefdef.rdflags & RDF_IRGOGGLES && currententity->flags & RF_IR_VISIBLE); /* PGM */
+	iractive = ((r_newrefdef.rdflags & RDF_IRGOGGLES) && (currententity->flags & RF_IR_VISIBLE)); /* PGM */
 
 	/* put work vertexes on stack, cache aligned */
 	pfinalverts = (finalvert_t *)
@@ -239,7 +239,7 @@ static void R_AliasPreparePoints (void)
 	pstverts = (dstvert_t *)((byte *)s_pmdl + s_pmdl->ofs_st);
 	ptri = (dtriangle_t *)((byte *)s_pmdl + s_pmdl->ofs_tris);
 
-	if ( ( currententity->flags & RF_WEAPONMODEL ) && ( r_lefthand->value == 1.0F ) )
+	if ( (currententity->flags & RF_WEAPONMODEL) && (r_lefthand->intValue == 1) )
 	{
 		for (i=0 ; i<s_pmdl->num_tris ; i++, ptri++)
 		{
@@ -663,13 +663,13 @@ void R_AliasDrawModel (void)
 
 	s_pmdl = (dmdl_t *)currentmodel->extradata;
 
-	if ( r_lerpmodels->value == 0 )
+	if (!r_lerpmodels->intValue)
 		currententity->backlerp = 0;
 
 	if ( currententity->flags & RF_WEAPONMODEL )
 	{
 		float fov = 0.0f;
-		if ( r_lefthand->value == 2.0F )
+		if (r_lefthand->intValue == 2)
 			return;
 
 		if (r_gunfov->intValue && r_gunfov->intValue <= 179)
@@ -679,7 +679,7 @@ void R_AliasDrawModel (void)
 			aliasyscale = aliasxscale;
 		}
 
-		if ( r_lefthand->value == 1.0F )
+		if (r_lefthand->intValue == 1)
 			aliasxscale = -aliasxscale;
 	}
 
@@ -696,7 +696,7 @@ void R_AliasDrawModel (void)
 	**/
 	if ( R_AliasCheckBBox() == BBOX_TRIVIAL_REJECT )
 	{
-		if ( ( currententity->flags & RF_WEAPONMODEL ) && ( r_lefthand->value == 1.0F ) )
+		if ((currententity->flags & RF_WEAPONMODEL) && (r_lefthand->intValue == 1))
 		{
 			aliasxscale = -aliasxscale;
 		}

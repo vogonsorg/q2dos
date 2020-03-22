@@ -217,7 +217,7 @@ extern oldrefdef_t      r_refdef;
 #define ALIAS_Z_CLIP                            0x0010
 #define ALIAS_XY_CLIP_MASK                      0x000F
 
-#define SURFCACHE_SIZE_AT_320X240    1024*768
+#define SURFCACHE_SIZE_AT_320X240    (1024*768)
 
 #define BMODEL_FULLY_CLIPPED    0x10 // value returned by R_BmodelCheckBBox ()
 									 //  if bbox is trivially rejected
@@ -238,7 +238,7 @@ extern oldrefdef_t      r_refdef;
 
 // turbulence stuff
 
-#define AMP             8*0x10000
+#define AMP             (8*0x10000)
 #define AMP2    3
 #define SPEED   20
 
