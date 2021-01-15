@@ -217,7 +217,7 @@ extern oldrefdef_t      r_refdef;
 #define ALIAS_Z_CLIP                            0x0010
 #define ALIAS_XY_CLIP_MASK                      0x000F
 
-#define SURFCACHE_SIZE_AT_320X240    1024*768
+#define SURFCACHE_SIZE_AT_320X240    (1024*768)
 
 #define BMODEL_FULLY_CLIPPED    0x10 // value returned by R_BmodelCheckBBox ()
 									 //  if bbox is trivially rejected
@@ -238,7 +238,7 @@ extern oldrefdef_t      r_refdef;
 
 // turbulence stuff
 
-#define AMP             8*0x10000
+#define AMP             (8*0x10000)
 #define AMP2    3
 #define SPEED   20
 
@@ -811,6 +811,8 @@ extern unsigned d_8to24table[256]; // base
 
 void    Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length);
 void    Sys_SetFPCW (void);
+void	Sys_SetSP24_FPPrecision (void); /* FS */
+void	Sys_SetChopCW_FPPrecision (void); /* FS */
 
 void LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *height);
 

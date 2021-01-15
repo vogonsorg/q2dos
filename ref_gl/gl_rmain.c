@@ -164,7 +164,7 @@ qboolean R_CullBox (vec3_t mins, vec3_t maxs)
 {
 	int		i;
 
-	if (r_nocull->value)
+	if (r_nocull->intValue)
 		return false;
 
 	for (i=0 ; i<4 ; i++)
@@ -189,7 +189,7 @@ void R_RotateForEntity (entity_t *e, qboolean full)
 /* Knightmare- allow disabling of backwards alias model roll */
 int R_RollMult (void)
 {
-	if (r_entity_fliproll->value)
+	if (r_entity_fliproll->intValue)
 		return -1;
 	else
 		return 1;
@@ -349,7 +349,7 @@ void R_DrawEntitiesOnList (void)
 {
 	int		i;
 
-	if (!r_drawentities->value)
+	if (!r_drawentities->intValue)
 		return;
 
 	// draw non-transparent first
@@ -541,7 +541,7 @@ R_PolyBlend
 */
 void R_PolyBlend (void)
 {
-	if (!gl_polyblend->value)
+	if (!gl_polyblend->intValue)
 		return;
 	if (!v_blend[3])
 		return;
@@ -801,7 +801,7 @@ void R_SetupGL (void)
 	//
 	// set drawing parms
 	//
-	if (gl_cull->value)
+	if (gl_cull->intValue)
 		qglEnable(GL_CULL_FACE);
 	else
 		qglDisable(GL_CULL_FACE);
@@ -820,11 +820,11 @@ void R_Clear (void)
 {
 	GLbitfield clearbits = 0;	/* Knightmare added */
 
-	if (gl_ztrick->value)
+	if (gl_ztrick->intValue)
 	{
 		static int trickframe;
 
-		if (gl_clear->value)
+		if (gl_clear->intValue)
 		//	qglClear (GL_COLOR_BUFFER_BIT);
 			clearbits |=  GL_COLOR_BUFFER_BIT;
 
@@ -844,7 +844,7 @@ void R_Clear (void)
 	}
 	else
 	{
-		if (gl_clear->value)
+		if (gl_clear->intValue)
 		//	qglClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			clearbits |=  (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	/* Knightmare changed */
 		else
@@ -886,7 +886,7 @@ r_newrefdef must be set before the first call
 */
 void R_RenderView (refdef_t *fd)
 {
-	if (r_norefresh->value)
+	if (r_norefresh->intValue)
 		return;
 
 	r_newrefdef = *fd;
@@ -894,7 +894,7 @@ void R_RenderView (refdef_t *fd)
 	if (!r_worldmodel && !( r_newrefdef.rdflags & RDF_NOWORLDMODEL ) )
 		ri.Sys_Error (ERR_DROP, "R_RenderView: NULL worldmodel");
 
-	if (r_speeds->value)
+	if (r_speeds->intValue)
 	{
 		c_brush_polys = 0;
 		c_alias_polys = 0;
@@ -902,7 +902,7 @@ void R_RenderView (refdef_t *fd)
 
 	R_PushDlights ();
 
-	if (gl_finish->value)
+	if (gl_finish->intValue)
 		qglFinish ();
 
 	R_SetupFrame ();
@@ -925,7 +925,7 @@ void R_RenderView (refdef_t *fd)
 
 	R_Flash();
 
-	if (r_speeds->value)
+	if (r_speeds->intValue)
 	{
 		ri.Con_Printf (PRINT_ALL, "%4i wpoly %4i epoly %i tex %i lmaps\n",
 			c_brush_polys, 
@@ -1426,7 +1426,7 @@ int R_Init ( void *hinstance, void *hWnd )
 
 	if ( gl_config.renderer & GL_RENDERER_3DLABS )
 	{
-		if ( gl_3dlabs_broken->value )
+		if (gl_3dlabs_broken->intValue)
 			gl_config.allow_cds = false;
 		else
 			gl_config.allow_cds = true;
@@ -1508,7 +1508,7 @@ int R_Init ( void *hinstance, void *hWnd )
 	// GL_EXT_point_parameters
 	if ( StringContainsToken( gl_config.extensions_string, "GL_EXT_point_parameters" ) )
 	{
-		if ( gl_ext_pointparameters->value )
+		if (gl_ext_pointparameters->intValue)
 		{
 			qglPointParameterfEXT = ( void (APIENTRY *)( GLenum, GLfloat ) ) qwglGetProcAddress( "glPointParameterfEXT" );
 			qglPointParameterfvEXT = ( void (APIENTRY *)( GLenum, const GLfloat * ) ) qwglGetProcAddress( "glPointParameterfvEXT" );
@@ -1562,7 +1562,7 @@ int R_Init ( void *hinstance, void *hWnd )
 		StringContainsToken( gl_config.extensions_string, "GL_EXT_paletted_texture" ) && 
 		StringContainsToken( gl_config.extensions_string, "GL_EXT_shared_texture_palette" ) )
 	{
-		if ( gl_ext_palettedtexture->value )
+		if (gl_ext_palettedtexture->intValue)
 		{
 			qglColorTableEXT = ( void ( APIENTRY * ) ( GLenum, GLenum, GLsizei, GLenum, GLenum, const GLvoid * ) ) qwglGetProcAddress( "glColorTableEXT" );
 			if (qglColorTableEXT)
@@ -1584,7 +1584,7 @@ int R_Init ( void *hinstance, void *hWnd )
 	gl_config.multitexture = false;
 	if ( StringContainsToken( gl_config.extensions_string, "GL_ARB_multitexture" ) )
 	{
-		if ( gl_ext_multitexture->value )
+		if (gl_ext_multitexture->intValue)
 		{
 			qglMultiTexCoord2f = ( void * ) qwglGetProcAddress( "glMultiTexCoord2fARB" );
 			qglActiveTextureARB = ( void * ) qwglGetProcAddress( "glActiveTextureARB" );
@@ -1629,7 +1629,7 @@ int R_Init ( void *hinstance, void *hWnd )
 		{
 			ri.Con_Printf( PRINT_ALL, "...GL_SGIS_multitexture deprecated in favor of ARB_multitexture\n" );
 		}
-		else if ( gl_ext_multitexture->value )
+		else if (gl_ext_multitexture->intValue)
 		{
 			qglMultiTexCoord2f = ( void * ) qwglGetProcAddress( "glMTexCoord2fSGIS" );
 			qglSelectTextureSGIS = ( void * ) qwglGetProcAddress( "glSelectTextureSGIS" );
@@ -1661,7 +1661,7 @@ int R_Init ( void *hinstance, void *hWnd )
 	gl_config.arbTextureNonPowerOfTwo = false;
 	if ( StringContainsToken( gl_config.extensions_string, "GL_ARB_texture_non_power_of_two" ) )
 	{
-		if (gl_arb_texturenonpoweroftwo->value) {
+		if (gl_arb_texturenonpoweroftwo->intValue) {
 			ri.Con_Printf (PRINT_ALL, "...using GL_ARB_texture_non_power_of_two\n");
 			gl_config.arbTextureNonPowerOfTwo = true;
 		}
@@ -1780,7 +1780,7 @@ void R_BeginFrame( float camera_separation )
 		gl_log->modified = false;
 	}
 
-	if ( gl_log->value )
+	if (gl_log->intValue)
 	{
 		GLimp_LogNewFrame();
 	}

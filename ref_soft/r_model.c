@@ -1190,7 +1190,7 @@ void R_BeginRegistration (char *model)
 	// explicitly free the old map if different
 	// this guarantees that mod_known[0] is the world map
 	flushmap = ri.Cvar_Get ("flushmap", "0", 0);
-	if ( strcmp(mod_known[0].name, fullname) || flushmap->value)
+	if ((strcmp(mod_known[0].name, fullname) != 0) || flushmap->intValue)
 		Mod_Free (&mod_known[0]);
 	r_worldmodel = R_RegisterModel (fullname);
 	R_NewMap ();

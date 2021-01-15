@@ -278,7 +278,7 @@ void Cbuf_AddEarlyCommands (qboolean clear)
 	for (i=0 ; i<COM_Argc() ; i++)
 	{
 		s = COM_Argv(i);
-		if (strcmp (s, "+set"))
+		if (strcmp (s, "+set") != 0)
 			continue;
 		Cbuf_AddText (va("set %s %s\n", COM_Argv(i+1), COM_Argv(i+2)));
 		if (clear)
@@ -1124,13 +1124,13 @@ void Cmd_Flushlog_f (void) /* FS: clear the logfile */
 	extern cvar_t	*logfile_active;
 	extern FILE		*logfile;
 
-	if(!logfile_name->string[0])
+	if (!logfile_name->string[0])
 	{
 		Com_Printf("Error: logfile_name not set.  Aborting flushlog.\n");
 		return;
 	}
 
-	if(!logfile_active->value)
+	if (!logfile_active->intValue)
 	{
 		Com_Printf("Warning: logfile disabled but logfile_name set; continuing with flushlog.\n");
 	}

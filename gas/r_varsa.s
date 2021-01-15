@@ -88,6 +88,9 @@ C(d_pzbuffer):		.long	0
 C(d_zrowbytes):		.long	0
 C(d_zwidth):		.long	0
 
+.globl  C(s_prefetch_address)
+C(s_prefetch_address):	.long	0
+
 
 //-------------------------------------------------------
 // ASM-only variables
@@ -219,5 +222,3 @@ spr8entryvec_table:	.long	0, Spr8Entry2_8, Spr8Entry3_8, Spr8Entry4_8
 					.long	Spr8Entry5_8, Spr8Entry6_8, Spr8Entry7_8, Spr8Entry8_8
 
 #endif	// id386
-
-

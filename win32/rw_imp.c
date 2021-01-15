@@ -54,7 +54,7 @@ void VID_CreateWindow( int width, int height, int stylebits )
 	vid_ypos = ri.Cvar_Get ("vid_ypos", "0", 0);
 	vid_fullscreen = ri.Cvar_Get ("vid_fullscreen", "0", CVAR_ARCHIVE );
 
-	if ( vid_fullscreen->value )
+	if ( vid_fullscreen->intValue)
 		exstyle = WS_EX_TOPMOST;
 	else
 		exstyle = 0;
@@ -391,7 +391,7 @@ void SWimp_AppActivate( qboolean active )
 		{
 			if ( sww_state.initializing )
 				return;
-			if ( vid_fullscreen->value )
+			if ( vid_fullscreen->intValue)
 				ShowWindow( sww_state.hWnd, SW_MINIMIZE );
 		}
 	}
@@ -468,6 +468,16 @@ void Sys_SetFPCW( void )
 	__asm and ah, 0f0h          ; ceil mode, 24-bit single precision
 	__asm or  ah, 008h          ; 
 	__asm mov fpu_sp24_ceil_cw, eax
+}
+
+void Sys_SetSP24_FPPrecision (void)
+{
+	__asm fldcw	fpu_sp24_cw
+}
+
+void Sys_SetChopCW_FPPrecision (void)
+{
+	__asm fldcw	fpu_chop_cw
 }
 #else
 /* GAS version is in sys_dosa.s */

@@ -103,8 +103,8 @@ typedef struct image_s
 #define	MAX_LIGHTMAPS	128		/* Knightmare- moved this here for use by macros */
 
 #define	TEXNUM_LIGHTMAPS	1024
-#define	TEXNUM_SCRAPS		TEXNUM_LIGHTMAPS + MAX_LIGHTMAPS	/* Knightmare- changed to use macro, was 1152 */
-#define	TEXNUM_IMAGES		TEXNUM_SCRAPS + 1	/* Knightmare- changed to use macro, was 1153 */
+#define	TEXNUM_SCRAPS		(TEXNUM_LIGHTMAPS + MAX_LIGHTMAPS)	/* Knightmare- changed to use macro, was 1152 */
+#define	TEXNUM_IMAGES		(TEXNUM_SCRAPS + 1)	/* Knightmare- changed to use macro, was 1153 */
 
 #define		MAX_GLTEXTURES	2048	/* Knightmare increased, was 1024 */
 

@@ -926,7 +926,7 @@ void R_ClipAndDrawPoly ( float alpha, int isturbulent, qboolean textured )
 		}
 		else
 		{
-			if ( sw_stipplealpha->value )
+			if ( sw_stipplealpha->intValue)
 			{
 				if ( isturbulent )
 				{

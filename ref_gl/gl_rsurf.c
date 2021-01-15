@@ -253,9 +253,9 @@ void R_DrawTriangleOutlines (msurface_t *surf, qboolean multitexture, qboolean a
 {
 	int			i, j;
 	glpoly_t	*p;
-	qboolean	depthtest = ((int)gl_showtris->value > 1);
+	qboolean	depthtest = gl_showtris->intValue;
 
-	if (!gl_showtris->value)
+	if (!gl_showtris->intValue)
 		return;
 
 	if (surf != NULL) {
@@ -430,7 +430,7 @@ void R_BlendLightmaps (void)
 	msurface_t	*surf, *newdrawsurf = 0;
 
 	// don't bother if we're set to fullbright
-	if (r_fullbright->value)
+	if (r_fullbright->intValue)
 		return;
 	if (!r_worldmodel->lightdata)
 		return;
@@ -442,11 +442,11 @@ void R_BlendLightmaps (void)
 	** set the appropriate blending mode unless we're only looking at the
 	** lightmaps.
 	*/
-	if (!gl_lightmap->value)
+	if (!gl_lightmap->intValue)
 	{
 		qglEnable (GL_BLEND);
 
-		if ( gl_saturatelighting->value )
+		if (gl_saturatelighting->intValue)
 		{
 			qglBlendFunc( GL_ONE, GL_ONE );
 		}
@@ -457,8 +457,6 @@ void R_BlendLightmaps (void)
 				switch ( toupper( gl_monolightmap->string[0] ) )
 				{
 				case 'I':
-					qglBlendFunc (GL_ZERO, GL_SRC_COLOR );
-					break;
 				case 'L':
 					qglBlendFunc (GL_ZERO, GL_SRC_COLOR );
 					break;
@@ -500,7 +498,7 @@ void R_BlendLightmaps (void)
 	/*
 	** render dynamic lightmaps
 	*/
-	if ( gl_dynamic->value )
+	if (gl_dynamic->intValue)
 	{
 		LM_InitBlock();
 
@@ -658,7 +656,7 @@ void R_RenderBrushPoly (msurface_t *fa)
 	if ( fa->dlightframe == r_framecount )
 	{
 dynamic:
-		if ( gl_dynamic->value )
+		if (gl_dynamic->intValue)
 		{
 			if (!( fa->texinfo->flags & (SURF_SKY|SURF_TRANS33|SURF_TRANS66|SURF_WARP)) )
 			{
@@ -817,7 +815,7 @@ void R_DrawTextureChains (void)
 		GL_SelectTexture( gl_texture0);
 		GL_TexEnv (GL_REPLACE);
 		GL_SelectTexture( gl_texture1);
-		if (gl_lightmap->value)
+		if (gl_lightmap->intValue)
 			GL_TexEnv (GL_REPLACE);
 		else 
 			GL_TexEnv (GL_MODULATE);
@@ -879,7 +877,7 @@ void R_UpdateSurfaceLightmap (msurface_t *surf)
 	int			map, smax, tmax;
 	qboolean	is_dynamic = false;
 
-	if ( !qglMultiTexCoord2f || (r_fullbright->value != 0) )
+	if ( !qglMultiTexCoord2f || (r_fullbright->intValue != 0) )
 		return;
 	if ( surf->texinfo->flags & (SURF_SKY|SURF_WARP) )
 		return;
@@ -894,7 +892,7 @@ void R_UpdateSurfaceLightmap (msurface_t *surf)
 	if ( (surf->dlightframe == r_framecount) || surf->cached_dlight )
 	{
 dynamic:
-		if ( gl_dynamic->value || surf->cached_dlight )
+		if ( gl_dynamic->intValue || surf->cached_dlight )
 		{
 			if ( !(surf->texinfo->flags & (SURF_SKY|SURF_TRANS33|SURF_TRANS66|SURF_WARP)) )
 			{
@@ -1095,7 +1093,7 @@ void R_DrawInlineBModel (void)
 	qboolean	duplicate;
 
 	// calculate dynamic lighting for bmodel
-	if ( !gl_flashblend->value )
+	if (!gl_flashblend->intValue)
 	{
 		lt = r_newrefdef.dlights;
 		// special method for models with rotation
@@ -1154,7 +1152,7 @@ void R_DrawInlineBModel (void)
 
 /* Knightmare- added for lightmap update batching */
 #ifdef BATCH_LM_UPDATES
-			if ( gl_config.multitexture && ( r_fullbright->value == 0 ) 
+			if ( gl_config.multitexture && ( r_fullbright->intValue == 0 )
 				&& !(psurf->texinfo->flags & (SURF_SKY|SURF_TRANS33|SURF_TRANS66|SURF_WARP)) )
 				R_UpdateSurfaceLightmap (psurf);
 #endif
@@ -1410,7 +1408,7 @@ void R_RecursiveWorldNode (mnode_t *node)
 
 /* Knightmare- added for lightmap update batching */
 #ifdef BATCH_LM_UPDATES
-		if ( gl_config.multitexture && ( r_fullbright->value == 0 ) && 
+		if ( gl_config.multitexture && ( r_fullbright->intValue == 0 ) &&
 			!(surf->texinfo->flags & (SURF_SKY|SURF_TRANS33|SURF_TRANS66|SURF_WARP)) )
 			R_UpdateSurfaceLightmap (surf);
 #endif
@@ -1461,7 +1459,7 @@ void R_DrawWorld (void)
 {
 	entity_t	ent;
 
-	if (!r_drawworld->value)
+	if (!r_drawworld->intValue)
 		return;
 
 	if ( r_newrefdef.rdflags & RDF_NOWORLDMODEL )
@@ -1537,12 +1535,12 @@ void R_MarkLeaves (void)
 	mleaf_t	*leaf;
 	int		cluster;
 
-	if (r_oldviewcluster == r_viewcluster && r_oldviewcluster2 == r_viewcluster2 && !r_novis->value && r_viewcluster != -1)
+	if (r_oldviewcluster == r_viewcluster && r_oldviewcluster2 == r_viewcluster2 && !r_novis->intValue && r_viewcluster != -1)
 		return;
 
 	// development aid to let you run around and see exactly where
 	// the pvs ends
-	if (gl_lockpvs->value)
+	if (gl_lockpvs->intValue)
 		return;
 
 	r_visframecount++;
@@ -1854,7 +1852,7 @@ void GL_BeginBuildingLightmaps (model_t *m)
 {
 	static lightstyle_t	lightstyles[MAX_LIGHTSTYLES];
 	int				i;
-	unsigned		dummy[128*128];
+	unsigned		dummy[128 * 128] = { 0 };
 
 	memset( gl_lms.allocated, 0, sizeof(gl_lms.allocated) );
 

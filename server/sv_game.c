@@ -77,12 +77,12 @@ PF_dprintf (unsigned int developerFlags, char *fmt, ...)
 	va_list		argptr;
 	unsigned int			devValue = 0;
 		
-	if (!developer || !developer->value)
+	if (!developer || !developer->intValue)
 		return;			// don't confuse non-developers with techie stuff...
 
-	devValue = (unsigned int)developer->value;
+	devValue = (unsigned int)developer->intValue;
 
-	if (developer->value == 1) /* FS: Show all except extremely verbose shit */
+	if (developer->intValue == 1) /* FS: Show all except extremely verbose shit */
 		devValue = 65534;
 
 	if (!(devValue & developerFlags))

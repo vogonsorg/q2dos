@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -206,16 +206,16 @@ void	R_InitTextures (void)
 {
 	int		x,y, m;
 	byte	*dest;
-	
+
 // create a simple checkerboard texture for the default
 	r_notexture_mip = (image_t *)&r_notexture_buffer;
-	
+
 	r_notexture_mip->width = r_notexture_mip->height = 16;
 	r_notexture_mip->pixels[0] = &r_notexture_buffer[sizeof(image_t)];
 	r_notexture_mip->pixels[1] = r_notexture_mip->pixels[0] + 16*16;
 	r_notexture_mip->pixels[2] = r_notexture_mip->pixels[1] + 8*8;
 	r_notexture_mip->pixels[3] = r_notexture_mip->pixels[2] + 4*4;
-	
+
 	for (m=0 ; m<4 ; m++)
 	{
 		dest = r_notexture_mip->pixels[m];
@@ -228,7 +228,7 @@ void	R_InitTextures (void)
 				else
 					*dest++ = 0xff;
 			}
-	}	
+	}
 }
 
 
@@ -240,11 +240,11 @@ R_InitTurb
 void R_InitTurb (void)
 {
 	int		i;
-	
+
 	for (i=0 ; i<TABLESIZE ; i++) // FS: Changed from 1280
 	{
-		sintable[i] = AMP + sin(i*3.14159*2/CYCLE)*AMP;
-		intsintable[i] = AMP2 + sin(i*3.14159*2/CYCLE)*AMP2;	// AMP2, not 20
+		sintable[i] = AMP + sin(i*M_PI*2/CYCLE)*AMP;
+		intsintable[i] = AMP2 + sin(i*M_PI*2/CYCLE)*AMP2;	// AMP2, not 20
 		blanktable[i] = 0;			//PGM
 	}
 }
@@ -477,12 +477,12 @@ void R_MarkLeaves (void)
 	mleaf_t	*leaf;
 	int		cluster;
 
-	if (r_oldviewcluster == r_viewcluster && !r_novis->value && r_viewcluster != -1)
+	if (r_oldviewcluster == r_viewcluster && !r_novis->intValue && r_viewcluster != -1)
 		return;
-	
+
 	// development aid to let you run around and see exactly where
 	// the pvs ends
-	if (sw_lockpvs->value)
+	if (sw_lockpvs->intValue)
 		return;
 
 	r_visframecount++;
@@ -499,7 +499,7 @@ void R_MarkLeaves (void)
 	}
 
 	vis = Mod_ClusterPVS (r_viewcluster, r_worldmodel);
-	
+
 	for (i=0,leaf=r_worldmodel->leafs ; i<r_worldmodel->numleafs ; i++, leaf++)
 	{
 		cluster = leaf->cluster;
@@ -555,7 +555,7 @@ void R_DrawEntitiesOnList (void)
 	int			i;
 	qboolean	translucent_entities = false;
 
-	if (!r_drawentities->value)
+	if (!r_drawentities->intValue)
 		return;
 
 	// all bmodels have already been drawn by the edge list
@@ -675,7 +675,7 @@ int R_BmodelCheckBBox (float *minmaxs)
 		rejectpt[0] = minmaxs[pindex[0]];
 		rejectpt[1] = minmaxs[pindex[1]];
 		rejectpt[2] = minmaxs[pindex[2]];
-		
+
 		d = DotProduct (rejectpt, view_clipplanes[i].normal);
 		d -= view_clipplanes[i].dist;
 
@@ -716,7 +716,7 @@ mnode_t *R_FindTopnode (vec3_t mins, vec3_t maxs)
 	{
 		if (node->visframe != r_visframecount)
 			return NULL;		// not visible at all
-		
+
 		if (node->contents != CONTENTS_NODE)
 		{
 			if (node->contents != CONTENTS_SOLID)
@@ -724,13 +724,13 @@ mnode_t *R_FindTopnode (vec3_t mins, vec3_t maxs)
 							//  visible and not BSP clipped
 			return NULL;	// in solid, so not visible
 		}
-		
+
 		splitplane = node->plane;
 		sides = BOX_ON_PLANE_SIDE(mins, maxs, (cplane_t *)splitplane);
-		
+
 		if (sides == 3)
 			return node;	// this is the splitter
-		
+
 	// not split yet; recurse down the contacted side
 		if (sides & 1)
 			node = node->children[0];
@@ -813,7 +813,7 @@ void R_DrawBEntitiesOnList (void)
 	float		minmaxs[6];
 	mnode_t		*topnode;
 
-	if (!r_drawentities->value)
+	if (!r_drawentities->intValue)
 		return;
 
 	VectorCopy (modelorg, oldorigin);
@@ -872,7 +872,7 @@ void R_DrawBEntitiesOnList (void)
 			R_DrawSubmodelPolygons (currentmodel, clipflags, topnode);
 		}
 
-	// put back world rotation and frustum clipping		
+	// put back world rotation and frustum clipping
 	// FIXME: R_RotateBmodel should just work off base_vxx
 		VectorCopy (base_vpn, vpn);
 		VectorCopy (base_vup, vup);
@@ -923,14 +923,14 @@ void R_EdgeDrawing (void)
 
 	R_BeginEdgeFrame ();
 
-	if (r_dspeeds->value)
+	if (r_dspeeds->intValue)
 	{
 		rw_time1 = Sys_Milliseconds ();
 	}
 
 	R_RenderWorld ();
 
-	if (r_dspeeds->value)
+	if (r_dspeeds->intValue)
 	{
 		rw_time2 = Sys_Milliseconds ();
 		db_time1 = rw_time2;
@@ -938,7 +938,7 @@ void R_EdgeDrawing (void)
 
 	R_DrawBEntitiesOnList ();
 
-	if (r_dspeeds->value)
+	if (r_dspeeds->intValue)
 	{
 		db_time2 = Sys_Milliseconds ();
 		se_time1 = db_time2;
@@ -1039,7 +1039,7 @@ void R_RenderFrame (refdef_t *fd)
 	VectorCopy (fd->vieworg, r_refdef.vieworg);
 	VectorCopy (fd->viewangles, r_refdef.viewangles);
 
-	if (r_speeds->value || r_dspeeds->value)
+	if (r_speeds->intValue || r_dspeeds->intValue)
 		r_time1 = Sys_Milliseconds ();
 
 	R_SetupFrame ();
@@ -1050,7 +1050,7 @@ void R_RenderFrame (refdef_t *fd)
 
 	R_EdgeDrawing ();
 
-	if (r_dspeeds->value)
+	if (r_dspeeds->intValue)
 	{
 		se_time2 = Sys_Milliseconds ();
 		de_time1 = se_time2;
@@ -1058,7 +1058,7 @@ void R_RenderFrame (refdef_t *fd)
 
 	R_DrawEntitiesOnList ();
 
-	if (r_dspeeds->value)
+	if (r_dspeeds->intValue)
 	{
 		de_time2 = Sys_Milliseconds ();
 		dp_time1 = Sys_Milliseconds ();
@@ -1066,7 +1066,7 @@ void R_RenderFrame (refdef_t *fd)
 
 	R_DrawParticles ();
 
-	if (r_dspeeds->value)
+	if (r_dspeeds->intValue)
 		dp_time2 = Sys_Milliseconds ();
 
 	currententity = &r_worldentity; // FS: Dr Jack Whitham ref_soft fix
@@ -1079,27 +1079,27 @@ void R_RenderFrame (refdef_t *fd)
 	if (r_dowarp)
 		D_WarpScreen ();
 
-	if (r_dspeeds->value)
+	if (r_dspeeds->intValue)
 		da_time1 = Sys_Milliseconds ();
 
-	if (r_dspeeds->value)
+	if (r_dspeeds->intValue)
 		da_time2 = Sys_Milliseconds ();
 
 	R_CalcPalette ();
 
-	if (sw_aliasstats->value)
+	if (sw_aliasstats->intValue)
 		R_PrintAliasStats ();
-		
-	if (r_speeds->value)
+
+	if (r_speeds->intValue)
 		R_PrintTimes ();
 
-	if (r_dspeeds->value)
+	if (r_dspeeds->intValue)
 		R_PrintDSpeeds ();
 
-	if (sw_reportsurfout->value && r_outofsurfaces)
+	if (sw_reportsurfout->intValue && r_outofsurfaces)
 		ri.Con_Printf (PRINT_ALL,"Short %d surfaces\n", r_outofsurfaces);
 
-	if (sw_reportedgeout->value && r_outofedges)
+	if (sw_reportedgeout->intValue && r_outofedges)
 		ri.Con_Printf (PRINT_ALL,"Short roughly %d edges\n", r_outofedges * 2 / 3);
 }
 
@@ -1265,7 +1265,7 @@ void Draw_BuildGammaTable (void)
 			sw_state.gammatable[i] = i;
 		return;
 	}
-	
+
 	for (i=0 ; i<256 ; i++)
 	{
 		inf = 255 * pow ( (i+0.5)/255.5 , g ) + 0.5;

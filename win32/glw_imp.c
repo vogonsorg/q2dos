@@ -159,7 +159,7 @@ static void HWGamma_Check3dfxGamma (void)
 {
 	const char *extensions = (const char *) qglGetString(GL_EXTENSIONS);
 	if (strstr(extensions, "WGL_3DFX_gamma_control")) {
-		if (!r_ignorehwgamma->value) {
+		if (!r_ignorehwgamma->intValue) {
 			qwglGetDeviceGammaRamp3DFX = (BOOL (WINAPI *)(HDC, LPVOID)) qwglGetProcAddress("wglGetDeviceGammaRamp3DFX");
 			qwglSetDeviceGammaRamp3DFX = (BOOL (WINAPI *)(HDC, LPVOID)) qwglGetProcAddress("wglSetDeviceGammaRamp3DFX");
 			if (qwglGetDeviceGammaRamp3DFX && qwglSetDeviceGammaRamp3DFX)
@@ -181,7 +181,7 @@ void InitGammaRamp (void)
 {
 	HWGamma_Check3dfxGamma ();
 
-	if (!r_ignorehwgamma->value)
+	if (!r_ignorehwgamma->intValue)
 	{
 		if (qwglGetDeviceGammaRamp3DFX)
 			gl_state.gammaRamp = qwglGetDeviceGammaRamp3DFX (glw_state.hDC, original_ramp);
@@ -445,7 +445,7 @@ static void VID_SoftRestart (void)
 		glw_state.hWnd = NULL;
 	}
 
-	if (vid_fullscreen->value)
+	if (vid_fullscreen->intValue)
 	{
 		if (vid_fullscreen->intValue >= 2) /* FS: Borderless windows */
 			exstyle = 0;
@@ -572,18 +572,18 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 		dm.dmFields     = DM_PELSWIDTH | DM_PELSHEIGHT;
 
 		// Knightmare- added refresh rate control
-		if ( r_displayrefresh->value != 0 )
+		if (r_displayrefresh->intValue)
 		{
-			dm.dmDisplayFrequency = (int)r_displayrefresh->value;
+			dm.dmDisplayFrequency = r_displayrefresh->intValue;
 			dm.dmFields |= DM_DISPLAYFREQUENCY;
-			ri.Con_Printf( PRINT_ALL, "...using r_displayrefresh of %d\n", (int)r_displayrefresh->value );
+			ri.Con_Printf( PRINT_ALL, "...using r_displayrefresh of %d\n", r_displayrefresh->intValue);
 		}
 
-		if ( gl_bitdepth->value != 0 )
+		if (gl_bitdepth->intValue)
 		{
-			dm.dmBitsPerPel = gl_bitdepth->value;
+			dm.dmBitsPerPel = gl_bitdepth->intValue;
 			dm.dmFields |= DM_BITSPERPEL;
-			ri.Con_Printf( PRINT_ALL, "...using gl_bitdepth of %d\n", ( int ) gl_bitdepth->value );
+			ri.Con_Printf( PRINT_ALL, "...using gl_bitdepth of %d\n", gl_bitdepth->intValue);
 		}
 		else
 		{
@@ -623,9 +623,9 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 			dm.dmPelsHeight = height;
 			dm.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
 
-			if ( gl_bitdepth->value != 0 )
+			if (gl_bitdepth->intValue)
 			{
-				dm.dmBitsPerPel = gl_bitdepth->value;
+				dm.dmBitsPerPel = gl_bitdepth->intValue;
 				dm.dmFields |= DM_BITSPERPEL;
 			}
 
@@ -814,7 +814,7 @@ qboolean GLimp_InitGL (void)
 	/*
 	** set PFD_STEREO if necessary
 	*/
-	if ( stereo->value != 0 )
+	if (stereo->intValue)
 	{
 		ri.Con_Printf( PRINT_ALL, "...attempting to use stereo\n" );
 		pfd.dwFlags |= PFD_STEREO;
@@ -886,7 +886,7 @@ qboolean GLimp_InitGL (void)
 		{
 			extern cvar_t *gl_allow_software;
 
-			if ( gl_allow_software->value )
+			if (gl_allow_software->intValue)
 				glw_state.mcd_accelerated = true;
 			else
 				glw_state.mcd_accelerated = false;
@@ -900,7 +900,7 @@ qboolean GLimp_InitGL (void)
 	/*
 	** report if stereo is desired but unavailable
 	*/
-	if ( !( pfd.dwFlags & PFD_STEREO ) && ( stereo->value != 0 ) ) 
+	if ( !( pfd.dwFlags & PFD_STEREO ) && stereo->intValue)
 	{
 		ri.Con_Printf( PRINT_ALL, "...failed to select stereo pixel format\n" );
 		ri.Cvar_SetValue( "cl_stereo", 0 );
@@ -997,7 +997,7 @@ void GLimp_BeginFrame( float camera_separation )
 {
 	if ( gl_bitdepth->modified )
 	{
-		if ( gl_bitdepth->value != 0 && !glw_state.allowdisplaydepthchange )
+		if ( gl_bitdepth->intValue && !glw_state.allowdisplaydepthchange )
 		{
 			ri.Cvar_SetValue( "gl_bitdepth", 0 );
 			ri.Con_Printf( PRINT_ALL, "gl_bitdepth requires Win95 OSR2.x or WinNT 4.x\n" );
@@ -1073,7 +1073,7 @@ void GLimp_AppActivate( qboolean active )
 	else
 	{
 		HWGamma_Toggle (false);	// Knightmare
-		if ( vid_fullscreen->value )
+		if ( vid_fullscreen->intValue )
 			ShowWindow( glw_state.hWnd, SW_MINIMIZE );
 	}
 }

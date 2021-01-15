@@ -3,10 +3,21 @@
 # Copyright (C) 1995-2000  Brian Paul
 
 # standalone Makefile for fxMesa libGL.so
+# builds normally for Glide3x
+# to build for Glide2x:  make GLIDE3=0
 
 INCDIR = ../include
 LIBDIR = ../lib
-G3DIR  = ../glide3
+
+#build for glide3
+GLIDE3 = 1
+ifneq ($(GLIDE3),1)
+GLIDEDIR=../glide
+GLIDELIB=glide2x
+else
+GLIDEDIR=../glide3
+GLIDELIB=glide3x
+endif
 
 GL_LIB = libGL.so
 
@@ -16,10 +27,14 @@ LD = $(CC)
 CFLAGS = -O2 -mtune=i586 -fPIC -ffast-math -fomit-frame-pointer \
 	-DUSE_XSHM -DPTHREADS \
 	-DFX -DUSE_X86_ASM -DUSE_MMX_ASM -DUSE_3DNOW_ASM -DUSE_KATMAI_ASM -IFX/X86 \
-	-DFX_GLIDE3 -I$(G3DIR)/include -I. -I$(INCDIR)
+	-I$(GLIDEDIR)/include -I. -I$(INCDIR)
+CFLAGS+= -DNDEBUG
+ifeq ($(GLIDE3),1)
+CFLAGS+= -DFX_GLIDE3
+endif
 
 LDFLAGS = -shared -Wl,--no-undefined
-LDLIBS = -L/usr/X11R6/lib -lX11 -lXext -L$(G3DIR)/lib -lglide3 -lm -lpthread
+LDLIBS = -L/usr/X11R6/lib -lX11 -lXext -L$(GLIDEDIR)/lib -l$(GLIDELIB) -lm -lpthread
 
 CORE_SOURCES = \
 	aatriangle.c \

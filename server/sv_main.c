@@ -289,7 +289,7 @@ void SVC_Info (void)
 	int		i, count;
 	int		version;
 
-	if (maxclients->value == 1)
+	if (maxclients->intValue == 1)
 		return;		// ignore in single player
 
 	version = atoi (Cmd_Argv(1));
@@ -577,7 +577,7 @@ int Rcon_Validate (void)
 	if (!strlen (rcon_password->string))
 		return 0;
 
-	if (strcmp (Cmd_Argv(1), rcon_password->string) )
+	if (strcmp (Cmd_Argv(1), rcon_password->string) != 0)
 		return 0;
 
 	return 1;
@@ -870,7 +870,7 @@ void SV_ReadPackets (void)
 			break;
 		}
 		
-		if (i != maxclients->value)
+		if (i != maxclients->intValue)
 			continue;
 	}
 }
@@ -953,7 +953,7 @@ SV_RunGameFrame
 */
 void SV_RunGameFrame (void)
 {
-	if (host_speeds->value)
+	if (host_speeds->intValue)
 		time_before_game = Sys_Milliseconds ();
 
 	// we always need to bump framenum, even if we
@@ -964,20 +964,20 @@ void SV_RunGameFrame (void)
 	sv.time = sv.framenum*100;
 
 	// don't run if paused
-	if (!sv_paused->value || maxclients->value > 1)
+	if (!sv_paused->intValue || maxclients->intValue > 1)
 	{
 		ge->RunFrame ();
 
 		// never get more than one tic behind
 		if (sv.time < svs.realtime)
 		{
-			if (sv_showclamp->value)
+			if (sv_showclamp->intValue)
 				Com_Printf ("sv highclamp\n");
 			svs.realtime = sv.time;
 		}
 	}
 
-	if (host_speeds->value)
+	if (host_speeds->intValue)
 		time_after_game = Sys_Milliseconds ();
 
 }
@@ -1008,12 +1008,12 @@ void SV_Frame (int msec)
 	SV_ReadPackets ();
 
 	// move autonomous things around if enough time has passed
-	if (!sv_timedemo->value && svs.realtime < sv.time)
+	if (!sv_timedemo->intValue && svs.realtime < sv.time)
 	{
 		// never let the time get too far off
 		if (sv.time - svs.realtime > 100)
 		{
-			if (sv_showclamp->value)
+			if (sv_showclamp->intValue)
 				Com_Printf ("sv lowclamp\n");
 			svs.realtime = sv.time - 100;
 		}

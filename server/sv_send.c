@@ -100,7 +100,7 @@ void SV_BroadcastPrintf (int level, char *fmt, ...)
 	string[sizeof(string)-1] = 0;
 
 	// echo to console
-	if (dedicated->value)
+	if (dedicated->intValue)
 	{
 		char	copy[1024];
 		int		i;
@@ -232,7 +232,7 @@ void SV_Multicast (vec3_t origin, multicast_t to)
 			area2 = CM_LeafArea (leafnum);
 			if (!CM_AreasConnected (area1, area2))
 				continue;
-			if ( mask && (!(mask[cluster>>3] & (1<<(cluster&7)) ) ) )
+			if (!(mask[cluster>>3] & (1<<(cluster&7))))
 				continue;
 		}
 
@@ -511,7 +511,7 @@ void SV_SendClientMessages (void)
 	// read the next demo message if needed
 	if (sv.state == ss_demo && sv.demofile)
 	{
-		if (sv_paused->value)
+		if (sv_paused->intValue)
 			msglen = 0;
 		else
 		{
