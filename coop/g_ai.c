@@ -557,12 +557,17 @@ HuntTarget(edict_t *self)
 
 	if (self->monsterinfo.aiflags & AI_STAND_GROUND)
 	{
-		self->monsterinfo.stand(self);
+		if (self->monsterinfo.stand)
+		{
+			self->monsterinfo.stand(self);
+		}
 	}
 	else
 	{
-		if ((game.gametype == rogue_coop && self->monsterinfo.run) || (game.gametype != rogue_coop)) /* FS: Coop: Rogue specific */
+		if (self->monsterinfo.run) /* FS: Coop: Rogue patch, check run func ptr. */
+		{
 			self->monsterinfo.run(self);
+		}
 	}
 
 	if(visible(self, self->enemy))
