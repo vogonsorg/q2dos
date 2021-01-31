@@ -1,0 +1,740 @@
+From 790dc19f5348fd786ccc8d3330308667496b7942 Mon Sep 17 00:00:00 2001
+From: Ozkan Sezer <sezeroz@gmail.com>
+Date: Tue, 26 Jan 2021 17:55:56 +0300
+Subject: [PATCH 02/32] applied 3DNow! patch by Andrew Lewycky - prevents read past end of arrays
+
+https://sourceforge.net/p/mesa3d/mailman/message/7715210/
+https://sourceforge.net/p/mesa3d/mailman/message/7715230/
+---
+ src/X86/3dnow_norm_raw.S   |   85 ++++++++++++++------------------------
+ src/X86/3dnow_xform_raw3.S |   89 +++++++++++++++--------------------------
+ src/X86/3dnow_xform_raw4.S |   96 +++++++++++++++-----------------------------
+ 3 files changed, 96 insertions(+), 174 deletions(-)
+
+diff --git a/src/X86/3dnow_norm_raw.S b/src/X86/3dnow_norm_raw.S
+index d844b3c..74492a3 100644
+--- a/src/X86/3dnow_norm_raw.S
++++ b/src/X86/3dnow_norm_raw.S
+@@ -121,12 +121,12 @@ GLNAME(gl_3dnow_transform_normalize_normals_raw):
+     PFMUL      ( MM0, MM6 )             /* scale * m9    | scale * m8      */
+     PFMUL      ( MM0, MM7 )             /*               | scale * m10     */
+ 
++ALIGNTEXT32
+ LLBL (G3TN_scale_end):
++LLBL (G3TN_transform):
+     MOVQ       ( REGIND (EDX), MM0 )    /*  x1              | x0         */
+     MOVD       ( REGOFF (8, EDX), MM2 ) /*                  | x2         */
+ 
+-ALIGNTEXT32
+-LLBL (G3TN_transform):
+     MOVQ       ( MM0, MM1 )             /*  x1              | x0           */
+     PUNPCKLDQ  ( MM2, MM2 )             /*  x2              | x2           */
+ 
+@@ -156,9 +156,6 @@ LLBL (G3TN_transform):
+     PREFETCH   ( REGIND(EDX) )
+ 
+     MOVD       ( MM1, REGOFF(-4, EAX) ) /*  write r2                       */
+-    MOVQ       ( REGIND (EDX), MM0 )    /*  x1           | x0              */
+-
+-    MOVD       ( REGOFF (8, EDX), MM2 ) /*               | x2              */
+     DEC_L      ( EBP )                  /*  decrement normal counter       */
+     JA         ( LLBL (G3TN_transform) )
+ 
+@@ -292,18 +289,17 @@ GLNAME(gl_3dnow_transform_normalize_normals_no_rot_raw):
+ 
+ ALIGNTEXT32
+ LLBL (G3TNNR_scale_end):
+-    MOVQ       ( REGIND(EDX), MM6 )     /* x1            | x0                 */
+-    MOVD       ( REGOFF(8, EDX), MM7 )  /*               | x2                 */
+-
+     CMP_L      ( CONST(0), EDI )        /* lengths == 0 ?                     */
+     JE         ( LLBL (G3TNNR_norm) )   /* need to calculate lengths          */
+ 
+-    MOVD       ( REGIND(EDI), MM3 )     /*                 | length (x)       */
+-
+-
+ ALIGNTEXT32
+ LLBL (G3TNNR_norm_w_lengths):           /* use precalculated lengths          */
+ 
++    MOVQ       ( REGIND(EDX), MM6 )     /* x1            | x0                 */
++    MOVD       ( REGOFF(8, EDX), MM7 )  /*               | x2                 */
++
++    MOVD       ( REGIND(EDI), MM3 )     /*                 | length (x)       */
++
+     PREFETCHW  ( REGIND(EAX) )
+ 
+     PFMUL      ( MM0, MM6 )             /* x1*m5         | x0*m0              */
+@@ -324,10 +320,6 @@ LLBL (G3TNNR_norm_w_lengths):           /* use precalculated lengths          */
+     MOVQ       ( MM6, REGOFF(-12, EAX) ) /* write r0, r1                      */
+ 
+     MOVD       ( MM7, REGOFF(-4, EAX) ) /* write r2                           */
+-    MOVD       ( REGIND(EDI), MM3 )     /*                 | length (x)       */
+-
+-    MOVQ       ( REGIND(EDX), MM6 )     /* x1              | x0               */
+-    MOVD       ( REGOFF(8, EDX), MM7 )  /*                 | x2               */
+ 
+     JA         ( LLBL (G3TNNR_norm_w_lengths) )
+     JMP        ( LLBL (G3TNNR_exit_3dnow) )
+@@ -335,6 +327,9 @@ LLBL (G3TNNR_norm_w_lengths):           /* use precalculated lengths          */
+ ALIGNTEXT32
+ LLBL (G3TNNR_norm):                     /* need to calculate lengths          */
+ 
++    MOVQ       ( REGIND(EDX), MM6 )     /* x1            | x0                 */
++    MOVD       ( REGOFF(8, EDX), MM7 )  /*               | x2                 */
++
+     PREFETCHW  ( REGIND(EAX) )
+ 
+     PFMUL      ( MM0, MM6 )             /* x1*m5           | x0*m0            */
+@@ -371,9 +366,6 @@ LLBL (G3TNNR_norm):                     /* need to calculate lengths          */
+     PFMUL      ( MM5, MM7 )             /*                 | x2 (normalized)  */
+ 
+     MOVD       ( MM7, REGOFF(-4, EAX) ) /* write r2                           */
+-    MOVQ       ( REGIND(EDX), MM6 )     /* x1              | x0               */
+-
+-    MOVD       ( REGOFF(8, EDX), MM7 )  /*                 | x2               */
+     JA         ( LLBL (G3TNNR_norm) )
+ 
+ 
+@@ -426,14 +418,14 @@ GLNAME(gl_3dnow_transform_rescale_normals_no_rot_raw):
+     PFMUL      ( MM6, MM0 )             /* scale*m5      | scale*m0           */
+     MOVD       ( REGOFF(40, ECX), MM2 ) /*               | m10                */
+ 
+-    MOVQ       ( REGIND(EDX), MM4 )     /* x1            | x0                 */
+     PFMUL      ( MM6, MM2 )             /*               | scale*m10          */
+ 
+-    MOVD       ( REGOFF(8, EDX), MM5 )  /*               | x2                 */
+-
+ ALIGNTEXT32
+ LLBL (G3TRNR_rescale):
+ 
++    MOVQ       ( REGIND(EDX), MM4 )     /* x1            | x0                 */
++    MOVD       ( REGOFF(8, EDX), MM5 )  /*               | x2                 */
++
+     PREFETCHW  ( REGIND(EAX) )
+ 
+     PFMUL      ( MM0, MM4 )             /* x1*m5         | x0*m0              */
+@@ -448,9 +440,6 @@ LLBL (G3TRNR_rescale):
+     MOVQ       ( MM4, REGOFF(-12, EAX) ) /* write r0, r1                      */
+ 
+     MOVD       ( MM5, REGOFF(-4, EAX) ) /* write r2                           */
+-    MOVQ       ( REGIND(EDX), MM4 )     /* x1            | x0                 */
+-
+-    MOVD       ( REGOFF(8, EDX), MM5 )  /*               | x2                 */
+     JA         ( LLBL (G3TRNR_rescale) ) /* cnt > 0 ? -> process next normal  */
+ 
+     FEMMS
+@@ -507,14 +496,15 @@ GLNAME(gl_3dnow_transform_rescale_normals_raw):
+     PFMUL      ( MM0, MM5 )             /* scale*m6      | scale*m2           */
+ 
+     PFMUL      ( MM0, MM6 )             /* scale*m9      | scale*m8           */
+-    MOVD       ( REGOFF(8, EDX), MM2 )  /*               | x2                 */
+ 
+     PFMUL      ( MM0, MM7 )             /*               | scale*m10          */
+-    MOVQ       ( REGIND(EDX), MM0 )     /* x1            | x0                 */
+ 
+ ALIGNTEXT32
+ LLBL (G3TR_rescale):
+ 
++    MOVD       ( REGOFF(8, EDX), MM2 )  /*               | x2                 */
++    MOVQ       ( REGIND(EDX), MM0 )     /* x1            | x0                 */
++
+     PREFETCHW  ( REGIND(EAX) )
+ 
+     MOVQ       ( MM0, MM1 )             /* x1            | x0                 */
+@@ -545,9 +535,6 @@ LLBL (G3TR_rescale):
+     PFADD      ( MM2, MM1 )             /* *not used*    | x0*m8+x1*m9+x2*m10 */
+     MOVD       ( MM1, REGOFF(-4, EAX) ) /* write r2                           */
+ 
+-    MOVQ       ( REGIND(EDX), MM0 )     /* x1            | x0                 */
+-    MOVD       ( REGOFF(8, EDX), MM2 )  /*               | x2                 */
+-
+     DEC_L      ( EDI )                  /* decrement normal counter           */
+     JA         ( LLBL (G3TR_rescale) )
+ 
+@@ -594,12 +581,12 @@ GLNAME(gl_3dnow_transform_normals_no_rot_raw):
+     MOVD       ( REGOFF(40, ECX), MM2 ) /*               | m10                */
+     PUNPCKLDQ  ( MM2, MM2 )             /* m10           | m10                */
+ 
+-    MOVQ       ( REGIND(EDX), MM4 )     /* x1            | x0                 */
+-    MOVD       ( REGOFF(8, EDX), MM5 )  /*               | x2                 */
+-
+ ALIGNTEXT32
+ LLBL (G3TNR_transform):
+ 
++    MOVQ       ( REGIND(EDX), MM4 )     /* x1            | x0                 */
++    MOVD       ( REGOFF(8, EDX), MM5 )  /*               | x2                 */
++
+     PREFETCHW  ( REGIND(EAX) )
+ 
+     PFMUL      ( MM0, MM4 )             /* x1*m5         | x0*m0              */
+@@ -614,9 +601,6 @@ LLBL (G3TNR_transform):
+     MOVQ       ( MM4, REGOFF(-12, EAX) ) /* write r0, r1                      */
+ 
+     MOVD       ( MM5, REGOFF(-4, EAX) ) /* write r2                           */
+-    MOVQ       ( REGIND(EDX), MM4 )     /* x1            | x0                 */
+-
+-    MOVD       ( REGOFF(8, EDX), MM5 )  /*               | x2                 */
+     JA         ( LLBL (G3TNR_transform) )
+ 
+     FEMMS
+@@ -666,12 +650,12 @@ GLNAME(gl_3dnow_transform_normals_raw):
+     MOVQ       ( REGOFF(32, ECX), MM6 ) /* m9            | m8                 */
+     MOVD       ( REGOFF(40, ECX), MM7 ) /*               | m10                */
+ 
+-    MOVQ       ( REGIND(EDX), MM0 )     /* x1            | x0                 */
+-    MOVD       ( REGOFF(8, EDX), MM2 )  /*               | x2                 */
+-
+ ALIGNTEXT32
+ LLBL (G3T_transform):
+ 
++    MOVQ       ( REGIND(EDX), MM0 )     /* x1            | x0                 */
++    MOVD       ( REGOFF(8, EDX), MM2 )  /*               | x2                 */
++
+     PREFETCHW  ( REGIND(EAX) )
+ 
+     MOVQ       ( MM0, MM1 )             /* x1            | x0                 */
+@@ -701,9 +685,6 @@ LLBL (G3T_transform):
+     PFADD      ( MM2, MM1 )             /* *not used*    | x0*m8+x1*m9+x2*m10 */
+ 
+     MOVD       ( MM1, REGOFF(-4, EAX) ) /* write r2                           */
+-    MOVQ       ( REGIND(EDX), MM0 )     /* x1            | x0                 */
+-
+-    MOVD       ( REGOFF(8, EDX), MM2 )  /*               | x2                 */
+     DEC_L      ( EDI )                  /* decrement normal counter           */
+     JA         ( LLBL (G3T_transform) )
+ 
+@@ -743,15 +724,15 @@ GLNAME(gl_3dnow_normalize_normals_raw):
+ 
+     FEMMS
+ 
+-    MOVQ       ( REGIND(ECX), MM0 )     /* x1              | x0               */
+-    MOVD       ( REGOFF(8, ECX), MM1 )  /*                 | x2               */
+-
+     CMP_L      ( CONST(0), EDX )        /* lengths == 0 ?                     */
+     JE         ( LLBL (G3N_norm2) )     /* calculate lengths                  */
+ 
+ ALIGNTEXT32
+ LLBL (G3N_norm1):                       /* use precalculated lengths          */
+ 
++    MOVQ       ( REGIND(ECX), MM0 )     /* x1              | x0               */
++    MOVD       ( REGOFF(8, ECX), MM1 )  /*                 | x2               */
++
+     PREFETCH   ( REGIND(EAX) )
+ 
+     MOVD       ( REGIND(EDX), MM3 )     /*                 | length (x)       */
+@@ -771,8 +752,6 @@ LLBL (G3N_norm1):                       /* use precalculated lengths          */
+     ADD_L      ( CONST(4), EDX )        /* next length                        */
+     DEC_L      ( EBP )                  /* decrement normal counter           */
+ 
+-    MOVQ       ( REGIND(ECX), MM0 )     /* x1              | x0               */
+-    MOVD       ( REGOFF(8, ECX), MM1 )  /*                 | x2               */
+     JA         ( LLBL (G3N_norm1) )
+ 
+     JMP        ( LLBL (G3N_end1) )
+@@ -780,6 +759,9 @@ LLBL (G3N_norm1):                       /* use precalculated lengths          */
+ ALIGNTEXT32
+ LLBL (G3N_norm2):                       /* need to calculate lengths          */
+ 
++    MOVQ       ( REGIND(ECX), MM0 )     /* x1              | x0               */
++    MOVD       ( REGOFF(8, ECX), MM1 )  /*                 | x2               */
++
+     PREFETCHW  ( REGIND(EAX) )
+ 
+     MOVQ       ( MM0, MM3 )             /* x1              | x0               */
+@@ -813,8 +795,6 @@ LLBL (G3N_norm2):                       /* need to calculate lengths          */
+     PFMUL      ( MM5, MM1 )             /*                 | x2 (normalized)  */
+     MOVD       ( MM1, REGOFF(-4, EAX) ) /* write new x2                       */
+ 
+-    MOVQ       ( REGIND(ECX), MM0 )     /* x1              | x0               */
+-    MOVD       ( REGOFF(8, ECX), MM1 )  /*                 | x2               */
+     JA         ( LLBL (G3N_norm2) )
+ 
+ LLBL (G3N_end1):
+@@ -855,12 +835,12 @@ GLNAME(gl_3dnow_rescale_normals_raw):
+     MOVD       ( ARG_SCALE, MM0 )       /* scale                              */
+     PUNPCKLDQ  ( MM0, MM0 )
+ 
+-    MOVQ       ( REGIND(ECX), MM1 )     /* x1            | x0                 */
+-    MOVD       ( REGOFF(8, ECX), MM2 )  /*               | x2                 */
+-
+ ALIGNTEXT32
+ LLBL (G3R_rescale):
+ 
++    MOVQ       ( REGIND(ECX), MM1 )     /* x1            | x0                 */
++    MOVD       ( REGOFF(8, ECX), MM2 )  /*               | x2                 */
++
+     PREFETCHW  ( REGIND(EAX) )
+ 
+     PFMUL      ( MM0, MM1 )             /* x1*scale      | x0*scale           */
+@@ -875,9 +855,6 @@ LLBL (G3R_rescale):
+     MOVD       ( MM2, REGOFF(-4, EAX) ) /* write r2                           */
+ 
+     DEC_L      ( EDX )                  /* decrement normal counter           */
+-    MOVQ       ( REGIND(ECX), MM1 )     /* x1            | x0                 */
+-
+-    MOVD       ( REGOFF(8, ECX), MM2 )  /*               | x2                 */
+     JA         ( LLBL (G3R_rescale) )
+ 
+     FEMMS
+diff --git a/src/X86/3dnow_xform_raw3.S b/src/X86/3dnow_xform_raw3.S
+index 2a9d8d7..7bdec05 100644
+--- a/src/X86/3dnow_xform_raw3.S
++++ b/src/X86/3dnow_xform_raw3.S
+@@ -59,15 +59,15 @@ GLNAME( gl_3dnow_transform_points3_general_raw ):
+ 
+     PREFETCHW ( REGIND(EDX) )
+ 
+-    MOVQ      ( REGIND(EAX), MM0 )	/* x1              | x0              */
+-    MOVD      ( REGOFF(8, EAX), MM2 )	/*                 | x2              */
+-
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+-
+ ALIGNTEXT16
+ LLBL( G3TPGR_1 ):
+ 
+     PREFETCHW ( REGOFF(32, EDX) )	/* prefetch 2 vertices ahead         */
++
++    MOVQ      ( REGIND(EAX), MM0 )	/* x1              | x0              */
++    MOVD      ( REGOFF(8, EAX), MM2 )	/*                 | x2              */
++
++    ADD_L     ( EDI, EAX )		/* next vertex                       */
+     PREFETCH  ( REGIND(EAX) )
+ 
+     MOVQ      ( MM0, MM1 )		/* x1              | x0              */
+@@ -103,10 +103,6 @@ LLBL( G3TPGR_1 ):
+     PFADD     ( MM4, MM5 )		/* r3              | r2              */
+     MOVQ      ( MM5, REGOFF(-8, EDX) )	/* write r2, r3                      */
+ 
+-    MOVQ      ( REGIND(EAX), MM0 )	/* x1              | x0              */
+-    MOVD      ( REGOFF(8, EAX), MM2 )	/*                 | x2              */
+-
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+     DEC_L     ( ESI )			/* decrement vertex counter          */
+     JNZ       ( LLBL( G3TPGR_1 ) )	/* cnt > 0 ? -> process next vertex  */
+ 
+@@ -156,15 +152,15 @@ GLNAME( gl_3dnow_transform_points3_perspective_raw ):
+ 
+     MOVD      ( REGOFF(56, ECX), MM3 )	/*                 | m32             */
+ 
+-    MOVD      ( REGOFF(8, EAX), MM5 )	/*                 | x2              */
+-    MOVQ      ( REGIND(EAX), MM4 )	/* x1              | x0              */
+-
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+-
+ ALIGNTEXT16
+ LLBL( G3TPPR_1 ):
+ 
+     PREFETCHW ( REGOFF(32, EDX) )	/* prefetch 2 vertices ahead         */
++
++    MOVD      ( REGOFF(8, EAX), MM5 )	/*                 | x2              */
++    MOVQ      ( REGIND(EAX), MM4 )	/* x1              | x0              */
++
++    ADD_L     ( EDI, EAX )		/* next vertex                       */
+     PREFETCH  ( REGIND(EAX) )
+ 
+     PXOR      ( MM7, MM7 )		/* 0               | 0               */
+@@ -186,10 +182,6 @@ LLBL( G3TPPR_1 ):
+     MOVD      ( MM6, REGOFF(-8, EDX) )	/* write r2                          */
+ 
+     MOVD      ( MM7, REGOFF(-4, EDX) )	/* write r3                          */
+-    MOVD      ( REGOFF(8, EAX), MM5 )	/*                 | x2              */
+-
+-    MOVQ      ( REGIND(EAX), MM4 )	/* x1              | x0              */
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+ 
+     DEC_L     ( ESI )			/* decrement vertex counter          */
+     JNZ       ( LLBL( G3TPPR_1 ) )	/* cnt > 0 ? -> process next vertex  */
+@@ -235,15 +227,15 @@ GLNAME( gl_3dnow_transform_points3_3d_raw ):
+     MOVD      ( REGOFF(8, ECX), MM7 )	/*                 | m2              */
+     PUNPCKLDQ ( REGOFF(24, ECX), MM7 )	/* m6              | m2              */
+ 
+-    MOVQ      ( REGIND(EAX), MM0 )	/* x1              | x0              */
+-    MOVD      ( REGOFF(8, EAX), MM1 )	/*                 | x2              */
+-
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+-
+ ALIGNTEXT16
+ LLBL( G3TP3R_1 ):
+ 
+     PREFETCHW ( REGOFF(32, EDX) )	/* prefetch 2 vertices ahead         */
++
++    MOVQ      ( REGIND(EAX), MM0 )	/* x1              | x0              */
++    MOVD      ( REGOFF(8, EAX), MM1 )	/*                 | x2              */
++
++    ADD_L     ( EDI, EAX )		/* next vertex                       */
+     PREFETCH  ( REGIND(EAX) )
+ 
+     MOVQ      ( MM0, MM2 )		/* x1              | x0              */
+@@ -276,11 +268,7 @@ LLBL( G3TP3R_1 ):
+     PFACC     ( MM1, MM1 )		/*                 | r2              */
+ 
+     MOVD      ( MM1, REGOFF(-8, EDX) )	/* write r2                          */
+-    MOVQ      ( REGIND(EAX), MM0 )	/* x1              | x0              */
+ 
+-    MOVD      ( REGOFF(8, EAX), MM1 )	/*                 | x2              */
+-
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+     DEC_L     ( ESI )			/* decrement vertex counter          */
+     JNZ       ( LLBL( G3TP3R_1 ) )	/* cnt > 0 ? -> process next vertex  */
+ 
+@@ -332,15 +320,15 @@ GLNAME( gl_3dnow_transform_points3_3d_no_rot_raw ):
+     MOVD      ( REGOFF(56, ECX), MM3 )	/*                 | m32             */
+ 
+     PUNPCKLDQ ( MM3, MM3 )		/* m32             | m32             */
+-    MOVQ      ( REGIND(EAX), MM4 )	/* x1              | x0              */
+-
+-    MOVD      ( REGOFF(8, EAX), MM5 )	/*                 | x2              */
+-
+ 
+ ALIGNTEXT16
+ LLBL( G3TP3NRR_1 ):
+ 
+     PREFETCHW ( REGOFF(32, EDX) )	/* prefetch 2 vertices ahead         */
++
++    MOVQ      ( REGIND(EAX), MM4 )	/* x1              | x0              */
++    MOVD      ( REGOFF(8, EAX), MM5 )	/*                 | x2              */
++
+     ADD_L     ( EDI, EAX )		/* next vertex                       */
+ 
+     PREFETCHW ( REGIND(EAX) )
+@@ -356,9 +344,6 @@ LLBL( G3TP3NRR_1 ):
+     DEC_L     ( ESI )			/* decrement vertex counter          */
+ 
+     MOVD      ( MM5, REGOFF(-8, EDX) )	/* write r2                          */
+-    MOVQ      ( REGIND(EAX), MM4 )	/* x1              | x0              */
+-
+-    MOVD      ( REGOFF(8, EAX), MM5 )	/*                 | x2              */
+     JNZ       ( LLBL( G3TP3NRR_1 ) )	/* cnt > 0 ? -> process next vertex  */
+ 
+ LLBL( G3TP3NRR_2 ):
+@@ -406,15 +391,16 @@ GLNAME( gl_3dnow_transform_points3_2d_raw ):
+     PUNPCKLDQ ( REGOFF(20, ECX), MM1 )	/* m11             | m01             */
+ 
+     MOVQ      ( REGOFF(48, ECX), MM2 )	/* m31             | m30             */
+-    MOVQ      ( REGIND(EAX), MM3 )	/* x1              | x0              */
+-
+-    MOVD      ( REGOFF(8, EAX), MM5 )	/*                 | x2              */
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+ 
+ ALIGNTEXT16
+ LLBL( G3TP2R_2 ):
+ 
+     PREFETCHW ( REGOFF(32, EDX) )	/* prefetch 2 vertices ahead         */
++
++    MOVQ      ( REGIND(EAX), MM3 )	/* x1              | x0              */
++    MOVD      ( REGOFF(8, EAX), MM5 )	/*                 | x2              */
++
++    ADD_L     ( EDI, EAX )		/* next vertex                       */
+     PREFETCH  ( REGIND(EAX) )
+ 
+     MOVQ      ( MM3, MM4 )		/* x1              | x0              */
+@@ -429,10 +415,6 @@ LLBL( G3TP2R_2 ):
+     PFADD     ( MM2, MM3 )		/* x0*...*m10+m30  | x0*...*m11+m31  */
+     MOVQ      ( MM3, REGOFF(-16, EDX) )	/* write r0, r1                      */
+ 
+-    MOVQ      ( REGIND(EAX), MM3 )	/* x1              | x0              */
+-    MOVD      ( REGOFF(8, EAX), MM5 )	/*                 | x2              */
+-
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+     DEC_L     ( ESI )			/* decrement vertex counter          */
+     JNZ       ( LLBL( G3TP2R_2 ) )	/* cnt > 0 ? -> process next vertex  */
+ 
+@@ -478,16 +460,16 @@ GLNAME( gl_3dnow_transform_points3_2d_no_rot_raw ):
+     PUNPCKLDQ ( REGOFF(20, ECX), MM0 )	/* m11             | m00             */
+ 
+     MOVQ      ( REGOFF(48, ECX), MM1 )	/* m31             | m30             */
+-    MOVQ      ( REGIND(EAX), MM4 )	/* x1              | x0              */
+-
+-    MOVD      ( REGOFF(8, EAX), MM5 )	/*                 | x2              */
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+-
+ 
+ ALIGNTEXT16
+ LLBL( G3TP2NRR_1 ):
+ 
+     PREFETCHW ( REGOFF(32, EDX) )	/* prefetch 2 vertices ahead         */
++
++    MOVQ      ( REGIND(EAX), MM4 )	/* x1              | x0              */
++    MOVD      ( REGOFF(8, EAX), MM5 )	/*                 | x2              */
++
++    ADD_L     ( EDI, EAX )		/* next vertex                       */
+     PREFETCH  ( REGIND(EAX) )
+ 
+     PFMUL     ( MM0, MM4 )		/* x1*m11          | x0*m00          */
+@@ -498,10 +480,6 @@ LLBL( G3TP2NRR_1 ):
+     MOVQ      ( MM4, REGOFF(-16, EDX) )	/* write r0, r1                      */
+     MOVD      ( MM5, REGOFF(-8, EDX) )	/* write r2 (=x2)                    */
+ 
+-    MOVQ      ( REGIND(EAX), MM4 )	/* x1              | x0              */
+-    MOVD      ( REGOFF(8, EAX), MM5 )	/*                 | x2              */
+-
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+     DEC_L     ( ESI )			/* decrement vertex counter          */
+     JNZ       ( LLBL( G3TP2NRR_1 ) )	/* cnt > 0 ? -> process next vertex  */
+ 
+@@ -542,14 +520,14 @@ GLNAME( gl_3dnow_transform_points3_identity_raw ):
+ 
+     PREFETCHW ( REGIND(EDX) )
+ 
+-    MOVQ      ( REGIND(EAX), MM0 )	/* x1              | x0              */
+-    MOVD      ( REGOFF(8, EAX), MM1 )	/*                 | x2              */
+-
+ ALIGNTEXT16
+ LLBL( G3TPIR_1 ):
+ 
+     PREFETCHW ( REGOFF(32, EDX) )
+ 
++    MOVQ      ( REGIND(EAX), MM0 )	/* x1              | x0              */
++    MOVD      ( REGOFF(8, EAX), MM1 )	/*                 | x2              */
++
+     ADD_L     ( EDI, EAX )		/* next vertex                       */
+     ADD_L     ( CONST(16), EDX )	/* next r                            */
+ 
+@@ -557,9 +535,6 @@ LLBL( G3TPIR_1 ):
+     MOVQ      ( MM0, REGOFF(-16, EDX) )	/* r1              | r0              */
+ 
+     MOVD      ( MM1, REGOFF(-8, EDX) )	/*                 | r2              */
+-    MOVQ      ( REGIND(EAX), MM0 )	/* x1              | x0              */
+-
+-    MOVD      ( REGOFF(8, EAX), MM1 )	/*                 | x2              */
+     JNZ       ( LLBL( G3TPIR_1 ) )	/* cnt > 0 ? -> process next vertex  */
+ 
+ LLBL( G3TPIR_2 ):
+diff --git a/src/X86/3dnow_xform_raw4.S b/src/X86/3dnow_xform_raw4.S
+index 6a204f4..2530732 100644
+--- a/src/X86/3dnow_xform_raw4.S
++++ b/src/X86/3dnow_xform_raw4.S
+@@ -59,15 +59,15 @@ GLNAME( gl_3dnow_transform_points4_general_raw ):
+ 
+     PREFETCHW ( REGIND(EDX) )
+ 
+-    MOVQ      ( REGIND(EAX), MM0 )	/* x1              | x0              */
+-    MOVQ      ( REGOFF(8, EAX), MM4 )	/* x3              | x2              */
+-
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+-
+ ALIGNTEXT16
+ LLBL( G3TPGR_1 ):
+ 
+     PREFETCHW ( REGOFF(32, EDX) )	/* prefetch 2 vertices ahead         */
++
++    MOVQ      ( REGIND(EAX), MM0 )	/* x1              | x0              */
++    MOVQ      ( REGOFF(8, EAX), MM4 )	/* x3              | x2              */
++
++    ADD_L     ( EDI, EAX )		/* next vertex                       */
+     PREFETCH  ( REGIND(EAX) )
+ 
+     MOVQ      ( MM0, MM2 )		/* x1              | x0              */
+@@ -110,10 +110,6 @@ LLBL( G3TPGR_1 ):
+     MOVQ      ( MM6, REGOFF(-16, EDX) )
+ 
+     MOVQ      ( MM7, REGOFF(-8, EDX) )
+-    MOVQ      ( REGIND(EAX), MM0 )	/* x1            | x0                */
+-
+-    MOVQ      ( REGOFF(8, EAX), MM4 )	/* x3            | x2                */
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+ 
+     DEC_L     ( ESI )			/* decrement vertex counter          */
+     JNZ       ( LLBL( G3TPGR_1 ) )	/* cnt > 0 ? -> process next vertex  */
+@@ -165,16 +161,16 @@ GLNAME( gl_3dnow_transform_points4_perspective_raw ):
+     MOVQ      ( REGOFF(32, ECX), MM2 )	/* m21             | m20             */
+     PXOR      ( MM7, MM7 )		/* 0               | 0               */
+ 
++ALIGNTEXT16
++LLBL( G3TPPR_1 ):
++
++    PREFETCHW ( REGOFF(32, EDX) )	/* prefetch 2 vertices ahead         */
++
+     MOVQ      ( REGIND(EAX), MM4 )	/* x1              | x0              */
+     MOVQ      ( REGOFF(8, EAX), MM5 )	/* x3              | x2              */
+     MOVD      ( REGOFF(8, EAX), MM3 )	/*                 | x2              */
+ 
+     ADD_L     ( EDI, EAX )		/* next vertex                       */
+-
+-ALIGNTEXT16
+-LLBL( G3TPPR_1 ):
+-
+-    PREFETCHW ( REGOFF(32, EDX) )	/* prefetch 2 vertices ahead         */
+     PREFETCH  ( REGOFF(32, EAX) )	/* hopefully stride is zero          */
+ 
+     MOVQ      ( MM5, MM6 )		/* x3              | x2              */
+@@ -193,12 +189,7 @@ LLBL( G3TPPR_1 ):
+     MOVQ      ( MM5, REGOFF(-16, EDX) )	/* write r0, r1                      */
+ 
+     MOVQ      ( MM6, REGOFF(-8, EDX) )	/* write r2, r3                      */
+-    MOVQ      ( REGIND(EAX), MM4 )	/* x1              | x0              */
+ 
+-    MOVQ      ( REGOFF(8, EAX), MM5 )	/* x3              | x2              */
+-    MOVD      ( REGOFF(8, EAX), MM3 )	/*                 | x2              */
+-
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+     DEC_L     ( ESI )			/* decrement vertex counter          */
+ 
+     JNZ       ( LLBL( G3TPPR_1 ) )	/* cnt > 0 ? -> process next vertex  */
+@@ -244,12 +235,12 @@ GLNAME( gl_3dnow_transform_points4_3d_raw ):
+     MOVD      ( REGOFF(40, ECX), MM7 )	/*                 | m10             */
+     PUNPCKLDQ ( REGOFF(56, ECX), MM7 )	/* m14             | m10             */
+ 
+-    MOVQ      ( REGIND(EAX), MM2 )	/* x1              | x0              */
+-    MOVQ      ( REGOFF(8, EAX), MM3 )	/* x3              | x2              */
+-
+ ALIGNTEXT16
+ LLBL( G3TP3R_1 ):
+ 
++    MOVQ      ( REGIND(EAX), MM2 )	/* x1              | x0              */
++    MOVQ      ( REGOFF(8, EAX), MM3 )	/* x3              | x2              */
++
+     PREFETCHW ( REGOFF(32, EDX) )	/* prefetch 2 vertices ahead         */
+     PREFETCH  ( REGOFF(32, EAX) )	/* hopefully array is tightly packed */
+ 
+@@ -281,7 +272,6 @@ LLBL( G3TP3R_1 ):
+     PFADD     ( MM3, MM4 )		/* r1              | r0              */
+ 
+     PFACC     ( MM2, MM5 )		/* x0*m2+x1*m6     | x2*m10+x3*m14   */
+-    MOVD      ( REGOFF(12, EAX), MM0 )	/*                 | x3              */
+ 
+     ADD_L     ( EDI, EAX )		/* next vertex                       */
+     PFACC     ( MM0, MM5 )		/* r3              | r2              */
+@@ -289,9 +279,6 @@ LLBL( G3TP3R_1 ):
+     MOVQ      ( MM4, REGOFF(-16, EDX) )	/* write r0, r1                      */
+     MOVQ      ( MM5, REGOFF(-8, EDX) )	/* write r2, r3                      */
+ 
+-    MOVQ      ( REGIND(EAX), MM2 )	/* x1              | x0              */
+-    MOVQ      ( REGOFF(8, EAX), MM3 )	/* x3              | x2              */
+-
+     DEC_L     ( ESI )			/* decrement vertex counter          */
+     JNZ       ( LLBL( G3TP3R_1 ) )	/* cnt > 0 ? -> process next vertex  */
+ 
+@@ -337,16 +324,17 @@ GLNAME( gl_3dnow_transform_points4_3d_no_rot_raw ):
+ 
+     MOVQ      ( REGOFF(48, ECX), MM1 )	/* m31             | m30             */
+ 
++ALIGNTEXT16
++LLBL( G3TP3NRR_1 ):
++
++    PREFETCHW ( REGOFF(32, EDX) )	/* prefetch 2 vertices ahead         */
++
+     MOVQ      ( REGIND(EAX), MM4 )	/* x1              | x0              */
+     MOVQ      ( REGOFF(8, EAX), MM5 )	/* x3              | x2              */
+     MOVD      ( REGOFF(12, EAX), MM7 )	/*                 | x3              */
+ 
+     ADD_L     ( EDI, EAX )		/* next vertex                       */
+ 
+-ALIGNTEXT16
+-LLBL( G3TP3NRR_1 ):
+-
+-    PREFETCHW ( REGOFF(32, EDX) )	/* prefetch 2 vertices ahead         */
+     PREFETCH  ( REGOFF(32, EAX) )	/* hopefully stride is zero          */
+ 
+     MOVQ      ( MM5, MM6 )		/* x3              | x2              */
+@@ -364,12 +352,6 @@ LLBL( G3TP3NRR_1 ):
+     MOVQ      ( MM4, REGOFF(-16, EDX) )	/* write r0, r1                      */
+     MOVQ      ( MM5, REGOFF(-8, EDX) )	/* write r2, r3                      */
+ 
+-    MOVQ      ( REGIND(EAX), MM4 )	/* x1              | x0              */
+-    MOVQ      ( REGOFF(8, EAX), MM5 )	/* x3              | x2              */
+-
+-    MOVD      ( REGOFF(12, EAX), MM7 )	/*                 | x3              */
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+-
+     DEC_L     ( ESI )			/* decrement vertex counter          */
+     JNZ       ( LLBL( G3TP3NRR_1 ) )	/* cnt > 0 ? -> process next vertex  */
+ 
+@@ -416,15 +398,15 @@ GLNAME( gl_3dnow_transform_points4_2d_raw ):
+ 
+     MOVQ      ( REGOFF(48, ECX), MM2 )	/* m31             | m30             */
+ 
+-    MOVQ      ( REGIND(EAX), MM3 )	/* x1              | x0              */
+-    MOVQ      ( REGOFF(8, EAX), MM5 )	/* x3              | x2              */
+-
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+-
+ ALIGNTEXT16
+ LLBL( G3TP2R_1 ):
+ 
+     PREFETCHW ( REGOFF(32, EDX) )       /* prefetch 2 vertices ahead         */
++
++    MOVQ      ( REGIND(EAX), MM3 )	/* x1              | x0              */
++    MOVQ      ( REGOFF(8, EAX), MM5 )	/* x3              | x2              */
++
++    ADD_L     ( EDI, EAX )		/* next vertex                       */
+     PREFETCH  ( REGIND(EAX) )
+ 
+     MOVQ      ( MM3, MM4 )		/* x1              | x0              */
+@@ -443,10 +425,6 @@ LLBL( G3TP2R_1 ):
+     MOVQ      ( MM5, REGOFF(-8, EDX) )	/* write r2, r3                      */
+ 
+     MOVQ      ( MM3, REGOFF(-16, EDX) )	/* write r0, r1                      */
+-    MOVQ      ( REGIND(EAX), MM3 )	/* x1              | x0              */
+-
+-    MOVQ      ( REGOFF(8, EAX), MM5 )	/* x3              | x2              */
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+ 
+     DEC_L     ( ESI )			/* decrement vertex counter          */
+     JNZ       ( LLBL( G3TP2R_1 ) )	/* cnt > 0 ? -> process next vertex  */
+@@ -491,15 +469,15 @@ GLNAME( gl_3dnow_transform_points4_2d_no_rot_raw ):
+ 
+     MOVQ      ( REGOFF(48, ECX), MM1 )	/* m31             | m30             */
+ 
+-    MOVQ      ( REGIND(EAX), MM4 )	/* x1              | x0              */
+-    MOVQ      ( REGOFF(8, EAX), MM5 )	/* x3              | x2              */
+-
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+-
+ ALIGNTEXT16
+ LLBL( G3TP2NRR_2 ):
+ 
+     PREFETCHW ( REGOFF(32, EDX) )	/* prefetch 2 vertices ahead         */
++
++    MOVQ      ( REGIND(EAX), MM4 )	/* x1              | x0              */
++    MOVQ      ( REGOFF(8, EAX), MM5 )	/* x3              | x2              */
++
++    ADD_L     ( EDI, EAX )		/* next vertex                       */
+     PREFETCH  ( REGIND(EAX) )
+ 
+     PFMUL     ( MM0, MM4 )		/* x1*m11          | x0*m00          */
+@@ -514,10 +492,6 @@ LLBL( G3TP2NRR_2 ):
+     MOVQ      ( MM6, REGOFF(-16, EDX) )	/* write r0, r1                      */
+     MOVQ      ( MM5, REGOFF(-8, EDX) )	/* write r2, r3                      */
+ 
+-    MOVQ      ( REGIND(EAX), MM4 )	/* x1              | x0              */
+-    MOVQ      ( REGOFF(8, EAX), MM5 )	/* x3              | x2              */
+-
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+     DEC_L     ( ESI )			/* decrement vertex counter          */
+ 
+     JNZ       ( LLBL( G3TP2NRR_2 ) )	/* cnt > 0 ? -> process next vertex  */
+@@ -557,25 +531,21 @@ GLNAME( gl_3dnow_transform_points4_identity_raw ):
+     TEST_L    ( ESI, ESI )
+     JZ        ( LLBL( G3TPIR_2 ) )
+ 
+-    MOVQ      ( REGIND(EAX), MM0 )	/* x1              | x0              */
+-    MOVQ      ( REGOFF(8, EAX), MM1 )	/* x3              | x2              */
+-
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+-
+ ALIGNTEXT16
+ LLBL( G3TPIR_1 ):
+ 
+     PREFETCHW ( REGOFF(32, EDX) )       /* prefetch 2 vertices ahead         */
++	
++    MOVQ      ( REGIND(EAX), MM0 )	/* x1              | x0              */
++    MOVQ      ( REGOFF(8, EAX), MM1 )	/* x3              | x2              */
++
++    ADD_L     ( EDI, EAX )		/* next vertex                       */
+     PREFETCH  ( REGIND(EAX) )
+ 
+     ADD_L     ( CONST(16), EDX )	/* next r                            */
+     MOVQ      ( MM0, REGOFF(-16, EDX) )	/* r1              | r0              */
+ 
+     MOVQ      ( MM1, REGOFF(-8, EDX) )	/* r3              | r2              */
+-    MOVQ      ( REGIND(EAX), MM0 )	/* x1              | x0              */
+-
+-    MOVQ      ( REGOFF(8, EAX), MM1 )	/* x3              | x2              */
+-    ADD_L     ( EDI, EAX )		/* next vertex                       */
+ 
+     DEC_L     ( ESI )			/* decrement vertex counter          */
+     JNZ       ( LLBL( G3TPIR_1 ) )	/* cnt > 0 ? -> process next vertex  */
+-- 
+1.7.1
+

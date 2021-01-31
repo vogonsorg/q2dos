@@ -1,14 +1,14 @@
 # Mesa 3-D graphics library
-# Version:  3.4
+# Version:  3.4.2
 # Copyright (C) 1995-2000  Brian Paul
-
+#
 # Makefile for fxMesa gl.dxe (DJGPP 2.04 and newer)
 
 INCDIR = ../include
 LIBDIR = ../lib
-G2DIR  = ../glide
+G2DIR  = ../3dfx/glide
 G2LIB  = glide2x.dxe
-G3DIR  = ../glide3
+G3DIR  = ../3dfx/glide3
 G3LIB  = glide3x.dxe
 #build for glide3x :
 GLIDE3 = 1
