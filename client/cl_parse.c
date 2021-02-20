@@ -454,7 +454,7 @@ void CL_LoadClientinfo (clientinfo_t *ci, char *s)
 	// isolate the player's name
 	strncpy(ci->name, s, sizeof(ci->name));
 	ci->name[sizeof(ci->name)-1] = 0;
-	t = strstr (s, "\\");
+	t = strchr (s, '\\');
 	if (t)
 	{
 		ci->name[t-s] = 0;
@@ -477,9 +477,9 @@ void CL_LoadClientinfo (clientinfo_t *ci, char *s)
 	{
 		// isolate the model name
 		strcpy (model_name, s);
-		t = strstr(model_name, "/");
+		t = strchr(model_name, '/');
 		if (!t)
-			t = strstr(model_name, "\\");
+			t = strchr(model_name, '\\');
 		if (!t)
 			t = model_name;
 		*t = 0;
@@ -532,7 +532,7 @@ void CL_LoadClientinfo (clientinfo_t *ci, char *s)
 				Com_sprintf (weapon_filename, sizeof(weapon_filename), "players/male/%s", cl_weaponmodels[i]);
 				ci->weaponmodel[i] = re.RegisterModel(weapon_filename);
 			}
-			if (!cl_vwep->value)
+			if (!cl_vwep->intValue)
 				break; // only one when vwep is off
 		}
 
@@ -860,7 +860,7 @@ void CL_ParseStartSoundPacket(void)
 
 void SHOWNET(char *s)
 {
-	if (cl_shownet->value>=2)
+	if (cl_shownet->intValue >=2)
 		Com_Printf ("%3i:%s\n", net_message.readcount-1, s);
 }
 
@@ -870,7 +870,7 @@ void SHOWNET(char *s)
 	   potentially scary shit */
 qboolean CL_MaliciousStuffText(char *s)
 {
-	if(!cl_stufftext_check->value)
+	if(!cl_stufftext_check->intValue)
 		return false;
 
 	if(!s || s[0] == 0)
@@ -905,9 +905,9 @@ void CL_ParseServerMessage (void)
 //
 // if recording demos, copy the message out
 //
-	if (cl_shownet->value == 1)
+	if (cl_shownet->intValue == 1)
 		Com_Printf ("%i ",net_message.cursize);
-	else if (cl_shownet->value >= 2)
+	else if (cl_shownet->intValue >= 2)
 		Com_Printf ("------------------\n");
 
 

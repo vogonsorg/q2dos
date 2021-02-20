@@ -431,8 +431,11 @@ void Menu_DrawStatusBar( const char *string )
 void Menu_DrawString( int x, int y, const char *string )
 {
 	unsigned i;
+	int len;
 
-	for ( i = 0; i < strlen( string ); i++ )
+	len = strlen(string);
+
+	for ( i = 0; i < len; i++ )
 	{
 		Draw_Char( ( x + i*8 ), y, string[i] );
 	}
@@ -441,8 +444,11 @@ void Menu_DrawString( int x, int y, const char *string )
 void Menu_DrawStringDark( int x, int y, const char *string )
 {
 	unsigned i;
+	int len;
 
-	for ( i = 0; i < strlen( string ); i++ )
+	len = strlen(string);
+
+	for ( i = 0; i < len; i++ )
 	{
 		Draw_Char( ( x + i*8 ), y, string[i] + 128 );
 	}
@@ -451,20 +457,26 @@ void Menu_DrawStringDark( int x, int y, const char *string )
 void Menu_DrawStringR2L( int x, int y, const char *string )
 {
 	unsigned i;
+	int len;
 
-	for ( i = 0; i < strlen( string ); i++ )
+	len = strlen(string);
+
+	for ( i = 0; i < len; i++ )
 	{
-		Draw_Char( ( x - i*8 ), y, string[strlen(string)-i-1] );
+		Draw_Char( ( x - i*8 ), y, string[len-i-1] );
 	}
 }
 
 void Menu_DrawStringR2LDark( int x, int y, const char *string )
 {
 	unsigned i;
+	int len;
 
-	for ( i = 0; i < strlen( string ); i++ )
+	len = strlen(string);
+
+	for ( i = 0; i < len; i++ )
 	{
-		Draw_Char( ( x - i*8 ), y, string[strlen(string)-i-1]+128 );
+		Draw_Char( ( x - i*8 ), y, string[len-i-1]+128 );
 	}
 }
 

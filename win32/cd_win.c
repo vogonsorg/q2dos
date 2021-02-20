@@ -183,7 +183,7 @@ void CDAudio_Play2(int track, qboolean looping)
 	playTrack = track;
 	playing = true;
 
-	if ( Cvar_VariableValue( "cd_nocd" ) )
+	if ( Cvar_VariableValueInt( "cd_nocd" ) )
 		CDAudio_Pause ();
 }
 
@@ -440,9 +440,9 @@ LRESULT CDAudio_MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 void CDAudio_Update(void)
 {
-	if ( cd_nocd->value != !enabled )
+	if ( cd_nocd->intValue != !enabled )
 	{
-		if ( cd_nocd->value )
+		if ( cd_nocd->intValue )
 		{
 			CDAudio_Stop();
 			enabled = false;
@@ -466,7 +466,7 @@ int CDAudio_Init(void)
 	cd_nocd = Cvar_Get ("cd_nocd", "0", CVAR_ARCHIVE );
 	cd_loopcount = Cvar_Get ("cd_loopcount", "4", 0);
 	cd_looptrack = Cvar_Get ("cd_looptrack", "11", 0);
-	if ( cd_nocd->value)
+	if ( cd_nocd->intValue)
 		return -1;
 
 	mciOpenParms.lpstrDeviceType = "cdaudio";

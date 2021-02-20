@@ -93,7 +93,7 @@ void M_PushMenu ( void (*draw) (void), const char *(*key) (int k) )
 {
 	int		i;
 
-	if (Cvar_VariableValue ("maxclients") == 1 
+	if (Cvar_VariableValueInt("maxclients") == 1 
 		&& Com_ServerState ())
 		Cvar_Set ("paused", "1");
 
@@ -1190,31 +1190,31 @@ float ClampCvar( float min, float max, float value )
 
 static int Get_S_KHZ_Quality (void)  /* FS: Added */
 {
-	if(s_khz->intValue <= 19293)
+	if (s_khz->intValue <= 19293)
 	{
 		return 0;
 	}
-	else if(s_khz->intValue > 19293 && s_khz->intValue <= 22050)
+	else if (s_khz->intValue <= 22050)
 	{
 		return 1;
 	}
-	else if(s_khz->intValue > 22050 && s_khz->intValue <= 44100)
+	else if (s_khz->intValue <= 44100)
 	{
 		return 2;
 	}
-	else if(s_khz->intValue > 44100 && s_khz->intValue <= 48000 )
+	else if (s_khz->intValue <= 48000)
 	{
-		if(havegus == 1) /* FS: Max of GUS Classic is 44100 */
+		if (havegus == 1) /* FS: Max of GUS Classic is 44100 */
 		{
 			return 2;
 		}
 		return 3;
 	}
-	else if(s_khz->intValue > 48000 )
+	else
 	{
 		if (havegus)
 		{
-			if(havegus == 1)
+			if (havegus == 1)
 			{
 				return 2; /* FS: Max of GUS Classic is 44100 */
 			}
@@ -3003,7 +3003,7 @@ static void SearchGamespyGames (void)
 	int		i;
 
 	m_num_gamespy_servers = 0;
-	for (i=0 ; i<=MAX_GAMESPY_MENU_SERVERS ; i++)
+	for (i = 0; i < MAX_GAMESPY_MENU_SERVERS; i++)
 	{
 		strcpy (gamespy_server_names[i], NO_SERVER_STRING);
 	}
@@ -3184,7 +3184,7 @@ static void JoinGamespyServer_MenuInit(void)
 
 	vidscale = Get_Vidscale();
 
-	for (i = 0; i <= MAX_GAMESPY_MENU_SERVERS; i++)
+	for (i = 0; i < MAX_GAMESPY_MENU_SERVERS; i++)
 	{
 		strcpy (gamespy_server_names[i], NO_SERVER_STRING);
 		memset (&gamespy_connect_string, 0, sizeof(gamespy_connect_string));
@@ -3257,7 +3257,7 @@ static void JoinGamespyServer_Redraw( int serverscale )
 
 	vidscale = Get_Vidscale();
 
-	for (i = 0; i <= MAX_GAMESPY_MENU_SERVERS; i++)
+	for (i = 0; i < MAX_GAMESPY_MENU_SERVERS; i++)
 	{
 		strcpy (gamespy_server_names[i], NO_SERVER_STRING);
 	}
@@ -3654,7 +3654,7 @@ void StartServer_MenuInit( void )
 		s_rules_box.itemnames = dm_coop_names;
 //PGM
 
-	if (Cvar_VariableValue("coop"))
+	if (Cvar_VariableValueInt("coop"))
 		s_rules_box.curvalue = 1;
 	else
 		s_rules_box.curvalue = 0;
@@ -3694,7 +3694,7 @@ void StartServer_MenuInit( void )
 	s_maxclients_field.generic.statusbar = NULL;
 	s_maxclients_field.length = 3;
 	s_maxclients_field.visible_length = 3;
-	if ( Cvar_VariableValue( "maxclients" ) == 1 )
+	if ( Cvar_VariableValueInt( "maxclients" ) == 1 )
 		strcpy( s_maxclients_field.buffer, "8" );
 	else 
 		strcpy( s_maxclients_field.buffer, Cvar_VariableString("maxclients") );

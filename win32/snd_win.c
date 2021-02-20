@@ -625,7 +625,7 @@ qboolean SNDDMA_Init(void)
 	stat = SIS_FAILURE;	// assume DirectSound won't initialize
 
 	/* Init DirectSound */
-	if (!s_wavonly->value)
+	if (!s_wavonly->intValue)
 	{
 		if (snd_firsttime || snd_isdirect)
 		{
@@ -675,9 +675,6 @@ qboolean SNDDMA_Init(void)
 
 	if (!dsound_init && !wav_init)
 	{
-		if (snd_firsttime)
-			Com_Printf ("*** No sound device initialized ***\n");
-
 		return 0;
 	}
 

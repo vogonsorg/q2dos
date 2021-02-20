@@ -638,10 +638,10 @@ void SCR_DrawPause (void)
 {
 	int		w, h;
 
-	if (!scr_showpause->value)		// turn off for screenshots
+	if (!scr_showpause->intValue)		// turn off for screenshots
 		return;
 
-	if (!cl_paused->value)
+	if (!cl_paused->intValue)
 		return;
 
 	re.DrawGetPicSize (&w, &h, "pause");
@@ -745,7 +745,7 @@ void SCR_BeginLoadingPlaque (void)
 	CDAudio_Stop ();
 	if (cls.disable_screen)
 		return;
-	if (developer->value)
+	if (developer->intValue)
 		return;
 	if (cls.state == ca_disconnected)
 		return;	// if at console, don't bring up the plaque
@@ -876,12 +876,12 @@ void SCR_TileClear (void)
 	int		top, bottom, left, right;
 	dirty_t	clear;
 
-	if (scr_drawall->value)
+	if (scr_drawall->intValue)
 		SCR_DirtyScreen ();	// for power vr or broken page flippers...
 
 	if (scr_con_current == 1.0)
 		return;		// full screen console
-	if (scr_viewsize->value == 100)
+	if (scr_viewsize->intValue == 100)
 		return;		// full screen rendering
 	if (cl.cinematictime > 0)
 		return;		// full screen cinematic
@@ -1475,7 +1475,7 @@ void SCR_UpdateScreen (void)
 	else if ( cl_stereo_separation->value < 0 )
 		Cvar_SetValue( "cl_stereo_separation", 0.0 );
 
-	if ( cl_stereo->value )
+	if ( cl_stereo->intValue)
 	{
 		numframes = 2;
 		separation[0] = -cl_stereo_separation->value / 2;
@@ -1563,10 +1563,10 @@ void SCR_UpdateScreen (void)
 			SCR_DrawNet ();
 			SCR_CheckDrawCenterString ();
 
-			if (scr_timegraph->value)
+			if (scr_timegraph->intValue)
 				SCR_DebugGraph (cls.renderFrameTime*300, 0);
 
-			if (scr_debuggraph->value || scr_timegraph->value || scr_netgraph->value)
+			if (scr_debuggraph->intValue || scr_timegraph->intValue || scr_netgraph->intValue)
 				SCR_DrawDebugGraph ();
 
 			SCR_DrawPause ();

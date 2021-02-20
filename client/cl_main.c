@@ -897,7 +897,7 @@ void CL_PingServers_f (void)
 	Com_Printf ("pinging broadcast...\n");
 
 	noudp = Cvar_Get ("noudp", "0", CVAR_NOSET);
-	if (!noudp->value)
+	if (!noudp->intValue)
 	{
 		adr.type = NA_BROADCAST;
 		adr.port = BigShort(PORT_SERVER);
@@ -905,7 +905,7 @@ void CL_PingServers_f (void)
 	}
 
 	noipx = Cvar_Get ("noipx", "0", CVAR_NOSET);
-	if (!noipx->value)
+	if (!noipx->intValue)
 	{
 		adr.type = NA_BROADCAST_IPX;
 		adr.port = BigShort(PORT_SERVER);
@@ -1162,7 +1162,7 @@ void CL_FixUpGender(void)
 	char *p;
 	char sk[80];
 
-	if (gender_auto->value) {
+	if (gender_auto->intValue) {
 
 		if (gender->modified) {
 			// was set directly, don't override the user
@@ -1259,18 +1259,18 @@ void CL_RequestNextDownload (void)
 		localServer = true;
 
 	// skip to loading map if downloads disabled or on local server
-	if ( (localServer || !allow_download->value) && (precache_check < ENV_CNT) )
+	if ( (localServer || !allow_download->intValue) && (precache_check < ENV_CNT) )
 		precache_check = ENV_CNT;
 
 //ZOID
 	if (precache_check == CS_MODELS) { // confirm map
 		precache_check = CS_MODELS+2; // 0 isn't used
-		if (allow_download_maps->value)
+		if (allow_download_maps->intValue)
 			if (!CL_CheckOrDownloadFile(cl.configstrings[CS_MODELS+1]))
 				return; // started a download
 	}
 	if (precache_check >= CS_MODELS && precache_check < CS_MODELS+MAX_MODELS) {
-		if (allow_download_models->value) {
+		if (allow_download_models->intValue) {
 			while (precache_check < CS_MODELS+MAX_MODELS &&
 				cl.configstrings[precache_check][0]) {
 				if (cl.configstrings[precache_check][0] == '*' ||
@@ -1382,8 +1382,6 @@ void CL_RequestNextDownload (void)
 						// r1ch: spam warning for models that are broken
 						if (strchr (skinname, '\\'))
 							Com_Printf ("Warning, model %s with incorrectly linked skin: %s\n", cl.configstrings[precache_check], skinname);
-						else if (strlen(skinname) > MAX_SKINNAME-1)
-							Com_Error (ERR_DROP, "Model %s has too long a skin path: %s", cl.configstrings[precache_check], skinname);
 
 						if (!CL_CheckOrDownloadFile(skinname))
 						{
@@ -1405,7 +1403,7 @@ void CL_RequestNextDownload (void)
 		precache_check = CS_SOUNDS;
 	}
 	if (precache_check >= CS_SOUNDS && precache_check < CS_SOUNDS+MAX_SOUNDS) { 
-		if (allow_download_sounds->value) {
+		if (allow_download_sounds->intValue) {
 			if (precache_check == CS_SOUNDS)
 				precache_check++; // zero is blank
 			while (precache_check < CS_SOUNDS+MAX_SOUNDS &&
@@ -1436,7 +1434,7 @@ void CL_RequestNextDownload (void)
 	// model, weapon model and skin
 	// so precache_check is now *3
 	if (precache_check >= CS_PLAYERSKINS && precache_check < CS_PLAYERSKINS + MAX_CLIENTS * PLAYER_MULT) {
-		if (allow_download_players->value) {
+		if (allow_download_players->intValue) {
 			while (precache_check < CS_PLAYERSKINS + MAX_CLIENTS * PLAYER_MULT) {
 				int i, n;
 				char model[MAX_QPATH], skin[MAX_QPATH], *p;
@@ -2113,14 +2111,14 @@ void CL_Frame_Async (int msec)
 		cls.netchan.last_received = Sys_Milliseconds ();
 	}
 
-	if (!cl_timedemo->value)
+	if (!cl_timedemo->intValue)
 	{	// Don't flood packets out while connecting
 		if (cls.state == ca_connected && packetDelta < 100)
 		{
 			packetFrame = false;
 		}
 
-		if (packetDelta < 1000.0 / net_maxfps->value)
+		if (packetDelta < 1000.0 / net_maxfps->intValue)
 		{
 			packetFrame = false;
 		}
@@ -2143,9 +2141,9 @@ void CL_Frame_Async (int msec)
 		if (!packetFrame && !renderFrame && !cls.forcePacket && !userinfo_modified)
 		{
 			// Pooy's CPU usage fix
-			if (cl_sleep->value)
+			if (cl_sleep->intValue)
 			{
-				int temptime = min( (1000.0 / net_maxfps->value - packetDelta), (1000.0 / r_maxfps->value - renderDelta) );
+				int temptime = min( (1000.0 / net_maxfps->intValue - packetDelta), (1000.0 / r_maxfps->intValue - renderDelta) );
 				if (temptime > 1)
 				{
 					Sys_Sleep (1);
@@ -2228,14 +2226,14 @@ void CL_Frame_Async (int msec)
 		}
 
 		// update the screen
-		if (host_speeds->value)
+		if (host_speeds->intValue)
 		{
 			time_before_ref = Sys_Milliseconds ();
 		}
 
 		SCR_UpdateScreen ();
 
-		if (host_speeds->value)
+		if (host_speeds->intValue)
 		{
 			time_after_ref = Sys_Milliseconds ();
 		}
@@ -2256,7 +2254,7 @@ void CL_Frame_Async (int msec)
 
 		cls.framecount++;
 
-		if (log_stats->value)
+		if (log_stats->intValue)
 		{
 			if (cls.state == ca_active)
 			{
@@ -2329,7 +2327,7 @@ void CL_Frame (int msec)
 	static int  lasttimecalled;
 	float	fps;
 
-	if (dedicated->value)
+	if (dedicated->intValue)
 	{
 		return;
 	}
@@ -2339,7 +2337,7 @@ void CL_Frame (int msec)
 #endif
 
 #ifdef CLIENT_SPLIT_NETFRAME
-	if (cl_async->value && !cl_timedemo->value)
+	if (cl_async->intValue && !cl_timedemo->intValue)
 	{
 		CL_Frame_Async (msec);
 		return;
@@ -2348,16 +2346,16 @@ void CL_Frame (int msec)
 
 	extratime += msec;
 
-	if (cl_maxfps->value)
+	if (cl_maxfps->intValue)
 	{
-		fps = bound(5, cl_maxfps->value, 1000); /* FS: Don't go under 5 */
+		fps = bound(5, cl_maxfps->intValue, 1000); /* FS: Don't go under 5 */
 	}
 	else
 	{
-		fps = bound(5, cl_maxfps->value, 72); /* FS: Default to 72hz if nothing is set */
+		fps = bound(5, cl_maxfps->intValue, 72); /* FS: Default to 72hz if nothing is set */
 	}
 
-	if (!cl_timedemo->value)
+	if (!cl_timedemo->intValue)
 	{
 		if (cls.state == ca_connected && extratime < 100)
 		{
@@ -2367,9 +2365,9 @@ void CL_Frame (int msec)
 		if (extratime < 1000.0/fps)
 		{
 			// Knightmare- added Pooy's CPU usage fix
-			if (cl_sleep->value)
+			if (cl_sleep->intValue)
 			{
-				int temptime = 1000 / cl_maxfps->value - extratime;
+				int temptime = 1000 / cl_maxfps->intValue - extratime;
 
 				if (temptime > 1)
 				{
@@ -2438,14 +2436,14 @@ void CL_Frame (int msec)
 	}
 
 	// update the screen
-	if (host_speeds->value)
+	if (host_speeds->intValue)
 	{
 		time_before_ref = Sys_Milliseconds ();
 	}
 
 	SCR_UpdateScreen ();
 
-	if (host_speeds->value)
+	if (host_speeds->intValue)
 	{
 		time_after_ref = Sys_Milliseconds ();
 	}
@@ -2463,7 +2461,7 @@ void CL_Frame (int msec)
 
 	cls.framecount++;
 
-	if ( log_stats->value )
+	if ( log_stats->intValue)
 	{
 		if ( cls.state == ca_active )
 		{
@@ -2501,7 +2499,7 @@ CL_Init
 */
 void CL_Init (void)
 {
-	if (dedicated->value)
+	if (dedicated->intValue)
 	{
 		return;		// nothing running on the client
 	}

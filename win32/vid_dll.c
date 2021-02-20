@@ -271,7 +271,7 @@ void AppActivate(BOOL fActive, BOOL minimize)
 		CDAudio_Activate (false);
 		S_Activate (false);
 
-		if ( win_noalttab->value )
+		if ( win_noalttab->intValue )
 		{
 			WIN_EnableAltTab();
 		}
@@ -281,7 +281,7 @@ void AppActivate(BOOL fActive, BOOL minimize)
 		IN_Activate (true);
 		CDAudio_Activate (true);
 		S_Activate (true);
-		if ( win_noalttab->value )
+		if ( win_noalttab->intValue )
 		{
 			WIN_DisableAltTab();
 		}
@@ -374,7 +374,7 @@ LRESULT WINAPI MainWndProc (
 			RECT r;
 			int		style;
 
-			if (!vid_fullscreen->value)
+			if (!vid_fullscreen->intValue)
 			{
 				xPos = (short) LOWORD(lParam);    // horizontal position 
 				yPos = (short) HIWORD(lParam);    // vertical position 
@@ -672,7 +672,7 @@ void VID_CheckChanges (void)
 
 	if ( win_noalttab->modified )
 	{
-		if ( win_noalttab->value )
+		if ( win_noalttab->intValue )
 		{
 			WIN_DisableAltTab();
 		}
@@ -721,8 +721,8 @@ void VID_CheckChanges (void)
 	*/
 	if ( vid_xpos->modified || vid_ypos->modified )
 	{
-		if (!vid_fullscreen->value)
-			VID_UpdateWindowPosAndSize( vid_xpos->value, vid_ypos->value );
+		if (!vid_fullscreen->intValue)
+			VID_UpdateWindowPosAndSize( vid_xpos->intValue, vid_ypos->intValue );
 
 		vid_xpos->modified = false;
 		vid_ypos->modified = false;

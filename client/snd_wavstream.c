@@ -429,7 +429,7 @@ static void S_WAV_LoadFileList (void)
 	while (path)
 	{
 		// Knightmare- catch repeated paths
-		if ( strlen(lastPath) > 0 && !strcmp (path, lastPath) ) {
+		if ( lastPath[0] != '\0' && !strcmp (path, lastPath) ) {
 			path = FS_NextPath( path );
 			continue;
 		}

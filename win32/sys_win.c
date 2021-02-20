@@ -181,7 +181,7 @@ void Sys_CopyProtect (void)
 	char	*cddir;
 
 	cddir = Sys_ScanForCD();
-	if (!cddir[0])
+	if (!cddir || !cddir[0])
 		Com_Error (ERR_FATAL, "You must have the Quake2 CD in the drive to play.");
 #endif
 }

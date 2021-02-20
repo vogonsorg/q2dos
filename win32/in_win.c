@@ -146,7 +146,7 @@ void IN_ActivateMouse (void)
 
 	if (!mouseinitialized)
 		return;
-	if (!in_mouse->value)
+	if (!in_mouse->intValue)
 	{
 		mouseactive = false;
 		return;
@@ -288,7 +288,7 @@ void IN_MouseMove (usercmd_t *cmd)
 		return;
 #endif
 
-	if (m_filter->value)
+	if (m_filter->intValue)
 	{
 		mouse_x = (mx + old_mouse_x) * 0.5;
 		mouse_y = (my + old_mouse_y) * 0.5;

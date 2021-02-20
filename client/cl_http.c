@@ -716,7 +716,7 @@ static void CL_ParseFileList (dlhandle_t *dl)
 	char	 *list;
 	char	*p;
 
-	if (!cl_http_filelists->value)
+	if (!cl_http_filelists->intValue)
 		return;
 
 	list = dl->tempBuffer;
