@@ -770,11 +770,13 @@ void Con_DrawConsole (float frac)
 		dlbar[i++] = '\x82';
 		dlbar[i] = 0;
 
-		Com_sprintf(dlbar + strlen(dlbar), sizeof(dlbar)-strlen(dlbar), " %02d%%", cls.gamespypercent);
+		dlbarlen = strlen(dlbar);
+
+		Com_sprintf(dlbar + dlbarlen, sizeof(dlbar)-dlbarlen, " %02d%%", cls.gamespypercent);
 
 		// draw it
 		y = con.vislines-12;
-		for (i = 0; i < strlen(dlbar); i++)
+		for (i = 0; i < dlbarlen; i++)
 			re.DrawChar ( (i+1)<<3, y, dlbar[i]);
 	}
 #endif
