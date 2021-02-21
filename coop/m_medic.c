@@ -1625,14 +1625,7 @@ medic_hook_retract(edict_t *self)
 
 	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (self->mass == 400)
-		{
-			gi.sound(self, CHAN_WEAPON, sound_hook_retract, 1, ATTN_NORM, 0);
-		}
-		else
-		{
-			gi.sound(self, CHAN_WEAPON, sound_hook_retract, 1, ATTN_NORM, 0);
-		}
+		gi.sound(self, CHAN_WEAPON, sound_hook_retract, 1, ATTN_NORM, 0);
 
 		self->monsterinfo.aiflags &= ~AI_MEDIC;
 

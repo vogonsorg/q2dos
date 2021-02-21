@@ -329,9 +329,9 @@ void SVCmd_SayPerson_f (void)
 	Com_strcat (msg, sizeof(msg), p);
 
 	/* don't let text be too long for malicious reasons */
-	if (strlen(msg) > 2000) /* FS: This is unfortunate, but this is what TSAdmin uses and wallfly can hit about 512 sometimes... */
+	if (strlen(msg) > sizeof(msg)-1) /* FS: This is unfortunate, but this is what TSAdmin uses and wallfly can hit about 512 sometimes... */
 	{
-		msg[2000] = 0;
+		msg[sizeof(msg)-1] = '\0';
 	}
 
 	Com_strcat (msg, sizeof(msg), "\n");
@@ -372,7 +372,7 @@ void SVCmd_StuffCmd_f (void)
 		{
 			client = &g_edicts[i];
 
-			if(!client || !client->inuse || !client->client /* || !client->client->pers.connected */ || !client->client->pers.netname) /* FS: FIXME: Unreliable check */
+			if(!client || !client->inuse || !client->client /* || !client->client->pers.connected */ || !client->client->pers.netname[0]) /* FS: FIXME: Unreliable check */
 			{
 				continue;
 			}

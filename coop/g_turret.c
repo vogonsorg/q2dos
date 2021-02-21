@@ -613,7 +613,7 @@ turret_brain_think(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	vec3_t target;
 	vec3_t dir;
-	vec3_t endpos;
+	vec3_t endpos = { 0 };
 	float reaction_time;
 	trace_t trace;
 

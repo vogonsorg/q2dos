@@ -119,6 +119,9 @@ sphere_chase(edict_t *self, int stupidChase)
 		return;
 	}
 
+	if (!self->enemy)
+		return;
+
 	VectorCopy(self->enemy->s.origin, dest);
 
 	if (self->enemy->client)
@@ -199,7 +202,7 @@ sphere_fire(edict_t *self, edict_t *enemy)
 	vec3_t dest;
 	vec3_t dir;
 
-	if (!self || !enemy)
+	if (!self)
 	{
 		return;
 	}

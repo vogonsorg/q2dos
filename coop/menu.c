@@ -52,15 +52,33 @@ PMenu_Open(edict_t *ent, pmenu_t *entries, pmenu_t *header, int cur, int num, in
 	}
 
 	hnd = malloc(sizeof(*hnd));
+	if (!hnd)
+	{
+		gi.error("PMenu_Open:  Failed allocating memory.\n");
+		return NULL;
+	}
 
 	hnd->arg = arg;
 	hnd->entries = malloc(sizeof(pmenu_t) * num);
+	if (!hnd->entries)
+	{
+		gi.error("PMenu_Open:  Failed allocating memory.\n");
+		free(hnd);
+		return NULL;
+	}
 	hnd->menutype = menutype;
 	memcpy(hnd->entries, entries, sizeof(pmenu_t) * num);
 
 	if (header && numheader) /* FS */
 	{
 		hnd->header = malloc(sizeof(pmenu_t) * numheader);
+		if (!hnd->header)
+		{
+			gi.error("PMenu_Open:  Failed allocating memory.\n");
+			free(hnd->entries);
+			free(hnd);
+			return NULL;
+		}
 		memcpy(hnd->header, header, sizeof(pmenu_t) * numheader);
 
 		for (i = 0; i < numheader; i++)

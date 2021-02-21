@@ -285,7 +285,7 @@ qboolean vote_mapcheck (edict_t *ent, const char *mapName)
 	char *listPtr = NULL;
 	char *listPtr2 = NULL;
 	char separators[] = ",\n";
-	char separators2[] = ",";
+//	char separators2[] = ",";
 	long fileSize;
 	int mapCount = 0;
 	FILE *f = NULL;
@@ -410,12 +410,12 @@ void vote_map (edict_t *ent, const char *mapName)
 
 	vote_Reset();
 
-	if(strstr(mapName, "."))
+	if(strchr(mapName, '.'))
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Map name can not contain '.'\n");
 		return;
 	}
-	else if(strstr(mapName, ";"))
+	else if(strchr(mapName, ';'))
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Map name can not contain ';'\n");
 		return;
@@ -452,9 +452,10 @@ void vote_map (edict_t *ent, const char *mapName)
 
 void vote_warp (edict_t *ent, const char *mapName)
 {
-	if(!ent || !ent->client)
+	if (!ent || !ent->client)
 	{
 		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_warp from a non-player!\n");
+		return;
 	}
 
 	if (bVoteInProgress)
@@ -465,12 +466,12 @@ void vote_warp (edict_t *ent, const char *mapName)
 
 	vote_Reset();
 
-	if(strstr(mapName, "."))
+	if(strchr(mapName, '.'))
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Map name can not contain '.'\n");
 		return;
 	}
-	else if(strstr(mapName, ";"))
+	else if(strchr(mapName, ';'))
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Map name can not contain ';'\n");
 		return;
@@ -515,9 +516,10 @@ void vote_warp (edict_t *ent, const char *mapName)
 
 void vote_gamemode(edict_t *ent, const char *gamemode)
 {
-	if(!ent || !ent->client)
+	if (!ent || !ent->client)
 	{
 		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_gamemode from a non-player!\n");
+		return;
 	}
 
 	if (bVoteInProgress)
@@ -690,9 +692,10 @@ void vote_random (edict_t *ent)
 
 void vote_restartmap (edict_t *ent)
 {
-	if(!ent || !ent->client)
+	if (!ent || !ent->client)
 	{
 		gi.dprintf(DEVELOPER_MSG_GAME, "Error: vote_map from a non-player!\n");
+		return;
 	}
 
 	if (bVoteInProgress)

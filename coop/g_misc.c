@@ -629,8 +629,11 @@ path_corner_touch(edict_t *self, edict_t *other, cplane_t *plane /* unused */, c
 	}
 	else
 	{
-		VectorSubtract(other->goalentity->s.origin, other->s.origin, v);
-		other->ideal_yaw = vectoyaw(v);
+		if (other->goalentity)
+		{
+			VectorSubtract(other->goalentity->s.origin, other->s.origin, v);
+			other->ideal_yaw = vectoyaw(v);
+		}
 	}
 }
 
@@ -1014,7 +1017,7 @@ SP_func_wall(edict_t *self)
 void
 func_object_touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf /* unused */)
 {
-	if (!self || !other || !plane)
+	if (!self || !other)
 	{
 		return;
 	}

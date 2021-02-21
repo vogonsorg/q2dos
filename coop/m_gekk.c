@@ -54,7 +54,7 @@ gekk_check_melee(edict_t *self)
 		return false;
 	}
 
-	if (!self->enemy && (self->enemy->health <= 0))
+	if (!self->enemy || (self->enemy->health <= 0))
 	{
 		return false;
 	}

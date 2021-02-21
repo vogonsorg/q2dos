@@ -541,7 +541,7 @@ use_target_changelevel(edict_t *self, edict_t *other, edict_t *activator)
 	}
 
 	/* if going to a new unit, clear cross triggers */
-	if (self->map && strstr(self->map, "*"))
+	if (self->map && strchr(self->map, '*'))
 	{
 		game.serverflags &= ~(SFL_CROSS_TRIGGER_MASK);
 	}

@@ -907,7 +907,7 @@ Pickup_Sphere(edict_t *ent, edict_t *other) /* FS: Coop: Rogue specific */
 {
 	int quantity;
 
-	if (!ent || !other)
+	if (!ent || !other || !other->client)
 	{
 		return false;
 	}
@@ -958,12 +958,12 @@ Pickup_Sphere(edict_t *ent, edict_t *other) /* FS: Coop: Rogue specific */
 void
 Use_Defender(edict_t *ent, gitem_t *item) /* FS: Coop: Rogue specific */
 {
-	if (!ent || !item)
+	if (!ent || !ent->client || !item)
 	{
 		return;
 	}
 
-	if (ent->client && ent->client->owned_sphere)
+	if (ent->client->owned_sphere)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Only one sphere at a time!\n");
 		return;
@@ -978,12 +978,12 @@ Use_Defender(edict_t *ent, gitem_t *item) /* FS: Coop: Rogue specific */
 void
 Use_Hunter(edict_t *ent, gitem_t *item) /* FS: Coop: Rogue specific */
 {
-	if (!ent || !item)
+	if (!ent || !ent->client || !item)
 	{
 		return;
 	}
 
-	if (ent->client && ent->client->owned_sphere)
+	if (ent->client->owned_sphere)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Only one sphere at a time!\n");
 		return;
@@ -998,12 +998,12 @@ Use_Hunter(edict_t *ent, gitem_t *item) /* FS: Coop: Rogue specific */
 void
 Use_Vengeance(edict_t *ent, gitem_t *item) /* FS: Coop: Rogue specific */
 {
-	if (!ent || !item)
+	if (!ent || !ent->client || !item)
 	{
 		return;
 	}
 
-	if (ent->client && ent->client->owned_sphere)
+	if (ent->client->owned_sphere)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Only one sphere at a time!\n");
 		return;
@@ -1238,7 +1238,7 @@ Pickup_Key(edict_t *ent, edict_t *other)
 				coopReturn = true;
 		}
 
-		if(ent->item && ent->item->pickup_name && other->client->pers.netname && coopReturn == true)
+		if(ent->item && ent->item->pickup_name && other->client->pers.netname[0] && coopReturn == true)
 		{
 			gi.bprintf(PRINT_HIGH,"\x02[%s]: ", other->client->pers.netname);
 			gi.bprintf(PRINT_HIGH, "Team, everyone has the %s!\n", ent->item->pickup_name);
@@ -1419,7 +1419,7 @@ Pickup_Ammo(edict_t *ent, edict_t *other)
 		/* don't switch to tesla */
 		if ((other->client->pers.weapon != ent->item) &&
 			(!deathmatch->intValue || (other->client->pers.weapon == FindItem("blaster"))) &&
-			(ent->classname && strcmp(ent->classname, "ammo_tesla"))) /* FS: Coop: Rogue specific -- ammo_tesla */
+			(ent->classname && strcmp(ent->classname, "ammo_tesla") != 0)) /* FS: Coop: Rogue specific -- ammo_tesla */
 		{
 			other->client->newweapon = ent->item;
 		}
@@ -1744,7 +1744,7 @@ Use_PowerArmor(edict_t *ent, gitem_t *item)
 {
 	int index;
 
-	if (!ent || !item)
+	if (!ent || !ent->client || !item)
 	{
 		return;
 	}
@@ -1753,12 +1753,12 @@ Use_PowerArmor(edict_t *ent, gitem_t *item)
 	{
 		ent->flags &= ~FL_POWER_ARMOR;
 
-		if(coop->intValue && ent->client) /* FS: Save power armor state for respawn. */
+		if (coop->intValue) /* FS: Save power armor state for respawn. */
 		{
 			ent->client->resp.coop_respawn.savedFlags &= ~FL_POWER_ARMOR;
 		}
 
-		gi.sound(ent, CHAN_AUTO, gi.soundindex( "misc/power2.wav"), 1, ATTN_NORM, 0);
+		gi.sound(ent, CHAN_AUTO, gi.soundindex("misc/power2.wav"), 1, ATTN_NORM, 0);
 	}
 	else
 	{
@@ -1772,7 +1772,7 @@ Use_PowerArmor(edict_t *ent, gitem_t *item)
 
 		ent->flags |= FL_POWER_ARMOR;
 
-		if(coop->intValue && ent->client) /* FS: Save power armor state for respawn. */
+		if (coop->intValue) /* FS: Save power armor state for respawn. */
 		{
 			ent->client->resp.coop_respawn.savedFlags |= FL_POWER_ARMOR;
 		}
@@ -2142,13 +2142,13 @@ droptofloor(edict_t *ent)
 	{
 		gi.setmodel(ent, ent->model);
 	}
-	else if ((game.gametype == rogue_coop) && (ent->item->world_model)) /* FS: Coop: Rogue specific */
+	else if (ent->item->world_model) /* FS: Coop: Rogue specific */
 	{
 		gi.setmodel(ent, ent->item->world_model);
 	}
 	else
 	{
-		gi.setmodel(ent, ent->item->world_model);
+		/* FS: FIXME: Should we bail? */
 	}
 
 	ent->solid = SOLID_TRIGGER;
@@ -4672,7 +4672,7 @@ SP_xatrix_item(edict_t *self) /* FS: Coop: Rogue specific */
 {
 	gitem_t *item;
 	int i;
-	char *spawnClass = NULL;
+	char *spawnClass = "";
 
 	if (!self || !self->classname)
 	{

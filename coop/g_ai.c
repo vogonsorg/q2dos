@@ -1109,7 +1109,7 @@ M_CheckAttack(edict_t *self)
 	}
 
 	/* go ahead and shoot every time if it's a info_notnull */
-	if ((random() < chance) || ((game.gametype == rogue_coop) && (self->enemy->solid == SOLID_NOT)) ) /* FS: Coop: Rogue specific */
+	if ((random() < chance) || ((game.gametype == rogue_coop) && (self->enemy) && (self->enemy->solid == SOLID_NOT)) ) /* FS: Coop: Rogue specific */
 	{
 		self->monsterinfo.attack_state = AS_MISSILE;
 		self->monsterinfo.attack_finished = level.time + 2 * random();
@@ -1296,7 +1296,7 @@ ai_run_slide_rogue (edict_t *self, float distance) /* FS: Coop: Rogue specific *
 	}
 
 	/* clamp maximum sideways move for non flyers to make them look less jerky */
-	if (!self->flags & FL_FLY)
+	if (!(self->flags & FL_FLY))
 	{
 		distance = min(distance, 0.8);
 	}

@@ -556,7 +556,7 @@ void target_actor_touch (edict_t *self, edict_t *other, cplane_t *plane, csurfac
 		other->monsterinfo.pausetime = level.time + 100000000;
 		other->monsterinfo.stand (other);
 	}
-	else if (other->movetarget == other->goalentity)
+	else if (other->movetarget && (other->movetarget == other->goalentity))
 	{
 		VectorSubtract (other->movetarget->s.origin, other->s.origin, v);
 		other->ideal_yaw = vectoyaw (v);

@@ -555,6 +555,7 @@ WriteField1(FILE *f /* unused */, field_t *field, byte *base)
 #endif
 #endif
 					gi.error ("WriteField1: function not in list, can't save game");
+					return;
 				}
 				
 				len = strlen(func->funcStr)+1;
@@ -575,6 +576,7 @@ WriteField1(FILE *f /* unused */, field_t *field, byte *base)
 				if (!mmove)
 				{
 					gi.error ("WriteField1: mmove not in list, can't save game");
+					return;
 				}
 
 				len = strlen(mmove->mmoveStr)+1;
@@ -622,6 +624,7 @@ WriteField2(FILE *f, field_t *field, byte *base)
 				if (!func)
 				{
 					gi.error ("WriteField2: function not in list, can't save game");
+					return;
 				}
 				
 				len = strlen(func->funcStr)+1;
@@ -638,6 +641,7 @@ WriteField2(FILE *f, field_t *field, byte *base)
 				if (!mmove)
 				{
 					gi.error ("WriteField2: mmove not in list, can't save game");
+					return;
 				}
 
 				len = strlen(mmove->mmoveStr)+1;
@@ -867,6 +871,7 @@ WriteGame(const char *filename, qboolean autosave)
 	if (!f)
 	{
 		gi.error("Couldn't open %s", filename);
+		return;
 	}
 
 	/* Savegame identification */
@@ -919,6 +924,7 @@ ReadGame(const char *filename)
 	if (!f)
 	{
 		gi.error("Couldn't open %s", filename);
+		return;
 	}
 
 	/* Sanity checks */
@@ -927,26 +933,29 @@ ReadGame(const char *filename)
 	fread(str_os, sizeof(str_os), 1, f);
 	fread(str_arch, sizeof(str_arch), 1, f);
 
-	if (strcmp(str_ver, SAVEGAMEVER))
+	if (strcmp(str_ver, SAVEGAMEVER) != 0)
 	{
 		fclose(f);
 		gi.error("Savegame from an incompatible version.\n");
+		return;
 	}
-	else if (strcmp(str_game, GAMEVERSION))
+	else if (strcmp(str_game, GAMEVERSION) != 0)
 	{
 		fclose(f);
 		gi.error("Savegame from an other game.so.\n");
+		return;
 	}
- 	else if (strcmp(str_os, OS))
+ 	else if (strcmp(str_os, OS) != 0)
 	{
 		fclose(f);
 		gi.error("Savegame from an other os.\n");
+		return;
 	}
-
- 	else if (strcmp(str_arch, ARCH))
+ 	else if (strcmp(str_arch, ARCH) != 0)
 	{
 		fclose(f);
 		gi.error("Savegame from an other architecure.\n");
+		return;
 	}
 
 	g_edicts = gi.TagMalloc(game.maxentities * sizeof(g_edicts[0]), TAG_GAME);
@@ -1042,6 +1051,7 @@ WriteLevel(const char *filename)
 	if (!f)
 	{
 		gi.error("Couldn't open %s", filename);
+		return;
 	}
 
 	/* write out edict size for checking */
@@ -1133,6 +1143,7 @@ ReadLevel(const char *filename)
 	if (!f)
 	{
 		gi.error("Couldn't open %s", filename);
+		return;
 	}
 
 	/* free any dynamic memory allocated by
@@ -1150,6 +1161,7 @@ ReadLevel(const char *filename)
 	{
 		fclose(f);
 		gi.error("ReadLevel: mismatched edict size");
+		return;
 	}
 
 	/* load the level locals */
@@ -1162,6 +1174,7 @@ ReadLevel(const char *filename)
 		{
 			fclose(f);
 			gi.error("ReadLevel: failed to read entnum");
+			return;
 		}
 
 		if (entnum == -1)

@@ -179,6 +179,8 @@ static void ShowStats(edict_t *ent, edict_t *player)
 		return;
 	}
 
+	armor = 0;
+
 	if (CellsIndex == -1)
 	{
 		CellsIndex = ITEM_INDEX(FindItem("cells"));

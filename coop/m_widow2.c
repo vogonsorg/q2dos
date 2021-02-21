@@ -1725,6 +1725,7 @@ ThrowWidowGibReal(edict_t *self, char *gibname, int damage, int type,
 void
 BloodFountain(edict_t *self, int number, vec3_t startpos, int damage)
 {
+#if 0 /* FS: FIXME?  This earlies out and does nothing. */
 	int n;
 	vec3_t vd;
 	vec3_t origin, size, velocity;
@@ -1756,6 +1757,7 @@ BloodFountain(edict_t *self, int number, vec3_t startpos, int damage)
 		velocity[0] *= 2;
 		velocity[1] *= 2;
 	}
+#endif
 }
 
 void
@@ -1796,7 +1798,7 @@ ThrowMoreStuff(edict_t *self, vec3_t point)
 		return;
 	}
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_meat/tris.md2",
 				300, GIB_ORGANIC, point, false);
@@ -1898,7 +1900,7 @@ WidowExplode(edict_t *self)
 		case 12:
 			self->s.sound = 0;
 
-			for (n = 0; n < 1; n++)
+//			for (n = 0; n < 1; n++)
 			{
 				ThrowWidowGib(self, "models/objects/gibs/sm_meat/tris.md2",
 						400, GIB_ORGANIC);
@@ -1972,13 +1974,13 @@ WidowExplosion1(edict_t *self)
 	gi.WritePosition(startpoint);
 	gi.multicast(self->s.origin, MULTICAST_ALL);
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_meat/tris.md2",
 				300, GIB_ORGANIC, startpoint, false);
 	}
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_metal/tris.md2",
 				100, GIB_METALLIC, startpoint, false);
@@ -2011,13 +2013,13 @@ WidowExplosion2(edict_t *self)
 	gi.WritePosition(startpoint);
 	gi.multicast(self->s.origin, MULTICAST_ALL);
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_meat/tris.md2",
 				300, GIB_ORGANIC, startpoint, false);
 	}
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_metal/tris.md2",
 				100, GIB_METALLIC, startpoint, false);
@@ -2050,13 +2052,13 @@ WidowExplosion3(edict_t *self)
 	gi.WritePosition(startpoint);
 	gi.multicast(self->s.origin, MULTICAST_ALL);
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_meat/tris.md2",
 				300, GIB_ORGANIC, startpoint, false);
 	}
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_metal/tris.md2",
 				100, GIB_METALLIC, startpoint, false);
@@ -2089,13 +2091,13 @@ WidowExplosion4(edict_t *self)
 	gi.WritePosition(startpoint);
 	gi.multicast(self->s.origin, MULTICAST_ALL);
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_meat/tris.md2",
 				300, GIB_ORGANIC, startpoint, false);
 	}
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_metal/tris.md2",
 				100, GIB_METALLIC, startpoint, false);
@@ -2128,13 +2130,13 @@ WidowExplosion5(edict_t *self)
 	gi.WritePosition(startpoint);
 	gi.multicast(self->s.origin, MULTICAST_ALL);
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_meat/tris.md2",
 				300, GIB_ORGANIC, startpoint, false);
 	}
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_metal/tris.md2",
 				100, GIB_METALLIC, startpoint, false);
@@ -2167,13 +2169,13 @@ WidowExplosion6(edict_t *self)
 	gi.WritePosition(startpoint);
 	gi.multicast(self->s.origin, MULTICAST_ALL);
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_meat/tris.md2",
 				300, GIB_ORGANIC, startpoint, false);
 	}
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_metal/tris.md2",
 				100, GIB_METALLIC, startpoint, false);
@@ -2206,13 +2208,13 @@ WidowExplosion7(edict_t *self)
 	gi.WritePosition(startpoint);
 	gi.multicast(self->s.origin, MULTICAST_ALL);
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_meat/tris.md2",
 				300, GIB_ORGANIC, startpoint, false);
 	}
 
-	for (n = 0; n < 1; n++)
+//	for (n = 0; n < 1; n++)
 	{
 		ThrowWidowGibLoc(self, "models/objects/gibs/sm_metal/tris.md2",
 				100, GIB_METALLIC, startpoint, false);

@@ -353,6 +353,7 @@ SP_info_player_coop(edict_t *self)
 		{
 			G_FreeEdict(self);
 			self = NULL;
+			return;
 		}
 	}
 
@@ -405,7 +406,7 @@ SP_info_player_coop_lava(edict_t *self) /* FS: Coop: Rogue specific */
 void
 SP_info_coop_checkpoint_touch ( edict_t * self , edict_t * other , cplane_t * plane , csurface_t * surf )
 {
-	if(!self || self->dmg || !other || !other->client || !other->client->pers.netname)
+	if(!self || self->dmg || !other || !other->client || !other->client->pers.netname[0])
 	{
 		return;
 	}
@@ -1122,18 +1123,18 @@ player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 {
 	int n;
 
-	if (!self || !inflictor || !attacker)
+	if (!self || !self->client || !inflictor || !attacker)
 	{
 		return;
 	}
 
 	// if we're in a camera, get out
-	if ((game.gametype == zaero_coop) && (self->client && self->client->zCameraTrack)) /* FS: Zaero specific game dll changes */
+	if ((game.gametype == zaero_coop) && (self->client->zCameraTrack)) /* FS: Zaero specific game dll changes */
 	{
 		stopCamera(self);
 	}
 
-	if (self->client && self->client->blinky_client.cam_target) /* FS: Added */
+	if (self->client->blinky_client.cam_target) /* FS: Added */
 	{
 		stopBlinkyCam(self);
 	}
@@ -1940,6 +1941,7 @@ SelectSpawnPoint(edict_t *ent, vec3_t origin, vec3_t angles)
 			if (!spot)
 			{
 				gi.error("Couldn't find spawn point %s\n", game.spawnpoint);
+				return;
 			}
 		}
 	}
@@ -1953,7 +1955,7 @@ SelectSpawnPoint(edict_t *ent, vec3_t origin, vec3_t angles)
 	{
 		index = ent->client - game.clients;
 
-		if (spot->classname && Q_stricmp(spot->classname, "info_player_start") == 0 && index != 0)
+		if (spot && spot->classname && Q_stricmp(spot->classname, "info_player_start") == 0 && index != 0)
 		{
 			while(counter < 3)
 			{
@@ -2142,8 +2144,8 @@ spectator_respawn(edict_t *ent)
 		char *value = Info_ValueForKey(ent->client->pers.userinfo, "spectator");
 
 		if (*spectator_password->string &&
-			strcmp(spectator_password->string, "none") &&
-			strcmp(spectator_password->string, value))
+			strcmp(spectator_password->string, "none") != 0 &&
+			strcmp(spectator_password->string, value) != 0)
 		{
 			gi.cprintf(ent, PRINT_HIGH, "Spectator password incorrect.\n");
 			ent->client->pers.spectator = false;
@@ -2185,8 +2187,8 @@ spectator_respawn(edict_t *ent)
 		   game he must have the right password */
 		char *value = Info_ValueForKey(ent->client->pers.userinfo, "password");
 
-		if (*password->string && strcmp(password->string, "none") &&
-			strcmp(password->string, value))
+		if (*password->string && strcmp(password->string, "none") != 0 &&
+			strcmp(password->string, value) != 0)
 		{
 			gi.cprintf(ent, PRINT_HIGH, "Password incorrect.\n");
 			ent->client->pers.spectator = true;
@@ -2632,7 +2634,7 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 	qboolean bAllowNameChange = true;
 	int playernum;
 
-	if (!ent || !userinfo)
+	if (!ent || !ent->client || !userinfo)
 	{
 		return;
 	}
@@ -2648,15 +2650,14 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 	if(!s[0] || s[0] == ' ') /* FS: Catch trouble makers */
 	{
 		Info_SetValueForKey(userinfo, "name", "unnamed");
-		strncpy(ent->client->pers.netname, "unnamed", sizeof(ent->client->pers.netname) -
-				1);
+		strncpy(ent->client->pers.netname, "unnamed", sizeof(ent->client->pers.netname)-1);
 		ent->client->pers.name_timeout = level.time + sv_coop_name_timeout->value;
 	}
 	else
 	{
-		if(sv_coop_announce_name_change->intValue && ent->client && ent->client->pers.netname[0] && s[0] && Q_stricmp(ent->client->pers.netname, s)) /* FS: Catch trouble makers */
+		if(sv_coop_announce_name_change->intValue && ent->client->pers.netname[0] && s[0] && Q_stricmp(ent->client->pers.netname, s)) /* FS: Catch trouble makers */
 		{
-			if(ent->client && ent->client->pers.name_timeout > level.time)
+			if(ent->client->pers.name_timeout > level.time)
 			{
 				gi.cprintf(ent, PRINT_HIGH, "You are changing names too quickly!  Please wait another %d second(s).\n", (int)ent->client->pers.name_timeout-(int)level.time);
 				Info_SetValueForKey(userinfo, "name", ent->client->pers.netname);
@@ -2674,8 +2675,7 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 			{
 				ent->client->pers.name_timeout = level.time + sv_coop_name_timeout->value;
 			}
-			strncpy(ent->client->pers.netname, s, sizeof(ent->client->pers.netname) -
-					1);
+			strncpy(ent->client->pers.netname, s, sizeof(ent->client->pers.netname)-1);
 		}
 	}
 
@@ -2683,7 +2683,7 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 	s = Info_ValueForKey(userinfo, "spectator");
 
 	/* spectators are only supported in deathmatch */
-	if ((deathmatch->intValue || coop->intValue) && *s && strcmp(s, "0"))
+	if ((deathmatch->intValue || coop->intValue) && *s && strcmp(s, "0") != 0)
 	{
 		ent->client->pers.spectator = true;
 	}
@@ -2817,13 +2817,13 @@ ClientConnect(edict_t *ent, char *userinfo)
 	/* check for a spectator */
 	value = Info_ValueForKey(userinfo, "spectator");
 
-	if (deathmatch->intValue && *value && strcmp(value, "0"))
+	if (deathmatch->intValue && *value && strcmp(value, "0") != 0)
 	{
 		int i, numspec;
 
 		if (*spectator_password->string &&
-			strcmp(spectator_password->string, "none") &&
-			strcmp(spectator_password->string, value))
+			strcmp(spectator_password->string, "none") != 0 &&
+			strcmp(spectator_password->string, value) != 0)
 		{
 			Info_SetValueForKey(userinfo, "rejmsg", "Spectator password required or incorrect.");
 			return false;
@@ -2849,8 +2849,8 @@ ClientConnect(edict_t *ent, char *userinfo)
 		/* check for a password */
 		value = Info_ValueForKey(userinfo, "password");
 
-		if (*password->string && strcmp(password->string, "none") &&
-			strcmp(password->string, value))
+		if (*password->string && strcmp(password->string, "none") != 0 &&
+			strcmp(password->string, value) != 0)
 		{
 			Info_SetValueForKey(userinfo, "rejmsg", "Password required or incorrect.");
 			return false;
@@ -3108,7 +3108,7 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 			pm.s.velocity[i] = tmpVel;
 		}
 
-		if (memcmp(&client->old_pmove, &pm.s, sizeof(pm.s)))
+		if (memcmp(&client->old_pmove, &pm.s, sizeof(pm.s)) != 0)
 		{
 			pm.snapinitial = true;
 		}
@@ -3423,7 +3423,7 @@ int P_Clients_Connected (qboolean spectators) /* FS: Coop: Find out how many pla
 		ent = &g_edicts [i + 1];
 		if (ent->inuse && ent->client)
 		{
-			if(ent->client->pers.netname && !Q_stricmp(ent->client->pers.netname, "WallFly[BZZZ]")) /* FS: TODO FIXME: Waiting on tastyspleen for additional details to reliably detect WallFly */
+			if(ent->client->pers.netname[0] && !Q_stricmp(ent->client->pers.netname, "WallFly[BZZZ]")) /* FS: TODO FIXME: Waiting on tastyspleen for additional details to reliably detect WallFly */
 			{
 				continue;
 			}

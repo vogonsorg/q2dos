@@ -324,7 +324,7 @@ use_scanner(edict_t *self)
 	edict_t *ent = NULL;
 	float radius = 1024;
 	vec3_t vec;
-	int len;
+	int len = 0;
 
   	if (!self)
 	{
@@ -363,8 +363,11 @@ use_scanner(edict_t *self)
 		}
 	}
 
-	VectorSubtract(self->s.origin, self->goalentity->s.origin, vec);
-	len = VectorLength(vec);
+	if (self->goalentity)
+	{
+		VectorSubtract(self->s.origin, self->goalentity->s.origin, vec);
+		len = VectorLength(vec);
+	}
 
 	if (len < 32)
 	{
@@ -543,7 +546,7 @@ blastoff(edict_t *self, vec3_t start, vec3_t aimdir, int damage,
 			}
 			else
 			{
-				if (strncmp(tr.surface->name, "sky", 3) != 0)
+				if (tr.surface && strncmp(tr.surface->name, "sky", 3) != 0)
 				{
 					gi.WriteByte(svc_temp_entity);
 					gi.WriteByte(te_impact);

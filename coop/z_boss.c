@@ -423,12 +423,14 @@ mmove_t zboss_move_pain3 = {FRAME_pain3Start, FRAME_pain3End, zboss_frames_pain3
 void zboss_pain (edict_t *self, edict_t *other, float kick, int damage)
 {
 	float r;
-	float hbreak = (self->max_health / 3.0);
+	float hbreak;
 
 	if (!self)
 	{
 		return;
 	}
+
+	hbreak = (self->max_health / 3.0);
 
 	// set the skin
 	if (self->health < hbreak)

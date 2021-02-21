@@ -514,7 +514,7 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 			if((targ->svflags & SVF_MONSTER) &&
 				attacker &&
 				attacker->client &&
-				attacker->client->pers.netname &&
+				attacker->client->pers.netname[0] &&
 				targ->classname &&
 				!stricmp(targ->classname, "monster_turret")) /* FS: Coop: monster_turrets have MOVETYPE_NONE so they stop here. */
 			{
@@ -528,7 +528,7 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 	if ((targ->svflags & SVF_MONSTER) && (targ->deadflag != DEAD_DEAD))
 	{
 		targ->touch = NULL;
-		if(attacker && attacker->client && attacker->client->pers.netname && targ && targ->classname) /* FS: Coop: Announce who we killed */
+		if(attacker && attacker->client && attacker->client->pers.netname[0] && targ && targ->classname) /* FS: Coop: Announce who we killed */
 		{
 			GetCoopMeansOfDeath(targ->classname, attacker->client->pers.netname);
 		}

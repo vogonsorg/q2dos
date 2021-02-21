@@ -1385,7 +1385,7 @@ void Info_RemoveKey (char *s, char *key)
 		return;
 	}
 
-	if (strstr (key, "\\"))
+	if (strchr (key, '\\'))
 	{
 //		Com_Printf ("Can't use a key with a \\\n");
 		return;
@@ -1442,9 +1442,9 @@ qboolean Info_Validate (char *s)
 		return false;
 	}
 
-	if (strstr (s, "\""))
+	if (strchr (s, '\"'))
 		return false;
-	if (strstr (s, ";"))
+	if (strchr (s, ';'))
 		return false;
 	return true;
 }
@@ -1473,19 +1473,19 @@ void Info_SetValueForKey (char *s, char *key, char *value)
 		return;
 	}
 
-	if (strstr (key, "\\") || strstr (value, "\\") )
+	if (strchr (key, '\\') || strchr (value, '\\') )
 	{
 		Com_Printf ("Can't use keys or values with a \\\n");
 		return;
 	}
 
-	if (strstr (key, ";") )
+	if (strchr (key, ';') )
 	{
 		Com_Printf ("Can't use keys or values with a semicolon\n");
 		return;
 	}
 
-	if (strstr (key, "\"") || strstr (value, "\"") )
+	if (strchr (key, '\"') || strchr (value, '\"') )
 	{
 		Com_Printf ("Can't use keys or values with a \"\n");
 		return;

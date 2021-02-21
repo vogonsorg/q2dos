@@ -188,7 +188,7 @@ pmenu_t voteskillmenu[] = {
 
 #define MOTDMENU_START 4
 #define MOTDMENU_END 16
-#define MOTDMENU_MAXLINES MOTDMENU_END-MOTDMENU_START
+#define MOTDMENU_MAXLINES ((MOTDMENU_END)-(MOTDMENU_START))
 pmenu_t motdmenu[] = {
 	{"*Quake II", PMENU_ALIGN_CENTER, NULL},
 	{"*Mara'akate and Freewill", PMENU_ALIGN_CENTER, NULL},
@@ -882,6 +882,11 @@ void CoopVoteMap(edict_t *ent, pmenuhnd_t *p /* unused */)
 	votemenu_loadmaplist();
 	size = sizeof(pmenu_t) * (mapCount + 2);
 	votemapmenu = malloc(size);
+	if (!votemapmenu)
+	{
+		gi.error("CoopVoteMap:  Failed allocating memory.\n");
+		return;
+	}
 	memset((pmenu_t *)votemapmenu, 0, size);
 	CoopUpdateVoteMapMenu(ent);
 
@@ -985,7 +990,7 @@ void CoopCheckGamemode(edict_t *ent, pmenuhnd_t *p /* unused */)
 
 void CoopCheckDifficulty(edict_t *ent, pmenuhnd_t *p /* unused */)
 {
-	char votestring[64];
+	char votestring[64] = { 0 };
 
 	if(!ent || !ent->client)
 	{
@@ -1644,11 +1649,16 @@ void CoopVoteGamemodeDynamic(edict_t *ent, pmenuhnd_t *p /* unused */)
 	votemenu_loadmaplist();
 	size = sizeof(pmenu_t) * (gamemodeCount + 2);
 	votegamemodemenu = malloc(size);
+	if (!votegamemodemenu)
+	{
+		gi.error("CoopVoteGamemodeDynamic:  Failed allocating memory.\n");
+		return;
+	}
 	memset((pmenu_t *)votegamemodemenu, 0, size);
 
 	for (i = 0; i < gamemodeCount; i++)
 	{
-		if(i < MAX_GAMEMODES && gamemode_array[i].gamemode && strlen(gamemode_array[i].gamemode))
+		if(i < MAX_GAMEMODES && gamemode_array[i].gamemode[0] != '\0')
 		{
 			votegamemodemenu[i].text = gamemode_array[i].gamemode;
 			votegamemodemenu[i].align = PMENU_ALIGN_LEFT;
