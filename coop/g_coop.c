@@ -449,14 +449,9 @@ void CoopUpdateJoinMenu(edict_t *ent)
 		return;
 	}
 
-	if(!ent || !ent->client)
-	{
-		return;
-	}
-
 	numplayers = numspectators = 0;
 
-	for (i = 0; i < maxclients->value; i++)
+	for (i = 0; i < maxclients->intValue; i++)
 	{
 		if (!g_edicts[i + 1].inuse)
 		{
@@ -498,7 +493,7 @@ CoopInitJoinMenu(edict_t *ent)
 
 	numplayers = numspectators = 0;
 
-	for (i = 0; i < maxclients->value; i++)
+	for (i = 0; i < maxclients->intValue; i++)
 	{
 		if (!g_edicts[i + 1].inuse)
 		{

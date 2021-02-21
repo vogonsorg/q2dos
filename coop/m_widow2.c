@@ -217,7 +217,7 @@ Widow2Spawn(edict_t *self)
 
 			ent->monsterinfo.aiflags |= AI_SPAWNED_WIDOW | AI_DO_NOT_COUNT | AI_IGNORE_SHOTS;
 
-			if (!(coop && coop->value))
+			if (!(coop && coop->intValue))
 			{
 				designated_enemy = self->enemy;
 			}
@@ -457,7 +457,7 @@ widow2_disrupt_reattack(edict_t *self)
 
 	luck = random();
 
-	if (luck < (0.25 + ((float)(skill->value)) * 0.15))
+	if (luck < (0.25 + ((float)(skill->intValue)) * 0.15))
 	{
 		self->monsterinfo.nextframe = FRAME_firea01;
 	}
@@ -1148,7 +1148,7 @@ widow2_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 		self->s.skinnum = 1;
 	}
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -1168,8 +1168,8 @@ widow2_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 	{
 		gi.sound(self, CHAN_VOICE, sound_pain2, 1, ATTN_NONE, 0);
 
-		if ((skill->value < 3) &&
-			(random() < (0.6 - (0.2 * ((float)skill->value)))))
+		if ((skill->intValue < 3) &&
+			(random() < (0.6 - (0.2 * ((float)skill->intValue)))))
 		{
 			self->monsterinfo.aiflags &= ~AI_MANUAL_STEERING;
 			self->monsterinfo.currentmove = &widow2_move_pain;
@@ -1179,8 +1179,8 @@ widow2_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 	{
 		gi.sound(self, CHAN_VOICE, sound_pain3, 1, ATTN_NONE, 0);
 
-		if ((skill->value < 3) &&
-			(random() < (0.75 - (0.1 * ((float)skill->value)))))
+		if ((skill->intValue < 3) &&
+			(random() < (0.75 - (0.1 * ((float)skill->intValue)))))
 		{
 			self->monsterinfo.aiflags &= ~AI_MANUAL_STEERING;
 			self->monsterinfo.currentmove = &widow2_move_pain;
@@ -1374,7 +1374,7 @@ Widow2_CheckAttack(edict_t *self)
 			if (widow2_tongue_attack_ok(spot1, spot2, 256))
 			{
 				/* be nice in easy mode */
-				if ((skill->value == 0) && (rand() & 3))
+				if ((skill->intValue == 0) && (rand() & 3))
 				{
 					return false;
 				}
@@ -1469,7 +1469,7 @@ SP_monster_widow2(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -1488,17 +1488,17 @@ SP_monster_widow2(edict_t *self)
 	VectorSet(self->mins, -70, -70, 0);
 	VectorSet(self->maxs, 70, 70, 144);
 
-	self->health = 2000 + 800 + 1000 * (skill->value);
+	self->health = 2000 + 800 + 1000 * (skill->intValue);
 
-	if (coop->value)
+	if (coop->intValue)
 	{
-		self->health += 500 * (skill->value);
+		self->health += 500 * (skill->intValue);
 	}
 
 	self->gib_health = -900;
 	self->mass = 2500;
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		self->monsterinfo.power_armor_type = POWER_ARMOR_SHIELD;
 		self->monsterinfo.power_armor_power = 750;
@@ -1790,7 +1790,7 @@ ThrowMoreStuff(edict_t *self, vec3_t point)
 		return;
 	}
 
-	if (coop && coop->value)
+	if (coop && coop->intValue)
 	{
 		ThrowSmallStuff(self, point);
 		return;

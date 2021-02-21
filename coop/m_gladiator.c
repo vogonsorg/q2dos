@@ -367,7 +367,7 @@ gladiator_pain(edict_t *self, edict_t *other /* unused */,
 		gi.sound(self, CHAN_VOICE, sound_pain2, 1, ATTN_NORM, 0);
 	}
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -490,7 +490,7 @@ SP_monster_gladiator(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;

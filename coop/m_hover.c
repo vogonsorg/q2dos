@@ -716,13 +716,13 @@ hover_attack(edict_t *self)
 
 	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (!skill->value)
+		if (!skill->intValue)
 		{
 			chance = 0;
 		}
 		else
 		{
-			chance = 1.0 - (0.5 / (float)(skill->value));
+			chance = 1.0 - (0.5 / (float)(skill->intValue));
 		}
 
 		if (self->mass > 150)  /* the daedalus strafes more */
@@ -780,7 +780,7 @@ hover_pain(edict_t *self, edict_t *other /* unused */,
 
 	self->pain_debounce_time = level.time + 3;
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -820,7 +820,7 @@ hover_pain(edict_t *self, edict_t *other /* unused */,
 	{
 		if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 		{
-			if (random() < (0.45 - (0.1 * skill->value)))
+			if (random() < (0.45 - (0.1 * skill->intValue)))
 			{
 				/* daedalus sounds */
 				if (self->mass < 225)
@@ -1031,7 +1031,7 @@ hover_blocked(edict_t *self, float dist) /* FS: Coop: Rogue specific */
 		return false;
 	}
 
-	if (blocked_checkshot(self, 0.25 + (0.05 * skill->value)))
+	if (blocked_checkshot(self, 0.25 + (0.05 * skill->intValue)))
 	{
 		return true;
 	}
@@ -1054,7 +1054,7 @@ SP_monster_hover(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;

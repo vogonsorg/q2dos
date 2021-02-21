@@ -340,13 +340,13 @@ InitGame(void)
 	game.helpmessage2[0] = 0;
 
 	/* initialize all entities for this game */
-	game.maxentities = maxentities->value;
+	game.maxentities = maxentities->intValue;
 	g_edicts =  gi.TagMalloc (game.maxentities * sizeof(g_edicts[0]), TAG_GAME);
 	globals.edicts = g_edicts;
 	globals.max_edicts = game.maxentities;
 
 	/* initialize all clients for this game */
-	game.maxclients = maxclients->value;
+	game.maxclients = maxclients->intValue;
 	game.clients = gi.TagMalloc (game.maxclients * sizeof(game.clients[0]), TAG_GAME);
 	globals.num_edicts = game.maxclients+1;
 
@@ -1141,7 +1141,7 @@ ReadLevel(const char *filename)
 
 	/* wipe all the entities */
 	memset(g_edicts, 0, game.maxentities * sizeof(g_edicts[0]));
-	globals.num_edicts = maxclients->value + 1;
+	globals.num_edicts = maxclients->intValue + 1;
 
 	/* check edict size */
 	fread(&i, sizeof(i), 1, f);
@@ -1185,7 +1185,7 @@ ReadLevel(const char *filename)
 	fclose(f);
 
 	/* mark all clients as unconnected */
-	for (i = 0; i < maxclients->value; i++)
+	for (i = 0; i < maxclients->intValue; i++)
 	{
 		ent = &g_edicts[i + 1];
 		ent->client = game.clients + i;

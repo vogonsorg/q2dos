@@ -149,7 +149,7 @@ void Blinky_BeginRunFrame(void)
 	int i;
 	edict_t	*ent;
 
-	for (i=0; i<maxclients->value; i++)
+	for (i=0; i<maxclients->intValue; i++)
 	{
 		ent = g_edicts + 1 + i;
 
@@ -352,7 +352,7 @@ void Cmd_Stats_f(edict_t *ent)
 		return;
 	}
 
-	for (player = &g_edicts[0]+1; player< &g_edicts[0]+(int)(maxclients->value)+1; player++)
+	for (player = &g_edicts[0]+1; player< &g_edicts[0]+(int)(maxclients->intValue)+1; player++)
 	{
 		if (!player->inuse || !player->client || player->client->pers.spectator)
 			continue;
@@ -389,7 +389,7 @@ void Cmd_Cam_f(edict_t *ent)
 	bdata = &ent->client->blinky_client;
 	obj1 = bdata->cam_target;
 
-	if (!coop->value || IsSpectator(ent))
+	if (!coop->intValue || IsSpectator(ent))
 	{
 		return;
 	}
@@ -507,7 +507,7 @@ void Cmd_Cam_f(edict_t *ent)
 		{
 			// advance loop thru edicts
 			// to do - this ought to cycle at maxclients instead of num_edicts
-			if (target < &g_edicts[0]+(int)(maxclients->value)+1)
+			if (target < &g_edicts[0]+(int)(maxclients->intValue)+1)
 				target++;
 			else
 				target = g_edicts+1;
@@ -620,7 +620,7 @@ static void Summon(edict_t *ent, edict_t *other)
 
 	Blinky_ResetView(other); /* FS */
 
-	ent->client->summon_time = level.time + sv_coop_summon_time->value;
+	ent->client->summon_time = level.time + sv_coop_summon_time->intValue;
 }
 
 static void Teleport(edict_t *ent, edict_t *other)
@@ -687,7 +687,7 @@ static void Teleport(edict_t *ent, edict_t *other)
 	other->s.event = EV_OTHER_TELEPORT;
 	gi.linkentity (other);
 
-	other->client->summon_time = level.time + sv_coop_summon_time->value;
+	other->client->summon_time = level.time + sv_coop_summon_time->intValue;
 }
 
 void Cmd_NoSummon_f(edict_t *ent)
@@ -959,7 +959,7 @@ void Blinky_OnClientTerminate(edict_t *self)
 	}
 
 	/* disconnect any cams */
-	for (player = &g_edicts[0]+1; player< &g_edicts[0]+(int)(maxclients->value)+1; player++)
+	for (player = &g_edicts[0]+1; player< &g_edicts[0]+(int)(maxclients->intValue)+1; player++)
 	{
 		if (!player->client || !player->inuse)
 			continue;

@@ -583,15 +583,15 @@ void sentien_post_blast_attack(edict_t *self)
 	if (visible(self, self->enemy) &&
 		infront(self, self->enemy))
 	{
-		if(skill->value == 1)
+		if (skill->intValue == 1)
 		{
 			refire = 0.40f;
 		}
-		else if(skill->value == 2)
+		else if (skill->intValue == 2)
 		{
 			refire = 0.60f;
 		}
-		else if(skill->value >= 3)
+		else if(skill->intValue >= 3)
 		{
 			refire = 0.75f;
 		}
@@ -951,14 +951,14 @@ void sentien_fend (edict_t *self, edict_t *attacker, float eta, trace_t *fake /*
 		return;
 	}
 
-	if (skill->value == 0)
+	if (skill->intValue == 0)
 	{
 		if (random() > 0.45f)
 		{
 			return;
 		}
 	}
-	else if(skill->value == 1)
+	else if (skill->intValue == 1)
 	{
 		if (random() > 0.60f)
 		{
@@ -1079,7 +1079,7 @@ void sentien_pain (edict_t *self, edict_t *other, float kick, int damage)
 		return;
 	}
 
-	if (skill->value >= 1)
+	if (skill->intValue >= 1)
 	{
 		// don't flinch if attacking
 		if(self->monsterinfo.currentmove == &sentien_move_laser_attack ||
@@ -1089,7 +1089,7 @@ void sentien_pain (edict_t *self, edict_t *other, float kick, int damage)
 		}
 	}
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return;      // no pain anims in nightmare
 	}
@@ -1364,12 +1364,12 @@ void SP_monster_sentien(edict_t *self)
 
 	create_sentien_laser(self);
 
-	if(skill->value == 2)
+	if (skill->intValue == 2)
 	{
 		self->laser->dmg *= 1.5;
 		self->yaw_speed *= 1.5;
 	}
-	else if(skill->value >= 3)
+	else if(skill->intValue >= 3)
 	{
 		self->laser->dmg *= 2.5;
 		self->yaw_speed *= 2;

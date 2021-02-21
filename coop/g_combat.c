@@ -488,7 +488,7 @@ Killed(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 		{
 			level.killed_monsters++;
 
-			if (coop->value && attacker->client)
+			if (coop->intValue && attacker->client)
 			{
 				attacker->client->resp.score++;
 			}
@@ -1046,14 +1046,14 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	/* friendly fire avoidance. If enabled you can't
 	   hurt teammates (but you can hurt yourself)
 	   knockback still occurs */
-	if ((targ != attacker) && ((deathmatch->value &&
-		 ((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS))) ||
-		 coop->value))
+	if ((targ != attacker) && ((deathmatch->intValue &&
+		 (dmflags->intValue & (DF_MODELTEAMS | DF_SKINTEAMS))) ||
+		 coop->intValue))
 	{
 		if (OnSameTeam(targ, attacker))
 		{
 			/* nukes kill everyone */
-			if ((((int)(dmflags->value) & DF_NO_FRIENDLY_FIRE) || coop->intValue) && (mod != MOD_TELEFRAG) && /* FS: Coop: No friendly fire in Coop, except for telefrags */
+			if (((dmflags->intValue & DF_NO_FRIENDLY_FIRE) || coop->intValue) && (mod != MOD_TELEFRAG) && /* FS: Coop: No friendly fire in Coop, except for telefrags */
 				(mod != MOD_NUKE)) /* FS: Coop: Rogue specific */
 			{
 				damage = 0;
@@ -1070,7 +1070,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	/* allow the deathmatch game to change values */
 	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if (deathmatch->value && gamerules && gamerules->value)
+		if (deathmatch->intValue && gamerules && gamerules->intValue)
 		{
 			if (DMGame.ChangeDamage)
 			{
@@ -1090,7 +1090,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	}
 
 	/* easy mode takes half damage */
-	if ((skill->value == 0) && (deathmatch->value == 0) && targ->client)
+	if ((skill->intValue == 0) && (deathmatch->intValue == 0) && targ->client)
 	{
 		damage *= 0.5;
 
@@ -1376,7 +1376,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 			targ->pain(targ, attacker, knockback, take);
 
 			/* nightmare mode monsters don't go into pain frames often */
-			if (skill->value == 3)
+			if (skill->intValue == 3)
 			{
 				targ->pain_debounce_time = level.time + 5;
 			}

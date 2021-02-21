@@ -376,7 +376,7 @@ berserk_pain(edict_t *self, edict_t *other /* unsued */,
 	self->pain_debounce_time = level.time + 3;
 	gi.sound(self, CHAN_VOICE, sound_pain, 1, ATTN_NORM, 0);
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -508,7 +508,7 @@ SP_monster_berserk(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;

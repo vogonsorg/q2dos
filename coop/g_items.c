@@ -191,7 +191,7 @@ DoRespawn(edict_t *ent)
 		}
 	}
 
-	if (randomrespawn && randomrespawn->value) /* FS: Coop: Rogue specific */
+	if (randomrespawn && randomrespawn->intValue) /* FS: Coop: Rogue specific */
 	{
 		edict_t *newEnt;
 
@@ -244,27 +244,27 @@ Pickup_Powerup(edict_t *ent, edict_t *other)
 
 	quantity = other->client->pers.inventory[ITEM_INDEX(ent->item)];
 
-	if (((skill->value == 1) &&
-		 (quantity >= 2)) || ((skill->value >= 2) && (quantity >= 1)))
+	if (((skill->intValue == 1) &&
+		 (quantity >= 2)) || ((skill->intValue >= 2) && (quantity >= 1)))
 	{
 		return false;
 	}
 
-	if ((coop->value) && (ent->item->flags & IT_STAY_COOP) && (quantity > 0))
+	if ((coop->intValue) && (ent->item->flags & IT_STAY_COOP) && (quantity > 0))
 	{
 		return false;
 	}
 
 	other->client->pers.inventory[ITEM_INDEX(ent->item)]++;
 
-	if (deathmatch->value || Coop_Respawn()) /* FS: Coop: Added */
+	if (deathmatch->intValue || Coop_Respawn()) /* FS: Coop: Added */
 	{
 		if (!(ent->spawnflags & DROPPED_ITEM))
 		{
 			SetRespawn(ent, ent->item->quantity);
 		}
 
-		if (((int)dmflags->value & DF_INSTANT_ITEMS) ||
+		if ((dmflags->intValue & DF_INSTANT_ITEMS) ||
 			((ent->item->use == Use_Quad) &&
 			 (ent->spawnflags & DROPPED_PLAYER_ITEM)))
 		{
@@ -284,7 +284,7 @@ Pickup_Powerup(edict_t *ent, edict_t *other)
 				gi.dprintf(DEVELOPER_MSG_GAME, "Powerup has no use function!\n");
 			}
 		}
-		else if (((int)dmflags->value & DF_INSTANT_ITEMS) || /* FS: Coop: Xatrix specific */
+		else if ((dmflags->intValue & DF_INSTANT_ITEMS) || /* FS: Coop: Xatrix specific */
 				 ((ent->item->use == Use_QuadFire) &&
 				  (ent->spawnflags & DROPPED_PLAYER_ITEM)))
 		{
@@ -324,7 +324,7 @@ Pickup_Adrenaline(edict_t *ent, edict_t *other)
 		return false;
 	}
 
-	if (!deathmatch->value)
+	if (!deathmatch->intValue)
 	{
 		other->max_health += 1;
 	}
@@ -339,7 +339,7 @@ Pickup_Adrenaline(edict_t *ent, edict_t *other)
 		other->health = other->max_health;
 	}
 
-	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value || Coop_Respawn()) ) /* FS: Coop: Added */
+	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->intValue || Coop_Respawn()) ) /* FS: Coop: Added */
 	{
 		SetRespawn(ent, ent->item->quantity);
 	}
@@ -357,7 +357,7 @@ Pickup_AncientHead(edict_t *ent, edict_t *other)
 
 	other->max_health += 2;
 
-	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value || Coop_Respawn()) ) /* FS: Coop: Added */
+	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->intValue || Coop_Respawn()) ) /* FS: Coop: Added */
 	{
 		SetRespawn(ent, ent->item->quantity);
 	}
@@ -442,7 +442,7 @@ Pickup_Bandolier(edict_t *ent /* may be null */, edict_t *other)
 		}
 	}
 
-	if ((ent) && (!(ent->spawnflags & DROPPED_ITEM)) && (deathmatch->value || Coop_Respawn()) ) /* FS: Coop: Added */
+	if ((ent) && (!(ent->spawnflags & DROPPED_ITEM)) && (deathmatch->intValue || Coop_Respawn()) ) /* FS: Coop: Added */
 	{
 		SetRespawn(ent, ent->item->quantity);
 	}
@@ -704,7 +704,7 @@ Pickup_Pack(edict_t *ent /* may be null */, edict_t *other)
 		}
 	}
 
-	if ((ent) && (!(ent->spawnflags & DROPPED_ITEM)) && (deathmatch->value || Coop_Respawn()) ) /* FS: Coop: Added */
+	if ((ent) && (!(ent->spawnflags & DROPPED_ITEM)) && (deathmatch->intValue || Coop_Respawn()) ) /* FS: Coop: Added */
 	{
 		SetRespawn(ent, ent->item->quantity);
 	}
@@ -734,14 +734,14 @@ Pickup_Nuke(edict_t *ent, edict_t *other) /* FS: Coop: Rogue specific */
 		return false;
 	}
 
-	if ((coop->value) && (ent->item->flags & IT_STAY_COOP) && (quantity > 0))
+	if ((coop->intValue) && (ent->item->flags & IT_STAY_COOP) && (quantity > 0))
 	{
 		return false;
 	}
 
 	other->client->pers.inventory[ITEM_INDEX(ent->item)]++;
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		if (!(ent->spawnflags & DROPPED_ITEM))
 		{
@@ -880,7 +880,7 @@ Pickup_Doppleganger(edict_t *ent, edict_t *other) /* FS: Coop: Rogue specific */
 		return false;
 	}
 
-	if (!(deathmatch->value))
+	if (!(deathmatch->intValue))
 	{
 		return false;
 	}
@@ -919,27 +919,27 @@ Pickup_Sphere(edict_t *ent, edict_t *other) /* FS: Coop: Rogue specific */
 
 	quantity = other->client->pers.inventory[ITEM_INDEX(ent->item)];
 
-	if (((skill->value == 1) &&
-		 (quantity >= 2)) || ((skill->value >= 2) && (quantity >= 1)))
+	if (((skill->intValue == 1) &&
+		 (quantity >= 2)) || ((skill->intValue >= 2) && (quantity >= 1)))
 	{
 		return false;
 	}
 
-	if ((coop->value) && (ent->item->flags & IT_STAY_COOP) && (quantity > 0))
+	if ((coop->intValue) && (ent->item->flags & IT_STAY_COOP) && (quantity > 0))
 	{
 		return false;
 	}
 
 	other->client->pers.inventory[ITEM_INDEX(ent->item)]++;
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		if (!(ent->spawnflags & DROPPED_ITEM))
 		{
 			SetRespawn(ent, ent->item->quantity);
 		}
 
-		if (((int)dmflags->value & DF_INSTANT_ITEMS))
+		if ((dmflags->intValue & DF_INSTANT_ITEMS))
 		{
 			if (ent->item->use)
 			{
@@ -1184,14 +1184,14 @@ Pickup_Key(edict_t *ent, edict_t *other)
 		return false;
 	}
 
-	if (coop->value) /* FS: Coop: Distribute keys and special items */
+	if (coop->intValue) /* FS: Coop: Distribute keys and special items */
 	{
 		int i;
 		edict_t *client;
 		qboolean coopReturn = false;
 
 		/* respawn any dead clients */
-		for (i = 0; i < maxclients->value; i++)
+		for (i = 0; i < maxclients->intValue; i++)
 		{
 			client = g_edicts + 1 + i;
 
@@ -1243,7 +1243,7 @@ Pickup_Key(edict_t *ent, edict_t *other)
 			gi.bprintf(PRINT_HIGH,"\x02[%s]: ", other->client->pers.netname);
 			gi.bprintf(PRINT_HIGH, "Team, everyone has the %s!\n", ent->item->pickup_name);
 
-			for (i = 0; i < maxclients->value; i++)
+			for (i = 0; i < maxclients->intValue; i++)
 			{
 				client = g_edicts + 1 + i;
 
@@ -1384,7 +1384,7 @@ Pickup_Ammo(edict_t *ent, edict_t *other)
 
 	weapon = (ent->item->flags & IT_WEAPON);
 
-	if ((weapon) && ((int)dmflags->value & DF_INFINITE_AMMO))
+	if ((weapon) && (dmflags->intValue & DF_INFINITE_AMMO))
 	{
 		count = 1000;
 	}
@@ -1418,7 +1418,7 @@ Pickup_Ammo(edict_t *ent, edict_t *other)
 	{
 		/* don't switch to tesla */
 		if ((other->client->pers.weapon != ent->item) &&
-			(!deathmatch->value || (other->client->pers.weapon == FindItem("blaster"))) &&
+			(!deathmatch->intValue || (other->client->pers.weapon == FindItem("blaster"))) &&
 			(ent->classname && strcmp(ent->classname, "ammo_tesla"))) /* FS: Coop: Rogue specific -- ammo_tesla */
 		{
 			other->client->newweapon = ent->item;
@@ -1426,7 +1426,7 @@ Pickup_Ammo(edict_t *ent, edict_t *other)
 	}
 
 	if (!(ent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM)) &&
-		(deathmatch->value || Coop_Respawn()) ) /* FS: Coop: Added */
+		(deathmatch->intValue || Coop_Respawn()) ) /* FS: Coop: Added */
 	{
 		SetRespawn(ent, 30);
 	}
@@ -1485,7 +1485,7 @@ qboolean Pickup_A2k (edict_t *ent, edict_t *other) /* FS: Zaero specific game dl
 	}
 
 	other->client->pers.inventory[ITEM_INDEX(ent->item)] = 1;
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		if (!(ent->spawnflags & DROPPED_ITEM) )
 			SetRespawn (ent, 30);
@@ -1511,7 +1511,7 @@ MegaHealth_think(edict_t *self)
 		return;
 	}
 
-	if (!(self->spawnflags & DROPPED_ITEM) && (deathmatch->value || Coop_Respawn()) ) /* FS: Coop: Added */
+	if (!(self->spawnflags & DROPPED_ITEM) && (deathmatch->intValue || Coop_Respawn()) ) /* FS: Coop: Added */
 	{
 		SetRespawn(self, 20);
 	}
@@ -1558,7 +1558,7 @@ Pickup_Health(edict_t *ent, edict_t *other)
 	}
 	else
 	{
-		if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value || Coop_Respawn()) ) /* FS: Coop: Added */
+		if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->intValue || Coop_Respawn()) ) /* FS: Coop: Added */
 		{
 			SetRespawn(ent, 30);
 		}
@@ -1698,7 +1698,7 @@ Pickup_Armor(edict_t *ent, edict_t *other)
 		}
 	}
 
-	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value || Coop_Respawn()) ) /* FS: Coop: Added */
+	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->intValue || Coop_Respawn()) ) /* FS: Coop: Added */
 	{
 		SetRespawn(ent, 20);
 	}
@@ -1795,7 +1795,7 @@ Pickup_PowerArmor(edict_t *ent, edict_t *other)
 
 	other->client->pers.inventory[ITEM_INDEX(ent->item)]++;
 
-	if (deathmatch->value || Coop_Respawn() ) /* FS: Coop: Added */
+	if (deathmatch->intValue || Coop_Respawn() ) /* FS: Coop: Added */
 	{
 		if (!(ent->spawnflags & DROPPED_ITEM))
 		{
@@ -1840,7 +1840,7 @@ qboolean Pickup_PlasmaShield(edict_t *ent, edict_t *other) /* FS: Zaero specific
 
 	other->client->pers.inventory[ITEM_INDEX(ent->item)] = 1;
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		if (!(ent->spawnflags & DROPPED_ITEM) )
 			SetRespawn (ent, ent->item->quantity);
@@ -1866,7 +1866,7 @@ qboolean Pickup_Visor(edict_t *ent, edict_t *other) /* FS: Zaero specific game d
 	else
 		other->client->pers.visorFrames = 300;
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		if (!(ent->spawnflags & DROPPED_ITEM) )
 			SetRespawn (ent, 30);
@@ -1966,7 +1966,7 @@ Touch_Item(edict_t *ent, edict_t *other, cplane_t *plane /* unused */, csurface_
 		return;
 	}
 
-	if (!((coop->value) && (ent->item->flags & IT_STAY_COOP)) ||
+	if (!((coop->intValue) && (ent->item->flags & IT_STAY_COOP)) ||
 		(ent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM)))
 	{
 		if (ent->flags & FL_RESPAWN)
@@ -2012,7 +2012,7 @@ drop_make_touchable(edict_t *ent)
 
 	ent->touch = Touch_Item;
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		ent->nextthink = level.time + 29;
 		ent->think = G_FreeEdict;
@@ -2406,9 +2406,9 @@ SpawnItem(edict_t *ent, gitem_t *item)
 	}
 
 	/* some items will be prevented in deathmatch */
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
-		if ((int)dmflags->value & DF_NO_ARMOR)
+		if (dmflags->intValue & DF_NO_ARMOR)
 		{
 			if ((item->pickup == Pickup_Armor) ||
 				(item->pickup == Pickup_PowerArmor))
@@ -2418,7 +2418,7 @@ SpawnItem(edict_t *ent, gitem_t *item)
 			}
 		}
 
-		if ((int)dmflags->value & DF_NO_ITEMS)
+		if (dmflags->intValue & DF_NO_ITEMS)
 		{
 			if (item->pickup == Pickup_Powerup)
 			{
@@ -2439,7 +2439,7 @@ SpawnItem(edict_t *ent, gitem_t *item)
 			}
 		}
 
-		if ((int)dmflags->value & DF_NO_HEALTH)
+		if (dmflags->intValue & DF_NO_HEALTH)
 		{
 			if ((item->pickup == Pickup_Health) ||
 				(item->pickup == Pickup_Adrenaline) ||
@@ -2450,7 +2450,7 @@ SpawnItem(edict_t *ent, gitem_t *item)
 			}
 		}
 
-		if ((int)dmflags->value & DF_INFINITE_AMMO)
+		if (dmflags->intValue & DF_INFINITE_AMMO)
 		{
 			if ((item->flags == IT_AMMO) ||
 				(ent->classname && strcmp(ent->classname, "weapon_bfg") == 0))
@@ -2460,7 +2460,7 @@ SpawnItem(edict_t *ent, gitem_t *item)
 			}
 		}
 
-		if ((int)dmflags->value & DF_NO_MINES) /* FS: Coop: Rogue specific */
+		if (dmflags->intValue & DF_NO_MINES) /* FS: Coop: Rogue specific */
 		{
 			if (ent->classname && (!strcmp(ent->classname, "ammo_prox") ||
 				!strcmp(ent->classname, "ammo_tesla")))
@@ -2470,7 +2470,7 @@ SpawnItem(edict_t *ent, gitem_t *item)
 			}
 		}
 
-		if ((int)dmflags->value & DF_NO_NUKES) /* FS: Coop: Rogue specific */
+		if (dmflags->intValue & DF_NO_NUKES) /* FS: Coop: Rogue specific */
 		{
 			if (ent->classname && !strcmp(ent->classname, "ammo_nuke"))
 			{
@@ -2479,7 +2479,7 @@ SpawnItem(edict_t *ent, gitem_t *item)
 			}
 		}
 
-		if ((int)dmflags->value & DF_NO_SPHERES) /* FS: Coop: Rogue specific */
+		if (dmflags->intValue & DF_NO_SPHERES) /* FS: Coop: Rogue specific */
 		{
 			if (item->pickup == Pickup_Sphere)
 			{
@@ -2490,7 +2490,7 @@ SpawnItem(edict_t *ent, gitem_t *item)
 	}
 
 	/* DM only items */
-	if (!deathmatch->value) /* FS: Coop: Rogue specific */
+	if (!deathmatch->intValue) /* FS: Coop: Rogue specific */
 	{
 		if ((item->pickup == Pickup_Doppleganger) ||
 			(item->pickup == Pickup_Nuke))
@@ -2508,14 +2508,14 @@ SpawnItem(edict_t *ent, gitem_t *item)
 
 	PrecacheItem(item);
 
-	if ((coop->value) && (ent->classname) && (strcmp(ent->classname, "key_power_cube") == 0))
+	if ((coop->intValue) && (ent->classname) && (strcmp(ent->classname, "key_power_cube") == 0))
 	{
 		ent->spawnflags |= (1 << (8 + level.power_cubes));
 		level.power_cubes++;
 	}
 
 	/* don't let them drop items that stay in a coop game */
-	if ((coop->value) && (item->flags & IT_STAY_COOP))
+	if ((coop->intValue) && (item->flags & IT_STAY_COOP))
 	{
 		item->drop = NULL;
 	}
@@ -4526,7 +4526,7 @@ SP_item_health(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value && ((int)dmflags->value & DF_NO_HEALTH))
+	if (deathmatch->intValue && (dmflags->intValue & DF_NO_HEALTH))
 	{
 		G_FreeEdict(self);
 		return;
@@ -4549,7 +4549,7 @@ SP_item_health_small(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value && ((int)dmflags->value & DF_NO_HEALTH))
+	if (deathmatch->intValue && (dmflags->intValue & DF_NO_HEALTH))
 	{
 		G_FreeEdict(self);
 		return;
@@ -4571,7 +4571,7 @@ void SP_item_health_large (edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value && ((int)dmflags->value & DF_NO_HEALTH))
+	if (deathmatch->intValue && (dmflags->intValue & DF_NO_HEALTH))
 	{
 		G_FreeEdict(self);
 		return;
@@ -4594,7 +4594,7 @@ SP_item_health_mega(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value && ((int)dmflags->value & DF_NO_HEALTH))
+	if (deathmatch->intValue && (dmflags->intValue & DF_NO_HEALTH))
 	{
 		G_FreeEdict(self);
 		return;
@@ -4614,7 +4614,7 @@ void SP_item_foodcube (edict_t *self) /* FS: Coop: Xatrix specific */
 		return;
 	}
 
-	if (deathmatch->value && ((int)dmflags->value & DF_NO_HEALTH))
+	if (deathmatch->intValue && (dmflags->intValue & DF_NO_HEALTH))
 	{
 		G_FreeEdict(self);
 		return;

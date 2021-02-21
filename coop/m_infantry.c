@@ -316,7 +316,7 @@ infantry_pain(edict_t *self, edict_t *other /* unused */,
 
 	self->pain_debounce_time = level.time + 3;
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -1066,7 +1066,7 @@ infantry_blocked(edict_t *self, float dist) /* FS: Coop: Rogue specific */
 		return false;
 	}
 
-	if (blocked_checkshot(self, 0.25 + (0.05 * skill->value)))
+	if (blocked_checkshot(self, 0.25 + (0.05 * skill->intValue)))
 	{
 		return true;
 	}
@@ -1104,21 +1104,21 @@ infantry_duck(edict_t *self, float eta) /* FS: Coop: Rogue specific */
 		(self->monsterinfo.currentmove == &infantry_move_attack2))
 	{
 		/* if we're shooting, and not on easy, don't dodge */
-		if (skill->value)
+		if (skill->intValue)
 		{
 			self->monsterinfo.aiflags &= ~AI_DUCKED;
 			return;
 		}
 	}
 
-	if (skill->value == 0)
+	if (skill->intValue == 0)
 	{
 		/* stupid dodge */
 		self->monsterinfo.duck_wait_time = level.time + eta + 1;
 	}
 	else
 	{
-		self->monsterinfo.duck_wait_time = level.time + eta + (0.1 * (3 - skill->value));
+		self->monsterinfo.duck_wait_time = level.time + eta + (0.1 * (3 - skill->intValue));
 	}
 
 	/* has to be done immediately otherwise he can get stuck */
@@ -1148,7 +1148,7 @@ infantry_sidestep(edict_t *self) /* FS: Coop: Rogue specific */
 		(self->monsterinfo.currentmove == &infantry_move_attack2))
 	{
 		/* if we're shooting, and not on easy, don't dodge */
-		if (skill->value)
+		if (skill->intValue)
 		{
 			self->monsterinfo.aiflags &= ~AI_DODGING;
 			return;
@@ -1172,7 +1172,7 @@ SP_monster_infantry(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;

@@ -436,7 +436,7 @@ gunner_pain(edict_t *self, edict_t *other /* unused */,
 		gi.sound(self, CHAN_VOICE, sound_pain2, 1, ATTN_NORM, 0);
 	}
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -571,7 +571,7 @@ gunner_duck_down(edict_t *self)
 
 	self->monsterinfo.aiflags |= AI_DUCKED;
 
-	if (skill->value >= 2)
+	if (skill->intValue >= 2)
 	{
 		if (random() > 0.5)
 		{
@@ -1321,7 +1321,7 @@ gunner_blocked(edict_t *self, float dist) /* FS: Coop: Rogue specific */
 		return false;
 	}
 
-	if (blocked_checkshot(self, 0.25 + (0.05 * skill->value)))
+	if (blocked_checkshot(self, 0.25 + (0.05 * skill->intValue)))
 	{
 		return true;
 	}
@@ -1361,21 +1361,21 @@ gunner_duck(edict_t *self, float eta) /* FS: Coop: Rogue specific */
 		)
 	{
 		/* if we're shooting, and not on easy, don't dodge */
-		if (skill->value)
+		if (skill->intValue)
 		{
 			self->monsterinfo.aiflags &= ~AI_DUCKED;
 			return;
 		}
 	}
 
-	if (skill->value == 0)
+	if (skill->intValue == 0)
 	{
 		/* stupid dodge */
 		self->monsterinfo.duck_wait_time = level.time + eta + 1;
 	}
 	else
 	{
-		self->monsterinfo.duck_wait_time = level.time + eta + (0.1 * (3 - skill->value));
+		self->monsterinfo.duck_wait_time = level.time + eta + (0.1 * (3 - skill->intValue));
 	}
 
 	/* has to be done immediately otherwise he can get stuck */
@@ -1406,7 +1406,7 @@ gunner_sidestep(edict_t *self) /* FS: Coop: Rogue specific */
 		)
 	{
 		/* if we're shooting, and not on easy, don't dodge */
-		if (skill->value)
+		if (skill->intValue)
 		{
 			self->monsterinfo.aiflags &= ~AI_DODGING;
 			return;
@@ -1430,7 +1430,7 @@ SP_monster_gunner(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;

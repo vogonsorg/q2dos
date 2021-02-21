@@ -1154,7 +1154,7 @@ plat2_hit_top(edict_t *ent) /* FS: Coop: Rogue specific */
 			ent->nextthink = level.time + 5.0;
 		}
 
-		if (deathmatch->value)
+		if (deathmatch->intValue)
 		{
 			ent->last_move_time = level.time - 1.0;
 		}
@@ -1212,7 +1212,7 @@ plat2_hit_bottom(edict_t *ent) /* FS: Coop: Rogue specific */
 			ent->nextthink = level.time + 5.0;
 		}
 
-		if (deathmatch->value)
+		if (deathmatch->intValue)
 		{
 			ent->last_move_time = level.time - 1.0;
 		}
@@ -1351,7 +1351,7 @@ plat2_operate(edict_t *ent, edict_t *other) /* FS: Coop: Rogue specific */
 
 	ent->plat2flags = PLAT2_MOVING;
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		pauseTime = 0.3;
 	}
@@ -1579,7 +1579,7 @@ SP_func_plat2(edict_t *ent) /* FS: Coop: Rogue specific */
 		ent->decel *= 0.1;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		ent->speed *= 2;
 		ent->accel *= 2;
@@ -3018,7 +3018,7 @@ SP_func_door(edict_t *ent)
 		ent->speed = 100;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		ent->speed *= 2;
 	}

@@ -287,7 +287,7 @@ SP_info_player_start(edict_t *self)
 	self->think = SP_CreateUnnamedSpawn;
 	self->nextthink = level.time + FRAMETIME;
 
-	if (!coop->value)
+	if (!coop->intValue)
 	{
 		return;
 	}
@@ -313,7 +313,7 @@ SP_info_player_deathmatch(edict_t *self)
 		return;
 	}
 
-	if (!deathmatch->value)
+	if (!deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -334,7 +334,7 @@ SP_info_player_coop(edict_t *self)
 		return;
 	}
 
-	if (!coop->value)
+	if (!coop->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -395,7 +395,7 @@ SP_info_player_coop_lava(edict_t *self) /* FS: Coop: Rogue specific */
 		return;
 	}
 
-	if (!coop->value)
+	if (!coop->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -558,12 +558,12 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker
 		return;
 	}
 
-	if (coop->value && attacker->client)
+	if (coop->intValue && attacker->client)
 	{
 		meansOfDeath |= MOD_FRIENDLY_FIRE;
 	}
 
-	if (deathmatch->value || coop->value)
+	if (deathmatch->intValue || coop->intValue)
 	{
 		ff = meansOfDeath & MOD_FRIENDLY_FIRE;
 		mod = meansOfDeath & ~MOD_FRIENDLY_FIRE;
@@ -708,7 +708,7 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker
 		{
 			gi.bprintf(PRINT_MEDIUM, "%s %s.\n", self->client->pers.netname, message);
 
-			if (deathmatch->value)
+			if (deathmatch->intValue)
 			{
 				self->client->resp.score--;
 			}
@@ -889,7 +889,7 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker
 				gi.bprintf(PRINT_MEDIUM, "%s %s %s%s\n", self->client->pers.netname,
 						message, attacker->client->pers.netname, message2);
 
-				if (gamerules && gamerules->value) /* FS: Coop: Rogue specific */
+				if (gamerules && gamerules->intValue) /* FS: Coop: Rogue specific */
 				{
 					if (DMGame.Score)
 					{
@@ -906,7 +906,7 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker
 					return;
 				}
 
-				if (deathmatch->value)
+				if (deathmatch->intValue)
 				{
 					if (ff)
 					{
@@ -932,9 +932,9 @@ ClientObituary(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker
 		gi.bprintf(PRINT_MEDIUM, "%s died.\n", self->client->pers.netname);
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
-		if (gamerules && gamerules->value) /* FS: Coop: Rogue specific */
+		if (gamerules && gamerules->intValue) /* FS: Coop: Rogue specific */
 		{
 			if (DMGame.Score)
 			{
@@ -964,7 +964,7 @@ TossClientWeapon(edict_t *self)
 		return;
 	}
 
-	if (!deathmatch->value)
+	if (!deathmatch->intValue)
 	{
 		return;
 	}
@@ -981,7 +981,7 @@ TossClientWeapon(edict_t *self)
 		item = NULL;
 	}
 
-	if (!((int)(dmflags->value) & DF_QUAD_DROP))
+	if (!(dmflags->intValue & DF_QUAD_DROP))
 	{
 		quad = false;
 	}
@@ -990,7 +990,7 @@ TossClientWeapon(edict_t *self)
 		quad = (self->client->quad_framenum > (level.framenum + 10));
 	}
 
-	if (!((int)(dmflags->value) & DF_QUADFIRE_DROP)) /* FS: Coop: Xatrix specific */
+	if (!(dmflags->intValue & DF_QUADFIRE_DROP)) /* FS: Coop: Xatrix specific */
 	{
 		quadfire = false;
 	}
@@ -1163,7 +1163,7 @@ player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 		ClientObituary(self, inflictor, attacker);
 		TossClientWeapon(self);
 
-		if (deathmatch->value)
+		if (deathmatch->intValue)
 		{
 			Cmd_Help_f(self); /* show scores */
 		}
@@ -1172,7 +1172,7 @@ player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 		   how we want to handle keys in coop */
 		for (n = 0; n < game.num_items; n++)
 		{
-			if (coop->value && itemlist[n].flags & IT_KEY)
+			if (coop->intValue && itemlist[n].flags & IT_KEY)
 			{
 				self->client->resp.coop_respawn.inventory[n] =
 					self->client->pers.inventory[n];
@@ -1191,7 +1191,7 @@ player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 	}
 
 	/* FS: Coop: Rogue specific */
-	if (gamerules && gamerules->value) /* if we're in a dm game, alert the game */
+	if (gamerules && gamerules->intValue) /* if we're in a dm game, alert the game */
 	{
 		if (DMGame.PlayerDeath)
 		{
@@ -1246,7 +1246,7 @@ player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 			gi.sound(self, CHAN_BODY, gi.soundindex( "misc/udeath.wav"), 1, ATTN_NORM, 0);
 
 			/* more meaty gibs for your dollar! */
-			if ((deathmatch->value) && (self->health < -80))
+			if ((deathmatch->intValue) && (self->health < -80))
 			{
 				for (n = 0; n < 4; n++)
 				{
@@ -1350,7 +1350,7 @@ InitClientPersistant(gclient_t *client)
 
 	client->pers.weapon = item;
 
-	if ((game.gametype == zaero_coop) && (!deathmatch->value)) /* FS: Zaero specific game dll changes */
+	if ((game.gametype == zaero_coop) && (!deathmatch->intValue)) /* FS: Zaero specific game dll changes */
 	{
 		item = FindItem("Flare Gun");
 		client->pers.inventory[ITEM_INDEX(item)] = 1;
@@ -1529,7 +1529,7 @@ SaveClientData(void)
 		game.clients[i].pers.max_health = ent->max_health;
 		game.clients[i].pers.savedFlags = (ent->flags & (FL_GODMODE | FL_NOTARGET | FL_POWER_ARMOR));
 
-		if (coop->value)
+		if (coop->intValue)
 		{
 			game.clients[i].pers.score = ent->client->resp.score;
 		}
@@ -1548,7 +1548,7 @@ FetchClientEntData(edict_t *ent)
 	ent->max_health = ent->client->pers.max_health;
 	ent->flags |= ent->client->pers.savedFlags;
 
-	if (coop->value)
+	if (coop->intValue)
 	{
 		ent->client->resp.score = ent->client->pers.score;
 	}
@@ -1573,7 +1573,7 @@ PlayersRangeFromSpot(edict_t *spot)
 
 	bestplayerdistance = 9999999;
 
-	for (n = 1; n <= maxclients->value; n++)
+	for (n = 1; n <= maxclients->intValue; n++)
 	{
 		player = &g_edicts[n];
 
@@ -1701,7 +1701,7 @@ SelectFarthestDeathmatchSpawnPoint(void)
 edict_t *
 SelectDeathmatchSpawnPoint(void)
 {
-	if ((int)(dmflags->value) & DF_SPAWN_FARTHEST)
+	if (dmflags->intValue & DF_SPAWN_FARTHEST)
 	{
 		return SelectFarthestDeathmatchSpawnPoint();
 	}
@@ -1899,11 +1899,11 @@ SelectSpawnPoint(edict_t *ent, vec3_t origin, vec3_t angles)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		spot = SelectDeathmatchSpawnPoint();
 	}
-	else if (coop->value)
+	else if (coop->intValue)
 	{
 		spot = SelectCoopSpawnPoint(ent);
 	}
@@ -1949,7 +1949,7 @@ SelectSpawnPoint(edict_t *ent, vec3_t origin, vec3_t angles)
 	   connected or the map was loaded via console
 	   and thus no previously map is known to the
 	   client) use one in 550 units radius. */
-	if (coop->value)
+	if (coop->intValue)
 	{
 		index = ent->client - game.clients;
 
@@ -2054,7 +2054,7 @@ CopyToBodyQue(edict_t *ent)
 	}
 
 	/* grab a body que and cycle to the next one */
-	body = &g_edicts[(int)maxclients->value + level.body_que + 1];
+	body = &g_edicts[maxclients->intValue + level.body_que + 1];
 	level.body_que = (level.body_que + 1) % BODY_QUEUE_SIZE;
 
 	gi.unlinkentity(ent);
@@ -2088,7 +2088,7 @@ respawn(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value || coop->value)
+	if (deathmatch->intValue || coop->intValue)
 	{
 		/* spectators don't leave bodies */
 		if (self->movetype != MOVETYPE_NOCLIP)
@@ -2154,7 +2154,7 @@ spectator_respawn(edict_t *ent)
 		}
 
 		/* count spectators */
-		for (i = 1, numspec = 0; i <= maxclients->value; i++)
+		for (i = 1, numspec = 0; i <= maxclients->intValue; i++)
 		{
 			if (g_edicts[i].inuse && g_edicts[i].client->pers.spectator)
 			{
@@ -2162,7 +2162,7 @@ spectator_respawn(edict_t *ent)
 			}
 		}
 
-		if (numspec >= maxspectators->value)
+		if (numspec >= maxspectators->intValue)
 		{
 			gi.cprintf(ent, PRINT_HIGH, "Server spectator limit is full.");
 			ent->client->pers.spectator = false;
@@ -2260,7 +2260,7 @@ PutClientInServer(edict_t *ent)
 
 	/* find a spawn point. do it before setting health back
 	   up, so farthest ranging doesn't count this client */
-	if (gamerules && gamerules->value && DMGame.SelectSpawnPoint) /* FS: Coop: Rogue specific */
+	if (gamerules && gamerules->intValue && DMGame.SelectSpawnPoint) /* FS: Coop: Rogue specific */
 	{
 		DMGame.SelectSpawnPoint(ent, spawn_origin, spawn_angles);
 	}
@@ -2273,7 +2273,7 @@ PutClientInServer(edict_t *ent)
 	client = ent->client;
 
 	/* deathmatch wipes most client data every spawn */
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 
 		resp = client->resp;
@@ -2281,7 +2281,7 @@ PutClientInServer(edict_t *ent)
 		InitClientPersistant(client);
 		ClientUserinfoChanged(ent, userinfo);
 	}
-	else if (coop->value)
+	else if (coop->intValue)
 	{
 
 		resp = client->resp;
@@ -2376,7 +2376,7 @@ PutClientInServer(edict_t *ent)
 	client->ps.pmove.origin[1] = spawn_origin[1] * 8;
 	client->ps.pmove.origin[2] = spawn_origin[2] * 8;
 
-	if (deathmatch->value && ((int)dmflags->value & DF_FIXED_FOV))
+	if (deathmatch->intValue && (dmflags->intValue & DF_FIXED_FOV))
 	{
 		client->ps.fov = 90;
 	}
@@ -2472,7 +2472,7 @@ PutClientInServer(edict_t *ent)
 	{
 		/* if you get on to rboss in single player or coop, ensure
 		   the player has the nuke key. (not in DM) */
-		if (!(deathmatch->value))
+		if (!(deathmatch->intValue))
 		{
 			gitem_t *item;
 
@@ -2505,7 +2505,7 @@ ClientBeginDeathmatch(edict_t *ent)
 	G_InitEdict(ent);
 	InitClientResp(ent->client);
 
-	if (gamerules && gamerules->value && DMGame.ClientBegin) /* FS: Coop: Rogue specific */
+	if (gamerules && gamerules->intValue && DMGame.ClientBegin) /* FS: Coop: Rogue specific */
 	{
 		DMGame.ClientBegin(ent);
 	}
@@ -2548,7 +2548,7 @@ ClientBegin(edict_t *ent)
 
 	ent->client = game.clients + (ent - g_edicts - 1);
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		ClientBeginDeathmatch(ent);
 		if(!ent->client->pers.didMotd)
@@ -2683,7 +2683,7 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 	s = Info_ValueForKey(userinfo, "spectator");
 
 	/* spectators are only supported in deathmatch */
-	if ((deathmatch->value || coop->intValue) && *s && strcmp(s, "0"))
+	if ((deathmatch->intValue || coop->intValue) && *s && strcmp(s, "0"))
 	{
 		ent->client->pers.spectator = true;
 	}
@@ -2706,7 +2706,7 @@ ClientUserinfoChanged(edict_t *ent, char *userinfo)
 	gi.configstring(CS_PLAYERSKINS + playernum, va("%s\\%s", ent->client->pers.netname, s));
 
 	/* fov */
-	if (deathmatch->value && ((int)dmflags->value & DF_FIXED_FOV))
+	if (deathmatch->intValue && (dmflags->intValue & DF_FIXED_FOV))
 	{
 		ent->client->ps.fov = 90;
 	}
@@ -2817,7 +2817,7 @@ ClientConnect(edict_t *ent, char *userinfo)
 	/* check for a spectator */
 	value = Info_ValueForKey(userinfo, "spectator");
 
-	if (deathmatch->value && *value && strcmp(value, "0"))
+	if (deathmatch->intValue && *value && strcmp(value, "0"))
 	{
 		int i, numspec;
 
@@ -2830,7 +2830,7 @@ ClientConnect(edict_t *ent, char *userinfo)
 		}
 
 		/* count spectators */
-		for (i = numspec = 0; i < maxclients->value; i++)
+		for (i = numspec = 0; i < maxclients->intValue; i++)
 		{
 			if (g_edicts[i + 1].inuse && g_edicts[i + 1].client->pers.spectator)
 			{
@@ -2838,7 +2838,7 @@ ClientConnect(edict_t *ent, char *userinfo)
 			}
 		}
 
-		if (numspec >= maxspectators->value)
+		if (numspec >= maxspectators->intValue)
 		{
 			Info_SetValueForKey(userinfo, "rejmsg", "Server spectator limit is full.");
 			return false;
@@ -2940,7 +2940,7 @@ ClientDisconnect(edict_t *ent)
 		ent->client->owned_sphere = NULL;
 	}
 
-	if (gamerules && gamerules->value) /* FS: Coop: Rogue specific */
+	if (gamerules && gamerules->intValue) /* FS: Coop: Rogue specific */
 	{
 		if (DMGame.PlayerDisconnect)
 		{
@@ -3276,7 +3276,7 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 	}
 
 	/* update chase cam if being followed */
-	for (i = 1; i <= maxclients->value; i++)
+	for (i = 1; i <= maxclients->intValue; i++)
 	{
 		other = g_edicts + i;
 
@@ -3323,7 +3323,7 @@ ClientBeginServerFrame(edict_t *ent)
 
 	client = ent->client;
 
-	if ((deathmatch->value || coop->intValue) &&
+	if ((deathmatch->intValue || coop->intValue) &&
 		(client->pers.spectator != client->resp.spectator) &&
 		((level.time - client->respawn_time) >= 5))
 	{
@@ -3347,7 +3347,7 @@ ClientBeginServerFrame(edict_t *ent)
 		if (level.time > client->respawn_time)
 		{
 			/* in deathmatch, only wait for attack button */
-			if (deathmatch->value)
+			if (deathmatch->intValue)
 			{
 				buttonMask = BUTTON_ATTACK;
 			}
@@ -3357,7 +3357,7 @@ ClientBeginServerFrame(edict_t *ent)
 			}
 
 			if ((client->latched_buttons & buttonMask) ||
-				(deathmatch->value && ((int)dmflags->value & DF_FORCE_RESPAWN)))
+				(deathmatch->intValue && (dmflags->intValue & DF_FORCE_RESPAWN)))
 			{
 				respawn(ent);
 				client->latched_buttons = 0;
@@ -3368,7 +3368,7 @@ ClientBeginServerFrame(edict_t *ent)
 	}
 
 	/* add player trail so monsters can follow */
-	if (!deathmatch->value)
+	if (!deathmatch->intValue)
 	{
 		if (!visible(ent, PlayerTrail_LastSpot()))
 		{
@@ -3418,7 +3418,7 @@ int P_Clients_Connected (qboolean spectators) /* FS: Coop: Find out how many pla
 
 	i = clientsInGame = 0;
 
-	for (i=0 ; i<maxclients->value ; i++)
+	for (i=0 ; i<maxclients->intValue; i++)
 	{
 		ent = &g_edicts [i + 1];
 		if (ent->inuse && ent->client)

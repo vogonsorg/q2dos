@@ -86,7 +86,7 @@ CarrierCoopCheck(edict_t *self)
 	}
 
 	/* if we're not in coop, this is a noop */
-	if (!coop || !coop->value)
+	if (!coop || !coop->intValue)
 	{
 		return;
 	}
@@ -1277,7 +1277,7 @@ carrier_pain(edict_t *self, edict_t *other /* unused */, float kick /* unused */
 		self->s.skinnum = 1;
 	}
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -1517,7 +1517,7 @@ SP_monster_carrier(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -1540,12 +1540,12 @@ SP_monster_carrier(edict_t *self)
 	VectorSet(self->maxs, 56, 56, 44);
 
 	/* 2000 - 4000 health */
-	self->health = max(2000, 2000 + 1000 * ((skill->value) - 1));
+	self->health = max(2000, 2000 + 1000 * ((skill->intValue) - 1));
 
 	/* add health in coop (500 * skill) */
-	if (coop->value)
+	if (coop->intValue)
 	{
-		self->health += 500 * (skill->value);
+		self->health += 500 * (skill->intValue);
 	}
 
 	self->gib_health = -200;
@@ -1578,7 +1578,7 @@ SP_monster_carrier(edict_t *self)
 
 	self->monsterinfo.attack_finished = 0;
 
-	switch ((int)skill->value)
+	switch (skill->intValue)
 	{
 		case 0:
 			self->monsterinfo.monster_slots = 3;

@@ -383,7 +383,7 @@ chick_pain(edict_t *self, edict_t *other /* other */, float kick /* other */, in
 		gi.sound(self, CHAN_VOICE, sound_pain3, 1, ATTN_NORM, 0);
 	}
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -708,7 +708,7 @@ ChickRocket_Rogue(edict_t *self) /* FS: Coop: Rogue specific */
 	G_ProjectSource(self->s.origin, monster_flash_offset[MZ2_CHICK_ROCKET_1],
 			forward, right, start);
 
-	rocketSpeed = 500 + (100 * skill->value); /* rock & roll.... :) */
+	rocketSpeed = 500 + (100 * skill->intValue); /* rock & roll.... :) */
 
 	if (blindfire)
 	{
@@ -740,7 +740,7 @@ ChickRocket_Rogue(edict_t *self) /* FS: Coop: Rogue specific */
 	}
 
 	/* lead target (not when blindfiring) */
-	if ((!blindfire) && ((random() < (0.2 + ((3 - skill->value) * 0.15)))))
+	if ((!blindfire) && ((random() < (0.2 + ((3 - skill->intValue) * 0.15)))))
 	{
 		float time;
 
@@ -954,7 +954,7 @@ chick_rerocket(edict_t *self)
 			{
 				if (visible(self, self->enemy))
 				{
-					if (random() <= (0.6 + (0.05 * ((float)skill->value))))
+					if (random() <= (0.6 + (0.05 * ((float)skill->intValue))))
 					{
 						self->monsterinfo.currentmove = &chick_move_attack1;
 						return;
@@ -1171,7 +1171,7 @@ chick_blocked(edict_t *self, float dist) /* FS: Coop: Rogue specific */
 		return false;
 	}
 
-	if (blocked_checkshot(self, 0.25 + (0.05 * skill->value)))
+	if (blocked_checkshot(self, 0.25 + (0.05 * skill->intValue)))
 	{
 		return true;
 	}
@@ -1196,21 +1196,21 @@ chick_duck(edict_t *self, float eta) /* FS: Coop: Rogue specific */
 		(self->monsterinfo.currentmove == &chick_move_attack1))
 	{
 		/* if we're shooting, and not on easy, don't dodge */
-		if (skill->value)
+		if (skill->intValue)
 		{
 			self->monsterinfo.aiflags &= ~AI_DUCKED;
 			return;
 		}
 	}
 
-	if (skill->value == 0)
+	if (skill->intValue == 0)
 	{
 		/* stupid dodge */
 		self->monsterinfo.duck_wait_time = level.time + eta + 1;
 	}
 	else
 	{
-		self->monsterinfo.duck_wait_time = level.time + eta + (0.1 * (3 - skill->value));
+		self->monsterinfo.duck_wait_time = level.time + eta + (0.1 * (3 - skill->intValue));
 	}
 
 	/* has to be done immediately otherwise she can get stuck */
@@ -1233,7 +1233,7 @@ chick_sidestep(edict_t *self) /* FS: Coop: Rogue specific */
 		(self->monsterinfo.currentmove == &chick_move_attack1))
 	{
 		/* if we're shooting, and not on easy, don't dodge */
-		if (skill->value)
+		if (skill->intValue)
 		{
 			self->monsterinfo.aiflags &= ~AI_DODGING;
 			return;
@@ -1257,7 +1257,7 @@ SP_monster_chick(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;

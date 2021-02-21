@@ -900,7 +900,7 @@ P_FallingDamage(edict_t *ent)
 
 		VectorSet(dir, 0, 0, 1);
 
-		if (!deathmatch->value || !((int)dmflags->value & DF_NO_FALLING))
+		if (!deathmatch->intValue || !(dmflags->intValue & DF_NO_FALLING))
 		{
 			T_Damage(ent, world, world, dir, ent->s.origin, vec3_origin,
 					damage, 0, 0, MOD_FALLING);
@@ -1126,7 +1126,7 @@ G_SetClientEffects(edict_t *ent)
 		ent->s.renderfx |= RF_USE_DISGUISE;
 	}
 
-	if (gamerules && gamerules->value) /* FS: Coop: Rogue specific */
+	if (gamerules && gamerules->intValue) /* FS: Coop: Rogue specific */
 	{
 		if (DMGame.PlayerEffects)
 		{

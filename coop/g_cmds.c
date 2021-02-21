@@ -50,7 +50,7 @@ ClientTeam(edict_t *ent, char* value)
 		return value;
 	}
 
-	if ((int)(dmflags->value) & DF_MODELTEAMS)
+	if (dmflags->intValue & DF_MODELTEAMS)
 	{
 		*p = 0;
 		return value;
@@ -78,7 +78,7 @@ OnSameTeam(edict_t *ent1, edict_t *ent2)
 		}
 	}
 
-	if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS)))
+	if (!(dmflags->intValue & (DF_MODELTEAMS | DF_SKINTEAMS)))
 	{
 		return false;
 	}
@@ -312,7 +312,7 @@ Cmd_Give_f(edict_t *ent)
 		return;
 	}
 
-	if ((deathmatch->value || coop->value) && !Client_CanCheat(ent))
+	if ((deathmatch->intValue || coop->intValue) && !Client_CanCheat(ent))
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"You must run the server with '+set cheats 1' to enable this command.\n");
@@ -589,7 +589,7 @@ Cmd_God_f(edict_t *ent)
 		return;
 	}
 
-	if ((deathmatch->value || coop->value) && !Client_CanCheat(ent))
+	if ((deathmatch->intValue || coop->intValue) && !Client_CanCheat(ent))
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"You must run the server with '+set cheats 1' to enable this command.\n");
@@ -630,7 +630,7 @@ Cmd_Notarget_f(edict_t *ent)
 		return;
 	}
 
-	if ((deathmatch->value || coop->value) && !Client_CanCheat(ent))
+	if ((deathmatch->intValue || coop->intValue) && !Client_CanCheat(ent))
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"You must run the server with '+set cheats 1' to enable this command.\n");
@@ -668,7 +668,7 @@ Cmd_Noclip_f(edict_t *ent)
 		return;
 	}
 
-	if ((deathmatch->value || coop->value) && !Client_CanCheat(ent))
+	if ((deathmatch->intValue || coop->intValue) && !Client_CanCheat(ent))
 	{
 		gi.cprintf(ent, PRINT_HIGH, "You must run the server with '+set cheats 1' to enable this command.\n");
 		return;
@@ -1095,7 +1095,7 @@ Cmd_Score_f(edict_t *ent)
 		PMenu_Close(ent);
 	}
 
-	if (!deathmatch->value && !coop->value)
+	if (!deathmatch->intValue && !coop->intValue)
 	{
 		return;
 	}
@@ -1121,7 +1121,7 @@ Cmd_Help_f(edict_t *ent)
 	}
 
 	/* this is for backwards compatability */
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		Cmd_Score_f(ent);
 		return;
@@ -1532,7 +1532,7 @@ Cmd_Players_f(edict_t *ent)
 
 	count = 0;
 
-	for (i = 0; i < maxclients->value; i++)
+	for (i = 0; i < maxclients->intValue; i++)
 	{
 		if (game.clients[i].pers.connected)
 		{
@@ -1747,7 +1747,7 @@ Cmd_Say_f(edict_t *ent, qboolean team, qboolean arg0)
 		return;
 	}
 
-	if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS)))
+	if (!(dmflags->intValue & (DF_MODELTEAMS | DF_SKINTEAMS)))
 	{
 		team = false;
 	}
@@ -1822,7 +1822,7 @@ Cmd_Say_f(edict_t *ent, qboolean team, qboolean arg0)
 		cl->flood_when[cl->flood_whenhead] = level.time;
 	}
 
-	if (dedicated->value)
+	if (dedicated->intValue)
 	{
 		gi.cprintf(NULL, PRINT_CHAT, "%s", text);
 	}
@@ -1895,7 +1895,7 @@ Cmd_PlayerList_f(edict_t *ent)
 	/* connect time, ping, score, name */
 	*text = 0;
 
-	for (i = 0, e2 = g_edicts + 1; i < maxclients->value; i++, e2++)
+	for (i = 0, e2 = g_edicts + 1; i < maxclients->intValue; i++, e2++)
 	{
 		if (!e2->inuse)
 		{
@@ -1969,7 +1969,7 @@ void Cmd_Beam_f (edict_t *ent) /* FS: From YamaqiQ2: Beam us to direct coordinat
 		return;
 	}
 
-	if ((deathmatch->value || coop->value) && !Client_CanCheat(ent))
+	if ((deathmatch->intValue || coop->intValue) && !Client_CanCheat(ent))
 	{
 		gi.cprintf(ent, PRINT_HIGH,
 				"You must run the server with '+set cheats 1' to enable this command.\n");
@@ -2272,7 +2272,7 @@ Cmd_SayPerson_f(edict_t *ent) /* FS: Tastyspleen/Q2Admin stuff.  By request. */
 		cl->flood_when[cl->flood_whenhead] = level.time;
 	}
 
-	if (dedicated->value)
+	if (dedicated->intValue)
 	{
 		gi.cprintf(NULL, PRINT_CHAT, "%s", text);
 	}

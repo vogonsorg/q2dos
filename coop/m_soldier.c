@@ -539,7 +539,7 @@ soldier_pain(edict_t *self, edict_t *other /* unused */,
 		return;
 	}
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -685,7 +685,7 @@ soldier_fire_rogue(edict_t *self, int in_flash_number) /* FS: Coop: Rogue specif
 		vectoangles(aim, dir);
 		AngleVectors(dir, forward, right, up);
 
-		if (skill->value < 2)
+		if (skill->intValue < 2)
 		{
 			r = crandom() * 1000;
 			u = crandom() * 500;
@@ -882,7 +882,7 @@ soldier_attack1_refire1(edict_t *self)
 		return;
 	}
 
-	if (((skill->value == 3) &&
+	if (((skill->intValue == 3) &&
 		 (random() < 0.5)) || (range(self, self->enemy) == RANGE_MELEE))
 	{
 		self->monsterinfo.nextframe = FRAME_attak102;
@@ -911,7 +911,7 @@ soldier_attack1_refire2(edict_t *self)
 		return;
 	}
 
-	if (((skill->value == 3) &&
+	if (((skill->intValue == 3) &&
 		 (random() < 0.5)) || (range(self, self->enemy) == RANGE_MELEE))
 	{
 		self->monsterinfo.nextframe = FRAME_attak102;
@@ -971,7 +971,7 @@ soldier_attack2_refire1(edict_t *self)
 		return;
 	}
 
-	if (((skill->value == 3) &&
+	if (((skill->intValue == 3) &&
 		 (random() < 0.5)) || (range(self, self->enemy) == RANGE_MELEE))
 	{
 		self->monsterinfo.nextframe = FRAME_attak204;
@@ -1000,7 +1000,7 @@ soldier_attack2_refire2(edict_t *self)
 		return;
 	}
 
-	if (((skill->value == 3) &&
+	if (((skill->intValue == 3) &&
 		 (random() < 0.5)) || (range(self, self->enemy) == RANGE_MELEE))
 	{
 		self->monsterinfo.nextframe = FRAME_attak204;
@@ -1236,8 +1236,8 @@ soldier_attack6_refire(edict_t *self)
 		return;
 	}
 
-	if ((skill->value == 3) ||
-	((game.gametype == rogue_coop) && ((random() < (0.25 * ((float)skill->value))))) ) /* FS: Coop: Rogue specific */
+	if ((skill->intValue == 3) ||
+	((game.gametype == rogue_coop) && ((random() < (0.25 * ((float)skill->intValue))))) ) /* FS: Coop: Rogue specific */
 	{
 		self->monsterinfo.nextframe = FRAME_runs03;
 	}
@@ -1350,7 +1350,7 @@ soldier_attack_rogue(edict_t *self) /* FS: Coop: Rogue specific */
 
 	if ((!(self->monsterinfo.aiflags & (AI_BLOCKED | AI_STAND_GROUND))) &&
 		(range(self, self->enemy) >= RANGE_NEAR) &&
-		((r < (skill->value * 0.25)) &&
+		((r < (skill->intValue * 0.25)) &&
 		 (self->s.skinnum <= 3)))
 	{
 		self->monsterinfo.currentmove = &soldier_move_attack6_rogue;
@@ -1425,7 +1425,7 @@ soldier_sight(edict_t *self, edict_t *other /* unused */)
 
 	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
 	{
-		if ((skill->value > 0) && (self->enemy) &&
+		if ((skill->intValue > 0) && (self->enemy) &&
 			(range(self, self->enemy) >= RANGE_NEAR))
 		{
 			/*	don't let machinegunners run & shoot */
@@ -1437,7 +1437,7 @@ soldier_sight(edict_t *self, edict_t *other /* unused */)
 	}
 	else
 	{
-		if ((skill->value > 0) && (range(self, self->enemy) >= RANGE_MID))
+		if ((skill->intValue > 0) && (range(self, self->enemy) >= RANGE_MID))
 		{
 			if (random() > 0.5)
 			{
@@ -1518,7 +1518,7 @@ soldier_dodge(edict_t *self, edict_t *attacker, float eta, trace_t *fake /* unus
 		self->enemy = attacker;
 	}
 
-	if (skill->value == 0)
+	if (skill->intValue == 0)
 	{
 		self->monsterinfo.currentmove = &soldier_move_duck;
 		return;
@@ -1527,7 +1527,7 @@ soldier_dodge(edict_t *self, edict_t *attacker, float eta, trace_t *fake /* unus
 	self->monsterinfo.pausetime = level.time + eta + 0.3;
 	r = random();
 
-	if (skill->value == 1)
+	if (skill->intValue == 1)
 	{
 		if (r > 0.33)
 		{
@@ -1541,7 +1541,7 @@ soldier_dodge(edict_t *self, edict_t *attacker, float eta, trace_t *fake /* unus
 		return;
 	}
 
-	if (skill->value >= 2)
+	if (skill->intValue >= 2)
 	{
 		if (r > 0.66)
 		{
@@ -1573,7 +1573,7 @@ soldier_blocked(edict_t *self, float dist) /* FS: Coop: Rogue specific */
 		return false;
 	}
 
-	if (blocked_checkshot(self, 0.25 + (0.05 * skill->value)))
+	if (blocked_checkshot(self, 0.25 + (0.05 * skill->intValue)))
 	{
 		return true;
 	}
@@ -2087,7 +2087,7 @@ soldier_duck(edict_t *self, float eta) /* FS: Coop: Rogue specific */
 	/* has to be done immediately otherwise he can get stuck */
 	monster_duck_down(self);
 
-	if (skill->value == 0)
+	if (skill->intValue == 0)
 	{
 		self->monsterinfo.nextframe = FRAME_duck01;
 		self->monsterinfo.currentmove = &soldier_move_duck_rogue;
@@ -2097,11 +2097,11 @@ soldier_duck(edict_t *self, float eta) /* FS: Coop: Rogue specific */
 
 	r = random();
 
-	if (r > (skill->value * 0.3))
+	if (r > (skill->intValue * 0.3))
 	{
 		self->monsterinfo.nextframe = FRAME_duck01;
 		self->monsterinfo.currentmove = &soldier_move_duck_rogue;
-		self->monsterinfo.duck_wait_time = level.time + eta + (0.1 * (3 - skill->value));
+		self->monsterinfo.duck_wait_time = level.time + eta + (0.1 * (3 - skill->intValue));
 	}
 	else
 	{
@@ -2241,7 +2241,7 @@ SP_monster_soldier_light(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -2278,7 +2278,7 @@ SP_monster_soldier(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -2308,7 +2308,7 @@ SP_monster_soldier_ss(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -2759,7 +2759,7 @@ soldierh_pain(edict_t *self, edict_t *other /* unused */,
 		return;
 	}
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -2991,7 +2991,7 @@ soldierh_attack1_refire1(edict_t *self)
 		return;
 	}
 
-	if (((skill->value == 3) && (random() < 0.5)) || (range(self, self->enemy) == RANGE_MELEE))
+	if (((skill->intValue == 3) && (random() < 0.5)) || (range(self, self->enemy) == RANGE_MELEE))
 	{
 		self->monsterinfo.nextframe = FRAME_attak102;
 	}
@@ -3019,7 +3019,7 @@ soldierh_attack1_refire2(edict_t *self)
 		return;
 	}
 
-	if (((skill->value == 3) && (random() < 0.5)) || (range(self, self->enemy) == RANGE_MELEE))
+	if (((skill->intValue == 3) && (random() < 0.5)) || (range(self, self->enemy) == RANGE_MELEE))
 	{
 		self->monsterinfo.nextframe = FRAME_attak102;
 	}
@@ -3141,7 +3141,7 @@ soldierh_attack2_refire1(edict_t *self)
 		return;
 	}
 
-	if (((skill->value == 3) && (random() < 0.5)) || (range(self, self->enemy) == RANGE_MELEE))
+	if (((skill->intValue == 3) && (random() < 0.5)) || (range(self, self->enemy) == RANGE_MELEE))
 	{
 		self->monsterinfo.nextframe = FRAME_attak204;
 	}
@@ -3169,7 +3169,7 @@ soldierh_attack2_refire2(edict_t *self)
 		return;
 	}
 
-	if (((skill->value == 3) &&
+	if (((skill->intValue == 3) &&
 		 (random() < 0.5)) ||
 		((range(self, self->enemy) == RANGE_MELEE) && (self->s.skinnum < 4)))
 	{
@@ -3340,7 +3340,7 @@ soldierh_attack6_refire(edict_t *self)
 		return;
 	}
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		self->monsterinfo.nextframe = FRAME_runs03;
 	}
@@ -3412,7 +3412,7 @@ soldierh_sight(edict_t *self, edict_t *other /* unused */)
 		gi.sound(self, CHAN_VOICE, sound_sight2, 1, ATTN_NORM, 0);
 	}
 
-	if ((skill->value > 0) && (range(self, self->enemy) >= RANGE_MID))
+	if ((skill->intValue > 0) && (range(self, self->enemy) >= RANGE_MID))
 	{
 		if (random() > 0.5)
 		{
@@ -3483,7 +3483,7 @@ soldierh_dodge(edict_t *self, edict_t *attacker, float eta, trace_t *fake /* unu
 		self->enemy = attacker;
 	}
 
-	if (skill->value == 0)
+	if (skill->intValue == 0)
 	{
 		self->monsterinfo.currentmove = &soldierh_move_duck;
 		return;
@@ -3492,7 +3492,7 @@ soldierh_dodge(edict_t *self, edict_t *attacker, float eta, trace_t *fake /* unu
 	self->monsterinfo.pausetime = level.time + eta + 0.3;
 	r = random();
 
-	if (skill->value == 1)
+	if (skill->intValue == 1)
 	{
 		if (r > 0.33)
 		{
@@ -3506,7 +3506,7 @@ soldierh_dodge(edict_t *self, edict_t *attacker, float eta, trace_t *fake /* unu
 		return;
 	}
 
-	if (skill->value >= 2)
+	if (skill->intValue >= 2)
 	{
 		if (r > 0.66)
 		{
@@ -3983,7 +3983,7 @@ SP_monster_soldier_ripper(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -4014,7 +4014,7 @@ SP_monster_soldier_hypergun(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -4043,7 +4043,7 @@ SP_monster_soldier_lasergun(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;

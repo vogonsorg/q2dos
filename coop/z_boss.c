@@ -504,7 +504,7 @@ void zboss_pain (edict_t *self, edict_t *other, float kick, int damage)
 
 	self->pain_debounce_time = level.time + 5;
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 		return;		// no pain anims in nightmare
 
 	if(self->laser)
@@ -1181,11 +1181,11 @@ void FireCannon(edict_t *self)
 		distance = 700;
 	}
 	
-	if(skill->value < 2)
+	if(skill->intValue < 2)
 	{
 		fire_plasmaCannon (self, start, dir, 90, 700, 2.5, 90+40, distance);
 	}
-	else if(skill->value < 3)
+	else if(skill->intValue < 3)
 	{
 		fire_plasmaCannon (self, start, dir, 90, (int)(distance * 1.2), 2.5, 90+40, distance);
 	}
@@ -1837,7 +1837,7 @@ void SP_monster_zboss (edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict (self);
 		return;
@@ -1860,15 +1860,15 @@ void SP_monster_zboss (edict_t *self)
 	self->monsterinfo.aiflags = AI_MONREDUCEDDAMAGE;
 	self->monsterinfo.reducedDamageAmount = 0.25;
 
-	if(skill->value == 0)
+	if (skill->intValue == 0)
 	{
 		self->health = 3000;
 	}
-	else if(skill->value == 1)
+	else if (skill->intValue == 1)
 	{
 		self->health = 4500;
 	}
-	else if(skill->value == 2)
+	else if (skill->intValue == 2)
 	{
 		self->health = 6000;
 	}

@@ -99,13 +99,13 @@ void vote_command(edict_t *ent)
 
 	argc = gi.argc();
 
-	if (maxclients->value <= 1.0f)
+	if (maxclients->intValue <= 1)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Voting is only available in multiplayer.\n");
 		return;
 	}
 
-	if (!sv_vote_enabled->value)
+	if (!sv_vote_enabled->intValue)
 	{
 		gi.cprintf(ent, PRINT_HIGH, "Voting disabled on this server!\n");
 		return;

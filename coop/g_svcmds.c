@@ -150,11 +150,11 @@ SV_FilterPacket(char *from)
 	{
 		if ((in & ipfilters[i].mask) == ipfilters[i].compare)
 		{
-			return (int)filterban->value;
+			return filterban->intValue;
 		}
 	}
 
-	return (int)!filterban->value;
+	return !filterban->intValue;
 }
 
 void
@@ -274,7 +274,7 @@ SVCmd_WriteIP_f(void)
 		return;
 	}
 
-	fprintf(f, "set filterban %d\n", (int)filterban->value);
+	fprintf(f, "set filterban %d\n", filterban->intValue);
 
 	for (i = 0; i < numipfilters; i++)
 	{

@@ -751,9 +751,9 @@ G_Spawn(void)
 	int i;
 	edict_t *e;
 
-	e = &g_edicts[(int)maxclients->value + 1];
+	e = &g_edicts[maxclients->intValue + 1];
 
-	for (i = maxclients->value + 1; i < globals.num_edicts; i++, e++)
+	for (i = maxclients->intValue + 1; i < globals.num_edicts; i++, e++)
 	{
 		/* the first couple seconds of server time can involve a lot of
 		   freeing and allocating, so relax the replacement policy */
@@ -789,16 +789,16 @@ G_FreeEdict(edict_t *ed)
 
 	gi.unlinkentity(ed); /* unlink from world */
 
-	if (deathmatch->value || coop->value)
+	if (deathmatch->intValue || coop->intValue)
 	{
-		if ((ed - g_edicts) <= (maxclients->value + BODY_QUEUE_SIZE))
+		if ((ed - g_edicts) <= (maxclients->intValue + BODY_QUEUE_SIZE))
 		{
 			return;
 		}
 	}
 	else
 	{
-		if ((ed - g_edicts) <= maxclients->value)
+		if ((ed - g_edicts) <= maxclients->intValue)
 		{
 			return;
 		}
@@ -1098,12 +1098,12 @@ qboolean G_SpawnCheck(int cap)
 	int i;
 	edict_t *e;
 
-	e = &g_edicts[(int)maxclients->value + 1];
+	e = &g_edicts[maxclients->intValue + 1];
 
 	if (!cap)
 		cap = 1;
 
-	for (i = maxclients->value + 1; i < globals.num_edicts; i++, e++)
+	for (i = maxclients->intValue + 1; i < globals.num_edicts; i++, e++)
 	{
 		/* the first couple seconds of server time can involve a lot of
 		   freeing and allocating, so relax the replacement policy */

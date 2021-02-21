@@ -547,7 +547,7 @@ brain_tentacle_attack(edict_t *self)
 
 	VectorSet(aim, MELEE_DISTANCE, 0, 8);
 
-	if (fire_hit(self, aim, (10 + (rand() % 5)), -600) && (skill->value > 0))
+	if (fire_hit(self, aim, (10 + (rand() % 5)), -600) && (skill->intValue > 0))
 	{
 		self->spawnflags |= 65536;
 	}
@@ -975,7 +975,7 @@ brain_pain(edict_t *self, edict_t *other /* unused */,
 
 	self->pain_debounce_time = level.time + 3;
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -1092,14 +1092,14 @@ brain_duck(edict_t *self, float eta) /* FS: Coop: Rogue specific */
 	/* has to be done immediately otherwise he can get stuck */
 	monster_duck_down(self);
 
-	if (skill->value == 0)
+	if (skill->intValue == 0)
 	{
 		/* PMM - stupid dodge */
 		self->monsterinfo.duck_wait_time = level.time + eta + 1;
 	}
 	else
 	{
-		self->monsterinfo.duck_wait_time = level.time + eta + (0.1 * (3 - skill->value));
+		self->monsterinfo.duck_wait_time = level.time + eta + (0.1 * (3 - skill->intValue));
 	}
 
 	self->monsterinfo.currentmove = &brain_move_duck_rogue;
@@ -1118,7 +1118,7 @@ SP_monster_brain(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;

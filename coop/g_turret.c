@@ -118,7 +118,7 @@ turret_breach_fire(edict_t *self)
 	}
 
 	damage = 100 + random() * 50;
-	speed = 550 + 50 * skill->value;
+	speed = 550 + 50 * skill->intValue;
 	fire_rocket(self->teammaster->owner, start, f, damage, speed, 150, damage);
 	gi.positioned_sound(start, self, CHAN_WEAPON, gi.soundindex("weapons/rocklf1a.wav"), 1, ATTN_NORM, 0);
 }
@@ -482,7 +482,7 @@ turret_driver_think(edict_t *self)
 		return;
 	}
 
-	reaction_time = (3 - skill->value) * 1.0;
+	reaction_time = (3 - skill->intValue) * 1.0;
 
 	if ((level.time - self->monsterinfo.trail_time) < reaction_time)
 	{
@@ -542,7 +542,7 @@ SP_turret_driver(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -686,7 +686,7 @@ turret_brain_think(edict_t *self) /* FS: Coop: Rogue specific */
 	}
 	else
 	{
-		reaction_time = (3 - skill->value) * 1.0;
+		reaction_time = (3 - skill->intValue) * 1.0;
 	}
 
 	if ((level.time - self->monsterinfo.trail_time) < reaction_time)

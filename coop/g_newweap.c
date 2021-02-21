@@ -307,7 +307,7 @@ prox_open(edict_t *ent)
 			   blow up */
 			if (((((search->svflags & SVF_MONSTER) ||
 				   (search->client)) && (search->health > 0)) ||
-				   ((deathmatch->value) &&(((search->classname) && (!strcmp(search->classname, "info_player_deathmatch"))) ||
+				   ((deathmatch->intValue) &&(((search->classname) && (!strcmp(search->classname, "info_player_deathmatch"))) ||
 				   ((search->classname) && (!strcmp(search->classname, "info_player_start"))) ||
 				   ((search->classname) && (!strcmp(search->classname, "info_player_coop"))) ||
 				   ((search->classname) && (!strcmp(search->classname, "misc_teleporter_dest")))))) &&
@@ -319,7 +319,7 @@ prox_open(edict_t *ent)
 			}
 		}
 
-		if (strong_mines && (strong_mines->value))
+		if (strong_mines && (strong_mines->intValue))
 		{
 			ent->wait = level.time + PROX_TIME_TO_LIVE;
 		}
@@ -1055,7 +1055,7 @@ tesla_think_active(edict_t *self)
 		/* don't hit clients in single-player or coop */
 		if (hit->client)
 		{
-			if (coop->value || !deathmatch->value)
+			if (coop->intValue || !deathmatch->intValue)
 			{
 				continue;
 			}
@@ -1127,7 +1127,7 @@ tesla_activate(edict_t *self)
 	}
 
 	/* only check for spawn points in deathmatch */
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		search = NULL;
 
@@ -1164,7 +1164,7 @@ tesla_activate(edict_t *self)
 	VectorClear(self->s.angles);
 
 	/* clear the owner if in deathmatch */
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		self->owner = NULL;
 	}
@@ -1300,7 +1300,7 @@ fire_tesla(edict_t *self, vec3_t start, vec3_t aimdir,
 	/* blow up on contact with lava & slime code */
 	tesla->touch = tesla_lava;
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		tesla->health = 20;
 	}

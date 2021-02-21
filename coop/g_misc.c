@@ -746,7 +746,7 @@ SP_point_combat(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -881,7 +881,7 @@ SP_light(edict_t *self)
 	}
 
 	/* no targeted lights in deathmatch, because they cause global messages */
-	if (!self->targetname || deathmatch->value)
+	if (!self->targetname || deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
@@ -1306,7 +1306,7 @@ SP_func_explosive_rogue (edict_t *self) /* FS: Coop: Rogue specific */
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		/* auto-remove for deathmatch */
 		G_FreeEdict(self);
@@ -1383,7 +1383,7 @@ SP_func_explosive(edict_t *self)
 		SP_func_explosive_rogue(self);
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		/* auto-remove for deathmatch */
 		G_FreeEdict(self);
@@ -1650,7 +1650,7 @@ SP_misc_explobox(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		/* auto-remove for deathmatch */
 		G_FreeEdict(self);
@@ -2071,7 +2071,7 @@ SP_misc_deadsoldier(edict_t *ent)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		/* auto-remove for deathmatch */
 		G_FreeEdict(ent);

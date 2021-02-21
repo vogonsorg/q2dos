@@ -446,8 +446,8 @@ hunter_pain(edict_t *self, edict_t *other, float kick, int damage)
 		return;
 	}
 
-	if (!((int)dmflags->value & DF_FORCE_RESPAWN) &&
-		(huntercam && (huntercam->value)))
+	if (!(dmflags->intValue & DF_FORCE_RESPAWN) &&
+		(huntercam && (huntercam->intValue)))
 	{
 		VectorSubtract(other->s.origin, self->s.origin, dir);
 		dist = VectorLength(dir);

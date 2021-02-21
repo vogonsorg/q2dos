@@ -228,7 +228,7 @@ void ClientEndServerFrames (void)
 
 	// calc the player views now that all pushing
 	// and damage has been added
-	for (i=0 ; i<maxclients->value ; i++)
+	for (i=0 ; i<maxclients->intValue; i++)
 	{
 		ent = g_edicts + 1 + i;
 
@@ -278,7 +278,7 @@ void EndDMLevel (void)
 	static const char *seps = " ,\n\r";
 
 	/* stay on same level flag */
-	if ((int)dmflags->value & DF_SAME_LEVEL)
+	if (dmflags->intValue & DF_SAME_LEVEL)
 	{
 		BeginIntermission(CreateTargetChangeLevel(level.mapname));
 		return;
@@ -389,12 +389,12 @@ CheckDMRules(void)
 		return;
 	}
 
-	if (!deathmatch->value)
+	if (!deathmatch->intValue)
 	{
 		return;
 	}
 
-	if (gamerules && gamerules->value && DMGame.CheckDMRules) /* FS: Coop: Rogue specific */
+	if (gamerules && gamerules->intValue && DMGame.CheckDMRules) /* FS: Coop: Rogue specific */
 	{
 		if (DMGame.CheckDMRules())
 		{
@@ -412,9 +412,9 @@ CheckDMRules(void)
 		}
 	}
 
-	if (fraglimit->value)
+	if (fraglimit->intValue)
 	{
-		for (i = 0; i < maxclients->value; i++)
+		for (i = 0; i < maxclients->intValue; i++)
 		{
 			cl = game.clients + i;
 
@@ -423,7 +423,7 @@ CheckDMRules(void)
 				continue;
 			}
 
-			if (cl->resp.score >= fraglimit->value)
+			if (cl->resp.score >= fraglimit->intValue)
 			{
 				gi.bprintf(PRINT_HIGH, "Fraglimit hit.\n");
 				EndDMLevel();
@@ -452,7 +452,7 @@ ExitLevel(void)
 	ClientEndServerFrames();
 
 	/* clear some things before going to next level */
-	for (i = 0; i < maxclients->value; i++)
+	for (i = 0; i < maxclients->intValue; i++)
 	{
 		ent = g_edicts + 1 + i;
 
@@ -558,7 +558,7 @@ G_RunFrame(void)
 			}
 		}
 
-		if ((i > 0) && (i <= maxclients->value))
+		if ((i > 0) && (i <= maxclients->intValue))
 		{
 			ClientBeginServerFrame(ent);
 			continue;

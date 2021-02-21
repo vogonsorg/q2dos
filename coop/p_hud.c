@@ -16,7 +16,7 @@ MoveClientToIntermission(edict_t *ent)
 		return;
 	}
 
-	if (deathmatch->value || coop->value)
+	if (deathmatch->intValue || coop->intValue)
 	{
 		ent->client->showscores = true;
 	}
@@ -62,7 +62,7 @@ MoveClientToIntermission(edict_t *ent)
 	gi.linkentity(ent);
 
 	/* add the layout */
-	if (deathmatch->value || coop->value)
+	if (deathmatch->intValue || coop->intValue)
 	{
 		DeathmatchScoreboardMessage(ent, NULL);
 		gi.unicast(ent, true);
@@ -88,7 +88,7 @@ BeginIntermission(edict_t *targ)
 	game.autosaved = false;
 
 	/* respawn any dead clients */
-	for (i = 0; i < maxclients->value; i++)
+	for (i = 0; i < maxclients->intValue; i++)
 	{
 		client = g_edicts + 1 + i;
 
@@ -108,7 +108,7 @@ BeginIntermission(edict_t *targ)
 
 	if (game.gametype == zaero_coop) /* FS: Zaero specific game dll changes */
 	{
-		if (Q_stricmp(level.mapname, "zboss") == 0 && !deathmatch->value)
+		if (Q_stricmp(level.mapname, "zboss") == 0 && !deathmatch->intValue)
 		{
 			level.fadeFrames = 50;
 		}
@@ -116,9 +116,9 @@ BeginIntermission(edict_t *targ)
 
 	if (level.changemap && strstr(level.changemap, "*"))
 	{
-		if (coop->value)
+		if (coop->intValue)
 		{
-			for (i = 0; i < maxclients->value; i++)
+			for (i = 0; i < maxclients->intValue; i++)
 			{
 				client = g_edicts + 1 + i;
 
@@ -140,7 +140,7 @@ BeginIntermission(edict_t *targ)
 	}
 	else
 	{
-		if (!deathmatch->value)
+		if (!deathmatch->intValue)
 		{
 			level.exitintermission = 1; /* go immediately to the next level */
 			return;
@@ -182,7 +182,7 @@ BeginIntermission(edict_t *targ)
 	VectorCopy(ent->s.angles, level.intermission_angle);
 
 	/* move all clients to the intermission point */
-	for (i = 0; i < maxclients->value; i++)
+	for (i = 0; i < maxclients->intValue; i++)
 	{
 		client = g_edicts + 1 + i;
 
@@ -283,7 +283,7 @@ DeathmatchScoreboardMessage(edict_t *ent, edict_t *killer /* can be NULL */)
 
 		/* FS: Coop: Xatrix specific */
 		/* allow new DM games to override the tag picture */
-		if (gamerules && gamerules->value)
+		if (gamerules && gamerules->intValue)
 		{
 			if (DMGame.DogTag)
 			{
@@ -352,15 +352,15 @@ HelpComputerMessage(edict_t *ent)
 		return;
 	}
 
-	if (skill->value == 0)
+	if (skill->intValue == 0)
 	{
 		sk = "easy";
 	}
-	else if (skill->value == 1)
+	else if (skill->intValue == 1)
 	{
 		sk = "medium";
 	}
-	else if (skill->value == 2)
+	else if (skill->intValue == 2)
 	{
 		sk = "hard";
 	}
@@ -590,7 +590,7 @@ G_SetStats(edict_t *ent)
 	/* layouts */
 	ent->client->ps.stats[STAT_LAYOUTS] = 0;
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		if ((ent->client->pers.health <= 0) || level.intermissiontime || ent->client->showscores)
 		{
@@ -629,7 +629,7 @@ G_SetStats(edict_t *ent)
 		cvar_t *gun;
 		gun = gi.cvar("cl_gun", "2", 0);
 
-		if (gun->value != 2)
+		if (gun->intValue != 2)
 		{
 			ent->client->ps.stats[STAT_HELPICON] = gi.imageindex(ent->client->pers.weapon->icon);
 		}
@@ -680,7 +680,7 @@ G_CheckChaseStats(edict_t *ent)
 		return;
 	}
 
-	for (i = 1; i <= maxclients->value; i++)
+	for (i = 1; i <= maxclients->intValue; i++)
 	{
 		cl = g_edicts[i].client;
 

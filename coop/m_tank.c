@@ -372,7 +372,7 @@ tank_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 	}
 
 	/* If hard or nightmare, don't go into pain while attacking */
-	if (skill->value >= 2)
+	if (skill->intValue >= 2)
 	{
 		if ((self->s.frame >= FRAME_attak301) &&
 			(self->s.frame <= FRAME_attak330))
@@ -390,7 +390,7 @@ tank_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 	self->pain_debounce_time = level.time + 3;
 	gi.sound(self, CHAN_VOICE, sound_pain, 1, ATTN_NORM, 0);
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		return; /* no pain anims in nightmare */
 	}
@@ -615,7 +615,7 @@ tank_reattack_blaster(edict_t *self)
 		return;
 	}
 
-	if (skill->value >= 2)
+	if (skill->intValue >= 2)
 	{
 		if (visible(self, self->enemy))
 		{
@@ -828,7 +828,7 @@ tank_refire_rocket(edict_t *self)
 	}
 
 	/* Only on hard or nightmare */
-	if (skill->value >= 2)
+	if (skill->intValue >= 2)
 	{
 		if (self->enemy->health > 0)
 		{
@@ -1041,7 +1041,7 @@ SP_monster_tank(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;

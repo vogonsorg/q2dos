@@ -256,7 +256,7 @@ gladbGun_check(edict_t *self)
 		return;
 	}
 
-	if (skill->value == 3)
+	if (skill->intValue == 3)
 	{
 		gladbGun(self);
 	}
@@ -485,7 +485,7 @@ gladb_die(edict_t *self, edict_t *inflictor /* unused */,
 void
 SP_monster_gladb(edict_t *self)
 {
-	if (deathmatch->value)
+	if (deathmatch->intValue)
 	{
 		G_FreeEdict(self);
 		return;
