@@ -3064,10 +3064,8 @@ static int Get_Vidscale(void)
 		return 30;
 	if (viddef.height <= 800)
 		return 36;
-	if (viddef.height > 800)
-		return 38;
-	/* FS: We must have some weirdo mode, so 20 should be OK. */
-	return 18;
+
+	return 38; /* > 800 */
 }
 #endif /* GAMESPY */
 
