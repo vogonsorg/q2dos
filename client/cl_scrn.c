@@ -1392,7 +1392,7 @@ void SCR_ExecuteLayoutString (char *s)
 			value = cl.frame.playerstate.stats[atoi(token)];
 			if (!value)
 			{	// skip to endif
-				while (s && strcmp(token, "endif") )
+				while (s && strcmp(token, "endif") != 0 )
 				{
 					token = COM_Parse (&s);
 				}

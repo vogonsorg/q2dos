@@ -1986,9 +1986,9 @@ void CL_FixCvarCheats (void)
 	}
 
 	// make sure they are all set to the proper values
-	for (i=0, var = cheatvars ; i<numcheatvars ; i++, var++)
+	for (i = 0, var = cheatvars; i < numcheatvars; i++, var++)
 	{
-		if ( strcmp (var->var->string, var->value) )
+		if (strcmp (var->var->string, var->value) != 0)
 		{
 			Cvar_Set (var->name, var->value);
 		}

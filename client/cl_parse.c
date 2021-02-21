@@ -385,7 +385,7 @@ void CL_ParseServerData (void)
 	strncpy (cl.gamedir, str, sizeof(cl.gamedir)-1);
 
 	// set gamedir
-	if ((*str && (!fs_gamedirvar->string || !*fs_gamedirvar->string || strcmp(fs_gamedirvar->string, str))) || (!*str && (fs_gamedirvar->string || *fs_gamedirvar->string)))
+	if ((*str && (!fs_gamedirvar->string || !*fs_gamedirvar->string || strcmp(fs_gamedirvar->string, str) != 0)) || (!*str && (fs_gamedirvar->string || *fs_gamedirvar->string)))
 		Cvar_Set("game", str);
 
 	// parse player entity number
@@ -774,7 +774,7 @@ void CL_ParseConfigString (void)
 		i -= CS_PLAYERSKINS;
 		if (i < cl.maxclients)
 		{
-			if (cl.refresh_prepped && strcmp(olds, s))
+			if (cl.refresh_prepped && strcmp(olds, s) != 0)
 				CL_ParseClientinfo (i);
 		}
 		else

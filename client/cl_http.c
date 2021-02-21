@@ -616,10 +616,10 @@ static void CL_CheckAndQueueDownload (char *path)
 	else
 		pak = false;
 
-	if (!pak && strcmp (ext, "pcx") && strcmp (ext, "wal") && strcmp (ext, "wav") && strcmp (ext, "md2") &&
-		strcmp (ext, "sp2") && strcmp (ext, "tga") && strcmp (ext, "png") && strcmp (ext, "jpg") &&
-		strcmp (ext, "bsp") && strcmp (ext, "ent") && strcmp (ext, "txt") && strcmp (ext, "dm2") &&
-		strcmp (ext, "loc"))
+	if (!pak && strcmp (ext, "pcx") != 0 && strcmp (ext, "wal") != 0 && strcmp (ext, "wav") != 0 && strcmp (ext, "md2") != 0 &&
+		strcmp (ext, "sp2") != 0 && strcmp (ext, "tga") != 0 && strcmp (ext, "png") != 0 && strcmp (ext, "jpg") != 0 &&
+		strcmp (ext, "bsp") != 0 && strcmp (ext, "ent") != 0 && strcmp (ext, "txt") != 0 && strcmp (ext, "dm2") != 0 &&
+		strcmp (ext, "loc") != 0)
 	{
 //		Com_Printf ("WARNING: Illegal file type '%s' in filelist.\n", MakePrintable(path, length));
 		return;

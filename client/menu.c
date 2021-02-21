@@ -4507,7 +4507,7 @@ static qboolean IsValidSkin (char **filelist, int numFiles, int index)
 
 	if ( !strcmp (filelist[index]+max(len-4,0), ".pcx") )
 	{
-		if ( strcmp (filelist[index]+max(len-6,0), "_i.pcx") )
+		if ( strcmp (filelist[index]+max(len-6,0), "_i.pcx") != 0 )
 		{
 			if ( IconOfSkinExists (filelist[index], filelist, numFiles-1) )
 			{
