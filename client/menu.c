@@ -2298,8 +2298,6 @@ void M_Credits_MenuDraw( void )
 
 		if ( y <= -8 )
 			continue;
-		if (y > viddef.height)
-			continue;
 
 		if ( credits[i][0] == '+' )
 		{
