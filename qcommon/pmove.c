@@ -720,12 +720,7 @@ void PM_CatagorizePosition (void)
 				pm->groundentity = trace.ent;
 			}
 		}
-		else if (!trace.ent)
-		{ 
 // end Jitspoe's fix
-			pm->groundentity = NULL;
-			pm->s.pm_flags &= ~PMF_ON_GROUND;
-		}
 		else
 		{
 			pm->groundentity = trace.ent;
