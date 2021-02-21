@@ -540,7 +540,7 @@ void Cvar_List_f (void)
 				Com_Printf("Listing matches for '%s'...\n", Cmd_Argv(1));
 			while( !strstr(var->name, Cmd_Argv(1)) && var->next)
 			{
-					var = var->next;
+				var = var->next;
 			}
 
 			if(!var->next)

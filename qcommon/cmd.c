@@ -920,8 +920,7 @@ void Cmd_List_f (void)
 				Com_Printf("Listing matches for '%s'...\n", Cmd_Argv(1));
 			while( !strstr(cmd->name, Cmd_Argv(1)) && cmd->next)
 			{
-				if(cmd->next)
-					cmd = cmd->next;
+				cmd = cmd->next;
 			}
 			if(!cmd->next)
 			{
