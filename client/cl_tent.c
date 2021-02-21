@@ -1113,10 +1113,7 @@ void CL_ParseTEnt (void)
 		if (frand() < 0.5)
 			ex->baseframe = 15;
 		ex->frames = 15;
-		if (type == TE_ROCKET_EXPLOSION_WATER)
-			S_StartSound (pos, 0, 0, cl_sfx_watrexp, 1, ATTN_NORM, 0);
-		else
-			S_StartSound (pos, 0, 0, cl_sfx_rockexp, 1, ATTN_NORM, 0);
+		S_StartSound (pos, 0, 0, cl_sfx_rockexp, 1, ATTN_NORM, 0);
 		break;
 
 	case TE_FLASHLIGHT:
