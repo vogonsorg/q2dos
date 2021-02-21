@@ -578,6 +578,7 @@ void Con_DrawConsole (float frac)
 	char			version[64];
 	char			dlbar[1024];
 	int				verlen;
+	int				dlbarlen;
 
 	lines = viddef.height * frac;
 	if (lines <= 0)
@@ -723,15 +724,16 @@ void Con_DrawConsole (float frac)
 		dlbar[i++] = '\x82';
 		dlbar[i] = 0;
 
-//		sprintf(dlbar + strlen(dlbar), " %02d%%", cls.downloadpercent);
+		dlbarlen = strlen(dlbar);
+
 		if (cls.downloadrate > 0.0f)
-			Com_sprintf(dlbar + strlen(dlbar), sizeof(dlbar)-strlen(dlbar), " %2d%% (%4.2fKB/s)", cls.downloadpercent, cls.downloadrate);
+			Com_sprintf(dlbar + dlbarlen, sizeof(dlbar)-dlbarlen, " %2d%% (%4.2fKB/s)", cls.downloadpercent, cls.downloadrate);
 		else
-			Com_sprintf(dlbar + strlen(dlbar), sizeof(dlbar)-strlen(dlbar), " %2d%%", cls.downloadpercent);
+			Com_sprintf(dlbar + dlbarlen, sizeof(dlbar)-dlbarlen, " %2d%%", cls.downloadpercent);
 
 		// draw it
 		y = con.vislines-12;
-		for (i = 0; i < strlen(dlbar); i++)
+		for (i = 0; i < dlbarlen; i++)
 			re.DrawChar ( (i+1)<<3, y, dlbar[i]);
 	}
 //ZOID
