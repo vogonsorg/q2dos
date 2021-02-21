@@ -181,16 +181,6 @@ qboolean Field_Key( menufield_s *f, int key )
 		break;
 	}
 
-	if ( key > 127 )
-	{
-		switch ( key )
-		{
-		case K_DEL:
-		default:
-			return false;
-		}
-	}
-
 	/*
 	** support pasting from the clipboard
 	*/
@@ -210,6 +200,16 @@ qboolean Field_Key( menufield_s *f, int key )
 			free( cbd );
 		}
 		return true;
+	}
+
+	if (key > 127)
+	{
+		switch (key)
+		{
+			case K_DEL:
+			default:
+				return false;
+		}
 	}
 
 	switch ( key )
