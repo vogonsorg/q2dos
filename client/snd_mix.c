@@ -306,7 +306,7 @@ void S_PaintChannels(int endtime)
 				if (!sc)
 					break;
 
-				if (count > 0 && ch->sfx)
+				if (count > 0)
 				{	
 					if (sc->width == 1)// FIXME; 8 bit asm is wrong now
 						S_PaintChannelFrom8(ch, sc, count,  ltime - paintedtime);
