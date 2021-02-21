@@ -563,6 +563,7 @@ qboolean CL_PendingHTTPDownloads (void)
 
 	return pendingCount + handleCount;
 
+#if 0 /* FS: TODO? Unreachable code. */
 	q = &cls.downloadQueue;
 
 	while (q->next)
@@ -573,6 +574,7 @@ qboolean CL_PendingHTTPDownloads (void)
 	}
 
 	return false;
+#endif
 }
 
 /*
