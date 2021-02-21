@@ -120,7 +120,7 @@ void S_Init (void)
 	Com_Printf("\n------- sound initialization -------\n");
 
 	cv = Cvar_Get ("s_initsound", "1", 0);
-	if (!cv->value)
+	if (!cv->intValue)
 	{
 		dma.buffer = NULL;/* just in case */
 		Com_Printf ("not initializing.\n");
@@ -602,7 +602,7 @@ void S_IssuePlaysound (playsound_t *ps)
 	channel_t	*ch;
 	sfxcache_t	*sc;
 
-	if (s_show->value)
+	if (s_show->intValue)
 		Com_Printf ("Issue %i\n", ps->begin);
 	// pick a channel to play on
 	ch = S_PickChannel(ps->entnum, ps->entchannel);
@@ -895,7 +895,7 @@ void S_AddLoopSounds (void)
 	vec3_t		origin_v;	// Knightmare added
 	entity_state_t	*ent;
 
-	if (cl_paused->value)
+	if (cl_paused->intValue)
 		return;
 
 	if (cls.state != ca_active)
@@ -1143,7 +1143,7 @@ void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 	//
 	// debugging output
 	//
-	if (s_show->value)
+	if (s_show->intValue)
 	{
 		total = 0;
 		ch = channels;

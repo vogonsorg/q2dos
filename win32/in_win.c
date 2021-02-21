@@ -224,7 +224,7 @@ void IN_StartupMouse (void)
 	cvar_t		*cv;
 
 	cv = Cvar_Get ("in_initmouse", "1", CVAR_NOSET);
-	if ( !cv->value )
+	if ( !cv->intValue)
 		return;
 
 	mouseinitialized = true;
@@ -495,7 +495,7 @@ void IN_StartupJoystick (void)
 
 	// abort startup if user requests no joystick
 	cv = Cvar_Get ("in_initjoy", "1", CVAR_NOSET);
-	if ( !cv->value )
+	if ( !cv->intValue)
 		return;
 
 	// verify joystick driver is present
