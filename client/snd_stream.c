@@ -431,6 +431,11 @@ static void S_OGG_LoadFileList (void)
 	int		i, numfiles = 0;
 
 	ogg_filelist = malloc(sizeof(char *) * MAX_OGGLIST);
+	if (!ogg_filelist)
+	{
+		Sys_Error("S_OGG_LoadFileList:  Failed to allocate memory\n");
+		return;
+	}
 	memset( ogg_filelist, 0, sizeof( char * ) * MAX_OGGLIST );
 	lastPath[0] = 0;	// Knightmare added
 

@@ -421,6 +421,11 @@ static void S_WAV_LoadFileList (void)
 	int		i, numfiles = 0;
 
 	wav_filelist = malloc(sizeof(char *) * MAX_WAVLIST);
+	if (!wav_filelist)
+	{
+		Sys_Error("S_WAV_LoadFileList:  Failed to allocate memory.\n");
+		return;
+	}
 	memset( wav_filelist, 0, sizeof( char * ) * MAX_WAVLIST );
 	lastPath[0] = 0;	// Knightmare added
 

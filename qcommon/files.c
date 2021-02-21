@@ -1046,6 +1046,11 @@ char **FS_ListFiles( char *findname, int *numfiles, unsigned musthave, unsigned 
 	*numfiles = nfiles;
 
 	list = malloc( sizeof( char * ) * nfiles );
+	if (!list)
+	{
+		Sys_Error("FS_ListFiles:  Failed to allocate memory.\n");
+		return NULL;
+	}
 	memset(list, 0, sizeof(char *) * nfiles);
 
 	s = Sys_FindFirst(findname, musthave, canthave);
@@ -1201,6 +1206,11 @@ void FS_InitFilesystem (void)
 		str = fs_basedir->string + (sz - 1);
 		if (*str == '/' || *str == '\\') {
 			str = strdup(fs_basedir->string);
+			if (!str)
+			{
+				Sys_Error("FS_InitFilesystem:  Failed to allocate memory.\n");
+				return;
+			}
 			str[sz-1] = '\0';
 			Cvar_ForceSet ("basedir", str);
 			free(str);
@@ -1272,6 +1282,11 @@ char **FS_ListPak (char *find, int *num)
 	}
 
 	list = malloc( sizeof( char * ) * nfiles );
+	if (!list)
+	{
+		Sys_Error("FS_ListPak:  Failed to allocate memory.\n");
+		return NULL;
+	}
 	memset( list, 0, sizeof( char * ) * nfiles );
 
 	for (search = fs_searchpaths; search; search = search->next)

@@ -556,7 +556,7 @@ it left.
 */
 qboolean CL_PendingHTTPDownloads (void)
 {
-	dlqueue_t	*q;
+	//dlqueue_t	*q;
 
 	if (!cls.downloadServer[0])
 		return false;
@@ -895,7 +895,16 @@ static void CL_FinishHTTPDownload (void)
 		}
 
 		if (i == MAX_HTTP_HANDLES)
+		{
 			Com_Error (ERR_DROP, "CL_FinishHTTPDownload: Handle not found");
+			return;
+		}
+
+		if (!dl)
+		{
+			Com_Error(ERR_DROP, "CL_FinishHTTPDownload: Handle is NULL.\n");
+			return;
+		}
 
 		// we mark everything as done even if it errored to prevent multiple
 		// attempts.

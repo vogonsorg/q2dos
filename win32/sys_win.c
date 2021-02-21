@@ -392,6 +392,12 @@ char *Sys_GetClipboardData (void)
 			if ( (cliptext = GlobalLock(hClipboardData)) != 0) 
 			{
 				data = malloc(GlobalSize(hClipboardData) + 1);
+				if (!data)
+				{
+					Sys_Error("Sys_GetClipboardData:  Failed to allocate memory.\n");
+					return NULL;
+				}
+
 				strcpy(data, cliptext);
 				GlobalUnlock(hClipboardData);
 			}

@@ -3578,6 +3578,11 @@ void StartServer_MenuInit( void )
 		fseek(fp, 0, SEEK_SET);
 #endif
 		buffer = malloc( length );
+		if (!buffer)
+		{
+			Com_Error(ERR_FATAL, "StartServer_MenuInit:  Failed to allocate memory.\n");
+			return;
+		}
 		fread( buffer, length, 1, fp );
 	}
 
@@ -3586,15 +3591,23 @@ void StartServer_MenuInit( void )
 	i = 0;
 	while ( i < length )
 	{
-		if ( s[i] == '\r' )
+		if ( s && s[i] == '\r' )
 			nummaps++;
 		i++;
 	}
 
-	if ( nummaps == 0 )
-		Com_Error( ERR_DROP, "no maps in maps.lst\n" );
+	if (nummaps == 0)
+	{
+		Com_Error(ERR_DROP, "no maps in maps.lst\n");
+		return;
+	}
 
 	mapnames = malloc( sizeof( char * ) * ( nummaps + 1 ) );
+	if (!mapnames)
+	{
+		Com_Error(ERR_FATAL, "StartServer_MenuInit:  Failed to allocate memory.\n");
+		return;
+	}
 	memset( mapnames, 0, sizeof( char * ) * ( nummaps + 1 ) );
 
 	s = buffer;
@@ -3611,6 +3624,11 @@ void StartServer_MenuInit( void )
 		Com_sprintf( scratch, sizeof( scratch ), "%s\n%s", longname, shortname );
 
 		mapnames[i] = malloc( strlen( scratch ) + 1 );
+		if (!mapnames[i])
+		{
+			Com_Error(ERR_FATAL, "StartServer_MenuInit:  Failed to allocate memory.\n");
+			return;
+		}
 		strcpy( mapnames[i], scratch );
 	}
 	mapnames[nummaps] = 0;
@@ -4631,6 +4649,11 @@ static qboolean PlayerConfig_ScanDirectories( void )
 				continue;
 
 			skinnames = malloc( sizeof( char * ) * ( nskins + 1 ) );
+			if (!skinnames)
+			{
+				Com_Error(ERR_FATAL, "PlayerConfig_ScanDirectories:  Failed to allocate memory.\n");
+				return false;
+			}
 			memset( skinnames, 0, sizeof( char * ) * ( nskins + 1 ) );
 
 			// copy the valid skins
