@@ -731,6 +731,8 @@ void Con_DrawConsole (float frac)
 		else
 			Com_sprintf(dlbar + dlbarlen, sizeof(dlbar)-dlbarlen, " %2d%%", cls.downloadpercent);
 
+		dlbarlen = strlen(dlbar);
+
 		// draw it
 		y = con.vislines-12;
 		for (i = 0; i < dlbarlen; i++)
@@ -773,6 +775,7 @@ void Con_DrawConsole (float frac)
 		dlbarlen = strlen(dlbar);
 
 		Com_sprintf(dlbar + dlbarlen, sizeof(dlbar)-dlbarlen, " %02d%%", cls.gamespypercent);
+		dlbarlen = strlen(dlbar);
 
 		// draw it
 		y = con.vislines-12;
