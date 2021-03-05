@@ -676,7 +676,14 @@ Scroll it up or down
 */
 void SCR_RunConsole (void)
 {
-// decide on the height of the console
+	/* src_conspeed must be a positive integer,
+	   otherwise things go wrong. Clamp it. */
+	if (scr_conspeed->value < 0.1f)
+	{
+		Cvar_Set("scr_conspeed", "0.1");
+	}
+
+	// decide on the height of the console
 	if (cls.key_dest == key_console)
 		scr_conlines = 0.5;		// half screen
 	else
