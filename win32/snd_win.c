@@ -654,7 +654,6 @@ qboolean SNDDMA_Init(void)
 	{
 		if (snd_firsttime || snd_iswave)
 		{
-
 			snd_iswave = SNDDMA_InitWav ();
 
 			if (snd_iswave)
@@ -669,15 +668,17 @@ qboolean SNDDMA_Init(void)
 		}
 	}
 
-	snd_firsttime = false;
-
 	snd_buffer_count = 1;
 
 	if (!dsound_init && !wav_init)
 	{
+		if (snd_firsttime)
+			Com_Printf ("*** No sound device initialized ***\n");
+		snd_firsttime = false;
 		return 0;
 	}
 
+	snd_firsttime = false;
 	return 1;
 }
 
