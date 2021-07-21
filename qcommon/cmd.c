@@ -883,6 +883,26 @@ void	Cmd_ExecuteString (char *text)
 	}
 }
 
+static int cmpr_cmds (const void *a, const void *b)
+{
+	cmd_function_t *aa = *(cmd_function_t **)a;
+	cmd_function_t *bb = *(cmd_function_t **)b;
+
+	return strcmp(aa->name, bb->name);
+}
+
+static int GetCmdCount (void)
+{
+	int i = 0;
+	cmd_function_t* cmd;
+
+	for (cmd = cmd_functions; cmd; cmd = cmd->next)
+	{
+		i++;
+	}
+
+	return i;
+}
 /*
 ============
 Cmd_List_f
@@ -890,36 +910,72 @@ Cmd_List_f
 */
 void Cmd_List_f (void)
 {
+	cmd_function_t	**sorted_cmds = NULL; /* FS: Sort by name. */
+	cmd_function_t	*head = &cmd_functions[0];
 	cmd_function_t	*cmd;
-	qboolean endReached = false; /* FS: For the filter */
-	qboolean endIsAMatch = false; /* FS: For the filter */
-	int				i;
+	const char *search_filter = NULL;
+	int		i = 0, j = 0, q = 0, args = 0, search_filter_len = 0, cmd_count = 0;
 
-	i = 0;
-	for (cmd=cmd_functions ; cmd ; cmd=cmd->next, i++)
+	args = Cmd_Argc();
+	if (args > 1) /* FS */
 	{
-		if(Cmd_Argc() > 1)
+		search_filter = Cmd_Argv(1);
+		if (search_filter)
 		{
-			if (i == 0)
-				Com_Printf("Listing matches for '%s'...\n", Cmd_Argv(1));
-			while( !strstr(cmd->name, Cmd_Argv(1)) && cmd->next)
+			Com_Printf("Listing matches for '%s'...\n", search_filter);
+
+			if (args > 2)
 			{
-				cmd = cmd->next;
-			}
-			if(!cmd->next)
-			{
-				if(strstr(cmd->name, Cmd_Argv(1))) /* FS: The last one in the search actually matches, so don't break out */
-					endIsAMatch = true;
-				endReached = true;
+				search_filter_len = strlen(search_filter);
 			}
 		}
-		if(endReached && !endIsAMatch) /* FS: We're at the end, and it's not a match to the filter so bust out. */
+	}
+
+	cmd_count = GetCmdCount();
+
+	sorted_cmds = (cmd_function_t **)malloc(sizeof(cmd_function_t*)*cmd_count);
+	if (!sorted_cmds)
+	{
+		Com_Error(ERR_FATAL, "Cmd_List_f: Failed to allocate memory.");
+		return;
+	}
+
+	for (q = 0; q < cmd_count; q++)
+	{
+		sorted_cmds[q] = cmd_functions;
+		cmd_functions = cmd_functions->next;
+	}
+
+	qsort(sorted_cmds, cmd_count, sizeof(cvar_t*), &cmpr_cmds);
+
+	for (i = 0; i < cmd_count; i++)
+	{
+		cmd = sorted_cmds[i];
+		if (!cmd)
 		{
 			break;
 		}
-		Com_Printf ("     %s\n", cmd->name); /* FS: Make it look consistent with cvarlist */
+
+		if ((args > 1) && (search_filter)) /* FS */
+		{
+			if (!strstr(cmd->name, search_filter))
+				continue;
+
+			if ((args > 2) && (strncmp(cmd->name, search_filter, search_filter_len)))
+				continue;
+
+			j++;
+		}
+
+		Com_Printf("     %s\n", cmd->name); /* FS: Make it look consistent with cvarlist */
 	}
-	Com_Printf ("%i commands\n", i);
+
+	Com_Printf("%d commands\n", search_filter ? j: i);
+
+	free(sorted_cmds);
+	sorted_cmds = NULL;
+
+	cmd_functions = (cmd_function_t *)head;
 }
 
 /*

@@ -516,6 +516,27 @@ void Cvar_WriteVariables (char *path)
 	fclose (f);
 }
 
+static int cmpr_cvars (const void *a, const void *b)
+{
+	cvar_t *aa = *(cvar_t **)a;
+	cvar_t *bb = *(cvar_t **)b;
+
+	return strcmp(aa->name, bb->name);
+}
+
+static int GetCVARCount (void)
+{
+	int i = 0;
+	cvar_t* cvar;
+
+	for (cvar = cvar_vars; cvar; cvar = cvar->next)
+	{
+		i++;
+	}
+
+	return i;
+}
+
 /*
 ============
 Cvar_List_f
@@ -524,71 +545,100 @@ Cvar_List_f
 */
 void Cvar_List_f (void)
 {
+	cvar_t **sorted_cvars = NULL; /* FS: Sort by name. */
+	cvar_t	*head = &cvar_vars[0];
 	cvar_t	*var;
-	qboolean endReached = false; /* FS: For the filter */
-	qboolean endIsAMatch = false; /* FS: For the filter */
-	int		i;
+	const char *search_filter = NULL;
+	int		i = 0, j = 0, q = 0, args = 0, search_filter_len = 0, cvar_count = 0;
 
-	i = 0;
+	args = Cmd_Argc();
 
-	for (var = cvar_vars ; var ; var = var->next, i++)
+	if (args > 1) /* FS */
 	{
-		/* FS: Filter it */
-		if(Cmd_Argc() > 1)
+		search_filter = Cmd_Argv(1);
+		if (search_filter != NULL)
 		{
-			if (i == 0)
-				Com_Printf("Listing matches for '%s'...\n", Cmd_Argv(1));
-			while( !strstr(var->name, Cmd_Argv(1)) && var->next)
-			{
-				var = var->next;
-			}
+			Com_Printf("Listing matches for '%s'...\n", search_filter);
 
-			if(!var->next)
+			if (args > 2)
 			{
-				if(strstr(var->name, Cmd_Argv(1))) /* FS: The last one in the search actually matches, so don't break out */
-				{
-					endIsAMatch = true;
-				}
-
-				endReached = true;
+				search_filter_len = strlen(search_filter);
 			}
 		}
+	}
 
-		if(endReached && !endIsAMatch) /* FS: We're at the end, and it's not a match to the filter so bust out. */
+	cvar_count = GetCVARCount();
+
+	sorted_cvars = (cvar_t **)malloc(sizeof(cvar_t*)*cvar_count);
+	if (!sorted_cvars)
+	{
+		Com_Error(ERR_FATAL, "Cvar_List_f: Failed to allocate memory.");
+		return;
+	}
+
+	for (q = 0; q < cvar_count; q++)
+	{
+		sorted_cvars[q] = cvar_vars;
+		cvar_vars = cvar_vars->next;
+	}
+
+	qsort(sorted_cvars, cvar_count, sizeof(cvar_t*), &cmpr_cvars);
+
+	for (i = 0; i < cvar_count; i++)
+	{
+		var = sorted_cvars[i];
+		if (!var)
 		{
 			break;
 		}
 
+		if (search_filter) /* FS */
+		{
+			if (!strstr(var->name, search_filter))
+				continue;
+
+			if ((args > 2) && (strncmp(var->name, search_filter, search_filter_len)))
+				continue;
+
+			j++;
+		}
+
 		if (var->flags & CVAR_ARCHIVE)
-			Com_Printf ("*");
+			Com_Printf("*");
 		else
-			Com_Printf (" ");
+			Com_Printf(" ");
 		if (var->flags & CVAR_USERINFO)
-			Com_Printf ("U");
+			Com_Printf("U");
 		else
-			Com_Printf (" ");
+			Com_Printf(" ");
 		if (var->flags & CVAR_SERVERINFO)
-			Com_Printf ("S");
+			Com_Printf("S");
 		else
-			Com_Printf (" ");
+			Com_Printf(" ");
 		if (var->flags & CVAR_NOSET)
-			Com_Printf ("-");
+			Com_Printf("-");
 		else if (var->flags & CVAR_LATCH)
-			Com_Printf ("L");
+			Com_Printf("L");
 		else
-			Com_Printf (" ");
+			Com_Printf(" ");
 		if (var->description)
-			Com_Printf ("D");
+			Com_Printf("D");
 		else
-			Com_Printf (" ");
+			Com_Printf(" ");
 
 		if ( (var->flags & CVAR_LATCH) && var->latched_string)
-			Com_Printf ("\"%s\" is \"%s\", Default: \"%s\", Latched to: \"%s\"\n", var->name, var->string, var->defaultValue, var->latched_string);
+			Com_Printf("\"%s\" is \"%s\", Default: \"%s\", Latched to: \"%s\"\n", var->name, var->string, var->defaultValue, var->latched_string);
 		else
-			Com_Printf (" %s \"%s\", Default: \"%s\"\n", var->name, var->string, var->defaultValue);
+			Com_Printf(" %s \"%s\", Default: \"%s\"\n", var->name, var->string, var->defaultValue);
 	}
+
 	Com_Printf("Legend: * Archive. U Userinfo. S Serverinfo. - Write Protected. L Latched. D Containts a Help Description.\n"); /* FS: Added a legend */
-	Com_Printf ("%i cvars\n", i);
+	Com_Printf("%d cvars\n", search_filter ? j : i);
+
+	free(sorted_cvars);
+	sorted_cvars = NULL;
+
+	cvar_vars = (cvar_t *)head;
 }
 
 
