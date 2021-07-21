@@ -148,7 +148,7 @@ void Con_Dump_f (void)
 	int		l, x;
 	char	*line;
 	FILE	*f;
-	char	buffer[1024];
+	char	*buffer;
 	char	name[MAX_OSPATH];
 
 	if (Cmd_Argc() != 2)
@@ -180,7 +180,14 @@ void Con_Dump_f (void)
 	}
 
 	// write the remaining lines
-	buffer[con.linewidth] = 0;
+	buffer = (char *)calloc(1, sizeof(char) * (con.linewidth + 1));
+	if (!buffer)
+	{
+		Com_Error(ERR_FATAL, "Error allocating memory.\n");
+		fclose(f);
+		return;
+	}
+
 	for ( ; l <= con.current ; l++)
 	{
 		line = con.text + (l%con.totallines)*con.linewidth;
@@ -198,6 +205,7 @@ void Con_Dump_f (void)
 		fprintf (f, "%s\n", buffer);
 	}
 
+	free(buffer);
 	fclose (f);
 }
 
