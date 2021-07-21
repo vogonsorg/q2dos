@@ -1178,26 +1178,40 @@ R_SetMode
 qboolean R_SetMode (void)
 {
 	rserr_t err;
-	qboolean fullscreen;
+	rdisptype_t fullscreen;
 
 	/* cds check only needed with WIN32 to deal with a broken driver */
 	#ifdef _WIN32
 	if ( vid_fullscreen->modified && !gl_config.allow_cds )
 	{
 		ri.Con_Printf( PRINT_ALL, "R_SetMode() - CDS not allowed with this driver\n" );
-		ri.Cvar_SetValue( "vid_fullscreen", !vid_fullscreen->value );
+		ri.Cvar_SetValue("vid_fullscreen", (float)!vid_fullscreen->intValue);
 		vid_fullscreen->modified = false;
 	}
 	#endif
-	fullscreen = vid_fullscreen->value;
+
+	switch (vid_fullscreen->intValue)
+	{
+		case 1:
+			fullscreen = dt_fullscreen;
+			break;
+		case 0:
+			fullscreen = dt_windowed;
+			break;
+		case 2:
+		default:
+			fullscreen = dt_borderless;
+			break;
+	}
+
 	r_skydistance->modified = true; /* Knightmare- skybox size variable */
 
 	vid_fullscreen->modified = false;
 	gl_mode->modified = false;
 
-	if ( ( err = GLimp_SetMode( &vid.width, &vid.height, gl_mode->value, fullscreen ) ) == rserr_ok )
+	if ( ( err = GLimp_SetMode( &vid.width, &vid.height, gl_mode->intValue, fullscreen ) ) == rserr_ok )
 	{
-		gl_state.prev_mode = gl_mode->value;
+		gl_state.prev_mode = gl_mode->intValue;
 	}
 	else
 	{
@@ -1206,7 +1220,7 @@ qboolean R_SetMode (void)
 			ri.Cvar_SetValue( "vid_fullscreen", 0);
 			vid_fullscreen->modified = false;
 			ri.Con_Printf( PRINT_ALL, "ref_gl::R_SetMode() - fullscreen unavailable in this mode\n" );
-			if ( ( err = GLimp_SetMode( &vid.width, &vid.height, gl_mode->value, false ) ) == rserr_ok )
+			if ( ( err = GLimp_SetMode( &vid.width, &vid.height, gl_mode->intValue, dt_windowed ) ) == rserr_ok )
 				return true;
 		}
 		else if ( err == rserr_invalid_mode )
@@ -1217,7 +1231,7 @@ qboolean R_SetMode (void)
 		}
 
 		// try setting it back to something safe
-		if ( ( err = GLimp_SetMode( &vid.width, &vid.height, gl_state.prev_mode, false ) ) != rserr_ok )
+		if ( ( err = GLimp_SetMode( &vid.width, &vid.height, gl_state.prev_mode, dt_windowed ) ) != rserr_ok )
 		{
 			ri.Con_Printf( PRINT_ALL, "ref_gl::R_SetMode() - could not revert to safe mode\n" );
 			return false;

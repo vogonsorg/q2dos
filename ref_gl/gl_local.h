@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -74,7 +74,7 @@ extern	viddef_t	vid;
 
 */
 
-typedef enum 
+typedef enum
 {
 	it_skin,
 	it_sprite,
@@ -119,6 +119,13 @@ typedef enum
 
 	rserr_unknown
 } rserr_t;
+
+typedef enum /* FS: Borderless windows. */
+{
+	dt_windowed = 0,
+	dt_fullscreen = 1,
+	dt_borderless = 2
+} rdisptype_t;
 
 #include "gl_model.h"
 
@@ -515,7 +522,7 @@ void		GLimp_BeginFrame( float camera_separation );
 void		GLimp_EndFrame( void );
 qboolean	GLimp_Init( void *hinstance, void *hWnd );
 void		GLimp_Shutdown( void );
-rserr_t 	GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen );
+rserr_t 	GLimp_SetMode( int *pwidth, int *pheight, int mode, rdisptype_t fullscreen );
 void		GLimp_AppActivate( qboolean active );
 void		GLimp_EnableLogging( qboolean enable );
 void		GLimp_LogNewFrame( void );

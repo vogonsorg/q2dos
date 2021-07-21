@@ -134,7 +134,7 @@ static const int NUM_GL_RESOLUTIONS = (int) (sizeof(resolutions) / sizeof(resolu
 /*
 ** GLimp_SetMode
 */
-rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
+rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, rdisptype_t fullscreen )
 {
 	int width, height, bpp;
 	int stencil = 0;

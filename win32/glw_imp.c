@@ -213,7 +213,7 @@ void UpdateGammaRamp (void)
 
 	if (!gl_state.gammaRamp)
 		return;
-	g = vid_gamma->value/* + 0.3f*/; /* FS: Just use the direct gamma value, this is fucking up hardware gamma and non-hardware gamma being unbalanced. */
+	g = vid_gamma->value/* + 0.3f*/; /* FS: Just use the direct gamma value, this is goofing up hardware gamma and non-hardware gamma being unbalanced. */
 	memcpy (gamma_ramp, original_ramp, sizeof(original_ramp));
 	for (i = 0; i < 3; i++)
 	{
@@ -263,7 +263,7 @@ static qboolean VerifyDriver( void )
 {
 	char buffer[1024];
 
-	strcpy( buffer, (const char *) qglGetString( GL_RENDERER ) );
+	strncpy(buffer, (const char*)qglGetString(GL_RENDERER), sizeof(buffer) - 1);
 	strlwr( buffer );
 	if ( strcmp( buffer, "gdi generic" ) == 0 )
 		if ( !glw_state.mcd_accelerated )
@@ -276,14 +276,16 @@ static qboolean VerifyDriver( void )
 */
 #define	WINDOW_CLASS_NAME	"Quake 2"
 
-qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
+qboolean VID_CreateWindow (int width, int height, rdisptype_t fullscreen)
 {
 	WNDCLASS		wc;
 	RECT			r;
 	cvar_t			*vid_xpos, *vid_ypos;
-	int				stylebits;
+	unsigned long	stylebits;
 	int				x, y, w, h;
-	int				exstyle;
+	unsigned long	exstyle;
+	HDC hDC;
+	int nHorzRes, nVertRes, nBPP;
 
 	/* Register the frame class */
     wc.style         = 0;
@@ -293,27 +295,28 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
     wc.hInstance     = glw_state.hInstance;
     wc.hIcon         = 0;
     wc.hCursor       = LoadCursor (NULL,IDC_ARROW);
-	wc.hbrBackground = (void *)COLOR_GRAYTEXT;
+	wc.hbrBackground = (HBRUSH)COLOR_GRAYTEXT;
     wc.lpszMenuName  = 0;
     wc.lpszClassName = WINDOW_CLASS_NAME;
 
     if (!RegisterClass (&wc) )
 		ri.Sys_Error (ERR_FATAL, "Couldn't register window class");
 
-	if (fullscreen)
+	switch (fullscreen)
 	{
+		case dt_fullscreen:
 		exstyle = WS_EX_TOPMOST;
 		stylebits = WS_POPUP|WS_VISIBLE;
-	}
-	else if (vid_fullscreen->intValue > 1) /* FS: Borderless windows */
-	{
+			break;
+		case dt_borderless: /* FS: Borderless windows */
 		exstyle = 0;
 		stylebits = WS_POPUP|WS_VISIBLE;
-	}
-	else
-	{
+			break;
+		default:
+		case dt_windowed:
 		exstyle = 0;
 		stylebits = WINDOW_STYLE;
+			break;
 	}
 
 	r.left = 0;
@@ -326,34 +329,36 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 	w = r.right - r.left;
 	h = r.bottom - r.top;
 
-	if (fullscreen)
+	switch (fullscreen)
 	{
+		case dt_fullscreen:
 		x = 0;
 		y = 0;
-	}
-	else if(vid_fullscreen->intValue >= 2) /* FS: Borderless windows */
-	{
-		HDC hDC = GetDC( NULL );
-		int nHorzRes = GetDeviceCaps( hDC, HORZRES );
-		int nVertRes = GetDeviceCaps( hDC, VERTRES );
-		ReleaseDC( 0, hDC );
+			break;
+		case dt_borderless:
+			hDC = GetDC(NULL);
+			nHorzRes = GetDeviceCaps(hDC, HORZRES);
+			nVertRes = GetDeviceCaps(hDC, VERTRES);
+			nBPP = GetDeviceCaps(hDC, BITSPIXEL);
+			ReleaseDC( 0, hDC );
 
-		if (nHorzRes <= vid.width || nVertRes <= vid.height)
-		{
-			x = y = 0;
-		}
-		else
-		{
-			x = ( nHorzRes - vid.width ) / 2;
-			y = ( nVertRes - vid.height ) / 2;
-		}
-	}
-	else
-	{
-		vid_xpos = ri.Cvar_Get ("vid_xpos", "0", 0);
-		vid_ypos = ri.Cvar_Get ("vid_ypos", "0", 0);
-		x = vid_xpos->value;
-		y = vid_ypos->value;
+			if (nHorzRes <= vid.width || nVertRes <= vid.height)
+			{
+				x = y = 0;
+			}
+			else
+			{
+				x = ( nHorzRes - vid.width ) / 2;
+				y = ( nVertRes - vid.height ) / 2;
+			}
+			break;
+		case dt_windowed:
+		default:
+			vid_xpos = ri.Cvar_Get ("vid_xpos", "0", 0);
+			vid_ypos = ri.Cvar_Get ("vid_ypos", "0", 0);
+			x = vid_xpos->value;
+			y = vid_ypos->value;
+			break;
 	}
 
 	glw_state.hWnd = CreateWindowEx (
@@ -368,8 +373,11 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 		 NULL);
 
 	if (!glw_state.hWnd)
+	{
 		ri.Sys_Error (ERR_FATAL, "Couldn't create window");
-	
+		return false;
+	}
+
 	ShowWindow( glw_state.hWnd, SW_SHOW );
 	UpdateWindow( glw_state.hWnd );
 
@@ -422,7 +430,7 @@ static void VID_SoftRestart (void)
 	unsigned long stylebits;
 	int x, y;
 
-	if (qwglMakeCurrent && !qwglMakeCurrent(NULL, NULL))
+	if (!qwglMakeCurrent || !qwglMakeCurrent(NULL, NULL))
 		ri.Con_Printf( PRINT_ALL, "ref_gl::R_Shutdown() - wglMakeCurrent failed\n");
 
 	if (glw_state.hGLRC)
@@ -469,6 +477,7 @@ static void VID_SoftRestart (void)
 		HDC hDC = GetDC( NULL );
 		int nHorzRes = GetDeviceCaps( hDC, HORZRES );
 		int nVertRes = GetDeviceCaps( hDC, VERTRES );
+		int nBPP = GetDeviceCaps(hDC, BITSPIXEL);
 		ReleaseDC( 0, hDC );
 
 		if (nHorzRes <= vid.width || nVertRes <= vid.height)
@@ -501,7 +510,10 @@ static void VID_SoftRestart (void)
 		 NULL);
 
 	if (!glw_state.hWnd)
+	{
 		ri.Sys_Error (ERR_FATAL, "Couldn't create window");
+		return;
+	}
 
 	ShowWindow( glw_state.hWnd, SW_SHOW );
 	UpdateWindow( glw_state.hWnd );
@@ -509,6 +521,7 @@ static void VID_SoftRestart (void)
 	if ((glw_state.hDC = GetDC(glw_state.hWnd)) == NULL)
 	{
 		ri.Sys_Error( ERR_FATAL, "RImp_Init() - GetDC failed\n" );
+		return;
 	}
 
 	SetPixelFormat(glw_state.hDC, glPixelFormatMSAA, &pfd);
@@ -516,11 +529,13 @@ static void VID_SoftRestart (void)
 	if ((glw_state.hGLRC = qwglCreateContext(glw_state.hDC)) == 0)
 	{
 		ri.Sys_Error (ERR_FATAL, "RImp_Init() - qwglCreateContext failed\n");
+		return;
 	}
 
 	if (!qwglMakeCurrent(glw_state.hDC, glw_state.hGLRC))
 	{
 		ri.Sys_Error (ERR_FATAL, "RImp_Init() - qwglMakeCurrent failed\n");
+		return;
 	}
 
 	SetForegroundWindow( glw_state.hWnd );
@@ -533,7 +548,7 @@ static void VID_SoftRestart (void)
 /*
 ** GLimp_SetMode
 */
-rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
+rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, rdisptype_t fullscreen )
 {
 	int width, height;
 	const char *win_fs[] = { "W", "FS", "BL" };
@@ -557,7 +572,7 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 	}
 
 	// do a CDS if needed
-	if ( fullscreen && vid_fullscreen->intValue == 1) /* FS: Borderless windows */
+	if (fullscreen == dt_fullscreen) /* FS: Borderless windows */
 	{
 		DEVMODE dm;
 
@@ -579,7 +594,7 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 			ri.Con_Printf( PRINT_ALL, "...using r_displayrefresh of %d\n", r_displayrefresh->intValue);
 		}
 
-		if (gl_bitdepth->intValue)
+		if (gl_bitdepth->intValue != 0)
 		{
 			dm.dmBitsPerPel = gl_bitdepth->intValue;
 			dm.dmFields |= DM_BITSPERPEL;
@@ -605,7 +620,7 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 
 			ri.Con_Printf( PRINT_ALL, "ok\n" );
 
-			if ( !VID_CreateWindow (width, height, true) )
+			if (!VID_CreateWindow (width, height, dt_fullscreen))
 				return rserr_invalid_mode;
 
 			return rserr_ok;
@@ -623,7 +638,7 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 			dm.dmPelsHeight = height;
 			dm.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
 
-			if (gl_bitdepth->intValue)
+			if (gl_bitdepth->intValue != 0)
 			{
 				dm.dmBitsPerPel = gl_bitdepth->intValue;
 				dm.dmFields |= DM_BITSPERPEL;
@@ -644,14 +659,14 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 				*pwidth = width;
 				*pheight = height;
 				gl_state.fullscreen = false;
-				if ( !VID_CreateWindow (width, height, false) )
+				if (!VID_CreateWindow (width, height, dt_windowed))
 					return rserr_invalid_mode;
 				return rserr_invalid_fullscreen;
 			}
 			else
 			{
 				ri.Con_Printf( PRINT_ALL, " ok\n" );
-				if ( !VID_CreateWindow (width, height, true) )
+				if (!VID_CreateWindow (width, height, dt_fullscreen))
 					return rserr_invalid_mode;
 
 				gl_state.fullscreen = true;
@@ -668,7 +683,7 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 		*pwidth = width;
 		*pheight = height;
 		gl_state.fullscreen = false;
-		if ( !VID_CreateWindow (width, height, false) )
+		if (!VID_CreateWindow (width, height, fullscreen))
 			return rserr_invalid_mode;
 	}
 
@@ -778,6 +793,20 @@ qboolean GLimp_Init( void *hinstance, void *wndproc )
 	return true;
 }
 
+static rdisptype_t GLimp_GetWindowMode (int mode)
+{
+	switch (mode)
+	{
+		case 0:
+			return dt_windowed;
+		case 1:
+			return dt_fullscreen;
+		case 2:
+		default:
+			return dt_borderless;
+	}
+}
+
 qboolean GLimp_InitGL (void)
 {
     PIXELFORMATDESCRIPTOR pfd =
@@ -814,7 +843,7 @@ qboolean GLimp_InitGL (void)
 	/*
 	** set PFD_STEREO if necessary
 	*/
-	if (stereo->intValue)
+	if (stereo->intValue != 0)
 	{
 		ri.Con_Printf( PRINT_ALL, "...attempting to use stereo\n" );
 		pfd.dwFlags |= PFD_STEREO;
@@ -940,7 +969,7 @@ qboolean GLimp_InitGL (void)
 			if (s_win95 || !gl_multisample_softrestart->intValue)
 			{
 				/* FS: wglChoosePixelFormatARB will be unavailable until the context is created which is stupid but true: https://www.khronos.org/opengl/wiki/Multisampling */
-				GLimp_SetMode((int*)&vid.width, (int*)&vid.height, gl_mode->value, vid_fullscreen->intValue ? true : false);
+				GLimp_SetMode((int*)&vid.width, (int*)&vid.height, gl_mode->value, GLimp_GetWindowMode(vid_fullscreen->intValue));
 				qglEnable(glMultisample);
 				return true;
 			}
@@ -1073,7 +1102,7 @@ void GLimp_AppActivate( qboolean active )
 	else
 	{
 		HWGamma_Toggle (false);	// Knightmare
-		if ( vid_fullscreen->intValue )
+		if (vid_fullscreen->intValue == 1) /* FS: Borderless windows */
 			ShowWindow( glw_state.hWnd, SW_MINIMIZE );
 	}
 }
