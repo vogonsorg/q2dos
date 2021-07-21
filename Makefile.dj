@@ -180,6 +180,7 @@ endif
 endif
 
 QCOMMON = qcommon/cmd.o \
+	qcommon/cmd_auto.o \
 	qcommon/cmodel.o \
 	qcommon/common.o \
 	qcommon/crc.o \

@@ -102,6 +102,9 @@
     <ClCompile Include="..\null\vid_null.c">
       <Filter>Source Files\NULL</Filter>
     </ClCompile>
+    <ClCompile Include="..\qcommon\cmd_auto.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\client\adivtab.h">

@@ -20,19 +20,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // cmd.c -- Quake script command processing module
 
 #include "qcommon.h"
+#include "cmd.h"
 
 #ifndef DEDICATED_ONLY
 void Cmd_ForwardToServer (void);
 #endif
-
-#define	MAX_ALIAS_NAME	32
-
-typedef struct cmdalias_s
-{
-	struct cmdalias_s	*next;
-	char	name[MAX_ALIAS_NAME];
-	char	*value;
-} cmdalias_t;
 
 cmdalias_t	*cmd_alias;
 
@@ -503,20 +495,12 @@ void Cmd_Alias_f (void)
 =============================================================================
 */
 
-typedef struct cmd_function_s
-{
-	struct cmd_function_s	*next;
-	char					*name;
-	xcommand_t				function;
-} cmd_function_t;
-
-
 static	int			cmd_argc;
 static	char		*cmd_argv[MAX_STRING_TOKENS];
 static	char		*cmd_null_string = "";
 static	char		cmd_args[MAX_STRING_CHARS];
 
-static	cmd_function_t	*cmd_functions;		// possible commands to execute
+cmd_function_t	*cmd_functions;		// possible commands to execute
 
 /*
 ============
@@ -982,138 +966,6 @@ void Cmd_Shutdown(void)
 		Z_Free(cmd);
 		cmd = NULL;
 	}
-}
-
-#define RETRY_INITIAL	0
-#define RETRY_ONCE		1
-#define RETRY_MULTIPLE	2
-
-/* FS: Merged from Cmd_CompleteCommand and Cvar_CompleteVariable */
-/* FS: Inspired from KMQ2 with 100% in house code. */
-char *Sort_Possible_Cmds (char *partial)
-{
-	cmd_function_t	*cmd;
-	cvar_t			*cvar;
-	int				len;
-	cmdalias_t		*a;
-	int	foundExactCount = 0;
-	int foundPartialCount = 0;
-	int retryPartialFlag = RETRY_INITIAL;
-
-	len = strlen(partial);
-
-	if (!len)
-		return NULL;
-
-// check for exact match
-	foundExactCount = 0;
-	for (cmd=cmd_functions ; cmd ; cmd=cmd->next)
-	{
-		if (!strcmp (partial,cmd->name))
-		{
-			foundExactCount++;
-			return cmd->name;
-		}
-	}
-	for (a=cmd_alias ; a ; a=a->next)
-	{
-		if (!strcmp (partial, a->name))
-		{
-			foundExactCount++;
-			return a->name;
-		}
-	}
-
-// check exact match
-	for (cvar=cvar_vars ; cvar ; cvar=cvar->next)
-	{
-		if (!strcmp (partial,cvar->name))
-		{
-			foundExactCount++;
-			return cvar->name;
-		}
-	}
-
-// check for partial match
-retryPartial:
-	foundPartialCount = 0;
-	for (cmd=cmd_functions ; cmd ; cmd=cmd->next)
-	{
-		if (Sort_Possible_Strtolower(partial, cmd->name))
-		{
-			foundPartialCount++;
-
-			if(retryPartialFlag == RETRY_MULTIPLE)
-				Com_Printf("  %s [C]\n", cmd->name);
-			else if (retryPartialFlag == RETRY_ONCE)
-				return cmd->name;
-		}
-	}
-	for (a=cmd_alias ; a ; a=a->next)
-	{
-		if (Sort_Possible_Strtolower(partial, a->name))
-		{
-			foundPartialCount++;
-
-			if(retryPartialFlag == RETRY_MULTIPLE)
-				Com_Printf("  %s [A]\n", a->name);
-			else if (retryPartialFlag == RETRY_ONCE)
-				return a->name;
-		}
-	}
-	for (cvar=cvar_vars ; cvar ; cvar=cvar->next)
-	{
-		if (Sort_Possible_Strtolower(partial, cvar->name))
-		{
-			foundPartialCount++;
-
-			if(retryPartialFlag == RETRY_MULTIPLE)
-				Com_Printf("  %s [V]\n", cvar->name);
-			else if (retryPartialFlag == RETRY_ONCE)
-				return cvar->name;
-		}
-	}
-
-	if(foundPartialCount == 1)
-	{
-		retryPartialFlag = RETRY_ONCE;
-		goto retryPartial;
-	}
-	else if (foundPartialCount == 0)
-	{
-		return NULL;
-	}
-	else if (retryPartialFlag == RETRY_INITIAL)
-	{
-		retryPartialFlag = RETRY_MULTIPLE;
-		Com_Printf("Listing matches for '%s'...\n", partial);
-		goto retryPartial;
-	}
-	else if (foundExactCount+foundPartialCount > 0)
-		Com_Printf("Found %i matches.\n", foundExactCount+foundPartialCount);
-
-	return NULL;
-}
-
-/* FS: This is needed because cmds, aliases, and cvars are case sensitive. */
-qboolean	Sort_Possible_Strtolower (char *partial, char *complete)
-{
-	int partialLength = 0;
-	int x = 0;
-
-	partialLength = strlen(partial);
-
-	while(x < partialLength)
-	{
-		if(Q_tolower(partial[x]) != Q_tolower(complete[x]))
-		{
-			return false;
-		}
-
-		x++;
-	}
-
-	return true;
 }
 
 void Cmd_Flushlog_f (void) /* FS: clear the logfile */

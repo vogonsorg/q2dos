@@ -437,6 +437,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\qcommon\cmd_auto.c"
+				>
+			</File>
+			<File
 				RelativePath="..\QCOMMON\cmodel.c"
 				>
 				<FileConfiguration
@@ -1464,4 +1468,6 @@
 			</File>
 		</Filter>
 	</Files>
+	<Globals>
+	</Globals>
 </VisualStudioProject>

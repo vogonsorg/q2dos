@@ -250,6 +250,7 @@
     <ClCompile Include="..\null\snddma_null.c" />
     <ClCompile Include="..\null\vid_null.c" />
     <ClCompile Include="..\QCOMMON\cmd.c" />
+    <ClCompile Include="..\qcommon\cmd_auto.c" />
     <ClCompile Include="..\QCOMMON\cmodel.c" />
     <ClCompile Include="..\QCOMMON\common.c" />
     <ClCompile Include="..\QCOMMON\crc.c" />
