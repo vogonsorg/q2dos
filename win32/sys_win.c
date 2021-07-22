@@ -627,7 +627,7 @@ static void Sys_SetHighDPIMode(void)
 	}
 }
 
-void Detect_WinNT() /* FS: Detect if we're using Windows XP for alt+tab appcompat */
+void Detect_WinNT (void) /* FS: Detect if we're using Windows XP for alt+tab appcompat */
 {
 	DWORD WinVersion;
 	DWORD WinLowByte, WinHiByte;

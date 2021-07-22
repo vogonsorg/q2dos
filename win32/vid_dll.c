@@ -464,6 +464,13 @@ LRESULT WINAPI MainWndProc (
     return DefWindowProc( hWnd, uMsg, wParam, lParam );
 }
 
+void VID_Minimize_f (void) /* FS: By request. */
+{
+#ifndef DEDICATED_ONLY
+	ShowWindow(cl_hwnd, SW_MINIMIZE);
+#endif
+}
+
 /*
 ============
 VID_Restart_f
@@ -750,6 +757,8 @@ void VID_Init (void)
 	Cmd_AddCommand ("vid_restart", VID_Restart_f);
 	Cmd_AddCommand ("vid_front", VID_Front_f);
 
+	Cmd_AddCommand ("minimize", VID_Minimize_f); /* FS: By request. */
+
 	/*
 	** this is a gross hack but necessary to clamp the mode for 3Dfx
 	*/
@@ -789,5 +798,3 @@ void VID_Shutdown (void)
 		VID_FreeReflib ();
 	}
 }
-
-
