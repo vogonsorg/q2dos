@@ -1373,13 +1373,15 @@ InitClientPersistant(gclient_t *client)
 	client->pers.max_prox = 50;
 	client->pers.max_tesla = 50;
 	client->pers.max_flechettes = 200;
+	/* Knightmare- this was uninitialized! */
+	client->pers.max_rounds = 100;
 
 	/* FS: Coop: Xatrix specific */
 	client->pers.max_magslug = 50;
 	client->pers.max_trap = 5;
 
 	/* FS: Coop: Zaero specific */
-	client->pers.max_tbombs		    = 30;
+	client->pers.max_tbombs		  = 30;
 	client->pers.max_flares       = 30;
 	client->pers.max_a2k          = 1;
 	client->pers.max_empnuke      = 50;
@@ -1411,6 +1413,23 @@ InitClientCoopPersistant(edict_t *ent) /* FS: Coop: Give back some goodies on re
 	client->pers.max_grenades = 50;
 	client->pers.max_cells = 200;
 	client->pers.max_slugs = 50;
+
+	/* Knightmare: Coop: Rogue specific */
+	client->pers.max_prox = 50;
+	client->pers.max_tesla = 50;
+	client->pers.max_flechettes = 200;
+	client->pers.max_rounds = 100;
+
+	/* Knightmare: Coop: Xatrix specific */
+	client->pers.max_magslug = 50;
+	client->pers.max_trap = 5;
+
+	/* Knightmare: Coop: Zaero specific */
+	client->pers.max_tbombs		  = 30;
+	client->pers.max_flares       = 30;
+	client->pers.max_a2k          = 1;
+	client->pers.max_empnuke      = 50;
+	client->pers.max_plasmashield = 20;
 
 	if ((game.gametype == zaero_coop)) /* FS: Always have at least 3 flares in Zaero coop */
 	{

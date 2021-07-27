@@ -402,6 +402,10 @@ Pickup_Bandolier(edict_t *ent /* may be null */, edict_t *other)
 		{
 			other->client->pers.max_flechettes = 250;
 		}
+		if (other->client->pers.max_rounds < 150) /* Knightmare: Coop: Rogue specific */
+		{
+			other->client->pers.max_rounds = 150;
+		}
 	}
 
 	if (game.gametype == xatrix_coop)
@@ -409,6 +413,14 @@ Pickup_Bandolier(edict_t *ent /* may be null */, edict_t *other)
 		if (other->client->pers.max_magslug < 75) /* FS: Coop: Xatrix specific */
 		{
 			other->client->pers.max_magslug = 75;
+		}
+	}
+
+	if (game.gametype == zaero_coop)
+	{
+		if (other->client->pers.max_flares < 45) /* Knightmare: Zaero specific */
+		{
+			other->client->pers.max_flares = 45;
 		}
 	}
 
@@ -449,7 +461,9 @@ Pickup_Bandolier(edict_t *ent /* may be null */, edict_t *other)
 
 	if (coop->intValue) /* FS: Coop: Keep bandolier during respawn */
 	{
-		other->client->pers.ammoUpgrade = other->client->resp.coop_respawn.ammoUpgrade = COOP_BANDOLIER;
+		/* Knightmare- Make sure client isn't already set to respawn with a pack before setting this value! */
+		if (other->client->pers.ammoUpgrade != COOP_BACKPACK)
+			other->client->pers.ammoUpgrade = other->client->resp.coop_respawn.ammoUpgrade = COOP_BANDOLIER;
 	}
 
 	return true;
@@ -498,9 +512,21 @@ Pickup_Pack(edict_t *ent /* may be null */, edict_t *other)
 
 	if (game.gametype == rogue_coop)
 	{
-		if (other->client->pers.max_flechettes < 200) /* FS: Coop: Rogue specific */
+		if (other->client->pers.max_flechettes < 300) /* FS: Coop: Rogue specific */
 		{
-			other->client->pers.max_flechettes = 200;
+			other->client->pers.max_flechettes = 300; /* Knightmare- this was 200 instead of 300! */
+		}
+		if (other->client->pers.max_rounds < 200) /* Knightmare: Coop: Rogue specific */
+		{
+			other->client->pers.max_rounds = 200;
+		}
+		if (other->client->pers.max_prox < 100) /* Knightmare: Coop: Rogue specific */
+		{
+			other->client->pers.max_prox = 100;
+		}
+		if (other->client->pers.max_tesla < 100) /* Knightmare: Coop: Rogue specific */
+		{
+			other->client->pers.max_tesla = 100;
 		}
 	}
 
@@ -519,6 +545,11 @@ Pickup_Pack(edict_t *ent /* may be null */, edict_t *other)
 			other->client->pers.max_tbombs = 100;
 		}
 
+		if (other->client->pers.max_flares < 60) /* Knightmare: Zaero specific game dll changes */
+		{
+			other->client->pers.max_flares = 60;
+		}
+
 		if (other->client->pers.max_a2k < 1) /* FS: Zaero specific game dll changes */
 		{
 			other->client->pers.max_a2k = 1;
@@ -531,7 +562,7 @@ Pickup_Pack(edict_t *ent /* may be null */, edict_t *other)
 
 		if (other->client->pers.max_plasmashield < 40) /* FS: Zaero specific game dll changes */
 		{
-			other->client->pers.max_plasmashield =40;
+			other->client->pers.max_plasmashield = 40;
 		}
 	}
 
