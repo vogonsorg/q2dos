@@ -1294,14 +1294,37 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		}
 		else if ((targ->svflags & SVF_MONSTER) || (client))
 		{
-			if ((game.gametype == rogue_coop) && (mod == MOD_CHAINFIST)) /* FS: Coop: Rogue specific */
+			/* Knightmare- enumerated blood types */
+			if (targ->blood_type == 1)
+			{
+				SpawnDamage (TE_GREENBLOOD, point, normal);
+			}
+			else if (targ->blood_type == 2)
+			{
+				SpawnDamage (TE_SPARKS, point, normal);
+				SpawnDamage (TE_SPARKS, point, normal);
+			}
+			else if (targ->blood_type == 3)
+			{
+				SpawnDamage (TE_SPARKS, point, normal);
+				SpawnDamage (TE_SPARKS, point, normal);
+				SpawnDamage (TE_BLOOD, point, normal);
+			}			
+			else if (targ->blood_type == 4)
+			{
+				SpawnDamage (TE_ELECTRIC_SPARKS, point, normal);
+			}
+			/* end Knightmare */
+			else if ((game.gametype == rogue_coop) && (mod == MOD_CHAINFIST)) /* FS: Coop: Rogue specific */
 			{
 				SpawnDamage(TE_MOREBLOOD, point, normal);
 			}
-			else if ((game.gametype == xatrix_coop) && (targ->classname) && (strcmp(targ->classname, "monster_gekk") == 0)) /* FS: Coop: Xatrix specific */
+			/*	Knightmare- this is now redundant due to using blood_type field */
+			/* FS: Coop: Xatrix specific */
+		/*	else if ((game.gametype == xatrix_coop) && (targ->classname) && (strcmp(targ->classname, "monster_gekk") == 0))
 			{
 				SpawnDamage(TE_GREENBLOOD, point, normal);
-			}
+			} */
 			else
 			{
 				SpawnDamage(TE_BLOOD, point, normal);

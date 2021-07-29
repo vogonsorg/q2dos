@@ -933,7 +933,7 @@ flyer_pain(edict_t *self, edict_t *other /* unused */,
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
 	}
 
 	if (level.time < self->pain_debounce_time)
@@ -1096,6 +1096,8 @@ SP_monster_flyer(edict_t *self)
 		self->monsterinfo.blocked = (void *)flyer_blocked;
 	}
 
+	self->blood_type = 3;	// Knightmare- use sparks and blood type
+
 	gi.linkentity(self);
 
 	self->monsterinfo.currentmove = &flyer_move_stand;
@@ -1154,6 +1156,8 @@ SP_monster_kamikaze(edict_t *self) /* FS: Coop: Rogue specific */
 	self->monsterinfo.idle = flyer_idle;
 
 	self->monsterinfo.blocked = (void *)flyer_blocked;
+
+	self->blood_type = 3;	// Knightmare- use sparks and blood type
 
 	gi.linkentity(self);
 

@@ -1784,6 +1784,7 @@ void zboss_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage
 
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
+	self->s.skinnum = 2;	// Knightmare- make sure pain skin is set if we got one-shotted
 
 	// todo
 	if (random() < 0.5)
@@ -1892,6 +1893,8 @@ void SP_monster_zboss (edict_t *self)
 	self->monsterinfo.melee = zboss_melee;
 	self->monsterinfo.sight = zboss_sight;
 	self->monsterinfo.idle = possibleBossTaunt;
+
+	self->blood_type = 2; // Knightmare- use sparks blood type
 
 	gi.linkentity (self);
 

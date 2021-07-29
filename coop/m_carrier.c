@@ -1274,7 +1274,8 @@ carrier_pain(edict_t *self, edict_t *other /* unused */, float kick /* unused */
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
+		self->blood_type = 3;	// Knightmare- sparks and blood
 	}
 
 	if (skill->intValue == 3)
@@ -1347,6 +1348,9 @@ carrier_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /*
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_NO;
 	self->count = 0;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
+	self->blood_type = 3;	// Knightmare- sparks and blood
+
 	self->monsterinfo.currentmove = &carrier_move_death;
 }
 
@@ -1567,6 +1571,9 @@ SP_monster_carrier(edict_t *self)
 	self->monsterinfo.attack = carrier_attack;
 	self->monsterinfo.sight = carrier_sight;
 	self->monsterinfo.checkattack = Carrier_CheckAttack;
+
+	self->blood_type = 2; // Knightmare- use sparks blood type
+
 	gi.linkentity(self);
 
 	self->monsterinfo.currentmove = &carrier_move_stand;

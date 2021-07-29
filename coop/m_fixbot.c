@@ -1638,6 +1638,8 @@ SP_monster_fixbot(edict_t *self)
 	self->monsterinfo.run = fixbot_run;
 	self->monsterinfo.attack = fixbot_attack;
 
+	self->blood_type = 2; // Knightmare- use sparks blood type
+
 	gi.linkentity(self);
 
 	self->monsterinfo.currentmove = &fixbot_move_stand;

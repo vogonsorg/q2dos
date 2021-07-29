@@ -557,7 +557,8 @@ supertank_pain(edict_t *self, edict_t *other /* unused */, float kick, int damag
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
+		self->blood_type = 3;	// Knightmare- sparks and blood
 	}
 
 	if (level.time < self->pain_debounce_time)
@@ -827,6 +828,9 @@ supertank_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker 
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_NO;
 	self->count = 0;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
+	self->blood_type = 3;	// Knightmare- sparks and blood
+
 	self->monsterinfo.currentmove = &supertank_move_death;
 }
 
@@ -902,6 +906,8 @@ SP_monster_supertank(edict_t *self)
 	{
 		self->monsterinfo.blocked = supertank_blocked;
 	}
+
+	self->blood_type = 2; // Knightmare- use sparks blood type
 
 	gi.linkentity(self);
 

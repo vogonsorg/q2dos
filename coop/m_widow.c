@@ -1315,7 +1315,7 @@ widow_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
 	}
 
 	if (skill->intValue == 3)
@@ -1389,6 +1389,8 @@ widow_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* u
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_NO;
 	self->count = 0;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
+
 	self->monsterinfo.quad_framenum = 0;
 	self->monsterinfo.double_framenum = 0;
 	self->monsterinfo.invincible_framenum = 0;
@@ -1906,6 +1908,8 @@ SP_monster_widow(edict_t *self)
 	self->monsterinfo.sight = widow_sight;
 
 	self->monsterinfo.blocked = widow_blocked;
+
+	self->blood_type = 3;	// Knightmare- use sparks and blood type
 
 	gi.linkentity(self);
 

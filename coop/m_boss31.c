@@ -534,7 +534,8 @@ jorg_pain(edict_t *self, edict_t *other /* unused */,
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
+		self->blood_type = 3;	// Knightmare- sparks and blood
 	}
 
 	self->s.sound = 0;
@@ -745,6 +746,9 @@ jorg_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* un
 	self->takedamage = DAMAGE_NO;
 	self->s.sound = 0;
 	self->count = 0;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
+	self->blood_type = 3;	// Knightmare- sparks and blood
+
 	self->monsterinfo.currentmove = &jorg_move_death;
 }
 
@@ -898,8 +902,9 @@ SP_monster_jorg(edict_t *self)
 
 	self->movetype = MOVETYPE_STEP;
 	self->solid = SOLID_BBOX;
-	self->s.modelindex = gi.modelindex("models/monsters/boss3/rider/tris.md2");
-	self->s.modelindex2 = gi.modelindex("models/monsters/boss3/jorg/tris.md2");
+	/* Knightmare- these modelindexes were reversed, causing the pain skin to show on the rider instead of jorg! */
+	self->s.modelindex = gi.modelindex("models/monsters/boss3/jorg/tris.md2");
+	self->s.modelindex2 = gi.modelindex("models/monsters/boss3/rider/tris.md2");
 	VectorSet(self->mins, -80, -80, 0);
 	VectorSet(self->maxs, 80, 80, 140);
 
@@ -918,6 +923,9 @@ SP_monster_jorg(edict_t *self)
 	self->monsterinfo.melee = NULL;
 	self->monsterinfo.sight = NULL;
 	self->monsterinfo.checkattack = Jorg_CheckAttack;
+
+	self->blood_type = 2; // Knightmare- use sparks blood type
+
 	gi.linkentity(self);
 
 	self->monsterinfo.currentmove = &jorg_move_stand;

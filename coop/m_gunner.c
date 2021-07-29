@@ -400,14 +400,16 @@ gunner_pain(edict_t *self, edict_t *other /* unused */,
 
 	if (self->health < (self->max_health / 2))
 	{
-		if (game.gametype == vanilla_coop) /* FS: Coop: Vanilla specific */
+		self->s.skinnum |= 1; /* Knightmare- ORing with 1 does the same as both of the below */
+		/* FS: Coop: Vanilla specific */
+	/*	if (game.gametype == vanilla_coop) 
 		{
 			self->s.skinnum |= 1;
 		}
 		else
 		{
 			self->s.skinnum = 1;
-		}
+		} */
 	}
 
 	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
@@ -554,6 +556,7 @@ gunner_die(edict_t *self, edict_t *inflictor /* unused */,
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
 	self->monsterinfo.currentmove = &gunner_move_death;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
 }
 
 void
@@ -1491,6 +1494,8 @@ SP_monster_gunner(edict_t *self)
 	{
 		self->monsterinfo.blocked = gunner_blocked;
 	}
+
+	self->blood_type = 3;	// Knightmare- use sparks and blood type
 
 	gi.linkentity(self);
 

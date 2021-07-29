@@ -1047,6 +1047,7 @@ void sentien_pain (edict_t *self, edict_t *other, float kick, int damage)
 	if((self->health < (self->max_health / 2)))
 	{
 		self->s.skinnum |= 1;
+		self->blood_type = 3;	// Knightmare- sparks and blood
 	}
 
 	// less than this we don't flinch
@@ -1265,7 +1266,8 @@ void sentien_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int dama
 
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
-	self->s.skinnum |= 1;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
+	self->blood_type = 3;	// Knightmare- sparks and blood
 
 	if (random() < 0.80)
 	{
@@ -1358,6 +1360,8 @@ void SP_monster_sentien(edict_t *self)
 	self->monsterinfo.idle = NULL;
 
 	self->monsterinfo.reducedDamageAmount = 0.85;
+
+	self->blood_type = 2; // Knightmare- use sparks blood type
 
 	self->laser = NULL;
 	gi.linkentity(self);

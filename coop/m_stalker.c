@@ -1434,6 +1434,7 @@ stalker_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /*
 	}
 
 	/* regular death */
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
 	gi.sound(self, CHAN_VOICE, sound_die, 1, ATTN_NORM, 0);
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
@@ -1491,6 +1492,8 @@ SP_monster_stalker(edict_t *self)
 	self->monsterinfo.dodge = stalker_dodge;
 	self->monsterinfo.blocked = stalker_blocked;
 	self->monsterinfo.melee = stalker_attack_melee;
+
+	self->blood_type = 3;	// Knightmare- use sparks and blood type
 
 	gi.linkentity(self);
 

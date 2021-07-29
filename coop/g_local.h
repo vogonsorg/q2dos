@@ -1782,6 +1782,9 @@ struct edict_s
 
 	float bossFireTimeout;
 	int bossFireCount;
+
+	// Knightmare- this sets blood type on damage for monsters
+	int			blood_type;
 };
 
 //zaero debug includes (need type info)

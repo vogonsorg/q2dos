@@ -820,14 +820,16 @@ medic_pain(edict_t *self, edict_t *other /* unused */,
 
 	if ((self->health < (self->max_health / 2)))
 	{
-		if ((game.gametype == rogue_coop) && (self->mass > 400)) /* FS: Coop: Rogue specific */
+		self->s.skinnum |= 1;	/* Knightmare- ORing with 1 is sufficient to set either of these skinnum values */
+		/* FS: Coop: Rogue specific */
+	/*	if ((game.gametype == rogue_coop) && (self->mass > 400)) 
 		{
 			self->s.skinnum = 3;
 		}
 		else
 		{
 			self->s.skinnum = 1;
-		}
+		} */
 	}
 
 	if (level.time < self->pain_debounce_time)
@@ -1079,6 +1081,7 @@ medic_die(edict_t *self, edict_t *inflictor /* unused */,
 		gi.sound(self, CHAN_VOICE, commander_sound_die, 1, ATTN_NORM, 0);
 	}
 
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
 
@@ -2429,6 +2432,8 @@ SP_monster_medic_rogue(edict_t *self)
 	self->monsterinfo.checkattack = medic_checkattack;
 	self->monsterinfo.blocked = medic_blocked;
 
+	self->blood_type = 3;	// Knightmare- use sparks and blood type
+
 	gi.linkentity(self);
 
 	self->monsterinfo.currentmove = &medic_move_stand;
@@ -2547,6 +2552,8 @@ SP_monster_medic(edict_t *self)
 	self->monsterinfo.idle = medic_idle;
 	self->monsterinfo.search = medic_search;
 	self->monsterinfo.checkattack = medic_checkattack;
+
+	self->blood_type = 3;	// Knightmare- use sparks and blood type
 
 	gi.linkentity(self);
 

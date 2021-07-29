@@ -296,7 +296,7 @@ infantry_pain(edict_t *self, edict_t *other /* unused */,
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
 	}
 
 	if (game.gametype == rogue_coop) /* FS: Coop: Rogue specific */
@@ -584,6 +584,7 @@ infantry_die(edict_t *self, edict_t *inflictor /* unused */,
 	/* regular death */
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
 
 	n = rand() % 3;
 

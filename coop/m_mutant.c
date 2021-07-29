@@ -665,7 +665,7 @@ mutant_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
 	}
 
 	if (level.time < self->pain_debounce_time)
@@ -793,7 +793,7 @@ mutant_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* 
 	gi.sound(self, CHAN_VOICE, sound_death, 1, ATTN_NORM, 0);
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
-	self->s.skinnum = 1;
+	self->s.skinnum |= 1;
 
 	if (random() < 0.5)
 	{

@@ -2005,6 +2005,8 @@ SP_monster_gekk(edict_t *self)
 	self->monsterinfo.idle = gekk_idle;
 	self->monsterinfo.checkattack = gekk_checkattack;
 
+	self->blood_type = 1; // Knightmare- use green blood type
+
 	gi.linkentity(self);
 
 	self->monsterinfo.currentmove = &gekk_move_stand;

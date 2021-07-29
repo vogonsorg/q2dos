@@ -686,7 +686,8 @@ floater_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
+		self->blood_type = 3;	// Knightmare- sparks and blood
 	}
 
 	if (level.time < self->pain_debounce_time)
@@ -793,6 +794,8 @@ SP_monster_floater(edict_t *self)
 	self->monsterinfo.melee = floater_melee;
 	self->monsterinfo.sight = floater_sight;
 	self->monsterinfo.idle = floater_idle;
+
+	self->blood_type = 2; // Knightmare- use sparks blood type
 
 	gi.linkentity(self);
 

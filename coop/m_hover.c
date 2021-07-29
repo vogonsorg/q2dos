@@ -968,6 +968,7 @@ hover_die(edict_t *self, edict_t *inflictor /* unused */,
 		}
 	}
 
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
 	self->monsterinfo.currentmove = &hover_move_death1;
@@ -1145,6 +1146,8 @@ SP_monster_hover(edict_t *self)
 
 		gi.modelindex("models/proj/laser2/tris.md2"); /* FS: Coop: Need to precache this */
 	}
+
+	self->blood_type = 3;	// Knightmare- use sparks and blood type
 
 	gi.linkentity(self);
 

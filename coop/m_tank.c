@@ -351,6 +351,7 @@ tank_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 	if (self->health < (self->max_health / 2))
 	{
 		self->s.skinnum |= 1;
+		self->blood_type = 3;	// Knightmare- sparks and blood
 	}
 
 	if (damage <= 10)
@@ -1021,6 +1022,8 @@ tank_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* un
 	gi.sound(self, CHAN_VOICE, sound_die, 1, ATTN_NORM, 0);
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
+	self->blood_type = 3;	// Knightmare- sparks and blood
 
 	self->monsterinfo.currentmove = &tank_move_death;
 }
@@ -1093,6 +1096,8 @@ SP_monster_tank(edict_t *self)
 	self->monsterinfo.melee = NULL;
 	self->monsterinfo.sight = tank_sight;
 	self->monsterinfo.idle = tank_idle;
+
+	self->blood_type = 2; // Knightmare- use sparks blood type
 
 	gi.linkentity(self);
 

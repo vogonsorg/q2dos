@@ -1145,7 +1145,8 @@ widow2_pain(edict_t *self, edict_t *other /* unused */, float kick, int damage)
 
 	if (self->health < (self->max_health / 2))
 	{
-		self->s.skinnum = 1;
+		self->s.skinnum |= 1;
+		self->blood_type = 3;	// Knightmare- sparks and blood
 	}
 
 	if (skill->intValue == 3)
@@ -1236,6 +1237,7 @@ widow2_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* 
 		return;
 	}
 
+
 	/* check for gib */
 	if (self->health <= self->gib_health)
 	{
@@ -1282,10 +1284,14 @@ widow2_die(edict_t *self, edict_t *inflictor /* unused */, edict_t *attacker /* 
 		return;
 	}
 
+	/* regular death */
 	gi.sound(self, CHAN_VOICE, sound_death, 1, ATTN_NONE, 0);
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_NO;
 	self->count = 0;
+	self->s.skinnum |= 1;	// Knightmare- make sure pain skin is set if we got one-shotted
+	self->blood_type = 3;	// Knightmare- sparks and blood
+
 	KillChildren(self);
 	self->monsterinfo.quad_framenum = 0;
 	self->monsterinfo.double_framenum = 0;
@@ -1519,6 +1525,9 @@ SP_monster_widow2(edict_t *self)
 	self->monsterinfo.attack = widow2_attack;
 	self->monsterinfo.search = widow2_search;
 	self->monsterinfo.checkattack = Widow2_CheckAttack;
+
+	self->blood_type = 2; // Knightmare- use sparks blood type
+
 	gi.linkentity(self);
 
 	self->monsterinfo.currentmove = &widow2_move_stand;

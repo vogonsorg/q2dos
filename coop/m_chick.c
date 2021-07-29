@@ -354,6 +354,7 @@ chick_pain(edict_t *self, edict_t *other /* other */, float kick /* other */, in
 		if ((game.gametype == xatrix_coop) && (self->classname) && (!strcmp(self->classname, "monster_chick_heat"))) /* FS: Coop: Xatrix specific */
 		{
 			self->s.skinnum = 2;
+			self->blood_type = 0;	// Knightmare- use ordinary blood
 		}
 		else
 		{
@@ -533,6 +534,17 @@ chick_die(edict_t *self, edict_t *inflictor /* unused */,
 	/* regular death */
 	self->deadflag = DEAD_DEAD;
 	self->takedamage = DAMAGE_YES;
+
+	// Knightmare- make sure pain skin is set if we got one-shotted
+	if ((game.gametype == xatrix_coop) && (self->classname) && (!strcmp(self->classname, "monster_chick_heat"))) /* FS: Coop: Xatrix specific */
+	{
+		self->s.skinnum = 2;
+		self->blood_type = 0;	// Knightmare- use ordinary blood
+	}
+	else
+	{
+		self->s.skinnum = 1;
+	}
 
 	n = rand() % 2;
 
@@ -1352,4 +1364,5 @@ SP_monster_chick_heat(edict_t *self) /* FS: Coop: Xatrix specific */
 
 	SP_monster_chick(self);
 	self->s.skinnum = 3;
+	self->blood_type = 3;	// Knightmare- use sparks and blood type
 }
