@@ -2247,15 +2247,12 @@ SP_monster_soldier_light(edict_t *self)
 		return;
 	}
 
-	SP_monster_soldier_x(self);
-
 	sound_pain_light = gi.soundindex("soldier/solpain2.wav");
 	sound_death_light = gi.soundindex("soldier/soldeth2.wav");
 	gi.modelindex("models/objects/laser/tris.md2");
 	gi.soundindex("misc/lasfly.wav");
 	gi.soundindex("soldier/solatck2.wav");
 
-	self->s.skinnum = 0;
 	self->health = 20;
 	self->gib_health = -30;
 
@@ -2263,6 +2260,11 @@ SP_monster_soldier_light(edict_t *self)
 	{
 		self->monsterinfo.blindfire = true;
 	}
+
+	// Knightmare- moved these here to allow pain skins to show at half health
+	SP_monster_soldier_x(self);
+
+	self->s.skinnum = 0;
 }
 
 /*
@@ -2284,15 +2286,17 @@ SP_monster_soldier(edict_t *self)
 		return;
 	}
 
-	SP_monster_soldier_x(self);
-
 	sound_pain = gi.soundindex("soldier/solpain1.wav");
 	sound_death = gi.soundindex("soldier/soldeth1.wav");
 	gi.soundindex("soldier/solatck1.wav");
 
-	self->s.skinnum = 2;
 	self->health = 30;
 	self->gib_health = -30;
+
+	// Knightmare- moved these here to allow pain skins to show at half health
+	SP_monster_soldier_x(self);
+
+	self->s.skinnum = 2;
 }
 
 /*
@@ -2314,15 +2318,17 @@ SP_monster_soldier_ss(edict_t *self)
 		return;
 	}
 
-	SP_monster_soldier_x(self);
-
 	sound_pain_ss = gi.soundindex("soldier/solpain3.wav");
 	sound_death_ss = gi.soundindex("soldier/soldeth3.wav");
 	gi.soundindex("soldier/solatck3.wav");
 
-	self->s.skinnum = 4;
 	self->health = 40;
 	self->gib_health = -30;
+
+	// Knightmare- moved these here to allow pain skins to show at half health
+	SP_monster_soldier_x(self);
+
+	self->s.skinnum = 4;
 }
 
 /* FS: Coop: Xatrix specific.  Everything below this line! */
@@ -3989,8 +3995,6 @@ SP_monster_soldier_ripper(edict_t *self)
 		return;
 	}
 
-	SP_monster_soldier_h(self);
-
 	sound_pain_light = gi.soundindex("soldier/solpain2.wav");
 	sound_death_light = gi.soundindex("soldier/soldeth2.wav");
 
@@ -3998,9 +4002,13 @@ SP_monster_soldier_ripper(edict_t *self)
 	gi.soundindex("misc/lasfly.wav");
 	gi.soundindex("soldier/solatck2.wav");
 
-	self->s.skinnum = 0;
 	self->health = 50;
 	self->gib_health = -30;
+
+	// Knightmare- moved these here to allow pain skins to show at half health
+	SP_monster_soldier_h(self);
+
+	self->s.skinnum = 0;
 }
 
 /*
@@ -4020,16 +4028,18 @@ SP_monster_soldier_hypergun(edict_t *self)
 		return;
 	}
 
-	SP_monster_soldier_h(self);
-
 	gi.modelindex("models/objects/blaser/tris.md2");
 	sound_pain = gi.soundindex("soldier/solpain1.wav");
 	sound_death = gi.soundindex("soldier/soldeth1.wav");
 	gi.soundindex("soldier/solatck1.wav");
 
-	self->s.skinnum = 2;
 	self->health = 60;
 	self->gib_health = -30;
+
+	// Knightmare- moved these here to allow pain skins to show at half health
+	SP_monster_soldier_h(self);
+
+	self->s.skinnum = 2;
 }
 
 /*
@@ -4049,13 +4059,15 @@ SP_monster_soldier_lasergun(edict_t *self)
 		return;
 	}
 
-	SP_monster_soldier_h(self);
-
 	sound_pain_ss = gi.soundindex("soldier/solpain3.wav");
 	sound_death_ss = gi.soundindex("soldier/soldeth3.wav");
 	gi.soundindex("soldier/solatck3.wav");
 
-	self->s.skinnum = 4;
 	self->health = 70;
 	self->gib_health = -30;
+
+	// Knightmare- moved these here to allow pain skins to show at half health
+	SP_monster_soldier_h(self);
+
+	self->s.skinnum = 4;
 }
