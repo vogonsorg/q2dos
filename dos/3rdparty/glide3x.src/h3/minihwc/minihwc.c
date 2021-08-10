@@ -527,6 +527,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 
 #include <3dfx.h>
@@ -1052,7 +1053,11 @@ hwcInit(FxU32 vID, FxU32 dID)
                          (void *) hInfo.boardInfo[i].hMon);
       }
     }
-  
+    if (!hInfo.nBoards) {
+      const char *error = pciGetErrorCode() ? pciGetErrorString() :
+                          "Voodoo Banshee or Voodoo3 not detected\n";
+      strcpy(errorString, error);
+    }
   }
 #endif /* HWC_EXT_INIT */
   if (hInfo.nBoards)

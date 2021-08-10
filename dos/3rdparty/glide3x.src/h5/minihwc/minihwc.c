@@ -1778,6 +1778,11 @@ hwcInit(FxU32 vID, FxU32 dID)
                          (void *) hInfo.boardInfo[i].hMon);
       }
     }
+    if (!hInfo.nBoards) {
+      const char *error = pciGetErrorCode() ? pciGetErrorString() :
+                          "Voodoo Banshee or Voodoo3/4/5 not detected\n";
+      strcpy(errorString, error);
+    }
   }
 #endif /* HWC_EXT_INIT */
 
@@ -7307,6 +7312,7 @@ static void hwcCopyBuffer8888FlippedDithered(hwcBoardInfo *bInfo, FxU16 *source,
       :"a"(src), "d"(dst), "D"(endline), "S"(end), "m"(w), "m"(dither_mask), "g"(val_max), "m"(aaShift), "c"(sse_mmxplus)
       :"%ebx");
 #elif defined(__WATCOMC__)
+      (void) sse_mmxplus; /* FIXME -- UNUSED */
 #else
       __asm
       {
