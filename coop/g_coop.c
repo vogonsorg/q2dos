@@ -1845,7 +1845,7 @@ static void CoopUpdateVotePlayerBanMenu(edict_t *ent)
 			continue;
 		}
 
-		PMenu_UpdateEntry(p->entries + i + PLAYERBANMENU_START, other->client->pers.netname, PMENU_ALIGN_LEFT, CoopVotePlayerKickExec);
+		PMenu_UpdateEntry(p->entries + i + PLAYERBANMENU_START, other->client->pers.netname, PMENU_ALIGN_LEFT, CoopVotePlayerBanExec);
 	}
 }
 
