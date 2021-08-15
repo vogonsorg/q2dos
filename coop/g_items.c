@@ -1824,6 +1824,13 @@ Pickup_PowerArmor(edict_t *ent, edict_t *other)
 
 	quantity = other->client->pers.inventory[ITEM_INDEX(ent->item)];
 
+	/* Knightmare- only allow players to pick up 2 power shields in coop. */
+	/* This prevents dropped item spamming. */
+	if ((coop->intValue) && (quantity >= 2))
+	{
+		return false;
+	}
+
 	other->client->pers.inventory[ITEM_INDEX(ent->item)]++;
 
 	if (deathmatch->intValue || Coop_Respawn() ) /* FS: Coop: Added */
