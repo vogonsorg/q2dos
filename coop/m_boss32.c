@@ -1100,6 +1100,9 @@ MakronSpawn(edict_t *self)
 		return;
 	}
 
+	/* Knightmare- set the right classname */
+	self->classname = "monster_makron";
+
 	SP_monster_makron(self);
 
 	/* jump at player */

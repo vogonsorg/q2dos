@@ -158,7 +158,8 @@ char *GetProperMonsterName (char *monsterName) /* FS: Coop: Get proper name for 
 		return "Hornet";
 	else if(!strcmp("monster_jorg", monsterName))
 		return "Jorg";
-	else if(!strcmp("makron", monsterName))
+	/* Knightmare- use correct monster classname */
+	else if(!strcmp("monster_makron", monsterName))
 		return "Makron";
 	else if(!strcmp("misc_insane", monsterName))
 		return "Prisoner";
