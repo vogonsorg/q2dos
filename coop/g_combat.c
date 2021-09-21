@@ -1397,12 +1397,18 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 
 		if (!(targ->monsterinfo.aiflags & AI_DUCKED) && (take))
 		{
-			targ->pain(targ, attacker, knockback, take);
+			if (targ->pain)
+			{
+				targ->pain(targ, attacker, knockback, take);
+			}
 
 			/* nightmare mode monsters don't go into pain frames often */
 			if (skill->intValue == 3)
 			{
-				targ->pain_debounce_time = level.time + 5;
+				if (targ->pain)
+				{
+					targ->pain_debounce_time = level.time + 5;
+				}
 			}
 		}
 	}
@@ -1410,7 +1416,10 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	{
 		if (!(targ->flags & FL_GODMODE) && (take))
 		{
-			targ->pain(targ, attacker, knockback, take);
+			if (targ->pain)
+			{
+				targ->pain(targ, attacker, knockback, take);
+			}
 		}
 	}
 	else if (take)
