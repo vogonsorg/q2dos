@@ -681,31 +681,34 @@ static void WinParseEarlyParms (void)
 
 	for (i = 1; i < argc; i++)
 	{
-#ifdef DEDICATED_ONLY
-		if (!strnicmp(argv[i], "-cwd", 4))
+		if (argv[i])
 		{
-			if (_chdir(argv[i+1]))
+#ifdef DEDICATED_ONLY
+			if (!strnicmp(argv[i], "-cwd", 4) && argv[i+1])
 			{
-				switch (errno)
+				if (_chdir(argv[i+1]))
 				{
-					case ENOENT:
-						printf( "Unable to locate the directory: %s\n", argv[1] );
-						break;
-					case EINVAL:
-						printf( "Invalid buffer.\n");
-						break;
-					default:
-						printf( "Unknown error.\n");
+					switch (errno)
+					{
+						case ENOENT:
+							printf( "Unable to locate the directory: %s\n", argv[i+1] );
+							break;
+						case EINVAL:
+							printf( "Invalid buffer.\n");
+							break;
+						default:
+							printf( "Unknown error.\n");
+					}
+				}
+				else
+				{
+					char buff[250];
+					_getcwd(buff, sizeof(buff)-1);
+					printf("CWD set to %s\n", buff);
 				}
 			}
-			else
-			{
-				char buff[250];
-				_getcwd(buff, sizeof(buff)-1);
-				printf("CWD set to %s\n", buff);
-			}
-		}
 #endif
+		}
 	}
 }
 
