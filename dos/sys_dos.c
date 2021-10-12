@@ -275,6 +275,8 @@ void Sys_Quit (void)
 	if(!dedicated || !dedicated->value)
 		dos_restoreintr(9); /* FS: Give back the keyboard */
 
+	Cvar_Shutdown(); /* FS: Free our CVAR memory too */
+
 	if (unlockmem)
 	{
 		dos_unlockmem (&start_of_memory,

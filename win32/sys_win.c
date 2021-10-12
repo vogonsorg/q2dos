@@ -95,6 +95,8 @@ void Sys_Quit (void)
 		FreeConsole ();
 #endif
 
+	Cvar_Shutdown(); /* FS: Free our CVAR memory too */
+
 	exit (0);
 }
 

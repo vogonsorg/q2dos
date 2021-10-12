@@ -725,6 +725,7 @@ void Cvar_Shutdown (void)
 			var->name = NULL;
 		}
 
+		Z_Free(var);
 		var = NULL;
 	}
 }
