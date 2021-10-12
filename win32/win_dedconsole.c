@@ -76,6 +76,7 @@ static sysConsole_t	sys_console;
 
 static char dedWindowName[255];
 extern cvar_t *hostname;
+extern cvar_t *win_close_on_error;
 
 /*
 =================
@@ -152,6 +153,12 @@ void Sys_Error (char *error, ...)
 	char	string[1024];
 	va_list	argPtr;
 	MSG		msg;
+
+	if (win_close_on_error->intValue)
+	{
+		Sys_Quit();
+		return;
+	}
 
 	// Make sure all subsystems are down
 	CL_Shutdown ();

@@ -63,6 +63,10 @@ cvar_t	*showtrace;
 cvar_t	*dedicated;
 cvar_t	*cfg_default; /* FS: Added */
 
+#ifdef _WIN32 /* FS */
+cvar_t	*win_close_on_error;
+#endif
+
 FILE	*logfile;
 
 int		server_state;
@@ -1474,6 +1478,11 @@ void Qcommon_Init (int argc, char **argv)
 	dedicated = Cvar_Get ("dedicated", "0", CVAR_NOSET);
 #endif
 
+#ifdef _WIN32
+	win_close_on_error = Cvar_Get("win_close_on_error", "0", 0);
+	Cvar_Set_Description("win_close_on_error", "Silently terminate Daikatana if a Sys_Error() is generated.  Useful for dedicated servers.");
+#endif
+
 	s = va("Q2DOS %4.2f %s %s %s", VERSION, CPUSTRING, __DATE__, BUILDSTRING);
 	Cvar_Get ("version", s, CVAR_SERVERINFO|CVAR_NOSET);
 
@@ -1662,7 +1671,6 @@ Qcommon_Shutdown
 */
 void Qcommon_Shutdown (void)
 {
-	Cvar_Shutdown();
 }
 
 /*
