@@ -682,7 +682,7 @@ static void WinParseEarlyParms (void)
 	for (i = 1; i < argc; i++)
 	{
 #ifdef DEDICATED_ONLY
-		if (!strnicmp(argv[i], "-cwd", 3))
+		if (!strnicmp(argv[i], "-cwd", 4))
 		{
 			if (_chdir(argv[i+1]))
 			{
