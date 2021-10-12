@@ -881,6 +881,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\win32\service.c"
+				>
+			</File>
+			<File
 				RelativePath="..\SERVER\sv_ccmds.c"
 				>
 				<FileConfiguration
@@ -1387,6 +1391,10 @@
 			</File>
 			<File
 				RelativePath="..\server\server.h"
+				>
+			</File>
+			<File
+				RelativePath="..\win32\service.h"
 				>
 			</File>
 			<File

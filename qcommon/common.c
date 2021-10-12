@@ -1480,7 +1480,7 @@ void Qcommon_Init (int argc, char **argv)
 
 #ifdef _WIN32
 	win_close_on_error = Cvar_Get("win_close_on_error", "0", 0);
-	Cvar_SetDescription("win_close_on_error", "Silently terminate Daikatana if a Sys_Error() is generated.  Useful for dedicated servers.");
+	Cvar_SetDescription("win_close_on_error", "Silently terminate Q2DOS if a Sys_Error() is generated.  Useful for dedicated servers.");
 #endif
 
 	s = va("Q2DOS %4.2f %s %s %s", VERSION, CPUSTRING, __DATE__, BUILDSTRING);

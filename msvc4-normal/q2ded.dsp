@@ -200,6 +200,10 @@ SOURCE=..\SERVER\sv_world.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\WIN32\service.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\WIN32\sys_win.c
 # End Source File
 # Begin Source File

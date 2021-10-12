@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../qcommon/qcommon.h"
 #include "winquake.h"
+#include "service.h"
 #include "resource.h"
 #include <errno.h>
 #include <float.h>
@@ -51,6 +52,7 @@ unsigned int	sys_frame_time;
 int		argc;
 char	*argv[MAX_NUM_ARGVS];
 
+char cmdline[4096] = { "\0" };
 
 /*
 ===============================================================================
@@ -97,7 +99,10 @@ void Sys_Quit (void)
 
 	Cvar_Shutdown(); /* FS: Free our CVAR memory too */
 
-	exit (0);
+#ifdef DEDICATED_ONLY
+	if (!bRunningAsService)
+#endif
+		exit (0);
 }
 
 
@@ -670,6 +675,40 @@ void Detect_WinNT (void) /* FS: Detect if we're using Windows XP for alt+tab app
 	}
 }
 
+static void WinParseEarlyParms (void)
+{
+	int i;
+
+	for (i = 1; i < argc; i++)
+	{
+#ifdef DEDICATED_ONLY
+		if (!strnicmp(argv[i], "-cwd", 3))
+		{
+			if (_chdir(argv[i+1]))
+			{
+				switch (errno)
+				{
+					case ENOENT:
+						printf( "Unable to locate the directory: %s\n", argv[1] );
+						break;
+					case EINVAL:
+						printf( "Invalid buffer.\n");
+						break;
+					default:
+						printf( "Unknown error.\n");
+				}
+			}
+			else
+			{
+				char buff[250];
+				_getcwd(buff, sizeof(buff)-1);
+				printf("CWD set to %s\n", buff);
+			}
+		}
+#endif
+	}
+}
+
 /*
 ==================
 WinMain
@@ -686,11 +725,28 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
     if (hPrevInstance)
         return 0;
 
+	if (hInstance)
+		strncpy (cmdline, lpCmdLine, sizeof(cmdline) - 1);
+
 	global_hInstance = hInstance;
 
 	Detect_WinNT(); /* FS */
 
 	ParseCommandLine (lpCmdLine);
+	WinParseEarlyParms();
+
+//hInstance is empty when we are back here with service code
+#ifdef DEDICATED_ONLY
+	if (hInstance && argc > 1)
+	{
+		if (!strcmp(argv[1], "-service"))
+		{
+			bRunningAsService = true;
+			return main();
+		}
+	}
+#endif
+
 // Knightmare added- new dedicated console
 #ifdef NEW_DED_CONSOLE
 	Sys_InitDedConsole ();

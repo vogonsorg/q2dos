@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../qcommon/qcommon.h"
 #include "resource.h"
 #include "winquake.h"
-
+#include "service.h"
 
 #ifdef NEW_DED_CONSOLE
 
@@ -107,6 +107,11 @@ void Sys_ConsoleOutput (char *text)
 	char	buffer[MAX_PRINTMSG];
 	int		len = 0;
 
+#ifdef DEDICATED_ONLY
+	if (bRunningAsService)
+		return;
+#endif
+
 	// Change \n to \r\n so it displays properly in the edit box and
 	// remove color escapes
 	while (*text)
@@ -154,9 +159,16 @@ void Sys_Error (char *error, ...)
 	va_list	argPtr;
 	MSG		msg;
 
+#ifdef DEDICATED_ONLY
+	if (bRunningAsService || win_close_on_error->intValue)
+#else
 	if (win_close_on_error->intValue)
+#endif
 	{
-		Sys_Quit();
+		va_start (argPtr, error);
+		Q_vsnprintf(string, sizeof(string), error, argPtr);
+		Com_Printf("*** ERROR *** %s\n", string);
+		Com_Quit();
 		return;
 	}
 
@@ -209,6 +221,11 @@ Sys_ShowConsole
 */
 void Sys_ShowConsole (qboolean show)
 {
+#ifdef DEDICATED_ONLY
+	if (bRunningAsService)
+		return;
+#endif
+
 	if (!show)
 	{
 		ShowWindow(sys_console.hWnd, SW_HIDE);
@@ -363,6 +380,11 @@ Sys_ShutdownConsole
 */
 void Sys_ShutdownConsole (void)
 {
+#ifdef DEDICATED_ONLY
+	if (bRunningAsService)
+		return;
+#endif
+
 	if (sys_console.timerActive)
 		KillTimer(sys_console.hWnd, 1);
 
@@ -403,6 +425,11 @@ void Sys_InitDedConsole (void)
 	HDC			hDC;
 	RECT		r;
 	int			x, y, w, h;
+
+#ifdef DEDICATED_ONLY
+	if (bRunningAsService)
+		return;
+#endif
 
 	// Center the window in the desktop
 	hDC = GetDC(0);
@@ -493,6 +520,10 @@ void Sys_InitDedConsole (void)
 
 void Sys_DedConsoleCheckHostname (void)
 {
+#ifdef DEDICATED_ONLY
+	if (bRunningAsService)
+		return;
+#endif
 	if (hostname && hostname->modified && hostname->string[0])
 	{
 		Com_sprintf(dedWindowName, sizeof(dedWindowName), "%s - %s", CONSOLE_WINDOW_NAME, hostname->string);
